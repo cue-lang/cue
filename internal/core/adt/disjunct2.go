@@ -695,6 +695,7 @@ func (n *nodeContext) finalizeDisjunctions() {
 		Values:      a,
 		NumDefaults: p,
 		HasDefaults: hasDefaults,
+		owner:       n.node,
 	}
 
 	v := n.node

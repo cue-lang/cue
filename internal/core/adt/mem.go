@@ -222,12 +222,20 @@ skipRoot:
 func (r reclaimer) reclaimBaseValueBuffers(v *Vertex) {
 	switch x := v.BaseValue.(type) {
 	case *Disjunction:
+		// A cloned Vertex (see [overlayContext.cloneVertex]) shares its
+		// BaseValue with the original vertex, so only the owner may reclaim
+		// the disjuncts, which may still be pending finalization there.
+		if x.owner != v {
+			break
+		}
 		for _, d := range x.Values {
 			if v, ok := d.(*Vertex); ok {
 				r.ctx.reclaimRecursive(v)
 			}
 		}
 	case *Conjunction:
+		// TODO(mem): Conjunction values may be shared with a clone in the
+		// same way, but there is no ownership record to guard with yet.
 		for _, d := range x.Values {
 			if v, ok := d.(*Vertex); ok {
 				r.ctx.reclaimRecursive(v)

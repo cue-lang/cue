@@ -1,0 +1,158 @@
+# An import with an explicit package qualifier matching the implied one,
+# such as "x.example/a:a", must resolve just like the unqualified form.
+# Three scenarios cover paths where the qualified spelling diverges:
+#
+# - miss: the qualified import is in a dependency module whose own default
+#   selects the major version; the main module does not use the import path.
+# - wrongmajor: as above, but the main module also resolves the same import
+#   path under a different default major version.
+# - replace: a module replacement rewrite makes the qualifier redundant,
+#   e.g. "example.com/foo:bar" becoming "example.com/bar:bar".
+#
+# Issue: https://cuelang.org/issue/4446
+
+# TODO(4446): should succeed and print the contents of "want".
+cd $WORK/miss
+! exec cue export .
+stderr 'import failed: no dependency found for package "x.example/a"'
+
+# TODO(4446): "other" should be "v1", per x.example/b's own default;
+# instead the qualified import silently reuses the main module's v0.
+cd $WORK/wrongmajor
+exec cue export .
+cmp stdout want
+
+# TODO(4446): should succeed and print the contents of "want".
+cd $WORK/replace
+! exec cue export .
+stderr 'import failed: no dependency found for package "example.com/bar"'
+
+-- miss/cue.mod/module.cue --
+module: "m.example@v0"
+language: version: "v0.9.0"
+deps: {
+	"x.example/a@v1": v: "v1.0.0"
+	"x.example/b@v0": v: "v0.0.0"
+}
+-- miss/main.cue --
+package main
+
+import "x.example/b@v0"
+
+out: b.out
+
+-- miss/want --
+{
+    "out": "v1"
+}
+-- wrongmajor/cue.mod/module.cue --
+module: "m.example@v0"
+language: version: "v0.9.0"
+deps: {
+	"x.example/a@v0": {
+		default: true
+		v: "v0.0.0"
+	}
+	"x.example/a@v1": v: "v1.0.0"
+	"x.example/b@v0": {
+		default: true
+		v: "v0.0.0"
+	}
+}
+-- wrongmajor/main.cue --
+package main
+
+import (
+	"x.example/a"
+	"x.example/b"
+)
+
+direct: a.value
+other:  b.out
+
+-- wrongmajor/want --
+{
+    "direct": "v0",
+    "other": "v0"
+}
+-- replace/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+
+deps: {
+	"example.com/bar@v0": {
+		v: "v0.1.0"
+	}
+}
+-- replace/cue.mod/local-module.cue --
+deps: {
+	"example.com/bar@v0": {
+		v: "v0.1.0"
+		replaceWith: "example.com/foo@v0.1.0"
+	}
+}
+-- replace/main.cue --
+package main
+
+import "example.com/bar@v0:lib"
+
+out: lib.value
+
+-- replace/want --
+{
+    "out": "from replacement"
+}
+-- _registry/x.example_a_v0.0.0/cue.mod/module.cue --
+module: "x.example/a@v0"
+language: version: "v0.9.0"
+-- _registry/x.example_a_v0.0.0/a.cue --
+package a
+
+value: "v0"
+
+-- _registry/x.example_a_v1.0.0/cue.mod/module.cue --
+module: "x.example/a@v1"
+language: version: "v0.9.0"
+-- _registry/x.example_a_v1.0.0/a.cue --
+package a
+
+value: "v1"
+
+-- _registry/x.example_b_v0.0.0/cue.mod/module.cue --
+module: "x.example/b@v0"
+language: version: "v0.9.0"
+deps: "x.example/a@v1": {
+	default: true
+	v:       "v1.0.0"
+}
+-- _registry/x.example_b_v0.0.0/b.cue --
+package b
+
+import "x.example/a:a"
+
+out: a.value
+
+-- _registry/example.com_bar_v0.1.0/cue.mod/module.cue --
+module: "example.com/bar@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_bar_v0.1.0/lib.cue --
+package lib
+
+value: "from original (should not see this)"
+
+-- _registry/example.com_foo_v0.1.0/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.9.0"
+-- _registry/example.com_foo_v0.1.0/lib.cue --
+package lib
+
+// The qualifier "bar" matches the final element of the original module
+// path, so the replacement rewrite makes it redundant.
+import "example.com/foo:bar"
+
+value: bar.value
+
+-- _registry/example.com_foo_v0.1.0/bar.cue --
+package bar
+
+value: "from replacement"

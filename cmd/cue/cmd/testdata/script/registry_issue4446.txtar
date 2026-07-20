@@ -11,13 +11,10 @@
 #
 # Issue: https://cuelang.org/issue/4446
 
-# TODO(4446): should succeed and print the contents of "want".
 cd $WORK/miss
-! exec cue export .
-stderr 'import failed: no dependency found for package "x.example/a"'
+exec cue export .
+cmp stdout want
 
-# TODO(4446): "other" should be "v1", per x.example/b's own default;
-# instead the qualified import silently reuses the main module's v0.
 cd $WORK/wrongmajor
 exec cue export .
 cmp stdout want
@@ -73,7 +70,7 @@ other:  b.out
 -- wrongmajor/want --
 {
     "direct": "v0",
-    "other": "v0"
+    "other": "v1"
 }
 -- replace/cue.mod/module.cue --
 module: "example.com/main@v0"

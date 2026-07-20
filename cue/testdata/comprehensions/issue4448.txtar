@@ -45,8 +45,7 @@ app: {
 		_port: 8080 @test(eq, 8080)
 		spec: {
 			src: "x" @test(eq, "x")
-			tags: [#cfg._all] @test(err, at=0.0, code=incomplete,
-				contains="invalid interpolation", contains="non-concrete value", pos=[-19:13]) @test(eq:todo, [["8080"]])
+			tags: [#cfg._all] @test(eq, [["8080"]])
 		}
 	}
 }
@@ -55,15 +54,11 @@ app: {
     ./in.cue:19:13
 [incomplete] #Mixin.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
     ./in.cue:19:13
-[incomplete] app.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
-    ./in.cue:19:13
-[incomplete] app.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
-    ./in.cue:19:13
 -- out/eval/stats --
 Leaks:  4
 Freed:  45
-Reused: 23
-Allocs: 26
+Reused: 28
+Allocs: 21
 Retain: 0
 
 Unifications: 41

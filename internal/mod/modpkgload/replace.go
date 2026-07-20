@@ -258,6 +258,10 @@ func (r *Replacements) Lookup(modulePath string) (Replacement, bool) {
 // module's namespace. For example, if original module "a.com/foo" is replaced
 // by "b.com/bar", then "b.com/bar/subpkg" is rewritten to "a.com/foo/subpkg".
 //
+// A rewritten path is returned in canonical form: rewriting the path can
+// change whether the qualifier is redundant, and downstream package
+// registration and lookups assume canonical paths.
+//
 // If no rewriting is needed, importPath is returned unchanged.
 func (r *Replacements) CanonicalImportPath(importPath string) string {
 	if r == nil {
@@ -274,7 +278,7 @@ func (r *Replacements) CanonicalImportPath(importPath string) string {
 			} else {
 				parts.Path = origBase
 			}
-			return parts.String()
+			return parts.Canonical().String()
 		}
 		i := strings.LastIndex(p, "/")
 		if i < 0 {

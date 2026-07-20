@@ -19,10 +19,9 @@ cd $WORK/wrongmajor
 exec cue export .
 cmp stdout want
 
-# TODO(4446): should succeed and print the contents of "want".
 cd $WORK/replace
-! exec cue export .
-stderr 'import failed: no dependency found for package "example.com/bar"'
+exec cue export .
+cmp stdout want
 
 -- miss/cue.mod/module.cue --
 module: "m.example@v0"

@@ -89,6 +89,12 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 		recloseStack = recloseStack[:len(recloseStack)-1]
 		c.ClearEnclosingModified()
 	}
+	// Each struct literal collects the embedFlags of its own embedded
+	// declarations and decides its wrapper from exactly those: flags
+	// must not leak to sibling literals in the same scope. Enclosing
+	// literals re-collect them through collectEmbedFlags, which
+	// descends into embedded literals.
+	var flagsStack []embedFlags
 	result = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
@@ -126,6 +132,10 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 
 		case *ast.EmbedDecl:
 			info.suspendReclose++
+
+		case *ast.StructLit:
+			flagsStack = append(flagsStack, info.embedFlags)
+			info.embedFlags = embedFlags{}
 		}
 		return true
 	}, func(c astutil.Cursor) bool {
@@ -173,6 +183,9 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 			}
 
 		case *ast.StructLit:
+			flags := info.embedFlags
+			info.embedFlags = flagsStack[len(flagsStack)-1]
+			flagsStack = flagsStack[:len(flagsStack)-1]
 			if c.Modified() && info.shouldReclose() {
 				hasChanges = true
 
@@ -181,7 +194,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 				// They still apply when the embedded expression guarantees
 				// the closing by itself (a definition, with no operand
 				// that needs a runtime check).
-				closeSubsumed := info.def && !info.other && !info.forceReclose
+				closeSubsumed := flags.def && !flags.other && !flags.forceReclose
 
 				// Single embedding: { expr } ≡ expr, so the wrapper can
 				// often be omitted. This is decided in post-processing
@@ -190,7 +203,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 				// element count.
 				if embed, ok := singleEmbed(n); ok {
 					if pf, ok := embed.Expr.(*ast.PostfixExpr); ok && pf.Op == token.ELLIPSIS {
-						if !info.close || closeSubsumed {
+						if !flags.close || closeSubsumed {
 							// Use the expression directly without
 							// wrapping; strip the ... since it is not
 							// needed outside a wrapper.
@@ -207,7 +220,7 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 					} else {
 						// A bare embedding: the struct argument of a
 						// hoisted close() call.
-						if !info.close {
+						if !flags.close {
 							c.ClearEnclosingModified()
 							break
 						}
@@ -223,14 +236,14 @@ func fixExplicitOpen(f *ast.File) (result *ast.File, hasChanges bool) {
 				ast.SetRelPos(n, token.NoSpace)
 				var wrapper ast.Expr = n
 				switch {
-				case info.def && !info.forceReclose:
+				case flags.def && !flags.forceReclose:
 					wrapper = ast.NewCall(ast.NewIdent("__closeAll"), n)
-				case info.other || info.forceReclose:
+				case flags.other || flags.forceReclose:
 					wrapper = ast.NewCall(ast.NewIdent("__reclose"), n)
-					if info.close {
+					if flags.close {
 						wrapper = ast.NewCall(ast.NewIdent("close"), wrapper)
 					}
-				case info.close:
+				case flags.close:
 					wrapper = ast.NewCall(ast.NewIdent("close"), n)
 				}
 				c.Replace(wrapper)
@@ -316,8 +329,17 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 			return embedFlags{other: true}
 		}
 		return embedFlags{}
+	case *ast.StructLit:
+		// A struct literal is open by itself, but embeddings inside
+		// it may still close it.
+		var f embedFlags
+		for _, d := range x.Elts {
+			if e, ok := d.(*ast.EmbedDecl); ok {
+				f = f.or(collectEmbedFlags(e.Expr))
+			}
+		}
+		return f
 	case *ast.ListLit, // Lists cannot be opened anyway (atm).
-		*ast.StructLit, // Structs are open by default.
 		*ast.BasicLit,
 		*ast.Interpolation:
 		return embedFlags{}
@@ -352,6 +374,12 @@ func openEmbedExpr(expr ast.Expr) (result ast.Expr, changed bool, flags embedFla
 	case *ast.ParenExpr:
 		// Add ... to the whole parenthesized expression.
 		return addEllipsis(expr), true, collectEmbedFlags(x)
+
+	case *ast.StructLit:
+		// The literal itself needs no ellipsis — its inner embeddings
+		// were already opened — but their flags still influence the
+		// wrapping of the enclosing struct.
+		return expr, false, collectEmbedFlags(x)
 
 	case *ast.CallExpr:
 		if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "close" {

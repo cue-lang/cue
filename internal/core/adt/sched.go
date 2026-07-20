@@ -534,16 +534,13 @@ processNextTask:
 			// A comprehension still evaluating its clauses does not defer
 			// resolvers: its guards may depend on the resolver's conjuncts.
 			continue
-		case hasPendingDisjunction && t.run == handleComprehension &&
-			t.completes == allTasksCompleted:
+		case hasPendingDisjunction && t.isPushedDownComp():
 			// Defer pushed-down comprehensions until pending
-			// disjunctions have expanded the parent into disjuncts.
-			// Only comps whose body was fully pushed down (after
-			// pushDownDeps, completes == allTasksCompleted) are
-			// delayed: such comps need to run inside each disjunct
-			// so the pushed-down arcs see that disjunct's view.
-			// Comps with broader completes (e.g. for-comps over a
-			// list) are not delayed.
+			// disjunctions have expanded the parent into disjuncts:
+			// such comps need to run inside each disjunct so the
+			// pushed-down arcs see that disjunct's view. Comps with
+			// broader completes (e.g. for-comps over a list) are not
+			// delayed.
 			continue
 		default:
 			runTask(t, mode)

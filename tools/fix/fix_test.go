@@ -490,6 +490,45 @@ s2: close(__reclose({o...}))
 		},
 
 		{
+			// Embedding flags must not leak between sibling struct
+			// literals in one scope: each literal's wrapper is decided by
+			// its own embeddings. A literal embedded directly in another
+			// still carries its flags to the enclosing literal.
+			// TODO: the def flag from the first operand upgrades the
+			// second operand's __reclose to __closeAll, unconditionally
+			// closing a struct whose own embedding only warranted a
+			// runtime check.
+			name: "sibling struct literals in a conjunction (fixExplicitOpen)",
+			exps: []string{"explicitopen"},
+			in: `package foo
+
+#A: {a: int, d: int}
+o: {}
+
+v: {#A} & {o, d: 2}
+
+w: {
+	{#A}
+	extra: 1
+}
+`,
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: {a: int, d: int}
+o:  {}
+
+v: {#A} & __closeAll({o..., d: 2})
+
+w: __closeAll({
+	{#A...}
+	extra: 1
+})
+`,
+		},
+
+		{
 			// Blank aliases bind nothing that can be referenced; they must be
 			// dropped rather than converted to blank postfix aliases, which
 			// Sanitize rejects, or to an invalid "let _ = self".

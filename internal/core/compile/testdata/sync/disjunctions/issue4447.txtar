@@ -1,0 +1,20 @@
+# Reclaiming a failed disjunct used to descend into the Disjunction base
+# values of its arcs. A cloned vertex shares its base value with the vertex
+# it was cloned from, so this freed disjuncts that were still pending
+# finalization there, panicking in finalizeDisjunctions.
+# See: https://cuelang.org/issue/4447
+-- in.cue --
+t1: {
+	a: 0 | 1
+	a
+	a * 0
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    a: (0|1)
+    〈0;a〉
+    (〈0;a〉 * 0)
+  }
+}

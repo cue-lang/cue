@@ -2061,6 +2061,12 @@ type Disjunction struct {
 	// NumDefaults indicates the number of default values.
 	NumDefaults int
 	HasDefaults bool
+
+	// owner, if set, is the Vertex whose disjuncts Values holds. Cloned
+	// vertices share BaseValue with the vertex they were cloned from; only
+	// the owner may reclaim the Values. See
+	// [reclaimer.reclaimBaseValueBuffers].
+	owner *Vertex
 }
 
 func (x *Disjunction) Source() ast.Node { return x.Src }

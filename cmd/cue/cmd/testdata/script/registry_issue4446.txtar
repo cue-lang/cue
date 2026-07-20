@@ -4,9 +4,8 @@
 # unqualified "x.example/a" form.
 # Issue: https://cuelang.org/issue/4446
 
-# TODO(4446): this should succeed and print the contents of "want".
-! exec cue export .
-stderr 'import failed: no dependency found for package "x.example/a"'
+exec cue export .
+cmp stdout want
 
 -- cue.mod/module.cue --
 module: "m.example@v0"

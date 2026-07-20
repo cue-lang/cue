@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a6dec8d_142b27c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-07-20T13:03:02Z",
+      "side": 1,
+      "message": "Seems reasonable. The only thing is that we could maybe avoid that memory, but this is certainly the clearer and safer thing to do. You might want to add a to-do to see if you can get rid of this field, but since these junctions are relatively rare, I think it\u0027s probably not a problem.",
+      "revId": "ef0714e28b3de88204bd619b1b4fe8474b67fb25",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

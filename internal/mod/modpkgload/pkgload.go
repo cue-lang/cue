@@ -178,7 +178,11 @@ func (pkg *Package) Mod() module.Version {
 // This is used for external module packages where the importing module's
 // default major versions differ from the main module's.
 func (pkg *Package) CanonicalImportPath(rawPath string) string {
-	if p, ok := pkg.resolvedImports[rawPath]; ok {
+	// The resolvedImports keys are canonical import paths (see
+	// [modimports.AllImports]), so canonicalize the raw path before looking
+	// it up; e.g. "foo.com/bar:bar" is stored as "foo.com/bar".
+	path := ast.ParseImportPath(rawPath).Canonical().String()
+	if p, ok := pkg.resolvedImports[path]; ok {
 		return p
 	}
 	return rawPath

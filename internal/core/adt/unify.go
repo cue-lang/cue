@@ -812,6 +812,38 @@ func root(v *Vertex) *Vertex {
 	return v
 }
 
+// arcSettledForLookup reports whether the arc for f is already a member
+// whose conjunct set cannot be affected by pushed-down comprehension
+// tasks, so that a lookup-driven process call may leave those tasks
+// unforced by dropping allTasksCompleted from its needs mask.
+//
+// This preserves the fine-grained dependency tracking of comprehension
+// pushdown: a pushed-down comprehension task (see [task.isPushedDownComp])
+// contributes conjuncts solely to the arcs it pre-created at scheduling
+// time, so one that may still contribute to f is found in the parentTasks
+// of this node or of the arc itself.
+//
+// TODO(cycle): this guard removes one trigger of a deeper problem. When a
+// forced task resolves a disjunction, doDisjunct leaks finalize mode into
+// vertices outside its overlay, and the freeze cycle-breaker then commits
+// permanent incomplete errors for tasks blocked on a vertex that is merely
+// in-flight on the evaluation stack, not semantically cyclic. A more
+// principled fix would distinguish stack re-entrancy from value cycles in
+// the freeze path, or keep finalize scoped to the disjunct overlay.
+func (n *nodeContext) arcSettledForLookup(f Feature) bool {
+	// An ancestor comprehension may still add conjuncts to this node.
+	if n.hasActiveParentTask() {
+		return false
+	}
+	arc := n.node.LookupRaw(f)
+	if arc == nil || arc.ArcType != ArcMember {
+		return false
+	}
+	// Pushed-down comprehensions that may contribute to f, whether from
+	// this node or an ancestor, are registered on the arc itself.
+	return arc.state == nil || !arc.state.hasActiveParentTask()
+}
+
 func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Vertex {
 	needs := flags.condition
 	runMode := flags.mode
@@ -851,9 +883,17 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 
 		// Drive the lookup target forward when its scheduler has not yet
 		// started everything; the !allTasksStarted guard keeps us out of
-		// nodes that are already mid-execution.
+		// nodes that are already mid-execution. When the requested arc is
+		// already settled (see [nodeContext.arcSettledForLookup]), drop
+		// allTasksCompleted from the needs mask: the selectTasks filter in
+		// process then skips pushed-down comprehensions, which cannot
+		// affect the arc, instead of forcing them.
 		if !allTasksStarted(state) {
-			state.process(valueKnown|fieldConjunctsKnown|allTasksCompleted, attemptOnly)
+			needs := valueKnown | fieldConjunctsKnown | allTasksCompleted
+			if state.arcSettledForLookup(f) {
+				needs = valueKnown | fieldConjunctsKnown
+			}
+			state.process(needs, attemptOnly)
 			state.updateScalar()
 		}
 	}

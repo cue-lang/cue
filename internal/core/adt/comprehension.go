@@ -334,3 +334,12 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 
 	return completes | allTasksCompleted
 }
+
+// isPushedDownComp reports whether t is a comprehension task whose body
+// was fully pushed down: [pushDownDeps] returns bare allTasksCompleted
+// exactly when the body consists of literal fields only. Such a task
+// contributes conjuncts solely to the arcs it pre-created at scheduling
+// time, registering itself in their parentTasks.
+func (t *task) isPushedDownComp() bool {
+	return t.run == handleComprehension && t.completes == allTasksCompleted
+}

@@ -249,8 +249,7 @@ func hasDeferredCompAncestor(v *Vertex) bool {
 			return false
 		}
 		for _, t := range p.state.tasks {
-			if t.run == handleComprehension &&
-				t.completes == allTasksCompleted {
+			if t.isPushedDownComp() {
 				return true
 			}
 		}

@@ -1,0 +1,108 @@
+# Tests that looking up a settled member arc (_port) does not force an
+# unrelated pushed-down comprehension guard on the same node. Forcing the
+# guard resolved the spec disjunction, whose evaluation re-entered the
+# in-flight port vertex and froze the "\(port)" interpolation into a
+# permanent incomplete error, even though port resolved to 8080 right
+# after. The test is sensitive to evaluation order; the unused _s field
+# and the m alias are needed to trigger the original failure.
+# https://cuelang.org/issue/4448
+
+-- in.cue --
+import (
+	"list"
+	"strings"
+)
+
+_s: strings.ToLower("A")
+
+#App: {
+	units: {_elem: {
+		spec: {src: string, tags: _} | {tags: _}
+		if spec != _|_ {}
+	}}
+	m: units._elem
+}
+
+#Mixin: {
+	#cfg: {
+		entries: w: {
+			_lines: ["\(port)"]
+			port: _
+		}
+		_all: list.Concat([entries.w._lines])
+	}
+
+	...
+}
+
+app: #App
+app: #Mixin
+app: {
+	#cfg: entries: w: {
+		port: units._elem._port
+	}
+	units: _elem: {
+		_port: 8080
+		spec: {
+			src: "x"
+			tags: [#cfg._all]
+		}
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  _s: 〈import;strings〉.ToLower("A")
+  #App: {
+    units: {
+      _elem: {
+        spec: ({
+          src: string
+          tags: _
+        }|{
+          tags: _
+        })
+        if (〈0;spec〉 != _|_(explicit error (_|_ literal) in source)) {}
+      }
+    }
+    m: 〈0;units〉._elem
+  }
+  #Mixin: {
+    #cfg: {
+      entries: {
+        w: {
+          _lines: [
+            "\(〈1;port〉)",
+          ]
+          port: _
+        }
+      }
+      _all: 〈import;list〉.Concat([
+        〈1;entries〉.w._lines,
+      ])
+    }
+    ...
+  }
+  app: 〈0;#App〉
+  app: 〈0;#Mixin〉
+  app: {
+    #cfg: {
+      entries: {
+        w: {
+          port: 〈3;units〉._elem._port
+        }
+      }
+    }
+    units: {
+      _elem: {
+        _port: 8080
+        spec: {
+          src: "x"
+          tags: [
+            〈4;#cfg〉._all,
+          ]
+        }
+      }
+    }
+  }
+}

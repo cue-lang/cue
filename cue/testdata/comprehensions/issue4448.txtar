@@ -1,0 +1,73 @@
+# Tests that looking up a settled member arc (_port) does not force an
+# unrelated pushed-down comprehension guard on the same node. Forcing the
+# guard resolved the spec disjunction, whose evaluation re-entered the
+# in-flight port vertex and froze the "\(port)" interpolation into a
+# permanent incomplete error, even though port resolved to 8080 right
+# after. The test is sensitive to evaluation order; the unused _s field
+# and the m alias are needed to trigger the original failure.
+# https://cuelang.org/issue/4448
+
+-- in.cue --
+import (
+	"list"
+	"strings"
+)
+
+_s: strings.ToLower("A") @test(eq, "a")
+
+#App: {
+	units: {_elem: {
+		spec: {src: string, tags: _} | {tags: _}
+		if spec != _|_ {}
+	}}
+	m: units._elem
+}
+
+#Mixin: {
+	#cfg: {
+		entries: w: {
+			_lines: ["\(port)"]
+			port: _
+		}
+		_all: list.Concat([entries.w._lines])
+	}
+
+	...
+}
+
+app: #App
+app: #Mixin
+app: {
+	#cfg: entries: w: {
+		port: units._elem._port @test(eq, 8080)
+	}
+	units: _elem: {
+		_port: 8080 @test(eq, 8080)
+		spec: {
+			src: "x" @test(eq, "x")
+			tags: [#cfg._all] @test(err, at=0.0, code=incomplete,
+				contains="invalid interpolation", contains="non-concrete value", pos=[-19:13]) @test(eq:todo, [["8080"]])
+		}
+	}
+}
+-- out/errors.txt --
+[incomplete] #Mixin.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:19:13
+[incomplete] #Mixin.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:19:13
+[incomplete] app.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:19:13
+[incomplete] app.#cfg.entries.w._lines.0: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:19:13
+-- out/eval/stats --
+Leaks:  4
+Freed:  45
+Reused: 23
+Allocs: 26
+Retain: 0
+
+Unifications: 41
+Conjuncts:    64
+Disjuncts:    4
+
+NumCloseIDs: 9

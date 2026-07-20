@@ -261,6 +261,30 @@ compLiteralField: {
 		{enable: true, egress: {a: 1, extra: 1, extra2: 2}})
 }
 
+// Sibling struct literals in one conjunction each decide their own
+// wrapper: the def flag from the first operand must not upgrade the
+// second operand's __reclose to __closeAll.
+siblingOperands: {
+	#A: {a: int, d: int}
+	o: {}
+	v: {#A} & {o, d: 2}
+
+	t1: v & {a: 1} @test(eq, {a: 1, d: 2})
+}
+
+// A struct literal embedded directly in another literal carries its
+// inner embedding flags to the enclosing struct.
+nestedLiteral: {
+	#B: {x: int}
+	v: {
+		{#B}
+		extra: 1
+	}
+
+	t1: v & {x: 1}    @test(eq, {x: 1, extra: 1})
+	t2: v & {more: 2} @test(err, code=eval, path=more, contains="field not allowed")
+}
+
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
@@ -335,21 +359,23 @@ compLiteralField: {
 [eval] conjunctComplex.tb5.b: field not allowed:
     ./in.cue:83:8
 [eval] embeddedCloseField.t3.c: field not allowed:
-    ./in.cue:112:11
+    ./in.cue:131:11
 [incomplete] defaultDisjunct.#S: incomplete bool: bool:
-    ./in.cue:148:11
+    ./in.cue:167:11
 [eval] andField.v.c: field not allowed:
-    ./in.cue:161:15
+    ./in.cue:180:15
 [eval] andField.t1.c: field not allowed:
-    ./in.cue:161:15
+    ./in.cue:180:15
 [eval] andField.t2.c: field not allowed:
-    ./in.cue:161:15
+    ./in.cue:180:15
 [eval] selConjField.t2.c: field not allowed:
-    ./in.cue:190:11
+    ./in.cue:209:11
 [incomplete] compCallField.#S: incomplete bool: bool:
-    ./in.cue:193:11
+    ./in.cue:219:11
 [incomplete] compLiteralField.#S: incomplete bool: bool:
-    ./in.cue:213:11
+    ./in.cue:239:11
+[eval] nestedLiteral.t2.more: field not allowed:
+    ./in.cue:271:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -596,4 +622,28 @@ compLiteralField: {
 
 	t1: #S & {enable: true, egress: {a: 1, extra2: 2}} @test(eq,
 		{enable: true, egress: {a: 1, extra: 1, extra2: 2}})
+}
+
+// Sibling struct literals in one conjunction each decide their own
+// wrapper: the def flag from the first operand must not upgrade the
+// second operand's __reclose to __closeAll.
+siblingOperands: {
+	#A: {a: int, d: int}
+	o:  {}
+	v:  {#A} & __reclose({o..., d: 2})
+
+	t1: v & {a: 1} @test(eq, {a: 1, d: 2})
+}
+
+// A struct literal embedded directly in another literal carries its
+// inner embedding flags to the enclosing struct.
+nestedLiteral: {
+	#B: {x: int}
+	v: __closeAll({
+		{#B...}
+		extra: 1
+	})
+
+	t1: v & {x: 1}    @test(eq, {x: 1, extra: 1})
+	t2: v & {more: 2} @test(err, code=eval, path=more, contains="field not allowed")
 }

@@ -1,0 +1,50 @@
+# An import with an explicit package qualifier matching the implied one,
+# such as "x.example/a:a", where the imported module's major version comes
+# from the importing module's own default, should work just like the
+# unqualified "x.example/a" form.
+# Issue: https://cuelang.org/issue/4446
+
+# TODO(4446): this should succeed and print the contents of "want".
+! exec cue export .
+stderr 'import failed: no dependency found for package "x.example/a"'
+
+-- cue.mod/module.cue --
+module: "m.example@v0"
+language: version: "v0.9.0"
+deps: {
+	"x.example/a@v1": v: "v1.0.0"
+	"x.example/b@v0": v: "v0.0.0"
+}
+-- main.cue --
+package main
+
+import "x.example/b@v0"
+
+out: b.out
+
+-- _registry/x.example_a_v1.0.0/cue.mod/module.cue --
+module: "x.example/a@v1"
+language: version: "v0.9.0"
+-- _registry/x.example_a_v1.0.0/a.cue --
+package a
+
+value: "v1"
+
+-- _registry/x.example_b_v0.0.0/cue.mod/module.cue --
+module: "x.example/b@v0"
+language: version: "v0.9.0"
+deps: "x.example/a@v1": {
+	default: true
+	v:       "v1.0.0"
+}
+-- _registry/x.example_b_v0.0.0/b.cue --
+package b
+
+import "x.example/a:a"
+
+out: a.value
+
+-- want --
+{
+    "out": "v1"
+}

@@ -338,18 +338,25 @@ func parsePosSpecs(s string) ([]posSpec, error) {
 
 // parseArgsList parses a bracket-enclosed, comma-separated list of arg strings,
 // e.g. `["list", "int"]` → ["list", "int"].
-// Tokens wrapped in double quotes are unquoted via strconv.Unquote so that the
-// stored form (produced by formatErrMsg using strconv.Quote) round-trips back to
-// the original string that fmt.Sprint of the Msg() argument would produce.
+// Tokens are stored verbatim as produced by fmt.Sprint of the Msg() arguments
+// (see formatErrMsg). The attribute tokenizer splits on top-level commas only:
+// commas nested inside brackets, braces, parentheses, or strings are part of
+// the token, so values like `{a:1,b:2}` round-trip.
 func parseArgsList(s string) ([]string, error) {
 	inner, err := trimSurrounding(s, '[', ']')
 	if err != nil {
 		return nil, fmt.Errorf("error parsing args: %w", err)
 	}
+	syntheticAttr := internal.ParseAttr(&ast.Attribute{
+		Text: fmt.Sprintf("@test(%s)", inner),
+	})
+	if syntheticAttr.Err != nil {
+		return nil, fmt.Errorf("error parsing args: %v", syntheticAttr.Err)
+	}
 	var result []string
-	for tok := range strings.SplitSeq(inner, ",") {
-		tok = strings.TrimSpace(tok)
-		if tok != "" {
+	for _, kv := range syntheticAttr.Fields {
+		// Text is the verbatim token span, including any key= prefix.
+		if tok := strings.TrimSpace(kv.Text()); tok != "" {
 			result = append(result, tok)
 		}
 	}

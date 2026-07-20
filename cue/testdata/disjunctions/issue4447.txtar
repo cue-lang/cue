@@ -1,0 +1,37 @@
+# Reclaiming a failed disjunct used to descend into the Disjunction base
+# values of its arcs. A cloned vertex shares its base value with the vertex
+# it was cloned from, so this freed disjuncts that were still pending
+# finalization there, panicking in finalizeDisjunctions.
+# See: https://cuelang.org/issue/4447
+-- in.cue --
+t1: {
+	a: 0 | 1
+	a
+	a * 0
+	@test(err, code=eval,
+		suberr=(code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{a:(0|1),a,(a * 0)}, 0, struct, int], pos=[0:5, 1:5, 2:2]),
+		suberr=(code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{a:(0|1),a,(a * 0)}, 1, struct, int], pos=[0:5, 1:9, 2:2]))
+}
+-- out/errors.txt --
+[eval] t1: 2 errors in empty disjunction:
+t1: conflicting values {a:(0|1),a,(a * 0)} and 0 (mismatched types struct and int):
+    ./in.cue:1:5
+    ./in.cue:2:5
+    ./in.cue:3:2
+t1: conflicting values {a:(0|1),a,(a * 0)} and 1 (mismatched types struct and int):
+    ./in.cue:1:5
+    ./in.cue:2:9
+    ./in.cue:3:2
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 2
+Allocs: 7
+Retain: 0
+
+Unifications: 3
+Conjuncts:    10
+Disjuncts:    4
+Notifications: 1
+
+NumCloseIDs: 3

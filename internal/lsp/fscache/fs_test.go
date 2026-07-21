@@ -294,10 +294,9 @@ func TestReadCUENoDecls(t *testing.T) {
 	}
 }
 
-// TestOverlayFSRootedAtRoot shows bad behaviour: an overlay FS
-// rooted at the file system root panics when asked about the "."
-// name, because splitting the root into path components produces no
-// components at all.
+// TestOverlayFSRootedAtRoot tests that an overlay FS rooted at the
+// file system root copes with the "." name: historically this
+// panicked because splitting the root produced no path components.
 func TestOverlayFSRootedAtRoot(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("there is no meaningful bare root path on windows")
@@ -305,9 +304,12 @@ func TestOverlayFSRootedAtRoot(t *testing.T) {
 
 	fs := fscache.NewOverlayFS(fscache.NewCUECachedFS()).IoFS("/")
 
-	qt.Assert(t, qt.PanicMatches(
-		func() { _, _ = iofs.Stat(fs, ".") },
-		".*slice bounds out of range.*"))
+	fi, err := iofs.Stat(fs, ".")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsTrue(fi.IsDir()))
+
+	_, err = iofs.ReadDir(fs, ".")
+	qt.Assert(t, qt.IsNil(err))
 }
 
 func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {

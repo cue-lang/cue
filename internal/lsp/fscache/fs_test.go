@@ -258,11 +258,9 @@ func TestReadCUENonCUE(t *testing.T) {
 	}
 }
 
-// TestReadCUENoDecls shows bad behaviour: a CUE file with no
-// declarations (empty, or containing only comments) has a token.File
-// which carries no content and has the wrong size, because
-// ast.File.Pos fabricates a new, empty token.File on every call for
-// such files.
+// TestReadCUENoDecls tests that a CUE file with no declarations
+// (empty, or containing only comments) has a single stable token.File
+// which carries the file's content.
 func TestReadCUENoDecls(t *testing.T) {
 	contents := map[string]string{
 		"empty.cue":    "",
@@ -275,7 +273,7 @@ func TestReadCUENoDecls(t *testing.T) {
 	forceMFTUpdateOnWindows(t, dir)
 
 	fs := fscache.NewCUECachedFS()
-	for name := range contents {
+	for name, content := range contents {
 		uri := protocol.URIFromPath(filepath.Join(dir, name))
 		fh, err := fs.ReadFile(uri)
 		qt.Assert(t, qt.IsNil(err))
@@ -286,10 +284,12 @@ func TestReadCUENoDecls(t *testing.T) {
 
 		tokFile := syntax.Pos().File()
 		qt.Assert(t, qt.IsNotNil(tokFile))
-		// The tokFile carries no content,
-		qt.Assert(t, qt.HasLen(tokFile.Content(), 0), qt.Commentf("%s", name))
-		// and its size bears no relation to the file's.
-		qt.Assert(t, qt.Equals(tokFile.Size(), 1), qt.Commentf("%s", name))
+		// The tokFile must be stable across calls,
+		qt.Assert(t, qt.Equals(syntax.Pos().File(), tokFile), qt.Commentf("%s", name))
+		// carry the file's content,
+		qt.Assert(t, qt.DeepEquals(tokFile.Content(), []byte(content)), qt.Commentf("%s", name))
+		// and be correctly sized.
+		qt.Assert(t, qt.Equals(tokFile.Size(), len(content)), qt.Commentf("%s", name))
 	}
 }
 

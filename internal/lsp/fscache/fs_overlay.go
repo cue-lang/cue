@@ -577,6 +577,14 @@ func (fs *rootedOverlayFS) pathComponents(name string) ([]string, string) {
 	components = slices.DeleteFunc(components, func(component string) bool { return component == "" })
 
 	idx := len(components) - 1
+	if idx < 0 {
+		// name refers to the root of this FS itself, e.g. name is
+		// "." and the FS is rooted at "/". The overlay never
+		// contains an entry for the root, so return a name that
+		// cannot match any entry: callers will fall back to the
+		// delegate FS.
+		return nil, ""
+	}
 	return components[:idx], components[idx]
 }
 

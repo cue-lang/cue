@@ -2486,14 +2486,18 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 
 	case *ast.ListLit:
 		result.patternField = true
-		elt := label.Elts[0]
-		if alias, ok := elt.(*ast.Alias); ok {
-			// [X=e]: field
-			// X is only visible within field.
-			result.keyAliasIdent = alias.Ident
-			result.keyExpr = alias.Expr
-		} else {
-			result.exprs = append(result.exprs, elt)
+		if len(label.Elts) > 0 {
+			// If the source is invalid (e.g. mid-edit, "[]: field"),
+			// the parser can produce a pattern label with no elements.
+			elt := label.Elts[0]
+			if alias, ok := elt.(*ast.Alias); ok {
+				// [X=e]: field
+				// X is only visible within field.
+				result.keyAliasIdent = alias.Ident
+				result.keyExpr = alias.Expr
+			} else {
+				result.exprs = append(result.exprs, elt)
+			}
 		}
 	}
 

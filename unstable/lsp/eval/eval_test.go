@@ -2215,6 +2215,33 @@ foo: 3
 		},
 
 		{
+			name: "Pattern_EmptyLabel",
+			archive: `-- a.cue --
+foo: 3
+[]: bar: foo
+`,
+			// A pattern constraint whose label has no element is invalid
+			// CUE, but is an everyday state mid-edit: the parser reports
+			// an error and produces a partial AST containing a
+			// zero-element ListLit label.
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "foo"): {ln(1, 1, "foo")},
+
+				ln(1, 1, "foo"): {self},
+				ln(2, 1, "bar"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 4):   {f: []string{"foo"}},
+				or1(4):     {e: []string{"foo"}},
+				or1(6):     {e: []string{"foo"}},
+				or1(7):     {f: []string{"foo"}},
+				or1(10):    {f: []string{"bar"}, e: []string{"foo"}},
+				or(11, 15): {f: []string{"bar"}},
+				or(15, 20): {e: []string{"bar", "foo"}},
+			},
+		},
+
+		{
 			name: "Dynamic_Plain",
 			archive: `-- a.cue --
 foo: "x"
@@ -5926,17 +5953,3 @@ func (or *offsetRange) setFilename(filesByName map[string]*ast.File) {
 // expectation values to refer to that expectation's key. Typically
 // used to indicate a field's key should resolve to itself.
 var self = position{offset: math.MinInt}
-
-// TestPatternEmptyLabelPanics shows bad behaviour: a pattern
-// constraint whose label has no element is invalid CUE, but is an
-// everyday state mid-edit (the parser reports an error and produces
-// a partial AST containing a zero-element ListLit label), and
-// evaluating any frame containing such a field panics.
-func TestPatternEmptyLabelPanics(t *testing.T) {
-	const src = "foo: 3\n[]: bar: foo\n"
-	fileAst, _ := parser.ParseFile("a.cue", src, parser.ParseComments)
-	qt.Assert(t, qt.IsNotNil(fileAst))
-	fileAst.Pos().File().SetContent([]byte(src))
-	e := eval.New(eval.Config{}, fileAst)
-	qt.Assert(t, qt.PanicMatches(func() { e.ForFile("a.cue") }, ".*index out of range.*"))
-}

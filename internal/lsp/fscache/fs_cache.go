@@ -361,31 +361,24 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 	// NB filePath is GOOS-appropriate (uri.Path() calls [filepath.FromSlash])
 	filePath := uri.FilePath()
 
-	bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input)
-	if err != nil {
-		// Yes, throw the error away, and return an empty cueFileParser
-		// so that we record that this uri can never be converted to a
-		// CUE AST.
-		return &diskFileEntry{
-			modTime:       mtime,
-			uri:           uri,
-			cueFileParser: &cueFileParser{},
-		}, nil
-	}
-
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	bf.Source = content
+
+	parser := &cueFileParser{content: content}
+	if bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input); err == nil {
+		bf.Source = content
+		parser.buildFile = bf
+	}
+	// A nil buildFile records that this uri can never be converted to
+	// a CUE AST. The content is still available via
+	// [FileHandle.Content].
 
 	return &diskFileEntry{
-		modTime: mtime,
-		uri:     uri,
-		cueFileParser: &cueFileParser{
-			content:   content,
-			buildFile: bf,
-		},
+		modTime:       mtime,
+		uri:           uri,
+		cueFileParser: parser,
 	}, nil
 }
 

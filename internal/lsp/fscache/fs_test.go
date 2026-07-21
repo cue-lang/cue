@@ -233,12 +233,8 @@ func TestConvertToCueFS(t *testing.T) {
 	qt.Assert(t, qt.IsFalse(isCueable))
 }
 
-// TestReadCUENonCUE shows bad behaviour: for JSON and YAML files,
-// ReadCUE never assigns the config that it both returns to the
-// caller and stores as its cache-populated marker. The returned
-// config is therefore invalid, which is direct evidence that the
-// cache was left unpopulated, and every call re-parses the file:
-// repeated reads return distinct ASTs, each with its own token.File.
+// TestReadCUENonCUE tests that the parse of a JSON or YAML file is
+// cached just like a CUE file's: repeated reads return the same AST.
 func TestReadCUENonCUE(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "a.json"), `{"x": true}`)
@@ -254,16 +250,11 @@ func TestReadCUENonCUE(t *testing.T) {
 		ast1, cfg1, err := fh.ReadCUE(parser.NewConfig())
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.IsNotNil(ast1))
-		qt.Assert(t, qt.IsFalse(cfg1.IsValid()))
+		qt.Assert(t, qt.IsTrue(cfg1.IsValid()))
 
 		ast2, _, err := fh.ReadCUE(parser.NewConfig())
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.Not(qt.Equals(ast1, ast2)), qt.Commentf("%s: repeated reads return distinct ASTs", name))
-		// Each re-parse mints a fresh token.File, so downstream state
-		// keyed by AST identity, such as the workspace's
-		// token.File-to-mapper index, can never be found via a later
-		// read of the same file.
-		qt.Assert(t, qt.Not(qt.Equals(ast1.Pos().File(), ast2.Pos().File())), qt.Commentf("%s: repeated reads return distinct token.Files", name))
+		qt.Assert(t, qt.Equals(ast1, ast2), qt.Commentf("%s: repeated reads must return the same AST", name))
 	}
 }
 

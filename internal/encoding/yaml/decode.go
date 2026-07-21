@@ -81,6 +81,9 @@ type decoder struct {
 	// but we need to extract these comments first since they have earlier positions.
 	pendingHeadComments []*ast.Comment
 
+	// commentRuns memoizes splitCommentRuns per comment group.
+	commentRuns map[*gast.CommentGroupNode][]commentRun
+
 	// anchors maps anchor names to their YAML nodes. goccy does not
 	// resolve aliases, so we do it ourselves as we walk the tree,
 	// which also matches YAML's define-before-use semantics.
@@ -604,9 +607,15 @@ type commentRun struct {
 
 // splitCommentRuns converts a goccy comment group into runs of
 // contiguous comment lines, translating each comment to CUE form.
-func splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
+func (d *decoder) splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
 	if cg == nil {
 		return nil
+	}
+	// Memoize the result: the lookaheads in entryHasHeadComments and
+	// nodeHasHeadComments split a comment group ahead of the pass that
+	// actually attaches it.
+	if runs, ok := d.commentRuns[cg]; ok {
+		return runs
 	}
 	var runs []commentRun
 	var cur commentRun
@@ -619,8 +628,12 @@ func splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
 		if tk.Position != nil {
 			line = tk.Position.Line
 		}
-		// The token value carries the comment text without the leading "#".
-		cmt := &ast.Comment{Text: "//" + tk.Value}
+		// The token value carries the comment text without the leading
+		// "#". The position points at the "#".
+		cmt := &ast.Comment{
+			Slash: d.tokFile.Pos(d.tokenOffset(tk), token.NoRelPos),
+			Text:  "//" + tk.Value,
+		}
 		if len(cur.comments) > 0 && line == cur.endLine+1 {
 			cur.comments = append(cur.comments, cmt)
 			cur.endLine = line
@@ -634,6 +647,10 @@ func splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
 	if len(cur.comments) > 0 {
 		runs = append(runs, cur)
 	}
+	if d.commentRuns == nil {
+		d.commentRuns = make(map[*gast.CommentGroupNode][]commentRun)
+	}
+	d.commentRuns[cg] = runs
 	return runs
 }
 
@@ -641,7 +658,7 @@ func splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
 // converted to CUE form.
 func (d *decoder) groupComments(cg *gast.CommentGroupNode) []*ast.Comment {
 	var comments []*ast.Comment
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		comments = append(comments, run.comments...)
 	}
 	return comments
@@ -650,7 +667,7 @@ func (d *decoder) groupComments(cg *gast.CommentGroupNode) []*ast.Comment {
 // addPendingGroup adds all of a comment group's runs to the pending
 // head comments.
 func (d *decoder) addPendingGroup(cg *gast.CommentGroupNode) {
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		d.addPendingRun(run)
 	}
 }
@@ -665,7 +682,7 @@ func (d *decoder) nodeComments(yn gast.Node) (lineComments []*ast.Comment) {
 		return nil
 	}
 	nodeLine := goccyLine(yn)
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		if run.startLine >= nodeLine {
 			lineComments = append(lineComments, run.comments...)
 		} else {
@@ -882,7 +899,7 @@ func (d *decoder) scopeEndBefore(keyLine int, hasHeadComments bool) int {
 // entry's key by a blank line trails the previous entry, matching
 // yaml.v3's foot comment attachment.
 func (d *decoder) entryRuns(cg *gast.CommentGroupNode, keyLine int) (prev, head []commentRun) {
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		if run.endLine < keyLine-1 && d.lineIsContent(run.startLine-1) {
 			prev = append(prev, run)
 		} else {
@@ -923,7 +940,7 @@ func (d *decoder) nodeHasHeadComments(yn gast.Node) bool {
 		return false
 	}
 	nodeLine := goccyLine(yn)
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		if run.startLine < nodeLine {
 			return true
 		}
@@ -1073,7 +1090,15 @@ outer:
 
 		if _, ok := mv.Key.(*gast.MergeKeyNode); ok {
 			mergeValues = true
-			if err := d.merge(mv.Value, m, multiline); err != nil {
+			// The anchor content named by `<<: *name` typically sits
+			// earlier in the source, where pos() would refuse to move
+			// back to and produce invalid positions. Reset the position
+			// tracking around the expansion, like alias() does.
+			savedLastOffset := d.lastOffset
+			d.lastOffset = -1
+			err := d.merge(mv.Value, m, multiline)
+			d.lastOffset = savedLastOffset
+			if err != nil {
 				return err
 			}
 			continue

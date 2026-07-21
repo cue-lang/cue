@@ -326,7 +326,7 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			case *gast.CommentGroupNode:
 				// A document holding only comments, e.g. preceding a
 				// "---" header; carry them over to the next value.
-				for _, run := range splitCommentRuns(body) {
+				for _, run := range d.splitCommentRuns(body) {
 					d.addPendingRun(run)
 				}
 			default:
@@ -545,7 +545,7 @@ type commentRun struct {
 
 // splitCommentRuns converts a goccy comment group into runs of
 // contiguous comment lines, translating each comment to CUE form.
-func splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
+func (d *decoder) splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
 	if cg == nil {
 		return nil
 	}
@@ -560,8 +560,12 @@ func splitCommentRuns(cg *gast.CommentGroupNode) []commentRun {
 		if tk.Position != nil {
 			line = tk.Position.Line
 		}
-		// The token value carries the comment text without the leading "#".
-		cmt := &ast.Comment{Text: "//" + tk.Value}
+		// The token value carries the comment text without the leading
+		// "#". The position points at the "#".
+		cmt := &ast.Comment{
+			Slash: d.tokFile.Pos(d.tokenOffset(tk), token.NoRelPos),
+			Text:  "//" + tk.Value,
+		}
 		if len(cur.comments) > 0 && line == cur.endLine+1 {
 			cur.comments = append(cur.comments, cmt)
 			cur.endLine = line
@@ -588,7 +592,7 @@ func (d *decoder) nodeComments(yn gast.Node) (lineComments []*ast.Comment) {
 		return nil
 	}
 	nodeLine := goccyLine(yn)
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		if run.startLine >= nodeLine {
 			lineComments = append(lineComments, run.comments...)
 		} else {
@@ -805,7 +809,7 @@ func (d *decoder) scopeEndBefore(keyLine int, hasHeadComments bool) int {
 // entry's key by a blank line trails the previous entry, matching
 // yaml.v3's foot comment attachment.
 func (d *decoder) entryRuns(cg *gast.CommentGroupNode, keyLine int) (prev, head []commentRun) {
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		if run.endLine < keyLine-1 && d.lineIsContent(run.startLine-1) {
 			prev = append(prev, run)
 		} else {
@@ -846,7 +850,7 @@ func (d *decoder) nodeHasHeadComments(yn gast.Node) bool {
 		return false
 	}
 	nodeLine := goccyLine(yn)
-	for _, run := range splitCommentRuns(cg) {
+	for _, run := range d.splitCommentRuns(cg) {
 		if run.startLine < nodeLine {
 			return true
 		}
@@ -994,7 +998,15 @@ outer:
 
 		if _, ok := mv.Key.(*gast.MergeKeyNode); ok {
 			mergeValues = true
-			if err := d.merge(mv.Value, m, multiline); err != nil {
+			// The anchor content named by `<<: *name` typically sits
+			// earlier in the source, where pos() would refuse to move
+			// back to and produce invalid positions. Reset the position
+			// tracking around the expansion, like alias() does.
+			savedLastOffset := d.lastOffset
+			d.lastOffset = -1
+			err := d.merge(mv.Value, m, multiline)
+			d.lastOffset = savedLastOffset
+			if err != nil {
 				return err
 			}
 			continue
@@ -1009,7 +1021,7 @@ outer:
 		// nested value below, becomes a line comment on the field.
 		var keyLineComments []*ast.Comment
 		if cg := mv.Key.GetComment(); cg != nil {
-			for _, run := range splitCommentRuns(cg) {
+			for _, run := range d.splitCommentRuns(cg) {
 				if run.startLine >= keyLine {
 					keyLineComments = append(keyLineComments, run.comments...)
 				} else {
@@ -1057,7 +1069,7 @@ outer:
 		field.Value = value
 
 		if mv.FootComment != nil {
-			runs := splitCommentRuns(mv.FootComment)
+			runs := d.splitCommentRuns(mv.FootComment)
 			if i+1 < len(values) {
 				// More entries follow: foot comments become head comments for later.
 				for _, run := range runs {
@@ -1250,7 +1262,7 @@ func (d *decoder) sequence(yn *gast.SequenceNode) (ast.Expr, error) {
 			nextEntry = yn.Entries[i+1]
 		}
 		if entry != nil && entry.HeadComment != nil {
-			for _, run := range splitCommentRuns(entry.HeadComment) {
+			for _, run := range d.splitCommentRuns(entry.HeadComment) {
 				d.addPendingRun(run)
 			}
 		}
@@ -1269,7 +1281,7 @@ func (d *decoder) sequence(yn *gast.SequenceNode) (ast.Expr, error) {
 		}
 		if entry != nil && entry.LineComment != nil {
 			var comments []*ast.Comment
-			for _, run := range splitCommentRuns(entry.LineComment) {
+			for _, run := range d.splitCommentRuns(entry.LineComment) {
 				comments = append(comments, run.comments...)
 			}
 			ast.AddComment(elem, &ast.CommentGroup{

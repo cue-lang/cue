@@ -876,6 +876,54 @@ func TestUnmarshal(t *testing.T) {
 	}
 }
 
+// TestPositions checks that decoding attaches a valid source position
+// to every CUE node, including comments and fields expanded from merge
+// keys, whose anchor content sits earlier in the source.
+func TestPositions(t *testing.T) {
+	data := `# doc
+base: &b
+  p: 1
+out:
+  <<: *b
+é: "x"
+after: 2
+list:
+  - one # line
+`
+	expr, err := callUnmarshal(t, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	positions := make(map[string]string)
+	ast.Walk(expr, func(n ast.Node) bool {
+		if !n.Pos().IsValid() {
+			t.Errorf("invalid position for %T node", n)
+		}
+		switch x := n.(type) {
+		case *ast.Ident:
+			positions[x.Name] = x.NamePos.String()
+		case *ast.BasicLit:
+			positions[x.Value] = x.ValuePos.String()
+		case *ast.Comment:
+			positions[x.Text] = x.Slash.String()
+		}
+		return true
+	}, nil)
+	for name, want := range map[string]string{
+		"base":    "test.yaml:2:1",
+		"p":       "test.yaml:3:3",
+		"out":     "test.yaml:4:1",
+		`"x"`:     "test.yaml:6:5",
+		"after":   "test.yaml:7:1",
+		"// doc":  "test.yaml:1:1",
+		"// line": "test.yaml:9:9",
+	} {
+		if got := positions[name]; got != want {
+			t.Errorf("position of %q: got %v, want %v", name, got, want)
+		}
+	}
+}
+
 // For debug purposes: do not delete.
 func TestX(t *testing.T) {
 	y := `

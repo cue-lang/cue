@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
+	"cuelang.org/go/internal/encoding/yaml/goccy"
 	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 )
@@ -54,20 +55,7 @@ func Extract(filename string, src any) (*ast.File, error) {
 		}
 		a = append(a, expr)
 	}
-	f := &ast.File{Filename: filename}
-	switch len(a) {
-	case 0:
-	case 1:
-		switch x := a[0].(type) {
-		case *ast.StructLit:
-			f.Decls = x.Elts
-		default:
-			f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: x}}
-		}
-	default:
-		f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: &ast.ListLit{Elts: a}}}
-	}
-	return f, nil
+	return goccy.ComposeFile(filename, a), nil
 }
 
 // Encode returns the YAML encoding of v.

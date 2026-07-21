@@ -16,9 +16,9 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding/json"
+	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -124,7 +124,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 
 	case build.YAML:
 		cfg = parser.NewConfig(config)
-		syntax, err = yaml.Extract(filename, content)
+		syntax, err = yaml.ExtractLenient(filename, content)
 
 	default:
 		return nil, parser.Config{}, nil

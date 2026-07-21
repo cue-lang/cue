@@ -54,20 +54,7 @@ func Extract(filename string, src any) (*ast.File, error) {
 		}
 		a = append(a, expr)
 	}
-	f := &ast.File{Filename: filename}
-	switch len(a) {
-	case 0:
-	case 1:
-		switch x := a[0].(type) {
-		case *ast.StructLit:
-			f.Decls = x.Elts
-		default:
-			f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: x}}
-		}
-	default:
-		f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: &ast.ListLit{Elts: a}}}
-	}
-	return f, nil
+	return cueyaml.ComposeFile(filename, a), nil
 }
 
 // Encode returns the YAML encoding of v.

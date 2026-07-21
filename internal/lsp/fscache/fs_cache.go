@@ -15,9 +15,9 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding/json"
+	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/robustio"
@@ -132,7 +132,10 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		json.PatchExpr(syntax, nil)
 
 	case build.YAML:
-		syntax, err = yaml.Extract(filename, content)
+		// Like the CUE parser above, this returns a best-effort partial
+		// AST alongside any errors, which is valuable for files that
+		// are temporarily invalid mid-edit.
+		syntax, err = yaml.ExtractLenient(filename, content)
 
 	default:
 		return nil, parser.Config{}, nil

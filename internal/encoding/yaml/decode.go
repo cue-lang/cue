@@ -66,6 +66,13 @@ type decoder struct {
 	// decodeErr is returned by any further calls to Decode when not nil.
 	decodeErr error
 
+	// lenient makes Decode tolerate errors instead of terminating the
+	// stream: a document with a syntax error is re-parsed up to the
+	// error's position, a document that fails to extract is skipped,
+	// and the errors are collected in errs. Used by ExtractLenient.
+	lenient bool
+	errs    []error
+
 	// tagHandles records the tag shorthands declared by %TAG directives,
 	// mapping a handle such as "!e!" to its prefix.
 	tagHandles map[string]string
@@ -252,6 +259,42 @@ func parseTokens(toks gtoken.Tokens) (*gast.File, error) {
 	return nil, err
 }
 
+// parseTokenPrefix handles a document segment which failed to parse:
+// it parses the segment's longest token prefix preceding the error's
+// position, resulting in a best-effort partial document for input that
+// is invalid mid-edit. It returns nil when no usable prefix exists or
+// when the prefix does not parse either.
+func parseTokenPrefix(seg gtoken.Tokens, err error) *gast.File {
+	var perr interface{ GetToken() *gtoken.Token }
+	if !errors.As(err, &perr) {
+		return nil
+	}
+	tk := perr.GetToken()
+	if tk == nil || tk.Position == nil {
+		return nil
+	}
+	var prefix gtoken.Tokens
+	for _, t := range seg {
+		if t == tk || t.Position == nil || !positionBefore(t.Position, tk.Position) {
+			break
+		}
+		prefix = append(prefix, t)
+	}
+	if len(prefix) == 0 {
+		return nil
+	}
+	file, err := parseTokens(prefix)
+	if err != nil {
+		return nil
+	}
+	return file
+}
+
+// positionBefore reports whether position a is strictly before b.
+func positionBefore(a, b *gtoken.Position) bool {
+	return a.Line < b.Line || (a.Line == b.Line && a.Column < b.Column)
+}
+
 // stripComments removes comment tokens, either inside flow collections
 // only, or everywhere.
 func stripComments(toks gtoken.Tokens, onlyFlow bool) gtoken.Tokens {
@@ -320,6 +363,10 @@ func (d *decoder) Decode() (ast.Expr, error) {
 				return d.nullExpr(doc), nil
 			case *gast.DirectiveNode:
 				if err := d.directive(body); err != nil {
+					if d.lenient {
+						d.errs = append(d.errs, err)
+						continue
+					}
 					d.decodeErr = err
 					return nil, err
 				}
@@ -333,6 +380,11 @@ func (d *decoder) Decode() (ast.Expr, error) {
 				d.yamlNonEmpty = true
 				expr, err := d.extract(body)
 				if err != nil {
+					if d.lenient {
+						// Skip just this document; keep decoding.
+						d.errs = append(d.errs, err)
+						continue
+					}
 					d.decodeErr = err
 					return nil, err
 				}
@@ -369,10 +421,20 @@ func (d *decoder) Decode() (ast.Expr, error) {
 		d.segIdx++
 		file, err := parseTokens(seg)
 		if err != nil {
-			// Any further Decode calls repeat this error.
-			err = d.wrapParseError(err)
-			d.decodeErr = err
-			return nil, err
+			if !d.lenient {
+				// Any further Decode calls repeat this error.
+				err = d.wrapParseError(err)
+				d.decodeErr = err
+				return nil, err
+			}
+			d.errs = append(d.errs, d.wrapParseError(err))
+			// Re-parse the longest token prefix preceding the error,
+			// giving a best-effort partial document; any following
+			// documents are still decoded.
+			file = parseTokenPrefix(seg, err)
+			if file == nil {
+				continue
+			}
 		}
 		d.docs, d.docIdx = file.Docs, 0
 	}

@@ -47,7 +47,7 @@ func TestCUECacheFSURI(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))
 			// 2 decls: 1 for the package one for x, because the
-			// [parser.ImportsOnly] mode is modified to
+			// requested mode is always modified to
 			// [parser.ParseComments].
 			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
 			qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContentGood)))
@@ -122,7 +122,7 @@ func TestOverlayFSURI(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Equals(cfg.Mode, parser.ParseComments))
 			// 2 decls: 1 for the package one for x, because the
-			// [parser.ImportsOnly] mode is modified to
+			// requested mode is always modified to
 			// [parser.ParseComments].
 			qt.Assert(t, qt.Equals(len(ast.Decls), 2))
 			qt.Assert(t, qt.DeepEquals(ast.Pos().File().Content(), []byte(fileContentGood)))

@@ -35,10 +35,9 @@ type FileHandle interface {
 	URI() protocol.DocumentURI
 	// ReadCUE attempts to parse the file content as CUE. The config
 	// supplied governs all parts of the parsing config apart from the
-	// Mode. ReadCUE will forcibly set the Mode first to ParseComments,
-	// and if that fails, to ImportsOnly. The returned config is the
-	// first config that produced no error, or, failing that, the last
-	// config attempted.
+	// Mode, which is forcibly set to ParseComments. If parsing fails,
+	// a partial AST may be returned along with the error: whenever
+	// the returned AST is non-nil, its positions are valid.
 	ReadCUE(config parser.Config) (*ast.File, parser.Config, error)
 	// Version returns the file version, as defined by the LSP client.
 	Version() int32
@@ -79,11 +78,9 @@ type cueFileParser struct {
 
 // ReadCUE implements [FileHandle]
 //
-// ReadCUE attempts to parse the content first with
-// [parser.ParseComments], and then [parser.ImportsOnly]. The first
-// attempt that succeeds (nil error) is returned. It is useful to fall
-// back to ImportsOnly if there are syntax errors further on in the
-// CUE.
+// ReadCUE parses the content with [parser.ParseComments]. When the
+// content contains syntax errors, the parser usually still produces a
+// partial AST, which is returned along with the error.
 //
 // Any non-nil AST returned will have an [ast.Package] decl in the
 // root of the AST. If no package decl is present in the parsed AST,
@@ -110,17 +107,9 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 
 	switch bf.Encoding {
 	case build.CUE:
-		parseComments := parser.NewConfig(config)
-		parseComments.Mode = parser.ParseComments
-		importsOnly := parser.NewConfig(config)
-		importsOnly.Mode = parser.ImportsOnly
-
-		for _, cfg = range []parser.Config{parseComments, importsOnly} {
-			syntax, err = parser.ParseFile(filename, content, cfg)
-			if syntax != nil && syntax.Pos().HasAbsPos() {
-				break
-			}
-		}
+		cfg = parser.NewConfig(config)
+		cfg.Mode = parser.ParseComments
+		syntax, err = parser.ParseFile(filename, content, cfg)
 
 	case build.JSON:
 		cfg = parser.NewConfig(config)

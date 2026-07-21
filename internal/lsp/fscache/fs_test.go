@@ -233,9 +233,8 @@ func TestConvertToCueFS(t *testing.T) {
 	qt.Assert(t, qt.IsFalse(isCueable))
 }
 
-// TestReadCUENonCUE shows bad behaviour: unlike a CUE file's, the
-// parse of a JSON or YAML file is never cached, so repeated reads
-// return distinct ASTs, and the returned config is invalid.
+// TestReadCUENonCUE tests that the parse of a JSON or YAML file is
+// cached just like a CUE file's: repeated reads return the same AST.
 func TestReadCUENonCUE(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "a.json"), `{"x": true}`)
@@ -251,11 +250,11 @@ func TestReadCUENonCUE(t *testing.T) {
 		ast1, cfg1, err := fh.ReadCUE(parser.NewConfig())
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.IsNotNil(ast1))
-		qt.Assert(t, qt.IsFalse(cfg1.IsValid()))
+		qt.Assert(t, qt.IsTrue(cfg1.IsValid()))
 
 		ast2, _, err := fh.ReadCUE(parser.NewConfig())
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.Not(qt.Equals(ast1, ast2)), qt.Commentf("%s: repeated reads return distinct ASTs", name))
+		qt.Assert(t, qt.Equals(ast1, ast2), qt.Commentf("%s: repeated reads must return the same AST", name))
 	}
 }
 

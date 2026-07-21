@@ -367,14 +367,11 @@ out: _ @embed(file=data/data1.json)
 // TestEmbedLateFileOnDisk starts with an embed attribute which names
 // a file that does not exist, and then creates that file on disk (not
 // in the editor), in a directory which contains no other active
-// files.
-//
-// This test shows the current behaviour, which is bad: the creation
-// of the file is ignored because its directory contains no active
-// files, even though a loaded package has an embed attribute which
-// matches the new file. So the embedding package is not reloaded, the
-// "failed to stat" diagnostic does not clear, and the embed is never
-// linked.
+// files. Even though the directory contains no active files, the
+// creation must be noticed because a loaded package has an embed
+// attribute which matches the new file: a package is created for the
+// new file, the embedding package is reloaded, the "failed to stat"
+// diagnostic clears, and the embed is linked.
 func TestEmbedLateFileOnDisk(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -402,12 +399,11 @@ out: _ @embed(file=other/data3.json)
 		env.WriteWorkspaceFile("other/data3.json", `{"field3": true}`)
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			// The new file is ignored: no package is created for it,
-			// the embedding package is not reloaded, and the stale
-			// diagnostic remains.
-			NoLogMatching(protocol.Debug, `Package dirs=\[%v/other\] importPath=mod\.example/x/other@v0:_.+ Created`, rootURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			// A package is created for the new file, the embedding
+			// package is reloaded, and the diagnostic clears.
+			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/other\] importPath=mod\.example/x/other@v0:_.+ Reloaded`, rootURI),
+			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			NoDiagnostics(ForFile("a.cue")),
 		)
 
 		mappers := make(map[string]*protocol.Mapper)
@@ -415,10 +411,13 @@ out: _ @embed(file=other/data3.json)
 			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
 			mappers[file.Name] = mapper
 		}
+		mappers["other/data3.json"] = protocol.NewMapper(rootURI+"/other/data3.json", []byte(`{"field3": true}`))
 
-		// Jump-to-definition on the attribute finds nothing.
+		// Jump-to-definition on the attribute arrives at the new file.
 		definitionsTestCases{
-			fln("a.cue", 4, 1, "@embed(file=other/data3.json)"): {},
+			fln("a.cue", 4, 1, "@embed(file=other/data3.json)"): {
+				fln("other/data3.json", 1, 1, ""),
+			},
 		}.run(t, env, mappers)
 	})
 }
@@ -426,13 +425,11 @@ out: _ @embed(file=other/data3.json)
 // TestEmbedLateGlobOnDisk starts with a glob embed attribute which
 // matches nothing, and then creates a matching file on disk (not in
 // the editor), in a directory which contains no other active files.
-//
-// This test shows the current behaviour, which is bad: the creation
-// of the file is ignored because its directory contains no active
-// files, even though it matches the glob embed attribute of a loaded
-// package. So the embedding package is not reloaded, the "no matches
-// for glob pattern" diagnostic does not clear, and the embed is never
-// linked.
+// Even though the directory contains no active files, the creation
+// must be noticed because it matches the glob embed attribute of a
+// loaded package: a package is created for the new file, the
+// embedding package is reloaded, the "no matches for glob pattern"
+// diagnostic clears, and the embed is linked.
 func TestEmbedLateGlobOnDisk(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -458,12 +455,11 @@ out: _ @embed(glob=other/*.json)
 		env.WriteWorkspaceFile("other/data3.json", `{"field3": true}`)
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			// The new file is ignored: no package is created for it,
-			// the embedding package is not reloaded, and the stale
-			// diagnostic remains.
-			NoLogMatching(protocol.Debug, `Package dirs=\[%v/other\] importPath=mod\.example/x/other@v0:_.+ Created`, rootURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			// A package is created for the new file, the embedding
+			// package is reloaded, and the diagnostic clears.
+			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/other\] importPath=mod\.example/x/other@v0:_.+ Reloaded`, rootURI),
+			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			NoDiagnostics(ForFile("a.cue")),
 		)
 	})
 }

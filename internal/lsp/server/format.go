@@ -40,7 +40,10 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 		s.debugLog(fmt.Sprintf("%v is not a CUE file", uri))
 		return nil, nil
 	} else if config.Mode != parser.ParseComments {
-		s.debugLog(fmt.Sprintf("cannot format %v due to syntax errors", uri))
+		// ReadCUE parses plain CUE files with ParseComments; any
+		// other mode means the file is a different encoding
+		// (e.g. JSON or YAML) which we do not format as CUE.
+		s.debugLog(fmt.Sprintf("cannot format %v: not a plain CUE file", uri))
 		return nil, nil
 	}
 

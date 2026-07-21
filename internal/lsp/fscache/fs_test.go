@@ -171,6 +171,27 @@ func TestOverlayFS(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 }
 
+func TestReadCUEPartialYAML(t *testing.T) {
+	dir := t.TempDir()
+	// A YAML file that is invalid mid-edit: a new key is being typed on
+	// line 3. Reading it as CUE yields the well-formed prefix of the
+	// file alongside the error.
+	absPath := filepath.Join(dir, "a.yaml")
+	writeFile(t, absPath, "x: 1\ny: 2\nnewkey")
+
+	fs := fscache.NewCUECachedFS()
+	fh, err := fs.ReadFile(protocol.URIFromPath(absPath))
+	qt.Assert(t, qt.IsNil(err))
+
+	syntax, _, err := fh.ReadCUE(parser.NewConfig())
+	qt.Assert(t, qt.IsNotNil(err))
+	qt.Assert(t, qt.StringContains(err.Error(), "a.yaml:3: non-map value is specified"))
+	qt.Assert(t, qt.IsNotNil(syntax))
+	// The partial AST holds the two fields preceding the edit point,
+	// plus the injected phantom package declaration.
+	qt.Assert(t, qt.Equals(len(syntax.Decls), 3))
+}
+
 func TestConvertToCueFS(t *testing.T) {
 	now := time.Now()
 	dir := t.TempDir()

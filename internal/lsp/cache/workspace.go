@@ -348,7 +348,9 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 			// This file is not open in the editor/client. But something
 			// has changed about it. If there's another file in
 			// activeFiles which is in the same directory, or is a
-			// descendant, then we need to inspect this file.
+			// descendant, or if a loaded package has an embed attribute
+			// which matches this file, then we need to inspect this
+			// file.
 			needsInspecting := false
 			_, isDir := activeDirs[uri]
 			if isDir {
@@ -357,6 +359,11 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 				// it's possible that this is a new file which will
 				// influence a sibling or descendant (neice/nephew?) file
 				// by being in the same package (ancestor imports pattern)
+				needsInspecting = true
+			} else if w.matchesUnknownEmbedding(uri) {
+				// A loaded cue package has an embed attribute which
+				// matches this file, but does not currently embed it -
+				// this file must be new in some way.
 				needsInspecting = true
 			}
 
@@ -1075,6 +1082,20 @@ func (w *Workspace) reloadPackages() {
 			pkg.linkWithEmbeddedFiles()
 		}
 	}
+}
+
+// matchesUnknownEmbedding reports whether any loaded cue package
+// within the workspace should embed, but does not currently, the
+// given file. See [Package.matchesUnknownEmbedding].
+func (w *Workspace) matchesUnknownEmbedding(file protocol.DocumentURI) bool {
+	for _, m := range w.modules {
+		for _, pkg := range m.packages {
+			if pkg.isCue && pkg.matchesUnknownEmbedding(file) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (w *Workspace) findPackage(modRootURI protocol.DocumentURI, ip ast.ImportPath) (*Package, bool) {

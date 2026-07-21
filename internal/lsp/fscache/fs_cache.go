@@ -15,6 +15,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding/json"
@@ -150,11 +151,22 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 	}
 
 	if syntax != nil {
-		syntax.Pos().File().SetContent(content)
 		pkg, _ := internal.Package(syntax)
-		decls := syntax.Decls
 		if pkg == nil {
-			pkg = &ast.Package{PackagePos: syntax.Pos()}
+			pkgPos := syntax.Pos()
+			decls := syntax.Decls
+			if len(decls) == 0 {
+				// When the file has no declarations (it is empty, or
+				// contains only comments), [ast.File.Pos] fabricates
+				// a new, empty, token.File on every call. Create a
+				// single correctly-sized token.File to anchor the
+				// phantom package declaration, and hence the whole
+				// AST, stably.
+				tokFile := token.NewFile(filename, -1, len(content))
+				tokFile.SetLinesForContent(content)
+				pkgPos = tokFile.Pos(0, token.NoRelPos)
+			}
+			pkg = &ast.Package{PackagePos: pkgPos}
 			if len(decls) == 0 {
 				decls = append(decls, pkg)
 			} else {
@@ -167,6 +179,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 			// Important that this ident has no position.
 			pkg.Name = ast.NewIdent(phantomPackageName(filename))
 		}
+		syntax.Pos().File().SetContent(content)
 	}
 
 	p.config = cfg

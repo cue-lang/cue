@@ -122,6 +122,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		}
 
 	case build.JSON:
+		cfg = parser.NewConfig(config)
 		var expr ast.Expr
 		expr, err = parser.ParseExpr(filename, content)
 		syntax = internal.ToFile(expr, true)
@@ -132,6 +133,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg par
 		json.PatchExpr(syntax, nil)
 
 	case build.YAML:
+		cfg = parser.NewConfig(config)
 		syntax, err = yaml.Extract(filename, content)
 
 	default:

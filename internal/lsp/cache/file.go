@@ -208,7 +208,12 @@ func (f *File) maybeDelete() {
 // setSyntax updates this state with the provided syntax. All derived
 // fields (tokFile, mapper, symbols etc) are also appropriately
 // updated.
-func (f *File) setSyntax(syntax *ast.File) {
+//
+// syntax may be nil, when the file's current content cannot be
+// parsed at all. In that case, content (which is otherwise ignored)
+// is used to build the file's mapper, so that errors can still be
+// converted to diagnostics for this file.
+func (f *File) setSyntax(syntax *ast.File, content []byte) {
 	w := f.workspace
 	if oldTokFile := f.tokFile; oldTokFile != nil {
 		delete(w.mappers, oldTokFile)
@@ -219,14 +224,19 @@ func (f *File) setSyntax(syntax *ast.File) {
 		tokFile = syntax.Pos().File()
 	}
 	f.tokFile = tokFile
-	if tokFile == nil {
+	if tokFile != nil {
+		content = tokFile.Content()
+	}
+	if f.buildFile != nil {
+		f.buildFile.Source = content
+	}
+	if content == nil {
 		f.mapper = nil
 	} else {
-		if f.buildFile != nil {
-			f.buildFile.Source = tokFile.Content()
+		f.mapper = protocol.NewMapper(f.uri, content)
+		if tokFile != nil {
+			w.mappers[tokFile] = f.mapper
 		}
-		f.mapper = protocol.NewMapper(f.uri, tokFile.Content())
-		w.mappers[tokFile] = f.mapper
 	}
 	f.symbols = nil
 }
@@ -344,7 +354,7 @@ func (f *File) tokenRangeOffsets(offset int) (start, end int) {
 // true is returned, to indicate errors were found. In all other
 // cases, false is returned.
 func (f *File) publishErrors(clearOnly bool) bool {
-	if !f.dirtyErrors || f.tokFile == nil || f.mapper == nil {
+	if !f.dirtyErrors || f.mapper == nil {
 		return false
 	}
 	if !f.isOpen && !f.hasPublishedDiags {
@@ -369,8 +379,10 @@ func (f *File) publishErrors(clearOnly bool) bool {
 	f.hasPublishedDiags = len(diags) > 0
 	params := &protocol.PublishDiagnosticsParams{
 		URI:         f.uri,
-		Version:     f.tokFile.Revision(),
 		Diagnostics: diags,
+	}
+	if f.tokFile != nil {
+		params.Version = f.tokFile.Revision()
 	}
 	w := f.workspace
 	w.enqueue(func() {
@@ -383,13 +395,28 @@ func (f *File) publishErrors(clearOnly bool) bool {
 // messages. It will extract positions from the errors, check they
 // belong to this File, find corresponding ranges within this File,
 // and append new Diagnostics to the provided accumulator.
+//
+// An error which carries no position information at all (it is not a
+// [cueerrors.Error]) is reported at the start of the file: it was
+// recorded against this File by one of its users, so it concerns
+// this file even though it cannot be located within it. For example,
+// the errors produced when extracting YAML are not cue errors.
 func (f *File) errorToDiagnostics(err error, acc []protocol.Diagnostic) []protocol.Diagnostic {
-	err, ok := err.(cueerrors.Error)
+	cueErr, ok := err.(cueerrors.Error)
 	if !ok {
-		return acc
+		r, rErr := f.mapper.OffsetRange(0, 0)
+		if rErr != nil {
+			return acc
+		}
+		return append(acc, protocol.Diagnostic{
+			Range:    r,
+			Severity: protocol.SeverityError,
+			Source:   "cue",
+			Message:  err.Error(),
+		})
 	}
 
-	for _, e := range cueerrors.Errors(err) {
+	for _, e := range cueerrors.Errors(cueErr) {
 		errPos := e.Position()
 		if !errPos.IsValid() {
 			continue
@@ -400,7 +427,10 @@ func (f *File) errorToDiagnostics(err error, acc []protocol.Diagnostic) []protoc
 			continue
 		}
 
-		startOffset, endOffset := f.tokenRangeOffsets(errPos.Offset())
+		startOffset, endOffset := errPos.Offset(), errPos.Offset()
+		if f.syntax != nil {
+			startOffset, endOffset = f.tokenRangeOffsets(errPos.Offset())
+		}
 		r, err := f.mapper.OffsetRange(startOffset, endOffset)
 		if err != nil {
 			continue

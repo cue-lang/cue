@@ -3,35 +3,36 @@ package workspace
 import (
 	"testing"
 
-	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 )
 
-// TestDiagnosticsUnparseableFile shows bad behaviour: a file whose
-// content cannot be parsed at all (no AST can be produced, e.g.
-// fatally invalid YAML) never has its parse error published as a
-// diagnostic. The standalone file is silently deleted, taking the
-// error record with it, and the user is told nothing.
+// TestDiagnosticsUnparseableFile tests that a file whose content
+// cannot be parsed at all (no AST can be produced, e.g. fatally
+// invalid YAML) still has its parse error published as a diagnostic,
+// and that the diagnostic clears when the content is fixed.
 func TestDiagnosticsUnparseableFile(t *testing.T) {
 	const files = `
 -- a.yaml --
 x: true
 `
 	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
-		rootURI := env.Sandbox.Workdir.RootURI()
-
 		env.OpenFile("a.yaml")
 		env.Await(
 			env.DoneWithOpen(),
 			NoDiagnostics(ForFile("a.yaml")),
 		)
 
-		// This YAML is fatally invalid: no AST can be produced. The
-		// standalone file is deleted, and no diagnostic appears.
+		// This YAML is fatally invalid: no AST can be produced.
 		env.SetBufferContent("a.yaml", "x: [\n- {y\n")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a.yaml Deleted", rootURI),
+			Diagnostics(ForFile("a.yaml")),
+		)
+
+		// And on fixing the content, the diagnostic clears.
+		env.SetBufferContent("a.yaml", "x: true\n")
+		env.Await(
+			env.DoneWithChange(),
 			NoDiagnostics(ForFile("a.yaml")),
 		)
 	})

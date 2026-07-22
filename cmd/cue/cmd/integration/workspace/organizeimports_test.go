@@ -188,8 +188,10 @@ x: p1 & p4 & p7
 		},
 
 		{
-			// This shows bad behaviour: every comment within the
-			// import block is silently deleted.
+			// Comments attached to surviving specs, and comments
+			// within the decl (before the closing paren), are
+			// preserved. Comments attached to a removed spec are
+			// removed with it.
 			name: "comments_preserved",
 			input: `
 package p1
@@ -210,8 +212,11 @@ x: p3 & p4
 package p1
 
 import (
-	"mod.com/p3"
+	// doc for p3
+	"mod.com/p3" // pinned
+	// floating comment for p4
 	"mod.com/p4"
+	// before the closing paren
 )
 
 x: p3 & p4
@@ -219,8 +224,9 @@ x: p3 & p4
 		},
 
 		{
-			// This shows bad behaviour: the surviving import's
-			// comments are silently deleted.
+			// With a single surviving import, its doc comment moves
+			// above the import keyword and its line comment stays on
+			// the line.
 			name: "comments_preserved_single_survivor",
 			input: `
 package p1
@@ -236,7 +242,8 @@ x: p3
 			expected: `
 package p1
 
-import "mod.com/p3"
+// doc for p3
+import "mod.com/p3" // pinned
 
 x: p3
 `[1:],

@@ -232,9 +232,9 @@ func (m *Module) FindImportPathForFile(file protocol.DocumentURI) (*ast.ImportPa
 			isOldMod = true
 			ip.Path = pkgPathOldMod
 			dirUris = []protocol.DocumentURI{
-				m.rootURI + "/cue.mod/gen/" + protocol.DocumentURI(pkgPathOldMod),
-				m.rootURI + "/cue.mod/pkg/" + protocol.DocumentURI(pkgPathOldMod),
-				m.rootURI + "/cue.mod/usr/" + protocol.DocumentURI(pkgPathOldMod),
+				joinURI(m.rootURI, "cue.mod/gen/"+pkgPathOldMod),
+				joinURI(m.rootURI, "cue.mod/pkg/"+pkgPathOldMod),
+				joinURI(m.rootURI, "cue.mod/usr/"+pkgPathOldMod),
 			}
 			break
 		}

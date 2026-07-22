@@ -833,15 +833,15 @@ func (w *Workspace) reloadPackages() {
 					for _, prefix := range []string{"cue.mod/gen/", "cue.mod/pkg/", "cue.mod/usr/"} {
 						if dirOldMod, wasCut := strings.CutPrefix(loc.Dir, prefix); wasCut {
 							dirUris = []protocol.DocumentURI{
-								m.rootURI + "/cue.mod/gen/" + protocol.DocumentURI(dirOldMod),
-								m.rootURI + "/cue.mod/pkg/" + protocol.DocumentURI(dirOldMod),
-								m.rootURI + "/cue.mod/usr/" + protocol.DocumentURI(dirOldMod),
+								joinURI(m.rootURI, "cue.mod/gen/"+dirOldMod),
+								joinURI(m.rootURI, "cue.mod/pkg/"+dirOldMod),
+								joinURI(m.rootURI, "cue.mod/usr/"+dirOldMod),
 							}
 							break locations
 						}
 					}
 
-					uri := protocol.DocumentURI(string(modRootURI) + "/" + loc.Dir)
+					uri := joinURI(modRootURI, loc.Dir)
 					if dirUri == "" || dirUri.Encloses(uri) {
 						dirUri = uri
 					}

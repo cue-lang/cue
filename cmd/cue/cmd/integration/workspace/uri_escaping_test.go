@@ -5,15 +5,13 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	"github.com/go-quicktest/qt"
 )
 
-// TestFileNameNeedingEscaping shows bad behaviour: LSP functionality
-// is dead within a file whose name contains a character which URIs
-// escape (a space). URIs received from the client are
-// percent-encoded, but URIs built internally are assembled by string
-// concatenation with no encoding, so the workspace holds two
-// unrelated states for such a file, and hover (among much else)
-// returns nothing.
+// TestFileNameNeedingEscaping tests LSP functionality within a file
+// whose name contains a character which URIs escape (a space). URIs
+// received from the client are percent-encoded, so URIs built
+// internally must be canonicalized the same way.
 func TestFileNameNeedingEscaping(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -43,14 +41,15 @@ out: field: {
 
 		mappers := makeMappers(env, files)
 
+		docComment := "does the field contain cows?"
+
 		p := fln("my data.json", 3, 1, `cows`)
 		p.determinePos(mappers)
 		got, _ := env.Hover(protocol.Location{
 			URI:   p.mapper.URI,
 			Range: protocol.Range{Start: p.pos},
 		})
-		if got != nil {
-			t.Errorf("hover in %q = %v, want nothing", "my data.json", got)
-		}
+		qt.Assert(t, qt.IsNotNil(got))
+		qt.Assert(t, qt.StringContains(got.Value, docComment))
 	})
 }

@@ -106,7 +106,9 @@ y: x
 			env.Await(
 				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: invalid attribute: expected '('", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Deleted", rootURI),
+				// The file is kept, with its error published as a
+				// diagnostic.
+				Diagnostics(ForFile("z.cue")),
 			)
 		})
 	})
@@ -118,7 +120,9 @@ y: x
 			env.Await(
 				env.DoneWithOpen(),
 				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: parsing experiments", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Deleted", rootURI),
+				// The file is kept, with its error published as a
+				// diagnostic.
+				Diagnostics(ForFile("z.cue")),
 			)
 		})
 	})

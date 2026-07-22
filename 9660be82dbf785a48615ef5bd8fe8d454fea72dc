@@ -16,6 +16,23 @@
       "message": "This logic is repeated in every single test. Maybe worth factoring out to a helper function?",
       "revId": "9660be82dbf785a48615ef5bd8fe8d454fea72dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac1da31d_96af4fd2",
+        "filename": "cmd/cue/cmd/integration/workspace/embedchange_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T12:11:32Z",
+      "side": 1,
+      "message": "I\u0027d like to see a test that more than one level of glob still works (i.e. that we correctly get notifications even when the exact directory within which the new file appears did not exist previously).\n\nFor example,\n```\nout: _ @embed(glob\u003dother/*/*.json)\n```\nand a new file being created inside `other/foo/bar.json` when a `foo` directory didn\u0027t previously exist.",
+      "revId": "9660be82dbf785a48615ef5bd8fe8d454fea72dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -241,6 +241,13 @@ func (m *Module) FindImportPathForFile(file protocol.DocumentURI) (*ast.ImportPa
 	}
 
 	if !isOldMod {
+		if pkgPath == "/cue.mod" || strings.HasPrefix(pkgPath, "/cue.mod/") {
+			// Apart from the old module system's gen|pkg|usr
+			// hierarchies (handled above), files under cue.mod can
+			// never belong to a package - e.g. the
+			// cue.mod/module.cue file itself.
+			return nil, nil, nil
+		}
 		modPath, version, _ := ast.SplitPackageVersion(m.modFile.QualifiedModule())
 		ip.Path = modPath + pkgPath
 		ip.Version = version

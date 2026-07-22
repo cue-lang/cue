@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08e04963_2d2a6233",
+        "filename": "internal/lsp/hover/hover.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T15:50:44Z",
+      "side": 1,
+      "message": "If we renamed this to `appendConjunctOperands` and added a slice to the arguments, we could avoid O(n^2) copies when recursing...",
+      "revId": "28f82262a287d6728d77ff18fcde7cfa2c24b5a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

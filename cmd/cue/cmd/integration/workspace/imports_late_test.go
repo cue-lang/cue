@@ -8,12 +8,11 @@ import (
 	"github.com/go-quicktest/qt"
 )
 
-// TestImportCreatedLater shows bad behaviour: a package with an
-// import which does not (yet) resolve never recovers when the
-// imported package comes into existence. Nothing links the new
-// package back to its failed importers, so the import stays dead -
-// no definitions, hover or completion through it - until the
-// importing package happens to be edited for some other reason.
+// TestImportCreatedLater tests that a package with an import which
+// does not (yet) resolve, recovers once the imported package comes
+// into existence: the importing package must be reloaded so that the
+// import resolves, without requiring any edit to the importing
+// package itself.
 func TestImportCreatedLater(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -41,16 +40,24 @@ ax: sub.y
 		env.Await(
 			env.DoneWithOpen(),
 			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sub] importPath=mod.example/x/sub@v0 Reloaded", rootURI),
-			// The importing package is not reloaded: its import
-			// stays unresolved.
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			// The importing package must be reloaded so that its
+			// import now resolves.
+			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
-		// Definitions on "y" within "ax: sub.y" find nothing.
+		// Definitions on "y" within "ax: sub.y" must arrive at
+		// sub/sub.cue.
 		gotDefs := env.Definition(protocol.Location{
 			URI:   rootURI + "/a.cue",
 			Range: protocol.Range{Start: protocol.Position{Line: 4, Character: 8}},
 		})
-		qt.Assert(t, qt.HasLen(gotDefs, 0))
+		wantDefs := []protocol.Location{{
+			URI: rootURI + "/sub/sub.cue",
+			Range: protocol.Range{
+				Start: protocol.Position{Line: 2, Character: 0},
+				End:   protocol.Position{Line: 2, Character: 1},
+			},
+		}}
+		qt.Assert(t, qt.DeepEquals(gotDefs, wantDefs))
 	})
 }

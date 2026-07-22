@@ -92,6 +92,13 @@ type Package struct {
 	// imports contains the packages that are imported by this package.
 	imports []*Package
 
+	// unresolvedImports contains the (canonical, version-stripped)
+	// import paths of this package's import specs which could not be
+	// resolved to a loaded package - e.g. the imported package does
+	// not exist (yet). If a package satisfying such an import later
+	// comes into existence, this package must be reloaded.
+	unresolvedImports map[ast.ImportPath]struct{}
+
 	// embeddedBy contains the packages that directly embed this package.
 	embeddedBy []*Package
 
@@ -318,22 +325,33 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	}
 
 	pkg.imports = pkg.imports[:0]
+	pkg.unresolvedImports = nil
 
 	importCanonicalisation := make(map[string]ast.ImportPath)
 	importCanonicalisation[modpkg.ImportPath()] = pkg.importPath
 	importCanonicalisation[ast.ParseImportPath(modpkg.ImportPath()).Canonical().String()] = pkg.importPath
 
 	for _, importedModpkg := range modpkg.Imports() {
-		if isUnhandledPackage(importedModpkg) {
+		if importedModpkg.IsStdlibPackage() {
 			continue
 		}
 		ip := normalizeImportPath(importedModpkg)
+		if !importedModpkg.Mod().IsValid() {
+			// The import could not be resolved to any module,
+			// e.g. the imported package does not exist (yet).
+			pkg.markImportUnresolved(ip)
+			continue
+		}
 		modRootURI := moduleRootURI(importedModpkg)
 		if importedPkg, found := w.findPackage(modRootURI, ip); found {
 			importedPkg.EnsureImportedBy(pkg)
 			pkg.imports = append(pkg.imports, importedPkg)
 			importCanonicalisation[importedModpkg.ImportPath()] = importedPkg.importPath
 			importCanonicalisation[ast.ParseImportPath(importedModpkg.ImportPath()).Canonical().String()] = importedPkg.importPath
+		} else {
+			// The import names a module we know about, but the
+			// package itself is not loaded, e.g. its load errored.
+			pkg.markImportUnresolved(ip)
 		}
 	}
 	pkg.imports = slices.Clip(pkg.imports)
@@ -554,6 +572,19 @@ func (pkg *Package) pkgEmbedders() map[*eval.Evaluator][]*embed.Embed {
 	}
 
 	return evals
+}
+
+// markImportUnresolved records that this package has an import spec
+// for the given import path which could not be resolved to a loaded
+// package. The recorded path is version-stripped, so that a package
+// which later satisfies the import can be matched regardless of
+// whether the failed resolution knew the major version.
+func (pkg *Package) markImportUnresolved(ip ast.ImportPath) {
+	ip.Version = ""
+	if pkg.unresolvedImports == nil {
+		pkg.unresolvedImports = make(map[ast.ImportPath]struct{})
+	}
+	pkg.unresolvedImports[ip] = struct{}{}
 }
 
 // EnsureImportedBy ensures that importer is recorded as a user of

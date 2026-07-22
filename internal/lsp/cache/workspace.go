@@ -918,6 +918,21 @@ func (w *Workspace) reloadPackages() {
 			}
 		}
 
+		// A package loaded in this iteration may satisfy an import
+		// which previously failed to resolve. Any package holding
+		// such an unresolved import must be reloaded so that it now
+		// resolves the import (there is no record on the new package
+		// pointing back at the failed importers, so we must search
+		// for them).
+		for _, pkgModPkg := range processedPkgs {
+			if pkgModPkg == nil || pkgModPkg.pkg == nil {
+				continue
+			}
+			if w.markUnresolvedImportersDirty(pkgModPkg.pkg.importPath) {
+				repeatReload = true
+			}
+		}
+
 		// Note that there's a potential memory leak here: we might load a
 		// package "foo" because it's imported by "bar". If "bar" is edited
 		// so that it no longer imports "foo" then we'll notice that, and
@@ -1102,6 +1117,24 @@ func (w *Workspace) matchesUnknownEmbedding(file protocol.DocumentURI) bool {
 		}
 	}
 	return false
+}
+
+// markUnresolvedImportersDirty marks as dirty every loaded package
+// which has an unresolved import that a package with the given
+// import path would satisfy. It reports whether any package was
+// marked.
+func (w *Workspace) markUnresolvedImportersDirty(ip ast.ImportPath) bool {
+	ip.Version = ""
+	marked := false
+	for _, m := range w.modules {
+		for _, pkg := range m.packages {
+			if _, found := pkg.unresolvedImports[ip]; found {
+				pkg.markDirty()
+				marked = true
+			}
+		}
+	}
+	return marked
 }
 
 func (w *Workspace) findPackage(modRootURI protocol.DocumentURI, ip ast.ImportPath) (*Package, bool) {

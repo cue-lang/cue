@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
@@ -63,15 +63,15 @@ x: 4
 	}
 
 	t.Run("format syntactically valid", func(t *testing.T) {
-		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("m/a/a.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
 			env.FormatBuffer("m/a/a.cue")
 			content, open := env.Editor.BufferText("m/a/a.cue")
@@ -81,15 +81,15 @@ x: 4
 	})
 
 	t.Run("format syntactically invalid", func(t *testing.T) {
-		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("m/a/b.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
 			env.FormatBuffer("m/a/b.cue")
 			content, open := env.Editor.BufferText("m/a/b.cue")
@@ -99,15 +99,15 @@ x: 4
 	})
 
 	t.Run("format with fixed formatter", func(t *testing.T) {
-		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("m/a/c.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/m/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
 			)
 			env.FormatBuffer("m/a/c.cue")
 			content, open := env.Editor.BufferText("m/a/c.cue")
@@ -117,7 +117,7 @@ x: 4
 	})
 
 	t.Run("format no-package file", func(t *testing.T) {
-		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 			env.OpenFile("m/a/nopkg.cue")
 			env.Await(env.DoneWithOpen())
 			env.FormatBuffer("m/a/nopkg.cue")
@@ -128,7 +128,7 @@ x: 4
 	})
 
 	t.Run("format standalone file", func(t *testing.T) {
-		WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 			env.OpenFile("standalone/a.cue")
 			env.Await(env.DoneWithOpen())
 			env.FormatBuffer("standalone/a.cue")

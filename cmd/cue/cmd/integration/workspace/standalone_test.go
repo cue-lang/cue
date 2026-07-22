@@ -4,14 +4,14 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 )
 
 func TestStandalone(t *testing.T) {
 	t.Run("open", func(t *testing.T) {
 		// no package decl, no module
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("a/a.cue", `
 x: 4
@@ -19,8 +19,8 @@ y: x
 `[1:])
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
 			)
 
 			// Check we can do jump to definition
@@ -42,19 +42,19 @@ y: x
 			env.CloseBuffer("a/a.cue")
 			env.Await(
 				env.DoneWithClose(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
 				// Once the buffer is closed, there's an attempt to read
 				// it from disk, which will error:
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Error when reloading: ", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Error when reloading: ", rootURI),
 				// And given it doesn't exist on disk, it'll be deleted
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Deleted", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Deleted", rootURI),
 			)
 		})
 	})
 
 	t.Run("open with package", func(t *testing.T) {
 		// package decl, but no module
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("a/a.cue", `
 package wibble
@@ -64,15 +64,15 @@ y: x
 `[1:])
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
 			)
 		})
 	})
 
 	t.Run("open with module", func(t *testing.T) {
 		// module, but no package decl
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("cue.mod/module.cue", `
 module: "cue.example.net"
@@ -88,8 +88,8 @@ y: x
 				// If a file is missing a package declaration then we add
 				// one. So if there is a valid module then such files will
 				// not be treated as standalone.
-				LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Created`, rootURI),
-				LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Reloaded`, rootURI),
+				I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Created`, rootURI),
+				I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/a\] importPath=cue\.example\.net/a@v0:_.+ Reloaded`, rootURI),
 			)
 		})
 	})
@@ -100,36 +100,36 @@ y: x
 		// empty. Calling Pos() on such an AST returns NoPos, which has
 		// a nil source [token.File]. We test that this scenario does
 		// not cause crashes.
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("z.cue", "@")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: invalid attribute: expected '('", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: invalid attribute: expected '('", rootURI),
 				// The file is kept, with its error published as a
 				// diagnostic.
-				Diagnostics(ForFile("z.cue")),
+				I.Diagnostics(I.ForFile("z.cue")),
 			)
 		})
 	})
 
 	t.Run("open - bad experiment", func(t *testing.T) {
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("z.cue", "@experiment(unknown)")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: parsing experiments", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: parsing experiments", rootURI),
 				// The file is kept, with its error published as a
 				// diagnostic.
-				Diagnostics(ForFile("z.cue")),
+				I.Diagnostics(I.ForFile("z.cue")),
 			)
 		})
 	})
 
 	t.Run("transition to module", func(t *testing.T) {
 		// starts with a package and without a module, then we add the module
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("a/a.cue", `
 package wibble
@@ -139,9 +139,9 @@ y: x
 `[1:])
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
-				NoLogExactf(protocol.Debug, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
+				I.NoLogExactf(protocol.Debug, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Reloaded", rootURI),
 			)
 			env.CreateBuffer("cue.mod/module.cue", `
 module: "cue.example.net"
@@ -149,15 +149,15 @@ language: version: "v0.13.0"
 `[1:])
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Deleted", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Deleted", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Reloaded", rootURI),
 			)
 		})
 	})
 
 	t.Run("transition to standalone", func(t *testing.T) {
 		// starts with package and module, but then we delete the module
-		WithOptions(RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *Env) {
+		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.CreateBuffer("cue.mod/module.cue", `
 module: "cue.example.net"
@@ -172,16 +172,16 @@ y: x
 `[1:])
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Reloaded", rootURI),
-				NoLogExactf(protocol.Debug, "StandaloneFile %v/a/a.cue Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Reloaded", rootURI),
+				I.NoLogExactf(protocol.Debug, "StandaloneFile %v/a/a.cue Created", rootURI),
 			)
 			env.CloseBuffer("cue.mod/module.cue")
 			env.Await(
 				env.DoneWithClose(),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Deleted", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=cue.example.net@v0 Deleted", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=cue.example.net/a@v0:wibble Deleted", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=cue.example.net@v0 Deleted", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/a/a.cue Reloaded", rootURI),
 			)
 		})
 	})

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/lsp/cache"
 	"cuelang.org/go/mod/modcache"
@@ -59,84 +59,84 @@ import "
 `
 
 	t.Run("open", func(t *testing.T) {
-		WithOptions(
-			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
-		).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("a/a.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Reloaded", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/a@v0]", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/a@v0]", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 				// A module is created for the imported module.
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=unknown Created", cacheURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo@v0.0.1 module=example.com/foo@v0 Reloaded", cacheURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
 			)
 		})
 	})
 
 	t.Run("open - bad import", func(t *testing.T) {
-		WithOptions(
-			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
-		).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("b/b.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/b] importPath=example.com/bar/b@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/b] importPath=example.com/bar/b@v0 Reloaded", rootURI),
 				// Nothing is created for the unfindable imports
-				NoLogExactf(protocol.Debug, "example.net/bar/doesnotexist"),
-				NoLogExactf(protocol.Debug, "example.com/bar/doesnotexist"),
+				I.NoLogExactf(protocol.Debug, "example.net/bar/doesnotexist"),
+				I.NoLogExactf(protocol.Debug, "example.com/bar/doesnotexist"),
 			)
 		})
 	})
 
 	t.Run("open - bad import syntax", func(t *testing.T) {
-		WithOptions(
-			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
-		).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("c/c.cue")
 			env.Await(
 				env.DoneWithOpen(),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/c@v0]", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Created", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Error when reloading: cannot get imports", rootURI),
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Deleted", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Loading packages [example.com/bar/c@v0]", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Created", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=example.com/bar@v0 Error when reloading: cannot get imports", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Deleted", rootURI),
 			)
 			// Now edit it to correct the imports line:
 			env.EditBuffer("c/c.cue", fake.NewEdit(2, 7, 2, 7, `"`))
 			env.Await(
 				env.DoneWithChange(),
 				// We should get the package load
-				LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Reloaded", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/c] importPath=example.com/bar/c@v0 Reloaded", rootURI),
 			)
 		})
 	})
 
 	t.Run("jump to definition - inter module", func(t *testing.T) {
-		WithOptions(
-			RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
-		).Run(t, files, func(t *testing.T, env *Env) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
 			env.Await(
-				LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
 			env.OpenFile("a/a.cue")
 			env.Await(

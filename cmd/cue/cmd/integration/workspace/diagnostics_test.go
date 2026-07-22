@@ -3,7 +3,7 @@ package workspace
 import (
 	"testing"
 
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 )
 
@@ -27,11 +27,11 @@ language: version: "v0.11.0"
 -- a/a.cue --
 hello world
 `
-				WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+				I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 					env.OpenFile("a/a.cue")
 					env.Await(
 						env.DoneWithOpen(),
-						Diagnostics(ForFile("a/a.cue"), env.AtRegexp("a/a.cue", "world")),
+						I.Diagnostics(I.ForFile("a/a.cue"), env.AtRegexp("a/a.cue", "world")),
 					)
 				})
 			})
@@ -41,11 +41,11 @@ hello world
 -- a/a.cue --
 "hello world"
 `
-				WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+				I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 					env.OpenFile("a/a.cue")
 					env.Await(
 						env.DoneWithOpen(),
-						NoDiagnostics(ForFile("a/a.cue")),
+						I.NoDiagnostics(I.ForFile("a/a.cue")),
 					)
 				})
 			})
@@ -55,16 +55,16 @@ hello world
 -- a/a.cue --
 helloworld
 `
-				WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+				I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 					env.OpenFile("a/a.cue")
 					env.Await(
 						env.DoneWithOpen(),
-						NoDiagnostics(ForFile("a/a.cue")),
+						I.NoDiagnostics(I.ForFile("a/a.cue")),
 					)
 
 					env.EditBuffer("a/a.cue", fake.NewEdit(0, 5, 0, 5, " ")) // transform to `hello world`
 					env.Await(
-						Diagnostics(ForFile("a/a.cue"), env.AtRegexp("a/a.cue", "world")),
+						I.Diagnostics(I.ForFile("a/a.cue"), env.AtRegexp("a/a.cue", "world")),
 					)
 				})
 			})
@@ -74,16 +74,16 @@ helloworld
 -- a/a.cue --
 hello world
 `
-				WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+				I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 					env.OpenFile("a/a.cue")
 					env.Await(
 						env.DoneWithOpen(),
-						Diagnostics(ForFile("a/a.cue"), env.AtRegexp("a/a.cue", "world")),
+						I.Diagnostics(I.ForFile("a/a.cue"), env.AtRegexp("a/a.cue", "world")),
 					)
 
 					env.EditBuffer("a/a.cue", fake.NewEdit(0, 5, 0, 6, "")) // transform to `helloworld`
 					env.Await(
-						NoDiagnostics(ForFile("a/a.cue")),
+						I.NoDiagnostics(I.ForFile("a/a.cue")),
 					)
 				})
 			})

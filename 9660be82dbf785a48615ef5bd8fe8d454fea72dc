@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9903a8a_ed96cf77",
+        "filename": "cmd/cue/cmd/integration/workspace/embedchange_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T12:02:29Z",
+      "side": 1,
+      "message": "This logic is repeated in every single test. Maybe worth factoring out to a helper function?",
+      "revId": "9660be82dbf785a48615ef5bd8fe8d454fea72dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

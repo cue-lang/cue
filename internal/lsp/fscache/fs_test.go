@@ -310,6 +310,27 @@ func TestOverlayFSRootedAtRoot(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 }
 
+// TestReadFileNonCUE shows bad behaviour: a file which can never be
+// parsed as CUE (e.g. a markdown file) never has its content read
+// from disk at all, so Content returns nothing. Consumers such as
+// the external validator snapshot rely on Content.
+func TestReadFileNonCUE(t *testing.T) {
+	const content = "# a readme\n"
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "README.md"), content)
+	forceMFTUpdateOnWindows(t, dir)
+
+	fs := fscache.NewCUECachedFS()
+	fh, err := fs.ReadFile(protocol.URIFromPath(filepath.Join(dir, "README.md")))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.HasLen(fh.Content(), 0))
+
+	// It does not parse as CUE.
+	syntax, _, err := fh.ReadCUE(parser.NewConfig())
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsNil(syntax))
+}
+
 func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {
 	t.Helper()
 	dir = t.TempDir()

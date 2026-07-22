@@ -936,8 +936,7 @@ func (w *Workspace) reloadPackages() {
 			// NB the loop body can re-add entries to m.dirtyFiles (via
 			// markFileDirty): iterate over a snapshot of the keys so
 			// that any re-added file is left for the next iteration of
-			// the enclosing reload loop, rather than being
-			// (unspecifiedly) re-produced by this range.
+			// the enclosing reload loop.
 			for _, fileUri := range slices.Sorted(maps.Keys(m.dirtyFiles)) {
 				delete(m.dirtyFiles, fileUri)
 

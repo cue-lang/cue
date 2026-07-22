@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 )
 
@@ -251,7 +251,7 @@ x: p3
 	}
 
 	for _, tc := range testCases {
-		fun := func(t *testing.T, env *Env) {
+		fun := func(t *testing.T, env *I.Env) {
 			resolveSupport, err := env.Editor.EditResolveSupport()
 			if err != nil {
 				t.Fatal(err)
@@ -291,13 +291,13 @@ x: p3
 		}
 
 		t.Run(tc.name+"/eager", func(t *testing.T) {
-			WithOptions(RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, fun)
+			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, fun)
 		})
 
 		t.Run(tc.name+"/lazy", func(t *testing.T) {
-			WithOptions(
-				RootURIAsDefaultFolder(),
-				CapabilitiesJSON([]byte(`{
+			I.WithOptions(
+				I.RootURIAsDefaultFolder(),
+				I.CapabilitiesJSON([]byte(`{
   "textDocument": {"codeAction": {
     "dataSupport": true,
     "resolveSupport": {"properties": ["edit"]}

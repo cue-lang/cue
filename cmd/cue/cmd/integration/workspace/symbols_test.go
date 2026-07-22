@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
@@ -56,7 +56,7 @@ b.dog: range:4:3-4:9 selectionRange:4:3-4:6
 		}
 
 		t.Run(name, func(t *testing.T) {
-			WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 				rootURI := env.Sandbox.Workdir.RootURI()
 
 				env.OpenFile(name)

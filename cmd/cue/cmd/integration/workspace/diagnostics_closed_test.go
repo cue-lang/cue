@@ -3,7 +3,7 @@ package workspace
 import (
 	"testing"
 
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 )
 
 // TestDiagnosticsClearedAfterClose tests that diagnostics published
@@ -28,12 +28,12 @@ package a
 
 y: 6
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
 			// data1.json does not exist, so a.cue has a diagnostic.
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			I.Diagnostics(I.ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
 		)
 
 		env.CloseBuffer("a.cue")
@@ -43,7 +43,7 @@ y: 6
 		env.WriteWorkspaceFile("data/data1.json", `{"field1": true}`)
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			NoDiagnostics(ForFile("a.cue")),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 	})
 }
@@ -67,11 +67,11 @@ package a
 
 y: 6
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			I.Diagnostics(I.ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
 		)
 
 		env.CloseBuffer("a.cue")
@@ -82,7 +82,7 @@ y: 6
 		env.RemoveWorkspaceFile("a.cue")
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			NoDiagnostics(ForFile("a.cue")),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 	})
 }

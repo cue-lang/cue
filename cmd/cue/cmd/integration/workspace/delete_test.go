@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 )
 
@@ -17,14 +17,14 @@ language: version: "v0.11.0"
 -- a.cue --
 package a
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x@v0:a]", rootURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x@v0:a]", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		err := env.Sandbox.Workdir.RemoveFile(env.Ctx, "a.cue")
@@ -36,9 +36,9 @@ package a
 		env.CloseBuffer("a.cue")
 		env.Await(
 			env.DoneWithClose(),
-			LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x@v0:a]", rootURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Deleted", rootURI),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Cannot read file %v/a.cue: ", rootURI, rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x@v0:a]", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Deleted", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Cannot read file %v/a.cue: ", rootURI, rootURI),
 		)
 	})
 }

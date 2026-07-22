@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"golang.org/x/tools/txtar"
 )
 
@@ -13,7 +13,7 @@ import (
 // txtar archive, keyed by file name. Each mapper reflects the
 // archive's original file content: tests which edit a file must
 // replace its entry.
-func makeMappers(env *Env, files string) map[string]*protocol.Mapper {
+func makeMappers(env *I.Env, files string) map[string]*protocol.Mapper {
 	mappers := make(map[string]*protocol.Mapper)
 	for _, file := range txtar.Parse([]byte(files)).Files {
 		mappers[file.Name] = protocol.NewMapper(env.Sandbox.Workdir.URI(file.Name), file.Data)
@@ -53,7 +53,7 @@ out: field: {
   }
 }
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
@@ -61,7 +61,7 @@ out: field: {
 		env.OpenFile("data/data2.json")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		mappers := makeMappers(env, files)
@@ -92,7 +92,7 @@ out: field: {
 		env.RegexpReplace("a.cue", "data1", "data2")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// After the change: data2.json is embedded, data1.json is not.
@@ -125,13 +125,13 @@ out: _ @embed(file=data/data1.json)
 -- data/data2.json --
 {"field2": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		mappers := makeMappers(env, files)
@@ -145,7 +145,7 @@ out: _ @embed(file=data/data1.json)
 		env.RegexpReplace("a.cue", "data1", "data2")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		definitionsTestCases{
@@ -157,7 +157,7 @@ out: _ @embed(file=data/data1.json)
 		env.RegexpReplace("a.cue", "data2", "data1")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		definitionsTestCases{
@@ -185,25 +185,25 @@ out: _ @embed(file=data/data1.json)
 -- data/data1.json --
 {"field1": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			NoDiagnostics(ForFile("a.cue")),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 
 		// Point the attribute at a file which does not exist.
 		env.RegexpReplace("a.cue", "data1", "data3")
 		env.Await(
 			env.DoneWithChange(),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			I.Diagnostics(I.ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
 		)
 
 		// And point it back at the file which does exist.
 		env.RegexpReplace("a.cue", "data3", "data1")
 		env.Await(
 			env.DoneWithChange(),
-			NoDiagnostics(ForFile("a.cue")),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 	})
 }
@@ -226,13 +226,13 @@ out: _ @embed(glob=data/d1*.json)
 -- data/d2a.json --
 {"field2": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		mappers := makeMappers(env, files)
@@ -246,7 +246,7 @@ out: _ @embed(glob=data/d1*.json)
 		env.RegexpReplace("a.cue", `glob=data/d1`, "glob=data/d2")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		definitionsTestCases{
@@ -276,13 +276,13 @@ out: _ @embed(file=data/data1.json)
 -- data/dataX23.json --
 {"fieldX23": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Type towards dataX23.json one edit at a time, without
@@ -294,7 +294,7 @@ out: _ @embed(file=data/data1.json)
 		env.Await(
 			env.DoneWithChange(),
 			env.DoneWithSave(),
-			NoDiagnostics(ForFile("a.cue")),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 
 		mappers := makeMappers(env, files)
@@ -329,20 +329,20 @@ out: _ @embed(file=data/data1.json)
 -- other/data3.json --
 {"field3": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		env.RegexpReplace("a.cue", `data/data1\.json`, "other/data3.json")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			NoDiagnostics(ForFile("a.cue")),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 
 		mappers := makeMappers(env, files)
@@ -376,14 +376,14 @@ package a
 
 out: _ @embed(file=other/data3.json)
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.Diagnostics(I.ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
 		)
 
 		// Now create the file on disk, without opening it in the
@@ -393,9 +393,9 @@ out: _ @embed(file=other/data3.json)
 			env.DoneWithChangeWatchedFiles(),
 			// A package is created for the new file, the embedding
 			// package is reloaded, and the diagnostic clears.
-			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/other\] importPath=mod\.example/x/other@v0:_.+ Reloaded`, rootURI),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			NoDiagnostics(ForFile("a.cue")),
+			I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/other\] importPath=mod\.example/x/other@v0:_.+ Reloaded`, rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 
 		mappers := makeMappers(env, files)
@@ -430,14 +430,14 @@ package a
 
 out: _ @embed(glob=other/*/*.json)
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.Diagnostics(I.ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
 		)
 
 		env.WriteWorkspaceFile("other/foo/bar.json", `{"bar": true}`)
@@ -445,9 +445,9 @@ out: _ @embed(glob=other/*/*.json)
 			env.DoneWithChangeWatchedFiles(),
 			// A package is created for the new file, the embedding
 			// package is reloaded, and the diagnostic clears.
-			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/other/foo\] importPath=mod\.example/x/other/foo@v0:_.+ Reloaded`, rootURI),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			NoDiagnostics(ForFile("a.cue")),
+			I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/other/foo\] importPath=mod\.example/x/other/foo@v0:_.+ Reloaded`, rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.NoDiagnostics(I.ForFile("a.cue")),
 		)
 	})
 }
@@ -469,27 +469,27 @@ out: _ @embed(file=data/data1.json)
 -- data/data1.json --
 {"field1": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Point the attribute at a file which does not exist yet.
 		env.RegexpReplace("a.cue", "data1", "data3")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Now create the file.
 		env.CreateBuffer("data/data3.json", `{"field3": true}`)
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		mappers := makeMappers(env, files)
@@ -522,15 +522,15 @@ out: _ @embed(file=data/data1.json)
 -- data/data2.json --
 {"field2": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
-			LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
+			I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
 		)
 
 		mappers := makeMappers(env, files)
@@ -548,11 +548,11 @@ out: _ @embed(file=data/data1.json)
 		env.RegexpReplace("a.cue", "data1", "data2")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 			// A second phantom package (for data2.json) should now be
 			// created and loaded.
-			LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
-			LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
+			I.LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
+			I.LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
 		)
 
 		// NB the a.cue mapper reflects the original content; the buffer

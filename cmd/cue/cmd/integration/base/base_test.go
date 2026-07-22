@@ -4,13 +4,13 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/hooks"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"github.com/go-quicktest/qt"
 )
 
 func TestMain(m *testing.M) {
-	Main(m, hooks.Options)
+	I.Main(m, hooks.Options)
 }
 
 func TestFormatFile(t *testing.T) {
@@ -24,7 +24,7 @@ package foo
 
   // this is a test
 `
-	Run(t, files, func(t *testing.T, env *Env) {
+	I.Run(t, files, func(t *testing.T, env *I.Env) {
 		env.OpenFile("foo.cue")
 		env.EditBuffer("foo.cue", fake.NewEdit(0, 0, 1, 0, "package bar\n"))
 		env.FormatBuffer("foo.cue")

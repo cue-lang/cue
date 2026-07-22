@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 )
 
@@ -39,7 +39,7 @@ bx: out.field
 -- data/data.json --
 {"field": true}
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
@@ -47,8 +47,8 @@ bx: out.field
 		env.OpenFile("data/data.json")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:b Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:b Reloaded", rootURI),
 		)
 
 		// "field" within `bx: out.field` in b.cue.
@@ -96,7 +96,7 @@ bx: out.field
 		env.RegexpReplace("a.cue", "ax:", "ay:")
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// References within data.json must still find the usages in

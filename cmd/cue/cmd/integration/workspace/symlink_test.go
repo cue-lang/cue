@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"github.com/go-quicktest/qt"
 )
@@ -22,7 +22,7 @@ language: version: "v0.11.0"
 -- a.cue --
 package a
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 		rootFilePath := rootURI.FilePath()
 
@@ -36,7 +36,7 @@ package a
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// The order of these events is very important. We need to
@@ -50,7 +50,7 @@ package a
 		env.CheckForFileChanges()
 
 		env.Await(
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Closing a.cue will now cause a re-read of the file from disk
@@ -60,7 +60,7 @@ package a
 		env.CloseBuffer("a.cue")
 		env.Await(
 			env.DoneWithClose(),
-			LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 3, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 	})
 }
@@ -79,7 +79,7 @@ y: x
 // docs for x
 x: _
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 		rootFilePath := rootURI.FilePath()
 
@@ -89,7 +89,7 @@ x: _
 		env.OpenFile("sym link/a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sym%%20link] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sym%%20link] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		got, _ := env.Hover(protocol.Location{

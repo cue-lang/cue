@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 
 	"github.com/go-quicktest/qt"
 )
@@ -28,17 +28,17 @@ package x
 y: 3
 `
 
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 		env.Await(
-			LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 		)
 		env.OpenFile("a/a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 			// A package is created for the imported package.
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/x] importPath=example.com/bar/x@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/x] importPath=example.com/bar/x@v0 Reloaded", rootURI),
 		)
 
 		// Now perform a jump-to-dfn from the open a.cue file, from the

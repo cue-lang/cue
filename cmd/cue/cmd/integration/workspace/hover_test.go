@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/lsp/rangeset"
 
 	"github.com/go-quicktest/qt"
@@ -85,19 +85,19 @@ f: x.z
 g: f.y.x
 `
 
-	WithOptions(
-		RootURIAsDefaultFolder(), Registry(reg), Modes(DefaultModes()&^Forwarded),
-	).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(
+		I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+	).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 		cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
 		env.Await(
-			LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 		)
 		env.OpenFile("a/a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
 		)
 
 		mappers := make(map[string]*protocol.Mapper)

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 )
 
@@ -91,7 +91,7 @@ a:
 	}
 
 	for _, tc := range testCases {
-		fun := func(t *testing.T, env *Env) {
+		fun := func(t *testing.T, env *I.Env) {
 			resolveSupport, err := env.Editor.EditResolveSupport()
 			if err != nil {
 				t.Fatal(err)
@@ -136,13 +136,13 @@ a:
 		}
 
 		t.Run(tc.name+"/eager", func(t *testing.T) {
-			WithOptions(RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, fun)
+			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, fun)
 		})
 
 		t.Run(tc.name+"/lazy", func(t *testing.T) {
-			WithOptions(
-				RootURIAsDefaultFolder(),
-				CapabilitiesJSON([]byte(`{
+			I.WithOptions(
+				I.RootURIAsDefaultFolder(),
+				I.CapabilitiesJSON([]byte(`{
   "textDocument": {"codeAction": {
     "dataSupport": true,
     "resolveSupport": {"properties": ["edit"]}
@@ -242,7 +242,7 @@ a:
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			WithOptions(RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, func(t *testing.T, env *Env) {
+			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, func(t *testing.T, env *I.Env) {
 				env.OpenFile("input.cue")
 				env.Await(env.DoneWithOpen())
 				rootURI := env.Sandbox.Workdir.RootURI()
@@ -315,7 +315,7 @@ foo: {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			WithOptions(RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, func(t *testing.T, env *Env) {
+			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "-- input.cue --\n"+tc.input, func(t *testing.T, env *I.Env) {
 				env.OpenFile("input.cue")
 				env.Await(env.DoneWithOpen())
 				rootURI := env.Sandbox.Workdir.RootURI()

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"github.com/go-quicktest/qt"
 )
 
@@ -26,23 +26,23 @@ import "mod.example/x/sub"
 
 ax: sub.y
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Now create the imported package.
 		env.CreateBuffer("sub/sub.cue", "package sub\n\ny: 4\n")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sub] importPath=mod.example/x/sub@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sub] importPath=mod.example/x/sub@v0 Reloaded", rootURI),
 			// The importing package must be reloaded so that its
 			// import now resolves.
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Definitions on "y" within "ax: sub.y" must arrive at
@@ -80,13 +80,13 @@ import "mod.example/x/sub"
 
 ax: sub.y
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		// Now create the imported package on disk, without opening
@@ -94,10 +94,10 @@ ax: sub.y
 		env.WriteWorkspaceFile("sub/sub.cue", "package sub\n\ny: 4\n")
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sub] importPath=mod.example/x/sub@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/sub] importPath=mod.example/x/sub@v0 Reloaded", rootURI),
 			// The importing package must be reloaded so that its
 			// import now resolves.
-			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
 		gotDefs := env.Definition(protocol.Location{

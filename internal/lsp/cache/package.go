@@ -188,44 +188,59 @@ func (pkg *Package) matchesUnknownEmbedding(fileUri protocol.DocumentURI) bool {
 	return false
 }
 
-// resetEval resets the package's own evaluator. If recursive is true,
-// it also resets the evaluators of every upstream and downstream
-// package that could possibly contain objects (frames, navigables
-// etc) from this package's evaluator.
+// resetEval resets the package's own evaluator. If recursive is
+// true, it also resets the evaluator of every package reachable from
+// this one over the import and embed relationships, followed in both
+// directions.
+//
+// Evaluators write into each other during evaluation: a package's
+// evaluator records usages within the evaluators of the packages it
+// imports and embeds, and holds pointers into their state (and vice
+// versa). Resetting one evaluator therefore invalidates state held
+// by, and within, its neighbors, transitively: the entire connected
+// component must be reset together. Anything less leaves some
+// third-party package holding pointers into a reset evaluator. For
+// example, when two packages embed the same file, resetting one
+// embedder (and hence the embedded package) must also reset the
+// other embedder: otherwise its usage records within the embedded
+// package's evaluator are lost, and its own memoized state prevents
+// them from ever being re-recorded, so find-references within the
+// embedded file silently misses results.
 func (pkg *Package) resetEval(recursive bool) {
-	if pkg.eval != nil {
-		pkg.eval.Reset()
-	}
-
 	if !recursive {
+		if pkg.eval != nil {
+			pkg.eval.Reset()
+		}
 		return
 	}
 
-	// upstream - packges we import
-	worklist := pkg.imports
-	for len(worklist) > 0 {
-		importedPkg := worklist[0]
-		importedPkg.resetEval(false)
-		worklist = append(worklist[1:], importedPkg.imports...)
-	}
-
-	// upstream - files/pkgs we embed - no need for transitive
-	// treatment because an embedded pkg cannot embed or import
-	// anything.
-	for _, embedding := range pkg.embeddings {
-		for _, embedded := range embedding.results {
-			if embeddedPkg := embedded.pkg; embeddedPkg != nil {
-				embeddedPkg.resetEval(false)
+	seen := map[*Package]struct{}{pkg: {}}
+	worklist := []*Package{pkg}
+	enqueue := func(pkgs ...*Package) {
+		for _, p := range pkgs {
+			if _, found := seen[p]; !found {
+				seen[p] = struct{}{}
+				worklist = append(worklist, p)
 			}
 		}
 	}
-
-	// downstream - packages that import (or embed) us
-	worklist = append(pkg.importedBy, pkg.embeddedBy...)
 	for len(worklist) > 0 {
-		pkg := worklist[0]
-		pkg.resetEval(false)
-		worklist = append(worklist[1:], pkg.importedBy...)
+		p := worklist[0]
+		worklist = worklist[1:]
+		if p.eval != nil {
+			p.eval.Reset()
+		}
+
+		enqueue(p.imports...)
+		enqueue(p.importedBy...)
+		enqueue(p.embeddedBy...)
+		for _, embedding := range p.embeddings {
+			for _, embedded := range embedding.results {
+				if embeddedPkg := embedded.pkg; embeddedPkg != nil {
+					enqueue(embeddedPkg)
+				}
+			}
+		}
 	}
 }
 

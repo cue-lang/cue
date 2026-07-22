@@ -8,13 +8,14 @@ import (
 	"github.com/go-quicktest/qt"
 )
 
-// TestReferencesEmbedCoEmbedders shows bad behaviour: find-references
-// within a file which is embedded by two different packages silently
-// misses results after one of the embedding packages has been
-// edited. Editing one embedder resets the embedded package's
-// evaluator, but not the other embedder's, whose usage records
-// within the embedded package are lost: its own memoized state
-// prevents them from being re-recorded.
+// TestReferencesEmbedCoEmbedders tests find-references within a file
+// which is embedded by two different packages, after one of the
+// embedding packages has been edited. Editing one embedder resets
+// the embedded package's evaluator; the other embedder's evaluator
+// must be reset too, otherwise its usage records within the embedded
+// package are lost (its own memoized state prevents them from being
+// re-recorded), and find-references within the embedded file
+// silently misses its results.
 func TestReferencesEmbedCoEmbedders(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -98,10 +99,9 @@ bx: out.field
 			LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
-		// References within data.json should still find the usages in
-		// both embedding packages, but b.cue's usage has been lost.
-		wantToStale := []protocol.Location{wantTo[0], wantTo[2]}
+		// References within data.json must still find the usages in
+		// both embedding packages.
 		gotTo = env.References(fromJSON)
-		qt.Assert(t, qt.ContentEquals(gotTo, wantToStale))
+		qt.Assert(t, qt.ContentEquals(gotTo, wantTo))
 	})
 }

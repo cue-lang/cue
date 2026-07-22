@@ -31,9 +31,7 @@ func TestExtractLineEnding(t *testing.T) {
 		{"foo\r\nbar", "\r\n"},
 		// The first line consisting only of its line terminator:
 		{"\nbar", "\n"},
-		// This shows bad behaviour: a CRLF file whose first line is
-		// empty is detected as using LF endings.
-		{"\r\nbar", "\n"},
+		{"\r\nbar", "\r\n"},
 	}
 
 	for _, tc := range testCases {

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 )
 
 // TestModuleRecovery tests the workspace's behavior when a broken
@@ -20,13 +20,13 @@ package a
 
 x: 5
 `
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
 		env.OpenFile("cue.mod/module.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Deleted", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=unknown Deleted", rootURI),
 		)
 
 		// Now fix the module file.
@@ -35,10 +35,10 @@ language: version: "v0.16.0"
 `)
 		env.Await(
 			env.DoneWithChange(),
-			LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Reloaded", rootURI),
 			// No package may be created for the cue.mod directory.
-			NoLogMatching(protocol.Debug, `Package dirs=\[%v/cue\.mod\]`, rootURI),
-			NoLogMatching(protocol.Debug, `produced no result`),
+			I.NoLogMatching(protocol.Debug, `Package dirs=\[%v/cue\.mod\]`, rootURI),
+			I.NoLogMatching(protocol.Debug, `produced no result`),
 		)
 	})
 }

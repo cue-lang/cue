@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 
 	"github.com/go-quicktest/qt"
 )
@@ -64,12 +64,12 @@ package dontload
 greeting: "hello"
 `
 
-	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 		env.OpenFile("a/a.cue")
 		env.Await(
 			env.DoneWithOpen(),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 		)
 
 		// Now perform a find-references from the open a/a.cue file,
@@ -144,7 +144,7 @@ greeting: "hello"
 		env.Await(
 			// Make sure we did not create a package dontload: that pkg
 			// only belongs to the nested module.
-			NoLogExactf(protocol.Debug, "Package dirs=[%v/nested] importPath=example.com/bar/nested@v0:dontload", rootURI),
+			I.NoLogExactf(protocol.Debug, "Package dirs=[%v/nested] importPath=example.com/bar/nested@v0:dontload", rootURI),
 		)
 	})
 }

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fedcfb6_5d193400",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T12:25:05Z",
+      "side": 1,
+      "message": "LGTM except I don\u0027t really understand the test.",
+      "revId": "e650cb132c520c0de7433264c19f77bf34533d0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13f8acd7_f4bacbec",
+        "filename": "internal/lsp/fscache/fs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T12:25:05Z",
+      "side": 1,
+      "message": "I don\u0027t get the \"and the returned config is invalid\" assertion here.\nHow does the fact that the file isn\u0027t cached imply that the returned config is invalid?",
+      "revId": "e650cb132c520c0de7433264c19f77bf34533d0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

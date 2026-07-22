@@ -332,7 +332,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 
 	for i, modpkgFile := range modpkgFiles {
 		evalASTs[i] = modpkgFile.Syntax
-		fileUri := m.rootURI + protocol.DocumentURI("/"+modpkgFile.FilePath)
+		fileUri := joinURI(m.rootURI, modpkgFile.FilePath)
 		delete(m.dirtyFiles, fileUri)
 
 		isCue = isCue && strings.HasSuffix(string(fileUri), ".cue")
@@ -392,7 +392,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 					}
 					for _, filePath := range matches {
 						embedding.results = append(embedding.results, &embeddingResult{
-							fileUri: m.rootURI + "/" + protocol.DocumentURI(filePath),
+							fileUri: joinURI(m.rootURI, filePath),
 						})
 					}
 				}

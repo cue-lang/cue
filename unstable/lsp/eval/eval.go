@@ -1610,7 +1610,12 @@ func expandNavigables(navs []*navigable) map[*navigable]struct{} {
 // those locations it walks forward down the (reversed) path.
 func expandNavigablesViaPath(navs []*navigable) map[*navigable]struct{} {
 	result := expandNavigables(navs)
-	for nav := range result {
+	// NB the loop body adds the navigables it discovers to result:
+	// iterate over a snapshot of the keys so that only the original
+	// navigables are path-walked, deterministically, rather than
+	// leaving it unspecified whether newly added navigables are
+	// visited too.
+	for _, nav := range slices.Collect(maps.Keys(result)) {
 		var names []string
 		for ; nav != nil && nav.name != ""; nav = nav.parent {
 			names = append(names, nav.name)

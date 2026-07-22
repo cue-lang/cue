@@ -61,3 +61,50 @@ ax: sub.y
 		qt.Assert(t, qt.DeepEquals(gotDefs, wantDefs))
 	})
 }
+
+// TestImportCreatedLaterOnDisk is like TestImportCreatedLater,
+// except the imported package is created on disk (not in the
+// editor), in a directory which contains no other active files. This
+// shows bad behaviour: the file's creation is ignored entirely, so
+// the new package is never loaded and the import stays unresolved.
+func TestImportCreatedLaterOnDisk(t *testing.T) {
+	const files = `
+-- cue.mod/module.cue --
+module: "mod.example/x"
+language: version: "v0.16.0"
+
+-- a.cue --
+package a
+
+import "mod.example/x/sub"
+
+ax: sub.y
+`
+	WithOptions(RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+
+		env.OpenFile("a.cue")
+		env.Await(
+			env.DoneWithOpen(),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+		)
+
+		// Now create the imported package on disk, without opening
+		// any of its files in the editor. The creation is ignored:
+		// the new package is never loaded, and the importing package
+		// is not reloaded.
+		env.WriteWorkspaceFile("sub/sub.cue", "package sub\n\ny: 4\n")
+		env.Await(
+			env.DoneWithChangeWatchedFiles(),
+			NoLogMatching(protocol.Debug, `Package dirs=\[%v/sub\]`, rootURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+		)
+
+		// Definitions on "y" within "ax: sub.y" find nothing.
+		gotDefs := env.Definition(protocol.Location{
+			URI:   rootURI + "/a.cue",
+			Range: protocol.Range{Start: protocol.Position{Line: 4, Character: 8}},
+		})
+		qt.Assert(t, qt.HasLen(gotDefs, 0))
+	})
+}

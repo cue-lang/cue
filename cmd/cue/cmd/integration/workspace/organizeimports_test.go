@@ -186,6 +186,61 @@ import (
 x: p1 & p4 & p7
 `[1:],
 		},
+
+		{
+			// This shows bad behaviour: every comment within the
+			// import block is silently deleted.
+			name: "comments_preserved",
+			input: `
+package p1
+
+import (
+	// doc for p3
+	"mod.com/p3" // pinned
+	// doc for unused p2
+	"mod.com/p2"
+	// floating comment for p4
+	"mod.com/p4"
+	// before the closing paren
+)
+
+x: p3 & p4
+`[1:],
+			expected: `
+package p1
+
+import (
+	"mod.com/p3"
+	"mod.com/p4"
+)
+
+x: p3 & p4
+`[1:],
+		},
+
+		{
+			// This shows bad behaviour: the surviving import's
+			// comments are silently deleted.
+			name: "comments_preserved_single_survivor",
+			input: `
+package p1
+
+import (
+	// doc for p3
+	"mod.com/p3" // pinned
+	"mod.com/p2"
+)
+
+x: p3
+`[1:],
+			expected: `
+package p1
+
+import "mod.com/p3"
+
+x: p3
+`[1:],
+		},
 	}
 
 	for _, tc := range testCases {

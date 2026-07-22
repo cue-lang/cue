@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a340d32e_14a68aff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T12:33:55Z",
+      "side": 1,
+      "message": "LGTM but maybe there\u0027s a slightly nicer fix here?",
+      "revId": "872c00ff455a486a097f0d55a6970dd85b08602c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f6efd9b_9756a3ce",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-22T12:33:55Z",
+      "side": 1,
+      "message": "I guess another approach might be to address the TODO inside `ast.File.Pos` rather than papering over the gap. For example we could add a `File *token.File` field to `ast.File`\nand populate that when parsing.",
+      "revId": "872c00ff455a486a097f0d55a6970dd85b08602c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

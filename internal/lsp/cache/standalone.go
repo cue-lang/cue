@@ -100,6 +100,10 @@ func (s *Standalone) deleteFile(uri protocol.DocumentURI) {
 // file.
 func (s *Standalone) subtractModulesAndPackages() error {
 	for fileUri, sfile := range s.files {
+		if sfile.file.syntax == nil {
+			// The file's content cannot currently be parsed at all.
+			continue
+		}
 		if pkgName := sfile.file.syntax.PackageName(); pkgName == "" {
 			continue
 		}
@@ -197,7 +201,7 @@ func (f *standaloneFile) reload() error {
 
 	syntax, _, err := fh.ReadCUE(standaloneParserConfig)
 	file := f.file
-	file.setSyntax(syntax)
+	file.setSyntax(syntax, fh.Content())
 	if err == nil {
 		file.ensureUser(f)
 	} else {
@@ -205,8 +209,13 @@ func (f *standaloneFile) reload() error {
 	}
 
 	if syntax == nil {
+		// The file's content cannot be parsed at all (e.g. fatally
+		// invalid YAML). Keep the standalone file, with its error,
+		// so that the error is published as a diagnostic and any
+		// previously published diagnostics are updated; but there is
+		// no evaluator for it.
+		f.definitions = nil
 		w.debugLogf("%v Error when reloading: %v", f, err)
-		f.delete()
 		return ErrBadFile
 	}
 	if extm := w.extValidatorMgr; extm != nil {

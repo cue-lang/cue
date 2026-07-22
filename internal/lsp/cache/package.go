@@ -340,7 +340,15 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 		file := w.ensureFile(fileUri)
 		filesSet[fileUri] = file
 		syntax := modpkgFile.Syntax
-		file.setSyntax(syntax)
+		var content []byte
+		if syntax == nil {
+			// Even without an AST, the file's content allows errors
+			// to be converted to diagnostics for this file.
+			if fh, err := w.overlayFS.ReadFile(fileUri); err == nil {
+				content = fh.Content()
+			}
+		}
+		file.setSyntax(syntax, content)
 
 		var errs []error
 		if modpkgFile.SyntaxError != nil {

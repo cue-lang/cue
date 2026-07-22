@@ -286,7 +286,7 @@ func extractLineEnding(content []byte, lineStartOffsets []int) string {
 	if len(lineStartOffsets) > 1 {
 		// be careful: the very first line could be \n only
 		offset := lineStartOffsets[1] - 2
-		if offset > 0 && content[offset] == '\r' {
+		if offset >= 0 && content[offset] == '\r' {
 			return "\r\n"
 		}
 	}

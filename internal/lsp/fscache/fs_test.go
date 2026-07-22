@@ -259,6 +259,42 @@ func TestReadCUENonCUECached(t *testing.T) {
 	}
 }
 
+// TestReadCUENoDecls shows bad behaviour: a CUE file with no
+// declarations (empty, or containing only comments) is anchored to a
+// token.File which carries no content and has the wrong size,
+// because ast.File.Pos fabricates a new, empty token.File on every
+// call for such files, and ReadCUE's SetContent lands on one of the
+// throwaways.
+func TestReadCUENoDecls(t *testing.T) {
+	contents := map[string]string{
+		"empty.cue":    "",
+		"comments.cue": "// just a comment\n\n// another\n",
+	}
+	dir := t.TempDir()
+	for name, content := range contents {
+		writeFile(t, filepath.Join(dir, name), content)
+	}
+	forceMFTUpdateOnWindows(t, dir)
+
+	fs := fscache.NewCUECachedFS()
+	for name := range contents {
+		uri := protocol.URIFromPath(filepath.Join(dir, name))
+		fh, err := fs.ReadFile(uri)
+		qt.Assert(t, qt.IsNil(err))
+
+		syntax, _, err := fh.ReadCUE(parser.NewConfig())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.IsNotNil(syntax))
+
+		tokFile := syntax.Pos().File()
+		qt.Assert(t, qt.IsNotNil(tokFile))
+		// The anchor carries no content,
+		qt.Assert(t, qt.HasLen(tokFile.Content(), 0), qt.Commentf("%s", name))
+		// and its size bears no relation to the file's.
+		qt.Assert(t, qt.Equals(tokFile.Size(), 1), qt.Commentf("%s", name))
+	}
+}
+
 func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {
 	t.Helper()
 	dir = t.TempDir()

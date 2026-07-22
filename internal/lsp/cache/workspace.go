@@ -366,6 +366,13 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 				// matches this file, but does not currently embed it -
 				// this file must be new in some way.
 				needsInspecting = true
+			} else if w.matchesUnresolvedImport(uri) {
+				// A loaded cue package has an import which does not
+				// currently resolve, and this file's directory is
+				// where that import's package would live. Inspecting
+				// this file will load its package, and reloadPackages
+				// will then reload the failed importers.
+				needsInspecting = true
 			}
 
 			if !needsInspecting {
@@ -1113,6 +1120,54 @@ func (w *Workspace) matchesUnknownEmbedding(file protocol.DocumentURI) bool {
 		for _, pkg := range m.packages {
 			if pkg.isCue && pkg.matchesUnknownEmbedding(file) {
 				return true
+			}
+		}
+	}
+	return false
+}
+
+// matchesUnresolvedImport reports whether any loaded cue package has
+// an unresolved import which the given file could help satisfy: that
+// is, whether the file's directory is a package directory implied by
+// some unresolved import path.
+func (w *Workspace) matchesUnresolvedImport(file protocol.DocumentURI) bool {
+	dir := file.Dir()
+
+	// Gather the unresolved import paths of all loaded packages: any
+	// loaded package, in any module, could hold an import which this
+	// file helps satisfy.
+	unresolved := make(map[ast.ImportPath]struct{})
+	for _, m := range w.modules {
+		for _, pkg := range m.packages {
+			maps.Copy(unresolved, pkg.unresolvedImports)
+		}
+	}
+	if len(unresolved) == 0 {
+		return false
+	}
+
+	// For each module enclosing the file, test whether the file's
+	// directory is where some unresolved import's package would
+	// live, either within the module itself, or under the old module
+	// system's cue.mod/{gen|pkg|usr} hierarchies.
+	for _, m := range w.modules {
+		if m.modFile == nil || !m.rootURI.Encloses(file) {
+			continue
+		}
+		modPath, _, _ := ast.SplitPackageVersion(m.modFile.QualifiedModule())
+		for ip := range unresolved {
+			if ip.Path == modPath && m.rootURI == dir {
+				return true
+			}
+			if relPath, ok := strings.CutPrefix(ip.Path, modPath+"/"); ok {
+				if joinURI(m.rootURI, relPath) == dir {
+					return true
+				}
+			}
+			for _, prefix := range []string{"cue.mod/gen/", "cue.mod/pkg/", "cue.mod/usr/"} {
+				if joinURI(m.rootURI, prefix+ip.Path) == dir {
+					return true
+				}
 			}
 		}
 	}

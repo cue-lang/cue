@@ -233,6 +233,32 @@ func TestConvertToCueFS(t *testing.T) {
 	qt.Assert(t, qt.IsFalse(isCueable))
 }
 
+// TestReadCUENonCUE shows bad behaviour: unlike a CUE file's, the
+// parse of a JSON or YAML file is never cached, so repeated reads
+// return distinct ASTs, and the returned config is invalid.
+func TestReadCUENonCUE(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "a.json"), `{"x": true}`)
+	writeFile(t, filepath.Join(dir, "a.yaml"), "x: true\n")
+	forceMFTUpdateOnWindows(t, dir)
+
+	fs := fscache.NewCUECachedFS()
+	for _, name := range []string{"a.json", "a.yaml"} {
+		uri := protocol.URIFromPath(filepath.Join(dir, name))
+		fh, err := fs.ReadFile(uri)
+		qt.Assert(t, qt.IsNil(err))
+
+		ast1, cfg1, err := fh.ReadCUE(parser.NewConfig())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.IsNotNil(ast1))
+		qt.Assert(t, qt.IsFalse(cfg1.IsValid()))
+
+		ast2, _, err := fh.ReadCUE(parser.NewConfig())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Not(qt.Equals(ast1, ast2)), qt.Commentf("%s: repeated reads return distinct ASTs", name))
+	}
+}
+
 func setup(t *testing.T) (dir string, onDiskFiles, onDiskFilesAbs []string) {
 	t.Helper()
 	dir = t.TempDir()

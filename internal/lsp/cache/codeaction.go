@@ -330,6 +330,19 @@ func (w *Workspace) CodeActionOrganizeImports(ctx context.Context, params *proto
 			}
 		}
 
+		// Comment groups which are attached to the decl itself but
+		// live within it - e.g. a comment between the final spec and
+		// the closing paren - must be preserved if the decl
+		// survives. By contrast, comments attached to removed specs
+		// are deliberately removed along with their spec.
+		var innerComments []*ast.CommentGroup
+		declStart, declEnd := decl.Pos().Offset(), decl.End().Offset()
+		for _, cg := range ast.Comments(decl) {
+			if cgStart := cg.Pos().Offset(); declStart <= cgStart && cgStart < declEnd {
+				innerComments = append(innerComments, cg)
+			}
+		}
+
 		if l := len(survivors); l > 0 {
 			plural := l > 1
 			if plural {
@@ -338,21 +351,49 @@ func (w *Workspace) CodeActionOrganizeImports(ctx context.Context, params *proto
 				})
 			}
 
-			organisedContent.WriteString("import ")
-			if plural {
-				organisedContent.WriteString("(\n")
-			}
-			for _, spec := range survivors {
-				if plural {
+			if plural || len(innerComments) > 0 {
+				organisedContent.WriteString("import (\n")
+				for _, spec := range survivors {
+					// Include the spec's comments: doc comments start
+					// before the spec, line comments end after it.
+					specStart, specEnd := spec.Pos().Offset(), spec.End().Offset()
+					for _, cg := range ast.Comments(spec) {
+						specStart = min(specStart, cg.Pos().Offset())
+						specEnd = max(specEnd, cg.End().Offset())
+					}
 					organisedContent.WriteString("\t")
-				}
-				organisedContent.Write(content[spec.Pos().Offset():spec.End().Offset()])
-				if plural {
+					organisedContent.Write(content[specStart:specEnd])
 					organisedContent.WriteString("\n")
 				}
-			}
-			if plural {
+				for _, cg := range innerComments {
+					organisedContent.WriteString("\t")
+					organisedContent.Write(content[cg.Pos().Offset():cg.End().Offset()])
+					organisedContent.WriteString("\n")
+				}
 				organisedContent.WriteString(")")
+
+			} else {
+				// A single import spec, written without
+				// parentheses. Its doc comments must precede the
+				// import keyword, and its line comments follow the
+				// spec; any comment within the spec is part of the
+				// spec's own content range.
+				spec := survivors[0]
+				specStart, specEnd := spec.Pos().Offset(), spec.End().Offset()
+				for _, cg := range ast.Comments(spec) {
+					if cg.Pos().Offset() < specStart {
+						organisedContent.Write(content[cg.Pos().Offset():cg.End().Offset()])
+						organisedContent.WriteString("\n")
+					}
+				}
+				organisedContent.WriteString("import ")
+				organisedContent.Write(content[specStart:specEnd])
+				for _, cg := range ast.Comments(spec) {
+					if cg.End().Offset() > specEnd {
+						organisedContent.WriteString(" ")
+						organisedContent.Write(content[cg.Pos().Offset():cg.End().Offset()])
+					}
+				}
 			}
 		}
 	}

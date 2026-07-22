@@ -6,11 +6,12 @@ import (
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 )
 
-// TestDiagnosticsClearedAfterClose shows bad behaviour: diagnostics
-// published for a file are never cleared once the file is closed in
-// the editor, even when the underlying problem is resolved. The
-// client retains published diagnostics until they are explicitly
-// cleared, so it shows the stale diagnostics indefinitely.
+// TestDiagnosticsClearedAfterClose tests that diagnostics published
+// for a file are cleared if the underlying problem is resolved after
+// the file has been closed in the editor. The client retains
+// published diagnostics until they are explicitly cleared, so the
+// server must keep updating files whose diagnostics it has published,
+// even once they are closed.
 func TestDiagnosticsClearedAfterClose(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -38,19 +39,18 @@ y: 6
 		env.CloseBuffer("a.cue")
 		env.Await(env.DoneWithClose())
 
-		// Resolve the problem on disk while the file is closed. The
-		// stale diagnostics remain.
+		// Resolve the problem on disk while the file is closed.
 		env.WriteWorkspaceFile("data/data1.json", `{"field1": true}`)
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			Diagnostics(ForFile("a.cue"), env.AtRegexp("a.cue", "@embed")),
+			NoDiagnostics(ForFile("a.cue")),
 		)
 	})
 }
 
-// TestDiagnosticsClearedAfterDelete shows bad behaviour: diagnostics
-// published for a file outlive the file itself when it is deleted
-// from disk after being closed in the editor.
+// TestDiagnosticsClearedAfterDelete tests that diagnostics published
+// for a file are cleared if the file is deleted from disk after
+// being closed in the editor.
 func TestDiagnosticsClearedAfterDelete(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -77,12 +77,12 @@ y: 6
 		env.CloseBuffer("a.cue")
 		env.Await(env.DoneWithClose())
 
-		// Delete the offending file entirely: its stale diagnostics
-		// outlive it.
+		// Delete the offending file entirely: its diagnostics must
+		// not outlive it.
 		env.RemoveWorkspaceFile("a.cue")
 		env.Await(
 			env.DoneWithChangeWatchedFiles(),
-			Diagnostics(ForFile("a.cue")),
+			NoDiagnostics(ForFile("a.cue")),
 		)
 	})
 }

@@ -111,6 +111,13 @@ type File struct {
 	// dirtyErrors records if the errors for this file have changed
 	// since we last published them to the client.
 	dirtyErrors bool
+	// hasPublishedDiags records whether the most recent
+	// PublishDiagnostics notification sent to the client for this
+	// file contained a non-empty set of diagnostics. The client
+	// retains diagnostics until they are explicitly cleared, so if
+	// this is true, the client must be sent updates (or a clear)
+	// even if this file is no longer open.
+	hasPublishedDiags bool
 }
 
 type userErrors struct {
@@ -176,6 +183,22 @@ func (f *File) maybeDelete() {
 		return
 	}
 	w := f.workspace
+	if f.hasPublishedDiags {
+		// The client still holds diagnostics for this file. We are
+		// about to lose all record of the file, so clear them now,
+		// otherwise the client shows them indefinitely.
+		f.hasPublishedDiags = false
+		params := &protocol.PublishDiagnosticsParams{
+			URI:         f.uri,
+			Diagnostics: []protocol.Diagnostic{},
+		}
+		if f.tokFile != nil {
+			params.Version = f.tokFile.Revision()
+		}
+		w.enqueue(func() {
+			w.client.PublishDiagnostics(context.Background(), params)
+		})
+	}
 	if tokFile := f.tokFile; tokFile != nil {
 		delete(w.mappers, tokFile)
 	}
@@ -321,7 +344,12 @@ func (f *File) tokenRangeOffsets(offset int) (start, end int) {
 // true is returned, to indicate errors were found. In all other
 // cases, false is returned.
 func (f *File) publishErrors(clearOnly bool) bool {
-	if !f.isOpen || !f.dirtyErrors || f.tokFile == nil || f.mapper == nil {
+	if !f.dirtyErrors || f.tokFile == nil || f.mapper == nil {
+		return false
+	}
+	if !f.isOpen && !f.hasPublishedDiags {
+		// The file is not open, and the client holds no diagnostics
+		// for it: there is nothing to publish or clear.
 		return false
 	}
 
@@ -338,6 +366,7 @@ func (f *File) publishErrors(clearOnly bool) bool {
 	}
 
 	f.dirtyErrors = false
+	f.hasPublishedDiags = len(diags) > 0
 	params := &protocol.PublishDiagnosticsParams{
 		URI:         f.uri,
 		Version:     f.tokFile.Revision(),

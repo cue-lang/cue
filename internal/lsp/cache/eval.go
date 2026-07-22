@@ -392,7 +392,10 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadExtra 
 	if e == nil {
 		if standalone, found := w.standalone.files[fileUri]; found {
 			e = standalone.definitions
-		} else {
+		}
+		if e == nil {
+			// NB a standalone file whose content cannot be parsed at
+			// all has a nil evaluator.
 			return nil, nil, nil, nil
 		}
 	}

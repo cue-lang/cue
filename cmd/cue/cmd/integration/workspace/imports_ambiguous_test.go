@@ -99,7 +99,7 @@ out: x.y
 			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", r2RootURI),
 			// A module is created for the imported module.
 			LogExactf(protocol.Debug, 1, false, "Module dir=%v/example.com/foo/x@v0.0.1 module=example.com/foo/x@v0 Reloaded", cacheURI),
-			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo/x@v0.0.1/.] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
+			LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo/x@v0.0.1] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
 			// Repeat key assertions from the first OpenFile call to
 			// prove that the r1 package (and imports) has not been
 			// reloaded:

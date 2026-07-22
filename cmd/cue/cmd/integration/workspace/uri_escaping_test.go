@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"strings"
 	"testing"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -8,13 +9,13 @@ import (
 	"golang.org/x/tools/txtar"
 )
 
-// TestFileNameNeedingEscaping shows bad behaviour: LSP functionality
-// is dead within a file whose name contains a character which URIs
-// escape (a space). URIs received from the client are
-// percent-encoded, but URIs built internally are assembled by string
-// concatenation with no encoding, so the workspace holds two
+// TestFileNameNeedingEscaping tests LSP functionality within a file
+// whose name contains a character which URIs escape (a space). URIs
+// received from the client are percent-encoded, so URIs built
+// internally must be canonicalized the same way; historically they
+// were built by string concatenation, so the workspace held two
 // unrelated states for such a file, and hover (among much else)
-// returns nothing.
+// returned nothing.
 func TestFileNameNeedingEscaping(t *testing.T) {
 	const files = `
 -- cue.mod/module.cue --
@@ -48,14 +49,16 @@ out: field: {
 			mappers[file.Name] = mapper
 		}
 
+		docComment := "does the field contain cows?"
+
 		p := fln("my data.json", 3, 1, `cows`)
 		p.determinePos(mappers)
 		got, _ := env.Hover(protocol.Location{
 			URI:   p.mapper.URI,
 			Range: protocol.Range{Start: p.pos},
 		})
-		if got != nil {
-			t.Errorf("hover in %q = %v, want nothing", "my data.json", got)
+		if got == nil || !strings.Contains(got.Value, docComment) {
+			t.Errorf("hover in %q = %v, want doc comment", "my data.json", got)
 		}
 	})
 }

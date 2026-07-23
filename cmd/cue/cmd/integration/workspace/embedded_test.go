@@ -8,7 +8,6 @@ import (
 	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/lsp/rangeset"
 	"github.com/go-quicktest/qt"
-	"golang.org/x/tools/txtar"
 )
 
 func TestEmbedSimple(t *testing.T) {
@@ -338,11 +337,7 @@ func TestEmbedHover(t *testing.T) {
 			I.LogMatching(protocol.Debug, 3, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(filesHoverComplete)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, filesHoverComplete)
 
 		testCases := map[position]string{
 			fln("data/file.json", 3, 1, `sheep`): fmt.Sprintf(`
@@ -440,11 +435,7 @@ func TestEmbedCompletion(t *testing.T) {
 			I.NoLogMatching(protocol.Debug, `Package dirs=\[%v/data\] importPath=mod\.example/x@v0:a Created`, rootURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(filesHoverComplete)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, filesHoverComplete)
 
 		testCases := map[position][]string{
 			fln("data/file.json", 3, 1, `"`): {`"sheep"`, `"cows"`, `"horses"`},
@@ -543,11 +534,7 @@ s: field: {
 			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(files)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, files)
 
 		testCases := definitionsTestCases{
 			fln("a.cue", 13, 1, "field"): {
@@ -604,11 +591,7 @@ field: _
 			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(files)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, files)
 
 		testCases := definitionsTestCases{
 			fln("a.cue", 5, 1, "field"): {
@@ -654,11 +637,7 @@ a: {
 			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(files)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, files)
 
 		testCases := definitionsTestCases{
 			fln("a.cue", 7, 1, "fieldCount"): {

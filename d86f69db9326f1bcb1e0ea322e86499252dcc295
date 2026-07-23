@@ -16,6 +16,24 @@
       "message": "Do we actually need to sort the keys as well as snapshot them? i.e. maybe slices.Collect would be sufficient and save a bit of compute time.",
       "revId": "d86f69db9326f1bcb1e0ea322e86499252dcc295",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f80f8dd_a8b1fed0",
+        "filename": "internal/lsp/cache/workspace.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-23T16:37:39Z",
+      "side": 1,
+      "message": "Agreed. Done.",
+      "parentUuid": "6ca2aaf2_67498a99",
+      "revId": "d86f69db9326f1bcb1e0ea322e86499252dcc295",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

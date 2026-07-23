@@ -100,11 +100,7 @@ g: f.y.x
 			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/example.com/foo@v0.0.1/x] importPath=example.com/foo/x@v0 Reloaded", cacheURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(files)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, files)
 
 		testCases := map[position]string{
 			fln("a/a.cue", 3, 1, `"example.com/foo/x"`): fmt.Sprintf(`
@@ -247,11 +243,7 @@ t: _
 			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=example.com/bar/a@v0 Reloaded", rootURI),
 		)
 
-		mappers := make(map[string]*protocol.Mapper)
-		for _, file := range txtar.Parse([]byte(files)).Files {
-			mapper := protocol.NewMapper(rootURI+"/"+protocol.DocumentURI(file.Name), file.Data)
-			mappers[file.Name] = mapper
-		}
+		mappers := makeMappers(env, files)
 
 		cue := func(value string) string {
 			return fmt.Sprintf("Unified with: `%s`", value)

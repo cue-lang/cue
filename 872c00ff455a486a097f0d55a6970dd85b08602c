@@ -33,6 +33,24 @@
       "message": "I guess another approach might be to address the TODO inside `ast.File.Pos` rather than papering over the gap. For example we could add a `File *token.File` field to `ast.File`\nand populate that when parsing.",
       "revId": "872c00ff455a486a097f0d55a6970dd85b08602c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9974f34c_ed2e962c",
+        "filename": "internal/lsp/fscache/fs_cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-23T16:33:25Z",
+      "side": 1,
+      "message": "Indeed, though that opens up the possibility that the `ast.File.File` is different to `ast.File.Pos().File()` which is worrying. Happy to revise later, but I think for now the possibility of divergence between those two fields alarms me more than papering over this edge-case here.",
+      "parentUuid": "8f6efd9b_9756a3ce",
+      "revId": "872c00ff455a486a097f0d55a6970dd85b08602c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -141,11 +141,25 @@ func varToString(s string, err error) (ast.Expr, error) {
 	return ast.NewString(s), nil
 }
 
+// tagScope controls in which packages a tag is applied.
+type tagScope int
+
+const (
+	// tagScopePkg is the default scope: the tag is only applied when its
+	// package is specified directly on the command line (a "root" package).
+	tagScopePkg tagScope = iota
+
+	// tagScopeMod causes the tag to be applied even when the package is merely
+	// imported, as long as the package belongs to the same module as the root
+	// package. Declared with @tag(name,scope=mod).
+	tagScopeMod
+)
+
 // A tag binds an identifier to a field to allow passing command-line values.
 //
 // A tag is of the form
 //
-//	@tag(<name>,[type=(string|int|number|bool)][,short=<shorthand>+])
+//	@tag(<name>,[type=(string|int|number|bool)][,short=<shorthand>+][,scope=(pkg|mod)])
 //
 // The name is mandatory and type defaults to string. Tags are set using the -t
 // option on the command line. -t name=value will parse value for the type
@@ -154,6 +168,11 @@ func varToString(s string, err error) (ast.Expr, error) {
 //
 // Tags also allow shorthands. If a shorthand bar is declared for a tag with
 // name foo, then -t bar is identical to -t foo=bar.
+//
+// The scope parameter controls cross-package injection. The default scope is
+// "pkg", meaning the tag is only applied when its package is a root package.
+// With scope=mod, the tag is also applied when the package is imported from
+// another package in the same module.
 //
 // It is a deliberate choice to not allow other values to be associated with
 // shorthands than the shorthand name itself. Doing so would create a powerful
@@ -164,6 +183,7 @@ type tag struct {
 	kind           cue.Kind
 	shorthands     []string
 	vars           string // -T flag
+	scope          tagScope
 	hasReplacement bool
 
 	field *ast.Field
@@ -205,6 +225,17 @@ func parseTag(astAttr *ast.Attribute) (t *tag, err errors.Error) {
 
 	if s, ok, _ := a.Lookup(1, "var"); ok {
 		t.vars = s
+	}
+
+	if s, ok, _ := a.Lookup(1, "scope"); ok {
+		switch s {
+		case "pkg":
+			// pkg is the default (zero value); accept it without assignment.
+		case "mod":
+			t.scope = tagScopeMod
+		default:
+			return t, errors.Newf(pos, "invalid tag scope %q", s)
+		}
 	}
 
 	return t, nil
@@ -346,6 +377,34 @@ func (tg *tagger) injectTags(tags []string) errors.Error {
 		}
 	}
 	return nil
+}
+
+// findModuleScopedTags collects tags with scope=mod from the transitive imports
+// of inst that belong to modPath. visited is mutated to track seen import paths
+// and must be pre-seeded with the root package paths to avoid double-processing.
+func findModuleScopedTags(inst *build.Instance, modPath string, visited map[string]struct{}) ([]*tag, errors.Error) {
+	var tags []*tag
+	var errs errors.Error
+	for _, imp := range inst.Imports {
+		if _, ok := visited[imp.ImportPath]; ok {
+			continue
+		}
+		visited[imp.ImportPath] = struct{}{}
+		if imp.Module != modPath {
+			continue
+		}
+		impTags, err := findTags(imp)
+		errs = errors.Append(errs, err)
+		for _, t := range impTags {
+			if t.scope == tagScopeMod {
+				tags = append(tags, t)
+			}
+		}
+		childTags, err := findModuleScopedTags(imp, modPath, visited)
+		errs = errors.Append(errs, err)
+		tags = append(tags, childTags...)
+	}
+	return tags, errs
 }
 
 func shouldBuildFile(f *ast.File, tagIsSet func(key string) bool) errors.Error {

@@ -51,6 +51,24 @@
       "parentUuid": "13f8acd7_f4bacbec",
       "revId": "e650cb132c520c0de7433264c19f77bf34533d0c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d2c69aa_b44192bb",
+        "filename": "internal/lsp/fscache/fs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-23T16:29:41Z",
+      "side": 1,
+      "message": "The comment has been reworded.\nIn fs_cache.go, we have\n```\nfunc (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, cfg parser.Config, err error) {\n```\nIn there, we look at the cached cfg, and if it is valid, then we return the cached AST too. But in the YAML and JSON cases we were never assigning to the cached config, and so every call to ReadCUE would re-parse the file; additionally, in the JSON and YAML cases, the returned cfg would always be the zero value, which is invalid.\n\nBecause every call returned a new AST, it would mean all callers that eventually compare ASTs by pointer (or the tokFile that hangs off the AST), would always fail.",
+      "parentUuid": "768305e3_9729b489",
+      "revId": "e650cb132c520c0de7433264c19f77bf34533d0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

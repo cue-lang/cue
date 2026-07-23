@@ -743,6 +743,37 @@ func (b *builder) object(v cue.Value) {
 		b.setSingle("properties", (*ast.StructLit)(properties), false)
 	}
 
+	attr := v.Attribute("openapi")
+	for i := range attr.NumArgs() {
+		key, value := attr.Arg(i)
+		if key != "extensions" {
+			continue
+		}
+
+		extension := v.Context().CompileString(value)
+
+		if extension.Err() != nil {
+			b.failf(v, "invalid openapi extension attribute %q: %v", key, extension.Err())
+			return
+		}
+
+		iter, err := extension.Fields()
+		if err != nil {
+			b.failf(v, "invalid openapi extension attribute %q: %v", key, err)
+			return
+		}
+		for iter.Next() {
+			sel := iter.Selector()
+
+			switch node := iter.Value().Syntax(cue.Concrete(true)).(type) {
+			case ast.Expr:
+				b.setSingle(sel.Unquoted(), node, true)
+			default:
+				b.failf(v, "invalid openapi extension attribute %q: %v must be an expression", key, value)
+			}
+		}
+	}
+
 	if t := v.LookupPath(cue.MakePath(cue.AnyString)); t.Exists() &&
 		(b.core == nil || b.core.items == nil) && b.checkCycle(t) {
 		schema := b.schema(nil, cue.AnyString, t)

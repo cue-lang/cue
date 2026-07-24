@@ -92,6 +92,37 @@ nil: null
 non: false
 `,
 	}, {
+		// Scalars inside single-line flow collections need quoting for
+		// characters which are special in flow context, such as commas,
+		// braces, and colons. Scalars beginning with the "?" indicator
+		// and keys containing newlines need quoting in any context.
+		name: "quoting",
+		in: `
+		v: {a: "x,y", b: 2}
+		w: ["x,y", "z"]
+		u: {a: "x}y"}
+		fk: {"x,y": 1}
+		c: {a: "a:b", u: "http://x/y"}
+		"k\nl": 3
+		q: "?"
+		r: "? q"
+		s: "?x"
+		`,
+		out: `
+v: {a: 'x,y', b: 2}
+w: ['x,y', z]
+u: {a: 'x}y'}
+fk: {'x,y': 1}
+c: {a: 'a:b', u: 'http://x/y'}
+? |-
+  k
+  l
+: 3
+q: '?'
+r: '? q'
+s: ?x
+`,
+	}, {
 		name: "comments",
 		in: `
 // Document

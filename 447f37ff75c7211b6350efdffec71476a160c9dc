@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d33074ac_627c0d7a",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1839,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-24T13:26:58Z",
+      "side": 1,
+      "message": "The main point of this logic is to come up with small names when possible. Including the full package path on every name would seem to be working against that goal. We can revisit this decision later if needed.",
+      "parentUuid": "5fa0b733_3be590b0",
+      "revId": "447f37ff75c7211b6350efdffec71476a160c9dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdbbc210_21478a02",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-20T15:12:30Z",
       "side": 1,
       "message": "perhaps call this \"qualifiedName\" or \"fullName\" for clarity?",
+      "revId": "447f37ff75c7211b6350efdffec71476a160c9dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f20a790_97e341aa",
+        "filename": "encoding/jsonschema/generate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1843,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-24T13:26:58Z",
+      "side": 1,
+      "message": "It\u0027s not necessarily either qualified or full, so I don\u0027t think that either choice there would be quite right. I _think_ it\u0027s OK as is.",
+      "parentUuid": "cdbbc210_21478a02",
       "revId": "447f37ff75c7211b6350efdffec71476a160c9dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

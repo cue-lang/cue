@@ -781,6 +781,50 @@ a:
 "Override anchor":   "Bar"
 "Reuse anchor":      "Bar"`,
 	},
+
+	// String keys beginning with a dash are not negative numbers.
+	{
+		"-foo: 1",
+		`"-foo": 1`,
+	},
+	{
+		`"--flag": true`,
+		`"--flag": true`,
+	},
+	// Explicit key syntax.
+	{
+		"? explicit\n: 1",
+		"explicit:\n\t1",
+	},
+	// An anchored key: the anchor names the key scalar.
+	{
+		"&x foo: 1\nbar: *x",
+		"foo: 1\nbar: \"foo\"",
+	},
+	// Tagged keys and tagged anchors.
+	{
+		"!!str 123: v",
+		`"123": "v"`,
+	},
+	{
+		"v: !!str &x hi\nw: *x",
+		"v: \"hi\"\nw: \"hi\"",
+	},
+	// A UTF-8 byte order mark is skipped.
+	{
+		"\ufeffa: 1",
+		`a: 1`,
+	},
+	// %TAG directives declare tag shorthands, including the primary
+	// handle "!"; a merge key may be spelled via such a shorthand.
+	{
+		"%TAG ! tag:yaml.org,2002:\n---\nv: !str 123",
+		`v: "123"`,
+	},
+	{
+		"%TAG !m! tag:yaml.org,2002:\n---\nbase: &b\n  x: 1\nout:\n  !m!merge \"<<\": *b",
+		"base: {\n\tx: 1\n}\nout: {x: 1}",
+	},
 }
 
 type M map[interface{}]interface{}
@@ -914,6 +958,24 @@ func TestUnmarshalNaN(t *testing.T) {
 	}
 }
 
+// TestTagDirectiveScope checks that a %TAG directive applies only to the
+// single document that follows it: the same shorthand used in a later
+// document of the stream is an error.
+func TestTagDirectiveScope(t *testing.T) {
+	dec := newDecoder(t, "%TAG !e! tag:yaml.org,2002:\n---\nv: !e!int '1'\n---\nw: !e!int '2'")
+	expr, err := dec.Decode()
+	if err != nil {
+		t.Fatalf("first document: unexpected error %v", err)
+	}
+	if got, want := cueStr(expr), "v: 1"; got != want {
+		t.Errorf("first document: got %v; want %v", got, want)
+	}
+	wantErr := "test.yaml:4: found undefined tag handle"
+	if _, err = dec.Decode(); err == nil || err.Error() != wantErr {
+		t.Errorf("second document: got error %v; want %q", err, wantErr)
+	}
+}
+
 var unmarshalErrorTests = []struct {
 	data, error string
 }{
@@ -933,6 +995,8 @@ var unmarshalErrorTests = []struct {
 	{"{{.}}", `test.yaml:1: invalid map key: !!map`},
 	{"b: *a\na: &a {c: 1}", `test.yaml: unknown anchor 'a' referenced`},
 	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml: did not find expected whitespace"},
+	// An alias node cannot carry a tag.
+	{"a: &x hi\nv: !!str *x", "test.yaml:1: did not find expected key"},
 }
 
 func TestUnmarshalErrors(t *testing.T) {

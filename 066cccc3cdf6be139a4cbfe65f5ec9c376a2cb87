@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f719b817_aca2f960",
+        "filename": "cmd/cue/cmd/integration/workspace/uri_escaping_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-24T15:40:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e0421fd_90c145c0",
+      "revId": "066cccc3cdf6be139a4cbfe65f5ec9c376a2cb87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4018212_6e5d16b6",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-24T12:17:38Z",
       "side": 1,
       "message": "Hmm, do we really want filepath logic here? Or would it be more appropriate to assume forward-slash separation?",
+      "revId": "066cccc3cdf6be139a4cbfe65f5ec9c376a2cb87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6935b038_1d77fe8c",
+        "filename": "internal/lsp/cache/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-24T15:40:53Z",
+      "side": 1,
+      "message": "Yeah, so the obvious alternative is:\n```\nreturn protocol.DocumentURI(path.Join(string(dir), relPath))\n```\nBut, `path.Join` does a `Clean`, so that means `file:///` would change to `file:/`\n\nAnd if you did\n```\nreturn protocol.DocumentURI(string(dir) + \"/\" + relPath)\n```\nthen you skip the %-encoding, which is kinda the whole point of this fix. I agree though it\u0027s not particularly nice bouncing back through filepaths.",
+      "parentUuid": "a4018212_6e5d16b6",
       "revId": "066cccc3cdf6be139a4cbfe65f5ec9c376a2cb87",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

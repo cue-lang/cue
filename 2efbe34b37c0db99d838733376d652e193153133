@@ -16,6 +16,24 @@
       "message": "I don\u0027t really understand why we\u0027re writing CUE text directly rather than creating AST nodes, but I\u0027m sure there\u0027s a good reason for it.",
       "revId": "2efbe34b37c0db99d838733376d652e193153133",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc99fecc_813d5403",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-24T12:02:44Z",
+      "side": 1,
+      "message": "There is (I think). Organise imports is distinct from formatting, so organise imports should ideally not change formatting of those import lines. Neither the old or new formatter can produce byte-for-byte identical output (from parsed input to printed output).",
+      "parentUuid": "8b13bc4c_96413428",
+      "revId": "2efbe34b37c0db99d838733376d652e193153133",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

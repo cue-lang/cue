@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b13bc4c_96413428",
+        "filename": "internal/lsp/cache/codeaction.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-24T11:46:47Z",
+      "side": 1,
+      "message": "I don\u0027t really understand why we\u0027re writing CUE text directly rather than creating AST nodes, but I\u0027m sure there\u0027s a good reason for it.",
+      "revId": "2efbe34b37c0db99d838733376d652e193153133",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e0421fd_90c145c0",
+        "filename": "cmd/cue/cmd/integration/workspace/uri_escaping_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-24T12:17:38Z",
+      "side": 1,
+      "message": "are we allowed to to t.Fatalf in these functions.\nIf so, then I\u0027d be tempted to do:\n\n```\nqt.Assert(t, qt.NotNil(got))\nqt.Assert(t, qt.StringContains(got.Value, docComment))\n```",
+      "revId": "066cccc3cdf6be139a4cbfe65f5ec9c376a2cb87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4018212_6e5d16b6",
+        "filename": "internal/lsp/cache/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-07-24T12:17:38Z",
+      "side": 1,
+      "message": "Hmm, do we really want filepath logic here? Or would it be more appropriate to assume forward-slash separation?",
+      "revId": "066cccc3cdf6be139a4cbfe65f5ec9c376a2cb87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

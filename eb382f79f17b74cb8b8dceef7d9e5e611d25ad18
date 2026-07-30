@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73b892f5_b05bbdb6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9aa7ecaf_2a4decc2",
+      "range": {
+        "startLine": 15,
+        "startChar": 8,
+        "endLine": 15,
+        "endChar": 14
+      },
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b47f1313_ee5bc85a",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "nit: backquote or double quote example names like this, otherwise I almost thought that you had an unfinished sentence here.",
+      "range": {
+        "startLine": 49,
+        "startChar": 63,
+        "endLine": 49,
+        "endChar": 64
+      },
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "440e3e48_45419294",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b47f1313_ee5bc85a",
       "range": {
         "startLine": 49,
         "startChar": 63,
@@ -64,6 +112,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6971ddc7_6246d4b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Ok, I can\u0027t really claim to understand all this myself, but apparently \"it\u0027s both\":\n\nIt\u0027s both, and they coincide. Merge keys come from the YAML 1.1 merge type working draft (https://yaml.org/type/merge.html), where merge behaviour attaches to the tag tag:yaml.org,2002:merge; a plain \u003c\u003c acquires that tag by implicit resolution, and !!merge/!\u003ctag:yaml.org,2002:merge\u003e denote it explicitly via core tag syntax. So the tagged forms follow from the type definition rather than being a yaml.v3 quirk — yaml.v3 supports them, and our merge.test golden data has pinned them since 2018 (it originally came from go-yaml\u0027s own test suite), so dropping them would be a permanent regression once the old decoder is removed, not something the experiment transition smooths over. Concretely, goccy v1.19.2 rejects !!merge \"\u003c\u003c\" with a parse error and parses the other tagged forms as a plain tag node, losing the merge semantics.\n\nI shall file a bug upstream.",
+      "parentUuid": "bda2196f_4d96558e",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "685c3c34_9f69d657",
@@ -77,6 +143,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "Hm. This sounds like a goccy bug we should file?",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7eee726e_b8eaf31a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "It is indeed a goccy bug, and it\u0027s already filed upstream, twice. Commit message and code comments updated.",
+      "parentUuid": "685c3c34_9f69d657",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -98,6 +182,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9493e6ff_c0aaed93",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60b4302d_05893c42",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6524bea2_d4061144",
@@ -111,6 +213,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "nit: I might use github.com/go-yaml/yaml to refer to the old library, as I suspect most people know the github URL better than the new vanity domain that the YAML org came up with.\n\n(I commented in the generated file, but you get the idea)",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ce0d89_aed59089",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6524bea2_d4061144",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -149,6 +269,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42d9a2c0_7ad982be",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07e110ac_17aaabf7",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29172175_ac83c050",
@@ -162,6 +300,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "nit: could we use \"y\" or \"yaml\" prefixes for these? I feel like seeing e.g. \"gparser\" makes me think \"go parser\".\n\nthe alternative approach, given that this is a YAML-heavy package, is to rename CUE\u0027s packages to \"cueast\" etc, and keep these names as-is. I\u0027d be fine with either approach.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a844a729_431a39c4",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29172175_ac83c050",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -217,6 +373,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab1a8d64_56f1d9da",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Already done; comment updated to reference them.",
+      "parentUuid": "cff77315_b0861842",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c422112_fad1df9a",
@@ -230,6 +404,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "internal/encoding already handles BOM, so I wouldn\u0027t do it in the decoder itself. if the old yaml decoder happened to do this as well, I would ignore that, because we don\u0027t really want each of our encodings to have a second BOM stripping phase.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0506b9b3_47d74a6f",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c422112_fad1df9a",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -251,6 +443,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d093839_6075d594",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Yep - it implements the c-tag-handle grammar from the YAML spec (a primary !, the secondary !!, or a named !word-chars! handle). And agreed on the API point: goccy neither validates %TAG handles nor resolves declared handles against the shorthands that use them - it only special-cases the default !! handle, tracked globally rather than per document - which is why the decoder carries validTagHandle and resolveTagWith with its own per-document scoping.\n\nWill file a bug.",
+      "parentUuid": "2f108206_18392677",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef472460_4ab6e6aa",
@@ -264,6 +474,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "ask the AI to do a pass on the entire stack and replace most (all?) uses of the `sort` package with the `slices` package, which is generic and much nicer. e.g. here, I\u0027d use slices.BinarySearch.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6323342_43ad6c23",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef472460_4ab6e6aa",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -285,6 +513,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31fa2211_db76f553",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9380db2_35702af2",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11f7dc23_72970d68",
@@ -302,6 +548,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c64701f8_d45bfd42",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Yep, agreed - will mention in the same issue as the other thingy.\n\n\u003e it does export the reserved short-tag strings as constants — token.MappingTag (\"!!map\"), token.SequenceTag, token.StringTag, etc. (token.ReservedTagKeyword) — but those exist for recognizing explicit tags in the source. There is no API answering \"what tag does this node resolve to\": no Node.Tag field, no ShortTag() equivalent.",
+      "parentUuid": "11f7dc23_72970d68",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63d92879_3c6423d0",
@@ -315,6 +579,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "why do",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c06b87fe_4a8a5fd9",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1480,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Erm, see your commit 4fe848db9 ;)\n\nFor a scalar like 0778, YAML 1.1 resolution fails as int (bad octal digits) and fails as 1.1 float (which requires a dot), so most 1.1 decoders resolve it as a string. yaml.v3 is the odd one out: its resolver falls through int and then matches its own float regexp (plain digits qualify), so it resolves 0778 as float 778.\n\n\u003e Before Daniel\u0027s 2024 commit 4fe848db9, the old CUE decoder took yaml.v3\u0027s float tag at face value and then choked building a CUE literal from the original text, because CUE decimals can\u0027t start with 0\n\nExactly this code exists at yaml/decode.go:785",
+      "parentUuid": "63d92879_3c6423d0",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -372,6 +654,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "275ef53e_18ca8229",
+        "filename": "internal/encoding/yaml/goccy/decode_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "This is *exactly* the same as in yaml/decode_test.go",
+      "parentUuid": "7c43b30f_0b94f173",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fd4b75f2_ad9a4818",
         "filename": "internal/encoding/yaml/goccy/decode_test.go",
         "patchSetId": 9
@@ -383,6 +683,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "are these test cases copied verbatim from internal/encoding/yaml? if so, I\u0027d mention this somewhere like the commit message.\n\nif any changes happened due to the new decoder, then I would suggest that you do one commit that just copies the file as-is first (maybe just changing the package name), and then in here you edit it as needed.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3e718b5_c7682986",
+        "filename": "internal/encoding/yaml/goccy/decode_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-30T15:19:08Z",
+      "side": 1,
+      "message": "Agreed, done.",
+      "parentUuid": "fd4b75f2_ad9a4818",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,390 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aa7ecaf_2a4decc2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "Hm. I had named the old experiment yamlv3 because it literally meant switching to go-yaml/yaml v3.0.0. I can see how yamlv4 is nicely linear, but we\u0027re making up a \"v4\" here, so I think that\u0027s a little confusing.\n\nGiven that the yamlv3 experiment has been finished for years now, I think it\u0027s fine to ignore it and come up with a clearer name. How about `yamlgoccy`? I think having \"yaml\" at the start is still nice.",
+      "range": {
+        "startLine": 15,
+        "startChar": 8,
+        "endLine": 15,
+        "endChar": 14
+      },
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b47f1313_ee5bc85a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "nit: backquote or double quote example names like this, otherwise I almost thought that you had an unfinished sentence here.",
+      "range": {
+        "startLine": 49,
+        "startChar": 63,
+        "endLine": 49,
+        "endChar": 64
+      },
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bda2196f_4d96558e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "just to clarify, was this done to improve compatibility with the old yaml.v3 decoder, or to improve support for the YAML 1.1 spec? If the latter, we should file a bug and add a TODO. If just the former, and it\u0027s not a spec-required behavior, personally I\u0027d remove the workaround and let the experiment transition smooth over the change.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "685c3c34_9f69d657",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "Hm. This sounds like a goccy bug we should file?",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60b4302d_05893c42",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "perhaps note that we\u0027re OK with this tradeoff given that the new decoder is much more flexible and opens possibilities like the LSP.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6524bea2_d4061144",
+        "filename": "cmd/cue/cmd/experiments_help_gen.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "nit: I might use github.com/go-yaml/yaml to refer to the old library, as I suspect most people know the github URL better than the new vanity domain that the YAML org came up with.\n\n(I commented in the generated file, but you get the idea)",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7c233dc_2f8daeef",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "thanks for fixing the order of this one!",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07e110ac_17aaabf7",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "personally I\u0027d drop this mention here; we want to document the global experiment in one place, and not in the handful of APIs it affects. and moreover, this is internal API :)",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29172175_ac83c050",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "nit: could we use \"y\" or \"yaml\" prefixes for these? I feel like seeing e.g. \"gparser\" makes me think \"go parser\".\n\nthe alternative approach, given that this is a YAML-heavy package, is to rename CUE\u0027s packages to \"cueast\" etc, and keep these names as-is. I\u0027d be fine with either approach.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20ba3fa9_2f8035a9",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "I feel like these names need a slight rethink, what is a \"column column\"?",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc1d7b64_6036f205",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "raise a bug upstream and link it here?",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cff77315_b0861842",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "ditto raising a bug",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c422112_fad1df9a",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "internal/encoding already handles BOM, so I wouldn\u0027t do it in the decoder itself. if the old yaml decoder happened to do this as well, I would ignore that, because we don\u0027t really want each of our encodings to have a second BOM stripping phase.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f108206_18392677",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "assuming this means valid in terms of YAML, I get the feeling like this should be an API in goccy/go-yaml...",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef472460_4ab6e6aa",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "ask the AI to do a pass on the entire stack and replace most (all?) uses of the `sort` package with the `slices` package, which is generic and much nicer. e.g. here, I\u0027d use slices.BinarySearch.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9380db2_35702af2",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "personally, I would drop all of these mentions of the old \"yaml.v3\" decoder by name, and just describe the behavior we want (and why, if necessary). because we want to remove the old decoder soon-ish, any mentions to it will become stale and confusing rather quickly.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11f7dc23_72970d68",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "a little surprised that goccy/go-yaml doesn\u0027t have anything like this",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63d92879_3c6423d0",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1480,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "why do",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89114165_801cc998",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1529,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "I\u0027m a little nervous about this. We want the new decoder to have nice semantics when decoding spec-compliant YAML into CUE; matching the behavior of the old decoder is not the desired outcome here, given that the old decoder had bugs, and that we\u0027re providing a CUE_EXPERIMENT transition anyway.\n\nIn other words, having wonky go-yaml/yaml semantics in the new decoder would mean we\u0027d need another CUE_EXPERIMENT in the future to clean this up; I\u0027d rather bite the bullet now.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bf11216_5a6e1ee3",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1538,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "so is goccy/go-yaml falling back to a scalar being \"string type\" when it cannot infer another valid scalar type, like int or float? with that understanding this func seems fine, but I\u0027d perhaps clarify this by mentioning it at the start of the godoc above.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c43b30f_0b94f173",
+        "filename": "internal/encoding/yaml/goccy/decode_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "please be careful; you\u0027re joining what seems to be a file or package doc with the copyright comment.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd4b75f2_ad9a4818",
+        "filename": "internal/encoding/yaml/goccy/decode_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-30T07:58:02Z",
+      "side": 1,
+      "message": "are these test cases copied verbatim from internal/encoding/yaml? if so, I\u0027d mention this somewhere like the commit message.\n\nif any changes happened due to the new decoder, then I would suggest that you do one commit that just copies the file as-is first (maybe just changing the package name), and then in here you edit it as needed.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

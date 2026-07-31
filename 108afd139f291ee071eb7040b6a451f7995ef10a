@@ -16,6 +16,24 @@
       "message": "nit: use a more precise parameter name than `a`, like `docs`, because otherwise this func looks like a duplicate of our existing cue/ast ToFile helper, which does something different",
       "revId": "108afd139f291ee071eb7040b6a451f7995ef10a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "180a2efc_12951bd7",
+        "filename": "internal/encoding/yaml/goccy/extract.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:06:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17b04cc4_3cacec39",
+      "revId": "108afd139f291ee071eb7040b6a451f7995ef10a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

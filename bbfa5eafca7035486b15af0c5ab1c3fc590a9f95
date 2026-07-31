@@ -246,6 +246,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc79b094_1659d720",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T16:09:48Z",
+      "side": 1,
+      "message": "FWIW I\u0027ve found /simplify or any use of sub-agents or other agents with clean contexts to be better at this than simply asking the same session about it, because the same session carries its decision that what it did was right, and is less likely to change its mind.",
+      "parentUuid": "9f28ddd2_db720d0c",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "927281c0_ff99dc51",

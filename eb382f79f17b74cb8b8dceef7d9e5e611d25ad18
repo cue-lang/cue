@@ -339,6 +339,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90273bb6_d2686dc0",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T10:40:56Z",
+      "side": 1,
+      "message": "Yeah, I think the comment helps, but agreed, not enough, and the field names are bad. This has been reworked. Hopefully it\u0027s better.",
+      "parentUuid": "20ba3fa9_2f8035a9",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc1d7b64_6036f205",
@@ -618,6 +636,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eca5ef13_675575da",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1529,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T10:40:56Z",
+      "side": 1,
+      "message": "Yep, this has been done in a follow-up commit so the effect can be easily seen.",
+      "parentUuid": "89114165_801cc998",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bf11216_5a6e1ee3",
@@ -631,6 +667,24 @@
       "writtenOn": "2026-07-30T07:58:02Z",
       "side": 1,
       "message": "so is goccy/go-yaml falling back to a scalar being \"string type\" when it cannot infer another valid scalar type, like int or float? with that understanding this func seems fine, but I\u0027d perhaps clarify this by mentioning it at the start of the godoc above.",
+      "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd7af9a6_1bf54675",
+        "filename": "internal/encoding/yaml/goccy/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1538,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T10:40:56Z",
+      "side": 1,
+      "message": "Yes, string absolutely is goccy\u0027s fallback type. Comment improved.",
+      "parentUuid": "8bf11216_5a6e1ee3",
       "revId": "eb382f79f17b74cb8b8dceef7d9e5e611d25ad18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

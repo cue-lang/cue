@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2b19c50_cfc94a3f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Reworded. It\u0027s thinner than the comment suggested.",
+      "parentUuid": "81b6035d_34df6595",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a254e746_dd5b5f8e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-31T11:55:50Z",
       "side": 1,
       "message": "Just to sanity check outloud: the old yaml encoder also supports comments, but they are not wired up in the yaml filetype (https://github.com/cue-lang/cue/issues/1180, github.com/cue-lang/cue/pull/1549), which is why `cue export --out yaml` doesn\u0027t include comments today.\n\nThis will remain being the case. And it\u0027s good to include comment support for parity with the old encoder.\n\nPlease say if I got this wrong.",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa5dc8d0_800ba3b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Yep, you\u0027re absolutely right.",
+      "parentUuid": "a254e746_dd5b5f8e",
       "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01cba9ac_71d65edb",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b24c93e1_32fef8b9",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "173f5048_48ff52d6",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-07-31T11:55:50Z",
       "side": 1,
       "message": "nit: I would probably not prefix this with \"y\", because yyaml is a little trippy",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cffcb277_2df6f77d",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "173f5048_48ff52d6",
       "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "581010ea_e7a904ce",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "410cf29e_0a89a8be",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7df83c44_49664a22",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-07-31T11:55:50Z",
       "side": 1,
       "message": "goccy doesn\u0027t have a \"quote in single quotes\" API?",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "634db75e_e6b4cb85",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "the scalars we single-quote are precisely the ones goccy refuses to quote (?, \u003c\u003c, flow-unsafe content).\n\nComment updated.",
+      "parentUuid": "7df83c44_49664a22",
       "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f28ddd2_db720d0c",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Done. Yep, simplify was able to remove a bunch of these, *even though* fable defended them first when directly asked about them. Sigh.",
+      "parentUuid": "487f8332_9028acd1",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "927281c0_ff99dc51",
@@ -133,6 +259,24 @@
       "writtenOn": "2026-07-31T11:55:50Z",
       "side": 1,
       "message": "again surprised that goccy doesn\u0027t handle this, or provide api for it, given that it\u0027s very clearly YAML syntax details",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b69dd408_6478020c",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2026-07-31T16:03:42Z",
+      "side": 1,
+      "message": "Comment improved. goccy does quote these itself, so the table isn\u0027t covering a gap - it pins the quote style. Quoting is what YAML 1.1 compatibility needs (either style would do); we force double quotes for parity with the old encoder\u0027s output, since our UseSingleQuote configuration would otherwise render them as \u0027yes\u0027.",
+      "parentUuid": "927281c0_ff99dc51",
       "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

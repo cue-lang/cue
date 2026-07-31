@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81b6035d_34df6595",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "out of curiosity, why not encode directly into a YAML syntax tree? given that the decoder goes straight from YAML syntax to cue/ast, I would hope that the encoder can also go from cue/ast (or cue.Value) straight to YAML syntax, be it a node tree or a token stream.\n\nadding an extra step in the form of a \"Go value tree\" is perhaps nice in terms of isolation, but I worry a bit that it adds a whole bunch of allocations.",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a254e746_dd5b5f8e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "Just to sanity check outloud: the old yaml encoder also supports comments, but they are not wired up in the yaml filetype (https://github.com/cue-lang/cue/issues/1180, github.com/cue-lang/cue/pull/1549), which is why `cue export --out yaml` doesn\u0027t include comments today.\n\nThis will remain being the case. And it\u0027s good to include comment support for parity with the old encoder.\n\nPlease say if I got this wrong.",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b24c93e1_32fef8b9",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "same as before, I\u0027d drop this internal godoc note",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "173f5048_48ff52d6",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "nit: I would probably not prefix this with \"y\", because yyaml is a little trippy",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "410cf29e_0a89a8be",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "Given that this is an internal package, you can just export EncodeConfig and be done with it - no need to be cute with functional options like one might want to do with a public API",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7df83c44_49664a22",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "goccy doesn\u0027t have a \"quote in single quotes\" API?",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "487f8332_9028acd1",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "a few helpers in this package go a little too low level in terms of being a YAML tokenizer/scanner for my comfort, and I\u0027d hope that goccy should or already does provide APIs to satisfy our needs. this applies to `isDecimalNumber` but also to `shouldQuote` and `yamlUnprintable`, for example.\n\nFor instance, can we not tokenize and then inspect the result to derive these bits of info?\n\nI\u0027d do a `/simplify` pass with Fable to see what it comes up with, either in terms of reusing existing code/apis, or in terms of raising reasonable API requests upstream.",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "927281c0_ff99dc51",
+        "filename": "internal/encoding/yaml/goccy/encode.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-07-31T11:55:50Z",
+      "side": 1,
+      "message": "again surprised that goccy doesn\u0027t handle this, or provide api for it, given that it\u0027s very clearly YAML syntax details",
+      "revId": "bbfa5eafca7035486b15af0c5ab1c3fc590a9f95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

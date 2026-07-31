@@ -153,8 +153,14 @@ var unmarshalTests = []struct {
 		"octal_yaml11: 02472256",
 		"octal_yaml11: 0o2472256",
 	}, {
+		"octal_yaml11_neg: -02472256",
+		"octal_yaml11_neg: -0o2472256",
+	}, {
 		"octal_yaml12: 0o2472256",
 		"octal_yaml12: 0o2472256",
+	}, {
+		"float_leading_zero: 01289.5",
+		"float_leading_zero: 01289.5",
 	}, {
 		"not_octal_yaml11: 0123456789",
 		`not_octal_yaml11: "0123456789"`,
@@ -400,7 +406,7 @@ null:   1
 	},
 	{
 		"float32_maxuint64+1: 18446744073709551616",
-		`"float32_maxuint64+1": number & 18446744073709551616`,
+		`"float32_maxuint64+1": 18446744073709551616`,
 	},
 
 	// float64
@@ -416,22 +422,24 @@ null:   1
 		"float64_maxuint64: 18446744073709551615",
 		"float64_maxuint64: 18446744073709551615",
 	},
-	// TODO(mvdan): numberKind uses strconv APIs like ParseUint to decide
-	// whether a scalar is a YAML integer or a float.
-	// Integers in CUE aren't limited to 64 bits, so we should arguably not decode
-	// large integers that don't fit in 64 bits as floats via `number &`.
+	// Integers are unbounded, like CUE's, with no 64-bit cliff in any
+	// base.
 	{
 		"float64_maxuint64+1: 18446744073709551616",
-		`"float64_maxuint64+1": number & 18446744073709551616`,
+		`"float64_maxuint64+1": 18446744073709551616`,
 	},
 	{
 		"v: -9223372036854775809",
-		"v: number & -9223372036854775809",
+		"v: -9223372036854775809",
+	},
+	{
+		"v: 36_893_488_147_419_103_232",
+		"v: 36_893_488_147_419_103_232",
 	},
 
 	// Scalars that are valid CUE numbers but not YAML numbers must stay
 	// strings, such as Kubernetes resource quantities with multiplier
-	// suffixes or hexadecimals beyond 64 bits.
+	// suffixes.
 	{
 		"memory: 1Gi",
 		`memory: "1Gi"`,
@@ -450,7 +458,7 @@ null:   1
 	},
 	{
 		"v: 0xFFFFFFFFFFFFFFFFF",
-		`v: "0xFFFFFFFFFFFFFFFFF"`,
+		"v: 0xFFFFFFFFFFFFFFFFF",
 	},
 
 	// Overflow cases.

@@ -1452,16 +1452,24 @@ func infString(n *yast.InfinityNode) string {
 	return "+Inf"
 }
 
-// yamlStyleFloat matches the plain scalars that resolve as floats when
-// they do not parse as integers; see [numberKind].
-var yamlStyleFloat = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$`)
+// rxYamlInt matches the plain scalars this package resolves as
+// integers: the YAML 1.2 core schema forms extended with the YAML 1.1
+// forms CUE keeps supporting, namely leading-zero octals, binary
+// integers, and a sign before any base. A decimal integer must not
+// start with a zero digit, so that broken octals such as `0778`
+// resolve as strings. Underscore separators are stripped before
+// matching; see [numberKind].
+var rxYamlInt = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`^[-+]?(0|[1-9][0-9]*|0b[01]+|0o?[0-7]+|0x[0-9a-fA-F]+)$`)
 })
 
-// rxAnyOctalYaml11 uses the implicit tag resolution regular expression for base-8 integers
-// from YAML's 1.1 spec, but including the 8 and 9 digits which aren't valid for octal integers.
-var rxAnyOctalYaml11 = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[-+]?0[0-9_]+$`)
+// rxYamlFloat matches the plain scalars this package resolves as
+// floats: decimal digits with a dot, an exponent, or both. Requiring
+// the dot or exponent keeps decimal integers, whatever their leading
+// digit, out of the float form. Underscore separators are stripped
+// before matching; see [numberKind].
+var rxYamlFloat = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`^[-+]?((\.[0-9]+|[0-9]+\.[0-9]*)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+)$`)
 })
 
 // specialFloats maps the plain scalar spellings of infinities and NaN
@@ -1475,36 +1483,24 @@ var specialFloats = map[string]string{
 
 // numberKind reports whether this package resolves the plain scalar s
 // as a number, returning token.INT, token.FLOAT, or token.ILLEGAL when
-// s is not a number. Infinities and NaN are handled separately via
-// [specialFloats]. Note that we cannot use CUE's own number syntax to
-// decide, as it is a superset of YAML's: for example, `1Gi` is a valid
-// CUE literal but a string in YAML.
+// s is not a number. The accepted forms are those of [rxYamlInt] and
+// [rxYamlFloat], with no limit on the size of integers. Infinities and
+// NaN are handled separately via [specialFloats]. Note that we cannot
+// use CUE's own number syntax to decide, as it is a superset of
+// YAML's: for example, `1Gi` is a valid CUE literal but a string in
+// YAML.
 func numberKind(s string) token.Token {
-	if s == "" {
+	if s == "" || s[0] == '_' {
 		return token.ILLEGAL
 	}
-	switch c := s[0]; {
-	case c == '.':
-		// A float such as `.5e3`.
-		if _, err := strconv.ParseFloat(s, 64); err == nil {
-			return token.FLOAT
-		}
-	case c == '+' || c == '-' || (c >= '0' && c <= '9'):
-		// Strip underscores, which YAML 1.1 allows as separators.
-		plain := strings.ReplaceAll(s, "_", "")
-		if _, err := strconv.ParseInt(plain, 0, 64); err == nil {
-			return token.INT
-		}
-		if _, err := strconv.ParseUint(plain, 0, 64); err == nil {
-			return token.INT
-		}
-		// A float, such as an integer beyond 64 bits or an exponent
-		// without a decimal point like `123456e1`.
-		if yamlStyleFloat().MatchString(plain) {
-			if _, err := strconv.ParseFloat(plain, 64); err == nil {
-				return token.FLOAT
-			}
-		}
+	// Strip underscores, which YAML 1.1 allows as separators within
+	// numbers.
+	plain := strings.ReplaceAll(s, "_", "")
+	switch {
+	case rxYamlInt().MatchString(plain):
+		return token.INT
+	case rxYamlFloat().MatchString(plain):
+		return token.FLOAT
 	}
 	return token.ILLEGAL
 }
@@ -1527,24 +1523,30 @@ func (d *decoder) scalarString(n *yast.StringNode) (ast.Expr, error) {
 		case token.INT:
 			return d.intExpr(pos, value)
 		case token.FLOAT:
-			// Values which look like YAML 1.1 octal literals but aren't
-			// valid octal integers, such as `0778`, are interpreted as
-			// strings instead, as most YAML decoders do.
-			if !rxAnyOctalYaml11().MatchString(value) {
-				return d.floatExpr(pos, value, true)
-			}
+			return d.floatExpr(pos, value, true)
 		}
 	}
 	return d.quotedString(pos, value), nil
 }
 
-// yaml11OctalToCUE converts a YAML 1.1 octal literal like 0777 to CUE
-// form. Other values are returned unchanged.
+// yaml11OctalToCUE converts a YAML 1.1 octal literal like 0777 or
+// -0777 to CUE form. Other values, such as floats with a leading zero
+// digit like 01289.5, are returned unchanged.
 func yaml11OctalToCUE(value string) string {
-	if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
-		return "0o" + value[1:]
+	sign, digits := "", value
+	if len(digits) > 0 && (digits[0] == '+' || digits[0] == '-') {
+		sign, digits = digits[:1], digits[1:]
 	}
-	return value
+	rest, ok := strings.CutPrefix(digits, "0")
+	if !ok || rest == "" {
+		return value
+	}
+	for _, c := range rest {
+		if (c < '0' || c > '7') && c != '_' {
+			return value
+		}
+	}
+	return sign + "0o" + rest
 }
 
 func (d *decoder) integer(n *yast.IntegerNode) (ast.Expr, error) {

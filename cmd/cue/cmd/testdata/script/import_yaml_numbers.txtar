@@ -39,7 +39,7 @@ float: !!float 123
 memory: "1Gi"
 cpu:    "100m"
 frac:   "1.5Gi"
-huge:   number & 18446744073709551616
+huge:   18446744073709551616
 exp:    123456e1
 float:  number & 123
 -- expect-import-old-stderr --

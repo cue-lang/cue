@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2593e9c0_081ead01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2026-08-01T09:49:39Z",
+      "side": 1,
+      "message": "I bet the error is related to non-deterministic aspects of the test. I believe there are some features available in the testing framework that can help you make it deterministic, but I forgot what those were.",
+      "revId": "bd7b50112394e4f58e81b9669ce4aa3e95209057",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

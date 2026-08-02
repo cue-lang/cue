@@ -16,6 +16,24 @@
       "message": "I bet the error is related to non-deterministic aspects of the test. I believe there are some features available in the testing framework that can help you make it deterministic, but I forgot what those were.",
       "revId": "bd7b50112394e4f58e81b9669ce4aa3e95209057",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3c78f34_8cd10d31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-02T12:27:12Z",
+      "side": 1,
+      "message": "Done. Switched the test to the \"sequenced\" runner with explicit seq numbers, which serializes task completion, so the snapshots are deterministic even while the two tasks run concurrently at this commit. Verified with repeated -race runs.",
+      "parentUuid": "2593e9c0_081ead01",
+      "revId": "bd7b50112394e4f58e81b9669ce4aa3e95209057",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

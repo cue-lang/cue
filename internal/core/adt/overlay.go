@@ -42,17 +42,12 @@ import (
 // could get by with only copying arcs to that are modified in the copy.
 
 func newOverlayContext(ctx *OpContext) *overlayContext {
-	// Reuse the map from the overlays stack if one exists at this depth.
-	var m vertexMap
-	if i := len(ctx.overlays); i < cap(ctx.overlays) {
-		m = ctx.overlays[:cap(ctx.overlays)][i].vertexMap
-	}
-	if m == nil {
-		m = make(map[*Vertex]*Vertex)
-	}
+	// Note that this map cannot be reused across overlayContexts: cloneRoot
+	// stores it on the cloned nodeContext, where it seeds the vertexMap of
+	// any later disjunct that uses the clone as its basis. See cloneRoot.
 	return &overlayContext{
 		ctx:       ctx,
-		vertexMap: m,
+		vertexMap: make(map[*Vertex]*Vertex),
 	}
 }
 
@@ -83,8 +78,6 @@ type vertexMap map[*Vertex]*Vertex
 //
 // TODO(perf): right now this is only used for resolving vertices in
 // comprehensions. We could also use this for resolving environments, though.
-// Furthermore, we could used the "cleared" vertexMaps on this stack to avoid
-// allocating memory.
 //
 // NOTE: using a stack globally in OpContext is not very principled, as we
 // may be evaluating nested evaluations of different disjunctions. However,
@@ -101,15 +94,10 @@ func (c *OpContext) pushOverlay(v *Vertex, m vertexMap) {
 
 func (c *OpContext) popOverlay() {
 	i := len(c.overlays) - 1
-	// TODO(mvdan): unfortunately, clearing maps with large capacities
-	// is fairly slow as of Go 1.25, and most uses only need few entries.
-	// Do not reuse large maps to avoid this pitfall for now.
-	// See: https://github.com/golang/go/issues/70617
-	if l := len(c.overlays[i].vertexMap); l > 512 {
-		c.overlays[i].vertexMap = nil
-	} else {
-		clear(c.overlays[i].vertexMap)
-	}
+	// The map may still be referenced as the vertexMap of the cloned
+	// nodeContext, so it must not be cleared or reused; only drop the
+	// stack's own reference.
+	c.overlays[i] = overlayFrame{}
 	c.overlays = c.overlays[:i]
 }
 
@@ -132,8 +120,12 @@ func (c *OpContext) deref(v *Vertex) *Vertex {
 func (c *OpContext) derefRoot(v *Vertex) *Vertex {
 	for i := len(c.overlays) - 1; i >= 0; i-- {
 		f := c.overlays[i]
+		// Dereference transitively: when disjuncts are chained across
+		// multiple disjunctions, the map contains a chain from each
+		// intermediate cross product to the most recent clone, and only
+		// the most recent clone is being evaluated.
 		if x, ok := f.vertexMap[v]; ok {
-			return x
+			return f.vertexMap.deref(x)
 		}
 	}
 	return v

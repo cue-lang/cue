@@ -1,0 +1,28 @@
+# Unifying three or more conjuncts that each hold a disjunction used to hang
+# when a disjunct references a sibling field: the reference resolved against a
+# freed intermediate cross product vertex, replaying its disjunction
+# processing indefinitely.
+# https://cuelang.org/issue/4453
+
+-- in.cue --
+t1: {
+	out: (int | {d: d}) & (int | {}) & (int | {}) @test(eq, int | {d: _})
+}
+t2: {
+	i1: [null | {b: int, c: b}]
+	i2: [null | {b: int, c: b}]
+	i3: [null | {b: int, c: b}]
+	out: i1 & i2 & i3 @test(eq, [null | {b: int, c: int}])
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  63
+Reused: 47
+Allocs: 16
+Retain: 0
+
+Unifications: 21
+Conjuncts:    60
+Disjuncts:    26
+
+NumCloseIDs: 3

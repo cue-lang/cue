@@ -100,7 +100,10 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	} else {
 		for x := range constraint.LeafConjuncts() {
 			if x.x == c.x && x.Env.Equal(ctx, c.Env) {
-				if c.CloseInfo.opID == n.ctx.opID {
+				// Both defIDs must stem from the current OpContext: x may
+				// predate it, in which case its defID indexes another
+				// context's containments table.
+				if c.CloseInfo.opID == n.ctx.opID && x.CloseInfo.opID == n.ctx.opID {
 					// TODO: do we need this replacement?
 					src := x.CloseInfo.defID
 					dst := c.CloseInfo.defID

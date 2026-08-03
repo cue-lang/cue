@@ -1,0 +1,29 @@
+# Verify that eval of an expression does not panic when it re-inserts a
+# pattern constraint conjunct that was first inserted while evaluating the
+# instance under a different OpContext.
+# Issue #4449.
+
+exec cue eval -e export.objects.p in.cue
+cmp stdout stdout.golden
+
+-- in.cue --
+export: objects: ({
+	in: _
+	out: p: {
+		for x in in.deployment {}
+	}
+} & {in: export.objects}).out
+export: objects: [string]: _
+-- stdout.golden --
+_ &
+    {
+        for x in OBJECTS.deployment {}
+    }
+
+//cue:path: export.objects
+let OBJECTS = ({
+    in: _
+    out: p: {
+        for x in OBJECTS.deployment {}
+    }
+} & {in: OBJECTS}).out & {{[string]: _}}

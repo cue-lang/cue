@@ -16,6 +16,24 @@
       "message": "Hmm, given the method name, I wonder if it might be better to return `path` here?\nIf not, perhaps add a comment saying why not.",
       "revId": "55d4440eb501cafcf67035b7cab8cdaa9b99feb4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fd6fe76_8a6b7852",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T10:51:46Z",
+      "side": 1,
+      "message": "Good point — done. Returning the canonical form here is always safe since Canonical only strips a redundant qualifier, and it keeps the result canonical in all cases as the name suggests.",
+      "parentUuid": "c16d2c91_8aef9e98",
+      "revId": "55d4440eb501cafcf67035b7cab8cdaa9b99feb4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -783,6 +783,12 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		if it := g.makeCallItem(v, args, mode); it != nil {
 			return it
 		}
+		if v.IsConcrete() {
+			// The call isn't a known validator but it evaluated to a
+			// concrete value (for example hex.Encode(a)), so fall through
+			// and emit that value as a const.
+			break
+		}
 		// For unknown functions, accept anything rather than fail.
 		// This allows for gradual implementation of more function types.
 		return &itemTrue{}
@@ -912,12 +918,16 @@ func (g *generator) constExpr(v cue.Value, mode closedMode) (ast.Expr, bool) {
 		}
 		return &ast.ListLit{Elts: elems}, true
 	}
-	// For other kinds (atoms), if it's concrete, return its syntax
+	// For other kinds (atoms), if it's concrete, return its syntax.
 	if !v.IsConcrete() {
 		return nil, false
 	}
-	expr, ok := v.Syntax().(ast.Expr)
-	return expr, ok
+	if expr, ok := v.Syntax(cue.Final()).(ast.Expr); ok {
+		return expr, true
+	}
+	// Shouldn't happen, because for concrete atoms with Final,
+	// the result should never need to be a file with imports.
+	return nil, false
 }
 
 // sizedNumber describes the JSON Schema type and format used to represent a

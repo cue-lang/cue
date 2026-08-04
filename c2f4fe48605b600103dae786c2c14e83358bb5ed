@@ -22,6 +22,24 @@
       },
       "revId": "c2f4fe48605b600103dae786c2c14e83358bb5ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82da0669_c4405211",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T11:30:14Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "9e6668b8_1032f25d",
+      "revId": "c2f4fe48605b600103dae786c2c14e83358bb5ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

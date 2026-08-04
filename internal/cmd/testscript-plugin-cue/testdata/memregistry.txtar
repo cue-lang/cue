@@ -1,0 +1,44 @@
+# Test that memregistry starts an in-memory OCI registry: publish a module to
+# it and then resolve that module from another module. The variable name must
+# be one the plugin declares it may set (the CUE_REGISTRY* family).
+plugin cue
+
+memregistry CUE_REGISTRY1
+env CUE_REGISTRY=${CUE_REGISTRY1}+insecure
+
+# Publish the dependency to the in-memory registry.
+cd dep
+exec cue mod publish v0.1.0
+cd ..
+
+# Resolve and use it from the main module.
+cd main
+exec cue export .
+cmp stdout ../want.txt
+
+-- dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.17.0"
+source: kind: "self"
+-- dep/dep.cue --
+package dep
+
+value: "published value"
+-- main/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+deps: {
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+}
+-- main/main.cue --
+package main
+
+import "example.com/dep@v0:dep"
+
+out: dep.value
+-- want.txt --
+{
+    "out": "published value"
+}

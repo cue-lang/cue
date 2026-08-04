@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83ee9cb0_15c2924c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T18:01:23Z",
+      "side": 1,
+      "message": "LGTM assuming this is largely copied from the logic we already have for _registry.\n\nAlso, can we reuse any of this code, or the plugin itself, for our existing test suite? Or is the amount of code to reuse small enough where it doesn\u0027t really matter?",
+      "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a1263d2_0fbb5527",
+        "filename": "go.mod",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T18:01:23Z",
+      "side": 1,
+      "message": "replace with v0.16.0 once you\u0027ve done the release",
+      "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5820411d_772d5d80",
+        "filename": "internal/cmd/testscript-plugin-cue/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T18:01:23Z",
+      "side": 1,
+      "message": "rewrite these links to be collected in a section as follows, so they render well in pkg.go.dev, the LSP, etc: https://go.dev/doc/comment#links",
+      "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

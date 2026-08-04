@@ -31,19 +31,36 @@ verbatim:
 Omit it otherwise (typical of patch releases).
 
 **Sections**, in this fixed order; omit any that are empty:
-`## Language` · `## Evaluator` · `` ## `cmd/cue` `` · `## LSP server` ·
-`## Encodings` · `## Standard library` · `## Go API`.
+`## Language` · `## Evaluator` · `` ## `cmd/cue` `` · `## Modules` ·
+`## LSP server` · `## Encodings` · `## Standard library` · `## Go API`.
 Lead with the headline feature when one dominates, overriding the order
 (e.g. the new `cue lsp` led v0.15.0).
+
+Two boundary rules:
+- `## Modules` covers modules and package loading: import resolution,
+  package patterns and arguments, `@embed`, registries, publishing, and
+  `cue mod` behavior — even when surfaced through the CLI.
+- Encodings work goes in `## Encodings` even when the change affects
+  the CLI interface (new `--out`/filetype tags, `cue import`/`cue
+  export` conversion behavior, `cue get go`). `` ## `cmd/cue` `` keeps
+  command UX not tied to one encoding: flags, argument handling, tool
+  tasks.
 
 **Subsections** (`####`) group a large section or a flagship item:
 - Named experiments/features (`` #### The new `try` experiment ``):
   1–3 paragraphs on what it does and how to enable it
   (`@experiment(...)` or a language version), with links to the how-to,
   proposal, and spec CL.
+- An experiment first appearing in this release is introduced as new
+  ("The new `X` experiment …"), even when it starts out enabled by
+  default. Phrase it as "now enabled by default" only for an
+  experiment that shipped in a past release, linking that release.
 - `#### Performance` / `#### Other changes` split `## Evaluator` when
   there is substantial performance work.
 - A `####` may carry `:warning:` when the whole subsection is breaking.
+- Do not create a `####` for a single reasonably short paragraph — fold
+  it into the parent section. If that leaves `#### Other changes` as
+  the only subsection, drop that heading too and flatten the section.
 
 ## Entry style
 
@@ -74,8 +91,15 @@ Lead with the headline feature when one dominates, overriding the order
   `GenerateConfig.NameFunc`.
 - **Breaking changes**: prefix `:warning:`, and phrase so the impact and
   migration path are clear.
+- **Release self-references**: when scoping a statement to the release
+  being drafted ("the old formatter remains available … for this
+  release"), name the feature-release series explicitly instead:
+  "for v0.18".
 - **Regressions** name the version that introduced them ("a regression
-  introduced in `v0.12.0`"); plain bugs need not.
+  introduced in `v0.12.0`"); plain bugs need not. Never attribute a
+  regression to a past patch release — the fix may yet be backported
+  in a further patch, so describe the fix without the regression
+  framing (issue links may stay).
 - **Quantify performance** ("up to 80% faster", "memory down by as much
   as 60%"); credit the Unity service where relevant.
 - **Aggregate** many small same-theme fixes into one paragraph, often
@@ -91,6 +115,10 @@ Lead with the headline feature when one dominates, overriding the order
 - Issues `https://cuelang.org/issue/NNN` · CLs `https://cuelang.org/cl/NNN`
   · Discussions/proposals `https://cuelang.org/discussion/NNN` · How-tos
   `https://cuelang.org/docs/howto/...`.
+- Mentions of a specific past release (e.g. "announced in `v0.17.0`",
+  "a regression introduced in `v0.12.0`") link to its GitHub release:
+  `https://github.com/cue-lang/cue/releases/tag/vX.Y.Z`. Version-series
+  mentions ("v0.17") and future releases stay unlinked.
 - LSP sections link the Getting Started wiki and invite bug reports via
   the issue tracker and the `#lsp` Discord/Slack channels.
 
@@ -131,6 +159,13 @@ regression-test commits; CI, build, tooling, and dependency bumps;
 doc-only and comment fixes; anything with no observable effect on the
 CLI, the language, or the Go API.
 
+Also exclude changes already released and announced in a patch release
+of the previous minor, even though the diff base (the previous `.0`)
+includes them — users have already been told. Do not replace them with
+a pointer line like "includes all fixes from vX.Y.1" either; simply
+leave them out. Naming a past minor as the source of a regression
+remains fine; a patch release does not (see Entry style).
+
 ## Release types
 
 - **Minor** (`vX.Y.0`): full treatment — `## Language` with experiment
@@ -138,7 +173,10 @@ CLI, the language, or the Go API.
   the previous minor as the diff base.
 - **Pre-release** (`-alpha.N` / `-rc.N`): same structure as the minor it
   leads to; content accumulates into the final `.0`. RCs often document
-  late design tweaks under a `:warning:` subsection.
+  late design tweaks under a `:warning:` subsection. Do not open with a
+  line framing the release as leading up to the final (e.g. "the first
+  pre-release on the way to vX.Y.0") — the tag already says so; start
+  directly with the warning legend or first section.
 - **Patch** (`vX.Y.Z`, Z>0): short and fix-focused — no preamble, no
   warning legend, usually no `## Language` section; phrase entries as
   "Fix a …". Aggregate hard: group fixes by symptom class rather than

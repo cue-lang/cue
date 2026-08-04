@@ -1,0 +1,20 @@
+# Test that the get-manifest command fetches the OCI manifest of a published
+# module from a registry started by memregistry.
+plugin cue
+
+memregistry CUE_REGISTRY1
+env CUE_REGISTRY=${CUE_REGISTRY1}+insecure
+
+exec cue mod publish v0.1.0
+
+get-manifest $CUE_REGISTRY1/example.com/dep:v0.1.0 manifest.json
+grep application/vnd.cue manifest.json
+
+-- cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.17.0"
+source: kind: "self"
+-- dep.cue --
+package dep
+
+value: "published value"

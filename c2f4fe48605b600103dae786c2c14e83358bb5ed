@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e6668b8_1032f25d",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-08-04T10:51:57Z",
+      "side": 1,
+      "message": "```suggestion\n\tpkg.Root \u003d cmp.Or(l.cfg.ModuleRoot, l.cfg.Dir)\n```\n?",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 0
+      },
+      "revId": "c2f4fe48605b600103dae786c2c14e83358bb5ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

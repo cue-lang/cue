@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad0b03ac_236b74b0",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T11:30:14Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "69bbab67_c409b6f8",
+      "revId": "d7d10adfff1bc0b6d4f2ebb2919ebfc03ad8240b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8672909_dd9a4053",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-04T10:51:07Z",
       "side": 1,
       "message": "I saw that matthew needed to work around this recently. It might be nice to fix (I don\u0027t think there\u0027s any inherent reason for it). Maybe raise an issue and add a TODO here?",
+      "revId": "d7d10adfff1bc0b6d4f2ebb2919ebfc03ad8240b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bac2139_a03ddb0d",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-08-04T11:30:14Z",
+      "side": 1,
+      "message": "Done; filed https://cuelang.org/issue/4458 and added a TODO here.",
+      "parentUuid": "d8672909_dd9a4053",
       "revId": "d7d10adfff1bc0b6d4f2ebb2919ebfc03ad8240b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

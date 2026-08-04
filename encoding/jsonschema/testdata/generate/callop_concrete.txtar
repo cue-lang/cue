@@ -1,0 +1,31 @@
+# Tests that a builtin call which evaluates to a concrete value (rather than a
+# recognized validator) is emitted as a const, not as an unconstrained schema.
+# Regression test for https://cuelang.org/issue/4450 where hex.Encode and
+# uuid.Parse rendered as `true` (accept anything).
+-- test.cue --
+package test
+
+import (
+	"uuid"
+	"encoding/hex"
+	"strconv"
+)
+
+a: '\x18\xb3\x1b\x66\x0a\x87\x44\x3d\x8d\xa2\xeb\x89\x3e\x04\xdc\x4b'
+b: hex.Encode(a)
+c: uuid.Parse(b)
+n: strconv.Atoi("42")
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		a: const: '''
+			\x18\xb3\x1bf
+			\x87D=\x8d\xa2\xeb\x89>\x04\xdcK
+			'''
+		b: const: "18b31b660a87443d8da2eb893e04dc4b"
+		c: const: "18b31b66-0a87-443d-8da2-eb893e04dc4b"
+		n: const: 42
+	}
+}

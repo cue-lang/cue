@@ -564,6 +564,13 @@ b: "c"`,
 	"""`,
 	},
 
+	// A %YAML 1.2 directive is accepted.
+	// Issue 3349
+	{
+		"%YAML 1.2\n---\na: 1\n",
+		"a: 1",
+	},
+
 	// bug 1243827
 	{
 		"a: -b_c",

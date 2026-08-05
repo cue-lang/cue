@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6197d03e_f1daab1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-08-05T11:18:49Z",
+      "side": 1,
+      "message": "Good thought. I\u0027ve factored this into two commits so the functionality is now in common between this command and the cmd/cue tests.",
+      "parentUuid": "83ee9cb0_15c2924c",
+      "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a1263d2_0fbb5527",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5c4fe9d_aa65dfae",
+        "filename": "go.mod",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-08-05T11:18:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a1263d2_0fbb5527",
+      "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5820411d_772d5d80",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-08-04T18:01:23Z",
       "side": 1,
       "message": "rewrite these links to be collected in a section as follows, so they render well in pkg.go.dev, the LSP, etc: https://go.dev/doc/comment#links",
+      "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "440ba046_0f65efd6",
+        "filename": "internal/cmd/testscript-plugin-cue/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2026-08-05T11:18:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5820411d_772d5d80",
       "revId": "22042bd782dc3c269d4c22964d86d76dc0f88063",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

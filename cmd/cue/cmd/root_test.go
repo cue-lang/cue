@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"cuelang.org/go/cmd/cue/cmd"
+	"cuelang.org/go/internal/cuetestscript"
 	"cuelang.org/go/internal/cueversion"
 	"github.com/go-quicktest/qt"
 )
@@ -146,7 +147,8 @@ func TestInterrupt(t *testing.T) {
 	toolPath := strings.TrimSpace(string(toolOut))
 
 	// We set up a mock registry so the OAuth flow used by `cue login` is always pending.
-	srv := newMockRegistryOauth("pending-forever")
+	srv, err := cuetestscript.NewMockRegistryOauth(cuetestscript.OauthPendingForever)
+	qt.Assert(t, qt.IsNil(err))
 	regURL, _ := url.Parse(srv.URL)
 	t.Cleanup(srv.Close)
 

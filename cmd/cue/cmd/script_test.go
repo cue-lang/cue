@@ -23,9 +23,8 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -33,18 +32,12 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
-	"cuelabs.dev/go/oci/ociregistry/ociclient"
-	"cuelabs.dev/go/oci/ociregistry/ocimem"
-	"cuelabs.dev/go/oci/ociregistry/ociref"
-	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
-	"golang.org/x/oauth2"
 	"golang.org/x/tools/txtar"
 
 	cuecmd "cuelang.org/go/cmd/cue/cmd"
@@ -54,9 +47,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/cueversion"
-	"cuelang.org/go/internal/mod/semver"
-	"cuelang.org/go/mod/modregistrytest"
+	"cuelang.org/go/internal/cuetestscript"
 )
 
 // hostGoModCache returns the host's GOMODCACHE, letting testscripts reuse
@@ -152,91 +143,6 @@ func TestScript(t *testing.T) {
 				ts.Check(err)
 				_, err = fmt.Fprint(ts.Stdout(), fi.ModTime().UnixNano())
 				ts.Check(err)
-			},
-			// get-manifest writes the manifest for a given reference within an OCI
-			// registry to a file in JSON format.
-			"get-manifest": func(ts *testscript.TestScript, neg bool, args []string) {
-				usage := func() {
-					ts.Fatalf("usage: get-metadata OCI-ref@tag dest-file")
-				}
-				if neg {
-					usage()
-				}
-				if len(args) != 2 {
-					usage()
-				}
-				ref, err := ociref.Parse(args[0])
-				if err != nil {
-					ts.Fatalf("invalid OCI reference %q: %v", args[0], err)
-				}
-				if ref.Tag == "" {
-					ts.Fatalf("no tag in OCI reference %q", args[0])
-				}
-				client, err := ociclient.New(ref.Host, &ociclient.Options{
-					Insecure: true,
-				})
-				ts.Check(err)
-				r, err := client.GetTag(context.Background(), ref.Repository, ref.Tag)
-				ts.Check(err)
-				data, err := io.ReadAll(r)
-				ts.Check(err)
-				err = os.WriteFile(ts.MkAbs(args[1]), data, 0o666)
-				ts.Check(err)
-			},
-			// memregistry starts an in-memory OCI server and sets the argument
-			// environment variable name to its hostname.
-			"memregistry": func(ts *testscript.TestScript, neg bool, args []string) {
-				usage := func() {
-					ts.Fatalf("usage: memregistry [-auth=username:password] <envvar-name>")
-				}
-				if neg {
-					usage()
-				}
-				var auth *modregistrytest.AuthConfig
-				if len(args) > 0 && strings.HasPrefix(args[0], "-") {
-					userPass, ok := strings.CutPrefix(args[0], "-auth=")
-					if !ok {
-						usage()
-					}
-					user, pass, ok := strings.Cut(userPass, ":")
-					if !ok {
-						usage()
-					}
-					auth = &modregistrytest.AuthConfig{
-						Username: user,
-						Password: pass,
-					}
-					args = args[1:]
-				}
-				if len(args) != 1 {
-					usage()
-				}
-
-				srv, err := modregistrytest.NewServer(ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true}), auth)
-				if err != nil {
-					ts.Fatalf("cannot start registrytest server: %v", err)
-				}
-				ts.Setenv(args[0], srv.Host())
-				ts.Defer(srv.Close)
-			},
-			// oauthregistry starts an HTTP server with enough endpoints to test `cue login`.
-			// It takes a single argument to describe the oauth server's behavior:
-			//
-			// * device-code-not-found: /login/device/code responds with 404
-			// * device-code-method-not-allowed: /login/device/code responds with 405
-			// * device-code-expired: polling for a token with device_code
-			//   always responds with [tokenErrorCodeExpired]
-			// * pending-success: polling for a token with device_code
-			//   responds with [tokenErrorCodePending] once, and then succeeds
-			// * immediate-success: polling for a token with device_code succeeds right away
-			"oauthregistry": func(ts *testscript.TestScript, neg bool, args []string) {
-				if neg || len(args) != 1 {
-					ts.Fatalf("usage: oauthregistry <mode>")
-				}
-				srv := newMockRegistryOauth(args[0])
-				u, _ := url.Parse(srv.URL)
-				ts.Setenv("CUE_REGISTRY", u.Host+"+insecure")
-				ts.Defer(srv.Close)
 			},
 			// find-files recursively lists files under a directory, like `find -type f` on Linux.
 			// It prints slash-separated paths relative to the root working directory of the testscript run,
@@ -358,21 +264,12 @@ func TestScript(t *testing.T) {
 			},
 		},
 		Setup: func(e *testscript.Env) error {
-			// If a testscript loads CUE packages but forgot to set up a cue.mod,
-			// we might walk up to the system's temporary directory looking for cue.mod.
-			// If /tmp/cue.mod exists for instance, this can lead to test failures
-			// as our behavior when it comes to the module root and file paths changes.
-			// Make the testscript.Params.WorkdirRoot directory a module,
-			// ensuring consistent behavior no matter what parent directories contain.
-			//
-			// Note that creating the directory is enough for now,
-			// and we ignore ErrExist since only the first test will succeed.
-			// We can't create the directory before testscript.Run, as it sets up WorkdirRoot.
-			workdirRoot := filepath.Dir(e.WorkDir)
-			if err := os.Mkdir(filepath.Join(workdirRoot, "cue.mod"), 0o777); err != nil && !errors.Is(err, fs.ErrExist) {
+			// Set up the environment that the cue command expects: the
+			// registries described by the script's _registry* directories,
+			// the cache directory, and the language version variables.
+			if err := cuetestscript.Setup(cuetestscript.SetupEnv(e)); err != nil {
 				return err
 			}
-
 			// Let testscripts build Go code against this cuelang.org/go
 			// checkout via a replace directive without network access.
 			checkoutRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
@@ -384,77 +281,16 @@ func TestScript(t *testing.T) {
 				return err
 			}
 			e.Vars = append(e.Vars,
-				// The current language version which would be added by `cue mod init`, e.g. v0.10.0.
-				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
-				// A later language version which only increases the bugfix release, e.g. v0.10.99.
-				"CUE_LANGUAGE_VERSION_BUGFIX="+semver.MajorMinor(cueversion.LanguageVersion())+".99",
 				"CUE_CHECKOUT_ROOT="+checkoutRoot,
 				"HOST_GOMODCACHE="+goModCache,
 			)
-			entries, err := os.ReadDir(e.WorkDir)
-			if err != nil {
-				return fmt.Errorf("cannot read workdir: %v", err)
-			}
-			// Since os.UserCacheDir relies on OS-specific env vars that we don't set,
-			// explicitly set up the cache directory somewhere predictable.
-			e.Vars = append(e.Vars, "CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"))
-			for _, entry := range entries {
-				if !entry.IsDir() {
-					continue
-				}
-				regID, ok := strings.CutPrefix(entry.Name(), "_registry")
-				if !ok {
-					continue
-				}
-				// There's a _registry directory. Start a fake registry server to serve
-				// the modules in it.
-				registryDir := filepath.Join(e.WorkDir, entry.Name())
-				prefix := ""
-				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry"+regID+"_prefix")); err == nil {
-					prefix = strings.TrimSpace(string(data))
-				}
-				useProxy := false
-				proxyFile := filepath.Join(e.WorkDir, "_registry"+regID+"_proxy")
-				if data, err := os.ReadFile(proxyFile); err == nil {
-					useProxy, err = strconv.ParseBool(strings.TrimSpace(string(data)))
-					if err != nil {
-						return fmt.Errorf("invalid contents of proxy file %q: %v", proxyFile, err)
-					}
-				}
-				reg, err := modregistrytest.New(os.DirFS(registryDir), prefix)
-				if err != nil {
-					return fmt.Errorf("cannot start test registry server: %v", err)
-				}
-				e.Defer(reg.Close)
-				if prefix != "" {
-					prefix = "/" + prefix
-				}
-				regHost := reg.Host()
-				if useProxy {
-					// Use a proxy for the registry, mirroring the way that the Central Registry
-					// works.
-					proxyClient, err := ociclient.New(regHost, &ociclient.Options{
-						Insecure: true,
-					})
-					if err != nil {
-						return fmt.Errorf("cannot create oci proxy client")
-					}
-					reg2 := httptest.NewServer(ociserver.New(proxyClient, nil))
-					reg2URL, _ := url.Parse(reg2.URL)
-					regHost = reg2URL.Host
-					e.Defer(reg2.Close)
-				}
-				e.Vars = append(e.Vars,
-					"CUE_REGISTRY"+regID+"="+regHost+prefix+"+insecure",
-					// This enables some tests to construct their own malformed
-					// CUE_REGISTRY values that still refer to the test registry.
-					"DEBUG_REGISTRY"+regID+"_HOST="+regHost,
-				)
-			}
 			return nil
 		},
 		Condition: cuetest.Condition,
 	}
+	// Add the commands that come with the cue testscript environment,
+	// such as memregistry; see [cuetestscript.Cmds].
+	maps.Copy(p.Cmds, cuetestscript.TestscriptCmds())
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)
 	}
@@ -705,99 +541,4 @@ func testCmd() {
 	default:
 		check(fmt.Errorf("unknown command: %q\n", cmd))
 	}
-}
-
-// newMockRegistryOauth starts a test HTTP server with the OAuth2 device flow endpoints
-// used by `cue login` to obtain an access token.
-// Note that this HTTP server isn't an OCI registry yet, as that isn't needed for now.
-//
-// TODO: once we support refresh tokens, add those endpoints and test them too.
-func newMockRegistryOauth(mode string) *httptest.Server {
-	mux := http.NewServeMux()
-	ts := httptest.NewServer(mux)
-	const (
-		staticUserCode    = "user-code"
-		staticDeviceCode  = "device-code-longer-string"
-		staticAccessToken = "secret-access-token"
-		intervalSecs      = 1 // 1s to keep the tests fast
-	)
-	// OAuth2 Device Authorization Request endpoint: https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
-	mux.HandleFunc("/login/device/code", func(w http.ResponseWriter, r *http.Request) {
-		switch mode {
-		case "device-code-not-found":
-			http.Error(w, "404 page not found", http.StatusNotFound)
-			return
-		case "device-code-method-not-allowed":
-			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-		writeJSON(w, http.StatusOK, oauth2.DeviceAuthResponse{
-			DeviceCode: staticDeviceCode,
-			UserCode:   staticUserCode,
-
-			VerificationURI:         ts.URL + "/login/device",
-			VerificationURIComplete: ts.URL + "/login/device?user_code=" + url.QueryEscape(staticUserCode),
-
-			Expiry:   time.Now().Add(time.Minute),
-			Interval: intervalSecs,
-		})
-	})
-	// OAuth2 Token endpoint: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
-	var tokenRequestCounter atomic.Int64
-	mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
-		deviceCode := r.FormValue("device_code")
-		if deviceCode != staticDeviceCode {
-			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeDenied})
-			return
-		}
-		switch mode {
-		case "device-code-expired":
-			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeExpired})
-		case "pending-forever":
-			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodePending})
-		case "pending-success":
-			count := tokenRequestCounter.Add(1)
-			if count == 1 {
-				writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodePending})
-				break
-			}
-			fallthrough
-		case "immediate-success":
-			writeJSON(w, http.StatusOK, oauth2.Token{
-				AccessToken: staticAccessToken,
-				TokenType:   "Bearer",
-				ExpiresIn:   int64(time.Hour / time.Second), // 1h in seconds
-			})
-		default:
-			panic(fmt.Sprintf("unknown mode: %q", mode))
-		}
-	})
-	return ts
-}
-
-func writeJSON(w http.ResponseWriter, statusCode int, v any) {
-	b, err := json.Marshal(v)
-	if err != nil { // should never happen
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	w.Write(b)
-}
-
-const (
-	// Device flow token error code strings from https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
-	tokenErrorCodePending  = "authorization_pending" // waiting for user
-	tokenErrorCodeSlowDown = "slow_down"             // increase polling interval
-	tokenErrorCodeDenied   = "access_denied"         // the user denied the request
-	tokenErrorCodeExpired  = "expired_token"         // the device_code expired
-)
-
-// tokenError implements the error response structure defined by
-// https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
-type tokenError struct {
-	ErrorCode        string `json:"error"` // one of the constants above
-	ErrorDescription string `json:"error_description,omitempty"`
-	ErrorURI         string `json:"error_uri,omitempty"`
 }

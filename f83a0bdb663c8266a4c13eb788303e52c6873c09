@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81b9eca9_219a1110",
+        "filename": "project.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2026-08-05T14:22:29Z",
+      "side": 1,
+      "message": "We don\u0027t need to surface this. I think we just say \"it\u0027s read only\". I think this description is public.",
+      "range": {
+        "startLine": 98,
+        "startChar": 47,
+        "endLine": 98,
+        "endChar": 55
+      },
+      "revId": "f83a0bdb663c8266a4c13eb788303e52c6873c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -3,18 +3,21 @@ obj:    {a: 1, b: 2}              @test(eq, {a: 1, b: 2})
 index:  {a: 1, b:     2}["b"]     @test(eq, 2)
 mulidx: {a: 1, b: {a: 1, b: 3}}["b"]["b"] @test(eq, 3)
 e:      {a: 1}[4]                 @test(err, code=eval, pos=[0:16])
-f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:16])
-g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:16])
-h:      [3].b                     @test(err, code=eval, pos=[0:13])
+f:      {a: 1}.b                  @test(err, code=incomplete, pos=[0:16, 0:9])
+g:      {a: 1}["b"]               @test(err, code=incomplete, pos=[0:16, 0:9])
+h:      [3].b                     @test(err, code=eval, pos=[0:13, 0:9])
 -- out/errors.txt --
 [eval] e: invalid index 4 (found struct, want list):
     ./in.cue:4:16
 [incomplete] f: undefined field: b:
     ./in.cue:5:16
+    ./in.cue:5:9
 [incomplete] g: undefined field: b:
     ./in.cue:6:16
+    ./in.cue:6:9
 [eval] h: undefined field: b:
     ./in.cue:7:13
+    ./in.cue:7:9
 -- todo.txt --
 Some error messages could use improvement. Address after query
 extension is implemented.

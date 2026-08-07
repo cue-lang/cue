@@ -29,7 +29,7 @@ issue4119: reducedNested: {
 			}
 		]
 	}
-	@test(err, code=eval, path=x.y.0.f, contains="undefined field: %s", args=[f], pos=[6:10])
+	@test(err, code=eval, path=x.y.0.f, contains="undefined field: %s", args=[f], pos=[6:10, 1:6, 2:6, 4:3])
 }
 issue4119: full: {
 	_img: {
@@ -81,6 +81,9 @@ issue4119: full: {
 -- out/errors.txt --
 [eval] issue4119.reducedNested.x.y.0.f: undefined field: f:
     ./comprehensions.cue:26:10
+    ./comprehensions.cue:21:6
+    ./comprehensions.cue:22:6
+    ./comprehensions.cue:24:3
 -- out/eval/stats --
 Leaks:  7
 Freed:  50

@@ -279,6 +279,19 @@ func (v *Vertex) reportFieldCycleError(c *OpContext, pos token.Pos, f Feature) *
 	return b
 }
 
+// addVertexPositions adds the positions of the expressions that v is composed
+// of to err. Errors about a field of v not being usable otherwise only carry
+// the position of the failing selector, which says nothing about where the
+// value that was searched is declared.
+//
+// Unlike [addPositions], this keeps conjuncts that are not fields, as an
+// inline struct or list is just as much a declaration site as a field is.
+func addVertexPositions(err *ValueError, v *Vertex) {
+	for c := range v.LeafConjuncts() {
+		err.AddPosition(c.x)
+	}
+}
+
 func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg, stringMsg string) *Bottom {
 	code := IncompleteError
 	// If v is an error, we need to adopt the worst error.
@@ -297,12 +310,13 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 
 	label := f.SelectorString(c.Runtime)
 
-	var err errors.Error
+	var err *ValueError
 	if f.IsInt() {
 		err = c.NewPosf(pos, intMsg, f.Index(), iterutil.Count(v.Elems()))
 	} else {
 		err = c.NewPosf(pos, stringMsg, label)
 	}
+	addVertexPositions(err, v)
 	b := &Bottom{
 		Code: code,
 		Err:  err,

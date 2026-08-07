@@ -14,15 +14,15 @@ doesNotDistributeType: {
 	a: (*l | {"3": 3})["3"] @test(err, code=eval, contains="undefined field", pos=[0:21])
 }
 
-stringIndexToList: [2][""] @test(err, code=eval, contains="undefined field", pos=[0:24])
+stringIndexToList: [2][""] @test(err, code=eval, contains="undefined field", pos=[0:24, 0:20])
 indexOutOfBounds2: 2[2] @test(err, code=eval, contains="invalid operand 2 (found int, want list or struct)", pos=[0:20])
 booleanIndex:      [][true] @test(err, code=eval, contains="invalid index true (invalid type bool)", pos=[0:20, 0:23])
-indexOutOfBounds3: [1, 2, 3][4] @test(err, code=eval, contains="index out of range [4] with length 3", pos=[0:30])
+indexOutOfBounds3: [1, 2, 3][4] @test(err, code=eval, contains="index out of range [4] with length 3", pos=[0:30, 0:20])
 negativeIndex:     [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1 (index must be non-negative)", pos=[0:20, 0:30])
 
 varIndexTooLarge: {
 	n: 3
-	a: [1, 2, 3][n] @test(err, code=eval, contains="index out of range [3] with length 3", pos=[0:15])
+	a: [1, 2, 3][n] @test(err, code=eval, contains="index out of range [3] with length 3", pos=[0:15, 0:5])
 }
 
 varNegativeIndex: {
@@ -30,15 +30,15 @@ varNegativeIndex: {
 	a: [1, 2, 3][n] @test(err, code=eval, contains="index n out of range [-1]", pos=[0:5, -1:5, 0:15])
 }
 
-// A failed lookup should also report where the value that was searched is
-// declared, not just the failing selector, so that a mapping table missing an
-// entry can be pointed at. Only the selector is reported for now.
+// A failed lookup also reports where the value that was searched is declared,
+// not just the failing selector, so that a mapping table missing an entry can
+// be pointed at. Every declaration of the table is reported.
 declaredAt: {
 	_table: one: "1"
 	_table: two: "2"
 	key: "three"
-	a:   _table[key] @test(err, code=incomplete, contains="undefined field: three", pos=[0:14])
-	b:   [1, 2][5] @test(err, code=eval, contains="index out of range [5] with length 2", pos=[0:14])
+	a:   _table[key] @test(err, code=incomplete, contains="undefined field: three", pos=[0:14, -3:2, -2:2])
+	b:   [1, 2][5] @test(err, code=eval, contains="index out of range [5] with length 2", pos=[0:14, 0:7])
 }
 
 // An integer index into a value that can never be a list reports a fatal
@@ -58,6 +58,7 @@ intIndexToStructRef: {
     ./in.cue:13:21
 [eval] stringIndexToList: undefined field: "":
     ./in.cue:16:24
+    ./in.cue:16:20
 [eval] indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
     ./in.cue:17:20
 [eval] booleanIndex: invalid index true (invalid type bool):
@@ -65,19 +66,24 @@ intIndexToStructRef: {
     ./in.cue:18:23
 [eval] indexOutOfBounds3: index out of range [4] with length 3:
     ./in.cue:19:30
+    ./in.cue:19:20
 [eval] negativeIndex: invalid index -1 (index must be non-negative):
     ./in.cue:20:20
     ./in.cue:20:30
 [eval] varIndexTooLarge.a: index out of range [3] with length 3:
     ./in.cue:24:15
+    ./in.cue:24:5
 [eval] varNegativeIndex.a: index n out of range [-1]:
     ./in.cue:29:5
     ./in.cue:28:5
     ./in.cue:29:15
 [incomplete] declaredAt.a: undefined field: three:
     ./in.cue:39:14
+    ./in.cue:36:2
+    ./in.cue:37:2
 [eval] declaredAt.b: index out of range [5] with length 2:
     ./in.cue:40:14
+    ./in.cue:40:7
 [eval] intIndexToStruct: invalid index 0 (found struct, want list):
     ./in.cue:45:32
 [eval] intIndexToOpenStruct: invalid index 0 (found struct, want list):

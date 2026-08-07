@@ -63,6 +63,7 @@ checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
     ./main.cue:5:20
 [incomplete] OUT.IMPORTS.0.export.GENERATORS.0.OUT: undefined field: spec:
     ./main.cue:11:17
+    ./main.cue:10:5
 [cycle] OUT.IMPORTS.0.export.OBJECTS.b.name: cycle with field: a.spec:
     ./main.cue:5:20
 [cycle] export.OBJECTS.a.spec: cycle with field: a.spec:

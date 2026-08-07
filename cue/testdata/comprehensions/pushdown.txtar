@@ -409,7 +409,7 @@ emptyComprehensionIncomplete: {
 	b: {
 		// b should be an incomplete error
 		if a.b {}
-	} @test(err, code=incomplete, contains="undefined field: %s", args=[b], pos=[2:8])
+	} @test(err, code=incomplete, contains="undefined field: %s", args=[b], pos=[2:8, -1:2])
 	@test(eq, {
 		a: {}
 		b: _|_
@@ -645,9 +645,9 @@ voidLookup: {
 		}
 	})
 	@test(err, at=a.x.z, code=incomplete,
-		contains="undefined field: %s", args=[void], pos=[1:17])
+		contains="undefined field: %s", args=[void], pos=[1:17, 5:3, 14:3])
 	@test(err, at=a.x.c, code=incomplete,
-		path=voidLookup.a.x.z, contains="undefined field: %s", args=[void], pos=[1:17])
+		path=voidLookup.a.x.z, contains="undefined field: %s", args=[void], pos=[1:17, 5:3, 14:3])
 }
 
 // Eliminate the top value even if there is an error (especially incomplete
@@ -923,7 +923,7 @@ errorPropagation: {
 		} // Report this error.
 	}
 	for id in ["elem"] {deployment: (id): x2: 2}
-	@test(err, code=incomplete, contains="undefined field: env2", pos=[3:19])
+	@test(err, code=incomplete, contains="undefined field: env2", pos=[3:19, 7:34])
 }
 
 -- issue2131.cue --
@@ -1324,7 +1324,7 @@ issue3935: full: {
 		}
 		#SchemaSelected: {
 			spec!: {name!: string, config!: _}
-			namespace: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected.namespace: undefined field: namespace", pos=[22:27])
+			namespace: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected.namespace: undefined field: namespace", pos=[22:27, 25:3])
 			_specConfig: _|_ @test(err, code=incomplete, contains="issue3935.full.#SchemaSelected._specConfig: required field missing: spec", pos=[25:16])
 		}
 	})
@@ -1501,6 +1501,7 @@ cyclicError.a: incomplete bool: bool:
     ./in.cue:382:6
 [incomplete] emptyComprehensionIncomplete.b: undefined field: b:
     ./in.cue:408:8
+    ./in.cue:405:2
 [incomplete] voidEliminationSuccess.derefRef1.E.f: operand e of '!' not concrete (was bool):
     ./in.cue:477:7
 [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
@@ -1517,8 +1518,12 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./in.cue:551:7
 [incomplete] voidLookup.a.x.z: undefined field: void:
     ./in.cue:616:17
+    ./in.cue:620:3
+    ./in.cue:629:3
 [incomplete] voidLookup.a.x.z: undefined field: void:
     ./in.cue:616:17
+    ./in.cue:620:3
+    ./in.cue:629:3
 [incomplete] topElimination.x: non-concrete value int in operand to +:
     ./in.cue:656:6
     ./in.cue:653:5
@@ -1529,6 +1534,7 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./in.cue:736:9
 [incomplete] errorPropagation: undefined field: env2:
     ./issue2113.cue:33:19
+    ./issue2113.cue:37:34
 [eval] issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:29:4
 [eval] issue3729.withoutDisjunction.root: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
@@ -1538,18 +1544,22 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./issue3935.cue:12:7
 [incomplete] issue3935.full.#SchemaSelected.namespace: undefined field: namespace:
     ./issue3935.cue:47:27
+    ./issue3935.cue:50:3
 [incomplete] issue3935.full.#SchemaSelected._specConfig: required field missing: spec:
     ./issue3935.cue:50:16
 [incomplete] issue4422.hosts: key value of dynamic field not yet known:
     ./issue4422.cue:22:11
 [incomplete] regression1.#Primary: undefined field: spec:
     ./rework.cue:5:13
+    ./rework.cue:3:3
 [incomplete] regression1.#Rollout.out: undefined field: spec:
     ./rework.cue:5:13
+    ./rework.cue:10:3
 regression1.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
     ./rework.cue:11:30
 [incomplete] regression2.#Primary: undefined field: spec:
     ./rework.cue:25:13
+    ./rework.cue:24:3
 [incomplete] regression2.#Rollout.out: _Y.spec undefined as _Y is incomplete (type _):
     ./rework.cue:25:10
 regression2.#Rollout.out: _X.patch undefined as _X is incomplete (type _):

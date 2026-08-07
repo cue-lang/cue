@@ -8,7 +8,7 @@ fatalArg: {
 // don't call builtin for a permanent error of a child node
 fatalChild: {
 	#b: {}
-	x: and([{a: #b.c}]) @test(err, at=a, code=eval, contains="undefined field: c", pos=[0:17])
+	x: and([{a: #b.c}]) @test(err, at=a, code=eval, contains="undefined field: c", pos=[0:17, -1:2])
 }
 
 // allow incomplete child values. The error will persist after `and` is
@@ -55,5 +55,7 @@ NumCloseIDs: 3
     ./in.cue:2:17
 [eval] fatalChild.x.a: undefined field: c:
     ./in.cue:10:17
+    ./in.cue:9:2
 [incomplete] okIncompleteChild.x.a: undefined field: c:
     ./in.cue:18:16
+    ./in.cue:17:2

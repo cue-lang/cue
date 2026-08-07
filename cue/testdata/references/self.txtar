@@ -216,7 +216,7 @@ forComp: {
 
 // self inside a list comprehension body refers to the yielded element, not
 // to the enclosing list, so indexing it fails.
-listComp: [10, 20, for _ in [1] {self[0]}]  @test(err, at=2, code=incomplete, pos=[0:39])
+listComp: [10, 20, for _ in [1] {self[0]}]  @test(err, at=2, code=incomplete, pos=[0:39, 0:33])
 
 // self inside an if comprehension.
 ifComp: {
@@ -452,6 +452,7 @@ a: {
 -- out/errors.txt --
 [incomplete] listComp.2: index out of range [0] with length 0:
     ./comprehension.cue:13:39
+    ./comprehension.cue:13:33
 [incomplete] letSelfDynamic.#Client.options: key value of dynamic field must be concrete, found string:
     ./issue4440.cue:14:13
     ./issue4440.cue:12:12

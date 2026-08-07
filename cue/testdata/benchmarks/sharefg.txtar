@@ -173,12 +173,16 @@ weaveExtraField: {
 -- out/errors.txt --
 [incomplete] weave.f.in: undefined field: out:
     ./in.cue:79:14
+    ./in.cue:80:3
 [incomplete] weave.f.in: undefined field: out:
     ./in.cue:79:14
+    ./in.cue:80:3
 [incomplete] weaveExtraField.f.in: undefined field: out:
     ./in.cue:124:14
+    ./in.cue:125:3
 [incomplete] weaveExtraField.f.in: undefined field: out:
     ./in.cue:124:14
+    ./in.cue:125:3
 -- out/eval/stats --
 Leaks:  0
 Freed:  510

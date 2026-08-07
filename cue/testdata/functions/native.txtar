@@ -687,8 +687,10 @@ structural cycle:
     ./in.cue:447:9
 [incomplete] a: undefined field: q:
     ./in.cue:487:9
+    ./in.cue:486:2
 [incomplete] incompleteArgs.z: undefined field: q:
     ./in.cue:490:11
+    ./in.cue:486:2
 [eval] declarations.open.bad: cannot call function without implementation:
     ./in.cue:529:8
 [eval] partial.missing: missing argument c:

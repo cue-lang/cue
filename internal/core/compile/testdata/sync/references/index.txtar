@@ -30,9 +30,9 @@ varNegativeIndex: {
 	a: [1, 2, 3][n]
 }
 
-// A failed lookup should also report where the value that was searched is
-// declared, not just the failing selector, so that a mapping table missing an
-// entry can be pointed at. Only the selector is reported for now.
+// A failed lookup also reports where the value that was searched is declared,
+// not just the failing selector, so that a mapping table missing an entry can
+// be pointed at. Every declaration of the table is reported.
 declaredAt: {
 	_table: one: "1"
 	_table: two: "2"

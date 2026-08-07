@@ -8,30 +8,30 @@ import (
 list1: {
 	// Note that Top is not incomplete, only its first element is.
 	// We allow FlattenN to proceed and pass on the incomplete values.
-	Out1: list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
-	Out2: [...] & list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
-	Out3: list.FlattenN(Top, 1) & [...] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	Out1: list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10, in.cue:20:2])
+	Out2: [...] & list.FlattenN(Top, 1) @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10, in.cue:20:2])
+	Out3: list.FlattenN(Top, 1) & [...] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10, in.cue:20:2])
 
 	// This evaluates to a list with an incomplete element.
 	Top: [
 		[for _, F in _Sub {F}],
-	] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	] @test(err, at=0, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10, in.cue:20:2])
 
-	_Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10])
+	_Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[in.cue:19:10, in.cue:20:2])
 	a: {} // b does not
 }
 
 list2: {
-	Out1: list.FlattenN(_Top, 1)         @test(err, code=incomplete, contains="undefined field: b", pos=[9:10])
-	Out2: [...] & list.FlattenN(_Top, 1) @test(err, code=incomplete, contains="undefined field: b", pos=[8:10])
-	Out3: list.FlattenN(_Top, 1) & [...] @test(err, code=incomplete, contains="undefined field: b", pos=[7:10])
+	Out1: list.FlattenN(_Top, 1)         @test(err, code=incomplete, contains="undefined field: b", pos=[9:10, 11:2])
+	Out2: [...] & list.FlattenN(_Top, 1) @test(err, code=incomplete, contains="undefined field: b", pos=[8:10, 10:2])
+	Out3: list.FlattenN(_Top, 1) & [...] @test(err, code=incomplete, contains="undefined field: b", pos=[7:10, 9:2])
 
 	// This evaluates to a list with an incomplete element.
 	_Top: [
 		for _, F in #Sub {F},
-	] @test(err, code=incomplete, contains="undefined field: b", pos=[4:10])
+	] @test(err, code=incomplete, contains="undefined field: b", pos=[4:10, 6:2])
 
-	#Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
+	#Sub: a.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:10, 2:2])
 
 	a: {} // b does not
 }
@@ -122,24 +122,34 @@ NumCloseIDs: 7
 -- out/errors.txt --
 [incomplete] list1._Sub: undefined field: b:
     ./in.cue:19:10
+    ./in.cue:20:2
 [incomplete] list1._Sub: undefined field: b:
     ./in.cue:19:10
+    ./in.cue:20:2
 [incomplete] list1._Sub: undefined field: b:
     ./in.cue:19:10
+    ./in.cue:20:2
 [incomplete] list1._Sub: undefined field: b:
     ./in.cue:19:10
+    ./in.cue:20:2
 [incomplete] list1._Sub: undefined field: b:
     ./in.cue:19:10
+    ./in.cue:20:2
 [incomplete] list2.#Sub: undefined field: b:
     ./in.cue:33:10
+    ./in.cue:35:2
 [incomplete] list2.#Sub: undefined field: b:
     ./in.cue:33:10
+    ./in.cue:35:2
 [incomplete] list2.#Sub: undefined field: b:
     ./in.cue:33:10
+    ./in.cue:35:2
 [incomplete] list2.#Sub: undefined field: b:
     ./in.cue:33:10
+    ./in.cue:35:2
 [incomplete] list2.#Sub: undefined field: b:
     ./in.cue:33:10
+    ./in.cue:35:2
 [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
     ./in.cue:39:5
 [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):

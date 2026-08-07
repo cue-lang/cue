@@ -36,7 +36,7 @@ issue3437: {
 	// TODO(perf): either use structure sharing or stronger pruning. This seems
 	// disproportional.
 	@test(eq, {
-		r: _|_ @test(err, code=incomplete, contains="issue3437.r: undefined field: a", pos=[1:22])
+		r: _|_ @test(err, code=incomplete, contains="issue3437.r: undefined field: a", pos=[1:22, 1:2])
 		d: {a: {a: {a: {b: 4}}}}
 		out: {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}, b: 4} | {a: {a: {
 		a: {b: 4} | {a: {a: {a: {b: 4} | {a: {a: {a: {b: 4}}}}}}}
@@ -86,6 +86,7 @@ t2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
     ./in.cue:14:11
 [incomplete] issue3437.r: undefined field: a:
     ./issue3437.cue:5:22
+    ./issue3437.cue:5:2
 -- out/eval/stats --
 Leaks:  562
 Freed:  2472

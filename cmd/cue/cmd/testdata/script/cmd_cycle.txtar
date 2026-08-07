@@ -120,6 +120,7 @@ limits:
 -- stderr2416.golden --
 command.build.contents: invalid bytes argument: index out of range [0] with length 0:
     ./issue2416a_tool.cue:21:10
+    ./issue2416a_tool.cue:24:14
     ./issue2416a_tool.cue:29:2
     ./issue2416a_tool.cue:29:18
     tool/file:20:2

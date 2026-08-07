@@ -138,26 +138,34 @@ large: {
     ./in.cue:12:8
 [cycle] minimal.b: undefined field: port:
     ./in.cue:20:8
+    ./in.cue:11:2
 [cycle] small.p1.#Y: cyclic reference to field port:
     ./in.cue:33:50
 [cycle] small.p1.#X: undefined field: port:
     ./in.cue:36:10
+    ./in.cue:33:3
 small.p1.#X: undefined field: port:
     ./in.cue:39:10
+    ./in.cue:33:3
 [cycle] medium.p1.#Y: undefined field: port:
     ./in.cue:59:50
+    ./in.cue:71:3
 [cycle] medium.p1.Y: undefined field: port:
     ./in.cue:66:10
+    ./in.cue:59:3
 [cycle] medium.p1.#X: cyclic reference to field port:
     ./in.cue:75:9
 medium.p1.#X: cyclic reference to field port:
     ./in.cue:78:9
 [cycle] large.p1.Y: undefined field: userinfo:
     ./in.cue:120:10
+    ./in.cue:131:3
 large.p1.Y: undefined field: port:
     ./in.cue:126:10
+    ./in.cue:131:3
 [cycle] large.p1.X: undefined field: port:
     ./in.cue:99:33
+    ./in.cue:101:3
 [cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
     ./in.cue:102:7
 large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
@@ -168,6 +176,7 @@ large.p1.#X: cyclic reference to field port:
     ./in.cue:114:9
 [cycle] large.p1.X: undefined field: port:
     ./in.cue:99:33
+    ./in.cue:101:3
 -- out/todo.txt --
 minimal.a/b: pushdown reports cycle error (matching v2) instead of incomplete (v3).
 small.p1: pushdown resolves #Y to {port: ""} (matching v2); #X still has cycle error.

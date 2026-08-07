@@ -152,7 +152,7 @@ issue3940: reduced1: {
 		a: {
 			b: {
 				a: {b: {y: {a: {}, objects: {}}}}
-				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced1.a.b.objects: undefined field: objects", pos=[11:22])
+				objects: _|_ @test(err, code=incomplete, contains="issue3940.reduced1.a.b.objects: undefined field: objects", pos=[11:22, 11:14])
 			}
 		}
 		X: {a: {}, objects: {}}
@@ -477,56 +477,87 @@ issue3990: {
 -- out/errors.txt --
 [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
     ./issue3940.cue:15:22
+    ./issue3940.cue:15:14
 [incomplete] issue3940.reduced1.objects: cannot range over ({} & v).objects (incomplete type _):
     ./issue3940.cue:15:13
 [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
     ./issue3940.cue:54:22
+    ./issue3940.cue:54:14
 [incomplete] issue3940.reduced2.objects: cannot range over ({} & v).objects (incomplete type _):
     ./issue3940.cue:54:13
 [incomplete] issue3940.let.a.b.objects: undefined field: objects:
     ./issue3940.cue:147:15
+    ./issue3940.cue:146:13
 [incomplete] issue3940.let.objects: cannot range over x.objects (incomplete type _):
     ./issue3940.cue:147:13
 [incomplete] issue3940.full.out._imports.0.objects.branch.region: undefined field: global:
     ./issue3940.cue:160:18
+    ./issue3940.cue:159:4
 [incomplete] issue3940.full.out._imports.0.imports.0.objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full.out._imports.0.imports.0.#export._objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full.out._imports.0.imports.0.#export.objects.0.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full.out._imports.0.#export._objects.branch.region: undefined field: global:
     ./issue3940.cue:160:18
+    ./issue3940.cue:159:4
 [incomplete] issue3940.full.out._imports.0.#export._imports.0.objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export._objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full.out._imports.0.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full.out._imports.0.#export.objects.0.branch.region: undefined field: global:
     ./issue3940.cue:160:18
+    ./issue3940.cue:159:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full.out._imports.0.#export.objects.1.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full._branch.objects.branch.region: undefined field: global:
     ./issue3940.cue:160:18
+    ./issue3940.cue:159:4
 [incomplete] issue3940.full._branch.#export._objects.branch.region: undefined field: global:
     ./issue3940.cue:160:18
+    ./issue3940.cue:159:4
 [incomplete] issue3940.full._branch.#export._imports.0.objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full._branch.#export._imports.0.#export._objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full._branch.#export._imports.0.#export.objects.0.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full._branch.#export.objects.0.branch.region: undefined field: global:
     ./issue3940.cue:160:18
+    ./issue3940.cue:159:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full._branch.#export.objects.1.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
+    ./issue3940.cue:184:43
 [incomplete] issue3940.full._leaf.objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full._leaf.#export._objects.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
 [incomplete] issue3940.full._leaf.#export.objects.0.leaf.region: undefined field: global:
     ./issue3940.cue:171:18
+    ./issue3940.cue:170:4
+    ./issue3940.cue:184:43
 [incomplete] issue3990._Deployment._names: cannot range over this.volumes (incomplete):
     ./issue3990.cue:25:16
 -- out/todo.txt --

@@ -132,7 +132,7 @@ doNotEscalateError: {
 	}
 	b: {
 		required!: _
-		pass:    (a & {in: required}).out @test(err, code=incomplete, contains="undefined field: %s", args=[self], pos=[-4:11])
+		pass:    (a & {in: required}).out @test(err, code=incomplete, contains="undefined field: %s", args=[self], pos=[-4:11, -5:3, 0:18])
 	}
 }
 -- out/errors.txt --
@@ -162,6 +162,8 @@ doNotEscalateError: {
     ./issue3918.cue:49:8
 [incomplete] doNotEscalateError.b.pass: undefined field: self:
     ./issue3918.cue:49:11
+    ./issue3918.cue:48:3
+    ./issue3918.cue:53:18
 -- out/eval/stats --
 Leaks:  0
 Freed:  70

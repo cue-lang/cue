@@ -16,8 +16,10 @@ b: json.Marshal(foo) @test(err, code=incomplete)
     ./in.cue:3:21
 [incomplete] foo.b: undefined field: c:
     ./in.cue:7:9
+    ./in.cue:5:1
 [incomplete] b: error in call to encoding/json.Marshal: undefined field: c:
     ./in.cue:9:4
+    ./in.cue:5:1
     ./in.cue:7:9
 -- out/eval/stats --
 Leaks:  0

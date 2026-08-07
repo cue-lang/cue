@@ -67,10 +67,12 @@ _Service: {
     ./in.cue:54:13
 _Service._service: undefined field: name:
     ./in.cue:54:20
+    ./in.cue:50:2
 [incomplete] _Service._service: key value of dynamic field must be concrete, found _|_(_Service._service: undefined field: name):
     ./in.cue:54:13
 _Service._service: undefined field: name:
     ./in.cue:54:20
+    ./in.cue:50:2
 -- out/eval/stats --
 Leaks:  15
 Freed:  115

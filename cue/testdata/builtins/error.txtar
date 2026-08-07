@@ -20,7 +20,7 @@ interpolation: {
 	a: {b: int}
 	world: "world" @test(eq, "world")
 
-	substituteAll: a.notExist | error("hello \(world)") @test(err, code=incomplete, contains="hello world", pos=[0:30])
+	substituteAll: a.notExist | error("hello \(world)") @test(err, code=incomplete, contains="hello world", pos=[0:30, -3:2])
 
 	substituteFail: a.b + 1 | a.notExist | error("reference failed: \(a.b) | \(a.notExist)") @test(err, code=incomplete, contains="reference failed:", pos=[0:41, -5:9, 0:77])
 
@@ -122,6 +122,7 @@ selection.twoCustomErrors: error two:
     ./in.cue:11:5
 [incomplete] interpolation.substituteAll: hello world:
     ./in.cue:19:30
+    ./in.cue:16:2
 [incomplete] interpolation.substituteFail: reference failed: int | a.notExist:
     ./in.cue:21:41
     ./in.cue:16:9

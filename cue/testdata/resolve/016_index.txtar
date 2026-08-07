@@ -5,13 +5,13 @@ c: (*l | {"3": 3})["3"] @test(err, code=eval, contains="undefined field", pos=[0
 d: (*[] | [1])[0]       @test(err, code=eval, contains="index out of range [0]", pos=[0:16])
 l: []                   @test(eq, [])
 
-e1: [2][""]       @test(err, code=eval, contains="undefined field", pos=[0:9])
+e1: [2][""]       @test(err, code=eval, contains="undefined field", pos=[0:9, 0:5])
 e2: 2[2]          @test(err, code=eval, contains="invalid operand 2", pos=[0:5])
 e3: [][true]      @test(err, code=eval, contains="invalid index true", pos=[0:5, 0:8])
-e4: [1, 2, 3][3]  @test(err, code=eval, contains="index out of range [3]", pos=[0:15])
+e4: [1, 2, 3][3]  @test(err, code=eval, contains="index out of range [3]", pos=[0:15, 0:5])
 e5: [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1", pos=[0:5, 0:15])
 e6: (*[] | {})[1] @test(err, code=eval, contains="index out of range [1]", pos=[0:16])
-e7: [1, 2, 3][3]  @test(err, code=eval, contains="index out of range [3]", pos=[0:15])
+e7: [1, 2, 3][3]  @test(err, code=eval, contains="index out of range [3]", pos=[0:15, 0:5])
 e8: [1, 2, 3][-1] @test(err, code=eval, contains="invalid index -1", pos=[0:5, 0:15])
 e9: (*[] | {})[1] @test(err, code=eval, contains="index out of range [1]", pos=[0:16])
 
@@ -19,7 +19,7 @@ def: {
 	a:  1
 	#b: 3
 } @test(eq, {a: 1, #b: 3})
-e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:10])
+e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:10, -4:1])
 -- out/errors.txt --
 [eval] c: undefined field: "3":
     ./in.cue:3:20
@@ -27,6 +27,7 @@ e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:
     ./in.cue:4:16
 [eval] e1: undefined field: "":
     ./in.cue:7:9
+    ./in.cue:7:5
 [eval] e2: invalid operand 2 (found int, want list or struct):
     ./in.cue:8:5
 [eval] e3: invalid index true (invalid type bool):
@@ -34,6 +35,7 @@ e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:
     ./in.cue:9:8
 [eval] e4: index out of range [3] with length 3:
     ./in.cue:10:15
+    ./in.cue:10:5
 [eval] e5: invalid index -1 (index must be non-negative):
     ./in.cue:11:5
     ./in.cue:11:15
@@ -41,6 +43,7 @@ e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:
     ./in.cue:12:16
 [eval] e7: index out of range [3] with length 3:
     ./in.cue:13:15
+    ./in.cue:13:5
 [eval] e8: invalid index -1 (index must be non-negative):
     ./in.cue:14:5
     ./in.cue:14:15
@@ -48,6 +51,7 @@ e10: def["b"] @test(err, code=incomplete, contains="undefined field: b", pos=[0:
     ./in.cue:15:16
 [incomplete] e10: undefined field: b:
     ./in.cue:21:10
+    ./in.cue:17:1
 -- out/eval/stats --
 Leaks:  0
 Freed:  56

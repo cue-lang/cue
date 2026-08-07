@@ -157,6 +157,7 @@ issue3486: {
     ./in.cue:78:6
 [incomplete] dedupTodo.#sub: undefined field: n:
     ./in.cue:98:8
+    ./in.cue:97:3
 -- out/eval/stats --
 Leaks:  4
 Freed:  77

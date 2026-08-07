@@ -385,18 +385,23 @@ issue3838: {
     ./mutual.cue:10:9
 [cycle] mutual.mutualCycleFail.a: undefined field: foo:
     ./mutual.cue:14:9
+    ./mutual.cue:9:3
 [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
     ./mutualsamestruct.cue:28:6
 [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
     ./mutualsamestruct.cue:40:6
 [incomplete] sameStruct.cycleFail.t2.p1.ret: cyclic reference to field a:
     ./mutualsamestruct.cue:67:6
+    ./mutualsamestruct.cue:66:3
 [incomplete] sameStruct.cycleFail.t2.p2.raises: cyclic reference to field a:
     ./mutualsamestruct.cue:82:6
+    ./mutualsamestruct.cue:81:3
 [incomplete] sameStruct.cycleFail.t3.p1.ret: cyclic reference to field a:
     ./mutualsamestruct.cue:98:6
+    ./mutualsamestruct.cue:97:3
 [incomplete] sameStruct.cycleFail.t3.p2.raises: cyclic reference to field a:
     ./mutualsamestruct.cue:112:6
+    ./mutualsamestruct.cue:111:3
 [cycle] nestedChain.cycleFail: cyclic reference to field x:
     ./nestedchain.cue:4:9
 [cycle] nestedChain.doubleAddfail: cyclic reference to field x:

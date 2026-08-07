@@ -9,11 +9,11 @@ import "strings"
 	let splits = strings.Split(id, "_never_")
 	let prefix = splits[0]
 
-	#ID:    =~"^\(prefix)$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -2:22])
-	#SubID: =~"^\(prefix):sub$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -3:22])
+	#ID:    =~"^\(prefix)$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -3:2, -2:22])
+	#SubID: =~"^\(prefix):sub$" @test(err, code=incomplete, contains="invalid interpolation", pos=[0:12, -4:2, -3:22])
 
-	id:    #ID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -5:22])
-	subid: #SubID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -6:22])
+	id:    #ID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -6:2, -5:22])
+	subid: #SubID @test(err, code=incomplete, contains="invalid interpolation", pos=[-3:12, -7:2, -6:22])
 }
 
 case1: #schema & {
@@ -38,15 +38,19 @@ case2: #schema & {
 -- out/errors.txt --
 [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
     ./in.cue:7:12
+    ./in.cue:4:2
     ./in.cue:5:22
 [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
     ./in.cue:8:12
+    ./in.cue:4:2
     ./in.cue:5:22
 [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
     ./in.cue:7:12
+    ./in.cue:4:2
     ./in.cue:5:22
 [incomplete] #schema.prefix: invalid interpolation: index out of range [0] with length 1:
     ./in.cue:8:12
+    ./in.cue:4:2
     ./in.cue:5:22
 -- out/eval/stats --
 Leaks:  8

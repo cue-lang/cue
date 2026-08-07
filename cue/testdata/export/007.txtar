@@ -21,10 +21,13 @@ Disjuncts:    0
 Errors:
 c: undefined field: c:
     ./in.cue:4:8
+    ./in.cue:2:2
 d: undefined field: d:
     ./in.cue:5:8
+    ./in.cue:2:2
 e: undefined field: t:
     ./in.cue:6:8
+    ./in.cue:2:2
 
 Result:
 (_|_){
@@ -37,13 +40,16 @@ Result:
   c: (_|_){
     // [eval] c: undefined field: c:
     //     ./in.cue:4:8
+    //     ./in.cue:2:2
   }
   d: (_|_){
     // [eval] d: undefined field: d:
     //     ./in.cue:5:8
+    //     ./in.cue:2:2
   }
   e: (_|_){
     // [eval] e: undefined field: t:
     //     ./in.cue:6:8
+    //     ./in.cue:2:2
   }
 }

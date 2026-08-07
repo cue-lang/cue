@@ -786,14 +786,14 @@ crossRefNoCycle: t5: {
 	C: T & {x: T}
 	@test(eq, {
 		T: {
-			y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[3:8])
+			y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[3:8, 1:2])
 		}
 		C: {
 			x: {
-				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[3:8])
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[3:8, 1:2])
 			}
 			y: {
-				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[3:8])
+				y: _|_ @test(err, code=incomplete, contains="crossRefNoCycle.t5.T.y: undefined field: x", pos=[3:8, 1:2])
 			}
 		}
 	})
@@ -946,6 +946,7 @@ nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
 [structural_cycle] z1.z.g: structural cycle
 [incomplete] crossRefNoCycle.t5.T.y: undefined field: x:
     ./in.cue:783:8
+    ./in.cue:781:2
 -- out/todo.txt --
 Structural cycles are reported in all chains compared to old implementation.
 

@@ -1056,15 +1056,18 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
     ./in.cue:88:3
 [incomplete] issue3832.#T._subject.out.outFirstName: undefined field: firstName:
     ./issue3832.cue:12:24
+    ./issue3832.cue:11:16
 [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#2=_|_(issue3832.#T._assert.pass.self: undefined field: self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
     ./issue3832.cue:25:12
 [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
     ./issue3832.cue:12:24
+    ./issue3832.cue:11:16
 [eval] issue3833.evalv2Issue.out.a.c: field not allowed:
     ./issue3833.cue:29:6
     ./issue3833.cue:31:9
 [incomplete] orig.t2.#Output.out: undefined field: input:
     ./issue3858.cue:77:18
+    ./issue3858.cue:77:9
 [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
     ./large.cue:7:25
     ./large.cue:3:12
@@ -1088,6 +1091,7 @@ disjunction.withErr.t1.out.b1.b2: conflicting values {b3:params.mayExistLater} a
     ./validators.cue:43:17
 disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
     ./validators.cue:40:22
+    ./validators.cue:38:2
 -- out/diff-v2-v3.txt --
 Errors differ between v2 and v3 evaluators (v3 reports fewer positions).
 Structure sharing differences between v2 and v3.

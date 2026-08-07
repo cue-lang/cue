@@ -55,7 +55,7 @@ incompleteLet: {
 		let mx = list.max
 
 		min: mn
-		max: mx @test(err, code=incomplete, contains="undefined field: max", pos=[-3:17])
+		max: mx @test(err, code=incomplete, contains="undefined field: max", pos=[-3:17, list:2:1])
 	}
 
 	x: {
@@ -67,9 +67,9 @@ incompleteLet: {
 		last: {min: 1, max: 5}
 		bar: {
 			min: 1
-			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[10:17])
+			max: _|_ @test(err, code=incomplete, contains="incompleteLet.bar.max: undefined field: max", pos=[10:17, list:2:1])
 		}
-		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[17:11])
+		x: _|_ @test(err, code=incomplete, contains="incompleteLet.x: undefined field: max", pos=[17:11, list:2:1])
 	})
 }
 
@@ -120,8 +120,10 @@ issue1116: {
 -- out/errors.txt --
 [incomplete] incompleteLet.bar.max: undefined field: max:
     ./in.cue:54:17
+    list:2:1
 [incomplete] incompleteLet.x: undefined field: max:
     ./in.cue:61:11
+    list:2:1
 -- out/todo.txt --
 v2 reports a cycle error for issue1116.b (let List = #a before #a is defined):
   issue1116.b: let List#11 = (_|_){ // [incomplete] cycle error referencing #a }

@@ -42,6 +42,7 @@ cyclic: {
     ./test.cue:5:8
 [cycle] cyclic.b: undefined field: port:
     ./test.cue:10:8
+    ./test.cue:4:2
 -- out/status.txt --
 update: output passes run
 -- out/run/errors.txt --
@@ -62,7 +63,7 @@ cyclic: {
 	}
 	@test(eq, {
 		a: _|_ @test(err, code=cycle, contains="cyclic.a: cyclic reference to field port", pos=[2:8])
-		b: _|_ @test(err, code=cycle, contains="cyclic.b: undefined field: port", pos=[7:8])
+		b: _|_ @test(err, code=cycle, contains="cyclic.b: undefined field: port", pos=[7:8, 1:2])
 	})
 }
 -- out/force/out/errors.txt --
@@ -70,3 +71,4 @@ cyclic: {
     ./test.cue:5:8
 [cycle] cyclic.b: undefined field: port:
     ./test.cue:10:8
+    ./test.cue:4:2

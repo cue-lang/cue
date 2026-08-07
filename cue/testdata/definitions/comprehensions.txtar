@@ -12,11 +12,12 @@ issue595: {
 	for cfg in #cfgs {
 		files: cfg.nam
 	}
-	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14])
+	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14, 3:10])
 }
 -- out/errors.txt --
 [eval] issue595.files: undefined field: nam:
     ./in.cue:12:14
+    ./in.cue:7:10
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

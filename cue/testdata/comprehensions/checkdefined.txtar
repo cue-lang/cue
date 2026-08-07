@@ -70,7 +70,7 @@ issue1969: oko: {
 
 	if Y != _|_ {Y}
 	@test(eq, {
-		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[1:13])
+		s: _|_ @test(err, code=incomplete, contains="issue1969.oko.X: undefined field: undefined", pos=[1:13, -54:1])
 	})
 }
 -- issue2245.cue --
@@ -125,6 +125,7 @@ structs: {
 -- out/errors.txt --
 [incomplete] issue1969.oko.X: undefined field: undefined:
     ./in.cue:62:13
+    ./in.cue:7:1
 [incomplete] yo.g: non-concrete value int in operand to <:
     ./issue2245.cue:6:5
     ./issue2245.cue:5:5

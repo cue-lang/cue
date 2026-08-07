@@ -37,7 +37,7 @@ issue1837: {
 	// @test(permute)
 	p1: {
 		context: {}
-		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14, -1:3])
 		if x == _|_ {
 			message: "a"
 		}
@@ -51,7 +51,7 @@ issue1837: {
 		if x == _|_ {
 			message: "a"
 		}
-		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14, 1:3])
 		context: {}
 		@test(eq, {
 			message: "a"
@@ -64,7 +64,7 @@ issue1837: {
 			message: "a"
 		}
 		context: {}
-		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14])
+		x: context.b @test(err, code=incomplete, contains="undefined field: b", pos=[0:14, -1:3])
 		@test(eq, {
 			message: "a"
 			context: {}
@@ -117,7 +117,10 @@ E.b: non-concrete value >=5 in operand to -:
     ./in.cue:21:15
 [incomplete] issue1837.p1.x: undefined field: b:
     ./in.cue:34:14
+    ./in.cue:33:3
 [incomplete] issue1837.p2.x: undefined field: b:
     ./in.cue:48:14
+    ./in.cue:49:3
 [incomplete] issue1837.p3.x: undefined field: b:
     ./in.cue:61:14
+    ./in.cue:60:3

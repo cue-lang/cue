@@ -207,11 +207,11 @@ closedness: {
 	}
 	notExistsDef: {
 		try { v: #Def.g? }
-		@test(err, code=eval, path=v, contains="undefined field: %s", args=[g], pos=[1:17])
+		@test(err, code=eval, path=v, contains="undefined field: %s", args=[g], pos=[1:17, -8:2])
 	}
 	notExistsValue: {
 		try { v: d.g? }
-		@test(err, code=eval, path=v, contains="undefined field: %s", args=[g], pos=[1:14])
+		@test(err, code=eval, path=v, contains="undefined field: %s", args=[g], pos=[1:14, -12:2])
 	}
 }
 
@@ -239,13 +239,13 @@ indexTests: {
 	// Index out of range on CLOSED list - should ERROR (can never be satisfied)
 	outOfRangeClosed: {
 		try { v: closedList[10]? } else { fallback: -1 }
-		@test(err, code=eval, path=v, contains="index out of range [%d] with length %d", args=[10, 3], pos=[1:23])
+		@test(err, code=eval, path=v, contains="index out of range [%d] with length %d", args=[10, 3], pos=[1:23, -16:2])
 	}
 
 	// Index out of range on CLOSED list without else - should ERROR
 	outOfRangeClosedNoElse: {
 		try { v: closedList[100]? }
-		@test(err, code=eval, path=v, contains="index out of range [%d] with length %d", args=[100, 3], pos=[1:23])
+		@test(err, code=eval, path=v, contains="index out of range [%d] with length %d", args=[100, 3], pos=[1:23, -22:2])
 	}
 
 	// Index out of range on OPEN list - should trigger else (list might grow)
@@ -360,13 +360,13 @@ refIntoTry: {
 	failedRef1: {
 		try { v: mixedSource.foo } else { missing: true }
 		@test(eq, {
-			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef1.v: undefined field: foo", pos=[1:24])
+			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef1.v: undefined field: foo", pos=[1:24, -11:2])
 		})
 	}
 	failedRef2: {
 		try { v: mixedSource.foo } else { missing: true }
 		@test(eq, {
-			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef2.v: undefined field: foo", pos=[1:24])
+			v: _|_ @test(err, code=incomplete, contains="refIntoTry.failedRef2.v: undefined field: foo", pos=[1:24, -17:2])
 		})
 	}
 	successRef: {
@@ -493,7 +493,7 @@ assignmentForm: {
 		list: [10, 20, 30]
 		try v = list[10]? { result: v } else { fallback: -1 }
 		@test(err, code=eval, path=result,
-			contains="index out of range [%d] with length %d", args=[10, 3], pos=[2:16])
+			contains="index out of range [%d] with length %d", args=[10, 3], pos=[2:16, 1:3])
 	}
 
 	// Assignment with out-of-range index on open list - should trigger else
@@ -974,12 +974,16 @@ issue4483: {
     ./in.cue:101:11
 [eval] closedness.notExistsDef.v: undefined field: g:
     ./in.cue:208:17
+    ./in.cue:199:2
 [eval] closedness.notExistsValue.v: undefined field: g:
     ./in.cue:212:14
+    ./in.cue:199:2
 [eval] indexTests.outOfRangeClosed.v: index out of range [10] with length 3:
     ./in.cue:240:23
+    ./in.cue:223:2
 [eval] indexTests.outOfRangeClosedNoElse.v: index out of range [100] with length 3:
     ./in.cue:246:23
+    ./in.cue:223:2
 [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
     ./in.cue:299:6
 [eval] edgeCases.referenceError.a: failed arithmetic: division by zero:
@@ -990,8 +994,10 @@ issue4483: {
     ./in.cue:299:6
 [incomplete] refIntoTry.failedRef1.v: undefined field: foo:
     ./in.cue:360:24
+    ./in.cue:348:2
 [incomplete] refIntoTry.failedRef2.v: undefined field: foo:
     ./in.cue:366:24
+    ./in.cue:348:2
 [eval] errorPrecedence.typeErrorDefined.v: invalid operands 1 and "string" to '+' (type int and string):
     ./in.cue:384:12
     ./in.cue:7:4
@@ -1004,6 +1010,7 @@ issue4483: {
     ./in.cue:406:17
 [eval] assignmentForm.withOutOfRangeIndex.result: index out of range [10] with length 3:
     ./in.cue:493:16
+    ./in.cue:492:3
 [eval] assignmentForm.withRealError.result: failed arithmetic: division by zero:
     ./in.cue:519:11
 [incomplete] letTryCycle._d.c: invalid interpolation: cannot reference optional field: inner:

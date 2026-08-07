@@ -10,6 +10,7 @@ _t3: {
 -- out/errors.txt --
 [incomplete] _t3.repeater: undefined field: a:
     ./in.cue:3:29
+    ./in.cue:3:2
 [structural_cycle] _t3.data.a.a: structural cycle
 [structural_cycle] _t3.out.a.a: structural cycle
 -- out/eval/stats --

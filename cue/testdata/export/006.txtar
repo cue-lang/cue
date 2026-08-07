@@ -21,13 +21,16 @@ Disjuncts:    0
   c: (_|_){
     // [incomplete] c: undefined field: c:
     //     ./in.cue:1:38
+    //     ./in.cue:1:2
   }
   d: (_|_){
     // [incomplete] d: undefined field: d:
     //     ./in.cue:1:46
+    //     ./in.cue:1:2
   }
   e: (_|_){
     // [incomplete] e: undefined field: t:
     //     ./in.cue:1:57
+    //     ./in.cue:1:2
   }
 }

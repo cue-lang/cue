@@ -92,6 +92,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] wrapped.#T.out.next: undefined field: out:
             //     ./in.cue:6:44
+            //     ./in.cue:6:26
           }
         }
       }, (#struct){
@@ -100,6 +101,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] wrapped.#T.out.next: undefined field: out:
             //     ./in.cue:7:44
+            //     ./in.cue:7:26
           }
         }
       }, (#struct){
@@ -108,6 +110,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] wrapped.#T.out.next: undefined field: out:
             //     ./in.cue:8:44
+            //     ./in.cue:8:26
           }
         }
       }, (#struct){
@@ -116,6 +119,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] wrapped.#T.out.next: undefined field: out:
             //     ./in.cue:9:44
+            //     ./in.cue:9:26
           }
         }
       }, (#struct){
@@ -124,6 +128,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] wrapped.#T.out.next: undefined field: out:
             //     ./in.cue:10:44
+            //     ./in.cue:10:26
           }
         }
       }) }
@@ -139,6 +144,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] declaredFirst.#T.out.next: undefined field: out:
             //     ./in.cue:17:44
+            //     ./in.cue:17:26
           }
         }
       }, (#struct){
@@ -147,6 +153,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] declaredFirst.#T.out.next: undefined field: out:
             //     ./in.cue:18:44
+            //     ./in.cue:18:26
           }
         }
       }, (#struct){
@@ -155,6 +162,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] declaredFirst.#T.out.next: undefined field: out:
             //     ./in.cue:19:44
+            //     ./in.cue:19:26
           }
         }
       }, (#struct){
@@ -163,6 +171,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] declaredFirst.#T.out.next: undefined field: out:
             //     ./in.cue:20:44
+            //     ./in.cue:20:26
           }
         }
       }, (#struct){
@@ -171,6 +180,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] declaredFirst.#T.out.next: undefined field: out:
             //     ./in.cue:21:44
+            //     ./in.cue:21:26
           }
         }
       }) }
@@ -196,6 +206,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] unified.#T.out.next: undefined field: out:
             //     ./in.cue:31:44
+            //     ./in.cue:31:26
           }
         }
       }, (#struct){
@@ -205,6 +216,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] unified.#T.out.next: undefined field: out:
             //     ./in.cue:32:44
+            //     ./in.cue:32:26
           }
         }
       }, (#struct){
@@ -214,6 +226,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] unified.#T.out.next: undefined field: out:
             //     ./in.cue:33:44
+            //     ./in.cue:33:26
           }
         }
       }, (#struct){
@@ -223,6 +236,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] unified.#T.out.next: undefined field: out:
             //     ./in.cue:34:44
+            //     ./in.cue:34:26
           }
         }
       }, (#struct){
@@ -232,6 +246,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] unified.#T.out.next: undefined field: out:
             //     ./in.cue:35:44
+            //     ./in.cue:35:26
           }
         }
       }) }
@@ -247,6 +262,7 @@ NumCloseIDs: 99
           next: (_|_){
             // [incomplete] undeclared.#T.out.next: undefined field: out:
             //     ./in.cue:41:44
+            //     ./in.cue:41:26
           }
         }
       }) }

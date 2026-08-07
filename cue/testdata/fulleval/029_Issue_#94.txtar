@@ -21,9 +21,9 @@ select: {
 index: {
 	opt:     foo["opt"]     @test(err, code=incomplete, contains="cannot reference optional field", pos=[0:15])
 	"txt":   foo["txt"]     @test(eq, 2)
-	#def:    foo["#def"]    @test(err, code=incomplete, contains="undefined field", pos=[0:15])
+	#def:    foo["#def"]    @test(err, code=incomplete, contains="undefined field", pos=[0:15, -19:1])
 	regular: foo["regular"] @test(eq, 4)
-	_hidden: foo["_hidden"] @test(err, code=incomplete, contains="undefined field", pos=[0:15])
+	_hidden: foo["_hidden"] @test(err, code=incomplete, contains="undefined field", pos=[0:15, -21:1])
 }
 -- out/errors.txt --
 [incomplete] select.opt: cannot reference optional field: opt:
@@ -32,8 +32,10 @@ index: {
     ./in.cue:18:15
 [incomplete] index.#def: undefined field: "#def":
     ./in.cue:20:15
+    ./in.cue:1:1
 [incomplete] index._hidden: undefined field: "_hidden":
     ./in.cue:22:15
+    ./in.cue:1:1
 -- out/eval/stats --
 Leaks:  0
 Freed:  22

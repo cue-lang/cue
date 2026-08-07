@@ -470,7 +470,7 @@ selfReferential: fail: {
 	a: {}
 	b: a.x != ""
 	if b {}
-	@test(err, code=incomplete, contains="undefined field: x", pos=[2:7])
+	@test(err, code=incomplete, contains="undefined field: x", pos=[2:7, 1:2])
 }
 
 // Issue #2367: stack overflow triggered by a comprehension that inserts into
@@ -802,6 +802,7 @@ NumCloseIDs: 314
     ./in.cue:154:3
 [incomplete] selfReferential.fail.b: undefined field: x:
     ./in.cue:470:7
+    ./in.cue:469:2
 [incomplete] issue2310.original.#s: error in call to strings.Replace: non-concrete value string:
     ./in.cue:490:46
     ./in.cue:490:38

@@ -19,14 +19,14 @@ incomplete: err1: {
 	if a.d {
 		2
 	}
-	@test(err, code=incomplete, contains="undefined field: d", pos=[1:7])
+	@test(err, code=incomplete, contains="undefined field: d", pos=[1:7, -16:1])
 }
 incomplete: err2: {
 	list: [1, 2, 3]
 	for x in list if a.d {
 		x
 	}
-	@test(err, code=incomplete, contains="undefined field: d", pos=[2:21])
+	@test(err, code=incomplete, contains="undefined field: d", pos=[2:21, -22:1])
 }
 
 // issue809: Tests that comprehension guards using `!= _|_` work correctly
@@ -124,8 +124,10 @@ issue1972: {
     ./in.cue:1:14
 [incomplete] incomplete.err1: undefined field: d:
     ./in.cue:18:7
+    ./in.cue:1:1
 [incomplete] incomplete.err2: undefined field: d:
     ./in.cue:25:21
+    ./in.cue:1:1
 [eval] issue1972.err1: conflicting values {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} and [...{}] (mismatched types struct and list):
     ./in.cue:85:8
     ./in.cue:87:18

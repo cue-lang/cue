@@ -15,7 +15,7 @@ lookup: {
 	x: {
 		name: "Hello"
 	}
-	y:        x.a       @test(err, code=incomplete, contains="undefined field: a", pos=[0:14])
+	y:        x.a       @test(err, code=incomplete, contains="undefined field: a", pos=[0:14, -3:2])
 	ok1:      *x.a | x  @test(eq, {name: "Hello"})
 	ok2:      x | *x.a  @test(eq, {name: "Hello"})
 	ok3:      x.a | *x  @test(eq, {name: "Hello"})
@@ -23,12 +23,12 @@ lookup: {
 	ok5:      x | x.a   @test(eq)
 	ok5:      x.a | x   @test(eq, {name: "Hello"})
 	allFail1: x.a | x.b @test(err, code=incomplete, contains="2 errors in empty disjunction",
-		suberr=(code=incomplete, contains="undefined field: a", pos=[0:14]),
-		suberr=(code=incomplete, contains="undefined field: b", pos=[0:20]),
+		suberr=(code=incomplete, contains="undefined field: a", pos=[0:14, -10:2]),
+		suberr=(code=incomplete, contains="undefined field: b", pos=[0:20, -10:2]),
 	)
 	allFail2: x.a | x.b @test(err, code=incomplete, contains="2 errors in empty disjunction",
-		suberr=(code=incomplete, contains="undefined field: a", pos=[0:14]),
-		suberr=(code=incomplete, contains="undefined field: b", pos=[0:20]),
+		suberr=(code=incomplete, contains="undefined field: a", pos=[0:14, -14:2]),
+		suberr=(code=incomplete, contains="undefined field: b", pos=[0:20, -14:2]),
 	)
 }
 
@@ -105,16 +105,21 @@ issue3680: t2: {
 -- out/errors.txt --
 [incomplete] lookup.y: undefined field: a:
     ./in.cue:17:14
+    ./in.cue:14:2
 [incomplete] lookup.allFail1: 2 errors in empty disjunction:
 lookup.allFail1: undefined field: a:
     ./in.cue:24:14
+    ./in.cue:14:2
 lookup.allFail1: undefined field: b:
     ./in.cue:24:20
+    ./in.cue:14:2
 [incomplete] lookup.allFail2: 2 errors in empty disjunction:
 lookup.allFail2: undefined field: a:
     ./in.cue:28:14
+    ./in.cue:14:2
 lookup.allFail2: undefined field: b:
     ./in.cue:28:20
+    ./in.cue:14:2
 [incomplete] func.ok1: 2 errors in empty disjunction:
 func.ok1: error in call to encoding/yaml.MarshalStream: non-concrete argument 0:
     ./in.cue:36:7

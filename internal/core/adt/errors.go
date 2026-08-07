@@ -301,7 +301,11 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 	if f.IsInt() {
 		err = c.NewPosf(pos, intMsg, f.Index(), iterutil.Count(v.Elems()))
 	} else {
-		err = c.NewPosf(pos, stringMsg, label)
+		verr := c.NewPosf(pos, stringMsg, label)
+		for cj := range v.LeafConjuncts() {
+			verr.AddPosition(cj.x)
+		}
+		err = verr
 	}
 	b := &Bottom{
 		Code: code,

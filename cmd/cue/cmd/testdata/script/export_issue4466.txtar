@@ -1,0 +1,15 @@
+# Issue 4466: CUE stream separators must land in the output file,
+# not on process stdout, when exporting more than one value.
+
+exec cue export data.cue -e a -e b --out cue -o out.cue
+cmp out.cue expect-out.cue
+cmp stdout expect-stdout
+
+-- data.cue --
+a: 1
+b: 2
+-- expect-out.cue --
+1
+// ---
+2
+-- expect-stdout --

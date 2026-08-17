@@ -154,7 +154,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 				// TODO: make this relative to DIR
 				fmt.Fprintf(w, "// %s\n", filepath.Base(name))
 			} else if useSep {
-				fmt.Println("// ---")
+				fmt.Fprintln(w, "// ---")
 			}
 			useSep = true
 

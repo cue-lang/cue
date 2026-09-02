@@ -1272,17 +1272,81 @@ func TestValues(t *testing.T) {
 			err: "value not an instance",
 		},
 
+		// The value of an ellipsis is part of the list value.
+		// See https://cuelang.org/issue/1654.
+		{
+			in:  `a: [...int], b: [...2]`,
+			err: "",
+		},
+		{
+			in:  `a: [...2], b: [...int]`,
+			err: "value not an instance",
+		},
+		{
+			// TODO: should be "".
+			// See https://cuelang.org/issue/1654.
+			in:  `a: [...int], b: [2, ...int]`,
+			err: "value not an instance: inexact subsumption",
+		},
+		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
+			in:  `a: [...int], b: [2, ...string]`,
+			err: "value not an instance: inexact subsumption",
+		},
+		{
+			in:  `a: [...string] | [...int], b: [...int]`,
+			err: "",
+		},
+		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
+			in:   `a: [...string], b: [...int]`,
+			mode: subDefaults,
+			err:  "",
+		},
+
 		// Defaults:
 		// TODO: for the purpose of v0.2 compatibility these
 		// evaluate to true. Reconsider before making this package
 		// public.
 		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
 			in:   `a: [], b: [...int]`,
 			mode: subDefaults,
 			err:  "",
 		},
 		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
 			in:   `a: [2], b: [2, ...int]`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
+			in:   `a: [...int], b: c, c: [1, ...string]`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
+			in:   `a: [...int], b: *[1, ...string] | [...int]`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			// TODO: should be "value not an instance".
+			// See https://cuelang.org/issue/1654.
+			in:   `a: [], b: *[...int] | [...string]`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			in:   `a: [...int], b: *[...int] | [...string]`,
 			mode: subDefaults,
 			err:  "",
 		},
@@ -1360,6 +1424,11 @@ func TestValues(t *testing.T) {
 		{
 			in:  openlists + `a: [...string], b: ["a", 1]`,
 			err: "value not an instance",
+		},
+		{
+			in:   `a: [], b: *[...int] | [...string]`,
+			mode: subFinal,
+			err:  "",
 		},
 
 		// Structural

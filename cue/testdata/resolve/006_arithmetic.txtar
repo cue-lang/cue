@@ -7,6 +7,32 @@ n1: 1            @test(eq, 1) @test(kind=int)
 v5: 2.0 / n1     @test(eq, 2.0)
 v6: 1.0 / 1.0   @test(eq, 1.0) @test(kind:todo=int, hint="may consider this")
 e2: int & 4.0/2.0   @test(err, code=eval, contains="conflicting values int and 2.0", pos=[0:5, 0:11])
+
+// A quotient keeps the decimal places the operation implies. The General
+// Decimal Arithmetic specification calls this the ideal exponent, and for
+// division it is the dividend's exponent less the divisor's.
+// Multiplication already does this: the product of 2.00 and 3 is 6.00.
+p1: 2.00 * 3   @test(debugCheck, "(float){ 6.00 }")
+p2: 6.00 / 3   @test(debugCheck, "(float){ 2.0 }", incorrect) @test(debugCheck:todo, "(float){ 2.00 }", p=2)
+p3: 2.00 / 4   @test(debugCheck, "(float){ 0.5 }", incorrect) @test(debugCheck:todo, "(float){ 0.50 }", p=2)
+p4: 1.000 / 8  @test(debugCheck, "(float){ 0.125 }")
+p5: 1 / 3      @test(debugCheck, "(float){ 0.3333333333333333333333333333333333 }")
+// A zero dividend and a negative one keep the decimal places too.
+p6: 0.00 / 3   @test(debugCheck, "(float){ 0.0 }", incorrect) @test(debugCheck:todo, "(float){ 0.00 }", p=2)
+p7: -6.00 / 3  @test(debugCheck, "(float){ -2.0 }", incorrect) @test(debugCheck:todo, "(float){ -2.00 }", p=2)
+// The ideal exponent applies to exact quotients only. An inexact one keeps
+// every digit of the context precision, trailing zeros included, rather than
+// being reduced to one digit fewer.
+p8: 1 / 33.0   @test(debugCheck, "(float){ 0.0303030303030303030303030303030303 }", incorrect) @test(debugCheck:todo, "(float){ 0.03030303030303030303030303030303030 }", p=2)
+// An exact quotient is reduced towards the ideal exponent only as far as the
+// coefficient fits the context precision, so this one has 34 digits, not 42.
+p9: 10000000000000000000000000000000000000000.0 / 1.0  @test(debugCheck, "(float){ 1E+40 }", incorrect) @test(debugCheck:todo, "(float){ 1.000000000000000000000000000000000E+40 }", p=2)
+// A negative zero keeps its sign.
+p10: (0.0 * -1) / 2  @test(debugCheck, "(float){ 0.0 }", incorrect) @test(debugCheck:todo, "(float){ -0.0 }", p=2)
+// A zero dividend with a positive ideal exponent, +2 here, is a deliberate
+// deviation from the specification, which gives 0E+2: the exponent of a zero
+// carries no information, and 0.0 reads better.
+p11: 0 / 3.00  @test(debugCheck, "(float){ 0.0 }")
 -- out/errors.txt --
 [eval] e2: conflicting values int and 2.0 (mismatched types int and float):
     ./in.cue:6:5

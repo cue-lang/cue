@@ -316,8 +316,11 @@ func (e *exporter) num(n *adt.Num, orig []adt.Conjunct) *ast.BasicLit {
 		kind = token.INT
 	}
 	s := n.X.String()
+	// A float must carry a decimal point or an exponent, so that it is not
+	// mistaken for an integer. Append a zero along with the point, as a bare
+	// "2." reads oddly in the formats we export to, even where it is valid.
 	if kind == token.FLOAT && !strings.ContainsAny(s, "eE.") {
-		s += "."
+		s += ".0"
 	}
 	return &ast.BasicLit{Kind: kind, Value: s}
 }

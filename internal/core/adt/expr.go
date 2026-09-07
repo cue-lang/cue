@@ -287,11 +287,10 @@ func (x *Num) BigInt(z *big.Int) *big.Int {
 // Int64 returns the value of x as an int64, reporting whether it fits.
 // x must be of a kind which includes [IntKind].
 func (x *Num) Int64() (int64, bool) {
-	if x.X.Exponent == 0 {
-		// Fast path for the common case, avoiding a [big.Int].
-		if !x.X.Coeff.IsInt64() {
-			return 0, false
-		}
+	if x.X.Exponent == 0 && x.X.Coeff.IsInt64() {
+		// Fast path for the common case, avoiding a [big.Int]. A coefficient
+		// of 2^63 does not fit an int64 while its negation does, so leave
+		// that one to the general path rather than reject it here.
 		i := x.X.Coeff.Int64()
 		if x.X.Negative {
 			i = -i

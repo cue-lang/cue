@@ -50,33 +50,57 @@ func (c Context) WithPrecision(p uint32) Context {
 	return c
 }
 
-// apd/v2 used to call Reduce on the result of Quo and Rem,
-// so that the operations always trimmed all but one trailing zeros.
-// apd/v3 does not do that at all.
-// For now, get the old behavior back by calling Reduce ourselves.
-// Note that v3's Reduce also removes all trailing zeros,
-// whereas v2's Reduce would leave ".0" behind.
-// Get that detail back as well, to consistently show floats with decimal points.
-//
-// TODO: Rather than reducing all trailing zeros,
-// we should keep a number of zeros that makes sense given the operation.
+var bigIntTen = apd.NewBigInt(10)
 
-func reduceKeepingFloats(d *apd.Decimal) {
-	oldExponent := d.Exponent
-	d.Reduce(d)
-	// If the decimal had decimal places, like "3.000" and "5.000E+5",
-	// Reduce gives us "3" and "5E+5", but we want "3.0" and "5.0E+5".
-	if oldExponent < 0 && d.Exponent >= 0 {
-		d.Exponent--
-		// TODO: we can likely make the NewBigInt(10) a static global to reduce allocs
-		d.Coeff.Mul(&d.Coeff, apd.NewBigInt(10))
+// reduceToIdeal trims the trailing zeros of an exact result d, but stops at
+// the ideal exponent rather than removing all of them.
+//
+// apd pads the result of a division to the full precision of the context,
+// which says nothing about the operation: dividing 6.00 by 3 yields
+// 2.000000000000000000000000000000000. The General Decimal Arithmetic
+// specification instead defines an ideal exponent per operation, and reduces
+// an exact result towards it, which is what gives 2.00 here. apd implements
+// that rule for addition, subtraction and multiplication, but not for
+// division.
+//
+// The specification reduces an exact result only, so an inexact one keeps
+// every digit of the precision, and stops reducing once the coefficient fits
+// the precision, so that an exact quotient never exceeds it either.
+func (c Context) reduceToIdeal(d *apd.Decimal, res apd.Condition, ideal int32) {
+	if d.Form != apd.Finite || res.Inexact() {
+		return
 	}
+	// Reduce clears the sign of a zero, which the specification keeps.
+	neg := d.Negative
+	d.Reduce(d)
+	d.Negative = neg
+	// Reduce removes every trailing zero, which may take the exponent past the
+	// ideal one; put back the zeros the operation implies, as far as the
+	// precision allows.
+	n := d.Exponent - ideal
+	if c.Precision != 0 {
+		n = min(n, int32(c.Precision)-int32(d.NumDigits()))
+	}
+	if n <= 0 {
+		return
+	}
+	var scale apd.BigInt
+	scale.Exp(bigIntTen, apd.NewBigInt(int64(n)), nil)
+	d.Coeff.Mul(&d.Coeff, &scale)
+	d.Exponent -= n
 }
 
 func (c Context) Quo(d, x, y *apd.Decimal) (apd.Condition, error) {
+	// The ideal exponent of a quotient is the dividend's less the divisor's.
+	// Read it before the call, as d may alias x or y.
+	ideal := x.Exponent - y.Exponent
 	res, err := c.Context.Quo(d, x, y)
-	reduceKeepingFloats(d)
-	return res, err
+	if err != nil {
+		// A failed division leaves d holding no result of its own.
+		return res, err
+	}
+	c.reduceToIdeal(d, res, ideal)
+	return res, nil
 }
 
 // BaseContext is used as CUE's default context for arbitrary-precision decimals.

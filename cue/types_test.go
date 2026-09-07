@@ -391,6 +391,18 @@ func TestInt(t *testing.T) {
 		err:   cue.ErrAbove.Error(),
 		errU:  cue.ErrAbove.Error(),
 	}, {
+		// TODO: math.MinInt64 is representable, so Int64 must not report
+		// an error; its fast path rejects the coefficient 2^63 as too large.
+		value: "-9223372036854775808",
+		int:   math.MinInt64,
+		uint:  0,
+		err:   cue.ErrAbove.Error(),
+		errU:  cue.ErrAbove.Error(),
+	}, {
+		value: "9223372036854775807",
+		int:   math.MaxInt64,
+		uint:  math.MaxInt64,
+	}, {
 		value: "111222333444555666777888999000",
 		int:   math.MaxInt64,
 		uint:  math.MaxUint64,

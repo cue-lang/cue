@@ -22,6 +22,23 @@ t30: math.Log10(4)
 t31: math.Log2(5)
 t32: math.Dim(3, 2.5)
 t33: math.Dim(5, 7.2)
+// Rounding a value which needs more than the 34 digits of the decimal
+// context must not lose it. TODO: Floor and Ceil are broken here: t34, t35,
+// t39 and t40 must be their arguments, which are already integers, not zero.
+t34: math.Floor(1e40)
+t35: math.Ceil(1e40)
+t36: math.Trunc(1e40)
+t37: math.Round(1e40)
+t38: math.RoundToEven(1e40)
+t39: math.Floor(-1.5e40)
+t40: math.Ceil(-1.5e40)
+// The same, for arguments which do have a fraction to round away. TODO: Floor
+// and Ceil are broken here too: t41 to t44 must be the 35-digit integer nearest
+// to their argument, not zero.
+t41: math.Floor(12345678901234567890123456789012345.5)
+t42: math.Ceil(12345678901234567890123456789012345.5)
+t43: math.Floor(-12345678901234567890123456789012345.5)
+t44: math.Ceil(-12345678901234567890123456789012345.5)
 -- out/math-v3 --
 Errors:
 t3: cannot call non-function math.Pi (type float):
@@ -52,3 +69,20 @@ t30: 0.6020599913279623904274777894489861
 t31: 2.321928094887362347870319429489391
 t32: 0.5
 t33: 0
+// Rounding a value which needs more than the 34 digits of the decimal
+// context must not lose it. TODO: Floor and Ceil are broken here: t34, t35,
+// t39 and t40 must be their arguments, which are already integers, not zero.
+t34: 0
+t35: 0
+t36: 10000000000000000000000000000000000000000
+t37: 10000000000000000000000000000000000000000
+t38: 10000000000000000000000000000000000000000
+t39: 0
+t40: 0
+// The same, for arguments which do have a fraction to round away. TODO: Floor
+// and Ceil are broken here too: t41 to t44 must be the 35-digit integer nearest
+// to their argument, not zero.
+t41: 0
+t42: 0
+t43: 0
+t44: 0

@@ -1,0 +1,55 @@
+# Tests that integer arithmetic keeps arbitrary precision, as the spec
+# requires: integer values must be represented with at least 256 bits, and
+# an implementation must error rather than round when it cannot represent an
+# integer precisely.
+# https://cuelang.org/issue/3787
+-- in.cue --
+// A 35-digit literal is exact.
+a: 10000000000000000000000000000000001
+
+// Arithmetic reaching 35 digits must be exact too.
+b: 10000000000000000000000000000000000 + 1
+c: 10000000000000000000000000000000002 - 1
+d: 99999999999999999999999999999999999 * 10
+
+// 34 digits fit the decimal context and must be exact as well.
+x: 9999999999999999999999999999999998
+y: 9999999999999999999999999999999997 + 1
+z: 9999999999999999999999999999999999 - 1
+
+// Beyond a certain size the decimal cannot hold an integer at all, and an
+// error is the only correct answer. Squaring a hundred-digit number ten
+// times passes that point; the exact threshold is the decimal library's.
+big0:  1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+big1:  big0 * big0
+big2:  big1 * big1
+big3:  big2 * big2
+big4:  big3 * big3
+big5:  big4 * big4
+big6:  big5 * big5
+big7:  big6 * big6
+big8:  big7 * big7
+big9:  big8 * big8
+big10: big9 * big9
+-- out/compile --
+--- in.cue
+{
+  a: 10000000000000000000000000000000001
+  b: (10000000000000000000000000000000000 + 1)
+  c: (10000000000000000000000000000000002 - 1)
+  d: (99999999999999999999999999999999999 * 10)
+  x: 9999999999999999999999999999999998
+  y: (9999999999999999999999999999999997 + 1)
+  z: (9999999999999999999999999999999999 - 1)
+  big0: 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  big1: (〈0;big0〉 * 〈0;big0〉)
+  big2: (〈0;big1〉 * 〈0;big1〉)
+  big3: (〈0;big2〉 * 〈0;big2〉)
+  big4: (〈0;big3〉 * 〈0;big3〉)
+  big5: (〈0;big4〉 * 〈0;big4〉)
+  big6: (〈0;big5〉 * 〈0;big5〉)
+  big7: (〈0;big6〉 * 〈0;big6〉)
+  big8: (〈0;big7〉 * 〈0;big7〉)
+  big9: (〈0;big8〉 * 〈0;big8〉)
+  big10: (〈0;big9〉 * 〈0;big9〉)
+}

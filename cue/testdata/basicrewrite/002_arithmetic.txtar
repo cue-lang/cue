@@ -8,6 +8,7 @@ div2:    2 / 3 * 6   @test(eq, 4.0) @test(kind=float,
 		hint="we may consider this to be int in the future")
 div3:    1.00 / 1.00 @test(eq, 1.0) @test(kind=float)
 divZero: 1.0 / 0     @test(err, code=eval, contains="division by zero", pos=[0:10])
+divZeroI: 1 / 0      @test(err, code=eval, contains="division by zero", pos=[0:11])
 div00:   0 / 0       @test(err, code=eval, contains="division undefined", pos=[0:10])
 b:       1 != 4      @test(eq, true)
 add:     div1 + 1.0  @test(eq, 5.0)
@@ -30,27 +31,29 @@ e8: mod(1.0, 1) @test(err, code=eval, contains="cannot use", pos=[0:9])
 -- out/errors.txt --
 [eval] divZero: failed arithmetic: division by zero:
     ./in.cue:9:10
+[eval] divZeroI: failed arithmetic: division by zero:
+    ./in.cue:10:11
 [eval] div00: failed arithmetic: division undefined:
-    ./in.cue:10:10
+    ./in.cue:11:10
 [eval] idiv00: error in call to div: division by zero:
-    ./in.cue:14:9
-[eval] imod00: error in call to mod: division by zero:
     ./in.cue:15:9
-[eval] iquo00: error in call to quo: division by zero:
+[eval] imod00: error in call to mod: division by zero:
     ./in.cue:16:9
-[eval] irem00: error in call to rem: division by zero:
+[eval] iquo00: error in call to quo: division by zero:
     ./in.cue:17:9
+[eval] irem00: error in call to rem: division by zero:
+    ./in.cue:18:9
 [eval] e0: invalid operands 2 and "a" to '+' (type int and string):
-    ./in.cue:24:5
-    ./in.cue:24:9
-[eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    ./in.cue:25:5
     ./in.cue:25:9
+[eval] e5: cannot use 1.0 (type float) as int in argument 1 to div:
+    ./in.cue:26:9
 [eval] e6: cannot use 2.0 (type float) as int in argument 2 to rem:
-    ./in.cue:26:12
-[eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
     ./in.cue:27:12
+[eval] e7: cannot use 2.0 (type float) as int in argument 2 to quo:
+    ./in.cue:28:12
 [eval] e8: cannot use 1.0 (type float) as int in argument 1 to mod:
-    ./in.cue:28:9
+    ./in.cue:29:9
 -- out/eval/stats --
 Leaks:  0
 Freed:  24

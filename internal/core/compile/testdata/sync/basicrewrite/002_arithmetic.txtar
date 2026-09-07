@@ -7,6 +7,7 @@ div1:    2.0 / 3 * 6
 div2:    2 / 3 * 6
 div3:    1.00 / 1.00
 divZero: 1.0 / 0
+divZeroI: 1 / 0
 div00:   0 / 0
 b:       1 != 4
 add:     div1 + 1.0
@@ -36,6 +37,7 @@ e8: mod(1.0, 1)
   div2: ((2 / 3) * 6)
   div3: (1.00 / 1.00)
   divZero: (1.0 / 0)
+  divZeroI: (1 / 0)
   div00: (0 / 0)
   b: (1 != 4)
   add: (〈0;div1〉 + 1.0)

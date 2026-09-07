@@ -1,6 +1,8 @@
 # Tests arithmetic operations including division producing floats and
 # conflicting types (int & float).
 -- in.cue --
+import "math"
+
 // 1.0T is an integer literal with a zero exponent, so the ideal exponent of
 // the quotient is +1, and the reduction stops ten zeros short of 5E+11. This
 // is what the specification prescribes, and what other implementations of it
@@ -37,10 +39,37 @@ p10: (0.0 * -1) / 2  @test(debugCheck, "(float){ -0.0 }")
 // deviation from the specification, which gives 0E+2: the exponent of a zero
 // carries no information, and 0.0 reads better.
 p11: 0 / 3.00  @test(debugCheck, "(float){ 0.0 }")
+
+// A quotient is an integer only when both operands are integers and it can be
+// represented as one, which is what doc/ref/spec.md prescribes.
+k1: 4 / 2       @test(eq, 2) @test(kind=int)
+k2: 4 / 2 & int @test(eq, 2) @test(kind=int)
+k3: 7 / 2       @test(eq, 3.5) @test(kind=float)
+k4: 1 / 3       @test(kind=float)
+k5: 4.0 / 2.0   @test(eq, 2.0) @test(kind=float)
+k6: 6.00 / 3    @test(eq, 2) @test(kind=float)
+// Whether the quotient of two integers is one itself must not be decided by
+// rounding the division to the decimal context's precision first, as that
+// would report a rounded quotient as an exact integer.
+k7:  100000000000000000000000000000000001 / 1 @test(eq, 100000000000000000000000000000000001) @test(kind=int)
+k8:  999999999999999999999999999999999999 / 9 @test(eq, 111111111111111111111111111111111111) @test(kind=int)
+k9:  100000000000000000000000000000000001 / 3 @test(kind=float)
+k10: -4 / 2  @test(eq, -2) @test(kind=int)
+k11: 4 / -2  @test(eq, -2) @test(kind=int)
+k12: 0 / -3  @test(eq, 0) @test(kind=int) @test(debugCheck, "(int){ 0 }")
+k13: 1.0T / 2 @test(eq, 5.0e+11) @test(kind=int) @test(debugCheck, "(int){ 500000000000 }")
+
+// An infinite operand is divided as a decimal, as it has no integer value.
+let inf = math.Exp(math.Ldexp(1, 1024))
+k14: 1 / inf    @test(debugCheck, "(float){ 0.0 }")
+k15: inf / 1    @test(debugCheck, "(float){ Infinity.0 }")
+k16: inf / inf  @test(err, code=eval, contains="invalid operation")
 -- out/errors.txt --
 [eval] e2: conflicting values int and 2.0 (mismatched types int and float):
-    ./in.cue:10:5
-    ./in.cue:10:11
+    ./in.cue:12:5
+    ./in.cue:12:11
+[eval] k16: failed arithmetic: invalid operation:
+    ./in.cue:63:6
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

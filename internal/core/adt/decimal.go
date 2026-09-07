@@ -44,6 +44,21 @@ func (c *OpContext) Mul(a, b *Num) Value {
 }
 
 func (c *OpContext) Quo(a, b *Num) Value {
+	// doc/ref/spec.md: the quotient of two integers is an integer when it
+	// can be represented as one, which a zero remainder reports. Testing a
+	// decimal quotient for integrality instead would not do, as it is
+	// rounded to the context's precision first. numOp handles a zero
+	// divisor, telling 1 / 0 from the undefined 0 / 0, and an infinite
+	// operand, which has no coefficient to divide.
+	if a.Kind()&FloatKind == 0 && b.Kind()&FloatKind == 0 && !b.X.IsZero() &&
+		a.X.Form == apd.Finite && b.X.Form == apd.Finite {
+		var x, y, d apd.Decimal
+		var rem apd.BigInt
+		d.Coeff.QuoRem(intOperand(&x, a), intOperand(&y, b), &rem)
+		if rem.Sign() == 0 {
+			return c.intNum(&d)
+		}
+	}
 	return numOp(c, (*internal.Context).Quo, FloatKind, a, b)
 }
 
@@ -108,25 +123,28 @@ func intDivOp(c *OpContext, fn intFunc, a, b *Num) Value {
 	if b.X.IsZero() {
 		return c.NewErrf("division by zero")
 	}
+	var x, y, d apd.Decimal
+	fn(&d.Coeff, intOperand(&x, a), intOperand(&y, b))
+	return c.intNum(&d)
+}
 
-	var x, y apd.Decimal
-	_, _ = internal.BaseContext.RoundToIntegralValue(&x, &a.X)
-	if x.Negative {
-		x.Coeff.Neg(&x.Coeff)
+// intOperand returns the value of the integer n as a signed big integer, using
+// d as scratch space. Rounding to an integral value brings the exponent to
+// zero, so that the coefficient alone is the magnitude.
+func intOperand(d *apd.Decimal, n *Num) *apd.BigInt {
+	_, _ = internal.BaseContext.RoundToIntegralValue(d, &n.X)
+	if d.Negative {
+		d.Coeff.Neg(&d.Coeff)
 	}
-	_, _ = internal.BaseContext.RoundToIntegralValue(&y, &b.X)
-	if y.Negative {
-		y.Coeff.Neg(&y.Coeff)
-	}
+	return &d.Coeff
+}
 
-	var d apd.Decimal
-
-	fn(&d.Coeff, &x.Coeff, &y.Coeff)
-
+// intNum returns d, whose coefficient holds a signed integer, as an integer
+// value.
+func (c *OpContext) intNum(d *apd.Decimal) Value {
 	if d.Coeff.Sign() < 0 {
 		d.Coeff.Neg(&d.Coeff)
 		d.Negative = true
 	}
-
-	return c.newNum(&d, IntKind)
+	return c.newNum(d, IntKind)
 }

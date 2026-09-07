@@ -1,6 +1,8 @@
 # Tests arithmetic operations including division producing floats and
 # conflicting types (int & float).
 -- in.cue --
+import "math"
+
 // 1.0T is an integer literal with a zero exponent, so the ideal exponent of
 // the quotient is +1, and the reduction stops ten zeros short of 5E+11. This
 // is what the specification prescribes, and what other implementations of it
@@ -37,6 +39,31 @@ p10: (0.0 * -1) / 2
 // deviation from the specification, which gives 0E+2: the exponent of a zero
 // carries no information, and 0.0 reads better.
 p11: 0 / 3.00
+
+// A quotient is an integer only when both operands are integers and it can be
+// represented as one, which is what doc/ref/spec.md prescribes.
+k1: 4 / 2
+k2: 4 / 2 & int
+k3: 7 / 2
+k4: 1 / 3
+k5: 4.0 / 2.0
+k6: 6.00 / 3
+// Whether the quotient of two integers is one itself must not be decided by
+// rounding the division to the decimal context's precision first, as that
+// would report a rounded quotient as an exact integer.
+k7:  100000000000000000000000000000000001 / 1
+k8:  999999999999999999999999999999999999 / 9
+k9:  100000000000000000000000000000000001 / 3
+k10: -4 / 2
+k11: 4 / -2
+k12: 0 / -3
+k13: 1.0T / 2
+
+// An infinite operand is divided as a decimal, as it has no integer value.
+let inf = math.Exp(math.Ldexp(1, 1024))
+k14: 1 / inf
+k15: inf / 1
+k16: inf / inf
 -- out/compile --
 --- in.cue
 {
@@ -57,4 +84,21 @@ p11: 0 / 3.00
   p9: (10000000000000000000000000000000000000000.0 / 1.0)
   p10: ((0.0 * -1) / 2)
   p11: (0 / 3.00)
+  k1: (4 / 2)
+  k2: ((4 / 2) & int)
+  k3: (7 / 2)
+  k4: (1 / 3)
+  k5: (4.0 / 2.0)
+  k6: (6.00 / 3)
+  k7: (100000000000000000000000000000000001 / 1)
+  k8: (999999999999999999999999999999999999 / 9)
+  k9: (100000000000000000000000000000000001 / 3)
+  k10: (-4 / 2)
+  k11: (4 / -2)
+  k12: (0 / -3)
+  k13: (1000000000000 / 2)
+  let inf#1 = 〈import;math〉.Exp(〈import;math〉.Ldexp(1, 1024))
+  k14: (1 / 〈0;let inf#1〉)
+  k15: (〈0;let inf#1〉 / 1)
+  k16: (〈0;let inf#1〉 / 〈0;let inf#1〉)
 }

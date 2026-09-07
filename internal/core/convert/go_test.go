@@ -154,7 +154,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		int64(-3), "(int){ -3 }",
 	}, {
-		float64(3), "(float){ 3 }",
+		float64(3), "(float){ 3.0 }",
 	}, {
 		float64(3.1), "(float){ 3.1 }",
 	}, {
@@ -164,7 +164,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		&i34, "(int){ 34 }",
 	}, {
-		&f37, "(float){ 37 }",
+		&f37, "(float){ 37.0 }",
 	}, {
 		&d35, "(int){ 35 }",
 	}, {

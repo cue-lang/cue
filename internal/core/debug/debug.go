@@ -603,7 +603,7 @@ func (w *printer) node(n adt.Node) {
 		w.dst = strconv.AppendBool(w.dst, x.B)
 
 	case *adt.Num:
-		w.string(x.X.String())
+		w.string(numString(x))
 
 	case *adt.String:
 		w.dst = literal.String.Append(w.dst, x.Str)

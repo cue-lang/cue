@@ -22,10 +22,22 @@ package debug
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/internal/core/adt"
 )
+
+// numString renders n the way its kind reads back: a float always carries a
+// decimal point or an exponent, so that it is not mistaken for an integer.
+// An integer's decimal never has a fractional part, so it needs no such care.
+func numString(n *adt.Num) string {
+	s := n.X.String()
+	if n.K&adt.IntKind == 0 && !strings.ContainsAny(s, "eE.") {
+		s += ".0"
+	}
+	return s
+}
 
 func (w *printer) compactNode(n adt.Node) {
 	switch x := n.(type) {
@@ -184,7 +196,7 @@ func (w *printer) compactNode(n adt.Node) {
 		w.dst = strconv.AppendBool(w.dst, x.B)
 
 	case *adt.Num:
-		w.string(x.X.String())
+		w.string(numString(x))
 
 	case *adt.String:
 		w.dst = literal.String.Append(w.dst, x.Str)

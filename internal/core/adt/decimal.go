@@ -32,31 +32,48 @@ func (a *Num) Cmp(b *Num) int {
 }
 
 func (c *OpContext) Add(a, b *Num) Value {
-	return numOp(c, internal.BaseContext.Add, a, b)
+	return numOp(c, (*internal.Context).Add, numKind(a, b), a, b)
 }
 
 func (c *OpContext) Sub(a, b *Num) Value {
-	return numOp(c, internal.BaseContext.Sub, a, b)
+	return numOp(c, (*internal.Context).Sub, numKind(a, b), a, b)
 }
 
 func (c *OpContext) Mul(a, b *Num) Value {
-	return numOp(c, internal.BaseContext.Mul, a, b)
+	return numOp(c, (*internal.Context).Mul, numKind(a, b), a, b)
 }
 
 func (c *OpContext) Quo(a, b *Num) Value {
-	v := numOp(c, internal.BaseContext.Quo, a, b)
-	if n, ok := v.(*Num); ok {
-		n.K = FloatKind
-	}
-	return v
+	return numOp(c, (*internal.Context).Quo, FloatKind, a, b)
 }
 
-type numFunc func(z, x, y *apd.Decimal) (apd.Condition, error)
+// numKind returns the kind of an arithmetic result over a and b: the kind they
+// share, or a float if they share none.
+func numKind(a, b *Num) Kind {
+	k := a.Kind() & b.Kind()
+	if k == 0 {
+		k = FloatKind
+	}
+	return k
+}
 
-func numOp(c *OpContext, fn numFunc, x, y *Num) Value {
+type numFunc func(c *internal.Context, z, x, y *apd.Decimal) (apd.Condition, error)
+
+// numOp applies fn to x and y, giving the result kind k.
+//
+// An integer result is computed without rounding, so that it keeps the
+// arbitrary precision doc/ref/spec.md requires. Only operations which are
+// exact over the integers may yield one, which rules out division: a quotient
+// such as 1/3 has no finite decimal representation, and apd refuses to divide
+// at all in a context with no precision to round to.
+func numOp(c *OpContext, fn numFunc, k Kind, x, y *Num) Value {
+	ctx := internal.BaseContext
+	if k&FloatKind == 0 {
+		ctx = internal.ExactContext
+	}
+
 	var d apd.Decimal
-
-	cond, err := fn(&d, &x.X, &y.X)
+	cond, err := fn(&ctx, &d, &x.X, &y.X)
 
 	if err != nil {
 		return c.NewErrf("failed arithmetic: %v", err)
@@ -66,10 +83,6 @@ func numOp(c *OpContext, fn numFunc, x, y *Num) Value {
 		return c.NewErrf("division by zero")
 	}
 
-	k := x.Kind() & y.Kind()
-	if k == 0 {
-		k = FloatKind
-	}
 	return c.newNum(&d, k)
 }
 

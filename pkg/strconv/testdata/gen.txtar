@@ -67,6 +67,9 @@ t50: strconv.ParseNumber("1Ki")
 t51: strconv.ParseNumber("-.5")
 t52: strconv.ParseNumber("1_")
 t53: strconv.ParseNumber("0xG")
+// An integer computed beyond the 34 digits of the decimal context must still
+// convert exactly; see https://cuelang.org/issue/3787.
+t59: strconv.FormatInt(10000000000000000000000000000000000 + 1, 10)
 -- out/strconv-v3 --
 Errors:
 t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]:
@@ -181,6 +184,9 @@ t50: 1024
 t51: -0.5
 t52: _|_ // t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number
 t53: _|_ // t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG"
+// An integer computed beyond the 34 digits of the decimal context must still
+// convert exactly; see https://cuelang.org/issue/3787.
+t59: "10000000000000000000000000000000001"
 -- diff/-out/strconv-v3<==>+out/strconv --
 diff old new
 --- old
@@ -292,7 +298,7 @@ diff old new
  // Test ParseUint with various bit widths
  t34: 255
  t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range
-@@ -41,3 +104,10 @@
+@@ -41,3 +104,13 @@
  t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
  t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
  t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range
@@ -303,6 +309,9 @@ diff old new
 +t51: -0.5
 +t52: _|_ // t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number
 +t53: _|_ // t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG"
++// An integer computed beyond the 34 digits of the decimal context must still
++// convert exactly; see https://cuelang.org/issue/3787.
++t59: "10000000000000000000000000000000001"
 -- out/strconv --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:

@@ -39,6 +39,15 @@ parse: {
 
 fromInt: a: uuid.FromInt(0x052ef62d_7223_58b6_a551_c1deee46d401)
 
+// A UUID derived from a large integer must keep the low-order digits which
+// distinguish it; see https://cuelang.org/issue/4263.
+fromIntLarge: {
+	seed:   123456789012345678901234567890123456789
+	a:      uuid.FromInt(seed)
+	b:      uuid.FromInt(seed + 1)
+	differ: a != b
+}
+
 variant: a: uuid.Variant(sha1.a)
 version: a: uuid.Version(sha1.a)
 urn: a:     uuid.URN(sha1.a)
@@ -105,6 +114,15 @@ parse: {
 	}
 }
 fromInt: a: "052ef62d-7223-58b6-a551-c1deee46d401"
+
+// A UUID derived from a large integer must keep the low-order digits which
+// distinguish it; see https://cuelang.org/issue/4263.
+fromIntLarge: {
+	seed:   123456789012345678901234567890123456789
+	a:      "5ce0e9a5-6015-fec5-aadf-a328ae398115"
+	b:      "5ce0e9a5-6015-fec5-aadf-a328ae398116"
+	differ: true
+}
 variant: a: 1
 version: a: 5
 urn: a:     "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"
@@ -159,7 +177,7 @@ diff old new
  	ok: {
  		a: "052ef62d-7223-58b6-a551-c1deee46d401"
  		b: "052ef62d-7223-58b6-a551-c1deee46d401"
-@@ -56,24 +57,9 @@
+@@ -56,24 +57,18 @@
  		d: "123e4567-e89b-12d3-a456-426655440000"
  		e: "123e4567-e89b-12d3-a456-426655440000"
  	}
@@ -186,6 +204,15 @@ diff old new
 -}
 +}
 +fromInt: a: "052ef62d-7223-58b6-a551-c1deee46d401"
++
++// A UUID derived from a large integer must keep the low-order digits which
++// distinguish it; see https://cuelang.org/issue/4263.
++fromIntLarge: {
++	seed:   123456789012345678901234567890123456789
++	a:      "5ce0e9a5-6015-fec5-aadf-a328ae398115"
++	b:      "5ce0e9a5-6015-fec5-aadf-a328ae398116"
++	differ: true
++}
 +variant: a: 1
 +version: a: 5
 +urn: a:     "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"

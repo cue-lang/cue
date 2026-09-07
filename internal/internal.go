@@ -82,6 +82,15 @@ func (c Context) Quo(d, x, y *apd.Decimal) (apd.Condition, error) {
 // BaseContext is used as CUE's default context for arbitrary-precision decimals.
 var BaseContext = Context{*apd.BaseContext.WithPrecision(34)}
 
+// ExactContext is like [BaseContext] but never rounds, as apd treats a
+// precision of zero as unlimited.
+//
+// Integer arithmetic uses it so that results keep arbitrary precision, which
+// doc/ref/spec.md requires: rounding an integer would silently drop its
+// low-order digits, and an implementation must report an error rather than
+// round when it cannot represent an integer precisely.
+var ExactContext = Context{apd.BaseContext}
+
 // EvaluatorVersion is declared here so it can be used everywhere without import cycles,
 // but the canonical documentation lives at [cuelang.org/go/cue/cuecontext.EvalVersion].
 //

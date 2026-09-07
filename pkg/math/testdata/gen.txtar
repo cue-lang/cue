@@ -23,8 +23,7 @@ t31: math.Log2(5)
 t32: math.Dim(3, 2.5)
 t33: math.Dim(5, 7.2)
 // Rounding a value which needs more than the 34 digits of the decimal
-// context must not lose it. TODO: Floor and Ceil are broken here: t34, t35,
-// t39 and t40 must be their arguments, which are already integers, not zero.
+// context must not lose it.
 t34: math.Floor(1e40)
 t35: math.Ceil(1e40)
 t36: math.Trunc(1e40)
@@ -32,13 +31,20 @@ t37: math.Round(1e40)
 t38: math.RoundToEven(1e40)
 t39: math.Floor(-1.5e40)
 t40: math.Ceil(-1.5e40)
-// The same, for arguments which do have a fraction to round away. TODO: Floor
-// and Ceil are broken here too: t41 to t44 must be the 35-digit integer nearest
-// to their argument, not zero.
+// The same, for arguments which do have a fraction to round away.
 t41: math.Floor(12345678901234567890123456789012345.5)
 t42: math.Ceil(12345678901234567890123456789012345.5)
 t43: math.Floor(-12345678901234567890123456789012345.5)
 t44: math.Ceil(-12345678901234567890123456789012345.5)
+// Directed rounding, including trailing zeros which leave the intermediate
+// result with a negative exponent.
+t45: math.Ceil(math.Pi)
+t46: math.Floor(-2.5)
+t47: math.Ceil(-2.5)
+t48: math.Floor(3.400)
+t49: math.Ceil(3.400)
+t50: math.Floor(-3.400)
+t51: math.Ceil(-3.400)
 -- out/math-v3 --
 Errors:
 t3: cannot call non-function math.Pi (type float):
@@ -70,19 +76,25 @@ t31: 2.321928094887362347870319429489391
 t32: 0.5
 t33: 0
 // Rounding a value which needs more than the 34 digits of the decimal
-// context must not lose it. TODO: Floor and Ceil are broken here: t34, t35,
-// t39 and t40 must be their arguments, which are already integers, not zero.
-t34: 0
-t35: 0
+// context must not lose it.
+t34: 10000000000000000000000000000000000000000
+t35: 10000000000000000000000000000000000000000
 t36: 10000000000000000000000000000000000000000
 t37: 10000000000000000000000000000000000000000
 t38: 10000000000000000000000000000000000000000
-t39: 0
-t40: 0
-// The same, for arguments which do have a fraction to round away. TODO: Floor
-// and Ceil are broken here too: t41 to t44 must be the 35-digit integer nearest
-// to their argument, not zero.
-t41: 0
-t42: 0
-t43: 0
-t44: 0
+t39: -15000000000000000000000000000000000000000
+t40: -15000000000000000000000000000000000000000
+// The same, for arguments which do have a fraction to round away.
+t41: 12345678901234567890123456789012345
+t42: 12345678901234567890123456789012346
+t43: -12345678901234567890123456789012346
+t44: -12345678901234567890123456789012345
+// Directed rounding, including trailing zeros which leave the intermediate
+// result with a negative exponent.
+t45: 4
+t46: -3
+t47: -2
+t48: 3
+t49: 4
+t50: -4
+t51: -3

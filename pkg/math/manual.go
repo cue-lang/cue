@@ -29,17 +29,22 @@ func roundContext(rounder apd.Rounder) internal.Context {
 	return c
 }
 
-// TODO: for now we convert Decimals to int. This allows the desired type to be
-// conveyed. This has the disadvantage that a number like 1E10000 will need to be
-// expanded. Eventually it would be better to unify number types and allow
-// anything that results in an integer to pose as an integer type.
-// TODO: this is likely buggy, as we discard d.Exponent entirely.
+// toInt converts an integral d to a big.Int. Callers must round d to an
+// integral value first, so that no non-zero digits are dropped.
+//
+// TODO: converting to an int is how the desired type is conveyed, at the cost
+// of expanding a number such as 1E10000. It would be better to unify the
+// number types and let anything with an integer value pose as an integer.
 func toInt(d *internal.Decimal) *big.Int {
-	i := &d.Coeff
-	if d.Negative {
-		i.Neg(i)
+	// Rounding to an integral value brings the exponent to zero, so that the
+	// coefficient alone is the magnitude.
+	var i internal.Decimal
+	_, _ = internal.BaseContext.RoundToIntegralValue(&i, d)
+	b := i.Coeff.MathBigInt()
+	if i.Negative {
+		b.Neg(b)
 	}
-	return i.MathBigInt()
+	return b
 }
 
 // Floor returns the greatest integer value less than or equal to x.
@@ -51,8 +56,9 @@ func toInt(d *internal.Decimal) *big.Int {
 //	Floor(NaN) = NaN
 func Floor(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
-	_, err := internal.BaseContext.Floor(&d, x)
-	_, _ = internal.BaseContext.Quantize(&d, &d, 0)
+	// apd truncates towards zero and then subtracts one, so an argument with
+	// a fraction needs a context which will not round that step away.
+	_, err := internal.ExactContext.Floor(&d, x)
 	return toInt(&d), err
 }
 
@@ -65,8 +71,8 @@ func Floor(x *internal.Decimal) (*big.Int, error) {
 //	Ceil(NaN) = NaN
 func Ceil(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
-	_, err := internal.BaseContext.Ceil(&d, x)
-	_, _ = internal.BaseContext.Quantize(&d, &d, 0)
+	// See the comment in [Floor]; Ceil adds one rather than subtracting it.
+	_, err := internal.ExactContext.Ceil(&d, x)
 	return toInt(&d), err
 }
 

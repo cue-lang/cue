@@ -78,17 +78,29 @@ func yieldConjuncts(v cue.Value, yield func(cue.Value) bool) bool {
 	return true
 }
 
+// FormatTestDir returns the test data files that [WriteTestDir] would write,
+// keyed by their path under dir.
+func FormatTestDir(dir string, tests map[string][]*Schema) (map[string][]byte, error) {
+	files := make(map[string][]byte, len(tests))
+	for filename, schemas := range tests {
+		data, err := stdjson.MarshalIndent(schemas, "", "\t")
+		if err != nil {
+			return nil, err
+		}
+		files[filepath.Join(dir, filename)] = append(data, '\n')
+	}
+	return files, nil
+}
+
 // WriteTestDir writes test data files as read by ReadTestDir
 // to the given directory. The keys of tests are filenames relative
 // to dir.
 func WriteTestDir(dir string, tests map[string][]*Schema) error {
-	for filename, schemas := range tests {
-		filename = filepath.Join(dir, filename)
-		data, err := stdjson.MarshalIndent(schemas, "", "\t")
-		if err != nil {
-			return err
-		}
-		data = append(data, '\n')
+	files, err := FormatTestDir(dir, tests)
+	if err != nil {
+		return err
+	}
+	for filename, data := range files {
 		oldData, err := os.ReadFile(filename)
 		if err != nil {
 			return err

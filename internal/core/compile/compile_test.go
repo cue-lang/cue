@@ -18,8 +18,10 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -39,7 +41,7 @@ var (
 )
 
 func TestCompile(t *testing.T) {
-	if cuetest.UpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		syncTestdataInputsCUE(t)
 	}
 
@@ -117,10 +119,8 @@ func syncTestdataInputsCUE(t *testing.T) {
 	const srcRoot = "../../../cue/testdata"
 	const dstRoot = "testdata/sync"
 
-	if err := os.RemoveAll(dstRoot); err != nil {
-		t.Fatal(err)
-	}
-
+	// The mirrored archives by destination path.
+	want := make(map[string][]byte)
 	err := filepath.WalkDir(srcRoot, func(srcPath string, entry os.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -159,13 +159,33 @@ func syncTestdataInputsCUE(t *testing.T) {
 			}
 			archive.Files = append(archive.Files, txtar.File{Name: f.Name, Data: data})
 		}
-		if err := os.MkdirAll(filepath.Dir(dstPath), 0777); err != nil {
-			return err
-		}
-		return os.WriteFile(dstPath, txtar.Format(archive), 0666)
+		want[dstPath] = txtar.Format(archive)
+		return nil
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	// Mirrors whose source archive is gone are removed when updating, and
+	// reported under CUE_UPDATE=diff.
+	err = filepath.WalkDir(dstRoot, func(dstPath string, entry os.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return err
+		}
+		if _, ok := want[dstPath]; ok {
+			return nil
+		}
+		if cuetest.DiffGoldenFiles() {
+			t.Errorf("%s is stale; CUE_UPDATE=1 would remove it", dstPath)
+			return nil
+		}
+		return os.Remove(dstPath)
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, dstPath := range slices.Sorted(maps.Keys(want)) {
+		cuetxtar.UpdateInputs(t, dstPath, want[dstPath])
 	}
 }
 

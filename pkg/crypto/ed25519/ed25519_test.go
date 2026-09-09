@@ -18,16 +18,16 @@ import (
 	"bytes"
 	"crypto/ed25519"
 	"fmt"
-	"os"
 	"testing"
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/pkg/internal/builtintest"
 )
 
 func TestBuiltin(t *testing.T) {
-	if cuetest.UpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		updateGoldenFiles(t)
 	}
 
@@ -84,7 +84,5 @@ func updateGoldenFiles(t *testing.T) {
 	var buf bytes.Buffer
 	fmt.Fprintln(&buf, "-- in.cue --")
 	fmt.Fprintf(&buf, "%s", fInputs)
-	if err := os.WriteFile("testdata/gen.txtar", buf.Bytes(), 0666); err != nil {
-		t.Fatal(err)
-	}
+	cuetxtar.UpdateInputs(t, "testdata/gen.txtar", buf.Bytes())
 }

@@ -598,7 +598,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debugCheck) — fill placeholder. A :todo directive states
 		// an output the evaluator does not produce yet, so never fill it in.
-		if cuetest.UpdateGoldenFiles() && !pa.isTodo {
+		if cuetest.UpdateOrDiffGoldenFiles() && !pa.isTodo {
 			actual := r.debugPrinterOutput(val)
 			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
@@ -622,7 +622,7 @@ func (r *inlineRunner) runDebugCheckInline(t testing.TB, path cue.Path, val cue.
 	if match {
 		return
 	}
-	if cuetest.ForceUpdateGoldenFiles() || cuetest.UpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}
@@ -640,7 +640,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 	actual := r.debugPrinterOutput(val)
 	if len(pa.raw.Fields) < 2 {
 		// Empty @test(debug) — fill placeholder.
-		if cuetest.UpdateGoldenFiles() {
+		if cuetest.UpdateOrDiffGoldenFiles() {
 			r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		}
 		return
@@ -651,7 +651,7 @@ func (r *inlineRunner) runDebugOutputInline(t testing.TB, path cue.Path, val cue
 		return
 	}
 	// Always auto-update on mismatch (informational, not an assertion).
-	if cuetest.ForceUpdateGoldenFiles() || cuetest.UpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		r.enqueueInlineFill(pa, r.formatDebugAttr(name, actual, pa))
 		return
 	}

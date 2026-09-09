@@ -423,7 +423,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 			logHint(t, pa.hint)
 			return
 		}
-		if cuetest.UpdateGoldenFiles() {
+		if cuetest.UpdateOrDiffGoldenFiles() {
 			r.enqueueInlineFill(pa, r.formatErrFillAttr(val, pa, path.String(), ""))
 		}
 		return
@@ -456,7 +456,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 		}
 		// Bare @test(err, at=<path>): only at= present, no other constraints.
 		// Fill from the sub-path error when CUE_UPDATE=1.
-		if ea.isBareAt() && cuetest.UpdateGoldenFiles() && pa.srcAttr != nil {
+		if ea.isBareAt() && cuetest.UpdateOrDiffGoldenFiles() && pa.srcAttr != nil {
 			if checkIsErr(subVal) == nil {
 				r.enqueueInlineFill(pa, r.formatErrFillAttrAt(subVal, pa, ea.at))
 			}
@@ -651,7 +651,7 @@ func (r *inlineRunner) checkSubErrors(t testing.TB, path cue.Path, val cue.Value
 		if posSpecsMatch(positions, p.exp.pos, pa.baseLine, r.relFilename) {
 			continue
 		}
-		if isPlaceholder && (cuetest.UpdateGoldenFiles() || cuetest.ForceUpdateGoldenFiles()) {
+		if isPlaceholder && cuetest.UpdateOrDiffGoldenFiles() {
 			posUpdates = append(posUpdates, posUpdate{p.expIdx, positions})
 			needWriteback = true
 			continue
@@ -977,7 +977,7 @@ func (r *inlineRunner) checkErrPositions(t testing.TB, path cue.Path, val cue.Va
 	// pos=[] is a fill-in placeholder: update with CUE_UPDATE=1.
 	// pos=[non-empty] that is wrong: update only with CUE_UPDATE=force.
 	isPlaceholder := len(expected) == 0
-	if (isPlaceholder && cuetest.UpdateGoldenFiles()) || cuetest.ForceUpdateGoldenFiles() {
+	if (isPlaceholder && cuetest.UpdateOrDiffGoldenFiles()) || cuetest.ForceUpdateGoldenFiles() {
 		r.enqueuePosWrite(pa, positions)
 		return
 	}

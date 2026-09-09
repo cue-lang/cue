@@ -467,10 +467,12 @@ evaluates the field and rewrites the attribute in the source file:
 | Value            | `@test(eq, <value>)` |
 | Error            | `@test(err, code=<code>, contains="<msg>")` |
 
-`CUE_UPDATE=diff` shows a unified diff of what `CUE_UPDATE=1` *would* write,
-without modifying any files.  Documentary sections (e.g. `out/errors.txt`)
-are also validated in this mode.  `CUE_UPDATE=force` overwrites unconditionally,
-including non-empty `pos=` specs that would normally require manual review.
+`CUE_UPDATE=diff` fails with a diff wherever `CUE_UPDATE=1` *would* write,
+without modifying any files, so a passing diff run proves that every
+placeholder is filled and every documentary section (e.g. `out/errors.txt`)
+is up to date; CI runs the tests this way.  `CUE_UPDATE=force` overwrites
+unconditionally, including non-empty `pos=` specs that would normally
+require manual review.
 
 The `out/errors.txt` section needs no manual upkeep: `CUE_UPDATE=1` inserts it
 after the last input file once the archive produces errors, updates it in place

@@ -21,10 +21,10 @@ package cuetxtar
 // cleanup operations.
 
 import (
-	"os"
+	"bytes"
 	"slices"
 
-	"golang.org/x/tools/txtar"
+	"cuelang.org/go/internal/cuetest"
 )
 
 // ── inline fill write-back ─────────────────────────────────────────────────────
@@ -47,6 +47,9 @@ type inlineFillWrite struct {
 // and pos= writes.  All writes are combined and applied in a single
 // descending-offset pass per file so that no write shifts the byte positions
 // used by another write in the same pass.
+//
+// Under CUE_UPDATE=diff the archive is left alone and each file that would
+// be rewritten is reported as a failure instead.
 func (r *inlineRunner) applyInlineFillWritebacks() {
 	// Flush nestedPosFills into pendingPosWrites: each accumulated entry
 	// represents an outer @test(eq, {...}) attribute whose text was updated
@@ -92,13 +95,17 @@ func (r *inlineRunner) applyInlineFillWritebacks() {
 			data = append(data[:w.attrOffset:w.attrOffset],
 				append([]byte(w.newAttrText), data[end:]...)...)
 		}
+		if bytes.Equal(f.Data, data) {
+			continue
+		}
+		if cuetest.DiffGoldenFiles() {
+			cuetest.StaleGoldenFile(r.sinkOrT(), f.Name, f.Data, data)
+			continue
+		}
 		r.archive.Files[i].Data = data
 		changed = true
 	}
-	if changed && r.filePath != "" {
-		out := txtar.Format(r.archive)
-		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
-			r.t.Errorf("inline: fill write-back to %s: %v", r.filePath, err)
-		}
+	if changed {
+		r.writeArchive("fill")
 	}
 }

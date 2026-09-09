@@ -17,10 +17,16 @@
 package cuetest
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/internal/tdtest"
 )
@@ -62,8 +68,8 @@ var (
 // In some cases, tests might refuse to perform some updates by default.
 // The special value "force" can be used to force updates in that situation.
 //
-// The special value "diff" does not update files but shows a diff of the
-// changes that would be applied; see [DiffGoldenFiles].
+// The special value "diff" does not update files but fails the test with
+// a diff of the changes that would be applied; see [DiffGoldenFiles].
 //
 // These flags are functions rather than variables so that the environment
 // is read while a test runs; see the comment on Init in internal/cueexperiment
@@ -79,12 +85,61 @@ func ForceUpdateGoldenFiles() bool {
 	return os.Getenv(envUpdate) == "force"
 }
 
-// DiffGoldenFiles determines whether tests should display a diff of changes
-// that would be applied by CUE_UPDATE=1, without actually writing any files.
-// It is controlled by setting CUE_UPDATE=diff.
-// Documentary sections (e.g. out/errors.txt) are also checked in this mode.
+// DiffGoldenFiles determines whether tests should fail with a diff wherever
+// CUE_UPDATE=1 would write a file, without actually writing anything.
+// It is controlled by setting CUE_UPDATE=diff, and is otherwise a regular
+// test run: a diff run passes exactly when the tests pass and an update
+// run would leave every file unchanged, which is what CI relies on.
+//
+// Output that a regular run never compares, such as documentary sections
+// or unfilled placeholders, must therefore check [UpdateOrDiffGoldenFiles]
+// rather than [UpdateGoldenFiles] and report a difference in diff mode,
+// for instance via [WriteGoldenFile].
 func DiffGoldenFiles() bool {
 	return os.Getenv(envUpdate) == "diff"
+}
+
+// UpdateOrDiffGoldenFiles reports whether tests should work out what
+// CUE_UPDATE=1 would write, either to write it ([UpdateGoldenFiles]) or to
+// fail when it differs from what is stored ([DiffGoldenFiles]).
+func UpdateOrDiffGoldenFiles() bool {
+	return os.Getenv(envUpdate) != ""
+}
+
+// WriteGoldenFile writes data to path when updating golden files, creating
+// parent directories as needed and skipping the write when the file already
+// holds data so that its modification time, which the go test cache keys on,
+// is left alone. Under CUE_UPDATE=diff it writes nothing and instead fails t
+// with a diff when the file differs. Callers must be gated on
+// [UpdateOrDiffGoldenFiles].
+func WriteGoldenFile(t testing.TB, path string, data []byte) {
+	t.Helper()
+	old, err := os.ReadFile(path)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		t.Fatal(err)
+	}
+	if bytes.Equal(old, data) {
+		return
+	}
+	if DiffGoldenFiles() {
+		StaleGoldenFile(t, path, old, data)
+		return
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, data, 0o666); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// StaleGoldenFile fails t under CUE_UPDATE=diff, reporting that CUE_UPDATE=1
+// would rewrite the file or section name from old to new. It is for callers
+// which cannot use [WriteGoldenFile], such as those updating part of a file.
+func StaleGoldenFile(t testing.TB, name string, old, new []byte) {
+	t.Helper()
+	t.Errorf("%s is stale; CUE_UPDATE=1 would rewrite it: (-want +got)\n%s",
+		name, cmp.Diff(string(old), string(new)))
 }
 
 // FormatTxtar ensures that .cue files in txtar test archives are well

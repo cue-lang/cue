@@ -104,8 +104,8 @@ func runUpdateTest(t *testing.T, filePath string) {
 	// --- Plain run (no update mode) ---
 
 	capR := &cuetxtar.FailCapture{TB: t}
-	withUpdateMode(false, false, func() {
-		runner := cuetxtar.NewInlineRunnerCapture(t, nil, cloneTxtarArchive(inputArchive), t.TempDir(), capR)
+	withCUEUpdate("", func() {
+		runner := newCaptureRunner(t, cloneTxtarArchive(inputArchive), capR)
 		runner.Run()
 	})
 	runErrors := capR.Messages()
@@ -120,16 +120,16 @@ func runUpdateTest(t *testing.T, filePath string) {
 	// Pass 1: run with update mode enabled; capture assertion errors.
 	update1 := cloneTxtarArchive(inputArchive)
 	cap1 := &cuetxtar.FailCapture{TB: t}
-	withUpdateMode(true, false, func() {
-		runner := cuetxtar.NewInlineRunnerCapture(t, nil, update1, t.TempDir(), cap1)
+	withCUEUpdate("1", func() {
+		runner := newCaptureRunner(t, update1, cap1)
 		runner.Run()
 	})
 
 	// Pass 2: run again from the pass-1 result to verify idempotency.
 	update2 := cloneTxtarArchive(update1)
 	cap2 := &cuetxtar.FailCapture{TB: t}
-	withUpdateMode(true, false, func() {
-		runner := cuetxtar.NewInlineRunnerCapture(t, nil, update2, t.TempDir(), cap2)
+	withCUEUpdate("1", func() {
+		runner := newCaptureRunner(t, update2, cap2)
 		runner.Run()
 	})
 
@@ -144,6 +144,26 @@ func runUpdateTest(t *testing.T, filePath string) {
 
 	// out/update/ sections: omitted when update is identical to input.
 	updateIdentical := txtarFileDiff(inputArchive, update1) == ""
+
+	// --- Diff run (CUE_UPDATE=diff) ---
+	// A diff run writes nothing, and fails exactly when the plain run fails or
+	// the update run changes the archive, so it needs no sections of its own.
+	// Its messages may differ from the plain run's: a placeholder is reported
+	// as the rewrite it needs rather than as a mismatch.
+	diffArchive := cloneTxtarArchive(inputArchive)
+	capD := &cuetxtar.FailCapture{TB: t}
+	withCUEUpdate("diff", func() {
+		runner := newCaptureRunner(t, diffArchive, capD)
+		runner.Run()
+	})
+	if diff := txtarFileDiff(inputArchive, diffArchive); diff != "" {
+		t.Errorf("CUE_UPDATE=diff modified the archive:\n%s", diff)
+	}
+	wantFail := runErrors != "" || !updateIdentical
+	if gotFail := capD.Messages() != ""; gotFail != wantFail {
+		t.Errorf("CUE_UPDATE=diff fails: %v, want %v (plain run fails: %v, CUE_UPDATE=1 changes the archive: %v)\n%s",
+			gotFail, wantFail, runErrors != "", !updateIdentical, capD.Messages())
+	}
 	ctx.apply(section{
 		prefix:      "out/update/",
 		content:     update1,
@@ -166,8 +186,8 @@ func runUpdateTest(t *testing.T, filePath string) {
 	updateOutputPasses := updateIdentical || updateSourceIdentical
 	if !updateSourceIdentical {
 		capUR := &cuetxtar.FailCapture{TB: t}
-		withUpdateMode(false, false, func() {
-			runner := cuetxtar.NewInlineRunnerCapture(t, nil, cloneTxtarArchive(update1), t.TempDir(), capUR)
+		withCUEUpdate("", func() {
+			runner := newCaptureRunner(t, cloneTxtarArchive(update1), capUR)
 			runner.Run()
 		})
 		if errs := capUR.Messages(); errs != "" {
@@ -182,8 +202,8 @@ func runUpdateTest(t *testing.T, filePath string) {
 
 	forceArchive := cloneTxtarArchive(inputArchive)
 	capF := &cuetxtar.FailCapture{TB: t}
-	withUpdateMode(true, true, func() {
-		runner := cuetxtar.NewInlineRunnerCapture(t, nil, forceArchive, t.TempDir(), capF)
+	withCUEUpdate("force", func() {
+		runner := newCaptureRunner(t, forceArchive, capF)
 		runner.Run()
 	})
 	forceDiffers := txtarFileDiff(update1, forceArchive) != "" || cap1.Messages() != capF.Messages()
@@ -293,17 +313,15 @@ func (ctx *sectionCtx) apply(s section) {
 	}
 }
 
-// withUpdateMode temporarily sets CUE_UPDATE so that cuetest.UpdateGoldenFiles
-// and cuetest.ForceUpdateGoldenFiles report the requested values for the
-// duration of fn, then restores it. A force update implies a plain update.
-func withUpdateMode(update, force bool, fn func()) {
-	v := ""
-	switch {
-	case force:
-		v = "force"
-	case update:
-		v = "1"
-	}
+// newCaptureRunner returns an inline runner over archive which captures
+// assertion failures into cap and maintains the documentary sections, as
+// the runner over the archives on disk does.
+func newCaptureRunner(t *testing.T, archive *txtar.Archive, cap *cuetxtar.FailCapture) *cuetxtar.InlineRunner {
+	return cuetxtar.NewInlineRunnerCapture(t, nil, archive, t.TempDir(), cap).RecordErrors()
+}
+
+// withCUEUpdate sets CUE_UPDATE to v for the duration of fn, then restores it.
+func withCUEUpdate(v string, fn func()) {
 	orig, had := os.LookupEnv("CUE_UPDATE")
 	os.Setenv("CUE_UPDATE", v)
 	defer func() {

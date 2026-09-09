@@ -498,12 +498,13 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// raw text sections).
 			if x.Inline && isInlineMode(a) {
 				runner := &inlineRunner{
-					t:           t,
-					m:           m,
-					archive:     a,
-					dir:         filepath.Dir(filepath.Join(dir, fullpath)),
-					filePath:    filepath.Join(dir, fullpath),
-					recordStats: x.RecordStats,
+					t:            t,
+					m:            m,
+					archive:      a,
+					dir:          filepath.Dir(filepath.Join(dir, fullpath)),
+					filePath:     filepath.Join(dir, fullpath),
+					recordErrors: true,
+					recordStats:  x.RecordStats,
 				}
 				runner.runArchive()
 				return
@@ -678,9 +679,9 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					continue
 				}
 
-				// Skip the test if just the diff differs.
+				// Skip the test if just the diff differs, unless CUE_UPDATE=diff.
 				// TODO: also fail once diffs are fully in use.
-				if sub.diff {
+				if sub.diff && !cuetest.DiffGoldenFiles() {
 					continue
 				}
 

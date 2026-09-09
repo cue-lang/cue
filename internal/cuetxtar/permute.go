@@ -104,7 +104,8 @@ func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, record
 
 // checkPermuteCount verifies or auto-updates the count= option inside a
 // @test(permute, count=N) directive after all permutations for a group have
-// run. When CUE_UPDATE=1, the count is filled or replaced with the actual value.
+// run. Under CUE_UPDATE modes the count is filled or replaced with the actual
+// value.
 func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, pa parsedTestAttr, actualCount int) {
 	t.Helper()
 	// Find the count= option.
@@ -119,14 +120,14 @@ func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, pa parsedT
 	}
 	if !hasCount {
 		// No count= option yet — add it when updating.
-		if cuetest.UpdateGoldenFiles() {
+		if cuetest.UpdateOrDiffGoldenFiles() {
 			r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		}
 		return
 	}
 	if countVal == "" {
 		// Empty count= placeholder — fill with actual count.
-		if cuetest.UpdateGoldenFiles() {
+		if cuetest.UpdateOrDiffGoldenFiles() {
 			r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		}
 		return
@@ -139,7 +140,7 @@ func (r *inlineRunner) checkPermuteCount(t testing.TB, path cue.Path, pa parsedT
 	if expected == actualCount {
 		return // matches
 	}
-	if cuetest.UpdateGoldenFiles() || cuetest.ForceUpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		r.enqueueInlineFill(pa, buildPermuteAttr(pa, actualCount))
 		return
 	}

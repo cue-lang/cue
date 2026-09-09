@@ -44,7 +44,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -106,11 +105,12 @@ func runInlineTestsForMatrix(t *testing.T, m *cuetdtest.M, dir string) {
 
 		t.Run(testName, func(t *testing.T) {
 			runner := &inlineRunner{
-				t:        t,
-				m:        m,
-				archive:  archive,
-				dir:      filepath.Dir(fullpath),
-				filePath: fullpath,
+				t:            t,
+				m:            m,
+				archive:      archive,
+				dir:          filepath.Dir(fullpath),
+				filePath:     fullpath,
+				recordErrors: true,
 			}
 			runner.runArchive()
 		})
@@ -139,6 +139,14 @@ func NewInlineRunner(t *testing.T, m *cuetdtest.M, archive *txtar.Archive, dir s
 // (compile errors, write-back failures) still propagate through t.
 func NewInlineRunnerCapture(t *testing.T, m *cuetdtest.M, archive *txtar.Archive, dir string, cap *FailCapture) *InlineRunner {
 	return &InlineRunner{r: &inlineRunner{t: t, m: m, archive: archive, dir: dir, errSink: cap}}
+}
+
+// RecordErrors enables the out/errors.txt documentary section, which
+// [RunInlineTests] maintains for the archives it walks and which a runner over an
+// archive owned by some other test has no home for. It returns ir.
+func (ir *InlineRunner) RecordErrors() *InlineRunner {
+	ir.r.recordErrors = true
+	return ir
 }
 
 // Run executes all inline test cases in the archive.
@@ -179,6 +187,9 @@ type inlineRunner struct {
 	// intentionally evaluate non-source-order variants, such as @test(permute)
 	// validation runs.
 	suppressWritebacks bool
+
+	// recordErrors, if true, maintains the out/errors.txt documentary section.
+	recordErrors bool
 
 	// recordStats, if true, enables generation and tracking of evaluation stats.
 	recordStats bool
@@ -427,9 +438,10 @@ func (r *inlineRunner) runArchive() {
 	// AST-based write-backs re-parse the updated bytes.
 	r.applyInlineFillWritebacks()
 
-	// Update the optional out/errors.txt documentary section.
-	r.handleErrorsTxtSection(val)
-
+	if r.recordErrors {
+		// Update the optional out/errors.txt documentary section.
+		r.handleErrorsTxtSection(val)
+	}
 	if r.recordStats {
 		// Update the optional out/eval/stats documentary section.
 		r.handleStatsSection(evalStats)
@@ -495,38 +507,37 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	}
 
 	// Section needs to be added, removed, or updated.
-	if cuetest.DiffGoldenFiles() {
-		r.t.Errorf("result for %s differs: (-want +got)\n%s",
-			sectionName, cmp.Diff(string(existing), result))
+	if !cuetest.UpdateOrDiffGoldenFiles() {
 		return
 	}
-	if !cuetest.UpdateGoldenFiles() {
-		return // silently skip
+	if cuetest.DiffGoldenFiles() {
+		cuetest.StaleGoldenFile(r.sinkOrT(), sectionName, existing, resultBytes)
+		return
 	}
-
-	changed := false
 	switch {
 	case sectionIdx >= 0 && len(resultBytes) == 0:
 		// Section exists but should be absent — remove it.
 		r.archive.Files = slices.Delete(r.archive.Files, sectionIdx, sectionIdx+1)
-		changed = true
 	case sectionIdx >= 0:
 		// Section exists with wrong content — update in place.
 		r.archive.Files[sectionIdx].Data = resultBytes
-		changed = true
 	default:
 		// Section absent but should exist — insert after last input file.
 		insertIdx := r.errorsInsertIdx()
 		r.archive.Files = slices.Insert(r.archive.Files, insertIdx,
 			txtar.File{Name: sectionName, Data: resultBytes})
-		changed = true
 	}
+	r.writeArchive(sectionName)
+}
 
-	if changed && r.filePath != "" {
-		out := txtar.Format(r.archive)
-		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
-			r.t.Errorf("inline: errors.txt write-back to %s: %v", r.filePath, err)
-		}
+// writeArchive writes the archive back to its file, if it has one, after
+// what was updated in it.
+func (r *inlineRunner) writeArchive(what string) {
+	if r.filePath == "" {
+		return
+	}
+	if err := os.WriteFile(r.filePath, txtar.Format(r.archive), 0o644); err != nil {
+		r.t.Errorf("inline: %s write-back to %s: %v", what, r.filePath, err)
 	}
 }
 
@@ -538,68 +549,42 @@ func (r *inlineRunner) handleStatsSection(counts stats.Counts) {
 	result := fmt.Sprintf("%v\n", counts)
 	resultBytes := []byte(result)
 
-	// Find the section in the archive. Treat out/evalalpha/stats as the same section.
-	sectionIdx := -1
-	changed := false
-	for i, f := range r.archive.Files {
-		if f.Name == sectionName || f.Name == "out/evalalpha/stats" {
-			sectionIdx = i
-			if f.Name != sectionName {
-				r.archive.Files[i].Name = sectionName
-				changed = true
-			}
-			break
-		}
-	}
-
+	sectionIdx := slices.IndexFunc(r.archive.Files, func(f txtar.File) bool {
+		return f.Name == sectionName
+	})
 	var existing []byte
 	if sectionIdx >= 0 {
 		existing = r.archive.Files[sectionIdx].Data
 	}
-
-	// No change needed only when section exists with matching content.
 	if sectionIdx >= 0 && bytes.Equal(existing, resultBytes) {
-		// fall through to write if renamed
-	} else if cuetest.DiffGoldenFiles() {
-		r.t.Errorf("result for %s differs: (-want +got)\n%s",
-			sectionName, cmp.Diff(string(existing), result))
-	} else if cuetest.UpdateGoldenFiles() {
-		updateContent := false
-		if sectionIdx >= 0 {
-			c := r.cueContext()
-			v := c.CompileBytes(existing)
-			var orig stats.Counts
-			v.Decode(&orig)
-
-			switch {
-			case cuetest.ForceUpdateGoldenFiles():
-				updateContent = true
-			case SignificantStatsChange(orig, counts):
-				// For now, we mainly care about disjuncts, but other thresholds apply.
-				// TODO: add triggers once the disjunction issues have been solved.
-				updateContent = true
-			}
-		} else {
-			updateContent = true
-		}
-
-		if updateContent {
-			if sectionIdx >= 0 {
-				r.archive.Files[sectionIdx].Data = resultBytes
-			} else {
-				// Section absent but should exist — append it to the archive.
-				r.archive.Files = append(r.archive.Files, txtar.File{Name: sectionName, Data: resultBytes})
-			}
-			changed = true
-		}
+		return
+	}
+	if !cuetest.UpdateOrDiffGoldenFiles() {
+		return
 	}
 
-	if changed && r.filePath != "" {
-		out := txtar.Format(r.archive)
-		if err := os.WriteFile(r.filePath, out, 0o644); err != nil {
-			r.t.Errorf("inline: %s write-back to %s: %v", sectionName, r.filePath, err)
+	// An existing section is only rewritten on a significant change, so that
+	// minor fluctuations do not churn the archives. For now, we mainly care
+	// about disjuncts, but other thresholds apply.
+	// TODO: add triggers once the disjunction issues have been solved.
+	if sectionIdx >= 0 && !cuetest.ForceUpdateGoldenFiles() {
+		var orig stats.Counts
+		r.cueContext().CompileBytes(existing).Decode(&orig)
+		if !SignificantStatsChange(orig, counts) {
+			return
 		}
 	}
+	if cuetest.DiffGoldenFiles() {
+		cuetest.StaleGoldenFile(r.sinkOrT(), sectionName, existing, resultBytes)
+		return
+	}
+	if sectionIdx >= 0 {
+		r.archive.Files[sectionIdx].Data = resultBytes
+	} else {
+		// Section absent but should exist — append it to the archive.
+		r.archive.Files = append(r.archive.Files, txtar.File{Name: sectionName, Data: resultBytes})
+	}
+	r.writeArchive(sectionName)
 }
 
 // errorsInsertIdx returns the index at which to insert out/errors.txt:
@@ -947,8 +932,8 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 // runEqInline checks that val equals the CUE expression in the first arg of pa.
 // When CUE_UPDATE modes are active it enqueues the appropriate write-back
 // instead of (or in addition to) running the comparison:
-//   - empty placeholder @test(eq): fill with actual value (UpdateGoldenFiles)
-//   - passing assertion with stale skip: remove the skip (UpdateGoldenFiles)
+//   - empty placeholder @test(eq): fill with actual value (UpdateOrDiffGoldenFiles)
+//   - passing assertion with stale skip: remove the skip (UpdateOrDiffGoldenFiles)
 //   - failing assertion: overwrite with actual value (ForceUpdateGoldenFiles)
 func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
@@ -1000,7 +985,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 		cmpErr := (&cmpCtx{baseLine: pa.baseLine}).astCmp(cue.Path{}, expr, val)
 		if cmpErr == nil {
 			t.Logf("WARNING: path %s: TODO eq:todo now passes — consider upgrading to @test(eq, %s)", path, exprStr)
-			if cuetest.UpdateGoldenFiles() || cuetest.ForceUpdateGoldenFiles() {
+			if cuetest.UpdateOrDiffGoldenFiles() {
 				r.enqueueInlineFill(pa, promoteTodoAttr(pa))
 			}
 		} else {
@@ -1010,7 +995,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	}
 	if exprStr == "" {
 		// Empty @test(eq) or @test(eq, at=N) — fill placeholder.
-		if cuetest.UpdateGoldenFiles() {
+		if cuetest.UpdateOrDiffGoldenFiles() {
 			r.enqueueInlineFill(pa, r.eqFillAttr(val, atStr, pa))
 		}
 		return
@@ -1039,7 +1024,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 	cmpErr := ctx.astCmp(cue.Path{}, expr, val)
 	if cmpErr == nil {
 		// Assertion passes via AST comparison.
-		if hasSkip && cuetest.UpdateGoldenFiles() {
+		if hasSkip && cuetest.UpdateOrDiffGoldenFiles() {
 			// Stale-skip cleanup: the assertion now passes; strip the skip,
 			// restoring @test(eq, <expr>[, at=<sel>]).
 			r.enqueueInlineFill(pa, r.eqFillAttrStr(exprStr, atStr, pa))

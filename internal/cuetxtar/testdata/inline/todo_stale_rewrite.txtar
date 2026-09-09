@@ -1,0 +1,11 @@
+# A bare @test(todo) captures its sibling directives' failures, but CUE_UPDATE=1
+# still rewrites a stale debugCheck. CUE_UPDATE=diff must report that pending
+# rewrite through the writeback sink, outside the todo capture, rather than
+# let the todo swallow the mismatch and pass.
+-- in/test.cue --
+staleDebug: 42 @test(debugCheck, "stale") @test(todo)
+-- out/update/test.cue --
+staleDebug: 42 @test(debugCheck, "(int){ 42 }") @test(todo)
+-- out/status.txt --
+update: output passes run
+force:  identical to update

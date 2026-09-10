@@ -55,6 +55,13 @@ func Version(v string) Option {
 	return func(c *config) { c.languageVersion = v }
 }
 
+// PreV2 selects the formatter used before formatv2 became the default in
+// CUE v0.18.0. It is intended for callers that must reproduce text persisted
+// by an earlier CUE release. Options implemented only by formatv2 are ignored.
+func PreV2() Option {
+	return func(c *config) { c.forcePreV2 = true }
+}
+
 // Indent specifies the string emitted for one level of indentation.
 // The empty string disables indentation entirely; common choices are
 // "\t" for tabs and a fixed run of spaces for space-based indentation.
@@ -264,7 +271,8 @@ type config struct {
 	// forceV2 records that an option only the v2 formatter implements
 	// was used, which selects that formatter for this call even when
 	// the formatv2 experiment is explicitly disabled.
-	forceV2 bool
+	forceV2    bool
+	forcePreV2 bool
 }
 
 // style builds the [ASTStyle] that drives the v2 pre-pass.
@@ -283,7 +291,7 @@ func (cfg *config) style() ASTStyle {
 
 // formatV2 reports whether this call uses the v2 formatter.
 func (cfg *config) formatV2() bool {
-	return cueexperiment.Flags.FormatV2 || cfg.forceV2
+	return !cfg.forcePreV2 && (cueexperiment.Flags.FormatV2 || cfg.forceV2)
 }
 
 func newConfig(opt []Option) *config {

@@ -23,7 +23,9 @@ import (
 
 	"github.com/go-quicktest/qt"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -563,6 +565,53 @@ func TestFormatV2Smoke(t *testing.T) {
 	got, err = format.Source([]byte(src))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Check(t, qt.Equals(string(got), wantV1))
+}
+
+func TestPreV2(t *testing.T) {
+	const src = "a: 1\nbbbb: [1, 2, 3]\n"
+	const wantDefault = "a:    1\nbbbb: [1, 2, 3]\n"
+	const want = "a: 1\nbbbb: [1, 2, 3]\n"
+
+	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
+	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
+	cueexperiment.Flags.FormatV2 = true
+	got, err := format.Source([]byte(src))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Check(t, qt.Equals(string(got), wantDefault))
+
+	t.Run("Source", func(t *testing.T) {
+		got, err := format.Source([]byte(src), format.PreV2())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Check(t, qt.Equals(string(got), want))
+	})
+	t.Run("Node", func(t *testing.T) {
+		f, err := parser.ParseFile("", src)
+		qt.Assert(t, qt.IsNil(err))
+		got, err := format.Node(f, format.PreV2())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Check(t, qt.Equals(string(got), want))
+	})
+	t.Run("Simplify", func(t *testing.T) {
+		v := cuecontext.New().CompileString("tags: env: {required: true}")
+		qt.Assert(t, qt.IsNil(v.Err()))
+		node := v.LookupPath(cue.ParsePath("tags.env")).Syntax(cue.Optional(true))
+		defaultText, err := format.Node(node, format.Simplify())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Check(t, qt.Equals(string(defaultText), "{required: true}"))
+		got, err := format.Node(node, format.Simplify(), format.PreV2())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Check(t, qt.Equals(string(got), "{\n\trequired: true\n}"))
+	})
+	t.Run("V2OptionsIgnored", func(t *testing.T) {
+		for _, opts := range [][]format.Option{
+			{format.PreV2(), format.LineWidth(1)},
+			{format.LineWidth(1), format.PreV2()},
+		} {
+			got, err := format.Source([]byte(src), opts...)
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(got), want))
+		}
+	})
 }
 
 // TestV2Options exercises the options that only the formatv2 formatter

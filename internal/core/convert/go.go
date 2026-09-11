@@ -290,6 +290,12 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 		return x
 
+	case adtNum:
+		// A number computed by a builtin, which carries its own kind; see
+		// [adt.NumAdd].
+		v, _ := reflect.TypeAssert[*adt.Num](val)
+		return v
+
 	case bigInt:
 		v, _ := reflect.TypeAssert[*big.Int](val)
 		return &adt.Num{
@@ -628,6 +634,7 @@ var (
 	bigRat        = reflect.TypeFor[*big.Rat]()
 	bigFloat      = reflect.TypeFor[*big.Float]()
 	apdDecimal    = reflect.TypeFor[*apd.Decimal]()
+	adtNum        = reflect.TypeFor[*adt.Num]()
 	topSentinel   = ast.NewIdent("_")
 )
 

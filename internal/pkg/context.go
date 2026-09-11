@@ -161,18 +161,27 @@ func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
 }
 
 func (c *CallCtxt) Decimal(i int) *apd.Decimal {
+	if num := c.Num(i); num != nil {
+		return &num.X
+	}
+	return nil
+}
+
+// Num returns argument i as a number along with its kind, which tells an
+// integer apart from a float that happens to be integral.
+func (c *CallCtxt) Num(i int) *adt.Num {
 	arg := c.BuiltinCallContext.Value(i)
 	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
-		return &num.X
+		return num
 	}
 	x := value.Make(c.ctx, arg)
 	res, err := x.Decimal()
 	if err != nil {
-		c.invalidArgType(arg, i, "Decimal", err)
+		c.invalidArgType(arg, i, "number", err)
 		return nil
 	}
-	return res
+	return &adt.Num{X: *res, K: x.Kind() & adt.NumberKind}
 }
 
 func (c *CallCtxt) Float64(i int) float64 {
@@ -354,6 +363,20 @@ func (c *CallCtxt) getList(i int) *adt.Vertex {
 }
 
 func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
+	nums := c.NumList(i)
+	if nums == nil {
+		return nil
+	}
+	a = make([]*apd.Decimal, len(nums))
+	for i, n := range nums {
+		a[i] = &n.X
+	}
+	return a
+}
+
+// NumList returns argument i as a list of numbers along with their kinds; see
+// [CallCtxt.Num].
+func (c *CallCtxt) NumList(i int) (a []*adt.Num) {
 	v := c.getList(i)
 	if v == nil {
 		return nil
@@ -364,7 +387,7 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 		w.Finalize(c.ctx) // defensive
 		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.Num:
-			a = append(a, &x.X)
+			a = append(a, x)
 
 		case *adt.Bottom:
 			if x.IsIncomplete() {

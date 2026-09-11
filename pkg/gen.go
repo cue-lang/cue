@@ -674,6 +674,8 @@ func (g *goEmitter) callCtxtGetter(typ types.Type) string {
 			return "StringList"
 		case "*cuelang.org/go/internal.Decimal":
 			return "DecimalList"
+		case "*cuelang.org/go/internal/core/adt.Num":
+			return "NumList"
 		}
 		return "List"
 	}
@@ -684,6 +686,8 @@ func (g *goEmitter) callCtxtGetter(typ types.Type) string {
 		return "BigFloat"
 	case "*cuelang.org/go/internal.Decimal":
 		return "Decimal"
+	case "*cuelang.org/go/internal/core/adt.Num":
+		return "Num"
 	case "cuelang.org/go/internal/pkg.List":
 		return "CueList"
 	case "cuelang.org/go/internal/pkg.Struct":
@@ -749,7 +753,8 @@ func (g *goEmitter) adtKind(typ types.Type) string {
 		return "adt.ListKind"
 	case "*math/big.Int":
 		return "adt.IntKind"
-	case "*cuelang.org/go/internal.Decimal", "*math/big.Float":
+	case "*cuelang.org/go/internal.Decimal", "*math/big.Float",
+		"*cuelang.org/go/internal/core/adt.Num":
 		return "adt.NumberKind"
 	case "cuelang.org/go/cue.Value", "cuelang.org/go/cue/ast.Expr", "cuelang.org/go/internal/pkg.Schema":
 		return "adt.TopKind" // TODO: can be more precise
@@ -910,7 +915,8 @@ func cueType(typ types.Type) string {
 		return "[...]"
 	case "*math/big.Int":
 		return "int"
-	case "*cuelang.org/go/internal.Decimal", "*math/big.Float":
+	case "*cuelang.org/go/internal.Decimal", "*math/big.Float",
+		"*cuelang.org/go/internal/core/adt.Num":
 		return "number"
 	case "cuelang.org/go/cue.Value",
 		"cuelang.org/go/cue/ast.Expr",

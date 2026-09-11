@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+	"github.com/go-quicktest/qt"
 	mdast "github.com/yuin/goldmark/v2/ast"
 	mdparser "github.com/yuin/goldmark/v2/parser"
 )
@@ -47,6 +48,51 @@ func TestSpecCheck(t *testing.T) {
 		}
 	} else {
 		t.Error("spec.md needs updating; run with CUE_UPDATE=1")
+	}
+}
+
+// TestSpecEdits checks that the error comment following a code block
+// is updated to record the error of the block, if any.
+func TestSpecEdits(t *testing.T) {
+	const (
+		parseBlock = "```cue !\nx: (\n```\n"
+		parseError = "<!-- error:\nexpected operand, found 'EOF':\n    1:6\n-->\n"
+	)
+	tests := []struct {
+		name   string
+		source string
+		want   string
+	}{{
+		name:   "up to date",
+		source: parseBlock + parseError,
+		want:   parseBlock + parseError,
+	}, {
+		name:   "missing",
+		source: parseBlock,
+		want:   parseBlock + parseError,
+	}, {
+		name:   "longer",
+		source: parseBlock + strings.Replace(parseError, "1:6", "1:6000", 1),
+		want:   parseBlock + parseError,
+	}, {
+		name:   "same length",
+		source: parseBlock + strings.Replace(parseError, "1:6", "1:9", 1),
+		// TODO: the edits are applied on top of the source itself, so an update
+		// which keeps the length of the source goes unnoticed.
+		want: parseBlock + strings.Replace(parseError, "1:6", "1:9", 1),
+	}}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			source := []byte(test.source)
+			doc := mdparser.New().Parse(source)
+			updated := walkNode(t, doc, source)
+			// Like TestSpecCheck, only a difference from the source is an update.
+			got := test.source
+			if !bytes.Equal(source, updated) {
+				got = string(updated)
+			}
+			qt.Assert(t, qt.Equals(got, test.want))
+		})
 	}
 }
 

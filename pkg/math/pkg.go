@@ -146,9 +146,9 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			x := c.Decimal(0)
+			x := c.Num(0)
 			if c.Do() {
-				c.Ret, c.Err = Abs(x)
+				c.Ret = Abs(x)
 			}
 		},
 	}, {
@@ -289,7 +289,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			x, y := c.Decimal(0), c.Decimal(1)
+			x, y := c.Num(0), c.Num(1)
 			if c.Do() {
 				c.Ret = Copysign(x, y)
 			}
@@ -302,7 +302,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			x, y := c.Decimal(0), c.Decimal(1)
+			x, y := c.Num(0), c.Num(1)
 			if c.Do() {
 				c.Ret, c.Err = Dim(x, y)
 			}

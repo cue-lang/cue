@@ -46,13 +46,11 @@ t49: math.Ceil(3.400)
 t50: math.Floor(-3.400)
 t51: math.Ceil(-3.400)
 // Integers wider than the 34 digits of the decimal context must not be
-// rounded by operations which are exact over the integers. TODO: t52 and t53
-// are broken here: they must be the 41-digit integers their arguments imply.
+// rounded by operations which are exact over the integers.
 t52: math.Abs(-12345678901234567890123456789012345678901)
 t53: math.Dim(12345678901234567890123456789012345678901, 1)
 t54: math.Dim(1, 12345678901234567890123456789012345678901)
-// A float which happens to be integral keeps its kind. TODO: t55, t56 and t57
-// are broken here: they must be 2.0, -2.0 and 0.0, and t33 above must be 0.0.
+// A float which happens to be integral keeps its kind.
 t55: math.Abs(-2.0)
 t56: math.Copysign(2.0, -1)
 t57: math.Copysign(-0.0, 1.0)
@@ -87,7 +85,7 @@ t29: 1.386294361119890618834464242916353
 t30: 0.6020599913279623904274777894489861
 t31: 2.321928094887362347870319429489391
 t32: 0.5
-t33: 0
+t33: 0.0
 // Rounding a value which needs more than the 34 digits of the decimal
 // context must not lose it.
 t34: 10000000000000000000000000000000000000000
@@ -112,15 +110,13 @@ t49: 4
 t50: -4
 t51: -3
 // Integers wider than the 34 digits of the decimal context must not be
-// rounded by operations which are exact over the integers. TODO: t52 and t53
-// are broken here: they must be the 41-digit integers their arguments imply.
-t52: 12345678901234567890123456789012350000000
-t53: 12345678901234567890123456789012350000000
+// rounded by operations which are exact over the integers.
+t52: 12345678901234567890123456789012345678901
+t53: 12345678901234567890123456789012345678900
 t54: 0
-// A float which happens to be integral keeps its kind. TODO: t55, t56 and t57
-// are broken here: they must be 2.0, -2.0 and 0.0, and t33 above must be 0.0.
-t55: 2
-t56: -2
-t57: 0
+// A float which happens to be integral keeps its kind.
+t55: 2.0
+t56: -2.0
+t57: 0.0
 // Copysign moves the sign only, so it must not round a wide integer either.
 t58: 12345678901234567890123456789012345678901

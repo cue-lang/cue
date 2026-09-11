@@ -22,6 +22,7 @@ import (
 	"github.com/cockroachdb/apd/v3"
 	"github.com/go-quicktest/qt"
 
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/pkg/internal/builtintest"
 	"cuelang.org/go/pkg/list"
 )
@@ -30,15 +31,21 @@ func TestBuiltin(t *testing.T) {
 	builtintest.Run("list", t)
 }
 
+func num(t *testing.T, s string, k adt.Kind) *adt.Num {
+	d, _, err := apd.NewFromString(s)
+	qt.Assert(t, qt.IsNil(err))
+	return &adt.Num{X: *d, K: k}
+}
+
 // TestRangeWide starts a range at an integer wider than the 34 digits of the
 // decimal context. Rounding the step away would leave the range stuck at its
 // start forever.
 func TestRangeWide(t *testing.T) {
-	start, _, _ := apd.NewFromString("10000000000000000000000000000000000000000")
-	limit, _, _ := apd.NewFromString("10000000000000000000000000000000000000002")
-	step := apd.New(1, 0)
+	start := num(t, "10000000000000000000000000000000000000000", adt.IntKind)
+	limit := num(t, "10000000000000000000000000000000000000002", adt.IntKind)
+	step := num(t, "1", adt.IntKind)
 
-	var got []*apd.Decimal
+	var got []*adt.Num
 	var err error
 	done := make(chan struct{})
 	go func() {
@@ -47,23 +54,24 @@ func TestRangeWide(t *testing.T) {
 	}()
 	select {
 	case <-done:
-		t.Fatal("Range returned")
 	case <-time.After(2 * time.Second):
-		// TODO: Range rounds the step away and never advances past start.
-		return
+		t.Fatal("Range did not return")
 	}
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.Equals(fmt.Sprint(got), "[10000000000000000000000000000000000000000 10000000000000000000000000000000000000001]"))
+	var strs []string
+	for _, n := range got {
+		strs = append(strs, n.X.String())
+	}
+	qt.Assert(t, qt.Equals(fmt.Sprint(strs), "[10000000000000000000000000000000000000000 10000000000000000000000000000000000000001]"))
 }
 
-// TestRangeRoundedStep starts a range at 1e40 with a step of 1, which rounds
-// away beside it in the 34 digits of the decimal context. Spelled this way the
-// start is a float, so it keeps rounding once integer arithmetic turns exact,
-// and Range must report that it cannot advance.
+// TestRangeRoundedStep steps a float range by a step which rounds away beside
+// its start, as adding 1 to 1e40 does in the 34 digits of the decimal context.
+// The range cannot advance, which Range must report.
 func TestRangeRoundedStep(t *testing.T) {
-	start, _, _ := apd.NewFromString("1e40")
-	limit, _, _ := apd.NewFromString("2e40")
-	step := apd.New(1, 0)
+	start := num(t, "1e40", adt.FloatKind)
+	limit := num(t, "2e40", adt.FloatKind)
+	step := num(t, "1", adt.IntKind)
 
 	var err error
 	done := make(chan struct{})
@@ -73,10 +81,8 @@ func TestRangeRoundedStep(t *testing.T) {
 	}()
 	select {
 	case <-done:
-		t.Fatal("Range returned")
 	case <-time.After(2 * time.Second):
-		// TODO: Range rounds the step away and never advances past start.
-		return
+		t.Fatal("Range did not return")
 	}
 	qt.Assert(t, qt.ErrorMatches(err, `step 1 is too small to advance from 1E\+40`))
 }

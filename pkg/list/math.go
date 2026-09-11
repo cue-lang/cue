@@ -19,41 +19,31 @@ import (
 
 	"github.com/cockroachdb/apd/v3"
 
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 )
 
 // Avg returns the average value of a non empty list xs.
-func Avg(xs []*internal.Decimal) (*internal.Decimal, error) {
+func Avg(xs []*adt.Num) (*adt.Num, error) {
 	if len(xs) == 0 {
 		return nil, fmt.Errorf("empty list")
 	}
-
-	s := apd.New(0, 0)
-	for _, x := range xs {
-		_, err := internal.BaseContext.Add(s, x, s)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var d apd.Decimal
-	l := apd.New(int64(len(xs)), 0)
-	_, err := internal.BaseContext.Quo(&d, s, l)
+	s, err := Sum(xs)
 	if err != nil {
 		return nil, err
 	}
-	return &d, nil
+	l := &adt.Num{X: *apd.New(int64(len(xs)), 0), K: adt.IntKind}
+	return adt.NumQuo(s, l)
 }
 
 // Max returns the maximum value of a non empty list xs.
-func Max(xs []*internal.Decimal) (*internal.Decimal, error) {
+func Max(xs []*adt.Num) (*adt.Num, error) {
 	if len(xs) == 0 {
 		return nil, fmt.Errorf("empty list")
 	}
 
 	max := xs[0]
 	for _, x := range xs[1:] {
-		if max.Cmp(x) == -1 {
+		if max.X.Cmp(&x.X) == -1 {
 			max = x
 		}
 	}
@@ -61,14 +51,14 @@ func Max(xs []*internal.Decimal) (*internal.Decimal, error) {
 }
 
 // Min returns the minimum value of a non empty list xs.
-func Min(xs []*internal.Decimal) (*internal.Decimal, error) {
+func Min(xs []*adt.Num) (*adt.Num, error) {
 	if len(xs) == 0 {
 		return nil, fmt.Errorf("empty list")
 	}
 
 	min := xs[0]
 	for _, x := range xs[1:] {
-		if min.Cmp(x) == +1 {
+		if min.X.Cmp(&x.X) == +1 {
 			min = x
 		}
 	}
@@ -76,11 +66,11 @@ func Min(xs []*internal.Decimal) (*internal.Decimal, error) {
 }
 
 // Product returns the product of a non empty list xs.
-func Product(xs []*internal.Decimal) (*internal.Decimal, error) {
-	d := apd.New(1, 0)
+func Product(xs []*adt.Num) (*adt.Num, error) {
+	d := &adt.Num{X: *apd.New(1, 0), K: adt.IntKind}
 	for _, x := range xs {
-		_, err := internal.BaseContext.Mul(d, x, d)
-		if err != nil {
+		var err error
+		if d, err = adt.NumMul(d, x); err != nil {
 			return nil, err
 		}
 	}
@@ -97,47 +87,51 @@ func Product(xs []*internal.Decimal) (*internal.Decimal, error) {
 // results in
 //
 //	[0, 2, 4]
-func Range(start, limit, step *internal.Decimal) ([]*internal.Decimal, error) {
-	if step.IsZero() {
+func Range(start, limit, step *adt.Num) ([]*adt.Num, error) {
+	if step.X.IsZero() {
 		return nil, fmt.Errorf("step must be non zero")
 	}
 
-	if !step.Negative && start.Cmp(limit) == +1 {
+	if !step.X.Negative && start.X.Cmp(&limit.X) == +1 {
 		return nil, fmt.Errorf("end must be greater than start when step is positive")
 	}
 
-	if step.Negative && start.Cmp(limit) == -1 {
+	if step.X.Negative && start.X.Cmp(&limit.X) == -1 {
 		return nil, fmt.Errorf("end must be less than start when step is negative")
 	}
 
-	var vals []*internal.Decimal
+	var vals []*adt.Num
 	num := start
 	for {
-		if !step.Negative && num.Cmp(limit) != -1 {
+		if !step.X.Negative && num.X.Cmp(&limit.X) != -1 {
 			break
 		}
 
-		if step.Negative && num.Cmp(limit) != +1 {
+		if step.X.Negative && num.X.Cmp(&limit.X) != +1 {
 			break
 		}
 
 		vals = append(vals, num)
-		d := apd.New(0, 0)
-		_, err := internal.BaseContext.Add(d, step, num)
+		next, err := adt.NumAdd(num, step)
 		if err != nil {
 			return nil, err
 		}
-		num = d
+		// A step which rounds away beside the value it is added to leaves the
+		// range where it started, so stop rather than never advance.
+		if next.X.Cmp(&num.X) == 0 {
+			return nil, fmt.Errorf("step %v is too small to advance from %v", &step.X, &num.X)
+		}
+		num = next
 	}
 	return vals, nil
 }
 
 // Sum returns the sum of a list non empty xs.
-func Sum(xs []*internal.Decimal) (*internal.Decimal, error) {
-	d := apd.New(0, 0)
+func Sum(xs []*adt.Num) (*adt.Num, error) {
+	d := &adt.Num{K: adt.IntKind}
 	for _, x := range xs {
-		_, err := internal.BaseContext.Add(d, x, d)
-		if err != nil {
+		var err error
+		if d, err = adt.NumAdd(d, x); err != nil {
 			return nil, err
 		}
 	}

@@ -177,7 +177,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			xs := c.DecimalList(0)
+			xs := c.NumList(0)
 			if c.Do() {
 				c.Ret, c.Err = Avg(xs)
 			}
@@ -189,7 +189,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			xs := c.DecimalList(0)
+			xs := c.NumList(0)
 			if c.Do() {
 				c.Ret, c.Err = Max(xs)
 			}
@@ -201,7 +201,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			xs := c.DecimalList(0)
+			xs := c.NumList(0)
 			if c.Do() {
 				c.Ret, c.Err = Min(xs)
 			}
@@ -213,7 +213,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			xs := c.DecimalList(0)
+			xs := c.NumList(0)
 			if c.Do() {
 				c.Ret, c.Err = Product(xs)
 			}
@@ -227,7 +227,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.ListKind,
 		Func: func(c *pkg.CallCtxt) {
-			start, limit, step := c.Decimal(0), c.Decimal(1), c.Decimal(2)
+			start, limit, step := c.Num(0), c.Num(1), c.Num(2)
 			if c.Do() {
 				c.Ret, c.Err = Range(start, limit, step)
 			}
@@ -239,7 +239,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
-			xs := c.DecimalList(0)
+			xs := c.NumList(0)
 			if c.Do() {
 				c.Ret, c.Err = Sum(xs)
 			}

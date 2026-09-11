@@ -672,8 +672,6 @@ func (g *goEmitter) callCtxtGetter(typ types.Type) string {
 			return "Bytes"
 		case "string":
 			return "StringList"
-		case "*cuelang.org/go/internal.Decimal":
-			return "DecimalList"
 		case "*cuelang.org/go/internal/core/adt.Num":
 			return "NumList"
 		}

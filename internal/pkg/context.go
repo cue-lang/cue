@@ -362,18 +362,6 @@ func (c *CallCtxt) getList(i int) *adt.Vertex {
 	return nil
 }
 
-func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
-	nums := c.NumList(i)
-	if nums == nil {
-		return nil
-	}
-	a = make([]*apd.Decimal, len(nums))
-	for i, n := range nums {
-		a[i] = &n.X
-	}
-	return a
-}
-
 // NumList returns argument i as a list of numbers along with their kinds; see
 // [CallCtxt.Num].
 func (c *CallCtxt) NumList(i int) (a []*adt.Num) {

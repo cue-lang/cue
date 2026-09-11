@@ -20,14 +20,6 @@ import (
 	"github.com/cockroachdb/apd/v3"
 )
 
-// We avoid cuelang.org/go/internal.Context as that would be an import cycle.
-var baseContext apd.Context
-
-func init() {
-	baseContext = apd.BaseContext
-	baseContext.Precision = 34
-}
-
 // NumInfo contains information about a parsed numbers.
 //
 // Reusing a NumInfo across parses may avoid memory allocations.
@@ -77,8 +69,10 @@ func (p *NumInfo) decimal(v *apd.Decimal) error {
 	}
 	_ = v.UnmarshalText(p.buf)
 	if p.mul != 0 {
-		_, _ = baseContext.Mul(v, v, mulToRat[p.mul])
-		cond, _ := baseContext.RoundToIntegralExact(v, v)
+		// apd.BaseContext has no precision, so it never rounds: a literal
+		// keeps every digit however wide it is, as the spec requires.
+		_, _ = apd.BaseContext.Mul(v, v, mulToRat[p.mul])
+		cond, _ := apd.BaseContext.RoundToIntegralExact(v, v)
 		if cond.Inexact() {
 			return p.errorf("number cannot be represented as int")
 		}

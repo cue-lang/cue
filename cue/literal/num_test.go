@@ -77,8 +77,8 @@ func TestNumbers(t *testing.T) {
 		{"1.5Mi", "1572864", mkMul("1.5", Mi, 10)},
 		// {"1.3Mi", &bottom{}}, // Cannot be accurately represented.
 		{"1.3G", "1300000000", mkMul("1.3", G, 10)},
-		// TODO: a multiplier must not round a literal wider than 34 digits, but does.
-		{"123456789012345678901234567890123456789K", "123456789012345678901234567890123500000000", mkMul("123456789012345678901234567890123456789", K, 10)},
+		// A multiplier must not round a literal wider than 34 digits.
+		{"123456789012345678901234567890123456789K", "123456789012345678901234567890123456789000", mkMul("123456789012345678901234567890123456789", K, 10)},
 		{"1.3e+20", "1.3e+20", mkFloat("1.3e+20")},
 		{"1.3e20", "1.3e20", mkFloat("1.3e20")},
 		{"1.3e-5", "1.3e-5", mkFloat("1.3e-5")},

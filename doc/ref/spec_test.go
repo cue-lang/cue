@@ -18,9 +18,13 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
@@ -55,8 +59,13 @@ func TestSpecCheck(t *testing.T) {
 // is updated to record the error of the block, if any.
 func TestSpecEdits(t *testing.T) {
 	const (
-		parseBlock = "```cue !\nx: (\n```\n"
+		parseBlock = "```cue ! parse\nx: (\n```\n"
 		parseError = "<!-- error:\nexpected operand, found 'EOF':\n    1:6\n-->\n"
+
+		vetBlock = "```cue ! vet\nx: 1 & 2\n```\n"
+		vetError = "<!-- error:\nx: conflicting values 2 and 1:\n    1:4\n    1:8\n-->\n"
+
+		validBlock = "```cue vet\nx: 1\n```\n"
 	)
 	tests := []struct {
 		name   string
@@ -78,6 +87,14 @@ func TestSpecEdits(t *testing.T) {
 		name:   "same length",
 		source: parseBlock + strings.Replace(parseError, "1:6", "1:9", 1),
 		want:   parseBlock + parseError,
+	}, {
+		name:   "vet",
+		source: vetBlock,
+		want:   vetBlock + vetError,
+	}, {
+		name:   "no longer failing",
+		source: validBlock + vetError,
+		want:   validBlock,
 	}}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -103,13 +120,14 @@ func walkNode(t *testing.T, doc mdast.Node, source []byte) []byte {
 		newStr string
 	}
 	var edits []edit
+	ctx := cuecontext.New()
 
 	for child := doc.FirstChild(); child != nil; child = child.NextSibling() {
 		fcb, ok := child.(*mdast.CodeBlock)
 		if !ok || fcb.CodeBlockKind != mdast.CodeBlockKindFenced {
 			continue
 		}
-		e, ok := checkBlock(t, fcb, source)
+		e, ok := checkBlock(t, ctx, fcb, source)
 		if ok {
 			edits = append(edits, edit(e))
 		}
@@ -182,7 +200,7 @@ func formatComment(errStr string) string {
 	return commentPrefix + "\n" + errStr + "-->\n"
 }
 
-func checkBlock(t *testing.T, fcb *mdast.CodeBlock, source []byte) (blockEdit, bool) {
+func checkBlock(t *testing.T, ctx *cue.Context, fcb *mdast.CodeBlock, source []byte) (blockEdit, bool) {
 	info := string(fcb.Info.Bytes(source))
 	fields := strings.Fields(info)
 	if len(fields) == 0 {
@@ -207,46 +225,105 @@ func checkBlock(t *testing.T, fcb *mdast.CodeBlock, source []byte) (blockEdit, b
 	if wantError {
 		rest = rest[1:]
 	}
-	// By default, we check for valid syntax.
-	// TODO: mark intent (export, eval, vet) and validate it.
-	mode := "parse"
-	if len(rest) > 0 {
-		mode = rest[0]
-	}
-	switch mode {
-	case "parse":
-	case "rows":
-		// TODO: parse and validate line by line
+	// Every block declares what we do with it and what we expect.
+	if len(rest) != 1 {
+		t.Errorf("%s: want a single cue code block mode: ```%s", blockPos, info)
 		return blockEdit{}, false
-	case "untested":
+	}
+	src := string(fcb.Value.Bytes(source))
+
+	// Keep generated diagnostics relative to the example, not to spec.md.
+	var err error
+	switch mode := rest[0]; mode {
+	case "parse":
+		_, err = parser.ParseFile("", src, parser.ParseComments)
+	case "vet":
+		var file *ast.File
+		file, err = parser.ParseFile("", src, parser.ParseComments)
+		if err != nil {
+			break
+		}
+		val := ctx.BuildFile(file)
+		err = val.Validate()
+		checkBottoms(t, blockPos, val, file)
+	case "rows", "untested":
+		// TODO: parse and validate rows line by line
+		if wantError {
+			t.Errorf("%s: %q blocks are not checked: ```%s", blockPos, mode, info)
+		}
 		return blockEdit{}, false
 	default:
 		t.Errorf("%s: unknown cue code block mode: ```%s", blockPos, info)
 		return blockEdit{}, false
 	}
 
-	src := string(fcb.Value.Bytes(source))
-
-	// Keep generated diagnostics relative to the example, not to spec.md.
-	_, err := parser.ParseFile("", src, parser.ParseComments)
-
+	fenceEnd := closingFenceEnd(fcb, source)
+	oldLen, _ := existingComment(source, fenceEnd)
 	if !wantError {
 		if err != nil {
-			t.Errorf("%s: %q block failed to parse:\n%s", blockPos, info, err)
+			t.Errorf("%s: %q block failed:\n%s", blockPos, info, err)
+			return blockEdit{}, false
 		}
-		return blockEdit{}, false
+		// Drop the error comment left behind by a block which used to fail.
+		return blockEdit{offset: fenceEnd, oldLen: oldLen}, oldLen > 0
 	}
 	if err == nil {
-		t.Errorf("%s: %q block parsed successfully, but expected an error", blockPos, info)
+		t.Errorf("%s: %q block succeeded, but expected an error", blockPos, info)
 		return blockEdit{}, false
 	}
 	// Check or update the error comment following the code block.
-	fenceEnd := closingFenceEnd(fcb, source)
-	oldLen, _ := existingComment(source, fenceEnd)
-	want := formatComment(errors.Details(err, nil))
+	details := errors.Details(err, nil)
+	if strings.Contains(details, "-->") {
+		t.Errorf("%s: error cannot be recorded in an HTML comment:\n%s", blockPos, details)
+		return blockEdit{}, false
+	}
+	want := formatComment(details)
 	return blockEdit{
 		offset: fenceEnd,
 		oldLen: oldLen,
 		newStr: want,
 	}, true
+}
+
+// checkBottoms checks that every field annotated with a "_|_" line comment
+// evaluates to an error, including an incomplete one,
+// which validating the block as a whole does not report.
+func checkBottoms(t *testing.T, blockPos string, val cue.Value, file *ast.File) {
+	annotated := make(map[int]bool)
+	ast.Walk(file, func(n ast.Node) bool {
+		if c, ok := n.(*ast.Comment); ok && strings.Contains(c.Text, "_|_") {
+			annotated[c.Pos().Line()] = true
+		}
+		return true
+	}, nil)
+	var walk func(path []cue.Selector, decls []ast.Decl)
+	walk = func(path []cue.Selector, decls []ast.Decl) {
+		for _, decl := range decls {
+			field, ok := decl.(*ast.Field)
+			if !ok {
+				continue
+			}
+			sel := cue.Label(field.Label)
+			if sel.Type() == cue.InvalidSelectorType || sel.ConstraintType() == cue.PatternConstraint {
+				continue
+			}
+			path := append(slices.Clip(path), sel)
+			// The outermost field ending at an annotated line is the one meant.
+			if line := field.End().Line(); annotated[line] {
+				delete(annotated, line)
+				path := cue.MakePath(path...)
+				if v := val.LookupPath(path); v.Err() == nil && v.Validate() == nil {
+					t.Errorf("%s: %v is annotated as _|_ but has no error", blockPos, path)
+				}
+				continue
+			}
+			if lit, ok := field.Value.(*ast.StructLit); ok {
+				walk(path, lit.Elts)
+			}
+		}
+	}
+	walk(nil, file.Decls)
+	for line := range annotated {
+		t.Errorf("%s: no field for the _|_ annotation at line %d", blockPos, line)
+	}
 }

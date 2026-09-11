@@ -53,23 +53,31 @@ Jsonnet, HCL, Flabbergast, Nix, JSONPath, Haskell, Objective-C, and Python.
 We annotate code blocks with syntax highlighting like ```ebnf.
 It turns out that we can use a space to add arbitrary text
 without breaking syntax highlighting in Hugo,
-so we use that to annotate code blocks with intent:
+so we use that to annotate CUE code blocks with intent,
+in the form ```cue [!] mode:
 
-* `cue` for standalone CUE files which we expect to parse OK;
-  we do not yet mark what we want to do with them (export, eval, vet)
-  nor do we record what the expected outcome is yet.
+* `cue vet` for CUE which we expect to validate OK.
+  A field followed by a `// _|_` comment must evaluate to an error,
+  which may be an incomplete one that validation does not report.
+
+* `cue parse` for CUE which we expect to parse OK,
+  but which we do not expect to validate,
+  such as when it refers to names declared in another code block.
 
 * `cue untested` for syntax that is CUE-like but invalid.
 
-* `cue parse` for CUE files which we expect parse OK,
-  but we do not expect to compile or evaluate correctly.
-
-* `cue ! parse` for CUE which we expect to fail parsing;
-  the error is recorded as an HTML comment after the code block.
-
 * `cue rows` for tables of input-output rows.
-  Just like `cue`, we do not yet mark what to do with them,
+  We do not yet mark what to do with them,
   but the output column is generally the expected outcome.
+
+A `!` before `parse` or `vet` expects that step to fail instead,
+such as `cue ! vet`, and the resulting error is recorded
+as an HTML comment right after the code block.
+
+Each code block is checked on its own, as if it were a single CUE file,
+so names declared by one block are not visible to any other.
+Run the checks with "go test ./doc/ref", and record the expected errors
+anew with "CUE_UPDATE=1 go test ./doc/ref".
 -->
 
 The syntax is specified using Extended Backus-Naur Form (EBNF):
@@ -552,7 +560,7 @@ lines in the string literal.
 A closing triple quote may not appear in the string.
 To include it is suffices to escape one of the quotes.
 
-```cue parse
+```cue vet
 """
     lily:
     out of the water
@@ -568,7 +576,7 @@ To include it is suffices to escape one of the quotes.
 
 This represents the same string as:
 
-```cue
+```cue vet
 "lily:\nout of the water\nout of itself\n\n" +
 "bass\npicking bugs\noff the moon\n" +
 "    — Nick Virgilio, Selected Haiku, 1988"
@@ -1327,7 +1335,7 @@ future extensions and relaxations:
     additionalProperties and additionalItems.
 -->
 
-```cue
+```cue ! vet
 intMap: [string]: int
 intMap: {
     t1: 43
@@ -1341,12 +1349,17 @@ nameMap: [string]: {
 
 nameMap: hank: firstName: "Hank"
 ```
+<!-- error:
+intMap.t2: conflicting values 2.4 and int (mismatched types float and int):
+    1:19
+    4:9
+-->
 
 The optional field set defined by `nameMap` matches every field,
 in this case just `hank`, and unifies the associated constraint
 with the matched field, resulting in:
 
-```cue
+```cue vet
 nameMap: hank: {
     firstName: "Hank"
     nickName:  "Hank"
@@ -1360,7 +1373,7 @@ By default, structs are open to adding fields.
 Instances of an open struct `p` may contain fields not defined in `p`.
 This is makes it easy to add fields, but can lead to bugs:
 
-```cue
+```cue vet
 S: {
     field1: string
 }
@@ -1397,7 +1410,7 @@ Syntactically, structs are closed explicitly with the `close` builtin or
 implicitly and recursively by [definitions](#definitions-and-hidden-fields).
 
 
-```cue
+```cue ! vet
 A: close({
     field1: string
     field2: string
@@ -1409,7 +1422,7 @@ A1: A & {
 
 A2: A & {
     for k,v in { feild1: string } {
-        k: v
+        "\(k)": v
     }
 }  // _|_ feild1 not defined for A
 
@@ -1430,6 +1443,12 @@ D: close({
     }
 })
 ```
+<!-- error:
+A1.feild1: field not allowed:
+    7:5
+A2.feild1: field not allowed:
+    12:9
+-->
 
 <!-- (jba) Somewhere it should be said that optional fields are only
      interesting inside closed structs. -->
@@ -1450,7 +1469,7 @@ definitions or hidden fields. Regular fields are not allowed in such case.
 
 Syntactically, embeddings may be any expression.
 
-```cue
+```cue vet
 Meta: {
     kind: string
     name: string
@@ -1481,7 +1500,7 @@ or the [spread operator](#spread-operator) (postfix `...`).
 If referencing a definition would always result in an error, implementations
 may report this inconsistency at the point of its declaration.
 
-```cue
+```cue ! vet
 #MyStruct: {
     sub: field:    string
 }
@@ -1496,7 +1515,7 @@ myValue: #MyStruct & {
 }
 
 #D: {
-    #OneOf
+    #OneOf...
 
     c: int // adds this field.
 }
@@ -1507,9 +1526,23 @@ myValue: #MyStruct & {
 D1: #D & { a: 12, c: 22 }  // { a: 12, c: 22 }
 D2: #D & { a: 12, b: 33 }  // _|_ // cannot define both `a` and `b`
 ```
+<!-- error:
+D2: 2 errors in empty disjunction:
+D2.a: field not allowed:
+    24:12
+D2.b: field not allowed:
+    24:19
+myValue.sub.feild: field not allowed:
+    10:10
+-->
 
 
-```cue
+<!-- TODO: this example predates the strict embedding of language version
+     v0.18.0, under which B and #B may not declare `b` next to the
+     embedded #A. Embedding `#A...` instead leaves B open, so `x: d: 3`
+     is then allowed. -->
+
+```cue ! vet
 #A: {a: int}
 
 B: {
@@ -1531,6 +1564,16 @@ y: d: 3  // allowed as nothing closes b
 z: #B.b
 z: d: 3  // not allowed, as referencing #B closes b
 ```
+<!-- error:
+#B.b: field not allowed:
+    16:5
+B.b: field not allowed:
+    5:5
+x.b: field not allowed:
+    5:5
+x.d: field not allowed:
+    9:4
+-->
 
 
 <!---
@@ -1563,7 +1606,7 @@ such as a mapping to a protocol buffer <!-- TODO: add link --> tag or alternativ
 name of the field when mapping to a different language.
 
 
-```cue
+```cue vet
 // Package attributes
 @experiment(try)
 @protobuf(proto3)
@@ -1641,13 +1684,13 @@ foo: {
      Consider removing.
 -->
 
-```cue
+```cue vet
 // A field alias
 result1: X  // 4
 "not an identifier"~(X): 4
 ```
 
-```cue
+```cue vet
 // A field alias example
 foo~(F): {
     x: F.a
@@ -1655,13 +1698,13 @@ foo~(F): {
 bar: foo & {a: 1}  // {a: 1, x: 1}
 ```
 
-```cue
+```cue vet
 // A label alias with dual form
 [string]~(K, V): { name: K, add1: V.value+1 }
 foo: { value: 1 } // outputs: foo: { name: "foo", value: 1, add1: 2 }
 ```
 
-```cue
+```cue vet
 // Dynamic field with dual form
 ("my" + "Field")~(K, V): { label: K, foo: 42 }
 value: V.foo
@@ -1678,7 +1721,7 @@ The identifier is only visible within the [scope](#declarations-and-scopes)
 in which it is declared.
 The identifier must be unique within its scope.
 
-```cue
+```cue parse
 let x = expr
 
 a: x + 1
@@ -1702,11 +1745,11 @@ A field whose value is a struct with a single field may be written as
 a colon-separated sequence of the two field names,
 followed by a colon and the value of that single field.
 
-```cue
+```cue vet
 job: myTask: replicas: 2
 ```
 expands to
-```cue
+```cue vet
 job: {
     myTask: {
         replicas: 2
@@ -1776,7 +1819,7 @@ ElementList   = Ellipsis | Embedding { "," Embedding } [ "," Ellipsis ] .
 
 Lists can be thought of as structs:
 
-```cue
+```cue vet
 List: *null | {
     Elem: _
     Tail: List
@@ -1786,11 +1829,11 @@ List: *null | {
 For closed lists, `Tail` is `null` for the last element, for open lists it is
 `*null | List`, defaulting to the shortest variant.
 For instance, the open list [ 1, 2, ... ] can be represented as:
-```cue
+```cue parse
 open: List & { Elem: 1, Tail: { Elem: 2 } }
 ```
 and the closed version of this list, [ 1, 2 ], as
-```cue
+```cue parse
 closed: List & { Elem: 1, Tail: { Elem: 2, Tail: null } }
 ```
 
@@ -1911,7 +1954,7 @@ such as regular fields or definitions starting with `#`.
 Any identifier starting with `_` is hidden from other packages;
 it resides in a separate namespace than namesake identifiers of other packages.
 
-```cue
+```cue vet
 package mypackage
 
 foo:   string  // visible outside mypackage
@@ -1945,7 +1988,7 @@ A field associates the value of an expression to a label within a struct.
 If this label is an identifier, it binds the field to that identifier,
 so the field's value can be referenced by writing the identifier.
 String labels are not bound to fields.
-```cue
+```cue ! vet
 a: {
     b: 2
     "s": 3
@@ -1955,6 +1998,10 @@ a: {
     e: a.s // 3
 }
 ```
+<!-- error:
+a.d: reference "s" not found:
+    6:8
+-->
 
 <!-- TODO: the annotation for e only holds because d is a compile-time error.
 If d were an evaluation error instead, such as 1 & 2, a would be bottom
@@ -2045,7 +2092,7 @@ the fields they were originally bound to.
 Implementations may use a different mechanism to evaluate as long as
 these semantics are maintained.
 
-```cue
+```cue vet
 a: {
     place:    string
     greeting: "Hello, \(place)!"
@@ -2190,7 +2237,7 @@ the result of the expression is bottom (an error).
 In the latter case the expression is incomplete.
 The operand of a selector may be associated with a default.
 
-```cue
+```cue vet
 T: {
     x:     int
     y:     3
@@ -2253,7 +2300,7 @@ for `a` of struct type:
 - bottom (an error), otherwise
 
 
-```cue
+```cue ! vet
 a: [ 1, 2 ][1]     // 2
 b: [ 1, 2 ][2]     // _|_
 c: [ 1, 2, ...][2] // _|_
@@ -2263,6 +2310,11 @@ x: [1, 2] | *[3, 4]
 y: int | *1
 z: x[y]  // 4
 ```
+<!-- error:
+b: index out of range [2] with length 2:
+    2:13
+    2:4
+-->
 
 
 
@@ -2436,7 +2488,7 @@ String addition creates a new string by concatenating the operands.
 
 A string can be repeated by multiplying it:
 
-```cue parse
+```cue vet
 s: "etc. "*3  // "etc. etc. etc. "
 ```
 
@@ -2758,7 +2810,7 @@ LetClause           = "let" identifier "=" Expression .
 ElseClause          = "else" StructLit .
 ```
 
-```cue
+```cue vet
 a: [1, 2, 3, 4]
 b: [for x in a if x > 1 { x+1 }]  // [3, 4, 5]
 
@@ -2796,7 +2848,7 @@ The result of the expression is substituted as follows:
 - struct: illegal
 
 
-```cue
+```cue vet
 a: "World"
 b: "Hello \( a )!" // Hello World!
 ```
@@ -2818,18 +2870,30 @@ interpolation, it will be extra resilient: if any of the arguments to the
 interpolation fail, they will be printed as an expression. This allows failing
 expressions to be a part of the error message.
 
-```cue
+```cue ! vet
 a: 1/0 | error("infinity and beyond!: \(1/0)")
 ```
+<!-- error:
+a: infinity and beyond!: (1 / 0):
+    1:10
+    1:41
+-->
 
 To refer to the value being validated, enclose the validator in braces and use
 [`self`](#self-from-v0150):
 
-```cue
+```cue ! vet
 #Option: {"one" | "two" | "three" | error("invalid option \(self)")}
 
 a: #Option & "four" // error: invalid option four
 ```
+<!-- error:
+a: invalid option four:
+    1:37
+    1:11
+    3:4
+    3:14
+-->
 
 ### `len`
 
@@ -2988,15 +3052,15 @@ It counts how many schemas unify successfully (without producing an error).
 The validator succeeds if the count satisfies the numeric constraint provided
 as the first argument.
 
-```cue
+```cue vet
 // Exactly 2 schemas must match
-value: "foo" & matchN(2, [string, !="bar", <4])  // true: string and !="bar" match
+value1: "foo" & matchN(2, [string, !="bar", <4])  // true: string and !="bar" match
 
 // At least 1 schema must match
-value: 5 & matchN(>=1, [int, >10])  // true: int matches
+value2: 5 & matchN(>=1, [int, >10])  // true: int matches
 
 // Exactly 0 schemas must match (none should match)
-value: "test" & matchN(0, [int, >100])  // true: neither matches
+value3: "test" & matchN(0, [int, >100])  // true: neither matches
 ```
 
 If the numeric constraint cannot be satisfied even with incomplete information,
@@ -3020,7 +3084,11 @@ If the condition unifies successfully, the "then" schema is applied;
 otherwise, the "else" schema is applied.
 The validator succeeds if the chosen schema unifies successfully with the value.
 
-```cue
+<!-- TODO: the first example is meant to validate; the "else" schema is
+     evaluated even though the condition matches. The error of the second
+     example is incomplete, so it is not recorded below. -->
+
+```cue ! vet
 // If value is a string, it must have length > 3; otherwise it must be > 10
 value: "hello" & matchIf(string, len(value) > 3, value > 10) // OK; len("hello") is >3
 
@@ -3030,6 +3098,12 @@ x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // error; missing 
 // If value is >5, it must be <10; otherwise it must be <3
 y: 2 & matchIf(>5, <10, <3) // OK; 2 is <3
 ```
+<!-- error:
+value: invalid operands "hello" and 10 to '>' (type string and int):
+    2:50
+    2:8
+    2:58
+-->
 
 
 ## Cycles
@@ -3043,7 +3117,7 @@ during evaluation according to the rules in this section.
 A _reference cycle_ occurs if a field references itself, either directly or
 indirectly.
 
-```cue
+```cue vet
 // x references itself
 x: x
 
@@ -3092,7 +3166,7 @@ and take `v` as the result of unification.
 <!-- Tomabechi's graph unification algorithm
 can detect such cycles at near-zero cost. -->
 
-```cue
+```cue vet
 // Configuration     Evaluated
 //
 //       c           Cycles in nodes of type struct evaluate
@@ -3113,7 +3187,7 @@ c: a & { z: 3 }      // c: { x: 1, y: 2, z: 3 }
 This rule also applies to field values that are disjunctions of unification
 operations of the above form.
 
-```cue
+```cue vet
 a: b&{x:1} | {y:1}  // {x:1,y:3,z:2} | {y:1}
 b: {x:2} | c&{z:2}  // {x:2} | {x:1,y:3,z:2}
 c: a&{y:3} | {z:3}  // {x:1,y:3,z:2} | {z:3}
@@ -3138,7 +3212,7 @@ evaluate to this value.
 
 A structural cycle is when a node references one of its ancestor nodes.
 It is possible to construct a structural cycle by unifying two acyclic values:
-```cue
+```cue ! vet
 // acyclic
 y: {
     f: h: g
@@ -3152,10 +3226,13 @@ x: {
 // introduces structural cycle
 z: x & y
 ```
+<!-- error:
+z.g: structural cycle
+-->
 Implementations should be able to detect such structural cycles dynamically.
 
 A structural cycle can result in infinite structure or evaluation loops.
-```cue
+```cue ! vet
 // infinite structure
 a: b: a
 
@@ -3165,6 +3242,11 @@ f: {
     out: n + (f & {n: 1}).out
 }
 ```
+<!-- error:
+a.b: structural cycle
+structural cycle:
+    7:15
+-->
 CUE must allow or disallow structural cycles under certain circumstances.
 
 If a node `a` references an ancestor node, we call it and any of its
@@ -3173,7 +3255,7 @@ So if `a` is cyclic, all of its descendants are also regarded as cyclic.
 A given node `x`, whose value is composed of the conjuncts `c1 & ... & cn`,
 is valid if any of its conjuncts is not cyclic.
 
-```cue
+```cue ! vet
 // Disallowed: a list of infinite length with all elements being 1.
 #List: {
     head: 1
@@ -3187,7 +3269,13 @@ a: {
 c: {
     d: a
 }
+```
+<!-- error:
+#List.tail: structural cycle
+c.d: structural cycle
+-->
 
+```cue vet
 // #List defines a list of arbitrary length. Because the recursive reference
 // is part of a disjunction, this does not result in a structural cycle.
 #List: {
@@ -3237,7 +3325,7 @@ to a data format
 SourceFile = { attribute "," } [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
 ```
 
-```cue
+```cue vet
 "Hello \(#place)!"
 
 #place: "world"
@@ -3262,7 +3350,7 @@ as if there were no package clause. This can be useful to allow adding
 package level attributes or doc comments to a CUE file without a package
 name.
 
-```cue
+```cue vet
 package math
 ```
 

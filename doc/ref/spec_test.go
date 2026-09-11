@@ -77,9 +77,7 @@ func TestSpecEdits(t *testing.T) {
 	}, {
 		name:   "same length",
 		source: parseBlock + strings.Replace(parseError, "1:6", "1:9", 1),
-		// TODO: the edits are applied on top of the source itself, so an update
-		// which keeps the length of the source goes unnoticed.
-		want: parseBlock + strings.Replace(parseError, "1:6", "1:9", 1),
+		want:   parseBlock + parseError,
 	}}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -118,7 +116,8 @@ func walkNode(t *testing.T, doc mdast.Node, source []byte) []byte {
 	}
 
 	// Apply edits in reverse order to preserve earlier offsets.
-	result := source
+	// Never edit the source itself, as the caller compares the two.
+	result := bytes.Clone(source)
 	for i := len(edits) - 1; i >= 0; i-- {
 		e := edits[i]
 		result = append(result[:e.offset],

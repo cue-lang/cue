@@ -816,6 +816,95 @@ tryRootedCycleDisjunct: {
 	@test(eq, {out: {}, ext: {}})
 }
 
+// =============================================================================
+// Try body fields shadowing fields of the enclosing struct
+// =============================================================================
+
+// The try body is embedded into the enclosing struct, so a ?-marked reference
+// through a field the body declares must see the fields the enclosing struct
+// contributes to that field as well. The pre-evaluation of the body currently
+// sees only the body's own fields, so the try is wrongly discarded.
+// https://github.com/cue-lang/cue/discussions/4482
+shadowing: {
+	// The reporter's example: x.a is only declared outside the try body.
+	outerField: {
+		x: {a?: int, b?: int}
+		x: a: 1
+		try { x: b: x.a? } else { fallback: -1 }
+	} @test(eq, {x: {a: 1, b?: int}, fallback: -1}, incorrect) @test(eq:todo, {x: {a: 1, b: 1}})
+
+	// Still discarded when the field is absent from both.
+	outerFieldUndefined: {
+		x: {a?: int, b?: int}
+		try { x: b: x.a? } else { fallback: -1 }
+	} @test(eq, {x: {a?: int, b?: int}, fallback: -1})
+
+	// Deeper path through body fields.
+	nestedPath: {
+		x: y: a: 1
+		try { x: y: b: x.y.a? }
+	} @test(eq, {x: y: {a: 1}}, incorrect) @test(eq:todo, {x: y: {a: 1, b: 1}})
+
+	// Index form.
+	indexForm: {
+		x: {a: 1}
+		try { x: b: x["a"]? }
+	} @test(eq, {x: {a: 1}}, incorrect) @test(eq:todo, {x: {a: 1, b: 1}})
+
+	// The shadowing body belongs to an enclosing try, whose pre-evaluation
+	// hosts the inner one.
+	nestedTry: {
+		x: a: 1
+		try {
+			x: b: 2
+			try { x: c: x.a? }
+		}
+	} @test(eq, {x: {a: 1, b: 2}}, incorrect) @test(eq:todo, {x: {a: 1, b: 2, c: 1}})
+
+	// The outer field is produced by a comprehension.
+	outerFieldFromFor: {
+		src: {a: 1}
+		x: { for k, v in src { (k): v } }
+		try { x: b: x.a? }
+	} @test(eq, {src: {a: 1}, x: {a: 1}}, incorrect) @test(eq:todo, {src: {a: 1}, x: {a: 1, b: 1}})
+
+	// The binding form evaluates its expression on its own: nothing outside
+	// the struct literal can supply the field its own a? refers to.
+	bindingExpr: {
+		a: 1
+		try v = {a?: int, b: a?} {ok: true} else {fallback: true}
+	} @test(eq, {a: 1, fallback: true})
+
+	// A chained ?-marked selector through a field the body declares.
+	chained: {
+		x: a: foo: 1
+		try { x: b: x.a?.foo? } else { fallback: true }
+	} @test(eq, {x: {a: {foo: 1}}, fallback: true}, incorrect) @test(eq:todo, {x: {a: {foo: 1}, b: 1}})
+
+	chainedUndefined: {
+		x: a: {}
+		try { x: b: x.a?.foo? } else { fallback: true }
+	} @test(eq, {x: {a: {}}, fallback: true})
+
+	// The base of the failing lookup is reached through a let or for binding,
+	// or through a field structure-shared with a rooted vertex.
+	letBase: {
+		x: a: 1
+		try { x: b: 1, let L = x, y: L.a? } else { fallback: true }
+	} @test(eq, {x: {a: 1}, fallback: true}, incorrect) @test(eq:todo, {x: {a: 1, b: 1}, y: 1})
+
+	forBase: {
+		x: a: 1
+		try { x: b: 1, for k, v in {p: x} { y: (k): v.a? } } else { fallback: true }
+	} @test(eq, {x: {a: 1}, fallback: true}, incorrect) @test(eq:todo, {x: {a: 1, b: 1}, y: {p: 1}})
+
+	sharedBase: {
+		x: a: 1
+		s: {c: 1}
+		try { x: s, y: x.a? } else { fallback: true }
+	} @test(eq, {x: {a: 1}, s: {c: 1}, fallback: true}, incorrect) @test(eq:todo, {x: {a: 1, c: 1}, s: {c: 1}, y: 1})
+}
+
 -- out/errors.txt --
 [incomplete] requiredUnfilled.x: required field missing: a:
     ./in.cue:83:11

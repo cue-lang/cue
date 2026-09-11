@@ -724,6 +724,95 @@ tryRootedCycleDisjunct: {
 	} | {}
 }
 
+// =============================================================================
+// Try body fields shadowing fields of the enclosing struct
+// =============================================================================
+
+// The try body is embedded into the enclosing struct, so a ?-marked reference
+// through a field the body declares must see the fields the enclosing struct
+// contributes to that field as well. The pre-evaluation of the body currently
+// sees only the body's own fields, so the try is wrongly discarded.
+// https://github.com/cue-lang/cue/discussions/4482
+shadowing: {
+	// The reporter's example: x.a is only declared outside the try body.
+	outerField: {
+		x: {a?: int, b?: int}
+		x: a: 1
+		try { x: b: x.a? } else { fallback: -1 }
+	}
+
+	// Still discarded when the field is absent from both.
+	outerFieldUndefined: {
+		x: {a?: int, b?: int}
+		try { x: b: x.a? } else { fallback: -1 }
+	}
+
+	// Deeper path through body fields.
+	nestedPath: {
+		x: y: a: 1
+		try { x: y: b: x.y.a? }
+	}
+
+	// Index form.
+	indexForm: {
+		x: {a: 1}
+		try { x: b: x["a"]? }
+	}
+
+	// The shadowing body belongs to an enclosing try, whose pre-evaluation
+	// hosts the inner one.
+	nestedTry: {
+		x: a: 1
+		try {
+			x: b: 2
+			try { x: c: x.a? }
+		}
+	}
+
+	// The outer field is produced by a comprehension.
+	outerFieldFromFor: {
+		src: {a: 1}
+		x: { for k, v in src { (k): v } }
+		try { x: b: x.a? }
+	}
+
+	// The binding form evaluates its expression on its own: nothing outside
+	// the struct literal can supply the field its own a? refers to.
+	bindingExpr: {
+		a: 1
+		try v = {a?: int, b: a?} {ok: true} else {fallback: true}
+	}
+
+	// A chained ?-marked selector through a field the body declares.
+	chained: {
+		x: a: foo: 1
+		try { x: b: x.a?.foo? } else { fallback: true }
+	}
+
+	chainedUndefined: {
+		x: a: {}
+		try { x: b: x.a?.foo? } else { fallback: true }
+	}
+
+	// The base of the failing lookup is reached through a let or for binding,
+	// or through a field structure-shared with a rooted vertex.
+	letBase: {
+		x: a: 1
+		try { x: b: 1, let L = x, y: L.a? } else { fallback: true }
+	}
+
+	forBase: {
+		x: a: 1
+		try { x: b: 1, for k, v in {p: x} { y: (k): v.a? } } else { fallback: true }
+	}
+
+	sharedBase: {
+		x: a: 1
+		s: {c: 1}
+		try { x: s, y: x.a? } else { fallback: true }
+	}
+}
+
 -- out/compile --
 --- in.cue
 {
@@ -1597,5 +1686,174 @@ tryRootedCycleDisjunct: {
         }
       }
     }|{})
+  }
+  shadowing: {
+    outerField: {
+      x: {
+        a?: int
+        b?: int
+      }
+      x: {
+        a: 1
+      }
+      try {
+        x: {
+          b: 〈1;x〉.a?
+        }
+      } else {
+        fallback: -1
+      }
+    }
+    outerFieldUndefined: {
+      x: {
+        a?: int
+        b?: int
+      }
+      try {
+        x: {
+          b: 〈1;x〉.a?
+        }
+      } else {
+        fallback: -1
+      }
+    }
+    nestedPath: {
+      x: {
+        y: {
+          a: 1
+        }
+      }
+      try {
+        x: {
+          y: {
+            b: 〈2;x〉.y.a?
+          }
+        }
+      }
+    }
+    indexForm: {
+      x: {
+        a: 1
+      }
+      try {
+        x: {
+          b: 〈1;x〉["a"]?
+        }
+      }
+    }
+    nestedTry: {
+      x: {
+        a: 1
+      }
+      try {
+        x: {
+          b: 2
+        }
+        try {
+          x: {
+            c: 〈1;x〉.a?
+          }
+        }
+      }
+    }
+    outerFieldFromFor: {
+      src: {
+        a: 1
+      }
+      x: {
+        for k, v in 〈1;src〉 {
+          〈1;k〉: 〈1;v〉
+        }
+      }
+      try {
+        x: {
+          b: 〈1;x〉.a?
+        }
+      }
+    }
+    bindingExpr: {
+      a: 1
+      try v = {
+        a?: int
+        b: 〈0;a〉?
+      } {
+        ok: true
+      } else {
+        fallback: true
+      }
+    }
+    chained: {
+      x: {
+        a: {
+          foo: 1
+        }
+      }
+      try {
+        x: {
+          b: 〈1;x〉.a?.foo?
+        }
+      } else {
+        fallback: true
+      }
+    }
+    chainedUndefined: {
+      x: {
+        a: {}
+      }
+      try {
+        x: {
+          b: 〈1;x〉.a?.foo?
+        }
+      } else {
+        fallback: true
+      }
+    }
+    letBase: {
+      x: {
+        a: 1
+      }
+      try {
+        x: {
+          b: 1
+        }
+        let L#2 = 〈0;x〉
+        y: 〈0;let L#2〉.a?
+      } else {
+        fallback: true
+      }
+    }
+    forBase: {
+      x: {
+        a: 1
+      }
+      try {
+        x: {
+          b: 1
+        }
+        for k, v in {
+          p: 〈1;x〉
+        } {
+          y: {
+            〈2;k〉: 〈2;v〉.a?
+          }
+        }
+      } else {
+        fallback: true
+      }
+    }
+    sharedBase: {
+      x: {
+        a: 1
+      }
+      s: {
+        c: 1
+      }
+      try {
+        x: 〈1;s〉
+        y: 〈0;x〉.a?
+      } else {
+        fallback: true
+      }
+    }
   }
 }

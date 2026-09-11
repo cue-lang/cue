@@ -343,11 +343,10 @@ type nodeContextState struct {
 	// node after a corresponding task has been completed.
 	toComplete bool
 
-	// trySkip, when non-nil, marks this node as a try clause body currently
-	// being finalized, which [scheduler.inTryBody] also relies on;
-	// a failed ?-marked reference sets *trySkip via
-	// [OpContext.markSkipTry]. See [TryClause.yield].
-	trySkip *bool
+	// tryBody, when non-nil, marks this node as a try clause body currently
+	// being finalized, which [scheduler.inTryBody] also relies on.
+	// See [TryClause.yield].
+	tryBody *tryBody
 
 	// embedClosedness tracks the strongest closedness level among vertices
 	// embedded through a spread operator. It is used to determine whether

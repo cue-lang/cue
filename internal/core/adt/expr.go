@@ -623,26 +623,81 @@ func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 	}()
 
 	v := c.lookup(n, pos, x.Label, state)
-
-	return c.checkSkipTry(x.Optional, v)
+	if v == nil && x.Optional {
+		v = c.retryOptionalLookup(n, pos, x.Label, state)
+	}
+	return v
 }
 
-func (c *OpContext) checkSkipTry(optional bool, arc *Vertex) *Vertex {
-	if arc != nil {
+// retryOptionalLookup handles a ?-marked lookup of l in base that failed. If
+// the field is absent, the enclosing try body is marked to be discarded,
+// unless the field exists in the struct the body is inserted into (see
+// [OpContext.lookupInTryTarget]).
+func (c *OpContext) retryOptionalLookup(base *Vertex, pos token.Pos, l Feature, flags Flags) *Vertex {
+	if c.errs == nil || !c.errs.IsIncomplete() {
+		return nil
+	}
+
+	savedErrs := c.errs
+	if arc := c.lookupInTryTarget(base, pos, l, flags); arc != nil {
+		c.errs = nil
 		return arc
 	}
+	c.errs = savedErrs
 
-	if optional && c.errs != nil && c.errs.IsIncomplete() {
-		c.markSkipTry()
+	c.markSkipTry()
+	return nil
+}
+
+// lookupInTryTarget retries a ?-marked lookup of l in base, which failed
+// during the pre-evaluation of a try body, against the struct the body will
+// be inserted into. See [TryClause.yield].
+//
+// The pre-evaluation runs in an inline vertex, so a field the body declares
+// shadows the same-named field of the enclosing struct: in
+//
+//	x: a: 1
+//	try { x: b: x.a? }
+//
+// the reference x.a resolves to the body's x, which has no a, whereas the
+// real evaluation unifies the two and finds a. To decide existence, follow
+// the path from the body root down to base in the vertex the body is inserted
+// into and look up l there. This recurses for enclosing try bodies, as that
+// vertex is itself an inline vertex for a nested body.
+//
+// Only bases reached through the body's own fields are covered. A base bound
+// by a let or for clause, or structure-shared with a rooted vertex, is not a
+// descendant of the body root, and the lookup then fails as before.
+func (c *OpContext) lookupInTryTarget(base *Vertex, pos token.Pos, l Feature, flags Flags) *Vertex {
+	root := base.tryBodyRoot()
+	if root == nil {
+		return nil
+	}
+	target := root.state.tryBody.target
+	if target == nil {
+		return nil
 	}
 
-	return nil
+	var path []Feature
+	for v := base; v != root; v = v.Parent {
+		path = append(path, v.Label)
+	}
+	c.errs = nil
+	for i := len(path) - 1; i >= 0; i-- {
+		if target = c.lookup(target, pos, path[i], flags); target == nil {
+			return nil
+		}
+	}
+	if arc := c.lookup(target, pos, l, flags); arc != nil {
+		return arc
+	}
+	return c.lookupInTryTarget(target, pos, l, flags)
 }
 
 // markSkipTry records that a ?-marked reference failed to resolve because its
 // optional field is not present. The failure is attributed to the nearest
 // enclosing try clause body by walking up the parent chain from the vertex
-// currently being evaluated until it reaches a body whose [nodeContext.trySkip]
+// currently being evaluated until it reaches a body whose [nodeContext.tryBody]
 // is set (see [TryClause.yield]).
 //
 // A single shared flag cannot distinguish which try a failed reference belongs
@@ -653,11 +708,8 @@ func (c *OpContext) checkSkipTry(optional bool, arc *Vertex) *Vertex {
 // affected by this interleaving, so resolving the owner by structural ancestry
 // rather than by stack order attributes the failure correctly (issue #4347).
 func (c *OpContext) markSkipTry() {
-	for v := c.vertex; v != nil; v = v.Parent {
-		if v.state != nil && v.state.trySkip != nil {
-			*v.state.trySkip = true
-			return
-		}
+	if root := c.vertex.tryBodyRoot(); root != nil {
+		root.state.tryBody.skip = true
 	}
 }
 
@@ -1060,9 +1112,11 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 	}()
 
 	pos := x.Src.Sel.Pos()
-	result := c.lookup(n, pos, x.Sel, state)
-
-	return c.checkSkipTry(x.Optional, result)
+	v := c.lookup(n, pos, x.Sel, state)
+	if v == nil && x.Optional {
+		v = c.retryOptionalLookup(n, pos, x.Sel, state)
+	}
+	return v
 }
 
 // IndexExpr is like a selector, but selects an index.
@@ -1121,9 +1175,11 @@ func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	// }()
 
 	pos := x.Src.Index.Pos()
-	result := ctx.lookup(n, pos, f, state)
-
-	return ctx.checkSkipTry(x.Optional, result)
+	v := ctx.lookup(n, pos, f, state)
+	if v == nil && x.Optional {
+		v = ctx.retryOptionalLookup(n, pos, f, state)
+	}
+	return v
 }
 
 // A SliceExpr represents a slice operation. (Not currently in spec.)
@@ -3408,6 +3464,14 @@ func (x *LetClause) yield(s *compState) {
 //
 //	try { ... }
 //
+// The body is pre-evaluated in isolation in an inline vertex, which only
+// approximates its real evaluation. Several mechanisms compensate for the
+// differences: a failed reference is attributed to its body by ancestry
+// ([OpContext.markSkipTry]), tasks blocked on rooted vertices are left
+// alone ([scheduler.inTryBody]), and a lookup through a field the body
+// declares falls back to the struct it is inserted into
+// ([OpContext.lookupInTryTarget]).
+//
 // TryClause represents a try clause in a comprehension.
 // It can have two forms:
 //   - try { struct } - Value is set, Label/Expr are zero/nil
@@ -3417,6 +3481,19 @@ type TryClause struct {
 	Label Feature // identifier for assignment form (InvalidLabel for struct form)
 	Expr  Expr    // expression for assignment form (nil for struct form)
 	// Struct form: body is in Comprehension.Value
+}
+
+// tryBody is the state of the pre-evaluation of a try clause body, held by the
+// [nodeContext] of the inline vertex evaluating it.
+type tryBody struct {
+	// skip records that a ?-marked reference in the body failed to resolve.
+	// See [OpContext.markSkipTry].
+	skip bool
+
+	// target is the vertex a struct-form body is inserted into when it
+	// yields, and nil for the binding form, whose expression is not inserted
+	// anywhere. See [OpContext.lookupInTryTarget].
+	target *Vertex
 }
 
 func (x *TryClause) Source() ast.Node {
@@ -3441,11 +3518,14 @@ func (x *TryClause) yield(s *compState) {
 	// the try expression early.
 
 	var expr Expr
+	tb := &tryBody{}
 	if x.Expr != nil {
 		expr = x.Expr
 	} else {
-		// Struct form: body is in Comprehension.Value
+		// Struct form: the body is inserted into the node the comprehension
+		// runs on, which [OpContext.yield] set as the current vertex.
 		expr = s.comp.Value
+		tb.target = c.vertex
 	}
 
 	v := c.newInlineVertex(env.DerefVertex(c), nil, Conjunct{env, expr, c.ci})
@@ -3454,13 +3534,12 @@ func (x *TryClause) yield(s *compState) {
 	// rather than an enclosing or interleaving one (see markSkipTry), and so
 	// that finalizing it leaves tasks blocked on rooted vertices alone (see
 	// [scheduler.inTryBody]).
-	var skip bool
-	v.getState(c).trySkip = &skip
+	v.getState(c).tryBody = tb
 	v.Finalize(c)
 
 	// If any ?-marked reference belonging to this body failed, don't yield -
 	// the else clause (if present) runs instead.
-	if skip {
+	if tb.skip {
 		return
 	}
 

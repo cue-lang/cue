@@ -653,19 +653,22 @@ unblockTasks:
 }
 
 // inTryBody reports whether this scheduler belongs to the inline vertex
-// that pre-evaluates a try clause body (see [nodeContext.trySkip]) or to
-// one of its descendants. Descendants of an inline vertex are non-rooted
-// themselves, so the walk stops at the first rooted ancestor.
+// that pre-evaluates a try clause body (see [nodeContext.tryBody]) or to
+// one of its descendants.
 func (s *scheduler) inTryBody() bool {
-	if s.node == nil {
-		return false
-	}
-	for v := s.node.node; v != nil && !v.Rooted(); v = v.Parent {
-		if v.state != nil && v.state.trySkip != nil {
-			return true
+	return s.node != nil && s.node.node.tryBodyRoot() != nil
+}
+
+// tryBodyRoot returns the inline vertex pre-evaluating the try clause body
+// that v belongs to, or nil if there is none. Descendants of an inline vertex
+// are non-rooted themselves, so the walk stops at the first rooted ancestor.
+func (v *Vertex) tryBodyRoot() *Vertex {
+	for ; v != nil && !v.Rooted(); v = v.Parent {
+		if v.state != nil && v.state.tryBody != nil {
+			return v
 		}
 	}
-	return false
+	return nil
 }
 
 // mustDeferUnblock reports whether finalizing this scheduler, for which

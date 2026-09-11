@@ -822,8 +822,7 @@ tryRootedCycleDisjunct: {
 
 // The try body is embedded into the enclosing struct, so a ?-marked reference
 // through a field the body declares must see the fields the enclosing struct
-// contributes to that field as well. The pre-evaluation of the body currently
-// sees only the body's own fields, so the try is wrongly discarded.
+// contributes to that field as well.
 // https://github.com/cue-lang/cue/discussions/4482
 shadowing: {
 	// The reporter's example: x.a is only declared outside the try body.
@@ -831,7 +830,7 @@ shadowing: {
 		x: {a?: int, b?: int}
 		x: a: 1
 		try { x: b: x.a? } else { fallback: -1 }
-	} @test(eq, {x: {a: 1, b?: int}, fallback: -1}, incorrect) @test(eq:todo, {x: {a: 1, b: 1}})
+	} @test(eq, {x: {a: 1, b: 1}})
 
 	// Still discarded when the field is absent from both.
 	outerFieldUndefined: {
@@ -843,13 +842,13 @@ shadowing: {
 	nestedPath: {
 		x: y: a: 1
 		try { x: y: b: x.y.a? }
-	} @test(eq, {x: y: {a: 1}}, incorrect) @test(eq:todo, {x: y: {a: 1, b: 1}})
+	} @test(eq, {x: y: {a: 1, b: 1}})
 
 	// Index form.
 	indexForm: {
 		x: {a: 1}
 		try { x: b: x["a"]? }
-	} @test(eq, {x: {a: 1}}, incorrect) @test(eq:todo, {x: {a: 1, b: 1}})
+	} @test(eq, {x: {a: 1, b: 1}})
 
 	// The shadowing body belongs to an enclosing try, whose pre-evaluation
 	// hosts the inner one.
@@ -859,14 +858,14 @@ shadowing: {
 			x: b: 2
 			try { x: c: x.a? }
 		}
-	} @test(eq, {x: {a: 1, b: 2}}, incorrect) @test(eq:todo, {x: {a: 1, b: 2, c: 1}})
+	} @test(eq, {x: {a: 1, b: 2, c: 1}})
 
 	// The outer field is produced by a comprehension.
 	outerFieldFromFor: {
 		src: {a: 1}
 		x: { for k, v in src { (k): v } }
 		try { x: b: x.a? }
-	} @test(eq, {src: {a: 1}, x: {a: 1}}, incorrect) @test(eq:todo, {src: {a: 1}, x: {a: 1, b: 1}})
+	} @test(eq, {src: {a: 1}, x: {a: 1, b: 1}})
 
 	// The binding form evaluates its expression on its own: nothing outside
 	// the struct literal can supply the field its own a? refers to.
@@ -879,7 +878,7 @@ shadowing: {
 	chained: {
 		x: a: foo: 1
 		try { x: b: x.a?.foo? } else { fallback: true }
-	} @test(eq, {x: {a: {foo: 1}}, fallback: true}, incorrect) @test(eq:todo, {x: {a: {foo: 1}, b: 1}})
+	} @test(eq, {x: {a: {foo: 1}, b: 1}})
 
 	chainedUndefined: {
 		x: a: {}

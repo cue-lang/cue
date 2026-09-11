@@ -730,8 +730,7 @@ tryRootedCycleDisjunct: {
 
 // The try body is embedded into the enclosing struct, so a ?-marked reference
 // through a field the body declares must see the fields the enclosing struct
-// contributes to that field as well. The pre-evaluation of the body currently
-// sees only the body's own fields, so the try is wrongly discarded.
+// contributes to that field as well.
 // https://github.com/cue-lang/cue/discussions/4482
 shadowing: {
 	// The reporter's example: x.a is only declared outside the try body.

@@ -124,9 +124,14 @@ func generate() error {
 	if err := emitTagTypes(&buf, rootVal); err != nil {
 		return err
 	}
-	if err := emitRegistry(&buf, rootVal); err != nil {
+	// The registry is emitted first so that the aspect arrays its
+	// entries share are all interned by the time they are declared.
+	var registry bytes.Buffer
+	if err := emitRegistry(&registry, rootVal); err != nil {
 		return err
 	}
+	aspectSets.emit(&buf)
+	buf.Write(registry.Bytes())
 
 	data, err := goformat.Source(buf.Bytes())
 	if err != nil {
@@ -320,35 +325,20 @@ func emitEntry(buf *bytes.Buffer, e *entry, depth int) {
 	if s := svalExpr(e.form); s != "" {
 		fmt.Fprintf(buf, "%s\tform: %s,\n", indent, s)
 	}
-	if len(e.aspects) > 0 {
-		fmt.Fprintf(buf, "%s\taspects: [numAspects]bval{", indent)
-		first := true
-		for _, name := range aspectNames {
-			v, ok := e.aspects[name]
-			if !ok {
-				continue
-			}
-			if s := bvalExpr(v); s != "" {
-				if !first {
-					fmt.Fprintf(buf, ", ")
-				}
-				first = false
-				fmt.Fprintf(buf, "%s: %s", aspectConst(name), s)
-			}
-		}
-		fmt.Fprintf(buf, "},\n")
+	if s := aspectSets.intern(e.aspects); s != "" {
+		fmt.Fprintf(buf, "%s\taspects: %s,\n", indent, s)
 	}
 	if len(e.boolTags) > 0 {
 		fmt.Fprintf(buf, "%s\tboolTags: map[string]bval{\n", indent)
 		for _, name := range slices.Sorted(maps.Keys(e.boolTags)) {
-			fmt.Fprintf(buf, "%s\t\t%q: %s,\n", indent, name, bvalExpr(e.boolTags[name]))
+			fmt.Fprintf(buf, "%s\t\t%q: %s,\n", indent, name, elideType(bvalExpr(e.boolTags[name])))
 		}
 		fmt.Fprintf(buf, "%s\t},\n", indent)
 	}
 	if len(e.tags) > 0 {
 		fmt.Fprintf(buf, "%s\ttags: map[string]sval{\n", indent)
 		for _, name := range slices.Sorted(maps.Keys(e.tags)) {
-			fmt.Fprintf(buf, "%s\t\t%q: %s,\n", indent, name, svalExpr(e.tags[name]))
+			fmt.Fprintf(buf, "%s\t\t%q: %s,\n", indent, name, elideType(svalExpr(e.tags[name])))
 		}
 		fmt.Fprintf(buf, "%s\t},\n", indent)
 	}
@@ -359,43 +349,91 @@ func aspectConst(name string) string {
 	return "a" + strings.ToUpper(name[:1]) + name[1:]
 }
 
+// aspectSets interns the aspect arrays of every emitted entry. The
+// built-in entries hold only a handful of distinct aspect
+// combinations between them, so naming each one once and referring to
+// it keeps both the generated code and the data it builds small.
+var aspectSets aspectSetTable
+
+type aspectSetTable struct {
+	names map[string]string // literal -> variable name
+	order []string          // literals, in first-seen order
+}
+
+// intern returns the name of the variable holding aspects, declaring a
+// new one if this combination has not been seen. It returns the empty
+// string if every aspect is unset, in which case the entry's zero
+// value already says the same thing.
+func (t *aspectSetTable) intern(aspects map[string]bval) string {
+	var lit strings.Builder
+	lit.WriteString("[numAspects]bval{")
+	first := true
+	for _, name := range aspectNames {
+		s := bvalExpr(aspects[name])
+		if s == "" {
+			continue
+		}
+		if !first {
+			lit.WriteString(", ")
+		}
+		first = false
+		fmt.Fprintf(&lit, "%s: %s", aspectConst(name), s)
+	}
+	lit.WriteString("}")
+	if first {
+		return ""
+	}
+	key := lit.String()
+	if name, ok := t.names[key]; ok {
+		return name
+	}
+	name := fmt.Sprintf("aspectSet%d", len(t.order))
+	if t.names == nil {
+		t.names = make(map[string]string)
+	}
+	t.names[key] = name
+	t.order = append(t.order, key)
+	return name
+}
+
+// emit writes the declarations for every interned aspect array. It
+// must run after the entries that refer to them have been emitted.
+func (t *aspectSetTable) emit(buf *bytes.Buffer) {
+	if len(t.order) == 0 {
+		return
+	}
+	fmt.Fprintf(buf, "// Aspect combinations shared by the entries below.\nvar (\n")
+	for _, key := range t.order {
+		fmt.Fprintf(buf, "\t%s = %s\n", t.names[key], key)
+	}
+	fmt.Fprintf(buf, ")\n\n")
+}
+
+// svalExpr and bvalExpr emit struct literals rather than calls to the
+// sval and bval constructors in unify.go. A call cannot be folded at
+// compile time, so every one of the hundreds of values here would
+// otherwise have to be built by instructions at run time; literals let
+// the compiler lay the shared aspect arrays out as static data.
+
 func svalExpr(v sval) string {
 	switch v.kind {
 	case unset:
 		return ""
 	case constraint:
 		if v.domain != nil {
-			args := make([]string, len(v.domain))
-			for i, d := range v.domain {
-				args[i] = fmt.Sprintf("%q", d)
-			}
-			return fmt.Sprintf("strDom(%s)", strings.Join(args, ", "))
+			return fmt.Sprintf("sval{kind: constraint, domain: %s}", stringSlice(v.domain))
 		}
-		args := make([]string, len(v.excluded))
-		for i, d := range v.excluded {
-			args[i] = fmt.Sprintf("%q", d)
-		}
-		return fmt.Sprintf("strNot(%s)", strings.Join(args, ", "))
+		return fmt.Sprintf("sval{kind: constraint, excluded: %s}", stringSlice(v.excluded))
 	case dflt:
-		if len(v.excluded) != 0 {
-			args := make([]string, 0, len(v.excluded)+1)
-			args = append(args, fmt.Sprintf("%q", v.value))
-			for _, d := range v.excluded {
-				args = append(args, fmt.Sprintf("%q", d))
-			}
-			return fmt.Sprintf("dstrNot(%s)", strings.Join(args, ", "))
+		switch {
+		case len(v.excluded) != 0:
+			return fmt.Sprintf("sval{kind: dflt, value: %q, excluded: %s}", v.value, stringSlice(v.excluded))
+		case v.domain != nil:
+			return fmt.Sprintf("sval{kind: dflt, value: %q, domain: %s}", v.value, stringSlice(v.domain))
 		}
-		if v.domain == nil {
-			return fmt.Sprintf("dstr(%q)", v.value)
-		}
-		args := make([]string, 0, len(v.domain)+1)
-		args = append(args, fmt.Sprintf("%q", v.value))
-		for _, d := range v.domain {
-			args = append(args, fmt.Sprintf("%q", d))
-		}
-		return fmt.Sprintf("dstrDom(%s)", strings.Join(args, ", "))
+		return fmt.Sprintf("sval{kind: dflt, value: %q}", v.value)
 	default:
-		return fmt.Sprintf("cstr(%q)", v.value)
+		return fmt.Sprintf("sval{kind: concrete, value: %q}", v.value)
 	}
 }
 
@@ -409,13 +447,32 @@ func bvalExpr(v bval) string {
 		}
 		return "dfalse"
 	case ref:
-		return fmt.Sprintf("rbool(%q)", v.reference)
+		return fmt.Sprintf("bval{kind: ref, reference: %q}", v.reference)
 	default:
 		if v.value {
 			return "ctrue"
 		}
 		return "cfalse"
 	}
+}
+
+// elideType drops the type name from a composite literal, as is
+// required of a value inside a map or slice literal of that same type
+// for the result to be gofmt -s clean. Values that are not composite
+// literals, such as the shared bvals, are returned unchanged.
+func elideType(lit string) string {
+	if i := strings.IndexByte(lit, '{'); i >= 0 {
+		return lit[i:]
+	}
+	return lit
+}
+
+func stringSlice(ss []string) string {
+	args := make([]string, len(ss))
+	for i, s := range ss {
+		args[i] = fmt.Sprintf("%q", s)
+	}
+	return fmt.Sprintf("[]string{%s}", strings.Join(args, ", "))
 }
 
 // extractEntry converts one evaluated #FileInfo-shaped CUE value into

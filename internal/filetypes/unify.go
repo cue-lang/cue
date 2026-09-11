@@ -79,8 +79,9 @@ type bval struct {
 	reference string
 }
 
-// Constructors used by the generated data in types_gen.go and by the
-// dynamic registry. The zero value is the unset state.
+// Constructors used by the dynamic registry. The generated data in
+// types_gen.go spells out its literals instead, so that it can be laid
+// out as static data. The zero value is the unset state.
 
 // cstr returns a concrete string value.
 func cstr(v string) sval { return sval{kind: concrete, value: v} }
@@ -88,20 +89,9 @@ func cstr(v string) sval { return sval{kind: concrete, value: v} }
 // dstr returns a defaulted string value with an open domain.
 func dstr(v string) sval { return sval{kind: dflt, value: v} }
 
-// dstrNot returns a defaulted string value excluding the listed values.
-func dstrNot(v string, deny ...string) sval {
-	return sval{kind: dflt, value: v, excluded: deny}
-}
-
 // dstrDom is dstr for a closed disjunction: v is the default and dom is
 // the sorted set of all admissible values (including v).
 func dstrDom(v string, dom ...string) sval { return sval{kind: dflt, value: v, domain: dom} }
-
-// strDom returns a non-default string constrained to the listed values.
-func strDom(dom ...string) sval { return sval{kind: constraint, domain: dom} }
-
-// strNot returns a non-default string excluding the listed values.
-func strNot(values ...string) sval { return sval{kind: constraint, excluded: values} }
 
 // cbool returns a concrete Boolean value.
 func cbool(v bool) bval { return bval{kind: concrete, value: v} }
@@ -109,16 +99,15 @@ func cbool(v bool) bval { return bval{kind: concrete, value: v} }
 // dbool returns a defaulted Boolean value.
 func dbool(v bool) bval { return bval{kind: dflt, value: v} }
 
-// rbool returns a Boolean default referencing another tag.
-func rbool(name string) bval {
-	return bval{kind: ref, reference: name}
-}
-
+// The bvals the generated aspect arrays are built from. These spell out
+// their literals rather than calling cbool and dbool so that the arrays
+// in types_gen.go, and hence the arrays copied from them, can be laid
+// out as static data.
 var (
-	cfalse = cbool(false)
-	ctrue  = cbool(true)
-	dfalse = dbool(false)
-	dtrue  = dbool(true)
+	cfalse = bval{kind: concrete, value: false}
+	ctrue  = bval{kind: concrete, value: true}
+	dfalse = bval{kind: dflt, value: false}
+	dtrue  = bval{kind: dflt, value: true}
 )
 
 // unify merges two tri-state values: unset yields to anything, a

@@ -891,6 +891,9 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	// For @embed to also work in _tool.cue files, we must pass the module info along.
 	ti.Module = binst[0].Module
 	ti.Root = binst[0].Root
+	// Resolve imports the same way as the package the tool files belong to,
+	// so that they share its build instances.
+	ti.CanonicalImportPath = binst[0].CanonicalImportPath
 
 	for _, inst := range binst {
 		inst.Files = slices.DeleteFunc(inst.Files, func(f *ast.File) bool {

@@ -6,9 +6,6 @@
 # definition in it exist twice, which changed the field order of values
 # unified with both copies: name is listed first only when #ObjectMeta
 # is shared.
-#
-# The golden output below records the current, incorrect behavior: the
-# package is loaded twice, and name is listed after labels.
 
 -- cue.mod/module.cue --
 module: "main.org"
@@ -75,19 +72,17 @@ package meta
 }
 -- out/modfetch/instance-info --
 main.org@v0:main module=main.org@v0 version=v0.9.0-main
-	dep.example/core module=dep.example@v0 version=v0.9.0-dep.example.v0.1.0
+	dep.example/core@v0 module=dep.example@v0 version=v0.9.0-dep.example.v0.1.0
 		schema.example/meta@v0 module=schema.example@v0 version=v0.9.0-schema.example.v0.2.0
-	schema.example/meta module=schema.example@v0 version=v0.9.0-schema.example.v0.2.0
--- out/modfetch/duplicate-instances --
-package meta in schema.example@v0.2.0 loaded as two instances: "schema.example/meta@v0" and "schema.example/meta"
+	schema.example/meta@v0 module=schema.example@v0 version=v0.9.0-schema.example.v0.2.0
 -- out/modfetch/result --
 {
 	objects: [{
 		apiVersion: "v1"
 		kind:       "Namespace"
 		metadata: {
-			labels: "app.kubernetes.io/part-of": "test"
 			name: "test"
+			labels: "app.kubernetes.io/part-of": "test"
 		}
 	}]
 }

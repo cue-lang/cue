@@ -238,7 +238,32 @@ func LoadPackages(
 	}
 	<-pkgs.work.Idle()
 	pkgs.buildStacks()
+	pkgs.addVersionedPaths()
 	return pkgs
+}
+
+// addVersionedPaths makes each package that was imported without a major
+// version also available from [Packages.Pkg] by its path with the major
+// version of the module that provides it, unless another package is already
+// registered by that path. Imports in the main module are loaded as spelled
+// in its source files, while imports in external modules are resolved to
+// versioned paths, so this lets callers look up any package by its canonical
+// versioned path, regardless of how its importers spelled it.
+func (pkgs *Packages) addVersionedPaths() {
+	for _, pkg := range pkgs.pkgs {
+		if pkg.err != nil || pkg.inStd || !pkg.mod.IsValid() || pkg.mod.IsLocal() {
+			continue
+		}
+		ip := ast.ParseImportPath(pkg.path)
+		if ip.Version != "" {
+			continue
+		}
+		// Packages in the main module have no version to add.
+		if ip.Version = semver.Major(pkg.mod.Version()); ip.Version == "" {
+			continue
+		}
+		pkgs.pkgCache.Do(ip.Canonical().String(), func() *Package { return pkg })
+	}
 }
 
 // buildStacks computes minimal import stacks for each package,
@@ -276,6 +301,8 @@ func (pkgs *Packages) All() []*Package {
 }
 
 // Pkg obtains a given package given its canonical import path.
+// A package imported without a major version can also be obtained
+// by its path with the major version of the module that provides it.
 func (pkgs *Packages) Pkg(canonicalPkgPath string) *Package {
 	pkg, _ := pkgs.pkgCache.Get(canonicalPkgPath)
 	return pkg

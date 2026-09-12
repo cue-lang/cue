@@ -121,6 +121,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 
 	pkg.User = true
 	l.addFiles(pkg)
+	l.setCanonicalImportPath(pkg)
 
 	_ = pkg.Complete()
 	pkg.DisplayPath = "command-line-arguments"

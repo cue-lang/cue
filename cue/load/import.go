@@ -553,36 +553,49 @@ func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromMo
 	return pkgpath.Join([]string{osPath, loc.Dir}, os), nil
 }
 
+// canonicalImportPath returns the canonical form of an import path found in
+// the main module. Beyond dropping a redundant package qualifier, it adds the
+// major version of the dependency module that provides the package, as
+// selected by the main module's default major versions, when the path omits
+// it. This is the same form that [modpkgload.Package.CanonicalImportPath]
+// produces for imports in dependency modules, so that a package shares one
+// build instance regardless of how each importer spells its path.
+func (l *loader) canonicalImportPath(importPath string) string {
+	ip := ast.ParseImportPath(importPath).Canonical()
+	if ip.Version != "" {
+		return ip.String()
+	}
+	pkg := l.pkgs.Pkg(ip.String())
+	if pkg == nil || pkg.Error() != nil {
+		return ip.String()
+	}
+	// Packages in the main module and in the local cue.mod directories have
+	// no version to add; neither do packages that could not be resolved.
+	ip.Version = semver.Major(pkg.Mod().Version())
+	return ip.String()
+}
+
 // setCanonicalImportPath sets a CanonicalImportPath function on the build instance.
 // This handles two kinds of canonicalization:
-//   - For external module packages, rewriting unversioned imports to include
-//     the correct major version based on the importing module's defaults.
+//   - Rewriting unversioned imports to include the correct major version:
+//     for external module packages, based on the importing module's own
+//     defaults; for main module packages, based on the main module's.
 //   - For all packages, rewriting imports that reference a replacement module's
 //     namespace back to the original module's namespace.
 func (l *loader) setCanonicalImportPath(p *build.Instance) {
 	if l.pkgs == nil {
 		return
 	}
-	parts := ast.ParseImportPath(p.ImportPath)
-	mpkg := l.pkgs.Pkg(parts.Canonical().String())
-
-	var externalCanonical func(string) string
-	if mpkg != nil && mpkg.FromExternalModule() {
-		externalCanonical = mpkg.CanonicalImportPath
+	canonical := l.canonicalImportPath
+	if mpkg := l.pkgs.Pkg(ast.ParseImportPath(p.ImportPath).Canonical().String()); mpkg != nil && mpkg.FromExternalModule() {
+		canonical = mpkg.CanonicalImportPath
 	}
 	repls := l.cfg.replacements
-
-	if externalCanonical == nil && repls == nil {
-		return
-	}
 	p.CanonicalImportPath = func(importPath string) string {
 		if repls != nil {
 			importPath = repls.CanonicalImportPath(importPath)
 		}
-		if externalCanonical != nil {
-			importPath = externalCanonical(importPath)
-		}
-		return importPath
+		return canonical(importPath)
 	}
 }
 

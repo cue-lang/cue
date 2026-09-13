@@ -340,6 +340,12 @@ type Field struct {
 
 	Value Expr // the value associated with this field.
 
+	// Equal and Default hold the position of "=" and the default expression
+	// of a function parameter, as in a: int = 2. They are set only on a
+	// FuncParam; a struct field never carries a default.
+	Equal   token.Pos
+	Default Expr
+
 	Attrs []*Attribute
 
 	comments
@@ -595,6 +601,9 @@ func (x *Interpolation) Quotes() (first, last *BasicLit) {
 //
 // If Label is nil, the parameter is anonymous and positional-only. Otherwise
 // Label, Alias, Constraint, and TokenPos have the same meaning as in Field.
+// Default, if set, is the parameter's default expression, written after "="
+// and used as the argument when a call leaves the parameter unbound; Equal is
+// the position of that "=".
 // Attrs holds field-style attributes following the parameter; like field
 // attributes, they do not affect evaluation.
 // FuncParam has Field's underlying representation so that their field-shaped
@@ -622,6 +631,9 @@ func (p *FuncParam) pos() *token.Pos {
 func (p *FuncParam) End() token.Pos {
 	if len(p.Attrs) > 0 {
 		return p.Attrs[len(p.Attrs)-1].End()
+	}
+	if p.Default != nil {
+		return p.Default.End()
 	}
 	if p.Value != nil {
 		return p.Value.End()

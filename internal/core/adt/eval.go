@@ -318,6 +318,12 @@ type nodeContext struct {
 
 	postChecks []envCheck // Check non-monotonic constraints, among other things.
 
+	// funcDefaultChecks holds the function literals evaluated within this
+	// node whose declared parameter defaults are checked against their
+	// constraints once the node's arcs have completed; see
+	// [Function.scheduleDefaultCheck].
+	funcDefaultChecks []funcDefaultCheck
+
 	// Disjunction handling
 	disjunctions []envDisjunct
 
@@ -505,22 +511,23 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 				constraintKind: TopKind,
 				defaultKind:    TopKind,
 			},
-			toFree:          n.toFree[:0],
-			arcMap:          n.arcMap[:0],
-			cyclicConjuncts: n.cyclicConjuncts[:0],
-			notify:          n.notify[:0],
-			sharedIDs:       n.sharedIDs[:0],
-			checks:          n.checks[:0],
-			postChecks:      n.postChecks[:0],
-			reqDefIDs:       n.reqDefIDs[:0],
-			replaceIDs:      n.replaceIDs[:0],
-			flatReplaceIDs:  n.flatReplaceIDs[:0],
-			conjunctInfo:    n.conjunctInfo[:0],
-			reqSets:         n.reqSets[:0],
-			disjunctions:    n.disjunctions[:0],
-			disjunctErrs:    n.disjunctErrs[:0],
-			userErrs:        n.userErrs[:0],
-			disjuncts:       n.disjuncts[:0],
+			toFree:            n.toFree[:0],
+			arcMap:            n.arcMap[:0],
+			cyclicConjuncts:   n.cyclicConjuncts[:0],
+			notify:            n.notify[:0],
+			sharedIDs:         n.sharedIDs[:0],
+			checks:            n.checks[:0],
+			postChecks:        n.postChecks[:0],
+			funcDefaultChecks: n.funcDefaultChecks[:0],
+			reqDefIDs:         n.reqDefIDs[:0],
+			replaceIDs:        n.replaceIDs[:0],
+			flatReplaceIDs:    n.flatReplaceIDs[:0],
+			conjunctInfo:      n.conjunctInfo[:0],
+			reqSets:           n.reqSets[:0],
+			disjunctions:      n.disjunctions[:0],
+			disjunctErrs:      n.disjunctErrs[:0],
+			userErrs:          n.userErrs[:0],
+			disjuncts:         n.disjuncts[:0],
 		}
 		n.scheduler.clear()
 	} else {

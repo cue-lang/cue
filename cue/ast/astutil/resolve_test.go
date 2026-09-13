@@ -152,6 +152,28 @@ f: func(x: int) -> (func(a: int) -> int: x): 1
 		wantErr: []string{
 			`cannot refer to parameter "x" in a parameter constraint or return type`,
 		},
+	}, {
+		desc: "parameter default resolves in the enclosing scope",
+		src: `
+@experiment(functions)
+base: 1
+f: func(x: int = base) -> int: x
+`,
+	}, {
+		desc: "parameter default referring to sibling parameter is reserved",
+		src: `
+@experiment(functions)
+f: func(x: int, y: int = x) -> int: y
+`,
+		wantErr: []string{
+			`cannot refer to parameter "x" in a parameter constraint or return type`,
+		},
+	}, {
+		desc: "nested function in parameter default resolves own parameter in body",
+		src: `
+@experiment(functions)
+f: func(g: _ = (func(a: int) -> int: a + 1)) -> int: 1
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

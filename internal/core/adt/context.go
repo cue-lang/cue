@@ -217,14 +217,18 @@ type OpContext struct {
 	// indexed by parameter position. See [anonParamLabel].
 	anonParamLabels []Feature
 
-	// probingDefaults tracks the native CUE function literals whose parameter
-	// defaults are currently being probed for arity checking. Unlike a call
-	// body (which the structural cycle detector handles through the shared
-	// anchor), the default probe runs outside any vertex, so a recursive or
-	// mutually recursive default would loop forever. Re-entering the probe for
-	// a function already on this set is treated as "no single default", which
-	// surfaces as a missing-argument error.
-	probingDefaults map[*Function]bool
+	// checkingDefaults tracks the function literals, per closure, whose
+	// declared parameter defaults are being checked against their constraints
+	// (see [Function.checkDefaults]). The check runs outside any call, so a
+	// default that calls the function itself would re-enter it; re-entry for
+	// a closure already on this set leaves the check undone, and the call
+	// that omits the parameter reports the cycle.
+	checkingDefaults map[funcAnchorKey]bool
+
+	// funcDefaultsChecked records the closures whose parameter defaults have
+	// been checked (see [Function.checkDefaults]), so that the check runs
+	// once per closure.
+	funcDefaultsChecked map[funcAnchorKey]bool
 
 	// Source node associated with the CUE operation, if any.
 	// When nil, created nodes like [Bool] may use sentinels to avoid allocations.

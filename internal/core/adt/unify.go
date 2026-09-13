@@ -766,6 +766,23 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		ctx.popConjunct(f)
 	}
 
+	// The declared parameter defaults of function literals evaluated within
+	// this node are checked now that its arcs have completed, so that
+	// nothing a default refers to is still in flight; see
+	// [Function.scheduleDefaultCheck]. An error is placed on the vertex that
+	// holds the literal, making the function value itself the error, and
+	// recorded on this node like any other child error.
+	for _, chk := range n.funcDefaultChecks {
+		b := chk.fn.checkDefaults(n.ctx, chk.env)
+		if b == nil {
+			continue
+		}
+		if chk.holder != nil && chk.holder != n.node {
+			chk.holder.AddErr(n.ctx, b)
+		}
+		n.AddChildError(b)
+	}
+
 	// This should be called after all arcs have been processed, because
 	// whether sharing is possible or not may depend on how arcs with type
 	// ArcPending will resolve.

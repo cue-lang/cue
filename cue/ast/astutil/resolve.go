@@ -425,17 +425,24 @@ func (s *scope) Before(n ast.Node) bool {
 		return false
 
 	case *ast.Func:
-		// Parameter constraints and the return type resolve in the enclosing
-		// scope; only the body gets a function-parameter scope. A reference to
-		// another parameter is reserved for a possible future dependent-
-		// parameter feature and is reported as an error rather than silently
-		// binding to a like-named field of an enclosing scope.
+		// Parameter constraints, parameter defaults, and the return type
+		// resolve in the enclosing scope; only the body gets a
+		// function-parameter scope. A reference to another parameter is
+		// reserved for a possible future dependent-parameter feature and is
+		// reported as an error rather than silently binding to a like-named
+		// field of an enclosing scope.
 		if params := x.Parameters(); len(params) > 0 {
 			cs := newFuncScope(s.file, s, x)
 			cs.identFn = paramConstraintIdentFn(cs, cs.identFn)
 			for _, p := range params {
-				if p != nil && p.Value != nil {
+				if p == nil {
+					continue
+				}
+				if p.Value != nil {
 					ast.Walk(p.Value, cs.Before, nil)
+				}
+				if p.Default != nil {
+					ast.Walk(p.Default, cs.Before, nil)
 				}
 			}
 			if x.Ret != nil {

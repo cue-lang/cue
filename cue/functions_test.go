@@ -37,16 +37,16 @@ sum: func(a: int, b: int) -> int: a + b
 twice: func(n: int) -> int: sum(n, n)
 add1: func(_~x: int) -> int: x + 1
 addNamed: func(_~x: int, a: int) -> int: x + a
-pick: func(a: int | *5) -> int: a
+pick: func(a: int = 5) -> int: a
 defaultValue: int | *6
-pickRef: func(a: defaultValue) -> int: a
+pickRef: func(a: int = defaultValue) -> int: a
 keyword: func(a!: int, b?: int) -> int: a
 base: 10
 capture: func(a: int) -> int: a + base
 paramScope: {
 	base: int | *7
 	f: func(a: string, b: base) -> int: b
-	out: f("shadow")
+	out: f("shadow", 7)
 }
 
 typedAdd1: func(_~x: int) -> int: x + 1
@@ -494,21 +494,21 @@ out: bad(1)
 			in: `
 @experiment(functions)
 
-f: func(n: int | *f()) -> int: n
+f: func(n: int = f()) -> int: n
 out: f()
 `,
-			err: "missing argument n",
+			err: "structural cycle",
 		},
 		{
 			name: "mutual recursive default",
 			in: `
 @experiment(functions)
 
-f: func(n: int | *g()) -> int: n
-g: func(n: int | *f()) -> int: n
+f: func(n: int = g()) -> int: n
+g: func(n: int = f()) -> int: n
 out: f()
 `,
-			err: "missing argument n",
+			err: "structural cycle",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

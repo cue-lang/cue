@@ -184,6 +184,7 @@ func (c *cloner) node(node Node) Node {
 		x.Label = clone(c, n.Label)
 		x.Alias = clone(c, n.Alias)
 		x.Value = clone(c, n.Value)
+		x.Default = clone(c, n.Default)
 		x.Attrs = cloneList(c, n.Attrs)
 		return x
 

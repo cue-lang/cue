@@ -52,20 +52,187 @@ arguments: {
 	}
 }
 
+// A parameter default is declared with = and applies only when the caller
+// leaves the parameter unbound; a supplied argument makes it irrelevant. A
+// default reached through a reference is an ordinary part of the constraint
+// and does not make the parameter omittable.
 defaults: {
 	value:   int | *6
-	pick:    func(a: int | *5) -> int: a
+	pick:    func(a: int = 5) -> int: a
 	pickRef: func(a: value) -> int: a
-	pickAmbiguous: func(a: int | *1 | *2) -> int: a
-	pickRecursive: func(a: int | *pickRecursive()) -> int: a
-	pickMutualA:   func(a: int | *pickMutualB()) -> int: a
-	pickMutualB:   func(a: int | *pickMutualA()) -> int: a
+	pickAmbiguous: func(a: int = 1 | 2) -> int: a
+	pickRecursive: func(a: int = pickRecursive()) -> int: a
+	pickMutualA:   func(a: int = pickMutualB()) -> int: a
+	pickMutualB:   func(a: int = pickMutualA()) -> int: a
 
 	literal:   pick()
+	supplied:  pick(3)
 	reference: pickRef()
+	referenceSupplied: pickRef(1)
 	ambiguous: pickAmbiguous()
-	recursive: pickRecursive()
-	mutualRecursive: pickMutualA()
+
+	// A default that calls its own function is a cycle when it fires, and
+	// nothing else: the literal is not an error, and a call that supplies
+	// the argument never evaluates the default.
+	recursive:         pickRecursive()
+	recursiveSupplied: pickRecursive(3)
+	mutualRecursive:   pickMutualA()
+	mutualSupplied:    pickMutualA(4)
+
+	// The same holds when the self-reference is nested inside a
+	// disjunction, a struct, or a list in the default: the declaration
+	// check must not taint the function for callers that supply the
+	// argument.
+	compound: {
+		f:    func(n: int = 1 | f()) -> int: n
+		out:  f(3)
+		g:    func(n: {x: int} = {x: g({x: 1})}) -> int: n.x
+		outg: g({x: 4})
+		h:    func(n: [...int] = [h([1])]) -> int: n[0]
+		outh: h([5])
+	}
+}
+
+// The declared-default scenarios and the argument-kind × binding-mode matrix:
+// a supplied argument of any kind displaces the default.
+declaredDefaults: {
+	add: func(a: int, b: int = 10) -> int: a + b
+	// id returns the parameter itself, so the value the parameter took is
+	// observable even when it is not concrete.
+	id:  func(a: int, b: int = 10) -> int: b
+	x:   int | *5
+	ref: 7
+
+	omitted:    add(1)
+	positional: add(1, 2)
+	labeled:    add(1, b: 2)
+	reordered:  add(b: 2, a: 1)
+
+	// An argument carrying its own disjunction default keeps it: the
+	// parameter is the argument unified with the constraint, and no conflict
+	// with the parameter default is reported.
+	defaultedArg: id(1, x)
+	defaultedArgSelected: {
+		out: add(1, x)
+	}
+	// A non-concrete argument does not fire the default: the parameter is
+	// the argument, and arithmetic on it is incomplete rather than 11.
+	topArg:     id(1, _)
+	topArgSum:  add(1, _)
+
+	// {literal, reference, defaulted disjunction, top} × {positional,
+	// labeled, via partial application}.
+	matrix: {
+		posLit:  add(1, 2)
+		posRef:  add(1, ref)
+		posDef:  id(1, x)
+		posTop:  id(1, _)
+		labLit:  add(1, b: 2)
+		labRef:  add(1, b: ref)
+		labDef:  id(1, b: x)
+		labTop:  id(1, b: _)
+		partLit: add(1, 2, ...)()
+		partRef: add(1, ref, ...)()
+		partDef: id(1, x, ...)()
+		partTop: id(1, _, ...)()
+	}
+
+	// The default resolves in the signature's scope, not the caller's.
+	scope: {
+		base: 7
+		f:    func(a: int = base) -> int: a
+		caller: {
+			base: 9
+			out:  f()
+		}
+	}
+
+	// A required parameter is the name-only counterpart of a plain one: a
+	// default makes it omittable the same way, and it takes the default
+	// when omitted.
+	required: {
+		f:        func(a!: int = 1, b?: int) -> int: a
+		omitted:  f()
+		supplied: f(a: 4)
+		labeled:  f(b: 2, a: 3)
+		noDefault: {
+			g:   func(a!: int, b!: int = 2) -> int: a + b
+			out: g(a: 1)
+			err: g(b: 1)
+		}
+	}
+
+	// An omitted optional parameter is absent in the body, as an absent
+	// optional field is: a reference to it is the same error, and the call
+	// is incomplete. Supplying it binds it like any other argument.
+	optional: {
+		g:       func(b?: int) -> _: b
+		absent:  g()
+		present: g(b: 3)
+		unused:  (func(a: int, b?: int) -> int: a)(1)
+	}
+
+	// A positional-only parameter with a default is omitted by supplying
+	// fewer positional arguments; later parameters are then bound by label.
+	positionalOnly: {
+		f:        func(_~x: int = 1, y: int) -> int: x + y
+		byLabel:  f(y: 2)
+		both:     f(5, 2)
+		missingY: f(5)
+	}
+
+	// A default reached through a reference does not make the parameter
+	// omittable, but flows into the parameter like any other value.
+	viaReference: {
+		#Port:    int | *80
+		f:        func(p: #Port) -> int: p
+		omitted:  f()
+		supplied: f(8080)
+		open:     f(int)
+	}
+
+	// Partial application: a bound parameter loses its default; the rest keep
+	// theirs until completion.
+	partial: {
+		add3: func(a: int, b: int = 10, c: int = 100) -> int: a + b + c
+		f:    add3(1, ...)
+		all:  f()
+		one:  f(2)
+		lab:  f(c: 3)
+	}
+}
+
+// A default is checked against its parameter's constraint once the struct
+// declaring the literal has completed, whether or not the function is called;
+// the function value is then the error. A default that cannot be evaluated
+// yet leaves the check undone: the omitting call is incomplete.
+declarationCheck: {
+	uncalled: {
+		f: func(a: int = "x") -> int: 1
+	}
+	// A supplied argument never meets the default, so a call made while the
+	// struct is still evaluating succeeds; the literal is still reported.
+	called: {
+		f:   func(a: int = "x") -> int: 1
+		out: f(1)
+	}
+	// A default that is itself an error is reported as an invalid default.
+	erroneous: {
+		f: func(a: int = (1 & "x")) -> int: a
+	}
+	incomplete: {
+		pending: int
+		f:       func(a: int = pending) -> int: a
+		out:     f()
+	}
+	// The check is per closure: a literal that closes over a call's
+	// parameter is checked against the value it received.
+	closure: {
+		make:   func(v: _) -> _: func(a: int = v) -> int: a
+		ok:     make(2)()
+		alone:  make("x")(1)
+		nested: make(make("x")(1))()
+	}
 }
 
 scoping: {
@@ -83,12 +250,15 @@ scoping: {
 	parameter: {
 		// A parameter constraint resolves in the scope enclosing the function,
 		// so it may refer to an outer field (but not to another parameter; see
-		// TestFunctionParameterScope).
-		base: int | *7
-		fn:   func(a: string, b: base) -> int: b
-		out:  fn("shadow")
+		// TestFunctionParameterScope). A default reached through such a
+		// reference flows into the parameter but does not make it omittable.
+		base:    int | *7
+		fn:      func(a: string, b: base) -> int: b
+		out:     fn("shadow", 1)
+		omitted: fn("shadow")
+		open:    fn("shadow", int)
 		selected: {
-			out: fn("shadow")
+			out: fn("shadow", int)
 		}
 	}
 
@@ -115,11 +285,12 @@ scoping: {
 			out:   add3(4)
 		}
 
-		// A function literal with a body in a parameter constraint refers to
-		// its own parameter.
+		// A function literal with a body in a parameter default refers to its
+		// own parameter.
 		paramDefault: {
-			f:   func(g: int | *(func(a: int) -> int: a + 1)) -> int: 1
-			out: f(2)
+			f:       func(g: _ = (func(a: int) -> int: a + 1)) -> int: 1
+			out:     f(2)
+			omitted: f()
 		}
 
 		// The same, in a return-type disjunction.
@@ -456,17 +627,143 @@ partial: {
   }
   defaults: {
     value: (int|*6)
-    pick: func(a: (int|*5)) -> int: 〈0;a〉
+    pick: func(a: int = 5) -> int: 〈0;a〉
     pickRef: func(a: 〈0;value〉) -> int: 〈0;a〉
-    pickAmbiguous: func(a: (int|*1|*2)) -> int: 〈0;a〉
-    pickRecursive: func(a: (int|*〈0;pickRecursive〉())) -> int: 〈0;a〉
-    pickMutualA: func(a: (int|*〈0;pickMutualB〉())) -> int: 〈0;a〉
-    pickMutualB: func(a: (int|*〈0;pickMutualA〉())) -> int: 〈0;a〉
+    pickAmbiguous: func(a: int = (1|2)) -> int: 〈0;a〉
+    pickRecursive: func(a: int = 〈0;pickRecursive〉()) -> int: 〈0;a〉
+    pickMutualA: func(a: int = 〈0;pickMutualB〉()) -> int: 〈0;a〉
+    pickMutualB: func(a: int = 〈0;pickMutualA〉()) -> int: 〈0;a〉
     literal: 〈0;pick〉()
+    supplied: 〈0;pick〉(3)
     reference: 〈0;pickRef〉()
+    referenceSupplied: 〈0;pickRef〉(1)
     ambiguous: 〈0;pickAmbiguous〉()
     recursive: 〈0;pickRecursive〉()
+    recursiveSupplied: 〈0;pickRecursive〉(3)
     mutualRecursive: 〈0;pickMutualA〉()
+    mutualSupplied: 〈0;pickMutualA〉(4)
+    compound: {
+      f: func(n: int = (1|〈0;f〉())) -> int: 〈0;n〉
+      out: 〈0;f〉(3)
+      g: func(n: {
+        x: int
+      } = {
+        x: 〈1;g〉({
+          x: 1
+        })
+      }) -> int: 〈0;n〉.x
+      outg: 〈0;g〉({
+        x: 4
+      })
+      h: func(n: [
+        ...int,
+      ] = [
+        〈1;h〉([
+          1,
+        ]),
+      ]) -> int: 〈0;n〉[0]
+      outh: 〈0;h〉([
+        5,
+      ])
+    }
+  }
+  declaredDefaults: {
+    add: func(a: int, b: int = 10) -> int: (〈0;a〉 + 〈0;b〉)
+    id: func(a: int, b: int = 10) -> int: 〈0;b〉
+    x: (int|*5)
+    ref: 7
+    omitted: 〈0;add〉(1)
+    positional: 〈0;add〉(1, 2)
+    labeled: 〈0;add〉(1, b: 2)
+    reordered: 〈0;add〉(b: 2, a: 1)
+    defaultedArg: 〈0;id〉(1, 〈0;x〉)
+    defaultedArgSelected: {
+      out: 〈1;add〉(1, 〈1;x〉)
+    }
+    topArg: 〈0;id〉(1, _)
+    topArgSum: 〈0;add〉(1, _)
+    matrix: {
+      posLit: 〈1;add〉(1, 2)
+      posRef: 〈1;add〉(1, 〈1;ref〉)
+      posDef: 〈1;id〉(1, 〈1;x〉)
+      posTop: 〈1;id〉(1, _)
+      labLit: 〈1;add〉(1, b: 2)
+      labRef: 〈1;add〉(1, b: 〈1;ref〉)
+      labDef: 〈1;id〉(1, b: 〈1;x〉)
+      labTop: 〈1;id〉(1, b: _)
+      partLit: 〈1;add〉(1, 2)()
+      partRef: 〈1;add〉(1, 〈1;ref〉)()
+      partDef: 〈1;id〉(1, 〈1;x〉)()
+      partTop: 〈1;id〉(1, _)()
+    }
+    scope: {
+      base: 7
+      f: func(a: int = 〈0;base〉) -> int: 〈0;a〉
+      caller: {
+        base: 9
+        out: 〈1;f〉()
+      }
+    }
+    required: {
+      f: func(a!: int = 1, b?: int) -> int: 〈0;a〉
+      omitted: 〈0;f〉()
+      supplied: 〈0;f〉(a: 4)
+      labeled: 〈0;f〉(b: 2, a: 3)
+      noDefault: {
+        g: func(a!: int, b!: int = 2) -> int: (〈0;a〉 + 〈0;b〉)
+        out: 〈0;g〉(a: 1)
+        err: 〈0;g〉(b: 1)
+      }
+    }
+    optional: {
+      g: func(b?: int) -> _: 〈0;b〉
+      absent: 〈0;g〉()
+      present: 〈0;g〉(b: 3)
+      unused: func(a: int, b?: int) -> int: 〈0;a〉(1)
+    }
+    positionalOnly: {
+      f: func(int = 1, y: int) -> int: (〈0;x〉 + 〈0;y〉)
+      byLabel: 〈0;f〉(y: 2)
+      both: 〈0;f〉(5, 2)
+      missingY: 〈0;f〉(5)
+    }
+    viaReference: {
+      #Port: (int|*80)
+      f: func(p: 〈0;#Port〉) -> int: 〈0;p〉
+      omitted: 〈0;f〉()
+      supplied: 〈0;f〉(8080)
+      open: 〈0;f〉(int)
+    }
+    partial: {
+      add3: func(a: int, b: int = 10, c: int = 100) -> int: ((〈0;a〉 + 〈0;b〉) + 〈0;c〉)
+      f: 〈0;add3〉(1)
+      all: 〈0;f〉()
+      one: 〈0;f〉(2)
+      lab: 〈0;f〉(c: 3)
+    }
+  }
+  declarationCheck: {
+    uncalled: {
+      f: func(a: int = "x") -> int: 1
+    }
+    called: {
+      f: func(a: int = "x") -> int: 1
+      out: 〈0;f〉(1)
+    }
+    erroneous: {
+      f: func(a: int = (1 & "x")) -> int: 〈0;a〉
+    }
+    incomplete: {
+      pending: int
+      f: func(a: int = 〈0;pending〉) -> int: 〈0;a〉
+      out: 〈0;f〉()
+    }
+    closure: {
+      make: func(v: _) -> _: func(a: int = 〈0;v〉) -> int: 〈0;a〉
+      ok: 〈0;make〉(2)()
+      alone: 〈0;make〉("x")(1)
+      nested: 〈0;make〉(〈0;make〉("x")(1))()
+    }
   }
   scoping: {
     capture: {
@@ -481,9 +778,11 @@ partial: {
     parameter: {
       base: (int|*7)
       fn: func(a: string, b: 〈0;base〉) -> int: 〈0;b〉
-      out: 〈0;fn〉("shadow")
+      out: 〈0;fn〉("shadow", 1)
+      omitted: 〈0;fn〉("shadow")
+      open: 〈0;fn〉("shadow", int)
       selected: {
-        out: 〈1;fn〉("shadow")
+        out: 〈1;fn〉("shadow", int)
       }
     }
     returnType: {
@@ -500,8 +799,9 @@ partial: {
         out: 〈0;add3〉(4)
       }
       paramDefault: {
-        f: func(g: (int|*func(a: int) -> int: (〈0;a〉 + 1))) -> int: 1
+        f: func(g: _ = func(a: int) -> int: (〈0;a〉 + 1)) -> int: 1
         out: 〈0;f〉(2)
+        omitted: 〈0;f〉()
       }
       returnDisjunct: {
         f: func(x: int) -> (int|func(a: int) -> int: 〈0;a〉): 〈0;x〉

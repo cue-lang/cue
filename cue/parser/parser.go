@@ -1714,6 +1714,7 @@ func (p *parser) parseFuncParam() (param *ast.FuncParam) {
 			p.checkFuncParamName(param)
 			param.TokenPos = p.expect(token.COLON)
 			param.Value = p.parseExpr()
+			p.parseFuncParamDefault(param)
 			p.checkFuncParamColon(param)
 			param.Attrs = p.parseAttributes()
 			return param
@@ -1721,9 +1722,34 @@ func (p *parser) parseFuncParam() (param *ast.FuncParam) {
 	}
 
 	param.Value = p.parseExpr()
+	p.parseFuncParamDefault(param)
 	p.checkFuncParamColon(param)
 	param.Attrs = p.parseAttributes()
 	return param
+}
+
+// parseFuncParamDefault parses the optional default that may follow a
+// parameter's constraint: "=" and an expression, as in a: int = 2. The
+// default applies when a call leaves the parameter unbound. A required
+// parameter (a!) is the name-only counterpart of a named one, so a default
+// makes it omittable in the same way. An optional parameter (a?) is absent
+// from the body when omitted, so a default on it could never apply and is
+// reported; the expression is still parsed to keep the parameter list in
+// sync.
+func (p *parser) parseFuncParamDefault(param *ast.FuncParam) {
+	if p.tok != token.BIND {
+		return
+	}
+	param.Equal = p.pos
+	if param.Constraint == token.OPTION {
+		name := "_"
+		if ident, ok := param.Label.(*ast.Ident); ok {
+			name = ident.Name
+		}
+		p.errf(p.pos, "optional parameter %s cannot have a default; declare it as %s! instead", name, name)
+	}
+	p.next()
+	param.Default = p.parseExpr()
 }
 
 // checkFuncParamName reports a dedicated error for a parameter name that is a

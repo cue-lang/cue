@@ -51,7 +51,7 @@ package path
 //
 // A pattern may not contain '**', as a wildcard matching separator characters
 // is not supported at this time.
-Match: func(pattern: string, name: string, os: string | *"unix") -> bool
+Match: func(pattern: string, name: string, os: string = "unix") -> bool
 
 Unix: "unix"
 
@@ -83,7 +83,7 @@ Plan9: "plan9"
 // See also Rob Pike, “Lexical File Names in Plan 9 or
 // Getting Dot-Dot Right,”
 // https://9p.io/sys/doc/lexnames.html
-Clean: func(path: string, os: string | *"unix") -> string
+Clean: func(path: string, os: string = "unix") -> string
 
 // ToSlash returns the result of replacing each separator character
 // in path with a slash ('/') character. Multiple separators are
@@ -106,7 +106,7 @@ SplitList: func(path: string, os: string) -> [...string]
 // If there is no slash in path, Split returns an empty dir and file set to
 // path. The returned values have the property that path = dir+file.
 // The default value for os is Unix.
-Split: func(path: string, os: string | *"unix") -> [...string]
+Split: func(path: string, os: string = "unix") -> [...string]
 
 // Join joins any number of path elements into a single path,
 // separating them with an OS specific Separator. Empty elements
@@ -116,18 +116,18 @@ Split: func(path: string, os: string | *"unix") -> [...string]
 // On Windows, the result will only be a UNC path if the first
 // non-empty element is a UNC path.
 // The default value for os is Unix.
-Join: func(elem: [...string], os: string | *"unix") -> string
+Join: func(elem: [...string], os: string = "unix") -> string
 
 // Ext returns the file name extension used by path.
 // The extension is the suffix beginning at the final dot
 // in the final element of path; it is empty if there is
 // no dot. The default value for os is Unix.
-Ext: func(path: string, os: string | *"unix") -> string
+Ext: func(path: string, os: string = "unix") -> string
 
 // Resolve reports the path of sub relative to dir. If sub is an absolute path,
 // or if dir is empty, it will return sub. If sub is empty, it will return dir.
 // Resolve calls Clean on the result. The default value for os is Unix.
-Resolve: func(dir: string, sub: string, os: string | *"unix") -> string
+Resolve: func(dir: string, sub: string, os: string = "unix") -> string
 
 // Rel returns a relative path that is lexically equivalent to targpath when
 // joined to basepath with an intervening separator. That is,
@@ -137,14 +137,14 @@ Resolve: func(dir: string, sub: string, os: string | *"unix") -> string
 // An error is returned if targpath can't be made relative to basepath or if
 // knowing the current working directory would be necessary to compute it.
 // Rel calls Clean on the result. The default value for os is Unix.
-Rel: func(basepath: string, targpath: string, os: string | *"unix") -> string
+Rel: func(basepath: string, targpath: string, os: string = "unix") -> string
 
 // Base returns the last element of path.
 // Trailing path separators are removed before extracting the last element.
 // If the path is empty, Base returns ".".
 // If the path consists entirely of separators, Base returns a single separator.
 // The default value for os is Unix.
-Base: func(path: string, os: string | *"unix") -> string
+Base: func(path: string, os: string = "unix") -> string
 
 // Dir returns all but the last element of path, typically the path's directory.
 // After dropping the final element, Dir calls Clean on the path and trailing
@@ -153,16 +153,16 @@ Base: func(path: string, os: string | *"unix") -> string
 // If the path consists entirely of separators, Dir returns a single separator.
 // The returned path does not end in a separator unless it is the root directory.
 // The default value for os is Unix.
-Dir: func(path: string, os: string | *"unix") -> string
+Dir: func(path: string, os: string = "unix") -> string
 
 // IsAbs reports whether the path is absolute. The default value for os is Unix.
 // Note that because IsAbs has a default value, it cannot be used as
 // a validator.
-IsAbs: func(path: string, os: string | *"unix") -> bool
+IsAbs: func(path: string, os: string = "unix") -> bool
 
 // VolumeName returns leading volume name.
 // Given "C:\foo\bar" it returns "C:" on Windows.
 // Given "\\host\share\foo" it returns "\\host\share".
 // On other platforms it returns "".
 // The default value for os is Windows.
-VolumeName: func(path: string, os: string | *"unix") -> string
+VolumeName: func(path: string, os: string = "unix") -> string

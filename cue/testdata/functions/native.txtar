@@ -52,20 +52,193 @@ arguments: {
 	}
 }
 
+// A parameter default is declared with = and applies only when the caller
+// leaves the parameter unbound; a supplied argument makes it irrelevant. A
+// default reached through a reference is an ordinary part of the constraint
+// and does not make the parameter omittable.
 defaults: {
 	value:   int | *6
-	pick:    func(a: int | *5) -> int: a
+	pick:    func(a: int = 5) -> int: a
 	pickRef: func(a: value) -> int: a
-	pickAmbiguous: func(a: int | *1 | *2) -> int: a
-	pickRecursive: func(a: int | *pickRecursive()) -> int: a
-	pickMutualA:   func(a: int | *pickMutualB()) -> int: a
-	pickMutualB:   func(a: int | *pickMutualA()) -> int: a
+	pickAmbiguous: func(a: int = 1 | 2) -> int: a
+	pickRecursive: func(a: int = pickRecursive()) -> int: a
+	pickMutualA:   func(a: int = pickMutualB()) -> int: a
+	pickMutualB:   func(a: int = pickMutualA()) -> int: a
 
-	literal:   pick() @test(eq, int | *5)
-	reference: pickRef() @test(eq, int | *6)
-	ambiguous: pickAmbiguous() @test(err, code=eval, contains="missing argument a")
-	recursive: pickRecursive() @test(err, code=eval, contains="missing argument a")
-	mutualRecursive: pickMutualA() @test(err, code=eval, contains="missing argument a")
+	literal:   pick() @test(eq, 5)
+	supplied:  pick(3) @test(eq, 3)
+	reference: pickRef() @test(err, code=eval, contains="missing argument a")
+	referenceSupplied: pickRef(1) @test(eq, 1)
+	ambiguous: pickAmbiguous() @test(eq, 1 | 2)
+
+	// A default that calls its own function is a cycle when it fires, and
+	// nothing else: the literal is not an error, and a call that supplies
+	// the argument never evaluates the default.
+	recursive:         pickRecursive() @test(err, code=structural_cycle, contains="structural cycle")
+	recursiveSupplied: pickRecursive(3) @test(eq, 3)
+	mutualRecursive:   pickMutualA() @test(err, code=structural_cycle, contains="structural cycle")
+	mutualSupplied:    pickMutualA(4) @test(eq, 4)
+
+	// The same holds when the self-reference is nested inside a
+	// disjunction, a struct, or a list in the default: the declaration
+	// check must not taint the function for callers that supply the
+	// argument.
+	compound: {
+		f:    func(n: int = 1 | f()) -> int: n
+		out:  f(3) @test(eq, 3)
+		g:    func(n: {x: int} = {x: g({x: 1})}) -> int: n.x
+		outg: g({x: 4}) @test(eq, 4)
+		h:    func(n: [...int] = [h([1])]) -> int: n[0]
+		outh: h([5]) @test(eq, 5)
+	}
+}
+
+// The declared-default scenarios and the argument-kind × binding-mode matrix:
+// a supplied argument of any kind displaces the default.
+declaredDefaults: {
+	add: func(a: int, b: int = 10) -> int: a + b
+	// id returns the parameter itself, so the value the parameter took is
+	// observable even when it is not concrete.
+	id:  func(a: int, b: int = 10) -> int: b
+	x:   int | *5
+	ref: 7
+
+	omitted:    add(1) @test(eq, 11)
+	positional: add(1, 2) @test(eq, 3)
+	labeled:    add(1, b: 2) @test(eq, 3)
+	reordered:  add(b: 2, a: 1) @test(eq, 3)
+
+	// An argument carrying its own disjunction default keeps it: the
+	// parameter is the argument unified with the constraint, and no conflict
+	// with the parameter default is reported.
+	defaultedArg: id(1, x) @test(eq, int | *5)
+	defaultedArgSelected: {
+		out: add(1, x)
+		@test(eq, {
+			out: 6 @test(final)
+		})
+	}
+	// A non-concrete argument does not fire the default: the parameter is
+	// the argument, and arithmetic on it is incomplete rather than 11.
+	topArg:     id(1, _) @test(eq, int)
+	topArgSum:  add(1, _) @test(err, code=incomplete)
+
+	// {literal, reference, defaulted disjunction, top} × {positional,
+	// labeled, via partial application}.
+	matrix: {
+		posLit:  add(1, 2) @test(eq, 3)
+		posRef:  add(1, ref) @test(eq, 8)
+		posDef:  id(1, x) @test(eq, int | *5)
+		posTop:  id(1, _) @test(eq, int)
+		labLit:  add(1, b: 2) @test(eq, 3)
+		labRef:  add(1, b: ref) @test(eq, 8)
+		labDef:  id(1, b: x) @test(eq, int | *5)
+		labTop:  id(1, b: _) @test(eq, int)
+		partLit: add(1, 2, ...)() @test(eq, 3)
+		partRef: add(1, ref, ...)() @test(eq, 8)
+		partDef: id(1, x, ...)() @test(eq, int | *5)
+		partTop: id(1, _, ...)() @test(eq, int)
+	}
+
+	// The default resolves in the signature's scope, not the caller's.
+	scope: {
+		base: 7
+		f:    func(a: int = base) -> int: a
+		caller: {
+			base: 9 @test(eq, 9)
+			out:  f() @test(eq, 7)
+		}
+	}
+
+	// A required parameter is the name-only counterpart of a plain one: a
+	// default makes it omittable the same way, and it takes the default
+	// when omitted.
+	required: {
+		f:        func(a!: int = 1, b?: int) -> int: a
+		omitted:  f() @test(eq, 1)
+		supplied: f(a: 4) @test(eq, 4)
+		labeled:  f(b: 2, a: 3) @test(eq, 3)
+		noDefault: {
+			g:   func(a!: int, b!: int = 2) -> int: a + b
+			out: g(a: 1) @test(eq, 3)
+			err: g(b: 1) @test(err, code=eval, contains="missing required argument a")
+		}
+	}
+
+	// An omitted optional parameter is absent in the body, as an absent
+	// optional field is: a reference to it is the same error, and the call
+	// is incomplete. Supplying it binds it like any other argument.
+	optional: {
+		g:       func(b?: int) -> _: b
+		absent:  g() @test(err, code=incomplete, contains="cannot reference optional field")
+		present: g(b: 3) @test(eq, 3)
+		unused:  (func(a: int, b?: int) -> int: a)(1) @test(eq, 1)
+	}
+
+	// A positional-only parameter with a default is omitted by supplying
+	// fewer positional arguments; later parameters are then bound by label.
+	positionalOnly: {
+		f:        func(_~x: int = 1, y: int) -> int: x + y
+		byLabel:  f(y: 2) @test(eq, 3)
+		both:     f(5, 2) @test(eq, 7)
+		missingY: f(5) @test(err, code=eval, contains="missing argument y")
+	}
+
+	// A default reached through a reference does not make the parameter
+	// omittable, but flows into the parameter like any other value.
+	viaReference: {
+		#Port:    int | *80
+		f:        func(p: #Port) -> int: p
+		omitted:  f() @test(err, code=eval, contains="missing argument p")
+		supplied: f(8080) @test(eq, 8080)
+		open:     f(int) @test(eq, int | *80)
+	}
+
+	// Partial application: a bound parameter loses its default; the rest keep
+	// theirs until completion.
+	partial: {
+		add3: func(a: int, b: int = 10, c: int = 100) -> int: a + b + c
+		f:    add3(1, ...)
+		all:  f() @test(eq, 111)
+		one:  f(2) @test(eq, 103)
+		lab:  f(c: 3) @test(eq, 14)
+	}
+}
+
+// A default is checked against its parameter's constraint once the struct
+// declaring the literal has completed, whether or not the function is called;
+// the function value is then the error. A default that cannot be evaluated
+// yet leaves the check undone: the omitting call is incomplete.
+declarationCheck: {
+	uncalled: {
+		f: func(a: int = "x") -> int: 1
+		@test(err, at=f, code=eval, contains="conflicting values")
+	}
+	// A supplied argument never meets the default, so a call made while the
+	// struct is still evaluating succeeds; the literal is still reported.
+	called: {
+		f:   func(a: int = "x") -> int: 1
+		out: f(1) @test(eq, 1)
+		@test(err, at=f, code=eval, contains="conflicting values")
+	}
+	// A default that is itself an error is reported as an invalid default.
+	erroneous: {
+		f: func(a: int = (1 & "x")) -> int: a
+		@test(err, at=f, code=eval, contains="invalid default for parameter a")
+	}
+	incomplete: {
+		pending: int
+		f:       func(a: int = pending) -> int: a
+		out:     f() @test(eq, int)
+	}
+	// The check is per closure: a literal that closes over a call's
+	// parameter is checked against the value it received.
+	closure: {
+		make:   func(v: _) -> _: func(a: int = v) -> int: a
+		ok:     make(2)() @test(eq, 2)
+		alone:  make("x")(1) @test(err, code=eval, contains="invalid default for parameter a")
+		nested: make(make("x")(1))() @test(err, code=eval, contains="invalid default for parameter a")
+	}
 }
 
 scoping: {
@@ -83,12 +256,15 @@ scoping: {
 	parameter: {
 		// A parameter constraint resolves in the scope enclosing the function,
 		// so it may refer to an outer field (but not to another parameter; see
-		// TestFunctionParameterScope).
-		base: int | *7
-		fn:   func(a: string, b: base) -> int: b
-		out:  fn("shadow") @test(eq, int | *7)
+		// TestFunctionParameterScope). A default reached through such a
+		// reference flows into the parameter but does not make it omittable.
+		base:    int | *7
+		fn:      func(a: string, b: base) -> int: b
+		out:     fn("shadow", 1) @test(eq, 1)
+		omitted: fn("shadow") @test(err, code=eval, contains="missing argument b")
+		open:    fn("shadow", int) @test(eq, int | *7)
 		selected: {
-			out: fn("shadow")
+			out: fn("shadow", int)
 			@test(eq, {
 				out: 7 @test(final)
 			})
@@ -118,11 +294,12 @@ scoping: {
 			out:   add3(4) @test(eq, 7)
 		}
 
-		// A function literal with a body in a parameter constraint refers to
-		// its own parameter.
+		// A function literal with a body in a parameter default refers to its
+		// own parameter.
 		paramDefault: {
-			f:   func(g: int | *(func(a: int) -> int: a + 1)) -> int: 1
-			out: f(2) @test(eq, 1)
+			f:       func(g: _ = (func(a: int) -> int: a + 1)) -> int: 1
+			out:     f(2) @test(eq, 1)
+			omitted: f() @test(eq, 1)
 		}
 
 		// The same, in a return-type disjunction.
@@ -433,81 +610,112 @@ partial: {
     ./in.cue:46:15
 [eval] arguments.builtin.labeled: labeled arguments are not supported for builtin len: it declares no parameter names:
     ./in.cue:50:12
-[eval] defaults.ambiguous: missing argument a:
-    ./in.cue:65:13
-[eval] defaults.recursive: missing argument a:
-    ./in.cue:66:13
-[eval] defaults.mutualRecursive: missing argument a:
-    ./in.cue:67:19
+[eval] defaults.reference: missing argument a:
+    ./in.cue:69:13
+[structural_cycle] structural cycle:
+    ./in.cue:63:31
+[structural_cycle] structural cycle:
+    ./in.cue:64:31
+[incomplete] declaredDefaults.topArgSum: non-concrete value int in operand to +:
+    ./in.cue:98:41
+    ./in.cue:98:23
+    ./in.cue:123:21
+[eval] declaredDefaults.required.noDefault.err: missing required argument a:
+    ./in.cue:163:9
+[incomplete] declaredDefaults.optional.absent: cannot reference optional field: b:
+    ./in.cue:171:32
+[eval] declaredDefaults.positionalOnly.missingY: missing argument y:
+    ./in.cue:183:13
+[eval] declaredDefaults.viaReference.omitted: missing argument p:
+    ./in.cue:191:13
+[eval] invalid default for parameter a: conflicting values "x" and int (mismatched types string and int):
+    ./in.cue:213:20
+    ./in.cue:213:14
+[eval] invalid default for parameter a: conflicting values "x" and int (mismatched types string and int):
+    ./in.cue:219:22
+    ./in.cue:219:16
+[eval] invalid default for parameter a: conflicting values 1 and "x" (mismatched types int and string):
+    ./in.cue:225:21
+    ./in.cue:225:25
+[eval] invalid default for parameter a: conflicting values int and "x" (mismatched types int and string):
+    ./in.cue:236:42
+    ./in.cue:236:36
+    ./in.cue:238:16
+[eval] invalid default for parameter a: invalid default for parameter a: conflicting values int and "x" (mismatched types int and string):
+    ./in.cue:236:42
+    ./in.cue:236:36
+    ./in.cue:239:21
+[eval] scoping.parameter.omitted: missing argument b:
+    ./in.cue:263:12
 [eval] invalid value 50 (out of bound <10):
-    ./in.cue:100:10
-    ./in.cue:103:13
+    ./in.cue:276:10
+    ./in.cue:279:13
 [eval] conflicting values 1 and string (mismatched types int and string):
-    ./in.cue:106:31
-    ./in.cue:106:39
+    ./in.cue:282:31
+    ./in.cue:282:39
 [structural_cycle] structural cycle:
-    ./in.cue:148:29
+    ./in.cue:325:29
 [structural_cycle] structural cycle:
-    ./in.cue:153:29
+    ./in.cue:330:29
 [structural_cycle] structural cycle:
-    ./in.cue:159:29
+    ./in.cue:336:29
 structural cycle:
-    ./in.cue:159:40
+    ./in.cue:336:40
 [structural_cycle] structural cycle:
-    ./in.cue:164:37
+    ./in.cue:341:37
 [structural_cycle] 2 errors in empty disjunction::
-    ./in.cue:177:29
+    ./in.cue:354:29
 structural cycle:
-    ./in.cue:177:29
+    ./in.cue:354:29
 2 errors in empty disjunction::
-    ./in.cue:177:38
+    ./in.cue:354:38
 structural cycle:
-    ./in.cue:177:38
+    ./in.cue:354:38
 4 errors in empty disjunction::
-    ./in.cue:178:8
+    ./in.cue:355:8
 [incomplete] disjunction.ambiguous.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | func(a: int) -> int: ... (type func):
-    ./in.cue:238:8
+    ./in.cue:415:8
 [incomplete] disjunction.builtins.out: cannot call h: unresolved disjunction strings.ToUpper | strings.ToLower (type func):
-    ./in.cue:258:8
+    ./in.cue:435:8
 [incomplete] disjunction.mixed.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | 1 (type (int|func)):
-    ./in.cue:262:8
+    ./in.cue:439:8
 [eval] conflicting values 2 and 1:
-    ./in.cue:267:12
-    ./in.cue:267:16
+    ./in.cue:444:12
+    ./in.cue:444:16
 [incomplete] disjunction.callee.incomplete.out: cannot call non-concrete value x (type _):
-    ./in.cue:270:9
+    ./in.cue:447:9
 [incomplete] a: undefined field: q:
-    ./in.cue:310:9
+    ./in.cue:487:9
 [incomplete] incompleteArgs.z: undefined field: q:
-    ./in.cue:313:11
+    ./in.cue:490:11
 [eval] declarations.open.bad: cannot call function without implementation:
-    ./in.cue:352:8
+    ./in.cue:529:8
 [eval] partial.missing: missing argument c:
-    ./in.cue:388:11
+    ./in.cue:565:11
 [eval] b: invalid value 50 (out of bound <10):
-    ./in.cue:391:27
-    ./in.cue:393:18
+    ./in.cue:568:27
+    ./in.cue:570:18
 [eval] partial.tooMany: too many positional arguments in function call:
-    ./in.cue:397:11
+    ./in.cue:574:11
 [structural_cycle] structural cycle:
-    ./in.cue:401:31
+    ./in.cue:578:31
 [eval] partial.conflictArgs: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:360:7
+    ./in.cue:537:7
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:360:7
-    ./in.cue:412:17
+    ./in.cue:537:7
+    ./in.cue:589:17
 -- out/eval/stats --
-Leaks:  50
-Freed:  669
-Reused: 627
-Allocs: 92
+Leaks:  78
+Freed:  1137
+Reused: 1093
+Allocs: 122
 Retain: 0
 
-Unifications: 601
-Conjuncts:    1833
-Disjuncts:    99
+Unifications: 956
+Conjuncts:    2944
+Disjuncts:    224
 
-NumCloseIDs: 327
+NumCloseIDs: 505
 
-ConjunctInfos:       734
+ConjunctInfos:       1159
 MaxConjunctInfos:    8

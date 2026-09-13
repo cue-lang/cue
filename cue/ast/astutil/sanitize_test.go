@@ -730,6 +730,26 @@ f: func(x: time.Duration) -> math.MaxFloat64: 1.0
 	qt.Assert(t, qt.Equals(string(b), src))
 }
 
+// TestSanitizeFuncParamDefaultImports tests that an import referenced only
+// from a parameter default is marked as used, so that Sanitize does not strip
+// it. The default is resolved in the same scope as the parameter constraint.
+func TestSanitizeFuncParamDefaultImports(t *testing.T) {
+	const src = `@experiment(functions)
+
+import "time"
+
+f: func(x: int = time.Second) -> int: x
+`
+	f, err := parser.ParseFile("test.cue", src, parser.ParseComments)
+	qt.Assert(t, qt.IsNil(err))
+
+	qt.Assert(t, qt.IsNil(astutil.Sanitize(f)))
+
+	b, err := format.Node(f)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.StringContains(string(b), `import "time"`))
+}
+
 // For testing purposes: do not remove.
 func TestX(t *testing.T) {
 	t.Skip()

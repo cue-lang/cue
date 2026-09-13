@@ -2,6 +2,11 @@
 # parameters carry distinct local aliases: a labeled argument would otherwise
 # bind to multiple parameters at once. Repeated anonymous parameters and
 # repeated alias-only parameters carry no callable name and remain valid.
+#
+# Also tests that a default mark (*) written directly in a parameter's
+# constraint or default is rejected: a parameter default is declared with =
+# instead. A mark nested inside a literal, or a default reached through a
+# reference, is an ordinary part of the parameter's value and is accepted.
 #inlinetest:exclude skip: compile errors.
 -- in.cue --
 @experiment(functions)
@@ -12,8 +17,29 @@ mixed:   func(a~x: int, a: int) -> int: x
 // These must not be rejected: the repeated parameters have no callable name.
 anon:  func(int, int) -> int: 1
 blank: func(_~x: int, _~y: int) -> int: x + y
+
+// A default mark written in a parameter is rejected; the error points at the
+// = form.
+marked:     func(a: int | *5) -> int: a
+markedBoth: func(a: int | *5 = 3) -> int: a
+markedDef:  func(a: int = 1 | *2) -> int: a
+markedAnon: func(int | *5) -> int: 1
+
+// These must not be rejected: the mark is nested inside a literal, or the
+// default is reached through a reference.
+nested: func(a: {port: int | *80}) -> int: 1
+#Port:  int | *80
+viaRef: func(p: #Port) -> int: p
 -- out/evalalpha --
 aliased: parameter a redeclared in same scope:
     ./in.cue:3:25
 mixed: parameter a redeclared in same scope:
     ./in.cue:4:25
+marked: parameter a: default mark not allowed in a constraint; write a: int = 5 instead:
+    ./in.cue:12:28
+markedBoth: parameter a: default mark not allowed in a constraint; write a: int = 5 instead:
+    ./in.cue:13:28
+markedDef: parameter a: a default cannot itself carry a default mark:
+    ./in.cue:14:32
+markedAnon: parameter 1: default mark not allowed in a constraint; write int = 5 instead:
+    ./in.cue:15:25

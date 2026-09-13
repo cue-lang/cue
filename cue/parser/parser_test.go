@@ -1400,6 +1400,27 @@ bar: 2
 			out: "@experiment(functions), f: func(a: int @tag(x), b: int @foo() @bar(), c: int @baz()) -> int: a+b",
 		},
 		{
+			desc: "function parameter defaults",
+			in: `@experiment(functions)
+			named: func(a: int = 2) -> int: a
+			required: func(a!: int = 2) -> int: a
+			alias: func(_~x: int = 2) -> int: x
+			blank: func(_: int = 2) -> int: 1
+			anon: func(int = 2) -> int: 1
+			attr: func(a: int = 2 @tag(x)) -> int: a
+			open: func(a: int = 2, ...) -> int
+			disj: func(a: int = 1 | 2) -> int: a
+			multi: func(a: int = 2, b: string = "x") -> string: b
+			nested: func(f: func(int) -> int = func(x: int) -> int: x) -> int: f(1)`,
+			out: `@experiment(functions), named: func(a: int = 2) -> int: a, required: func(a!: int = 2) -> int: a, alias: func(_~x: int = 2) -> int: x, blank: func(_: int = 2) -> int: 1, anon: func(int = 2) -> int: 1, attr: func(a: int = 2 @tag(x)) -> int: a, open: func(a: int = 2, ...) -> int, disj: func(a: int = 1|2) -> int: a, multi: func(a: int = 2, b: string = "x") -> string: b, nested: func(f: func(int) -> int = func(x: int) -> int: x) -> int: f(1)`,
+		},
+		{
+			desc: "function parameter default on optional parameter",
+			in: `@experiment(functions)
+			f: func(a?: int = 1) -> int: a`,
+			out: "@experiment(functions), f: func(a?: int = 1) -> int: a\noptional parameter a cannot have a default; declare it as a! instead",
+		},
+		{
 			desc: "variadic parameter",
 			in: `@experiment(functions)
 			f: func(a: int, ...int) -> int`,

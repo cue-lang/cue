@@ -15,6 +15,7 @@
 package compile
 
 import (
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -1156,7 +1157,10 @@ func (c *compiler) funcParamLocal(p *ast.FuncParam) adt.Feature {
 	return adt.InvalidLabel
 }
 
-func (c *compiler) funcParam(p *ast.FuncParam) adt.FuncParam {
+// funcParam compiles the i-th parameter of a function literal. The constraint
+// and the default are compiled in the current, closure scope: only the body of
+// a function literal gets a parameter scope.
+func (c *compiler) funcParam(i int, p *ast.FuncParam) adt.FuncParam {
 	if p == nil {
 		return adt.FuncParam{
 			Label:      adt.InvalidLabel,
@@ -1178,6 +1182,14 @@ func (c *compiler) funcParam(p *ast.FuncParam) adt.FuncParam {
 		param.Label = c.label(p.Label)
 	}
 	param.Value = c.expr(p.Value)
+	if p.Default != nil {
+		param.Default = c.expr(p.Default)
+	}
+	if err := c.checkFuncParamMarks(i, p, &param); err != nil {
+		param.Value = err
+		param.Default = nil
+		return param
+	}
 	param.ArcType = adt.ConstraintFromToken(p.Constraint)
 	if param.ArcType != adt.ArcMember {
 		param.Positional = false
@@ -1186,6 +1198,69 @@ func (c *compiler) funcParam(p *ast.FuncParam) adt.FuncParam {
 		param.Positional = true
 	}
 	return param
+}
+
+// funcParamName names a parameter in a diagnostic: its callable label, else
+// its body-local name, else its 1-based position.
+func (c *compiler) funcParamName(i int, param *adt.FuncParam) string {
+	switch {
+	case param.Label != adt.InvalidLabel:
+		return param.Label.SelectorString(c.index)
+	case param.Local != adt.InvalidLabel:
+		return param.Local.SelectorString(c.index)
+	}
+	return strconv.Itoa(i + 1)
+}
+
+// checkFuncParamMarks reports a default mark (*) written directly in a
+// parameter's constraint or default. Whether a call may omit a parameter is
+// decided by a declared default alone, so a mark in a constraint would be
+// inert, and it is most likely the retired idiom for declaring a parameter
+// default; a mark inside a default is meaningless. Only the outermost
+// disjunction of the expression is inspected: a mark nested inside a struct
+// or list literal compiles inside its own node, and a default reached through
+// a reference is an ordinary part of the parameter's value.
+func (c *compiler) checkFuncParamMarks(i int, p *ast.FuncParam, param *adt.FuncParam) *adt.Bottom {
+	name := c.funcParamName(i, param)
+	if d, ok := param.Value.(*adt.DisjunctionExpr); ok && d.HasDefaults {
+		var others []string
+		var def string
+		var pos ast.Node = p
+		for _, v := range d.Values {
+			s := "_"
+			src := v.Val.Source()
+			if src != nil {
+				s = astinternal.DebugStr(src)
+			}
+			switch {
+			case !v.Default:
+				others = append(others, s)
+			case def == "":
+				def = s
+				if src != nil {
+					pos = src
+				}
+			}
+		}
+		suggestion := strings.Join(others, " | ") + " = " + def
+		if p.Label != nil {
+			suggestion = name + ": " + suggestion
+		}
+		return c.errf(pos, "parameter %s: default mark not allowed in a constraint; write %s instead", name, suggestion)
+	}
+	if d, ok := param.Default.(*adt.DisjunctionExpr); ok && d.HasDefaults {
+		var pos ast.Node = p.Default
+		for _, v := range d.Values {
+			if v.Default {
+				if src := v.Val.Source(); src != nil {
+					pos = src
+				}
+				break
+			}
+		}
+		return c.errf(pos, "parameter %s: a default cannot itself carry a default mark", name)
+	}
+	return nil
 }
 
 func (c *compiler) expr(expr ast.Expr) adt.Expr {
@@ -1208,8 +1283,8 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		seenParamName := map[adt.Feature]ast.Node{}
 		seenCallName := map[adt.Feature]ast.Node{}
 		seenNameOnly := false
-		for _, p := range params {
-			param := c.funcParam(p)
+		for i, p := range params {
+			param := c.funcParam(i, p)
 			if (seenCallableName && param.Label == adt.InvalidLabel) ||
 				(seenNameOnly && param.Positional) {
 				return c.errf(p, "positional parameter after named parameter")

@@ -73,12 +73,14 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 		Walk(n.Label, before, after)
 		walkIfNotNil(n.Alias, before, after)
 		walkIfNotNil(n.Value, before, after)
+		walkIfNotNil(n.Default, before, after)
 		walkList(n.Attrs, before, after)
 
 	case *FuncParam:
 		walkIfNotNil(n.Label, before, after)
 		walkIfNotNil(n.Alias, before, after)
 		walkIfNotNil(n.Value, before, after)
+		walkIfNotNil(n.Default, before, after)
 		walkList(n.Attrs, before, after)
 
 	case *Func:

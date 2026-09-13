@@ -836,7 +836,9 @@ func defParam(funcName string, param *types.Var) string {
 	case "cuelang.org/go/pkg/path.OS":
 		name = "os"
 		if paramHasDefault(funcName, param) {
-			typ += ` | *"unix"`
+			// A parameter default is declared with "=" after the
+			// constraint; a default mark in the constraint is rejected.
+			typ += ` = "unix"`
 		}
 	}
 	if name == "" {

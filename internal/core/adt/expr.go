@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"math/big"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -1551,6 +1552,13 @@ type FuncParam struct {
 	Value      Expr
 	Positional bool
 
+	// Default is the parameter's declared default expression, or nil. It is
+	// compiled in the closure scope, like Value. A call may leave a parameter
+	// unbound only if it is optional or has a default; an unbound default is
+	// used as the parameter's argument, and a supplied argument makes the
+	// default irrelevant to the call.
+	Default Expr
+
 	// ArcType records the parameter's requiredness: ArcMember for a plain
 	// parameter, ArcRequired for p!, and ArcOptional for p?.
 	ArcType ArcType
@@ -1595,11 +1603,241 @@ func (x *Function) Source() ast.Node {
 }
 
 func (x *Function) evaluate(c *OpContext, state Flags) Value {
+	env := c.Env(0)
+	if b := x.scheduleDefaultCheck(c, env); b != nil {
+		return b
+	}
 	return &FuncValue{
 		Src: x.Src,
 		Fn:  x,
-		Env: c.Env(0),
+		Env: env,
 	}
+}
+
+// hasDefaults reports whether any parameter of x declares a default.
+func (x *Function) hasDefaults() bool {
+	for i := range x.Params {
+		if x.Params[i].Default != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// A funcDefaultCheck records a function literal whose declared parameter
+// defaults are to be checked once the enclosing vertex has completed; see
+// [Function.scheduleDefaultCheck]. holder is the vertex whose conjunct the
+// literal was evaluated for; it receives the error, so that the function
+// value itself is in error.
+type funcDefaultCheck struct {
+	fn     *Function
+	env    *Environment
+	holder *Vertex
+}
+
+// scheduleDefaultCheck arranges for the literal's declared defaults to be
+// checked against their constraints (see [Function.checkDefaults]), so that
+// an inconsistent default is reported whether or not the function is ever
+// called. The check is deferred until the enclosing vertex has completed
+// evaluating all of its arcs: a default may refer to values that are still
+// in flight, including the very field that holds the literal, and finalizing
+// such a reference would freeze it as cyclic. When the enclosing vertex has
+// already completed, nothing it holds is in flight and the check runs now,
+// making the literal itself the error.
+func (x *Function) scheduleDefaultCheck(c *OpContext, env *Environment) *Bottom {
+	if !x.hasDefaults() {
+		return nil
+	}
+	if v := env.DerefVertex(c); v != nil {
+		if n := v.state; n != nil && v.status < finalized {
+			n.funcDefaultChecks = append(n.funcDefaultChecks, funcDefaultCheck{
+				fn:     x,
+				env:    env,
+				holder: c.vertex,
+			})
+			return nil
+		}
+	}
+	return x.checkDefaults(c, env)
+}
+
+// checkDefaults checks each declared parameter default against its
+// parameter's constraint, evaluated in the closure environment, where a call
+// evaluates them too. The check runs once per literal and closure. A default
+// that is not resolvable — an incomplete value, or a cycle, as for a default
+// that calls its own function — leaves the check undone: the call that omits
+// the parameter reports the incompleteness or the cycle. A default that is
+// itself an error, or that conflicts with the constraint, is reported at the
+// default's position.
+func (x *Function) checkDefaults(c *OpContext, env *Environment) *Bottom {
+	key := funcAnchorKey{fn: x, env: env}
+	if c.checkingDefaults[key] || c.funcDefaultsChecked[key] {
+		return nil
+	}
+	if c.checkingDefaults == nil {
+		c.checkingDefaults = map[funcAnchorKey]bool{}
+		c.funcDefaultsChecked = map[funcAnchorKey]bool{}
+	}
+	c.checkingDefaults[key] = true
+	defer delete(c.checkingDefaults, key)
+	c.funcDefaultsChecked[key] = true
+
+	for i := range x.Params {
+		p := &x.Params[i]
+		if p.Default == nil || p.Value == nil {
+			continue
+		}
+		if b := c.checkFuncParamDefault(env, i, p); b != nil {
+			return b
+		}
+	}
+	return nil
+}
+
+// uncheckableDefault reports whether b leaves a default check undone rather
+// than failed: an incomplete value or a cycle.
+func uncheckableDefault(b *Bottom) bool {
+	return b == nil || b.IsIncomplete() || b.Code == CycleError || b.Code == StructuralCycleError
+}
+
+// invalidDefault wraps the error b of a parameter's default as an error at
+// the default's position, retaining b's own positions.
+func (c *OpContext) invalidDefault(i int, p *FuncParam, b *Bottom) *Bottom {
+	name := funcParamName(c, i, p)
+	src := p.Default.Source()
+	var at token.Pos
+	if src != nil {
+		at = src.Pos()
+	}
+	return &Bottom{
+		Src:  src,
+		Code: b.Code,
+		Err:  errors.Wrapf(b.Err, at, "invalid default for parameter %s", name),
+	}
+}
+
+// checkFuncParamDefault unifies a parameter's default with its constraint,
+// as a call omitting the parameter would, and reports a conflict, or an
+// error in the default itself, at the default's position. Incomplete results
+// and cycles leave the check undone.
+func (c *OpContext) checkFuncParamDefault(env *Environment, i int, p *FuncParam) *Bottom {
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() { c.errs = savedErrs }()
+
+	s := c.PushState(env, p.Default.Source())
+	defer c.PopState(s)
+
+	// Evaluate the default on its own first: an error in the default itself
+	// is reported as such, and an unresolvable default leaves the check
+	// undone without consulting the constraint.
+	flags := Flags{status: partial, mode: yield}
+	def := c.evalState(p.Default, flags)
+	b := bottom(def)
+	if b == nil && def == nil {
+		return nil
+	}
+	if b == nil {
+		b = c.errs
+	}
+	if b != nil {
+		if uncheckableDefault(b) {
+			return nil
+		}
+		return c.invalidDefault(i, p, b)
+	}
+	con := c.evalState(p.Value, flags)
+	if b := bottom(con); b != nil || con == nil || c.errs != nil {
+		return nil
+	}
+
+	v := c.newInlineVertex(nil, nil,
+		MakeConjunct(env, p.Default, c.ci),
+		MakeConjunct(env, p.Value, c.ci))
+	v.Finalize(c)
+
+	b = v.Bottom()
+	if b == nil {
+		b = c.errs
+	}
+	if uncheckableDefault(b) {
+		return nil
+	}
+	return c.invalidDefault(i, p, b)
+}
+
+// funcParamName names a parameter in a diagnostic: its callable label, else
+// its body-local name, else its 1-based position.
+func funcParamName(c *OpContext, i int, p *FuncParam) string {
+	switch {
+	case p.Label != InvalidLabel:
+		return p.Label.SelectorString(c)
+	case p.Local != InvalidLabel:
+		return p.Local.SelectorString(c)
+	}
+	return strconv.Itoa(i + 1)
+}
+
+// hasDefault reports whether parameter i of x has a declared default: its own,
+// or one declared by an attached signature for the parameter it matched. A
+// defaulted parameter may be left unbound by a call.
+func (x *FuncValue) hasDefault(i int) bool {
+	return FuncParamHasDefault(x.Fn, x.Types, i)
+}
+
+// FuncParamHasDefault reports whether parameter i of fn declares a default,
+// itself or through one of the signatures in types attached to it. Such a
+// parameter is omittable: a call may leave it unbound, and it is admitted
+// beyond a closed signature like an optional one.
+func FuncParamHasDefault(fn *Function, types []FuncType, i int) bool {
+	if fn.Params[i].Default != nil {
+		return true
+	}
+	for _, t := range types {
+		matches := matchFuncParamsToValue(t.Fn, fn, types)
+		for j, tp := range t.Fn.Params {
+			if tp.Default != nil && matches[j] == i {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// funcArgBound reports whether an activation arc holds an argument. The
+// conjuncts scheduleFuncCall adds to an arc are exactly the constraint and
+// default expressions of the function's own signature and of the signatures
+// attached to it, so any other conjunct is the argument a call bound to the
+// parameter. An arc without an argument belongs to a parameter the call left
+// unbound. (The IsFuncArg mark of an argument conjunct is not used here: it
+// is inherited by the conjuncts of a call made as an argument of another.)
+func funcArgBound(a *Vertex, fn *Function, types []FuncType) bool {
+	for _, c := range a.Conjuncts {
+		if !isFuncSignatureExpr(c.x, fn, types) {
+			return true
+		}
+	}
+	return false
+}
+
+// isFuncSignatureExpr reports whether x is a constraint or default expression
+// of fn or of one of the signatures in types.
+func isFuncSignatureExpr(x Node, fn *Function, types []FuncType) bool {
+	for i := range fn.Params {
+		p := &fn.Params[i]
+		if (p.Value != nil && x == p.Value) || (p.Default != nil && x == p.Default) {
+			return true
+		}
+	}
+	for _, t := range types {
+		for i := range t.Fn.Params {
+			p := &t.Fn.Params[i]
+			if (p.Value != nil && x == p.Value) || (p.Default != nil && x == p.Default) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (x *FuncValue) Source() ast.Node {
@@ -1640,7 +1878,7 @@ func (n *nodeContext) scheduleFuncCall(ref *FuncCallRef, env *Environment, ci Cl
 		// instead of rescanning the arc list for every parameter.
 		k := 0
 		for i, p := range fn.Params {
-			if p.Value == nil {
+			if p.Value == nil && p.Default == nil {
 				continue
 			}
 			local := p.Local
@@ -1653,7 +1891,19 @@ func (n *nodeContext) scheduleFuncCall(ref *FuncCallRef, env *Environment, ci Cl
 				k++
 			}
 			if k < len(act.Arcs) {
-				act.Arcs[k].addConjunctUnchecked(MakeConjunct(env.Up, p.Value, ci))
+				a := act.Arcs[k]
+				// A parameter the call left unbound takes its declared
+				// default as the argument. Like the constraint, the default
+				// is compiled in the closure scope and carries the anchored
+				// ci, so a default that calls the function itself is a
+				// structural cycle rather than unbounded recursion. A bound
+				// parameter never sees its default.
+				if p.Default != nil && !funcArgBound(a, fn, ref.types) {
+					a.addConjunctUnchecked(MakeConjunct(env.Up, p.Default, ci))
+				}
+				if p.Value != nil {
+					a.addConjunctUnchecked(MakeConjunct(env.Up, p.Value, ci))
+				}
 			}
 		}
 	}
@@ -1678,7 +1928,7 @@ func (n *nodeContext) scheduleFuncCall(ref *FuncCallRef, env *Environment, ci Cl
 		if argArcs != nil {
 			matches := matchFuncParamsToValue(t.Fn, fn, ref.types)
 			for i, tp := range t.Fn.Params {
-				if tp.Value == nil {
+				if tp.Value == nil && tp.Default == nil {
 					continue
 				}
 				vi := matches[i]
@@ -1695,7 +1945,15 @@ func (n *nodeContext) scheduleFuncCall(ref *FuncCallRef, env *Environment, ci Cl
 					local = anonParamLabel(n.ctx, vi)
 				}
 				if a := argArcs[local]; a != nil {
-					a.addConjunctUnchecked(MakeConjunct(t.Env, tp.Value, ci))
+					// A default declared by the type carries over to an
+					// unbound parameter; when the value declares one too,
+					// the two unify in the arc.
+					if tp.Default != nil && !funcArgBound(a, fn, ref.types) {
+						a.addConjunctUnchecked(MakeConjunct(t.Env, tp.Default, ci))
+					}
+					if tp.Value != nil {
+						a.addConjunctUnchecked(MakeConjunct(t.Env, tp.Value, ci))
+					}
 				}
 			}
 		}
@@ -1789,24 +2047,6 @@ func (x *FuncCallRef) resolve(c *OpContext, state Flags) *Vertex {
 	return x.target
 }
 
-func valueHasSingleDefault(v Value) bool {
-	switch x := Unwrap(v).(type) {
-	case *Vertex:
-		return baseValueHasSingleDefault(x.BaseValue)
-	case *Disjunction:
-		return x.NumDefaults == 1
-	default:
-		return false
-	}
-}
-
-func baseValueHasSingleDefault(v BaseValue) bool {
-	if x, ok := v.(Value); ok {
-		return valueHasSingleDefault(x)
-	}
-	return false
-}
-
 // unresolvedDisjunction returns the disjunction underlying v if v does not
 // resolve to a single value, following the same traversal as
 // [OpContext.getDefault]. It returns nil if v resolves (getDefault succeeds)
@@ -1814,48 +2054,6 @@ func baseValueHasSingleDefault(v BaseValue) bool {
 func unresolvedDisjunction(v Value) *Disjunction {
 	_, d := resolveDefault(v)
 	return d
-}
-
-func (x *FuncValue) paramHasDefault(c *OpContext, env *Environment, p FuncParam, state Flags) (bool, *Bottom) {
-	if p.Value == nil {
-		return false, nil
-	}
-	// The default probe evaluates the parameter constraint outside any vertex,
-	// so a recursive or mutually recursive default (e.g. n: int | *f()) would
-	// loop forever; the shared-template structural cycle detector does not
-	// apply here. Guard against re-entering the probe for a function already
-	// being probed: treat its default as not single, which surfaces as a
-	// missing-argument error, matching the hand-written `(f & {...})` behavior.
-	if c.probingDefaults[x.Fn] {
-		return false, nil
-	}
-	if c.probingDefaults == nil {
-		c.probingDefaults = map[*Function]bool{}
-	}
-	c.probingDefaults[x.Fn] = true
-	defer delete(c.probingDefaults, x.Fn)
-
-	// Parameter constraints are evaluated in the closure scope, not in the
-	// function body scope, so probing for a single default does not depend
-	// on parameter bindings.
-	savedErrs := c.errs
-	c.errs = nil
-	s := c.PushState(env, p.Value.Source())
-	v := c.evalState(p.Value, Flags{
-		status:    partial,
-		condition: state.condition,
-		mode:      yield,
-	})
-	_ = c.PopState(s)
-	errs := c.errs
-	c.errs = savedErrs
-	if errs != nil && !errs.IsIncomplete() {
-		return false, errs
-	}
-	if b := bottom(v); b != nil && !b.IsIncomplete() {
-		return false, b
-	}
-	return valueHasSingleDefault(v), nil
 }
 
 func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
@@ -1990,26 +2188,23 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 		arg := bindings[i].expr
 		argEnv := bindings[i].env
 
-		if arg == nil {
-			if p.ArcType == ArcRequired {
+		// A parameter may be left unbound only if it is optional or has a
+		// declared default; a required parameter (p!) is the name-only
+		// counterpart of a plain one and takes a default the same way.
+		// Whatever its constraint evaluates to plays no part in this
+		// decision: a default reached through a reference is an ordinary
+		// part of the constraint. An unbound default is added to the
+		// parameter's arc by scheduleFuncCall.
+		if arg == nil && p.ArcType != ArcOptional && !x.hasDefault(i) {
+			switch {
+			case p.ArcType == ArcRequired:
 				c.AddErrf("missing required argument %s", p.Label.SelectorString(c))
-				return nil
+			case p.Label != InvalidLabel:
+				c.AddErrf("missing argument %s", p.Label.SelectorString(c))
+			default:
+				c.AddErrf("not enough arguments in function call")
 			}
-			if p.ArcType != ArcOptional {
-				hasDefault, b := x.paramHasDefault(c, x.Env, p, state)
-				if b != nil {
-					c.AddBottom(b)
-					return b
-				}
-				if !hasDefault {
-					if p.Label != InvalidLabel {
-						c.AddErrf("missing argument %s", p.Label.SelectorString(c))
-					} else {
-						c.AddErrf("not enough arguments in function call")
-					}
-					return nil
-				}
-			}
+			return nil
 		}
 		local := p.Local
 		if local == InvalidLabel {
@@ -2020,9 +2215,9 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			// arc that scheduleFuncCall addresses by the parameter's index.
 			local = anonParamLabel(c, i)
 		}
-		if arg == nil && p.Value == nil {
+		if arg == nil && p.Value == nil && p.Default == nil {
 			// Nothing binds this parameter: no argument was provided and
-			// there is no constraint to carry a default.
+			// there is neither a constraint nor a default.
 			continue
 		}
 
@@ -2036,6 +2231,14 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			Label:     local,
 			ArcType:   ArcMember,
 			IsDynamic: true,
+		}
+		if arg == nil && p.ArcType == ArcOptional && !x.hasDefault(i) {
+			// An omitted optional parameter is an optional field of the
+			// activation, holding only its constraint: a reference to it
+			// from the body reports the error a reference to an absent
+			// optional field reports, rather than seeing the bare
+			// constraint.
+			arc.ArcType = ArcOptional
 		}
 		if arg != nil {
 			// IsFuncArg pins the caller's cycle-reference chain to the

@@ -398,12 +398,14 @@ func applyCursor(v applyVisitor, c Cursor) {
 		apply(v, c, &n.Label)
 		applyIfNotNil(v, c, &n.Alias)
 		applyIfNotNil(v, c, &n.Value)
+		applyIfNotNil(v, c, &n.Default)
 		applyList(v, c, n.Attrs)
 
 	case *ast.FuncParam:
 		applyIfNotNil(v, c, &n.Label)
 		applyIfNotNil(v, c, &n.Alias)
 		applyIfNotNil(v, c, &n.Value)
+		applyIfNotNil(v, c, &n.Default)
 		applyList(v, c, n.Attrs)
 
 	case *ast.StructLit:

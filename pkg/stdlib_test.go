@@ -21,12 +21,10 @@ import (
 	"path"
 	"path/filepath"
 	"slices"
-	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
@@ -221,11 +219,12 @@ func TestDefsMatchRegisteredPackages(t *testing.T) {
 					}
 				}
 				for i, p := range params {
-					b, err := format.Node(p.Value)
-					qt.Assert(t, qt.IsNil(err))
+					// A declared default is written with "=" on the parameter;
+					// it must agree with whether the registered builtin
+					// carries a default for the same parameter.
 					hasDefault := builtin.Params[i].Default() != nil
-					qt.Check(t, qt.Equals(strings.Contains(string(b), "*"), hasDefault),
-						qt.Commentf("%s: parameter %q default vs builtin parameter %d having one", name, b, i))
+					qt.Check(t, qt.Equals(p.Default != nil, hasDefault),
+						qt.Commentf("%s: parameter %d declared default vs builtin parameter having one", name, i+1))
 				}
 			}
 		})

@@ -333,6 +333,10 @@ func (w *printer) fn(x *adt.Function) {
 		} else {
 			w.string("_")
 		}
+		if p.Default != nil {
+			w.string(" = ")
+			w.node(p.Default)
+		}
 	}
 	if x.Open {
 		if len(x.Params) > 0 {

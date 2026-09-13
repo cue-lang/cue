@@ -633,6 +633,10 @@ func DebugStr(x interface{}) (out string) {
 			out += ": "
 		}
 		out += DebugStr(v.Value)
+		if v.Default != nil {
+			out += " = "
+			out += DebugStr(v.Default)
+		}
 		for _, a := range v.Attrs {
 			out += " "
 			out += DebugStr(a)

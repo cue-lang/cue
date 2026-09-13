@@ -144,6 +144,9 @@ func (w *Visitor) node(n adt.Node) {
 			if v := x.Params[i].Value; v != nil {
 				w.node(v)
 			}
+			if d := x.Params[i].Default; d != nil {
+				w.node(d)
+			}
 		}
 		if x.Ret != nil {
 			w.node(x.Ret)

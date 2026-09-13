@@ -109,6 +109,7 @@ func TestModuleFetch(t *testing.T) {
 			return
 		}
 		writeInstanceInfo(t.T, t.Writer("instance-info"), inst, 0)
+		writeDuplicateInstances(t, inst)
 		qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
 		qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
 		qt.Assert(t, qt.Equals(inst.ModuleFile.Language.Version, "v0.9.0-main"))
@@ -145,6 +146,37 @@ func writeInstanceInfo(t *testing.T, w io.Writer, inst *build.Instance, depth in
 	for _, f := range inst.Files {
 		qt.Check(t, qt.Equals(f.Pos().LanguageVersion(), inst.ModuleFile.Language.Version), qt.Commentf("pkg %v", inst.ImportPath))
 	}
+}
+
+// writeDuplicateInstances reports each package reachable from root that is
+// loaded as more than one build instance, which happens when the instances
+// importing it spell its import path differently. The section is only
+// written when there is something to report, so it appears only in fixtures
+// that exhibit the problem and fails any other fixture that starts to.
+func writeDuplicateInstances(t *cuetxtar.Test, root *build.Instance) {
+	type pkgKey struct {
+		mod     module.Version
+		dir     string
+		pkgName string
+	}
+	seen := map[pkgKey]*build.Instance{}
+	visited := map[*build.Instance]bool{}
+	var walk func(*build.Instance)
+	walk = func(inst *build.Instance) {
+		if visited[inst] {
+			return
+		}
+		visited[inst] = true
+		key := pkgKey{inst.ModuleVersion, inst.Dir, inst.PkgName}
+		if prev, ok := seen[key]; ok {
+			fmt.Fprintf(t.Writer("duplicate-instances"), "package %s in %v loaded as two instances: %q and %q\n", inst.PkgName, inst.ModuleVersion, prev.ImportPath, inst.ImportPath)
+		}
+		seen[key] = inst
+		for _, imp := range inst.Imports {
+			walk(imp)
+		}
+	}
+	walk(root)
 }
 
 func TestInstanceModuleVersion(t *testing.T) {

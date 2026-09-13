@@ -1,0 +1,93 @@
+# The main module imports a package of a dependency without a major version
+# while another package of that dependency imports it too. The dependency's
+# import is resolved with the dependency's own default major versions and
+# thereby spelled with an explicit major version, so both spellings must
+# still load as one build instance. Loading the package twice made every
+# definition in it exist twice, which changed the field order of values
+# unified with both copies: name is listed first only when #ObjectMeta
+# is shared.
+#
+# The golden output below records the current, incorrect behavior: the
+# package is loaded twice, and name is listed after labels.
+
+-- cue.mod/module.cue --
+module: "main.org"
+language: version: "v0.9.0-main"
+deps: {
+	"dep.example@v0": v: "v0.1.0"
+	"schema.example@v0": v: "v0.2.0"
+}
+
+-- main.cue --
+package main
+
+import (
+	core "dep.example/core"
+	meta "schema.example/meta"
+)
+
+_object: {
+	apiVersion!: string
+	kind!:       string
+	metadata!:   meta.#ObjectMeta & {name!: string}
+	...
+}
+
+objects: [..._object] & [
+	core.#Namespace & {
+		metadata: {
+			name: "test"
+			labels: "app.kubernetes.io/part-of": "test"
+		}
+	},
+]
+
+-- _registry/dep.example_v0.1.0/cue.mod/module.cue --
+module: "dep.example@v0"
+language: version: "v0.9.0-dep.example.v0.1.0"
+deps: "schema.example@v0": v: "v0.2.0"
+
+-- _registry/dep.example_v0.1.0/core/core.cue --
+package core
+
+// Note: import without a major version takes
+// the major version from the module.cue file.
+import meta "schema.example/meta"
+
+#Namespace: {
+	apiVersion: "v1"
+	kind:       "Namespace"
+	metadata:   meta.#ObjectMeta
+}
+
+-- _registry/schema.example_v0.2.0/cue.mod/module.cue --
+module: "schema.example@v0"
+language: version: "v0.9.0-schema.example.v0.2.0"
+
+-- _registry/schema.example_v0.2.0/meta/meta.cue --
+package meta
+
+#ObjectMeta: {
+	annotations?: [string]: string
+	labels?: [string]:      string
+	name?:      string
+	namespace?: string
+}
+-- out/modfetch/instance-info --
+main.org@v0:main module=main.org@v0 version=v0.9.0-main
+	dep.example/core module=dep.example@v0 version=v0.9.0-dep.example.v0.1.0
+		schema.example/meta@v0 module=schema.example@v0 version=v0.9.0-schema.example.v0.2.0
+	schema.example/meta module=schema.example@v0 version=v0.9.0-schema.example.v0.2.0
+-- out/modfetch/duplicate-instances --
+package meta in schema.example@v0.2.0 loaded as two instances: "schema.example/meta@v0" and "schema.example/meta"
+-- out/modfetch/result --
+{
+	objects: [{
+		apiVersion: "v1"
+		kind:       "Namespace"
+		metadata: {
+			labels: "app.kubernetes.io/part-of": "test"
+			name: "test"
+		}
+	}]
+}

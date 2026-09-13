@@ -16,6 +16,7 @@
 
 import (
 	"list"
+	"path"
 	"strings"
 )
 
@@ -88,8 +89,7 @@ dynamic: {
 // label, but no call needs it either; if a sibling positional signature
 // exposes the same label, its constraint follows that slot. The builtin's own
 // parameters carry no optional markers, so only a parameter with a default
-// may exceed a closed type's count (defaults of builtins are static metadata,
-// unlike function value defaults, which are dynamic and never probed).
+// may exceed a closed type's count.
 optionalExtra: {
 	O:  func(string, sep?: string) -> string
 	up: O & strings.ToUpper
@@ -181,38 +181,66 @@ labeled: {
 		badName: (func(text: string, ...) -> string) & strings.ToUpper @test(err, code=eval, contains="conflicting parameter labels")
 	}
 }
+// A default declared by a function type is ignored on a builtin: builtin
+// defaults belong to the implementation, whereas a declared default belongs
+// to a CUE signature, and the two mechanisms do not interact. The type still
+// attaches, and its constraints are enforced per call as usual.
+typeDefaults: {
+	// The builtin carries no default for count, so the type's default does
+	// not make the argument omittable.
+	Rep:     func(s: string, count: int = 2) -> string
+	rep:     Rep & strings.Repeat
+	repX:    rep("ab", 3) @test(eq, "ababab")
+	repOmit: rep("ab") @test(err, code=eval, contains="not enough arguments in call to strings.Repeat")
+
+	// Two types attached to the builtin must still agree on their defaults,
+	// as they would without it: ignoring a default when completing the
+	// builtin's arguments does not make conflicting declarations compatible.
+	Rep3:       func(s: string, count: int = 3) -> string
+	repTypes:   Rep & Rep3 @test(err, code=eval, contains="conflicting defaults for parameter count")
+	repBoth:    strings.Repeat & Rep & Rep3 @test(err, code=eval, contains="conflicting defaults for parameter count")
+	repBothRev: Rep3 & strings.Repeat & Rep @test(err, code=eval, contains="conflicting defaults for parameter count")
+	repSame:    (Rep & strings.Repeat & Rep)("ab", 3) @test(eq, "ababab")
+
+	// The builtin's own default keeps applying, and a differing declared
+	// default neither replaces it nor conflicts with it.
+	Join:  func(elem: [...string], os: string = "windows") -> string
+	join:  Join & path.Join
+	joinX: join(["a", "b"]) @test(eq, "a/b")
+	joinOS: join(["a", "b"], "windows") @test(eq, "a\\b")
+}
 -- out/errors.txt --
 [eval] static.tooMany: function type has more positional parameters than builtin strings.ToUpper:
-    ./in.cue:33:51
-    ./in.cue:33:12
+    ./in.cue:34:51
+    ./in.cue:34:12
 static.tooMany: function type has more positional parameters than closed function type:
     strings:28:15
-    ./in.cue:33:12
-[eval] static.tooFew: builtin strings.ToUpper has more parameters than closed function type:
-    ./in.cue:34:32
     ./in.cue:34:12
+[eval] static.tooFew: builtin strings.ToUpper has more parameters than closed function type:
+    ./in.cue:35:32
+    ./in.cue:35:12
 static.tooFew: parameter s of function type not allowed by closed function type:
     strings:28:15
-    ./in.cue:34:12
+    ./in.cue:35:12
 [eval] static.badParam: parameter 1 of function type has kind int, conflicting with kind string of builtin strings.ToUpper:
-    ./in.cue:38:42
-    ./in.cue:38:14
-[eval] static.badResult: result of function type has kind int, conflicting with result kind string of builtin strings.ToUpper:
     ./in.cue:39:42
     ./in.cue:39:14
+[eval] static.badResult: result of function type has kind int, conflicting with result kind string of builtin strings.ToUpper:
+    ./in.cue:40:42
+    ./in.cue:40:14
 [eval] static.conflict: conflicting values func(a: string) -> string: ... and strings.ToUpper:
-    ./in.cue:42:12
     ./in.cue:43:12
-    ./in.cue:43:16
+    ./in.cue:44:12
+    ./in.cue:44:16
 [eval] invalid value "zz" (out of bound <="m"):
-    ./in.cue:50:11
-    ./in.cue:54:10
+    ./in.cue:51:11
+    ./in.cue:55:10
 [eval] conflicting values "HI" and "NO":
-    ./in.cue:57:28
-    ./in.cue:61:8
+    ./in.cue:58:28
+    ./in.cue:62:8
 [eval] invalid value "zz" (out of bound <="m"):
-    ./in.cue:65:12
-    ./in.cue:69:11
+    ./in.cue:66:12
+    ./in.cue:70:11
 [eval] optionalExtra.bad: parameter sep of function type not allowed by builtin strings.ToUpper: it can only be passed by label, and a builtin takes its arguments positionally:
     ./in.cue:92:48
     ./in.cue:92:8
@@ -238,15 +266,29 @@ optionalExtra.bad: parameter sep of function type not allowed by closed function
     ./in.cue:159:6
 [eval] labeled.user.badName: conflicting parameter labels s and text for positional parameter 1 in function type and function type:
     strings:28:15
+[eval] typeDefaults.repOmit: not enough arguments in call to strings.Repeat (have 1, want 2):
+    ./in.cue:180:11
+[eval] conflicting defaults for parameter count: conflicting values 2 and 3:
+    ./in.cue:185:43
+    ./in.cue:177:40
+    ./in.cue:186:20
+[eval] conflicting defaults for parameter count: conflicting values 2 and 3:
+    ./in.cue:185:43
+    ./in.cue:177:40
+    ./in.cue:187:37
+[eval] conflicting defaults for parameter count: conflicting values 3 and 2:
+    ./in.cue:177:40
+    ./in.cue:185:43
+    ./in.cue:188:38
 -- out/eval/stats --
-Leaks:  1
-Freed:  85
-Reused: 64
-Allocs: 22
+Leaks:  3
+Freed:  167
+Reused: 144
+Allocs: 26
 Retain: 0
 
-Unifications: 78
-Conjuncts:    186
-Disjuncts:    2
+Unifications: 122
+Conjuncts:    288
+Disjuncts:    38
 
-NumCloseIDs: 46
+NumCloseIDs: 56

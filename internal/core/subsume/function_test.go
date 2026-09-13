@@ -141,6 +141,54 @@ func TestFunctions(t *testing.T) {
 			err: "",
 		},
 
+		// Declared defaults. An extra defaulted parameter is admitted like an
+		// optional one, in both directions, and the value of a default never
+		// participates. For a matched parameter, omittability is part of the
+		// contract: b ⊑ a holds when adding a default (b may be omitted
+		// where a could not) and fails when removing one.
+		{
+			in:  `a: func(n: int) -> int, b: func(n: int, m: int = 1) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n: int, m: int = 1) -> int, b: func(n: int) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n: int, m: int = 1) -> int, b: func(n: int) -> int: n`,
+			err: "",
+		},
+		{
+			in:  `a: func(n: int) -> int, b: func(n: int = 1) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n: int = 1) -> int, b: func(n: int) -> int`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: func(n: int = 1) -> int, b: func(n: int = 2) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n: int = 1) -> int, b: func(n: int = 1) -> int: n`,
+			err: "",
+		},
+		{
+			// A default declared by a signature attached to b makes b's
+			// parameter omittable, for a matched parameter ...
+			in:  `a: func(n: int = 1) -> int, b: (func(n: int) -> int: n) & (func(n: int = 2) -> int)`,
+			err: "",
+		},
+		{
+			// ... but not for an extra one against a closed signature:
+			// admission beyond a closed type depends on the value's own
+			// declaration, as it does for unification, where a & b is
+			// bottom whatever the order of the attachments.
+			in:  `a: func(n: int) -> int, b: (func(n: int, m: int) -> int: n) & (func(n: int, m: int = 1) -> int)`,
+			err: "value not an instance",
+		},
+
 		// Parameter widening and narrowing in both directions.
 		{
 			in:  `a: func(n: number, ...) -> int, b: func(n: int, ...) -> int`,

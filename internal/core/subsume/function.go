@@ -236,10 +236,11 @@ func (s *subsumer) funcSignatureHead(fn *adt.Function, env *adt.Environment, b *
 	for i, p := range fn.Params {
 		j := matches[i]
 		if j < 0 {
-			if p.ArcType == adt.ArcOptional {
+			if p.ArcType == adt.ArcOptional || p.Default != nil {
 				// An extra parameter is admitted against a closed signature
-				// iff it is optional, mirroring the tightening and type-meet
-				// rules: calls through the signature never need to bind it.
+				// iff it is omittable — optional or defaulted — mirroring
+				// the tightening and type-meet rules: calls through the
+				// signature never need to bind it.
 				continue
 			}
 			return false
@@ -254,27 +255,38 @@ func (s *subsumer) funcSignatureHead(fn *adt.Function, env *adt.Environment, b *
 		if (p.ArcType == adt.ArcRequired) != (q.ArcType == adt.ArcRequired) {
 			return false
 		}
+		// Omittability is part of the contract: a parameter that the
+		// signature lets a call omit must be omittable through b as well,
+		// by its own default or by one declared by a signature attached
+		// to b. The value of a default does not participate, so signatures
+		// that differ only in a default's value subsume each other.
+		if p.Default != nil && q.ArcType != adt.ArcOptional && !adt.FuncParamHasDefault(b.Fn, b.Types, j) {
+			return false
+		}
 		if !s.funcConstraint(env, p.Value, b.Env, q.Value) {
 			return false
 		}
 	}
 
 	// Everything b declares beyond the signature's parameters is admitted
-	// only against an open signature. An optional extra parameter is not
-	// needed for a call to succeed and is always admitted; the check is the
-	// same one the tightening rules apply. A composite function type retains
-	// every contributing signature, so inspect them all rather than only its
-	// chosen head. An effectively open function type also admits future
-	// declarations and therefore cannot be an instance of a closed one.
+	// only against an open signature. An optional or defaulted extra
+	// parameter is not needed for a call to succeed and is always admitted;
+	// the check is the same one the tightening rules apply, and like them it
+	// consults each declaration on its own, not the defaults of the other
+	// signatures attached to b, so that subsumption agrees with unification.
+	// A composite function type retains every contributing signature, so
+	// inspect them all rather than only its chosen head. An effectively open
+	// function type also admits future declarations and therefore cannot be
+	// an instance of a closed one.
 	if !fn.Open {
 		if adt.IsFuncType(b) && effectiveFuncTypeOpen(b) {
 			return false
 		}
-		if _, ok := adt.ExtraFuncParam(fn, b.Fn); ok {
+		if _, ok := adt.ExtraFuncParam(fn, b.Fn, nil); ok {
 			return false
 		}
 		for _, t := range b.Types {
-			if _, ok := adt.ExtraFuncParam(fn, t.Fn); ok {
+			if _, ok := adt.ExtraFuncParam(fn, t.Fn, nil); ok {
 				return false
 			}
 		}

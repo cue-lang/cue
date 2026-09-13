@@ -1,9 +1,11 @@
 # Tests unification of CUE function values with function types (bodyless
 # signatures, possibly partial/open) and of function types with each other.
 # Static checks at unification time cover only what is decidable from the
-# compiled signatures: parameter names, positions, requiredness flags, and
-# closedness. Parameter and result constraint conflicts, defaults, and
-# missing arguments remain dynamic and surface when the function is called.
+# compiled signatures: parameter names, positions, requiredness flags,
+# closedness, and whether a parameter declares a default. Parameter and
+# result constraint conflicts and missing arguments remain dynamic and
+# surface when the function is called; two declared defaults for the same
+# parameter are unified when the signatures are.
 -- in.cue --
 @experiment(functions)
 
@@ -307,6 +309,95 @@ narrow: {
 	neg: g(-1) @test(err, code=eval, contains="invalid value -1 (out of bound >=0)")
 	hi:  g(11) @test(err, code=eval, contains="invalid value 11 (out of bound <10)")
 }
+// Declared defaults are part of a signature. A default on one side carries
+// over to a call; defaults on both sides must unify and conflict when the
+// signatures are unified; a defaulted parameter is admitted beyond a closed
+// type like an optional one; a partial application keeps the defaults of the
+// parameters it leaves unbound.
+defaults: {
+	T: func(a: int = 2) -> int
+
+	// The type's default fills a value parameter that declares none.
+	fill:  T & (func(a: int) -> int: a)
+	fillX: fill() @test(eq, 2)
+	fillS: fill(5) @test(eq, 5)
+
+	// Order of unification does not matter.
+	fillRev:  (func(a: int) -> int: a) & T
+	fillRevX: fillRev() @test(eq, 2)
+
+	// Equal defaults agree.
+	same:  T & (func(a: int = 2) -> int: a)
+	sameX: same() @test(eq, 2)
+
+	// Differing defaults conflict when the signatures are unified.
+	differ: T & (func(a: int = 3) -> int: a) @test(err, code=eval, contains="conflicting defaults for parameter a")
+	differRev: (func(a: int = 3) -> int: a) & T @test(err, code=eval, contains="conflicting defaults for parameter a")
+
+	// Two types with defaults for different parameters: each one-sided
+	// default carries over, and a value's own default must agree with the
+	// type's for the same parameter.
+	A:      func(a: int = 2, ...) -> string
+	B:      func(a: int, b: string = "x") -> string
+	three:  A & B & (func(a: int, b: string) -> string: "\(a)\(b)")
+	threeX: three() @test(eq, "2x")
+	threeRev:  B & (func(a: int, b: string) -> string: "\(a)\(b)") & A
+	threeRevX: threeRev() @test(eq, "2x")
+	threeBad:  A & (func(a: int = 4, b: string) -> string: "\(a)\(b)") & B @test(err, code=eval, contains="conflicting defaults for parameter a")
+
+	// A value's extra defaulted parameter is admitted beyond a closed type,
+	// as an optional one is: no call through the type ever needs it.
+	C:      func(a: int) -> int
+	extra:  C & (func(a: int, b: int = 2) -> int: a + b)
+	extraX: extra(1) @test(eq, 3)
+	extraBad: C & (func(a: int, b: int) -> int: a + b) @test(err, code=eval, contains="parameter b of function not allowed by closed function type")
+
+	// The reverse: a type's defaulted parameter that the value does not
+	// declare is admitted like an optional one.
+	D:      func(a: int, b: int = 2) -> int
+	lacks:  D & (func(a: int) -> int: a)
+	lacksX: lacks(1) @test(eq, 1)
+
+	// A partial application binds arguments, not defaults: bound parameters
+	// lose their default, the remaining ones keep it until completion.
+	add3: func(a: int, b: int = 10, c: int = 100) -> int: a + b + c
+	f:    add3(1, ...)
+	all:  f() @test(eq, 111)
+	one:  f(2) @test(eq, 103)
+	lab:  f(c: 3) @test(eq, 14)
+	two:  add3(1, 2, ...)() @test(eq, 103)
+
+	// Agreement does not depend on the operand order, also when a named
+	// and a positional-only parameter share a slot.
+	Bn:     func(_~x: int = 3) -> int
+	orderX: T & Bn @test(err, code=eval, contains="conflicting defaults for parameter")
+	orderY: Bn & T @test(err, code=eval, contains="conflicting defaults for parameter")
+
+	// Admission beyond a closed type depends on the value's own declaration.
+	// A default declared only by another attached type does not admit the
+	// parameter, so the outcome does not depend on the order in which the
+	// signatures are attached: a closed type restricts the value whatever
+	// else is attached, as a closed struct restricts its fields.
+	v2:      func(a: int, b: int) -> int: a + b
+	D2:      func(a: int, b: int = 2) -> int
+	C2:      func(a: int) -> int
+	orderDC: (v2 & D2) & C2 @test(err, code=eval, contains="parameter b of function not allowed by closed function type")
+	orderCD: (v2 & C2) & D2 @test(err, code=eval, contains="parameter b of function not allowed by closed function type")
+	orderTV: C2 & D2 & v2 @test(err, code=eval, contains="parameter b of function not allowed by closed function type")
+
+	// The value's own default admits it, in any order, and the two types
+	// agree with each other on their own: D2's default admits b beyond C2.
+	v3:    func(a: int, b: int = 2) -> int: a + b
+	ownDC: ((v3 & D2) & C2)(1) @test(eq, 3)
+	ownCD: ((v3 & C2) & D2)(1) @test(eq, 3)
+	ownTV: ((C2 & D2) & v3)(1) @test(eq, 3)
+
+	// A default attached by a type carries into a call made as the argument
+	// of another call.
+	id:           func(x: int) -> int: x
+	nestedDirect: fill() @test(eq, 2)
+	nestedCall:   id(fill()) @test(eq, 2)
+}
 -- out/errors.txt --
 [eval] tighten.y: missing argument b:
     ./in.cue:10:5
@@ -392,15 +483,47 @@ narrow: {
 [eval] invalid value 11 (out of bound <10):
     ./in.cue:296:14
     ./in.cue:301:9
+[eval] conflicting defaults for parameter a: conflicting values 3 and 2:
+    ./in.cue:309:19
+    ./in.cue:325:10
+    ./in.cue:325:29
+[eval] conflicting defaults for parameter a: conflicting values 3 and 2:
+    ./in.cue:309:19
+    ./in.cue:326:28
+    ./in.cue:326:44
+[eval] conflicting defaults for parameter a: conflicting values 4 and 2:
+    ./in.cue:331:24
+    ./in.cue:337:13
+    ./in.cue:337:32
+[eval] defaults.extraBad: parameter b of function not allowed by closed function type:
+    ./in.cue:341:10
+    ./in.cue:344:17
+[eval] conflicting defaults for parameter x: conflicting values 2 and 3:
+    ./in.cue:363:26
+    ./in.cue:309:19
+    ./in.cue:364:14
+[eval] conflicting defaults for parameter a: conflicting values 3 and 2:
+    ./in.cue:309:19
+    ./in.cue:363:26
+    ./in.cue:365:15
+[eval] defaults.orderDC: parameter b of function not allowed by closed function type:
+    ./in.cue:374:11
+    ./in.cue:372:11
+[eval] defaults.orderCD: parameter b of function not allowed by closed function type:
+    ./in.cue:374:11
+    ./in.cue:372:11
+[eval] defaults.orderTV: parameter b of function not allowed by closed function type:
+    ./in.cue:372:11
+    ./in.cue:374:11
 -- out/eval/stats --
-Leaks:  7
-Freed:  346
-Reused: 311
-Allocs: 42
+Leaks:  8
+Freed:  491
+Reused: 429
+Allocs: 70
 Retain: 0
 
-Unifications: 342
-Conjuncts:    1252
+Unifications: 488
+Conjuncts:    1753
 Disjuncts:    4
 
-NumCloseIDs: 193
+NumCloseIDs: 267

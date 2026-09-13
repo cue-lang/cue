@@ -1,9 +1,11 @@
 # Tests unification of CUE function values with function types (bodyless
 # signatures, possibly partial/open) and of function types with each other.
 # Static checks at unification time cover only what is decidable from the
-# compiled signatures: parameter names, positions, requiredness flags, and
-# closedness. Parameter and result constraint conflicts, defaults, and
-# missing arguments remain dynamic and surface when the function is called.
+# compiled signatures: parameter names, positions, requiredness flags,
+# closedness, and whether a parameter declares a default. Parameter and
+# result constraint conflicts and missing arguments remain dynamic and
+# surface when the function is called; two declared defaults for the same
+# parameter are unified when the signatures are.
 -- in.cue --
 @experiment(functions)
 
@@ -307,6 +309,95 @@ narrow: {
 	neg: g(-1)
 	hi:  g(11)
 }
+// Declared defaults are part of a signature. A default on one side carries
+// over to a call; defaults on both sides must unify and conflict when the
+// signatures are unified; a defaulted parameter is admitted beyond a closed
+// type like an optional one; a partial application keeps the defaults of the
+// parameters it leaves unbound.
+defaults: {
+	T: func(a: int = 2) -> int
+
+	// The type's default fills a value parameter that declares none.
+	fill:  T & (func(a: int) -> int: a)
+	fillX: fill()
+	fillS: fill(5)
+
+	// Order of unification does not matter.
+	fillRev:  (func(a: int) -> int: a) & T
+	fillRevX: fillRev()
+
+	// Equal defaults agree.
+	same:  T & (func(a: int = 2) -> int: a)
+	sameX: same()
+
+	// Differing defaults conflict when the signatures are unified.
+	differ: T & (func(a: int = 3) -> int: a)
+	differRev: (func(a: int = 3) -> int: a) & T
+
+	// Two types with defaults for different parameters: each one-sided
+	// default carries over, and a value's own default must agree with the
+	// type's for the same parameter.
+	A:      func(a: int = 2, ...) -> string
+	B:      func(a: int, b: string = "x") -> string
+	three:  A & B & (func(a: int, b: string) -> string: "\(a)\(b)")
+	threeX: three()
+	threeRev:  B & (func(a: int, b: string) -> string: "\(a)\(b)") & A
+	threeRevX: threeRev()
+	threeBad:  A & (func(a: int = 4, b: string) -> string: "\(a)\(b)") & B
+
+	// A value's extra defaulted parameter is admitted beyond a closed type,
+	// as an optional one is: no call through the type ever needs it.
+	C:      func(a: int) -> int
+	extra:  C & (func(a: int, b: int = 2) -> int: a + b)
+	extraX: extra(1)
+	extraBad: C & (func(a: int, b: int) -> int: a + b)
+
+	// The reverse: a type's defaulted parameter that the value does not
+	// declare is admitted like an optional one.
+	D:      func(a: int, b: int = 2) -> int
+	lacks:  D & (func(a: int) -> int: a)
+	lacksX: lacks(1)
+
+	// A partial application binds arguments, not defaults: bound parameters
+	// lose their default, the remaining ones keep it until completion.
+	add3: func(a: int, b: int = 10, c: int = 100) -> int: a + b + c
+	f:    add3(1, ...)
+	all:  f()
+	one:  f(2)
+	lab:  f(c: 3)
+	two:  add3(1, 2, ...)()
+
+	// Agreement does not depend on the operand order, also when a named
+	// and a positional-only parameter share a slot.
+	Bn:     func(_~x: int = 3) -> int
+	orderX: T & Bn
+	orderY: Bn & T
+
+	// Admission beyond a closed type depends on the value's own declaration.
+	// A default declared only by another attached type does not admit the
+	// parameter, so the outcome does not depend on the order in which the
+	// signatures are attached: a closed type restricts the value whatever
+	// else is attached, as a closed struct restricts its fields.
+	v2:      func(a: int, b: int) -> int: a + b
+	D2:      func(a: int, b: int = 2) -> int
+	C2:      func(a: int) -> int
+	orderDC: (v2 & D2) & C2
+	orderCD: (v2 & C2) & D2
+	orderTV: C2 & D2 & v2
+
+	// The value's own default admits it, in any order, and the two types
+	// agree with each other on their own: D2's default admits b beyond C2.
+	v3:    func(a: int, b: int = 2) -> int: a + b
+	ownDC: ((v3 & D2) & C2)(1)
+	ownCD: ((v3 & C2) & D2)(1)
+	ownTV: ((C2 & D2) & v3)(1)
+
+	// A default attached by a type carries into a call made as the argument
+	// of another call.
+	id:           func(x: int) -> int: x
+	nestedDirect: fill()
+	nestedCall:   id(fill())
+}
 -- out/compile --
 --- in.cue
 {
@@ -484,5 +575,53 @@ narrow: {
     mid: 〈0;g〉(5)
     neg: 〈0;g〉(-1)
     hi: 〈0;g〉(11)
+  }
+  defaults: {
+    T: func(a: int = 2) -> int
+    fill: (〈0;T〉 & func(a: int) -> int: 〈0;a〉)
+    fillX: 〈0;fill〉()
+    fillS: 〈0;fill〉(5)
+    fillRev: (func(a: int) -> int: 〈0;a〉 & 〈0;T〉)
+    fillRevX: 〈0;fillRev〉()
+    same: (〈0;T〉 & func(a: int = 2) -> int: 〈0;a〉)
+    sameX: 〈0;same〉()
+    differ: (〈0;T〉 & func(a: int = 3) -> int: 〈0;a〉)
+    differRev: (func(a: int = 3) -> int: 〈0;a〉 & 〈0;T〉)
+    A: func(a: int = 2, ...) -> string
+    B: func(a: int, b: string = "x") -> string
+    three: ((〈0;A〉 & 〈0;B〉) & func(a: int, b: string) -> string: "\(〈0;a〉)\(〈0;b〉)")
+    threeX: 〈0;three〉()
+    threeRev: ((〈0;B〉 & func(a: int, b: string) -> string: "\(〈0;a〉)\(〈0;b〉)") & 〈0;A〉)
+    threeRevX: 〈0;threeRev〉()
+    threeBad: ((〈0;A〉 & func(a: int = 4, b: string) -> string: "\(〈0;a〉)\(〈0;b〉)") & 〈0;B〉)
+    C: func(a: int) -> int
+    extra: (〈0;C〉 & func(a: int, b: int = 2) -> int: (〈0;a〉 + 〈0;b〉))
+    extraX: 〈0;extra〉(1)
+    extraBad: (〈0;C〉 & func(a: int, b: int) -> int: (〈0;a〉 + 〈0;b〉))
+    D: func(a: int, b: int = 2) -> int
+    lacks: (〈0;D〉 & func(a: int) -> int: 〈0;a〉)
+    lacksX: 〈0;lacks〉(1)
+    add3: func(a: int, b: int = 10, c: int = 100) -> int: ((〈0;a〉 + 〈0;b〉) + 〈0;c〉)
+    f: 〈0;add3〉(1)
+    all: 〈0;f〉()
+    one: 〈0;f〉(2)
+    lab: 〈0;f〉(c: 3)
+    two: 〈0;add3〉(1, 2)()
+    Bn: func(int = 3) -> int
+    orderX: (〈0;T〉 & 〈0;Bn〉)
+    orderY: (〈0;Bn〉 & 〈0;T〉)
+    v2: func(a: int, b: int) -> int: (〈0;a〉 + 〈0;b〉)
+    D2: func(a: int, b: int = 2) -> int
+    C2: func(a: int) -> int
+    orderDC: ((〈0;v2〉 & 〈0;D2〉) & 〈0;C2〉)
+    orderCD: ((〈0;v2〉 & 〈0;C2〉) & 〈0;D2〉)
+    orderTV: ((〈0;C2〉 & 〈0;D2〉) & 〈0;v2〉)
+    v3: func(a: int, b: int = 2) -> int: (〈0;a〉 + 〈0;b〉)
+    ownDC: ((〈0;v3〉 & 〈0;D2〉) & 〈0;C2〉)(1)
+    ownCD: ((〈0;v3〉 & 〈0;C2〉) & 〈0;D2〉)(1)
+    ownTV: ((〈0;C2〉 & 〈0;D2〉) & 〈0;v3〉)(1)
+    id: func(x: int) -> int: 〈0;x〉
+    nestedDirect: 〈0;fill〉()
+    nestedCall: 〈0;id〉(〈0;fill〉())
   }
 }

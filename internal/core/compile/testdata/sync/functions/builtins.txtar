@@ -16,6 +16,7 @@
 
 import (
 	"list"
+	"path"
 	"strings"
 )
 
@@ -88,8 +89,7 @@ dynamic: {
 // label, but no call needs it either; if a sibling positional signature
 // exposes the same label, its constraint follows that slot. The builtin's own
 // parameters carry no optional markers, so only a parameter with a default
-// may exceed a closed type's count (defaults of builtins are static metadata,
-// unlike function value defaults, which are dynamic and never probed).
+// may exceed a closed type's count.
 optionalExtra: {
 	O:  func(string, sep?: string) -> string
 	up: O & strings.ToUpper
@@ -180,6 +180,34 @@ labeled: {
 		// A second contract name for the already named slot conflicts.
 		badName: (func(text: string, ...) -> string) & strings.ToUpper
 	}
+}
+// A default declared by a function type is ignored on a builtin: builtin
+// defaults belong to the implementation, whereas a declared default belongs
+// to a CUE signature, and the two mechanisms do not interact. The type still
+// attaches, and its constraints are enforced per call as usual.
+typeDefaults: {
+	// The builtin carries no default for count, so the type's default does
+	// not make the argument omittable.
+	Rep:     func(s: string, count: int = 2) -> string
+	rep:     Rep & strings.Repeat
+	repX:    rep("ab", 3)
+	repOmit: rep("ab")
+
+	// Two types attached to the builtin must still agree on their defaults,
+	// as they would without it: ignoring a default when completing the
+	// builtin's arguments does not make conflicting declarations compatible.
+	Rep3:       func(s: string, count: int = 3) -> string
+	repTypes:   Rep & Rep3
+	repBoth:    strings.Repeat & Rep & Rep3
+	repBothRev: Rep3 & strings.Repeat & Rep
+	repSame:    (Rep & strings.Repeat & Rep)("ab", 3)
+
+	// The builtin's own default keeps applying, and a differing declared
+	// default neither replaces it nor conflicts with it.
+	Join:  func(elem: [...string], os: string = "windows") -> string
+	join:  Join & path.Join
+	joinX: join(["a", "b"])
+	joinOS: join(["a", "b"], "windows")
 }
 -- out/compile --
 --- in.cue
@@ -295,5 +323,28 @@ labeled: {
       x: 〈0;up〉(s: "hi")
       badName: (func(text: string, ...) -> string & 〈import;strings〉.ToUpper)
     }
+  }
+  typeDefaults: {
+    Rep: func(s: string, count: int = 2) -> string
+    rep: (〈0;Rep〉 & 〈import;strings〉.Repeat)
+    repX: 〈0;rep〉("ab", 3)
+    repOmit: 〈0;rep〉("ab")
+    Rep3: func(s: string, count: int = 3) -> string
+    repTypes: (〈0;Rep〉 & 〈0;Rep3〉)
+    repBoth: ((〈import;strings〉.Repeat & 〈0;Rep〉) & 〈0;Rep3〉)
+    repBothRev: ((〈0;Rep3〉 & 〈import;strings〉.Repeat) & 〈0;Rep〉)
+    repSame: ((〈0;Rep〉 & 〈import;strings〉.Repeat) & 〈0;Rep〉)("ab", 3)
+    Join: func(elem: [
+      ...string,
+    ], os: string = "windows") -> string
+    join: (〈0;Join〉 & 〈import;path〉.Join)
+    joinX: 〈0;join〉([
+      "a",
+      "b",
+    ])
+    joinOS: 〈0;join〉([
+      "a",
+      "b",
+    ], "windows")
   }
 }

@@ -1,0 +1,35 @@
+# cue def prints function literals with their parameter defaults on every
+# parameter form: named, positional-only, anonymous, name-only, and a
+# default in an open type. The output is the formatter's canonical form.
+#
+# The re-parse of the printed source is covered by the exporter's own
+# tests; cue def does not print the file-level @experiment attribute, so
+# its output cannot be evaluated as a file on its own.
+
+exec cue def
+cmp stdout expect-stdout
+
+exec cue eval -e out
+cmp stdout expect-out
+
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"
+-- in.cue --
+@experiment(functions)
+
+package p
+
+add: func(a: int, b: int = 10) -> int: a + b
+opt: func(_~n: int = 0, int = 2, c: {x: int} = {x: 1}, a!: int = 1) -> int: a
+T:   func(a: int = 2, ...) -> int
+out: add(1)
+-- expect-stdout --
+package p
+
+add: func(a: int, b: int = 10) -> int: a + b
+opt: func(_~(n): int = 0, int = 2, c: {x: int} = {x: 1}, a!: int = 1) -> int: a
+T:   func(a: int = 2, ...) -> int
+out: add(1)
+-- expect-out --
+11

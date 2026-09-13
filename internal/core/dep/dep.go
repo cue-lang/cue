@@ -304,6 +304,9 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 			if v := fn.Params[i].Value; v != nil {
 				c.markExpr(env.Up, v)
 			}
+			if d := fn.Params[i].Default; d != nil {
+				c.markExpr(env.Up, d)
+			}
 		}
 		if fn.Ret != nil {
 			c.markExpr(env.Up, fn.Ret)
@@ -668,16 +671,20 @@ func (c *visitor) feature(env *adt.Environment, r adt.Resolver) adt.Feature {
 }
 
 // markFunction marks dependencies in the expressions of a function literal.
-// env is the function's closure environment: parameter constraints and the
-// return type are compiled in that scope, while the body assumes one
-// additional scope level for the parameter activation (see the compilation
-// of ast.Func in internal/core/compile). Parameter references in the body
-// point into that extra level and simply do not resolve against the empty
-// vertex; only references to outer features yield dependencies.
+// env is the function's closure environment: parameter constraints,
+// parameter defaults, and the return type are compiled in that scope, while
+// the body assumes one additional scope level for the parameter activation
+// (see the compilation of ast.Func in internal/core/compile). Parameter
+// references in the body point into that extra level and simply do not
+// resolve against the empty vertex; only references to outer features yield
+// dependencies.
 func (c *visitor) markFunction(env *adt.Environment, fn *adt.Function) {
 	for i := range fn.Params {
 		if v := fn.Params[i].Value; v != nil {
 			c.markExpr(env, v)
+		}
+		if d := fn.Params[i].Default; d != nil {
+			c.markExpr(env, d)
 		}
 	}
 	if fn.Ret != nil {

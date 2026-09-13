@@ -4,12 +4,38 @@
 sum: func(
     _~x: int,
     // left operand
-    a: int | *5,
+    a: int = 5,
     req!: string,
     opt?: bool,
 ) -> int: call(x, a: a, req: req)
 
 mixed: sum(1, req: "x")
+
+defaults: func(
+    _~n: int = 0,
+    int = 1,
+    a: int = 2,
+    // a default followed by an attribute
+    c: int = 3 @tag(y),
+    d: {port: int} = {port: 80},
+    // a name-only parameter with a default
+    b!: string = "x",
+) -> int: a
+
+inline: func(a: int=2, b: int = base + 1) -> int: a
+
+// A comment after "=" or ":" trails its parameter; a comment on its own
+// line before a default or a constraint leads the parameter. A parameter
+// list with a comment closes on its own line, so that a // comment
+// cannot swallow the closing parenthesis or a following parameter.
+commented: func(a: int = // after the bind token
+    2, b: int =
+    // before the default
+    3, c:
+    // before the constraint
+    int = 4) -> int: a
+trailingLast: func(a: int = 2 // after the last parameter
+    ) -> int: a
 
 partialLabel: add(a: 1, ...)
 partialPos:   add(1, ...)
@@ -32,12 +58,38 @@ openMulti: func(
 sum: func(
 	_~(x): int,
 	// left operand
-	a: int | *5,
+	a: int = 5,
 	req!: string,
 	opt?: bool,
 ) -> int: call(x, a: a, req: req)
 
 mixed: sum(1, req: "x")
+
+defaults: func(
+	_~(n): int = 0,
+	int = 1,
+	a: int = 2,
+	// a default followed by an attribute
+	c: int = 3 @tag(y),
+	d: {port: int} = {port: 80},
+	// a name-only parameter with a default
+	b!: string = "x",
+) -> int: a
+
+inline: func(a: int = 2, b: int = base + 1) -> int: a
+
+// A comment after "=" or ":" trails its parameter; a comment on its own
+// line before a default or a constraint leads the parameter. A parameter
+// list with a comment closes on its own line, so that a // comment
+// cannot swallow the closing parenthesis or a following parameter.
+commented: func(a: int = 2, // after the bind token
+	// before the default
+	b: int = 3,
+	// before the constraint
+	c: int = 4,
+) -> int: a
+trailingLast: func(a: int = 2, // after the last parameter
+) -> int: a
 
 partialLabel: add(a: 1, ...)
 partialPos:   add(1, ...)

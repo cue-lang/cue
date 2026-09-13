@@ -25,6 +25,12 @@ paramref: {
 }
 paramref: T: 7
 
+defaultref: {
+	x: int
+	f: func(a: int = x) -> int: a
+}
+defaultref: x: 5
+
 inlinecall: {
 	x: int
 	y: (func(a: int) -> int: a + x)(1)
@@ -70,6 +76,12 @@ paramref: {
 	f: func(a: T) -> T: a
 }
 paramref: T: 7
+
+defaultref: {
+	x: int
+	f: func(a: int = x) -> int: a
+}
+defaultref: x: 5
 
 inlinecall: {
 	x: int

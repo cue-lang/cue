@@ -121,6 +121,56 @@ func TestPostfixSpread(t *testing.T) {
 	}
 }
 
+// TestFuncParamComments checks that both formatters keep a comment placed
+// after a parameter's "=" or ":", or on its own line before the default or
+// the constraint, and that the result parses back and is stable. The
+// parser attaches the own-line comments to the expression that follows,
+// not to the parameter, and a comment after the last parameter would
+// swallow the closing parenthesis on a shared line.
+func TestFuncParamComments(t *testing.T) {
+	const head = "@experiment(functions)\n\n"
+	sources := []struct{ src, comment string }{{
+		src:     head + "f: func(a: int = // after the bind token\n\t2) -> int: a\n",
+		comment: "// after the bind token",
+	}, {
+		src:     head + "f: func(a: int =\n\t// before the default\n\t2) -> int: a\n",
+		comment: "// before the default",
+	}, {
+		src:     head + "f: func(a:\n\t// before the constraint\n\tint = 2, b: int) -> int: a\n",
+		comment: "// before the constraint",
+	}, {
+		src:     head + "f: func(a: int = 2 // after the last parameter\n\t) -> int: a\n",
+		comment: "// after the last parameter",
+	}, {
+		src:     head + "f: func(a: int, // after the first parameter\n\tb: int = 2) -> int: a\n",
+		comment: "// after the first parameter",
+	}}
+
+	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
+	// Init is guarded by sync.Once, so overriding Flags directly here is not
+	// undone by the format functions calling cueexperiment.Init again.
+	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
+
+	for _, v2 := range []bool{false, true} {
+		t.Run(fmt.Sprintf("formatv2=%v", v2), func(t *testing.T) {
+			cueexperiment.Flags.FormatV2 = v2
+			for _, tc := range sources {
+				t.Run(tc.comment, func(t *testing.T) {
+					got, err := format.Source([]byte(tc.src))
+					qt.Assert(t, qt.IsNil(err))
+					_, err = parser.ParseFile("", got, parser.AllErrors)
+					qt.Assert(t, qt.IsNil(err), qt.Commentf("output:\n%s", got))
+					qt.Check(t, qt.StringContains(string(got), tc.comment))
+
+					again, err := format.Source(got)
+					qt.Assert(t, qt.IsNil(err))
+					qt.Check(t, qt.Equals(string(again), string(got)))
+				})
+			}
+		})
+	}
+}
+
 // Verify that the printer can be invoked during initialization.
 func init() {
 	const name = "foobar"

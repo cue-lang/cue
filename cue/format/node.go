@@ -357,6 +357,22 @@ func (f *formatter) walkCallArgsList(args []ast.Expr, labels []ast.Label, depth 
 	f.after(nil)
 }
 
+// funcParamDocComments prints the doc comments of a parameter's constraint
+// or default expression, which is printed with exprRaw and so without its
+// comments. Any other comment on the expression is printed by the
+// expression itself where it has one, and is otherwise beside the point:
+// a same-line comment attaches to the parameter, not to the expression.
+func (f *formatter) funcParamDocComments(e ast.Expr) {
+	if e == nil {
+		return
+	}
+	for _, cg := range ast.Comments(e) {
+		if cg.Doc {
+			f.printComment(cg)
+		}
+	}
+}
+
 func (f *formatter) postfixAlias(a *ast.PostfixAlias) {
 	if a == nil {
 		return
@@ -635,7 +651,14 @@ func (f *formatter) nextNeedsFormfeed(n ast.Expr) bool {
 			if len(ast.Comments(p)) > 0 || (p.Label != nil && len(ast.Comments(p.Label)) > 0) {
 				return true
 			}
-			if f.nextNeedsFormfeed(p.Value) {
+			// A comment on the constraint or the default is printed as
+			// the parameter's (see funcParamDocComments), and parses
+			// back as such: treat it the same here so that formatting
+			// is idempotent.
+			if len(ast.Comments(p.Value)) > 0 || f.nextNeedsFormfeed(p.Value) {
+				return true
+			}
+			if p.Default != nil && (len(ast.Comments(p.Default)) > 0 || f.nextNeedsFormfeed(p.Default)) {
 				return true
 			}
 		}
@@ -807,6 +830,12 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 					continue
 				}
 				f.before(p)
+				// The parser attaches a comment on its own line before
+				// the constraint or the default to that expression, which
+				// exprRaw prints without its comments. Print such doc
+				// comments with the parameter's own, before the label.
+				f.funcParamDocComments(p.Value)
+				f.funcParamDocComments(p.Default)
 				if p.Label != nil {
 					f.label(p.Label, token.ILLEGAL)
 					f.postfixAlias(p.Alias)
@@ -817,6 +846,12 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 					f.visitComments(f.current.pos)
 				}
 				f.exprRaw(p.Value, token.LowestPrec, depth)
+				if p.Default != nil {
+					// A parameter default follows the constraint as
+					// " = expr", the spacing of a let clause's "=".
+					f.print(blank, nooverride, p.Equal, token.BIND, blank)
+					f.exprRaw(p.Default, token.LowestPrec, depth)
+				}
 				for _, a := range p.Attrs {
 					if f.before(a) {
 						f.print(blank, a.At, a)

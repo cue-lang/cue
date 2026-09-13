@@ -805,6 +805,16 @@ func (s commentSlots) all() []*ast.CommentGroup {
 	return out
 }
 
+// nonDoc returns the prefix, suffix, and trailing comments in that order:
+// every comment but the doc comments.
+func (s commentSlots) nonDoc() []*ast.CommentGroup {
+	out := make([]*ast.CommentGroup, 0, len(s.prefix)+len(s.suffix)+len(s.trailing))
+	out = append(out, s.prefix...)
+	out = append(out, s.suffix...)
+	out = append(out, s.trailing...)
+	return out
+}
+
 // wrapInteriorComments places prefix comments before inner, and
 // suffix comments after inner, each on its own line. We separate
 // consecutive comments within a block by HardLine (upgraded to
@@ -1225,6 +1235,12 @@ type bracketedLayout struct {
 	noElemNewline bool // noElemHasNewline over the elements
 	lineHeader    bool // user wrote `{ // c\n...`
 
+	// forceOpenBreak opens the body broken whatever the first element's
+	// RelPos says: the first row starts with a comment the element does
+	// not own, as a parameter's doc comment hoisted from its constraint
+	// or default does (see [funcParamComments]).
+	forceOpenBreak bool
+
 	// allowsTrailingComma reports whether CUE syntax permits a
 	// trailing comma before the closing bracket. True for list
 	// literals only; struct fields are separated by commas/newlines
@@ -1527,6 +1543,9 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	leadRel := b.openerRel
 	if b.firstElem != nil {
 		leadRel = LeadingRelPos(b.firstElem)
+	}
+	if b.forceOpenBreak && leadRel < token.Newline {
+		leadRel = token.Newline
 	}
 	openBreaks := b.lineHeader || b.hasInterior || leadRel >= token.Newline || forceOpen
 	forceClose := openBreaks || b.closerRel >= token.Newline
@@ -2870,28 +2889,61 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 	if len(params) == 0 && !open {
 		return c.funcResult(cats(stringLit("func"), lParenLit, rParenLit), x)
 	}
-	// params may contain nil entries when the AST is constructed
-	// programmatically; skip them, as funcParamRows does.
-	hasParamDoc := false
+	// A parameter list with a comment renders as a table, one row per
+	// parameter: a // comment then sits after the row's comma and can
+	// swallow neither the next parameter nor the closing parenthesis, and
+	// a comment on its own line keeps that line. Comments on a parameter's
+	// constraint or default count as the parameter's own; see
+	// [funcParamComments]. params may contain nil entries when the AST is
+	// constructed programmatically; skip them, as funcParamRows does.
+	var anyComment, anyDoc, anyPost, firstHoistedDoc bool
+	first := true
 	for _, p := range params {
-		if p != nil && HasDocComment(p) {
-			hasParamDoc = true
-			break
+		if p == nil {
+			continue
+		}
+		slots := funcParamComments(p)
+		if slots.any() {
+			anyComment = true
+		}
+		if len(slots.doc) > 0 {
+			anyDoc = true
+			if first && !HasDocComment(p) {
+				firstHoistedDoc = true
+			}
+		}
+		first = false
+		for _, cg := range slots.nonDoc() {
+			if !isLineComment(cg) {
+				anyPost = true
+			}
 		}
 	}
-	if hasParamDoc {
+	if anyComment {
+		// The list closes on its own line: a // comment on the last row
+		// would swallow a closing parenthesis on the same line, and the
+		// comment may have moved to the row's end from after ":" or "=",
+		// so the authored position of ")" does not tell. The rows' trailing
+		// comma is emitted whenever the table breaks, which any comment
+		// makes it do, and belongs before a closer on its own line.
+		closerRel := x.Rparen.RelPos()
+		if closerRel < token.Newline {
+			closerRel = token.Newline
+		}
 		layout := bracketedLayout{
 			node:                x,
 			openPrefix:          stringLit("func"),
 			open:                lParenLit,
 			close:               rParenLit,
 			openerRel:           x.Lparen.RelPos(),
-			closerRel:           x.Rparen.RelPos(),
+			closerRel:           closerRel,
 			firstElem:           firstFuncParam(params),
 			lastElem:            lastFuncParam(params),
 			numElems:            len(params),
-			anyDoc:              hasParamDoc,
+			anyDoc:              anyDoc,
+			anyPost:             anyPost,
 			lineHeader:          hasLineLeadingComment(commentSlots{}, firstFuncParam(params)),
+			forceOpenBreak:      firstHoistedDoc,
 			allowsTrailingComma: true,
 			inner:               table(c.funcParamRows(params, x.Ellipsis, true)),
 		}
@@ -2902,7 +2954,7 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 		if p == nil {
 			continue
 		}
-		args = append(args, c.funcParam(p))
+		args = append(args, c.funcParamCore(p))
 	}
 	if open {
 		args = append(args, ellipsisLit)
@@ -2922,15 +2974,20 @@ func (c *converter) funcResult(d doc, x *ast.Func) doc {
 	return d
 }
 
-func (c *converter) funcParam(p *ast.FuncParam) doc {
-	return c.withComments(p, c.funcParamCore(p))
-}
-
+// funcParamCore renders a parameter without any comment: the caller
+// places the parameter's comments, including those of its constraint and
+// default (see [funcParamComments]), around the row it occupies.
 func (c *converter) funcParamCore(p *ast.FuncParam) doc {
 	if p == nil {
 		return nil
 	}
-	d := appendAttrs(c.expr(p.Value), p.Attrs)
+	d := c.exprCore(p.Value)
+	if p.Default != nil {
+		// A parameter default follows the constraint as " = expr" and
+		// precedes the attributes.
+		d = cats(d, spaceLit, stringLit("="), spaceLit, c.exprCore(p.Default))
+	}
+	d = appendAttrs(d, p.Attrs)
 	if p.Label == nil {
 		return d
 	}
@@ -2951,6 +3008,11 @@ func (c *converter) funcParamRows(params []*ast.FuncParam, ellipsis token.Pos, t
 	if open {
 		lastIdx = len(params) // the "..." row is last
 	}
+	// A row that ends in a // comment, or is followed by a comment on its
+	// own line, must be followed by a line break: the comment would
+	// otherwise swallow the next row. The comment may have moved there
+	// from after ":" or "=", so the next row's own RelPos does not tell.
+	soft := lineBreakOrSpace
 	for i, p := range params {
 		if p == nil {
 			continue
@@ -2963,34 +3025,88 @@ func (c *converter) funcParamRows(params []*ast.FuncParam, ellipsis token.Pos, t
 			comma = commaWhenBroken
 		}
 
-		slots := classifyComments(p)
-		lineSlots, otherSlots := partitionLineComments(slots)
+		// As for a list element (see [converter.listElemRow]): the doc
+		// slot becomes the row's doc comment, a same-line comment goes in
+		// the trailing cell after the comma, and any other comment
+		// follows the row on a line of its own.
+		slots := funcParamComments(p)
 		var trailing doc
-		for _, cg := range lineSlots.all() {
-			trailing = joinLines(trailing, c.commentGroup(cg))
+		var post []*ast.CommentGroup
+		for _, cg := range slots.nonDoc() {
+			if isLineComment(cg) {
+				trailing = joinLines(trailing, c.commentGroup(cg))
+			} else {
+				post = append(post, cg)
+			}
 		}
 		cells := []doc{cat(c.funcParamCore(p), comma)}
 		if trailing != nil {
 			cells = append(cells, trailing)
 		}
 		r := row{
-			docComment: c.docCommentBlock(otherSlots.doc, p.Pos().RelPos()),
+			docComment: c.docCommentBlock(slots.doc, p.Pos().RelPos()),
 			cells:      cells,
 			hasComment: slots.any(),
 		}
 		if len(rows) > 0 {
-			r.sep = relBreakOr(LeadingRelPos(p), lineBreakOrSpace)
+			r.sep = relBreakOr(funcParamLeadingRelPos(p, slots), soft)
 		}
 		rows = append(rows, r)
+		rows = append(rows, c.postCommentRows(post)...)
+		soft = lineBreakOrSpace
+		if trailing != nil || len(post) > 0 {
+			soft = lineBreakHard
+		}
 	}
 	if open {
 		r := row{cells: []doc{ellipsisLit}}
 		if len(rows) > 0 {
-			r.sep = relBreakOr(ellipsis.RelPos(), lineBreakOrSpace)
+			r.sep = relBreakOr(ellipsis.RelPos(), soft)
 		}
 		rows = append(rows, r)
 	}
 	return rows
+}
+
+// funcParamLeadingRelPos is [LeadingRelPos] for a parameter whose doc
+// comments, slots.doc, include those hoisted from its constraint and
+// default: the first of them leads the row, wherever it is attached.
+func funcParamLeadingRelPos(p *ast.FuncParam, slots commentSlots) token.RelPos {
+	if len(slots.doc) > 0 {
+		return slots.doc[0].Pos().RelPos()
+	}
+	return p.Pos().RelPos()
+}
+
+// funcParamComments returns the comments of a parameter together with
+// those of its constraint and default expressions. The parser attaches a
+// comment on its own line before either expression to that expression,
+// but a parameter renders as a single table cell, so such a comment is
+// treated as the parameter's: a doc comment precedes the row and any
+// other comment follows it. The interior comments of a bracketed
+// expression stay inside it (see [nodeManagesInteriorComments]).
+func funcParamComments(p *ast.FuncParam) commentSlots {
+	slots := classifyComments(p)
+	for _, e := range []ast.Expr{p.Value, p.Default} {
+		if e == nil {
+			continue
+		}
+		es := classifyComments(e)
+		slots.doc = append(slots.doc, es.doc...)
+		if !nodeManagesInteriorComments(e) {
+			slots.prefix = append(slots.prefix, es.prefix...)
+			slots.suffix = append(slots.suffix, es.suffix...)
+		}
+		slots.trailing = append(slots.trailing, es.trailing...)
+	}
+	return slots
+}
+
+// isLineComment reports whether cg sits on the same line as the token it
+// follows. The parser marks these with a Blank RelPos; a programmatically
+// built AST may set only cg.Line.
+func isLineComment(cg *ast.CommentGroup) bool {
+	return cg.Line || cg.Pos().RelPos() == token.Blank
 }
 
 func firstFuncParam(params []*ast.FuncParam) ast.Node {

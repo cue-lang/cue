@@ -31,6 +31,14 @@ out4: k.g(1)
 add:  func(x: int, y: int) -> int: x + y
 padd: add(1, ...)
 out5: padd(2)
+
+// A parameter default exports with the literal; a default declared by an
+// attached type stays in the "& type" term.
+dflt: func(a: int, b: int = 10) -> int: a + b
+out6: dflt(1)
+D:    func(a: int = 2, ...) -> int
+td:   D & (func(a: int) -> int: a)
+out7: td()
 -- out/value-v3 --
 == Simplified
 {
@@ -55,6 +63,14 @@ out5: padd(2)
 	add:  func(x: int, y: int) -> int: x + y
 	padd: func(x: int, y: int) -> int: x + y
 	out5: 3
+
+	// A parameter default exports with the literal; a default declared by an
+	// attached type stays in the "& type" term.
+	dflt: func(a: int, b: int = 10) -> int: a + b
+	out6: 11
+	D:    func(a: int = 2, ...) -> int
+	td:   (func(a: int) -> int: a) & (func(a: int = 2, ...) -> int)
+	out7: 2
 }
 == Raw
 {
@@ -79,6 +95,14 @@ out5: padd(2)
 	add:  func(x: int, y: int) -> int: x + y
 	padd: func(x: int, y: int) -> int: x + y
 	out5: 3
+
+	// A parameter default exports with the literal; a default declared by an
+	// attached type stays in the "& type" term.
+	dflt: func(a: int, b: int = 10) -> int: a + b
+	out6: 11
+	D:    func(a: int = 2, ...) -> int
+	td:   (func(a: int) -> int: a) & (func(a: int = 2, ...) -> int)
+	out7: 2
 }
 == Final
 {
@@ -103,6 +127,11 @@ out5: padd(2)
 	add:  func(x: int, y: int) -> int: x + y
 	padd: func(x: int, y: int) -> int: x + y
 	out5: 3
+	dflt: func(a: int, b: int = 10) -> int: a + b
+	out6: 11
+	D:    func(a: int = 2, ...) -> int
+	td:   (func(a: int) -> int: a) & (func(a: int = 2, ...) -> int)
+	out7: 2
 }
 == All
 {
@@ -127,6 +156,14 @@ out5: padd(2)
 	add:  func(x: int, y: int) -> int: x + y
 	padd: func(x: int, y: int) -> int: x + y
 	out5: 3
+
+	// A parameter default exports with the literal; a default declared by an
+	// attached type stays in the "& type" term.
+	dflt: func(a: int, b: int = 10) -> int: a + b
+	out6: 11
+	D:    func(a: int = 2, ...) -> int
+	td:   (func(a: int) -> int: a) & (func(a: int = 2, ...) -> int)
+	out7: 2
 }
 == Eval
 {
@@ -151,6 +188,11 @@ out5: padd(2)
 	add:  func(x: int, y: int) -> int: x + y
 	padd: func(x: int, y: int) -> int: x + y
 	out5: 3
+	dflt: func(a: int, b: int = 10) -> int: a + b
+	out6: 11
+	D:    func(a: int = 2, ...) -> int
+	td:   (func(a: int) -> int: a) & (func(a: int = 2, ...) -> int)
+	out7: 2
 }
 -- out/definition-v3-noshare --
 import "strings"
@@ -176,6 +218,14 @@ out4: k.g(1)
 add:  func(x: int, y: int) -> int: x + y
 padd: add(1, ...)
 out5: padd(2)
+
+// A parameter default exports with the literal; a default declared by an
+// attached type stays in the "& type" term.
+dflt: func(a: int, b: int = 10) -> int: a + b
+out6: dflt(1)
+D:    func(a: int = 2, ...) -> int
+td:   D & (func(a: int) -> int: a)
+out7: td()
 -- out/doc-v3 --
 []
 [a]
@@ -197,6 +247,14 @@ out5: padd(2)
 [add]
 [padd]
 [out5]
+[dflt]
+- A parameter default exports with the literal; a default declared by an
+attached type stays in the "& type" term.
+
+[out6]
+[D]
+[td]
+[out7]
 -- out/definition-v3 --
 import "strings"
 
@@ -221,3 +279,11 @@ out4: k.g(1)
 add:  func(x: int, y: int) -> int: x + y
 padd: add(1, ...)
 out5: padd(2)
+
+// A parameter default exports with the literal; a default declared by an
+// attached type stays in the "& type" term.
+dflt: func(a: int, b: int = 10) -> int: a + b
+out6: dflt(1)
+D:    func(a: int = 2, ...) -> int
+td:   D & (func(a: int) -> int: a)
+out7: td()

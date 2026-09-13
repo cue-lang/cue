@@ -1,11 +1,37 @@
 # Function expressions: parameter attributes render after the parameter
-# value, and a trailing "..." marks an open signature. A parameter list
-# with doc comments breaks into a table with the "..." on its own row. A
-# call whose argument list ends in "..." is a partial application.
+# value, a parameter default renders as " = " after the constraint and
+# before the attributes, and a trailing "..." marks an open signature. A
+# parameter list with doc comments breaks into a table with the "..." on
+# its own row. A call whose argument list ends in "..." is a partial
+# application.
 -- in --
 @experiment(functions)
 
 tagged: func(a: int @tag(x), b: int @foo() @bar()) -> int: a + b
+
+defaults: func(_~n: int = 0, a: int=2, c: int = 3 @tag(y), b!: string = "x") -> int: a
+defaultsMulti: func(
+	// a default on the first parameter
+	a: int = 2,
+	b: string = "x",
+) -> int: a
+
+// A comment after "=" or ":" trails its parameter; a comment on its own
+// line before a default or a constraint leads the parameter. A parameter
+// list with a comment closes on its own line, so that a // comment
+// cannot swallow the closing parenthesis or a following parameter.
+commented: func(a: int = // after the bind token
+	2, b: int =
+	// before the default
+	3, c:
+	// before the constraint
+	int = 4) -> int: a
+trailingLast: func(a: int = 2 // after the last parameter
+	) -> int: a
+standalone: func(
+	a: int = 2,
+	// after the last parameter, on its own line
+) -> int: a
 
 open:      func(a: int, ...) -> number
 openOnly:  func(...) -> int
@@ -25,6 +51,30 @@ partialMany:  add(1, 2, ...)
 
 tagged: func(a: int @tag(x), b: int @foo() @bar()) -> int: a + b
 
+defaults: func(_~(n): int = 0, a: int = 2, c: int = 3 @tag(y), b!: string = "x") -> int: a
+defaultsMulti: func(
+	// a default on the first parameter
+	a: int = 2,
+	b: string = "x",
+) -> int: a
+
+// A comment after "=" or ":" trails its parameter; a comment on its own
+// line before a default or a constraint leads the parameter. A parameter
+// list with a comment closes on its own line, so that a // comment
+// cannot swallow the closing parenthesis or a following parameter.
+commented: func(a: int = 2, // after the bind token
+	// before the default
+	b: int = 3,
+	// before the constraint
+	c: int = 4,
+) -> int: a
+trailingLast: func(a: int = 2, // after the last parameter
+) -> int: a
+standalone: func(
+	a: int = 2,
+	// after the last parameter, on its own line
+) -> int: a
+
 open:     func(a: int, ...) -> number
 openOnly: func(...) -> int
 openMulti: func(
@@ -40,7 +90,34 @@ partialNone:  add(...)
 partialMany:  add(1, 2, ...)
 -- out/norelpos --
 @experiment(functions)
-tagged:   func(a: int @tag(x), b: int @foo() @bar()) -> int: a + b
+tagged: func(a: int @tag(x), b: int @foo() @bar()) -> int: a + b
+defaults:
+	func(_~(n): int = 0, a: int = 2, c: int = 3 @tag(y), b!: string = "x") -> int: a
+defaultsMulti: func(
+	// a default on the first parameter
+	a: int = 2,
+	b: string = "x",
+) -> int: a
+// A comment after "=" or ":" trails its parameter; a comment on its own
+// line before a default or a constraint leads the parameter. A parameter
+// list with a comment closes on its own line, so that a // comment
+// cannot swallow the closing parenthesis or a following parameter.
+commented: func(
+	a: int = 2,
+	// after the bind token
+	// before the default
+	b: int = 3,
+	// before the constraint
+	c: int = 4,
+) -> int: a
+trailingLast: func(
+	a: int = 2,
+	// after the last parameter
+) -> int: a
+standalone: func(
+	a: int = 2,
+	// after the last parameter, on its own line
+) -> int: a
 open:     func(a: int, ...) -> number
 openOnly: func(...) -> int
 openMulti: func(

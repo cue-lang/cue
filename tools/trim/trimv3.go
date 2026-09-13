@@ -1141,14 +1141,17 @@ func (t *trimmerV3) resolveElemAll(c adt.Conjunct, f func(adt.Resolver, *adt.Ver
 				worklist = append(worklist, item{elemT.Fallback, env, true})
 			}
 		case *adt.Function:
-			// Parameter constraints and the return type are compiled in
-			// the closure scope of the literal and resolve against the
-			// current environment; the body assumes one additional scope
-			// level for the parameter activation (see the compilation of
-			// ast.Func in internal/core/compile).
+			// Parameter constraints, parameter defaults, and the return
+			// type are compiled in the closure scope of the literal and
+			// resolve against the current environment; the body assumes
+			// one additional scope level for the parameter activation (see
+			// the compilation of ast.Func in internal/core/compile).
 			for i := range elemT.Params {
 				if v := elemT.Params[i].Value; v != nil {
 					worklist = append(worklist, item{v, env, true})
+				}
+				if d := elemT.Params[i].Default; d != nil {
+					worklist = append(worklist, item{d, env, true})
 				}
 			}
 			if elemT.Ret != nil {

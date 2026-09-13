@@ -17,12 +17,18 @@ a: {
 	// conjunct is the call reference carrying the function's expressions.
 	mk: func(x: int) -> {out: int}: {out: x + offset}
 	d: mk(1).out
+
+	// A parameter default is an expression of the signature too, resolved
+	// in the closure scope like the constraint.
+	withDefault: func(x: int = dflt) -> int: x
+	e: withDefault()
 }
 
 T: int
 R: int
 offset: 3
 str: "5"
+dflt: 4
 -- out/dependencies/field --
 line  reference    path of resulting vertex
 8:    fn        => a.fn
@@ -35,6 +41,7 @@ line  reference       path of resulting vertex
 9:    str          => str
 13:   offset       => offset
 17:   offset       => offset
+22:   dflt         => dflt
 -- out/dependencies/dynamic --
 line  reference       path of resulting vertex
 8:    fn           => a.fn
@@ -46,9 +53,11 @@ line  reference       path of resulting vertex
 13:   offset       => offset
 17:   x            => **non-rooted**
 17:   offset       => offset
+22:   dflt         => dflt
+23:   withDefault  => a.withDefault
 -- out/dependencies-v3/stats/field --
 // COUNT: 1
 -- out/dependencies-v3/stats/all --
-// COUNT: 14
+// COUNT: 17
 -- out/dependencies-v3/stats/dynamic --
-// COUNT: 26
+// COUNT: 32

@@ -1,0 +1,68 @@
+# A default subsumed by a referenced definition leaves a reference to that
+# definition, which is emitted as a $ref.
+# See https://cuelang.org/issue/4305
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#Port:    {port: int}
+#Default: *{port: 1} | #Port
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Default": {
+            "$ref": "#/components/schemas/Port"
+         },
+         "Port": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "port": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "port"
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Default": {
+            "$ref": "#/components/schemas/Port"
+         },
+         "Port": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "port": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "port"
+            ]
+         }
+      }
+   }
+}

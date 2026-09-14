@@ -586,7 +586,15 @@ func (g *generator) makeItem(v cue.Value, mode closedMode) internItem {
 func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	op, args := v.Expr()
 	switch op {
-	case cue.NoOp, cue.SelectorOp:
+	case cue.NoOp:
+		if len(args) == 1 {
+			// The value to describe: v itself, or the sole surviving arm of a
+			// disjunction whose default the arm subsumes. In the latter case v
+			// is not concrete, so it must not be inspected as a struct below.
+			v = args[0]
+		}
+		fallthrough
+	case cue.SelectorOp:
 		pkg, path := v.ReferencePath()
 		if !pkg.Exists() {
 			break

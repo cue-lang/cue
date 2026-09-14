@@ -670,6 +670,11 @@ func newChildValue(o *structValue, i int) Value {
 
 // Dereference reports the value v refers to if v is a reference or v itself
 // otherwise.
+//
+// A disjunction is not a reference, even one such as "*1 | a" whose default
+// is dropped by [Value.Expr] and which [Value.ReferencePath] reports as a
+// reference to a: following it would lose the default. To resolve such a
+// reference, look up the path reported by ReferencePath in its root.
 func Dereference(v Value) Value {
 	n := v.v
 	if n == nil {
@@ -1969,7 +1974,9 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 
 // ReferencePath returns the value and path referred to by this value such that
 // [Value.LookupPath](path) resolves to the same value, or no path if this value
-// is not a reference.
+// is not a reference. A disjunction whose default the referenced value
+// subsumes, such as "*1 | a", reports the reference to a, whose value lacks
+// the default.
 //
 // The path is absolute from root and reflects where the reference resolves,
 // not its syntax: scope-relative and absolute references may report the same
@@ -2000,6 +2007,7 @@ func (v Value) ReferencePath() (root Value, p Path) {
 		}
 	}
 
+	expr = v.unwrapDisjunction(env, expr)
 	x, path := reference(v.idx, ctx, env, expr)
 	if x == nil {
 		return Value{}, Path{}
@@ -2353,6 +2361,13 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 //
 // A builtin call expression returns the value of the builtin followed by the
 // args of the call.
+//
+// For disjunctions, default arms that another arm subsumes are omitted, so
+// "*20 | int & >=1 & <=100" reports the expression of "int & >=1 & <=100"
+// alone, and "*1 | a" is a reference to a, as [Value.ReferencePath] also
+// reports. Values that are not expressions, such as a
+// struct literal without embeddings, report [NoOp] and the value itself, or
+// the surviving disjunct when it is such a value.
 func (v Value) Expr() (Op, []Value) {
 	// TODO: return v if this is complete? Yes for now
 	if v.v == nil {
@@ -2441,45 +2456,22 @@ process:
 			count++
 			a = append(a, remakeValue(v, env, disjunct))
 		}
+		if count == 1 {
+			// Report the sole remaining disjunct as the value itself.
+			return a[0].Expr()
+		}
 		if count > 1 {
 			op = OrOp
 		}
 
 	case *adt.DisjunctionExpr:
-		// Filter defaults that are subsumed by another value.
-		count := 0
-	outerExpr:
-		for _, disjunct := range x.Values {
-			if disjunct.Default {
-				for _, n := range x.Values {
-					a := adt.Vertex{
-						Label: v.v.Label,
-					}
-					b := a
-					a.AddConjunct(adt.MakeRootConjunct(env, n.Val))
-					b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
-
-					ctx := v.ctx()
-					a.Finalize(ctx)
-					b.Finalize(ctx)
-					if allowed(ctx, v.v, &b) != nil {
-						// Everything subsumed bottom
-						continue outerExpr
-					}
-					if allowed(ctx, v.v, &a) != nil {
-						// An error doesn't subsume anything except another error.
-						continue
-					}
-					a.Parent = v.v.Parent
-					if !n.Default && subsume.Simplify.Value(ctx, &a, &b) == nil {
-						continue outerExpr
-					}
-				}
-			}
-			count++
-			a = append(a, remakeValue(v, env, disjunct.Val))
+		for _, d := range v.survivingDisjuncts(env, x) {
+			a = append(a, remakeValue(v, env, d))
 		}
-		if count > 1 {
+		if len(a) == 1 {
+			return a[0].Expr()
+		}
+		if len(a) > 1 {
 			op = adt.OrOp
 		}
 
@@ -2643,4 +2635,55 @@ process:
 		a = append(a, v)
 	}
 	return op, a
+}
+
+// survivingDisjuncts returns the disjuncts of x that remain once the default
+// disjuncts subsumed by another disjunct are dropped. A value whose disjunction
+// has a single surviving disjunct is treated as that disjunct by [Value.Expr]
+// and [Value.ReferencePath], but not by [Dereference], which would lose the
+// default.
+func (v Value) survivingDisjuncts(env *adt.Environment, x *adt.DisjunctionExpr) []adt.Expr {
+	var a []adt.Expr
+outer:
+	for _, disjunct := range x.Values {
+		if disjunct.Default {
+			for _, n := range x.Values {
+				a := adt.Vertex{
+					Label: v.v.Label,
+				}
+				b := a
+				a.AddConjunct(adt.MakeRootConjunct(env, n.Val))
+				b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
+
+				ctx := v.ctx()
+				a.Finalize(ctx)
+				b.Finalize(ctx)
+				if allowed(ctx, v.v, &b) != nil {
+					// Everything subsumed bottom
+					continue outer
+				}
+				if allowed(ctx, v.v, &a) != nil {
+					// An error doesn't subsume anything except another error.
+					continue
+				}
+				a.Parent = v.v.Parent
+				if !n.Default && subsume.Simplify.Value(ctx, &a, &b) == nil {
+					continue outer
+				}
+			}
+		}
+		a = append(a, disjunct.Val)
+	}
+	return a
+}
+
+// unwrapDisjunction returns the single surviving disjunct of expr if it is a
+// disjunction with one, and expr itself otherwise.
+func (v Value) unwrapDisjunction(env *adt.Environment, expr adt.Expr) adt.Expr {
+	if x, ok := expr.(*adt.DisjunctionExpr); ok {
+		if a := v.survivingDisjuncts(env, x); len(a) == 1 {
+			return a[0]
+		}
+	}
+	return expr
 }

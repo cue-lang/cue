@@ -3666,10 +3666,9 @@ func TestReferencePath(t *testing.T) {
 		want:  "a.b.c",
 	}, {
 		// A default subsumed by a referenced value leaves a reference.
-		// TODO: the disjunction hides it; see https://cuelang.org/issue/4305.
 		input: "v: w: x: *1 | a, a: int",
 		path:  "v.w.x",
-		want:  "",
+		want:  "a",
 		alt:   "int",
 	}, {
 		input: "if true { v: w: x: a, a: 1 }",
@@ -4309,13 +4308,11 @@ func TestExpr(t *testing.T) {
 		want:  "|(1 2 3 4)",
 	}, {
 		// A default subsumed by the other arm is dropped, leaving that arm.
-		// TODO: the remaining arm is reported as a NoOp wrapping it, hiding
-		// its expression; see https://cuelang.org/issue/4305.
 		input: "v: *20 | int & >=1 & <=100",
-		want:  "((int & >=1) & <=100)",
+		want:  "&(&(int >=(1)) <=(100))",
 	}, {
 		input: "v: int & >=1 | *5",
-		want:  "(int & >=1)",
+		want:  "&(int >=(1))",
 	}, {
 		input: "v: 2 & 5", // Allow even with error.
 		want:  "&(2 5)",

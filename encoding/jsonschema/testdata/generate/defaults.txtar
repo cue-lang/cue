@@ -1,15 +1,12 @@
 # A default value is not part of a generated JSON Schema, but the constraints
 # it is disjoined with are. When the other arms subsume the default arm,
-# cue.Value.Expr drops it and reports the value as a NoOp wrapping the single
-# remaining arm, whose constraints must still be generated.
+# cue.Value.Expr drops it and reports the single remaining arm, whose
+# constraints must still be generated.
 #
-# bounded and trailingDefault have their default subsumed by the other arm,
-# which is all that remains; disjoint keeps both arms because the default is
-# not subsumed; noDefault is there to compare bounded against.
+# bounded, trailingDefault, and structDefault have their default subsumed by
+# the other arm, which is all that remains; disjoint keeps both arms because
+# the default is not subsumed; noDefault is there to compare bounded against.
 # See https://cuelang.org/issue/4305
-#
-# TODO bounded and trailingDefault lose their bounds, unlike noDefault, so
-# the schemas below accept values that CUE rejects.
 -- test.cue --
 package test
 
@@ -17,6 +14,7 @@ bounded?:         *20 | int & >=1 & <=100
 trailingDefault?: int & >=1 | *5
 disjoint?:        *20 | string
 noDefault?:       int & >=1 & <=100
+structDefault?:   *{port: 1} | {port: int}
 -- datatest/tests.cue --
 package datatest
 
@@ -25,15 +23,15 @@ ok: data: {
 	trailingDefault: 3
 	disjoint:        "x"
 	noDefault:       50
+	structDefault: port: 2
 }
 
 // The default itself remains a valid value, being within the bounds.
 okDefault: data: bounded: 20
 
-// TODO the dropped bounds make boundedTooLarge and trailingDefaultTooSmall
-// validate; both should be errors.
 boundedTooLarge: {
 	data: bounded: 500
+	error: true
 }
 
 boundedNotInt: {
@@ -43,10 +41,16 @@ boundedNotInt: {
 
 trailingDefaultTooSmall: {
 	data: trailingDefault: 0
+	error: true
 }
 
 disjointBadKind: {
 	data: disjoint: true
+	error: true
+}
+
+structDefaultBadKind: {
+	data: structDefault: port: "x"
 	error: true
 }
 -- out/generate-v3/schema --
@@ -54,7 +58,13 @@ disjointBadKind: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
-		bounded: type:   "integer"
+		bounded: allOf: [{
+			type: "number"
+		}, {
+			type:    "integer"
+			maximum: 100
+			minimum: 1
+		}]
 		disjoint: anyOf: [{const: 20}, {type: "string"}]
 		noDefault: allOf: [{
 			type: "number"
@@ -63,7 +73,17 @@ disjointBadKind: {
 			maximum: 100
 			minimum: 1
 		}]
-		trailingDefault: type: "integer"
+		structDefault: {
+			type: "object"
+			properties: port: type: "integer"
+			required: ["port"]
+		}
+		trailingDefault: allOf: [{
+			type: "number"
+		}, {
+			type:    "integer"
+			minimum: 1
+		}]
 	}
 }
 -- out/generate-v3/boundedNotInt --
@@ -71,15 +91,25 @@ boundedNotInt.data.bounded: conflicting values 50.5 and int (mismatched types fl
     ./datatest/tests.cue:20:17
     1:100
 -- out/generate-v3/boundedTooLarge --
+boundedTooLarge.data.bounded: invalid value 500 (out of bound <=100):
+    1:145
+    ./datatest/tests.cue:15:17
 -- out/generate-v3/disjointBadKind --
 disjointBadKind.data.disjoint: conflicting values true and 20 (mismatched types bool and int):
-    ./datatest/tests.cue:29:18
-    1:140
+    ./datatest/tests.cue:30:18
+    1:196
 disjointBadKind.data.disjoint: conflicting values true and string (mismatched types bool and string):
-    ./datatest/tests.cue:29:18
+    ./datatest/tests.cue:30:18
 disjointBadKind.data.disjoint: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
-    1:130
-    ./datatest/tests.cue:29:18
+    1:186
+    ./datatest/tests.cue:30:18
 -- out/generate-v3/ok --
 -- out/generate-v3/okDefault --
 -- out/generate-v3/trailingDefaultTooSmall --
+trailingDefaultTooSmall.data.trailingDefault: invalid value 0 (out of bound >=1):
+    1:474
+    ./datatest/tests.cue:25:25
+-- out/generate-v3/structDefaultBadKind --
+structDefaultBadKind.data.structDefault.port: conflicting values "x" and int (mismatched types string and int):
+    ./datatest/tests.cue:35:29
+    1:370

@@ -2,9 +2,6 @@
 # generated schema; the default itself is not part of it. The old encoder
 # failed on this with "unsupported op for number &".
 # See https://cuelang.org/issue/4305
-#
-# TODO Bounded and TrailingDefault lose their bounds below, so the generated
-# schemas accept values that CUE rejects.
 #v2
 #Version: 3.0
 #AllSchemas
@@ -26,7 +23,16 @@ paths: {}
    "components": {
       "schemas": {
          "Bounded": {
-            "type": "integer"
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 100,
+                  "minimum": 1
+               }
+            ]
          },
          "Disjoint": {
             "anyOf": [
@@ -41,7 +47,15 @@ paths: {}
             ]
          },
          "TrailingDefault": {
-            "type": "integer"
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "minimum": 1
+               }
+            ]
          }
       }
    }
@@ -57,7 +71,16 @@ paths: {}
    "components": {
       "schemas": {
          "Bounded": {
-            "type": "integer"
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "maximum": 100,
+                  "minimum": 1
+               }
+            ]
          },
          "Disjoint": {
             "anyOf": [
@@ -72,7 +95,15 @@ paths: {}
             ]
          },
          "TrailingDefault": {
-            "type": "integer"
+            "allOf": [
+               {
+                  "type": "number"
+               },
+               {
+                  "type": "integer",
+                  "minimum": 1
+               }
+            ]
          }
       }
    }

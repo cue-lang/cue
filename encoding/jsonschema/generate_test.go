@@ -171,8 +171,7 @@ func TestGenerateDefaultedStructDisjunction(t *testing.T) {
 	cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=^"+t.Name()+"$")
 	cmd.Env = append(os.Environ(), env+"=1")
 	out, err := cmd.CombinedOutput()
-	// TODO: generation recurses without end; see https://cuelang.org/issue/4305.
-	qt.Assert(t, qt.IsNotNil(err), qt.Commentf("%s", out))
+	qt.Assert(t, qt.IsNil(err), qt.Commentf("%s", out))
 }
 
 func TestGenerateMany(t *testing.T) {

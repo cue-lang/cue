@@ -68,13 +68,17 @@ func runDef(cmd *Command, args []string) error {
 	iter := b.instances()
 	defer iter.close()
 	for iter.scan() {
-		var err error
 		if f := iter.file(); f != nil {
-			err = e.EncodeFile(f)
-		} else {
-			err = e.Encode(iter.value())
+			if err := e.EncodeFile(f); err != nil {
+				return err
+			}
+			continue
 		}
+		v, err := b.placeValue(iter.value())
 		if err != nil {
+			return err
+		}
+		if err := e.Encode(v); err != nil {
 			return err
 		}
 	}

@@ -126,7 +126,10 @@ func runEval(cmd *Command, args []string) error {
 		if len(b.insts) > 1 {
 			id = iter.id()
 		}
-		v := iter.value()
+		v, err := b.placeValue(iter.value())
+		if err != nil {
+			return err
+		}
 
 		errHeader := func() {
 			if id != "" {
@@ -175,7 +178,7 @@ func runEval(cmd *Command, args []string) error {
 
 		f := internal.ToFile(v.Syntax(syn...), false)
 		f.Filename = id
-		err := e.EncodeFile(f)
+		err = e.EncodeFile(f)
 		if err != nil {
 			errHeader()
 			printError(cmd, err)

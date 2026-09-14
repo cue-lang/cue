@@ -4,9 +4,6 @@
 
 # eval, def, and export place the value the same way, for CUE inputs as
 # well as orphan data files.
-#
-# eval and def ignore the flag for CUE inputs today, so the first two
-# golden files below still show the unplaced value.
 
 exec cue eval -l 'input:' x.cue
 cmp stdout eval.golden
@@ -102,16 +99,18 @@ service: [string]: name: !~"^[A-Z]"
     "@name": "elem3"
 }
 -- eval.golden --
-kind:  "Deployment"
-#Name: string
-name:  "hello"
+input: {
+    kind:  "Deployment"
+    #Name: string
+    name:  "hello"
+}
 -- def.golden --
-package x
-
-kind:      "Deployment"
-#Name:     string
-name:      #Name & {"hello"}
-replicas?: int
+input: {
+	kind:      "Deployment"
+	#Name:     string
+	name:      #Name & {"hello"}
+	replicas?: int
+}
 -- export.golden --
 {
     "input": {

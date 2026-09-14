@@ -918,22 +918,22 @@ issue4483: {
 	binary: {
 		a?: int
 		try {b: a? + 1}
-		@test(eq:todo, {a?: int})
+		@test(eq, {a?: int})
 	}
 	comparison: {
 		a?: int
 		try {b: a? > 1}
-		@test(eq:todo, {a?: int})
+		@test(eq, {a?: int})
 	}
 	interpolation: {
 		a?: string
 		try {b: "x\(a?)"}
-		@test(eq:todo, {a?: string})
+		@test(eq, {a?: string})
 	}
 	bound: {
 		a?: int
 		try x = {value: a? + 1} {b: x}
-		@test(eq:todo, {a?: int})
+		@test(eq, {a?: int})
 	}
 	// The guard on the yielded body fails to hold; before the guards case
 	// below was fixed, this shape panicked as well.
@@ -1024,15 +1024,6 @@ issue4483: {
 [incomplete] tryNestedRootedCycle.ext.b: error in call to len: incomplete argument list (type list):
     ./in.cue:803:19
     ./in.cue:802:6
-[incomplete] issue4483.binary.b: cannot reference optional field: a:
-    ./in.cue:919:11
-[incomplete] issue4483.comparison.b: cannot reference optional field: a:
-    ./in.cue:924:11
-[incomplete] issue4483.interpolation.b: invalid interpolation: cannot reference optional field: a:
-    ./in.cue:929:11
-    ./in.cue:929:15
-[incomplete] issue4483.bound.b.value: cannot reference optional field: a:
-    ./in.cue:934:19
 [incomplete] issue4483.guards: cannot reference optional field: a:
     ./in.cue:963:35
 issue4483.guards: cannot reference optional field: b:

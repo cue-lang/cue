@@ -689,12 +689,27 @@ func (v *Vertex) tryBodyRoot() *Vertex {
 // Rooted vertices finalized while evaluating the body are finalized for
 // good, so their unblocking phase runs as usual: deferring there would let
 // them commit results that the deferred tasks later contradict.
+//
+// The tasks of the finalizing vertex itself, and of its descendants, are
+// never deferred, whatever they are blocked on: they are what the
+// pre-evaluation is about, and a ?-marked reference among them left
+// blocked would hide the very failure the try clause looks for.
 func (s *scheduler) mustDeferUnblock(t *task, inTryBody bool) bool {
 	if !inTryBody || t.blockedOn.node == nil {
 		return false
 	}
 	w := t.blockedOn.node.node
-	return w != nil && w.Rooted()
+	if w == nil || !w.Rooted() {
+		return false
+	}
+	if t.node != nil {
+		for v := t.node.node; v != nil && !v.Rooted(); v = v.Parent {
+			if v == s.node.node {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // yield causes the current task to be suspended until the given conditions

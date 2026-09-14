@@ -16,6 +16,7 @@ package adt
 
 import (
 	"math/bits"
+	"slices"
 )
 
 // The CUE scheduler schedules tasks for evaluation.
@@ -73,8 +74,13 @@ type taskContext struct {
 	// of all nodes necessary to evaluate that node. Any task that is blocked
 	// during such a round of evaluation is recorded here. Any mutual cycles
 	// will result in unresolved tasks. At the end of such a round, computation
-	// can be frozen and the tasks unblocked.
-	blocking []*task
+	// can be frozen and the tasks unblocked. Each finalize detaches this
+	// queue and owns that batch; see [scheduler.unblockTasks].
+	blocking []taskBlock
+
+	// blockID identifies each registration in blocking, including repeated waits
+	// by the same task and waits by tasks recycled from taskPool.
+	blockID uint64
 
 	// taskPool is a pool of tasks that can be reused to avoid allocations.
 	taskPool []*task
@@ -113,7 +119,7 @@ func (p *taskContext) popTask() {
 }
 
 // taskChunkSize is the number of tasks allocated at once when the pool is empty.
-// sizeof(task) is 120 bytes, so 32 tasks is just under 4KiB per chunk.
+// sizeof(task) is 128 bytes, so 32 tasks is exactly 4KiB per chunk.
 const taskChunkSize = 32
 
 func (p *taskContext) newTask() *task {
@@ -136,6 +142,8 @@ func (p *taskContext) newTask() *task {
 }
 
 func (p *taskContext) freeTask(t *task) {
+	// Invalidate any entries still held by an enclosing finalize.
+	t.blockID = 0
 	// Add task to pool without clearing. Task will be cleared when reused.
 	p.taskPool = append(p.taskPool, t)
 }
@@ -470,6 +478,10 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 
 	taskPos := 0
 
+	// Waits this finalize leaves alone, see [scheduler.unblockTasks]. Declared
+	// before the label so that a jump back does not reset it.
+	var deferred []taskBlock
+
 	selectTasks := needs
 	if needs&concreteKnown != 0 {
 		selectTasks |= valueKnown
@@ -585,77 +597,134 @@ processNextTask:
 		// remainder of function
 	}
 
-	// See mustDeferUnblock. This walks up the parent chain, so compute it
-	// once per finalize rather than per blocked task.
-	inTryBody := s.inTryBody()
+	deferred = s.unblockTasks(deferred)
 
-unblockTasks:
-	// Unblocking proceeds in three stages. Each of the stages may cause
-	// formerly blocked tasks to become unblocked. To ensure that unblocking
-	// tasks do not happen in an order-dependent way, we want to ensure that we
-	// have unblocked all tasks from one phase, before commencing to the next.
-
-	// The types of the node can no longer be altered. We can unblock the
-	// relevant states first to finish up any tasks that were just waiting for
-	// types, such as lists.
-	for _, t := range c.blocking {
-		if t.blockedOn != nil && !s.mustDeferUnblock(t, inTryBody) {
-			t.blockedOn.signal(s.ctx.autoUnblock)
-		}
-	}
-
-	// Mark all remaining conditions as "frozen" before actually running the
-	// tasks. Doing this before running the remaining tasks ensures that we get
-	// the same errors, regardless of the order in which tasks are unblocked.
-	for _, t := range c.blocking {
-		if t.blockedOn != nil && !s.mustDeferUnblock(t, inTryBody) {
-			t.blockedOn.freeze(t.blockCondition, t.x)
-			t.unblocked = true
-		}
-	}
-
-	// Run the remaining blocked tasks.
-	numBlocked := len(c.blocking)
-	for _, t := range c.blocking {
-		if t.blockedOn != nil && !t.defunct && !s.mustDeferUnblock(t, inTryBody) {
-			n, cond := t.blockedOn, t.blockCondition
-			t.blockedOn, t.blockCondition = nil, neverKnown
-			n.signal(cond)
-			runTask(t, attemptOnly) // Does this need to be final? Probably not if we do a fixed point computation.
-		}
-	}
-
-	// The running of tasks above may result in more tasks being added to the
-	// queue. Process these first before continuing.
+	// Unblocking may have added tasks to this scheduler.
 	if taskPos < len(s.tasks) {
 		goto processNextTask
 	}
 
-	// Similarly, the running of tasks may result in more tasks being blocked.
-	// Ensure we processed them all.
-	if numBlocked < len(c.blocking) {
-		goto unblockTasks
-	}
-
-	// Only tasks deferred by mustDeferUnblock remain blocked; retain them
-	// for a later regular finalize. Any other scheduler simply resets the
-	// queue, as it did before deferral existed. Compact in place without
-	// clearing the tail: an outer process call may be ranging over this
-	// same backing array, and must not observe nil entries.
-	if inTryBody {
-		n := 0
-		for _, t := range c.blocking {
-			if t.blockedOn != nil && !t.defunct {
-				c.blocking[n] = t
-				n++
-			}
-		}
-		c.blocking = c.blocking[:n]
-	} else {
-		c.blocking = c.blocking[:0]
-	}
+	s.releaseDeferred(deferred)
 
 	return true
+}
+
+// taskBlock identifies a particular wait, rather than just a task address:
+// running another task may unblock, reblock, or free and recycle this task.
+// An older entry must not act on the new wait, even if it uses the same address.
+type taskBlock struct {
+	task *task
+	id   uint64
+}
+
+// current reports whether the task is still on the wait this entry registered.
+func (b taskBlock) current() bool { return b.task.blockID == b.id }
+
+// pending reports whether that wait is still outstanding.
+func (b taskBlock) pending() bool { return b.current() && b.task.blockedOn != nil }
+
+// addBlocking registers t as blocked on s for the conditions in
+// t.blockCondition, both on s itself and on the context-wide queue.
+func (s *scheduler) addBlocking(t *task) {
+	// TODO: this line causes the scheduler state to fail if tasks are blocking
+	// on it. Is this desirable? At the very least we should then ensure that
+	// the scheduler where the tasks originate from will fail in that case.
+	s.needs |= t.blockCondition
+
+	t.blockedOn = s
+	s.blocking = append(s.blocking, t)
+
+	c := s.ctx
+	c.blockID++
+	t.blockID = c.blockID
+	c.blocking = append(c.blocking, taskBlock{t, c.blockID})
+}
+
+// unblockTasks takes ownership of each batch before running any tasks. Nested
+// finalizers can only take newly queued waits, never mutate an enclosing batch.
+// Each batch passes through all three unblocking stages. Waits deferred by this
+// scheduler are appended to deferred, which [scheduler.releaseDeferred] returns
+// to the context once this finalize is done running tasks.
+func (s *scheduler) unblockTasks(deferred []taskBlock) []taskBlock {
+	c := s.ctx
+	if len(c.blocking) == 0 {
+		return deferred
+	}
+	// This walks up the parent chain, so compute it once per finalize.
+	inTryBody := s.inTryBody()
+	canUnblock := func(b taskBlock) bool {
+		return b.pending() && !s.mustDeferUnblock(b.task, inTryBody)
+	}
+	numTasks := len(s.tasks)
+	// New waits, including those returned by nested finalizers, get their own
+	// round. Deferred waits cannot cause a busy loop here.
+	for len(c.blocking) > 0 {
+		blocking := c.blocking
+		c.blocking = nil
+
+		// The types of the node can no longer be altered. Unblock tasks
+		// waiting for types, such as lists, before freezing other conditions.
+		for _, b := range blocking {
+			if canUnblock(b) {
+				b.task.blockedOn.signal(c.autoUnblock)
+			}
+		}
+
+		// The signals above may have run tasks that registered new waits.
+		// Those belong to this batch too, so that they are frozen along with
+		// it rather than a round later.
+		blocking = append(blocking, c.blocking...)
+		c.blocking = nil
+
+		// Freeze all remaining conditions before running tasks, so errors
+		// do not depend on the order in which tasks are unblocked.
+		for _, b := range blocking {
+			if canUnblock(b) {
+				t := b.task
+				t.blockedOn.freeze(t.blockCondition, t.x)
+				t.unblocked = true
+			}
+		}
+
+		for _, b := range blocking {
+			if t := b.task; canUnblock(b) && !t.defunct {
+				n, cond := t.blockedOn, t.blockCondition
+				t.blockedOn, t.blockCondition = nil, neverKnown
+				n.signal(cond)
+				// signal can itself run tasks and invalidate this wait.
+				if b.current() {
+					runTask(t, attemptOnly)
+				}
+			}
+		}
+
+		for _, b := range blocking {
+			if b.pending() && !b.task.defunct {
+				deferred = append(deferred, b)
+			}
+		}
+		// Give newly scheduled work a chance to satisfy waits before
+		// forcefully unblocking another batch.
+		if numTasks < len(s.tasks) {
+			break
+		}
+	}
+	return deferred
+}
+
+// releaseDeferred hands the waits held back by [scheduler.unblockTasks] to the
+// context, for a later finalize to unblock.
+func (s *scheduler) releaseDeferred(deferred []taskBlock) {
+	if len(deferred) == 0 {
+		return
+	}
+	// A later batch may have satisfied or invalidated an earlier deferred
+	// wait. This slice is private to this invocation, so DeleteFunc clearing
+	// the tail is safe.
+	deferred = slices.DeleteFunc(deferred, func(b taskBlock) bool {
+		return !b.pending() || b.task.defunct
+	})
+	s.ctx.blocking = append(deferred, s.ctx.blocking...)
 }
 
 // inTryBody reports whether this scheduler belongs to the inline vertex
@@ -927,6 +996,8 @@ type task struct {
 	// scheduler.
 	blockedOn      *scheduler
 	blockCondition condition
+	// blockID identifies the wait the two fields above describe, see [taskBlock].
+	blockID uint64
 	// blockStack     []*task // TODO: use; for error reporting.
 
 	err *Bottom
@@ -1142,15 +1213,7 @@ func (t *task) waitFor(s *scheduler, needs condition) {
 	if s.meets(needs) {
 		panic("waiting for condition that already completed")
 	}
-	// TODO: this line causes the scheduler state to fail if tasks are blocking
-	// on it. Is this desirable? At the very least we should then ensure that
-	// the scheduler where the tasks originate from will fail in that case.
-	s.needs |= needs
-
 	t.state = taskWAITING
-
 	t.blockCondition = needs
-	t.blockedOn = s
-	s.blocking = append(s.blocking, t)
-	s.ctx.blocking = append(s.ctx.blocking, t)
+	s.addBlocking(t)
 }

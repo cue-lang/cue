@@ -705,22 +705,17 @@ func TestSchedulerReentrantFinalize(t *testing.T) {
 				outer.process(allKnown, finalize)
 				// The nested try owns newly registered waits, so its nested
 				// regular finalize cannot see or force those waits either.
-				// The expectations below record today's broken behavior: the
-				// nested finalizes reach into the enclosing try body's queue,
-				// force and freeze its deferred wait, and reset the queue, so
-				// nothing is retained for a later finalize.
-				wantRuns := 1
+				wantRuns := 0
 				if reuse == "reblocked" {
-					// One run is justified by an explicit signal, one is forced.
-					wantRuns = 2
+					// This run was justified by an explicit signal, before reblocking.
+					wantRuns = 1
 				}
+				wantAdded := 0
+				wantFrozen := false
+				wantPending := 2
 				if reuse == "cleared" {
-					// The freed task can no longer be reached to be forced.
-					wantRuns = 0
+					wantPending = 1
 				}
-				wantAdded := 1
-				wantFrozen := reuse != "cleared"
-				wantPending := 0
 				if runs != wantRuns || addedRuns != wantAdded {
 					t.Fatalf("runs: original=%d (want %d), added=%d (want %d)",
 						runs, wantRuns, addedRuns, wantAdded)
@@ -734,7 +729,9 @@ func TestSchedulerReentrantFinalize(t *testing.T) {
 
 				// A subsequent regular finalize must drain every deferred wait.
 				nested.process(allKnown, finalize)
-				// Nothing is left to drain: the waits already ran above.
+				if reuse != "cleared" {
+					wantRuns++
+				}
 				wantAdded = 1
 				if runs != wantRuns || addedRuns != wantAdded || len(ctx.blocking) != 0 {
 					t.Fatalf("lost waits: original=%d (want %d), added=%d (want %d), pending=%d",
@@ -770,13 +767,9 @@ func TestSchedulerReentrantFinalizeRetainsTasks(t *testing.T) {
 			waiting(func() { ran = append(ran, "first") })
 			waiting(func() { ran = append(ran, "second") })
 			outer.process(allKnown, finalize)
-			// "first" is silently lost: the nested try finalize compacts the
-			// shared queue, moving it behind the outer loop's cursor, and the
-			// outer finalize then resets the queue. With a newly ready task
-			// it survives, but runs after the nested one.
-			want := "trigger,second,nested"
+			want := "trigger,first,second,nested"
 			if newReady {
-				want = "trigger,second,nested,ready,first"
+				want = "trigger,first,second,ready,nested"
 			}
 			if got := strings.Join(ran, ","); got != want {
 				t.Fatalf("task execution = %s, want %s", got, want)
@@ -805,12 +798,9 @@ func TestSchedulerDeferredAcrossTaskLoop(t *testing.T) {
 	})
 
 	outer.process(allKnown, finalize)
-	// The expectations below record today's broken behavior: the regular
-	// finalize started from the try body's task loop reaches into the
-	// enclosing queue, forcing and freezing the deferred wait.
-	wantRuns := 1
-	wantFrozen := true
-	wantPending := 0
+	wantRuns := 0
+	wantFrozen := false
+	wantPending := 1
 	if runs != wantRuns {
 		t.Fatalf("deferred wait ran %d times, want %d", runs, wantRuns)
 	}
@@ -821,7 +811,7 @@ func TestSchedulerDeferredAcrossTaskLoop(t *testing.T) {
 		t.Fatalf("retained %d waits, want %d", len(st.ctx.blocking), wantPending)
 	}
 
-	// Nothing is left to drain: the wait already ran above.
+	// A subsequent regular finalize must drain the deferred wait.
 	nested.process(allKnown, finalize)
 	if runs != 1 || len(st.ctx.blocking) != 0 {
 		t.Fatalf("lost wait: runs=%d (want 1), pending=%d", runs, len(st.ctx.blocking))

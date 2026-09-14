@@ -65,8 +65,10 @@ checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
     ./main.cue:11:17
 [cycle] OUT.IMPORTS.0.export.OBJECTS.b.name: cycle with field: a.spec:
     ./main.cue:5:20
-[cycle] IN.spec: cycle with field: a.spec:
+[cycle] export.OBJECTS.a.spec: cycle with field: a.spec:
     ./main.cue:5:20
+OUT: cycle with field: IN.spec:
+    ./main.cue:11:14
 -- out/eval/stats --
 Leaks:  2
 Freed:  76

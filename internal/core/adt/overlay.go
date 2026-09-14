@@ -189,11 +189,7 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 				if before == after {
 					continue
 				}
-				s := &after.state.scheduler
-				t.blockedOn = s
-				s.blocking = append(s.blocking, t)
-				s.ctx.blocking = append(s.ctx.blocking, t)
-				s.needs |= t.blockCondition
+				after.state.scheduler.addBlocking(t)
 			}
 		}
 	}

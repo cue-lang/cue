@@ -5,13 +5,11 @@
 # until the goroutine stack overflowed.
 # Issue #4176.
 
-# The evaluator still overflows the stack; the fix in the next commit flips
-# these to compare against the golden files.
-! exec cue eval plain.cue
-stderr 'fatal error: stack overflow'
+exec cue eval plain.cue
+cmp stdout plain.golden
 
-! exec cue eval alias.cue
-stderr 'fatal error: stack overflow'
+exec cue eval alias.cue
+cmp stdout alias.golden
 
 -- plain.cue --
 #Def: {

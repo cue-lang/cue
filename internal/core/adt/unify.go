@@ -737,7 +737,10 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 	// bottom.
 	for _, c := range n.postChecks {
 		ctx := n.ctx
-		f := ctx.PushState(c.env, c.expr.Source())
+		// Replay the check in the cycle context of the original evaluation;
+		// without it a self-referential expression is no longer recognized
+		// as cyclic and re-expands without bound.
+		f := ctx.pushConjunct(MakeConjunct(c.env, c.expr, c.ci))
 
 		v := ctx.evalState(c.expr, Flags{
 			status:    finalized,
@@ -760,7 +763,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 			})
 		}
 
-		ctx.PopState(f)
+		ctx.popConjunct(f)
 	}
 
 	// This should be called after all arcs have been processed, because

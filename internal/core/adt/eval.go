@@ -768,6 +768,7 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 
 type envCheck struct {
 	env         *Environment
+	ci          CloseInfo
 	expr        Expr
 	expectError bool
 }

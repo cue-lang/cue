@@ -2306,6 +2306,7 @@ func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectErr
 	if n := env.DerefVertex(c).state; n != nil {
 		n.postChecks = append(n.postChecks, envCheck{
 			env:         env,
+			ci:          c.ci,
 			expr:        x,
 			expectError: expectError,
 		})

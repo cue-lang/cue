@@ -3665,6 +3665,13 @@ func TestReferencePath(t *testing.T) {
 		path:  "v.w.x",
 		want:  "a.b.c",
 	}, {
+		// A default subsumed by a referenced value leaves a reference.
+		// TODO: the disjunction hides it; see https://cuelang.org/issue/4305.
+		input: "v: w: x: *1 | a, a: int",
+		path:  "v.w.x",
+		want:  "",
+		alt:   "int",
+	}, {
 		input: "if true { v: w: x: a, a: 1 }",
 		path:  "v.w.x",
 		want:  "a",
@@ -3802,6 +3809,18 @@ func TestReferencePath(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestDereferenceDefault checks that Dereference leaves a disjunction alone
+// even when only one disjunct, a reference, survives [Value.Expr]'s filtering
+// of subsumed defaults: following the reference would drop the default.
+func TestDereferenceDefault(t *testing.T) {
+	v := cuecontext.New().CompileString("v: *1 | a, a: int").LookupPath(cue.ParsePath("v"))
+	d := cue.Dereference(v)
+	qt.Assert(t, qt.Equals(fmt.Sprint(d), "*1 | int"))
+	def, ok := d.Default()
+	qt.Assert(t, qt.IsTrue(ok))
+	qt.Assert(t, qt.Equals(fmt.Sprint(def), "1"))
 }
 
 func TestZeroValueBuildInstance(t *testing.T) {
@@ -4288,6 +4307,15 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: "v: 1 | 2 | 3 | *4",
 		want:  "|(1 2 3 4)",
+	}, {
+		// A default subsumed by the other arm is dropped, leaving that arm.
+		// TODO: the remaining arm is reported as a NoOp wrapping it, hiding
+		// its expression; see https://cuelang.org/issue/4305.
+		input: "v: *20 | int & >=1 & <=100",
+		want:  "((int & >=1) & <=100)",
+	}, {
+		input: "v: int & >=1 | *5",
+		want:  "(int & >=1)",
 	}, {
 		input: "v: 2 & 5", // Allow even with error.
 		want:  "&(2 5)",

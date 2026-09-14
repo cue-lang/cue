@@ -1,0 +1,79 @@
+# A default value disjoined with a bounded type keeps the bounds in the
+# generated schema; the default itself is not part of it. The old encoder
+# failed on this with "unsupported op for number &".
+# See https://cuelang.org/issue/4305
+#
+# TODO Bounded and TrailingDefault lose their bounds below, so the generated
+# schemas accept values that CUE rejects.
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+#Bounded:         *20 | int & >=1 & <=100
+#TrailingDefault: int & >=1 | *5
+#Disjoint:        *20 | string
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Bounded": {
+            "type": "integer"
+         },
+         "Disjoint": {
+            "anyOf": [
+               {
+                  "enum": [
+                     20
+                  ]
+               },
+               {
+                  "type": "string"
+               }
+            ]
+         },
+         "TrailingDefault": {
+            "type": "integer"
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Bounded": {
+            "type": "integer"
+         },
+         "Disjoint": {
+            "anyOf": [
+               {
+                  "enum": [
+                     20
+                  ]
+               },
+               {
+                  "type": "string"
+               }
+            ]
+         },
+         "TrailingDefault": {
+            "type": "integer"
+         }
+      }
+   }
+}

@@ -1038,6 +1038,25 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 
+		// A definition whose value is not a struct is not a closed struct.
+		// The first two cases are wrong: IsClosedStruct reports true for a
+		// reference to such a definition, and a closed struct never
+		// subsumes a value that is not closed, so subsumption is rejected.
+		// https://cuelang.org/issue/4156
+		{
+			in:  `#V: "car" | "bike", a: #V, b: "car"`,
+			err: "value not an instance",
+		},
+		{
+			in:  `#V: "car" | "bike", a: [...#V], b: ["car"]`,
+			err: "value not an instance",
+		},
+		{
+			// Closedness still applies to the struct disjuncts.
+			in:  `#V: {a: int} | string, a: #V, b: {a: 1, b: 2}`,
+			err: "value not an instance",
+		},
+
 		// Definitions are not regular fields.
 		{
 			in: `a: {#a: 1}, b: {a: 1}`,

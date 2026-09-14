@@ -904,6 +904,25 @@ shadowing: {
 	} @test(eq, {x: {a: 1}, s: {c: 1}, fallback: true}, incorrect) @test(eq:todo, {x: {a: 1, c: 1}, s: {c: 1}, y: 1})
 }
 
+// =============================================================================
+// Optional field that is a sibling of the try clause
+// =============================================================================
+
+// https://cuelang.org/issue/4483
+issue4483: {
+	// Both guards block on the lazily evaluated optional siblings, so both
+	// comprehensions are retried by the same unblocking loop of the enclosing
+	// vertex, the second one behind the first try body's finalize. That
+	// finalize used to clear the tail of the shared blocking queue under the
+	// loop, which then panicked on the nil entry.
+	guards: {
+		a?: int
+		try x = {value: 1} if x.value > a {out: x}
+		b?: int
+		try y = {value: 1} if y.value > b {out: y}
+	} @test(err, code=incomplete, contains="cannot reference optional field: a")
+}
+
 -- out/errors.txt --
 [incomplete] requiredUnfilled.x: required field missing: a:
     ./in.cue:83:11
@@ -961,19 +980,23 @@ shadowing: {
 [incomplete] tryNestedRootedCycle.ext.b: error in call to len: incomplete argument list (type list):
     ./in.cue:803:19
     ./in.cue:802:6
+[incomplete] issue4483.guards: cannot reference optional field: a:
+    ./in.cue:919:35
+issue4483.guards: cannot reference optional field: b:
+    ./in.cue:921:35
 -- out/todo.txt --
 In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).
 v3 adds the @experiment(try) feature that catches optional reference failures.
 -- out/eval/stats --
-Leaks:  80
-Freed:  553
-Reused: 508
-Allocs: 125
+Leaks:  101
+Freed:  673
+Reused: 627
+Allocs: 147
 Retain: 0
 
-Unifications: 595
-Conjuncts:    755
+Unifications: 735
+Conjuncts:    914
 Disjuncts:    14
 
-NumCloseIDs: 42
+NumCloseIDs: 45

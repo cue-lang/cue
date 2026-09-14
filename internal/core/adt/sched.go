@@ -16,7 +16,6 @@ package adt
 
 import (
 	"math/bits"
-	"slices"
 )
 
 // The CUE scheduler schedules tasks for evaluation.
@@ -640,11 +639,18 @@ unblockTasks:
 
 	// Only tasks deferred by mustDeferUnblock remain blocked; retain them
 	// for a later regular finalize. Any other scheduler simply resets the
-	// queue, as it did before deferral existed.
+	// queue, as it did before deferral existed. Compact in place without
+	// clearing the tail: an outer process call may be ranging over this
+	// same backing array, and must not observe nil entries.
 	if inTryBody {
-		c.blocking = slices.DeleteFunc(c.blocking, func(t *task) bool {
-			return t.blockedOn == nil || t.defunct
-		})
+		n := 0
+		for _, t := range c.blocking {
+			if t.blockedOn != nil && !t.defunct {
+				c.blocking[n] = t
+				n++
+			}
+		}
+		c.blocking = c.blocking[:n]
 	} else {
 		c.blocking = c.blocking[:0]
 	}

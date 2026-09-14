@@ -812,6 +812,25 @@ shadowing: {
 	}
 }
 
+// =============================================================================
+// Optional field that is a sibling of the try clause
+// =============================================================================
+
+// https://cuelang.org/issue/4483
+issue4483: {
+	// Both guards block on the lazily evaluated optional siblings, so both
+	// comprehensions are retried by the same unblocking loop of the enclosing
+	// vertex, the second one behind the first try body's finalize. That
+	// finalize used to clear the tail of the shared blocking queue under the
+	// loop, which then panicked on the nil entry.
+	guards: {
+		a?: int
+		try x = {value: 1} if x.value > a {out: x}
+		b?: int
+		try y = {value: 1} if y.value > b {out: y}
+	}
+}
+
 -- out/compile --
 --- in.cue
 {
@@ -1852,6 +1871,22 @@ shadowing: {
         y: 〈0;x〉.a?
       } else {
         fallback: true
+      }
+    }
+  }
+  issue4483: {
+    guards: {
+      a?: int
+      try x = {
+        value: 1
+      } if (〈0;x〉.value > 〈1;a〉) {
+        out: 〈1;x〉
+      }
+      b?: int
+      try y = {
+        value: 1
+      } if (〈0;y〉.value > 〈1;b〉) {
+        out: 〈1;y〉
       }
     }
   }

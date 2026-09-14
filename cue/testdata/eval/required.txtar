@@ -71,6 +71,13 @@ reference: {
 		max!: number & >min @test(err, code=incomplete, contains="required field missing: %s", args=[min], pos=[0:19])
 		max:  10
 	}
+	// Calling a required-but-missing field reports the missing field, rather
+	// than complaining that an error is not a function.
+	// https://cuelang.org/issue/4330
+	issue4330: {
+		#Foo: fn!: _
+		b: #Foo.fn("foo") @test(err, code=incomplete, contains="required field missing: %s", args=[fn], pos=[0:11])
+	}
 }
 -- issue3918.cue --
 import "strings"
@@ -141,6 +148,8 @@ doNotEscalateError: {
     ./in.cue:63:6
 [incomplete] reference.issue2937.max: required field missing: min:
     ./in.cue:70:19
+[incomplete] reference.issue4330.b: required field missing: fn:
+    ./in.cue:78:11
 [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
     ./issue3918.cue:10:22
 [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:

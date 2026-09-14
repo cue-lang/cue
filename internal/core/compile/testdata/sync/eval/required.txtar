@@ -60,6 +60,13 @@ reference: {
 		max!: number & >min
 		max:  10
 	}
+	// Calling a required-but-missing field reports the missing field, rather
+	// than complaining that an error is not a function.
+	// https://cuelang.org/issue/4330
+	issue4330: {
+		#Foo: fn!: _
+		b: #Foo.fn("foo")
+	}
 }
 -- issue3918.cue --
 import "strings"
@@ -169,6 +176,12 @@ doNotEscalateError: {
       min!: number
       max!: (number & >〈0;min〉)
       max: 10
+    }
+    issue4330: {
+      #Foo: {
+        fn!: _
+      }
+      b: 〈0;#Foo〉.fn("foo")
     }
   }
 }

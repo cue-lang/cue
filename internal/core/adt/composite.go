@@ -1218,10 +1218,17 @@ func (v *Vertex) IsClosedStruct() bool {
 		return false
 
 	case *Vertex:
-		return v.ClosedRecursive && !v.HasEllipsis
+		// Structure sharing may make another vertex the base value of v.
+		// The shared value is only a closed struct if it is a struct at all.
+		return v.ClosedRecursive && !v.HasEllipsis && v.Kind() == StructKind
 
 	case *StructMarker:
+
 	case *Disjunction:
+		// A disjunction is only a closed struct if all of its disjuncts are.
+		if v.Kind() != StructKind {
+			return false
+		}
 	}
 	return isClosed(v)
 }

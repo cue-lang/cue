@@ -2,11 +2,6 @@
 # field into a oneOf. The default is subsumed by the other disjunct, so it is
 # reported as "default" alongside a single schema.
 # Issue: https://cuelang.org/issue/4156
-#
-# The golden output below is wrong: the field is exported as a oneOf of the
-# two disjuncts, with the non-default one excluding the default. The result is
-# not valid OpenAPI, so extracting it back fails.
-#ExpectExtractError: .*the value of "items" must be an object or a boolean.*
 -- in.cue --
 #Vehicle: "car" | "bike" | "bus"
 
@@ -31,45 +26,11 @@
             "properties": {
                "vehicles": {
                   "type": "array",
+                  "items": {
+                     "$ref": "#/components/schemas/Vehicle"
+                  },
                   "default": [
                      "car"
-                  ],
-                  "oneOf": [
-                     {
-                        "items": [
-                           {
-                              "type": "string",
-                              "enum": [
-                                 "car"
-                              ]
-                           }
-                        ]
-                     },
-                     {
-                        "allOf": [
-                           {
-                              "items": {
-                                 "$ref": "#/components/schemas/Vehicle"
-                              }
-                           },
-                           {
-                              "not": {
-                                 "anyOf": [
-                                    {
-                                       "items": [
-                                          {
-                                             "type": "string",
-                                             "enum": [
-                                                "car"
-                                             ]
-                                          }
-                                       ]
-                                    }
-                                 ]
-                              }
-                           }
-                        ]
-                     }
                   ]
                }
             }

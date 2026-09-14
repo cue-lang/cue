@@ -1,0 +1,108 @@
+# The same conjunctions behind a default as in issue3043.txtar, which the
+# old encoder failed to expand. The new encoder expands them, but drops the
+# defaults, as every v2 fixture does, and loses precision on the int64
+# bounds of "def.a", which it renders as floats; without a default they
+# would be written as an int64 format instead.
+# See https://cuelang.org/issue/3043 and https://cuelang.org/issue/4169
+#v2
+#Version: 3.0
+#AllSchemas
+-- in.cue --
+import "strings"
+
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+paths: {}
+
+#a: strings.MinRunes(1) & strings.MaxRunes(1) | *","
+
+#def: {
+	a: *100 | int64
+	b: int64
+}
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "a": {
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1
+         },
+         "def": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "allOf": [
+                     {
+                        "type": "number"
+                     },
+                     {
+                        "type": "integer",
+                        "maximum": 9.223372036854776E+18,
+                        "minimum": -9.223372036854776E+18
+                     }
+                  ]
+               },
+               "b": {
+                  "type": "integer",
+                  "format": "int64"
+               }
+            },
+            "required": [
+               "b"
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "a": {
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1
+         },
+         "def": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "allOf": [
+                     {
+                        "type": "number"
+                     },
+                     {
+                        "type": "integer",
+                        "maximum": 9.223372036854776E+18,
+                        "minimum": -9.223372036854776E+18
+                     }
+                  ]
+               },
+               "b": {
+                  "type": "integer",
+                  "format": "int64"
+               }
+            },
+            "required": [
+               "b"
+            ]
+         }
+      }
+   }
+}

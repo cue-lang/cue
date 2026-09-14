@@ -817,3 +817,56 @@ func TestSchedulerDeferredAcrossTaskLoop(t *testing.T) {
 		t.Fatalf("lost wait: runs=%d (want 1), pending=%d", runs, len(st.ctx.blocking))
 	}
 }
+
+// TestSchedulerRecycledTaskWait covers the per-scheduler blocking list, which
+// keeps a task after it ran. Once the task is freed and recycled for a wait on
+// another scheduler, the stale entry must not act on that new wait.
+func TestSchedulerRecycledTaskWait(t *testing.T) {
+	for _, op := range []string{"signal", "clear"} {
+		t.Run(op, func(t *testing.T) {
+			st := newSchedTest()
+			var runs int
+			waitOn := func(owner, dependency *nodeContext) *task {
+				return st.wait(owner, dependency, valueKnown, func() { runs++ })
+			}
+
+			// The task waits on dep, runs once dep completes, and stays in
+			// dep's blocking list afterwards.
+			owner, dep := st.node(false), st.node(false)
+			x := waitOn(owner, dep)
+			dep.signal(valueKnown)
+			if runs != 1 {
+				t.Fatalf("task ran %d times, want 1", runs)
+			}
+
+			// Freeing the task returns it to the pool, from where it is
+			// handed out again for a wait on another scheduler.
+			owner.clear()
+			other := st.node(false)
+			if y := waitOn(st.node(false), other); y != x {
+				t.Fatal("test did not reuse the freed task")
+			}
+
+			// Today dep still acts on the entry it kept for the freed task:
+			// a signal runs the recycled task even though its own wait is
+			// unmet, and a clear wipes that wait so other can never run it.
+			wantForced, wantFinal := 2, 2
+			if op == "clear" {
+				wantFinal = 1
+			}
+			switch op {
+			case "signal":
+				dep.signal(scalarKnown)
+				if runs != wantForced {
+					t.Fatalf("after unrelated signal: runs=%d, want %d", runs, wantForced)
+				}
+			case "clear":
+				dep.clear()
+			}
+			other.signal(valueKnown)
+			if runs != wantFinal {
+				t.Fatalf("after the awaited signal: runs=%d, want %d", runs, wantFinal)
+			}
+		})
+	}
+}

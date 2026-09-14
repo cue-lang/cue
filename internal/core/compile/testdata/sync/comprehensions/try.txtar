@@ -816,8 +816,45 @@ shadowing: {
 // Optional field that is a sibling of the try clause
 // =============================================================================
 
+// Evaluating a ?-marked reference to an absent optional sibling blocks the
+// try body's task on that lazily evaluated arc. Finalizing the body must run
+// the task, as a failed ?-marked reference is only attributed to the try
+// while its body is being pre-evaluated; leaving it for a later regular
+// finalize yields the body for real, and the reference then fails for good.
 // https://cuelang.org/issue/4483
 issue4483: {
+	binary: {
+		a?: int
+		try {b: a? + 1}
+	}
+	comparison: {
+		a?: int
+		try {b: a? > 1}
+	}
+	interpolation: {
+		a?: string
+		try {b: "x\(a?)"}
+	}
+	bound: {
+		a?: int
+		try x = {value: a? + 1} {b: x}
+	}
+	// The guard on the yielded body fails to hold; before the guards case
+	// below was fixed, this shape panicked as well.
+	guarded: {
+		a?: int
+		try x = {value: a? + 1} if x.value > 5 {b: x}
+	}
+	// Using the reference as a conjunct, or with the optional field in an
+	// enclosing scope, never blocked; covered for contrast.
+	conjunct: {
+		a?: int
+		try {b: a?}
+	}
+	enclosing: {
+		a?: int
+		s: {try {b: a? + 1}}
+	}
 	// Both guards block on the lazily evaluated optional siblings, so both
 	// comprehensions are retried by the same unblocking loop of the enclosing
 	// vertex, the second one behind the first try body's finalize. That
@@ -1875,6 +1912,54 @@ issue4483: {
     }
   }
   issue4483: {
+    binary: {
+      a?: int
+      try {
+        b: (〈1;a〉? + 1)
+      }
+    }
+    comparison: {
+      a?: int
+      try {
+        b: (〈1;a〉? > 1)
+      }
+    }
+    interpolation: {
+      a?: string
+      try {
+        b: "x\(〈1;a〉?)"
+      }
+    }
+    bound: {
+      a?: int
+      try x = {
+        value: (〈1;a〉? + 1)
+      } {
+        b: 〈1;x〉
+      }
+    }
+    guarded: {
+      a?: int
+      try x = {
+        value: (〈1;a〉? + 1)
+      } if (〈0;x〉.value > 5) {
+        b: 〈1;x〉
+      }
+    }
+    conjunct: {
+      a?: int
+      try {
+        b: 〈1;a〉?
+      }
+    }
+    enclosing: {
+      a?: int
+      s: {
+        try {
+          b: (〈2;a〉? + 1)
+        }
+      }
+    }
     guards: {
       a?: int
       try x = {

@@ -305,6 +305,10 @@ type scheduler struct {
 	// blocking is a list of tasks that are blocked on the completion of
 	// the indicate conditions. This can hold tasks from other nodes or tasks
 	// originating from this node itself.
+	//
+	// Entries are never removed, so a task may have been unblocked since, or
+	// freed and recycled for a wait on another scheduler. Readers must check
+	// that a task is still blocked on this scheduler.
 	blocking []*task
 
 	// deferred tracks nodes that were not completed during computation and that
@@ -323,6 +327,11 @@ func (s *scheduler) clear() {
 	// is cleared. Perhaps this can happen when the scheduler is stopped prematurely.
 	// For now, this solution seems to work OK.
 	for _, t := range s.blocking {
+		if t.blockedOn != s {
+			// The task already ran, or was freed and recycled for a wait
+			// on another scheduler. Either way the wait is not ours.
+			continue
+		}
 		t.blockedOn = nil
 		t.blockCondition = neverKnown
 	}
@@ -829,7 +838,7 @@ func (s *scheduler) signal(completed condition) {
 	// TODO: this could benefit from a linked list where tasks are removed
 	// from the list before being run.
 	for _, t := range s.blocking {
-		if t.blockCondition&s.completed == t.blockCondition {
+		if t.blockedOn == s && t.blockCondition&s.completed == t.blockCondition {
 			// Prevent task from running again.
 			t.blockCondition = neverKnown
 			t.blockedOn = nil

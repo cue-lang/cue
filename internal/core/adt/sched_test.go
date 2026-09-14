@@ -847,13 +847,10 @@ func TestSchedulerRecycledTaskWait(t *testing.T) {
 				t.Fatal("test did not reuse the freed task")
 			}
 
-			// Today dep still acts on the entry it kept for the freed task:
-			// a signal runs the recycled task even though its own wait is
-			// unmet, and a clear wipes that wait so other can never run it.
-			wantForced, wantFinal := 2, 2
-			if op == "clear" {
-				wantFinal = 1
-			}
+			// The entry dep kept for the freed task no longer says anything
+			// about the recycled task: only the scheduler it now waits on
+			// may run it.
+			wantForced, wantFinal := 1, 2
 			switch op {
 			case "signal":
 				dep.signal(scalarKnown)

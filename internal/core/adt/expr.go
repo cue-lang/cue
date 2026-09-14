@@ -623,9 +623,16 @@ func (x *FieldReference) resolve(c *OpContext, state Flags) *Vertex {
 		c.errs = CombineErrors(c.src, c.errs, savedErrs)
 	}()
 
-	v := c.lookup(n, pos, x.Label, state)
-	if v == nil && x.Optional {
-		v = c.retryOptionalLookup(n, pos, x.Label, state)
+	return c.lookupRef(n, pos, x.Label, x.Optional, state)
+}
+
+// lookupRef resolves the field l of n for a reference. A failed ?-marked
+// reference may discard the enclosing try clause body instead of failing;
+// see [OpContext.retryOptionalLookup].
+func (c *OpContext) lookupRef(n *Vertex, pos token.Pos, l Feature, optional bool, flags Flags) *Vertex {
+	v := c.lookup(n, pos, l, flags)
+	if v == nil && optional {
+		v = c.retryOptionalLookup(n, pos, l, flags)
 	}
 	return v
 }
@@ -679,10 +686,9 @@ func (c *OpContext) lookupInTryTarget(base *Vertex, pos token.Pos, l Feature, fl
 		return nil
 	}
 
-	var path []Feature
-	for v := base; v != root; v = v.Parent {
-		path = append(path, v.Label)
-	}
+	path, _ := relPath(base, root)
+	// The lookups below must not see the failed lookup's pending error,
+	// nor, on recursion, those of the enclosing level.
 	c.errs = nil
 	for i := len(path) - 1; i >= 0; i-- {
 		if target = c.lookup(target, pos, path[i], flags); target == nil {
@@ -695,11 +701,22 @@ func (c *OpContext) lookupInTryTarget(base *Vertex, pos token.Pos, l Feature, fl
 	return c.lookupInTryTarget(target, pos, l, flags)
 }
 
+// relPath returns the labels leading from ancestor down to v, innermost
+// first, and whether v is a descendant of ancestor at all. The path is empty
+// when v is ancestor itself.
+func relPath(v, ancestor *Vertex) (path []Feature, ok bool) {
+	for ; v != ancestor; v = v.Parent {
+		if v == nil {
+			return nil, false
+		}
+		path = append(path, v.Label)
+	}
+	return path, true
+}
+
 // markSkipTry records that a ?-marked reference failed to resolve because its
-// optional field is not present. The failure is attributed to the nearest
-// enclosing try clause body by walking up the parent chain from the vertex
-// currently being evaluated until it reaches a body whose [nodeContext.tryBody]
-// is set (see [TryClause.yield]).
+// optional field is not present, so that the nearest enclosing try clause
+// body is discarded (see [Vertex.tryBodyRoot] and [TryClause.yield]).
 //
 // A single shared flag cannot distinguish which try a failed reference belongs
 // to when try bodies nest or their finalizations interleave: an inner body's
@@ -1113,11 +1130,7 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 	}()
 
 	pos := x.Src.Sel.Pos()
-	v := c.lookup(n, pos, x.Sel, state)
-	if v == nil && x.Optional {
-		v = c.retryOptionalLookup(n, pos, x.Sel, state)
-	}
-	return v
+	return c.lookupRef(n, pos, x.Sel, x.Optional, state)
 }
 
 // IndexExpr is like a selector, but selects an index.
@@ -1176,11 +1189,7 @@ func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	// }()
 
 	pos := x.Src.Index.Pos()
-	v := ctx.lookup(n, pos, f, state)
-	if v == nil && x.Optional {
-		v = ctx.retryOptionalLookup(n, pos, f, state)
-	}
-	return v
+	return ctx.lookupRef(n, pos, f, x.Optional, state)
 }
 
 // A SliceExpr represents a slice operation. (Not currently in spec.)
@@ -3825,14 +3834,10 @@ func (x *LetClause) yield(s *compState) {
 //	try { ... }
 //
 // The body is pre-evaluated in isolation in an inline vertex, which only
-// approximates its real evaluation. Several mechanisms compensate for the
-// differences: a failed reference is attributed to its body by ancestry
-// ([OpContext.markSkipTry]), tasks blocked on rooted vertices are left
-// alone ([scheduler.inTryBody]), and a lookup through a field the body
-// declares falls back to the struct it is inserted into
-// ([OpContext.lookupInTryTarget]).
+// approximates its real evaluation; see [OpContext.markSkipTry],
+// [scheduler.inTryBody] and [OpContext.lookupInTryTarget] for what
+// compensates for the differences.
 //
-// TryClause represents a try clause in a comprehension.
 // It can have two forms:
 //   - try { struct } - Value is set, Label/Expr are zero/nil
 //   - try x = expr   - Label/Expr are set, Value is nil

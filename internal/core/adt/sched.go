@@ -780,11 +780,9 @@ func (s *scheduler) mustDeferUnblock(t *task, inTryBody bool) bool {
 	if w == nil || !w.Rooted() {
 		return false
 	}
-	if t.node != nil {
-		for v := t.node.node; v != nil && !v.Rooted(); v = v.Parent {
-			if v == s.node.node {
-				return false
-			}
+	for v := t.node.node; v != nil && !v.Rooted(); v = v.Parent {
+		if v == s.node.node {
+			return false
 		}
 	}
 	return true

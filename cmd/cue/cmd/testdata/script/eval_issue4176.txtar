@@ -1,0 +1,41 @@
+# Verify that a definition which embeds top and whose body asks whether the
+# definition itself unifies with a scalar does not recurse without bound.
+# The condition is only answerable once the definition is known, so each
+# answer re-instantiates the definition; the evaluator used to keep doing so
+# until the goroutine stack overflowed.
+# Issue #4176.
+
+# The evaluator still overflows the stack; the fix in the next commit flips
+# these to compare against the golden files.
+! exec cue eval plain.cue
+stderr 'fatal error: stack overflow'
+
+! exec cue eval alias.cue
+stderr 'fatal error: stack overflow'
+
+-- plain.cue --
+#Def: {
+	_,
+	_out: {
+		if (#Def & string) != _|_ {
+			str: true
+		},
+	}
+}
+out: #Def & "foo"
+-- plain.golden --
+#Def: _
+out:  "foo"
+-- alias.cue --
+#Def~(_,z): {
+	_,
+	_out: {
+		if (z & string) != _|_ {
+			str: true
+		},
+	}
+}
+out: #Def & "foo"
+-- alias.golden --
+#Def: _
+out:  "foo"

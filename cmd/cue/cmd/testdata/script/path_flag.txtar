@@ -1,0 +1,162 @@
+# The --path/-l flag places a value at a path. This covers the flag itself:
+# how its labels are formed and reported, and how the commands which place
+# values honor it. The import command has its own tests in import_path.txtar.
+
+# eval, def, and export place the value the same way, for CUE inputs as
+# well as orphan data files.
+#
+# eval and def ignore the flag for CUE inputs today, so the first two
+# golden files below still show the unplaced value.
+
+exec cue eval -l 'input:' x.cue
+cmp stdout eval.golden
+
+exec cue def -l 'input:' x.cue
+cmp stdout def.golden
+
+exec cue export -l 'input:' x.cue
+cmp stdout export.golden
+
+exec cue eval -l 'input:' y.json
+cmp stdout eval-json.golden
+
+# Each -l flag adds a level of nesting, and a label may be an expression
+# evaluated within the value itself.
+
+exec cue export -l 'one:' -l 'strings.ToLower(kind)' x.cue
+cmp stdout nested.golden
+
+# vet reports errors at the placed path.
+
+! exec cue vet -l 'strings.ToLower(kind)' -l name services.jsonl services.cue
+cmp stderr vet.golden
+
+# --with-context evaluates label expressions within contextual data about
+# the record rather than within the record itself.
+
+exec cue eval --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)"' -l 'data["@name"]' -s records.jsonl
+cmp stdout context.golden
+
+# A label expression must evaluate to a string label. A non-string value is
+# keyed by wrapping it in string interpolation.
+
+! exec cue export -l 'count' counted.json
+cmp stderr nonstring.golden
+
+exec cue export -l '"\(count)"' counted.json
+cmp stdout interpolated.golden
+
+# An expression which resolves to no single label is reported rather than
+# panicking.
+
+! exec cue export -l '(*x|"foo")' data.yaml
+cmp stderr nonlabel.golden
+
+-- x.cue --
+package x
+
+kind: "Deployment"
+
+#Name: string
+name:  #Name
+name:  "hello"
+
+replicas?: int
+-- y.json --
+{
+	"y": 1
+}
+-- counted.json --
+{"count": 0}
+-- data.yaml --
+x: foo
+-- services.cue --
+deployment: [string]: name: !~"^[A-Z]"
+service: [string]: name: !~"^[A-Z]"
+
+-- services.jsonl --
+{
+    "kind": "Service",
+    "name": "booster"
+}
+{
+    "kind": "Deployment",
+    "name": "Booster",
+    "replicas": 1
+}
+{
+    "kind": "Service",
+    "name": "Supplement\nfoo"
+}
+-- records.jsonl --
+{
+    "kind": "Service",
+    "@name": "elem1"
+}
+{
+    "kind": "Deployment",
+    "@name": "elem2"
+}
+{
+    "kind": "Service",
+    "@name": "elem3"
+}
+-- eval.golden --
+kind:  "Deployment"
+#Name: string
+name:  "hello"
+-- def.golden --
+package x
+
+kind:      "Deployment"
+#Name:     string
+name:      #Name & {"hello"}
+replicas?: int
+-- export.golden --
+{
+    "input": {
+        "kind": "Deployment",
+        "name": "hello"
+    }
+}
+-- eval-json.golden --
+input: y: 1
+-- nested.golden --
+{
+    "one": {
+        "deployment": {
+            "kind": "Deployment",
+            "name": "hello"
+        }
+    }
+}
+-- vet.golden --
+deployment.Booster.name: invalid value "Booster" (out of bound !~"^[A-Z]"):
+    ./services.cue:1:29
+    ./services.jsonl:7:13
+service."Supplement\nfoo".name: invalid value "Supplement\nfoo" (out of bound !~"^[A-Z]"):
+    ./services.cue:2:26
+    ./services.jsonl:12:13
+-- context.golden --
+".jsonl:1/3": elem1: {
+    kind:    "Service"
+    "@name": "elem1"
+}
+".jsonl:2/3": elem2: {
+    kind:    "Deployment"
+    "@name": "elem2"
+}
+".jsonl:3/3": elem3: {
+    kind:    "Service"
+    "@name": "elem3"
+}
+-- nonstring.golden --
+error evaluating label count: 0
+-- interpolated.golden --
+{
+    "0": {
+        "count": 0
+    }
+}
+-- nonlabel.golden --
+expression is not a valid label: (*x|"foo")

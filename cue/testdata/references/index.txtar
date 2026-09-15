@@ -30,6 +30,17 @@ varNegativeIndex: {
 	a: [1, 2, 3][n] @test(err, code=eval, contains="index n out of range [-1]", pos=[0:5, -1:5, 0:15])
 }
 
+// A failed lookup should also report where the value that was searched is
+// declared, not just the failing selector, so that a mapping table missing an
+// entry can be pointed at. Only the selector is reported for now.
+declaredAt: {
+	_table: one: "1"
+	_table: two: "2"
+	key: "three"
+	a:   _table[key] @test(err, code=incomplete, contains="undefined field: three", pos=[0:14])
+	b:   [1, 2][5] @test(err, code=eval, contains="index out of range [5] with length 2", pos=[0:14])
+}
+
 // An integer index into a value that can never be a list reports a fatal
 // invalid-index error rather than a misleading out-of-range one.
 intIndexToStruct: {foo: "bar"}[0] @test(err, code=eval, contains="invalid index 0 (found struct, want list)", pos=[0:32])
@@ -63,12 +74,16 @@ intIndexToStructRef: {
     ./in.cue:29:5
     ./in.cue:28:5
     ./in.cue:29:15
+[incomplete] declaredAt.a: undefined field: three:
+    ./in.cue:39:14
+[eval] declaredAt.b: index out of range [5] with length 2:
+    ./in.cue:40:14
 [eval] intIndexToStruct: invalid index 0 (found struct, want list):
-    ./in.cue:34:32
+    ./in.cue:45:32
 [eval] intIndexToOpenStruct: invalid index 0 (found struct, want list):
-    ./in.cue:35:41
+    ./in.cue:46:41
 [eval] intIndexToStructRef.i: invalid index 0 (found struct, want list):
-    ./in.cue:38:7
+    ./in.cue:49:7
 -- out/todo.txt --
 Error messages slightly different between v2 and v3:
 - outOfBoundsDisjunction: v2 says "invalid list index 1 (out of bounds)", v3 says "index out of range [1] with length 0"

@@ -30,6 +30,17 @@ varNegativeIndex: {
 	a: [1, 2, 3][n]
 }
 
+// A failed lookup should also report where the value that was searched is
+// declared, not just the failing selector, so that a mapping table missing an
+// entry can be pointed at. Only the selector is reported for now.
+declaredAt: {
+	_table: one: "1"
+	_table: two: "2"
+	key: "three"
+	a:   _table[key]
+	b:   [1, 2][5]
+}
+
 // An integer index into a value that can never be a list reports a fatal
 // invalid-index error rather than a misleading out-of-range one.
 intIndexToStruct: {foo: "bar"}[0]
@@ -93,6 +104,20 @@ intIndexToStructRef: {
       2,
       3,
     ][〈0;n〉]
+  }
+  declaredAt: {
+    _table: {
+      one: "1"
+    }
+    _table: {
+      two: "2"
+    }
+    key: "three"
+    a: 〈0;_table〉[〈0;key〉]
+    b: [
+      1,
+      2,
+    ][5]
   }
   intIndexToStruct: {
     foo: "bar"

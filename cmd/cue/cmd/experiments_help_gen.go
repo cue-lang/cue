@@ -54,9 +54,7 @@ Available per-file experiments:
     structcmp enables comparison of structs. This also defines the ==
     operator to be defined on all values. For instance, comparing 1 and
     "foo" will return false, whereas previously it would return an error.
-    Proposal:      https://cuelang.org/issue/2583
-    Spec change:   https://cuelang.org/cl/1217013
-    Spec change:   https://cuelang.org/cl/1217014
+    Proposal: https://cuelang.org/issue/2583
 
   aliasv2 (preview: v0.15.0, stable: v0.18.0)
     aliasv2 enables the use of 'self' identifier to refer to the
@@ -64,26 +62,23 @@ Available per-file experiments:
     The file where this experiment is enabled disallows the use of old prefix
     alias syntax (X=). It is stable as of v0.18.0, so a file at that
     language version or later must use the postfix syntax.
-    Proposal:      https://cuelang.org/issue/4014
-    Spec change:   https://cuelang.org/cl/1222377
-    Requires cue fix when upgrading
+    Proposal: https://cuelang.org/issue/4014
+    Note: Requires cue fix when upgrading
 
   explicitopen (preview: v0.15.0, stable: v0.18.0)
     explicitopen enables the postfix ... operator to explicitly open
     closed structs, allowing additional fields to be added. It is stable as
     of v0.18.0, so a file at that language version or later embeds strictly
     and may use the postfix ... operator; cue fix migrates older files.
-    Proposal:      https://cuelang.org/issue/4032
-    Spec change:   https://cuelang.org/cl/1221642
-    Requires cue fix when upgrading
+    Proposal: https://cuelang.org/issue/4032
+    Note: Requires cue fix when upgrading
 
   try (preview: v0.16.0)
     try enables the try clause and optional reference markers (?).
     The try clause allows conditional field inclusion based on whether
     optional references resolve. The ? marker on references (a?, a.b?, a[i]?)
     is only valid within a try context.
-    Proposal:      https://cuelang.org/issue/4019
-    Spec change:   https://cuelang.org/cl/1231444
+    Proposal: https://cuelang.org/issue/4019
 
   shortcircuit (preview: v0.17.0)
     shortcircuit enables short-circuit evaluation for the logical operators
@@ -97,6 +92,7 @@ Available per-file experiments:
   functions (preview: v0.18.0)
     functions enables experimental function signatures and native CUE
     function bodies.
+    Proposal: https://cuelang.org/issue/4484
 
 
 ## Global Experiments
@@ -142,9 +138,7 @@ Available global experiments:
   keepvalidators (preview: v0.14.0, default: v0.14.0, stable: v0.15.0)
     keepvalidators prevents validators from simplifying into concrete values,
     even if their concrete value could be derived, such as '>=1 & <=1' to '1'.
-    Proposal:     https://cuelang.org/discussion/3775.
-    Spec change:  https://cuelang.org/cl/1217013
-    Spec change:  https://cuelang.org/cl/1217014
+    Proposal: https://cuelang.org/discussion/3775.
 
   formatv2 (preview: v0.18.0, default: v0.18.0)
     formatv2 selects the Wadler-Lindig pretty-printer as the

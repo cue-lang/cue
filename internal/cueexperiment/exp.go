@@ -65,9 +65,8 @@ type Config struct {
 
 	// KeepValidators prevents validators from simplifying into concrete values,
 	// even if their concrete value could be derived, such as '>=1 & <=1' to '1'.
-	// Proposal:     https://cuelang.org/discussion/3775.
-	// Spec change:  https://cuelang.org/cl/1217013
-	// Spec change:  https://cuelang.org/cl/1217014
+	//
+	// Proposal: https://cuelang.org/discussion/3775.
 	KeepValidators bool `experiment:"preview:v0.14.0,default:v0.14.0,stable:v0.15.0"`
 
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.

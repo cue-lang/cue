@@ -62,9 +62,7 @@ type File struct {
 	// operator to be defined on all values. For instance, comparing 1 and
 	// "foo" will return false, whereas previously it would return an error.
 	//
-	// Proposal:      https://cuelang.org/issue/2583
-	// Spec change:   https://cuelang.org/cl/1217013
-	// Spec change:   https://cuelang.org/cl/1217014
+	// Proposal: https://cuelang.org/issue/2583
 	StructCmp bool `experiment:"preview:v0.14.0,stable:v0.15.0"`
 
 	// ExplicitOpen enables the postfix ... operator to explicitly open
@@ -72,9 +70,8 @@ type File struct {
 	// of v0.18.0, so a file at that language version or later embeds strictly
 	// and may use the postfix ... operator; cue fix migrates older files.
 	//
-	// Proposal:      https://cuelang.org/issue/4032
-	// Spec change:   https://cuelang.org/cl/1221642
-	// Requires cue fix when upgrading
+	// Proposal: https://cuelang.org/issue/4032
+	// Note: Requires cue fix when upgrading
 	ExplicitOpen bool `experiment:"preview:v0.15.0,stable:v0.18.0"`
 
 	// AliasV2 enables the use of 'self' identifier to refer to the
@@ -83,9 +80,8 @@ type File struct {
 	// alias syntax (X=). It is stable as of v0.18.0, so a file at that
 	// language version or later must use the postfix syntax.
 	//
-	// Proposal:      https://cuelang.org/issue/4014
-	// Spec change:   https://cuelang.org/cl/1222377
-	// Requires cue fix when upgrading
+	// Proposal: https://cuelang.org/issue/4014
+	// Note: Requires cue fix when upgrading
 	AliasV2 bool `experiment:"preview:v0.15.0,stable:v0.18.0"`
 
 	// Try enables the try clause and optional reference markers (?).
@@ -93,8 +89,7 @@ type File struct {
 	// optional references resolve. The ? marker on references (a?, a.b?, a[i]?)
 	// is only valid within a try context.
 	//
-	// Proposal:      https://cuelang.org/issue/4019
-	// Spec change:   https://cuelang.org/cl/1231444
+	// Proposal: https://cuelang.org/issue/4019
 	Try bool `experiment:"preview:v0.16.0"`
 
 	// ShortCircuit enables short-circuit evaluation for the logical operators
@@ -109,6 +104,8 @@ type File struct {
 
 	// Functions enables experimental function signatures and native CUE
 	// function bodies.
+	//
+	// Proposal: https://cuelang.org/issue/4484
 	Functions bool `experiment:"preview:v0.18.0"`
 }
 

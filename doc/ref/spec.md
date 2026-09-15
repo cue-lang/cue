@@ -285,14 +285,6 @@ TODO:
     order [by]
 -->
 
-#### Expressions
-
-The following keyword introduces a function literal.
-
-```
-func
-```
-
 
 ### Operators and punctuation
 
@@ -300,7 +292,7 @@ The following character sequences represent operators and punctuation:
 
 ```
 +     &&    ==    <     =     (     )
--     ||    !=    >     :     {     }     ~     ->
+-     ||    !=    >     :     {     }     ~
 *     &     =~    <=    ?     [     ]     ,
 /     |     !~    >=    !     _|_   ...   .
 ```
@@ -2018,7 +2010,7 @@ a field, alias, or let declaration, or a parenthesized expression.
 
 ```ebnf
 Operand     = Literal | OperandName | "(" Expression ")" .
-Literal     = BasicLit | ListLit | StructLit | FuncLit .
+Literal     = BasicLit | ListLit | StructLit .
 BasicLit    = int_lit | float_lit | string_lit |
               null_lit | bool_lit | bottom_lit .
 OperandName = identifier | QualifiedIdent .
@@ -2106,7 +2098,7 @@ PrimaryExpr =
 
 Selector       = "." (identifier | simple_string_lit) .
 Index          = "[" Expression [ "," ] "]" .
-Argument       = [ identifier ":" ] Expression .
+Argument       = Expression .
 Arguments      = "(" [ ( Argument { "," Argument } ) [ "," ] ] ")" .
 ```
 <!---
@@ -2688,253 +2680,6 @@ c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 ```
 -->
 
-### Function literals
-
-Function literals are an experimental feature,
-enabled per file with the `@experiment(functions)` attribute.
-
-A function literal denotes a function value:
-an opaque value that computes a result from a set of arguments when called.
-A function value unifies with itself and with
-[function types](#function-types);
-unification with any other value results in bottom (`_|_`).
-
-```ebnf
-FuncLit    = ClosedFunc | OpenFunc .
-ClosedFunc = "func" "(" [ ParamList [ "," ] ] ")" [ "->" Expression ] [ ":" Expression ] .
-OpenFunc   = "func" "(" [ ParamList "," ] "..." [ "," ] ")" [ "->" Expression ] .
-ParamList  = ParamDecl { "," ParamDecl } .
-ParamDecl  = Param | Embedding .
-Param      = identifier [ "~" identifier ] [ "!" | "?" ] ":" Expression { attribute } .
-```
-
-A parameter declaration is a restricted form of [declaration](#structs):
-let clauses, attribute declarations, and comprehensions are not permitted,
-and a parameter's label must be a single, non-definition identifier —
-multi-part, string, pattern, dynamic, and definition labels are not permitted.
-The blank identifier `_` declares an anonymous positional parameter and may
-not be marked optional or required, as it could never be bound.
-An embedded expression also declares an anonymous positional parameter.
-An ellipsis must be the final element of the list and marks a bodyless
-signature as [open](#function-types). An open signature cannot have a body.
-Attributes attached to a parameter are treated like field attributes;
-they do not influence evaluation.
-
-The parameters name the values that a call supplies and may constrain them.
-The expression following `->` constrains the result of a call.
-The expression following the final `:` is the body,
-which defines the result of a call. A literal with a body is a closed
-function value. A literal without a body denotes a
-[function type](#function-types), which may be open or closed.
-
-Parameters take the following forms:
-
-```
-a: int      named: bound by position or by the label a
-a!: int     required: must be bound, by label only
-a?: int     optional: may be left unbound, bound by label only
-_~x: int    positional-only: bound by position, referenced as x in the body
-int         anonymous: bound by position, not referable from the body
-```
-
-A parameter that cannot be bound by label — anonymous or positional-only —
-may not follow a parameter that is declared with a name.
-A parameter that can be bound by position —
-any parameter not marked required (`!`) or optional (`?`) —
-may not follow a required or optional parameter.
-Parameter names must be unique within a parameter list.
-The dual form of a postfix alias may not be used in a parameter.
-
-Parameter constraints and the result constraint are resolved in the scope
-in which the literal is declared, not in the body's scope,
-and may refer to a field of an enclosing scope.
-Referring to another parameter is reserved for a possible future extension
-and is an error.
-Within the body, parameters shadow fields of enclosing scopes.
-A function value captures the scope in which its literal is declared.
-
-```cue
-@experiment(functions)
-
-base:  10
-sum:   func(a: int, b: int) -> int: a + b
-add1:  func(_~x: int) -> int: x + 1
-pick:  func(a: int | *5) -> int: a
-key:   func(a!: int, b?: int) -> int: a
-scale: func(a: int) -> int: a * base // captures base
-
-limit: int | *7
-f:     func(a: string, b: limit) -> int: b // b's constraint refers to limit
-out:   f("shadow") // int | *7
-```
-
-Referring to a parameter from another parameter's constraint or from the
-result constraint is an error:
-
-```cue !
-@experiment(functions)
-
-f: func(x: int, y: >x) -> int: x
-```
-<!-- error:
-cannot refer to parameter "x" in a parameter constraint or return type:
-    3:22
--->
-
-Parameters that can only be bound positionally must precede named parameters:
-
-```cue !
-@experiment(functions)
-
-bad: func(a: int, int) -> int: 1
-```
-<!-- error:
-positional parameter after named parameter:
-    3:19
--->
-
-A parameter that can be bound positionally may not follow a
-required or optional parameter:
-
-```cue !
-@experiment(functions)
-
-bad: func(a?: int, b: int) -> int: b
-```
-<!-- error:
-positional parameter after named parameter:
-    3:20
--->
-
-
-### Function types
-
-A function literal without a body denotes a function type.
-Calling a function type is an error.
-A trailing ellipsis marks a signature as open:
-an open type is a partial signature that admits parameters
-beyond the ones it declares.
-Without an ellipsis a signature is closed.
-An open type becomes callable only by unification with a closed function
-value or builtin that supplies its complete parameter slots and
-implementation. Unifying it with a closed bodyless signature still produces
-a function type and does not make it callable.
-
-Unifying two function types aligns every positionally bindable parameter —
-anonymous, positional-only, or plain named — one-to-one with the
-positionally bindable parameter at the same ordinal.
-For each aligned pair, an absent plain label is compatible with a present one,
-and the effective parameter acquires that label.
-If both parameters have plain labels, the labels must be identical;
-different labels for the same positional ordinal are incompatible.
-The same plain label may not identify different positional ordinals.
-A name-only parameter, marked required (`!`) or optional (`?`), matches by
-label.
-The result retains both signatures; the constraints of matched parameters
-and the result constraints apply jointly.
-Matched parameters must agree on requiredness.
-A parameter declared in only one of the types is an error
-unless the other type is open or the unmatched parameter is optional.
-The unified type is open only if both types are open.
-
-A plain name is part of the callable contract in addition to the parameter's
-position. When a signature is attached to a callable value by unification,
-its plain name supplies the label of a matched positional parameter that was
-otherwise unnamed. A signature may repeat that same label, but it may not
-supply a different label for the parameter.
-
-Unifying a function type with a function value tightens the value:
-the result is the function value with the type's parameter constraints
-and result constraint enforced on every call.
-Each parameter of the type must be declared by the value unless the unmatched
-parameter is optional,
-and unless the type is open,
-each parameter of the value must be declared by the type or be optional.
-Parameter constraints follow the same one-to-one parameter alignment as
-call labels.
-Whether a constraint of the type is compatible with the value
-is not decided at unification time:
-constraints are enforced when the tightened value is called,
-in the scope in which the type was declared.
-
-Builtin functions have a fixed sequence of positional parameter slots.
-This raw shape is not itself a CUE function type
-and does not form a second, independently closed parameter list.
-Unifying a function type with a builtin matches each positionally bindable
-parameter of the type to the builtin slot at the same position
-and records the type as an additional constraint on the builtin.
-The type's position-backed arity and closedness are checked against the
-builtin slots.
-A further attached type must also be compatible with the types already
-attached, but its positionally bindable parameters refer to those same slots.
-At each slot, an attached plain label may name an otherwise unnamed slot or
-repeat its existing label; a different plain label is incompatible.
-A required name-only parameter cannot be satisfied by a builtin.
-An unmatched optional name-only parameter may be attached because no call
-needs to bind it, but it contributes neither a raw slot nor a callable label.
-If another attached signature exposes the same label for a positional slot,
-the optional parameter's constraint follows that slot without adding a second
-slot or label.
-
-A plain parameter name in an attached type also names its matched builtin
-slot for calls. Before invoking the builtin, a labeled argument is resolved
-through the attached types and passed in that slot's positional argument.
-Compatible attached types must use the same plain label for a slot, if any;
-an unnamed type does not remove an existing label.
-Generated standard-library functions ordinarily carry declared CUE
-signatures attached in this way, so their parameter names are callable by
-label. Raw predeclared builtins, hand-registered functions without an
-attached signature, and bare validators do not acquire labels directly.
-At this experimental stage, a multi-parameter builtin's validator-constructor
-form remains a separate positional-only call path. Labels and constraints from
-an attached full-call signature are not projected into that constructor form.
-
-```cue
-@experiment(functions)
-
-import "strings"
-
-a: strings.Repeat("ab", count: 2) // "abab"
-
-// The package declaration names this slot s. A compatible anonymous type
-// constrains that positional slot without replacing its contract label.
-b: (func(string) -> string) & strings.ToUpper
-c: b("hi")      // "HI"
-d: b(s: "bye") // "BYE"
-
-// A second, different contract label for the slot is incompatible.
-e: (func(text: string) -> string) & strings.ToUpper // _|_
-```
-
-```cue
-@experiment(functions)
-
-T: func(a: int, ...) -> number // open: admits further parameters
-U: func(a: int) -> number      // closed
-
-f: T & (func(a: int, b: int) -> int: a + b)
-x: f(1, 2) // 3
-y: f(1)    // _|_ // missing argument b
-
-g:  U & (func(a: int) -> int: a)          // exact match
-g1: g(1)                                  // 1
-h:  U & (func(a: int, b?: int) -> int: a) // extra parameter is optional
-fromUnnamed: U & (func(_~v: int) -> int: v) // unnamed slot acquires label a
-r1: fromUnnamed(a: 1)                       // 1
-r2: fromUnnamed(2)                          // 2
-e1: U & (func(b: int) -> int: b)            // _|_ // labels a and b conflict
-e2: U & (func(a: int, b: int) -> int: a) // _|_ // b not admitted by closed U
-
-// Constraints are enforced per call, in the type's scope.
-s:  T & (func(a: string) -> int: 1)
-e3: s(1) // _|_ // conflicting values int and string
-
-Narrow: func(input: <10) -> int
-narrowed: Narrow & (func(_~x: int) -> int: x)
-e4: narrowed(input: 15) // _|_ // input's constraint follows slot 0
-```
-
-
 ### Calls
 
 Calls can be made to core library functions, called builtins.
@@ -2957,103 +2702,6 @@ to the function and the called function begins execution.
 The return parameters
 of the function are passed by value back to the calling function when the
 function returns.
-
-With the `functions` experiment, values of
-[function literals](#function-literals) may be called as well.
-An argument is positional or labeled;
-positional arguments must precede labeled arguments.
-Positional arguments bind the function's positional parameters in order;
-a labeled argument binds the effective contract label of a parameter.
-That label may be declared by the callable value itself or supplied by a
-compatible attached signature to an otherwise unnamed positional parameter.
-Arguments are evaluated in the scope of the caller.
-
-A call results in bottom (`_|_`) if it
-binds a parameter both by position and by label,
-labels a parameter that is unknown or not bindable by label,
-supplies more positional arguments than there are positional parameters,
-or leaves a required parameter unbound.
-Any other parameter may be left unbound if it is optional or
-if its constraint has a single default value.
-
-The result of a call is the unification of the body and the result
-constraint, evaluated with each parameter bound to the unification of
-its constraint and its argument, if any.
-
-```cue
-@experiment(functions)
-
-sum:  func(a: int, b: int) -> int: a + b
-key:  func(a!: int, b?: int) -> int: a
-pick: func(a: int | *5) -> int: a
-
-p: sum(1, 2)       // 3
-l: sum(a: 1, b: 2) // 3
-m: sum(1, b: 2)    // 3
-k: key(a: 4)       // 4
-d: pick()          // int | *5
-
-e1: sum(1, 2, 3)            // _|_ // too many positional arguments
-e2: sum(a: 1, b: 2, c: 3)   // _|_ // unknown argument c
-e3: sum(1, a: 2)            // _|_ // argument a provided by position and label
-e4: key(4)                  // _|_ // missing required argument a
-e5: sum(1)                  // _|_ // missing argument b
-e6: (func() -> string: 1)() // _|_ // conflicting values 1 and string
-```
-
-A call whose argument list ends in `...` is a partial application:
-it binds the given arguments and yields a function over the remaining
-parameters instead of evaluating the body.
-The bound arguments are retained;
-a later call combines them with its own arguments,
-and the body is evaluated once no parameter is left unbound.
-Partial applications may be chained.
-
-At this experimental stage, a function type must be attached before partial
-application. Unifying a function type with an already partially applied value
-is an error. A signature attached first remains in force, and its contract
-labels and constraints carry across to the remaining call surface.
-
-```cue
-@experiment(functions)
-
-add: func(a: int, b: int, c: int) -> int: a + b + c
-
-f: add(1, ...)    // a function of b and c
-g: f(2, ...)      // a function of c
-x: g(3)           // 6
-y: add(a: 1, ...)(2, 3) // 6
-```
-
-Recursion, direct or mutual, does not terminate in finite structure
-and results in a structural [cycle](#cycles) error.
-Calls do not otherwise constitute cycles:
-calls may be nested and repeated,
-including nested calls to the same function.
-
-```cue
-@experiment(functions)
-
-fib: func(n: int) -> int: fib(n-1) + fib(n-2)
-f:   fib(5) // _|_ // structural cycle
-
-twice: func(n: int) -> int: n + n
-t:     twice(twice(twice(2))) // 16
-```
-
-A positional argument may not follow a labeled argument:
-
-```cue !
-@experiment(functions)
-
-sum: func(a: int, b: int) -> int: a + b
-out: sum(a: 1, 2)
-```
-<!-- error:
-positional argument after labeled argument:
-    4:16
--->
-
 
 
 ### Comprehensions

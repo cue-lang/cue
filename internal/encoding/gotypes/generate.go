@@ -749,7 +749,7 @@ func (g *generator) emitTypeReference(val cue.Value) (bool, typeFacts, error) {
 		g.importCuePkgAsGoPkg[inst.ImportPath] = unqualifiedPath
 		// TODO: populate the facts here, which will require generating imported packages first.
 	} else {
-		def, err := g.genDef(path, cue.Dereference(val))
+		def, err := g.genDef(path, root.LookupPath(path))
 		if err != nil {
 			return false, typeFacts{}, err
 		}

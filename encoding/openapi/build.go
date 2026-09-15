@@ -61,10 +61,9 @@ type buildContext struct {
 }
 
 type externalType struct {
-	ref   string
-	inst  cue.Value
-	path  cue.Path
-	value cue.Value
+	ref  string
+	inst cue.Value
+	path cue.Path
 }
 
 type typeFunc func(b *builder, a cue.Value)
@@ -157,7 +156,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 			last := len(sels) - 1
 			c.path = sels[:last]
 			name := sels[last]
-			c.schemas.setExpr(ext.ref, c.build(name, cue.Dereference(ext.value)))
+			c.schemas.setExpr(ext.ref, c.build(name, ext.inst.LookupPath(ext.path)))
 		}
 	}
 
@@ -332,7 +331,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			case len(path.Selectors()) > 0:
 				ref := b.ctx.makeRef(v1, path)
 				if ref == "" {
-					v = cue.Dereference(v)
+					v = v1.LookupPath(path)
 					break
 				}
 				if dedup[ref] {
@@ -1224,10 +1223,9 @@ func (b *builder) addRef(v cue.Value, inst cue.Value, ref cue.Path) {
 
 	if b.ctx.inst != inst {
 		b.ctx.externalRefs[name] = &externalType{
-			ref:   name,
-			inst:  inst,
-			path:  ref,
-			value: v,
+			ref:  name,
+			inst: inst,
+			path: ref,
 		}
 	}
 }

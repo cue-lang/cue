@@ -41,8 +41,8 @@ github.com/pelletier/go-toml/v2 v2.4.3/go.mod h1:2gIqNv+qfxSVS7cM2xJQKtLSTLUE9V8
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/protocolbuffers/txtpbfmt v0.0.0-20260803135053-1fd8a60d1ffc h1:60QHVeAiwsBBrlOuCYJXJqogSU+j/TWYH9KTGlwz7iY=
-github.com/protocolbuffers/txtpbfmt v0.0.0-20260803135053-1fd8a60d1ffc/go.mod h1:JSbkp0BviKovYYt9XunS95M3mLPibE9bGg+Y95DsEEY=
+github.com/protocolbuffers/txtpbfmt v0.0.0-20260916144827-6e6d8ebdba95 h1:O+sm5aAf+Y8tyh+zoSe8iyJ5uyTg01FGjPImeghvCbs=
+github.com/protocolbuffers/txtpbfmt v0.0.0-20260916144827-6e6d8ebdba95/go.mod h1:JSbkp0BviKovYYt9XunS95M3mLPibE9bGg+Y95DsEEY=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/rogpeppe/go-internal v1.16.0 h1:O9DK+vNMDVGLr2BeZqmpLeMjiMNkuXfcqntWbZV6S5g=
 github.com/rogpeppe/go-internal v1.16.0/go.mod h1:DrUVZyrJU+txYW5/1kwtXQSMFio52ZOxX7yM1VHvnxs=

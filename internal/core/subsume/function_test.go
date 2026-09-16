@@ -33,7 +33,7 @@ import (
 // signature matching rules of function tightening and type meets:
 // positional parameters align by ordinal, their contract labels agree when
 // both are present, and name-only parameters match by label;
-// requiredness must agree, and extras of the subsumed signature are
+// requiredness is ordered as for struct fields, and extras of the subsumed signature are
 // admitted only against an open subsuming signature. Each matched
 // parameter constraint and the result constraint of the subsumer must
 // subsume the corresponding constraint of the subsumed, and every plain
@@ -217,10 +217,34 @@ func TestFunctions(t *testing.T) {
 			err: "value not an instance",
 		},
 
-		// Requiredness must agree.
+		// Requiredness is ordered as for struct fields: optional subsumes
+		// required, which subsumes plain. A required or optional parameter
+		// matches a positional one by label.
 		{
 			in:  `a: func(n!: int, ...) -> int, b: func(n: int, ...) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n?: int) -> int, b: func(n!: int) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n!: int) -> int, b: func(n?: int) -> int`,
 			err: "value not an instance",
+		},
+		{
+			in:  `a: func(n?: int) -> int, b: func(n!: int = 1) -> int`,
+			err: "",
+		},
+		{
+			in:  `a: func(n!: int) -> int, b: func(n: int) -> int: n`,
+			err: "",
+		},
+		{
+			// A signature unified with b makes its optional parameter
+			// required, so b is an instance of a signature requiring it.
+			in:  `a: func(n!: int) -> int, b: (func(n?: int) -> int: 1) & (func(n!: int) -> int)`,
+			err: "",
 		},
 		{
 			in:  `a: func(n: int, ...) -> int, b: func(n!: int, ...) -> int`,

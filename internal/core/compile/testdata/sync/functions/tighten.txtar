@@ -1,8 +1,9 @@
 # Tests unification of CUE function values with function types (bodyless
 # signatures, possibly partial/open) and of function types with each other.
 # Static checks at unification time cover only what is decidable from the
-# compiled signatures: parameter names, positions, requiredness flags,
-# closedness, and whether a parameter declares a default. Parameter and
+# compiled signatures: parameter names, positions, closedness, and whether a
+# parameter declares a default. Requiredness combines as for struct fields
+# and is enforced when a call omits a parameter. Parameter and
 # result constraint conflicts and missing arguments remain dynamic and
 # surface when the function is called; two declared defaults for the same
 # parameter are unified when the signatures are.
@@ -159,8 +160,30 @@ meet: {
 	badName: (func(a: int) -> int) & (func(b: int) -> int)
 	badNameRev: (func(b: int) -> int) & (func(a: int) -> int)
 
-	// Requiredness must agree between signatures.
-	badReq: (func(a!: int) -> int) & (func(a: int, ...) -> int)
+	// A required or optional parameter and a positional parameter with the
+	// same label are the same parameter, in either signature. Requiredness
+	// combines as for struct fields: a plain parameter is stricter than a
+	// required one, which is stricter than an optional one.
+	reqNamed:     (func(a!: int) -> int) & (func(a: int, ...) -> int)
+	reqNamedV:    (reqNamed & (func(a: int) -> int: a))(2)
+	optNamed:     (func(a: int) -> int) & (func(a?: int) -> int)
+	optNamedV:    (optNamed & (func(a: int) -> int: a))(a: 3)
+	optNamedOmit: (optNamed & (func(a: int) -> int: a))()
+	optReq:       (func(a?: int) -> int) & (func(a!: int) -> int)
+	optReqV:      (optReq & (func(a?: int) -> int: [if a != _|_ {a}, 0][0]))(a: 4)
+	optReqOmit:   (optReq & (func(a?: int) -> int: [if a != _|_ {a}, 0][0]))()
+
+	// The result does not depend on the order of unification.
+	T1:     func(a: int) -> int
+	T2:     func(a?: int) -> int
+	vA:     func(a: int) -> int: a
+	orderL: ((T1 & T2) & vA)(1)
+	orderR: (T1 & (T2 & vA))(1)
+	orderV: ((T2 & vA) & T1)(1)
+
+	// A positional parameter of a type still needs a positional parameter of
+	// the value, which decides how the function can be called.
+	posNameOnly: (func(a: int) -> int) & (func(a?: int) -> int: 1)
 
 	// A parameter present in only one signature is allowed if the other
 	// signature is open.
@@ -174,7 +197,7 @@ meet: {
 // needs it either. A sibling positional signature may expose the same label
 // and carry its constraint to a slot. One rule governs function tightening
 // (both directions), function type meets, and subsumption (see
-// internal/core/subsume); builtins have no optional markers (see builtins.txtar).
+// internal/core/subsume); see builtins.txtar for builtins.
 optionalExtra: {
 	// Tightening: an extra optional parameter of the value against a
 	// closed type (also covered by closed.ok3).
@@ -478,7 +501,31 @@ defaults: {
     wx2: 〈0;w〉(0.5)
     badName: (func(a: int) -> int & func(b: int) -> int)
     badNameRev: (func(b: int) -> int & func(a: int) -> int)
-    badReq: (func(a!: int) -> int & func(a: int, ...) -> int)
+    reqNamed: (func(a!: int) -> int & func(a: int, ...) -> int)
+    reqNamedV: (〈0;reqNamed〉 & func(a: int) -> int: 〈0;a〉)(2)
+    optNamed: (func(a: int) -> int & func(a?: int) -> int)
+    optNamedV: (〈0;optNamed〉 & func(a: int) -> int: 〈0;a〉)(a: 3)
+    optNamedOmit: (〈0;optNamed〉 & func(a: int) -> int: 〈0;a〉)()
+    optReq: (func(a?: int) -> int & func(a!: int) -> int)
+    optReqV: (〈0;optReq〉 & func(a?: int) -> int: [
+      if (〈1;a〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈2;a〉
+      },
+      0,
+    ][0])(a: 4)
+    optReqOmit: (〈0;optReq〉 & func(a?: int) -> int: [
+      if (〈1;a〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈2;a〉
+      },
+      0,
+    ][0])()
+    T1: func(a: int) -> int
+    T2: func(a?: int) -> int
+    vA: func(a: int) -> int: 〈0;a〉
+    orderL: ((〈0;T1〉 & 〈0;T2〉) & 〈0;vA〉)(1)
+    orderR: (〈0;T1〉 & (〈0;T2〉 & 〈0;vA〉))(1)
+    orderV: ((〈0;T2〉 & 〈0;vA〉) & 〈0;T1〉)(1)
+    posNameOnly: (func(a: int) -> int & func(a?: int) -> int: 1)
     wider: (func(a: int, ...) -> int & func(a: int, b: int, ...) -> int)
     widerV: (〈0;wider〉 & func(a: int, b: int, c?: int) -> int: (〈0;a〉 + 〈0;b〉))
     widerX: 〈0;widerV〉(1, 2)

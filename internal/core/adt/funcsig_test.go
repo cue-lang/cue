@@ -17,16 +17,17 @@ package adt
 import "testing"
 
 func TestMergeBuiltinsRejectsConflictingContractLabels(t *testing.T) {
-	raw := &Builtin{}
+	raw := &Builtin{Params: []Param{{Value: &Top{}}, {Value: &Top{}}}}
 	tightened := func(labels ...Feature) *Builtin {
 		params := make([]FuncParam, len(labels))
 		for i, label := range labels {
 			params[i] = FuncParam{Label: label, Positional: true}
 		}
 		return &Builtin{
-			orig: raw,
+			orig:   raw,
+			Params: raw.Params,
 			Types: []FuncType{{
-				Fn: &Function{Params: params},
+				Fn: &Function{Params: params, Open: true},
 			}},
 		}
 	}

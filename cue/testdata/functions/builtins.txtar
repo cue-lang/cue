@@ -4,10 +4,11 @@
 # full call. The legacy validator-constructor form remains a separate path.
 # A builtin binds its raw arguments by position. Positional type parameters
 # align with those raw slots by ordinal; a plain name supplies a contract label
-# only when the slot does not already have a different one. A required
-# name-only parameter cannot be satisfied by a builtin; an unmatched optional
-# one contributes no slot or label, though its constraint follows that slot if
-# a sibling positional signature supplies the label.
+# only when the slot does not already have a different one. A required or
+# optional parameter of a type is the builtin parameter with its label, as
+# named by the builtin's signatures; an optional one that matches nothing
+# contributes no slot or label. Defaults declared by the signatures fill
+# omitted arguments and must agree with the builtin's own defaults.
 # Statically checked at unification time are parameter matching, arity, and
 # kind-level compatibility where the constraint is literally a basic type;
 # all other constraints surface when the tightened builtin is called.
@@ -86,10 +87,8 @@ dynamic: {
 
 // An extra parameter is admitted against a closed signature iff it is
 // optional. An unmatched optional name-only parameter contributes no slot or
-// label, but no call needs it either; if a sibling positional signature
-// exposes the same label, its constraint follows that slot. The builtin's own
-// parameters carry no optional markers, so only a parameter with a default
-// may exceed a closed type's count.
+// label, but no call needs it either. A builtin parameter that a closed type
+// does not cover is admitted only if the builtin has a default for it.
 optionalExtra: {
 	O:  func(string, sep?: string) -> string
 	up: O & strings.ToUpper
@@ -100,10 +99,24 @@ optionalExtra: {
 	upExtra:   OnlyExtra & strings.ToUpper
 	y:         upExtra("hi") @test(eq, "HI")
 
-	// A required parameter is rejected: unlike a plain named parameter
-	// (see tighten.named), it declares no positional slot of its own and is
-	// rejected by the static builtin-attachment check.
-	bad: (func(string, sep!: string) -> string) & strings.ToUpper @test(err, code=eval, contains="parameter sep of function type not allowed by builtin strings.ToUpper: it can only be passed by label, and a builtin takes its arguments positionally")
+	// A required parameter must name a parameter of the builtin. Depending
+	// on the order of unification, the error is reported against the builtin
+	// or against its generated signature, which is closed.
+	bad: (func(string, sep!: string) -> string) & strings.ToUpper @test(err, code=eval, contains="parameter sep of function type not allowed by")
+}
+
+// A required or optional parameter of a type and the builtin parameter with
+// the same label are the same parameter, so the type covers it.
+labelMatch: {
+	opt:     strings.Repeat & (func(string, count?: <3) -> string)
+	optOK:   opt("x", 2) @test(eq, "xx")
+	optBad:  opt("x", 5) @test(err, code=eval, contains="out of bound")
+	req:     strings.Repeat & (func(string, count!: int) -> string)
+	reqOK:   req("x", count: 2) @test(eq, "xx")
+	// A label that names no builtin parameter leaves both that parameter and
+	// the builtin's count uncovered; which one is reported depends on the
+	// order of unification.
+	unknown: strings.Repeat & (func(string, times!: int) -> string) @test(err, code=eval, contains="of function type not allowed by")
 }
 
 // Tightened builtins are equal when derived from the same builtin with the
@@ -181,17 +194,15 @@ labeled: {
 		badName: (func(text: string, ...) -> string) & strings.ToUpper @test(err, code=eval, contains="conflicting parameter labels")
 	}
 }
-// A default declared by a function type is ignored on a builtin: builtin
-// defaults belong to the implementation, whereas a declared default belongs
-// to a CUE signature, and the two mechanisms do not interact. The type still
-// attaches, and its constraints are enforced per call as usual.
+// Defaults are part of CUE signatures, for builtins as for function
+// literals: a default declared by a function type unified with a builtin
+// fills an omitted argument, and it must agree with the builtin's own
+// default.
 typeDefaults: {
-	// The builtin carries no default for count, so the type's default does
-	// not make the argument omittable.
 	Rep:     func(s: string, count: int = 2) -> string
 	rep:     Rep & strings.Repeat
 	repX:    rep("ab", 3) @test(eq, "ababab")
-	repOmit: rep("ab") @test(err, code=eval, contains="not enough arguments in call to strings.Repeat")
+	repOmit: rep("ab") @test(eq, "abab")
 
 	// Two types attached to the builtin must still agree on their defaults,
 	// as they would without it: ignoring a default when completing the
@@ -202,12 +213,13 @@ typeDefaults: {
 	repBothRev: Rep3 & strings.Repeat & Rep @test(err, code=eval, contains="conflicting defaults for parameter count")
 	repSame:    (Rep & strings.Repeat & Rep)("ab", 3) @test(eq, "ababab")
 
-	// The builtin's own default keeps applying, and a differing declared
-	// default neither replaces it nor conflicts with it.
-	Join:  func(elem: [...string], os: string = "windows") -> string
-	join:  Join & path.Join
-	joinX: join(["a", "b"]) @test(eq, "a/b")
-	joinOS: join(["a", "b"], "windows") @test(eq, "a\\b")
+	// A declared default must agree with the builtin's own default.
+	Join:   func(elem: [...string], os: string = "windows") -> string
+	join:   Join & path.Join @test(err, code=eval, contains="conflicting defaults for parameter os")
+	Unix:   func(elem: [...string], os: string = "unix") -> string
+	unix:   Unix & path.Join
+	unixX:  unix(["a", "b"]) @test(eq, "a/b")
+	unixOS: unix(["a", "b"], "windows") @test(eq, "a\\b")
 }
 -- out/errors.txt --
 [eval] static.tooMany: function type has more positional parameters than builtin strings.ToUpper:
@@ -241,45 +253,47 @@ static.tooFew: parameter s of function type not allowed by closed function type:
 [eval] invalid value "zz" (out of bound <="m"):
     ./in.cue:66:12
     ./in.cue:70:11
-[eval] optionalExtra.bad: parameter sep of function type not allowed by builtin strings.ToUpper: it can only be passed by label, and a builtin takes its arguments positionally:
-    ./in.cue:92:48
-    ./in.cue:92:8
-optionalExtra.bad: parameter sep of function type not allowed by closed function type:
+[eval] optionalExtra.bad: parameter sep of function type not allowed by closed function type:
     strings:28:15
-    ./in.cue:92:8
+[eval] invalid value 5 (out of bound <3):
+    ./in.cue:96:50
+    ./in.cue:98:20
+[eval] labelMatch.unknown: parameter count of function type not allowed by closed function type:
+    strings:7:15
 [eval] partial.contains: partial application of builtin strings.Contains is not supported:
-    ./in.cue:110:12
+    ./in.cue:122:12
 [eval] partial.length: partial application of builtin len is not supported:
-    ./in.cue:111:12
+    ./in.cue:123:12
 [eval] conflicting values string and [1,2] (mismatched types string and list):
-    ./in.cue:125:13
-    ./in.cue:128:11
+    ./in.cue:137:13
+    ./in.cue:140:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:
-    ./in.cue:131:8
+    ./in.cue:143:8
 [eval] labeled.errors.unknown: unknown argument lst in call to list.Drop:
-    ./in.cue:147:12
+    ./in.cue:159:12
 [eval] labeled.errors.dup: argument s provided by position and label in call to strings.Repeat:
-    ./in.cue:150:8
+    ./in.cue:162:8
 [eval] labeled.errors.hole: missing argument 2 in call to list.Slice:
-    ./in.cue:153:9
+    ./in.cue:165:9
 [eval] labeled.user.f: builtin strings.SplitN has more parameters than closed function type:
-    ./in.cue:159:6
+    ./in.cue:171:6
 [eval] labeled.user.badName: conflicting parameter labels s and text for positional parameter 1 in function type and function type:
     strings:28:15
-[eval] typeDefaults.repOmit: not enough arguments in call to strings.Repeat (have 1, want 2):
-    ./in.cue:180:11
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:185:43
-    ./in.cue:177:40
-    ./in.cue:186:20
+    ./in.cue:195:43
+    ./in.cue:187:40
+    ./in.cue:196:20
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:185:43
-    ./in.cue:177:40
-    ./in.cue:187:37
+    ./in.cue:195:43
+    ./in.cue:187:40
+    ./in.cue:197:37
 [eval] conflicting defaults for parameter count: conflicting values 3 and 2:
-    ./in.cue:177:40
-    ./in.cue:185:43
-    ./in.cue:188:38
+    ./in.cue:187:40
+    ./in.cue:195:43
+    ./in.cue:198:38
+[eval] conflicting defaults for parameter os: conflicting values "unix" and "windows":
+    ./in.cue:202:47
+    ./in.cue:203:10
 -- out/eval/stats --
 Leaks:  3
 Freed:  167

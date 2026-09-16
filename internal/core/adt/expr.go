@@ -1804,6 +1804,25 @@ func FuncParamHasDefault(fn *Function, types []FuncType, i int) bool {
 	return false
 }
 
+// FuncParamArcType returns the requiredness of parameter i of fn under the
+// signatures in types attached to it: the strictest marking among fn's own
+// parameter and the parameters of types that match it. As for struct fields,
+// a plain parameter is stricter than a required one, which is stricter than
+// an optional one, so a parameter is optional only if every signature that
+// declares it marks it optional.
+func FuncParamArcType(fn *Function, types []FuncType, i int) ArcType {
+	a := fn.Params[i].ArcType
+	for _, t := range types {
+		matches := matchFuncParamsToValue(t.Fn, fn, types)
+		for j, tp := range t.Fn.Params {
+			if matches[j] == i && tp.ArcType < a {
+				a = tp.ArcType
+			}
+		}
+	}
+	return a
+}
+
 // funcArgBound reports whether an activation arc holds an argument. The
 // conjuncts scheduleFuncCall adds to an arc are exactly the constraint and
 // default expressions of the function's own signature and of the signatures
@@ -2191,13 +2210,16 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 		// A parameter may be left unbound only if it is optional or has a
 		// declared default; a required parameter (p!) is the name-only
 		// counterpart of a plain one and takes a default the same way.
-		// Whatever its constraint evaluates to plays no part in this
+		// Requiredness combines across the attached signatures as for struct
+		// fields, so a parameter is optional only if every signature marks it
+		// so. Whatever its constraint evaluates to plays no part in this
 		// decision: a default reached through a reference is an ordinary
 		// part of the constraint. An unbound default is added to the
 		// parameter's arc by scheduleFuncCall.
-		if arg == nil && p.ArcType != ArcOptional && !x.hasDefault(i) {
+		arcType := FuncParamArcType(x.Fn, x.Types, i)
+		if arg == nil && arcType != ArcOptional && !x.hasDefault(i) {
 			switch {
-			case p.ArcType == ArcRequired:
+			case arcType == ArcRequired:
 				c.AddErrf("missing required argument %s", p.Label.SelectorString(c))
 			case p.Label != InvalidLabel:
 				c.AddErrf("missing argument %s", p.Label.SelectorString(c))
@@ -2751,15 +2773,16 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 		}
 	}
 
-	// Materialize raw defaults before applying attached signature
-	// constraints. The builtin implementation has always received these
-	// values through Builtin.call; doing it here as well ensures an omitted
-	// defaulted argument is constrained just like an explicit argument.
-	if !builtin.checkArgs(c, Pos(call), len(args)) {
+	// Materialize defaults before applying attached signature constraints,
+	// so that an omitted defaulted argument is constrained just like an
+	// explicit argument.
+	args, ok := builtin.completeArgs(c, Pos(call), args, Flags{
+		status:    state.status,
+		condition: state.condition | fieldSetKnown | concreteKnown | disjunctionTask,
+		mode:      state.mode,
+	})
+	if !ok {
 		return nil
-	}
-	for i := len(args); i < len(builtin.Params); i++ {
-		args = append(args, builtin.Params[i].Default())
 	}
 
 	if builtin.PerDisjunct {
@@ -3039,6 +3062,59 @@ func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
 		}
 	}
 	return true
+}
+
+// completeArgs appends the arguments for the parameters a call omits. The
+// CUE signatures of a builtin are the source of truth for its defaults: an
+// omitted argument takes the default that a signature unified with the
+// builtin declares for the parameter, or else the builtin's own default,
+// which such a signature must agree with.
+func (x *Builtin) completeArgs(c *OpContext, p token.Pos, args []Value, flags Flags) ([]Value, bool) {
+	n := len(args)
+	if n > len(x.Params) {
+		c.addErrf(0, p,
+			"too many arguments in call to %v (have %d, want %d)",
+			x, n, len(x.Params))
+		return nil, false
+	}
+	for i := n; i < len(x.Params); i++ {
+		v, ok := x.signatureDefault(c, i, flags)
+		if !ok {
+			v = x.Params[i].Default()
+		} else if v == nil || bottom(v) != nil {
+			if b := bottom(v); b != nil {
+				c.AddBottom(b)
+			}
+			return nil, false
+		}
+		if v == nil {
+			c.addErrf(0, p,
+				"not enough arguments in call to %v (have %d, want %d)",
+				x, n, len(x.Params))
+			return nil, false
+		}
+		args = append(args, v)
+	}
+	return args, true
+}
+
+// signatureDefault evaluates the default that a signature unified with the
+// builtin declares for its parameter at position pos, and reports whether
+// there is one.
+func (x *Builtin) signatureDefault(c *OpContext, pos int, flags Flags) (Value, bool) {
+	for _, t := range x.Types {
+		for k, j := range matchBuiltinParams(t.Fn, x) {
+			d := t.Fn.Params[k].Default
+			if j != pos || d == nil {
+				continue
+			}
+			s := c.PushState(t.Env, d.Source())
+			v := c.value(d, flags)
+			c.PopState(s)
+			return v, true
+		}
+	}
+	return nil, false
 }
 
 func (x *Builtin) call(call BuiltinCallContext) Expr {

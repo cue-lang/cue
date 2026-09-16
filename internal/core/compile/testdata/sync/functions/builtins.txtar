@@ -4,10 +4,11 @@
 # full call. The legacy validator-constructor form remains a separate path.
 # A builtin binds its raw arguments by position. Positional type parameters
 # align with those raw slots by ordinal; a plain name supplies a contract label
-# only when the slot does not already have a different one. A required
-# name-only parameter cannot be satisfied by a builtin; an unmatched optional
-# one contributes no slot or label, though its constraint follows that slot if
-# a sibling positional signature supplies the label.
+# only when the slot does not already have a different one. A required or
+# optional parameter of a type is the builtin parameter with its label, as
+# named by the builtin's signatures; an optional one that matches nothing
+# contributes no slot or label. Defaults declared by the signatures fill
+# omitted arguments and must agree with the builtin's own defaults.
 # Statically checked at unification time are parameter matching, arity, and
 # kind-level compatibility where the constraint is literally a basic type;
 # all other constraints surface when the tightened builtin is called.
@@ -86,10 +87,8 @@ dynamic: {
 
 // An extra parameter is admitted against a closed signature iff it is
 // optional. An unmatched optional name-only parameter contributes no slot or
-// label, but no call needs it either; if a sibling positional signature
-// exposes the same label, its constraint follows that slot. The builtin's own
-// parameters carry no optional markers, so only a parameter with a default
-// may exceed a closed type's count.
+// label, but no call needs it either. A builtin parameter that a closed type
+// does not cover is admitted only if the builtin has a default for it.
 optionalExtra: {
 	O:  func(string, sep?: string) -> string
 	up: O & strings.ToUpper
@@ -100,10 +99,24 @@ optionalExtra: {
 	upExtra:   OnlyExtra & strings.ToUpper
 	y:         upExtra("hi")
 
-	// A required parameter is rejected: unlike a plain named parameter
-	// (see tighten.named), it declares no positional slot of its own and is
-	// rejected by the static builtin-attachment check.
+	// A required parameter must name a parameter of the builtin. Depending
+	// on the order of unification, the error is reported against the builtin
+	// or against its generated signature, which is closed.
 	bad: (func(string, sep!: string) -> string) & strings.ToUpper
+}
+
+// A required or optional parameter of a type and the builtin parameter with
+// the same label are the same parameter, so the type covers it.
+labelMatch: {
+	opt:     strings.Repeat & (func(string, count?: <3) -> string)
+	optOK:   opt("x", 2)
+	optBad:  opt("x", 5)
+	req:     strings.Repeat & (func(string, count!: int) -> string)
+	reqOK:   req("x", count: 2)
+	// A label that names no builtin parameter leaves both that parameter and
+	// the builtin's count uncovered; which one is reported depends on the
+	// order of unification.
+	unknown: strings.Repeat & (func(string, times!: int) -> string)
 }
 
 // Tightened builtins are equal when derived from the same builtin with the
@@ -181,13 +194,11 @@ labeled: {
 		badName: (func(text: string, ...) -> string) & strings.ToUpper
 	}
 }
-// A default declared by a function type is ignored on a builtin: builtin
-// defaults belong to the implementation, whereas a declared default belongs
-// to a CUE signature, and the two mechanisms do not interact. The type still
-// attaches, and its constraints are enforced per call as usual.
+// Defaults are part of CUE signatures, for builtins as for function
+// literals: a default declared by a function type unified with a builtin
+// fills an omitted argument, and it must agree with the builtin's own
+// default.
 typeDefaults: {
-	// The builtin carries no default for count, so the type's default does
-	// not make the argument omittable.
 	Rep:     func(s: string, count: int = 2) -> string
 	rep:     Rep & strings.Repeat
 	repX:    rep("ab", 3)
@@ -202,12 +213,13 @@ typeDefaults: {
 	repBothRev: Rep3 & strings.Repeat & Rep
 	repSame:    (Rep & strings.Repeat & Rep)("ab", 3)
 
-	// The builtin's own default keeps applying, and a differing declared
-	// default neither replaces it nor conflicts with it.
-	Join:  func(elem: [...string], os: string = "windows") -> string
-	join:  Join & path.Join
-	joinX: join(["a", "b"])
-	joinOS: join(["a", "b"], "windows")
+	// A declared default must agree with the builtin's own default.
+	Join:   func(elem: [...string], os: string = "windows") -> string
+	join:   Join & path.Join
+	Unix:   func(elem: [...string], os: string = "unix") -> string
+	unix:   Unix & path.Join
+	unixX:  unix(["a", "b"])
+	unixOS: unix(["a", "b"], "windows")
 }
 -- out/compile --
 --- in.cue
@@ -256,6 +268,14 @@ typeDefaults: {
     upExtra: (〈0;OnlyExtra〉 & 〈import;strings〉.ToUpper)
     y: 〈0;upExtra〉("hi")
     bad: (func(string, sep!: string) -> string & 〈import;strings〉.ToUpper)
+  }
+  labelMatch: {
+    opt: (〈import;strings〉.Repeat & func(string, count?: <3) -> string)
+    optOK: 〈0;opt〉("x", 2)
+    optBad: 〈0;opt〉("x", 5)
+    req: (〈import;strings〉.Repeat & func(string, count!: int) -> string)
+    reqOK: 〈0;req〉("x", count: 2)
+    unknown: (〈import;strings〉.Repeat & func(string, times!: int) -> string)
   }
   disjunction: {
     T: func(string, ...) -> string
@@ -338,11 +358,15 @@ typeDefaults: {
       ...string,
     ], os: string = "windows") -> string
     join: (〈0;Join〉 & 〈import;path〉.Join)
-    joinX: 〈0;join〉([
+    Unix: func(elem: [
+      ...string,
+    ], os: string = "unix") -> string
+    unix: (〈0;Unix〉 & 〈import;path〉.Join)
+    unixX: 〈0;unix〉([
       "a",
       "b",
     ])
-    joinOS: 〈0;join〉([
+    unixOS: 〈0;unix〉([
       "a",
       "b",
     ], "windows")

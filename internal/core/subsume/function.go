@@ -26,8 +26,11 @@ import (
 // Subsumption is structural, following the signature matching rules of
 // function tightening and function type meets: positional parameters align by
 // ordinal and their contract labels must be equal when both are present;
-// name-only parameters match by label; and matched pairs must agree on
-// requiredness. A plain label promised by the subsuming signature must already
+// name-only parameters match by label; and requiredness is ordered as for
+// struct fields: an optional parameter subsumes a required one, which
+// subsumes a plain one, where the subsumed parameter's requiredness is the
+// strictest among the signatures attached to it. A plain label promised by
+// the subsuming signature must already
 // select the matched slot on the candidate; merely being able to add it
 // through future tightening is not enough.
 // Directionally, everything the subsumed signature
@@ -229,9 +232,9 @@ func (s *subsumer) funcSignatureHead(fn *adt.Function, env *adt.Environment, b *
 	// Every parameter of the signature must be declared by b. Positional
 	// parameters align by ordinal and their contract labels must agree when
 	// both are present; name-only (a!, a?) parameters match by label. Every
-	// plain label must already select its matched slot on b. Matched pairs must
-	// agree on requiredness, and the signature's parameter constraint must
-	// subsume b's.
+	// plain label must already select its matched slot on b. A matched
+	// parameter of the signature must be at least as permissive about
+	// omission as b's, and its constraint must subsume b's.
 	matches := adt.MatchFuncValueParams(fn, b)
 	for i, p := range fn.Params {
 		j := matches[i]
@@ -252,7 +255,10 @@ func (s *subsumer) funcSignatureHead(fn *adt.Function, env *adt.Environment, b *
 			}
 		}
 		q := b.Fn.Params[j]
-		if (p.ArcType == adt.ArcRequired) != (q.ArcType == adt.ArcRequired) {
+		arcType := adt.FuncParamArcType(b.Fn, b.Types, j)
+		if p.ArcType < arcType {
+			// Optional subsumes required, which subsumes plain, as for
+			// struct fields.
 			return false
 		}
 		// Omittability is part of the contract: a parameter that the
@@ -260,7 +266,7 @@ func (s *subsumer) funcSignatureHead(fn *adt.Function, env *adt.Environment, b *
 		// by its own default or by one declared by a signature attached
 		// to b. The value of a default does not participate, so signatures
 		// that differ only in a default's value subsume each other.
-		if p.Default != nil && q.ArcType != adt.ArcOptional && !adt.FuncParamHasDefault(b.Fn, b.Types, j) {
+		if p.Default != nil && arcType != adt.ArcOptional && !adt.FuncParamHasDefault(b.Fn, b.Types, j) {
 			return false
 		}
 		if !s.funcConstraint(env, p.Value, b.Env, q.Value) {

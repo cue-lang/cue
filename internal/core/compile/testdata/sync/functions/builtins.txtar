@@ -99,9 +99,7 @@ optionalExtra: {
 	upExtra:   OnlyExtra & strings.ToUpper
 	y:         upExtra("hi")
 
-	// A required parameter must name a parameter of the builtin. Depending
-	// on the order of unification, the error is reported against the builtin
-	// or against its generated signature, which is closed.
+	// A required parameter must name a parameter of the builtin.
 	bad: (func(string, sep!: string) -> string) & strings.ToUpper
 }
 
@@ -113,10 +111,14 @@ labelMatch: {
 	optBad:  opt("x", 5)
 	req:     strings.Repeat & (func(string, count!: int) -> string)
 	reqOK:   req("x", count: 2)
-	// A label that names no builtin parameter leaves both that parameter and
-	// the builtin's count uncovered; which one is reported depends on the
-	// order of unification.
+	// A label that names no builtin parameter is rejected.
 	unknown: strings.Repeat & (func(string, times!: int) -> string)
+
+	// The builtin's labels are known however its uses are unified, also
+	// when a type labeling another parameter is unified first.
+	split: strings.Repeat
+	split: func(s: string, count!: int) -> string
+	splitOK: split("a", count: 3)
 }
 
 // Tightened builtins are equal when derived from the same builtin with the
@@ -216,6 +218,12 @@ typeDefaults: {
 	// A declared default must agree with the builtin's own default.
 	Join:   func(elem: [...string], os: string = "windows") -> string
 	join:   Join & path.Join
+
+	// A default declared on a type fills an omitted argument of a builtin
+	// as it would for a function value.
+	_rep: strings.Repeat
+	_rep: func(s: string, count: int = 3) -> string
+	split: _rep("a")
 	Unix:   func(elem: [...string], os: string = "unix") -> string
 	unix:   Unix & path.Join
 	unixX:  unix(["a", "b"])
@@ -276,6 +284,9 @@ typeDefaults: {
     req: (〈import;strings〉.Repeat & func(string, count!: int) -> string)
     reqOK: 〈0;req〉("x", count: 2)
     unknown: (〈import;strings〉.Repeat & func(string, times!: int) -> string)
+    split: 〈import;strings〉.Repeat
+    split: func(s: string, count!: int) -> string
+    splitOK: 〈0;split〉("a", count: 3)
   }
   disjunction: {
     T: func(string, ...) -> string
@@ -358,6 +369,9 @@ typeDefaults: {
       ...string,
     ], os: string = "windows") -> string
     join: (〈0;Join〉 & 〈import;path〉.Join)
+    _rep: 〈import;strings〉.Repeat
+    _rep: func(s: string, count: int = 3) -> string
+    split: 〈0;_rep〉("a")
     Unix: func(elem: [
       ...string,
     ], os: string = "unix") -> string

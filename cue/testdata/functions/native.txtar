@@ -713,7 +713,7 @@ Allocs: 122
 Retain: 0
 
 Unifications: 956
-Conjuncts:    2944
+Conjuncts:    2942
 Disjuncts:    224
 
 NumCloseIDs: 505

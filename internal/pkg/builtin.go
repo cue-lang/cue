@@ -116,6 +116,17 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 		panic(err.Err)
 	}
 
+	// A builtin's declared signature is part of the builtin itself: replace
+	// the conjuncts of each builtin field, the raw builtin and its signature,
+	// by their unification, so that any use of the field sees the builtin
+	// together with its parameter labels and defaults, whatever it is
+	// unified with.
+	for _, a := range obj.Arcs {
+		if b, ok := a.BaseValue.(*adt.Builtin); ok && len(b.Types) > 0 {
+			a.Conjuncts = []adt.Conjunct{adt.MakeRootConjunct(nil, b)}
+		}
+	}
+
 	return obj
 }
 

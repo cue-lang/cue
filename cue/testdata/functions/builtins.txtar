@@ -99,10 +99,8 @@ optionalExtra: {
 	upExtra:   OnlyExtra & strings.ToUpper
 	y:         upExtra("hi") @test(eq, "HI")
 
-	// A required parameter must name a parameter of the builtin. Depending
-	// on the order of unification, the error is reported against the builtin
-	// or against its generated signature, which is closed.
-	bad: (func(string, sep!: string) -> string) & strings.ToUpper @test(err, code=eval, contains="parameter sep of function type not allowed by")
+	// A required parameter must name a parameter of the builtin.
+	bad: (func(string, sep!: string) -> string) & strings.ToUpper @test(err, code=eval, contains="parameter sep of function type not allowed by builtin strings.ToUpper")
 }
 
 // A required or optional parameter of a type and the builtin parameter with
@@ -113,10 +111,14 @@ labelMatch: {
 	optBad:  opt("x", 5) @test(err, code=eval, contains="out of bound")
 	req:     strings.Repeat & (func(string, count!: int) -> string)
 	reqOK:   req("x", count: 2) @test(eq, "xx")
-	// A label that names no builtin parameter leaves both that parameter and
-	// the builtin's count uncovered; which one is reported depends on the
-	// order of unification.
-	unknown: strings.Repeat & (func(string, times!: int) -> string) @test(err, code=eval, contains="of function type not allowed by")
+	// A label that names no builtin parameter is rejected.
+	unknown: strings.Repeat & (func(string, times!: int) -> string) @test(err, code=eval, contains="parameter times of function type not allowed by builtin strings.Repeat")
+
+	// The builtin's labels are known however its uses are unified, also
+	// when a type labeling another parameter is unified first.
+	split: strings.Repeat
+	split: func(s: string, count!: int) -> string
+	splitOK: split("a", count: 3) @test(eq, "aaa")
 }
 
 // Tightened builtins are equal when derived from the same builtin with the
@@ -216,6 +218,12 @@ typeDefaults: {
 	// A declared default must agree with the builtin's own default.
 	Join:   func(elem: [...string], os: string = "windows") -> string
 	join:   Join & path.Join @test(err, code=eval, contains="conflicting defaults for parameter os")
+
+	// A default declared on a type fills an omitted argument of a builtin
+	// as it would for a function value.
+	_rep: strings.Repeat
+	_rep: func(s: string, count: int = 3) -> string
+	split: _rep("a") @test(eq, "aaa")
 	Unix:   func(elem: [...string], os: string = "unix") -> string
 	unix:   Unix & path.Join
 	unixX:  unix(["a", "b"]) @test(eq, "a/b")
@@ -225,14 +233,8 @@ typeDefaults: {
 [eval] static.tooMany: function type has more positional parameters than builtin strings.ToUpper:
     ./in.cue:34:51
     ./in.cue:34:12
-static.tooMany: function type has more positional parameters than closed function type:
-    strings:28:15
-    ./in.cue:34:12
 [eval] static.tooFew: builtin strings.ToUpper has more parameters than closed function type:
     ./in.cue:35:32
-    ./in.cue:35:12
-static.tooFew: parameter s of function type not allowed by closed function type:
-    strings:28:15
     ./in.cue:35:12
 [eval] static.badParam: parameter 1 of function type has kind int, conflicting with kind string of builtin strings.ToUpper:
     ./in.cue:39:42
@@ -253,47 +255,49 @@ static.tooFew: parameter s of function type not allowed by closed function type:
 [eval] invalid value "zz" (out of bound <="m"):
     ./in.cue:66:12
     ./in.cue:70:11
-[eval] optionalExtra.bad: parameter sep of function type not allowed by closed function type:
-    strings:28:15
+[eval] optionalExtra.bad: parameter sep of function type not allowed by builtin strings.ToUpper: no parameter of the builtin has this label:
+    ./in.cue:88:48
+    ./in.cue:88:8
 [eval] invalid value 5 (out of bound <3):
-    ./in.cue:96:50
-    ./in.cue:98:20
-[eval] labelMatch.unknown: parameter count of function type not allowed by closed function type:
-    strings:7:15
+    ./in.cue:94:50
+    ./in.cue:96:20
+[eval] labelMatch.unknown: parameter times of function type not allowed by builtin strings.Repeat: no parameter of the builtin has this label:
+    ./in.cue:100:29
 [eval] partial.contains: partial application of builtin strings.Contains is not supported:
-    ./in.cue:122:12
+    ./in.cue:124:12
 [eval] partial.length: partial application of builtin len is not supported:
-    ./in.cue:123:12
+    ./in.cue:125:12
 [eval] conflicting values string and [1,2] (mismatched types string and list):
-    ./in.cue:137:13
-    ./in.cue:140:11
+    ./in.cue:139:13
+    ./in.cue:142:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:
-    ./in.cue:143:8
+    ./in.cue:145:8
 [eval] labeled.errors.unknown: unknown argument lst in call to list.Drop:
-    ./in.cue:159:12
+    ./in.cue:161:12
 [eval] labeled.errors.dup: argument s provided by position and label in call to strings.Repeat:
-    ./in.cue:162:8
+    ./in.cue:164:8
 [eval] labeled.errors.hole: missing argument 2 in call to list.Slice:
-    ./in.cue:165:9
+    ./in.cue:167:9
 [eval] labeled.user.f: builtin strings.SplitN has more parameters than closed function type:
-    ./in.cue:171:6
-[eval] labeled.user.badName: conflicting parameter labels s and text for positional parameter 1 in function type and function type:
-    strings:28:15
+    ./in.cue:173:6
+[eval] labeled.user.badName: conflicting parameter labels text and s for positional parameter 1 in function type and function type:
+    ./in.cue:181:50
+    ./in.cue:181:13
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:195:43
-    ./in.cue:187:40
-    ./in.cue:196:20
+    ./in.cue:197:43
+    ./in.cue:189:40
+    ./in.cue:198:20
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:195:43
-    ./in.cue:187:40
-    ./in.cue:197:37
+    ./in.cue:197:43
+    ./in.cue:189:40
+    ./in.cue:199:37
 [eval] conflicting defaults for parameter count: conflicting values 3 and 2:
-    ./in.cue:187:40
-    ./in.cue:195:43
-    ./in.cue:198:38
+    ./in.cue:189:40
+    ./in.cue:197:43
+    ./in.cue:200:38
 [eval] conflicting defaults for parameter os: conflicting values "unix" and "windows":
-    ./in.cue:202:47
-    ./in.cue:203:10
+    ./in.cue:204:47
+    ./in.cue:205:10
 -- out/eval/stats --
 Leaks:  3
 Freed:  167

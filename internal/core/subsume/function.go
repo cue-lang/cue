@@ -44,8 +44,8 @@ import (
 // the subsumed one, and so must the result constraint.
 //
 // A function type subsumes a (tightened) function value whose signature
-// satisfies it. A function value subsumes itself and a tightening of
-// itself: tightening only adds constraints. A function type also subsumes a
+// satisfies it. A function value subsumes itself and any tightening or
+// composition of itself: both only add constraints. A function type also subsumes a
 // (tightened) builtin that its signatures admit, applying the same static
 // check the evaluator uses when tightening a builtin; a builtin subsumes
 // itself and a tightening of itself (see [adt.BuiltinSubsumes]).
@@ -73,20 +73,41 @@ func (s *subsumer) funcValues(a, b *adt.FuncValue) bool {
 		return true
 	}
 
-	// A function value subsumes itself and a tightening of itself:
-	// tightening only adds constraints, so every type constraint of a must
-	// also constrain b. Distinct partial applications differ on every call
+	// A function value subsumes itself, a tightening of itself, and a
+	// composition of itself with other functions: each only adds
+	// constraints, so every implementation and type constraint of a must
+	// also be part of b. Distinct partial applications differ on every call
 	// and never subsume one another: a and b must have bound the same
 	// arguments.
-	if adt.IsFuncType(b) || a.Fn != b.Fn || !a.Env.Equal(s.ctx, b.Env) || !a.EqualArgs(b) {
+	if adt.IsFuncType(b) || !a.EqualArgs(b) {
+		return false
+	}
+	if (a.IsPartial() || b.IsPartial()) && (a.Fn != b.Fn || !a.Env.Equal(s.ctx, b.Env)) {
+		// Bound arguments are indexed by the parameters of the head function.
+		return false
+	}
+	if !s.hasFunc(b, adt.FuncType{Fn: a.Fn, Env: a.Env}) {
 		return false
 	}
 	for _, t := range a.Types {
-		if !slices.Contains(b.Types, t) {
+		if !s.hasFunc(b, t) {
 			return false
 		}
 	}
 	return true
+}
+
+// hasFunc reports whether t is b's own function or one of the signatures
+// recorded on b. Functions with an implementation are the same if they are
+// the same literal evaluated in the same environment.
+func (s *subsumer) hasFunc(b *adt.FuncValue, t adt.FuncType) bool {
+	same := func(u adt.FuncType) bool {
+		if t.Fn.Body == nil {
+			return u == t
+		}
+		return u.Fn == t.Fn && u.Env.Equal(s.ctx, t.Env)
+	}
+	return same(adt.FuncType{Fn: b.Fn, Env: b.Env}) || slices.ContainsFunc(b.Types, same)
 }
 
 // funcBuiltin reports whether the function value or type a subsumes the

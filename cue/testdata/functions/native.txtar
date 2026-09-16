@@ -581,8 +581,9 @@ partial: {
 	recOut: recP(1) @test(err, code=structural_cycle, contains="structural cycle")
 
 	// Two partial applications are equal only when they bound the same
-	// arguments: different bindings conflict like any other distinct
-	// function values, and must not silently merge into one of the two.
+	// arguments: different bindings conflict, as bound arguments cannot be
+	// carried over to another implementation, and must not silently merge
+	// into one of the two.
 	conflictArgs: add(1, ...) & add(2, ...) @test(err, code=eval, contains="conflicting values")
 
 	// A plain function and a partial application of itself differ the same
@@ -703,7 +704,7 @@ structural cycle:
     ./in.cue:537:7
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
     ./in.cue:537:7
-    ./in.cue:589:17
+    ./in.cue:590:17
 -- out/eval/stats --
 Leaks:  78
 Freed:  1137

@@ -217,9 +217,7 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 
 	case *FuncValue:
 		if y, ok := w.(*FuncValue); ok {
-			return x.Fn == y.Fn && x.Env.Equal(ctx, y.Env) &&
-				equalFuncTypes(x.Types, y.Types) &&
-				equalFuncArgs(x.args, y.args)
+			return equalFuncValues(ctx, x, y)
 		}
 
 	case *Builtin:

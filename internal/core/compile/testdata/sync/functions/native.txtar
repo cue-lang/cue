@@ -572,8 +572,9 @@ partial: {
 	recOut: recP(1)
 
 	// Two partial applications are equal only when they bound the same
-	// arguments: different bindings conflict like any other distinct
-	// function values, and must not silently merge into one of the two.
+	// arguments: different bindings conflict, as bound arguments cannot be
+	// carried over to another implementation, and must not silently merge
+	// into one of the two.
 	conflictArgs: add(1, ...) & add(2, ...)
 
 	// A plain function and a partial application of itself differ the same

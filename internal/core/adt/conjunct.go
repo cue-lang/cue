@@ -787,7 +787,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				break
 			}
 			if z == nil {
-				// Two distinct function values conflict, like any scalars.
+				// Distinct partial applications conflict, like any scalars.
 				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id.posInfo)
 				break
 			}

@@ -308,6 +308,31 @@ func TestFunctions(t *testing.T) {
 			err: "value not an instance",
 		},
 
+		// A function value subsumes a composition of itself with another
+		// function, but not the other way around. Compositions of the same
+		// functions subsume each other regardless of order.
+		{
+			in:  `f: func(n: int) -> int: n, g: func(n: int) -> int: n, a: f, b: f & g`,
+			err: "",
+		},
+		{
+			in:  `f: func(n: int) -> int: n, g: func(n: int) -> int: n, a: g, b: f & g`,
+			err: "",
+		},
+		{
+			in:  `f: func(n: int) -> int: n, g: func(n: int) -> int: n, a: f & g, b: f`,
+			err: "value not an instance",
+		},
+		{
+			in:  `f: func(n: int) -> int: n, g: func(n: int) -> int: n, a: f & g, b: g & f`,
+			err: "",
+		},
+		{
+			// A type admits a composition that satisfies it.
+			in:  `f: func(n: int) -> int: n, g: func(n: int) -> int: n, a: func(n: int) -> int, b: f & g`,
+			err: "",
+		},
+
 		// A function type subsumes a function value whose signature
 		// satisfies it, including a value it tightened; a value subsumes a
 		// tightening of itself, but a tightened value does not subsume the

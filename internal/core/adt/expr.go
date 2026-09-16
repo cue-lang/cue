@@ -1823,6 +1823,18 @@ func FuncParamArcType(fn *Function, types []FuncType, i int) ArcType {
 	return a
 }
 
+// composedParam reports whether parameter i of x is declared by every
+// function composed with x. A composed function only admits the parameters
+// all its functions declare, as a closed type admits only its own.
+func composedParam(x *FuncValue, i int) bool {
+	for _, t := range x.Types {
+		if t.Fn.Body != nil && !slices.Contains(matchFuncParamsToValue(t.Fn, x.Fn, x.Types), i) {
+			return false
+		}
+	}
+	return true
+}
+
 // funcArgBound reports whether an activation arc holds an argument. The
 // conjuncts scheduleFuncCall adds to an arc are exactly the constraint and
 // default expressions of the function's own signature and of the signatures
@@ -1980,10 +1992,68 @@ func (n *nodeContext) scheduleFuncCall(ref *FuncCallRef, env *Environment, ci Cl
 			n.scheduleConjunct(MakeConjunct(t.Env, t.Fn.Ret, ci), ci)
 		}
 	}
+	// A signature with an implementation was composed with the called value:
+	// its body is evaluated as well and unifies with the result. It gets its
+	// own activation, binding its own local names, whose arcs hold the same
+	// conjuncts as the arcs of the parameters they matched, so that all
+	// implementations see the same arguments, constraints, and defaults.
+	for _, t := range ref.types {
+		if t.Fn.Body != nil {
+			n.scheduleComposedBody(t, fn, ref.types, argArcs, ci)
+		}
+	}
 	n.scheduleConjunct(MakeConjunct(env, fn.Body, ci), ci)
 	if fn.Ret != nil {
 		n.scheduleConjunct(MakeConjunct(env.Up, fn.Ret, ci), ci)
 	}
+}
+
+// scheduleComposedBody schedules the body of t, a function composed with the
+// called function fn, in an activation derived from argArcs, the activation
+// arcs of fn indexed by label. A parameter of t that matched no parameter of
+// fn is omittable (see [mergeFuncValues]) and is never bound by a call: it
+// takes its default, if any, or is absent.
+func (n *nodeContext) scheduleComposedBody(t FuncType, fn *Function, types []FuncType, argArcs map[Feature]*Vertex, ci CloseInfo) {
+	act := n.ctx.newInlineVertex(nil, nil)
+	matches := matchFuncParamsToValue(t.Fn, fn, types)
+	for i, p := range t.Fn.Params {
+		local := p.Local
+		if local == InvalidLabel {
+			local = anonParamLabel(n.ctx, i)
+		}
+		arc := &Vertex{
+			Parent:    act,
+			Label:     local,
+			ArcType:   ArcMember,
+			IsDynamic: true,
+		}
+		var src *Vertex
+		if vi := matches[i]; vi >= 0 {
+			vlocal := fn.Params[vi].Local
+			if vlocal == InvalidLabel {
+				vlocal = anonParamLabel(n.ctx, vi)
+			}
+			src = argArcs[vlocal]
+		}
+		switch {
+		case src != nil:
+			arc.ArcType = src.ArcType
+			arc.Conjuncts = slices.Clone(src.Conjuncts)
+		case p.Default != nil:
+			arc.addConjunctUnchecked(MakeConjunct(t.Env, p.Default, ci))
+			if p.Value != nil {
+				arc.addConjunctUnchecked(MakeConjunct(t.Env, p.Value, ci))
+			}
+		case p.Value != nil:
+			arc.ArcType = ArcOptional
+			arc.addConjunctUnchecked(MakeConjunct(t.Env, p.Value, ci))
+		default:
+			continue
+		}
+		act.Arcs = append(act.Arcs, arc)
+	}
+	env := &Environment{Up: t.Env, Vertex: act}
+	n.scheduleConjunct(MakeConjunct(env, t.Fn.Body, ci), ci)
 }
 
 // funcAnchorKey identifies the cached anchor vertex for a function literal
@@ -2149,6 +2219,16 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			boundLabel = label
 		}
 
+		if arg != nil && !composedParam(x, i) {
+			// A function composed with x declares no such parameter, so no
+			// call can bind it, whichever of the functions is the head.
+			if boundLabel != InvalidLabel {
+				c.AddErrf("unknown argument %s", boundLabel.SelectorString(c))
+			} else {
+				c.AddErrf("too many positional arguments in function call")
+			}
+			return nil
+		}
 		if arg != nil {
 			bindings[i] = funcArg{expr: arg, env: callEnv}
 		}
@@ -2237,7 +2317,7 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			// arc that scheduleFuncCall addresses by the parameter's index.
 			local = anonParamLabel(c, i)
 		}
-		if arg == nil && p.Value == nil && p.Default == nil {
+		if arg == nil && p.Value == nil && !x.hasDefault(i) {
 			// Nothing binds this parameter: no argument was provided and
 			// there is neither a constraint nor a default.
 			continue

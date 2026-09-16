@@ -242,8 +242,9 @@ values: {
 	f: func(a: int) -> int: a
 	g: func(a: int) -> int: a
 
-	// Distinct function values still conflict, as before.
-	conflict: f & g
+	// Distinct function values compose (see compose below).
+	composed:  f & g
+	composedX: composed(1)
 
 	// A function value unifies with itself.
 	same:  f & f
@@ -277,6 +278,79 @@ values: {
 // Tightening must preserve all structural cycle semantics: the cycle
 // anchor and call-site identity remain those of the function value being
 // called.
+// Distinct function values with compatible signatures compose: a call
+// evaluates every implementation and unifies the results.
+compose: {
+	f: func(a: int) -> _: {in: a}
+	g: func(a~x: int) -> _: {out: x + 1}
+
+	fg:     f & g
+	fgX:    fg(1)
+	fgL:    fg(a: 2)
+	gf:     g & f
+	gfX:    gf(1)
+	three:  f & g & (func(_~v: int) -> _: {w: v})
+	threeX: three(3)
+
+	// Composing a function again, in any order, does not add it twice.
+	again:  fg & gf & f
+	againX: again(1)
+	pick:   fg | gf
+	pickX:  pick(1)
+
+	// Two evaluations of the same literal in different environments are
+	// different values that compose: both give the same result.
+	_x: h: func(a: int) -> int: a + 1
+	envs:  _x.h & {_x}.h
+	envsX: envs(1)
+
+	// Results that do not unify make the call fail, not the composition.
+	inc:     func(a: int) -> int: a + 1
+	id:      func(a: int) -> int: a
+	clash:   inc & id
+	clashX:  clash(1)
+
+	// All constraints apply to every implementation.
+	lt:  func(a: <10) -> _: {lt: a}
+	ltf: lt & f
+	ltX: ltf(3)
+	ltE: ltf(30)
+
+	// A defaulted parameter of one function cannot be bound, as the other
+	// does not declare it: its default applies.
+	d:    func(a: int, b: int = 3, c?: int) -> _: {sum: a + b}
+	df:   d & f
+	dfX:  df(1)
+	dfB:  df(1, 2)
+	dfC:  df(1, c: 2)
+	fd:   f & d
+	fdX:  fd(1)
+	fdB:  fd(1, 2)
+	fdC:  fd(1, c: 2)
+
+	// Requiredness combines as for types.
+	req:    func(n!: int) -> _: {n1: n}
+	opt:    func(n?: int) -> _: {n2: n}
+	ro:     req & opt
+	roX:    ro(n: 4)
+	roOmit: ro()
+
+	// A type tightens all implementations.
+	T:     func(a: int) -> {in: int, ...}
+	tfg:   T & fg
+	tfgX:  tfg(1)
+
+	// Signatures must be compatible.
+	labels: f & (func(b: int) -> int: b)
+	arity:  f & (func(a: int, b: int) -> int: a)
+	// Calls bind positional arguments through either function, so a
+	// positional parameter must match a positional one.
+	named:  f & (func(a!: int) -> int: a)
+
+	// Builtins do not compose with function values.
+	builtin: (func(x: number) -> number: x) & len
+}
+
 cycles: {
 	T: func(n: int, ...) -> number
 
@@ -556,7 +630,8 @@ defaults: {
   values: {
     f: func(a: int) -> int: 〈0;a〉
     g: func(a: int) -> int: 〈0;a〉
-    conflict: (〈0;f〉 & 〈0;g〉)
+    composed: (〈0;f〉 & 〈0;g〉)
+    composedX: 〈0;composed〉(1)
     same: (〈0;f〉 & 〈0;f〉)
     sameX: 〈0;same〉(1)
     T: func(a: int, ...) -> number
@@ -573,6 +648,74 @@ defaults: {
     both2X: 〈0;both2〉(1)
     pick2: (〈0;o1〉|〈0;o2〉)
     pick2X: 〈0;pick2〉(1)
+  }
+  compose: {
+    f: func(a: int) -> _: {
+      in: 〈1;a〉
+    }
+    g: func(a: int) -> _: {
+      out: (〈1;x〉 + 1)
+    }
+    fg: (〈0;f〉 & 〈0;g〉)
+    fgX: 〈0;fg〉(1)
+    fgL: 〈0;fg〉(a: 2)
+    gf: (〈0;g〉 & 〈0;f〉)
+    gfX: 〈0;gf〉(1)
+    three: ((〈0;f〉 & 〈0;g〉) & func(int) -> _: {
+      w: 〈1;v〉
+    })
+    threeX: 〈0;three〉(3)
+    again: ((〈0;fg〉 & 〈0;gf〉) & 〈0;f〉)
+    againX: 〈0;again〉(1)
+    pick: (〈0;fg〉|〈0;gf〉)
+    pickX: 〈0;pick〉(1)
+    _x: {
+      h: func(a: int) -> int: (〈0;a〉 + 1)
+    }
+    envs: (〈0;_x〉.h & {
+      〈1;_x〉
+    }.h)
+    envsX: 〈0;envs〉(1)
+    inc: func(a: int) -> int: (〈0;a〉 + 1)
+    id: func(a: int) -> int: 〈0;a〉
+    clash: (〈0;inc〉 & 〈0;id〉)
+    clashX: 〈0;clash〉(1)
+    lt: func(a: <10) -> _: {
+      lt: 〈1;a〉
+    }
+    ltf: (〈0;lt〉 & 〈0;f〉)
+    ltX: 〈0;ltf〉(3)
+    ltE: 〈0;ltf〉(30)
+    d: func(a: int, b: int = 3, c?: int) -> _: {
+      sum: (〈1;a〉 + 〈1;b〉)
+    }
+    df: (〈0;d〉 & 〈0;f〉)
+    dfX: 〈0;df〉(1)
+    dfB: 〈0;df〉(1, 2)
+    dfC: 〈0;df〉(1, c: 2)
+    fd: (〈0;f〉 & 〈0;d〉)
+    fdX: 〈0;fd〉(1)
+    fdB: 〈0;fd〉(1, 2)
+    fdC: 〈0;fd〉(1, c: 2)
+    req: func(n!: int) -> _: {
+      n1: 〈1;n〉
+    }
+    opt: func(n?: int) -> _: {
+      n2: 〈1;n〉
+    }
+    ro: (〈0;req〉 & 〈0;opt〉)
+    roX: 〈0;ro〉(n: 4)
+    roOmit: 〈0;ro〉()
+    T: func(a: int) -> {
+      in: int
+      ...
+    }
+    tfg: (〈0;T〉 & 〈0;fg〉)
+    tfgX: 〈0;tfg〉(1)
+    labels: (〈0;f〉 & func(b: int) -> int: 〈0;b〉)
+    arity: (〈0;f〉 & func(a: int, b: int) -> int: 〈0;a〉)
+    named: (〈0;f〉 & func(a!: int) -> int: 〈0;a〉)
+    builtin: (func(x: number) -> number: 〈0;x〉 & len)
   }
   cycles: {
     T: func(n: int, ...) -> number

@@ -273,6 +273,17 @@ func checkFuncTightening(c *OpContext, typ, val *Function) *Bottom {
 	return c.NewErrf("function has more positional parameters than closed function type")
 }
 
+// checkFuncComposition verifies that two function values may be composed:
+// each must declare every non-omittable parameter of the other, and, as calls
+// bind positional arguments through either, a positional parameter of one
+// must match a positional parameter of the other.
+func checkFuncComposition(c *OpContext, x, y *Function) *Bottom {
+	if b := checkParamsDeclared(c, x, y, false, "function", "function"); b != nil {
+		return b
+	}
+	return checkParamsDeclared(c, y, x, false, "function", "function")
+}
+
 // ExtraFuncParam returns the first non-omittable parameter of val that is
 // not addressable through the closed signature typ — by label for name-only
 // parameters or by ordinal for positional parameters — and reports whether
@@ -1000,17 +1011,14 @@ func BuiltinSubsumes(a, b *Builtin) bool {
 // mergeFuncValues unifies two function values, types, or a combination
 // thereof. It returns the resulting value, or a Bottom describing why the
 // signatures are incompatible. A nil, nil return indicates that a and b are
-// conflicting function values, to be reported like any other conflicting
-// scalars.
+// conflicting partial applications, to be reported like any other
+// conflicting scalars.
 func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
-	if !IsFuncType(a) && !IsFuncType(b) {
-		// VALUE & VALUE: a function value unifies only with itself. Two
-		// partial applications are equal only when they bound the same
-		// arguments, and a plain function differs from any partial
-		// application of itself, mirroring [equalTerminal].
-		if a.Fn != b.Fn || !a.Env.Equal(c, b.Env) || !equalFuncArgs(a.args, b.args) {
-			return nil, nil
-		}
+	composing := !IsFuncType(a) && !IsFuncType(b)
+	if composing && a.Fn == b.Fn && a.Env.Equal(c, b.Env) && equalFuncArgs(a.args, b.args) {
+		// VALUE & VALUE of the same function: only the recorded types need
+		// to be combined. Two partial applications are the same only when
+		// they bound the same arguments, mirroring [equalTerminal].
 		if err := checkFuncTypeSetsMeet(c, a.Types, b.Types); err != nil {
 			return nil, err
 		}
@@ -1022,8 +1030,18 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 		return &merged, nil
 	}
 
-	// At least one of the two is a type. Make prim the value, if any, so
-	// that sec is always a type whose signatures are added as constraints.
+	// VALUE & VALUE of distinct functions composes them: the result is a
+	// with b's implementation recorded among its signatures, and a call
+	// evaluates all implementations and unifies their results (see
+	// [nodeContext.scheduleFuncCall]). The bound arguments of a partial
+	// application cannot be carried over to another implementation, so
+	// distinct partial applications conflict like any other scalars.
+	if composing && (a.IsPartial() || b.IsPartial()) {
+		return nil, nil
+	}
+
+	// Otherwise, at least one of the two is a type. Make prim the value, if
+	// any, so that the signatures of sec are added to it as constraints.
 	prim, sec := a, b
 	if IsFuncType(a) && !IsFuncType(b) {
 		prim, sec = b, a
@@ -1049,8 +1067,17 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 		if t == head || slices.Contains(types, t) {
 			continue
 		}
+		if t.Fn.Body != nil && (sameFunc(c, t, head) || slices.ContainsFunc(types, func(u FuncType) bool {
+			return sameFunc(c, t, u)
+		})) {
+			continue
+		}
 		if IsFuncType(prim) {
 			if b := checkFuncTypeMeet(c, t.Fn, head.Fn); b != nil {
+				return nil, b
+			}
+		} else if t.Fn.Body != nil {
+			if b := checkFuncComposition(c, t.Fn, head.Fn); b != nil {
 				return nil, b
 			}
 		} else {
@@ -1084,6 +1111,12 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 	merged := *prim
 	merged.Types = types
 	return &merged, nil
+}
+
+// sameFunc reports whether two signatures with an implementation are the
+// same function: the same literal evaluated in the same environment.
+func sameFunc(c *OpContext, x, y FuncType) bool {
+	return x.Fn == y.Fn && x.Env.Equal(c, y.Env)
 }
 
 // checkFuncDefaultsMeet reports a conflict between the defaults that two
@@ -1221,6 +1254,41 @@ func equalFuncTypes(a, b []FuncType) bool {
 	for _, t := range a {
 		if !slices.Contains(b, t) {
 			return false
+		}
+	}
+	return true
+}
+
+// equalFuncValues reports whether x and y are the same function value: they
+// bound the same arguments and consist of the same functions and types,
+// regardless of the order in which these were unified.
+func equalFuncValues(c *OpContext, x, y *FuncValue) bool {
+	if x.Fn == y.Fn && x.Env.Equal(c, y.Env) {
+		return equalFuncTypes(x.Types, y.Types) && equalFuncArgs(x.args, y.args)
+	}
+	// Composed values: each side's functions must all occur on the other.
+	// Bound arguments are indexed by the parameters of the head function, so
+	// partial applications with different heads are not compared.
+	if IsFuncType(x) || IsFuncType(y) || len(x.Types) != len(y.Types) || x.IsPartial() || y.IsPartial() {
+		return false
+	}
+	contains := func(v *FuncValue, t FuncType) bool {
+		same := func(u FuncType) bool {
+			if t.Fn.Body == nil {
+				return u == t
+			}
+			return sameFunc(c, u, t)
+		}
+		return same(FuncType{Fn: v.Fn, Env: v.Env}) || slices.ContainsFunc(v.Types, same)
+	}
+	for _, v := range [2][2]*FuncValue{{x, y}, {y, x}} {
+		if !contains(v[1], FuncType{Fn: v[0].Fn, Env: v[0].Env}) {
+			return false
+		}
+		for _, t := range v[0].Types {
+			if !contains(v[1], t) {
+				return false
+			}
 		}
 	}
 	return true

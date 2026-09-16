@@ -242,8 +242,9 @@ values: {
 	f: func(a: int) -> int: a
 	g: func(a: int) -> int: a
 
-	// Distinct function values still conflict, as before.
-	conflict: f & g @test(err, code=eval, contains="conflicting values")
+	// Distinct function values compose (see compose below).
+	composed:  f & g
+	composedX: composed(1) @test(eq, 1)
 
 	// A function value unifies with itself.
 	same:  f & f
@@ -277,6 +278,79 @@ values: {
 // Tightening must preserve all structural cycle semantics: the cycle
 // anchor and call-site identity remain those of the function value being
 // called.
+// Distinct function values with compatible signatures compose: a call
+// evaluates every implementation and unifies the results.
+compose: {
+	f: func(a: int) -> _: {in: a}
+	g: func(a~x: int) -> _: {out: x + 1}
+
+	fg:     f & g
+	fgX:    fg(1) @test(eq, {in: 1, out: 2})
+	fgL:    fg(a: 2) @test(eq, {in: 2, out: 3})
+	gf:     g & f
+	gfX:    gf(1) @test(eq, {in: 1, out: 2})
+	three:  f & g & (func(_~v: int) -> _: {w: v})
+	threeX: three(3) @test(eq, {in: 3, out: 4, w: 3})
+
+	// Composing a function again, in any order, does not add it twice.
+	again:  fg & gf & f
+	againX: again(1) @test(eq, {in: 1, out: 2})
+	pick:   fg | gf
+	pickX:  pick(1) @test(eq, {in: 1, out: 2})
+
+	// Two evaluations of the same literal in different environments are
+	// different values that compose: both give the same result.
+	_x: h: func(a: int) -> int: a + 1
+	envs:  _x.h & {_x}.h
+	envsX: envs(1) @test(eq, 2)
+
+	// Results that do not unify make the call fail, not the composition.
+	inc:     func(a: int) -> int: a + 1
+	id:      func(a: int) -> int: a
+	clash:   inc & id
+	clashX:  clash(1) @test(err, code=eval, contains="conflicting values 2 and 1")
+
+	// All constraints apply to every implementation.
+	lt:  func(a: <10) -> _: {lt: a}
+	ltf: lt & f
+	ltX: ltf(3) @test(eq, {in: 3, lt: 3})
+	ltE: ltf(30) @test(err, code=eval, contains="out of bound")
+
+	// A defaulted parameter of one function cannot be bound, as the other
+	// does not declare it: its default applies.
+	d:    func(a: int, b: int = 3, c?: int) -> _: {sum: a + b}
+	df:   d & f
+	dfX:  df(1) @test(eq, {in: 1, sum: 4})
+	dfB:  df(1, 2) @test(err, code=eval, contains="too many positional arguments")
+	dfC:  df(1, c: 2) @test(err, code=eval, contains="unknown argument c")
+	fd:   f & d
+	fdX:  fd(1) @test(eq, {in: 1, sum: 4})
+	fdB:  fd(1, 2) @test(err, code=eval, contains="too many positional arguments")
+	fdC:  fd(1, c: 2) @test(err, code=eval, contains="unknown argument c")
+
+	// Requiredness combines as for types.
+	req:    func(n!: int) -> _: {n1: n}
+	opt:    func(n?: int) -> _: {n2: n}
+	ro:     req & opt
+	roX:    ro(n: 4) @test(eq, {n1: 4, n2: 4})
+	roOmit: ro() @test(err, code=eval, contains="missing required argument n")
+
+	// A type tightens all implementations.
+	T:     func(a: int) -> {in: int, ...}
+	tfg:   T & fg
+	tfgX:  tfg(1) @test(eq, {in: 1, out: 2})
+
+	// Signatures must be compatible.
+	labels: f & (func(b: int) -> int: b) @test(err, code=eval, contains="conflicting parameter labels")
+	arity:  f & (func(a: int, b: int) -> int: a) @test(err, code=eval, contains="parameter b of function not allowed by closed function")
+	// Calls bind positional arguments through either function, so a
+	// positional parameter must match a positional one.
+	named:  f & (func(a!: int) -> int: a) @test(err, code=eval, contains="parameter a of function not allowed by closed function")
+
+	// Builtins do not compose with function values.
+	builtin: (func(x: number) -> number: x) & len @test(err, code=eval, contains="conflicting values")
+}
+
 cycles: {
 	T: func(n: int, ...) -> number
 
@@ -484,73 +558,96 @@ defaults: {
 [eval] optionalExtra.mBad: parameter b of function type not allowed by closed function type:
     ./in.cue:214:36
     ./in.cue:214:9
-[eval] values.conflict: conflicting values func(a: int) -> int: ... and func(a: int) -> int: ...:
-    ./in.cue:232:5
-    ./in.cue:233:5
-    ./in.cue:236:12
-    ./in.cue:236:16
+[eval] conflicting values 2 and 1:
+    ./in.cue:298:32
+    ./in.cue:299:32
+    ./in.cue:301:17
+[eval] in: invalid value 30 (out of bound <10):
+    ./in.cue:304:15
+    ./in.cue:307:11
+[eval] compose.dfB: too many positional arguments in function call:
+    ./in.cue:314:8
+[eval] compose.dfC: unknown argument c:
+    ./in.cue:315:8
+[eval] compose.fdB: too many positional arguments in function call:
+    ./in.cue:318:8
+[eval] compose.fdC: unknown argument c:
+    ./in.cue:319:8
+[eval] compose.roOmit: missing required argument n:
+    ./in.cue:326:10
+[eval] compose.labels: conflicting parameter labels a and b for positional parameter 1 in function and function:
+    ./in.cue:274:5
+    ./in.cue:334:15
+[eval] compose.arity: parameter b of function not allowed by closed function:
+    ./in.cue:274:5
+    ./in.cue:335:15
+[eval] compose.named: parameter a of function not allowed by closed function:
+    ./in.cue:274:5
+    ./in.cue:338:15
+[eval] compose.builtin: conflicting values func(x: number) -> number: ... and len:
+    ./in.cue:341:12
 [structural_cycle] structural cycle:
-    ./in.cue:274:34
+    ./in.cue:348:34
 [eval] n: invalid value 15 (out of bound <10):
-    ./in.cue:293:15
-    ./in.cue:297:9
+    ./in.cue:367:15
+    ./in.cue:371:9
 [eval] invalid value 400 (out of bound <100):
-    ./in.cue:301:27
-    ./in.cue:302:32
+    ./in.cue:375:27
+    ./in.cue:376:32
 [eval] conflicting values string and 42 (mismatched types string and int):
-    ./in.cue:309:61
-    ./in.cue:310:41
-    ./in.cue:313:23
+    ./in.cue:383:61
+    ./in.cue:384:41
+    ./in.cue:387:23
 [eval] cfg.port: invalid value 0 (out of bound >0):
-    ./in.cue:309:39
-    ./in.cue:314:35
+    ./in.cue:383:39
+    ./in.cue:388:35
 [eval] invalid value -1 (out of bound >=0):
-    ./in.cue:317:14
-    ./in.cue:322:9
+    ./in.cue:391:14
+    ./in.cue:396:9
 [eval] invalid value 11 (out of bound <10):
-    ./in.cue:318:14
-    ./in.cue:323:9
+    ./in.cue:392:14
+    ./in.cue:397:9
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
-    ./in.cue:331:19
-    ./in.cue:347:10
-    ./in.cue:347:29
+    ./in.cue:405:19
+    ./in.cue:421:10
+    ./in.cue:421:29
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
-    ./in.cue:331:19
-    ./in.cue:348:28
-    ./in.cue:348:44
+    ./in.cue:405:19
+    ./in.cue:422:28
+    ./in.cue:422:44
 [eval] conflicting defaults for parameter a: conflicting values 4 and 2:
-    ./in.cue:353:24
-    ./in.cue:359:13
-    ./in.cue:359:32
+    ./in.cue:427:24
+    ./in.cue:433:13
+    ./in.cue:433:32
 [eval] defaults.extraBad: parameter b of function not allowed by closed function type:
-    ./in.cue:363:10
-    ./in.cue:366:17
+    ./in.cue:437:10
+    ./in.cue:440:17
 [eval] conflicting defaults for parameter x: conflicting values 2 and 3:
-    ./in.cue:385:26
-    ./in.cue:331:19
-    ./in.cue:386:14
+    ./in.cue:459:26
+    ./in.cue:405:19
+    ./in.cue:460:14
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
-    ./in.cue:331:19
-    ./in.cue:385:26
-    ./in.cue:387:15
+    ./in.cue:405:19
+    ./in.cue:459:26
+    ./in.cue:461:15
 [eval] defaults.orderDC: parameter b of function not allowed by closed function type:
-    ./in.cue:396:11
-    ./in.cue:394:11
+    ./in.cue:470:11
+    ./in.cue:468:11
 [eval] defaults.orderCD: parameter b of function not allowed by closed function type:
-    ./in.cue:396:11
-    ./in.cue:394:11
+    ./in.cue:470:11
+    ./in.cue:468:11
 [eval] defaults.orderTV: parameter b of function not allowed by closed function type:
-    ./in.cue:394:11
-    ./in.cue:396:11
+    ./in.cue:468:11
+    ./in.cue:470:11
 -- out/eval/stats --
-Leaks:  8
-Freed:  537
-Reused: 475
-Allocs: 70
+Leaks:  9
+Freed:  746
+Reused: 683
+Allocs: 72
 Retain: 0
 
-Unifications: 530
-Conjuncts:    1964
-Disjuncts:    4
+Unifications: 722
+Conjuncts:    2539
+Disjuncts:    6
 
-NumCloseIDs: 301
+NumCloseIDs: 385

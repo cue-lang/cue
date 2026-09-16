@@ -388,7 +388,7 @@ indirect: {
 		b: #A
 
 		b1: b.zx
-		b1: d: 1 // This should fail as b.zx crosses a reference to definition.
+		b1: d: 1 // This fails as b.zx crosses a reference to definition.
 	}
 	closed: err1: {
 		X: {

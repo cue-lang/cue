@@ -433,8 +433,29 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// reflecting that. We need to handle this case here. Note that if an
 	// intermediate node refers to a definition, things are evaluated at least
 	// once.
+	//
+	// A reference may also reach a recursively closed value without naming a
+	// definition, by selecting from a regular field that holds one:
+	//
+	//	#D: a: {b: 1}
+	//	x: #D
+	//	y: x.a & {c: 2} // c is not allowed: x.a is closed by #D
+	//
+	// Such a value is closed like the definition it came from, so its
+	// closedness must carry over to the referring node as well.
+	//
+	// The same holds for a field of such a shared definition, reached from
+	// outside the definition through a regular field that holds it:
+	//
+	//	#D: s: {a: 1}
+	//	d: #D
+	//	h: d.s & {b: 2} // b is not allowed: d.s is #D.s
+	//
+	// The conjuncts of #D.s carry no FromDef either, so the reference must
+	// supply it, as it does for #D.s. A reference from within the definition
+	// itself, such as a sibling field referring to _a, does not close.
 	switch isDef, _ := IsDef(c.Expr()); {
-	case isDef || arc.Label.IsDef() || closeInfo.TopDef:
+	case isDef || arc.Label.IsDef() || closeInfo.TopDef || crossesDefinition(c.Env, arc):
 		if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
 			// Definitions are always recursively closed, even if arc
 			// doesn't have ClosedRecursive set yet at this point.
@@ -915,4 +936,31 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			n.insertValueConjunct(env, u, id)
 		}
 	}
+}
+
+// crossesDefinition reports whether arc lies within a definition that does
+// not enclose the environment in which the reference to it was written: the
+// reference then reaches the definition's value from outside, and must close
+// like a reference to the definition. A reference written inside the
+// definition, such as a sibling field referring to _a, does not close, even
+// if it is evaluated elsewhere because the definition's field was inlined.
+//
+// A reference evaluated through an inline struct, such as in.foo in
+// (f & {in: #D}).out with f: {in: _, out: in.foo}, does not close either:
+// selecting from an inline struct opens definition closedness, as it did in
+// the previous evaluator (see cue/testdata/eval/openinline.txtar).
+func crossesDefinition(env *Environment, arc *Vertex) bool {
+	def := enclosingDef(arc.Parent)
+	if def == nil {
+		return false
+	}
+	for e := env; e != nil; e = e.Up {
+		if e.Vertex == def {
+			return false
+		}
+		if e.Vertex != nil && !e.Vertex.Rooted() {
+			return false
+		}
+	}
+	return true
 }

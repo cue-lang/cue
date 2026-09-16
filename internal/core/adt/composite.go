@@ -424,6 +424,19 @@ func (v *Vertex) MayAttach() bool {
 	return !v.Label.IsLet() && !v.anonymous
 }
 
+// enclosingDef returns the innermost definition at or above v, or nil if v
+// does not lie within one. A definition closes its value recursively, so a
+// value at such a path is closed even though neither its label nor its own
+// conjuncts say so.
+func enclosingDef(v *Vertex) *Vertex {
+	for ; v != nil; v = v.Parent {
+		if v.Label.IsDef() {
+			return v
+		}
+	}
+	return nil
+}
+
 type ArcType uint8
 
 // See the stringer directive in doc.go for the generated String method.
@@ -1026,11 +1039,8 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 		// We approximate this to see if the path leading up to this
 		// value is a defintion. This is not fully accurate. We could
 		// investigate the closedness information contained in the parent.
-		for p := v; p != nil; p = p.Parent {
-			if p.Label.IsDef() {
-				c.CloseInfo.TopDef = true
-				break
-			}
+		if enclosingDef(v) != nil {
+			c.CloseInfo.TopDef = true
 		}
 	}
 

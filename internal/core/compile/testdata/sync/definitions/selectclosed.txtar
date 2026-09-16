@@ -1,8 +1,8 @@
 # A definition closes recursively, and a regular field holding a definition
 # is closed too. Selecting a field from that regular field must keep the
-# closedness, exactly as selecting it from the definition does. It does not
-# yet, so those cases record the open value they evaluate to alongside the
-# error they should produce.
+# closedness, exactly as selecting it from the definition does. A selection
+# written in a for body does not yet, so those cases record the open value
+# they evaluate to alongside the error they should produce.
 #
 # Whether the closed value then closes the struct it is embedded in is a
 # separate question, and one the explicitopen experiment answers differently.

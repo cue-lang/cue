@@ -1,8 +1,8 @@
 # A definition closes recursively, and a regular field holding a definition
 # is closed too. Selecting a field from that regular field must keep the
-# closedness, exactly as selecting it from the definition does. It does not
-# yet, so those cases record the open value they evaluate to alongside the
-# error they should produce.
+# closedness, exactly as selecting it from the definition does. A selection
+# written in a for body does not yet, so those cases record the open value
+# they evaluate to alongside the error they should produce.
 #
 # Whether the closed value then closes the struct it is embedded in is a
 # separate question, and one the explicitopen experiment answers differently.
@@ -26,18 +26,18 @@ direct: #Meta.meta & {extra: 1} @test(err, at=extra, contains="field not allowed
 whole: m & {meta: extra: 1} @test(err, at=meta.extra, contains="field not allowed")
 
 // Selecting from the regular field must be closed too.
-viaField: m.meta & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+viaField: m.meta & {extra: 1} @test(err, at=extra, contains="field not allowed")
 
 // Deeper selections, and a selection inside a definition.
 #Deep: a: b: {c: 1}
 d: #Deep
-viaDeep: d.a.b & {extra: 1} @test(eq, {c: 1, extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+viaDeep: d.a.b & {extra: 1} @test(err, at=extra, contains="field not allowed")
 #Use: x: d.a
 viaDef: #Use & {x: {b: {extra: 1}}} @test(err, at=x.b.extra, contains="field not allowed")
 
 // Through an intermediate regular field.
 inter: {x: m, y: x.meta & {extra: 1}}
-viaInter: inter.y @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, contains="field not allowed")
+viaInter: inter.y @test(err, contains="field not allowed")
 
 // A comprehension body is written at a path, so a selection in one closes
 // like one written in the struct around it, be it an if or a for.
@@ -45,7 +45,7 @@ viaIf: {
 	if true {
 		x: m.meta & {extra: 1}
 	}
-} @test(eq, {x: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=x.extra, contains="field not allowed")
+} @test(err, at=x.extra, contains="field not allowed")
 viaFor: {
 	for k, _ in {one: 1} {
 		"\(k)": m.meta & {extra: 1}
@@ -57,7 +57,7 @@ viaFor: {
 viaEmbed: {
 	m.meta
 	extra: 1
-} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+} @test(err, at=extra, contains="field not allowed")
 viaEmbedFor: {
 	for k, _ in {one: 1} {
 		m.meta
@@ -74,12 +74,12 @@ viaOpen: open.meta & {extra: 1} @test(eq, {name: "x", extra: 1})
 #Old: meta: {name: "x"}
 o:        #Old
 oldDirect: #Old.meta & {extra: 1} @test(err, at=extra, contains="field not allowed")
-oldField:  o.meta & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+oldField:  o.meta & {extra: 1} @test(err, at=extra, contains="field not allowed")
 oldViaIf: {
 	if true {
 		x: o.meta & {extra: 1}
 	}
-} @test(eq, {x: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=x.extra, contains="field not allowed")
+} @test(err, at=x.extra, contains="field not allowed")
 oldViaFor: {
 	for k, _ in {one: 1} {
 		"\(k)": o.meta & {extra: 1}
@@ -109,10 +109,26 @@ oldEmbedFor: {
     ./in.cue:7:23
 [eval] whole.meta.extra: field not allowed:
     ./in.cue:10:19
+[eval] viaField.extra: field not allowed:
+    ./in.cue:13:21
+[eval] viaDeep.extra: field not allowed:
+    ./in.cue:18:19
 [eval] viaDef.x.b.extra: field not allowed:
     ./in.cue:20:25
+[eval] inter.y.extra: field not allowed:
+    ./in.cue:23:28
+[eval] inter.y.extra: field not allowed:
+    ./in.cue:23:28
+[eval] viaIf.x.extra: field not allowed:
+    ./in.cue:30:16
+[eval] viaEmbed.extra: field not allowed:
+    ./in.cue:43:2
 [eval] oldDirect.extra: field not allowed:
     ./old.cue:5:25
+[eval] oldField.extra: field not allowed:
+    ./old.cue:6:22
+[eval] oldViaIf.x.extra: field not allowed:
+    ./old.cue:9:16
 -- out/eval/stats --
 Leaks:  0
 Freed:  99

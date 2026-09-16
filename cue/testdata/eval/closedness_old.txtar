@@ -388,15 +388,8 @@ indirect: {
 		b: #A
 
 		b1: b.zx
-		b1: d: 1 // This should fail as b.zx crosses a reference to definition.
-		@test(err:todo)
-		@test(eq, {
-			#A: {x: {a: {b: 1, c: 2}}, zx: {b: 1, c: 2}}
-			#x: {a: {b: 1}}
-			#y: {a: {c: 2}}
-			b: {x: {a: {b: 1, c: 2}}, zx: {b: 1, c: 2}}
-			b1: {d: 1, b: 1, c: 2}
-		})
+		b1: d: 1 // This fails as b.zx crosses a reference to definition.
+		@test(err, at=b1.d, code=eval, contains="field not allowed")
 	}
 	closed: err1: {
 		X: {
@@ -477,8 +470,10 @@ indirect: {
     ./embed.cue:345:16
 [eval] issue2241.b.x.r: field not allowed:
     ./embed.cue:365:8
+[eval] indirect.embed.err1.b1.d: field not allowed:
+    ./reroot.cue:16:7
 [eval] indirect.closed.err1.Y.a.e: field not allowed:
-    ./reroot.cue:31:7
+    ./reroot.cue:24:7
 -- out/eval/stats --
 Leaks:  0
 Freed:  373

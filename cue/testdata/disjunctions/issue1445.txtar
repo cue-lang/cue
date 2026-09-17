@@ -1,0 +1,42 @@
+# A disjunct whose interpolation cannot succeed must not keep the
+# disjunction unresolved: the arm interpolating a null content is an error,
+# so only the arm producing "" survives. This used to fail with
+# "invalid interpolation: unresolved disjunction".
+# https://cuelang.org/issue/1445
+
+-- in.cue --
+let fn = {
+	in: {
+		content: string
+		ch:      string | *"-"
+	}
+	out: "\(in.ch)\(in.content)\(in.ch)"
+} | {
+	in: content: null
+	out: ""
+}
+
+let outer = {inner: string | *null}
+
+// The content is the default null of outer.inner, so only the second
+// disjunct applies.
+let x = (fn & {in: content: outer.inner}).out
+ox: "\(x)" @test(eq, "")
+
+// Spelling the null out directly always worked.
+oy: "\((fn & {in: content: null}).out)" @test(eq, "")
+
+// A concrete string picks the first disjunct.
+oz: "\((fn & {in: content: "b"}).out)" @test(eq, "-b-")
+-- out/eval/stats --
+Leaks:  21
+Freed:  46
+Reused: 35
+Allocs: 32
+Retain: 0
+
+Unifications: 33
+Conjuncts:    76
+Disjuncts:    22
+
+NumCloseIDs: 6

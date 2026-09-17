@@ -1,0 +1,166 @@
+# Repeatedly applying a 'function' through a higher-order #Map used to stop
+# resolving after the second application: x2 and x3 stayed unevaluated, and
+# spelling out s3 reported a structural cycle. Take 2 differs only in that
+# #plusOne does not unify with #Function itself; there s3 used to collapse
+# onto the "Failure" arm of its disjunction.
+# https://cuelang.org/issue/1446
+
+-- in.cue --
+take1: {
+	#Function: {
+		in:  _
+		out: _
+	}
+
+	// Applies input to another 'function'.
+	#Map: {
+		function: #Function
+		input:    _
+		result:   function & {in: input}
+		output:   result.out
+	}
+
+	#plusOne: #Function & {
+		in:  number
+		out: in + 1
+	}
+
+	x0: 1
+	x1: {#Map, function: #plusOne, input: x0}.output
+	x2: {#Map, function: #plusOne, input: x1}.output
+	x3: {#Map, function: #plusOne, input: x2}.output
+
+	s0: 1
+	s1: (#Map & {function: #plusOne, input: s0}).output
+	s2: (#Map & {function: #plusOne, input: s1}).output
+	s3: (#Map & {function: #plusOne, input: s2}).output
+}
+
+take2: {
+	#Function: {
+		in:  _
+		out: _
+	}
+	#Map: {
+		function: #Function
+		input:    _
+		result:   function & {in: input}
+		output:   result.out
+	}
+
+	// Unlike take 1, #plusOne is not itself unified with #Function.
+	#plusOne: {
+		in:  number
+		out: in + 1
+	}
+
+	x0: 1
+	x1: {#Map, function: #plusOne, input: x0}.output
+	x2: {#Map, function: #plusOne, input: x1}.output
+	x3: {#Map, function: #plusOne, input: x2}.output
+
+	s0: 1
+	s1: (#Map & {function: #plusOne, input: s0}).output
+	s2: (#Map & {function: #plusOne, input: s1}).output
+
+	// The disjunction stays open: 4 does not lose to "Failure".
+	s3: (#Map & {function: #plusOne, input: s2}).output | "Failure"
+}
+-- out/compile --
+--- in.cue
+{
+  take1: {
+    #Function: {
+      in: _
+      out: _
+    }
+    #Map: {
+      function: 〈1;#Function〉
+      input: _
+      result: (〈0;function〉 & {
+        in: 〈1;input〉
+      })
+      output: 〈0;result〉.out
+    }
+    #plusOne: (〈0;#Function〉 & {
+      in: number
+      out: (〈0;in〉 + 1)
+    })
+    x0: 1
+    x1: {
+      〈1;#Map〉
+      function: 〈1;#plusOne〉
+      input: 〈1;x0〉
+    }.output
+    x2: {
+      〈1;#Map〉
+      function: 〈1;#plusOne〉
+      input: 〈1;x1〉
+    }.output
+    x3: {
+      〈1;#Map〉
+      function: 〈1;#plusOne〉
+      input: 〈1;x2〉
+    }.output
+    s0: 1
+    s1: (〈0;#Map〉 & {
+      function: 〈1;#plusOne〉
+      input: 〈1;s0〉
+    }).output
+    s2: (〈0;#Map〉 & {
+      function: 〈1;#plusOne〉
+      input: 〈1;s1〉
+    }).output
+    s3: (〈0;#Map〉 & {
+      function: 〈1;#plusOne〉
+      input: 〈1;s2〉
+    }).output
+  }
+  take2: {
+    #Function: {
+      in: _
+      out: _
+    }
+    #Map: {
+      function: 〈1;#Function〉
+      input: _
+      result: (〈0;function〉 & {
+        in: 〈1;input〉
+      })
+      output: 〈0;result〉.out
+    }
+    #plusOne: {
+      in: number
+      out: (〈0;in〉 + 1)
+    }
+    x0: 1
+    x1: {
+      〈1;#Map〉
+      function: 〈1;#plusOne〉
+      input: 〈1;x0〉
+    }.output
+    x2: {
+      〈1;#Map〉
+      function: 〈1;#plusOne〉
+      input: 〈1;x1〉
+    }.output
+    x3: {
+      〈1;#Map〉
+      function: 〈1;#plusOne〉
+      input: 〈1;x2〉
+    }.output
+    s0: 1
+    s1: (〈0;#Map〉 & {
+      function: 〈1;#plusOne〉
+      input: 〈1;s0〉
+    }).output
+    s2: (〈0;#Map〉 & {
+      function: 〈1;#plusOne〉
+      input: 〈1;s1〉
+    }).output
+    s3: ((〈0;#Map〉 & {
+      function: 〈1;#plusOne〉
+      input: 〈1;s2〉
+    }).output|"Failure")
+  }
+}

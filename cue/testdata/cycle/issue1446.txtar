@@ -1,0 +1,88 @@
+# Repeatedly applying a 'function' through a higher-order #Map used to stop
+# resolving after the second application: x2 and x3 stayed unevaluated, and
+# spelling out s3 reported a structural cycle. Take 2 differs only in that
+# #plusOne does not unify with #Function itself; there s3 used to collapse
+# onto the "Failure" arm of its disjunction.
+# https://cuelang.org/issue/1446
+
+-- in.cue --
+take1: {
+	#Function: {
+		in:  _
+		out: _
+	}
+
+	// Applies input to another 'function'.
+	#Map: {
+		function: #Function
+		input:    _
+		result:   function & {in: input}
+		output:   result.out
+	}
+
+	#plusOne: #Function & {
+		in:  number
+		out: in + 1
+	}
+
+	x0: 1
+	x1: {#Map, function: #plusOne, input: x0}.output @test(eq, 2)
+	x2: {#Map, function: #plusOne, input: x1}.output @test(eq, 3)
+	x3: {#Map, function: #plusOne, input: x2}.output @test(eq, 4)
+
+	s0: 1
+	s1: (#Map & {function: #plusOne, input: s0}).output @test(eq, 2)
+	s2: (#Map & {function: #plusOne, input: s1}).output @test(eq, 3)
+	s3: (#Map & {function: #plusOne, input: s2}).output @test(eq, 4)
+}
+
+take2: {
+	#Function: {
+		in:  _
+		out: _
+	}
+	#Map: {
+		function: #Function
+		input:    _
+		result:   function & {in: input}
+		output:   result.out
+	}
+
+	// Unlike take 1, #plusOne is not itself unified with #Function.
+	#plusOne: {
+		in:  number
+		out: in + 1
+	}
+
+	x0: 1
+	x1: {#Map, function: #plusOne, input: x0}.output @test(eq, 2)
+	x2: {#Map, function: #plusOne, input: x1}.output @test(eq, 3)
+	x3: {#Map, function: #plusOne, input: x2}.output @test(eq, 4)
+
+	s0: 1
+	s1: (#Map & {function: #plusOne, input: s0}).output @test(eq, 2)
+	s2: (#Map & {function: #plusOne, input: s1}).output @test(eq, 3)
+
+	// The disjunction stays open: 4 does not lose to "Failure".
+	s3: (#Map & {function: #plusOne, input: s2}).output | "Failure" @test(eq, 4 | "Failure")
+}
+-- out/errors.txt --
+[incomplete] take1.#plusOne.out: non-concrete value number in operand to +:
+    ./in.cue:17:8
+    ./in.cue:3:8
+    ./in.cue:16:8
+[incomplete] take2.#plusOne.out: non-concrete value number in operand to +:
+    ./in.cue:46:8
+    ./in.cue:45:8
+-- out/eval/stats --
+Leaks:  0
+Freed:  215
+Reused: 179
+Allocs: 36
+Retain: 0
+
+Unifications: 117
+Conjuncts:    501
+Disjuncts:    2
+
+NumCloseIDs: 195

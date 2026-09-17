@@ -942,13 +942,16 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 // not enclose the environment in which the reference to it was written: the
 // reference then reaches the definition's value from outside, and must close
 // like a reference to the definition. A reference written inside the
-// definition, such as a sibling field referring to _a, does not close, even
-// if it is evaluated elsewhere because the definition's field was inlined.
+// definition, such as b in #D: {a: {}, b: a}, does not close, even if it is
+// evaluated elsewhere because the definition's field was inlined.
 //
 // A reference evaluated through an inline struct, such as in.foo in
 // (f & {in: #D}).out with f: {in: _, out: in.foo}, does not close either:
 // selecting from an inline struct opens definition closedness, as it did in
-// the previous evaluator (see cue/testdata/eval/openinline.txtar).
+// the previous evaluator. Only a value with no path from the root opens in
+// this way: a comprehension body is written at a path and closes like the
+// struct around it. See cue/testdata/eval/openinline.txtar,
+// cue/testdata/eval/issue3672.txtar and cue/testdata/cycle/issue4228.txtar.
 func crossesDefinition(env *Environment, arc *Vertex) bool {
 	def := enclosingDef(arc.Parent)
 	if def == nil {
@@ -958,7 +961,11 @@ func crossesDefinition(env *Environment, arc *Vertex) bool {
 		if e.Vertex == def {
 			return false
 		}
-		if e.Vertex != nil && !e.Vertex.Rooted() {
+		// TODO(perf): IsDetached walks the parent chain of each vertex in
+		// the environment chain, so this loop can go quadratic in deeply
+		// nested values. Cache the result or bound the walk if this shows
+		// up in profiles.
+		if e.Vertex != nil && e.Vertex.IsDetached() {
 			return false
 		}
 	}

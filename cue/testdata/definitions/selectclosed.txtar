@@ -1,8 +1,6 @@
 # A definition closes recursively, and a regular field holding a definition
 # is closed too. Selecting a field from that regular field must keep the
-# closedness, exactly as selecting it from the definition does. A selection
-# written in a for body does not yet, so those cases record the open value
-# they evaluate to alongside the error they should produce.
+# closedness, exactly as selecting it from the definition does.
 #
 # Whether the closed value then closes the struct it is embedded in is a
 # separate question, and one the explicitopen experiment answers differently.
@@ -50,7 +48,7 @@ viaFor: {
 	for k, _ in {one: 1} {
 		"\(k)": m.meta & {extra: 1}
 	}
-} @test(eq, {one: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=one.extra, contains="field not allowed")
+} @test(err, at=one.extra, contains="field not allowed")
 
 // Under the experiment an embedded closed value closes the struct it lands
 // in, whether it is written there directly or in a comprehension body.
@@ -63,7 +61,7 @@ viaEmbedFor: {
 		m.meta
 	}
 	extra: 1
-} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+} @test(err, at=extra, contains="field not allowed")
 
 // A regular field with a struct literal stays open.
 open: {meta: {name: "x"}}
@@ -84,7 +82,7 @@ oldViaFor: {
 	for k, _ in {one: 1} {
 		"\(k)": o.meta & {extra: 1}
 	}
-} @test(eq, {one: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=one.extra, contains="field not allowed")
+} @test(err, at=one.extra, contains="field not allowed")
 
 // Embedding is where the two differ: without the experiment an embedded
 // closed value leaves the struct it lands in open. That holds for a value
@@ -121,14 +119,20 @@ oldEmbedFor: {
     ./in.cue:23:28
 [eval] viaIf.x.extra: field not allowed:
     ./in.cue:30:16
+[eval] viaFor.one.extra: field not allowed:
+    ./in.cue:35:21
 [eval] viaEmbed.extra: field not allowed:
     ./in.cue:43:2
+[eval] viaEmbedFor.extra: field not allowed:
+    ./in.cue:49:2
 [eval] oldDirect.extra: field not allowed:
     ./old.cue:5:25
 [eval] oldField.extra: field not allowed:
     ./old.cue:6:22
 [eval] oldViaIf.x.extra: field not allowed:
     ./old.cue:9:16
+[eval] oldViaFor.one.extra: field not allowed:
+    ./old.cue:14:21
 -- out/eval/stats --
 Leaks:  0
 Freed:  99

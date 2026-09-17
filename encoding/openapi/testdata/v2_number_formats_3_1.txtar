@@ -20,16 +20,9 @@ paths: {}
    "components": {
       "schemas": {
          "N32": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 2147483647,
-                  "minimum": -2147483648
-               }
-            ]
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": -2147483648
          }
       }
    }
@@ -45,16 +38,9 @@ paths: {}
    "components": {
       "schemas": {
          "N32": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 2147483647,
-                  "minimum": -2147483648
-               }
-            ]
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": -2147483648
          }
       }
    }

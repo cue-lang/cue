@@ -105,12 +105,10 @@ badScore2: {
 			description: "Math constraints"
 			multipleOf:  5
 		}
-		score: allOf: [{
-			type: "number"
-		}, {
+		score: {
 			type:       "integer"
 			multipleOf: 10
-		}]
+		}
 		shortList: {
 			type:        "array"
 			description: "List constraints"
@@ -143,7 +141,7 @@ badDateTime.data.dateTime: invalid value "2025-10-02T13" (does not satisfy time.
     1:255
 -- out/generate-v3/badScore2 --
 badScore2.data.score: invalid value 5 (does not satisfy math.MultipleOf(10)):
-    1:494
+    1:466
     ./datatest/tests.cue:42:15
     1:449
 -- out/generate-v3/badTime --
@@ -152,10 +150,10 @@ badTime.data.date: invalid value "25:00:10" (does not satisfy time.Format("2006-
     ./datatest/tests.cue:34:14
 -- out/generate-v3/badUserName --
 badUserName.data.userName: invalid value "x" (does not satisfy strings.MinRunes(3)):
-    1:800
+    1:770
     ./datatest/tests.cue:38:18
-    1:785
-    1:800
+    1:755
+    1:770
 -- out/generate-v3/notMultiple --
 notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5)):
     1:424
@@ -163,9 +161,9 @@ notMultiple.data.multiple: invalid value 1 (does not satisfy math.MultipleOf(5))
 -- out/generate-v3/ok --
 -- out/generate-v3/stringTooLong --
 stringTooLong.data.shortString: invalid value "01234567890" (does not satisfy strings.MaxRunes(10)):
-    1:659
+    1:629
     ./datatest/tests.cue:14:21
-    1:659
+    1:629
 -- out/generate-v3/stringTooShort --
 stringTooShort.data.longString: invalid value "x" (does not satisfy strings.MinRunes(5)):
     1:348

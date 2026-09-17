@@ -86,15 +86,13 @@ errScore: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
-				age: allOf: [{
-					type: "number"
-				}, {
+				age: {
 					type:             "integer"
 					exclusiveMaximum: true
 					exclusiveMinimum: true
 					maximum:          150
 					minimum:          0
-				}]
+				}
 				either: anyOf: [{type: "integer"}, {type: "string"}]
 				kind: enum:    ["widget"]
 				maybe: anyOf:  [{type: "integer"}, {type: "string"}, {enum: [null]}]
@@ -141,45 +139,45 @@ errScore: {
 }
 -- out/generate-v3/errAgeNotPositive --
 errAgeNotPositive.data.foo.age: invalid value 0 (out of bound >0):
-    1:207
+    1:179
     ./datatest/tests.cue:31:18
 -- out/generate-v3/errAgeTooBig --
 errAgeTooBig.data.foo.age: invalid value 200 (out of bound <150):
-    1:193
+    1:165
     ./datatest/tests.cue:27:18
 -- out/generate-v3/errEither --
 errEither.data.foo.either: conflicting values true and int (mismatched types bool and int):
     ./datatest/tests.cue:35:21
-    1:242
-    1:821
+    1:212
+    1:791
 errEither.data.foo.either: conflicting values true and string (mismatched types bool and string):
     ./datatest/tests.cue:35:21
-    1:821
+    1:791
 errEither.data.foo.either: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
-    1:232
+    1:202
     ./datatest/tests.cue:35:21
 -- out/generate-v3/errKind --
 errKind.data.foo.kind: conflicting values "widget" and "other":
     ./datatest/tests.cue:23:19
-    1:296
-    1:821
+    1:266
+    1:791
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --
 -- out/generate-v3/errScore --
 errScore.data.score: invalid value 0 (does not satisfy matchN): 1 matched, expected 2:
-    1:938
+    1:908
     ./datatest/tests.cue:40:15
 errScore.data.score: invalid value 0 (out of bound >0):
-    1:1026
+    1:996
     ./datatest/tests.cue:40:15
 -- out/generate-v3/okScore --
 -- out/generate-v3/errFooOpt --
 errFooOpt.data.fooOpt: 2 errors in empty disjunction:
 errFooOpt.data.fooOpt: conflicting values {name:1} and null (mismatched types struct and null):
     ./datatest/tests.cue:19:16
-    1:866
+    1:836
 errFooOpt.data.fooOpt.name: conflicting values 1 and string (mismatched types int and string):
     ./datatest/tests.cue:19:22
-    1:882
+    1:852
 -- out/generate-v3/okFooOpt --
 -- out/generate-v3/okFooOptNull --

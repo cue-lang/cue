@@ -25,6 +25,8 @@ func TestMergeAllOf(t *testing.T) {
 	itemString := u.intern(&itemType{kinds: []string{"string"}})
 	itemNumber := u.intern(&itemType{kinds: []string{"number"}})
 	itemBool := u.intern(&itemType{kinds: []string{"boolean"}})
+	itemInteger := u.intern(&itemType{kinds: []string{"integer"}})
+	itemDate := u.intern(&itemFormat{format: "date"})
 
 	tests := []struct {
 		name string
@@ -237,6 +239,49 @@ func TestMergeAllOf(t *testing.T) {
 						}),
 					}),
 				},
+			}),
+		},
+		{
+			name: "NumberTypeIsNarrowedToInteger",
+			item: u.intern(&itemAllOf{
+				elems: []internItem{itemNumber, itemInteger},
+			}),
+			want: itemInteger,
+		},
+		{
+			name: "TypesAreIntersectedInPlace",
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
+					itemNumber,
+					itemDate,
+					itemInteger,
+				},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemInteger, itemDate},
+			}),
+		},
+		{
+			name: "TypesAreIntersectedAcrossNestedAllOf",
+			item: u.intern(&itemAllOf{
+				elems: []internItem{
+					u.intern(&itemType{kinds: []string{"string", "number"}}),
+					u.intern(&itemAllOf{
+						elems: []internItem{
+							u.intern(&itemType{kinds: []string{"boolean", "integer"}}),
+						},
+					}),
+				},
+			}),
+			want: itemInteger,
+		},
+		{
+			name: "DisjointTypesAreLeftAlone",
+			item: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber, itemBool},
+			}),
+			want: u.intern(&itemAllOf{
+				elems: []internItem{itemString, itemNumber, itemBool},
 			}),
 		},
 	}

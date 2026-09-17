@@ -23,16 +23,9 @@ paths: {}
    "components": {
       "schemas": {
          "Bounded": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 100,
-                  "minimum": 1
-               }
-            ]
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1
          },
          "Disjoint": {
             "anyOf": [
@@ -47,15 +40,8 @@ paths: {}
             ]
          },
          "TrailingDefault": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "minimum": 1
-               }
-            ]
+            "type": "integer",
+            "minimum": 1
          }
       }
    }
@@ -71,16 +57,9 @@ paths: {}
    "components": {
       "schemas": {
          "Bounded": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "maximum": 100,
-                  "minimum": 1
-               }
-            ]
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1
          },
          "Disjoint": {
             "anyOf": [
@@ -95,15 +74,8 @@ paths: {}
             ]
          },
          "TrailingDefault": {
-            "allOf": [
-               {
-                  "type": "number"
-               },
-               {
-                  "type": "integer",
-                  "minimum": 1
-               }
-            ]
+            "type": "integer",
+            "minimum": 1
          }
       }
    }

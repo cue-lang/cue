@@ -40,16 +40,9 @@ paths: {}
             "additionalProperties": false,
             "properties": {
                "a": {
-                  "allOf": [
-                     {
-                        "type": "number"
-                     },
-                     {
-                        "type": "integer",
-                        "maximum": 9.223372036854776E+18,
-                        "minimum": -9.223372036854776E+18
-                     }
-                  ]
+                  "type": "integer",
+                  "maximum": 9.223372036854776E+18,
+                  "minimum": -9.223372036854776E+18
                },
                "b": {
                   "type": "integer",
@@ -83,16 +76,9 @@ paths: {}
             "additionalProperties": false,
             "properties": {
                "a": {
-                  "allOf": [
-                     {
-                        "type": "number"
-                     },
-                     {
-                        "type": "integer",
-                        "maximum": 9.223372036854776E+18,
-                        "minimum": -9.223372036854776E+18
-                     }
-                  ]
+                  "type": "integer",
+                  "maximum": 9.223372036854776E+18,
+                  "minimum": -9.223372036854776E+18
                },
                "b": {
                   "type": "integer",

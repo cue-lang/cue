@@ -430,13 +430,34 @@ func mergeAllOf(it internItem, u *uniqueItems) internItem {
 		it2 := &itemAllOf{
 			elems: make([]internItem, 0, len(it1.elems)),
 		}
+		typeIndex := -1
+		var typeKind cue.Kind
 		for e := range siblings(it1) {
 			// Remove elements that are entirely redundant.
-			// TODO we could unify itemType elements here, for example:
-			// allOf(itemType(number), itemType(integer)) -> itemType(integer)
-			if !slices.Contains(it2.elems, e) {
-				it2.elems = append(it2.elems, mergeAllOf(e, u))
+			if slices.Contains(it2.elems, e) {
+				continue
 			}
+			// Every type keyword constrains the same value, so fold them
+			// into the types they have in common, for example:
+			// allOf(itemType(number), itemType(integer)) -> itemType(integer)
+			// The CUE kinds do the work, as number is int|float.
+			if t, ok := e.Value().(*itemType); ok {
+				kind := cueKindForJSONSchemaTypes(t.kinds)
+				switch {
+				case typeIndex < 0:
+					typeIndex, typeKind = len(it2.elems), kind
+				case typeKind&kind != 0:
+					typeKind &= kind
+					it2.elems[typeIndex] = u.intern(&itemType{
+						kinds: cueKindToJSONSchemaTypes(typeKind),
+					})
+					continue
+				}
+				// Types with nothing in common are left as they are: the
+				// conjunction already rejects everything, and collapsing it
+				// to the false schema is a separate simplification.
+			}
+			it2.elems = append(it2.elems, mergeAllOf(e, u))
 		}
 		if len(it2.elems) == 1 {
 			return it2.elems[0]
@@ -1884,6 +1905,27 @@ func isIncompleteStruct(v cue.Value) bool {
 		return false
 	}
 	return iter.Next()
+}
+
+// jsonSchemaTypeKinds maps each JSON Schema type to the CUE kind of the values
+// it allows, the direction opposite to [cueKindToJSONSchemaTypes]. Note that
+// number allows integers as well, so its kind subsumes that of integer.
+var jsonSchemaTypeKinds = map[string]cue.Kind{
+	"null":    cue.NullKind,
+	"boolean": cue.BoolKind,
+	"string":  cue.StringKind,
+	"number":  cue.NumberKind,
+	"integer": cue.IntKind,
+	"object":  cue.StructKind,
+	"array":   cue.ListKind,
+}
+
+func cueKindForJSONSchemaTypes(types []string) cue.Kind {
+	var kind cue.Kind
+	for _, t := range types {
+		kind |= jsonSchemaTypeKinds[t]
+	}
+	return kind
 }
 
 // cueKindToJSONSchemaTypes converts a CUE kind to JSON Schema type strings

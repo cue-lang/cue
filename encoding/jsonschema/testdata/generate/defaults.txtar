@@ -58,32 +58,26 @@ structDefaultBadKind: {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
-		bounded: allOf: [{
-			type: "number"
-		}, {
+		bounded: {
 			type:    "integer"
 			maximum: 100
 			minimum: 1
-		}]
+		}
 		disjoint: anyOf: [{const: 20}, {type: "string"}]
-		noDefault: allOf: [{
-			type: "number"
-		}, {
+		noDefault: {
 			type:    "integer"
 			maximum: 100
 			minimum: 1
-		}]
+		}
 		structDefault: {
 			type: "object"
 			properties: port: type: "integer"
 			required: ["port"]
 		}
-		trailingDefault: allOf: [{
-			type: "number"
-		}, {
+		trailingDefault: {
 			type:    "integer"
 			minimum: 1
-		}]
+		}
 	}
 }
 -- out/generate-v3/boundedNotInt --
@@ -92,24 +86,24 @@ boundedNotInt.data.bounded: conflicting values 50.5 and int (mismatched types fl
     1:100
 -- out/generate-v3/boundedTooLarge --
 boundedTooLarge.data.bounded: invalid value 500 (out of bound <=100):
-    1:145
+    1:117
     ./datatest/tests.cue:15:17
 -- out/generate-v3/disjointBadKind --
 disjointBadKind.data.disjoint: conflicting values true and 20 (mismatched types bool and int):
     ./datatest/tests.cue:30:18
-    1:196
+    1:166
 disjointBadKind.data.disjoint: conflicting values true and string (mismatched types bool and string):
     ./datatest/tests.cue:30:18
 disjointBadKind.data.disjoint: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
-    1:186
+    1:156
     ./datatest/tests.cue:30:18
 -- out/generate-v3/ok --
 -- out/generate-v3/okDefault --
 -- out/generate-v3/trailingDefaultTooSmall --
 trailingDefaultTooSmall.data.trailingDefault: invalid value 0 (out of bound >=1):
-    1:474
+    1:386
     ./datatest/tests.cue:25:25
 -- out/generate-v3/structDefaultBadKind --
 structDefaultBadKind.data.structDefault.port: conflicting values "x" and int (mismatched types string and int):
     ./datatest/tests.cue:35:29
-    1:370
+    1:310

@@ -2316,6 +2316,39 @@ func TestSubsume(t *testing.T) {
 		pathB:   b,
 		options: []cue.Option{cue.Final()},
 		want:    true,
+	}, {
+		// Issue #375
+		// A bulk optional field used to make the schema fail to subsume a
+		// concrete instance of it.
+		value: `
+			#def: {
+				age?:  >=0 & <=100
+				hobby: string | *"hiking"
+				labels?: [string]: string
+			}
+			concrete: #def & {
+				hobby: "foo"
+			}
+			`,
+		pathA: cue.ParsePath("#def"),
+		pathB: cue.ParsePath("concrete"),
+		want:  true,
+	}, {
+		// Issue #375
+		// With Final, the default of the schema used to be forced onto the
+		// concrete value, reporting a conflict with "hello".
+		value: `
+			#def: {
+				hobby: *"hiking" | string
+			}
+			concrete: {
+				hobby: "hello"
+			}
+			`,
+		pathA:   cue.ParsePath("#def"),
+		pathB:   cue.ParsePath("concrete"),
+		options: []cue.Option{cue.Final()},
+		want:    true,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

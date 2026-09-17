@@ -1579,6 +1579,25 @@ func TestFillPathSyntax(t *testing.T) {
 	sliceOfValue: [{x: string | int}]
 	mapOfValue: hello: x: string | int
 }`,
+		}, {
+			// https://cuelang.org/issue/2298: an optional list field kept its
+			// open-list conjunct after evaluation, rendering as
+			// [1, 2] & [1, 2, ...] where the regular field beside it did not.
+			// TODO(#2298): Eval should not be needed here; dropping it still
+			// leaves both fields unsimplified.
+			name: "optionalListEval",
+			build: func() cue.Value {
+				open := ctx.CompileString(`{
+					a: [1, 2, ...]
+					b?: [1, 2, ...]
+				}`)
+				closed := ctx.CompileString(`{
+					a: [1, 2]
+					b?: [1, 2]
+				}`)
+				return open.FillPath(cue.ParsePath(""), closed).Eval()
+			},
+			out: "{\n\ta:  [1, 2]\n\tb?: [1, 2]\n}",
 		}}
 
 		for _, tc := range testCases {

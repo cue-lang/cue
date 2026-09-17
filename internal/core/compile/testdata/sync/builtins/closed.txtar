@@ -131,6 +131,44 @@ nestedWithSelfReference: t2: {
 	x: {{_schema}}
 	x: foo: disallowed: 5
 }
+// issue1206: close() used to resolve an embedded disjunction before the
+// enclosing struct was unified with its concrete fields, so the default arm
+// was picked too early. https://cuelang.org/issue/1206
+issue1206: defaults: {
+	parameters: close({
+		name: string
+		port: int
+
+		{
+			name: "custom-port"
+		} | *{
+			port: 8080
+			name: "default-port"
+		}
+	})
+
+	// The concrete port selects the non-default arm, as it does when
+	// parameters is written as a definition instead.
+	custom: parameters & {
+		port: 9999
+	}
+}
+issue1206: elimination: {
+	x: close({
+		{
+			name: int
+		} | {
+			name: string
+		}
+	})
+
+	// Unifying with a concrete name leaves a single disjunct: only x is
+	// unresolved, which is what "cue eval -c" reports.
+	y: x & {
+		name: "Hello"
+	}
+}
+
 -- out/compile --
 --- embed.cue
 {
@@ -269,6 +307,37 @@ nestedWithSelfReference: t2: {
           disallowed: 5
         }
       }
+    }
+  }
+  issue1206: {
+    defaults: {
+      parameters: close({
+        name: string
+        port: int
+        ({
+          name: "custom-port"
+        }|*{
+          port: 8080
+          name: "default-port"
+        })
+      })
+      custom: (〈0;parameters〉 & {
+        port: 9999
+      })
+    }
+  }
+  issue1206: {
+    elimination: {
+      x: close({
+        ({
+          name: int
+        }|{
+          name: string
+        })
+      })
+      y: (〈0;x〉 & {
+        name: "Hello"
+      })
     }
   }
 }

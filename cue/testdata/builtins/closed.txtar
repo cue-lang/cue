@@ -185,18 +185,56 @@ nestedWithSelfReference: t2: {
 	x: {{_schema}}
 	x: foo: disallowed: 5 @test(err, code=eval, contains="field not allowed", pos=[0:10])
 }
+// issue1206: close() used to resolve an embedded disjunction before the
+// enclosing struct was unified with its concrete fields, so the default arm
+// was picked too early. https://cuelang.org/issue/1206
+issue1206: defaults: {
+	parameters: close({
+		name: string
+		port: int
+
+		{
+			name: "custom-port"
+		} | *{
+			port: 8080
+			name: "default-port"
+		}
+	})
+
+	// The concrete port selects the non-default arm, as it does when
+	// parameters is written as a definition instead.
+	custom: parameters & {
+		port: 9999
+	} @test(eq, {name: "custom-port", port: 9999})
+}
+issue1206: elimination: {
+	x: close({
+		{
+			name: int
+		} | {
+			name: string
+		}
+	}) @test(eq, {name: int} | {name: string})
+
+	// Unifying with a concrete name leaves a single disjunct: only x is
+	// unresolved, which is what "cue eval -c" reports.
+	y: x & {
+		name: "Hello"
+	} @test(eq, {name: "Hello"})
+}
+
 -- out/eval/stats --
-Leaks:  3
-Freed:  345
-Reused: 308
-Allocs: 40
+Leaks:  8
+Freed:  405
+Reused: 367
+Allocs: 46
 Retain: 0
 
-Unifications: 226
-Conjuncts:    393
-Disjuncts:    18
+Unifications: 263
+Conjuncts:    475
+Disjuncts:    34
 
-NumCloseIDs: 65
+NumCloseIDs: 87
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7

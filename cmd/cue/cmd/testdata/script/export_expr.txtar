@@ -42,6 +42,21 @@ exec cue export input.cue -e 'self.x'
 cmp stdout expect-stdout
 cd ..
 
+# Issue 4092: an error in an unrelated top-level hidden field must not block
+# -e, whether the input is named as a file or resolved as a package. The
+# variant where both fields sit inside a struct still fails for both forms.
+# TODO(#4092): -e x.a should print 123 for both forms too.
+cd issue4092
+exec cue export file.cue -e a
+cmp stdout expect-stdout
+exec cue export -e a
+cmp stdout expect-stdout
+! exec cue export file.cue -e x.a
+stderr 'x\._b: conflicting values int and "foo"'
+! exec cue export -e x.a
+stderr 'x\._b: conflicting values int and "foo"'
+cd ..
+
 -- simple/expect-stdout --
 4
 ---
@@ -106,3 +121,18 @@ language: version: "v0.18.0"
 x: 1
 -- newmodule/expect-stdout --
 1
+-- issue4092/cue.mod/module.cue --
+module: "mod.test/issue4092"
+language: version: "v0.18.0"
+-- issue4092/file.cue --
+package p
+
+a:  123
+_b: int & "foo"
+
+x: {
+	a:  123
+	_b: int & "foo"
+}
+-- issue4092/expect-stdout --
+123

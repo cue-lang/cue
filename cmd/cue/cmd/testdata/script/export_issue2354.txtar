@@ -1,0 +1,35 @@
+# Issue #2354: the order of an embedded disjunction's arms changed which if
+# comprehension fired. Both files pick the *{type: "bar"} default, so both must
+# produce the "bar" field; foo_then_bar used to produce "foo" instead.
+
+exec cue export foo_then_bar.cue
+cmp stdout stdout.golden
+
+exec cue export bar_then_foo.cue
+cmp stdout stdout.golden
+
+-- foo_then_bar.cue --
+type: _
+{type: "foo"} | *{type: "bar"}
+
+if type == "foo" {
+	foo: true
+}
+if type == "bar" {
+	bar: true
+}
+-- bar_then_foo.cue --
+type: _
+*{type: "bar"} | {type: "foo"}
+
+if type == "foo" {
+	foo: true
+}
+if type == "bar" {
+	bar: true
+}
+-- stdout.golden --
+{
+    "type": "bar",
+    "bar": true
+}

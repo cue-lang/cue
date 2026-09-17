@@ -1,0 +1,101 @@
+# The attribute of a disjunct used to be lifted onto the struct enclosing the
+# disjunction, so exporting c added a spurious @foo(baz) — the attribute of the
+# last disjunct — next to the disjunction itself.
+# https://cuelang.org/issue/2373
+
+-- in.cue --
+a: {
+	r: 1
+	@foo(bar)
+}
+b: {
+	r: 2
+	@foo(baz)
+}
+c: a | b
+-- out/doc-v3 --
+[]
+[a]
+[a r]
+[b]
+[b r]
+[c]
+-- out/value-v3 --
+== Simplified
+{
+	a: r: 1
+	b: r: 2
+	c: {r: 1} | {r: 2}
+}
+== Raw
+{
+	a: r: 1
+	b: r: 2
+	c: {r: 1} | {r: 2}
+}
+== Final
+{
+	a: r: 1
+	b: r: 2
+	c: {r: 1} | {r: 2}
+}
+== All
+{
+	a: {
+		@foo(bar)
+		r: 1
+	}
+	b: {
+		@foo(baz)
+		r: 2
+	}
+	c:
+		{
+			@foo(bar)
+			r: 1
+		} |
+			{
+				@foo(baz)
+				r: 2
+			}
+}
+== Eval
+{
+	a: {
+		@foo(bar)
+		r: 1
+	}
+	b: {
+		@foo(baz)
+		r: 2
+	}
+	c:
+		{
+			@foo(bar)
+			r: 1
+		} |
+			{
+				@foo(baz)
+				r: 2
+			}
+}
+-- out/definition-v3 --
+a: {
+	@foo(bar)
+	r: 1
+}
+b: {
+	@foo(baz)
+	r: 2
+}
+c: a | b
+-- out/definition-v3-noshare --
+a: {
+	@foo(bar)
+	r: 1
+}
+b: {
+	@foo(baz)
+	r: 2
+}
+c: a | b

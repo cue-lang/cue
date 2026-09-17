@@ -161,7 +161,7 @@ func intDivOp(c *OpContext, fn intFunc, a, b *Num) Value {
 // d as scratch space. Rounding to an integral value brings the exponent to
 // zero, so that the coefficient alone is the magnitude.
 func intOperand(d *apd.Decimal, n *Num) *apd.BigInt {
-	_, _ = internal.BaseContext.RoundToIntegralValue(d, &n.X)
+	_, _ = internal.ExactContext.RoundToIntegralValue(d, &n.X)
 	if d.Negative {
 		d.Coeff.Neg(&d.Coeff)
 	}

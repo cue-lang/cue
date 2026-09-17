@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 var _ Elem = &ConjunctGroup{}
@@ -282,12 +281,7 @@ func (x *Num) BigInt(z *big.Int) *big.Int {
 		z = &big.Int{}
 	}
 	var d apd.Decimal
-	_, _ = internal.BaseContext.RoundToIntegralValue(&d, &x.X)
-	z.Set(d.Coeff.MathBigInt())
-	if d.Negative {
-		z.Neg(z)
-	}
-	return z
+	return z.Set(intOperand(&d, x).MathBigInt())
 }
 
 // Int64 returns the value of x as an int64, reporting whether it fits.

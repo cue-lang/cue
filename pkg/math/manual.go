@@ -39,7 +39,7 @@ func toInt(d *internal.Decimal) *big.Int {
 	// Rounding to an integral value brings the exponent to zero, so that the
 	// coefficient alone is the magnitude.
 	var i internal.Decimal
-	_, _ = internal.BaseContext.RoundToIntegralValue(&i, d)
+	_, _ = internal.ExactContext.RoundToIntegralValue(&i, d)
 	b := i.Coeff.MathBigInt()
 	if i.Negative {
 		b.Neg(b)

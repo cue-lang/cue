@@ -1,0 +1,69 @@
+# Issue #3999: a bound violated only by a value reached through an arithmetic
+# expression was dropped, so the export succeeded with num_cpus: 0. The three
+# files are the issue's original reproducer and the two reductions from its
+# discussion; all three must fail.
+
+# The error is reported against the shared vm node rather than the exported
+# output path; see the issue for that remaining wrinkle.
+! exec cue export -e output resource.cue
+stderr 'invalid value 0 \(out of bound >=2\)'
+
+! exec cue export -e output username.cue
+stderr 'conflicting values "bar" and "baz"'
+
+! exec cue export template.cue
+stderr 'invalid value 3 \(out of bound >=100\)'
+
+-- resource.cue --
+vm: "barbaz": {
+	cpus: 0
+}
+
+#vm: [string]: {
+	cpus: >=2 & <=32
+}
+
+Resource: {
+	vm: #vm
+	resource: {
+		for vm_name, vm in vm {
+			virtual_machine: (vm_name): {
+				num_cpus: 1 * vm.cpus
+			}
+		}
+	}
+}
+
+output: resource: ({"vm": vm} & Resource).resource
+-- username.cue --
+vm: "barbaz": {
+	username: "baz"
+}
+
+#vm: [string]: {
+	username: "foo" | "bar"
+}
+
+Resource: {
+	vm: #vm
+	resource: {
+		for vm_name, vm in vm {
+			virtual_machine: (vm_name): {
+				username: "\(vm.username)"
+			}
+		}
+	}
+}
+
+output: resource: ({"vm": vm} & Resource).resource
+-- template.cue --
+_template: {
+	_input: vals: >=100
+	result: {
+		for v in _input {
+			double: 2 * v
+		}
+	}
+}
+
+out: ({_input: vals: 3} & _template).result

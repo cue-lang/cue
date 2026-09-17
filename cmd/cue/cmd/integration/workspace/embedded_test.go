@@ -92,6 +92,59 @@ out: _ @embed(file=data/missing.json)
 	})
 }
 
+// TestEmbedTOMLFileOpened tests that opening an embedded file whose
+// encoding the workspace does not decode into a package (TOML here),
+// and then reloading the embedding package, leaves the package intact.
+// The open file is held as a standalone file, which the package cannot
+// link to.
+func TestEmbedTOMLFileOpened(t *testing.T) {
+	const files = `
+-- cue.mod/module.cue --
+module: "mod.example/x"
+language: version: "v0.16.0"
+
+-- a.cue --
+@extern(embed)
+package a
+
+out: _ @embed(file=data/data.toml)
+-- data/data.toml --
+field = true
+`
+	edited := `
+@extern(embed)
+package a
+
+out: _ @embed(file=data/data.toml)
+more: 1
+`[1:]
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+
+		env.OpenFile("a.cue")
+		env.Await(
+			env.DoneWithOpen(),
+			I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.NoLogMatching(protocol.Debug, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
+		)
+
+		env.OpenFile("data/data.toml")
+		env.Await(
+			env.DoneWithOpen(),
+			I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/data/data.toml Created", rootURI),
+		)
+
+		// Editing the package while the TOML file is open reloads the
+		// package and links it with its embedded files.
+		env.SetBufferContent("a.cue", edited)
+		env.Await(
+			env.DoneWithChange(),
+			I.LogExactf(protocol.Debug, 2, false, "Package dirs=[%v] importPath=mod.example/x@v0:a Reloaded", rootURI),
+			I.NoDiagnostics(I.ForFile("a.cue")),
+		)
+	})
+}
+
 func TestEmbedLateFile(t *testing.T) {
 	t.Parallel()
 	const files = `

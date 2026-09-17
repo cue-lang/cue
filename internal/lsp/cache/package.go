@@ -550,7 +550,13 @@ func (pkg *Package) linkWithEmbeddedFiles() {
 			if l := len(remotePkgs); l > 1 {
 				panic(fmt.Sprintf("Invariant failure: embedded file %q has %d packages. Must only have 1.", fileUri, l))
 			}
-			remotePkg := remotePkgs[0].(*Package)
+			// A file open in the editor whose encoding cannot be
+			// decoded into a package is held by a standalone file
+			// instead: there is nothing to link it to.
+			remotePkg, isPkg := remotePkgs[0].(*Package)
+			if !isPkg {
+				continue
+			}
 			embedded.pkg = remotePkg
 			remotePkg.EnsureEmbeddedBy(pkg)
 		}

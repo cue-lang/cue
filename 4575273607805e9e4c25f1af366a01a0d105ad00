@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14a67d0e_13922fa5",
+        "filename": "cue/testdata/builtins/056_issue314.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-09-17T09:19:59Z",
+      "side": 1,
+      "message": "Done. A call\u0027s result now keeps the call\u0027s path, and the failing field is nested in the message instead: `#U.out: error in call to encoding/yaml.Marshal: s: incomplete value string`. The same applies to `y: json.Validate(x, #z)`, which reports `y: error in call to encoding/json.Validate: Foo: field not allowed`. Only a validator attached to a field extends that field\u0027s path, since the field is the value being validated.",
+      "parentUuid": "9c5483f2_05c27375",
+      "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ce225df_c9bbce64",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9eb159e_42b0094d",
+        "filename": "cue/testdata/builtins/issue_3567.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-09-17T09:19:59Z",
+      "side": 1,
+      "message": "Done. The 0 was the element index within the argument list literal, appended because that ephemeral vertex has no parent and so looked like a relative path. Relativity is now an explicit property of vertices detached by Unroot, and errors report it through PathIsRelative, so this is reported at `a` again.",
+      "parentUuid": "9ce225df_c9bbce64",
+      "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c588cfe_1a1154ff",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-11T11:51:49Z",
       "side": 1,
       "message": "Maybe okay in practice, but technically not entirely correct. Would be acceptable, but should be provided with a footnote.",
+      "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1c5c0ab_7db6b0bd",
+        "filename": "cue/testdata/builtins/matchif.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2026-09-17T09:19:59Z",
+      "side": 1,
+      "message": "Added a footnote to the test. Extending the path is now specific to validators, where the field is the value being validated; a call keeps its own path and nests the failing field in the message, since it lies in an argument rather than under the call.",
+      "parentUuid": "7c588cfe_1a1154ff",
       "revId": "4575273607805e9e4c25f1af366a01a0d105ad00",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

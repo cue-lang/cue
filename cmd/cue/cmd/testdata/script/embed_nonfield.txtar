@@ -14,6 +14,11 @@ cd $WORK/field_multi
 exec cue export
 cmp stdout want-stdout
 
+# Issue #3294: several glob patterns on one field.
+cd $WORK/glob_multi
+exec cue export
+cmp stdout want-stdout
+
 cd $WORK/dynamic_field
 exec cue export
 cmp stdout want-stdout
@@ -82,6 +87,22 @@ a: _ @embed(file=x.json) @embed(file=y.json)
 {"x": true}
 -- field_multi/y.json --
 {"y": true}
+
+-- glob_multi/want-stdout --
+{
+    "f": {
+        "x.json": 5,
+        "x.yaml": "test"
+    }
+}
+-- glob_multi/x.cue --
+@extern(embed)
+package glob_multi
+f: _ @embed(glob=*.json) @embed(glob=*.yaml)
+-- glob_multi/x.json --
+5
+-- glob_multi/x.yaml --
+test
 
 -- dynamic_field/want-stdout --
 {

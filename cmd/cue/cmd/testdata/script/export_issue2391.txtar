@@ -1,0 +1,77 @@
+# Issue #2391: a required field violated inside a disjunct was not reported at
+# all once the disjunction was nested, so nothing in the output pointed at the
+# constraint that actually failed. Both forms must name the =~"^#" bound and
+# the line it is written on.
+
+! exec cue export -e _x ok.cue
+stderr '_x\.ref: invalid value "foo" \(out of bound =~"\^#"\)'
+stderr 'ok\.cue:8:9'
+
+! exec cue export -e _x not_ok.cue
+stderr '_x\.property\.items\.ref: invalid value "foo" \(out of bound =~"\^#"\)'
+stderr 'not_ok\.cue:26:8'
+
+# The discriminator case from the issue discussion still reports the "type"
+# conflicts of the arms it discarded.
+# TODO(#2391): the error should be the single requirement.cells conflict of
+# the arm that type: "C" selects.
+! exec cue export job.cue
+stderr 'requirement\.type: conflicting values "A" and "C"'
+stderr 'requirement\.type: conflicting values "B" and "C"'
+
+-- ok.cue --
+_x: #Ref & {
+	type: "ref"
+	ref:  "foo"
+}
+
+#Ref: string | {
+	type!: "ref"
+	ref!:  =~"^#"
+}
+-- not_ok.cue --
+_x: #Object & {
+	type: "object"
+	property: {
+		type: "array"
+		items: {
+			type: "ref"
+			ref:  "foo"
+		}
+	}
+}
+
+#Object: {
+	type!:     "object"
+	property!: #Ref | #Array
+}
+
+#Array: {
+	type!: "array"
+	items: #Ref
+}
+
+#Ref: string | {
+	type!: "ref"
+
+	// This is the line the error must point at.
+	ref!: =~"^#"
+}
+-- job.cue --
+#ValidCells: 1 | 2
+
+requirement: {
+	type:  "A"
+	cells: #ValidCells
+} | {
+	type:  "B"
+	cells: #ValidCells
+} | {
+	type:  "C"
+	cells: #ValidCells
+}
+
+requirement: {
+	type:  "C"
+	cells: 3
+}

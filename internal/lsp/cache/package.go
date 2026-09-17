@@ -409,19 +409,27 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	pkg.imports = slices.Clip(pkg.imports)
 
 	modpkgFiles := modpkg.Files()
-	evalASTs := make([]*ast.File, len(modpkgFiles))
+	evalASTs := make([]*ast.File, 0, len(modpkgFiles))
 	filesSet := make(map[protocol.DocumentURI]*File, len(modpkgFiles))
 	isCue := true
 	var embeddings map[token.Pos]*embedding
 	extv := m.extValidator
 
-	for i, modpkgFile := range modpkgFiles {
+	for _, modpkgFile := range modpkgFiles {
 		fileUri := joinURI(m.rootURI, modpkgFile.FilePath)
 		delete(m.dirtyFiles, fileUri)
 
 		syntax, bf, _, _, err := m.ReadCUEFile(fileUri)
 		isCue = isCue && bf != nil && bf.Encoding == build.CUE
-		evalASTs[i] = syntax
+		// Package membership is decided by a scan which parses only
+		// the package clause and imports, so a member file can still
+		// lack a usable AST: the full parse may bail out on its body.
+		// Such a file stays in the package, with its error published
+		// as a diagnostic below, but contributes nothing to the
+		// evaluator.
+		if syntax != nil {
+			evalASTs = append(evalASTs, syntax)
+		}
 
 		file := w.ensureFile(fileUri)
 		filesSet[fileUri] = file

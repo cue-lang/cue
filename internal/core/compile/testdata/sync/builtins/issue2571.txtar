@@ -1,0 +1,41 @@
+# A default over a builtin result that is read through an embedded scalar used
+# to be taken before the builtin's argument was resolved, so c fell back to the
+# "bug" default of the interpolation while a and b did not.
+# https://cuelang.org/issue/2571
+
+-- in.cue --
+import "regexp"
+
+#Example: {
+	#parse: string
+	#match: regexp.FindNamedSubmatch("^(?P<value>.*)$", #parse)
+
+	"\(*#match.value | "bug")"
+}
+
+a: #Example & {#parse: "hello", _}
+b: #Example & {#parse: "\(a)", _}
+
+// c passes the struct a itself, rather than a stringification of it.
+c: #Example & {#parse: a, _}
+-- out/compile --
+--- in.cue
+{
+  #Example: {
+    #parse: string
+    #match: 〈import;regexp〉.FindNamedSubmatch("^(?P<value>.*)$", 〈0;#parse〉)
+    "\((*〈0;#match〉.value|"bug"))"
+  }
+  a: (〈0;#Example〉 & {
+    #parse: "hello"
+    _
+  })
+  b: (〈0;#Example〉 & {
+    #parse: "\(〈1;a〉)"
+    _
+  })
+  c: (〈0;#Example〉 & {
+    #parse: 〈1;a〉
+    _
+  })
+}

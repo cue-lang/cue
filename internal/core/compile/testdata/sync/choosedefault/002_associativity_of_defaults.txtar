@@ -64,6 +64,41 @@ issue3908: full: {
 	out: #Schema & { field: string | *"dataDefault" }
 	#Schema: field: string | *null
 }
+-- issue1317.cue --
+// issue1317: nesting default marks inside the arms of an outer disjunction
+// gave results that depended on which arm came first, and that did not follow
+// the spec's M1/M3/D1/D2 rules. The expected values are the spec-derived ones
+// worked out in the issue; where it writes a plain "1 | 2" the marked form
+// "*1 | *2" is equivalent, as two defaults select no single one.
+// https://cuelang.org/issue/1317
+issue1317: a: [{
+	x: *(1|2) | (1|*2)
+	y: *(1|2) | (*1|2)
+}, {
+	// Swapping the outer arms must not change the outcome.
+	x: (1|*2) | *(1|2)
+	y: (*1|2) | *(1|2)
+}, {
+	x: (1|2) | (1|*2)
+	y: (1|2) | (*1|2)
+}]
+
+issue1317: b: [{
+	x: *1 | (1|*2)
+	y: *1 | (*1|2)
+}, {
+	x: (1|*2) | *1
+	y: (*1|2) | *1
+}, {
+	x: 1 | (1|*2)
+	y: 1 | (*1|2)
+}]
+
+issue1317: c: [{
+	x: (*1|2) | (*1|2)
+	y: *(*1|2) | (*1|2)
+	z: (*1|2) | *(*1|2)
+}]
 -- out/compile --
 --- complex.cue
 {
@@ -115,6 +150,50 @@ issue3908: full: {
   s5: (*1|*(*2|3))
   e1: (*(1 & 2)|(*"x"|string))
   e2: ((*"x"|string)|*(1 & 2))
+}
+--- issue1317.cue
+{
+  issue1317: {
+    a: [
+      {
+        x: (*(1|2)|(1|*2))
+        y: (*(1|2)|(*1|2))
+      },
+      {
+        x: ((1|*2)|*(1|2))
+        y: ((*1|2)|*(1|2))
+      },
+      {
+        x: ((1|2)|(1|*2))
+        y: ((1|2)|(*1|2))
+      },
+    ]
+  }
+  issue1317: {
+    b: [
+      {
+        x: (*1|(1|*2))
+        y: (*1|(*1|2))
+      },
+      {
+        x: ((1|*2)|*1)
+        y: ((*1|2)|*1)
+      },
+      {
+        x: (1|(1|*2))
+        y: (1|(*1|2))
+      },
+    ]
+  }
+  issue1317: {
+    c: [
+      {
+        x: ((*1|2)|(*1|2))
+        y: (*(*1|2)|(*1|2))
+        z: ((*1|2)|*(*1|2))
+      },
+    ]
+  }
 }
 --- issue3908.cue
 {

@@ -60,8 +60,8 @@ type QuoteMode int
 const (
 	quotesUnset    QuoteMode = iota // default zero value; equal to [QuotesLiteral] for now
 	QuotesLiteral                   // quotation marks are ordinary characters
-	QuotesStripped                  // one matching pair of surrounding quotes is removed
-	QuotesEscaped                   // as [QuotesStripped], and backslash escapes are interpreted
+	QuotesStripped                  // a value enclosed in matching quotes loses them
+	QuotesEscaped                   // double quotes around any part of a value are removed, and backslash escapes are interpreted
 )
 
 // CaseMode controls how the decoder treats the case of keys and section names.
@@ -144,8 +144,6 @@ type Config struct {
 
 	// Quotes controls how quotation marks around a value are treated.
 	// By default they are ordinary characters ([QuotesLiteral]).
-	//
-	// Not implemented yet.
 	Quotes QuoteMode
 
 	// Case controls the case of keys and section names.
@@ -303,6 +301,10 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
 		valuePos := tokenFile.Pos(lineOffset+indent+valueIdx, token.NoRelPos)
+		value, quoted, err := d.applyQuotes(value, valuePos)
+		if err != nil {
+			return nil, err
+		}
 
 		if d.cfg.Case == CaseLowerKeys || d.cfg.Case == CaseLower {
 			key = strings.ToLower(key)
@@ -315,7 +317,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 		cur.keys[key] = kindProperty
 
-		field, err := makeField(key, value, pos, valuePos, d.cfg.Values == ValuesTyped)
+		field, err := makeField(key, value, quoted, pos, valuePos, d.cfg.Values == ValuesTyped)
 		if err != nil {
 			return nil, errors.Newf(pos, "%v", err)
 		}
@@ -343,31 +345,58 @@ func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, o
 	value = strings.TrimSpace(unindented)
 
 	if d.cfg.InlineComments {
-		value = stripInlineComment(value)
+		value = d.stripInlineComment(value)
 	}
 	return key, value, valueIdx, true
 }
 
-// stripInlineComment trims value before the first ";" or "#" preceded by a
-// space or tab. A quoted prefix protects its own contents, so only a comment
-// after the closing quote is stripped. Since value is already trimmed, a
-// value starting with ";" or "#" is never a comment.
-func stripInlineComment(value string) string {
-	start := 0
-	if len(value) >= 2 && (value[0] == '"' || value[0] == '\'') {
-		if closeIdx := strings.IndexByte(value[1:], value[0]); closeIdx >= 0 {
-			start = closeIdx + 2
-		}
-	}
-	for i := start; i < len(value); i++ {
-		if c := value[i]; c != ';' && c != '#' {
-			continue
-		}
-		if i > 0 && (value[i-1] == ' ' || value[i-1] == '\t') {
-			return strings.TrimRight(value[:i-1], " \t")
+// stripInlineComment trims value before the first ";" or "#" that is
+// preceded by a space or tab and sits outside a quoted span, so that a
+// comment character within a quoted part of the value is kept. Since value
+// is already trimmed, a value starting with ";" or "#" is never a comment.
+//
+// Under [QuotesEscaped] every " that no backslash escapes opens or closes a
+// span, as git reads one. Otherwise either quote opens a span when its match
+// follows within the value; an unmatched quote is an ordinary character, such
+// as the apostrophe of "don't", unless it opens the value, in which case the
+// whole remainder is quoted.
+func (d *Decoder) stripInlineComment(value string) string {
+	escaped := d.cfg.Quotes == QuotesEscaped
+	for i := 0; i < len(value); i++ {
+		switch c := value[i]; {
+		case c == '\\' && escaped:
+			// The escaped byte neither quotes nor starts a comment.
+			i++
+		case c == '"' || (c == '\'' && !escaped):
+			end := d.closingQuote(value, i+1, c)
+			if end < 0 {
+				if escaped || i == 0 {
+					return value
+				}
+				continue
+			}
+			i = end
+		case (c == ';' || c == '#') && i > 0 && (value[i-1] == ' ' || value[i-1] == '\t'):
+			return strings.TrimRight(value[:i], " \t")
 		}
 	}
 	return value
+}
+
+// closingQuote returns the index of the first quote byte in text at or after
+// from, or -1 when there is none. Under [QuotesEscaped] a backslash escapes
+// the byte after it, so an escaped quote closes nothing.
+func (d *Decoder) closingQuote(text string, from int, quote byte) int {
+	for i := from; i < len(text); i++ {
+		if text[i] == '\\' && d.cfg.Quotes == QuotesEscaped {
+			i++
+			continue
+		}
+		if text[i] == quote {
+			return i
+		}
+	}
+	return -1
 }
 
 // buildNestedSection walks the section path, creating and registering missing
@@ -412,15 +441,79 @@ func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName s
 	return parent, nil
 }
 
+// applyQuotes removes the quotation marks [Config.Quotes] gives meaning to
+// and, under [QuotesEscaped], interprets the value's escape sequences. It
+// reports whether it removed a quote, which keeps the value a string under
+// [ValuesTyped].
+func (d *Decoder) applyQuotes(value string, pos token.Pos) (_ string, quoted bool, _ error) {
+	switch d.cfg.Quotes {
+	case QuotesStripped:
+		if len(value) >= 2 && (value[0] == '"' || value[0] == '\'') && value[len(value)-1] == value[0] {
+			return value[1 : len(value)-1], true, nil
+		}
+	case QuotesEscaped:
+		value, quoted, err := unquote(value)
+		if err != nil {
+			return "", false, errors.Newf(pos, "%v", err)
+		}
+		return value, quoted, nil
+	}
+	return value, false, nil
+}
+
+// unquote reads value as git-config does: each " that no backslash escapes
+// opens or closes a quoted part and is removed, and the escape sequences
+// \\ \" \n \t and \b are interpreted wherever they occur. Any other backslash
+// sequence is an error: leaving it alone would give one value two readings,
+// and dropping the backslash would change values such as a Windows path. It
+// reports whether value held a quote.
+func unquote(value string) (_ string, quoted bool, _ error) {
+	if !strings.ContainsAny(value, `"\`) {
+		return value, false, nil
+	}
+	var b strings.Builder
+	b.Grow(len(value))
+	open := false
+	for i := 0; i < len(value); i++ {
+		switch c := value[i]; c {
+		case '"':
+			open, quoted = !open, true
+		case '\\':
+			i++
+			if i == len(value) {
+				return "", false, fmt.Errorf("value ends with a backslash: %s", value)
+			}
+			switch e := value[i]; e {
+			case '\\', '"':
+				b.WriteByte(e)
+			case 'n':
+				b.WriteByte('\n')
+			case 't':
+				b.WriteByte('\t')
+			case 'b':
+				b.WriteByte('\b')
+			default:
+				return "", false, fmt.Errorf("unknown escape sequence: \\%c", e)
+			}
+		default:
+			b.WriteByte(c)
+		}
+	}
+	if open {
+		return "", false, fmt.Errorf("unterminated quoted value: %s", value)
+	}
+	return b.String(), quoted, nil
+}
+
 // makeField creates a CUE field with an appropriate value literal.
 // When typedValues is true, values are parsed as booleans or numbers when
 // possible. The label carries keyPos and the value carries valuePos, so that
 // an evaluator conflict points into the value rather than at the line.
-func makeField(key, value string, keyPos, valuePos token.Pos, typedValues bool) (*ast.Field, error) {
+func makeField(key, value string, quoted bool, keyPos, valuePos token.Pos, typedValues bool) (*ast.Field, error) {
 	var v ast.Expr
 	if typedValues {
 		var err error
-		v, err = makeValueLit(value, valuePos)
+		v, err = makeValueLit(value, quoted, valuePos)
 		if err != nil {
 			return nil, err
 		}
@@ -434,21 +527,16 @@ func makeField(key, value string, keyPos, valuePos token.Pos, typedValues bool) 
 	}, nil
 }
 
-// makeValueLit returns a bool, number, or string literal depending on the value.
-// If the value is quoted, it is unquoted and always treated as a string.
-// Otherwise, it is parsed as a bool, number, or string.
+// makeValueLit returns a bool, number, or string literal depending on the
+// value. A value that was quoted is always a string; any other is parsed as a
+// bool, number, or string.
 //
 // For example:
 //   - port=443 -> port is parsed as an int
 //   - portString="443" -> portString stays as a string "443"
-func makeValueLit(s string, pos token.Pos) (ast.Expr, error) {
-	// Quoted values are always strings; strip quotes via CUE unquoting.
-	if len(s) >= 2 && (s[0] == '"' || s[0] == '\'') {
-		unquoted, err := literal.Unquote(s)
-		if err != nil {
-			return nil, fmt.Errorf("invalid quoted value: %s", s)
-		}
-		return newStringLit(unquoted, pos), nil
+func makeValueLit(s string, quoted bool, pos token.Pos) (ast.Expr, error) {
+	if quoted {
+		return newStringLit(s, pos), nil
 	}
 	switch s := strings.ToLower(s); s {
 	case "true", "false":

@@ -666,7 +666,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedEscapeSequences",
-		config: ini.Config{Values: ini.ValuesTyped},
+		config: ini.Config{Values: ini.ValuesTyped, Quotes: ini.QuotesEscaped},
 		input: `
 			[section]
 			greeting = "hello\nworld"
@@ -680,7 +680,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedNumberStaysString",
-		config: ini.Config{Values: ini.ValuesTyped},
+		config: ini.Config{Values: ini.ValuesTyped, Quotes: ini.QuotesStripped},
 		input: `
 			[section]
 			port = "8080"
@@ -694,7 +694,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedBoolStaysString",
-		config: ini.Config{Values: ini.ValuesTyped},
+		config: ini.Config{Values: ini.ValuesTyped, Quotes: ini.QuotesStripped},
 		input: `
 			[section]
 			enabled = "true"
@@ -708,7 +708,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedStringStripsQuotes",
-		config: ini.Config{Values: ini.ValuesTyped},
+		config: ini.Config{Values: ini.ValuesTyped, Quotes: ini.QuotesStripped},
 		input: `
 			[section]
 			name = "John Doe"
@@ -722,7 +722,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/EmptyQuotedString",
-		config: ini.Config{Values: ini.ValuesTyped},
+		config: ini.Config{Values: ini.ValuesTyped, Quotes: ini.QuotesStripped},
 		input: `
 			[section]
 			val = ""
@@ -731,26 +731,31 @@ func TestDecoder(t *testing.T) {
 			section: val: ""
 			`,
 	}, {
-		name:   "TypedValues/UnclosedDoubleQuote",
-		config: ini.Config{Values: ini.ValuesTyped},
+		// A value that does not end with its opening quote is not enclosed in
+		// quotes, so it is kept as written, as the profile API reads it.
+		name:   "Quotes/Stripped/Unterminated",
+		config: ini.Config{Quotes: ini.QuotesStripped},
 		input: `
 			[section]
 			foo = "bar
+			title = 'tis the season
 			`,
-		wantErr: `
-			invalid quoted value: "bar:
-			    test.ini:2:1
+		wantCUE: `
+			section: {
+				foo:   "\"bar"
+				title: "'tis the season"
+			}
 			`,
 	}, {
-		name:   "TypedValues/UnclosedSingleQuote",
-		config: ini.Config{Values: ini.ValuesTyped},
+		name:   "Quotes/Escaped/Unterminated",
+		config: ini.Config{Quotes: ini.QuotesEscaped},
 		input: `
 			[section]
-			foo = 'bar
+			foo = a "bar
 			`,
 		wantErr: `
-			invalid quoted value: 'bar:
-			    test.ini:2:1
+			unterminated quoted value: a "bar:
+			    test.ini:2:7
 			`,
 	}, {
 		name:   "TypedValues/TrailingQuoteIsString",
@@ -774,7 +779,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "CombinedStrategies/CaseLowerAndTypedValues",
-		config: ini.Config{Case: ini.CaseLower, Values: ini.ValuesTyped},
+		config: ini.Config{Case: ini.CaseLower, Values: ini.ValuesTyped, Quotes: ini.QuotesStripped},
 		input: `
 			AppName = MyApp
 			[Database]
@@ -790,6 +795,163 @@ func TestDecoder(t *testing.T) {
 				debug:   true
 				version: 2.1
 				name:    "MyDB"
+			}
+			`,
+	}, {
+		name:   "Quotes/Stripped",
+		config: ini.Config{Quotes: ini.QuotesStripped},
+		input: `
+			[section]
+			name = "John Doe"
+			greeting = 'Hello World'
+			empty = ""
+			inner = a "b" c
+			trailing = baz"
+			path = "C:\Users\me"
+			escapes = "a\nb"
+			`,
+		wantCUE: `
+			section: {
+				name:     "John Doe"
+				greeting: "Hello World"
+				empty:    ""
+				inner:    "a \"b\" c"
+				trailing: "baz\""
+				path:     "C:\\Users\\me"
+				escapes:  "a\\nb"
+			}
+			`,
+	}, {
+		// Quotes and escapes are read as git reads them: a double quote
+		// anywhere opens or closes a quoted part, the escapes apply
+		// throughout the value, and a single quote is an ordinary character.
+		name:   "Quotes/Escaped",
+		config: ini.Config{Quotes: ini.QuotesEscaped},
+		input: `
+			[section]
+			backslash = "a\\b"
+			doubleQuote = "a\"b"
+			newline = "a\nb"
+			tab = "a\tb"
+			backspace = "a\bb"
+			unquoted = a\nb
+			parts = !echo "one"  "two"
+			spaces = " a "
+			single = 'q'
+			`,
+		wantCUE: `
+			section: {
+				backslash:   "a\\b"
+				doubleQuote: "a\"b"
+				newline:     "a\nb"
+				tab:         "a\tb"
+				backspace:   "a\bb"
+				unquoted:    "a\nb"
+				parts:       "!echo one  two"
+				spaces:      " a "
+				single:      "'q'"
+			}
+			`,
+	}, {
+		// git knows no \r or \' escape.
+		name:   "Quotes/Escaped/NoCarriageReturnEscape",
+		config: ini.Config{Quotes: ini.QuotesEscaped},
+		input: `
+			[section]
+			cr = "a\rb"
+			`,
+		wantErr: `
+			unknown escape sequence: \r:
+			    test.ini:2:6
+			`,
+	}, {
+		name:   "Quotes/Escaped/UnknownEscape",
+		config: ini.Config{Quotes: ini.QuotesEscaped},
+		input: `
+			[section]
+			path = "C:\Users\me"
+			`,
+		wantErr: `
+			unknown escape sequence: \U:
+			    test.ini:2:8
+			`,
+	}, {
+		name:   "Quotes/Escaped/TrailingBackslash",
+		config: ini.Config{Quotes: ini.QuotesEscaped},
+		input: `
+			[section]
+			foo = "bar\\\"
+			`,
+		wantErr: `
+			unterminated quoted value: "bar\\\":
+			    test.ini:2:7
+			`,
+	}, {
+		// A quoted span protects its contents wherever it sits in the value,
+		// not only when it opens the value.
+		name:   "Quotes/Stripped/QuotedSpanWithinAValue",
+		config: ini.Config{Quotes: ini.QuotesStripped, InlineComments: true},
+		input: `
+			[alias]
+			show = !echo "one # two"
+			semi = !echo "a ; b" ; a comment
+			single = 'Hello ; World'
+			`,
+		wantCUE: `
+			alias: {
+				show:   "!echo \"one # two\""
+				semi:   "!echo \"a ; b\""
+				single: "Hello ; World"
+			}
+			`,
+	}, {
+		// An unmatched quote that does not open the value is an ordinary
+		// character, so an apostrophe does not protect what follows it.
+		name:   "Quotes/Stripped/ApostropheIsNotAQuote",
+		config: ini.Config{Quotes: ini.QuotesStripped, InlineComments: true},
+		input: `
+			apos = don't ; a comment
+			`,
+		wantCUE: `
+			apos: "don't"
+			`,
+	}, {
+		// The closing quote may only arrive on a continuation line, so until
+		// it does the whole remainder is quoted and holds no comment.
+		name:   "Quotes/Stripped/UnfinishedQuoteHoldsNoComment",
+		config: ini.Config{Quotes: ini.QuotesStripped, InlineComments: true},
+		input: `
+			[section]
+			foo = "one ; two
+			`,
+		wantCUE: `
+			section: foo: "\"one ; two"
+			`,
+	}, {
+		name:   "Quotes/Literal/UnfinishedQuoteHoldsNoComment",
+		config: ini.Config{InlineComments: true},
+		input: `
+			[section]
+			foo = "one ; two
+			`,
+		wantCUE: `
+			section: foo: "\"one ; two"
+			`,
+	}, {
+		// A value that starts and ends with the same quote loses those two
+		// characters, whatever lies between them, as the profile API reads
+		// one.
+		name:   "Quotes/Stripped/PartlyQuoted",
+		config: ini.Config{Quotes: ini.QuotesStripped},
+		input: `
+			[section]
+			two = "a" "b"
+			tail = "a" c
+			`,
+		wantCUE: `
+			section: {
+				two:  "a\" \"b"
+				tail: "\"a\" c"
 			}
 			`,
 	}, {

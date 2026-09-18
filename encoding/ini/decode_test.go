@@ -206,6 +206,31 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
+		// A comment before the delimiter ends the line, leaving a bare key.
+		name:   "Comments/BeforeTheDelimiter",
+		config: ini.Config{InlineComments: true, BareKeys: ini.BareKeysTrue},
+		input: `
+			[core]
+			autocrlf # a comment
+			flag ; see a=b
+			`,
+		wantCUE: `
+			core: {
+				autocrlf: true
+				flag:     true
+			}
+			`,
+	}, {
+		name:   "Comments/BeforeTheDelimiter/BareKeysOff",
+		config: ini.Config{InlineComments: true},
+		input: `
+			flag ; see a=b
+			`,
+		wantErr: `
+			invalid line: flag ; see a=b:
+			    test.ini:1:1
+			`,
+	}, {
 		name: "CommentsAndBlankLines",
 		input: `
 			; Database configuration
@@ -531,7 +556,56 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "Continuations/Backslash",
+		name:   "BareKeys/Error",
+		config: ini.Config{BareKeys: ini.BareKeysError},
+		input: `
+			[Core]
+			sparseCheckout
+			`,
+		wantErr: `
+			invalid line: sparseCheckout:
+			    test.ini:2:1
+			`,
+	}, {
+		name:   "BareKeys/Null",
+		config: ini.Config{BareKeys: ini.BareKeysNull},
+		input: `
+			[Core]
+			sparseCheckout
+			empty =
+			`,
+		wantCUE: `
+			Core: {
+				sparseCheckout: null
+				empty:          ""
+			}
+			`,
+	}, {
+		name:   "BareKeys/True",
+		config: ini.Config{BareKeys: ini.BareKeysTrue},
+		input: `
+			[Core]
+			sparseCheckout
+			empty =
+			`,
+		wantCUE: `
+			Core: {
+				sparseCheckout: true
+				empty:          ""
+			}
+			`,
+	}, {
+		name:   "BareKeys/True/Duplicate",
+		config: ini.Config{BareKeys: ini.BareKeysTrue, DuplicateKeys: ini.DuplicatesList},
+		input: `
+			[Core]
+			sparseCheckout
+			sparseCheckout
+			`,
+		wantCUE: `
+			Core: sparseCheckout: [true, true]
+			`,
+	}, {name: "Continuations/Backslash",
 		config: ini.Config{Continuations: ini.ContinuationsBackslash},
 		input: `
 			[alias]

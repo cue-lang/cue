@@ -172,8 +172,6 @@ type Config struct {
 
 	// BareKeys controls what a line holding a key and no delimiter means.
 	// By default it is an error ([BareKeysError]).
-	//
-	// Not implemented yet.
 	BareKeys BareKeyMode
 
 	// Values controls whether the type of a value is interpreted.
@@ -293,7 +291,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 
 		// Key-value pair. The value keeps any trailing whitespace, which
 		// decides whether a backslash ends the line.
-		key, value, valueIdx, ok := d.parseKeyValue(line.text[indent:])
+		key, value, valueIdx, bare, ok := d.parseKeyValue(line.text[indent:])
 		if !ok {
 			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
@@ -306,6 +304,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 			keyPos:   pos,
 			valuePos: d.pos(line.offset + indent + valueIdx),
 			indent:   indent,
+			bare:     bare,
 		}
 		continued := d.addFragment(p, value, i)
 		if d.cfg.Continuations == ContinuationsIndented {
@@ -342,6 +341,9 @@ type property struct {
 	// indent is how far the key sits into its line, which an indented
 	// continuation line must exceed.
 	indent int
+	// bare reports that the line held no delimiter, so that the value
+	// comes from [Config.BareKeys] rather than from the text.
+	bare bool
 
 	// parts are the fragments of the value, joined by [Decoder.sep]. Each
 	// fragment is scanned once, rather than the value assembled so far, so
@@ -419,6 +421,7 @@ func (d *Decoder) joinIndented(p *property, i int) int {
 			}
 		}
 		d.addFragment(p, d.lines[i].text, i)
+		p.bare = false
 	}
 	return i
 }
@@ -538,7 +541,7 @@ func isComment(trimmed string) bool {
 
 // addProperty decodes p's value and adds it to its section.
 func (d *Decoder) addProperty(p *property) error {
-	value, quoted, err := d.applyQuotes(d.value(p), p.valuePos)
+	v, err := d.decodeValue(p)
 	if err != nil {
 		return err
 	}
@@ -546,32 +549,86 @@ func (d *Decoder) addProperty(p *property) error {
 		return errors.Newf(p.keyPos, "property %s conflicts with section of the same name", p.key)
 	}
 	if field := p.sec.props[p.key]; field != nil {
-		return d.addDuplicate(p, field, value, quoted)
+		return d.addDuplicate(p, field, v)
 	}
-	field, err := d.makeField(p.key, value, quoted, p.keyPos, p.valuePos)
-	if err != nil {
-		return errors.Newf(p.keyPos, "%v", err)
+	field := &ast.Field{
+		Label:    makeLabel(p.key, p.keyPos),
+		Value:    v,
+		TokenPos: p.keyPos,
 	}
 	p.sec.fields.Elts = append(p.sec.fields.Elts, field)
 	p.sec.props[p.key] = field
 	return nil
 }
 
+// decodeValue turns p's raw value text into a CUE expression. The value
+// carries its own position, so that an evaluator conflict points into the
+// value rather than at the line.
+func (d *Decoder) decodeValue(p *property) (ast.Expr, error) {
+	if p.bare {
+		var v ast.Expr = ast.NewNull()
+		if d.cfg.BareKeys == BareKeysTrue {
+			v = ast.NewBool(true)
+		}
+		ast.SetPos(v, p.valuePos)
+		return v, nil
+	}
+	value, quoted, err := d.applyQuotes(d.value(p), p.valuePos)
+	if err != nil {
+		return nil, err
+	}
+	if d.cfg.Values != ValuesTyped {
+		return newStringLit(value, p.valuePos), nil
+	}
+	v, err := makeValueLit(value, quoted, p.valuePos)
+	if err != nil {
+		return nil, errors.Newf(p.keyPos, "%v", err)
+	}
+	return v, nil
+}
+
 // parseKeyValue splits a line, its indentation removed, into key and value
 // using "=" as delimiter. It returns the trimmed key, the value with its
-// leading whitespace removed, the index of the value within line, and whether
-// the split succeeded.
-func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, ok bool) {
-	key, value, ok = strings.Cut(line, "=")
-	if !ok {
-		return "", "", 0, false
+// leading whitespace removed, the index of the value within line, whether
+// the line held no delimiter at all, and whether the line is a property. A
+// comment starting before any delimiter ends the line, leaving a bare key.
+func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, bare, ok bool) {
+	i := strings.IndexByte(line, '=')
+	keyEnd := i
+	if keyEnd < 0 {
+		keyEnd = len(line)
 	}
-	key = strings.TrimSpace(key)
+	if c := d.keyComment(line[:keyEnd]); c >= 0 {
+		i, keyEnd = -1, c
+	}
+	key = strings.TrimSpace(line[:keyEnd])
+	if i < 0 {
+		switch d.cfg.BareKeys {
+		case BareKeysNull, BareKeysTrue:
+			return key, "", len(key), true, true
+		}
+		return "", "", 0, false, false
+	}
 	if key == "" {
-		return "", "", 0, false
+		return "", "", 0, false, false
 	}
-	value = strings.TrimLeft(value, " \t")
-	return key, value, len(line) - len(value), true
+	value = strings.TrimLeft(line[i+1:], " \t")
+	return key, value, len(line) - len(value), false, true
+}
+
+// keyComment returns the index of the comment that starts in s, the text
+// before a line's delimiter, or -1 when there is none. A key holds no quotes,
+// so only [Config.InlineComments] decides.
+func (d *Decoder) keyComment(s string) int {
+	if !d.cfg.InlineComments {
+		return -1
+	}
+	for i := 1; i < len(s); i++ {
+		if (s[i] == ';' || s[i] == '#') && (s[i-1] == ' ' || s[i-1] == '\t') {
+			return i
+		}
+	}
+	return -1
 }
 
 // stripInlineComment trims text, the fragment of p's value from line, before
@@ -834,7 +891,7 @@ func unquote(value string) (_ string, quoted bool, _ error) {
 
 // addDuplicate folds a repeated occurrence of p's key into the field already
 // decoded for it, as [Config.DuplicateKeys] selects.
-func (d *Decoder) addDuplicate(p *property, field *ast.Field, value string, quoted bool) error {
+func (d *Decoder) addDuplicate(p *property, field *ast.Field, v ast.Expr) error {
 	switch d.cfg.DuplicateKeys {
 	case DuplicatesList:
 		list, ok := field.Value.(*ast.ListLit)
@@ -843,48 +900,15 @@ func (d *Decoder) addDuplicate(p *property, field *ast.Field, value string, quot
 			ast.SetPos(list, field.Value.Pos())
 			field.Value = list
 		}
-		v, err := d.makeValue(value, quoted, p.valuePos)
-		if err != nil {
-			return errors.Newf(p.keyPos, "%v", err)
-		}
 		list.Elts = append(list.Elts, v)
 	case DuplicatesFirst:
 		// The value already decoded wins.
 	case DuplicatesLast:
-		v, err := d.makeValue(value, quoted, p.valuePos)
-		if err != nil {
-			return errors.Newf(p.keyPos, "%v", err)
-		}
 		field.Value = v
 	default:
 		return errors.Newf(p.keyPos, "duplicate key: %s", p.key)
 	}
 	return nil
-}
-
-// makeField creates a CUE field with an appropriate value literal.
-// The label carries keyPos and the value carries valuePos, so that an
-// evaluator conflict points into the value rather than at the line.
-func (d *Decoder) makeField(key, value string, quoted bool, keyPos, valuePos token.Pos) (*ast.Field, error) {
-	v, err := d.makeValue(value, quoted, valuePos)
-	if err != nil {
-		return nil, err
-	}
-	return &ast.Field{
-		Label:    makeLabel(key, keyPos),
-		Value:    v,
-		TokenPos: keyPos,
-	}, nil
-}
-
-// makeValue turns a decoded value into a CUE expression. Under
-// [ValuesStrings] it is always a string; under [ValuesTyped] an unquoted
-// boolean or number becomes one.
-func (d *Decoder) makeValue(value string, quoted bool, pos token.Pos) (ast.Expr, error) {
-	if d.cfg.Values != ValuesTyped {
-		return newStringLit(value, pos), nil
-	}
-	return makeValueLit(value, quoted, pos)
 }
 
 // makeValueLit returns a bool, number, or string literal depending on the

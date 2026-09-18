@@ -556,7 +556,84 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "BareKeys/Error",
+		name:   "TypedValues/RejectedNumberForms",
+		config: ini.Config{Values: ini.ValuesTyped},
+		input: `
+			hex = 0x10
+			underscores = 1_000
+			multiplier = 1M
+			leadingZero = 010
+			noIntegerPart = .5
+			noFraction = 1.
+			infinity = Inf
+			`,
+		wantCUE: `
+			hex:           "0x10"
+			underscores:   "1_000"
+			multiplier:    "1M"
+			leadingZero:   "010"
+			noIntegerPart: ".5"
+			noFraction:    "1."
+			infinity:      "Inf"
+			`,
+	}, {
+		name:   "TypedValues/AcceptedNumberForms",
+		config: ini.Config{Values: ini.ValuesTyped},
+		input: `
+			zero = 0
+			exponent = 1e3
+			negativeExponent = 1.5E-3
+			negative = -42
+			positive = +1
+			`,
+		wantCUE: `
+			zero:             0
+			exponent:         1e3
+			negativeExponent: 1.5E-3
+			negative:         -42
+			positive:         1
+			`,
+	}, {
+		name:   "Booleans/TrueFalse",
+		config: ini.Config{Values: ini.ValuesTyped, Booleans: ini.BooleansTrueFalse},
+		input: `
+			a = true
+			b = FALSE
+			c = yes
+			d = on
+			e = 1
+			f = 0
+			`,
+		wantCUE: `
+			a: true
+			b: false
+			c: "yes"
+			d: "on"
+			e: 1
+			f: 0
+			`,
+	}, {
+		name:   "Booleans/Extended",
+		config: ini.Config{Values: ini.ValuesTyped, Booleans: ini.BooleansExtended},
+		input: `
+			a = true
+			b = No
+			c = yes
+			d = OFF
+			e = 1
+			f = 0
+			g = 2
+			`,
+		wantCUE: `
+			a: true
+			b: false
+			c: true
+			d: false
+			e: true
+			f: false
+			g: 2
+			`,
+	}, {name: "BareKeys/Error",
 		config: ini.Config{BareKeys: ini.BareKeysError},
 		input: `
 			[Core]

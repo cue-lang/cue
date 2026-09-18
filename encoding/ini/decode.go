@@ -44,6 +44,7 @@ package ini
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -51,7 +52,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
@@ -180,8 +180,6 @@ type Config struct {
 
 	// Booleans selects the vocabulary [ValuesTyped] recognizes as
 	// booleans. By default only true and false ([BooleansTrueFalse]).
-	//
-	// Not implemented yet.
 	Booleans BooleanMode
 }
 
@@ -577,14 +575,10 @@ func (d *Decoder) decodeValue(p *property) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	if d.cfg.Values != ValuesTyped {
+	if d.cfg.Values != ValuesTyped || quoted {
 		return newStringLit(value, p.valuePos), nil
 	}
-	v, err := makeValueLit(value, quoted, p.valuePos)
-	if err != nil {
-		return nil, errors.Newf(p.keyPos, "%v", err)
-	}
-	return v, nil
+	return d.makeValueLit(value, p.valuePos), nil
 }
 
 // parseKeyValue splits a line, its indentation removed, into key and value
@@ -912,34 +906,65 @@ func (d *Decoder) addDuplicate(p *property, field *ast.Field, v ast.Expr) error 
 }
 
 // makeValueLit returns a bool, number, or string literal depending on the
-// value. A value that was quoted is always a string; any other is parsed as a
-// bool, number, or string.
+// value. Booleans are consulted before numbers, so under [BooleansExtended]
+// the values 1 and 0 are booleans rather than integers.
 //
 // For example:
 //   - port=443 -> port is parsed as an int
 //   - portString="443" -> portString stays as a string "443"
-func makeValueLit(s string, quoted bool, pos token.Pos) (ast.Expr, error) {
-	if quoted {
-		return newStringLit(s, pos), nil
+func (d *Decoder) makeValueLit(s string, pos token.Pos) ast.Expr {
+	if b, ok := d.parseBool(s); ok {
+		lit := ast.NewBool(b)
+		ast.SetPos(lit, pos)
+		return lit
 	}
-	switch s := strings.ToLower(s); s {
-	case "true", "false":
-		b := ast.NewBool(s == "true")
-		ast.SetPos(b, pos)
-		return b, nil
-	}
-	var num literal.NumInfo
-	if err := literal.ParseNum(s, &num); err == nil {
+	if text, isInt, ok := jsonNumber(s); ok {
 		kind := token.FLOAT
-		if num.IsInt() {
+		if isInt {
 			kind = token.INT
 		}
-		lit := &ast.BasicLit{Kind: kind, Value: s}
+		lit := ast.NewLit(kind, text)
 		ast.SetPos(lit, pos)
-		return lit, nil
+		return lit
 	}
-	return newStringLit(s, pos), nil
+	return newStringLit(s, pos)
 }
+
+// parseBool recognizes the boolean vocabulary [Config.Booleans] selects,
+// ignoring case.
+func (d *Decoder) parseBool(s string) (_ bool, ok bool) {
+	extended := d.cfg.Booleans == BooleansExtended
+	switch strings.ToLower(s) {
+	case "true":
+		return true, true
+	case "false":
+		return false, true
+	case "yes", "on", "1":
+		return true, extended
+	case "no", "off", "0":
+		return false, extended
+	}
+	return false, false
+}
+
+// jsonNumber reports whether s matches the JSON number grammar, which is the
+// subset of number syntax the INI flavors share, and whether it has neither
+// a fraction nor an exponent. The returned text is a valid CUE literal, so a
+// leading "+", which CUE has no literal for, is dropped.
+func jsonNumber(s string) (text string, isInt, ok bool) {
+	unsigned := s
+	if s != "" && (s[0] == '+' || s[0] == '-') {
+		unsigned = s[1:]
+	}
+	// Starting and ending with a digit rules out every JSON value other
+	// than a number, and the white space [json.Valid] accepts around one.
+	if unsigned == "" || !isDigit(unsigned[0]) || !isDigit(unsigned[len(unsigned)-1]) || !json.Valid([]byte(unsigned)) {
+		return "", false, false
+	}
+	return strings.TrimPrefix(s, "+"), !strings.ContainsAny(unsigned, ".eE"), true
+}
+
+func isDigit(c byte) bool { return '0' <= c && c <= '9' }
 
 // makeLabel creates an appropriate CUE label for the given key.
 func makeLabel(key string, pos token.Pos) ast.Label {

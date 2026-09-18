@@ -450,7 +450,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		i.next = toml.NewDecoder(path, r).Decode
 		i.Next()
 	case build.INI:
-		i.next = ini.NewDecoder(path, r, ini.Config{}).Decode
+		i.next = ini.NewDecoder(path, r, iniConfig(f)).Decode
 		i.Next()
 	case build.XML:
 		switch {
@@ -749,4 +749,21 @@ func (v *validator) validate(n ast.Node) bool {
 		// Other types are either always okay or handled elsewhere.
 	}
 	return ok
+}
+
+// iniConfig maps the flavor tag of f to the [ini.Config] it names. An empty
+// tag is the zero Config, the generic flavor; file-type resolution has
+// already rejected any other name.
+func iniConfig(f *build.File) ini.Config {
+	switch f.Tags["flavor"] {
+	case "git":
+		return ini.GitConfig()
+	case "python":
+		return ini.PythonConfig()
+	case "systemd":
+		return ini.SystemdConfig()
+	case "windows":
+		return ini.WindowsConfig()
+	}
+	return ini.Config{}
 }

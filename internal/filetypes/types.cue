@@ -103,7 +103,6 @@ modes: input: {
 	extensions: ".yaml": interpretation: *"auto" | _
 	extensions: ".yml": interpretation:  *"auto" | _
 	extensions: ".toml": interpretation: *"auto" | _
-	extensions: ".ini": interpretation:  *"auto" | _
 	extensions: ".xml": interpretation:  *"auto" | _
 }
 
@@ -391,7 +390,13 @@ tagInfo: {
 		}
 	}
 	toml: encoding: "toml"
-	ini: encoding:  "ini"
+	ini: {
+		encoding: "ini"
+		// The flavor tag names an encoding/ini flavor, so that
+		// "ini+flavor=git" reads a file as git-config does. Empty is the
+		// generic flavor.
+		tags: flavor: *"" | "git" | "python" | "systemd" | "windows"
+	}
 	xml: {
 		encoding: "xml"
 		boolTags: {

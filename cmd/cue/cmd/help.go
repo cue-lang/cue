@@ -546,6 +546,7 @@ var filetypeHelp = &cobra.Command{
     json        .json           JSON files.
     yaml        .yaml/.yml      YAML files.
     toml        .toml           TOML files
+    ini         .ini            INI files.
     jsonl       .jsonl/.ndjson  Line-separated JSON values.
     jsonschema                  JSON Schema.
     openapi                     OpenAPI schema.
@@ -617,6 +618,11 @@ valid with is mentioned in parentheses at the end.
     indentSequences
                     indent sequence elements relative to their
                     enclosing mapping key; true by default (yaml)
+
+    flavor=<name>   read INI as the named tool does: git for
+                    git-config, python for Python's configparser,
+                    systemd for systemd unit files, or windows for
+                    the Windows profile API (ini)
 
 Many commands also support the --out and --outfile/-o flags.
 The --out flag specifies the output type using a qualifier

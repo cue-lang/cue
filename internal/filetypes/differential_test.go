@@ -162,6 +162,8 @@ func TestDriverMatchesCUE(t *testing.T) {
 			boolean  map[string]bool
 		}{
 			{scope: "code+lang=js", top: []string{"code"}, stringly: map[string]string{"lang": "js"}},
+			{scope: "ini+flavor=git", top: []string{"ini"}, stringly: map[string]string{"flavor": "git"}},
+			{scope: "ini+flavor=bogus", top: []string{"ini"}, stringly: map[string]string{"flavor": "bogus"}},
 			{scope: "json+compact", top: []string{"json"}, boolean: map[string]bool{"compact": true}},
 			{scope: "yaml+indentSequences=false", top: []string{"yaml"}, boolean: map[string]bool{"indentSequences": false}},
 			{scope: "jsonschema+strict", top: []string{"jsonschema"}, boolean: map[string]bool{"strict": true}},

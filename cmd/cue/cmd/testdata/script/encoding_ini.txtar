@@ -1,0 +1,271 @@
+# Test the INI encoding and its flavor tag in cmd/cue.
+# The reference files mirror the ones encoding/ini decodes in its own
+# tests, so both surfaces are exercised on the same input.
+
+# The generic flavor transforms nothing beyond trimming, so a value
+# holding " ; " or " #" keeps it.
+exec cue export svc.ini
+cmp stdout svc.json
+
+# The flavor tag on the ini file type names one of the flavors.
+exec cue export ini+flavor=git: git.ini
+cmp stdout git.json
+exec cue export ini+flavor=python: setup.cfg
+cmp stdout python.json
+exec cue export ini+flavor=systemd: unit.service
+cmp stdout systemd.json
+exec cue export ini+flavor=windows: app.ini
+cmp stdout windows.json
+
+# The .ini extension resolves the encoding by itself, so the flavor tag
+# alone is enough, as koala is for xml.
+exec cue export flavor=git: git.ini
+cmp stdout git.json
+
+# The ini tag reads a file with any name as INI.
+exec cue export ini: plain.conf
+cmp stdout plain.json
+
+# A flavor tag is accepted wherever a file qualifier is.
+exec cue eval ini+flavor=git: git.ini
+stdout 'sparsecheckout: true'
+exec cue vet schema.cue ini+flavor=git: git.ini
+# The imported CUE is the same as encoding/ini decodes the file to under
+# GitConfig, so the tag and the constructor cannot drift apart.
+exec cue import -o - ini+flavor=git: git.ini
+cmp stdout git-import.cue
+
+# A file named alongside a package decodes with the generic flavor.
+cd pkg
+exec cue export . data.ini
+cmp stdout data.json
+cd ..
+
+# File-type resolution rejects an unknown flavor, and two different
+# flavors at once, before reading the file.
+! exec cue export ini+flavor=bogus: git.ini
+cmp stderr bogus.stderr
+! exec cue export ini+flavor=git+flavor=systemd: git.ini
+cmp stderr two-flavors.stderr
+
+# The encoding and the flavor tag are documented.
+exec cue help filetypes
+stdout '\n    ini         \.ini            INI files\.\n'
+stdout '\n    flavor=<name>   read INI as the named tool does: git for\n'
+-- svc.ini --
+[Service]
+ExecStart=/bin/echo one ; /bin/echo two
+flags = -a #b
+-- git.ini --
+; Sample git configuration, modelled on a .git/config file read by
+; git-config.
+[remote "origin"]
+	url = https://example.com/project.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+	fetch = +refs/tags/*:refs/tags/*
+[Core]
+	IgnoreCase = true
+	sparseCheckout
+	excludesFile = ~/.gitignore ; the user-wide ignore list
+[alias]
+	lg = log --graph \
+		--oneline
+[user]
+	name = "Jane \"JD\" Doe"
+	signature = "first line\nsecond line"
+[url "https://example.com/"]
+	insteadOf = ex:
+[alias]
+	ci = commit --verbose
+-- setup.cfg --
+# Sample setup.cfg, modelled on a Python packaging configuration read by
+# configparser with its default settings.
+[metadata]
+Name = mypkg
+version = 1.2.3
+summary = A sample package
+long_description = The first line of the description
+    the second line
+    the third line
+license = Apache-2.0
+
+[options]
+python_requires: >=3.9
+zip_safe: False
+include_package_data: True
+
+[DEFAULT]
+verbose = 1
+-- unit.service --
+# Sample systemd service unit, modelled on a .service file read per
+# systemd.syntax(7).
+[Unit]
+Description=Example service
+; Comments may also start with a semicolon.
+After=network.target
+
+[Service]
+Environment=FIRST=1
+Environment=SECOND=2
+Environment=THIRD=3
+ExecStart=/bin/sh -c 'echo one ; echo two'
+ExecReload=/bin/kill -HUP $MAINPID \
+# A comment block between the backslash and its continuation is skipped.
+; So is this one.
+	--timeout 5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+-- app.ini --
+; Sample Windows profile, modelled on a file read with
+; GetPrivateProfileString.
+[Settings]
+WindowTitle="My Application"
+StatusText='Ready'
+
+[Paths]
+InstallDir=C:\Program Files\MyApp
+DataDir="C:\ProgramData\My App"
+
+[Network]
+Timeout=30
+; A lookup finds the first occurrence of a key.
+Timeout=60
+-- plain.conf --
+key = value
+-- schema.cue --
+core: sparsecheckout: bool
+-- cue.mod/module.cue --
+module: "mod.example"
+language: version: "v0.14.0"
+-- pkg/x.cue --
+package pkg
+
+extra: true
+-- pkg/data.ini --
+[server]
+host = localhost
+-- svc.json --
+{
+    "Service": {
+        "ExecStart": "/bin/echo one ; /bin/echo two",
+        "flags": "-a #b"
+    }
+}
+-- git.json --
+{
+    "remote": {
+        "origin": {
+            "url": "https://example.com/project.git",
+            "fetch": [
+                "+refs/heads/*:refs/remotes/origin/*",
+                "+refs/tags/*:refs/tags/*"
+            ]
+        }
+    },
+    "core": {
+        "ignorecase": "true",
+        "sparsecheckout": true,
+        "excludesfile": "~/.gitignore"
+    },
+    "alias": {
+        "lg": "log --graph \t\t--oneline",
+        "ci": "commit --verbose"
+    },
+    "user": {
+        "name": "Jane \"JD\" Doe",
+        "signature": "first line\nsecond line"
+    },
+    "url": {
+        "https://example.com/": {
+            "insteadof": "ex:"
+        }
+    }
+}
+-- python.json --
+{
+    "metadata": {
+        "name": "mypkg",
+        "version": "1.2.3",
+        "summary": "A sample package",
+        "long_description": "The first line of the description\nthe second line\nthe third line",
+        "license": "Apache-2.0"
+    },
+    "options": {
+        "python_requires": ">=3.9",
+        "zip_safe": "False",
+        "include_package_data": "True"
+    },
+    "DEFAULT": {
+        "verbose": "1"
+    }
+}
+-- systemd.json --
+{
+    "Unit": {
+        "Description": "Example service",
+        "After": "network.target"
+    },
+    "Service": {
+        "Environment": [
+            "FIRST=1",
+            "SECOND=2",
+            "THIRD=3"
+        ],
+        "ExecStart": "/bin/sh -c 'echo one ; echo two'",
+        "ExecReload": "/bin/kill -HUP $MAINPID  \t--timeout 5",
+        "Restart": "on-failure"
+    },
+    "Install": {
+        "WantedBy": "multi-user.target"
+    }
+}
+-- windows.json --
+{
+    "Settings": {
+        "WindowTitle": "My Application",
+        "StatusText": "Ready"
+    },
+    "Paths": {
+        "InstallDir": "C:\\Program Files\\MyApp",
+        "DataDir": "C:\\ProgramData\\My App"
+    },
+    "Network": {
+        "Timeout": "30"
+    }
+}
+-- plain.json --
+{
+    "key": "value"
+}
+-- git-import.cue --
+remote: origin: {
+	url:   "https://example.com/project.git"
+	fetch: ["+refs/heads/*:refs/remotes/origin/*", "+refs/tags/*:refs/tags/*"]
+}
+core: {
+	ignorecase:     "true"
+	sparsecheckout: true
+	excludesfile:   "~/.gitignore"
+}
+alias: {
+	lg: "log --graph \t\t--oneline"
+	ci: "commit --verbose"
+}
+user: {
+	name:      "Jane \"JD\" Doe"
+	signature: "first line\nsecond line"
+}
+url: "https://example.com/": insteadof: "ex:"
+-- pkg/data.json --
+{
+    "extra": true,
+    "server": {
+        "host": "localhost"
+    }
+}
+-- bogus.stderr --
+invalid value "bogus" for tag "flavor"; must be one of: git, python, systemd, windows
+-- two-flavors.stderr --
+conflicting values for tag "flavor": "git" and "systemd"

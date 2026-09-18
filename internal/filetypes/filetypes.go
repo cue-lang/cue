@@ -360,6 +360,9 @@ func parseScopeUncached(scopeStr string) (*scope, error) {
 			if !hasValue {
 				return nil, errors.Newf(token.NoPos, "tag %q must have value (%s=<value>)", tagName, tagName)
 			}
+			if old, ok := sc.subsidiaryString[tagName]; ok && old != tagVal {
+				return nil, errors.Newf(token.NoPos, "conflicting values for tag %q: %q and %q", tagName, old, tagVal)
+			}
 			sc.subsidiaryString[tagName] = tagVal
 		default:
 			return nil, errors.Newf(token.NoPos, "unknown filetype %s", tagName)

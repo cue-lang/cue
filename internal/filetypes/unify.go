@@ -24,6 +24,7 @@ import (
 	"cmp"
 	"maps"
 	"slices"
+	"strings"
 	"sync"
 
 	"cuelang.org/go/cue/build"
@@ -605,6 +606,11 @@ func toFileUncached(mode Mode, sc *scope, filename string) (*build.File, error) 
 			}
 			if decl.kind == concrete && decl.value != v {
 				return nil, errors.Newf(token.NoPos, "conflict on %s; %#v provided but need %#v", k, v, decl.value)
+			}
+			// A value outside a closed domain fails, as it would in CUE.
+			if !decl.allows(v) {
+				allowed := slices.DeleteFunc(slices.Clone(decl.domain), func(s string) bool { return s == "" })
+				return nil, errors.Newf(token.NoPos, "invalid value %q for tag %q; must be one of: %s", v, k, strings.Join(allowed, ", "))
 			}
 			e.tags[k] = cstr(v)
 		}

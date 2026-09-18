@@ -14,6 +14,7 @@ func newTagTypes() map[string]TagType {
 		"cue":                  TagTopLevel,
 		"dag":                  TagTopLevel,
 		"data":                 TagTopLevel,
+		"flavor":               TagSubsidiaryString,
 		"go":                   TagTopLevel,
 		"graph":                TagTopLevel,
 		"indentSequences":      TagSubsidiaryBool,
@@ -96,9 +97,11 @@ func newBuiltinRegistry() *registryData {
 					},
 				},
 				".ini": {
-					encoding:       sval{kind: concrete, value: "ini"},
-					interpretation: sval{kind: dflt, value: "auto"},
-					aspects:        aspectSet2,
+					encoding: sval{kind: concrete, value: "ini"},
+					aspects:  aspectSet2,
+					tags: map[string]sval{
+						"flavor": {kind: dflt, value: "", domain: []string{"", "git", "python", "systemd", "windows"}},
+					},
 				},
 				".json": {
 					encoding:       sval{kind: concrete, value: "json"},
@@ -195,6 +198,9 @@ func newBuiltinRegistry() *registryData {
 				".ini": {
 					encoding: sval{kind: concrete, value: "ini"},
 					aspects:  aspectSet2,
+					tags: map[string]sval{
+						"flavor": {kind: dflt, value: "", domain: []string{"", "git", "python", "systemd", "windows"}},
+					},
 				},
 				".json": {
 					encoding: sval{kind: concrete, value: "json"},
@@ -286,6 +292,9 @@ func newBuiltinRegistry() *registryData {
 				".ini": {
 					encoding: sval{kind: concrete, value: "ini"},
 					aspects:  aspectSet2,
+					tags: map[string]sval{
+						"flavor": {kind: dflt, value: "", domain: []string{"", "git", "python", "systemd", "windows"}},
+					},
 				},
 				".json": {
 					encoding: sval{kind: concrete, value: "json"},
@@ -377,6 +386,9 @@ func newBuiltinRegistry() *registryData {
 				".ini": {
 					encoding: sval{kind: concrete, value: "ini"},
 					aspects:  aspectSet2,
+					tags: map[string]sval{
+						"flavor": {kind: dflt, value: "", domain: []string{"", "git", "python", "systemd", "windows"}},
+					},
 				},
 				".json": {
 					encoding: sval{kind: concrete, value: "json"},
@@ -737,6 +749,9 @@ func newBuiltinRegistry() *registryData {
 			"ini": {
 				encoding: sval{kind: concrete, value: "ini"},
 				aspects:  aspectSet2,
+				tags: map[string]sval{
+					"flavor": {kind: dflt, value: "", domain: []string{"", "git", "python", "systemd", "windows"}},
+				},
 			},
 			"json": {
 				encoding: sval{kind: concrete, value: "json"},

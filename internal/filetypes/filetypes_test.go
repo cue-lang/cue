@@ -518,6 +518,53 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 	}, {
+		in: "ini+flavor=git: foo",
+		out: []*build.File{
+			{
+				Filename: "foo",
+				Encoding: build.INI,
+				Tags:     map[string]string{"flavor": "git"},
+			},
+		},
+	}, {
+		// The .ini extension resolves the encoding, so a bare flavor tag is
+		// enough, as "koala: x.xml" is for XML.
+		in: "flavor=git: foo.ini",
+		out: []*build.File{
+			{
+				Filename: "foo.ini",
+				Encoding: build.INI,
+				Tags:     map[string]string{"flavor": "git"},
+			},
+		},
+	}, {
+		in:  "ini+flavor=bogus: foo",
+		out: `invalid value "bogus" for tag "flavor"; must be one of: git, python, systemd, windows`,
+	}, {
+		in:  "ini+flavor=git+flavor=python: foo",
+		out: `conflicting values for tag "flavor": "git" and "python"`,
+	}, {
+		in:  "ini+flavor: foo",
+		out: `tag "flavor" must have value (flavor=<value>)`,
+	}, {
+		in:  "flavor=git: foo.json",
+		out: `tag flavor is not allowed in this context`,
+	}, {
+		in:  "json+flavor=git: foo",
+		out: `tag flavor is not allowed in this context`,
+	}, {
+		in:  "ini+git: foo",
+		out: `unknown filetype git`,
+	}, {
+		in: "foo.ini",
+		out: []*build.File{
+			{
+				Filename: "foo.ini",
+				Encoding: build.INI,
+				Tags:     map[string]string{"flavor": ""},
+			},
+		},
+	}, {
 		in: "koala: bar.xml",
 		out: []*build.File{
 			{

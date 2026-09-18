@@ -5,6 +5,25 @@ c: #R & {
 #R: {
 	w: [{}, ...]
 }
+
+// issue3487: a list of a definition closes its elements when it is embedded,
+// just as it does when it is unified in. https://cuelang.org/issue/3487
+issue3487: {
+	#Schema: known: string
+
+	unify: [...#Schema] & [{known: "foo", unknown: "bar"}] @test(err, code=eval, contains="field not allowed", pos=[0:40])
+
+	embed: {
+		@test(err, code=eval, contains="field not allowed", pos=[3:19])
+		[...#Schema]
+		[{known: "foo", unknown: "bar"}]
+	}
+}
+-- out/errors.txt --
+[eval] issue3487.unify.0.unknown: field not allowed:
+    ./in.cue:13:40
+[eval] issue3487.embed.0.unknown: field not allowed:
+    ./in.cue:18:19
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

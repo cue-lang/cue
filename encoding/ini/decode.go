@@ -19,13 +19,18 @@
 // standard for INI files, the zero [Config] accepts the subset every
 // flavor shares:
 //
-//   - Sections are declared with [name] headers.
+//   - Sections are declared with [name] headers; a repeated header
+//     reopens the section it names.
 //   - Properties use "key = value" syntax.
-//   - Lines whose first non-blank character is ; or # are comments.
-//   - Multi-word values do not require quoting; leading and trailing
-//     whitespace is trimmed.
-//   - Blank lines are ignored.
-//   - Duplicate keys within the same section are an error.
+//   - Lines whose first non-blank character is ; or # are comments;
+//     comments do not start within a value.
+//   - Values are the source text after the delimiter with leading and
+//     trailing whitespace trimmed and nothing else changed, so quotes,
+//     backslashes, ";" and "#" are all literal.
+//   - Blank lines are ignored, and a leading byte order mark is removed.
+//   - Duplicate keys within the same section are an error, as are an
+//     empty section name, text after "]", a line with no delimiter, and
+//     an empty key.
 //
 // Flavor differences are selected through the fields of [Config].
 //
@@ -38,6 +43,7 @@
 package ini
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -134,8 +140,6 @@ type Config struct {
 	// InlineComments reports whether a ";" or "#" preceded by a space or
 	// tab, outside a quoted value, starts a comment. It is off by default,
 	// so that no value is silently truncated.
-	//
-	// Not implemented yet; inline comments are always stripped.
 	InlineComments bool
 
 	// Quotes controls how quotation marks around a value are treated.
@@ -213,14 +217,13 @@ const (
 )
 
 // section tracks per-section state needed to detect name collisions.
+// It outlives any one [name] header, since a repeated header reopens the
+// section rather than starting a new one.
 type section struct {
 	// struct_ holds this section's fields.
 	struct_ *ast.StructLit
 	// keys records the kind of each name in struct_ for collision checks.
 	keys map[string]fieldKind
-	// explicit is true for [name] headers, and false for implicit parents
-	// of a nested path like `a` in [a.b].
-	explicit bool
 }
 
 // Decode parses the input stream as INI and converts it to a CUE [ast.Expr].
@@ -236,14 +239,16 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		return nil, err
 	}
 
+	// A byte order mark is not part of the first key.
+	data = bytes.TrimPrefix(data, []byte("\uFEFF"))
+
 	tokenFile := token.NewFile(d.filename, 0, len(data))
 	tokenFile.SetLinesForContent(data)
 	d.tokenFile = tokenFile
 
 	topSection := &section{
-		struct_:  &ast.StructLit{},
-		keys:     make(map[string]fieldKind),
-		explicit: true,
+		struct_: &ast.StructLit{},
+		keys:    make(map[string]fieldKind),
 	}
 	cur := topSection
 
@@ -252,20 +257,29 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 
 	offset := 0
 	for line := range strings.SplitSeq(string(data), "\n") {
-		pos := tokenFile.Pos(offset, token.NoRelPos)
+		lineOffset := offset
 		offset += len(line) + 1
+		pos := tokenFile.Pos(lineOffset, token.NoRelPos)
 		trimmed := strings.TrimSpace(line)
 
 		// Skip blank lines and comments.
 		if trimmed == "" || trimmed[0] == ';' || trimmed[0] == '#' {
 			continue
 		}
+		// indent is how far trimmed sits into line, so that an index into
+		// trimmed can be turned into a position.
+		indent := strings.Index(line, trimmed)
 
 		// Section header.
 		if trimmed[0] == '[' {
 			closeIdx := strings.IndexByte(trimmed, ']')
 			if closeIdx < 0 {
 				return nil, errors.Newf(pos, "missing closing bracket for section header")
+			}
+			if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" {
+				if !d.cfg.InlineComments || (rest[0] != ';' && rest[0] != '#') {
+					return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
+				}
 			}
 			sectionName := strings.TrimSpace(trimmed[1:closeIdx])
 			if d.cfg.Case == CaseLower {
@@ -274,24 +288,21 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 			if sectionName == "" {
 				return nil, errors.Newf(pos, "empty section name")
 			}
-			if existing := sections[sectionName]; existing != nil && existing.explicit {
-				return nil, errors.Newf(pos, "duplicate section: %s", sectionName)
-			}
 
 			sec, err := d.buildNestedSection(sections, sectionName, pos)
 			if err != nil {
 				return nil, err
 			}
-			sec.explicit = true
 			cur = sec
 			continue
 		}
 
 		// Key-value pair.
-		key, value, ok := parseKeyValue(trimmed)
+		key, value, valueIdx, ok := d.parseKeyValue(trimmed)
 		if !ok {
 			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
+		valuePos := tokenFile.Pos(lineOffset+indent+valueIdx, token.NoRelPos)
 
 		if d.cfg.Case == CaseLowerKeys || d.cfg.Case == CaseLower {
 			key = strings.ToLower(key)
@@ -304,7 +315,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 		cur.keys[key] = kindProperty
 
-		field, err := makeField(key, value, pos, d.cfg.Values == ValuesTyped)
+		field, err := makeField(key, value, pos, valuePos, d.cfg.Values == ValuesTyped)
 		if err != nil {
 			return nil, errors.Newf(pos, "%v", err)
 		}
@@ -313,35 +324,50 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	return topSection.struct_, nil
 }
 
-// parseKeyValue splits a line into key and value using "=" as delimiter.
-// It returns the trimmed key, trimmed value and whether the split succeeded.
-func parseKeyValue(line string) (key, value string, ok bool) {
+// parseKeyValue splits a trimmed line into key and value using "=" as
+// delimiter. It returns the trimmed key, the trimmed value, the index of the
+// first character of the value text within line, and whether the split
+// succeeded.
+func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, ok bool) {
 	key, value, ok = strings.Cut(line, "=")
 	if !ok {
-		return "", "", false
+		return "", "", 0, false
 	}
+	valueIdx = len(key) + 1
 	key = strings.TrimSpace(key)
 	if key == "" {
-		return "", "", false
+		return "", "", 0, false
 	}
-	value = strings.TrimSpace(value)
+	unindented := strings.TrimLeft(value, " \t")
+	valueIdx += len(value) - len(unindented)
+	value = strings.TrimSpace(unindented)
 
-	// Strip inline comments (only if preceded by whitespace).
-	// For quoted values, only comments after the closing quote are stripped.
+	if d.cfg.InlineComments {
+		value = stripInlineComment(value)
+	}
+	return key, value, valueIdx, true
+}
+
+// stripInlineComment trims value before the first ";" or "#" preceded by a
+// space or tab. A quoted prefix protects its own contents, so only a comment
+// after the closing quote is stripped. Since value is already trimmed, a
+// value starting with ";" or "#" is never a comment.
+func stripInlineComment(value string) string {
 	start := 0
 	if len(value) >= 2 && (value[0] == '"' || value[0] == '\'') {
 		if closeIdx := strings.IndexByte(value[1:], value[0]); closeIdx >= 0 {
 			start = closeIdx + 2
 		}
 	}
-	if i := strings.IndexAny(value[start:], ";#"); i >= 0 {
-		i += start
+	for i := start; i < len(value); i++ {
+		if c := value[i]; c != ';' && c != '#' {
+			continue
+		}
 		if i > 0 && (value[i-1] == ' ' || value[i-1] == '\t') {
-			value = strings.TrimRight(value[:i-1], " \t")
+			return strings.TrimRight(value[:i-1], " \t")
 		}
 	}
-
-	return key, value, true
+	return value
 }
 
 // buildNestedSection walks the section path, creating and registering missing
@@ -387,22 +413,24 @@ func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName s
 }
 
 // makeField creates a CUE field with an appropriate value literal.
-// When typedValues is true, values are parsed as booleans or numbers when possible.
-func makeField(key, value string, pos token.Pos, typedValues bool) (*ast.Field, error) {
+// When typedValues is true, values are parsed as booleans or numbers when
+// possible. The label carries keyPos and the value carries valuePos, so that
+// an evaluator conflict points into the value rather than at the line.
+func makeField(key, value string, keyPos, valuePos token.Pos, typedValues bool) (*ast.Field, error) {
 	var v ast.Expr
 	if typedValues {
 		var err error
-		v, err = makeValueLit(value, pos)
+		v, err = makeValueLit(value, valuePos)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		v = newStringLit(value, pos)
+		v = newStringLit(value, valuePos)
 	}
 	return &ast.Field{
-		Label:    makeLabel(key, pos),
+		Label:    makeLabel(key, keyPos),
 		Value:    v,
-		TokenPos: pos,
+		TokenPos: keyPos,
 	}, nil
 }
 

@@ -1,0 +1,38 @@
+#crlf
+-- in.ini --
+; Sample Windows profile, modelled on a file read with
+; GetPrivateProfileString.
+[Settings]
+WindowTitle="My Application"
+WindowWidth=1024
+WindowHeight=768
+
+[Paths]
+InstallDir=C:\Program Files\MyApp
+DataDir="C:\ProgramData\My App"
+
+[Network]
+ProxyServer=proxy.example.com:8080
+Timeout=30
+
+[Logging]
+Timeout=5
+LogFile=C:\ProgramData\MyApp\log.txt
+-- out/decode/default --
+Settings: {
+	WindowTitle:  "\"My Application\""
+	WindowWidth:  "1024"
+	WindowHeight: "768"
+}
+Paths: {
+	InstallDir: "C:\\Program Files\\MyApp"
+	DataDir:    "\"C:\\ProgramData\\My App\""
+}
+Network: {
+	ProxyServer: "proxy.example.com:8080"
+	Timeout:     "30"
+}
+Logging: {
+	Timeout: "5"
+	LogFile: "C:\\ProgramData\\MyApp\\log.txt"
+}

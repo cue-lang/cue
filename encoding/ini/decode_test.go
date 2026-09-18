@@ -182,12 +182,10 @@ func TestDecoder(t *testing.T) {
 			flags = -a #b
 			color = #fff
 			`,
-		// Intended: ExecStart is "/bin/echo one ; /bin/echo two" and flags
-		// is "-a #b", since inline comments are off by default.
 		wantCUE: `
 			Service: {
-				ExecStart: "/bin/echo one"
-				flags:     "-a"
+				ExecStart: "/bin/echo one ; /bin/echo two"
+				flags:     "-a #b"
 				color:     "#fff"
 			}
 			`,
@@ -356,11 +354,11 @@ func TestDecoder(t *testing.T) {
 			[section]
 			key2 = value2
 			`,
-		// Intended: the two headers merge into one struct holding key1
-		// and key2 in first-appearance order.
-		wantErr: `
-			duplicate section: section:
-			    test.ini:4:1
+		wantCUE: `
+			section: {
+				key1: "value1"
+				key2: "value2"
+			}
 			`,
 	}, {
 		name: "RepeatedSectionHeader/DuplicateKeyAcrossOccurrences",
@@ -371,11 +369,9 @@ func TestDecoder(t *testing.T) {
 			[section]
 			key = value2
 			`,
-		// Intended: the same error, reported at line 5 once the repeated
-		// header itself is accepted.
 		wantErr: `
-			duplicate section: section:
-			    test.ini:4:1
+			duplicate key: key:
+			    test.ini:5:1
 			`,
 	}, {
 		name:   "PropertyShadowsExistingSubsection",
@@ -477,10 +473,11 @@ func TestDecoder(t *testing.T) {
 			[section]
 			key2 = value2
 			`,
-		// Intended: one "section" struct holding key1 and key2.
-		wantErr: `
-			duplicate section: section:
-			    test.ini:4:1
+		wantCUE: `
+			section: {
+				key1: "value1"
+				key2: "value2"
+			}
 			`,
 	}, {
 		name: "SecondDecodeReturnsEOF",
@@ -801,9 +798,9 @@ func TestDecoder(t *testing.T) {
 			[a]b
 			key = value
 			`,
-		// Intended: an error at line 1 naming the text after "]".
-		wantCUE: `
-			a: key: "value"
+		wantErr: `
+			unexpected text after section header: b:
+			    test.ini:1:1
 			`,
 	}, {
 		name: "HeaderTrailingComment/RejectedByDefault",
@@ -811,9 +808,9 @@ func TestDecoder(t *testing.T) {
 			[s] ; c
 			key = value
 			`,
-		// Intended: an error at line 1, since inline comments are off.
-		wantCUE: `
-			s: key: "value"
+		wantErr: `
+			unexpected text after section header: ; c:
+			    test.ini:1:1
 			`,
 	}, {
 		name:   "HeaderTrailingComment/AcceptedWithInlineComments",
@@ -828,9 +825,8 @@ func TestDecoder(t *testing.T) {
 	}, {
 		name:  "LeadingBOM",
 		input: "\ufeffkey = value\n",
-		// Intended: the byte order mark is removed, so the key is "key".
 		wantCUE: `
-			"\ufeffkey": "value"
+			key: "value"
 			`,
 	}}
 
@@ -881,8 +877,7 @@ func TestPositions(t *testing.T) {
 	sec := expr.(*ast.StructLit).Elts[0].(*ast.Field)
 	field := sec.Value.(*ast.StructLit).Elts[0].(*ast.Field)
 	qt.Assert(t, qt.Equals(field.Label.Pos().String(), "test.ini:2:1"))
-	// Intended: test.ini:2:7, the first character of the value text.
-	qt.Assert(t, qt.Equals(field.Value.Pos().String(), "test.ini:2:1"))
+	qt.Assert(t, qt.Equals(field.Value.Pos().String(), "test.ini:2:7"))
 }
 
 // unindent strips the common leading whitespace from a multi-line raw string,

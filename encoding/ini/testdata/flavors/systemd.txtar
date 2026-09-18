@@ -1,0 +1,24 @@
+-- in.ini --
+# Sample systemd service unit, modelled on a .service file read per
+# systemd.syntax(7).
+[Unit]
+Description=Example service
+; Comments may also start with a semicolon.
+After=network.target
+
+[Service]
+Environment=FIRST=1
+Environment=SECOND=2
+Environment=THIRD=3
+ExecStart=/bin/sh -c 'echo one ; echo two'
+ExecReload=/bin/kill -HUP $MAINPID \
+# A comment block between the backslash and its continuation is skipped.
+; So is this one.
+	--timeout 5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+-- out/decode/default --
+duplicate key: Environment:
+    in.ini:10:1

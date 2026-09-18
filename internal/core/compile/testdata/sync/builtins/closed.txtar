@@ -75,6 +75,21 @@ embeddedDisjunction: {
 	t1: v & {a: 1}
 	t2: v & {d: 3}
 }
+
+// issue3963: close over a disjunction closes each disjunct, so unifying the
+// result selects the disjunct which admits the added field, and a field no
+// disjunct admits is denied. https://cuelang.org/issue/3963
+issue3963: {
+	#A: a: string
+	#B: b: string
+
+	disjunction: (#A | #B) & {a: "x"}
+	closed:      close(#A | #B) & {a: "x"}
+	denied:      close(#A | #B) & {c: "x"}
+
+	#D: #A | #B
+	definition: #D & {a: "x"}
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -471,6 +486,27 @@ issue1206: elimination: {
     })
     t2: (〈0;v〉 & {
       d: 3
+    })
+  }
+  issue3963: {
+    #A: {
+      a: string
+    }
+    #B: {
+      b: string
+    }
+    disjunction: ((〈0;#A〉|〈0;#B〉) & {
+      a: "x"
+    })
+    closed: (close((〈0;#A〉|〈0;#B〉)) & {
+      a: "x"
+    })
+    denied: (close((〈0;#A〉|〈0;#B〉)) & {
+      c: "x"
+    })
+    #D: (〈0;#A〉|〈0;#B〉)
+    definition: (〈0;#D〉 & {
+      a: "x"
     })
   }
 }

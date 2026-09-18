@@ -129,6 +129,21 @@ embeddedDisjunction: {
 	t1: v & {a: 1} @test(eq, {a: 1, c: 2})
 	t2: v & {d: 3} @test(err, code=eval, contains="field not allowed", pos=[0:11])
 }
+
+// issue3963: close over a disjunction closes each disjunct, so unifying the
+// result selects the disjunct which admits the added field, and a field no
+// disjunct admits is denied. https://cuelang.org/issue/3963
+issue3963: {
+	#A: a: string
+	#B: b: string
+
+	disjunction: (#A | #B) & {a: "x"} @test(eq, {a: "x"})
+	closed:      close(#A | #B) & {a: "x"} @test(eq, {a: "x"})
+	denied:      close(#A | #B) & {c: "x"} @test(err, code=eval, contains="field not allowed", pos=[0:33])
+
+	#D: #A | #B
+	definition: #D & {a: "x"} @test(eq, {a: "x"})
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -224,17 +239,17 @@ issue1206: elimination: {
 }
 
 -- out/eval/stats --
-Leaks:  8
-Freed:  405
-Reused: 367
-Allocs: 46
+Leaks:  14
+Freed:  452
+Reused: 419
+Allocs: 47
 Retain: 0
 
-Unifications: 263
-Conjuncts:    475
-Disjuncts:    34
+Unifications: 294
+Conjuncts:    538
+Disjuncts:    48
 
-NumCloseIDs: 87
+NumCloseIDs: 110
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7
@@ -254,6 +269,8 @@ NumCloseIDs: 87
     ./in.cue:5:9
 [eval] embeddedDisjunction.t2.d: field not allowed:
     ./in.cue:129:11
+[eval] issue3963.denied.c: field not allowed:
+    ./in.cue:141:33
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

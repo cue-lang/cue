@@ -531,7 +531,368 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "DuplicateKeys/Error",
+		name:   "Continuations/Backslash",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			[alias]
+			lg = log --graph \
+				--oneline \
+				--decorate
+			plain = log
+			`,
+		wantCUE: `
+			alias: {
+				lg:    "log --graph \t--oneline \t--decorate"
+				plain: "log"
+			}
+			`,
+	}, {
+		name:   "Continuations/Backslash/ContinuationIsNotClassified",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			comment = a\
+			; still the value
+			header = b\
+			[still the value]
+			`,
+		wantCUE: `
+			comment: "a; still the value"
+			header:  "b[still the value]"
+			`,
+	}, {
+		name:   "Continuations/Backslash/CommentsAndHeadersDoNotContinue",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			; a comment ending in a backslash \
+			[section]
+			key = value
+			`,
+		wantCUE: `
+			section: key: "value"
+			`,
+	}, {
+		// A backslash with nothing after it ends the value, as git and
+		// systemd read one, and git keeps the space before it.
+		name:   "Continuations/Backslash/NothingAfterTheBackslash",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			key = value \
+			`,
+		wantCUE: `
+			key: "value "
+			`,
+	}, {
+		// A backslash reached only by ignoring an inline comment is part of
+		// the comment, so it continues nothing and the next property stands.
+		name:   "Continuations/Backslash/BackslashInsideAnInlineComment",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		input: `
+			[core]
+			a = one ; a comment \
+			b = two
+			`,
+		wantCUE: `
+			core: {
+				a: "one"
+				b: "two"
+			}
+			`,
+	}, {
+		// Inline comments apply to continued text too.
+		name:   "Continuations/Backslash/ContinuedTextCarriesAComment",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		input: `
+			a = one\
+			two ; a comment
+			`,
+		wantCUE: `
+			a: "onetwo"
+			`,
+	}, {
+		name:   "Continuations/Backslash/QuotedValueSpansLines",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true, Quotes: ini.QuotesEscaped},
+		input: `
+			[a]
+			key = "one ; two \
+				three"
+			`,
+		wantCUE: `
+			a: key: "one ; two \tthree"
+			`,
+	}, {
+		// A quote within the value opens a span when its match is on a
+		// line the value continues onto, as git reads a double quote, while
+		// one with no match anywhere stays an ordinary character.
+		name:   "Continuations/Backslash/QuotedSpanWithinAValueSpansLines",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true, Quotes: ini.QuotesEscaped},
+		input: `
+			[alias]
+			demo = !echo "one \
+			 #two"
+			semi = !echo "a ; b \
+			 c" ; a comment
+			apos = don't ; a comment \
+			other = 1
+			`,
+		wantCUE: `
+			alias: {
+				demo:  "!echo one  #two"
+				semi:  "!echo a ; b  c"
+				apos:  "don't"
+				other: "1"
+			}
+			`,
+	}, {
+		// An even run of trailing backslashes continues nothing, so the
+		// next property stands. Both backslashes stay in the value, since
+		// nothing unescapes an unquoted one.
+		name:   "Continuations/Backslash/EscapedTrailingBackslash",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		input: `
+			[core]
+			a = path\\
+			b = two
+			`,
+		wantCUE: `
+			core: {
+				a: "path\\\\"
+				b: "two"
+			}
+			`,
+	}, {
+		name:   "Continuations/Backslash/OddRunContinues",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			a = one\\\
+			two
+			`,
+		wantCUE: `
+			a: "one\\\\two"
+			`,
+	}, {
+		// A comment may open the line a value continues onto, which ends the
+		// value there, keeping the space before the backslash as git does.
+		name:   "Continuations/Backslash/CommentOpensTheContinuedLine",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		input: `
+			[a]
+			k = one \
+			; a comment
+			`,
+		wantCUE: `
+			a: k: "one "
+			`,
+	}, {
+		// A blank line after a backslash ends the value, as git and systemd
+		// read one.
+		name:   "Continuations/Backslash/BlankLineAfterTheBackslash",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			a = one\
+
+			b = two
+			`,
+		wantCUE: `
+			a: "one"
+			b: "two"
+			`,
+	}, {
+		// A value starts at its first character other than whitespace, even
+		// one on a continuation line, as git reads it.
+		name:   "Continuations/Backslash/EmptyFirstLine",
+		config: ini.Config{Continuations: ini.ContinuationsBackslash},
+		input: `
+			x = \
+			   foo
+			`,
+		wantCUE: `
+			x: "foo"
+			`,
+	}, {
+		name:   "Continuations/BackslashSpace",
+		config: ini.Config{Continuations: ini.ContinuationsBackslashSpace},
+		input: `
+			[Service]
+			ExecStart=/bin/echo one\
+			two
+			After=network.target \
+			auditd.service
+			`,
+		wantCUE: `
+			Service: {
+				ExecStart: "/bin/echo one two"
+				After:     "network.target  auditd.service"
+			}
+			`,
+	}, {
+		// systemd.syntax(7) ignores a comment block between a backslash and
+		// the line it continues onto.
+		name:   "Continuations/BackslashSpace/CommentBlockIsSkipped",
+		config: ini.Config{Continuations: ini.ContinuationsBackslashSpace},
+		input: `
+			[Section C]
+			KeyThree=value 3\
+			# this line is ignored
+			; this line is ignored too
+			       value 3 continued
+			`,
+		wantCUE: `
+			"Section C": KeyThree: "value 3        value 3 continued"
+			`,
+	}, {
+		// Only a backslash ending the line continues the value, so one
+		// followed by spaces stays in it, as systemd reads it.
+		name:   "Continuations/BackslashSpace/SpaceAfterTheBackslash",
+		config: ini.Config{Continuations: ini.ContinuationsBackslashSpace},
+		input:  "a = one \\  \nb = two\n",
+		wantCUE: `
+			a: "one \\"
+			b: "two"
+			`,
+	}, {
+		name:   "Continuations/BackslashSpace/BlankLineAfterTheBackslash",
+		config: ini.Config{Continuations: ini.ContinuationsBackslashSpace},
+		input: `
+			a = one \
+
+			b = two
+			`,
+		wantCUE: `
+			a: "one"
+			b: "two"
+			`,
+	}, {
+		// configparser ignores a comment line within a value, indented or
+		// not, and resumes the value after it.
+		name:   "Continuations/Indented/CommentWithinTheValue",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			[s]
+			indented = one
+			    # explanation
+			    two
+			unindented = one
+			# explanation
+			    two
+			`,
+		wantCUE: `
+			s: {
+				indented:   "one\ntwo"
+				unindented: "one\ntwo"
+			}
+			`,
+	}, {name: "Continuations/Indented",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			[metadata]
+			long_description = the first line
+			    the second line
+			        the third line
+			license = Apache-2.0
+			`,
+		wantCUE: `
+			metadata: {
+				long_description: "the first line\nthe second line\nthe third line"
+				license:          "Apache-2.0"
+			}
+			`,
+	}, {
+		name:   "Continuations/Indented/InlineCommentInContinuedText",
+		config: ini.Config{Continuations: ini.ContinuationsIndented, InlineComments: true},
+		input: `
+			key = first ; a comment
+			    second ; another
+			`,
+		wantCUE: `
+			key: "first\nsecond"
+			`,
+	}, {
+		name:   "Continuations/Indented/QuotedSpanWithinAValueSpansLines",
+		config: ini.Config{Continuations: ini.ContinuationsIndented, InlineComments: true},
+		input: `
+			key = one "two
+			    three ; four" ; a comment
+			apos = don't
+			    stop ; a comment
+			`,
+		wantCUE: `
+			key:  "one \"two\nthree ; four\""
+			apos: "don't\nstop"
+			`,
+	}, {
+		// A blank line is an empty line of the value when a continuation line
+		// follows it, as configparser reads one; otherwise the value ends
+		// before it.
+		name:   "Continuations/Indented/BlankLineWithinTheValue",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			key = first
+			    second
+
+			    third = 3
+			other = one
+			    two
+
+
+			next = 2
+			`,
+		wantCUE: `
+			key:   "first\nsecond\n\nthird = 3"
+			other: "one\ntwo"
+			next:  "2"
+			`,
+	}, {
+		// configparser trims each line of a value, so an empty first line
+		// leaves the value starting with a line break.
+		name:   "Continuations/Indented/EmptyFirstLine",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			install_requires =
+			    foo
+
+			    bar
+			`,
+		wantCUE: `
+			install_requires: "\nfoo\n\nbar"
+			`,
+	}, {
+		name:   "Continuations/Indented/SameIndentIsNotAContinuation",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			[options]
+			    python_requires = >=3.9
+			    zip_safe = False
+			`,
+		wantCUE: `
+			options: {
+				python_requires: ">=3.9"
+				zip_safe:        "False"
+			}
+			`,
+	}, {
+		name:   "Continuations/Indented/NoPrecedingProperty",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			    orphan
+			key = value
+			`,
+		wantErr: `
+			invalid line: orphan:
+			    test.ini:1:1
+			`,
+	}, {
+		name:   "Continuations/Indented/HeaderEndsTheContinuation",
+		config: ini.Config{Continuations: ini.ContinuationsIndented},
+		input: `
+			key = first
+			[section]
+			other = second
+			`,
+		wantCUE: `
+			key: "first"
+			section: other: "second"
+			`,
+	}, {name: "DuplicateKeys/Error",
 		config: ini.Config{DuplicateKeys: ini.DuplicatesError},
 		input: `
 			[section]

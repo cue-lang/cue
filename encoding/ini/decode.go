@@ -47,6 +47,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -89,10 +90,11 @@ const (
 type ContinuationMode int
 
 const (
-	continuationsUnset     ContinuationMode = iota // default zero value; equal to [ContinuationsNone] for now
-	ContinuationsNone                              // every value ends at its line
-	ContinuationsBackslash                         // a trailing backslash continues the value on the next line
-	ContinuationsIndented                          // an indented line continues the value of the preceding property
+	continuationsUnset          ContinuationMode = iota // default zero value; equal to [ContinuationsNone] for now
+	ContinuationsNone                                   // every value ends at its line
+	ContinuationsBackslash                              // a trailing backslash is dropped and the next line joined on
+	ContinuationsBackslashSpace                         // a trailing backslash becomes a space, and comment lines between are skipped
+	ContinuationsIndented                               // an indented line continues the value of the preceding property
 )
 
 // BareKeyMode controls how the decoder treats a line holding a key and no delimiter.
@@ -166,8 +168,6 @@ type Config struct {
 
 	// Continuations controls how a value may span several lines.
 	// By default it may not ([ContinuationsNone]).
-	//
-	// Not implemented yet.
 	Continuations ContinuationMode
 
 	// BareKeys controls what a line holding a key and no delimiter means.
@@ -190,7 +190,16 @@ type Config struct {
 // NewDecoder creates a decoder for the INI flavor cfg describes.
 // The decoder keeps its own copy of cfg; later changes to cfg have no effect.
 func NewDecoder(filename string, r io.Reader, cfg Config) *Decoder {
-	return &Decoder{r: r, filename: filename, cfg: cfg}
+	d := &Decoder{r: r, filename: filename, cfg: cfg}
+	switch cfg.Continuations {
+	case ContinuationsBackslash:
+		d.backslashJoins = true
+	case ContinuationsBackslashSpace:
+		d.backslashJoins, d.sep = true, " "
+	case ContinuationsIndented:
+		d.sep = "\n"
+	}
+	return d
 }
 
 // Decoder implements the decoding state for INI input.
@@ -202,6 +211,13 @@ type Decoder struct {
 	filename  string
 	cfg       Config
 	tokenFile *token.File
+	lines     []line
+
+	// sep joins the fragments of a value, and backslashJoins reports
+	// whether a trailing backslash continues one. Both follow from
+	// [Config.Continuations], so they are resolved once.
+	sep            string
+	backslashJoins bool
 }
 
 // section tracks per-section state needed to detect name collisions.
@@ -245,27 +261,26 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	// A byte order mark is not part of the first key.
 	data = bytes.TrimPrefix(data, []byte("\uFEFF"))
 
-	tokenFile := token.NewFile(d.filename, 0, len(data))
-	tokenFile.SetLinesForContent(data)
-	d.tokenFile = tokenFile
+	d.tokenFile = token.NewFile(d.filename, 0, len(data))
+	d.tokenFile.SetLinesForContent(data)
 
 	topSection := newSection(&ast.StructLit{})
 	cur := topSection
 
-	offset := 0
-	for line := range strings.SplitSeq(string(data), "\n") {
-		lineOffset := offset
-		offset += len(line) + 1
-		pos := tokenFile.Pos(lineOffset, token.NoRelPos)
-		trimmed := strings.TrimSpace(line)
+	d.lines = splitLines(string(data))
+	for i := 0; i < len(d.lines); i++ {
+		line := d.lines[i]
+		pos := d.pos(line.offset)
+		trimmed := strings.TrimSpace(line.text)
+		// indent is how far trimmed sits into line.text, so that an index
+		// into trimmed can be turned into a position and an indented
+		// continuation line can be told from a new property.
+		indent := indentOf(line.text)
 
 		// Skip blank lines and comments.
-		if trimmed == "" || trimmed[0] == ';' || trimmed[0] == '#' {
+		if trimmed == "" || isComment(trimmed) {
 			continue
 		}
-		// indent is how far trimmed sits into line, so that an index into
-		// trimmed can be turned into a position.
-		indent := strings.Index(line, trimmed)
 
 		// Section header.
 		if trimmed[0] == '[' {
@@ -276,95 +291,333 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 			continue
 		}
 
-		// Key-value pair.
-		key, value, valueIdx, ok := d.parseKeyValue(trimmed)
+		// Key-value pair. The value keeps any trailing whitespace, which
+		// decides whether a backslash ends the line.
+		key, value, valueIdx, ok := d.parseKeyValue(line.text[indent:])
 		if !ok {
 			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
-		valuePos := tokenFile.Pos(lineOffset+indent+valueIdx, token.NoRelPos)
-		value, quoted, err := d.applyQuotes(value, valuePos)
-		if err != nil {
-			return nil, err
-		}
-
 		if d.cfg.Case == CaseLowerKeys || d.cfg.Case == CaseLower {
 			key = strings.ToLower(key)
 		}
-		if cur.children[key] != nil {
-			return nil, errors.Newf(pos, "property %s conflicts with section of the same name", key)
+		p := &property{
+			sec:      cur,
+			key:      key,
+			keyPos:   pos,
+			valuePos: d.pos(line.offset + indent + valueIdx),
+			indent:   indent,
 		}
-		if field := cur.props[key]; field != nil {
-			if err := d.addDuplicate(key, field, value, quoted, pos, valuePos); err != nil {
-				return nil, err
-			}
-			continue
+		continued := d.addFragment(p, value, i)
+		if d.cfg.Continuations == ContinuationsIndented {
+			i = d.joinIndented(p, i)
+		} else {
+			i = d.joinContinuations(p, continued, i)
 		}
-
-		field, err := d.makeField(key, value, quoted, pos, valuePos)
-		if err != nil {
-			return nil, errors.Newf(pos, "%v", err)
+		if err := d.addProperty(p); err != nil {
+			return nil, err
 		}
-		cur.fields.Elts = append(cur.fields.Elts, field)
-		cur.props[key] = field
 	}
 	return topSection.fields, nil
 }
 
-// parseKeyValue splits a trimmed line into key and value using "=" as
-// delimiter. It returns the trimmed key, the trimmed value, the index of the
-// first character of the value text within line, and whether the split
-// succeeded.
+// pos turns an offset into the input into a position.
+func (d *Decoder) pos(offset int) token.Pos {
+	return d.tokenFile.Pos(offset, token.NoRelPos)
+}
+
+// line is one logical input line: the text to classify, and the offset at
+// which it starts in the input.
+type line struct {
+	text   string
+	offset int
+}
+
+// property is a decoded key and the fragments of its value, held until no
+// further input line can extend the value.
+type property struct {
+	sec      *section
+	key      string
+	keyPos   token.Pos
+	valuePos token.Pos
+	// indent is how far the key sits into its line, which an indented
+	// continuation line must exceed.
+	indent int
+
+	// parts are the fragments of the value, joined by [Decoder.sep]. Each
+	// fragment is scanned once, rather than the value assembled so far, so
+	// that decoding stays linear in the size of the input.
+	parts []string
+	// prev is the last byte of the fragments so far, and open the quote one
+	// of them left unclosed, which the next fragment continues inside. Both
+	// are zero at the start of a value.
+	prev byte
+	open byte
+}
+
+// addFragment appends text, from line i, to p's value, dropping an inline
+// comment it starts and carrying the quote it leaves open. It reports whether
+// text ends in a line continuation, whose backslash it drops.
+func (d *Decoder) addFragment(p *property, text string, i int) (continued bool) {
+	if d.cfg.InlineComments {
+		prev := p.prev
+		if len(p.parts) > 0 && d.sep != "" {
+			prev = d.sep[len(d.sep)-1]
+		}
+		text, p.open = d.stripInlineComment(p, text, i, prev)
+	}
+	if d.backslashJoins && continues(text) {
+		text, continued = text[:len(text)-1], true
+	}
+	// An empty fragment contributes no bytes, so it leaves prev alone.
+	if text != "" {
+		p.prev = text[len(text)-1]
+	}
+	p.parts = append(p.parts, text)
+	return continued
+}
+
+// value joins the fragments of p's value and trims it. configparser trims
+// each line of an indented value, keeping the line break an empty first line
+// leaves, while git keeps the whitespace before a continuation backslash even
+// at the end of the value.
+func (d *Decoder) value(p *property) string {
+	switch d.cfg.Continuations {
+	case ContinuationsIndented:
+		for i, part := range p.parts {
+			p.parts[i] = strings.TrimSpace(part)
+		}
+		return strings.TrimRightFunc(strings.Join(p.parts, d.sep), unicode.IsSpace)
+	case ContinuationsBackslash:
+		last := len(p.parts) - 1
+		p.parts[last] = strings.TrimRightFunc(p.parts[last], unicode.IsSpace)
+		return strings.TrimLeftFunc(strings.Join(p.parts, d.sep), unicode.IsSpace)
+	}
+	return strings.TrimSpace(strings.Join(p.parts, d.sep))
+}
+
+// splitLines splits data into its lines, dropping a carriage return before
+// each newline but counting it in the offset.
+func splitLines(data string) []line {
+	var lines []line
+	offset := 0
+	for text := range strings.SplitSeq(data, "\n") {
+		lines = append(lines, line{text: strings.TrimSuffix(text, "\r"), offset: offset})
+		offset += len(text) + 1
+	}
+	return lines
+}
+
+// joinIndented extends p's value with the lines after line i that are
+// indented further than its key, returning the index of the last line it
+// consumed. A blank line between two such lines is an empty line of the
+// value.
+func (d *Decoder) joinIndented(p *property, i int) int {
+	for next := d.nextIndented(p, i); next >= 0; next = d.nextIndented(p, i) {
+		for i++; i < next; i++ {
+			if strings.TrimSpace(d.lines[i].text) == "" {
+				p.parts = append(p.parts, "")
+			}
+		}
+		d.addFragment(p, d.lines[i].text, i)
+	}
+	return i
+}
+
+// indentOf returns the length of the leading white space of text.
+func indentOf(text string) int {
+	return len(text) - len(strings.TrimLeftFunc(text, unicode.IsSpace))
+}
+
+// nextIndented returns the index of the line after line i that continues p's
+// value under [ContinuationsIndented], or -1 when the value ends at line i.
+// Neither a comment line nor a blank line ends the value, so either may sit
+// in the middle of one, as configparser reads it.
+func (d *Decoder) nextIndented(p *property, i int) int {
+	for next := i + 1; next < len(d.lines); next++ {
+		text := d.lines[next].text
+		trimmed := strings.TrimSpace(text)
+		if trimmed == "" || isComment(trimmed) {
+			continue
+		}
+		if indentOf(text) <= p.indent {
+			break
+		}
+		return next
+	}
+	return -1
+}
+
+// joinContinuations extends p's value with the lines that a trailing
+// backslash continues it onto, returning the index of the last line it
+// consumed. continued reports whether the value so far ends in such a
+// backslash; since every fragment has had its inline comment removed
+// already, a backslash inside a comment continues nothing.
+//
+// The backslash is dropped under [ContinuationsBackslash] and becomes a
+// space under [ContinuationsBackslashSpace]. The text is appended as it
+// stands, indentation included, and an inline comment within it ends the
+// value. A blank line or the end of the input after the backslash ends the
+// value, as git and systemd both read it; an empty last fragment then stands
+// for that line, so that [Decoder.value] keeps the whitespace before the
+// backslash.
+func (d *Decoder) joinContinuations(p *property, continued bool, i int) int {
+	for continued {
+		next := d.nextBackslashed(i)
+		if next < 0 {
+			p.parts = append(p.parts, "")
+			break
+		}
+		i = next
+		continued = d.addFragment(p, d.lines[i].text, i)
+	}
+	return i
+}
+
+// nextBackslashed returns the index of the line that a backslash ending line
+// i continues onto, or -1 when a blank line or the end of the input follows
+// it. [ContinuationsBackslashSpace] skips a block of whole-line comments
+// between the two.
+func (d *Decoder) nextBackslashed(i int) int {
+	for next := i + 1; next < len(d.lines); next++ {
+		trimmed := strings.TrimSpace(d.lines[next].text)
+		if trimmed == "" {
+			return -1
+		}
+		if d.cfg.Continuations != ContinuationsBackslashSpace || !isComment(trimmed) {
+			return next
+		}
+	}
+	return -1
+}
+
+// closesLater reports whether quote, left unmatched by the rest of text, the
+// fragment of p's value from line i, is matched on a line continuing the
+// value. Within the span the quote would open there is no comment, so a
+// backslash ending text continues the value.
+//
+// A search that fails reads only lines holding no such quote, where no later
+// search can start, and one that succeeds reads only lines the span then
+// covers, so decoding stays linear in the size of the input.
+func (d *Decoder) closesLater(p *property, text string, i int, quote byte) bool {
+	switch d.cfg.Continuations {
+	case ContinuationsIndented:
+		for i = d.nextIndented(p, i); i >= 0; i = d.nextIndented(p, i) {
+			if d.closingQuote(d.lines[i].text, 0, quote) >= 0 {
+				return true
+			}
+		}
+	case ContinuationsBackslash, ContinuationsBackslashSpace:
+		for continues(text) {
+			if i = d.nextBackslashed(i); i < 0 {
+				return false
+			}
+			text = d.lines[i].text
+			if d.closingQuote(text, 0, quote) >= 0 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// continues reports whether text ends in a line continuation: a backslash
+// that the one before it does not escape. A run of trailing backslashes
+// therefore continues the value only when its length is odd.
+func continues(text string) bool {
+	n := 0
+	for n < len(text) && text[len(text)-1-n] == '\\' {
+		n++
+	}
+	return n%2 == 1
+}
+
+// isComment reports whether a trimmed line is a whole-line comment.
+func isComment(trimmed string) bool {
+	return trimmed != "" && (trimmed[0] == ';' || trimmed[0] == '#')
+}
+
+// addProperty decodes p's value and adds it to its section.
+func (d *Decoder) addProperty(p *property) error {
+	value, quoted, err := d.applyQuotes(d.value(p), p.valuePos)
+	if err != nil {
+		return err
+	}
+	if p.sec.children[p.key] != nil {
+		return errors.Newf(p.keyPos, "property %s conflicts with section of the same name", p.key)
+	}
+	if field := p.sec.props[p.key]; field != nil {
+		return d.addDuplicate(p, field, value, quoted)
+	}
+	field, err := d.makeField(p.key, value, quoted, p.keyPos, p.valuePos)
+	if err != nil {
+		return errors.Newf(p.keyPos, "%v", err)
+	}
+	p.sec.fields.Elts = append(p.sec.fields.Elts, field)
+	p.sec.props[p.key] = field
+	return nil
+}
+
+// parseKeyValue splits a line, its indentation removed, into key and value
+// using "=" as delimiter. It returns the trimmed key, the value with its
+// leading whitespace removed, the index of the value within line, and whether
+// the split succeeded.
 func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, ok bool) {
 	key, value, ok = strings.Cut(line, "=")
 	if !ok {
 		return "", "", 0, false
 	}
-	valueIdx = len(key) + 1
 	key = strings.TrimSpace(key)
 	if key == "" {
 		return "", "", 0, false
 	}
-	unindented := strings.TrimLeft(value, " \t")
-	valueIdx += len(value) - len(unindented)
-	value = strings.TrimSpace(unindented)
-
-	if d.cfg.InlineComments {
-		value = d.stripInlineComment(value)
-	}
-	return key, value, valueIdx, true
+	value = strings.TrimLeft(value, " \t")
+	return key, value, len(line) - len(value), true
 }
 
-// stripInlineComment trims value before the first ";" or "#" that is
-// preceded by a space or tab and sits outside a quoted span, so that a
-// comment character within a quoted part of the value is kept. Since value
-// is already trimmed, a value starting with ";" or "#" is never a comment.
+// stripInlineComment trims text, the fragment of p's value from line, before
+// the first ";" or "#" that is preceded by a space or tab and sits outside a
+// quoted span, so that a comment character within a quoted part of the value
+// is kept. prev is the byte before text within the value, zero at the start
+// of one. It returns the text to keep and the quote left open after it, which
+// p.open holds for the next fragment.
 //
 // Under [QuotesEscaped] every " that no backslash escapes opens or closes a
 // span, as git reads one. Otherwise either quote opens a span when its match
-// follows within the value; an unmatched quote is an ordinary character, such
-// as the apostrophe of "don't", unless it opens the value, in which case the
-// whole remainder is quoted.
-func (d *Decoder) stripInlineComment(value string) string {
+// follows within the value, which may be on a continuation line, and a quote
+// opening the value does so even without one; an unmatched quote anywhere
+// else, such as the apostrophe of "don't", is an ordinary character.
+func (d *Decoder) stripInlineComment(p *property, text string, line int, prev byte) (string, byte) {
 	escaped := d.cfg.Quotes == QuotesEscaped
-	for i := 0; i < len(value); i++ {
-		switch c := value[i]; {
+	i, open := 0, p.open
+	if open != 0 {
+		end := d.closingQuote(text, 0, open)
+		if end < 0 {
+			// The whole fragment sits inside the span.
+			return text, open
+		}
+		i, open = end+1, 0
+	}
+	for ; i < len(text); i++ {
+		if i > 0 {
+			prev = text[i-1]
+		}
+		switch c := text[i]; {
 		case c == '\\' && escaped:
 			// The escaped byte neither quotes nor starts a comment.
 			i++
 		case c == '"' || (c == '\'' && !escaped):
-			end := d.closingQuote(value, i+1, c)
-			if end < 0 {
-				if escaped || i == 0 {
-					return value
-				}
-				continue
+			if end := d.closingQuote(text, i+1, c); end >= 0 {
+				i = end
+			} else if escaped || (i == 0 && prev == 0) || d.closesLater(p, text, line, c) {
+				// The span reaches the end of the fragment, so it holds
+				// no comment.
+				return text, c
 			}
-			i = end
-		case (c == ';' || c == '#') && i > 0 && (value[i-1] == ' ' || value[i-1] == '\t'):
-			return strings.TrimRight(value[:i], " \t")
+		case (c == ';' || c == '#') && (prev == ' ' || prev == '\t'):
+			return strings.TrimRight(text[:i], " \t"), open
 		}
 	}
-	return value
+	return text, open
 }
 
 // closingQuote returns the index of the first quote byte in text at or after
@@ -416,7 +669,7 @@ func (d *Decoder) openSection(top *section, trimmed string, pos token.Pos) (*sec
 		return nil, errors.Newf(pos, "missing closing bracket for section header")
 	}
 	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" {
-		if !d.cfg.InlineComments || (rest[0] != ';' && rest[0] != '#') {
+		if !d.cfg.InlineComments || !isComment(rest) {
 			return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
 		}
 	}
@@ -579,9 +832,9 @@ func unquote(value string) (_ string, quoted bool, _ error) {
 	return b.String(), quoted, nil
 }
 
-// addDuplicate folds a repeated occurrence of key into the field already
+// addDuplicate folds a repeated occurrence of p's key into the field already
 // decoded for it, as [Config.DuplicateKeys] selects.
-func (d *Decoder) addDuplicate(key string, field *ast.Field, value string, quoted bool, pos, valuePos token.Pos) error {
+func (d *Decoder) addDuplicate(p *property, field *ast.Field, value string, quoted bool) error {
 	switch d.cfg.DuplicateKeys {
 	case DuplicatesList:
 		list, ok := field.Value.(*ast.ListLit)
@@ -590,21 +843,21 @@ func (d *Decoder) addDuplicate(key string, field *ast.Field, value string, quote
 			ast.SetPos(list, field.Value.Pos())
 			field.Value = list
 		}
-		v, err := d.makeValue(value, quoted, valuePos)
+		v, err := d.makeValue(value, quoted, p.valuePos)
 		if err != nil {
-			return errors.Newf(pos, "%v", err)
+			return errors.Newf(p.keyPos, "%v", err)
 		}
 		list.Elts = append(list.Elts, v)
 	case DuplicatesFirst:
 		// The value already decoded wins.
 	case DuplicatesLast:
-		v, err := d.makeValue(value, quoted, valuePos)
+		v, err := d.makeValue(value, quoted, p.valuePos)
 		if err != nil {
-			return errors.Newf(pos, "%v", err)
+			return errors.Newf(p.keyPos, "%v", err)
 		}
 		field.Value = v
 	default:
-		return errors.Newf(pos, "duplicate key: %s", key)
+		return errors.Newf(p.keyPos, "duplicate key: %s", p.key)
 	}
 	return nil
 }

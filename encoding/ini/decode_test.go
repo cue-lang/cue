@@ -531,7 +531,84 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "QuotedSubsections",
+		name:   "DuplicateKeys/Error",
+		config: ini.Config{DuplicateKeys: ini.DuplicatesError},
+		input: `
+			[section]
+			key = value1
+			key = value2
+			`,
+		wantErr: `
+			duplicate key: key:
+			    test.ini:3:1
+			`,
+	}, {
+		name:   "DuplicateKeys/List",
+		config: ini.Config{DuplicateKeys: ini.DuplicatesList},
+		input: `
+			[section]
+			once = a
+			twice = b
+			twice = c
+			thrice = d
+			thrice = e
+			thrice = f
+			`,
+		wantCUE: `
+			section: {
+				once:   "a"
+				twice: ["b", "c"]
+				thrice: ["d", "e", "f"]
+			}
+			`,
+	}, {
+		name:   "DuplicateKeys/List/AcrossRepeatedHeaders",
+		config: ini.Config{DuplicateKeys: ini.DuplicatesList},
+		input: `
+			[section]
+			key = a
+
+			[section]
+			key = b
+			`,
+		wantCUE: `
+			section: key: ["a", "b"]
+			`,
+	}, {
+		name:   "DuplicateKeys/List/Typed",
+		config: ini.Config{DuplicateKeys: ini.DuplicatesList, Values: ini.ValuesTyped},
+		input: `
+			port = 1
+			port = 2
+			`,
+		wantCUE: `
+			port: [1, 2]
+			`,
+	}, {
+		name:   "DuplicateKeys/First",
+		config: ini.Config{DuplicateKeys: ini.DuplicatesFirst},
+		input: `
+			[section]
+			key = a
+			key = b
+			key = c
+			`,
+		wantCUE: `
+			section: key: "a"
+			`,
+	}, {
+		name:   "DuplicateKeys/Last",
+		config: ini.Config{DuplicateKeys: ini.DuplicatesLast},
+		input: `
+			[section]
+			key = a
+			key = b
+			key = c
+			`,
+		wantCUE: `
+			section: key: "c"
+			`,
+	}, {name: "QuotedSubsections",
 		config: ini.Config{QuotedSubsections: true},
 		input: `
 			[remote "origin"]

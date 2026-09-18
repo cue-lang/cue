@@ -162,8 +162,6 @@ type Config struct {
 	// DuplicateKeys controls what happens when a key recurs within a
 	// section. By default the second occurrence is an error
 	// ([DuplicatesError]).
-	//
-	// Not implemented yet; the second occurrence is always an error.
 	DuplicateKeys DuplicateMode
 
 	// Continuations controls how a value may span several lines.
@@ -206,23 +204,19 @@ type Decoder struct {
 	tokenFile *token.File
 }
 
-type fieldKind int
-
-const (
-	kindProperty fieldKind = iota + 1 // zero means "no such field"
-	kindSection
-)
-
 // section tracks per-section state needed to detect name collisions.
 // It outlives any one [name] header, since a repeated header reopens the
 // section rather than starting a new one.
 type section struct {
 	// fields holds this section's fields.
 	fields *ast.StructLit
-	// keys records the kind of each name in fields for collision checks.
-	keys map[string]fieldKind
-	// children holds the sections nested directly in this one, so that a
-	// section path is followed one segment at a time.
+	// props holds the field of each property in fields, so that a repeated
+	// key can extend or replace the value already decoded, and children
+	// holds the sections nested directly in this one, so that a section
+	// path is followed one segment at a time. A name in either map is a
+	// name taken, which is how a property and a section of the same name
+	// are found to collide.
+	props    map[string]*ast.Field
 	children map[string]*section
 }
 
@@ -230,7 +224,7 @@ type section struct {
 func newSection(fields *ast.StructLit) *section {
 	return &section{
 		fields:   fields,
-		keys:     make(map[string]fieldKind),
+		props:    make(map[string]*ast.Field),
 		children: make(map[string]*section),
 	}
 }
@@ -296,19 +290,22 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		if d.cfg.Case == CaseLowerKeys || d.cfg.Case == CaseLower {
 			key = strings.ToLower(key)
 		}
-		switch cur.keys[key] {
-		case kindSection:
+		if cur.children[key] != nil {
 			return nil, errors.Newf(pos, "property %s conflicts with section of the same name", key)
-		case kindProperty:
-			return nil, errors.Newf(pos, "duplicate key: %s", key)
 		}
-		cur.keys[key] = kindProperty
+		if field := cur.props[key]; field != nil {
+			if err := d.addDuplicate(key, field, value, quoted, pos, valuePos); err != nil {
+				return nil, err
+			}
+			continue
+		}
 
-		field, err := makeField(key, value, quoted, pos, valuePos, d.cfg.Values == ValuesTyped)
+		field, err := d.makeField(key, value, quoted, pos, valuePos)
 		if err != nil {
 			return nil, errors.Newf(pos, "%v", err)
 		}
 		cur.fields.Elts = append(cur.fields.Elts, field)
+		cur.props[key] = field
 	}
 	return topSection.fields, nil
 }
@@ -502,7 +499,7 @@ func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos
 			cur = child
 			continue
 		}
-		if cur.keys[part] == kindProperty {
+		if cur.props[part] != nil {
 			return nil, errors.Newf(pos, "section %s conflicts with property of the same name", part)
 		}
 		inner := &ast.StructLit{}
@@ -511,7 +508,6 @@ func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos
 			Value:    inner,
 			TokenPos: pos,
 		})
-		cur.keys[part] = kindSection
 		child := newSection(inner)
 		cur.children[part] = child
 		cur = child
@@ -583,26 +579,59 @@ func unquote(value string) (_ string, quoted bool, _ error) {
 	return b.String(), quoted, nil
 }
 
-// makeField creates a CUE field with an appropriate value literal.
-// When typedValues is true, values are parsed as booleans or numbers when
-// possible. The label carries keyPos and the value carries valuePos, so that
-// an evaluator conflict points into the value rather than at the line.
-func makeField(key, value string, quoted bool, keyPos, valuePos token.Pos, typedValues bool) (*ast.Field, error) {
-	var v ast.Expr
-	if typedValues {
-		var err error
-		v, err = makeValueLit(value, quoted, valuePos)
-		if err != nil {
-			return nil, err
+// addDuplicate folds a repeated occurrence of key into the field already
+// decoded for it, as [Config.DuplicateKeys] selects.
+func (d *Decoder) addDuplicate(key string, field *ast.Field, value string, quoted bool, pos, valuePos token.Pos) error {
+	switch d.cfg.DuplicateKeys {
+	case DuplicatesList:
+		list, ok := field.Value.(*ast.ListLit)
+		if !ok {
+			list = ast.NewList(field.Value)
+			ast.SetPos(list, field.Value.Pos())
+			field.Value = list
 		}
-	} else {
-		v = newStringLit(value, valuePos)
+		v, err := d.makeValue(value, quoted, valuePos)
+		if err != nil {
+			return errors.Newf(pos, "%v", err)
+		}
+		list.Elts = append(list.Elts, v)
+	case DuplicatesFirst:
+		// The value already decoded wins.
+	case DuplicatesLast:
+		v, err := d.makeValue(value, quoted, valuePos)
+		if err != nil {
+			return errors.Newf(pos, "%v", err)
+		}
+		field.Value = v
+	default:
+		return errors.Newf(pos, "duplicate key: %s", key)
+	}
+	return nil
+}
+
+// makeField creates a CUE field with an appropriate value literal.
+// The label carries keyPos and the value carries valuePos, so that an
+// evaluator conflict points into the value rather than at the line.
+func (d *Decoder) makeField(key, value string, quoted bool, keyPos, valuePos token.Pos) (*ast.Field, error) {
+	v, err := d.makeValue(value, quoted, valuePos)
+	if err != nil {
+		return nil, err
 	}
 	return &ast.Field{
 		Label:    makeLabel(key, keyPos),
 		Value:    v,
 		TokenPos: keyPos,
 	}, nil
+}
+
+// makeValue turns a decoded value into a CUE expression. Under
+// [ValuesStrings] it is always a string; under [ValuesTyped] an unquoted
+// boolean or number becomes one.
+func (d *Decoder) makeValue(value string, quoted bool, pos token.Pos) (ast.Expr, error) {
+	if d.cfg.Values != ValuesTyped {
+		return newStringLit(value, pos), nil
+	}
+	return makeValueLit(value, quoted, pos)
 }
 
 // makeValueLit returns a bool, number, or string literal depending on the

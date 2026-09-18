@@ -1,5 +1,8 @@
 # Check that we can use the cue mod publish command to create an
 # OCI image.
+# Naming a registry is enough; --out writes the image locally.
+
+env CUE_REGISTRY=registry.example
 
 exec cue mod publish --out $WORK/image v0.0.1
 stdout '^wrote image for example.com@v0.0.1 to .*/image$'

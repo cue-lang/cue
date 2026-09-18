@@ -3,6 +3,7 @@ package workspace
 import (
 	"testing"
 
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/golangorgx/gopls/hooks"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
@@ -11,6 +12,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// The tests here start an LSP server, which can resolve modules via a
+	// registry. They are meant to be hermetic; catch any that are not.
+	cuetest.DenyRegistryAccess()
 	I.Main(m, hooks.Options)
 }
 

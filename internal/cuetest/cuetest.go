@@ -227,3 +227,17 @@ func checkIssueCondition(s string) (isIssue bool, nonIssue bool, err error) {
 	}
 	return isIssue, r != nil && r.MatchString(s), nil
 }
+
+// DenyRegistryAccess sets $CUE_REGISTRY to "none" for the rest of the process,
+// so that resolving a module fails rather than reaching the Central Registry
+// over the network. Tests are meant to be hermetic, serving the modules they
+// need from a registry of their own and naming it in an explicit environment
+// such as [cuelang.org/go/cue/load.Config.Env]; this catches those which
+// forget to.
+//
+// Call it from the init or TestMain of any test package whose tests can load
+// CUE packages or run the cue command. It does not affect testscripts, which do
+// not inherit the environment; see [cuelang.org/go/internal/cuetestscript.Setup].
+func DenyRegistryAccess() {
+	os.Setenv("CUE_REGISTRY", "none")
+}

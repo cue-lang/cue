@@ -1,6 +1,9 @@
 # Check that we can use the cue mod publish command to
 # print information about the module to be published in JSON
-# format
+# format.
+# Naming a registry is enough; --json does not talk to it.
+
+env CUE_REGISTRY=registry.example
 
 cd example
 exec cue mod publish --json v0.0.1
@@ -14,7 +17,7 @@ exec cue vet got.json want.cue
 -- want.cue --
 #schema: {
 	version!: "example.com@v0.0.1"
-	ref!: =~ "^registry.cue.works/example.com:v0.0.1@sha256:[a-f0-9]+$"
+	ref!: =~ "^registry.example/example.com:v0.0.1@sha256:[a-f0-9]+$"
 	files!: [
 		"cue.mod/module.cue",
 		"foo.cue",

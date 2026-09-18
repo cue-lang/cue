@@ -31,16 +31,16 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
 )
 
 func init() {
 	// The user running `go test` might have a broken environment,
-	// such as an invalid $CUE_REGISTRY like the one below,
-	// or a broken $DOCKER_CONFIG/config.json due to syntax errors.
-	// Go tests should be hermetic by explicitly setting load.Config.Env;
-	// catch any that do not by leaving a broken $CUE_REGISTRY in os.Environ.
-	os.Setenv("CUE_REGISTRY", "inline:{")
+	// such as an invalid $CUE_REGISTRY, or a broken $DOCKER_CONFIG/config.json
+	// due to syntax errors. Go tests should be hermetic by explicitly setting
+	// load.Config.Env; catch any that do not.
+	cuetest.DenyRegistryAccess()
 }
 
 // TestLoad is an end-to-end test.

@@ -426,6 +426,13 @@ func splitArgs(line string) []string {
 }
 
 func TestMain(m *testing.M) {
+	// [testscript.Main] below re-executes this same binary for each command it
+	// registers, and such a process must keep the registry which its script set
+	// up. [cuetestscript.Setup] always names one, so an unset CUE_REGISTRY means
+	// that we are the test process rather than one of the commands.
+	if os.Getenv("CUE_REGISTRY") == "" {
+		cuetest.DenyRegistryAccess()
+	}
 	check := func(err error) {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

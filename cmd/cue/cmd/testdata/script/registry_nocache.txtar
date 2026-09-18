@@ -12,6 +12,9 @@ env XDG_CACHE_HOME= LocalAppData=
 env XDG_CONFIG_HOME= AppData=
 env CUE_CACHE_DIR=
 env CUE_CONFIG_DIR=
+# Name a registry which is never reached, as the commands below fail
+# on the missing cache or config directory before they would use it.
+env CUE_REGISTRY=registry.example
 
 # Working on standalone files and directories should work without a cache or config.
 exec cue version

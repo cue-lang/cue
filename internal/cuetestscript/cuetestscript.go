@@ -113,7 +113,8 @@ func registryIDs() []string {
 // Setup prepares the environment that the cue command expects for a single
 // test: a module root above the work directory, a predictable cache directory,
 // the language version variables, and a registry server for each _registry*
-// directory in the work directory.
+// directory in the work directory. A script which declares no registry is
+// denied access to any, so that none of them can reach the Central Registry.
 //
 // Any variable it sets is named by [ResultEnv].
 func Setup(e Env) error {
@@ -128,6 +129,11 @@ func Setup(e Env) error {
 	// release, e.g. v0.10.99.
 	e.Setenv("CUE_LANGUAGE_VERSION", cueversion.LanguageVersion())
 	e.Setenv("CUE_LANGUAGE_VERSION_BUGFIX", semver.MajorMinor(cueversion.LanguageVersion())+".99")
+	// Deny access to any registry by default, so that a script which needs one
+	// declares it. Without this, an empty CUE_REGISTRY makes the cue command
+	// fall back to the Central Registry and reach it over the network.
+	// setupRegistries below overrides this for the registries a script declares.
+	e.Setenv("CUE_REGISTRY", "none")
 	return setupRegistries(e)
 }
 

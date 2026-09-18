@@ -450,7 +450,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		i.next = toml.NewDecoder(path, r).Decode
 		i.Next()
 	case build.INI:
-		i.next = ini.NewDecoder(path, r, nil).Decode
+		i.next = ini.NewDecoder(path, r, ini.Config{}).Decode
 		i.Next()
 	case build.XML:
 		switch {

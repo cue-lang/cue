@@ -16,23 +16,18 @@
 //
 // INI files are a simple configuration format consisting of sections,
 // properties (key-value pairs), and comments. Since there is no single
-// standard for INI files, this package supports a common subset:
+// standard for INI files, the zero [Config] accepts the subset every
+// flavor shares:
 //
 //   - Sections are declared with [name] headers.
 //   - Properties use "key = value" syntax.
-//   - Comments are allowed and start with ; or # and span to the end of the line.
-//   - Multi-word values do not require quoting; leading/trailing
+//   - Lines whose first non-blank character is ; or # are comments.
+//   - Multi-word values do not require quoting; leading and trailing
 //     whitespace is trimmed.
 //   - Blank lines are ignored.
 //   - Duplicate keys within the same section are an error.
-//   - Key and section name case sensitivity is configured via [Config.CaseSensitivity].
-//   - Section name nesting is configured via [Config.SectionNameNesting].
-//   - Value type parsing is configured via [Config.ValueTypes].
 //
-// The following features found in some INI variants are out of scope:
-//   - The ":" key-value separator.
-//   - Any other non-standard features, such as multi-line values, line continuations
-//     and Structured or array values.
+// Flavor differences are selected through the fields of [Config].
 //
 // Properties defined before any section header are placed at the
 // top level of the resulting CUE struct. Section names become nested
@@ -53,59 +48,149 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-// CaseSensitivityStrategy controls how the decoder handles the case of keys and section names.
-type CaseSensitivityStrategy int
+// QuoteMode controls how the decoder treats quotation marks around a value.
+type QuoteMode int
 
 const (
-	caseSensitivityUnset CaseSensitivityStrategy = iota // default zero value; equal to [CaseSensitive] for now
-	CaseSensitive
-	CaseLower
+	quotesUnset    QuoteMode = iota // default zero value; equal to [QuotesLiteral] for now
+	QuotesLiteral                   // quotation marks are ordinary characters
+	QuotesStripped                  // one matching pair of surrounding quotes is removed
+	QuotesEscaped                   // as [QuotesStripped], and backslash escapes are interpreted
 )
 
-// ValueTypesStrategy controls how the decoder interprets INI values.
-type ValueTypesStrategy int
+// CaseMode controls how the decoder treats the case of keys and section names.
+type CaseMode int
 
 const (
-	valueTypesUnset   ValueTypesStrategy = iota // default zero value; equal to [ValuesRawStrings] for now
-	ValuesRawStrings                            // all values are represented as CUE strings
-	ValuesCUELiterals                           // booleans and numbers are parsed into their corresponding CUE types,
-	// quoted values are unquoted and always treated as strings
+	caseUnset     CaseMode = iota // default zero value; equal to [CasePreserve] for now
+	CasePreserve                  // keys and section names keep their source case
+	CaseLowerKeys                 // keys are lowercased, section names are not
+	CaseLower                     // keys and section names are lowercased
 )
 
-// SectionNameNestingStrategy controls how the decoder interprets dots in section names.
-type SectionNameNestingStrategy int
+// DuplicateMode controls how the decoder treats a key repeated within a section.
+type DuplicateMode int
 
 const (
-	sectionNamesUnset  SectionNameNestingStrategy = iota // default zero value; equal to [SectionNamesFlat] for now
-	SectionNamesFlat                                     // dots are treated as regular characters in section names
-	SectionNamesDotted                                   // dots are treated as nested section separators
+	duplicatesUnset DuplicateMode = iota // default zero value; equal to [DuplicatesError] for now
+	DuplicatesError                      // a repeated key is an error
+	DuplicatesList                       // a repeated key becomes a list in source order
+	DuplicatesFirst                      // later values are ignored
+	DuplicatesLast                       // later values replace earlier ones
 )
 
-// Config configures the behavior of the INI decoder.
+// ContinuationMode controls how the decoder joins a value spanning several lines.
+type ContinuationMode int
+
+const (
+	continuationsUnset     ContinuationMode = iota // default zero value; equal to [ContinuationsNone] for now
+	ContinuationsNone                              // every value ends at its line
+	ContinuationsBackslash                         // a trailing backslash continues the value on the next line
+	ContinuationsIndented                          // an indented line continues the value of the preceding property
+)
+
+// BareKeyMode controls how the decoder treats a line holding a key and no delimiter.
+type BareKeyMode int
+
+const (
+	bareKeysUnset BareKeyMode = iota // default zero value; equal to [BareKeysError] for now
+	BareKeysError                    // a line with no delimiter is an error
+	BareKeysNull                     // a bare key decodes to null
+	BareKeysTrue                     // a bare key decodes to true
+)
+
+// ValueMode controls whether the decoder interprets the type of a value.
+type ValueMode int
+
+const (
+	valuesUnset   ValueMode = iota // default zero value; equal to [ValuesStrings] for now
+	ValuesStrings                  // every value is a string
+	ValuesTyped                    // unquoted booleans and numbers become CUE booleans and numbers
+)
+
+// BooleanMode controls which words [ValuesTyped] recognizes as booleans.
+type BooleanMode int
+
+const (
+	booleansUnset     BooleanMode = iota // default zero value; equal to [BooleansTrueFalse] for now
+	BooleansTrueFalse                    // only true and false
+	BooleansExtended                     // also yes, no, on, off, 1, and 0
+)
+
+// Config describes an INI flavor. The zero value is the common subset
+// described in the package documentation; each field selects one flavor
+// difference, independently of all others.
+//
+// Config is passed and returned by value, so a preset such as [GitConfig]
+// combined with an explicit option is an ordinary assignment.
 type Config struct {
-	// CaseSensitivity controls how keys and section names are cased.
-	// By default the original case is preserved ([CaseSensitive]).
-	// Set to [CaseLower] to lowercase all keys and section names.
-	CaseSensitivity CaseSensitivityStrategy
+	// Delimiters holds the bytes accepted between a key and its value;
+	// the first occurrence of any of them splits the line.
+	// The empty string means "=".
+	//
+	// Not implemented yet; "=" is always the delimiter.
+	Delimiters string
 
-	// SectionNameNesting controls how dots in section names are interpreted.
-	// By default dots are treated as regular characters ([SectionNamesFlat]),
-	// so all sections are flat.
-	// Set to [SectionNamesDotted] to treat dots as nested section separators.
-	SectionNameNesting SectionNameNestingStrategy
+	// InlineComments reports whether a ";" or "#" preceded by a space or
+	// tab, outside a quoted value, starts a comment. It is off by default,
+	// so that no value is silently truncated.
+	//
+	// Not implemented yet; inline comments are always stripped.
+	InlineComments bool
 
-	// ValueTypes controls how INI values are interpreted.
-	// By default all values are raw CUE strings ([ValuesRawStrings]).
-	// Set to [ValuesCUELiterals] to parse booleans and numbers into
-	// their corresponding CUE types.
-	ValueTypes ValueTypesStrategy
+	// Quotes controls how quotation marks around a value are treated.
+	// By default they are ordinary characters ([QuotesLiteral]).
+	//
+	// Not implemented yet.
+	Quotes QuoteMode
+
+	// Case controls the case of keys and section names.
+	// By default the source case is preserved ([CasePreserve]).
+	Case CaseMode
+
+	// DottedSections reports whether dots in a section name separate
+	// nested sections. By default they are ordinary characters.
+	DottedSections bool
+
+	// QuotedSubsections reports whether a section name of the form
+	// `a "b"` nests b one level below a. By default it does not.
+	//
+	// Not implemented yet.
+	QuotedSubsections bool
+
+	// DuplicateKeys controls what happens when a key recurs within a
+	// section. By default the second occurrence is an error
+	// ([DuplicatesError]).
+	//
+	// Not implemented yet; the second occurrence is always an error.
+	DuplicateKeys DuplicateMode
+
+	// Continuations controls how a value may span several lines.
+	// By default it may not ([ContinuationsNone]).
+	//
+	// Not implemented yet.
+	Continuations ContinuationMode
+
+	// BareKeys controls what a line holding a key and no delimiter means.
+	// By default it is an error ([BareKeysError]).
+	//
+	// Not implemented yet.
+	BareKeys BareKeyMode
+
+	// Values controls whether the type of a value is interpreted.
+	// By default every value is a string ([ValuesStrings]).
+	Values ValueMode
+
+	// Booleans selects the vocabulary [ValuesTyped] recognizes as
+	// booleans. By default only true and false ([BooleansTrueFalse]).
+	//
+	// Not implemented yet.
+	Booleans BooleanMode
 }
 
-// NewDecoder creates a decoder from a stream of INI input.
-func NewDecoder(filename string, r io.Reader, cfg *Config) *Decoder {
-	if cfg == nil {
-		cfg = &Config{}
-	}
+// NewDecoder creates a decoder for the INI flavor cfg describes.
+// The decoder keeps its own copy of cfg; later changes to cfg have no effect.
+func NewDecoder(filename string, r io.Reader, cfg Config) *Decoder {
 	return &Decoder{r: r, filename: filename, cfg: cfg}
 }
 
@@ -116,7 +201,7 @@ func NewDecoder(filename string, r io.Reader, cfg *Config) *Decoder {
 type Decoder struct {
 	r         io.Reader
 	filename  string
-	cfg       *Config
+	cfg       Config
 	tokenFile *token.File
 }
 
@@ -183,7 +268,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 				return nil, errors.Newf(pos, "missing closing bracket for section header")
 			}
 			sectionName := strings.TrimSpace(trimmed[1:closeIdx])
-			if d.cfg.CaseSensitivity == CaseLower {
+			if d.cfg.Case == CaseLower {
 				sectionName = strings.ToLower(sectionName)
 			}
 			if sectionName == "" {
@@ -208,7 +293,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
 
-		if d.cfg.CaseSensitivity == CaseLower {
+		if d.cfg.Case == CaseLowerKeys || d.cfg.Case == CaseLower {
 			key = strings.ToLower(key)
 		}
 		switch cur.keys[key] {
@@ -219,7 +304,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 		cur.keys[key] = kindProperty
 
-		field, err := makeField(key, value, pos, d.cfg.ValueTypes == ValuesCUELiterals)
+		field, err := makeField(key, value, pos, d.cfg.Values == ValuesTyped)
 		if err != nil {
 			return nil, errors.Newf(pos, "%v", err)
 		}
@@ -261,13 +346,13 @@ func parseKeyValue(line string) (key, value string, ok bool) {
 
 // buildNestedSection walks the section path, creating and registering missing
 // sections along the way, and returns the innermost one. Dots in the section
-// name are treated as nesting separators only when [Config.SectionNameNesting]
-// opts in via [SectionNamesDotted]; otherwise the whole name is a single
-// segment. Existing sections are reused; an error is returned if any segment
-// collides with a property in its parent.
+// name are treated as nesting separators only when [Config.DottedSections]
+// opts in; otherwise the whole name is a single segment. Existing sections are
+// reused; an error is returned if any segment collides with a property in its
+// parent.
 func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName string, pos token.Pos) (*section, error) {
 	parts := []string{sectionName}
-	if d.cfg.SectionNameNesting == SectionNamesDotted {
+	if d.cfg.DottedSections {
 		// Explicitly opt-in to splitting section names by dots.
 		parts = strings.Split(sectionName, ".")
 	}

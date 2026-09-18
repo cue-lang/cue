@@ -31,7 +31,7 @@ func TestDecoder(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		config  *ini.Config
+		config  ini.Config
 		input   string
 		wantCUE string
 		wantErr string
@@ -123,7 +123,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "NestedSections",
-		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		config: ini.Config{DottedSections: true},
 		input: `
 			[database.pool]
 			min = 5
@@ -243,7 +243,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "DeeplyNestedSections",
-		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		config: ini.Config{DottedSections: true},
 		input: `
 			[a.b.c]
 			key = value
@@ -253,7 +253,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "SectionWithSiblingAndNestedSection",
-		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		config: ini.Config{DottedSections: true},
 		input: `
 			[server]
 			host = localhost
@@ -273,7 +273,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "FullExample",
-		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		config: ini.Config{DottedSections: true},
 		input: `
 			; Application configuration
 			app_name = MyWebApp
@@ -341,7 +341,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "PropertyShadowsExistingSubsection",
-		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		config: ini.Config{DottedSections: true},
 		input: `
 			[a.b]
 			x = 1
@@ -355,7 +355,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "SubsectionShadowsExistingProperty",
-		config: &ini.Config{SectionNameNesting: ini.SectionNamesDotted},
+		config: ini.Config{DottedSections: true},
 		input: `
 			[a]
 			b = 1
@@ -418,8 +418,8 @@ func TestDecoder(t *testing.T) {
 			    test.ini:2:1
 			`,
 	}, {
-		name:   "CaseInsensitive/DuplicateKeys",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower},
+		name:   "Case/Lower/DuplicateAfterFolding",
+		config: ini.Config{Case: ini.CaseLower},
 		input: `
 			[section]
 			Key = value1
@@ -430,8 +430,8 @@ func TestDecoder(t *testing.T) {
 			    test.ini:3:1
 			`,
 	}, {
-		name:   "CaseInsensitive/DuplicateSections",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower},
+		name:   "Case/Lower/DuplicateSections",
+		config: ini.Config{Case: ini.CaseLower},
 		input: `
 			[Section]
 			key1 = value1
@@ -452,8 +452,8 @@ func TestDecoder(t *testing.T) {
 			key: "value"
 			`,
 	}, {
-		name:   "CaseInsensitive/LowercasesKeysAndSections",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower},
+		name:   "Case/Lower/KeysAndSections",
+		config: ini.Config{Case: ini.CaseLower},
 		input: `
 			AppName = MyApp
 
@@ -469,8 +469,8 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "CaseInsensitive/LowercasesNestedSections",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower, SectionNameNesting: ini.SectionNamesDotted},
+		name:   "Case/Lower/NestedSections",
+		config: ini.Config{Case: ini.CaseLower, DottedSections: true},
 		input: `
 			[Server.TLS]
 			Cert = /path/to/cert
@@ -479,8 +479,8 @@ func TestDecoder(t *testing.T) {
 			server: tls: cert: "/path/to/cert"
 			`,
 	}, {
-		name:   "CaseInsensitive/MixedCaseKeys",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower},
+		name:   "Case/Lower/MixedCaseKeys",
+		config: ini.Config{Case: ini.CaseLower},
 		input: `
 			[section]
 			camelCase = value1
@@ -495,8 +495,61 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
+		name:   "Case/Preserve",
+		config: ini.Config{Case: ini.CasePreserve},
+		input: `
+			[Database]
+			Host = localhost
+			`,
+		wantCUE: `
+			Database: Host: "localhost"
+			`,
+	}, {
+		name:   "Case/LowerKeys",
+		config: ini.Config{Case: ini.CaseLowerKeys},
+		input: `
+			AppName = MyApp
+
+			[Database]
+			Host = localhost
+			PORT = 5432
+			`,
+		wantCUE: `
+			appname: "MyApp"
+			Database: {
+				host: "localhost"
+				port: "5432"
+			}
+			`,
+	}, {
+		name:   "Case/LowerKeys/SectionsKeepTheirCase",
+		config: ini.Config{Case: ini.CaseLowerKeys},
+		input: `
+			[Section]
+			key1 = value1
+
+			[section]
+			key2 = value2
+			`,
+		wantCUE: `
+			Section: key1: "value1"
+			section: key2: "value2"
+			`,
+	}, {
+		name:   "Case/LowerKeys/DuplicateAfterFolding",
+		config: ini.Config{Case: ini.CaseLowerKeys},
+		input: `
+			[section]
+			Key = value1
+			KEY = value2
+			`,
+		wantErr: `
+			duplicate key: key:
+			    test.ini:3:1
+			`,
+	}, {
 		name:   "TypedValues/IntegerValues",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			port = 8080
 			count = 0
@@ -509,7 +562,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/FloatValues",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			version = 1.0
 			rate = 3.14
@@ -520,7 +573,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/BooleanValues",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			enabled = true
 			disabled = false
@@ -535,7 +588,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/MixedTypes",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			name = MyApp
 			port = 443
@@ -550,7 +603,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/StringsThatLookLikeNumbers",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			zip = 01onal
 			phone = 555-1234
@@ -561,7 +614,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/UnquotedBackslashesAreLiteral",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			greeting = hello\nworld
@@ -577,7 +630,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedEscapeSequences",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			greeting = "hello\nworld"
@@ -591,7 +644,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedNumberStaysString",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			port = "8080"
@@ -605,7 +658,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedBoolStaysString",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			enabled = "true"
@@ -619,7 +672,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/QuotedStringStripsQuotes",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			name = "John Doe"
@@ -633,7 +686,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/EmptyQuotedString",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			val = ""
@@ -643,7 +696,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/UnclosedDoubleQuote",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			foo = "bar
@@ -654,7 +707,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/UnclosedSingleQuote",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			foo = 'bar
@@ -665,7 +718,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/TrailingQuoteIsString",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			foo = baz"
@@ -675,7 +728,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "TypedValues/NumberLikeStringStaysString",
-		config: &ini.Config{ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			[section]
 			foo = 34.bad
@@ -685,7 +738,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "CombinedStrategies/CaseLowerAndTypedValues",
-		config: &ini.Config{CaseSensitivity: ini.CaseLower, ValueTypes: ini.ValuesCUELiterals},
+		config: ini.Config{Case: ini.CaseLower, Values: ini.ValuesTyped},
 		input: `
 			AppName = MyApp
 			[Database]

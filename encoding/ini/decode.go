@@ -155,9 +155,8 @@ type Config struct {
 	DottedSections bool
 
 	// QuotedSubsections reports whether a section name of the form
-	// `a "b"` nests b one level below a. By default it does not.
-	//
-	// Not implemented yet.
+	// `a "b"` nests b one level below a, a backslash within the quotes
+	// escaping the character after it. By default it does not.
 	QuotedSubsections bool
 
 	// DuplicateKeys controls what happens when a key recurs within a
@@ -218,10 +217,22 @@ const (
 // It outlives any one [name] header, since a repeated header reopens the
 // section rather than starting a new one.
 type section struct {
-	// struct_ holds this section's fields.
-	struct_ *ast.StructLit
-	// keys records the kind of each name in struct_ for collision checks.
+	// fields holds this section's fields.
+	fields *ast.StructLit
+	// keys records the kind of each name in fields for collision checks.
 	keys map[string]fieldKind
+	// children holds the sections nested directly in this one, so that a
+	// section path is followed one segment at a time.
+	children map[string]*section
+}
+
+// newSection starts an empty section holding the given struct.
+func newSection(fields *ast.StructLit) *section {
+	return &section{
+		fields:   fields,
+		keys:     make(map[string]fieldKind),
+		children: make(map[string]*section),
+	}
 }
 
 // Decode parses the input stream as INI and converts it to a CUE [ast.Expr].
@@ -244,14 +255,8 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	tokenFile.SetLinesForContent(data)
 	d.tokenFile = tokenFile
 
-	topSection := &section{
-		struct_: &ast.StructLit{},
-		keys:    make(map[string]fieldKind),
-	}
+	topSection := newSection(&ast.StructLit{})
 	cur := topSection
-
-	// sections maps each section path to its struct; "" is the pre-header global section.
-	sections := map[string]*section{"": topSection}
 
 	offset := 0
 	for line := range strings.SplitSeq(string(data), "\n") {
@@ -270,28 +275,10 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 
 		// Section header.
 		if trimmed[0] == '[' {
-			closeIdx := strings.IndexByte(trimmed, ']')
-			if closeIdx < 0 {
-				return nil, errors.Newf(pos, "missing closing bracket for section header")
-			}
-			if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" {
-				if !d.cfg.InlineComments || (rest[0] != ';' && rest[0] != '#') {
-					return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
-				}
-			}
-			sectionName := strings.TrimSpace(trimmed[1:closeIdx])
-			if d.cfg.Case == CaseLower {
-				sectionName = strings.ToLower(sectionName)
-			}
-			if sectionName == "" {
-				return nil, errors.Newf(pos, "empty section name")
-			}
-
-			sec, err := d.buildNestedSection(sections, sectionName, pos)
+			cur, err = d.openSection(topSection, trimmed, pos)
 			if err != nil {
 				return nil, err
 			}
-			cur = sec
 			continue
 		}
 
@@ -321,9 +308,9 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		if err != nil {
 			return nil, errors.Newf(pos, "%v", err)
 		}
-		cur.struct_.Elts = append(cur.struct_.Elts, field)
+		cur.fields.Elts = append(cur.fields.Elts, field)
 	}
-	return topSection.struct_, nil
+	return topSection.fields, nil
 }
 
 // parseKeyValue splits a trimmed line into key and value using "=" as
@@ -399,46 +386,137 @@ func (d *Decoder) closingQuote(text string, from int, quote byte) int {
 	return -1
 }
 
-// buildNestedSection walks the section path, creating and registering missing
-// sections along the way, and returns the innermost one. Dots in the section
-// name are treated as nesting separators only when [Config.DottedSections]
-// opts in; otherwise the whole name is a single segment. Existing sections are
-// reused; an error is returned if any segment collides with a property in its
-// parent.
-func (d *Decoder) buildNestedSection(sections map[string]*section, sectionName string, pos token.Pos) (*section, error) {
-	parts := []string{sectionName}
-	if d.cfg.DottedSections {
-		// Explicitly opt-in to splitting section names by dots.
-		parts = strings.Split(sectionName, ".")
+// sectionClose returns the index of the "]" closing a section header, or -1.
+// A quoted subsection name may hold a "]", so the scan skips quoted spans,
+// and the escapes within them, when [Config.QuotedSubsections] is set.
+func (d *Decoder) sectionClose(trimmed string) int {
+	if !d.cfg.QuotedSubsections {
+		return strings.IndexByte(trimmed, ']')
 	}
-	parent := sections[""]
-	var path string
-	for _, part := range parts {
-		if path == "" {
-			path = part
-		} else {
-			path = path + "." + part
+	quoted := false
+	for i := 1; i < len(trimmed); i++ {
+		switch trimmed[i] {
+		case '\\':
+			if quoted {
+				i++
+			}
+		case '"':
+			quoted = !quoted
+		case ']':
+			if !quoted {
+				return i
+			}
 		}
-		if existing := sections[path]; existing != nil {
-			parent = existing
+	}
+	return -1
+}
+
+// openSection returns the section that the header on a trimmed line opens,
+// creating it and the sections above it if they do not exist yet.
+func (d *Decoder) openSection(top *section, trimmed string, pos token.Pos) (*section, error) {
+	closeIdx := d.sectionClose(trimmed)
+	if closeIdx < 0 {
+		return nil, errors.Newf(pos, "missing closing bracket for section header")
+	}
+	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" {
+		if !d.cfg.InlineComments || (rest[0] != ';' && rest[0] != '#') {
+			return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
+		}
+	}
+	name := strings.TrimSpace(trimmed[1:closeIdx])
+	if name == "" {
+		return nil, errors.Newf(pos, "empty section name")
+	}
+	parts, err := d.sectionPath(name, pos)
+	if err != nil {
+		return nil, err
+	}
+	return d.buildNestedSection(top, parts, pos)
+}
+
+// sectionPath splits a section name into the path of struct fields it names.
+// Dots separate nested sections only under [Config.DottedSections], and a
+// quoted subsection name contributes exactly one segment, never case-folded,
+// only under [Config.QuotedSubsections].
+func (d *Decoder) sectionPath(name string, pos token.Pos) ([]string, error) {
+	base, sub := name, ""
+	quoted := false
+	if d.cfg.QuotedSubsections {
+		if i := strings.IndexByte(name, '"'); i >= 0 {
+			var err error
+			if sub, err = subsection(name[i:]); err != nil {
+				return nil, errors.Newf(pos, "%v: %s", err, name)
+			}
+			base, quoted = strings.TrimSpace(name[:i]), true
+		}
+	}
+	parts := []string{base}
+	if d.cfg.DottedSections {
+		parts = strings.Split(base, ".")
+	}
+	for i, part := range parts {
+		if part == "" {
+			return nil, errors.Newf(pos, "empty section name")
+		}
+		if d.cfg.Case == CaseLower {
+			parts[i] = strings.ToLower(part)
+		}
+	}
+	if quoted {
+		parts = append(parts, sub)
+	}
+	return parts, nil
+}
+
+// subsection reads the quoted subsection name s, which starts with its
+// opening quote and must end with its closing one. A backslash escapes the
+// character after it.
+func subsection(s string) (string, error) {
+	var b strings.Builder
+	for i := 1; i < len(s); i++ {
+		switch c := s[i]; c {
+		case '\\':
+			if i++; i < len(s) {
+				b.WriteByte(s[i])
+			}
+		case '"':
+			if i != len(s)-1 {
+				return "", fmt.Errorf("text after subsection name")
+			}
+			return b.String(), nil
+		default:
+			b.WriteByte(c)
+		}
+	}
+	return "", fmt.Errorf("missing closing quote in subsection name")
+}
+
+// buildNestedSection walks the section path down from top, creating the
+// sections along the way that do not exist yet, and returns the innermost
+// one. An existing section is reused, so a repeated header reopens it; an
+// error is returned if any segment collides with a property in its parent.
+func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos) (*section, error) {
+	cur := top
+	for _, part := range parts {
+		if child := cur.children[part]; child != nil {
+			cur = child
 			continue
 		}
-		if parent.keys[part] == kindProperty {
+		if cur.keys[part] == kindProperty {
 			return nil, errors.Newf(pos, "section %s conflicts with property of the same name", part)
 		}
 		inner := &ast.StructLit{}
-		field := &ast.Field{
+		cur.fields.Elts = append(cur.fields.Elts, &ast.Field{
 			Label:    makeLabel(part, pos),
 			Value:    inner,
 			TokenPos: pos,
-		}
-		parent.struct_.Elts = append(parent.struct_.Elts, field)
-		parent.keys[part] = kindSection
-		sec := &section{struct_: inner, keys: make(map[string]fieldKind)}
-		sections[path] = sec
-		parent = sec
+		})
+		cur.keys[part] = kindSection
+		child := newSection(inner)
+		cur.children[part] = child
+		cur = child
 	}
-	return parent, nil
+	return cur, nil
 }
 
 // applyQuotes removes the quotation marks [Config.Quotes] gives meaning to

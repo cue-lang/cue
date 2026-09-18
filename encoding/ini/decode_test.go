@@ -531,7 +531,170 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "Case/Preserve",
+		name:   "QuotedSubsections",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[remote "origin"]
+			url = https://example.com/x.git
+
+			[remote "upstream"]
+			url = https://example.com/y.git
+			`,
+		wantCUE: `
+			remote: {
+				origin: url:   "https://example.com/x.git"
+				upstream: url: "https://example.com/y.git"
+			}
+			`,
+	}, {
+		name:   "QuotedSubsections/BaseIsNotSplitWithoutDottedSections",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a.b "c"]
+			key = value
+			`,
+		wantCUE: `
+			"a.b": c: key: "value"
+			`,
+	}, {
+		name:   "QuotedSubsections/WithDottedSections",
+		config: ini.Config{QuotedSubsections: true, DottedSections: true},
+		input: `
+			[a.b "c.d"]
+			key = value
+			`,
+		wantCUE: `
+			a: b: "c.d": key: "value"
+			`,
+	}, {
+		name:   "QuotedSubsections/CaseLowerKeepsSubsectionCase",
+		config: ini.Config{QuotedSubsections: true, Case: ini.CaseLower},
+		input: `
+			[URL "https://Example.COM/"]
+			insteadOf = ex:
+			`,
+		wantCUE: `
+			url: "https://Example.COM/": insteadof: "ex:"
+			`,
+	}, {
+		name:   "QuotedSubsections/BracketInSubsectionName",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "b]c"]
+			key = value
+			`,
+		wantCUE: `
+			a: "b]c": key: "value"
+			`,
+	}, {
+		// Paths are followed one segment at a time, so a name holding the
+		// byte a joined path would need cannot collide with a longer path.
+		name:   "QuotedSubsections/SectionPathsCannotCollide",
+		config: ini.Config{QuotedSubsections: true, DottedSections: true},
+		input:  "[a.b]\nx = 1\n[a\x00b]\ny = 2\n",
+		wantCUE: `
+			a: b: x: "1"
+			"a\u0000b": y: "2"
+			`,
+	}, {
+		name:   "QuotedSubsections/RepeatedHeaderMerges",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "b"]
+			key1 = value1
+
+			[a "b"]
+			key2 = value2
+			`,
+		wantCUE: `
+			a: b: {
+				key1: "value1"
+				key2: "value2"
+			}
+			`,
+	}, {
+		name:   "QuotedSubsections/MissingClosingQuote",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "b]
+			key = value
+			`,
+		wantErr: `
+			missing closing bracket for section header:
+			    test.ini:1:1
+			`,
+	}, {
+		// An unescaped quote ends the subsection name, so a second quoted
+		// part is text after it.
+		name:   "QuotedSubsections/QuoteInSubsectionName",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "b"c"d"]
+			key = value
+			`,
+		wantErr: `
+			text after subsection name: a "b"c"d":
+			    test.ini:1:1
+			`,
+	}, {
+		// A backslash escapes the character after it, as git reads a
+		// subsection name, so a quote, a backslash, and a "]" may all
+		// appear in one.
+		name:   "QuotedSubsections/Escapes",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "x\"y"]
+			k = 1
+			[b "x\\y"]
+			k = 2
+			[c "x\ty]"]
+			k = 3
+			`,
+		wantCUE: `
+			a: "x\"y": k: "1"
+			b: "x\\y": k: "2"
+			c: "xty]": k: "3"
+			`,
+	}, {
+		name:   "QuotedSubsections/TextAfterSubsectionName",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "b" c]
+			key = value
+			`,
+		wantErr: `
+			text after subsection name: a "b" c:
+			    test.ini:1:1
+			`,
+	}, {
+		name:   "QuotedSubsections/PropertyThenSubsection",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a]
+			b = 1
+
+			[a "b"]
+			key = 2
+			`,
+		wantErr: `
+			section b conflicts with property of the same name:
+			    test.ini:4:1
+			`,
+	}, {
+		name:   "QuotedSubsections/SubsectionThenProperty",
+		config: ini.Config{QuotedSubsections: true},
+		input: `
+			[a "b"]
+			key = 1
+
+			[a]
+			b = 2
+			`,
+		wantErr: `
+			property b conflicts with section of the same name:
+			    test.ini:5:1
+			`,
+	}, {name: "Case/Preserve",
 		config: ini.Config{Case: ini.CasePreserve},
 		input: `
 			[Database]

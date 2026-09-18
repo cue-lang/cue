@@ -20,6 +20,7 @@ import (
 
 	"github.com/go-quicktest/qt"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
@@ -174,16 +175,36 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name: "InlineComments",
+		name: "InlineComments/OffByDefault",
+		input: `
+			[Service]
+			ExecStart=/bin/echo one ; /bin/echo two
+			flags = -a #b
+			color = #fff
+			`,
+		// Intended: ExecStart is "/bin/echo one ; /bin/echo two" and flags
+		// is "-a #b", since inline comments are off by default.
+		wantCUE: `
+			Service: {
+				ExecStart: "/bin/echo one"
+				flags:     "-a"
+				color:     "#fff"
+			}
+			`,
+	}, {
+		name:   "InlineComments/On",
+		config: ini.Config{InlineComments: true},
 		input: `
 			[section]
 			key1 = value1 ; this is an inline comment
 			key2 = value2 # this is also an inline comment
+			color = #fff
 			`,
 		wantCUE: `
 			section: {
-				key1: "value1"
-				key2: "value2"
+				key1:  "value1"
+				key2:  "value2"
+				color: "#fff"
 			}
 			`,
 	}, {
@@ -327,7 +348,7 @@ func TestDecoder(t *testing.T) {
 			    test.ini:3:1
 			`,
 	}, {
-		name: "DuplicateSection",
+		name: "RepeatedSectionHeader/Merges",
 		input: `
 			[section]
 			key1 = value1
@@ -335,6 +356,23 @@ func TestDecoder(t *testing.T) {
 			[section]
 			key2 = value2
 			`,
+		// Intended: the two headers merge into one struct holding key1
+		// and key2 in first-appearance order.
+		wantErr: `
+			duplicate section: section:
+			    test.ini:4:1
+			`,
+	}, {
+		name: "RepeatedSectionHeader/DuplicateKeyAcrossOccurrences",
+		input: `
+			[section]
+			key = value1
+
+			[section]
+			key = value2
+			`,
+		// Intended: the same error, reported at line 5 once the repeated
+		// header itself is accepted.
 		wantErr: `
 			duplicate section: section:
 			    test.ini:4:1
@@ -430,7 +468,7 @@ func TestDecoder(t *testing.T) {
 			    test.ini:3:1
 			`,
 	}, {
-		name:   "Case/Lower/DuplicateSections",
+		name:   "Case/Lower/RepeatedSectionsMerge",
 		config: ini.Config{Case: ini.CaseLower},
 		input: `
 			[Section]
@@ -439,6 +477,7 @@ func TestDecoder(t *testing.T) {
 			[section]
 			key2 = value2
 			`,
+		// Intended: one "section" struct holding key1 and key2.
 		wantErr: `
 			duplicate section: section:
 			    test.ini:4:1
@@ -756,6 +795,43 @@ func TestDecoder(t *testing.T) {
 				name:    "MyDB"
 			}
 			`,
+	}, {
+		name: "HeaderTrailingText",
+		input: `
+			[a]b
+			key = value
+			`,
+		// Intended: an error at line 1 naming the text after "]".
+		wantCUE: `
+			a: key: "value"
+			`,
+	}, {
+		name: "HeaderTrailingComment/RejectedByDefault",
+		input: `
+			[s] ; c
+			key = value
+			`,
+		// Intended: an error at line 1, since inline comments are off.
+		wantCUE: `
+			s: key: "value"
+			`,
+	}, {
+		name:   "HeaderTrailingComment/AcceptedWithInlineComments",
+		config: ini.Config{InlineComments: true},
+		input: `
+			[s] ; c
+			key = value
+			`,
+		wantCUE: `
+			s: key: "value"
+			`,
+	}, {
+		name:  "LeadingBOM",
+		input: "\ufeffkey = value\n",
+		// Intended: the byte order mark is removed, so the key is "key".
+		wantCUE: `
+			"\ufeffkey": "value"
+			`,
 	}}
 
 	for _, test := range tests {
@@ -792,6 +868,21 @@ func TestDecoder(t *testing.T) {
 			qt.Assert(t, qt.Equals(string(actualCue), string(wantFormatted)))
 		})
 	}
+}
+
+// TestPositions checks the positions a decoded field and its value carry.
+func TestPositions(t *testing.T) {
+	t.Parallel()
+
+	dec := ini.NewDecoder("test.ini", strings.NewReader("[section]\nkey = value\n"), ini.Config{})
+	expr, err := dec.Decode()
+	qt.Assert(t, qt.IsNil(err))
+
+	sec := expr.(*ast.StructLit).Elts[0].(*ast.Field)
+	field := sec.Value.(*ast.StructLit).Elts[0].(*ast.Field)
+	qt.Assert(t, qt.Equals(field.Label.Pos().String(), "test.ini:2:1"))
+	// Intended: test.ini:2:7, the first character of the value text.
+	qt.Assert(t, qt.Equals(field.Value.Pos().String(), "test.ini:2:1"))
 }
 
 // unindent strips the common leading whitespace from a multi-line raw string,

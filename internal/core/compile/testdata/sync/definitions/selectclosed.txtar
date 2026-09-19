@@ -1,0 +1,238 @@
+# A definition closes recursively, and a regular field holding a definition
+# is closed too. Selecting a field from that regular field must keep the
+# closedness, exactly as selecting it from the definition does. It does not
+# yet, so those cases record the open value they evaluate to alongside the
+# error they should produce.
+#
+# Whether the closed value then closes the struct it is embedded in is a
+# separate question, and one the explicitopen experiment answers differently.
+# The module therefore opts in per file: in.cue is under the experiment, as
+# every file is from v0.18.0 on, and old.cue is not.
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+@experiment(explicitopen)
+
+#Meta: meta: {name: "x"}
+m: #Meta
+
+// Selecting from the definition keeps its closedness.
+direct: #Meta.meta & {extra: 1}
+
+// The regular field is closed.
+whole: m & {meta: extra: 1}
+
+// Selecting from the regular field must be closed too.
+viaField: m.meta & {extra: 1}
+
+// Deeper selections, and a selection inside a definition.
+#Deep: a: b: {c: 1}
+d: #Deep
+viaDeep: d.a.b & {extra: 1}
+#Use: x: d.a
+viaDef: #Use & {x: {b: {extra: 1}}}
+
+// Through an intermediate regular field.
+inter: {x: m, y: x.meta & {extra: 1}}
+viaInter: inter.y
+
+// A comprehension body is written at a path, so a selection in one closes
+// like one written in the struct around it, be it an if or a for.
+viaIf: {
+	if true {
+		x: m.meta & {extra: 1}
+	}
+}
+viaFor: {
+	for k, _ in {one: 1} {
+		"\(k)": m.meta & {extra: 1}
+	}
+}
+
+// Under the experiment an embedded closed value closes the struct it lands
+// in, whether it is written there directly or in a comprehension body.
+viaEmbed: {
+	m.meta
+	extra: 1
+}
+viaEmbedFor: {
+	for k, _ in {one: 1} {
+		m.meta
+	}
+	extra: 1
+}
+
+// A regular field with a struct literal stays open.
+open: {meta: {name: "x"}}
+viaOpen: open.meta & {extra: 1}
+-- old.cue --
+// A definition is closed either way, so the same selections close without
+// the experiment, in a comprehension body as anywhere else.
+#Old: meta: {name: "x"}
+o:        #Old
+oldDirect: #Old.meta & {extra: 1}
+oldField:  o.meta & {extra: 1}
+oldViaIf: {
+	if true {
+		x: o.meta & {extra: 1}
+	}
+}
+oldViaFor: {
+	for k, _ in {one: 1} {
+		"\(k)": o.meta & {extra: 1}
+	}
+}
+
+// Embedding is where the two differ: without the experiment an embedded
+// closed value leaves the struct it lands in open. That holds for a value
+// selected from a definition, so it must hold for one selected through a
+// regular field as well.
+oldEmbedDef: {
+	#Old.meta
+	extra: 1
+}
+oldEmbed: {
+	o.meta
+	extra: 1
+}
+oldEmbedFor: {
+	for k, _ in {one: 1} {
+		o.meta
+	}
+	extra: 1
+}
+-- out/compile --
+--- in.cue
+{
+  #Meta: {
+    meta: {
+      name: "x"
+    }
+  }
+  m: 〈0;#Meta〉
+  direct: (〈0;#Meta〉.meta & {
+    extra: 1
+  })
+  whole: (〈0;m〉 & {
+    meta: {
+      extra: 1
+    }
+  })
+  viaField: (〈0;m〉.meta & {
+    extra: 1
+  })
+  #Deep: {
+    a: {
+      b: {
+        c: 1
+      }
+    }
+  }
+  d: 〈0;#Deep〉
+  viaDeep: (〈0;d〉.a.b & {
+    extra: 1
+  })
+  #Use: {
+    x: 〈1;d〉.a
+  }
+  viaDef: (〈0;#Use〉 & {
+    x: {
+      b: {
+        extra: 1
+      }
+    }
+  })
+  inter: {
+    x: 〈1;m〉
+    y: (〈0;x〉.meta & {
+      extra: 1
+    })
+  }
+  viaInter: 〈0;inter〉.y
+  viaIf: {
+    if true {
+      x: (〈2;m〉.meta & {
+        extra: 1
+      })
+    }
+  }
+  viaFor: {
+    for k, _ in {
+      one: 1
+    } {
+      "\(〈1;k〉)": (〈3;m〉.meta & {
+        extra: 1
+      })
+    }
+  }
+  viaEmbed: {
+    〈1;m〉.meta
+    extra: 1
+  }
+  viaEmbedFor: {
+    for k, _ in {
+      one: 1
+    } {
+      〈3;m〉.meta
+    }
+    extra: 1
+  }
+  open: {
+    meta: {
+      name: "x"
+    }
+  }
+  viaOpen: (〈0;open〉.meta & {
+    extra: 1
+  })
+}
+--- old.cue
+{
+  #Old: {
+    meta: {
+      name: "x"
+    }
+  }
+  o: 〈0;#Old〉
+  oldDirect: (〈0;#Old〉.meta & {
+    extra: 1
+  })
+  oldField: (〈0;o〉.meta & {
+    extra: 1
+  })
+  oldViaIf: {
+    if true {
+      x: (〈2;o〉.meta & {
+        extra: 1
+      })
+    }
+  }
+  oldViaFor: {
+    for k, _ in {
+      one: 1
+    } {
+      "\(〈1;k〉)": (〈3;o〉.meta & {
+        extra: 1
+      })
+    }
+  }
+  oldEmbedDef: {
+    〈1;#Old〉.meta
+    extra: 1
+  }
+  oldEmbed: {
+    〈1;o〉.meta
+    extra: 1
+  }
+  oldEmbedFor: {
+    for k, _ in {
+      one: 1
+    } {
+      〈3;o〉.meta
+    }
+    extra: 1
+  }
+}

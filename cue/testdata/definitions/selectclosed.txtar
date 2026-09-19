@@ -1,0 +1,127 @@
+# A definition closes recursively, and a regular field holding a definition
+# is closed too. Selecting a field from that regular field must keep the
+# closedness, exactly as selecting it from the definition does. It does not
+# yet, so those cases record the open value they evaluate to alongside the
+# error they should produce.
+#
+# Whether the closed value then closes the struct it is embedded in is a
+# separate question, and one the explicitopen experiment answers differently.
+# The module therefore opts in per file: in.cue is under the experiment, as
+# every file is from v0.18.0 on, and old.cue is not.
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- in.cue --
+@experiment(explicitopen)
+
+#Meta: meta: {name: "x"}
+m: #Meta
+
+// Selecting from the definition keeps its closedness.
+direct: #Meta.meta & {extra: 1} @test(err, at=extra, contains="field not allowed")
+
+// The regular field is closed.
+whole: m & {meta: extra: 1} @test(err, at=meta.extra, contains="field not allowed")
+
+// Selecting from the regular field must be closed too.
+viaField: m.meta & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+
+// Deeper selections, and a selection inside a definition.
+#Deep: a: b: {c: 1}
+d: #Deep
+viaDeep: d.a.b & {extra: 1} @test(eq, {c: 1, extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+#Use: x: d.a
+viaDef: #Use & {x: {b: {extra: 1}}} @test(err, at=x.b.extra, contains="field not allowed")
+
+// Through an intermediate regular field.
+inter: {x: m, y: x.meta & {extra: 1}}
+viaInter: inter.y @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, contains="field not allowed")
+
+// A comprehension body is written at a path, so a selection in one closes
+// like one written in the struct around it, be it an if or a for.
+viaIf: {
+	if true {
+		x: m.meta & {extra: 1}
+	}
+} @test(eq, {x: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=x.extra, contains="field not allowed")
+viaFor: {
+	for k, _ in {one: 1} {
+		"\(k)": m.meta & {extra: 1}
+	}
+} @test(eq, {one: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=one.extra, contains="field not allowed")
+
+// Under the experiment an embedded closed value closes the struct it lands
+// in, whether it is written there directly or in a comprehension body.
+viaEmbed: {
+	m.meta
+	extra: 1
+} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+viaEmbedFor: {
+	for k, _ in {one: 1} {
+		m.meta
+	}
+	extra: 1
+} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+
+// A regular field with a struct literal stays open.
+open: {meta: {name: "x"}}
+viaOpen: open.meta & {extra: 1} @test(eq, {name: "x", extra: 1})
+-- old.cue --
+// A definition is closed either way, so the same selections close without
+// the experiment, in a comprehension body as anywhere else.
+#Old: meta: {name: "x"}
+o:        #Old
+oldDirect: #Old.meta & {extra: 1} @test(err, at=extra, contains="field not allowed")
+oldField:  o.meta & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+oldViaIf: {
+	if true {
+		x: o.meta & {extra: 1}
+	}
+} @test(eq, {x: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=x.extra, contains="field not allowed")
+oldViaFor: {
+	for k, _ in {one: 1} {
+		"\(k)": o.meta & {extra: 1}
+	}
+} @test(eq, {one: {name: "x", extra: 1}}, incorrect) @test(err:todo, p=1, at=one.extra, contains="field not allowed")
+
+// Embedding is where the two differ: without the experiment an embedded
+// closed value leaves the struct it lands in open. That holds for a value
+// selected from a definition, so it must hold for one selected through a
+// regular field as well.
+oldEmbedDef: {
+	#Old.meta
+	extra: 1
+} @test(eq, {name: "x", extra: 1})
+oldEmbed: {
+	o.meta
+	extra: 1
+} @test(eq, {name: "x", extra: 1})
+oldEmbedFor: {
+	for k, _ in {one: 1} {
+		o.meta
+	}
+	extra: 1
+} @test(eq, {name: "x", extra: 1})
+-- out/errors.txt --
+[eval] direct.extra: field not allowed:
+    ./in.cue:7:23
+[eval] whole.meta.extra: field not allowed:
+    ./in.cue:10:19
+[eval] viaDef.x.b.extra: field not allowed:
+    ./in.cue:20:25
+[eval] oldDirect.extra: field not allowed:
+    ./old.cue:5:25
+-- out/eval/stats --
+Leaks:  0
+Freed:  99
+Reused: 58
+Allocs: 41
+Retain: 0
+
+Unifications: 99
+Conjuncts:    146
+Disjuncts:    0
+
+NumCloseIDs: 30

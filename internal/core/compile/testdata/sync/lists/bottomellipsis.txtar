@@ -1,7 +1,7 @@
-# A trailing ..._|_ in a list literal. These cases record how the literal
-# behaves today: the ellipsis adds a pattern that every further element
-# fails, but the list itself stays open, so an index past the end is
-# incomplete rather than an error. The two readings agree for unification.
+# A trailing ..._|_ closes a list literal: the literal limits the length of
+# the list, one level deep, as a list literal without an ellipsis does,
+# rather than adding a pattern that further elements fail. The two read the
+# same for unification; they differ for observers such as indexing.
 -- in.cue --
 length: {
 	x: [1, ..._|_]
@@ -28,7 +28,7 @@ defElems: {
 	err: #D & [{a: 1, b: 2}]
 }
 
-// An index past the end of the list is incomplete, as the list is open.
+// An index past the end of the list is an error, not incomplete.
 index: {
 	x: [1, ..._|_][3]
 }

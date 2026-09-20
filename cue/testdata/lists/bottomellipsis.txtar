@@ -1,15 +1,15 @@
-# A trailing ..._|_ in a list literal. These cases record how the literal
-# behaves today: the ellipsis adds a pattern that every further element
-# fails, but the list itself stays open, so an index past the end is
-# incomplete rather than an error. The two readings agree for unification.
+# A trailing ..._|_ closes a list literal: the literal limits the length of
+# the list, one level deep, as a list literal without an ellipsis does,
+# rather than adding a pattern that further elements fail. The two read the
+# same for unification; they differ for observers such as indexing.
 -- in.cue --
 length: {
 	x: [1, ..._|_]
-	x: [_, 2] @test(err, contains="explicit error")
+	x: [_, 2] @test(err, contains="incompatible list lengths")
 }
 
 empty: {
-	x: [..._|_] & [1] @test(err, contains="explicit error")
+	x: [..._|_] & [1] @test(err, contains="incompatible list lengths")
 }
 
 // The literal closes one level: its elements keep their own closedness.
@@ -28,9 +28,9 @@ defElems: {
 	err: #D & [{a: 1, b: 2}] @test(err, contains="field not allowed")
 }
 
-// An index past the end of the list is incomplete, as the list is open.
+// An index past the end of the list is an error, not incomplete.
 index: {
-	x: [1, ..._|_][3] @test(err, code=incomplete, contains="index out of range")
+	x: [1, ..._|_][3] @test(err, code=eval, contains="index out of range")
 }
 
 open: {
@@ -38,13 +38,13 @@ open: {
 	n: len(x)                 @test(eq, 1)
 }
 -- out/errors.txt --
-[user] explicit error (_|_ literal) in source:
-    ./in.cue:2:12
-[user] explicit error (_|_ literal) in source:
-    ./in.cue:7:9
+[eval] length.x: incompatible list lengths (1 and 2):
+    ./in.cue:3:5
+[eval] empty.x: incompatible list lengths (0 and 1):
+    ./in.cue:7:16
 [eval] defElems.err.0.b: field not allowed:
     ./in.cue:23:20
-[incomplete] index.x: index out of range [3] with length 1:
+[eval] index.x: index out of range [3] with length 1:
     ./in.cue:28:17
     ./in.cue:28:5
 -- out/eval/stats --
@@ -55,7 +55,7 @@ Allocs: 13
 Retain: 0
 
 Unifications: 32
-Conjuncts:    46
+Conjuncts:    44
 Disjuncts:    0
 
 NumCloseIDs: 1

@@ -291,6 +291,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 	n.updateCyclicStatus(t.id)
 
 	var ellipsis Node
+	closedByBottom := false
 
 	id := c.subField(t.id)
 
@@ -339,6 +340,14 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 				return
 			}
 
+			// A trailing ..._|_ closes the literal: it limits the length of
+			// the list, as a list literal without an ellipsis does, rather
+			// than adding a pattern that further elements fail.
+			if _, ok := x.Value.(*Bottom); ok {
+				closedByBottom = true
+				continue
+			}
+
 			elem := x.Value
 			if elem == nil {
 				elem = &Top{}
@@ -364,7 +373,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 		}
 	}
 
-	isClosed := ellipsis == nil
+	isClosed := closedByBottom || ellipsis == nil
 
 	switch max := n.maxListLen; {
 	case int(index) < max:

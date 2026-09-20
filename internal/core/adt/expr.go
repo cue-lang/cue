@@ -1253,10 +1253,14 @@ func (x *SliceExpr) evaluate(c *OpContext, state Flags) Value {
 			return c.NewErrf("invalid slice index: %d > %d", lo, hi)
 		}
 
-		n := c.newList(c.src, v.Parent)
+		// Build the result from a list literal of the elements, as a builtin
+		// does, rather than from copies of the arcs: the literal is the
+		// conjunct through which a check of the result, such as by close,
+		// finds its elements. Copied arcs carry only the evidence of the
+		// sliced list, and close would reject them as not allowed.
+		lit := &ListLit{}
 		for i, a := range v.Arcs[lo:hi] {
-			label, err := MakeLabel(a.Source(), int64(i), IntLabel)
-			if err != nil {
+			if _, err := MakeLabel(a.Source(), int64(i), IntLabel); err != nil {
 				c.AddBottom(&Bottom{
 					Src:  a.Source(),
 					Err:  err,
@@ -1264,19 +1268,10 @@ func (x *SliceExpr) evaluate(c *OpContext, state Flags) Value {
 				})
 				return nil
 			}
-			if v.IsDynamic {
-				// If the list is dynamic, there is no need to recompute the
-				// arcs.
-				a.Label = label
-				n.Arcs = append(n.Arcs, a)
-				continue
-			}
-			arc := *a
-			arc.Parent = n
-			arc.Label = label
-			n.Arcs = append(n.Arcs, &arc)
+			lit.Elems = append(lit.Elems, a)
 		}
-		n.status = finalized
+		n := c.newInlineVertex(v.Parent, nil, Conjunct{x: lit})
+		n.Finalize(c)
 		return n
 
 	case *Bytes:

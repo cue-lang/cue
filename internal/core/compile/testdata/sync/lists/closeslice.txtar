@@ -1,0 +1,62 @@
+# close applies to the result of a slice as it does to a list literal or a
+# builtin result: the sliced elements are its own, and further elements are
+# rejected. A slice of a list built by a comprehension behaves the same.
+-- in.cue --
+x: [1, 2, 3]
+y: close(x[0:1])
+ok:  y & [1]
+err: y & [1, 2]
+
+d: close([for i in [1, 2, 3] {i}][0:1])
+dOk:  d & [1]
+dErr: d & [1, 2]
+
+// Slicing a list of structs keeps the elements.
+s: [{a: 1}, {a: 2}]
+t: close(s[1:]) & [{b: 2}]
+-- out/compile --
+--- in.cue
+{
+  x: [
+    1,
+    2,
+    3,
+  ]
+  y: close(〈0;x〉[0:1])
+  ok: (〈0;y〉 & [
+    1,
+  ])
+  err: (〈0;y〉 & [
+    1,
+    2,
+  ])
+  d: close([
+    for _, i in [
+      1,
+      2,
+      3,
+    ] {
+      〈1;i〉
+    },
+  ][0:1])
+  dOk: (〈0;d〉 & [
+    1,
+  ])
+  dErr: (〈0;d〉 & [
+    1,
+    2,
+  ])
+  s: [
+    {
+      a: 1
+    },
+    {
+      a: 2
+    },
+  ]
+  t: (close(〈0;s〉[1:]) & [
+    {
+      b: 2
+    },
+  ])
+}

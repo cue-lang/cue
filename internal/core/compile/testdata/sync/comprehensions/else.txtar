@@ -140,6 +140,13 @@ tryTwoBindsFallbackScope: {
 	}
 }
 
+// A fallback body directly inside a top-level field, with two bindings to
+// skip, leaves no scope to spare above it.
+tryTwoBindsPastRoot: {
+	shadowed: 1
+	try x = missing? try y = missing? { fromTry: x + y } fallback { fromFallback: shadowed }
+}
+
 // The struct form declares no binding; covered for contrast.
 tryStructFallbackScope: {
 	shadowed: 1
@@ -380,7 +387,7 @@ nestedInnerFallback: {
       try x = 〈2;missing〉? {
         fromTry: 〈1;x〉
       } else {
-        fromFallback: 〈2;shadowed〉
+        fromFallback: 〈1;shadowed〉
       }
     }
   }
@@ -391,8 +398,16 @@ nestedInnerFallback: {
       try x = 〈2;missing〉? try y = 〈3;missing〉? {
         fromTry: (〈2;x〉 + 〈1;y〉)
       } else {
-        fromFallback: 〈3;shadowed〉
+        fromFallback: 〈1;shadowed〉
       }
+    }
+  }
+  tryTwoBindsPastRoot: {
+    shadowed: 1
+    try x = 〈1;missing〉? try y = 〈2;missing〉? {
+      fromTry: (〈2;x〉 + 〈1;y〉)
+    } else {
+      fromFallback: 〈1;shadowed〉
     }
   }
   tryStructFallbackScope: {

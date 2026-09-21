@@ -145,7 +145,7 @@ tryBindFallbackScope: {
 	inner: {
 		shadowed: 2
 		try x = missing? { fromTry: x } else { fromFallback: shadowed }
-		@test(eq:todo, {shadowed: 2, fromFallback: 2})
+		@test(eq, {shadowed: 2, fromFallback: 2})
 	}
 }
 
@@ -156,8 +156,16 @@ tryTwoBindsFallbackScope: {
 	inner: {
 		shadowed: 2
 		try x = missing? try y = missing? { fromTry: x + y } fallback { fromFallback: shadowed }
-		@test(eq:todo, {shadowed: 2, fromFallback: 2})
+		@test(eq, {shadowed: 2, fromFallback: 2})
 	}
+}
+
+// A fallback body directly inside a top-level field, with two bindings to
+// skip, leaves no scope to spare above it.
+tryTwoBindsPastRoot: {
+	shadowed: 1
+	try x = missing? try y = missing? { fromTry: x + y } fallback { fromFallback: shadowed }
+	@test(eq, {shadowed: 1, fromFallback: 1})
 }
 
 // The struct form declares no binding; covered for contrast.
@@ -217,10 +225,6 @@ nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 	@test(eq, {inner: true})
 }
--- out/errors.txt --
-[incomplete] tryTwoBindsFallbackScope.inner.fromFallback: undefined field: shadowed:
-    ./in.cue:157:81
-    ./in.cue:1:1
 -- out/eval/stats --
 Leaks:  16
 Freed:  114

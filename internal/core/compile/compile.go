@@ -954,6 +954,10 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 	var a []adt.Yielder
 	hasTry := false
+	// The scope depth before any clause pushes its own; the fallback body is
+	// compiled at this depth. The clauses below only ever pop via defer, so
+	// their scopes are all still on the stack when the fallback is compiled.
+	outerDepth := len(c.stack)
 	for _, v := range x.Clauses {
 		switch x := v.(type) {
 		case *ast.ForClause:
@@ -1097,17 +1101,10 @@ func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 		// Pop all comprehension scopes temporarily to compile fallback in outer scope.
 		// We need to compile the fallback body outside the comprehension's scope chain.
 		savedStack := c.stack
-		// Find the scope depth before the comprehension clauses were pushed.
-		// Each for/let clause pushes one scope.
-		outerDepth := len(savedStack)
-		for _, clause := range x.Clauses {
-			switch clause.(type) {
-			case *ast.ForClause, *ast.LetClause:
-				outerDepth--
-			}
-		}
-		// Temporarily truncate to outer scope depth.
-		c.stack = savedStack[:outerDepth]
+		// Limit the capacity so that a scope pushed while compiling the
+		// fallback body does not overwrite the clause scopes, which the
+		// pending popScope calls still read.
+		c.stack = savedStack[:outerDepth:outerDepth]
 		fallbackBody := c.expr(x.Fallback.Body)
 		c.stack = savedStack // Restore full stack
 		if fallbackSt, ok := fallbackBody.(*adt.StructLit); ok {

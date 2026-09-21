@@ -119,6 +119,36 @@ outerScope: {
 	for x in [] { x } fallback { fallbackField: threshold }
 }
 
+// The fallback body is evaluated outside the comprehension's clauses, so a
+// reference in it names the field of the struct holding the comprehension,
+// not one the clauses bring into scope.
+tryBindFallbackScope: {
+	shadowed: 1
+	inner: {
+		shadowed: 2
+		try x = missing? { fromTry: x } else { fromFallback: shadowed }
+	}
+}
+
+// The number of try bindings a comprehension declares does not affect the
+// scope of its fallback body.
+tryTwoBindsFallbackScope: {
+	shadowed: 1
+	inner: {
+		shadowed: 2
+		try x = missing? try y = missing? { fromTry: x + y } fallback { fromFallback: shadowed }
+	}
+}
+
+// The struct form declares no binding; covered for contrast.
+tryStructFallbackScope: {
+	shadowed: 1
+	inner: {
+		shadowed: 2
+		try { fromTry: missing? } else { fromFallback: shadowed }
+	}
+}
+
 // if-else: nested body fields - else yields once
 ifNestedBody: {
 	if false { a: b: 1 } else { c: 2 }
@@ -341,6 +371,39 @@ nestedInnerFallback: {
       〈1;x〉
     } else {
       fallbackField: 〈1;let threshold#1〉
+    }
+  }
+  tryBindFallbackScope: {
+    shadowed: 1
+    inner: {
+      shadowed: 2
+      try x = 〈2;missing〉? {
+        fromTry: 〈1;x〉
+      } else {
+        fromFallback: 〈2;shadowed〉
+      }
+    }
+  }
+  tryTwoBindsFallbackScope: {
+    shadowed: 1
+    inner: {
+      shadowed: 2
+      try x = 〈2;missing〉? try y = 〈3;missing〉? {
+        fromTry: (〈2;x〉 + 〈1;y〉)
+      } else {
+        fromFallback: 〈3;shadowed〉
+      }
+    }
+  }
+  tryStructFallbackScope: {
+    shadowed: 1
+    inner: {
+      shadowed: 2
+      try {
+        fromTry: 〈3;missing〉?
+      } else {
+        fromFallback: 〈1;shadowed〉
+      }
     }
   }
   ifNestedBody: {

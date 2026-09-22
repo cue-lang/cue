@@ -69,6 +69,8 @@ errorSelf: {
 	@test(err, code=eval, contains="bad:", pos=[1:17, 0:12, 1:5, 2:5])
 }
 -- issues.cue --
+import "list"
+
 // issue4001: Tests that error() text is shown correctly when the message uses
 // string concatenation with interpolation. https://cuelang.org/issue/4001
 issue4001: {
@@ -95,16 +97,24 @@ issue3984: {
 	v: "a" | error("must be a")
 	v: "b" @test(err, code=eval, contains="must be a", pos=[-1:11, -1:5, 0:5])
 }
+// issue4490: Tests that a user error wrapped by a builtin is reported when the
+// same disjunction also fails with a regular error.
+// https://cuelang.org/issue/4490
+issue4490: {
+	a: 1 | list.Concat([[error("boom")]])
+	a: 2
+	@test(err, code=eval, contains="boom", pos=[1:9, 1:5, 1:23, 2:5])
+}
 -- out/eval/stats --
 Leaks:  3
-Freed:  84
-Reused: 57
-Allocs: 30
+Freed:  95
+Reused: 67
+Allocs: 31
 Retain: 0
 
-Unifications: 42
-Conjuncts:    99
-Disjuncts:    41
+Unifications: 49
+Conjuncts:    110
+Disjuncts:    43
 -- out/errors.txt --
 [eval] selection.useCustomError: use me:
     ./in.cue:4:24
@@ -152,20 +162,25 @@ multi: should remain incomplete:
 multi: second:
     ./incomplete.cue:7:66
 [eval] issue4001.a: error: a='b':
-    ./issues.cue:5:11
-    ./issues.cue:4:5
-    ./issues.cue:5:5
+    ./issues.cue:7:11
+    ./issues.cue:6:5
+    ./issues.cue:7:5
 [eval] issue3983.x: 2 errors in empty disjunction::
-    ./issues.cue:11:5
-    ./issues.cue:14:5
+    ./issues.cue:13:5
+    ./issues.cue:16:5
 issue3983.x: I wanted an integer:
-    ./issues.cue:10:11
+    ./issues.cue:12:11
 issue3983.x: I wanted more than 10:
-    ./issues.cue:11:11
+    ./issues.cue:13:11
 [eval] issue3984.v: must be a:
-    ./issues.cue:24:11
-    ./issues.cue:24:5
-    ./issues.cue:25:5
+    ./issues.cue:26:11
+    ./issues.cue:26:5
+    ./issues.cue:27:5
+[eval] issue4490.a: error in call to list.Concat: boom:
+    ./issues.cue:33:9
+    ./issues.cue:33:5
+    ./issues.cue:33:23
+    ./issues.cue:34:5
 [eval] errorSelf.v: bad: {v:_|_(errorSelf.v: bad: value at path 'errorSelf')}:
     ./self.cue:7:17
     ./self.cue:6:12

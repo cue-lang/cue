@@ -62,6 +62,8 @@ errorSelf: {
 	v: "z"
 }
 -- issues.cue --
+import "list"
+
 // issue4001: Tests that error() text is shown correctly when the message uses
 // string concatenation with interpolation. https://cuelang.org/issue/4001
 issue4001: {
@@ -82,6 +84,13 @@ issue3983: {
 issue3984: {
 	v: "a" | error("must be a")
 	v: "b"
+}
+// issue4490: Tests that a user error wrapped by a builtin is reported when the
+// same disjunction also fails with a regular error.
+// https://cuelang.org/issue/4490
+issue4490: {
+	a: 1 | list.Concat([[error("boom")]])
+	a: 2
 }
 -- out/compile --
 --- in.cue
@@ -140,6 +149,14 @@ issue3984: {
   issue3984: {
     v: ("a"|error("must be a"))
     v: "b"
+  }
+  issue4490: {
+    a: (1|〈import;list〉.Concat([
+      [
+        error("boom"),
+      ],
+    ]))
+    a: 2
   }
 }
 --- self.cue

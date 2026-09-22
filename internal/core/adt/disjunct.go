@@ -191,9 +191,7 @@ func (n *nodeContext) disjunctError() errors.Error {
 	disjuncts = errors.Sanitize(disjuncts)
 	k := len(errors.Errors(disjuncts))
 	if k == 1 {
-		if pos != nil {
-			addDisjunctPositions(disjuncts.(*ValueError), pos)
-		}
+		addDisjunctPositions(disjuncts, pos)
 		return disjuncts
 	}
 	// prefix '-' to sort to top
@@ -203,15 +201,19 @@ func (n *nodeContext) disjunctError() errors.Error {
 	// position would report the nested failures too, once errors.Append
 	// stops flattening the list into them.
 	err := ctx.Newf("%d errors in empty disjunction:", k)
-	if pos != nil {
-		addDisjunctPositions(err, pos)
-	}
+	addDisjunctPositions(err, pos)
 	return errors.Append(err, disjuncts)
 }
 
-func addDisjunctPositions(dst *ValueError, src errors.Error) {
+// addDisjunctPositions adds the positions of src to dst, if any. dst may wrap
+// the ValueError holding the positions, as a builtin wraps what it propagates.
+func addDisjunctPositions(dst, src errors.Error) {
+	var v *ValueError
+	if src == nil || !errors.As(dst, &v) {
+		return
+	}
 	for _, p := range src.InputPositions() {
-		dst.AddPos(p)
+		v.AddPos(p)
 	}
 }
 

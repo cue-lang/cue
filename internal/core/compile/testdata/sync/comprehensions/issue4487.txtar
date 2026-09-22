@@ -1,0 +1,431 @@
+# Each comprehension in a struct pushes down a pending arc, which stays pending
+# when the comprehension yields nothing. A list comprehension reading the
+# struct, and a guard reading that list in turn, must both see the settled
+# field set. The guard instead observes the list before its elements are
+# known, so it reports an incomplete len, and where the list is non-empty the
+# element that arrives afterwards no longer fits the frozen field set.
+#
+# A guard reading a struct with a comprehension nested in another's body must
+# likewise see the field the inner comprehension declares. It instead reports
+# a cyclic reference to that field, or an incomplete len when a list is in
+# between. https://cuelang.org/issue/4487
+-- in.cue --
+empty: {
+	q: {
+		a: 0
+		if false {b: 1}
+		if false {c: 2}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+}
+
+populated: {
+	q: {
+		a: 0
+		b: 1
+		if false {c: 2}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+}
+
+threeArcs: {
+	q: {
+		a: 0
+		if false {b: 1}
+		if false {c: 2}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+}
+
+forLoops: {
+	q: {
+		a: 0
+		for x in [] {b: x}
+		for x in [] {c: x}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+}
+
+guardFirst: {
+	spec: {
+		if len(n) != 0 {
+			out: n
+		}
+	}
+	q: {
+		a: 0
+		if false {b: 1}
+		if false {c: 2}
+	}
+	n: [if len(q) > 1 {q}]
+}
+
+subField: {
+	q: {
+		a: 0
+		if true {b: c: 1}
+		if false {d: 3}
+		if false {e: 4}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+}
+
+nestedPending: {
+	q: {
+		a: 0
+		if false {b: x: 1}
+		if false {b: y: 2}
+		if false {c: 2}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+}
+
+inDisjunction: {
+	d: {
+		kind: "a"
+		if false {b: 1}
+		if false {c: 2}
+	} | {kind: "b", x: 1, y: 2}
+	d: kind: "a"
+	n: [if len(d) > 1 {d}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+}
+
+nested: {
+	q: {
+		a: 0
+		for x in [1] {
+			if x == 1 {c: 2}
+		}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+}
+
+nestedGuard: {
+	q: {
+		a: 0
+		for x in [1] {
+			if true {c: 2}
+		}
+	}
+	if len(q) > 1 {
+		out: q
+	}
+}
+
+deepNested: {
+	q: {
+		a: 0
+		for x in [1] {
+			for y in [1] {
+				if x == y {c: 2}
+			}
+		}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+}
+
+deepNestedGuard: {
+	q: {
+		a: 0
+		if true {
+			if true {
+				if true {c: 2}
+			}
+		}
+	}
+	if len(q) > 1 {
+		out: q
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  empty: {
+    q: {
+      a: 0
+      if false {
+        b: 1
+      }
+      if false {
+        c: 2
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) == 0) {
+      out: "empty"
+    }
+  }
+  populated: {
+    q: {
+      a: 0
+      b: 1
+      if false {
+        c: 2
+      }
+      if false {
+        d: 3
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) != 0) {
+      out: 〈1;n〉
+    }
+  }
+  threeArcs: {
+    q: {
+      a: 0
+      if false {
+        b: 1
+      }
+      if false {
+        c: 2
+      }
+      if false {
+        d: 3
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) == 0) {
+      out: "empty"
+    }
+  }
+  forLoops: {
+    q: {
+      a: 0
+      for _, x in [] {
+        b: 〈1;x〉
+      }
+      for _, x in [] {
+        c: 〈1;x〉
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) == 0) {
+      out: "empty"
+    }
+  }
+  guardFirst: {
+    spec: {
+      if (len(〈1;n〉) != 0) {
+        out: 〈2;n〉
+      }
+    }
+    q: {
+      a: 0
+      if false {
+        b: 1
+      }
+      if false {
+        c: 2
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+  }
+  subField: {
+    q: {
+      a: 0
+      if true {
+        b: {
+          c: 1
+        }
+      }
+      if false {
+        d: 3
+      }
+      if false {
+        e: 4
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) != 0) {
+      out: 〈1;n〉
+    }
+  }
+  nestedPending: {
+    q: {
+      a: 0
+      if false {
+        b: {
+          x: 1
+        }
+      }
+      if false {
+        b: {
+          y: 2
+        }
+      }
+      if false {
+        c: 2
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) == 0) {
+      out: "empty"
+    }
+  }
+  inDisjunction: {
+    d: ({
+      kind: "a"
+      if false {
+        b: 1
+      }
+      if false {
+        c: 2
+      }
+    }|{
+      kind: "b"
+      x: 1
+      y: 2
+    })
+    d: {
+      kind: "a"
+    }
+    n: [
+      if (len(〈1;d〉) > 1) {
+        〈2;d〉
+      },
+    ]
+    if (len(〈0;n〉) == 0) {
+      out: "empty"
+    }
+  }
+  nested: {
+    q: {
+      a: 0
+      for _, x in [
+        1,
+      ] {
+        if (〈1;x〉 == 1) {
+          c: 2
+        }
+      }
+      if false {
+        d: 3
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) != 0) {
+      out: 〈1;n〉
+    }
+  }
+  nestedGuard: {
+    q: {
+      a: 0
+      for _, x in [
+        1,
+      ] {
+        if true {
+          c: 2
+        }
+      }
+    }
+    if (len(〈0;q〉) > 1) {
+      out: 〈1;q〉
+    }
+  }
+  deepNested: {
+    q: {
+      a: 0
+      for _, x in [
+        1,
+      ] {
+        for _, y in [
+          1,
+        ] {
+          if (〈3;x〉 == 〈1;y〉) {
+            c: 2
+          }
+        }
+      }
+      if false {
+        d: 3
+      }
+    }
+    n: [
+      if (len(〈1;q〉) > 1) {
+        〈2;q〉
+      },
+    ]
+    if (len(〈0;n〉) != 0) {
+      out: 〈1;n〉
+    }
+  }
+  deepNestedGuard: {
+    q: {
+      a: 0
+      if true {
+        if true {
+          if true {
+            c: 2
+          }
+        }
+      }
+    }
+    if (len(〈0;q〉) > 1) {
+      out: 〈1;q〉
+    }
+  }
+}

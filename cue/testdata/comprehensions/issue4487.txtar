@@ -1,0 +1,268 @@
+# Each comprehension in a struct pushes down a pending arc, which stays pending
+# when the comprehension yields nothing. A list comprehension reading the
+# struct, and a guard reading that list in turn, must both see the settled
+# field set. The guard instead observes the list before its elements are
+# known, so it reports an incomplete len, and where the list is non-empty the
+# element that arrives afterwards no longer fits the frozen field set.
+#
+# A guard reading a struct with a comprehension nested in another's body must
+# likewise see the field the inner comprehension declares. It instead reports
+# a cyclic reference to that field, or an incomplete len when a list is in
+# between. https://cuelang.org/issue/4487
+-- in.cue --
+empty: {
+	q: {
+		a: 0
+		if false {b: 1}
+		if false {c: 2}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+	@test(eq, {q: {a: 0}, n: []})
+	@test(eq:todo, {q: {a: 0}, n: [], out: "empty"})
+}
+
+populated: {
+	q: {
+		a: 0
+		b: 1
+		if false {c: 2}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+	@test(err, code=eval, path=n, contains="adding field 0 not allowed")
+	@test(eq:todo, {
+		q: {a: 0, b: 1}
+		n: [{a: 0, b: 1}]
+		out: [{a: 0, b: 1}]
+	})
+}
+
+threeArcs: {
+	q: {
+		a: 0
+		if false {b: 1}
+		if false {c: 2}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+	@test(err, code=incomplete, contains="incomplete argument list")
+	@test(eq:todo, {q: {a: 0}, n: [], out: "empty"})
+}
+
+forLoops: {
+	q: {
+		a: 0
+		for x in [] {b: x}
+		for x in [] {c: x}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+	@test(err, code=incomplete, contains="incomplete argument list")
+	@test(eq:todo, {q: {a: 0}, n: [], out: "empty"})
+}
+
+guardFirst: {
+	spec: {
+		if len(n) != 0 {
+			out: n
+		}
+	}
+	q: {
+		a: 0
+		if false {b: 1}
+		if false {c: 2}
+	}
+	n: [if len(q) > 1 {q}]
+	@test(eq, {
+		spec: _|_ @test(err, code=incomplete, contains="incomplete argument list")
+		q: {a: 0}
+		n: []
+	})
+	@test(eq:todo, {spec: {}, q: {a: 0}, n: []})
+}
+
+subField: {
+	q: {
+		a: 0
+		if true {b: c: 1}
+		if false {d: 3}
+		if false {e: 4}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+	@test(err, code=eval, path=n, contains="adding field 0 not allowed")
+	@test(eq:todo, {
+		q: {a: 0, b: c: 1}
+		n: [{a: 0, b: c: 1}]
+		out: [{a: 0, b: c: 1}]
+	})
+}
+
+nestedPending: {
+	q: {
+		a: 0
+		if false {b: x: 1}
+		if false {b: y: 2}
+		if false {c: 2}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+	@test(err, code=incomplete, contains="incomplete argument list")
+	@test(eq:todo, {q: {a: 0}, n: [], out: "empty"})
+}
+
+inDisjunction: {
+	d: {
+		kind: "a"
+		if false {b: 1}
+		if false {c: 2}
+	} | {kind: "b", x: 1, y: 2}
+	d: kind: "a"
+	n: [if len(d) > 1 {d}]
+	if len(n) == 0 {
+		out: "empty"
+	}
+	@test(eq, {d: {kind: "a"}, n: [], out: "empty"})
+}
+
+nested: {
+	q: {
+		a: 0
+		for x in [1] {
+			if x == 1 {c: 2}
+		}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+	@test(err, code=incomplete, contains="incomplete argument list")
+	@test(eq:todo, {
+		q: {a: 0, c: 2}
+		n: [{a: 0, c: 2}]
+		out: [{a: 0, c: 2}]
+	})
+}
+
+nestedGuard: {
+	q: {
+		a: 0
+		for x in [1] {
+			if true {c: 2}
+		}
+	}
+	if len(q) > 1 {
+		out: q
+	}
+	@test(err, code=incomplete, path=q, contains="cyclic reference to field c")
+	@test(eq:todo, {q: {a: 0, c: 2}, out: {a: 0, c: 2}})
+}
+
+deepNested: {
+	q: {
+		a: 0
+		for x in [1] {
+			for y in [1] {
+				if x == y {c: 2}
+			}
+		}
+		if false {d: 3}
+	}
+	n: [if len(q) > 1 {q}]
+	if len(n) != 0 {
+		out: n
+	}
+	@test(err, code=incomplete, contains="incomplete argument list")
+	@test(eq:todo, {
+		q: {a: 0, c: 2}
+		n: [{a: 0, c: 2}]
+		out: [{a: 0, c: 2}]
+	})
+}
+
+deepNestedGuard: {
+	q: {
+		a: 0
+		if true {
+			if true {
+				if true {c: 2}
+			}
+		}
+	}
+	if len(q) > 1 {
+		out: q
+	}
+	@test(err, code=incomplete, path=q, contains="cyclic reference to field c")
+	@test(eq:todo, {q: {a: 0, c: 2}, out: {a: 0, c: 2}})
+}
+-- out/errors.txt --
+[incomplete] empty: error in call to len: incomplete argument list (type list):
+    ./in.cue:8:5
+    ./in.cue:7:5
+[eval] populated.n: adding field 0 not allowed as field set was already referenced:
+    ./in.cue:22:6
+    ./in.cue:23:2
+[incomplete] threeArcs: error in call to len: incomplete argument list (type list):
+    ./in.cue:42:5
+    ./in.cue:41:5
+[incomplete] forLoops: error in call to len: incomplete argument list (type list):
+    ./in.cue:56:5
+    ./in.cue:55:5
+[incomplete] guardFirst.spec: error in call to len: incomplete argument list (type list):
+    ./in.cue:65:6
+    ./in.cue:74:5
+[eval] subField.n: adding field 0 not allowed as field set was already referenced:
+    ./in.cue:90:6
+    ./in.cue:91:2
+[incomplete] nestedPending: error in call to len: incomplete argument list (type list):
+    ./in.cue:110:5
+    ./in.cue:109:5
+[incomplete] nested: error in call to len: incomplete argument list (type list):
+    ./in.cue:140:5
+    ./in.cue:139:5
+[incomplete] nestedGuard.q: cyclic reference to field c:
+    ./in.cue:155:12
+    ./in.cue:152:2
+nestedGuard.q.c: cyclic reference to field c:
+    ./in.cue:155:12
+    ./in.cue:152:2
+nestedGuard.q: cyclic reference to field c:
+    ./in.cue:158:9
+    ./in.cue:152:2
+[incomplete] deepNested: error in call to len: incomplete argument list (type list):
+    ./in.cue:176:5
+    ./in.cue:175:5
+[incomplete] deepNestedGuard.q: cyclic reference to field c:
+    ./in.cue:191:12
+    ./in.cue:188:2
+deepNestedGuard.q: cyclic reference to field c:
+    ./in.cue:196:9
+    ./in.cue:188:2
+-- out/eval/stats --
+Leaks:  39
+Freed:  60
+Reused: 45
+Allocs: 54
+Retain: 0
+
+Unifications: 95
+Conjuncts:    78
+Disjuncts:    2
+
+NumCloseIDs: 2

@@ -1,0 +1,36 @@
+# JSON Schema compares numbers by mathematical value, so an integer const
+# also matches the equivalent float and vice versa, at any depth.
+# See issue #4121.
+
+# TODO the crossed test data should be valid; it is named err-crossed
+# because the extracted schema currently rejects it.
+
+-- schema.json --
+{
+    "type": "object",
+    "properties": {
+        "i": {"const": 1},
+        "f": {"const": -2.0},
+        "l": {"enum": [[1]]}
+    }
+}
+
+-- out/decode/extract --
+i?: 1
+f?: -2.0
+l?: [1]
+...
+-- out/decode/testerr/err-crossed --
+i: conflicting values 1 and 1.0 (mismatched types int and float):
+    generated.cue:1:5
+    test/err-crossed.json:1:7
+-- out/decode/testerr/err-value --
+i: conflicting values 2 and 1:
+    generated.cue:1:5
+    test/err-value.json:1:7
+-- test/exact.json --
+{"i": 1, "f": -2.0, "l": [1]}
+-- test/err-crossed.json --
+{"i": 1.0, "f": -2, "l": [1.0]}
+-- test/err-value.json --
+{"i": 2}

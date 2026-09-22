@@ -15,8 +15,7 @@ stdout 'pkg2/cue_types_otherpkg_gen\.go'
 # A CUE file with no package clause has no name to give the Go package nor its file.
 cd ../nopkg
 ! exec cue exp gengotypes nopkg.cue
-# TODO: the error should say that a CUE package name is required.
-stderr 'expected .IDENT., found .type.'
+stderr 'cannot generate Go types without a package name'
 ! exists cue_types_gen.go
 
 # A @go package attribute supplies the Go package name without a CUE package clause.

@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 const (
@@ -54,6 +55,10 @@ type decoder struct {
 	cfg          *Config
 	errs         errors.Error
 	mapURLErrors map[string]bool
+
+	// targetExp holds the experiments of [Config.TargetLanguageVersion],
+	// which decide the spellings the extracted syntax may use.
+	targetExp *cueexperiment.File
 
 	root   cue.Value
 	rootID *url.URL
@@ -1189,8 +1194,36 @@ func (s *state) constValue(n cue.Value) ast.Expr {
 		if !n.IsConcrete() {
 			s.errf(n, "invalid non-concrete value")
 		}
-		return setPos(n.Syntax(cue.Final()).(ast.Expr), n)
+		x := setPos(n.Syntax(cue.Final()).(ast.Expr), n)
+		if k&cue.NumberKind == 0 {
+			return x
+		}
+		// JSON Schema compares numbers by mathematical value, so a const
+		// of 1 must also match 1.0. Unification keeps ints and floats
+		// apart, whereas bounds compare by value.
+		if s.targetExp.StructCmp {
+			return setPos(&ast.UnaryExpr{Op: token.EQL, X: x}, n)
+		}
+		// Unary == needs the StructCmp experiment, so spell the same
+		// constraint as a pair of bounds for older targets, each with its
+		// own literal rather than one node aliased into both.
+		y := setPos(n.Syntax(cue.Final()).(ast.Expr), n)
+		return ast.NewBinExpr(token.AND,
+			setPos(&ast.UnaryExpr{Op: token.GEQ, X: x}, n),
+			setPos(&ast.UnaryExpr{Op: token.LEQ, X: y}, n),
+		)
 	}
+}
+
+// constValueKind reports the kind of values that [state.constValue] accepts
+// for n. Numbers are rendered as bounds, which match by mathematical value, so
+// a number admits both ints and floats regardless of how it is written.
+func constValueKind(n cue.Value) cue.Kind {
+	k := n.Kind()
+	if k&cue.NumberKind != 0 {
+		k = cue.NumberKind
+	}
+	return k
 }
 
 // processMap processes a yaml node, expanding merges.

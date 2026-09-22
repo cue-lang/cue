@@ -23,11 +23,11 @@ bad.data: 3 errors in empty disjunction:
 bad.data: conflicting values 0 and "three" (mismatched types int and string):
     ./datatest/tests.cue:6:8
     1:71
-bad.data: conflicting values 1 and 0:
-    ./datatest/tests.cue:6:8
+bad.data: invalid value 0 (out of bound ==1):
     1:67
-bad.data: conflicting values 2 and 0:
     ./datatest/tests.cue:6:8
+bad.data: invalid value 0 (out of bound ==2):
     1:69
+    ./datatest/tests.cue:6:8
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --

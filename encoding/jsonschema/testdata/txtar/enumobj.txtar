@@ -6,7 +6,7 @@
 
 -- out/decode/extract --
 close({
-	a!: 1
-	b!: [1, 2, 3]
-	c!: close({d!: 1})
+	a!: ==1
+	b!: [==1, ==2, ==3]
+	c!: close({d!: ==1})
 })

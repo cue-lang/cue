@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/cueexperiment"
 )
 
 // Object constraints
@@ -194,12 +193,7 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 	count := 0
 	// aliasv2 is what enables the postfix alias form, whether because the
 	// target language version has it stable or because it names it outright.
-	targetExp, err := cueexperiment.NewFile(s.cfg.TargetLanguageVersion)
-	if err != nil {
-		s.errf(n, "invalid target language version: %v", err)
-		return
-	}
-	postfixAliases := targetExp.AliasV2
+	postfixAliases := s.targetExp.AliasV2
 	s.processMap(n, func(key string, n cue.Value) {
 		var ident *ast.Ident
 		// TODO we could potentially avoid declaring the field

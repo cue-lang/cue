@@ -46,11 +46,7 @@ errorUnequal: {
 }
 errorEqual1: {
 	data: t04: 1.0
-	// TODO this currently succeeds even though it should not
-	// because `{not: {const: 1}}` translates to `matchN(0, [1])`
-	// but 1 does not unify with 1.0 in CUE.
-	// See https://cuelang.org/issue/4121
-	//error: true
+	error: true
 }
 errorEqual2: {
 	data: t04: 1
@@ -143,10 +139,13 @@ errorAboveUint64: {
 }
 -- out/generate-v3/ok --
 -- out/generate-v3/errorEqual1 --
+errorEqual1.data.t04: invalid value 1.0 (does not satisfy matchN): 1 matched, expected 0:
+    1:203
+    ./datatest/tests.cue:31:13
 -- out/generate-v3/errorEqual2 --
 errorEqual2.data.t04: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
     1:203
-    ./datatest/tests.cue:39:13
+    ./datatest/tests.cue:35:13
 -- out/generate-v3/errorMatchingRegexp --
 errorMatchingRegexp.data.t02: invalid value "xbary" (does not satisfy matchN): 1 matched, expected 0:
     1:153
@@ -158,36 +157,36 @@ errorNonMatchingRegexp.data.t01: invalid value "nfoo" (out of bound =~"^foo"):
 -- out/generate-v3/errorNotGreater --
 errorNotGreater.data.t05: invalid value 5 (out of bound >5):
     1:245
-    ./datatest/tests.cue:43:13
+    ./datatest/tests.cue:39:13
 -- out/generate-v3/errorNotGreaterEqual --
 errorNotGreaterEqual.data.t06: invalid value 4.99 (out of bound >=5):
     1:290
-    ./datatest/tests.cue:47:13
+    ./datatest/tests.cue:43:13
 -- out/generate-v3/errorNotLess --
 errorNotLess.data.t07: invalid value 10 (out of bound <10):
     1:326
-    ./datatest/tests.cue:51:13
+    ./datatest/tests.cue:47:13
 -- out/generate-v3/errorNotLessEqual --
 errorNotLessEqual.data.t08: invalid value 10.001 (out of bound <=10):
     1:372
-    ./datatest/tests.cue:55:13
+    ./datatest/tests.cue:51:13
 -- out/generate-v3/errorUnequal --
-errorUnequal.data.t03: conflicting values 1 and 2:
-    ./datatest/tests.cue:27:13
+errorUnequal.data.t03: invalid value 2 (out of bound ==1):
     1:185
+    ./datatest/tests.cue:27:13
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --
 -- out/generate-v3/errorAboveInt64 --
 errorAboveInt64.data.t11: invalid value 9223372036854775808 (out of bound <=9223372036854775807):
     1:458
-    ./datatest/tests.cue:66:13
+    ./datatest/tests.cue:62:13
 -- out/generate-v3/errorAboveUint64 --
 errorAboveUint64.data.t12: invalid value 18446744073709551616 (out of bound <=18446744073709551615):
     1:544
-    ./datatest/tests.cue:74:13
+    ./datatest/tests.cue:70:13
 -- out/generate-v3/errorBelowInt64 --
 errorBelowInt64.data.t11: invalid value -9223372036854775809 (out of bound >=-9223372036854775808):
     1:488
-    ./datatest/tests.cue:70:13
+    ./datatest/tests.cue:66:13
 -- out/generate-v3/okExactBounds --
 -- out/generate-v3/okExactDecimalBound --

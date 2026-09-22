@@ -44,8 +44,8 @@ import (
 )
 
 close({
-	constant?:  2
-	several?:   1 | 2 | 3 | 4
+	constant?:  ==2
+	several?:   ==1 | ==2 | ==3 | ==4
 	inclusive?: >=2 & <=3
 	exclusive?: int & >2 & <3
 	multi?:     int & >=2 & <=3 | strings.MaxRunes(5)

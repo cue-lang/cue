@@ -319,11 +319,7 @@
 			{
 				"description": "float zero is valid",
 				"data": 0.0,
-				"valid": true,
-				"skip": {
-					"v3": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values 0.0 and 0 (mismatched types float and int):\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "empty object is invalid",
@@ -362,11 +358,7 @@
 			{
 				"description": "float one is valid",
 				"data": 1.0,
-				"valid": true,
-				"skip": {
-					"v3": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values 1.0 and 1 (mismatched types float and int):\n    instance.json:1:1\n"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -380,11 +372,7 @@
 			{
 				"description": "integer -2 is valid",
 				"data": -2,
-				"valid": true,
-				"skip": {
-					"v3": "conflicting values -2 and -2.0 (mismatched types int and float):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values -2 and -2.0 (mismatched types int and float):\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "integer 2 is invalid",
@@ -428,11 +416,7 @@
 			{
 				"description": "float is valid",
 				"data": 9007199254740992.0,
-				"valid": true,
-				"skip": {
-					"v3": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
-					"v3-roundtrip": "conflicting values 9007199254740992.0 and 9007199254740992 (mismatched types float and int):\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "float minus one is invalid",

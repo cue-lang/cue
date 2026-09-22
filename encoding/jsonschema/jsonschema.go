@@ -39,6 +39,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // Extract converts JSON Schema data into an equivalent CUE representation.
@@ -85,8 +86,13 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
 	if !rootIDURI.IsAbs() {
 		return nil, fmt.Errorf("Config.ID %q is not absolute URI", cfg.ID)
 	}
+	targetExp, err := cueexperiment.NewFile(cfg.TargetLanguageVersion)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Config.TargetLanguageVersion value %q: %v", cfg.TargetLanguageVersion, err)
+	}
 	d := &decoder{
 		cfg:          cfg,
+		targetExp:    targetExp,
 		mapURLErrors: make(map[string]bool),
 		root:         data.Value(),
 		rootID:       rootIDURI,
@@ -317,7 +323,8 @@ type Config struct {
 	// Set it when writing the result into a module that declares an older
 	// language version, as a spelling valid today may not parse there: an
 	// alias is written in the postfix form from v0.18.0 on, and in the
-	// prefix form before it.
+	// prefix form before it; a numeric const or enum is written as a ==
+	// comparison from v0.15.0 on, and as a pair of bounds before it.
 	TargetLanguageVersion string
 
 	_ struct{} // prohibit casting from different type.

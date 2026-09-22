@@ -27,14 +27,10 @@ ok1: data: {
 	listWithUnaryEquals: [1, 2, 3]
 	listConcrete: ["a", "b", "c"]
 }
-errorFloatForInt: {
-	data: {
-		int: 2.0
-		// TODO perhaps this shouldn't be an error?
-		// jsonschema doesn't distinguish between floats and ints like CUE does.
-		// See https://cuelang.org/issue/4121 and https://cuelang.org/issue/253.
-	}
-	error: true
+floatForInt: {
+	// JSON Schema compares numbers by mathematical value, so a float
+	// matches an int const.
+	data: int: 2.0
 }
 errorNonBool: {
 	data: bool: "foo"
@@ -103,49 +99,46 @@ errorListWrongLength: {
 		}
 	}
 }
--- out/generate-v3/errorFloatForInt --
-errorFloatForInt.data.int: conflicting values 2.0 and 2 (mismatched types float and int):
-    ./datatest/tests.cue:16:8
-    1:229
 -- out/generate-v3/errorNonBool --
 errorNonBool.data.bool: conflicting values "foo" and true (mismatched types string and bool):
-    ./datatest/tests.cue:24:14
+    ./datatest/tests.cue:20:14
     1:97
 -- out/generate-v3/errorNonEqualFloat --
-errorNonEqualFloat.data.float: conflicting values 1.5 and 1.6:
-    ./datatest/tests.cue:28:15
+errorNonEqualFloat.data.float: invalid value 1.6 (out of bound ==1.5):
     1:209
+    ./datatest/tests.cue:24:15
 -- out/generate-v3/errorNonEqualInt --
-errorNonEqualInt.data.int: conflicting values 2 and 9:
-    ./datatest/tests.cue:32:13
+errorNonEqualInt.data.int: invalid value 9 (out of bound ==2):
     1:229
+    ./datatest/tests.cue:28:13
 -- out/generate-v3/errorNonNull --
 errorNonNull.data.null: conflicting values 1 and null (mismatched types int and null):
-    ./datatest/tests.cue:36:14
+    ./datatest/tests.cue:32:14
 -- out/generate-v3/errorNonString --
 errorNonString.data.string: conflicting values "something" and "other":
-    ./datatest/tests.cue:40:16
+    ./datatest/tests.cue:36:16
     1:352
 -- out/generate-v3/ok1 --
 -- out/generate-v3/errorClosedStructExtraField --
 errorClosedStructExtraField.data.closedStruct.c: field not allowed:
-    ./datatest/tests.cue:56:41
+    ./datatest/tests.cue:52:41
 -- out/generate-v3/errorListWrongElement --
-errorListWrongElement.data.listWithUnaryEquals.1: conflicting values 2 and 99:
-    ./datatest/tests.cue:60:33
+errorListWrongElement.data.listWithUnaryEquals.1: invalid value 99 (out of bound ==2):
     1:313
+    ./datatest/tests.cue:56:33
 -- out/generate-v3/errorListWrongLength --
 errorListWrongLength.data.listConcrete: incompatible list lengths (2 and 3):
     1:256
 -- out/generate-v3/errorNonClosedStructFieldA --
 errorNonClosedStructFieldA.data.closedStruct.a: conflicting values "foo" and "bar":
-    ./datatest/tests.cue:48:26
+    ./datatest/tests.cue:44:26
     1:136
 -- out/generate-v3/errorNonClosedStructFieldB --
-errorNonClosedStructFieldB.data.closedStruct.b: conflicting values 123 and 456:
-    ./datatest/tests.cue:52:36
+errorNonClosedStructFieldB.data.closedStruct.b: invalid value 456 (out of bound ==123):
     1:146
+    ./datatest/tests.cue:48:36
 -- out/generate-v3/errorNonUnaryEquals --
-errorNonUnaryEquals.data.unaryEquals: conflicting values 42 and 99:
-    ./datatest/tests.cue:44:21
+errorNonUnaryEquals.data.unaryEquals: invalid value 99 (out of bound ==42):
     1:476
+    ./datatest/tests.cue:40:21
+-- out/generate-v3/floatForInt --

@@ -45,8 +45,9 @@ func constraintComment(key string, n cue.Value, s *state) {
 
 func constraintConst(key string, n cue.Value, s *state) {
 	s.all.add(n, s.constValue(n))
-	s.allowedTypes &= n.Kind()
-	s.knownTypes &= n.Kind()
+	k := constValueKind(n)
+	s.allowedTypes &= k
+	s.knownTypes &= k
 }
 
 func constraintDefault(key string, n cue.Value, s *state) {
@@ -68,13 +69,16 @@ func constraintEnum(key string, n cue.Value, s *state) {
 	var a []ast.Expr
 	var types cue.Kind
 	for _, x := range s.listItems("enum", n, true) {
+		// Note that this asks for the kind as written, not the wider one
+		// [constValueKind] reports, so a float member of an integer enum
+		// is still dropped. See cuelang.org/issue/4121.
 		if (s.allowedTypes & x.Kind()) == 0 {
 			// Enum value is redundant because it's
 			// not in the allowed type set.
 			continue
 		}
 		a = append(a, s.constValue(x))
-		types |= x.Kind()
+		types |= constValueKind(x)
 	}
 	s.knownTypes &= types
 	s.allowedTypes &= types

@@ -15,9 +15,9 @@ cmp stderr expect
 conflicting values 0 and "three" (mismatched types int and string):
     ./data.json:1:1
     ./schema.json:1:76
-conflicting values 1 and 0:
-    ./data.json:1:1
+invalid value 0 (out of bound ==1):
     ./schema.json:1:70
-conflicting values 2 and 0:
     ./data.json:1:1
+invalid value 0 (out of bound ==2):
     ./schema.json:1:73
+    ./data.json:1:1

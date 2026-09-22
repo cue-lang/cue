@@ -89,7 +89,7 @@ boundedTooLarge.data.bounded: invalid value 500 (out of bound <=100):
     1:117
     ./datatest/tests.cue:15:17
 -- out/generate-v3/disjointBadKind --
-disjointBadKind.data.disjoint: conflicting values true and 20 (mismatched types bool and int):
+disjointBadKind.data.disjoint: conflicting values true and ==20 (mismatched types bool and number):
     ./datatest/tests.cue:30:18
     1:166
 disjointBadKind.data.disjoint: conflicting values true and string (mismatched types bool and string):

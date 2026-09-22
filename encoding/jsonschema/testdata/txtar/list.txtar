@@ -111,9 +111,9 @@ close({
 		[...]
 		[0]: string
 		[1]: int
-		[2]: 2
+		[2]: ==2
 	}
-	has?:  list.MatchN(>=1, 3)
+	has?:  list.MatchN(>=1, ==3)
 	too?:  list.MatchN(>=1, string)
 	size?: list.MinItems(3) & list.MaxItems(9) & list.UniqueItems()
 	additional?: {

@@ -1,0 +1,60 @@
+# A CRD extracted for a module below language version v0.15.0, where unary
+# == does not parse. Gateway API schemas carry numeric enums such as this
+# one, and the extracted schemas are published as a module of their own.
+
+#version: k8sCRD
+#targetLanguageVersion: v0.14.0
+
+-- schema.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: routes.example.com
+spec:
+  group: example.com
+  names:
+    kind: Route
+    plural: routes
+    singular: route
+    listKind: RouteList
+  scope: Namespaced
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          statusCode:
+            type: integer
+            enum: [301, 302]
+-- out/decode/extract --
+_embeddedResource
+statusCode?: (>=301 & <=301 | >=302 & <=302) & int
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+-- out/decodeCRD/extractCRD/0/v1 --
+package v1
+
+_embeddedResource
+statusCode?: (>=301 & <=301 | >=302 & <=302) & int
+
+_embeddedResource: {
+	apiVersion!: string
+	kind!:       string
+	metadata?:   {...}
+}
+apiVersion: "example.com/v1"
+kind:       "Route"
+metadata!: {
+	name!:      string
+	namespace!: string
+	labels?: [string]:      string
+	annotations?: [string]: string
+	...
+}

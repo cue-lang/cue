@@ -282,7 +282,9 @@ func TestDecodeCRD(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		crds, err := jsonschema.ExtractCRDs(v, &jsonschema.CRDConfig{})
+		cfg := &jsonschema.CRDConfig{}
+		cfg.TargetLanguageVersion, _ = t.Value("targetLanguageVersion")
+		crds, err := jsonschema.ExtractCRDs(v, cfg)
 		if err != nil {
 			w := t.Writer("extractCRD/error")
 			fmt.Fprintf(w, "%v\n", err)

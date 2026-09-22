@@ -30,14 +30,18 @@ var crdSchema = sync.OnceValue(func() cue.Value {
 })
 
 // CRDConfig holds configuration for [ExtractCRDs].
-// Although this empty currently, it allows configuration
-// to be added in the future without breaking the API.
-//
-// TODO: give it a target language version, as
-// [Config.TargetLanguageVersion] is, if or when the syntax written here
-// stops being valid at every version. Nothing it writes today has a
-// spelling or a meaning that varies by one.
-type CRDConfig struct{}
+type CRDConfig struct {
+	// TargetLanguageVersion holds the CUE language version that the
+	// extracted syntax must be valid at, as [Config.TargetLanguageVersion]
+	// does. The empty string means the current one.
+	//
+	// Set it when the extracted schemas are published as a module which
+	// declares an older language version, as a spelling valid today may
+	// not parse there.
+	TargetLanguageVersion string
+
+	_ struct{} // prohibit casting from different type.
+}
 
 // ExtractedCRD holds an extracted Kubernetes CRD and the data it was derived from.
 type ExtractedCRD struct {
@@ -66,6 +70,9 @@ type ExtractedCRD struct {
 //
 // If cfg is nil, it's equivalent to passing a pointer to the zero-valued [CRDConfig].
 func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
+	if cfg == nil {
+		cfg = &CRDConfig{}
+	}
 	crdInfos, crdValues, err := decodeCRDSpecs(data)
 	if err != nil {
 		return nil, fmt.Errorf("cannot decode CRD: %v", err)
@@ -86,11 +93,12 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 			f, err := Extract(crdValues[crdIndex], &Config{
 				PkgName: version.Name,
 				// There are several kubernetes-related keywords that aren't implemented yet
-				StrictFeatures: false,
-				StrictKeywords: true,
-				Root:           "#" + mustCUEPathToJSONPointer(rootPath),
-				SingleRoot:     true,
-				DefaultVersion: VersionKubernetesCRD,
+				StrictFeatures:        false,
+				StrictKeywords:        true,
+				Root:                  "#" + mustCUEPathToJSONPointer(rootPath),
+				SingleRoot:            true,
+				DefaultVersion:        VersionKubernetesCRD,
+				TargetLanguageVersion: cfg.TargetLanguageVersion,
 			})
 			if err != nil {
 				return nil, err

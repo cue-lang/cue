@@ -1,0 +1,21 @@
+# This tests the OpenAPI "float" and "double" number formats.
+
+# TODO they should decode to float32 and float64, mirroring "int32",
+# but the format keyword is currently ignored.
+
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    Double:
+        type: number
+        format: double
+    Float:
+        type: number
+        format: float
+
+-- out/decode/extract --
+#Double: number
+
+#Float: number

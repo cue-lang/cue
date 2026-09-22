@@ -203,6 +203,12 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
+		if !slices.Contains(files, "cue.mod/module.cue") {
+			// We read the module file from disk above, and the VCS reported no
+			// uncommitted changes, so the file can only be missing here because
+			// the VCS is ignoring it.
+			return fmt.Errorf("cue.mod/module.cue is not tracked by %s; the module directory may be ignored", mf.Source.Kind)
+		}
 
 		archive := make([]pathAbsPair, len(files))
 		for i, f := range files {

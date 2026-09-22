@@ -12,8 +12,7 @@ exec git -c user.name=noone -c user.email=noone@example.com commit -m 'initial c
 
 cd ignored
 ! exec cue mod publish v0.0.1
-# The error blames the module file, which is right there on disk.
-stderr 'create zip: no cue.mod/module.cue file found'
+stderr 'cue.mod/module.cue is not tracked by git; the module directory may be ignored'
 
 -- .gitignore --
 /ignored/

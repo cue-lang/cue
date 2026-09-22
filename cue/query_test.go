@@ -33,6 +33,12 @@ func TestLookupPath(t *testing.T) {
 		path cue.Path
 		out  string `test:"update"` // :nerdSnipe:
 		err  string `test:"update"` // :nerdSnipe:
+		// exists is stated for every case, and is independent of err: a
+		// path exists when the configuration holds a value at it, even a
+		// value that fails to evaluate. A conflict or an explicit error
+		// therefore exists, while an absent, optional, or required field
+		// does not. out is only compared when err is empty.
+		exists bool
 	}{{
 		in: `
 		#V: {
@@ -43,67 +49,79 @@ func TestLookupPath(t *testing.T) {
 		} & #V
 		v: #X
 		`,
-		path: cue.ParsePath("v.x"),
-		out:  `int64`,
+		path:   cue.ParsePath("v.x"),
+		out:    `int64`,
+		exists: true,
 	}, {
-		in:   `#foo: 3`,
-		path: cue.ParsePath("#foo"),
-		out:  `3`,
+		in:     `#foo: 3`,
+		path:   cue.ParsePath("#foo"),
+		out:    `3`,
+		exists: true,
 	}, {
-		in:   `_foo: 3`,
-		path: cue.MakePath(cue.Def("_foo")),
-		err:  `field not found: #_foo`,
+		in:     `_foo: 3`,
+		path:   cue.MakePath(cue.Def("_foo")),
+		err:    `field not found: #_foo`,
+		exists: false,
 	}, {
-		in:   `_#foo: 3`,
-		path: cue.MakePath(cue.Def("_#foo")),
-		err:  `field not found: _#foo`,
+		in:     `_#foo: 3`,
+		path:   cue.MakePath(cue.Def("_#foo")),
+		err:    `field not found: _#foo`,
+		exists: false,
 	}, {
-		in:   `"foo", #foo: 3`,
-		path: cue.ParsePath("#foo"),
-		out:  `3`,
+		in:     `"foo", #foo: 3`,
+		path:   cue.ParsePath("#foo"),
+		out:    `3`,
+		exists: true,
 	}, {
 		in: `
 		a: [...int]
 		`,
-		path: cue.MakePath(cue.Str("a"), cue.AnyIndex),
-		out:  `int`,
+		path:   cue.MakePath(cue.Str("a"), cue.AnyIndex),
+		out:    `int`,
+		exists: true,
 	}, {
 		in: `
 		[string]~(Name,_): { a: Name }
 		`,
-		path: cue.MakePath(cue.AnyString, cue.Str("a")),
-		out:  `string`,
+		path:   cue.MakePath(cue.AnyString, cue.Str("a")),
+		out:    `string`,
+		exists: true,
 	}, {
 		in: `
 		[string]~(Name,_): { a: Name }
 		`,
-		path: cue.MakePath(cue.Str("b").Optional(), cue.Str("a")),
-		out:  `"b"`,
+		path:   cue.MakePath(cue.Str("b").Optional(), cue.Str("a")),
+		out:    `"b"`,
+		exists: true,
 	}, {
 		in: `
 		[string]~(Name,_): { a: Name }
 		`,
-		path: cue.MakePath(cue.AnyString),
-		out:  `{a: string}`,
+		path:   cue.MakePath(cue.AnyString),
+		out:    `{a: string}`,
+		exists: true,
 	}, {
 		in: `
 		a: [string]~(Foo,_): [string]~(Bar,_): { b: Foo+Bar }
 		`,
-		path: cue.MakePath(cue.Str("a"), cue.Str("b"), cue.Str("c")).Optional(),
-		out:  `{b: "bc"}`,
+		path:   cue.MakePath(cue.Str("a"), cue.Str("b"), cue.Str("c")).Optional(),
+		out:    `{b: "bc"}`,
+		exists: true,
 	}, {
 		in: `
 		a: [string]~(Foo,_): b: [string]~(Bar,_): { c: Foo }
 		a: foo: b: [string]~(Bar,_): { d: Bar }
 		`,
-		path: cue.MakePath(cue.Str("a"), cue.Str("foo"), cue.Str("b"), cue.AnyString),
-		out:  `{c: "foo", d: string}`,
+		path:   cue.MakePath(cue.Str("a"), cue.Str("foo"), cue.Str("b"), cue.AnyString),
+		out:    `{c: "foo", d: string}`,
+		exists: true,
 	}, {
 		in: `
 		[string]~(Name,_): { a: Name }
 		`,
-		path: cue.MakePath(cue.Str("a")),
-		err:  `field not found: a`,
+		path:   cue.MakePath(cue.Str("a")),
+		err:    `field not found: a`,
+		exists: false,
 	}, {
 		in: `
 		x: {
@@ -111,8 +129,9 @@ func TestLookupPath(t *testing.T) {
 		}
 		y: x
 		`,
-		path: cue.MakePath(cue.Str("y"), cue.AnyString),
-		out:  `int`,
+		path:   cue.MakePath(cue.Str("y"), cue.AnyString),
+		out:    `int`,
+		exists: true,
 	}, {
 		in: `
 		x: {
@@ -120,16 +139,37 @@ func TestLookupPath(t *testing.T) {
 		}
 		y: x
 		`,
-		path: cue.MakePath(cue.Str("y"), cue.AnyString),
-		out:  `int`,
+		path:   cue.MakePath(cue.Str("y"), cue.AnyString),
+		out:    `int`,
+		exists: true,
 	}, {
-		in:   `t: {...}`,
-		path: cue.MakePath(cue.Str("t"), cue.AnyString),
-		out:  `_`,
+		in:     `t: {...}`,
+		path:   cue.MakePath(cue.Str("t"), cue.AnyString),
+		out:    `_`,
+		exists: true,
 	}, {
-		in:   `t: [...]`,
-		path: cue.MakePath(cue.Str("t"), cue.AnyIndex),
-		out:  `_`,
+		in:     `t: [...]`,
+		path:   cue.MakePath(cue.Str("t"), cue.AnyIndex),
+		out:    `_`,
+		exists: true,
+	}, {
+		// A required field holds no value of its own, so looking it up is
+		// indistinguishable from looking up an undeclared field.
+		in:     `x!: int`,
+		path:   cue.ParsePath("x"),
+		err:    `field not found: x`,
+		exists: false,
+	}, {
+		// A reference to a required field is itself declared, so it
+		// resolves to a value which exists and carries an incomplete
+		// error.
+		in: `
+		x!: int
+		z:  x
+		`,
+		path:   cue.ParsePath("z"),
+		err:    `z: required field missing: x`,
+		exists: true,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.path.String(), func(t *testing.T, m *cuetdtest.M) {
@@ -144,9 +184,10 @@ func TestLookupPath(t *testing.T) {
 				}
 			}
 
-			if exists := v.Exists(); exists != (tc.err == "") {
-				t.Fatalf("exists: got %v; want: %v", exists, tc.err == "")
-			} else if !exists {
+			if exists := v.Exists(); exists != tc.exists {
+				t.Fatalf("exists: got %v; want: %v", exists, tc.exists)
+			}
+			if tc.err != "" {
 				return
 			}
 
@@ -158,6 +199,89 @@ func TestLookupPath(t *testing.T) {
 				t.Error(b)
 			}
 		})
+	}
+}
+
+func TestLookupPathConstraintSelector(t *testing.T) {
+	// A required or optional field is a constraint rather than a value of its
+	// own, so a plain selector does not reach it until a value is supplied. A
+	// selector made with Selector.Required or Selector.Optional matches the
+	// constraint itself, which exists either way.
+	testCases := []struct {
+		in     string
+		sel    cue.Selector
+		exists bool
+	}{{
+		in:     `x!: int`,
+		sel:    cue.Str("x"),
+		exists: false,
+	}, {
+		in:     `x!: int`,
+		sel:    cue.Str("x").Required(),
+		exists: true,
+	}, {
+		in:     `x?: int`,
+		sel:    cue.Str("x"),
+		exists: false,
+	}, {
+		in:     `x?: int`,
+		sel:    cue.Str("x").Optional(),
+		exists: true,
+	}, {
+		// A constraint selector also matches an ordinary field.
+		in:     `x: 1`,
+		sel:    cue.Str("x").Required(),
+		exists: true,
+	}, {
+		// It does not conjure a field which was never declared.
+		in:     `y: 1`,
+		sel:    cue.Str("x").Required(),
+		exists: false,
+	}}
+	ctx := cuecontext.New()
+	for _, tc := range testCases {
+		t.Run(tc.in+"/"+tc.sel.String(), func(t *testing.T) {
+			v := mustCompile(t, ctx, tc.in)
+			w := v.LookupPath(cue.MakePath(tc.sel))
+			if got := w.Exists(); got != tc.exists {
+				t.Errorf("exists: got %v; want %v", got, tc.exists)
+			}
+		})
+	}
+}
+
+func TestLookupPathDanglingReference(t *testing.T) {
+	// A field whose value is a dangling reference is unlike any other failing
+	// lookup: the configuration does not compile, so the field is declared yet
+	// LookupPath reports it as absent.
+	//
+	// TODO: a is declared, so it should exist. Reporting the root's error
+	// here is not the fix: a compile error leaves the root vertex without
+	// arcs, so that makes every lookup exist, including a genuinely absent
+	// one, and callers which use Exists to test for a field then never stop
+	// looking. Value.Lookup below is no guide either, reporting absent
+	// fields as existing for the same reason. Retaining the arcs of a vertex
+	// which failed to compile is the place to start.
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`a: b`)
+	if got, want := fmt.Sprint(v.Err()), `a: reference "b" not found`; got != want {
+		t.Errorf("root:\n got %v\nwant %v", got, want)
+	}
+
+	w := v.LookupPath(cue.ParsePath("a"))
+	if w.Exists() {
+		t.Error("LookupPath: got exists true; want false")
+	}
+	if got, want := fmt.Sprint(w.Err()), `field not found: a`; got != want {
+		t.Errorf("LookupPath:\n got %v\nwant %v", got, want)
+	}
+
+	w = v.Lookup("a")
+	if !w.Exists() {
+		t.Error("Lookup: got exists false; want true")
+	}
+	if got, want := fmt.Sprint(w.Err()), `a: reference "b" not found`; got != want {
+		t.Errorf("Lookup:\n got %v\nwant %v", got, want)
 	}
 }
 

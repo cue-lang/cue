@@ -31,7 +31,7 @@ var (
 // Pointer represents a JSON Pointer as defined by RFC 6901.
 // It is a slash-separated list of tokens that reference a specific location
 // within a JSON document.
-// TODO(go1.26) alias this to [encoding/json/jsontext.Pointer]
+// TODO(go1.27) alias this to [encoding/json/jsontext.Pointer]
 type Pointer string
 
 // PointerFromTokens returns a JSON Pointer formed from

@@ -50,6 +50,11 @@ var (
 
 	OpenGraphs = false
 
+	// GraphDir is the directory under which the debug graphs are written.
+	// Tests set it to [testing.TB.ArtifactDir]; pass "go test -artifacts -v"
+	// to keep the graphs once the test ends and to log where they went.
+	GraphDir = ".debug"
+
 	// MaxGraphs is the maximum number of debug graphs to be opened. To avoid
 	// confusion, a panic will be raised if this number is exceeded.
 	MaxGraphs = 10
@@ -145,7 +150,7 @@ func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
 		return
 	}
 	graph, _ := CreateMermaidGraph(ctx, v, true)
-	path := filepath.Join(".debug", "TestX", name, fmt.Sprintf("%v", v.Path()))
+	path := filepath.Join(GraphDir, name, fmt.Sprintf("%v", v.Path()))
 	OpenNodeGraph(name, path, "in", "out", graph)
 }
 

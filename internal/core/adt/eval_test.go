@@ -201,6 +201,10 @@ language: version: "v0.15.0"
 		t.Skip()
 	}
 
+	if adt.OpenGraphs {
+		adt.GraphDir = t.ArtifactDir()
+	}
+
 	a := txtar.Parse([]byte(in))
 	instance := cuetxtar.Load(a, t.TempDir())[0]
 	if instance.Err != nil {
@@ -223,7 +227,7 @@ language: version: "v0.15.0"
 	out := debug.NodeString(r, v, nil)
 	if adt.OpenGraphs {
 		for p, g := range ctx.ErrorGraphs() {
-			path := filepath.Join(".debug/TestX", p)
+			path := filepath.Join(adt.GraphDir, p)
 			adt.OpenNodeGraph("TestX", path, in, out, g)
 		}
 	}

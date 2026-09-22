@@ -1137,7 +1137,13 @@ func (v Value) IsConcrete() bool {
 	return true
 }
 
-// Exists reports whether this value existed in the configuration.
+// Exists reports whether the configuration holds a value at this path.
+//
+// A value which fails to evaluate still exists; use [Value.Err] to check for
+// an error. A required or optional field is a constraint rather than a value
+// of its own, so an ordinary selector does not reach it until a value is
+// supplied; a selector made with [Selector.Required] or [Selector.Optional]
+// matches the constraint itself, which exists either way.
 func (v Value) Exists() bool {
 	if v.v == nil {
 		return false

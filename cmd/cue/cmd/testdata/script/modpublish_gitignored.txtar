@@ -1,0 +1,28 @@
+# Publishing a module with a git source from a directory which git ignores
+# finds no tracked files at all, so the error should point at git ignoring the
+# module rather than at a missing cue.mod/module.cue file.
+
+[!exec:git] skip 'no git command found'
+memregistry MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY
+
+exec git init .
+exec git add .
+exec git -c user.name=noone -c user.email=noone@example.com commit -m 'initial commit'
+
+cd ignored
+! exec cue mod publish v0.0.1
+# The error blames the module file, which is right there on disk.
+stderr 'create zip: no cue.mod/module.cue file found'
+
+-- .gitignore --
+/ignored/
+-- tracked.txt --
+-- ignored/cue.mod/module.cue --
+module: "x.example@v0"
+language: version: "v0.14.0"
+source: kind: "git"
+-- ignored/main.cue --
+package main
+
+x: 1

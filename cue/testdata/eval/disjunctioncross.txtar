@@ -183,6 +183,10 @@ issue3967: {
 issue3967.error.local.out.oneOrTwo.two: field not allowed:
     ./in.cue:147:8
     ./in.cue:143:14
+issue3967.error.local.out.oneOrTwo: undefined field: kind:
+    ./in.cue:147:10
+    ./in.cue:143:4
+    ./in.cue:146:4
 issue3967.error.local.out.oneOrTwo.two: circular dependency in evaluation of conditionals: X.two.optional changed after evaluation:
     ./in.cue:149:10
 -- out/eval/stats --

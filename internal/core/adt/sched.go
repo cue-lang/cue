@@ -477,8 +477,16 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 		s.handleParents(needs, mode)
 	}
 
-	if s.node != nil && s.node.node != nil && s.node.node.ArcType == ArcPending && mode == finalize {
-		s.tasks = s.tasks[:0]
+	if s.node != nil && s.node.node != nil && s.node.node.ArcType == ArcPending {
+		if mode == finalize {
+			s.tasks = s.tasks[:0]
+		}
+		// The parent tasks above may have been the last that could declare
+		// this field, so let stateCompletions settle it now rather than
+		// leaving its readers blocked until a finalize forces them.
+		if f := c.taskContext.complete; f != nil {
+			s.signal(f(s))
+		}
 	}
 
 	// hasRunning := false

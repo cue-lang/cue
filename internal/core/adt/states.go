@@ -328,7 +328,10 @@ func stateCompletions(s *scheduler) condition {
 		//       a: b: 1
 		//   }
 		// it may still become not pending if 'b' becomes a regular arc.
-		if s.counters[arcTypeKnown] == 0 && x.meets(subFieldsProcessed) {
+		// A pending arc with no active parent task has nothing left that
+		// could declare it, such as when its comprehension yielded nothing.
+		if s.counters[arcTypeKnown] == 0 && (x.meets(subFieldsProcessed) ||
+			v.ArcType == ArcPending && !s.hasActiveParentTask()) {
 			x |= arcTypeKnown
 		}
 	}

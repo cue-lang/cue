@@ -1,14 +1,11 @@
 # Each comprehension in a struct pushes down a pending arc, which stays pending
 # when the comprehension yields nothing. A list comprehension reading the
 # struct, and a guard reading that list in turn, must both see the settled
-# field set. The guard instead observes the list before its elements are
-# known, so it reports an incomplete len, and where the list is non-empty the
-# element that arrives afterwards no longer fits the frozen field set.
+# field set.
 #
 # A guard reading a struct with a comprehension nested in another's body must
 # likewise see the field the inner comprehension declares. It instead reports
-# a cyclic reference to that field, or an incomplete len when a list is in
-# between. https://cuelang.org/issue/4487
+# a cyclic reference to that field. https://cuelang.org/issue/4487
 -- in.cue --
 empty: {
 	q: {

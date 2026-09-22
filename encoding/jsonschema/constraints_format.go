@@ -41,10 +41,10 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"date":                  {vfrom(VersionDraft7) | openAPI | k8s, formatDate},
 		"date-time":             {allVersions | openAPI | k8s, formatDateTime},
 		"datetime":              {k8s, formatDateTime},
-		"double":                {openAPI | k8s, formatTODO},
+		"double":                {openAPI | k8s, formatFloat64},
 		"duration":              {vfrom(VersionDraft2019_09) | k8s, formatTODO},
 		"email":                 {allVersions | openAPI | k8s, formatTODO},
-		"float":                 {openAPI | k8s, formatTODO},
+		"float":                 {openAPI | k8s, formatFloat32},
 		"hexcolor":              {k8s, formatTODO},
 		"hostname":              {allVersions | openAPI | k8s, formatTODO},
 		"idn-email":             {vfrom(VersionDraft7), formatTODO},
@@ -144,6 +144,17 @@ func formatInt32(n cue.Value, s *state) {
 
 func formatInt64(n cue.Value, s *state) {
 	s.add(n, numType, ast.NewIdent("int64"))
+}
+
+// formatFloat32 and [formatFloat64] map to CUE types which only bound the
+// magnitude; unlike the integer formats, they do not reject values which are
+// not exactly representable at that precision, such as 1.1 as an IEEE single.
+func formatFloat32(n cue.Value, s *state) {
+	s.add(n, numType, ast.NewIdent("float32"))
+}
+
+func formatFloat64(n cue.Value, s *state) {
+	s.add(n, numType, ast.NewIdent("float64"))
 }
 
 func formatUint32(n cue.Value, s *state) {

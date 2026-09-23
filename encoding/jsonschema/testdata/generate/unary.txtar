@@ -11,6 +11,9 @@ t07?: <10
 t08?: <=10
 t09?: >"foo" // Not supported
 t10?: <"bar" // Not supported
+t11?: int64
+t12?: uint64
+t13?: <1.00000000000000000001
 -- datatest/tests.cue --
 package datatest
 
@@ -70,6 +73,30 @@ errorNotLessEqual: {
 	error: true
 }
 
+// Bounds are rounded to a float64, so integer bounds end up past the
+// int64 and uint64 limits, and decimal bounds lose precision.
+// See https://cuelang.org/issue/4438.
+okExactBounds: data: {
+	t11: 9223372036854775807
+	t12: 18446744073709551615
+}
+okExactDecimalBound: {
+	data: t13: 1
+	error: true // should succeed
+}
+errorAboveInt64: {
+	data: t11: 9223372036854775808
+	error: false // should fail
+}
+errorBelowInt64: {
+	data: t11: -9223372036854775809
+	error: false // should fail
+}
+errorAboveUint64: {
+	data: t12: 18446744073709551616
+	error: false // should fail
+}
+
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
@@ -103,6 +130,20 @@ errorNotLessEqual: {
 		}
 		t09: type: "string"
 		t10: type: "string"
+		t11: {
+			type:    "integer"
+			maximum: 9.223372036854776e+18
+			minimum: -9.223372036854776e+18
+		}
+		t12: {
+			type:    "integer"
+			maximum: 1.8446744073709552e+19
+			minimum: 0
+		}
+		t13: {
+			type:             "number"
+			exclusiveMaximum: 1
+		}
 	}
 }
 -- out/generate-v3/ok --
@@ -141,3 +182,11 @@ errorUnequal.data.t03: conflicting values 1 and 2:
     1:185
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --
+-- out/generate-v3/errorAboveInt64 --
+-- out/generate-v3/errorAboveUint64 --
+-- out/generate-v3/errorBelowInt64 --
+-- out/generate-v3/okExactBounds --
+-- out/generate-v3/okExactDecimalBound --
+okExactDecimalBound.data.t13: invalid value 1 (out of bound <1):
+    1:617
+    ./datatest/tests.cue:67:13

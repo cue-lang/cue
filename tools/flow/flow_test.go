@@ -23,6 +23,7 @@ import (
 	"sync"
 	"testing"
 	"testing/fstest"
+	"testing/synctest"
 	"time"
 
 	"cuelang.org/go/cue"
@@ -227,6 +228,84 @@ func TestFlowNonRootValue(t *testing.T) {
 	}
 	if done, err := c.Value().LookupPath(cue.MakePath(cue.Str("done"))).Bool(); err != nil || !done {
 		t.Errorf("done: got (%v, %v), want (true, nil)", done, err)
+	}
+}
+
+// TestFlowRunStopsEarly tests that when Run stops early, it returns without
+// waiting for the tasks which are still running, even if they ignore the
+// cancellation, and that their goroutines exit once those tasks finish.
+// Issue: https://cuelang.org/issue/2663
+func TestFlowRunStopsEarly(t *testing.T) {
+	// How the "stop" task stops the run.
+	for _, stop := range []string{"fail", "update", "cancel"} {
+		t.Run(stop, func(t *testing.T) {
+			leaked := false
+			func() {
+				defer func() {
+					// synctest panics when goroutines in the bubble remain
+					// blocked after the test function returns.
+					if r := recover(); r != nil {
+						if err, ok := r.(error); !ok || !strings.Contains(err.Error(), "deadlock") {
+							panic(r)
+						}
+						leaked = true
+					}
+				}()
+				synctest.Test(t, func(t *testing.T) {
+					testFlowRunStopsEarly(t, stop)
+				})
+			}()
+			// Task goroutines block forever sending their results.
+			if want := true; leaked != want {
+				t.Errorf("task goroutines left blocked: got %v, want %v", leaked, want)
+			}
+		})
+	}
+}
+
+func testFlowRunStopsEarly(t *testing.T, stop string) {
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	v := cuecontext.New().CompileString(`
+slow: $id: "slow"
+stop: $id: "stop"
+`)
+	slowStarted := make(chan struct{})
+	release := make(chan struct{})
+	cfg := &flow.Config{
+		UpdateFunc: func(c *flow.Controller, t *flow.Task) error {
+			if stop == "update" && t != nil && t.Path().String() == "stop" {
+				return fmt.Errorf("update failed")
+			}
+			return nil
+		},
+	}
+	c := flow.New(cfg, v, func(v cue.Value) (flow.Runner, error) {
+		id, err := v.LookupPath(cue.MakePath(cue.Str("$id"))).String()
+		if err != nil {
+			return nil, nil
+		}
+		return flow.RunnerFunc(func(t *flow.Task) error {
+			if id == "slow" {
+				// Ignore cancellation, like a task blocked reading stdin.
+				close(slowStarted)
+				<-release
+				return nil
+			}
+			<-slowStarted
+			switch stop {
+			case "fail":
+				return fmt.Errorf("stop failed")
+			case "cancel":
+				cancel()
+			}
+			return nil
+		}), nil
+	})
+	err := c.Run(ctx)
+	close(release)
+	if gotErr, wantErr := err != nil, stop != "cancel"; gotErr != wantErr {
+		t.Errorf("Run error: got %v, want error: %v", err, wantErr)
 	}
 }
 

@@ -1,5 +1,15 @@
 # cuelang.org/issues/345
 
+# Without data, ports is an open list which may still gain elements,
+# so newPort should be incomplete rather than an error.
+# TODO: list.Max fails on the empty open list.
+! exec cue vet -c=false x.cue
+stderr 'empty list'
+! exec cue vet x.cue
+stderr 'empty list'
+! exec cue def x.cue
+stderr 'empty list'
+
 stdin foo.json
 exec cue vet x.cue json: -
 
@@ -24,6 +34,11 @@ import "list"
 ports: [... int]
 newPort: list.Max(ports) + 1
 
+-- out/x-def.cue --
+import "list"
+
+ports:   [...int]
+newPort: list.Max(ports) + 1
 -- out/x.json --
 {
     "ports": [

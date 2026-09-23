@@ -1,0 +1,58 @@
+# Each data file is validated against the schema,
+# so errors in one file must not stop the others from being checked.
+
+! exec cue vet policy.cue dog1.yml dog2.yml dog3.yml
+# TODO: dog3.yml's error is missing, as vet stops at the first failing file.
+cmp stderr vet.stderr
+
+# eval reports errors per value too, and -i ignores them.
+! exec cue eval --merge=false --out json policy.cue dog1.yml dog3.yml
+# TODO: dog3.yml's error is missing, as eval stops at the first failing file.
+cmp stderr vet.stderr
+# TODO: this should succeed, printing both values with their errors inline.
+! exec cue eval --merge=false -i policy.cue dog1.yml dog3.yml
+cmp stdout eval-ignore.stdout
+! exec cue eval --merge=false policy.cue dog1.yml dog2.yml dog3.yml
+# TODO: dog3.yml's error and dog2.yml's value are missing.
+cmp stderr vet.stderr
+cmp stdout eval-cue.stdout
+
+# A failing eval does not replace an existing output file with partial output.
+! exec cue eval --merge=false --force -o cue:result.out policy.cue dog1.yml dog2.yml dog3.yml
+grep untouched result.out
+! exec cue eval --merge=false --force -o json:result.out policy.cue dog1.yml dog2.yml dog3.yml
+grep untouched result.out
+
+# export and def stop at the first error.
+! exec cue export --merge=false policy.cue dog1.yml dog3.yml
+cmp stderr first.stderr
+! exec cue def --merge=false policy.cue dog1.yml dog3.yml
+cmp stderr first.stderr
+
+-- policy.cue --
+species:   "dog"
+adorable?: true
+-- dog1.yml --
+name: dog1
+species: "dog"
+adorable: false
+-- dog2.yml --
+name: dog2
+species: "dog"
+adorable: true
+-- dog3.yml --
+name: dog3
+species: "cat"
+adorable: true
+-- result.out --
+untouched
+-- vet.stderr --
+adorable: conflicting values true and false:
+    ./dog1.yml:3:11
+    ./policy.cue:2:12
+-- eval-ignore.stdout --
+-- eval-cue.stdout --
+-- first.stderr --
+adorable: conflicting values true and false:
+    ./dog1.yml:3:11
+    ./policy.cue:2:12

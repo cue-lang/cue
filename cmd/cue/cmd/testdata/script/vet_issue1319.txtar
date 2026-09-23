@@ -1,0 +1,59 @@
+# Incomplete errors should be reported alongside errors of a greater
+# severity in other, independent fields, but they are dropped.
+
+! exec cue vet -c errors.cue
+cmp stderr vet-stderr
+
+! exec cue export errors.cue
+cmp stderr vet-stderr
+
+# Without -c, incomplete errors are not reported.
+! exec cue vet errors.cue
+cmp stderr vet-nonconcrete-stderr
+
+# https://cuelang.org/issue/4140: comparing lists of structs results in
+# an incomplete error, which should be reported alongside other failures,
+# but is dropped.
+! exec cue vet -c unique.cue
+cmp stderr unique-stderr
+
+-- errors.cue --
+s: "hello"
+s: "world" // conflicting values
+
+A: foo: "bar"
+a: A.goo // undefined field
+
+b: int // incomplete field
+
+m: [1, 2]
+v: m[2] // index out of range
+-- vet-stderr --
+s: conflicting values "world" and "hello":
+    ./errors.cue:1:4
+    ./errors.cue:2:4
+v: index out of range [2] with length 2:
+    ./errors.cue:10:6
+    ./errors.cue:9:1
+-- vet-nonconcrete-stderr --
+s: conflicting values "world" and "hello":
+    ./errors.cue:1:4
+    ./errors.cue:2:4
+v: index out of range [2] with length 2:
+    ./errors.cue:10:6
+    ./errors.cue:9:1
+-- unique.cue --
+import "list"
+
+[_]: list.UniqueItems
+
+scalars: [1, 2, 1]
+structs: [
+	{X: 1, O: 2},
+	{X: 2, O: 1},
+	{X: 1, O: 2},
+]
+-- unique-stderr --
+scalars: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
+    ./unique.cue:3:6
+    ./unique.cue:5:10

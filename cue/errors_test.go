@@ -16,7 +16,9 @@ package cue_test
 
 import (
 	"encoding/json"
+	stderrs "errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -143,6 +145,53 @@ func TestIsIncomplete(t *testing.T) {
 	}
 }
 
+func TestIsIncompleteValidate(t *testing.T) {
+	testCases := []struct {
+		name         string
+		cueValue     string
+		isIncomplete bool
+		// errors lists the path of each error, followed by whether it is
+		// incomplete.
+		errors []string
+	}{{
+		name:         "only incomplete errors",
+		cueValue:     `a: int, b: string`,
+		isIncomplete: true,
+		errors:       []string{"a incomplete", "b incomplete"},
+	}, {
+		name:         "incomplete and permanent errors",
+		cueValue:     `a: int, b: 1 & 2`,
+		isIncomplete: false,
+		// The incomplete error for "a" should also be reported, but it is
+		// dropped in favor of the permanent error.
+		errors: []string{"b permanent"},
+	}, {
+		name:         "error referenced more than once",
+		cueValue:     `a: x, b: x, x: 1 & 2`,
+		isIncomplete: false,
+		errors:       []string{"x permanent"},
+	}}
+
+	ctx := cuecontext.New()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			v := ctx.CompileString(tc.cueValue)
+			err := v.Validate(cue.Concrete(true))
+			qt.Check(t, qt.Equals(cue.IsIncomplete(err), tc.isIncomplete))
+
+			var got []string
+			for _, e := range errors.Errors(err) {
+				kind := "permanent"
+				if cue.IsIncomplete(e) {
+					kind = "incomplete"
+				}
+				got = append(got, strings.Join(e.Path(), ".")+" "+kind)
+			}
+			qt.Check(t, qt.DeepEquals(got, tc.errors))
+		})
+	}
+}
+
 func TestIsIncompleteCombined(t *testing.T) {
 	ctx := cuecontext.New()
 	incomplete := ctx.CompileString(`a: int`).Validate(cue.Concrete(true)).(errors.Error)
@@ -172,6 +221,32 @@ func TestIsIncompleteCombined(t *testing.T) {
 		err:          fmt.Errorf("plain error"),
 		isIncomplete: false,
 	}, {
+		name: "incomplete and plain errors",
+		err:  errors.Append(incomplete, plain),
+		// The plain error is permanent, so the combined error should not be
+		// incomplete.
+		isIncomplete: true,
+	}, {
+		name: "incomplete and plain errors joined",
+		err:  stderrs.Join(incomplete, plain),
+		// The plain error is permanent, so the joined error should not be
+		// incomplete.
+		isIncomplete: true,
+	}, {
+		name:         "plain and incomplete errors joined",
+		err:          stderrs.Join(plain, incomplete),
+		isIncomplete: false,
+	}, {
+		name:         "incomplete error wrapped with fmt.Errorf",
+		err:          fmt.Errorf("context: %w", incomplete),
+		isIncomplete: true,
+	}, {
+		name: "incomplete error wrapped with errors.Wrapf",
+		err:  errors.Wrapf(incomplete, token.NoPos, "context"),
+		// The wrapped error is incomplete, so the wrapping error should be
+		// too.
+		isIncomplete: false,
+	}, {
 		name:         "incomplete marshal error",
 		err:          marshal("a"),
 		isIncomplete: true,
@@ -186,6 +261,12 @@ func TestIsIncompleteCombined(t *testing.T) {
 	}, {
 		name:         "incomplete and incomplete marshal errors",
 		err:          errors.Append(incomplete, marshal("a")),
+		isIncomplete: true,
+	}, {
+		name: "incomplete marshal and plain errors joined",
+		err:  stderrs.Join(marshal("a"), plain),
+		// The plain error is permanent, so the joined error should not be
+		// incomplete.
 		isIncomplete: true,
 	}}
 

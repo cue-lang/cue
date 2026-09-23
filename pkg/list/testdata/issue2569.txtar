@@ -28,31 +28,27 @@ closed: {
 }
 -- out/list-v3 --
 Errors:
-open.max: error in call to list.Max: empty list:
-    ./in.cue:5:11
-open.min: error in call to list.Min: empty list:
-    ./in.cue:6:11
-open.avg: error in call to list.Avg: empty list:
-    ./in.cue:7:11
 closed.max: error in call to list.Max: empty list:
     ./in.cue:21:7
 
 Result:
+import "list"
+
 open: {
 	xs:      [...int]
-	max:     _|_ // open.max: error in call to list.Max: empty list
-	min:     _|_ // open.min: error in call to list.Min: empty list
-	avg:     _|_ // open.avg: error in call to list.Avg: empty list
-	sum:     0
-	product: 1
+	max:     list.Max(xs)
+	min:     list.Min(xs)
+	avg:     list.Avg(xs)
+	sum:     list.Sum(xs)
+	product: list.Product(xs)
 }
 openNonEmpty: {
 	xs:      [1, 2, ...int]
-	max:     2
-	min:     1
-	avg:     1.5
-	sum:     3
-	product: 2
+	max:     list.Max(xs)
+	min:     list.Min(xs)
+	avg:     list.Avg(xs)
+	sum:     list.Sum(xs)
+	product: list.Product(xs)
 }
 closed: {
 	xs:  []

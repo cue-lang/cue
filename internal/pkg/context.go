@@ -380,6 +380,13 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 		}
 		j++
 	}
+	// Unification may still add elements to an open list,
+	// changing the result of any arithmetic over them.
+	// Element errors above take precedence, as they are more specific.
+	if v.BaseValue.(*adt.ListMarker).IsOpen {
+		c.errcf(adt.IncompleteError, "open list for argument %d", i)
+		return nil
+	}
 	return a
 }
 

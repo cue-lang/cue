@@ -110,6 +110,8 @@ issue3541: error in call to list.Sum: invalid operands 2 and {num:6} to '+' (typ
     ./in.cue:53:3
 
 Result:
+import "list"
+
 issue563: {
 	#MyDef: name: string
 	output: [{name: "a"}, {name: "b"}, {name: "c"}, {name: "1"}, {name: "2"}, {name: "3"}]
@@ -122,7 +124,7 @@ issue3541: _|_ // issue3541: error in call to list.Sum: 0: invalid operands 2 an
 issue2594: {
 	sumFirst: {
 		#Def: {
-			0
+			number & list.Sum(#In)
 			#In: [...number]
 		}
 		x: {
@@ -132,7 +134,7 @@ issue2594: {
 	}
 	sumSecond: {
 		#Def: {
-			0
+			number & list.Sum(#In)
 			#In: [...number]
 		}
 		x: {
@@ -152,7 +154,7 @@ issue3950: true
 diff old new
 --- old
 +++ new
-@@ -1,36 +1,20 @@
+@@ -1,66 +1,48 @@
  Errors:
 -issue2594.sumSecond.x: conflicting values 0 and 6:
 -    ./in.cue:71:3
@@ -168,6 +170,8 @@ diff old new
 +    ./in.cue:53:3
  
  Result:
++import "list"
++
  issue563: {
 -	#MyDef: {
 -		name: string
@@ -197,11 +201,33 @@ diff old new
  issue2594: {
  	sumFirst: {
  		#Def: {
-@@ -47,20 +31,16 @@
- 			0
- 			#In: [...number]
- 		}
+-			0
+-			#In: [...number]
+-		}
+-		x: {
+-			6
+-			#In: [1, 2, 3]
+-		}
+-	}
+-	sumSecond: {
+-		#Def: {
+-			0
+-			#In: [...number]
+-		}
 -		x: _|_ // issue2594.sumSecond.x: conflicting values 0 and 6
++			number & list.Sum(#In)
++			#In: [...number]
++		}
++		x: {
++			6
++			#In: [1, 2, 3]
++		}
++	}
++	sumSecond: {
++		#Def: {
++			number & list.Sum(#In)
++			#In: [...number]
++		}
 +		x: {
 +			6
 +			#In: [1, 2, 3]

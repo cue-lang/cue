@@ -1960,6 +1960,13 @@ a: {
 }
 ```
 
+<!-- TODO: the annotation for e only holds because d is a compile-time error.
+If d were an evaluation error instead, such as 1 & 2, a would be bottom
+by the struct unification rule, and so would e, as selecting from bottom
+yields bottom; references such as c are unaffected.
+Consider moving d out of a so the example does not imply otherwise.
+-->
+
 If an expression may result in a value associated with a default value
 as described in [default values](#default-values), the field binds to this
 value-default pair.

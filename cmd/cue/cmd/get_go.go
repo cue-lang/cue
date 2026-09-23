@@ -85,6 +85,9 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  tag, in that order. A --codec flag can be used to change the priority of
 	  the tag search.
 
+	- the tag found for a field also decides whether it is optional, which
+	  is the case if the tag has an "omitempty" or "omitzero" option.
+
 	- embedded structs marked with a json inline tag unify with struct
 	  definition. For instance, the Go struct
 
@@ -1462,7 +1465,10 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 			continue
 		}
 		tag := x.Tag(i)
-		name := e.getName(f.Name(), tag)
+		codec, name := e.fieldCodec(tag)
+		if name == "" {
+			name = f.Name()
+		}
 		if name == "-" {
 			continue
 		}
@@ -1470,7 +1476,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		doc := docs[i]
 
 		// TODO: check referrers
-		attrs, err := e.detectFieldAttributes(f, doc, tag)
+		attrs, err := e.detectFieldAttributes(f, doc, tag, codec)
 		if err != nil {
 			e.logf("error parsing field %q:", s, err)
 			continue
@@ -1578,7 +1584,7 @@ func (e *extractor) fieldAttributesFromType(f types.Type) (attrs fieldAttributes
 	return attrs
 }
 
-func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, tag string) (fieldAttributes, error) {
+func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, tag, codec string) (fieldAttributes, error) {
 	var attrs fieldAttributes
 	// See k8s docs https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
 	for line := range strings.SplitSeq(doc.Text(), "\n") {
@@ -1602,12 +1608,12 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 
 	attrs |= e.fieldAttributesFromType(f.Type())
 
-	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty".
-	// Note that, as of mid 2025, YAML libraries don't seem to have picked up "omitzero" yet.
+	// Only the codec which governs the field decides whether it may be omitted.
+	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty";
+	// TOML and YAML libraries such as BurntSushi/toml and goccy/go-yaml support it too.
 	// TODO: also when the type is a list or other kind of pointer.
-	if hasFlag(tag, "json", "omitempty", 1) ||
-		hasFlag(tag, "json", "omitzero", 1) ||
-		hasFlag(tag, "yaml", "omitempty", 1) {
+	if hasFlag(tag, codec, "omitempty", 1) ||
+		hasFlag(tag, codec, "omitzero", 1) {
 		attrs |= optional
 	}
 
@@ -1627,7 +1633,11 @@ func hasFlag(tag, key, flag string, offset int) bool {
 	return false
 }
 
-func (e *extractor) getName(name string, tag string) string {
+// fieldCodec returns the codec from [extractor.codecs] which governs a field
+// with the given struct tag, and the field name given by that codec's tag, if any.
+// The governing codec is the first one whose tag gives a name, else the first
+// one with a tag at all, else the first codec.
+func (e *extractor) fieldCodec(tag string) (codec, name string) {
 	tags := reflect.StructTag(tag)
 	// TODO: We should probably never use a combination of names from different
 	// codecs in a single struct. For example, with `--codec json,yaml`, if a
@@ -1635,14 +1645,20 @@ func (e *extractor) getName(name string, tag string) string {
 	// that struct at that point. Do this in a separate change in the future,
 	// to aid in bisecting.
 	for _, s := range e.codecs {
-		if tag, ok := tags.Lookup(s); ok {
-			tag, _, _ = strings.Cut(tag, ",")
-			if tag != "" {
-				return tag
-			}
+		t, ok := tags.Lookup(s)
+		if !ok {
+			continue
+		}
+		if name, _, _ := strings.Cut(t, ","); name != "" {
+			return s, name
+		}
+		if codec == "" {
+			codec = s
 		}
 	}
+	if codec == "" {
+		codec = e.codecs[0]
+	}
 	// TODO: should we also consider to protobuf name? Probably not.
-
-	return name
+	return codec, ""
 }

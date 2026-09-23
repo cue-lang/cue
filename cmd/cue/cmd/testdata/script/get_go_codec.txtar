@@ -1,6 +1,4 @@
-# The goldens for #Optional take optionality from the json and yaml tags
-# regardless of which tag names each field, ignoring toml and yaml omitzero,
-# and the toml golden for #Pointers allows null, which TOML cannot encode.
+# The toml golden for #Pointers allows null, which TOML cannot encode.
 
 # Test default behavior (json,yaml)
 exec cue get go --local ./...
@@ -101,12 +99,12 @@ package pkg
 	f1_json?: int @go(F1)
 	f2_json?: int @go(F2)
 	f3_yaml?: int @go(F3)
-	f4_yaml:  int @go(F4)
+	f4_yaml?: int @go(F4)
 	F5:       int @toml(f5_toml,omitempty)
 	F6:       int @toml(f6_toml,omitzero)
 	f7_json?: int @go(F7)
-	f8_json?: int @go(F8)
-	f9_yaml?: int @go(F9)
+	f8_json:  int @go(F8)
+	f9_yaml:  int @go(F9)
 }
 
 // Pointer fields are nullable except under TOML, which has no null.
@@ -148,12 +146,12 @@ package pkg
 	f1_json?: int @go(F1)
 	f2_json?: int @go(F2)
 	f3_yaml?: int @go(F3)
-	f4_yaml:  int @go(F4)
+	f4_yaml?: int @go(F4)
 	F5:       int @toml(f5_toml,omitempty)
 	F6:       int @toml(f6_toml,omitzero)
-	f7_yaml?: int @go(F7)
+	f7_yaml:  int @go(F7)
 	f8_yaml?: int @go(F8)
-	f9_yaml?: int @go(F9)
+	f9_yaml:  int @go(F9)
 }
 
 // Pointer fields are nullable except under TOML, which has no null.
@@ -192,15 +190,15 @@ package pkg
 // Only the tag which names a field, or the first tag present, decides
 // whether the field is optional.
 #Optional: {
-	F1?:      int
-	F2?:      int
+	F1:       int
+	F2:       int
 	f3_yaml?: int @go(F3)
-	f4_yaml:  int @go(F4)
+	f4_yaml?: int @go(F4)
 	F5:       int @toml(f5_toml,omitempty)
 	F6:       int @toml(f6_toml,omitzero)
-	f7_yaml?: int @go(F7)
+	f7_yaml:  int @go(F7)
 	f8_yaml?: int @go(F8)
-	f9_yaml?: int @go(F9)
+	f9_yaml:  int @go(F9)
 }
 
 // Pointer fields are nullable except under TOML, which has no null.
@@ -239,15 +237,15 @@ package pkg
 // Only the tag which names a field, or the first tag present, decides
 // whether the field is optional.
 #Optional: {
-	F1?:     int
-	F2?:     int
-	F3?:     int
-	F4:      int
-	f5_toml: int @go(F5) @toml(f5_toml,omitempty)
-	f6_toml: int @go(F6) @toml(f6_toml,omitzero)
-	F7?:     int
-	F8?:     int
-	F9?:     int
+	F1:       int
+	F2:       int
+	F3:       int
+	F4:       int
+	f5_toml?: int @go(F5) @toml(f5_toml,omitempty)
+	f6_toml?: int @go(F6) @toml(f6_toml,omitzero)
+	F7:       int
+	F8:       int
+	F9:       int
 }
 
 // Pointer fields are nullable except under TOML, which has no null.

@@ -294,15 +294,13 @@ func TestConvert(t *testing.T) {
 			E int    `protobuf:"varint,5,opt,name=ee,proto3"`
 			F int    `protobuf:"fixed64,6,opt"`
 		}{3, 4, "hello", 5, 6, 7},
-		// TODO: A should keep its Go name, as its json tag gives no name,
-		// and C, E, and F should not take protobuf's wire type as a name.
 		`(struct){
-  aa: (int){ 3 }
+  A: (int){ 3 }
   bb: (int){ 4 }
-  bytes: (string){ "hello" }
+  C: (string){ "hello" }
   dd: (int){ 5 }
-  varint: (int){ 6 }
-  fixed64: (int){ 7 }
+  ee: (int){ 6 }
+  F: (int){ 7 }
 }`,
 	}, {
 		&struct{ A int }{3}, `(struct){
@@ -440,10 +438,9 @@ func TestConvertType(t *testing.T) {
 			A string `json:",omitempty" protobuf:"bytes,1,opt,name=foo"`
 			B int    `protobuf:"varint,2,opt,name=bb"`
 		}{},
-		// TODO: A and B should not take protobuf's wire type as a name.
 		want: `(struct){
-  bytes?: (string){ string }
-  varint: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  A?: (string){ string }
+  bb: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
 }`,
 	}, {
 		goTyp: struct {

@@ -128,25 +128,34 @@ func splitTag(tag string) (cue string, options string) {
 	return tag, ""
 }
 
+// getName returns the CUE name of a struct field. The first of the json, yaml,
+// and protobuf tags present on the field decides its name, even when the tag
+// gives no name, so that a field is named consistently with one encoding.
+//
 // TODO: should we allow mapping names in cue tags? This only seems like a good
 // idea if we ever want to allow mapping CUE to a different name than JSON.
-var tagsWithNames = []string{"json", "yaml", "protobuf"}
-
 func getName(f *reflect.StructField) string {
-	name := f.Name
-	if f.Anonymous {
-		name = ""
-	}
-	for _, s := range tagsWithNames {
-		if tag, ok := f.Tag.Lookup(s); ok {
-			tag, _, _ = strings.Cut(tag, ",")
-			if tag != "" {
-				name = tag
+	var name string
+	if tag, ok := f.Tag.Lookup("json"); ok {
+		name, _, _ = strings.Cut(tag, ",")
+	} else if tag, ok := f.Tag.Lookup("yaml"); ok {
+		name, _, _ = strings.Cut(tag, ",")
+	} else if tag, ok := f.Tag.Lookup("protobuf"); ok {
+		// Protobuf tags give the name as an option, like "bytes,2,opt,name=foo".
+		for opt := range strings.SplitSeq(tag, ",") {
+			if n, ok := strings.CutPrefix(opt, "name="); ok {
+				name = n
 				break
 			}
 		}
 	}
-	return name
+	switch {
+	case name != "":
+		return name
+	case f.Anonymous:
+		return ""
+	}
+	return f.Name
 }
 
 // isOptional indicates whether a field should be marked as optional.

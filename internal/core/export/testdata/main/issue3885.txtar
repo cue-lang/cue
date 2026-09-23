@@ -1,9 +1,6 @@
 # Lets inside struct literals which are not merged into the enclosing
 # struct, such as list elements or call arguments, must not leave behind
 # an empty struct in the enclosing scope.
-#
-# The definition outputs show the bug: every case but "merged" gains a
-# spurious "& {}" or "& close({})" conjunct.
 -- in.cue --
 list: [{
 	let b = 4
@@ -129,23 +126,23 @@ embedded: {
 list: [{
 	let b = 4
 	b
-}] & {}
+}]
 listField: [{
 	let b_1 = 4
 	x: b_1
-}] & {}
+}]
 call: close({
 	let b_2 = 4
 	x: b_2
-}) & close({})
+})
 callString: len({
 	let b_3 = 4
 	x: b_3
-}) & {}
-disjunction: (*{
+})
+disjunction: *{
 	let b_4 = 4
 	x: b_4
-} | 5) & {}
+} | 5
 merged: {
 	let b_A = 4
 	let c = 5
@@ -163,23 +160,23 @@ embedded: {
 list: [{
 	let b = 4
 	b
-}] & {}
+}]
 listField: [{
 	let b_1 = 4
 	x: b_1
-}] & {}
+}]
 call: close({
 	let b_2 = 4
 	x: b_2
-}) & close({})
+})
 callString: len({
 	let b_3 = 4
 	x: b_3
-}) & {}
-disjunction: (*{
+})
+disjunction: *{
 	let b_4 = 4
 	x: b_4
-} | 5) & {}
+} | 5
 merged: {
 	let b_A = 4
 	let c = 5

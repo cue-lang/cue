@@ -645,21 +645,21 @@ func (e *exporter) markLets(n ast.Node, scope *ast.StructLit) {
 		return
 	}
 	ast.Walk(n, func(n ast.Node) bool {
+		// Only descend into expressions whose struct literals are merged
+		// into scope; any other struct literal is exported with its own scope.
 		switch v := n.(type) {
 		case *ast.StructLit:
 			e.markLetDecls(v.Elts, scope)
+			return true
 		case *ast.File:
 			e.markLetDecls(v.Decls, scope)
-			// TODO: return true here and false for everything else?
-
-		case *ast.Field,
-			*ast.LetClause,
-			*ast.IfClause,
-			*ast.ForClause,
-			*ast.Comprehension:
-			return false
+			return true
+		case *ast.EmbedDecl, *ast.ParenExpr:
+			return true
+		case *ast.BinaryExpr:
+			return v.Op == token.AND
 		}
-		return true
+		return false
 	}, nil)
 }
 

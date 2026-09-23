@@ -60,7 +60,7 @@ import "encoding/json"
 			{}
 		}
 		arns
-	}) & {}
+	})
 }
 -- out-caller --
 package caller

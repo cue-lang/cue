@@ -640,27 +640,23 @@ func (e *exporter) bindValueAlias(name string, value ast.Expr) ast.Expr {
 	return s
 }
 
+// markLets marks the lets and field aliases of struct literals which are
+// merged into scope. Any other struct literal, such as a list element or
+// a call argument, is exported with its own scope.
 func (e *exporter) markLets(n ast.Node, scope *ast.StructLit) {
-	if n == nil {
-		return
-	}
-	ast.Walk(n, func(n ast.Node) bool {
-		// Only descend into expressions whose struct literals are merged
-		// into scope; any other struct literal is exported with its own scope.
-		switch v := n.(type) {
-		case *ast.StructLit:
-			e.markLetDecls(v.Elts, scope)
-			return true
-		case *ast.File:
-			e.markLetDecls(v.Decls, scope)
-			return true
-		case *ast.EmbedDecl, *ast.ParenExpr:
-			return true
-		case *ast.BinaryExpr:
-			return v.Op == token.AND
+	switch x := n.(type) {
+	case *ast.StructLit:
+		e.markLetDecls(x.Elts, scope)
+	case *ast.File:
+		e.markLetDecls(x.Decls, scope)
+	case *ast.ParenExpr:
+		e.markLets(x.X, scope)
+	case *ast.BinaryExpr:
+		if x.Op == token.AND {
+			e.markLets(x.X, scope)
+			e.markLets(x.Y, scope)
 		}
-		return false
-	}, nil)
+	}
 }
 
 func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit) {
@@ -670,6 +666,8 @@ func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit) {
 			e.prepareAliasedField(x, scope)
 		case *ast.LetClause:
 			e.markLetAlias(x)
+		case *ast.EmbedDecl:
+			e.markLets(x.Expr, scope)
 		}
 	}
 }

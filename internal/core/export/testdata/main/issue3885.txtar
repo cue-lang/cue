@@ -151,8 +151,8 @@ merged: {
 }
 // A let in an embedded struct literal is merged into the enclosing scope.
 embedded: {
-	let b_9 = 4
 	let c_1 = 5
+	let b_9 = 4
 	x: b_9
 	y: c_1
 }
@@ -185,8 +185,8 @@ merged: {
 }
 // A let in an embedded struct literal is merged into the enclosing scope.
 embedded: {
-	let b_9 = 4
 	let c_1 = 5
+	let b_9 = 4
 	x: b_9
 	y: c_1
 }

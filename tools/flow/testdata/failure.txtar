@@ -13,7 +13,7 @@ root: {
 	}
 }
 -- out/run/errors --
-error: task failed: failure
+error: root.a: task failed: failure
 -- out/run/t0 --
 graph TD
   t0("root.a [Ready]")

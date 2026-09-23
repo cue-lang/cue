@@ -1,13 +1,12 @@
-# A failed task's error should name the path of the task,
+# A failed task's error names the path of the task,
 # so that it can be found among many tasks.
-# The errors below do not name any path.
 # The OS error text is not checked, as it varies between platforms.
 
 ! exec cue cmd create
-stderr '^task failed: open nonexistent.file: '
+stderr '^command\.create\.nested\.bar: task failed: open nonexistent.file: '
 
 ! exec cue cmd mkdir
-stderr '^failed to create directory: mkdir afile.sub: '
+stderr '^command\.mkdir: failed to create directory: mkdir afile.sub: '
 stderr 'foo_tool.cue:9:10'
 
 -- cue.mod/module.cue --

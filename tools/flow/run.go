@@ -31,6 +31,7 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/cuedebug"
@@ -83,7 +84,7 @@ func (c *Controller) runLoop() {
 
 				go func(t *Task) {
 					if err := t.r.Run(t, nil); err != nil {
-						t.err = errors.Promote(err, "task failed")
+						t.err = taskFailed(t, err)
 					}
 
 					t.c.taskCh <- t
@@ -257,3 +258,28 @@ func (c *Controller) updateTaskResults(t *Task) bool {
 
 	return true
 }
+
+// taskFailed returns the error of a failed task, attaching the path of the
+// task unless err already carries a path of its own.
+func taskFailed(t *Task, err error) errors.Error {
+	perr := errors.Promote(err, "task failed")
+	if len(perr.Path()) > 0 {
+		return perr
+	}
+	e := &taskError{}
+	for _, sel := range t.v.Path().Selectors() {
+		e.path = append(e.path, sel.String())
+	}
+	return errors.Wrap(e, perr)
+}
+
+// taskError is the parent error of a failed task's error,
+// providing the path of the task.
+type taskError struct {
+	path []string
+	errors.Message
+}
+
+func (e *taskError) Path() []string              { return e.path }
+func (e *taskError) Position() token.Pos         { return token.NoPos }
+func (e *taskError) InputPositions() []token.Pos { return nil }

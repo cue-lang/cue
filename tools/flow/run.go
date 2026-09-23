@@ -87,7 +87,12 @@ func (c *Controller) runLoop() {
 						t.err = taskFailed(t, err)
 					}
 
-					t.c.taskCh <- t
+					// The run loop stops receiving once the context is
+					// canceled, which Run does on every return.
+					select {
+					case t.c.taskCh <- t:
+					case <-t.c.context.Done():
+					}
 				}(t)
 
 			case Running:

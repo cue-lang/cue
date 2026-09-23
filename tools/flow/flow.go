@@ -269,6 +269,10 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 }
 
 // Run runs the tasks of a workflow until completion.
+//
+// When Run stops early, because of an error or because ctx is canceled,
+// it cancels the context of the tasks still running and returns without
+// waiting for them to finish.
 func (c *Controller) Run(ctx context.Context) error {
 	c.context, c.cancelFunc = context.WithCancel(ctx)
 	defer c.cancelFunc()

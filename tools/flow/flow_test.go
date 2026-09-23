@@ -255,8 +255,7 @@ func TestFlowRunStopsEarly(t *testing.T) {
 					testFlowRunStopsEarly(t, stop)
 				})
 			}()
-			// Task goroutines block forever sending their results.
-			if want := true; leaked != want {
+			if want := false; leaked != want {
 				t.Errorf("task goroutines left blocked: got %v, want %v", leaked, want)
 			}
 		})

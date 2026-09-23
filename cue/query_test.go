@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
+	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
 
@@ -200,6 +201,36 @@ func TestLookupPath(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestLookupPathErroredParent checks that LookupPath steps into a struct
+// which is an error because of one of its fields, returning the values of
+// its other fields as if the struct were not an error.
+func TestLookupPathErroredParent(t *testing.T) {
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+		v := ctx.CompileString(`
+			a: {
+				x: "test"
+				_y: 1 & 2
+			}
+			`, cue.Filename("test"))
+		qt.Assert(t, qt.ErrorMatches(v.Err(), `a._y: conflicting values 2 and 1`))
+
+		a := v.LookupPath(cue.ParsePath("a"))
+		qt.Assert(t, qt.ErrorMatches(a.Err(), `a._y: conflicting values 2 and 1`))
+
+		x := a.LookupPath(cue.ParsePath("x"))
+		qt.Assert(t, qt.IsNil(x.Err()))
+		s, err := x.String()
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(s, "test"))
+
+		// Evaluating the same path as a CUE expression does fail,
+		// as selecting from an error results in that error.
+		e := ctx.CompileString(`a.x`, cue.Scope(v))
+		qt.Assert(t, qt.ErrorMatches(e.Err(), `a._y: conflicting values 2 and 1`))
+	})
 }
 
 func TestLookupPathConstraintSelector(t *testing.T) {

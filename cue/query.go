@@ -44,7 +44,14 @@ func getScopePrefix(v Value, p Path) Value {
 // Use [AnyString] and [AnyIndex] to find the value of undefined element types
 // for structs and lists respectively, for example for the patterns in
 // `{[string]: int}` and `[...string]`.
+//
+// LookupPath ignores errors in the values it steps through: given
+// `a: {x: 1, y: 1 & 2}`, looking up "a.x" yields 1 even though a is an
+// error because of y. This differs from evaluating the selector a.x
+// as a CUE expression, which results in the error of a.
 func (v Value) LookupPath(p Path) Value {
+	// TODO(v1): report errors from the values we step through,
+	// consistent with the evaluation of selectors.
 	if v.v == nil {
 		return Value{}
 	}

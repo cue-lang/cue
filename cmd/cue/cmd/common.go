@@ -151,6 +151,9 @@ func (b *buildPlan) instances() iterator {
 
 type iterator interface {
 	scan() bool
+	// value may hold errors, such as a data value which conflicts with
+	// the schema; scan does not stop at them, so that each command decides
+	// whether to report them and continue, or to stop.
 	value() cue.Value
 	file() *ast.File // may return nil
 	err() error
@@ -267,17 +270,11 @@ func (i *streamingIterator) scan() bool {
 		i.v = v
 	}
 	if schema := i.b.encConfig.Schema; schema.Exists() {
+		// Errors from the schema are left in the value, as above.
 		i.v = i.v.Unify(schema) // TODO(required fields): don't merge in schema
-		i.e = i.v.Err()
-		if i.e != nil {
-			if err := i.v.Validate(cue.Concrete(i.b.cfg.concrete)); err != nil {
-				// Validate should always be non-nil, but just in case.
-				i.e = err
-			}
-		}
 		i.f = nil
 	}
-	return i.e == nil
+	return true
 }
 
 func (i *streamingIterator) close() {
@@ -343,10 +340,6 @@ type config struct {
 	overrideDefault bool
 
 	noMerge bool // do not merge individual data files.
-
-	// concrete reports incomplete errors when data files fail to unify
-	// with a schema, for commands which require concrete values.
-	concrete bool
 
 	loadCfg *load.Config
 }

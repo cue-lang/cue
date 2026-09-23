@@ -89,10 +89,7 @@ const (
 )
 
 func runEval(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, &config{
-		mode:     filetypes.Eval,
-		concrete: flagConcrete.Bool(cmd),
-	})
+	b, err := parseArgs(cmd, args, &config{mode: filetypes.Eval})
 	if err != nil {
 		return err
 	}
@@ -165,7 +162,8 @@ func runEval(cmd *Command, args []string) error {
 			if err := v.Err(); err != nil {
 				if err = v.Validate(syn...); err != nil {
 					errHeader()
-					return err
+					printError(cmd, err)
+					continue
 				}
 			}
 
@@ -191,8 +189,9 @@ func runEval(cmd *Command, args []string) error {
 	if err := iter.err(); err != nil {
 		return err
 	}
-	if err := e.Close(); err != nil {
-		return err
+	if cmd.hasErr {
+		// Errors were reported above; do not write a partial output file.
+		return nil
 	}
-	return nil
+	return e.Close()
 }

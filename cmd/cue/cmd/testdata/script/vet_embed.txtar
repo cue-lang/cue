@@ -36,3 +36,5 @@ c: field not allowed:
 -- expect-stream --
 d: field not allowed:
     ./stream.yaml:2:1
+e: field not allowed:
+    ./stream.yaml:5:1

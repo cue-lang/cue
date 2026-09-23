@@ -85,8 +85,10 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  tag, in that order. A --codec flag can be used to change the priority of
 	  the tag search.
 
-	- the tag found for a field also decides whether it is optional, which
-	  is the case if the tag has an "omitempty" or "omitzero" option.
+	- the tag found for a field also decides how it is encoded: the field
+	  is optional if the tag has an "omitempty" or "omitzero" option, and
+	  a pointer field is not nullable if it is a "toml" tag, as TOML has no
+	  null. Fields without any such tag follow the first codec.
 
 	- embedded structs marked with a json inline tag unify with struct
 	  definition. For instance, the Go struct
@@ -1606,7 +1608,12 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 		return attrs, nil
 	}
 
-	attrs |= e.fieldAttributesFromType(f.Type())
+	typeAttrs := e.fieldAttributesFromType(f.Type())
+	if codec == "toml" {
+		// TOML has no null; encoders omit nil pointers instead.
+		typeAttrs &^= nullable
+	}
+	attrs |= typeAttrs
 
 	// Only the codec which governs the field decides whether it may be omitted.
 	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty";

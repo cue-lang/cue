@@ -1,5 +1,3 @@
-# The toml golden for #Pointers allows null, which TOML cannot encode.
-
 # Test default behavior (json,yaml)
 exec cue get go --local ./...
 cmp ./pkg/pkg_go_gen.cue ./pkg/pkg_go_gen_default.cue.golden
@@ -250,7 +248,7 @@ package pkg
 
 // Pointer fields are nullable except under TOML, which has no null.
 #Pointers: {
-	F1?:      null | int @go(,*int)
-	F2?:      null | int @go(,*int)
-	f3_toml?: null | int @go(F3,*int) @toml(f3_toml)
+	F1?:      int @go(,*int)
+	F2?:      int @go(,*int)
+	f3_toml?: int @go(F3,*int) @toml(f3_toml)
 }

@@ -803,15 +803,14 @@ var errorTests = []struct {
 	{"'''\n \n\t0\n '''", token.STRING, 0, "'''\n \n\t0\n '''", `non-matching whitespace for multiline string (expected " ", got "")`},
 	// Longer shared prefix that diverges (tab vs space after common prefix).
 	{"'''\n\t\t 0\n\t\t\t0\n\t\t\t'''", token.STRING, 0, "'''\n\t\t 0\n\t\t\t0\n\t\t\t'''", `non-matching whitespace for multiline string (expected "\t\t\t", got "\t\t")`},
-	// A backslash at the end of a line in a multiline string should escape the
-	// line terminator, but the scanner rejects it: https://cuelang.org/issue/2317.
-	{"\"\"\"\n\tabc\\\n\tdef\n\t\"\"\"", token.STRING, 9, "\"\"\"\n\tabc\\\n\tdef\n\t\"\"\"", "unknown escape sequence"},
-	{"\"\"\"\r\n\tabc\\\r\n\tdef\r\n\t\"\"\"", token.STRING, 10, "\"\"\"\n\tabc\\\n\tdef\n\t\"\"\"", "unknown escape sequence"},
-	{"#\"\"\"\n\tabc\\#\n\tdef\n\t\"\"\"#", token.STRING, 11, "#\"\"\"\n\tabc\\#\n\tdef\n\t\"\"\"#", "unknown escape sequence"},
-	{"'''\n\tabc\\\n\tdef\n\t'''", token.STRING, 9, "'''\n\tabc\\\n\tdef\n\t'''", "unknown escape sequence"},
-	{"\"\"\"\n\t\\(0)\\\n\tdef\n\t\"\"\"", token.INTERPOLATION, 10, "\"\"\"\n\t\\(", "unknown escape sequence"},
-	// Escaping the final newline should be rejected when unquoting, not when scanning.
-	{"\"\"\"\n\tabc\\\n\t\"\"\"", token.STRING, 9, "\"\"\"\n\tabc\\\n\t\"\"\"", "unknown escape sequence"},
+	// A backslash at the end of a line in a multiline string escapes the line terminator.
+	{"\"\"\"\n\tabc\\\n\tdef\n\t\"\"\"", token.STRING, 0, "\"\"\"\n\tabc\\\n\tdef\n\t\"\"\"", ""},
+	{"\"\"\"\r\n\tabc\\\r\n\tdef\r\n\t\"\"\"", token.STRING, 0, "\"\"\"\n\tabc\\\n\tdef\n\t\"\"\"", ""},
+	{"#\"\"\"\n\tabc\\#\n\tdef\n\t\"\"\"#", token.STRING, 0, "#\"\"\"\n\tabc\\#\n\tdef\n\t\"\"\"#", ""},
+	{"'''\n\tabc\\\n\tdef\n\t'''", token.STRING, 0, "'''\n\tabc\\\n\tdef\n\t'''", ""},
+	{"\"\"\"\n\t\\(0)\\\n\tdef\n\t\"\"\"", token.INTERPOLATION, 0, "\"\"\"\n\t\\(", ""},
+	// Escaping the final newline is rejected when unquoting, not when scanning.
+	{"\"\"\"\n\tabc\\\n\t\"\"\"", token.STRING, 0, "\"\"\"\n\tabc\\\n\t\"\"\"", ""},
 	{"\"\"\"\n\tabc\\\rdef\n\t\"\"\"", token.STRING, 9, "\"\"\"\n\tabc\\def\n\t\"\"\"", "unknown escape sequence"},
 	{"\"abc\n", token.STRING, 0, `"abc`, "string literal not terminated"},
 	{"\"abc\n   ", token.STRING, 0, `"abc`, "string literal not terminated"},

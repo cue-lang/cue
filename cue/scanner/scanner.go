@@ -378,6 +378,13 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 
 	offs := s.offset
 
+	// An escaped line terminator in a multiline string.
+	// Leave it for scanString, which tracks line starts.
+	if quote.numChar == 3 && (s.ch == '\n' ||
+		s.ch == '\r' && s.rdOffset < len(s.src) && s.src[s.rdOffset] == '\n') {
+		return true, false
+	}
+
 	var n int
 	var base, max uint32
 	switch s.ch {

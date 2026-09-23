@@ -474,6 +474,7 @@ little_u_value   = `\` { `#` } "u" hex_digit hex_digit hex_digit hex_digit .
 big_u_value      = `\` { `#` } "U" hex_digit hex_digit hex_digit hex_digit
                            hex_digit hex_digit hex_digit hex_digit .
 unicode_value    = unicode_char | little_u_value | big_u_value | escaped_char .
+escaped_newline  = `\` { `#` } newline .
 interpolation    = "\" { `#` } "(" Expression ")" .
 
 string_lit       = simple_string_lit |
@@ -485,10 +486,10 @@ string_lit       = simple_string_lit |
 simple_string_lit    = `"` { unicode_value | interpolation } `"` .
 simple_bytes_lit     = `'` { unicode_value | interpolation | byte_value } `'` .
 multiline_string_lit = `"""` newline
-                             { unicode_value | interpolation | newline }
+                             { unicode_value | interpolation | escaped_newline | newline }
                              newline `"""` .
 multiline_bytes_lit  = "'''" newline
-                             { unicode_value | interpolation | byte_value | newline }
+                             { unicode_value | interpolation | byte_value | escaped_newline | newline }
                              newline "'''" .
 ```
 
@@ -551,8 +552,7 @@ lines in the string literal.
 A closing triple quote may not appear in the string.
 To include it is suffices to escape one of the quotes.
 
-<!-- TODO: should the backslash here work? -->
-```cue ! parse
+```cue parse
 """
     lily:
     out of the water
@@ -565,10 +565,6 @@ To include it is suffices to escape one of the quotes.
         — Nick Virgilio, Selected Haiku, 1988
     """
 ```
-<!-- error:
-unknown escape sequence:
-    7:14
--->
 
 This represents the same string as:
 

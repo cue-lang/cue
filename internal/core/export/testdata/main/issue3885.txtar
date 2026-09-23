@@ -1,0 +1,221 @@
+# Lets inside struct literals which are not merged into the enclosing
+# struct, such as list elements or call arguments, must not leave behind
+# an empty struct in the enclosing scope.
+#
+# The definition outputs show the bug: every case but "merged" gains a
+# spurious "& {}" or "& close({})" conjunct.
+-- in.cue --
+list: [{
+	let b = 4
+	b
+}]
+listField: [{
+	let b = 4
+	x: b
+}]
+call: close({
+	let b = 4
+	x: b
+})
+callString: len({
+	let b = 4
+	x: b
+})
+disjunction: *{
+	let b = 4
+	x: b
+} | 5
+merged: {
+	let b = 4
+	x: b
+} & {
+	let c = 5
+	y: c
+}
+// A let in an embedded struct literal is merged into the enclosing scope.
+embedded: {
+	{
+		let c = 5
+		y: c
+	}
+	let b = 4
+	x: b
+}
+-- out/value-v3 --
+== Simplified
+{
+	list:      [4]
+	listField: [{x: 4}]
+	call: x: 4
+	callString:  1
+	disjunction: *{x: 4} | 5
+	merged: {
+		x: 4
+		y: 5
+	}
+	// A let in an embedded struct literal is merged into the enclosing scope.
+	embedded: {
+		y: 5
+		x: 4
+	}
+}
+== Raw
+{
+	list:      [4]
+	listField: [{x: 4}]
+	call: x: 4
+	callString:  1
+	disjunction: *{x: 4} | 5
+	merged: {
+		x: 4
+		y: 5
+	}
+	// A let in an embedded struct literal is merged into the enclosing scope.
+	embedded: {
+		y: 5
+		x: 4
+	}
+}
+== Final
+{
+	list:      [4]
+	listField: [{x: 4}]
+	call: x: 4
+	callString: 1
+	disjunction: x: 4
+	merged: {
+		x: 4
+		y: 5
+	}
+	embedded: {
+		y: 5
+		x: 4
+	}
+}
+== All
+{
+	list:      [4]
+	listField: [{x: 4}]
+	call: x: 4
+	callString:  1
+	disjunction: *{x: 4} | 5
+	merged: {
+		x: 4
+		y: 5
+	}
+	// A let in an embedded struct literal is merged into the enclosing scope.
+	embedded: {
+		y: 5
+		x: 4
+	}
+}
+== Eval
+{
+	list:      [4]
+	listField: [{x: 4}]
+	call: x: 4
+	callString: 1
+	disjunction: x: 4
+	merged: {
+		x: 4
+		y: 5
+	}
+	embedded: {
+		y: 5
+		x: 4
+	}
+}
+-- out/definition-v3 --
+list: [{
+	let b = 4
+	b
+}] & {}
+listField: [{
+	let b_1 = 4
+	x: b_1
+}] & {}
+call: close({
+	let b_2 = 4
+	x: b_2
+}) & close({})
+callString: len({
+	let b_3 = 4
+	x: b_3
+}) & {}
+disjunction: (*{
+	let b_4 = 4
+	x: b_4
+} | 5) & {}
+merged: {
+	let b_A = 4
+	let c = 5
+	x: b_A
+	y: c
+}
+// A let in an embedded struct literal is merged into the enclosing scope.
+embedded: {
+	let b_9 = 4
+	let c_1 = 5
+	x: b_9
+	y: c_1
+}
+-- out/definition-v3-noshare --
+list: [{
+	let b = 4
+	b
+}] & {}
+listField: [{
+	let b_1 = 4
+	x: b_1
+}] & {}
+call: close({
+	let b_2 = 4
+	x: b_2
+}) & close({})
+callString: len({
+	let b_3 = 4
+	x: b_3
+}) & {}
+disjunction: (*{
+	let b_4 = 4
+	x: b_4
+} | 5) & {}
+merged: {
+	let b_A = 4
+	let c = 5
+	x: b_A
+	y: c
+}
+// A let in an embedded struct literal is merged into the enclosing scope.
+embedded: {
+	let b_9 = 4
+	let c_1 = 5
+	x: b_9
+	y: c_1
+}
+-- out/doc-v3 --
+[]
+[list]
+[list 0]
+[list 0 b]
+[listField]
+[listField 0]
+[listField 0 b]
+[listField 0 x]
+[call]
+[call b]
+[call x]
+[callString]
+[disjunction]
+[merged]
+[merged b]
+[merged x]
+[merged c]
+[merged y]
+[embedded]
+- A let in an embedded struct literal is merged into the enclosing scope.
+
+[embedded c]
+[embedded y]
+[embedded b]
+[embedded x]

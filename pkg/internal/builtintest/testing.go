@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"testing"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
@@ -46,11 +47,13 @@ func Run(name string, t *testing.T) {
 		ctx := e.NewContext(v)
 		v.Finalize(ctx)
 
-		if b := adt.Validate(ctx, v, &adt.ValidateConfig{
-			AllErrors: true,
-		}); b != nil {
+		var verr errors.Error
+		for _, b := range adt.ValidateAll(ctx, v, nil) {
+			verr = errors.Append(verr, b.Err)
+		}
+		if verr != nil {
 			fmt.Fprintln(t, "Errors:")
-			t.WriteErrors(b.Err)
+			t.WriteErrors(verr)
 			fmt.Fprintln(t, "")
 			fmt.Fprintln(t, "Result:")
 		}

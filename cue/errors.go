@@ -101,23 +101,32 @@ var errNotExists = &adt.Bottom{
 // still exists (i.e., [Value.Exists] returns true), it typically means
 // the value is valid CUE but not fully resolved. In such cases,
 // [Value.Validate] with default options will return nil.
+//
+// An error wrapping other errors, such as one returned by
+// [Value.Validate], is incomplete only if all the errors it wraps are.
+// Errors which do not come from evaluating a value, such as those
+// made with [errors.Newf], are never incomplete.
 func IsIncomplete(err error) bool {
-	if err == nil {
+	switch x := err.(type) {
+	case nil:
 		return false
-	}
-	// Fast path:
-	if b, ok := err.(bottomer); ok {
-		return b.Bottom().IsIncomplete()
-	}
-	// Handle combined errors
-	for _, e := range errors.Errors(err) {
-		if b, ok := e.(bottomer); ok {
-			if b.Bottom().IsIncomplete() {
-				return true
-			}
-		}
+	case bottomer:
+		return x.Bottom().IsIncomplete()
+	case interface{ Unwrap() []error }:
+		return allIncomplete(x.Unwrap())
+	case interface{ Unwrap() error }:
+		return IsIncomplete(x.Unwrap())
 	}
 	return false
+}
+
+func allIncomplete(errs []error) bool {
+	for _, e := range errs {
+		if !IsIncomplete(e) {
+			return false
+		}
+	}
+	return len(errs) > 0
 }
 
 // bottomer is implemented by errors which carry an [adt.Bottom],

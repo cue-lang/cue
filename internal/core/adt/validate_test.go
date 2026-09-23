@@ -35,6 +35,7 @@ func TestValidate(t *testing.T) {
 		out    string
 		lookup string
 		cfg    *adt.ValidateConfig
+		all    bool // use ValidateAll
 
 		skipNoShare bool
 	}
@@ -95,7 +96,7 @@ func TestValidate(t *testing.T) {
 				    test:2:10`,
 	}, {
 		name: "all errors",
-		cfg:  &adt.ValidateConfig{AllErrors: true},
+		all:  true,
 		in: `
 		x: 1 & 2
 		y: 2 & 4
@@ -104,6 +105,7 @@ func TestValidate(t *testing.T) {
 				x: conflicting values 2 and 1:
 				    test:2:6
 				    test:2:10
+				eval
 				y: conflicting values 4 and 2:
 				    test:3:6
 				    test:3:10`,
@@ -423,10 +425,15 @@ func TestValidate(t *testing.T) {
 			v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup, "main"))
 		}
 
-		b := adt.Validate(ctx, v, tc.cfg)
+		var errs []*adt.Bottom
+		if tc.all {
+			errs = adt.ValidateAll(ctx, v, tc.cfg)
+		} else if b := adt.Validate(ctx, v, tc.cfg); b != nil {
+			errs = []*adt.Bottom{b}
+		}
 
 		w := &strings.Builder{}
-		if b != nil {
+		for _, b := range errs {
 			fmt.Fprintln(w, b.Code)
 			errors.Print(w, b.Err, nil)
 		}

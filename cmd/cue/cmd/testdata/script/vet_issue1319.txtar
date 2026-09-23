@@ -1,5 +1,5 @@
-# Incomplete errors should be reported alongside errors of a greater
-# severity in other, independent fields, but they are dropped.
+# Incomplete errors are reported alongside errors of a greater severity
+# in other, independent fields.
 
 ! exec cue vet -c errors.cue
 cmp stderr vet-stderr
@@ -12,8 +12,7 @@ cmp stderr vet-stderr
 cmp stderr vet-nonconcrete-stderr
 
 # https://cuelang.org/issue/4140: comparing lists of structs results in
-# an incomplete error, which should be reported alongside other failures,
-# but is dropped.
+# an incomplete error, which must be reported alongside other failures.
 ! exec cue vet -c unique.cue
 cmp stderr unique-stderr
 
@@ -29,9 +28,14 @@ b: int // incomplete field
 m: [1, 2]
 v: m[2] // index out of range
 -- vet-stderr --
+b: incomplete value int:
+    ./errors.cue:7:4
 s: conflicting values "world" and "hello":
     ./errors.cue:1:4
     ./errors.cue:2:4
+a: undefined field: goo:
+    ./errors.cue:5:6
+    ./errors.cue:4:1
 v: index out of range [2] with length 2:
     ./errors.cue:10:6
     ./errors.cue:9:1
@@ -57,3 +61,6 @@ structs: [
 scalars: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
     ./unique.cue:3:6
     ./unique.cue:5:10
+structs: invalid value [{X:1,O:2},{X:2,O:1},{X:1,O:2}] (does not satisfy list.UniqueItems): equal values at position 0 and 2:
+    ./unique.cue:3:6
+    ./unique.cue:6:10

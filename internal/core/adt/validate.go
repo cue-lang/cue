@@ -28,14 +28,12 @@ type ValidateConfig struct {
 	// requested.
 	ReportIncomplete bool
 
-	// AllErrors continues descending into a Vertex, even if errors are found.
-	AllErrors bool
-
 	// TODO: omitOptional, if this is becomes relevant.
 }
 
 // Validate checks that a value has certain properties. The value must have
-// been evaluated.
+// been evaluated. It stops at the first error; use [ValidateAll] to find all
+// errors.
 func Validate(ctx *OpContext, v *Vertex, cfg *ValidateConfig) *Bottom {
 	if cfg == nil {
 		cfg = &ValidateConfig{}
@@ -43,6 +41,18 @@ func Validate(ctx *OpContext, v *Vertex, cfg *ValidateConfig) *Bottom {
 	x := validator{ValidateConfig: *cfg, ctx: ctx}
 	x.validate(v)
 	return x.err
+}
+
+// ValidateAll is like [Validate], but it continues descending into a Vertex
+// even if errors are found, and returns each error separately, keeping its
+// own error code.
+func ValidateAll(ctx *OpContext, v *Vertex, cfg *ValidateConfig) []*Bottom {
+	if cfg == nil {
+		cfg = &ValidateConfig{}
+	}
+	x := validator{ValidateConfig: *cfg, ctx: ctx, all: true}
+	x.validate(v)
+	return x.errs
 }
 
 // validateValue checks that a value has certain properties. The value must have
@@ -76,6 +86,12 @@ type validator struct {
 	err          *Bottom
 	inDefinition int
 
+	// all collects every error in errs, rather than stopping at the first
+	// error in err.
+	all  bool
+	errs []*Bottom
+	seen map[*Bottom]bool // the errors in errs
+
 	sharedPositions []Node
 
 	// shared vertices should be visited at least once if referenced by
@@ -101,12 +117,18 @@ func (v *validator) checkFinal() bool {
 }
 
 func (v *validator) add(b *Bottom) {
-	if !v.AllErrors {
+	if !v.all {
 		v.err = CombineErrors(nil, v.err, b)
 		return
 	}
-	if !b.ChildError {
-		v.err = CombineErrors(nil, v.err, b)
+	// A shared vertex may be reached both through a reference and at its
+	// own position.
+	if !b.ChildError && !v.seen[b] {
+		if v.seen == nil {
+			v.seen = make(map[*Bottom]bool)
+		}
+		v.seen[b] = true
+		v.errs = append(v.errs, b)
 	}
 }
 
@@ -190,7 +212,7 @@ func (v *validator) validate(x *Vertex) {
 		if a.Label.IsLet() || !a.IsDefined(v.ctx) {
 			continue
 		}
-		if !v.AllErrors && v.err != nil {
+		if !v.all && v.err != nil {
 			break
 		}
 		if a.Label.IsRegular() {

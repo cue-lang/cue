@@ -162,9 +162,7 @@ func TestIsIncompleteValidate(t *testing.T) {
 		name:         "incomplete and permanent errors",
 		cueValue:     `a: int, b: 1 & 2`,
 		isIncomplete: false,
-		// The incomplete error for "a" should also be reported, but it is
-		// dropped in favor of the permanent error.
-		errors: []string{"b permanent"},
+		errors:       []string{"a incomplete", "b permanent"},
 	}, {
 		name:         "error referenced more than once",
 		cueValue:     `a: x, b: x, x: 1 & 2`,
@@ -221,17 +219,13 @@ func TestIsIncompleteCombined(t *testing.T) {
 		err:          fmt.Errorf("plain error"),
 		isIncomplete: false,
 	}, {
-		name: "incomplete and plain errors",
-		err:  errors.Append(incomplete, plain),
-		// The plain error is permanent, so the combined error should not be
-		// incomplete.
-		isIncomplete: true,
+		name:         "incomplete and plain errors",
+		err:          errors.Append(incomplete, plain),
+		isIncomplete: false,
 	}, {
-		name: "incomplete and plain errors joined",
-		err:  stderrs.Join(incomplete, plain),
-		// The plain error is permanent, so the joined error should not be
-		// incomplete.
-		isIncomplete: true,
+		name:         "incomplete and plain errors joined",
+		err:          stderrs.Join(incomplete, plain),
+		isIncomplete: false,
 	}, {
 		name:         "plain and incomplete errors joined",
 		err:          stderrs.Join(plain, incomplete),
@@ -241,11 +235,9 @@ func TestIsIncompleteCombined(t *testing.T) {
 		err:          fmt.Errorf("context: %w", incomplete),
 		isIncomplete: true,
 	}, {
-		name: "incomplete error wrapped with errors.Wrapf",
-		err:  errors.Wrapf(incomplete, token.NoPos, "context"),
-		// The wrapped error is incomplete, so the wrapping error should be
-		// too.
-		isIncomplete: false,
+		name:         "incomplete error wrapped with errors.Wrapf",
+		err:          errors.Wrapf(incomplete, token.NoPos, "context"),
+		isIncomplete: true,
 	}, {
 		name:         "incomplete marshal error",
 		err:          marshal("a"),
@@ -263,11 +255,9 @@ func TestIsIncompleteCombined(t *testing.T) {
 		err:          errors.Append(incomplete, marshal("a")),
 		isIncomplete: true,
 	}, {
-		name: "incomplete marshal and plain errors joined",
-		err:  stderrs.Join(marshal("a"), plain),
-		// The plain error is permanent, so the joined error should not be
-		// incomplete.
-		isIncomplete: true,
+		name:         "incomplete marshal and plain errors joined",
+		err:          stderrs.Join(marshal("a"), plain),
+		isIncomplete: false,
 	}}
 
 	for _, tc := range testCases {

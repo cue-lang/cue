@@ -142,11 +142,13 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 	// 	t.Skipf("%d leaks reported", n)
 	// }
 
-	if b := adt.Validate(ctx, v, &adt.ValidateConfig{
-		AllErrors: true,
-	}); b != nil {
+	var errs errors.Error
+	for _, b := range adt.ValidateAll(ctx, v, nil) {
+		errs = errors.Append(errs, b.Err)
+	}
+	if errs != nil {
 		fmt.Fprintln(t, "Errors:")
-		t.WriteErrors(b.Err)
+		t.WriteErrors(errs)
 		fmt.Fprintln(t, "")
 		fmt.Fprintln(t, "Result:")
 	}
@@ -232,9 +234,7 @@ language: version: "v0.15.0"
 		}
 	}
 
-	if b := adt.Validate(ctx, v, &adt.ValidateConfig{
-		AllErrors: true,
-	}); b != nil {
+	for _, b := range adt.ValidateAll(ctx, v, nil) {
 		t.Log(errors.Details(b.Err, nil))
 	}
 

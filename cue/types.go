@@ -2297,14 +2297,13 @@ func (v Value) Validate(opts ...Option) error {
 		Concrete:       o.concrete,
 		Final:          o.final,
 		DisallowCycles: o.disallowCycles,
-		AllErrors:      true,
 	}
 
-	b := adt.Validate(v.ctx(), v.v, cfg)
-	if b != nil {
-		return v.toErr(b)
+	var err errors.Error
+	for _, b := range adt.ValidateAll(v.ctx(), v.v, cfg) {
+		err = errors.Append(err, v.toErr(b))
 	}
-	return nil
+	return err
 }
 
 // Walk descends into all values of v, calling f. If f returns false, Walk

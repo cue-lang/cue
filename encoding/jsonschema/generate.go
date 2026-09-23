@@ -798,10 +798,11 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		}
 		switch kind := args[0].Kind(); kind {
 		case cue.FloatKind, cue.IntKind:
-			n, err := args[0].Float64()
-			if err != nil {
-				// Probably non-concrete.
-				return &itemTrue{}
+			syntax := args[0].Syntax()
+			n, ok := syntax.(ast.Expr)
+			if !ok {
+				g.addError(args[0], fmt.Errorf("expected expression from Syntax, got %T", syntax))
+				return &itemFalse{}
 			}
 			return &itemAllOf{
 				elems: []internItem{

@@ -41,8 +41,8 @@ paths: {}
             "properties": {
                "a": {
                   "type": "integer",
-                  "maximum": 9.223372036854776E+18,
-                  "minimum": -9.223372036854776E+18
+                  "maximum": 9223372036854775807,
+                  "minimum": -9223372036854775808
                },
                "b": {
                   "type": "integer",
@@ -77,8 +77,8 @@ paths: {}
             "properties": {
                "a": {
                   "type": "integer",
-                  "maximum": 9.223372036854776E+18,
-                  "minimum": -9.223372036854776E+18
+                  "maximum": 9223372036854775807,
+                  "minimum": -9223372036854775808
                },
                "b": {
                   "type": "integer",

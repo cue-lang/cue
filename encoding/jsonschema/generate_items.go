@@ -581,18 +581,16 @@ func (i *itemPattern) apply(f func(internItem, *uniqueItems) internItem, u *uniq
 // itemBounds represents numeric bounds constraints
 type itemBounds struct {
 	constraint cue.Op // LessThanEqualOp, LessThanOp, GreaterThanEqualOp, GreaterThanOp
-	// TODO this encodes awkwardly in CUE (for example 10 becomes 1e0). It
-	// would be good to fix that.
-	n float64
+	n          ast.Expr
 }
 
 func (it *itemBounds) hash(h *maphash.Hash, u *uniqueItems) {
 	maphash.WriteComparable(h, it.constraint)
-	maphash.WriteComparable(h, it.n)
+	writeExprHash(h, it.n)
 }
 
 func (i *itemBounds) generate(g *generator) ast.Expr {
-	num := ast.NewLit(token.FLOAT, fmt.Sprint(i.n))
+	num := i.n
 	if !g.dialect.numericExclusive {
 		// Exclusive bounds are expressed as a boolean keyword
 		// accompanying minimum/maximum (draft-04 and OpenAPI 3.0).

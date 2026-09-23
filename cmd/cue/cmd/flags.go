@@ -121,7 +121,6 @@ func addOrphanFlags(cmd *cobra.Command) {
 	f.Bool(string(flagWithContext), false, "import as object with contextual data (see 'cue help flags' for details)")
 	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
 	f.String(string(flagProtoEnum), "int", "mode for rendering enums (int|json)")
-	f.StringP(string(flagGlob), "n", "", "regexp filter for non-CUE file names in directories")
 	f.Bool(string(flagMerge), true, "merge non-CUE files")
 }
 

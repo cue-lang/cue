@@ -73,6 +73,11 @@ Using the --ext flag in combination with a mode causes matched files to be
 interpreted as the format indicated by the mode, overriding any other meaning
 attributed to that extension.
 
+The --name flag selects which files to import from directories by matching
+a regular expression against their paths, taking precedence over the
+extensions implied by the mode and --ext. Files given explicitly as arguments
+are always imported.
+
 auto mode
 
 In auto mode, data files are interpreted based on some marker
@@ -261,6 +266,7 @@ Example:
 	cmd.Flags().Bool(string(flagDryRun), false, "show what files would be created")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
 	cmd.Flags().StringArray(string(flagExt), nil, "match files with these extensions")
+	cmd.Flags().StringP(string(flagGlob), "n", "", "regular expression to match the paths of files to import from directories")
 
 	return cmd
 }
@@ -313,6 +319,9 @@ func runImport(cmd *Command, args []string) (err error) {
 	}
 	if len(extensions) > 0 {
 		c.fileFilter = `\.(` + strings.Join(extensions, "|") + `)$`
+	}
+	if s := flagGlob.String(cmd); s != "" {
+		c.fileFilter = s
 	}
 
 	b, err := parseArgs(cmd, args, c)

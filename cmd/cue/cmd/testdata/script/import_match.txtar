@@ -1,5 +1,9 @@
 exec cue import -p uni --with-context -l 'path.Ext(filename)' -n '.*uni.yml' ./...
 cmp uni.cue out/expect-uni.cue
+
+# -n/--name only filters files found in directories.
+! exec cue import -n '.*uni.yml' service.yaml
+cmp stderr out/expect-stderr-nodir
 -- uni.yml --
 hello: world
 -- service.yaml --
@@ -8,3 +12,5 @@ x: foobie
 package uni
 
 ".yml": hello: "world"
+-- out/expect-stderr-nodir --
+use of -n/--name flag without a directory

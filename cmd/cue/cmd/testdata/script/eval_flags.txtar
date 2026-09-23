@@ -1,13 +1,11 @@
 # Issue #969
 
+# The -n/--name flag only exists for cue import.
 ! exec cue eval test.json -n ".+\.cue"
-cmp stderr expect-stderr1
+stderr '^unknown shorthand flag: ''n'' in -n'
 
 ! exec cue eval test.json -d '#D2'
 cmp stderr expect-stderr2
-
-! exec cue eval test.json -n ".+\.cue" -d '#D2'
-cmp stderr expect-stderr3
 
 ! exec cue eval test.json vector.cue -d '#D1'
 cmp stderr expect-stderr4
@@ -36,12 +34,8 @@ package Vector
     Z: float
 }
 
--- expect-stderr1 --
-use of -n/--name flag without a directory
 -- expect-stderr2 --
 -d/--schema flag specified without a schema
--- expect-stderr3 --
-use of -n/--name flag without a directory
 -- expect-stderr4 --
 reference "#D1" not found:
     --schema:1:1

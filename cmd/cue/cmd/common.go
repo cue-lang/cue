@@ -586,7 +586,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		}
 	}
 
-	if len(p.insts) == 0 && flagGlob.String(p.cmd) != "" {
+	if p.importing && len(p.insts) == 0 && flagGlob.String(p.cmd) != "" {
 		return nil, errors.Newf(token.NoPos,
 			"use of -n/--name flag without a directory")
 	}
@@ -746,10 +746,6 @@ func (b *buildPlan) parseFlags() (err error) {
 		b.encConfig.Force = flagForce.Bool(b.cmd)
 	}
 
-	if s := flagGlob.String(b.cmd); s != "" {
-		// Set a default file filter to only include json and yaml files
-		b.cfg.fileFilter = s
-	}
 	// These flags exist only in specific output modes.
 	switch b.cfg.mode {
 	case filetypes.Export:

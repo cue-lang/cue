@@ -377,7 +377,8 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 	// list only if it ends in ..._|_: a list in a definition, or one closed by
 	// close, is closed by the same check that closes structs, applied to its
 	// integer labels.
-	isClosed := closedByBottom || (ellipsis == nil && !n.openListsEnabled(l))
+	isClosed := closedByBottom || (l.Src != nil && l.Src.Hash.IsValid()) ||
+		(ellipsis == nil && !n.openListsEnabled(l))
 
 	switch max := n.maxListLen; {
 	case int(index) < max:

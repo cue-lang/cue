@@ -23,6 +23,15 @@ closeBuiltin: {
 	err: c & [1, 2] @test(err, code=eval, contains="incompatible list lengths (%d and %d)", args=[1, 2], pos=[-1:13])
 }
 
+// Without the experiment, # followed by [ still indexes a definition
+// named #.
+hashIndex: {
+	#: [1, 2]
+	x: #[0]     @test(eq, 1)
+	y: (#)[0]   @test(eq, 1)
+	z: #[0:1]   @test(eq, [1])
+}
+
 concat: {
 	x: list.Concat([[1], [2]])
 	x: [_, _, 3] @test(err, contains="incompatible list lengths")

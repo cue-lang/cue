@@ -141,6 +141,9 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 
 	case *StructLit:
 		n.unshare()
+		if isClosedLiteral(x) {
+			id = n.closeLiteral(x, id)
+		}
 		n.scheduleStruct(env, x, id)
 
 	case *ListLit:

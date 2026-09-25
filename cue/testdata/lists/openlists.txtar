@@ -105,6 +105,51 @@ closeOneLevel: {
 	x: close([{a: 1}]) & [{a: 1, b: 2}] @test(eq, [{a: 1, b: 2}])
 }
 
+// A closed list literal means what a list literal means without the
+// experiment: it limits the length of the list, one level deep (D-0010).
+closedList: {
+	@test(permute, count=2)
+	x: #[1, 2]
+	x: [_, _, 3] @test(err, contains="incompatible list lengths")
+}
+
+closedListOneLevel: {
+	x: #[{a: 1}] & [{a: 1, b: 2}] @test(eq, [{a: 1, b: 2}])
+}
+
+closedListIndex: {
+	x: #[1, 2][5] @test(err, code=eval, contains="index out of range")
+}
+
+closedListOpen: {
+	x: #[1, 2] & [...int] @test(eq, [1, 2])
+	n: len(x)             @test(eq, 2)
+}
+
+// A closed struct literal closes one level, as close does, and a trailing
+// ellipsis opens it.
+closedStruct: {
+	x: #{a: 1} & {b: 2}           @test(err, contains="not allowed")
+	y: #{a: {b: 1}} & {a: {c: 2}} @test(eq, {a: {b: 1, c: 2}})
+	z: #{a: 1, ...} & {b: 2}      @test(eq, {a: 1, b: 2})
+}
+
+// Unlike the argument of close, the fields of a closed literal keep the
+// recursive closedness of an enclosing definition.
+closedLiteralsInDef: {
+	#S: #{a: {b: int}}
+	#L: #[{a: int}]
+	errS: #S & {a: {b: 1, c: 2}} @test(err, contains="not allowed")
+	errL: #L & [{a: 1, b: 2}]    @test(err, contains="not allowed")
+}
+
+// An index on a definition named # is written with parentheses.
+hashIndex: {
+	#: [1, 2]
+	x: (#)[0]   @test(eq, 1)
+	y: (#)[0:1] @test(eq, [1])
+}
+
 // Alternatives that differ only in openness are not merged as duplicates.
 closeDedup: {
 	x: [1] | close([1]) @test(eq, [1] | close([1]))
@@ -212,24 +257,35 @@ closeSlice: {
     ./in.cue:69:21
 [eval] closeBuiltin.err.1: field not allowed:
     ./in.cue:94:15
+[eval] closedList.x: incompatible list lengths (2 and 3):
+    ./in.cue:107:5
+[eval] closedListIndex.x: index out of range [5] with length 2:
+    ./in.cue:115:13
+    ./in.cue:115:5
+[eval] closedStruct.x.b: field not allowed:
+    ./in.cue:126:16
+[eval] closedLiteralsInDef.errS.a.c: field not allowed:
+    ./in.cue:136:24
+[eval] closedLiteralsInDef.errL.0.b: field not allowed:
+    ./in.cue:137:21
 [eval] defStructElems.err.0.b: field not allowed:
-    ./in.cue:115:20
+    ./in.cue:160:20
 [eval] defEmpty.err.0: field not allowed:
-    ./in.cue:121:13
+    ./in.cue:166:13
 [eval] defListRef.y.1: field not allowed:
-    ./in.cue:131:9
+    ./in.cue:176:9
 [eval] defListRef.z.b: field not allowed:
-    ./in.cue:133:12
+    ./in.cue:178:12
 [eval] defListRef.listVia.1: field not allowed:
-    ./in.cue:137:22
+    ./in.cue:182:22
 [eval] defListRef.structVia.b: field not allowed:
-    ./in.cue:138:25
+    ./in.cue:183:25
 [eval] defBuiltin.err.2: field not allowed:
-    ./in.cue:144:19
+    ./in.cue:189:19
 [eval] bottomEllipsis.x: incompatible list lengths (1 and 2):
-    ./in.cue:179:5
+    ./in.cue:224:5
 [eval] closeSlice.err.1: field not allowed:
-    ./in.cue:192:15
+    ./in.cue:237:15
 -- out/eval/stats --
 Leaks:  9
 Freed:  378

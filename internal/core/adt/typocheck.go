@@ -634,6 +634,29 @@ func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
 	return n.splitScope(s, id)
 }
 
+// isClosedLiteral reports whether s is written as a closed struct literal,
+// #{...}.
+func isClosedLiteral(s *StructLit) bool {
+	src, ok := s.Src.(*ast.StructLit)
+	return ok && src.Hash.IsValid()
+}
+
+// closeLiteral closes the node at one level for a closed struct literal,
+// #{...}, as close does: each field of the node must be declared in the
+// literal. Unlike the argument of close, the literal keeps the recursive
+// closedness of an enclosing definition, which id carries.
+func (n *nodeContext) closeLiteral(s *StructLit, id CloseInfo) CloseInfo {
+	if n.ctx.OpenDef {
+		return id
+	}
+	k := len(n.reqDefIDs)
+	id = n.newReq(s, id, defStruct)
+	if len(n.reqDefIDs) > k {
+		n.reqDefIDs[k].ignore = false
+	}
+	return id
+}
+
 func (n *nodeContext) splitScope(p Node, id CloseInfo) CloseInfo {
 	return n.newReq(p, id, defStruct)
 }

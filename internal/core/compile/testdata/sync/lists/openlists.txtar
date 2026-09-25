@@ -99,6 +99,50 @@ closeOneLevel: {
 	x: close([{a: 1}]) & [{a: 1, b: 2}]
 }
 
+// A closed list literal means what a list literal means without the
+// experiment: it limits the length of the list, one level deep (D-0010).
+closedList: {
+	x: #[1, 2]
+	x: [_, _, 3]
+}
+
+closedListOneLevel: {
+	x: #[{a: 1}] & [{a: 1, b: 2}]
+}
+
+closedListIndex: {
+	x: #[1, 2][5]
+}
+
+closedListOpen: {
+	x: #[1, 2] & [...int]
+	n: len(x)
+}
+
+// A closed struct literal closes one level, as close does, and a trailing
+// ellipsis opens it.
+closedStruct: {
+	x: #{a: 1} & {b: 2}
+	y: #{a: {b: 1}} & {a: {c: 2}}
+	z: #{a: 1, ...} & {b: 2}
+}
+
+// Unlike the argument of close, the fields of a closed literal keep the
+// recursive closedness of an enclosing definition.
+closedLiteralsInDef: {
+	#S: #{a: {b: int}}
+	#L: #[{a: int}]
+	errS: #S & {a: {b: 1, c: 2}}
+	errL: #L & [{a: 1, b: 2}]
+}
+
+// An index on a definition named # is written with parentheses.
+hashIndex: {
+	#: [1, 2]
+	x: (#)[0]
+	y: (#)[0:1]
+}
+
 // Alternatives that differ only in openness are not merged as duplicates.
 closeDedup: {
 	x: [1] | close([1])
@@ -361,6 +405,98 @@ closeSlice: {
         b: 2
       },
     ])
+  }
+  closedList: {
+    x: [
+      1,
+      2,
+    ]
+    x: [
+      _,
+      _,
+      3,
+    ]
+  }
+  closedListOneLevel: {
+    x: ([
+      {
+        a: 1
+      },
+    ] & [
+      {
+        a: 1
+        b: 2
+      },
+    ])
+  }
+  closedListIndex: {
+    x: [
+      1,
+      2,
+    ][5]
+  }
+  closedListOpen: {
+    x: ([
+      1,
+      2,
+    ] & [
+      ...int,
+    ])
+    n: len(〈0;x〉)
+  }
+  closedStruct: {
+    x: ({
+      a: 1
+    } & {
+      b: 2
+    })
+    y: ({
+      a: {
+        b: 1
+      }
+    } & {
+      a: {
+        c: 2
+      }
+    })
+    z: ({
+      a: 1
+      ...
+    } & {
+      b: 2
+    })
+  }
+  closedLiteralsInDef: {
+    #S: {
+      a: {
+        b: int
+      }
+    }
+    #L: [
+      {
+        a: int
+      },
+    ]
+    errS: (〈0;#S〉 & {
+      a: {
+        b: 1
+        c: 2
+      }
+    })
+    errL: (〈0;#L〉 & [
+      {
+        a: 1
+        b: 2
+      },
+    ])
+  }
+  hashIndex: {
+    #: [
+      1,
+      2,
+    ]
+    x: 〈0;#〉[0]
+    y: 〈0;#〉[0:1]
   }
   closeDedup: {
     x: ([

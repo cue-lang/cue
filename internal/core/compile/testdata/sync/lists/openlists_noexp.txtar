@@ -23,6 +23,15 @@ closeBuiltin: {
 	err: c & [1, 2]
 }
 
+// Without the experiment, # followed by [ still indexes a definition
+// named #.
+hashIndex: {
+	#: [1, 2]
+	x: #[0]
+	y: (#)[0]
+	z: #[0:1]
+}
+
 concat: {
 	x: list.Concat([[1], [2]])
 	x: [_, _, 3]
@@ -53,6 +62,15 @@ concat: {
       1,
       2,
     ])
+  }
+  hashIndex: {
+    #: [
+      1,
+      2,
+    ]
+    x: 〈0;#〉[0]
+    y: 〈0;#〉[0]
+    z: 〈0;#〉[0:1]
   }
   concat: {
     x: 〈import;list〉.Concat([

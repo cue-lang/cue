@@ -98,6 +98,9 @@ Available per-file experiments:
     openlists makes list literals open by default outside definitions,
     analogous to structs. A list without a trailing ellipsis is closed
     only within a definition or when closed with the close builtin.
+    It also enables closed literals, #[...] and #{...}, which close a list
+    or struct at its own level; #[1, 2] means what [1, 2] means without
+    the experiment. An index on a definition named # is written (#)[i].
     Proposal: https://cuelang.org/issue/1999
 
 

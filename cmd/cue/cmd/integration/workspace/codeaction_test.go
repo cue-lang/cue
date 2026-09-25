@@ -279,6 +279,35 @@ a:
 	}
 }
 
+// TestCodeActionConvertFromClosedStruct checks that the braces of a closed
+// struct literal, which the openlists experiment enables, are not offered
+// for removal: removing them would drop the closedness.
+func TestCodeActionConvertFromClosedStruct(t *testing.T) {
+	const archive = `-- cue.mod/module.cue --
+module: "closed.test"
+language: version: "v0.18.0"
+-- input.cue --
+@experiment(openlists)
+
+foo: #{
+	bar: "baz"
+}
+`
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, archive, func(t *testing.T, env *I.Env) {
+		env.OpenFile("input.cue")
+		env.Await(env.DoneWithOpen())
+		cursor := protocol.Location{
+			URI:   env.Sandbox.Workdir.RootURI() + "/input.cue",
+			Range: protocol.Range{Start: protocol.Position{Line: 3, Character: 1}}, // bar
+		}
+		actions, err := env.Editor.CodeAction(env.Ctx, cursor, nil)
+		qt.Assert(t, qt.IsNil(err))
+		for _, a := range actions {
+			qt.Check(t, qt.Not(qt.Equals(a.Title, "Remove surrounding struct braces")))
+		}
+	})
+}
+
 func TestCodeActionToggleStructBraces(t *testing.T) {
 	type testCase struct {
 		name     string

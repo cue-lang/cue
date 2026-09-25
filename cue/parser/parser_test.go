@@ -1670,6 +1670,48 @@ bar: 2
 			in: `a~X: {foo: 1}
 	b: X.foo`,
 			out: "a~X: {foo: 1}, b: X.foo",
+		},
+		{
+			desc: "closed literals",
+			in: `@experiment(openlists)
+			a: #[1, 2]
+			b: #{c: 1}
+			c: #[#{d: 1}, #[]]
+			e: #{}`,
+			out: "@experiment(openlists), a: #[1, 2], b: #{c: 1}, c: #[#{d: 1}, #[]], e: #{}",
+		},
+		{
+			desc: "closed struct literal without the experiment",
+			in:   `a: #{b: 1}`,
+			out:  "a: #{b: 1}\nclosed literals require @experiment(openlists)",
+		},
+		{
+			desc: "parenthesized index on a definition named #",
+			in: `@experiment(openlists)
+			#: [1, 2]
+			x: (#)[0]
+			y: (#)[0:1]`,
+			out: "@experiment(openlists), #: [1, 2], x: (#)[0], y: (#)[0:1]",
+		},
+		{
+			desc: "closed literals as call arguments",
+			in: `@experiment(openlists)
+			#: [1, 2]
+			x: f(#[1], #{a: 1}, (#)[0])`,
+			out: "@experiment(openlists), #: [1, 2], x: f(#[1], #{a: 1}, (#)[0])",
+		},
+		{
+			desc: "spaced index on a definition named #",
+			in: `@experiment(openlists)
+			#: [1, 2]
+			x: # [0]`,
+			out: "@experiment(openlists), #: [1, 2], x: #[0]\nan index on a definition named # must be written (#)[...] with @experiment(openlists)",
+		},
+		{
+			desc: "closed list literal with an ellipsis",
+			in: `@experiment(openlists)
+			a: #[1, ...int]`,
+			out: "@experiment(openlists), a: #[1, ...int]\nclosed list literal cannot end in an ellipsis",
 		}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -1693,6 +1735,65 @@ bar: 2
 			}
 		})
 	}
+}
+
+// TestClosedLiterals checks what "#" followed by a bracket parses to, with
+// and without the openlists experiment, where the compact rendering of
+// TestParse cannot tell a closed list from an index.
+func TestClosedLiterals(t *testing.T) {
+	const exp = "@experiment(openlists)\n"
+	value := func(t *testing.T, src string) ast.Expr {
+		t.Helper()
+		f, err := ParseFile("input", src)
+		if err != nil {
+			t.Fatalf("parse %q: %v", src, err)
+		}
+		return f.Decls[len(f.Decls)-1].(*ast.Field).Value
+	}
+
+	t.Run("closed list", func(t *testing.T) {
+		l, ok := value(t, exp+"#: [1]\nx: #[0]").(*ast.ListLit)
+		if !ok || !l.Hash.IsValid() {
+			t.Fatalf("got %#v; want a closed list literal", l)
+		}
+	})
+	t.Run("closed struct", func(t *testing.T) {
+		s, ok := value(t, exp+"x: #{a: 1}").(*ast.StructLit)
+		if !ok || !s.Hash.IsValid() {
+			t.Fatalf("got %#v; want a closed struct literal", s)
+		}
+	})
+	t.Run("open literals", func(t *testing.T) {
+		if l := value(t, exp+"x: [0]").(*ast.ListLit); l.Hash.IsValid() {
+			t.Errorf("list literal without # is closed")
+		}
+		if s := value(t, exp+"x: {a: 1}").(*ast.StructLit); s.Hash.IsValid() {
+			t.Errorf("struct literal without # is closed")
+		}
+	})
+	t.Run("parenthesized index", func(t *testing.T) {
+		x, ok := value(t, exp+"#: [1]\nx: (#)[0]").(*ast.IndexExpr)
+		if !ok {
+			t.Fatalf("got %T; want an index", x)
+		}
+		if _, ok := x.X.(*ast.ParenExpr); !ok {
+			t.Errorf("got %T; want a parenthesized #", x.X)
+		}
+	})
+	t.Run("index without the experiment", func(t *testing.T) {
+		for _, src := range []string{"#: [1]\nx: #[0]", "#: [1]\nx: #[0:1]"} {
+			switch x := value(t, src).(type) {
+			case *ast.IndexExpr, *ast.SliceExpr:
+			default:
+				t.Errorf("%q: got %T; want an index or slice", src, x)
+			}
+		}
+	})
+	t.Run("label", func(t *testing.T) {
+		if _, err := ParseFile("input", exp+"a: {#[string]: int}"); err == nil {
+			t.Errorf("a closed list literal as a label parsed without error")
+		}
+	})
 }
 
 func TestStrict(t *testing.T) {

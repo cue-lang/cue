@@ -573,7 +573,7 @@ func unchainField(f *ast.Field) (chain []*ast.Field, collapsible bool) {
 	cur := f
 	for {
 		sl, ok := cur.Value.(*ast.StructLit)
-		if !ok || sl.Lbrace.IsValid() || len(sl.Elts) != 1 || len(ast.Comments(sl)) > 0 {
+		if !ok || braced(sl) || len(sl.Elts) != 1 || len(ast.Comments(sl)) > 0 {
 			break
 		}
 		inner, ok := sl.Elts[0].(*ast.Field)
@@ -1110,7 +1110,7 @@ func (c *converter) label(l ast.Label) doc {
 		return c.interpolation(x)
 	case *ast.ListLit:
 		if len(x.Elts) == 1 {
-			return cats(lBracketLit, c.expr(x.Elts[0]), rBracketLit)
+			return cats(listOpener(x), c.expr(x.Elts[0]), rBracketLit)
 		}
 		return c.listLit(x)
 	case *ast.ParenExpr:
@@ -1320,21 +1320,21 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 
 	switch {
 	case len(elems) == 0 && !hasInterior:
-		return stringLit("{}")
+		return cats(structOpener(x), rBraceLit)
 	case len(elems) == 1 && !hasInterior && !nodeType[*ast.Field](elems[0]) && c.shouldHug(elems[0]):
 		// A struct hugs only when its single element renders the value
 		// directly after the brace - an embed (`{ {...} }`). A *Field*
 		// (`field: {...}`) would wedge the label between the braces
 		// (`{field: {`), so it falls through to the broken layout
 		// below.
-		return cats(lBraceLit, c.decl(elems[0]), rBraceLit)
+		return cats(structOpener(x), c.decl(elems[0]), rBraceLit)
 	}
 
 	inner := c.wrapInteriorComments(c.declSlice(elems), slots.prefix, slots.suffix)
 
 	layout := bracketedLayout{
 		node:          x,
-		open:          lBraceLit,
+		open:          structOpener(x),
 		close:         rBraceLit,
 		openerRel:     x.Lbrace.RelPos(),
 		closerRel:     x.Rbrace.RelPos(),
@@ -1389,9 +1389,9 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 
 	switch {
 	case len(elems) == 0 && !hasInterior:
-		return stringLit("[]")
+		return cats(listOpener(x), rBracketLit)
 	case len(elems) == 1 && !hasInterior && c.shouldHug(elems[0]):
-		return cats(lBracketLit, c.expr(elems[0]), rBracketLit)
+		return cats(listOpener(x), c.expr(elems[0]), rBracketLit)
 	}
 
 	// Preserve the source's comma style. In the comma-free style no
@@ -1403,7 +1403,7 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 	// listElemRow before building inner.
 	layout := bracketedLayout{
 		node:                x,
-		open:                lBracketLit,
+		open:                listOpener(x),
 		close:               rBracketLit,
 		openerRel:           x.Lbrack.RelPos(),
 		closerRel:           x.Rbrack.RelPos(),
@@ -2230,11 +2230,11 @@ func (c *converter) injectInteriorComments(x ast.Expr, extra []*ast.CommentGroup
 	var closerRel token.RelPos
 	switch n := x.(type) {
 	case *ast.StructLit:
-		open, close = lBraceLit, rBraceLit
+		open, close = structOpener(n), rBraceLit
 		body = c.declSlice(n.Elts)
 		closerRel = n.Rbrace.RelPos()
 	case *ast.ListLit:
-		open, close = lBracketLit, rBracketLit
+		open, close = listOpener(n), rBracketLit
 		omitCommas := listOmitsCommas(n.Elts, n.Lbrack, n.Rbrack)
 		if rows := c.elementRows(n.Elts, false, false, omitCommas); rows != nil {
 			body = table(rows)
@@ -3873,6 +3873,8 @@ var (
 	// commaWhenBroken emits a comma only in broken-mode.
 	commaWhenBroken = switchMode(commaLit, nil)
 	lBracketLit     = stringLit("[")
+	hashLBracket    = stringLit("#[")
+	hashLBrace      = stringLit("#{")
 	rBracketLit     = stringLit("]")
 	lBraceLit       = stringLit("{")
 	rBraceLit       = stringLit("}")
@@ -3963,7 +3965,7 @@ func nodeEndsWithLineComment(n ast.Node) bool {
 func isBracketed(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.StructLit:
-		return x.Lbrace.IsValid()
+		return braced(x)
 	case *ast.ImportDecl:
 		return x.Lparen.IsValid()
 	case *ast.ListLit, *ast.CallExpr, *ast.IndexExpr, *ast.SliceExpr, *ast.ParenExpr:
@@ -4605,9 +4607,9 @@ func allBracketArms(arms []chainArm) bool {
 func isBracketedInjectionTarget(e ast.Expr) bool {
 	switch x := e.(type) {
 	case *ast.StructLit:
-		return x.Lbrace.IsValid()
+		return braced(x)
 	case *ast.ListLit:
-		return x.Lbrack.IsValid()
+		return x.Lbrack.IsValid() || x.Hash.IsValid()
 	}
 	return false
 }
@@ -4618,11 +4620,11 @@ func isBracketedInjectionTarget(e ast.Expr) bool {
 func bracketClose(e ast.Expr) (close token.Pos, empty, bracketed bool) {
 	switch x := e.(type) {
 	case *ast.StructLit:
-		if x.Lbrace.IsValid() {
+		if braced(x) {
 			return x.Rbrace, len(x.Elts) == 0, true
 		}
 	case *ast.ListLit:
-		if x.Lbrack.IsValid() {
+		if x.Lbrack.IsValid() || x.Hash.IsValid() {
 			return x.Rbrack, len(x.Elts) == 0, true
 		}
 	}
@@ -4837,7 +4839,7 @@ func stripPrefixFromInterp(x *ast.Interpolation) string {
 // syntactic home for everything attached.
 func bracelessChainCollapsible(v ast.Expr) bool {
 	sl, ok := v.(*ast.StructLit)
-	if !ok || sl.Lbrace.IsValid() || len(sl.Elts) != 1 {
+	if !ok || braced(sl) || len(sl.Elts) != 1 {
 		return false
 	}
 	inner, ok := sl.Elts[0].(*ast.Field)
@@ -4862,7 +4864,7 @@ func bracelessChainCollapsible(v ast.Expr) bool {
 // own position with its first child's. The StructLit branch is
 // therefore handled separately and only fires for collapsible chains.
 func valNeedsLeadingBreak(v ast.Expr) bool {
-	if sl, ok := v.(*ast.StructLit); ok && !sl.Lbrace.IsValid() {
+	if sl, ok := v.(*ast.StructLit); ok && !braced(sl) {
 		if !bracelessChainCollapsible(v) {
 			return false
 		}
@@ -4890,4 +4892,28 @@ func (s *stack[T]) pop() T {
 func nodeType[T ast.Node](n ast.Node) bool {
 	_, ok := n.(T)
 	return ok
+}
+
+// listOpener returns the opening of a list literal, including the "#" of a
+// closed literal.
+func listOpener(x *ast.ListLit) doc {
+	if x.Hash.IsValid() {
+		return hashLBracket
+	}
+	return lBracketLit
+}
+
+// structOpener returns the opening of a struct literal, including the "#" of
+// a closed literal.
+func structOpener(x *ast.StructLit) doc {
+	if x.Hash.IsValid() {
+		return hashLBrace
+	}
+	return lBraceLit
+}
+
+// braced reports whether a struct literal is rendered with braces: it has
+// them in the source, or it is a closed literal, which always has them.
+func braced(x *ast.StructLit) bool {
+	return x.Lbrace.IsValid() || x.Hash.IsValid()
 }

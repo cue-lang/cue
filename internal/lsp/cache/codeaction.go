@@ -154,7 +154,9 @@ func (w *Workspace) CodeActionConvertFromStruct(ctx context.Context, params *pro
 	if structLit == nil || field == nil {
 		return nil, nil
 	}
-	if len(structLit.Elts) != 1 || !structLit.Lbrace.HasAbsPos() || !structLit.Rbrace.HasAbsPos() {
+	// Removing the braces of a closed literal, #{...}, would drop its
+	// closedness.
+	if len(structLit.Elts) != 1 || !structLit.Lbrace.HasAbsPos() || !structLit.Rbrace.HasAbsPos() || structLit.Hash.IsValid() {
 		return nil, nil
 	}
 

@@ -431,12 +431,18 @@ func DebugStr(x interface{}) (out string) {
 
 	case *ast.StructLit:
 		out := "{"
+		if v.Hash.IsValid() {
+			out = "#{"
+		}
 		out += DebugStr(v.Elts)
 		out += "}"
 		return out
 
 	case *ast.ListLit:
 		out := "["
+		if v.Hash.IsValid() {
+			out = "#["
+		}
 		out += DebugStr(v.Elts)
 		out += "]"
 		return out

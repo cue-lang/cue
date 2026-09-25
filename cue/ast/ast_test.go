@@ -58,6 +58,23 @@ func TestCommentText(t *testing.T) {
 	}
 }
 
+// TestClosedLiteralPos checks that a closed literal starts at its "#" when
+// the position of the "#" is known, and at its bracket otherwise.
+func TestClosedLiteralPos(t *testing.T) {
+	f, err := parser.ParseFile("in", "@experiment(openlists)\nx: #[1]\ny: #{a: 1}\n")
+	qt.Assert(t, qt.IsNil(err))
+	l := f.Decls[1].(*ast.Field).Value.(*ast.ListLit)
+	s := f.Decls[2].(*ast.Field).Value.(*ast.StructLit)
+	qt.Check(t, qt.Equals(l.Pos(), l.Hash))
+	qt.Check(t, qt.Equals(s.Pos(), s.Hash))
+
+	// Without a position for its "#" the literal is open, and starts at
+	// its bracket.
+	l.Hash, s.Hash = token.NoPos, token.NoPos
+	qt.Check(t, qt.Equals(l.Pos(), l.Lbrack))
+	qt.Check(t, qt.Equals(s.Pos(), s.Lbrace))
+}
+
 func TestPackageName(t *testing.T) {
 	testCases := []struct {
 		input string

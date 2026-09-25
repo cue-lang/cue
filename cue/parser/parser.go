@@ -653,6 +653,11 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 
 	switch p.tok {
 	case token.IDENT:
+		if p.lit == "#" {
+			if x := p.parseClosedLiteral(); x != nil {
+				return x
+			}
+		}
 		ident := p.parseIdent()
 		// Check for optional reference marker (?)
 		// Don't consume ? if it's followed by : (that's a field constraint, not optional reference)
@@ -1072,8 +1077,13 @@ func (p *parser) parseField() (decl ast.Decl) {
 	p.expect(token.COLON)
 
 	for {
-		if l, ok := m.Label.(*ast.ListLit); ok && len(l.Elts) != 1 {
-			p.errf(l.Pos(), "square bracket must have exactly one element")
+		if l, ok := m.Label.(*ast.ListLit); ok {
+			switch {
+			case l.Hash.IsValid():
+				p.errf(l.Pos(), "a closed list literal cannot be a label")
+			case len(l.Elts) != 1:
+				p.errf(l.Pos(), "square bracket must have exactly one element")
+			}
 		}
 
 		label, expr, _, ok := p.parseLabel(true)
@@ -1420,6 +1430,58 @@ func (p *parser) parseFallbackClause(clauses []ast.Clause) *ast.FallbackClause {
 		Fallback: pos,
 		Body:     body.(*ast.StructLit),
 	}).(*ast.FallbackClause)
+}
+
+// parseClosedLiteral parses a closed literal, #[...] or #{...}, if the
+// current token is the identifier "#" immediately followed by a bracket, and
+// returns nil otherwise.
+//
+// Without the openlists experiment, "#[" indexes a definition named "#", as
+// it always has. With the experiment, "#[" always starts a closed list, and
+// such an index is written "(#)[...]": "# [" is rejected rather than parsed
+// as an index, as formatting would remove the space.
+func (p *parser) parseClosedLiteral() ast.Expr {
+	// A caller may already have peeked at the token after "#", as call
+	// arguments do to recognize labels.
+	if !p.peekToken.scanned {
+		p.peek()
+	}
+	next := p.peekToken
+	adjacent := next.pos.Offset() == p.pos.Offset()+1
+	enabled := p.experiments != nil && p.experiments.OpenLists
+
+	switch {
+	case next.tok == token.LBRACE && adjacent:
+		if !enabled {
+			p.errf(p.pos, "closed literals require @experiment(openlists)")
+		}
+		hash := p.pos
+		p.next()
+		s, ok := p.parseStruct().(*ast.StructLit)
+		if ok {
+			s.Hash = hash
+		}
+		return s
+
+	case next.tok == token.LBRACK && enabled && !adjacent:
+		p.errf(next.pos, "an index on a definition named # must be written (#)[...] with @experiment(openlists)")
+
+	case next.tok == token.LBRACK && enabled:
+		hash := p.pos
+		p.next()
+		l, ok := p.parseList().(*ast.ListLit)
+		if !ok {
+			return l
+		}
+		l.Hash = hash
+		if n := len(l.Elts); n > 0 {
+			if e, ok := l.Elts[n-1].(*ast.Ellipsis); ok {
+				p.errf(e.Ellipsis, "closed list literal cannot end in an ellipsis")
+			}
+		}
+		return l
+	}
+	return nil
 }
 
 func (p *parser) functionsEnabled() bool {

@@ -689,6 +689,11 @@ func (x *Func) Parameters() []*FuncParam {
 
 // A StructLit node represents a literal struct.
 type StructLit struct {
+	// Hash is the position of the "#" of a closed struct literal, #{...},
+	// which requires the openlists experiment. A literal is closed if Hash
+	// is valid; a constructed node may use a position without a file.
+	Hash token.Pos
+
 	Lbrace token.Pos // position of "{"
 	Elts   []Decl    // list of elements; or nil
 	Rbrace token.Pos // position of "}"
@@ -780,6 +785,11 @@ type embedding EmbedDecl
 
 // A ListLit node represents a literal list.
 type ListLit struct {
+	// Hash is the position of the "#" of a closed list literal, #[...],
+	// which requires the openlists experiment. A literal is closed if Hash
+	// is valid; a constructed node may use a position without a file.
+	Hash token.Pos
+
 	Lbrack token.Pos // position of "["
 
 	// TODO: change to embedding or similar.
@@ -1012,14 +1022,22 @@ func (x *Func) Pos() token.Pos           { return x.Func }
 func (x *Func) pos() *token.Pos          { return &x.Func }
 func (x *StructLit) Pos() token.Pos      { return getPos(x) }
 func (x *StructLit) pos() *token.Pos {
+	if x.Hash.IsValid() {
+		return &x.Hash
+	}
 	if x.Lbrace == token.NoPos && len(x.Elts) > 0 {
 		return x.Elts[0].pos()
 	}
 	return &x.Lbrace
 }
 
-func (x *ListLit) Pos() token.Pos         { return x.Lbrack }
-func (x *ListLit) pos() *token.Pos        { return &x.Lbrack }
+func (x *ListLit) Pos() token.Pos { return *x.pos() }
+func (x *ListLit) pos() *token.Pos {
+	if x.Hash.IsValid() {
+		return &x.Hash
+	}
+	return &x.Lbrack
+}
 func (x *Ellipsis) Pos() token.Pos        { return x.Ellipsis }
 func (x *Ellipsis) pos() *token.Pos       { return &x.Ellipsis }
 func (x *LetClause) Pos() token.Pos       { return x.Let }

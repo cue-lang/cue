@@ -964,6 +964,9 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		case !x.Rbrace.HasRelPos() || !x.Elts[0].Pos().HasRelPos():
 			ws |= newline | nooverride
 		}
+		if x.Hash.IsValid() {
+			f.print(x.Hash, "#", noblank)
+		}
 		f.print(x.Lbrace, token.LBRACE, &l, ws, ff, indent)
 		f.prevLbraceOnLine = l == f.lineout
 
@@ -993,6 +996,9 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			ws |= collapseWs
 		}
 
+		if x.Hash.IsValid() {
+			f.print(x.Hash, "#", noblank)
+		}
 		f.print(x.Lbrack, token.LBRACK, ws)
 		f.walkListElems(x.Elts, x.Lbrack, x.Rbrack)
 		f.print(trailcomma, noblank)

@@ -1,0 +1,65 @@
+# Closed literals: the "#" prefix of a list or struct literal is printed
+# directly before the bracket, for nested literals, inside definitions, and
+# next to comments, with and without the parser's positions.
+-- in --
+@experiment(openlists)
+
+a: #[1, 2]
+b: #{c: 1}
+nested: #[#{a: 1}, #[2, 3]]
+#D: {
+	l: #[{a: int}]
+	s: #{
+		// a comment
+		x: int
+	}
+}
+long: #[
+	"first element",
+	"second element",
+]
+// a comment before a closed list
+commented: #[1]
+idx: (#)[0]
+empty: #[]
+emptyStruct: #{}
+-- out/relpos --
+@experiment(openlists)
+
+a:      #[1, 2]
+b:      #{c: 1}
+nested: #[#{a: 1}, #[2, 3]]
+#D: {
+	l: #[{a: int}]
+	s: #{
+		// a comment
+		x: int
+	}
+}
+long: #[
+	"first element",
+	"second element",
+]
+// a comment before a closed list
+commented:   #[1]
+idx:         (#)[0]
+empty:       #[]
+emptyStruct: #{}
+-- out/norelpos --
+@experiment(openlists)
+a:      #[1, 2]
+b:      #{c: 1}
+nested: #[#{a: 1}, #[2, 3]]
+#D: {
+	l: #[{a: int}]
+	s: #{
+		// a comment
+		x: int
+	}
+}
+long: #["first element", "second element"]
+// a comment before a closed list
+commented:   #[1]
+idx:         (#)[0]
+empty:       #[]
+emptyStruct: #{}

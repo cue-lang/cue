@@ -171,6 +171,45 @@ func TestFuncParamComments(t *testing.T) {
 	}
 }
 
+// TestClosedLiterals checks that both formatters keep the "#" of closed
+// literals, which the openlists experiment enables, for parsed and for
+// constructed nodes.
+func TestClosedLiterals(t *testing.T) {
+	const src = "@experiment(openlists)\n\n" +
+		"a: #[1, 2]\n" +
+		"b: #{c: 1}\n" +
+		"c: #[#{d: 1}, #[]]\n" +
+		"d: #{}\n" +
+		"e: (#)[0]\n"
+
+	list := &ast.ListLit{Hash: token.NoSpace.Pos(), Elts: []ast.Expr{ast.NewLit(token.INT, "1")}}
+	strct := &ast.StructLit{Hash: token.NoSpace.Pos(), Elts: []ast.Decl{
+		&ast.Field{Label: ast.NewIdent("a"), Value: ast.NewLit(token.INT, "1")},
+	}}
+
+	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
+	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
+
+	for _, v2 := range []bool{false, true} {
+		t.Run(fmt.Sprintf("formatv2=%v", v2), func(t *testing.T) {
+			cueexperiment.Flags.FormatV2 = v2
+
+			got, err := format.Source([]byte(src))
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(got), src))
+
+			b, err := format.Node(list)
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(b), "#[1]"))
+
+			b, err = format.Node(strct)
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.StringContains(string(b), "#{"))
+			qt.Check(t, qt.StringContains(string(b), "a: 1"))
+		})
+	}
+}
+
 // Verify that the printer can be invoked during initialization.
 func init() {
 	const name = "foobar"

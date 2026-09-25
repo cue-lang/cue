@@ -1,0 +1,33 @@
+# close accepts a list as well as a struct. On a list it closes one level,
+# as on a struct: the list admits only its own elements, and its elements
+# keep their own closedness.
+-- in.cue --
+c:   close([1])
+ok:  c & [1]
+err: c & [1, 2]
+
+oneLevel: close([{a: 1}]) & [{a: 1, b: 2}]
+-- out/compile --
+--- in.cue
+{
+  c: close([
+    1,
+  ])
+  ok: (〈0;c〉 & [
+    1,
+  ])
+  err: (〈0;c〉 & [
+    1,
+    2,
+  ])
+  oneLevel: (close([
+    {
+      a: 1
+    },
+  ]) & [
+    {
+      a: 1
+      b: 2
+    },
+  ])
+}

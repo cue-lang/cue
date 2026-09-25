@@ -132,8 +132,8 @@ var lenBuiltin = &adt.Builtin{
 
 var closeBuiltin = &adt.Builtin{
 	Name:        "close",
-	Params:      []adt.Param{structParam},
-	Result:      adt.StructKind,
+	Params:      []adt.Param{{Value: &adt.BasicType{K: adt.StructKind | adt.ListKind}}},
+	Result:      adt.StructKind | adt.ListKind,
 	PerDisjunct: true,
 	Func: func(call adt.BuiltinCallContext) adt.Expr {
 		c := call.OpContext()

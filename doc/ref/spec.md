@@ -2857,7 +2857,8 @@ len([1, 2, ...])     2
 ### `close`
 
 The builtin function `close` converts a partially defined—or open—struct
-to a fully defined—or closed—struct.
+or list to a fully defined—or closed—one.
+It closes only its argument, not the values nested within it.
 
 ### `__closeAll`
 

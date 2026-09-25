@@ -1,0 +1,24 @@
+# close accepts a list as well as a struct. On a list it closes one level,
+# as on a struct: the list admits only its own elements, and its elements
+# keep their own closedness.
+-- in.cue --
+c:   close([1])
+ok:  c & [1]    @test(eq, [1])
+err: c & [1, 2] @test(err, contains="incompatible list lengths")
+
+oneLevel: close([{a: 1}]) & [{a: 1, b: 2}] @test(eq, [{a: 1, b: 2}])
+-- out/errors.txt --
+[eval] err: incompatible list lengths (1 and 2):
+    ./in.cue:1:12
+-- out/eval/stats --
+Leaks:  2
+Freed:  30
+Reused: 19
+Allocs: 13
+Retain: 0
+
+Unifications: 25
+Conjuncts:    41
+Disjuncts:    2
+
+NumCloseIDs: 7

@@ -1,0 +1,32 @@
+# With @experiment(openlists), data lists merge like structs. A data list
+# without an ellipsis is shown without one; a list with an explicit ellipsis
+# keeps it in eval, and export shows the elements only.
+
+exec cue eval x.cue
+cmp stdout want-eval
+
+exec cue export x.cue
+cmp stdout want-export
+
+-- x.cue --
+@experiment(openlists)
+
+a: [1, 2]
+a: [_, _, 3]
+b: [...int]
+b: [1, 2]
+-- want-eval --
+a: [1, 2, 3]
+b: [1, 2]
+-- want-export --
+{
+    "a": [
+        1,
+        2,
+        3
+    ],
+    "b": [
+        1,
+        2
+    ]
+}

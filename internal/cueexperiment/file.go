@@ -107,6 +107,13 @@ type File struct {
 	//
 	// Proposal: https://cuelang.org/issue/4484
 	Functions bool `experiment:"preview:v0.18.0"`
+
+	// OpenLists makes list literals open by default outside definitions,
+	// analogous to structs. A list without a trailing ellipsis is closed
+	// only within a definition or when closed with the close builtin.
+	//
+	// Proposal: https://cuelang.org/issue/1999
+	OpenLists bool `experiment:"preview:v0.18.0"`
 }
 
 // LanguageVersion returns the language version of the file or "" if no language

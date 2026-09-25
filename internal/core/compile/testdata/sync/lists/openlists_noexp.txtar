@@ -1,0 +1,72 @@
+# Without @experiment(openlists), list literals outside definitions stay
+# closed: the programs of lists/openlists.txtar keep their current meaning.
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.18.0"
+-- in.cue --
+import "list"
+
+issue1999: {
+	y: [3]
+	y: [_, 4]
+}
+
+empty: {
+	e: []
+	e: [1]
+}
+
+// Accepting lists in close is not gated by the experiment, and has no
+// visible effect without it.
+closeBuiltin: {
+	c:   close([1])
+	err: c & [1, 2]
+}
+
+concat: {
+	x: list.Concat([[1], [2]])
+	x: [_, _, 3]
+}
+-- out/compile --
+--- in.cue
+{
+  issue1999: {
+    y: [
+      3,
+    ]
+    y: [
+      _,
+      4,
+    ]
+  }
+  empty: {
+    e: []
+    e: [
+      1,
+    ]
+  }
+  closeBuiltin: {
+    c: close([
+      1,
+    ])
+    err: (〈0;c〉 & [
+      1,
+      2,
+    ])
+  }
+  concat: {
+    x: 〈import;list〉.Concat([
+      [
+        1,
+      ],
+      [
+        2,
+      ],
+    ])
+    x: [
+      _,
+      _,
+      3,
+    ]
+  }
+}

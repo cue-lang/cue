@@ -1,0 +1,29 @@
+Under @experiment(openlists), a list in a definition is closed like a
+struct, and trim must keep whatever closes a list. A data list merged into a
+list with an ellipsis is open either way, so it may be removed.
+-- in.cue --
+@experiment(openlists)
+
+#D: ports: [{a: 1}, {a: 1}]
+x: #D & {ports: [{a: 1}, {a: 1}]}
+
+service: [string]: ports: [{a: 1}, {a: 1}, ...{extra: 3}]
+service: a: ports: [{a: 1}, {a: 1}]
+-- out/trim-v3 --
+== in.cue
+@experiment(openlists)
+
+#D: ports: [{a: 1}, {a: 1}]
+x: #D & _
+
+service: [string]: ports: [{a: 1}, {a: 1}, ...{extra: 3}]
+service: a: _
+-- out/trim-v3-noshare --
+== in.cue
+@experiment(openlists)
+
+#D: ports: [{a: 1}, {a: 1}]
+x: #D & _
+
+service: [string]: ports: [{a: 1}, {a: 1}, ...{extra: 3}]
+service: a: _

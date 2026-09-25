@@ -1,0 +1,532 @@
+# Tests for @experiment(openlists): list literals are open by default outside
+# definitions (cue-lang/cue#1999).
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.18.0"
+-- in.cue --
+@experiment(openlists)
+
+import "list"
+
+// The example from the issue: data lists unify like data structs.
+issue1999: {
+	y: [3]
+	y: [_, 4]
+}
+
+// Exporting and reapplying the data no longer conflicts.
+exportRoundTrip: {
+	a: [...int]
+	x: [1]
+	y: a & x
+
+	a: []
+	y: [1]
+}
+
+// An empty list literal no longer asserts emptiness.
+empty: {
+	e: []
+	e: [1]
+}
+
+// Lists of structs merge positionally, element by element.
+structElems: {
+	x: [{a: 1}]
+	x: [{b: 2}, {c: 3}]
+}
+
+// A list produced by a comprehension is open data too.
+comprehension: {
+	x: [for i in [1, 2] {i}]
+	x: [_, _, 3]
+}
+
+// Lists in definitions are closed. Closedness is checked like that of a
+// struct with integer labels, independent of the order of fields.
+def: {
+	#D: [1, 2]
+	ok:  #D & [1, 2]
+	err: #D & [1, 2, 3]
+}
+
+nestedDef: {
+	#D: l: [1]
+	err:  #D & {l: [1, 2]}
+	errL: err.l
+}
+
+hiddenDef: {
+	_#D: [1]
+	err: _#D & [1, 2]
+}
+
+// A data list referenced from within a definition is closed there, like a
+// struct, but remains open where it is defined.
+referencedIntoDef: {
+	x: [1]
+	#D: f: x
+	err:  #D & {f: [1, 2]}
+	errF: err.f
+	ok:   x & [1, 2]
+}
+
+// Selecting a field from an inline unification with a definition loses
+// closedness today, for structs and lists alike. Fixing that is a separate
+// change; until then, the list and the struct case behave the same.
+inlineSelection: {
+	#D: l: [1]
+	#E: l: {a: 1}
+	listCase:   (#D & {l: [1, 2]}).l
+	structCase: (#E & {l: {a: 1, b: 2}}).l
+}
+
+// An ellipsis keeps a list in a definition open.
+ellipsisInDef: {
+	#D: [...int]
+	ok: #D & [1, 2]
+}
+
+// The close builtin closes a list outside definitions. Closedness is checked
+// like that of a struct with integer labels.
+closeBuiltin: {
+	c:   close([1])
+	err: c & [1, 2]
+}
+
+// The close builtin closes one level only.
+closeOneLevel: {
+	x: close([{a: 1}]) & [{a: 1, b: 2}]
+}
+
+// Alternatives that differ only in openness are not merged as duplicates.
+closeDedup: {
+	x: [1] | close([1])
+}
+
+closeDedupStruct: {
+	x: {a: 1} | close({a: 1})
+}
+
+// Definitions close recursively: the elements of a list in a definition are
+// closed too.
+defStructElems: {
+	#D: [{a: 1}]
+	err: #D & [{a: 1, b: 2}]
+}
+
+// An empty list in a definition is closed.
+defEmpty: {
+	#D: []
+	err: #D & [1]
+}
+
+// A list in a definition stays closed where it is referenced, like a
+// struct, also through a regular field that holds the definition's value.
+defListRef: {
+	#D: l: [1]
+	#E: l: {a: 1}
+
+	y: #D.l
+	y: [1, 2]
+	z: #E.l
+	z: {a: 1, b: 2}
+
+	y2:        #D.l
+	z2:        #E.l
+	listVia:   y2 & [1, 2]
+	structVia: z2 & {a: 1, b: 2}
+}
+
+// The result of a builtin in a definition is closed there.
+defBuiltin: {
+	#D: list.Concat([[1], [2]])
+	err: #D & [1, 2, 3]
+}
+
+// Disjunctions that discriminate on list length become ambiguous outside
+// definitions, and even with a schema in a definition, as the data list may
+// grow to match the longer disjunct. Structs behave the same way.
+disjByLength: {
+	x: [1] & ([_] | [_, _])
+}
+
+disjByLengthDef: {
+	#T: [_] | [_, _]
+	x: [1] & #T
+}
+
+// Comparison and len use the elements present.
+compare: {
+	a: [1, 2]
+	eq:       a == [1, 2]
+	neqEmpty: a == []
+	lenData:  len(a)
+	lenOpen:  len([1, 2, ...])
+}
+
+// Results of builtins are data and hence open.
+concat: {
+	x: list.Concat([[1], [2]])
+	x: [_, _, 3]
+}
+
+// A trailing ..._|_ still closes a list literal under the experiment: this is
+// how cue fix keeps a list closed that leaves it a literal.
+bottomEllipsis: {
+	x: [1, ..._|_]
+	x: [_, 2]
+}
+
+bottomEllipsisOpen: {
+	x: [1, ..._|_] & [...int]
+	n: len(x)
+}
+
+// close applies to a slice, which is open data under the experiment.
+closeSlice: {
+	x:   [1, 2, 3]
+	y:   close(x[0:1])
+	ok:  y & [1]
+	err: y & [1, 2]
+}
+-- out/compile --
+--- in.cue
+{
+  issue1999: {
+    y: [
+      3,
+    ]
+    y: [
+      _,
+      4,
+    ]
+  }
+  exportRoundTrip: {
+    a: [
+      ...int,
+    ]
+    x: [
+      1,
+    ]
+    y: (〈0;a〉 & 〈0;x〉)
+    a: []
+    y: [
+      1,
+    ]
+  }
+  empty: {
+    e: []
+    e: [
+      1,
+    ]
+  }
+  structElems: {
+    x: [
+      {
+        a: 1
+      },
+    ]
+    x: [
+      {
+        b: 2
+      },
+      {
+        c: 3
+      },
+    ]
+  }
+  comprehension: {
+    x: [
+      for _, i in [
+        1,
+        2,
+      ] {
+        〈1;i〉
+      },
+    ]
+    x: [
+      _,
+      _,
+      3,
+    ]
+  }
+  def: {
+    #D: [
+      1,
+      2,
+    ]
+    ok: (〈0;#D〉 & [
+      1,
+      2,
+    ])
+    err: (〈0;#D〉 & [
+      1,
+      2,
+      3,
+    ])
+  }
+  nestedDef: {
+    #D: {
+      l: [
+        1,
+      ]
+    }
+    err: (〈0;#D〉 & {
+      l: [
+        1,
+        2,
+      ]
+    })
+    errL: 〈0;err〉.l
+  }
+  hiddenDef: {
+    _#D: [
+      1,
+    ]
+    err: (〈0;_#D〉 & [
+      1,
+      2,
+    ])
+  }
+  referencedIntoDef: {
+    x: [
+      1,
+    ]
+    #D: {
+      f: 〈1;x〉
+    }
+    err: (〈0;#D〉 & {
+      f: [
+        1,
+        2,
+      ]
+    })
+    errF: 〈0;err〉.f
+    ok: (〈0;x〉 & [
+      1,
+      2,
+    ])
+  }
+  inlineSelection: {
+    #D: {
+      l: [
+        1,
+      ]
+    }
+    #E: {
+      l: {
+        a: 1
+      }
+    }
+    listCase: (〈0;#D〉 & {
+      l: [
+        1,
+        2,
+      ]
+    }).l
+    structCase: (〈0;#E〉 & {
+      l: {
+        a: 1
+        b: 2
+      }
+    }).l
+  }
+  ellipsisInDef: {
+    #D: [
+      ...int,
+    ]
+    ok: (〈0;#D〉 & [
+      1,
+      2,
+    ])
+  }
+  closeBuiltin: {
+    c: close([
+      1,
+    ])
+    err: (〈0;c〉 & [
+      1,
+      2,
+    ])
+  }
+  closeOneLevel: {
+    x: (close([
+      {
+        a: 1
+      },
+    ]) & [
+      {
+        a: 1
+        b: 2
+      },
+    ])
+  }
+  closeDedup: {
+    x: ([
+      1,
+    ]|close([
+      1,
+    ]))
+  }
+  closeDedupStruct: {
+    x: ({
+      a: 1
+    }|close({
+      a: 1
+    }))
+  }
+  defStructElems: {
+    #D: [
+      {
+        a: 1
+      },
+    ]
+    err: (〈0;#D〉 & [
+      {
+        a: 1
+        b: 2
+      },
+    ])
+  }
+  defEmpty: {
+    #D: []
+    err: (〈0;#D〉 & [
+      1,
+    ])
+  }
+  defListRef: {
+    #D: {
+      l: [
+        1,
+      ]
+    }
+    #E: {
+      l: {
+        a: 1
+      }
+    }
+    y: 〈0;#D〉.l
+    y: [
+      1,
+      2,
+    ]
+    z: 〈0;#E〉.l
+    z: {
+      a: 1
+      b: 2
+    }
+    y2: 〈0;#D〉.l
+    z2: 〈0;#E〉.l
+    listVia: (〈0;y2〉 & [
+      1,
+      2,
+    ])
+    structVia: (〈0;z2〉 & {
+      a: 1
+      b: 2
+    })
+  }
+  defBuiltin: {
+    #D: 〈import;list〉.Concat([
+      [
+        1,
+      ],
+      [
+        2,
+      ],
+    ])
+    err: (〈0;#D〉 & [
+      1,
+      2,
+      3,
+    ])
+  }
+  disjByLength: {
+    x: ([
+      1,
+    ] & ([
+      _,
+    ]|[
+      _,
+      _,
+    ]))
+  }
+  disjByLengthDef: {
+    #T: ([
+      _,
+    ]|[
+      _,
+      _,
+    ])
+    x: ([
+      1,
+    ] & 〈0;#T〉)
+  }
+  compare: {
+    a: [
+      1,
+      2,
+    ]
+    eq: (〈0;a〉 == [
+      1,
+      2,
+    ])
+    neqEmpty: (〈0;a〉 == [])
+    lenData: len(〈0;a〉)
+    lenOpen: len([
+      1,
+      2,
+      ...,
+    ])
+  }
+  concat: {
+    x: 〈import;list〉.Concat([
+      [
+        1,
+      ],
+      [
+        2,
+      ],
+    ])
+    x: [
+      _,
+      _,
+      3,
+    ]
+  }
+  bottomEllipsis: {
+    x: [
+      1,
+      ..._|_(explicit error (_|_ literal) in source),
+    ]
+    x: [
+      _,
+      2,
+    ]
+  }
+  bottomEllipsisOpen: {
+    x: ([
+      1,
+      ..._|_(explicit error (_|_ literal) in source),
+    ] & [
+      ...int,
+    ])
+    n: len(〈0;x〉)
+  }
+  closeSlice: {
+    x: [
+      1,
+      2,
+      3,
+    ]
+    y: close(〈0;x〉[0:1])
+    ok: (〈0;y〉 & [
+      1,
+    ])
+    err: (〈0;y〉 & [
+      1,
+      2,
+    ])
+  }
+}

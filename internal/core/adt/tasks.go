@@ -373,7 +373,11 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 		}
 	}
 
-	isClosed := closedByBottom || ellipsis == nil
+	// Under the OpenLists experiment, a list literal limits the length of the
+	// list only if it ends in ..._|_: a list in a definition, or one closed by
+	// close, is closed by the same check that closes structs, applied to its
+	// integer labels.
+	isClosed := closedByBottom || (ellipsis == nil && !n.openListsEnabled(l))
 
 	switch max := n.maxListLen; {
 	case int(index) < max:
@@ -411,7 +415,12 @@ func processListVertex(c *OpContext, t *task, mode runMode) {
 	l := t.x.(*Vertex)
 
 	elems := slices.Collect(l.Elems())
-	isClosed := l.IsClosedList()
+	// A list value carries the openness of the expression that created it
+	// (see [ListMarkerAt]). Only a list created closed, outside the OpenLists
+	// experiment, limits the length here; other closing, as by close, is
+	// checked like that of a struct.
+	m, _ := l.BaseValue.(*ListMarker)
+	isClosed := m != nil && !m.IsOpen
 
 	// TODO: Share with code above.
 	switch max := n.maxListLen; {
@@ -447,6 +456,19 @@ func processListVertex(c *OpContext, t *task, mode runMode) {
 	}
 
 	n.updateListType(l, t.id, isClosed, nil)
+
+	if lm, ok := l.BaseValue.(*ListMarker); ok && lm.IsOpen && !lm.NoEllipsis {
+		if m, ok := n.node.BaseValue.(*ListMarker); ok {
+			m.NoEllipsis = false
+		}
+	}
+}
+
+// openListsEnabled reports whether the OpenLists experiment applies to the
+// list literal l: according to the file that contains it or, for a literal
+// without a source, the file of the expression that created it.
+func (n *nodeContext) openListsEnabled(l *ListLit) bool {
+	return l.OpenData || Pos(l).Experiment().OpenLists
 }
 
 func (n *nodeContext) updateListType(list Expr, id CloseInfo, isClosed bool, ellipsis Node) {
@@ -455,14 +477,21 @@ func (n *nodeContext) updateListType(list Expr, id CloseInfo, isClosed bool, ell
 	}
 	m, ok := n.node.BaseValue.(*ListMarker)
 	if !ok {
+		// A node that shares another vertex cannot also hold a list of its
+		// own, as it does for close applied to a list. Stop sharing first.
+		if n.isShared {
+			n.unshare()
+		}
 		m = &ListMarker{
-			IsOpen: true,
+			IsOpen:     true,
+			NoEllipsis: true,
 		}
 		n.setBaseValue(m)
 	}
 	m.IsOpen = m.IsOpen && !isClosed
 
 	if ellipsis != nil {
+		m.NoEllipsis = false
 		if src, _ := ellipsis.Source().(ast.Expr); src != nil {
 			if m.Src == nil {
 				m.Src = src

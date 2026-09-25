@@ -1488,7 +1488,12 @@ func (c *OpContext) NewBool(b bool) Value {
 }
 
 func (c *OpContext) newList(src ast.Node, parent *Vertex) *Vertex {
-	return c.newInlineVertex(parent, &ListMarker{})
+	var pos token.Pos
+	if src != nil {
+		pos = src.Pos()
+	}
+	m := *ListMarkerAt(pos)
+	return c.newInlineVertex(parent, &m)
 }
 
 // String reports a string of x, for use in errors or debugging.

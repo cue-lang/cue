@@ -1,0 +1,27 @@
+-- in.cue --
+@experiment(openlists)
+
+import "list"
+
+// A data list has a fixed length once evaluated, so a list that is too short
+// fails validation.
+data: [1, 2] & list.MinItems(3)
+
+// A list with an ellipsis may still grow: it is incomplete, not an error.
+open: [1, 2, ...] & list.MinItems(3)
+-- out/list-v3 --
+Errors:
+data: invalid value [1,2] (does not satisfy list.MinItems(3)): len(list) < MinItems(3) (2 < 3):
+    ./in.cue:7:16
+    ./in.cue:7:7
+    ./in.cue:7:30
+
+Result:
+import "list"
+
+// A data list has a fixed length once evaluated, so a list that is too short
+// fails validation.
+data: _|_ // data: invalid value [1,2] (does not satisfy list.MinItems(3)): len(list) < MinItems(3) (2 < 3)
+
+// A list with an ellipsis may still grow: it is incomplete, not an error.
+open: list.MinItems(3) & [1, 2, ...]

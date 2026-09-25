@@ -1,0 +1,41 @@
+# The openlists experiment applies per contributing file: a list is open or
+# closed according to the file of the expression that contributed it, also
+# when that expression is a builtin call (cue-lang/cue#1999).
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.18.0"
+-- a.cue --
+package p
+
+import "list"
+
+// This file does not enable the experiment, so the result of the builtin
+// call is closed.
+c: list.Concat([[1], [2]])
+-- b.cue --
+@experiment(openlists)
+
+package p
+
+import "list"
+
+// This file enables the experiment, so the result of the builtin call is
+// open data.
+d: list.Concat([[1], [2]])
+
+cc: c & [_, _, 3] @test(err, contains="incompatible list lengths")
+dd: d & [_, _, 3] @test(eq, [1, 2, 3])
+-- out/errors.txt --
+[eval] cc: incompatible list lengths (2 and 3)
+-- out/eval/stats --
+Leaks:  0
+Freed:  43
+Reused: 23
+Allocs: 20
+Retain: 0
+
+Unifications: 43
+Conjuncts:    64
+Disjuncts:    0
+
+NumCloseIDs: 14

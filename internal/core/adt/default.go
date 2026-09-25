@@ -92,8 +92,10 @@ func (v *Vertex) Default() *Vertex {
 		return w
 
 	case *ListMarker:
-		if !d.IsOpen {
-			// If the list is already closed, avoid the copies below.
+		if !d.IsOpen || d.NoEllipsis {
+			// A closed list is its own default, and so is a list without an
+			// ellipsis: under the OpenLists experiment such a list may grow,
+			// but its default is the list as it is, not a closed copy.
 			return v
 		}
 		m := *d

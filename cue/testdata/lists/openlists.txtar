@@ -1,0 +1,244 @@
+# Tests for @experiment(openlists): list literals are open by default outside
+# definitions (cue-lang/cue#1999).
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.18.0"
+-- in.cue --
+@experiment(openlists)
+
+import "list"
+
+// The example from the issue: data lists unify like data structs.
+issue1999: {
+	@test(permute, count=2)
+	y: [3]
+	y: [_, 4] @test(eq, [3, 4])
+}
+
+// Exporting and reapplying the data no longer conflicts.
+exportRoundTrip: {
+	@test(permute, count=120)
+	a: [...int]
+	x: [1]
+	y: a & x
+
+	a: [] @test(eq, [])
+	y: [1] @test(eq, [1])
+}
+
+// An empty list literal no longer asserts emptiness.
+empty: {
+	e: []
+	e: [1] @test(eq, [1])
+}
+
+// Lists of structs merge positionally, element by element.
+structElems: {
+	x: [{a: 1}]
+	x: [{b: 2}, {c: 3}] @test(eq, [{a: 1, b: 2}, {c: 3}])
+}
+
+// A list produced by a comprehension is open data too.
+comprehension: {
+	x: [for i in [1, 2] {i}]
+	x: [_, _, 3] @test(eq, [1, 2, 3])
+}
+
+// Lists in definitions are closed. Closedness is checked like that of a
+// struct with integer labels, independent of the order of fields.
+def: {
+	@test(permute, count=6)
+	#D: [1, 2]
+	ok:  #D & [1, 2]    @test(eq, [1, 2])
+	err: #D & [1, 2, 3] @test(err, at=2, contains="field not allowed")
+}
+
+nestedDef: {
+	@test(permute, count=6)
+	#D: l: [1]
+	err:  #D & {l: [1, 2]}
+	errL: err.l @test(err, contains="field not allowed")
+}
+
+hiddenDef: {
+	@test(permute, count=2)
+	_#D: [1]
+	err: _#D & [1, 2] @test(err, at=1, contains="field not allowed")
+}
+
+// A data list referenced from within a definition is closed there, like a
+// struct, but remains open where it is defined.
+referencedIntoDef: {
+	@test(permute, count=120)
+	x: [1]
+	#D: f: x
+	err:  #D & {f: [1, 2]}
+	errF: err.f      @test(err, contains="field not allowed")
+	ok:   x & [1, 2] @test(eq, [1, 2])
+}
+
+// Selecting a field from an inline unification with a definition loses
+// closedness today, for structs and lists alike. Fixing that is a separate
+// change; until then, the list and the struct case behave the same.
+inlineSelection: {
+	#D: l: [1]
+	#E: l: {a: 1}
+	listCase:   (#D & {l: [1, 2]}).l       @test(eq, [1, 2], incorrect) @test(err:todo, p=1, contains="not allowed")
+	structCase: (#E & {l: {a: 1, b: 2}}).l @test(eq, {a: 1, b: 2}, incorrect) @test(err:todo, p=1, contains="not allowed")
+}
+
+// An ellipsis keeps a list in a definition open.
+ellipsisInDef: {
+	#D: [...int]
+	ok: #D & [1, 2] @test(eq, [1, 2])
+}
+
+// The close builtin closes a list outside definitions. Closedness is checked
+// like that of a struct with integer labels.
+closeBuiltin: {
+	c:   close([1])
+	err: c & [1, 2] @test(err, at=1, contains="field not allowed")
+}
+
+// The close builtin closes one level only.
+closeOneLevel: {
+	x: close([{a: 1}]) & [{a: 1, b: 2}] @test(eq, [{a: 1, b: 2}])
+}
+
+// Alternatives that differ only in openness are not merged as duplicates.
+closeDedup: {
+	x: [1] | close([1]) @test(eq, [1] | close([1]))
+}
+
+closeDedupStruct: {
+	x: {a: 1} | close({a: 1}) @test(eq, {a: 1} | close({a: 1}))
+}
+
+// Definitions close recursively: the elements of a list in a definition are
+// closed too.
+defStructElems: {
+	#D: [{a: 1}]
+	err: #D & [{a: 1, b: 2}] @test(err, contains="field not allowed")
+}
+
+// An empty list in a definition is closed.
+defEmpty: {
+	#D: []
+	err: #D & [1] @test(err, at=0, contains="field not allowed")
+}
+
+// A list in a definition stays closed where it is referenced, like a
+// struct, also through a regular field that holds the definition's value.
+defListRef: {
+	#D: l: [1]
+	#E: l: {a: 1}
+
+	y: #D.l
+	y: [1, 2] @test(err, at=1, contains="field not allowed")
+	z: #E.l
+	z: {a: 1, b: 2} @test(err, at=b, contains="field not allowed")
+
+	y2:        #D.l
+	z2:        #E.l
+	listVia:   y2 & [1, 2]       @test(err, at=1, contains="field not allowed")
+	structVia: z2 & {a: 1, b: 2} @test(err, at=b, contains="field not allowed")
+}
+
+// The result of a builtin in a definition is closed there.
+defBuiltin: {
+	#D: list.Concat([[1], [2]])
+	err: #D & [1, 2, 3] @test(err, at=2, contains="field not allowed")
+}
+
+// Disjunctions that discriminate on list length become ambiguous outside
+// definitions, and even with a schema in a definition, as the data list may
+// grow to match the longer disjunct. Structs behave the same way.
+disjByLength: {
+	x: [1] & ([_] | [_, _]) @test(eq, [1] | [1, _])
+}
+
+disjByLengthDef: {
+	#T: [_] | [_, _]
+	x: [1] & #T @test(eq, [1] | [1, _])
+}
+
+// Comparison and len use the elements present.
+compare: {
+	a: [1, 2]
+	eq:       a == [1, 2]      @test(eq, true)
+	neqEmpty: a == []          @test(eq, false)
+	lenData:  len(a)           @test(eq, 2)
+	lenOpen:  len([1, 2, ...]) @test(eq, 2)
+}
+
+// Results of builtins are data and hence open.
+concat: {
+	x: list.Concat([[1], [2]])
+	x: [_, _, 3] @test(eq, [1, 2, 3])
+}
+
+// A trailing ..._|_ still closes a list literal under the experiment: this is
+// how cue fix keeps a list closed that leaves it a literal.
+bottomEllipsis: {
+	@test(permute, count=2)
+	x: [1, ..._|_]
+	x: [_, 2] @test(err, contains="incompatible list lengths")
+}
+
+bottomEllipsisOpen: {
+	x: [1, ..._|_] & [...int] @test(eq, [1])
+	n: len(x)                 @test(eq, 1)
+}
+
+// close applies to a slice, which is open data under the experiment.
+closeSlice: {
+	x:   [1, 2, 3]
+	y:   close(x[0:1])
+	ok:  y & [1]    @test(eq, [1])
+	err: y & [1, 2] @test(err, at=1, contains="field not allowed")
+}
+-- out/errors.txt --
+[eval] def.err.2: field not allowed:
+    ./in.cue:47:19
+[eval] nestedDef.err.l.1: field not allowed:
+    ./in.cue:53:21
+[eval] nestedDef.err.l.1: field not allowed:
+    ./in.cue:53:21
+[eval] hiddenDef.err.1: field not allowed:
+    ./in.cue:60:17
+[eval] referencedIntoDef.err.f.1: field not allowed:
+    ./in.cue:69:21
+[eval] referencedIntoDef.err.f.1: field not allowed:
+    ./in.cue:69:21
+[eval] closeBuiltin.err.1: field not allowed:
+    ./in.cue:94:15
+[eval] defStructElems.err.0.b: field not allowed:
+    ./in.cue:115:20
+[eval] defEmpty.err.0: field not allowed:
+    ./in.cue:121:13
+[eval] defListRef.y.1: field not allowed:
+    ./in.cue:131:9
+[eval] defListRef.z.b: field not allowed:
+    ./in.cue:133:12
+[eval] defListRef.listVia.1: field not allowed:
+    ./in.cue:137:22
+[eval] defListRef.structVia.b: field not allowed:
+    ./in.cue:138:25
+[eval] defBuiltin.err.2: field not allowed:
+    ./in.cue:144:19
+[eval] bottomEllipsis.x: incompatible list lengths (1 and 2):
+    ./in.cue:179:5
+[eval] closeSlice.err.1: field not allowed:
+    ./in.cue:192:15
+-- out/eval/stats --
+Leaks:  9
+Freed:  378
+Reused: 312
+Allocs: 75
+Retain: 0
+
+Unifications: 316
+Conjuncts:    638
+Disjuncts:    52
+
+NumCloseIDs: 81

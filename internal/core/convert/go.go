@@ -536,9 +536,16 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// avoiding repeated slice growth in append calls below.
 		numElems := val.Len()
 		src, _ := src.(*ast.ListLit)
+		// Without a source of its own, the list belongs to the file of the
+		// expression being evaluated, such as a builtin call.
+		pos := ctx.Pos()
+		if src != nil {
+			pos = src.Pos()
+		}
 		list := &adt.ListLit{
-			Src:   src,
-			Elems: make([]adt.Elem, 0, numElems),
+			Src:      src,
+			Elems:    make([]adt.Elem, 0, numElems),
+			OpenData: src == nil && pos.Experiment().OpenLists,
 		}
 		v := &adt.Vertex{
 			Arcs: make([]*adt.Vertex, 0, numElems),
@@ -563,7 +570,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 
 		v.AddConjunct(adt.MakeRootConjunct(env, list))
-		v.SetValue(ctx, listMarker)
+		v.SetValue(ctx, adt.ListMarkerAt(pos))
 		v.ForceDone()
 		return v
 	}
@@ -573,7 +580,6 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 // These are effectively singletons, so avoid allocating new ones.
 var (
 	structMarker = &adt.StructMarker{}
-	listMarker   = &adt.ListMarker{}
 )
 
 func fromGoBigInt(x *big.Int) apd.Decimal {

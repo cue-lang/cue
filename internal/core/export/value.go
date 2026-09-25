@@ -511,7 +511,7 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 		l.Elts = append(l.Elts, elem)
 	}
 	m, ok := v.BaseValue.(*adt.ListMarker)
-	if !e.cfg.TakeDefaults && ok && m.IsOpen {
+	if !e.cfg.TakeDefaults && ok && m.IsOpen && !m.NoEllipsis {
 		ellipsis := &ast.Ellipsis{}
 		typ := &adt.Vertex{
 			Parent: v,

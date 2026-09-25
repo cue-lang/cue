@@ -2043,6 +2043,53 @@ func TestDefaults(t *testing.T) {
 	}
 }
 
+func TestLenOpenLists(t *testing.T) {
+	// Under the openlists experiment, a data list without an ellipsis is
+	// open to unification but has a fixed length; a list with an ellipsis
+	// still reports a lower bound, unless it is ..._|_, which closes the list.
+	ctx := cuecontext.New()
+	v := ctx.CompileString("@experiment(openlists)\na: [1, 2]\nb: [1, 2, ...]\nc: [1, 2, ..._|_]")
+	qt.Assert(t, qt.IsNil(v.Err()))
+	for _, tc := range []struct{ path, length string }{
+		{"a", "2"},
+		{"b", "int & >=2"},
+		{"c", "2"},
+	} {
+		got := fmt.Sprint(v.LookupPath(cue.ParsePath(tc.path)).Len())
+		if got != tc.length {
+			t.Errorf("%s: length: got %v; want %v", tc.path, got, tc.length)
+		}
+	}
+}
+
+// TestDefaultsOpenLists checks that under the openlists experiment a list
+// without an ellipsis is its own default, although it may grow, while a
+// list with an ellipsis still defaults to its shortest form. The OpenAPI
+// generator relies on this: it emits a default only where Default reports
+// one, and a definition's list is not a default value.
+func TestDefaultsOpenLists(t *testing.T) {
+	ctx := cuecontext.New()
+	v := ctx.CompileString("@experiment(openlists)\na: [1, 2]\nb: [1, ...int]\n#D: [string, int]")
+	qt.Assert(t, qt.IsNil(v.Err()))
+	for _, tc := range []struct {
+		path string
+		ok   bool
+		def  string
+	}{
+		{"a", false, "[1, 2]"},
+		{"b", true, "[1]"},
+		{"#D", false, "[string, int]"},
+	} {
+		d, ok := v.LookupPath(cue.ParsePath(tc.path)).Default()
+		if ok != tc.ok {
+			t.Errorf("%s: hasDefault: got %v; want %v", tc.path, ok, tc.ok)
+		}
+		if got := fmt.Sprint(d); got != tc.def {
+			t.Errorf("%s: default: got %v; want %v", tc.path, got, tc.def)
+		}
+	}
+}
+
 func TestLen(t *testing.T) {
 	testCases := []struct {
 		input  string

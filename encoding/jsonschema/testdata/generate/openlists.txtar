@@ -1,0 +1,32 @@
+# With @experiment(openlists), a data list is still a constant, and a list
+# in a definition keeps its fixed length.
+-- test.cue --
+@experiment(openlists)
+
+package test
+
+// A data list is a constant.
+data?: [1, 2]
+
+// A list in a definition has a fixed length.
+#Pair: [string, int]
+pair?: #Pair
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: Pair: {
+		type:        "array"
+		description: "A list in a definition has a fixed length."
+		prefixItems: [{type: "string"}, {type: "integer"}]
+		maxItems:    2
+		minItems:    2
+	}
+	type: "object"
+	properties: {
+		data: {
+			description: "A data list is a constant."
+			const:       [1, 2]
+		}
+		pair: $ref: "#/$defs/Pair"
+	}
+}

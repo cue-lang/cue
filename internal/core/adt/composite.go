@@ -1243,11 +1243,18 @@ func (v *Vertex) IsClosedStruct() bool {
 	return isClosed(v)
 }
 
+// IsClosedList reports whether v is a list that admits no elements beyond
+// those it has. Under the OpenLists experiment, a list without an ellipsis is
+// closed like a struct: by a definition or by close.
 func (v *Vertex) IsClosedList() bool {
-	if x, ok := v.BaseValue.(*ListMarker); ok {
-		return !x.IsOpen
+	x, ok := v.BaseValue.(*ListMarker)
+	if !ok {
+		return false
 	}
-	return false
+	if !x.IsOpen {
+		return true
+	}
+	return x.NoEllipsis && (v.ClosedRecursive || v.ClosedNonRecursive)
 }
 
 // TODO: return error instead of boolean? (or at least have version that does.)

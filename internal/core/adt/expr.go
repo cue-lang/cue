@@ -194,6 +194,12 @@ type ListLit struct {
 
 	// scalars, comprehensions, ...T
 	Elems []Elem
+
+	// OpenData indicates that this literal, which has no source, was created
+	// by an expression in a file that enables the OpenLists experiment, such
+	// as a builtin whose result is converted from Go. Such a list is open
+	// data, like a list literal written in that file.
+	OpenData bool
 }
 
 func (x *ListLit) Source() ast.Node {
@@ -348,11 +354,31 @@ func (x *Bytes) Kind() Kind       { return BytesKind }
 type ListMarker struct {
 	Src    ast.Expr
 	IsOpen bool
+
+	// NoEllipsis indicates that none of the list literals that make up this
+	// list had an ellipsis: an open list is then open only because list
+	// literals are open by default outside definitions (the OpenLists
+	// experiment). Such a list has a fixed length once finalized.
+	NoEllipsis bool
 }
 
 func (x *ListMarker) Source() ast.Node { return x.Src }
 func (x *ListMarker) Kind() Kind       { return ListKind }
 func (x *ListMarker) node()            {}
+
+// closedListMarker is shared by closed lists without an ellipsis that are
+// created outside of evaluating list literals.
+var closedListMarker = &ListMarker{}
+
+// ListMarkerAt returns the marker for a list without an ellipsis created by
+// the expression at pos, such as a builtin call. The list is open data if the
+// file at pos enables the OpenLists experiment, and closed otherwise.
+func ListMarkerAt(pos token.Pos) *ListMarker {
+	if pos.Experiment().OpenLists {
+		return &ListMarker{IsOpen: true, NoEllipsis: true}
+	}
+	return closedListMarker
+}
 
 type StructMarker struct {
 	// TODO: once we introduce open by default lists,
@@ -1258,7 +1284,11 @@ func (x *SliceExpr) evaluate(c *OpContext, state Flags) Value {
 		// conjunct through which a check of the result, such as by close,
 		// finds its elements. Copied arcs carry only the evidence of the
 		// sliced list, and close would reject them as not allowed.
-		lit := &ListLit{}
+		var pos token.Pos
+		if c.src != nil {
+			pos = c.src.Pos()
+		}
+		lit := &ListLit{OpenData: ListMarkerAt(pos).IsOpen}
 		for i, a := range v.Arcs[lo:hi] {
 			if _, err := MakeLabel(a.Source(), int64(i), IntLabel); err != nil {
 				c.AddBottom(&Bottom{

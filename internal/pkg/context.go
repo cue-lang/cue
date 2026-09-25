@@ -298,7 +298,11 @@ func (c *CallCtxt) CueList(i int) List {
 	if v == nil {
 		return List{}
 	}
-	return List{v, v.BaseValue.(*adt.ListMarker).IsOpen}
+	// A list is open to builtins only if it has an ellipsis: a data list
+	// without one is open to unification under the OpenLists experiment, but
+	// its evaluated length is fixed.
+	m := v.BaseValue.(*adt.ListMarker)
+	return List{v, m.IsOpen && !m.NoEllipsis}
 }
 
 func (c *CallCtxt) Iter(i int) (a cue.Iterator) {

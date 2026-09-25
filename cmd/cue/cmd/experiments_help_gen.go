@@ -94,6 +94,12 @@ Available per-file experiments:
     function bodies.
     Proposal: https://cuelang.org/issue/4484
 
+  openlists (preview: v0.18.0)
+    openlists makes list literals open by default outside definitions,
+    analogous to structs. A list without a trailing ellipsis is closed
+    only within a definition or when closed with the close builtin.
+    Proposal: https://cuelang.org/issue/1999
+
 
 ## Global Experiments
 

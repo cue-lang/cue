@@ -1217,7 +1217,7 @@ func (v Value) Len() Value {
 			if x.IsList() {
 				n := &adt.Num{K: adt.IntKind}
 				n.X.SetInt64(int64(iterutil.Count(x.Elems())))
-				if x.IsClosedList() {
+				if m, _ := x.BaseValue.(*adt.ListMarker); x.IsClosedList() || m != nil && m.NoEllipsis {
 					return remakeFinal(v, n)
 				}
 				// Note: this HAS to be a Conjunction value and cannot be

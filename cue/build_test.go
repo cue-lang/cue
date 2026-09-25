@@ -150,6 +150,20 @@ func TestBuildExprClose(t *testing.T) {
 	}
 }
 
+func TestBuildExprCloseList(t *testing.T) {
+	// Closing a list in an expression without a file used to panic while
+	// finalizing a structurally shared node. The list must also be closed.
+	ctx := cuecontext.New()
+	expr, err := parser.ParseExpr("test", "close([1])")
+	qt.Assert(t, qt.IsNil(err))
+	v := ctx.BuildExpr(expr)
+	qt.Assert(t, qt.IsNil(v.Err()))
+	w := ctx.CompileString("[1, 2]")
+	if err := v.Unify(w).Err(); err == nil {
+		t.Error("close([1]) unified with [1, 2] should fail, but succeeded")
+	}
+}
+
 func TestBuild(t *testing.T) {
 	files := func(s ...string) []string { return s }
 	insts := func(i ...*bimport) []*bimport { return i }

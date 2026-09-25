@@ -1,0 +1,49 @@
+# Without @experiment(openlists), list literals outside definitions stay
+# closed: the programs of lists/openlists.txtar keep their current meaning.
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.18.0"
+-- in.cue --
+import "list"
+
+issue1999: {
+	y: [3]
+	y: [_, 4] @test(err, contains="incompatible list lengths")
+}
+
+empty: {
+	e: []
+	e: [1] @test(err, contains="incompatible list lengths")
+}
+
+// Accepting lists in close is not gated by the experiment, and has no
+// visible effect without it.
+closeBuiltin: {
+	c:   close([1])
+	err: c & [1, 2] @test(err, code=eval, contains="incompatible list lengths (%d and %d)", args=[1, 2], pos=[-1:13])
+}
+
+concat: {
+	x: list.Concat([[1], [2]])
+	x: [_, _, 3] @test(err, contains="incompatible list lengths")
+}
+-- out/errors.txt --
+[eval] issue1999.y: incompatible list lengths (1 and 2):
+    ./in.cue:5:5
+[eval] empty.e: incompatible list lengths (0 and 1):
+    ./in.cue:10:5
+[eval] closeBuiltin.err: incompatible list lengths (1 and 2):
+    ./in.cue:16:13
+[eval] concat.x: incompatible list lengths (2 and 3)
+-- out/eval/stats --
+Leaks:  0
+Freed:  38
+Reused: 18
+Allocs: 20
+Retain: 0
+
+Unifications: 36
+Conjuncts:    50
+Disjuncts:    0
+
+NumCloseIDs: 6

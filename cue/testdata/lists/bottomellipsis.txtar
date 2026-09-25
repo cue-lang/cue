@@ -1,0 +1,61 @@
+# A trailing ..._|_ in a list literal. These cases record how the literal
+# behaves today: the ellipsis adds a pattern that every further element
+# fails, but the list itself stays open, so an index past the end is
+# incomplete rather than an error. The two readings agree for unification.
+-- in.cue --
+length: {
+	x: [1, ..._|_]
+	x: [_, 2] @test(err, contains="explicit error")
+}
+
+empty: {
+	x: [..._|_] & [1] @test(err, contains="explicit error")
+}
+
+// The literal closes one level: its elements keep their own closedness.
+oneLevel: {
+	x: [{a: 1}, ..._|_] & [{a: 1, b: 2}] @test(eq, [{a: 1, b: 2}])
+}
+
+// The literal stays a list literal: it can refer to its own elements and
+// keeps the closedness a definition gives its elements.
+selfRef: {
+	l: [1, l[0] + 1, ..._|_] @test(eq, [1, 2])
+}
+
+defElems: {
+	#D: [{a: int}, ..._|_]
+	err: #D & [{a: 1, b: 2}] @test(err, contains="field not allowed")
+}
+
+// An index past the end of the list is incomplete, as the list is open.
+index: {
+	x: [1, ..._|_][3] @test(err, code=incomplete, contains="index out of range")
+}
+
+open: {
+	x: [1, ..._|_] & [...int] @test(eq, [1])
+	n: len(x)                 @test(eq, 1)
+}
+-- out/errors.txt --
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:2:12
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:7:9
+[eval] defElems.err.0.b: field not allowed:
+    ./in.cue:23:20
+[incomplete] index.x: index out of range [3] with length 1:
+    ./in.cue:28:17
+    ./in.cue:28:5
+-- out/eval/stats --
+Leaks:  0
+Freed:  33
+Reused: 20
+Allocs: 13
+Retain: 0
+
+Unifications: 32
+Conjuncts:    46
+Disjuncts:    0
+
+NumCloseIDs: 1

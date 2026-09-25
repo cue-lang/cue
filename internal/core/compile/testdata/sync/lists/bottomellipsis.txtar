@@ -1,0 +1,109 @@
+# A trailing ..._|_ in a list literal. These cases record how the literal
+# behaves today: the ellipsis adds a pattern that every further element
+# fails, but the list itself stays open, so an index past the end is
+# incomplete rather than an error. The two readings agree for unification.
+-- in.cue --
+length: {
+	x: [1, ..._|_]
+	x: [_, 2]
+}
+
+empty: {
+	x: [..._|_] & [1]
+}
+
+// The literal closes one level: its elements keep their own closedness.
+oneLevel: {
+	x: [{a: 1}, ..._|_] & [{a: 1, b: 2}]
+}
+
+// The literal stays a list literal: it can refer to its own elements and
+// keeps the closedness a definition gives its elements.
+selfRef: {
+	l: [1, l[0] + 1, ..._|_]
+}
+
+defElems: {
+	#D: [{a: int}, ..._|_]
+	err: #D & [{a: 1, b: 2}]
+}
+
+// An index past the end of the list is incomplete, as the list is open.
+index: {
+	x: [1, ..._|_][3]
+}
+
+open: {
+	x: [1, ..._|_] & [...int]
+	n: len(x)
+}
+-- out/compile --
+--- in.cue
+{
+  length: {
+    x: [
+      1,
+      ..._|_(explicit error (_|_ literal) in source),
+    ]
+    x: [
+      _,
+      2,
+    ]
+  }
+  empty: {
+    x: ([
+      ..._|_(explicit error (_|_ literal) in source),
+    ] & [
+      1,
+    ])
+  }
+  oneLevel: {
+    x: ([
+      {
+        a: 1
+      },
+      ..._|_(explicit error (_|_ literal) in source),
+    ] & [
+      {
+        a: 1
+        b: 2
+      },
+    ])
+  }
+  selfRef: {
+    l: [
+      1,
+      (〈1;l〉[0] + 1),
+      ..._|_(explicit error (_|_ literal) in source),
+    ]
+  }
+  defElems: {
+    #D: [
+      {
+        a: int
+      },
+      ..._|_(explicit error (_|_ literal) in source),
+    ]
+    err: (〈0;#D〉 & [
+      {
+        a: 1
+        b: 2
+      },
+    ])
+  }
+  index: {
+    x: [
+      1,
+      ..._|_(explicit error (_|_ literal) in source),
+    ][3]
+  }
+  open: {
+    x: ([
+      1,
+      ..._|_(explicit error (_|_ literal) in source),
+    ] & [
+      ...int,
+    ])
+    n: len(〈0;x〉)
+  }
+}

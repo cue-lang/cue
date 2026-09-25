@@ -149,6 +149,15 @@ func (ir *InlineRunner) RecordErrors() *InlineRunner {
 	return ir
 }
 
+// SuppressWritebacks runs the assertions without maintaining the archive, so that
+// CUE_UPDATE=1 rewrites nothing and CUE_UPDATE=diff reports no staleness. It
+// is for a runner over an archive that the test derives rather than owns, and
+// whose assertions are therefore not the archive's to complete. It returns ir.
+func (ir *InlineRunner) SuppressWritebacks() *InlineRunner {
+	ir.r.suppressWritebacks = true
+	return ir
+}
+
 // Run executes all inline test cases in the archive.
 func (ir *InlineRunner) Run() {
 	ir.r.runArchive()

@@ -87,7 +87,7 @@ func runInlineTests(t *testing.T, archive *txtar.Archive, dir string, fixedFiles
 	// Run @test assertions on the original (pre-fix) archive.
 	t.Run("pre-fix", func(t *testing.T) {
 		cap := &cuetxtar.FailCapture{TB: t}
-		runner := cuetxtar.NewInlineRunnerCapture(t, nil, archive, dir, cap)
+		runner := cuetxtar.NewInlineRunnerCapture(t, nil, archive, dir, cap).SuppressWritebacks()
 		runner.Run()
 		if cap.Failed() {
 			t.Errorf("@test assertions failed on original (pre-fix) input:\n%s", cap.Messages())
@@ -100,7 +100,7 @@ func runInlineTests(t *testing.T, archive *txtar.Archive, dir string, fixedFiles
 	// Run @test assertions on the fixed output.
 	t.Run("post-fix", func(t *testing.T) {
 		cap := &cuetxtar.FailCapture{TB: t}
-		runner := cuetxtar.NewInlineRunnerCapture(t, nil, postFixArchive, dir, cap)
+		runner := cuetxtar.NewInlineRunnerCapture(t, nil, postFixArchive, dir, cap).SuppressWritebacks()
 		runner.Run()
 		if cap.Failed() {
 			t.Errorf("@test assertions failed on fixed output:\n%s", cap.Messages())
@@ -187,7 +187,7 @@ tests: {
 		t.Run("post-fix", func(t *testing.T) {
 			postFixArchive := buildPostFixArchive(archive, brokenFixed)
 			cap := &cuetxtar.FailCapture{TB: t}
-			runner := cuetxtar.NewInlineRunnerCapture(t, nil, postFixArchive, dir, cap)
+			runner := cuetxtar.NewInlineRunnerCapture(t, nil, postFixArchive, dir, cap).SuppressWritebacks()
 			runner.Run()
 			if cap.Failed() {
 				postFixFailed = true

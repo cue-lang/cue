@@ -1,0 +1,180 @@
+#exp:openlists
+
+The inline assertions must hold both before the fix, without the
+experiment, and after it, with the experiment and the rewritten lists.
+They check only that an error remains an error: the fix preserves the
+outcome, while the wording of some errors changes. The runs are
+read-only: a detail filled in for one run would fail the other.
+
+-- cue.mod/module.cue --
+module: "openlists.test"
+
+language: version: "v0.18.0"
+
+-- a.cue --
+package foo
+
+import "list"
+
+// A data list stays closed: a longer list still conflicts.
+data: [1, 2]
+dataErr: data & [1, 2, 3] @test(err)
+
+// A list with an ellipsis is left alone.
+open: [1, ...int]
+openOk: open & [1, 2] @test(eq, [1, 2])
+
+// A pattern label is not a list, but the constraint is.
+patterns: [string]: [int, int]
+patterns: a: [1, 2]
+patternErr: patterns.a & [1, 2, 3] @test(err)
+
+// A definition that unifies a list with a list that has an ellipsis keeps
+// its length limit.
+#D: l: [...int] & [1]
+defX: #D & {l: [1, 2]}
+defErr: defX.l @test(err)
+
+// A definition closes its lists already; the fix closes them again, so
+// that the file reads the same with or without the experiment.
+#Pair: [string, int]
+pairErr: #Pair & ["a", 1, 2] @test(err)
+#Twice: l: [1]
+#Twice: l: [...int]
+twice: #Twice & {l: [1, 2]}
+twiceErr: twice.l @test(err)
+#Emb: {#Base, l: [1]}
+#Base: l: [...int]
+emb: #Emb & {l: [1, 2]}
+embErr: emb.l @test(err)
+#Closed: l: [1]
+#Closed: l: [1, ..._|_]
+closedX: #Closed & {l: [1, 2]}
+closedXErr: closedX.l @test(err)
+
+// The results of builtins and slices stay closed.
+concat: list.Concat([[1], [2]])
+concatErr: concat & [1, 2, 3] @test(err)
+slice: data[0:1]
+sliceErr: slice & [1, 2] @test(err)
+
+// A list closed explicitly is not wrapped again.
+closed: close([1])
+closedErr: closed & [1, 2] @test(err)
+
+// An index or slice on a definition named # gains parentheses.
+#: [1, 2]
+hashIdx: #[0] @test(eq, 1)
+hashSlice: #[0:1]
+hashSliceErr: hashSlice & [1, 2] @test(err)
+hashIdxClose: close(#[0]) @test(err)
+hashSliceClose: close(#[0:1])
+hashSliceCloseErr: hashSliceClose & [1, 2] @test(err)
+
+// A slice of a string or bytes literal is not a list and is left alone;
+// the fixed output is what the case checks.
+strSlice: "abc"[0:2]   @test(err, code=eval)
+bytesSlice: 'abc'[0:2] @test(eq, 'ab')
+
+// Another file of the package may open a definition's list: b.cue adds an
+// ellipsis to #Split.l.
+#Split: l: [1]
+split: #Split & {l: [1, 2]}
+splitErr: split.l @test(err)
+
+// A definition's list stays closed through a regular field that holds the
+// definition.
+#Sel: l: [1]
+selRef: #Sel.l
+selErr: selRef & [1, 2] @test(err)
+-- b.cue --
+package foo
+
+#Split: l: [...int]
+-- out/errors.txt --
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "openlists.test"
+language: version: "v0.18.0"
+--- a.cue
+@experiment(openlists)
+
+package foo
+
+import "list"
+
+// A data list stays closed: a longer list still conflicts.
+data:    #[1, 2]
+dataErr: data & #[1, 2, 3] @test(err)
+
+// A list with an ellipsis is left alone.
+open:   [1, ...int]
+openOk: open & #[1, 2] @test(eq, [1, 2])
+
+// A pattern label is not a list, but the constraint is.
+patterns: [string]: #[int, int]
+patterns: a:        #[1, 2]
+patternErr: patterns.a & #[1, 2, 3] @test(err)
+
+// A definition that unifies a list with a list that has an ellipsis keeps
+// its length limit.
+#D: l: [...int] & #[1]
+defX:   #D & {l: #[1, 2]}
+defErr: defX.l @test(err)
+
+// A definition closes its lists already; the fix closes them again, so
+// that the file reads the same with or without the experiment.
+#Pair:   #[string, int]
+pairErr: #Pair & #["a", 1, 2] @test(err)
+#Twice: l: #[1]
+#Twice: l: [...int]
+twice:    #Twice & {l: #[1, 2]}
+twiceErr: twice.l @test(err)
+#Emb:     {#Base, l: #[1]}
+#Base: l: [...int]
+emb:    #Emb & {l: #[1, 2]}
+embErr: emb.l @test(err)
+#Closed: l: #[1]
+#Closed: l: [1, ..._|_]
+closedX:    #Closed & {l: #[1, 2]}
+closedXErr: closedX.l @test(err)
+
+// The results of builtins and slices stay closed.
+concat:    close(list.Concat(#[#[1], #[2]]))
+concatErr: concat & #[1, 2, 3] @test(err)
+slice:     close(data[0:1])
+sliceErr:  slice & #[1, 2]     @test(err)
+
+// A list closed explicitly is not wrapped again.
+closed:    close([1])
+closedErr: closed & #[1, 2] @test(err)
+
+// An index or slice on a definition named # gains parentheses.
+#:                 #[1, 2]
+hashIdx:           (#)[0]                   @test(eq, 1)
+hashSlice:         close((#)[0:1])
+hashSliceErr:      hashSlice & #[1, 2]      @test(err)
+hashIdxClose:      close((#)[0])            @test(err)
+hashSliceClose:    close((#)[0:1])
+hashSliceCloseErr: hashSliceClose & #[1, 2] @test(err)
+
+// A slice of a string or bytes literal is not a list and is left alone;
+// the fixed output is what the case checks.
+strSlice:   "abc"[0:2] @test(err, code=eval)
+bytesSlice: 'abc'[0:2] @test(eq, 'ab')
+
+// Another file of the package may open a definition's list: b.cue adds an
+// ellipsis to #Split.l.
+#Split: l: #[1]
+split:    #Split & {l: #[1, 2]}
+splitErr: split.l @test(err)
+
+// A definition's list stays closed through a regular field that holds the
+// definition.
+#Sel: l: #[1]
+selRef: #Sel.l
+selErr: selRef & #[1, 2] @test(err)
+--- b.cue
+package foo
+
+#Split: l: [...int]

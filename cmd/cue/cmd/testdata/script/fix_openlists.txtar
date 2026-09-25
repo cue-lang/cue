@@ -1,0 +1,32 @@
+# cue fix closes every list that is closed today, including the lists a
+# definition closes, so that a file reads the same with or without the
+# experiment.
+
+exec cue fix --exp=openlists ./pkg
+cmp pkg/in.cue expect/out.cue
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.18.0"
+
+-- pkg/in.cue --
+package p
+
+// Data lists become closed literals; slices are wrapped in close.
+data: [1, 2]
+first: data[0:1]
+
+// A definition closes its list already.
+#D: l: [1]
+-- expect/out.cue --
+@experiment(openlists)
+
+package p
+
+// Data lists become closed literals; slices are wrapped in close.
+data:  #[1, 2]
+first: close(data[0:1])
+
+// A definition closes its list already.
+#D: l: #[1]

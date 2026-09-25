@@ -58,8 +58,14 @@ func elideTop(x ast.Expr) ast.Expr {
 		}
 
 	case *ast.ParenExpr:
-		switch x.X.(type) {
+		switch y := x.X.(type) {
 		case *ast.BinaryExpr, *ast.UnaryExpr:
+		case *ast.Ident:
+			// (#)[i] indexes a definition named #; without the parentheses
+			// #[ starts a closed list under the openlists experiment.
+			if y.Name != "#" {
+				return y
+			}
 		default:
 			return x.X
 		}

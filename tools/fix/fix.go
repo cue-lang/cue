@@ -158,6 +158,12 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		f = fixExperiment(fixAliasV2, f, "aliasv2", targetVersion)
 	}
 
+	if wantExps.OpenLists && !existingExps.OpenLists {
+		f = fixExperiment(func(f *ast.File) (*ast.File, bool) {
+			return fixOpenLists(f)
+		}, f, "openlists", targetVersion)
+	}
+
 	removeStableExperiments(f, targetVersion)
 
 	// Make sure we use the "after" function, and not the "before",

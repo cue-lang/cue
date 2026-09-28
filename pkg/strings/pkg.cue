@@ -23,8 +23,8 @@
 // Package strings implements simple functions to manipulate UTF-8 encoded
 // strings.
 //
-// Some of the functions in this package are specifically intended as field
-// constraints. For instance, MaxRunes as used in this CUE program
+// Some of the functions in this package are specifically intended as
+// validators. For instance, MaxRunes as used in this CUE program
 //
 // 	import "strings"
 //
@@ -47,12 +47,12 @@ Runes: func(s: string) -> [...]
 Repeat: func(s: string, count: int) -> string
 
 // MinRunes reports whether the number of runes (Unicode codepoints) in a string
-// is at least a certain minimum. MinRunes can be used as a field constraint to
+// is at least a certain minimum. MinRunes can be used as a validator to
 // accept all strings for which this property holds.
 MinRunes: (func(min: int) -> validator(string)) | (func(s: string, min: int) -> bool)
 
 // MaxRunes reports whether the number of runes (Unicode codepoints) in a string
-// exceeds a certain maximum. MaxRunes can be used as a field constraint to
+// exceeds a certain maximum. MaxRunes can be used as a validator to
 // accept all strings for which this property holds.
 MaxRunes: (func(max: int) -> validator(string)) | (func(s: string, max: int) -> bool)
 

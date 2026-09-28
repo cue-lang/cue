@@ -1,0 +1,95 @@
+# An import path under the main module's path can resolve either to a package
+# in the main module or to a dependency module whose path is nested under it.
+
+# Without a matching dependency, the package in the main module is used,
+# even when a nested module directory declares the imported path.
+cd $WORK/main
+exec cue export
+cmp stdout $WORK/want-main.json
+
+# With a matching dependency and no such package in the main module,
+# the dependency is used.
+cd $WORK/dep
+exec cue export
+cmp stdout $WORK/want-dep.json
+
+# When both exist, the import is ambiguous.
+cd $WORK/both
+! exec cue export
+cmp stderr $WORK/want-both.stderr
+
+-- want-main.json --
+{
+    "out": "from main module"
+}
+-- want-dep.json --
+{
+    "out": "from dependency"
+}
+-- want-both.stderr --
+foo.com/bar@v0: import failed: cannot find package "foo.com/bar/baz": ambiguous import: found package foo.com/bar/baz in multiple locations:
+	foo.com/bar@v0 (baz)
+	foo.com/bar/baz@v0 v0.0.1 (.):
+    ./p.cue:3:8
+-- main/cue.mod/module.cue --
+module: "foo.com/bar@v0"
+language: version: "v0.17.0"
+-- main/p.cue --
+package p
+
+import "foo.com/bar/baz"
+
+out: baz.x
+-- main/baz/x.cue --
+package baz
+
+x: "from main module"
+-- main/dep/cue.mod/module.cue --
+module: "foo.com/bar/baz@v0"
+language: version: "v0.17.0"
+-- main/dep/x.cue --
+package baz
+
+x: "from dependency"
+-- dep/cue.mod/module.cue --
+module: "foo.com/bar@v0"
+language: version: "v0.17.0"
+deps: "foo.com/bar/baz@v0": v: "v0.0.1"
+-- dep/cue.mod/local-module.cue --
+deps: "foo.com/bar/baz@v0": replaceWith: "./dep"
+-- dep/p.cue --
+package p
+
+import "foo.com/bar/baz"
+
+out: baz.x
+-- dep/dep/cue.mod/module.cue --
+module: "foo.com/bar/baz@v0"
+language: version: "v0.17.0"
+-- dep/dep/x.cue --
+package baz
+
+x: "from dependency"
+-- both/cue.mod/module.cue --
+module: "foo.com/bar@v0"
+language: version: "v0.17.0"
+deps: "foo.com/bar/baz@v0": v: "v0.0.1"
+-- both/cue.mod/local-module.cue --
+deps: "foo.com/bar/baz@v0": replaceWith: "./dep"
+-- both/p.cue --
+package p
+
+import "foo.com/bar/baz"
+
+out: baz.x
+-- both/baz/x.cue --
+package baz
+
+x: "from main module"
+-- both/dep/cue.mod/module.cue --
+module: "foo.com/bar/baz@v0"
+language: version: "v0.17.0"
+-- both/dep/x.cue --
+package baz
+
+x: "from dependency"

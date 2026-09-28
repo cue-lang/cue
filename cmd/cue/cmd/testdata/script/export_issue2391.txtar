@@ -13,7 +13,7 @@ stderr 'not_ok\.cue:26:8'
 
 # The discriminator case from the issue discussion still reports the "type"
 # conflicts of the arms it discarded.
-# TODO(#2391): the error should be the single requirement.cells conflict of
+# TODO(#3607): the error should be the single requirement.cells conflict of
 # the arm that type: "C" selects.
 ! exec cue export job.cue
 stderr 'requirement\.type: conflicting values "A" and "C"'

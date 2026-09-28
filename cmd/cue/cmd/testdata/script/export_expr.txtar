@@ -45,7 +45,7 @@ cd ..
 # Issue 4092: an error in an unrelated top-level hidden field must not block
 # -e, whether the input is named as a file or resolved as a package. The
 # variant where both fields sit inside a struct still fails for both forms.
-# TODO(#4092): -e x.a should print 123 for both forms too.
+# TODO(#3930): -e x.a should print 123 for both forms too.
 cd issue4092
 exec cue export file.cue -e a
 cmp stdout expect-stdout

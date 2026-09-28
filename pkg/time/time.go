@@ -197,16 +197,13 @@ func FormatString(layout, value string) (string, error) {
 //
 // In the absence of a time zone indicator, Parse returns a time in UTC.
 //
-// When parsing a time with a zone offset like -0700, if the offset corresponds
-// to a time zone used by the current location (Local), then Parse uses that
-// location and zone in the returned time. Otherwise it records the time as
-// being in a fabricated location with time fixed at the given zone offset.
+// A zone offset like -0700 is applied, and the result is converted to UTC.
 //
 // Parse currently does not support zone abbreviations like MST. All are
 // interpreted as UTC.
 func Parse(layout, value string) (string, error) {
-	// TODO: should we support locations? The result will be non-hermetic.
-	// See comments on github.com/cue-lang/cue/issues/1522.
+	// Parse in UTC rather than the local time zone so that the result is
+	// hermetic; see https://cuelang.org/issue/1522.
 	t, err := time.ParseInLocation(layout, value, time.UTC)
 	if err != nil {
 		return "", err

@@ -341,7 +341,6 @@ issue1940: {
 // Evaluator 0.5 regression where disjunctions combined with comprehensions
 // produced incorrect results or spurious errors.
 // https://cuelang.org/issue/2209
-// TODO: fix
 
 issue2209: simplified: t1: {
 	#SpecFoo: foo: min: 1

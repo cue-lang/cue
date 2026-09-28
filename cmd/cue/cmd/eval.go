@@ -165,8 +165,8 @@ func runEval(cmd *Command, args []string) error {
 				}
 			}
 
-			// TODO(#553): this can be removed once v.Syntax() below retains line
-			// information.
+			// v.Syntax below does not report non-concrete values as errors,
+			// so check for concreteness explicitly.
 			if e.IsConcrete() || flagConcrete.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
 					errHeader()

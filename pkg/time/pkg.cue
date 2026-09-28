@@ -169,10 +169,7 @@ FormatString: func(layout: string, value: string) -> string
 //
 // In the absence of a time zone indicator, Parse returns a time in UTC.
 //
-// When parsing a time with a zone offset like -0700, if the offset corresponds
-// to a time zone used by the current location (Local), then Parse uses that
-// location and zone in the returned time. Otherwise it records the time as
-// being in a fabricated location with time fixed at the given zone offset.
+// A zone offset like -0700 is applied, and the result is converted to UTC.
 //
 // Parse currently does not support zone abbreviations like MST. All are
 // interpreted as UTC.

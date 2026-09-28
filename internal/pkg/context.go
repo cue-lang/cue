@@ -62,7 +62,13 @@ func (c *CallCtxt) Value(i int) cue.Value {
 		v = value.Make(c.ctx, f)
 	}
 	if !v.IsConcrete() {
-		c.errcf(adt.IncompleteError, "non-concrete argument %d", i)
+		// An incomplete error says why the argument is not concrete; report that.
+		_, x := value.ToInternal(v)
+		if b := x.Bottom(); b != nil {
+			c.Err = &callError{b}
+		} else {
+			c.errcf(adt.IncompleteError, "non-concrete argument %d", i)
+		}
 	}
 	return v
 }

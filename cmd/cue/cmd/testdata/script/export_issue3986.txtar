@@ -1,6 +1,6 @@
 # An incomplete error in a builtin argument, such as a matchN failure caused
-# by an undefined field, is reported as a generic non-concrete argument error,
-# hiding the undefined field.
+# by an undefined field, is reported as is rather than as a generic
+# non-concrete argument error.
 # https://cuelang.org/issue/3986
 
 ! exec cue export in.cue
@@ -20,5 +20,8 @@ out: yaml.Marshal(#OneOf & {
 	foo: _templates.#Foo_typo
 })
 -- stderr.golden --
-out: error in call to encoding/yaml.Marshal: non-concrete argument 0:
+out: error in call to encoding/yaml.Marshal: invalid value {foo:_|_(foo: undefined field: #Foo_typo)} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:10:6
+    ./in.cue:3:9
+    ./in.cue:3:16
+    ./in.cue:10:19

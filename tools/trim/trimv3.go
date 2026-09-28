@@ -168,9 +168,14 @@ func filesV3(files []*ast.File, val cue.Value, cfg *Config) error {
 		// Should not be nil, but just in case.
 		return errors.Newf(val.Pos(), "trim: not a build instance")
 	}
-	dir := inst.Dir
-	dir = strings.TrimRight(dir, string(os.PathSeparator)) +
-		string(os.PathSeparator)
+	// Files outside dir, such as those of a package in a parent directory,
+	// are left alone. Files named as arguments, including stdin, are all
+	// part of the instance.
+	dir := ""
+	if !inst.User {
+		dir = strings.TrimRight(inst.Dir, string(os.PathSeparator)) +
+			string(os.PathSeparator)
+	}
 
 	if cfg.Trace && cfg.TraceWriter == nil {
 		cfg.TraceWriter = os.Stderr

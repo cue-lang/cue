@@ -1,20 +1,18 @@
 # Trimming stdin prints the result to stdout by default.
-# TODO: stdin cannot be reloaded to verify the trim.
 stdin x.cue
-! exec cue trim -
-stderr 'non-absolute file path "-" in overlay'
+exec cue trim -
+cmp stdout want.cue
 
 # An explicit output file is still honored.
 stdin x.cue
-! exec cue trim -o out.cue -
+exec cue trim -o out.cue -
 ! stdout .
-! exists out.cue
+cmp out.cue want.cue
 
 # Files named outside the current directory are trimmed too.
-# TODO: they are left untrimmed.
 cd sub
 exec cue trim -o - ../x.cue
-cmp stdout ../x.cue
+cmp stdout ../want.cue
 
 -- sub/.keep --
 -- x.cue --

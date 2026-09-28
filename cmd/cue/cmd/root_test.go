@@ -77,9 +77,8 @@ func TestCommand(t *testing.T) {
 		var buf bytes.Buffer
 		c.SetOutput(&buf)
 		err = c.Run(ctx)
-		// TODO: trim reads os.Stdin, and stdin cannot be reloaded to verify the trim.
-		qt.Assert(t, qt.ErrorMatches(err, `non-absolute file path "-" in overlay`))
-		qt.Assert(t, qt.Equals(buf.String(), ""))
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(buf.String(), "a: [string]: b: 1\na: x: _\n"))
 	})
 
 	// Verify that we can use the API exposed by the embedded cobra command.

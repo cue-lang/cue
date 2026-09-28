@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -40,7 +41,8 @@ func newTrimCmd(c *Command) *cobra.Command {
 
 A field, struct, or list is removed if it is implied by a constraint, such
 as from an optional field matching a required field, a list type value,
-a comprehension or any other implied content. It will modify the files in place.
+a comprehension or any other implied content. It will modify the files in place,
+except for standard input given as "-", which is written to standard output.
 
 
 Limitations
@@ -98,6 +100,7 @@ func runTrim(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defCfg.loadCfg.Stdin = cmd.InOrStdin()
 	binst := loadFromArgs(args, defCfg.loadCfg)
 	if binst == nil {
 		return nil
@@ -116,7 +119,8 @@ func runTrim(cmd *Command, args []string) error {
 		}
 	}
 
-	overlay := map[string]load.Source{}
+	cfg := *defCfg.loadCfg
+	cfg.Overlay = map[string]load.Source{}
 
 	for i, inst := range binst {
 		root := instances[i]
@@ -128,13 +132,19 @@ func runTrim(cmd *Command, args []string) error {
 		}
 
 		for _, f := range inst.Files {
-			overlay[f.Filename] = load.FromFile(f)
+			if f.Filename == "-" {
+				// The overlay cannot hold stdin, so reload it from the trimmed file.
+				b, err := format.Node(f)
+				if err != nil {
+					return err
+				}
+				cfg.Stdin = bytes.NewReader(b)
+				continue
+			}
+			cfg.Overlay[f.Filename] = load.FromFile(f)
 		}
-
 	}
 
-	cfg := *defCfg.loadCfg
-	cfg.Overlay = overlay
 	tinsts, err := buildInstances(cmd, load.Instances(args, &cfg), false)
 	if err != nil {
 		return err
@@ -175,7 +185,8 @@ func runTrim(cmd *Command, args []string) error {
 				return fmt.Errorf("error formatting file: %v", err)
 			}
 
-			if dst == "-" {
+			// Trimmed stdin goes to stdout unless an output file is given.
+			if dst == "-" || (dst == "" && filename == "-") {
 				_, err := cmd.OutOrStdout().Write(b)
 				if err != nil {
 					return err

@@ -341,7 +341,7 @@ func isLeafError(v cue.Value) bool {
 // filled immediately from the actual error so the annotation is stable after a
 // single CUE_UPDATE=1 pass.
 func (w *eqWriter) writeErrAnnotation(b *strings.Builder, v cue.Value) {
-	if v.Core().V == nil || v.Core().V.DerefValue().Bottom() == nil {
+	if v.Core().V == nil || v.Core().V.Bottom() == nil {
 		return
 	}
 	b.WriteString(" @test(")
@@ -357,7 +357,7 @@ func (w *eqWriter) writeErrAnnotationBody(b *strings.Builder, v cue.Value) {
 	if tv.V == nil {
 		return
 	}
-	bot := tv.V.DerefValue().Bottom()
+	bot := tv.V.Bottom()
 	if bot == nil {
 		return
 	}

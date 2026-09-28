@@ -236,8 +236,6 @@ func addLanguageVersion(v string) (func(*modfile.File) error, error) {
 		}
 
 		if min := modfile.EarliestClosedSchemaVersion(); semver.Compare(v, min) < 0 {
-			// TODO(rogpeppe) We might want to relax this to allow people to
-			// declare an earlier language version (see https://cuelang.org/issue/3145).
 			return nil, fmt.Errorf("language version %q is too early for module.cue schema (earliest allowed is %s)", v, min)
 		}
 		if max := cueversion.LanguageVersion(); semver.Compare(v, max) > 0 {

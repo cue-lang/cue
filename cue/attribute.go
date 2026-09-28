@@ -23,7 +23,9 @@ import (
 	"cuelang.org/go/internal/core/export"
 )
 
-// Attribute returns the attribute data for the given key.
+// Attribute returns the field attribute data for the given key.
+// Declaration attributes are not considered; use [Value.Attributes]
+// with [DeclAttr] to retrieve those.
 // The returned attribute will return an error for any of its methods if there
 // is no attribute for the requested key.
 func (v Value) Attribute(key string) Attribute {
@@ -54,10 +56,10 @@ func nonExistAttr(key string) Attribute {
 	return Attribute{a}
 }
 
-// Attributes reports all field attributes for the Value.
+// Attributes reports the attributes of the kinds selected by mask.
 //
 // To retrieve attributes of multiple kinds, you can bitwise-or kinds together.
-// Use ValueKind to query attributes associated with a value.
+// Use [ValueAttr] to query attributes associated with a value.
 func (v Value) Attributes(mask AttrKind) []Attribute {
 	if v.v == nil {
 		return nil

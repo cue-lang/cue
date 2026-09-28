@@ -24,9 +24,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
-	"github.com/yuin/goldmark"
-	goldast "github.com/yuin/goldmark/ast"
-	"github.com/yuin/goldmark/text"
+	mdast "github.com/yuin/goldmark/v2/ast"
+	mdparser "github.com/yuin/goldmark/v2/parser"
 )
 
 func TestSpecCheck(t *testing.T) {
@@ -35,8 +34,7 @@ func TestSpecCheck(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	md := goldmark.New()
-	doc := md.Parser().Parse(text.NewReader(source))
+	doc := mdparser.New().Parse(source)
 
 	updated := walkNode(t, doc, source)
 
@@ -54,7 +52,7 @@ func TestSpecCheck(t *testing.T) {
 
 // walkNode walks the AST and returns the potentially updated source.
 // Edits are collected and applied in reverse order to preserve offsets.
-func walkNode(t *testing.T, doc goldast.Node, source []byte) []byte {
+func walkNode(t *testing.T, doc mdast.Node, source []byte) []byte {
 	type edit struct {
 		offset int // position in source where comment starts or should be inserted
 		oldLen int // length of existing comment (0 if none)
@@ -63,8 +61,8 @@ func walkNode(t *testing.T, doc goldast.Node, source []byte) []byte {
 	var edits []edit
 
 	for child := doc.FirstChild(); child != nil; child = child.NextSibling() {
-		fcb, ok := child.(*goldast.FencedCodeBlock)
-		if !ok {
+		fcb, ok := child.(*mdast.CodeBlock)
+		if !ok || fcb.CodeBlockKind != mdast.CodeBlockKindFenced {
 			continue
 		}
 		e, ok := checkBlock(t, fcb, source)
@@ -90,19 +88,16 @@ type blockEdit struct {
 }
 
 // closingFenceEnd returns the byte offset right after the closing fence line (including its newline).
-func closingFenceEnd(fcb *goldast.FencedCodeBlock, source []byte) int {
+func closingFenceEnd(fcb *mdast.CodeBlock, source []byte) int {
 	// The content lines end before the closing fence.
 	// Find the closing ``` after the last content line.
 	var endOfContent int
-	if n := fcb.Lines().Len(); n > 0 {
-		last := fcb.Lines().At(n - 1)
-		endOfContent = last.Stop
+	if segs := fcb.Value.Segments(); len(segs) > 0 {
+		endOfContent = segs[len(segs)-1].Stop
 	} else {
 		// Empty code block: closing fence follows the opening fence directly.
 		// Use the start of the block.
-		if fcb.Info != nil {
-			endOfContent = fcb.Info.Segment.Stop
-		}
+		endOfContent = fcb.Info.Index().Stop
 	}
 	// Scan forward past the closing ``` line.
 	idx := bytes.Index(source[endOfContent:], []byte("```"))
@@ -142,11 +137,8 @@ func formatComment(errStr string) string {
 	return commentPrefix + "\n" + errStr + "-->\n"
 }
 
-func checkBlock(t *testing.T, fcb *goldast.FencedCodeBlock, source []byte) (blockEdit, bool) {
-	if fcb.Info == nil {
-		return blockEdit{}, false
-	}
-	info := string(fcb.Info.Value(source))
+func checkBlock(t *testing.T, fcb *mdast.CodeBlock, source []byte) (blockEdit, bool) {
+	info := string(fcb.Info.Bytes(source))
 	fields := strings.Fields(info)
 	if len(fields) == 0 {
 		return blockEdit{}, false
@@ -154,9 +146,8 @@ func checkBlock(t *testing.T, fcb *goldast.FencedCodeBlock, source []byte) (bloc
 
 	// Compute the markdown line number for the opening ``` line.
 	mdLine := 0
-	if fcb.Lines().Len() > 0 {
-		startOffset := fcb.Lines().At(0).Start
-		mdLine = bytes.Count(source[:startOffset], []byte("\n"))
+	if segs := fcb.Value.Segments(); len(segs) > 0 {
+		mdLine = bytes.Count(source[:segs[0].Start], []byte("\n"))
 	}
 	blockPos := fmt.Sprintf("spec.md:%d", mdLine)
 
@@ -189,12 +180,7 @@ func checkBlock(t *testing.T, fcb *goldast.FencedCodeBlock, source []byte) (bloc
 		return blockEdit{}, false
 	}
 
-	var buf bytes.Buffer
-	for i := 0; i < fcb.Lines().Len(); i++ {
-		line := fcb.Lines().At(i)
-		buf.Write(line.Value(source))
-	}
-	src := buf.String()
+	src := string(fcb.Value.Bytes(source))
 
 	// Keep generated diagnostics relative to the example, not to spec.md.
 	_, err := parser.ParseFile("", src, parser.ParseComments)

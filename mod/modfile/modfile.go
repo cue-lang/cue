@@ -22,7 +22,6 @@ package modfile
 import (
 	_ "embed"
 	"fmt"
-	"strings"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -32,6 +31,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -262,7 +262,7 @@ func ParseLegacy(modfile []byte, filename string) (*File, error) {
 	}
 	var f noDepsFile
 	if err := v.Decode(&f); err != nil {
-		return nil, newCUEError(err, filename)
+		return nil, newCUEError(err)
 	}
 	return &File{
 		Module: f.Module,
@@ -490,7 +490,7 @@ func parse(modfile []byte, filename string, defaultLangVersion string) (file *Fi
 		schema := latestSchema
 		v = v.Unify(lookup(schema, cue.Def("#File")))
 		if err := v.Validate(); err != nil {
-			return result{}, newCUEError(err, filename)
+			return result{}, newCUEError(err)
 		}
 		if latest == "v0.0.0" {
 			// The chosen schema is the earliest schema which allowed
@@ -500,7 +500,7 @@ func parse(modfile []byte, filename string, defaultLangVersion string) (file *Fi
 			// This mirrors the behavior of [ParseLegacy].
 			var f noDepsFile
 			if err := v.Decode(&f); err != nil {
-				return result{}, newCUEError(err, filename)
+				return result{}, newCUEError(err)
 			}
 			return result{
 				file: &File{
@@ -550,52 +550,14 @@ func parseDataOnlyCUE(ctx *cue.Context, cueData []byte, filename string) (*ast.F
 	return dec.File(), nil
 }
 
-func newCUEError(err error, filename string) error {
-	ps := errors.Positions(err)
-	for _, p := range ps {
-		if errStr := findErrorComment(p); errStr != "" {
-			return fmt.Errorf("invalid module file: %s", errStr)
+func newCUEError(err error) error {
+	// Calls to the error builtin in the schema carry messages meant for
+	// the user, but their positions point into the schema, so omit them.
+	for _, e := range errors.Errors(err) {
+		if b, ok := e.(interface{ Bottom() *adt.Bottom }); ok && b.Bottom().Code == adt.UserError {
+			return fmt.Errorf("invalid module file: %s", e.Error())
 		}
 	}
 	// TODO we have more potential to improve error messages here.
 	return err
-}
-
-// findErrorComment finds an error comment in the form
-//
-//	//error: ...
-//
-// before the given position.
-// This works as a kind of poor-man's error primitive
-// so we can customize the error strings when verification
-// fails.
-func findErrorComment(p token.Pos) string {
-	if p.Filename() != schemaFile {
-		return ""
-	}
-	off := p.Offset()
-	source := moduleSchemaData
-	if off > len(source) {
-		return ""
-	}
-	source, _, ok := cutLast(source[:off], "\n")
-	if !ok {
-		return ""
-	}
-	_, errorLine, ok := cutLast(source, "\n")
-	if !ok {
-		return ""
-	}
-	errStr, ok := strings.CutPrefix(errorLine, "//error: ")
-	if !ok {
-		return ""
-	}
-	return errStr
-}
-
-func cutLast(s, sep string) (before, after string, found bool) {
-	if i := strings.LastIndex(s, sep); i >= 0 {
-		return s[:i], s[i+len(sep):], true
-	}
-	return "", s, false
 }

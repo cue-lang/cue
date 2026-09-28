@@ -178,7 +178,7 @@ module: "foo.com/bar@v0"
 language: version: "v0.8.6"
 source: kind: "git"
 `,
-	wantError: `invalid module file: source field is not allowed at this language version; need at least v0.9.0-alpha.0`,
+	wantError: `invalid module file: source: not allowed at this language version; need at least v0.9.0-alpha.0`,
 }, {
 	testName: "WithEarlierVersionAndReplace",
 	parse:    Parse,
@@ -190,7 +190,7 @@ deps: "example.com/dep@v0": {
 	replaceWith: "./local_dep"
 }
 `,
-	wantError: `invalid module file: module replace is not allowed at this language version; need at least v0.17.0`,
+	wantError: `invalid module file: deps."example.com/dep@v0".replaceWith: not allowed at this language version; need at least v0.17.0`,
 }, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,

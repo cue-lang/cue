@@ -238,13 +238,13 @@ lists.eIncompat: v3 reports "incomplete" (list element type is abstract) while v
 Verdict: worsening -- v3 does not yet promote the type mismatch to a permanent eval error.
 -- out/eval/stats --
 Leaks:  9
-Freed:  697
-Reused: 625
-Allocs: 81
+Freed:  735
+Reused: 660
+Allocs: 84
 Retain: 0
 
-Unifications: 630
-Conjuncts:    891
-Disjuncts:    59
+Unifications: 666
+Conjuncts:    919
+Disjuncts:    63
 
-NumCloseIDs: 85
+NumCloseIDs: 76

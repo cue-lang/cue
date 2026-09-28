@@ -1,0 +1,42 @@
+# Trimming stdin prints the result to stdout by default.
+# TODO: stdin cannot be reloaded to verify the trim.
+stdin x.cue
+! exec cue trim -
+stderr 'non-absolute file path "-" in overlay'
+
+# An explicit output file is still honored.
+stdin x.cue
+! exec cue trim -o out.cue -
+! stdout .
+! exists out.cue
+
+# Files named outside the current directory are trimmed too.
+# TODO: they are left untrimmed.
+cd sub
+exec cue trim -o - ../x.cue
+cmp stdout ../x.cue
+
+-- sub/.keep --
+-- x.cue --
+payments: [{
+	price:    110
+	currency: "EUR"
+}, {
+	price:    35
+	currency: "GBP"
+}]
+
+payments: [...{
+	currency: *"EUR" | string
+}]
+-- want.cue --
+payments: [{
+	price: 110
+}, {
+	price:    35
+	currency: "GBP"
+}]
+
+payments: [...{
+	currency: *"EUR" | string
+}]

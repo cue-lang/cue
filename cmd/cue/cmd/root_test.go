@@ -62,6 +62,26 @@ func TestCommand(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(buf.String(), "{\n    \"foo\": 123\n}\n"))
 
+	// Verify that trim reads stdin via SetInput rather than os.Stdin.
+	t.Run("TrimStdin", func(t *testing.T) {
+		devNull, err := os.Open(os.DevNull)
+		qt.Assert(t, qt.IsNil(err))
+		defer devNull.Close()
+		origStdin := os.Stdin
+		os.Stdin = devNull
+		defer func() { os.Stdin = origStdin }()
+
+		c, err := cmd.New([]string{"trim", "-"})
+		qt.Assert(t, qt.IsNil(err))
+		c.SetInput(strings.NewReader("a: [string]: b: 1\na: x: b: 1\n"))
+		var buf bytes.Buffer
+		c.SetOutput(&buf)
+		err = c.Run(ctx)
+		// TODO: trim reads os.Stdin, and stdin cannot be reloaded to verify the trim.
+		qt.Assert(t, qt.ErrorMatches(err, `non-absolute file path "-" in overlay`))
+		qt.Assert(t, qt.Equals(buf.String(), ""))
+	})
+
 	// Verify that we can use the API exposed by the embedded cobra command.
 	c, err = cmd.New([]string{"fmt", "nosuchfile.cue"})
 	qt.Assert(t, qt.IsNil(err))

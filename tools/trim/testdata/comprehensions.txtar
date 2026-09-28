@@ -1,9 +1,7 @@
-# TODO(fmt): comprehension incorrectly indented: cuelang.org/issue/1544
-
 #Issue: 1299
 
 -- in.cue --
- if true {
+if true {
 	a_map: {
 		"first": {}
 	}

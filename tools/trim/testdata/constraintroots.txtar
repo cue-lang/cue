@@ -1,5 +1,3 @@
-# TODO(fmt): tabs incorrectly converted to spaces within comments: cuelang.org/issue/1040
-
 // Issue #716
 -- in.cue --
 keepPatternConstraintRoot: {

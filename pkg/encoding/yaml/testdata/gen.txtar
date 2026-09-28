@@ -1,19 +1,17 @@
-# TODO(fmt): wild attempt to align fields of builtin struct arguments: cuelang.org/issue/1546
-
 # generated from the original tests.
 # Henceforth it may be nicer to group tests into separate files.
 -- in.cue --
 import "encoding/yaml"
 
-t1: yaml.Validate("a: 2\n---\na: 4", {a:        <3})
-t2: yaml.Validate("a: 2\n---\na: 4", {a:        <5})
-t3: yaml.Validate("a: 2\n", {a:                 <5, b: int})
+t1: yaml.Validate("a: 2\n---\na: 4", {a: <3})
+t2: yaml.Validate("a: 2\n---\na: 4", {a: <5})
+t3: yaml.Validate("a: 2\n", {a: <5, b: int})
 t4: yaml.ValidatePartial("a: 2\n---\na: 4", {a: <3})
 t5: yaml.ValidatePartial("a: 2\n---\na: 4", {a: <5})
-t6: yaml.ValidatePartial("a: 2\n", {a:          <5, b:  int})
-t7: yaml.MarshalStream([{a:                     1}, {b: 2}])
-t8: yaml.Marshal({b:                            int | *2})
-t9: yaml.MarshalStream([{a:                     1}, {b: int | *2}])
+t6: yaml.ValidatePartial("a: 2\n", {a: <5, b: int})
+t7: yaml.MarshalStream([{a: 1}, {b: 2}])
+t8: yaml.Marshal({b: int | *2})
+t9: yaml.MarshalStream([{a: 1}, {b: int | *2}])
 
 unmarshalStream: {
 	t1:    yaml.UnmarshalStream("a: 1\n---\nb: 2")
@@ -36,11 +34,11 @@ unmarshalTrailingInput: {
 Errors:
 t1: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
     ./in.cue:3:5
-    ./in.cue:3:49
+    ./in.cue:3:42
     yaml.Validate:3:4
 t3: error in call to encoding/yaml.Validate: incomplete value int:
     ./in.cue:5:5
-    ./in.cue:5:56
+    ./in.cue:5:40
 t4: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3):
     ./in.cue:6:5
     ./in.cue:6:49

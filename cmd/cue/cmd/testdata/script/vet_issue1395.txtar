@@ -1,0 +1,42 @@
+# Issue #1395: when unifying two closed schemas fails in every arm of a
+# disjunction, each field that one schema does not allow is reported at its
+# own full path, pointing only at the line which declares it.
+
+! exec cue vet -c openapi.cue
+cmp stderr vet-stderr.golden
+
+-- openapi.cue --
+package contracts
+
+new: cloud: components: schemas: OnboardingResponse: cloudschemas.OnboardingResponse
+
+cloudschemas: OnboardingResponse: properties: bucket: *commonschemas.Bucket.#Ref | commonschemas.Bucket
+
+old: cloud: components: schemas: OnboardingResponse: properties: bucket: properties: retentionRules: {
+	items: type: "object"
+}
+
+commonschemas: Bucket: {
+	#Ref: $ref:                 "x"
+	properties: retentionRules: commonschemas.RetentionRules
+}
+
+commonschemas: RetentionRules: {
+	#Ref: $ref:  "y"
+	items: $ref: "foo"
+}
+
+#New: new
+#Old: old
+
+#Both: #Old & #New
+-- vet-stderr.golden --
+#Both.cloud.components.schemas.OnboardingResponse.properties.bucket: 4 errors in empty disjunction:
+#Both.cloud.components.schemas.OnboardingResponse.properties.bucket.$ref: field not allowed:
+    ./openapi.cue:12:8
+#Both.cloud.components.schemas.OnboardingResponse.properties.bucket.properties: field not allowed:
+    ./openapi.cue:7:74
+#Both.cloud.components.schemas.OnboardingResponse.properties.bucket.properties.retentionRules.items.$ref: field not allowed:
+    ./openapi.cue:18:9
+#Both.cloud.components.schemas.OnboardingResponse.properties.bucket.properties.retentionRules.items.type: field not allowed:
+    ./openapi.cue:8:9

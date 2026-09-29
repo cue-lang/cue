@@ -1362,6 +1362,14 @@ func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 			condition: scalarKnown,
 			mode:      yield,
 		})
+		// An error from a unification, such as x.blah & {}, is not
+		// recorded yet; do not let the empty string hide it.
+		if b, ok := v.(*Bottom); ok {
+			if b != c.errs {
+				c.AddBottom(b)
+			}
+			continue
+		}
 		if x.K == BytesKind {
 			sb.Write(c.ToBytes(v))
 		} else {

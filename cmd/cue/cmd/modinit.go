@@ -31,8 +31,7 @@ func newModInitCmd(c *Command) *cobra.Command {
 		Short: "initialize new module in current directory",
 		Long: `Init initializes a cue.mod directory in the current directory, in effect
 creating a new module rooted at the current directory. The cue.mod
-directory must not already exist. A legacy cue.mod file in the current
-directory is moved to the new subdirectory.
+directory must not already exist.
 
 If the module name is not provided, a default module path (cue.example) will be
 used.
@@ -59,11 +58,8 @@ func runModInit(cmd *Command, args []string) (err error) {
 	}
 
 	mod := filepath.Join(rootWorkingDir(), "cue.mod")
-	if info, err := os.Stat(mod); err == nil {
-		if !info.IsDir() {
-			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
-		}
-		return fmt.Errorf("cue.mod directory already exists")
+	if _, err := os.Stat(mod); err == nil {
+		return fmt.Errorf("cue.mod already exists")
 	}
 	mf := &modfile.File{
 		Module: modulePath,

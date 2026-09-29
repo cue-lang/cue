@@ -622,17 +622,21 @@ display:.
 files:
     $CWD/testdata/testmod/tagswithimports/nonprod.cue`,
 	}, {
+		// A cue.mod file, rather than a cue.mod directory, still marks
+		// the module root, but its contents are ignored. Without imports,
+		// the package loads without error as part of a module with no path.
 		name: "ModuleFileNonDirectory",
 		cfg: &Config{
 			Dir: testdata("testmod_legacymodfile"),
 		},
 		args: []string{"."},
-		want: `err:    cue.mod files are no longer supported; use cue.mod/module.cue
-path:   ""
+		want: `path:   :foo
 module: ""
-root:   ""
-dir:    ""
-display:""`,
+root:   $CWD/testdata/testmod_legacymodfile
+dir:    $CWD/testdata/testmod_legacymodfile
+display:.
+files:
+    $CWD/testdata/testmod_legacymodfile/foo.cue`,
 	}, {
 		// This test checks that files in parent directories
 		// do not result in irrelevant instances appearing

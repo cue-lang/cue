@@ -19,6 +19,8 @@ package cuetxtar
 
 import (
 	"fmt"
+	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -26,6 +28,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/cuetest"
+	"golang.org/x/sync/errgroup"
 )
 
 // runInlinePermutes processes @test(permute) attributes within an inline-form
@@ -182,9 +185,11 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	// Locate the struct literal and the indices of permutable fields in the AST.
 	var targetLit *ast.StructLit
 	var permIndices []int
-	for _, cf := range r.cueFiles {
+	var targetFile int
+	for i, cf := range r.cueFiles {
 		targetLit, permIndices = findPermFieldsAtPath(cf.strippedAST, structPath, fieldNames)
 		if targetLit != nil && len(permIndices) >= 2 {
+			targetFile = i
 			break
 		}
 	}
@@ -194,88 +199,36 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 
 	n := len(permIndices)
 
-	// Save the original AST elements at the permuted positions.
-	origElts := make([]ast.Decl, n)
+	// Name the permuted fields, for reporting a failing ordering.
+	labels := make([]string, n)
 	for i, idx := range permIndices {
-		origElts[i] = targetLit.Elts[idx]
+		if f, ok := targetLit.Elts[idx].(*ast.Field); ok {
+			labels[i] = identStr(f.Label)
+		} else {
+			labels[i] = fmt.Sprintf("[%d]", i)
+		}
 	}
 
-	// Evaluate the baseline (identity permutation / original source order).
-	ctx := r.cueContext()
-	baselineAll, _, err := r.buildValue(ctx, r.cueFiles)
-	if err != nil {
-		t.Errorf("path %s: @test(permute): baseline evaluation error: %v", structPath, err)
-		return 0
-	}
-	baseline := baselineAll.LookupPath(structPath)
-
-	// perm[i] = which origElt goes to permuted position i.
+	// perm[i] = which original field goes to permuted position i.
 	perm := make([]int, n)
 	for i := range perm {
 		perm[i] = i
 	}
 	c := make([]int, n)
 
-	permNum := 0
-	reported := false // report only the first differing permutation
+	type ordering struct {
+		perm []int
+		val  cue.Value
+		err  error
+	}
+	var orderings []*ordering
 
-	// Heap's algorithm: generates all N! permutations via in-place swaps.
+	// Heap's algorithm: generates all N! permutations via in-place swaps,
+	// starting with the identity.
 	var generate func(k int)
 	generate = func(k int) {
 		if k == 1 {
-			permNum++
-			if permNum == 1 {
-				return // skip identity — already evaluated as baseline
-			}
-			// Apply permutation: position permIndices[i] gets origElts[perm[i]].
-			for i, p := range perm {
-				targetLit.Elts[permIndices[i]] = origElts[p]
-			}
-			// Re-evaluate the modified archive.
-			permAll, _, evalErr := r.buildValue(ctx, r.cueFiles)
-			// Restore immediately so subsequent permutations start from original.
-			for i, idx := range permIndices {
-				targetLit.Elts[idx] = origElts[i]
-			}
-			if evalErr != nil || reported {
-				return
-			}
-			permVal := permAll.LookupPath(structPath)
-			cap := &failCapture{TB: t}
-			prevSuppress := r.suppressWritebacks
-			r.suppressWritebacks = true
-			for _, rec := range records {
-				if !pathHasPrefix(rec.path, structPath) {
-					continue
-				}
-				for _, pa := range selectActiveDirectives(records, rec.path, version) {
-					if pa.directive == "permute" {
-						continue // avoid recursion
-					}
-					r.runDirective(cap, rec.path, permAll.LookupPath(rec.path), pa)
-				}
-			}
-			r.suppressWritebacks = prevSuppress
-			// Filter out pos= related failures: pos= specs use absolute
-			// source line numbers that necessarily shift when fields are
-			// reordered. The remaining failures are order-independent
-			// directive checks (code=, contains=, eq, etc.).
-			msgs := stripPosFailureLines(cap.msgs.String())
-			if msgs != "" {
-				reported = true
-				permNames := make([]string, n)
-				for i, p := range perm {
-					if f, ok := origElts[p].(*ast.Field); ok {
-						permNames[i] = identStr(f.Label)
-					} else {
-						permNames[i] = fmt.Sprintf("[%d]", p)
-					}
-				}
-				t.Errorf("path %s: @test(permute): ordering [%s] fails directive checks:\n%s\ngot:  %s\nwant: %s",
-					structPath, strings.Join(permNames, ", "),
-					msgs,
-					r.formatValue(permVal, "", 0), r.formatValue(baseline, "", 0))
-			}
+			orderings = append(orderings, &ordering{perm: slices.Clone(perm)})
 			return
 		}
 		for i := 0; i < k; i++ {
@@ -289,8 +242,87 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 		}
 	}
 	generate(n)
-	t.Logf("path %s: @test(permute): evaluated %d permutations of %d fields", structPath, permNum, n)
-	return permNum
+
+	// Formatting and evaluating the orderings dominates the cost, so do
+	// both in parallel. They do not count towards the archive's stats,
+	// which are recorded before any permutation runs.
+	var g errgroup.Group
+	g.SetLimit(runtime.GOMAXPROCS(0))
+	for _, o := range orderings {
+		g.Go(func() error {
+			o.val, o.err = r.buildPermuted(targetFile, structPath, fieldNames, o.perm)
+			return nil
+		})
+	}
+	g.Wait()
+
+	// The identity ordering is the baseline the others are compared with.
+	if err := orderings[0].err; err != nil {
+		t.Errorf("path %s: @test(permute): baseline evaluation error: %v", structPath, err)
+		return 0
+	}
+	baseline := orderings[0].val.LookupPath(structPath)
+
+	for _, o := range orderings[1:] {
+		if o.err != nil {
+			continue
+		}
+		cap := &failCapture{TB: t}
+		prevSuppress := r.suppressWritebacks
+		r.suppressWritebacks = true
+		for _, rec := range records {
+			if !pathHasPrefix(rec.path, structPath) {
+				continue
+			}
+			for _, pa := range selectActiveDirectives(records, rec.path, version) {
+				if pa.directive == "permute" {
+					continue // avoid recursion
+				}
+				r.runDirective(cap, rec.path, o.val.LookupPath(rec.path), pa)
+			}
+		}
+		r.suppressWritebacks = prevSuppress
+		// Filter out pos= related failures: pos= specs use absolute
+		// source line numbers that necessarily shift when fields are
+		// reordered. The remaining failures are order-independent
+		// directive checks (code=, contains=, eq, etc.).
+		msgs := stripPosFailureLines(cap.msgs.String())
+		if msgs != "" {
+			permNames := make([]string, n)
+			for i, p := range o.perm {
+				permNames[i] = labels[p]
+			}
+			t.Errorf("path %s: @test(permute): ordering [%s] fails directive checks:\n%s\ngot:  %s\nwant: %s",
+				structPath, strings.Join(permNames, ", "),
+				msgs,
+				r.formatValue(o.val.LookupPath(structPath), "", 0), r.formatValue(baseline, "", 0))
+			break // report only the first differing permutation
+		}
+	}
+	t.Logf("path %s: @test(permute): evaluated %d permutations of %d fields", structPath, len(orderings), n)
+	return len(orderings)
+}
+
+// buildPermuted evaluates the archive with the permutable fields of the
+// struct at structPath in r.cueFiles[fileIdx] reordered so that position i
+// holds the field originally at position perm[i]. It reorders a clone of
+// the file, so it may be called concurrently.
+func (r *inlineRunner) buildPermuted(fileIdx int, structPath cue.Path, fieldNames []string, perm []int) (cue.Value, error) {
+	cf := *r.cueFiles[fileIdx]
+	cf.strippedAST = ast.Clone(cf.strippedAST)
+	lit, indices := findPermFieldsAtPath(cf.strippedAST, structPath, fieldNames)
+	elts := slices.Clone(lit.Elts)
+	for i, p := range perm {
+		elts[indices[i]] = lit.Elts[indices[p]]
+	}
+	lit.Elts = elts
+	files := slices.Clone(r.cueFiles)
+	files[fileIdx] = &cf
+	archive, err := r.strippedArchive(files)
+	if err != nil {
+		return cue.Value{}, err
+	}
+	return r.buildStripped(r.cueContext(), archive)
 }
 
 // stripPosFailureLines drops failure lines that report position mismatches

@@ -343,7 +343,7 @@ func (r *inlineRunner) runArchive() {
 	// intentional for tests that assert errors. We only fatal on compile errors.
 	adt.ResetStats()
 	ctx := r.cueContext()
-	val, allRecords, compileErr := r.buildValue(ctx, nil)
+	val, allRecords, compileErr := r.buildFromArchive(ctx)
 	evalStats := adt.TotalStats()
 	if compileErr != nil {
 		r.t.Fatalf("inline: CUE compile error:\n%s", cueerrors.Details(compileErr, nil))
@@ -635,26 +635,6 @@ type cueFileResult struct {
 	hasTestAttrs bool
 }
 
-// buildValue compiles and evaluates CUE files.
-//
-// When cueFiles is nil, loads fresh from r.archive using loadWithConfig (which
-// handles external package imports and cross-file references). @test attributes
-// are recorded from the parsed AST files (but not stripped — CUE ignores them),
-// and r.cueFiles is populated.
-//
-// When cueFiles is non-nil (permutation rebuild), the caller has already
-// modified the AST elements in place (field reordering). buildValue reformats
-// those ASTs, creates a fresh archive, and reloads to produce a new cue.Value
-// that reflects the permuted field ordering.
-func (r *inlineRunner) buildValue(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, []attrRecord, error) {
-	if cueFiles != nil {
-		// Permutation rebuild: format modified ASTs and reload.
-		return r.buildFromFilesViaLoad(ctx, cueFiles)
-	}
-	// Initial load.
-	return r.buildFromArchive(ctx)
-}
-
 // relFilename converts an absolute filename to a relative one by stripping the
 // runner's directory prefix. Falls back to the basename if stripping fails.
 func (r *inlineRunner) relFilename(absPath string) string {
@@ -701,14 +681,14 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrReco
 	return val, allRecords, nil
 }
 
-// buildFromFilesViaLoad formats ASTs, creates a stripped archive, and reloads
-// via loadWithConfig. Used for permutation rebuilds in module-aware archives.
-func (r *inlineRunner) buildFromFilesViaLoad(ctx *cue.Context, cueFiles []*cueFileResult) (cue.Value, []attrRecord, error) {
+// strippedArchive returns a copy of the archive with each of cueFiles
+// formatted from its current AST.
+func (r *inlineRunner) strippedArchive(cueFiles []*cueFileResult) (*txtar.Archive, error) {
 	strippedByName := make(map[string][]byte, len(cueFiles))
 	for _, cf := range cueFiles {
 		b, err := format.Node(cf.strippedAST)
 		if err != nil {
-			return cue.Value{}, nil, fmt.Errorf("format %s: %w", cf.name, err)
+			return nil, fmt.Errorf("format %s: %w", cf.name, err)
 		}
 		strippedByName[cf.name] = b
 	}
@@ -720,20 +700,25 @@ func (r *inlineRunner) buildFromFilesViaLoad(ctx *cue.Context, cueFiles []*cueFi
 			stripped.Files[i].Data = b
 		}
 	}
+	return &stripped, nil
+}
 
-	insts := loadWithConfig(&stripped, r.dir, load.Config{Env: []string{}})
+// buildStripped loads and builds an archive from [inlineRunner.strippedArchive].
+// It does not modify r, so it may be called concurrently.
+func (r *inlineRunner) buildStripped(ctx *cue.Context, stripped *txtar.Archive) (cue.Value, error) {
+	insts := loadWithConfig(stripped, r.dir, load.Config{Env: []string{}})
 	if len(insts) == 0 {
-		return cue.Value{}, nil, fmt.Errorf("no instances found")
+		return cue.Value{}, fmt.Errorf("no instances found")
 	}
 	inst := insts[0]
 	if inst.Err != nil {
-		return cue.Value{}, nil, inst.Err
+		return cue.Value{}, inst.Err
 	}
 	val := ctx.BuildInstance(inst)
 	if val.BuildInstance() == nil && val.Err() != nil {
-		return cue.Value{}, nil, val.Err()
+		return cue.Value{}, val.Err()
 	}
-	return val, nil, nil
+	return val, nil
 }
 
 // cueContext returns the appropriate cue.Context for the current matrix entry.

@@ -1,0 +1,94 @@
+# Errors in unified values used in an interpolation must not be dropped.
+# https://cuelang.org/issue/2201
+# https://cuelang.org/issue/2323
+-- in.cue --
+issue2201: {
+	#f: {
+		#input: _
+		"""
+			\(#input)
+			"""
+	}
+
+	x:   string
+	res: #f & {#input: x, _}
+
+	y1: """
+		# Hello
+
+		\(res)
+		"""
+
+	y2: """
+		# Hello
+
+		\(#f & {#input: x, _})
+		"""
+}
+issue2323: {
+	x: {}
+
+	y1: "\(x.blah)"
+	y2: "\(x.blah & {})"
+	y3: "\(x.blah & 1)"
+	y4: "\(x.blah & string)"
+	y5: '\(x.blah & {})'
+}
+nonConcrete: {
+	x:  string
+	y1: "\(x & string)"
+	y2: '\(x & string)'
+}
+conflict: {
+	y1: "\({a: 1} & {a: 2})"
+	y2: "\(({a: 1} & {a: 2}).a)"
+}
+-- out/compile --
+--- in.cue
+{
+  issue2201: {
+    #f: {
+      #input: _
+      "\(〈0;#input〉)"
+    }
+    x: string
+    res: (〈0;#f〉 & {
+      #input: 〈1;x〉
+      _
+    })
+    y1: "# Hello
+    
+    \(〈0;res〉)"
+    y2: "# Hello
+    
+    \((〈0;#f〉 & {
+      #input: 〈1;x〉
+      _
+    }))"
+  }
+  issue2323: {
+    x: {}
+    y1: "\(〈0;x〉.blah)"
+    y2: "\((〈0;x〉.blah & {}))"
+    y3: "\((〈0;x〉.blah & 1))"
+    y4: "\((〈0;x〉.blah & string))"
+    y5: '\((〈0;x〉.blah & {}))'
+  }
+  nonConcrete: {
+    x: string
+    y1: "\((〈0;x〉 & string))"
+    y2: '\((〈0;x〉 & string))'
+  }
+  conflict: {
+    y1: "\(({
+      a: 1
+    } & {
+      a: 2
+    }))"
+    y2: "\(({
+      a: 1
+    } & {
+      a: 2
+    }).a)"
+  }
+}

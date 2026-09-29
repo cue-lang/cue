@@ -1,0 +1,84 @@
+# Errors in unified values used in an interpolation must not be dropped.
+# https://cuelang.org/issue/2201
+# https://cuelang.org/issue/2323
+-- in.cue --
+issue2201: {
+	#f: {
+		#input: _
+		"""
+			\(#input)
+			"""
+	}
+
+	x:   string
+	res: #f & {#input: x, _} @test(err, code=incomplete, contains="non-concrete value string")
+
+	y1: """
+		# Hello
+
+		\(res)
+		""" @test(err, code=incomplete, contains="non-concrete value string")
+
+	y2: """
+		# Hello
+
+		\(#f & {#input: x, _})
+		""" @test(eq, "# Hello\n\n", incorrect) @test(err:todo, code=incomplete, contains="non-concrete value string")
+}
+issue2323: {
+	x: {}
+
+	y1: "\(x.blah)"          @test(err, code=incomplete, contains="undefined field: blah")
+	y2: "\(x.blah & {})"     @test(eq, "", incorrect) @test(err:todo, code=incomplete, contains="undefined field: blah")
+	y3: "\(x.blah & 1)"      @test(eq, "", incorrect) @test(err:todo, code=incomplete, contains="undefined field: blah")
+	y4: "\(x.blah & string)" @test(eq, "", incorrect) @test(err:todo, code=incomplete, contains="undefined field: blah")
+	y5: '\(x.blah & {})'     @test(eq, '', incorrect) @test(err:todo, code=incomplete, contains="undefined field: blah")
+}
+nonConcrete: {
+	x:  string
+	y1: "\(x & string)" @test(err, code=incomplete, contains="non-concrete value string")
+	y2: '\(x & string)' @test(err, code=incomplete, contains="non-concrete value string")
+}
+conflict: {
+	y1: "\({a: 1} & {a: 2})"     @test(err, code=eval, contains="cannot use {a:1 & 2} (type struct)")
+	y2: "\(({a: 1} & {a: 2}).a)" @test(err, code=eval, contains="conflicting values")
+}
+-- out/errors.txt --
+[incomplete] issue2201.#f: invalid interpolation: non-concrete value _ (type _):
+    ./in.cue:4:3
+[incomplete] issue2201.res: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:4:3
+    ./in.cue:9:7
+[incomplete] issue2201.res: invalid interpolation: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:12:6
+    ./in.cue:4:3
+    ./in.cue:9:7
+[incomplete] issue2323.y1: invalid interpolation: undefined field: blah:
+    ./in.cue:27:6
+    ./in.cue:25:2
+    ./in.cue:27:11
+[incomplete] nonConcrete.y1: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:35:6
+    ./in.cue:35:13
+[incomplete] nonConcrete.y2: invalid interpolation: non-concrete value string (type string):
+    ./in.cue:36:6
+    ./in.cue:36:13
+[eval] conflict.y1: invalid interpolation: cannot use {a:1 & 2} (type struct) as type (bool|string|bytes|number):
+    ./in.cue:39:6
+    ./in.cue:39:9
+[eval] a: invalid interpolation: conflicting values 2 and 1:
+    ./in.cue:40:6
+    ./in.cue:40:14
+    ./in.cue:40:23
+-- out/eval/stats --
+Leaks:  0
+Freed:  35
+Reused: 23
+Allocs: 12
+Retain: 0
+
+Unifications: 34
+Conjuncts:    58
+Disjuncts:    0
+
+NumCloseIDs: 6

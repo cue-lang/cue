@@ -184,7 +184,7 @@ func MakeIdentLabel(r StringIndexer, s, pkgpath string) Feature {
 // its package.
 func HiddenKey(s, pkgPath string) string {
 	// TODO: Consider just using space instead of \x00.
-	return fmt.Sprintf("%s\x00%s", s, pkgPath)
+	return s + "\x00" + pkgPath
 }
 
 // MakeNamedLabel creates a feature for the given name and feature type.

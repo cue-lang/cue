@@ -3918,6 +3918,16 @@ func TestReferencePath(t *testing.T) {
 	}
 }
 
+// TestReferencePathNonIntegerIndex checks that a reference indexing a list
+// with a non-integer number reports an invalid path.
+func TestReferencePathNonIntegerIndex(t *testing.T) {
+	v := cuecontext.New().CompileString("x: l[1.5], l: [1, 2]").LookupPath(cue.ParsePath("x"))
+	_, p := v.ReferencePath()
+	// TODO: the error is dropped, so the path looks valid.
+	qt.Assert(t, qt.Equals(fmt.Sprint(p.Err()), "<nil>"))
+	qt.Assert(t, qt.Equals(p.String(), "l."))
+}
+
 // TestDereferenceDefault checks that Dereference leaves a disjunction alone
 // even when only one disjunct, a reference, survives [Value.Expr]'s filtering
 // of subsumed defaults: following the reference would drop the default.

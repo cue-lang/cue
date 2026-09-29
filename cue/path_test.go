@@ -430,8 +430,7 @@ var selectorTests = []struct {
 	string:       "_foo?",
 	isHidden:     true,
 	isConstraint: true,
-	// TODO: the constraint hides the package scope; this should be "example.com".
-	pkgPath: "",
+	pkgPath:      "example.com",
 }}
 
 func TestSelector(t *testing.T) {

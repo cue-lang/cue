@@ -240,8 +240,12 @@ func (sel Selector) Compare(other Selector) int {
 // PkgPath reports the package scope associated with a hidden label, in the form
 // described by [Hid], or "" if this is not a hidden label.
 func (sel Selector) PkgPath() string {
-	s, _ := sel.sel.(scopedSelector)
-	return s.pkg
+	s := sel.sel
+	if c, ok := s.(constraintSelector); ok {
+		s = c.selector
+	}
+	h, _ := s.(scopedSelector)
+	return h.pkg
 }
 
 // Index returns the index of the selector.

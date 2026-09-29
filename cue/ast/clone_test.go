@@ -150,7 +150,7 @@ func TestClone(t *testing.T) {
 func nodeTypeNames(t *testing.T) []string {
 	t.Helper()
 	pkgs, err := packages.Load(&packages.Config{
-		Mode: packages.NeedName | packages.NeedTypes | packages.NeedImports | packages.NeedDeps,
+		Mode: packages.NeedName | packages.NeedTypes,
 	}, ".")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(len(pkgs), 1))

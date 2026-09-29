@@ -8,10 +8,9 @@
 
 ! exec cue vet x.cue
 stderr 'list1\.1: conflicting values 1 and string'
-# TODO: the errors of later elements and fields are missing.
-! stderr 'list1\.3: conflicting values 2 and string'
+stderr 'list1\.3: conflicting values 2 and string'
 stderr 'struct1\.b: conflicting values 1 and string'
-! stderr 'struct1\.d: conflicting values 2 and string'
+stderr 'struct1\.d: conflicting values 2 and string'
 ! stderr 'does not satisfy'
 
 -- x.cue --

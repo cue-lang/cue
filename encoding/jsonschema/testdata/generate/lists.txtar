@@ -259,6 +259,9 @@ badTupleLength.data.tuple: incompatible list lengths (1 and 2):
 -- out/generate-v3/badTupleType --
 badTupleType.data.tuple.0: conflicting values 1 and string (mismatched types int and string):
     ./datatest/tests.cue:86:16
+badTupleType.data.tuple.1: conflicting values "bar" and int (mismatched types string and int):
+    ./datatest/tests.cue:86:19
+    1:1790
 -- out/generate-v3/ok1 --
 -- out/generate-v3/ok2 --
 -- out/generate-v3/badBoundedPartialTuple --

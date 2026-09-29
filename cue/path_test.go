@@ -129,6 +129,12 @@ func TestPaths(t *testing.T) {
 		err:  true,
 		out:  `_|_ // non-constant expression a`,
 	}, {
+		// TODO: only the first error is kept.
+		path: cue.ParsePath(`b[a][c]`),
+		str:  "_|_",
+		err:  true,
+		out:  `_|_ // non-constant expression a`,
+	}, {
 		path: cue.ParsePath(`b[a]`).Optional(),
 		str:  "_|_",
 		err:  true,

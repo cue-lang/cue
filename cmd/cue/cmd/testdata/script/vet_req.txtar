@@ -22,6 +22,13 @@ cmp stderr expect-stderr5
 ! exec cue vet -c -d '#Schema' def.cue data1.yaml
 cmp stderr expect-stderr6
 
+# Likewise for a data file embedded via @embed.
+# TODO: point at the opening brace of the JSON object.
+cd embed
+! exec cue vet -c .
+cmp stderr ../expect-stderr7
+cd ..
+
 -- in.cue --
 x!: string
 -- data.json --
@@ -49,6 +56,18 @@ nested:
 -- data3.json --
 {
 	"nested": {"req": 3}
+}
+-- embed/cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.14.0"
+-- embed/x.cue --
+@extern(embed)
+package p
+
+x: {name!: string} & _ @embed(file=x.json)
+-- embed/x.json --
+{
+	"other": 1
 }
 -- expect-stdout1 --
 -- expect-stderr1 --
@@ -84,3 +103,7 @@ name: field is required but not present:
 nested.req: field is required but not present:
     ./data1.yaml:1:9
     ./def.cue:4:3
+-- expect-stderr7 --
+x.name: field is required but not present:
+    ./x.cue:4:5
+    x.json:2:3

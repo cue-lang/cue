@@ -1,4 +1,4 @@
-# Scenarios that produce alias-redeclaration errors from astutil.Resolve.
+# Scenarios that produce redeclaration errors from astutil.Resolve.
 # Each .cue file isolates one scenario so out/resolve/errors lists all of
 # them in one place.
 # The old prefix alias syntax (X=) is only accepted below v0.18.0, where
@@ -48,6 +48,15 @@ clash: {
 	let X = 1
 	X: 2
 }
+-- for_clause.cue --
+// A for clause declares its key and value in the same block,
+// yet redeclaring one identifier there is not reported.
+// See https://cuelang.org/issue/4012.
+structFor: {for k, k in {a: 1} {b: k}}
+listFor: [for i, i in [5] {i}]
+
+// The blank identifier _ declares nothing.
+blank: {for _, _ in [1] {a: _}}
 -- out/resolve/errors --
 cannot have both alias and field with name "X" in same scope:
     ./alias_field_clash.cue:4:5
@@ -68,3 +77,19 @@ alias "X" redeclared in same scope:
 4[_]: Scope: 0[<nil>] Node: 0[]
 6[N]: Scope: 0[<nil>] Node: 0[]
 7[_]: Scope: 0[<nil>] Node: 0[]
+-- out/resolve/for_clause --
+3[structFor]: Scope: 0[<nil>]           Node: 0[]
+6[k]:         Scope: 0[<nil>]           Node: 0[]
+7[k]:         Scope: 0[<nil>]           Node: 0[]
+10[a]:        Scope: 0[<nil>]           Node: 0[]
+13[b]:        Scope: 0[<nil>]           Node: 0[]
+14[k]:        Scope: 5[*ast.ForClause]  Node: 7[k]
+16[listFor]:  Scope: 0[<nil>]           Node: 0[]
+18[i]:        Scope: 0[<nil>]           Node: 0[]
+19[i]:        Scope: 0[<nil>]           Node: 0[]
+21[i]:        Scope: 17[*ast.ForClause] Node: 19[i]
+23[blank]:    Scope: 0[<nil>]           Node: 0[]
+26[_]:        Scope: 0[<nil>]           Node: 0[]
+27[_]:        Scope: 0[<nil>]           Node: 0[]
+30[a]:        Scope: 0[<nil>]           Node: 0[]
+31[_]:        Scope: 0[<nil>]           Node: 0[]

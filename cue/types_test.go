@@ -3923,9 +3923,8 @@ func TestReferencePath(t *testing.T) {
 func TestReferencePathNonIntegerIndex(t *testing.T) {
 	v := cuecontext.New().CompileString("x: l[1.5], l: [1, 2]").LookupPath(cue.ParsePath("x"))
 	_, p := v.ReferencePath()
-	// TODO: the error is dropped, so the path looks valid.
-	qt.Assert(t, qt.Equals(fmt.Sprint(p.Err()), "<nil>"))
-	qt.Assert(t, qt.Equals(p.String(), "l."))
+	qt.Assert(t, qt.Equals(fmt.Sprint(p.Err()), "invalid number: 1.5: has fractional part"))
+	qt.Assert(t, qt.Equals(p.String(), "_|_"))
 }
 
 // TestDereferenceDefault checks that Dereference leaves a disjunction alone

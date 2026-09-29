@@ -788,7 +788,7 @@ func valueToSel(v adt.Value) Selector {
 	case *adt.Num:
 		i, err := x.X.Int64()
 		if err != nil {
-			return Selector{&pathError{errors.Promote(err, "invalid number")}}
+			return Selector{pathError{errors.Promote(err, "invalid number")}}
 		}
 		return Index(i)
 	case *adt.String:

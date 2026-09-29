@@ -14,12 +14,44 @@ cmp stderr expect-stderr3
 cmp stdout expect-stdout4
 cmp stderr expect-stderr4
 
+# Each data file is reported for the required fields it lacks.
+# TODO: the errors do not point at the data files, so they cannot be told apart.
+! exec cue vet -c schema.cue data1.yaml data2.yaml data3.json
+cmp stderr expect-stderr5
+
+# Likewise when the schema is a definition.
+# TODO: the errors do not point at the data file.
+! exec cue vet -c -d '#Schema' def.cue data1.yaml
+cmp stderr expect-stderr6
+
 -- in.cue --
 x!: string
 -- data.json --
 {}
 -- data.yaml --
 y: 1
+-- schema.cue --
+name!: string
+nested: {
+	req!: int
+}
+-- def.cue --
+#Schema: {
+	name!: string
+	nested: {
+		req!: int
+	}
+}
+-- data1.yaml --
+nested: {}
+-- data2.yaml --
+name: foo
+nested:
+  other: true
+-- data3.json --
+{
+	"nested": {"req": 3}
+}
 -- expect-stdout1 --
 -- expect-stderr1 --
 some instances are incomplete; use the -c flag to show errors or -c=false to allow incomplete instances
@@ -33,3 +65,17 @@ x: field is required but not present:
 -- expect-stderr4 --
 x: field is required but not present:
     ./in.cue:1:1
+-- expect-stderr5 --
+name: field is required but not present:
+    ./schema.cue:1:1
+nested.req: field is required but not present:
+    ./schema.cue:3:2
+nested.req: field is required but not present:
+    ./schema.cue:3:2
+name: field is required but not present:
+    ./schema.cue:1:1
+-- expect-stderr6 --
+name: field is required but not present:
+    ./def.cue:2:2
+nested.req: field is required but not present:
+    ./def.cue:4:3

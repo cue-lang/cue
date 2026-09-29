@@ -129,6 +129,12 @@ func TestPaths(t *testing.T) {
 		err:  true,
 		out:  `_|_ // non-constant expression a`,
 	}, {
+		// TODO: Optional drops the error of the invalid selector.
+		path: cue.ParsePath(`b[a]`).Optional(),
+		str:  "_|_",
+		err:  false,
+		out:  `_|_ // field not found: ?`,
+	}, {
 		path: cue.ParsePath(`b['1']`),
 		str:  "_|_",
 		err:  true,

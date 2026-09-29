@@ -727,7 +727,10 @@ func (s constraintSelector) constraintType() SelectorType {
 
 func wrapConstraint(s Selector, t SelectorType) Selector {
 	sel := s.sel
-	if c, ok := sel.(constraintSelector); ok {
+	switch c := sel.(type) {
+	case pathError:
+		return s
+	case constraintSelector:
 		if c.constraint == t {
 			return s
 		}

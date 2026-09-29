@@ -293,6 +293,44 @@ a: 1 // replaced
 			return true
 		},
 	}, {
+		// Replace should keep the new node's comments, but it overwrites
+		// them with the old node's.
+		name: "replace keeps new comments",
+		in: `
+a: [
+	// old
+	1,
+	// old
+	2,
+]
+`,
+		out: `
+a: [
+	// old
+	3,
+	// old
+	4,
+]
+`,
+		before: func(c astutil.Cursor) bool {
+			x, ok := c.Node().(*ast.BasicLit)
+			if !ok {
+				return true
+			}
+			switch x.Value {
+			case "1":
+				lit := &ast.BasicLit{ValuePos: x.ValuePos, Kind: token.INT, Value: "3"}
+				ast.AddComment(lit, &ast.CommentGroup{
+					Doc:  true,
+					List: []*ast.Comment{{Slash: ast.Comments(x)[0].Pos(), Text: "// new"}},
+				})
+				c.Replace(lit)
+			case "2":
+				c.Replace(&ast.BasicLit{ValuePos: x.ValuePos, Kind: token.INT, Value: "4"})
+			}
+			return true
+		},
+	}, {
 		name: "imports add",
 		in: `
 a: "string"

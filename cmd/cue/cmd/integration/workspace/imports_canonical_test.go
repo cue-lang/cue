@@ -12,6 +12,7 @@ import (
 // TestImportsCanonical checks that imports which are needlessly spelt
 // with explicit qualifiers do not cause a problem.
 func TestImportsCanonical(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "example.com/bar"

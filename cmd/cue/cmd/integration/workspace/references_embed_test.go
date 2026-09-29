@@ -17,6 +17,7 @@ import (
 // re-recorded), and find-references within the embedded file
 // silently misses its results.
 func TestReferencesEmbedCoEmbedders(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

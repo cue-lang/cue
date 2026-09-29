@@ -8,6 +8,7 @@ import (
 )
 
 func TestDiagnostics(t *testing.T) {
+	t.Parallel()
 	module := `-- cue.mod/module.cue --
 module: "mod.example/x"
 language: version: "v0.11.0"

@@ -15,6 +15,7 @@ import (
 // and no package may be created for the cue.mod directory itself
 // (files under cue.mod can never belong to a package).
 func TestModuleRecovery(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 this is not valid cue
@@ -54,6 +55,7 @@ language: version: "v0.16.0"
 // resolves to the deleted package, then so that its import resolves
 // to the recreated package.
 func TestImportedModuleRecovery(t *testing.T) {
+	t.Parallel()
 	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- _registry/example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"

@@ -14,6 +14,7 @@ import (
 // loaded on demand, and that a loaded package is shared by all its
 // importers.
 func TestStdlibCompletion(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -88,6 +89,7 @@ js:    json.Marshal
 // library package shows the member's documentation, which comes from
 // the doc comment in the package's definition file.
 func TestStdlibHover(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -138,6 +140,7 @@ out: strings.ToUpper
 // can be used from user code, and hovering it shows its declaration
 // and documentation.
 func TestStdlibHoverNamedType(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -186,6 +189,7 @@ addr: net.#IP
 // packages also resolve within standalone files: files that are part
 // of no package or module.
 func TestStdlibStandalone(t *testing.T) {
+	t.Parallel()
 	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 		content := `
@@ -225,6 +229,7 @@ out: strings.ToUpper
 // importer's evaluator, and the usage records it left in the shared
 // standard library evaluators must not linger.
 func TestStdlibReferences(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

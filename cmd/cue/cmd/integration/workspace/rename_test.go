@@ -12,6 +12,7 @@ import (
 )
 
 func TestRename(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "example.com/bar"

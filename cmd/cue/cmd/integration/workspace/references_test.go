@@ -12,6 +12,7 @@ import (
 // TestReferences checks that querying for references will load
 // packages within the current module and search them for references.
 func TestReferences(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "example.com/bar"

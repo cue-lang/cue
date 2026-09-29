@@ -25,6 +25,7 @@ func makeMappers(env *I.Env, files string) map[string]*protocol.Mapper {
 // an @embed attribute is edited, hovers within the previously- and
 // newly-embedded json files reflect the change.
 func TestEmbedChangeAttributeHover(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -110,6 +111,7 @@ out: field: {
 // change relinks to the still-loaded (stale) phantom package for
 // data1.json.
 func TestEmbedChangeAttributeBackAndForth(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -172,6 +174,7 @@ out: _ @embed(file=data/data1.json)
 // point at a file which does not exist, expecting a diagnostic, and
 // then changes it back, expecting the diagnostic to clear.
 func TestEmbedChangeAttributeDiagnostics(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -211,6 +214,7 @@ out: _ @embed(file=data/data1.json)
 // TestEmbedChangeAttributeGlob changes the glob pattern within an
 // embed attribute so that it matches a different set of files.
 func TestEmbedChangeAttributeGlob(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -261,6 +265,7 @@ out: _ @embed(glob=data/d1*.json)
 // file name character by character (passing through intermediate
 // states which name files that do not exist), followed by a save.
 func TestEmbedChangeAttributeIncrementalEdits(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -314,6 +319,7 @@ out: _ @embed(file=data/data1.json)
 // point at an existing file in a directory which contains no other
 // active files.
 func TestEmbedChangeAttributeInactiveDir(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -365,6 +371,7 @@ out: _ @embed(file=data/data1.json)
 // new file, the embedding package is reloaded, the "failed to stat"
 // diagnostic clears, and the embed is linked.
 func TestEmbedLateFileOnDisk(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -419,6 +426,7 @@ out: _ @embed(file=other/data3.json)
 // file, the embedding package is reloaded, the "no matches for glob
 // pattern" diagnostic clears, and the embed is linked.
 func TestEmbedLateGlobOnDisk(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -456,6 +464,7 @@ out: _ @embed(glob=other/*/*.json)
 // point at a file which does not exist yet, and then creates that
 // file.
 func TestEmbedChangeAttributeLateFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -507,6 +516,7 @@ out: _ @embed(file=data/data1.json)
 // @embed attribute. The LSP state should be invalidated so that the
 // embedding package links to the new embedded file's package.
 func TestEmbedChangeAttributeFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

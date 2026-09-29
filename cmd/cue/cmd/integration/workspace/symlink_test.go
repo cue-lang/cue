@@ -14,6 +14,7 @@ import (
 )
 
 func TestSymlinks(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -66,6 +67,7 @@ package a
 }
 
 func TestSymlinksAncestor(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- real/cue.mod/module.cue --
 module: "mod.example/x"

@@ -9,6 +9,7 @@ import (
 )
 
 func TestStandalone(t *testing.T) {
+	t.Parallel()
 	t.Run("open", func(t *testing.T) {
 		// no package decl, no module
 		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, "", func(t *testing.T, env *I.Env) {

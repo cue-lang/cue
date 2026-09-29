@@ -13,6 +13,7 @@ import (
 )
 
 func TestDocumentSymbols(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- m/cue.mod/module.cue --
 module: "mod.example/x"

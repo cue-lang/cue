@@ -14,6 +14,7 @@ import (
 )
 
 func TestHover(t *testing.T) {
+	t.Parallel()
 	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- _registry/example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
@@ -205,6 +206,7 @@ func stripUnification(s string) string {
 }
 
 func TestHoverValue(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "example.com/bar"

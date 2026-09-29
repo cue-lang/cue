@@ -11,6 +11,7 @@ import (
 )
 
 func TestEmbedSimple(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -39,6 +40,7 @@ out: _ @embed(file=data/data.json)
 }
 
 func TestEmbedMissingExtern(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -65,6 +67,7 @@ out: _ @embed(file=data/data.json)
 }
 
 func TestEmbedMissingFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -90,6 +93,7 @@ out: _ @embed(file=data/missing.json)
 }
 
 func TestEmbedLateFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -123,6 +127,7 @@ out: _ @embed(file=data/late.json)
 }
 
 func TestEmbedDeleteFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -159,6 +164,7 @@ out: _ @embed(file=data/data.json)
 }
 
 func TestEmbedMissingGlob(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -184,6 +190,7 @@ out: _ @embed(glob=data/*.json)
 }
 
 func TestEmbedLateGlob(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -225,6 +232,7 @@ out: _ @embed(glob=data/*.json)
 }
 
 func TestEmbedDeleteGlob(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -325,6 +333,7 @@ s: field: {
 `
 
 func TestEmbedHover(t *testing.T) {
+	t.Parallel()
 	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, filesHoverComplete, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
@@ -423,6 +432,7 @@ how many fields do we have?
 }
 
 func TestEmbedCompletion(t *testing.T) {
+	t.Parallel()
 	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, filesHoverComplete, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
 
@@ -468,6 +478,7 @@ func TestEmbedCompletion(t *testing.T) {
 }
 
 func TestEmbedDefinitions(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -561,6 +572,7 @@ s: field: {
 }
 
 func TestEmbedDefinitionsTopLevel(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -604,6 +616,7 @@ field: _
 }
 
 func TestEmbedDefinitionsExpr(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

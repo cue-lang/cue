@@ -12,6 +12,7 @@ import (
 // TestImportsOldModules checks that imports using the old modules
 // system works: the packages get correctly loaded and analyse.
 func TestImportsOldModules(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "example.com/bar"

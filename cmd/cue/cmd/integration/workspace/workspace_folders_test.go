@@ -22,6 +22,7 @@ func TestMain(m *testing.M) {
 // works, or fails, as expected, due to various combinations of
 // WorkspaceFolders and the RootURI being set or unset.
 func TestWorkspaceFoldersRootURI(t *testing.T) {
+	t.Parallel()
 	const filesOneModule = `
 -- cue.mod/module.cue --
 module: "mod.example/b"
@@ -120,6 +121,7 @@ package a
 }
 
 func TestWorkspaceFoldersReconfigure(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/b"

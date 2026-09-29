@@ -10,6 +10,7 @@ import (
 )
 
 func TestCodeActionConvertToStruct(t *testing.T) {
+	t.Parallel()
 	type testCase struct {
 		name     string
 		input    string
@@ -154,6 +155,7 @@ a:
 }
 
 func TestCodeActionConvertFromStruct(t *testing.T) {
+	t.Parallel()
 	type testCase struct {
 		name     string
 		input    string
@@ -283,6 +285,7 @@ a:
 // struct literal, which the openlists experiment enables, are not offered
 // for removal: removing them would drop the closedness.
 func TestCodeActionConvertFromClosedStruct(t *testing.T) {
+	t.Parallel()
 	const archive = `-- cue.mod/module.cue --
 module: "closed.test"
 language: version: "v0.18.0"
@@ -309,6 +312,7 @@ foo: #{
 }
 
 func TestCodeActionToggleStructBraces(t *testing.T) {
+	t.Parallel()
 	type testCase struct {
 		name     string
 		input    string

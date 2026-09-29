@@ -12,6 +12,7 @@ import (
 // invalid YAML) still has its parse error published as a diagnostic,
 // and that the diagnostic clears when the content is fixed.
 func TestDiagnosticsUnparseableFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- a.yaml --
 x: true
@@ -46,6 +47,7 @@ x: true
 // imports alone, so a file whose body defeats the parser is still a
 // member of its package.
 func TestDiagnosticsUnparseablePackageFile(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

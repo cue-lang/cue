@@ -13,6 +13,7 @@ import (
 // received from the client are percent-encoded, so URIs built
 // internally must be canonicalized the same way.
 func TestFileNameNeedingEscaping(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

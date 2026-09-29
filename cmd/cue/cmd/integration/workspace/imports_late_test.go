@@ -14,6 +14,7 @@ import (
 // import resolves, without requiring any edit to the importing
 // package itself.
 func TestImportCreatedLater(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -68,6 +69,7 @@ ax: sub.y
 // file's creation must still be noticed, because a loaded package
 // has an unresolved import which it helps satisfy.
 func TestImportCreatedLaterOnDisk(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

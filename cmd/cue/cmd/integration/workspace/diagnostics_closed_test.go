@@ -13,6 +13,7 @@ import (
 // server must keep updating files whose diagnostics it has published,
 // even once they are closed.
 func TestDiagnosticsClearedAfterClose(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"
@@ -52,6 +53,7 @@ y: 6
 // for a file are cleared if the file is deleted from disk after
 // being closed in the editor.
 func TestDiagnosticsClearedAfterDelete(t *testing.T) {
+	t.Parallel()
 	const files = `
 -- cue.mod/module.cue --
 module: "mod.example/x"

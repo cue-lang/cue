@@ -458,7 +458,7 @@ func appendSelector(a []Selector, sel Selector) []Selector {
 	if len(a) == 1 {
 		if p, ok := a[0].sel.(pathError); ok {
 			if isErr {
-				p.Error = errors.Append(p.Error, err.Error)
+				a[0] = Selector{pathError{errors.Append(p.Error, err.Error)}}
 			}
 			return a
 		}

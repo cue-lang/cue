@@ -225,7 +225,7 @@ func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
 // more changes in the future.
 type applyVisitor interface {
 	Before(Cursor) applyVisitor
-	After(Cursor) bool
+	After(Cursor)
 	Mapping(before, after ast.Node)
 }
 
@@ -533,6 +533,9 @@ type applier struct {
 	before func(Cursor) bool
 	after  func(Cursor) bool
 
+	// stopped is set once after returns false; no more nodes are visited.
+	stopped bool
+
 	fieldValueMap map[ast.Node]ast.Node
 }
 
@@ -544,6 +547,9 @@ func (f *applier) Mapping(before, after ast.Node) {
 }
 
 func (f *applier) Before(c Cursor) applyVisitor {
+	if f.stopped {
+		return nil
+	}
 	node := c.Node()
 	if f.before == nil || (f.before(c) && node == c.Node()) {
 		return f
@@ -551,9 +557,8 @@ func (f *applier) Before(c Cursor) applyVisitor {
 	return nil
 }
 
-func (f *applier) After(c Cursor) bool {
-	if f.after != nil {
-		f.after(c)
+func (f *applier) After(c Cursor) {
+	if !f.stopped && f.after != nil {
+		f.stopped = !f.after(c)
 	}
-	return true
 }

@@ -542,22 +542,22 @@ func (h *hoister) hoist(f *ast.File) {
 		case *ast.Field:
 			name, _, _ := ast.LabelName(f.Label)
 			if name == "" {
-				return false
+				return true
 			}
 
 			lit, ok := f.Value.(*ast.BasicLit)
 			if !ok || lit.Kind != token.STRING {
-				return false
+				return true
 			}
 
 			str, err := literal.Unquote(lit.Value)
 			if err != nil {
-				return false
+				return true
 			}
 
 			expr, enc := tryParse(str)
 			if expr == nil {
-				return false
+				return true
 			}
 
 			importIdent := &ast.Ident{

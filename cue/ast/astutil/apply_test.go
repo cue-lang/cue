@@ -293,8 +293,6 @@ a: 1 // replaced
 			return true
 		},
 	}, {
-		// Replace should keep the new node's comments, but it overwrites
-		// them with the old node's.
 		name: "replace keeps new comments",
 		in: `
 a: [
@@ -306,7 +304,7 @@ a: [
 `,
 		out: `
 a: [
-	// old
+	// new
 	3,
 	// old
 	4,

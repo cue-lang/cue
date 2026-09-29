@@ -165,7 +165,7 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 func (c *cursor) Replace(n ast.Node) {
 	// panic if the value cannot convert to the original type.
 	reflect.ValueOf(n).Convert(reflect.TypeOf(c.typ).Elem())
-	if ast.Comments(n) != nil {
+	if len(ast.Comments(n)) == 0 {
 		CopyComments(n, c.node)
 	}
 	c.modified = true

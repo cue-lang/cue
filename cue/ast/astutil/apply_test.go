@@ -15,6 +15,7 @@
 package astutil_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -248,6 +249,53 @@ a: "string"
 			return true
 		},
 	}, {
+		// Each comment should be visited once, but doc comments are
+		// visited twice and other comments three times.
+		name: "comments visited once",
+		in: `
+// doc
+a: // label
+	1 // trailing
+`,
+		out: `
+// doc < > < >
+a: // label < > < > < >
+	1 // trailing < > < > < >
+`,
+		before: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.Comment); ok {
+				x.Text += " <"
+			}
+			return true
+		},
+		after: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.Comment); ok {
+				x.Text += " >"
+			}
+			return true
+		},
+	}, {
+		// Replacing a comment group should work, but it panics.
+		name: "replace comment groups",
+		in: `
+// doc
+a: 1 // trailing
+`,
+		out: `
+panic: reflect.Value.Convert: value of type *ast.CommentGroup cannot be converted to type ast.CommentGroup
+`,
+		before: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.CommentGroup); ok {
+				c.Replace(&ast.CommentGroup{
+					Doc:      x.Doc,
+					Line:     x.Line,
+					Position: x.Position,
+					List:     []*ast.Comment{{Text: "// replaced"}},
+				})
+			}
+			return true
+		},
+	}, {
 		name: "imports add",
 		in: `
 a: "string"
@@ -341,15 +389,22 @@ b: a
 				t.Fatal(err)
 			}
 
-			n := astutil.Apply(f, tc.before, tc.after)
-			// We call Sanitize to ensure that references are patched correctly.
-			// The references are otherwise not visualized in the test output.
-			err = astutil.Sanitize(n.(*ast.File))
-			qt.Assert(t, qt.IsNil(err))
+			got := func() (got string) {
+				defer func() {
+					if r := recover(); r != nil {
+						got = fmt.Sprint("panic: ", r)
+					}
+				}()
+				n := astutil.Apply(f, tc.before, tc.after)
+				// We call Sanitize to ensure that references are patched correctly.
+				// The references are otherwise not visualized in the test output.
+				err = astutil.Sanitize(n.(*ast.File))
+				qt.Assert(t, qt.IsNil(err))
 
-			b, err := format.Node(n)
-			qt.Assert(t, qt.IsNil(err))
-			got := strings.TrimSpace(string(b))
+				b, err := format.Node(n)
+				qt.Assert(t, qt.IsNil(err))
+				return strings.TrimSpace(string(b))
+			}()
 			want := strings.TrimSpace(tc.out)
 			qt.Assert(t, qt.Equals(got, want))
 		})

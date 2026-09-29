@@ -329,6 +329,25 @@ a: [
 			return true
 		},
 	}, {
+		// Returning false from after should stop the traversal, but the
+		// result is ignored.
+		name: "after stops",
+		in: `
+a: 1
+b: 2
+`,
+		out: `
+a: 3
+b: 3
+`,
+		after: func(c astutil.Cursor) bool {
+			if _, ok := c.Node().(*ast.BasicLit); ok {
+				c.Replace(ast.NewLit(token.INT, "3"))
+				return false
+			}
+			return true
+		},
+	}, {
 		name: "imports add",
 		in: `
 a: "string"

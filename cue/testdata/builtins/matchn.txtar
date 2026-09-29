@@ -237,7 +237,7 @@ incomplete: {
 		x: bar: 2
 		@test(err, code=incomplete, at=x,
 			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:18]))
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:18, 2:6]))
 	}
 	// foo could still be provided later.
 	incomplete2: {
@@ -253,7 +253,7 @@ incomplete: {
 		@test(eq, {x: {bar: 2}})
 		@test(err, code=incomplete, at=x,
 			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48]))
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48, 2:6]))
 	}
 	incomplete4: {
 		x: matchN(math.MultipleOf(2), [{bar!: int}, {foo!: int}, {baz!: int}])
@@ -261,8 +261,8 @@ incomplete: {
 		@test(eq, {x: {bar: 2}})
 		@test(err, code=incomplete, at=x,
 			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:61]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48]))
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:61, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:48, 2:6]))
 
 	}
 	incomplete5: {
@@ -271,8 +271,8 @@ incomplete: {
 		@test(eq, {x: {bar: 2}})
 		@test(err, code=incomplete, at=x,
 			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:38]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:51]))
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:38, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:51, 2:6]))
 	}
 	incomplete6: {
 		x: matchN(2|3, [{bar!: int}, {foo!: int}, {baz!: int}])
@@ -280,8 +280,8 @@ incomplete: {
 		@test(eq, {x: {bar: 2}})
 		@test(err, code=incomplete, at=x,
 			suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:33]),
-			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:46]))
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:33, 2:6]),
+			suberr=(code=incomplete, contains="field is required but not present", pos=[1:6, 1:46, 2:6]))
 	}
 
 	// incorrect type cannot be corrected
@@ -333,6 +333,7 @@ issue3389: {
 		    //     incomplete.cue:96:12
 		    // issue3389.x.foo: field is required but not present:
 		    //     incomplete.cue:96:5
+		    //     incomplete.cue:95:5
 		    //     incomplete.cue:96:35
 		    bar: (int){ 2 }
 		  }
@@ -691,6 +692,7 @@ allOf.multiple1Err3: invalid value 5 (does not satisfy math.MultipleOf(3)):
 incomplete.incomplete1.x.foo: field is required but not present:
     ./incomplete.cue:7:6
     ./incomplete.cue:7:18
+    ./incomplete.cue:8:6
 [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
     ./incomplete.cue:22:6
     ./incomplete.cue:22:13
@@ -698,6 +700,7 @@ incomplete.incomplete1.x.foo: field is required but not present:
 incomplete.incomplete3.x.foo: field is required but not present:
     ./incomplete.cue:22:6
     ./incomplete.cue:22:48
+    ./incomplete.cue:23:6
 [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
     ./incomplete.cue:30:6
     ./incomplete.cue:30:13
@@ -705,9 +708,11 @@ incomplete.incomplete3.x.foo: field is required but not present:
 incomplete.incomplete4.x.baz: field is required but not present:
     ./incomplete.cue:30:6
     ./incomplete.cue:30:61
+    ./incomplete.cue:31:6
 incomplete.incomplete4.x.foo: field is required but not present:
     ./incomplete.cue:30:6
     ./incomplete.cue:30:48
+    ./incomplete.cue:31:6
 [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
     ./incomplete.cue:40:6
     ./incomplete.cue:40:13
@@ -715,9 +720,11 @@ incomplete.incomplete4.x.foo: field is required but not present:
 incomplete.incomplete5.x.baz: field is required but not present:
     ./incomplete.cue:40:6
     ./incomplete.cue:40:51
+    ./incomplete.cue:41:6
 incomplete.incomplete5.x.foo: field is required but not present:
     ./incomplete.cue:40:6
     ./incomplete.cue:40:38
+    ./incomplete.cue:41:6
 [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
     ./incomplete.cue:49:6
     ./incomplete.cue:49:13
@@ -725,9 +732,11 @@ incomplete.incomplete5.x.foo: field is required but not present:
 incomplete.incomplete6.x.baz: field is required but not present:
     ./incomplete.cue:49:6
     ./incomplete.cue:49:46
+    ./incomplete.cue:50:6
 incomplete.incomplete6.x.foo: field is required but not present:
     ./incomplete.cue:49:6
     ./incomplete.cue:49:33
+    ./incomplete.cue:50:6
 [eval] incomplete.err1.x.bar: conflicting values 2 and string (mismatched types int and string):
     ./incomplete.cue:60:24
     ./incomplete.cue:61:11
@@ -763,6 +772,7 @@ incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, e
     ./incomplete.cue:96:12
 issue3389.x.foo: field is required but not present:
     ./incomplete.cue:96:5
+    ./incomplete.cue:95:5
     ./incomplete.cue:96:35
 [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3694.cue:4:9

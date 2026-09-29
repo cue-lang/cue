@@ -285,6 +285,10 @@ func ToFile(n ast.Node, preserveStructLit bool) *ast.File {
 			return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: n}}}
 
 		} else {
+			// TODO: the file does not keep the struct's position, so errors
+			// pointing at the top-level struct of a JSON file report its
+			// first field rather than its opening brace, or no position
+			// at all for an empty object.
 			f := &ast.File{Decls: n.Elts}
 			// Ensure that the comments attached to the struct literal are not lost.
 			ast.SetComments(f, ast.Comments(n))

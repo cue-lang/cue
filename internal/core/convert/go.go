@@ -477,7 +477,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		}
 
 		// There is no closedness or cycle info for Go structs, so we pass an empty CloseInfo.
-		v.AddStruct(sl, 0)
+		v.AddStruct(sl, 0, false)
 		v.SetValue(ctx, &adt.StructMarker{})
 		v.ForceDone()
 		return v
@@ -521,7 +521,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			}
 		}
 
-		v.AddStruct(obj, 0)
+		v.AddStruct(obj, 0, false)
 		v.SetValue(ctx, structMarker)
 		v.ForceDone()
 		return v

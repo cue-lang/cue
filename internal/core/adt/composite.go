@@ -545,6 +545,10 @@ type StructInfo struct {
 	// initialized records whether this StructInfo was scheduled in the
 	// containing Vertex.
 	initialized bool
+
+	// fromDef records whether the struct was only ever added from within
+	// a definition, as tracked by [CloseInfo.FromDef].
+	fromDef bool
 }
 
 // vertexStatus indicates the evaluation progress of a Vertex.
@@ -1507,11 +1511,12 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
 }
 
-func (v *Vertex) AddStruct(s *StructLit, compID uint32) {
+func (v *Vertex) AddStruct(s *StructLit, compID uint32, fromDef bool) {
 	for i, t := range v.Structs {
 		if t.StructLit == s {
 			v.Structs[i].Repeats++
 			v.Structs[i].initialized = true
+			v.Structs[i].fromDef = t.fromDef && fromDef
 			return
 		}
 	}
@@ -1519,6 +1524,7 @@ func (v *Vertex) AddStruct(s *StructLit, compID uint32) {
 		StructLit:   s,
 		CompID:      compID,
 		initialized: true,
+		fromDef:     fromDef,
 	}
 	v.Structs = append(v.Structs, info)
 }

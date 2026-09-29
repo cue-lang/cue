@@ -285,7 +285,7 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 		}
 	}
 	// TODO: do we still need to AddStruct?
-	n.node.AddStruct(s, compID)
+	n.node.AddStruct(s, compID, ci.FromDef)
 
 	// TODO(perf): precompile whether struct has embedding.
 loop1:

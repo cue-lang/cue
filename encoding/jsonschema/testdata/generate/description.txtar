@@ -59,4 +59,5 @@ missingName: {
 }
 -- out/generate-v3/simple --
 -- out/generate-v3/missingName --
-missingName.data.name: field is required but not present
+missingName.data.name: field is required but not present:
+    ./datatest/tests.cue:6:8

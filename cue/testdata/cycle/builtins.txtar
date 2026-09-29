@@ -467,6 +467,7 @@ issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, exp
     ./matchn.cue:85:24
 issue3633.final.data.a: field is required but not present:
     ./matchn.cue:85:17
+    ./matchn.cue:84:8
     ./matchn.cue:85:29
 [eval] selfCycle.t1.c: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
     ./yamlcycle.cue:24:5

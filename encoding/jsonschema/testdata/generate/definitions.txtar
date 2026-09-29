@@ -41,4 +41,5 @@ missingX: {
 }
 -- out/generate-v3/simple --
 -- out/generate-v3/missingX --
-missingX.data.foo.x: field is required but not present
+missingX.data.foo.x: field is required but not present:
+    ./datatest/testdata.cue:6:14

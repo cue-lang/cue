@@ -223,11 +223,27 @@ func addPositions(ctx *OpContext, err *ValueError, c Conjunct) {
 	err.AddPos(c.CloseInfo.Location(ctx))
 }
 
+// NewRequiredNotPresentError reports that the required field v is missing.
+// Besides the required field itself, the error points at the structs unified
+// into v's parent which do not declare it, such as a data file validated
+// against a schema. Structs from definitions are left out, as they are schemas.
+//
+// TODO: consider making the first such struct the primary position, so that
+// tools such as the language server report the error at the data.
 func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node) *Bottom {
 	saved := ctx.PushArc(v)
 	err := ctx.Newf("field is required but not present")
 	for _, p := range morePositions {
 		err.AddPosition(p)
+	}
+	// The structs of a vertex within a definition belong to a schema even when
+	// they were not added through a reference to one, as with structure sharing.
+	if p := v.Parent; p != nil && enclosingDef(p) == nil {
+		for _, s := range p.Structs {
+			if !s.fromDef && !declaresField(s.StructLit, v.Label) {
+				err.AddPosition(s.StructLit)
+			}
+		}
 	}
 	for c := range v.LeafConjuncts() {
 		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
@@ -243,6 +259,25 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 	}
 	ctx.PopArc(saved)
 	return b
+}
+
+// declaresField reports whether s declares a field with label f,
+// including within embedded struct literals and comprehension bodies.
+//
+// TODO: embedded references such as {common, name: "n"} are not resolved,
+// so a struct which declares f through one is reported as lacking it.
+func declaresField(s *StructLit, f Feature) bool {
+	return slices.ContainsFunc(s.Decls, func(d Decl) bool {
+		switch d := d.(type) {
+		case *Field:
+			return d.Label == f
+		case *StructLit:
+			return declaresField(d, f)
+		case *Comprehension:
+			return declaresField(d.Value, f)
+		}
+		return false
+	})
 }
 
 func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Vertex) *Bottom {

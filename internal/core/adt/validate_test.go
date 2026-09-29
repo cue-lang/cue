@@ -282,6 +282,7 @@ func TestValidate(t *testing.T) {
 			`,
 		out: `incomplete
 				x.foo: field is required but not present:
+				    test:2:8
 				    test:3:18`,
 	}, {
 		name: "required field missing from data unified with a definition",
@@ -291,11 +292,11 @@ func TestValidate(t *testing.T) {
 			#D: {#Base, foo!: int, ...}
 			x: #D & {bar: 2}
 		`,
-		// TODO: report the position of {bar: 2}, which lacks the field.
 		out: `incomplete
 				x.foo: field is required but not present:
 				    test:3:16
-				    test:4:7`,
+				    test:4:7
+				    test:4:12`,
 	}, {
 		name: "required field missing from a shared definition",
 		cfg:  &adt.ValidateConfig{Final: true},
@@ -314,10 +315,10 @@ func TestValidate(t *testing.T) {
 			x: {{foo!: int}}
 			x: {bar: 1}
 		`,
-		// TODO: report the position of {bar: 1}, which lacks the field.
 		out: `incomplete
 				x.foo: field is required but not present:
-				    test:2:9`,
+				    test:2:9
+				    test:3:7`,
 	}, {
 		name: "required field declared in a comprehension",
 		cfg:  &adt.ValidateConfig{Final: true},
@@ -325,10 +326,10 @@ func TestValidate(t *testing.T) {
 			x: {if true {foo!: int}}
 			x: {bar: 1}
 		`,
-		// TODO: report the position of {bar: 1}, which lacks the field.
 		out: `incomplete
 				x.foo: field is required but not present:
-				    test:2:17`,
+				    test:2:17
+				    test:3:7`,
 	}, {
 		name: "disallow incomplete error with report incomplete",
 		cfg:  &adt.ValidateConfig{ReportIncomplete: true},

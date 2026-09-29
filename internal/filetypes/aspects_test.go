@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/filetypes"
 )
 
@@ -30,11 +29,7 @@ import (
 // surfacing as a validation discrepancy between the evaluator-free
 // checks and the template.
 func TestAspectNamesMatchTemplate(t *testing.T) {
-	ctx := cuecontext.New()
-	root := ctx.CompileBytes(filetypes.TypesCUESource(), cue.Filename("types.cue"))
-	if err := root.Err(); err != nil {
-		t.Fatal(err)
-	}
+	root := compileTypes(t)
 	fi := root.LookupPath(cue.ParsePath("#FileInfo"))
 	if err := fi.Err(); err != nil {
 		t.Fatal(err)

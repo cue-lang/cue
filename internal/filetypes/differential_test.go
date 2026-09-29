@@ -47,11 +47,8 @@ import (
 // struct-level disjunction such as tagInfo.pb onto a non-default
 // branch when the extension conflicts with the default one.
 func TestDriverMatchesCUE(t *testing.T) {
-	ctx := cuecontext.New()
-	root := ctx.CompileBytes(filetypes.TypesCUESource(), cue.Filename("types.cue"))
-	if err := root.Err(); err != nil {
-		t.Fatalf("compiling types.cue: %v", err)
-	}
+	t.Parallel()
+	root := compileTypes(t)
 
 	modes := []filetypes.Mode{filetypes.Input, filetypes.Export, filetypes.Def, filetypes.Eval}
 	encodings := fieldNames(t, root.LookupPath(cue.ParsePath("modes.input.encodings")))
@@ -71,57 +68,51 @@ func TestDriverMatchesCUE(t *testing.T) {
 	}
 	filenames = append(filenames, "x.unknown", "withoutextension")
 
-	t.Run("fromfile", func(t *testing.T) {
-		for _, mode := range modes {
-			for _, enc := range encodings {
-				for _, interp := range interps {
-					for _, form := range forms {
-						b := &build.File{Filename: "x", Encoding: build.Encoding(enc), Interpretation: build.Interpretation(interp), Form: build.Form(form)}
-						fi, derr := filetypes.FromFile(b, mode)
-						ok, want := cueFromFile(root, mode, enc, interp, form)
-						if (derr == nil) != ok {
-							t.Errorf("[%s enc=%s interp=%q form=%q] driver ok=%v, CUE ok=%v", mode, enc, interp, form, derr == nil, ok)
-							continue
-						}
-						if derr == nil {
-							want.Filename = b.Filename
-							qt.Check(t, qt.CmpEquals(fi, want, cmpopts.EquateEmpty()),
-								qt.Commentf("[%s enc=%s interp=%q form=%q] FileInfo mismatch", mode, enc, interp, form))
-						}
+	// run runs body for every mode as parallel subtests of name, each
+	// with its own compiled types.cue to keep the subtests independent.
+	run := func(name string, body func(t *testing.T, root cue.Value, mode filetypes.Mode)) {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			for _, mode := range modes {
+				t.Run(mode.String(), func(t *testing.T) {
+					t.Parallel()
+					body(t, compileTypes(t), mode)
+				})
+			}
+		})
+	}
+
+	run("fromfile", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+		for _, enc := range encodings {
+			for _, interp := range interps {
+				for _, form := range forms {
+					b := &build.File{Filename: "x", Encoding: build.Encoding(enc), Interpretation: build.Interpretation(interp), Form: build.Form(form)}
+					fi, derr := filetypes.FromFile(b, mode)
+					ok, want := cueFromFile(root, mode, enc, interp, form)
+					if (derr == nil) != ok {
+						t.Errorf("[%s enc=%s interp=%q form=%q] driver ok=%v, CUE ok=%v", mode, enc, interp, form, derr == nil, ok)
+						continue
+					}
+					if derr == nil {
+						want.Filename = b.Filename
+						qt.Check(t, qt.CmpEquals(fi, want, cmpopts.EquateEmpty()),
+							qt.Commentf("[%s enc=%s interp=%q form=%q] FileInfo mismatch", mode, enc, interp, form))
 					}
 				}
 			}
 		}
 	})
 
-	// compare resolves one (scope, filename, mode) with the driver and
-	// with the oracle and asserts they agree.
-	compare := func(t *testing.T, mode filetypes.Mode, scope string, tagList []string, filename string) {
-		t.Helper()
-		f, derr := filetypes.ParseFileAndType(filename, scope, mode)
-		ok, oracle := cueToFile(root, mode, tagList, nil, nil, filename)
-		if (derr == nil) != ok {
-			t.Errorf("[%s %q %s] driver ok=%v (%v), CUE ok=%v", mode, scope, filename, derr == nil, derr, ok)
-			return
-		}
-		if derr == nil {
-			qt.Check(t, qt.CmpEquals(f, oracle, cmpopts.EquateEmpty()),
-				qt.Commentf("[%s %q %s] build.File mismatch", mode, scope, filename))
-		}
-	}
-
-	t.Run("qualifier-pairs", func(t *testing.T) {
-		for _, mode := range modes {
-			for _, a := range tags {
-				for _, b := range tags {
-					scope := a
-					want := []string{a}
-					if b != a {
-						scope = a + "+" + b
-						want = []string{a, b}
-					}
-					compare(t, mode, scope, want, "x")
+	run("qualifier-pairs", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+		for _, a := range tags {
+			for _, b := range tags {
+				scope := a
+				want := []string{a}
+				if b != a {
+					scope = a + "+" + b
+					want = []string{a, b}
 				}
+				compare(t, root, mode, scope, want, "x")
 			}
 		}
 	})
@@ -132,17 +123,15 @@ func TestDriverMatchesCUE(t *testing.T) {
 	// that does not pin the encoding (a form tag, or pb with its
 	// struct-level disjunction) must let the extension participate in
 	// disjunct selection.
-	t.Run("extension-axis", func(t *testing.T) {
+	run("extension-axis", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
 		scopes := append([]string{""}, tags...)
-		for _, mode := range modes {
-			for _, scope := range scopes {
-				var tagList []string
-				if scope != "" {
-					tagList = []string{scope}
-				}
-				for _, filename := range filenames {
-					compare(t, mode, scope, tagList, filename)
-				}
+		for _, scope := range scopes {
+			var tagList []string
+			if scope != "" {
+				tagList = []string{scope}
+			}
+			for _, filename := range filenames {
+				compare(t, root, mode, scope, tagList, filename)
 			}
 		}
 	})
@@ -150,24 +139,22 @@ func TestDriverMatchesCUE(t *testing.T) {
 	// tag-pairs-with-extensions: all tag pairs against a representative
 	// set of filenames. The pb pairs with .json/.proto/.textproto are
 	// the regression surface for extension-driven disjunct selection.
-	t.Run("tag-pairs-with-extensions", func(t *testing.T) {
+	run("tag-pairs-with-extensions", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
 		representative := []string{"x.json", "x.proto", "x.textproto", "-"}
-		for _, mode := range modes {
-			for _, a := range tags {
-				for _, b := range tags {
-					if b == a {
-						continue
-					}
-					scope := a + "+" + b
-					for _, filename := range representative {
-						compare(t, mode, scope, []string{a, b}, filename)
-					}
+		for _, a := range tags {
+			for _, b := range tags {
+				if b == a {
+					continue
+				}
+				scope := a + "+" + b
+				for _, filename := range representative {
+					compare(t, root, mode, scope, []string{a, b}, filename)
 				}
 			}
 		}
 	})
 
-	t.Run("subsidiary-tags", func(t *testing.T) {
+	run("subsidiary-tags", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
 		cases := []struct {
 			scope    string
 			top      []string
@@ -184,21 +171,45 @@ func TestDriverMatchesCUE(t *testing.T) {
 				boolean: map[string]bool{"strict": false, "strictKeywords": true},
 			},
 		}
-		for _, mode := range modes {
-			for _, tc := range cases {
-				got, derr := filetypes.ParseFileAndType("x", tc.scope, mode)
-				ok, want := cueToFile(root, mode, tc.top, tc.stringly, tc.boolean, "x")
-				if (derr == nil) != ok {
-					t.Errorf("[%s %s] driver ok=%v (%v), CUE ok=%v", mode, tc.scope, derr == nil, derr, ok)
-					continue
-				}
-				if derr == nil {
-					qt.Check(t, qt.CmpEquals(got, want, cmpopts.EquateEmpty()),
-						qt.Commentf("[%s %s] build.File mismatch", mode, tc.scope))
-				}
+		for _, tc := range cases {
+			got, derr := filetypes.ParseFileAndType("x", tc.scope, mode)
+			ok, want := cueToFile(root, mode, tc.top, tc.stringly, tc.boolean, "x")
+			if (derr == nil) != ok {
+				t.Errorf("[%s %s] driver ok=%v (%v), CUE ok=%v", mode, tc.scope, derr == nil, derr, ok)
+				continue
+			}
+			if derr == nil {
+				qt.Check(t, qt.CmpEquals(got, want, cmpopts.EquateEmpty()),
+					qt.Commentf("[%s %s] build.File mismatch", mode, tc.scope))
 			}
 		}
 	})
+}
+
+// compare resolves one (scope, filename, mode) with the driver and
+// with the oracle and asserts they agree.
+func compare(t *testing.T, root cue.Value, mode filetypes.Mode, scope string, tagList []string, filename string) {
+	t.Helper()
+	f, derr := filetypes.ParseFileAndType(filename, scope, mode)
+	ok, oracle := cueToFile(root, mode, tagList, nil, nil, filename)
+	if (derr == nil) != ok {
+		t.Errorf("[%s %q %s] driver ok=%v (%v), CUE ok=%v", mode, scope, filename, derr == nil, derr, ok)
+		return
+	}
+	if derr == nil {
+		qt.Check(t, qt.CmpEquals(f, oracle, cmpopts.EquateEmpty()),
+			qt.Commentf("[%s %q %s] build.File mismatch", mode, scope, filename))
+	}
+}
+
+// compileTypes compiles types.cue in a new context.
+func compileTypes(t *testing.T) cue.Value {
+	t.Helper()
+	root := cuecontext.New().CompileBytes(filetypes.TypesCUESource(), cue.Filename("types.cue"))
+	if err := root.Err(); err != nil {
+		t.Fatalf("compiling types.cue: %v", err)
+	}
+	return root
 }
 
 func fieldNames(t *testing.T, v cue.Value) []string {

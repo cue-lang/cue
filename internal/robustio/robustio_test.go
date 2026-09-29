@@ -30,10 +30,6 @@ func checkOSLink(t *testing.T, err error) {
 }
 
 func TestFileInfo(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping test which uses long sleeps")
-	}
-
 	// A nonexistent file has no ID.
 	nonexistent := filepath.Join(t.TempDir(), "nonexistent")
 	if _, _, err := robustio.GetFileID(nonexistent); err == nil {
@@ -50,13 +46,15 @@ func TestFileInfo(t *testing.T) {
 		t.Fatalf("can't get ID of regular file: %v", err)
 	}
 
-	// Sleep so that we get a new mtime for subsequent writes.
-	time.Sleep(2 * time.Second)
-
 	// A second regular file has a different ID.
+	// Give it a different mtime without waiting for the clock to move on.
 	real2 := filepath.Join(t.TempDir(), "real2")
 	if err := os.WriteFile(real2, nil, 0644); err != nil {
 		t.Fatalf("can't create second regular file: %v", err)
+	}
+	later := realMtime.Add(time.Hour)
+	if err := os.Chtimes(real2, later, later); err != nil {
+		t.Fatalf("can't set mtime of second regular file: %v", err)
 	}
 	real2ID, real2Mtime, err := robustio.GetFileID(real2)
 	if err != nil {

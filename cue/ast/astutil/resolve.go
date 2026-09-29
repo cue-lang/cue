@@ -288,7 +288,8 @@ func (s *scope) mustBeUnique(n, link ast.Node) bool {
 	if _, ok := s.node.(*ast.Field); ok {
 		return true
 	}
-	if _, ok := link.(*ast.PostfixAlias); ok {
+	switch link.(type) {
+	case *ast.PostfixAlias, *ast.ForClause:
 		return true
 	}
 	switch n.(type) {

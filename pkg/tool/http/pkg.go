@@ -59,6 +59,10 @@
 //	// served from the same address. Serve will multiplex these different instances
 //	// based on the serving path and, optionally, method.
 //	//
+//	// Requests are only served once all Serve tasks ready to run have run,
+//	// so that their routes are in place before the first request is handled.
+//	// Serve tasks which depend on other tasks may add their routes later.
+//	//
 //	// For more details see the documentation of the routing parameters such as
 //	// path and method.
 //	Serve: {

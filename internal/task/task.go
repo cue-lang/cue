@@ -196,6 +196,7 @@ func (c Context) ForkRunLoop(ctx context.Context, path cue.Path, v cue.Value, r 
 		InferTasks:       true,
 		IgnoreConcrete:   true,
 		RunInferredTasks: true, // Run inferred tasks since inputs are filled
+		UpdateFunc:       StartBackgroundWhenReady,
 	}
 
 	// Fill the root with the request data. The v value contains the filled
@@ -265,12 +266,16 @@ type Runner interface {
 	Run(ctx *Context) (results interface{}, err error)
 }
 
-// Background indicates whether the task is running in the background after
-// finishing.
-var Background atomic.Bool
+var (
+	backgroundMu     sync.Mutex
+	background       bool
+	backgroundStarts []func()
+)
 
 // BackgroundTask must be used by a task to indicate that it is running in the
-// background.
+// background. The start func is called in a new goroutine by the next call to
+// [StartBackground], such as to start accepting requests only once all the
+// handlers for a server are in place.
 // TODO: this is a hack. We should have a better way to indicate this. Also,
 // introduce mechanism to cancel and background tasks, detect when they are
 // done, and collect errors.
@@ -278,8 +283,39 @@ var Background atomic.Bool
 // task.Context and have a way to add to it (perhaps just expose a Go method)
 // and wait for it to complete (in practice you'd probably select on that
 // finishing and os.Interrupt)?
-func (c *Context) BackgroundTask() {
-	Background.Store(true)
+func (c *Context) BackgroundTask(start func()) {
+	backgroundMu.Lock()
+	defer backgroundMu.Unlock()
+	background = true
+	backgroundStarts = append(backgroundStarts, start)
+}
+
+// StartBackground starts the work registered via [Context.BackgroundTask]
+// since the last call, and reports whether any task is running in the background.
+func StartBackground() bool {
+	backgroundMu.Lock()
+	defer backgroundMu.Unlock()
+	for _, start := range backgroundStarts {
+		go start()
+	}
+	backgroundStarts = nil
+	return background
+}
+
+// StartBackgroundWhenReady is a [flow.Config.UpdateFunc] which calls
+// [StartBackground] once no service tasks are ready to run or running,
+// so that, for example, all the handlers which can be registered
+// for a server are in place before it accepts requests.
+// Services waiting on other tasks do not hold back background work,
+// as those tasks might be clients of the services which already ran.
+func StartBackgroundWhenReady(c *flow.Controller, _ *flow.Task) error {
+	for _, t := range c.Tasks() {
+		if t.IsService() && (t.State() == flow.Ready || t.State() == flow.Running) {
+			return nil
+		}
+	}
+	StartBackground()
+	return nil
 }
 
 // Register registers a task for cue commands.

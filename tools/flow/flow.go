@@ -420,6 +420,12 @@ func (t *Task) Index() int {
 	return t.index
 }
 
+// IsService reports whether the Task's runner is a [Service].
+// This will not change over time.
+func (t *Task) IsService() bool {
+	return t.isService
+}
+
 func (t *Task) done() bool {
 	return t.state > Running
 }

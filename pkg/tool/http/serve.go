@@ -99,8 +99,11 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 
 		log.Printf("listening on %v\n", addr)
 
+		// Only accept requests once all ready Serve tasks have run, as otherwise
+		// a request could arrive before its handler is registered.
+		// Until then, connections wait in the listener's backlog.
 		// TODO: use Server at some point.
-		go http.Serve(ln, mux)
+		ctx.BackgroundTask(func() { http.Serve(ln, mux) })
 	}
 	m.Unlock()
 
@@ -169,7 +172,6 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 		}
 	})
 
-	ctx.BackgroundTask()
 	return nil, nil
 }
 

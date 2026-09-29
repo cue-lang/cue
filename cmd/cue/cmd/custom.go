@@ -148,6 +148,7 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 		Root:           cmdPath,
 		InferTasks:     true,
 		IgnoreConcrete: true,
+		UpdateFunc:     itask.StartBackgroundWhenReady,
 	}
 
 	// Command and task discovery
@@ -215,7 +216,7 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	if err := c.Run(cmd.Context()); err != nil {
 		return err
 	}
-	if itask.Background.Load() {
+	if itask.StartBackground() {
 		signalChan := make(chan os.Signal, 1)
 		signal.Notify(signalChan, os.Interrupt)
 		<-signalChan

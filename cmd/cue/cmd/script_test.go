@@ -24,6 +24,7 @@ import (
 	"io"
 	"io/fs"
 	"maps"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -162,6 +163,25 @@ func TestScript(t *testing.T) {
 				ts.Check(err)
 				_, err = fmt.Fprint(ts.Stdout(), fi.ModTime().UnixNano())
 				ts.Check(err)
+			},
+			// wait-port waits until a TCP address like localhost:8080 accepts connections,
+			// for example from a server started in the background.
+			"wait-port": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg || len(args) != 1 {
+					ts.Fatalf("usage: wait-port host:port")
+				}
+				deadline := time.Now().Add(10 * time.Second)
+				for {
+					conn, err := net.DialTimeout("tcp", args[0], time.Until(deadline))
+					if err == nil {
+						conn.Close()
+						return
+					}
+					if time.Now().After(deadline) {
+						ts.Fatalf("wait-port: %v", err)
+					}
+					time.Sleep(10 * time.Millisecond)
+				}
 			},
 			// oauthregistry starts an HTTP server with enough endpoints to test `cue login`.
 			// It takes a single argument to describe the oauth server's behavior:

@@ -184,6 +184,7 @@ Examples:
 	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
 	cmd.Flags().BoolP(string(flagDiff), "d", false, "display diffs instead of rewriting files")
 	cmd.Flags().Bool(string(flagFiles), false, "treat arguments as paths to files or directories to recursively format")
+	addCUEOutputFlags(cmd)
 
 	return cmd
 }

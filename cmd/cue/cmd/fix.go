@@ -75,6 +75,7 @@ current version.
 
 	cmd.Flags().Bool("remove-list-commas", false,
 		"remove commas from multiline list elements (v0.17.0+)")
+	addCUEOutputFlags(cmd)
 
 	return cmd
 }

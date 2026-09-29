@@ -55,6 +55,7 @@ func TestCompile(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		r := runtime.New()
 		// TODO: use high-level API.
 

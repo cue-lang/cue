@@ -105,7 +105,6 @@ type cursor struct {
 	node     ast.Node
 	typ      interface{} // the type of the node
 	index    int         // position of any of the sub types.
-	replaced bool
 	modified bool
 }
 
@@ -172,8 +171,6 @@ func (c *cursor) Replace(n ast.Node) {
 	c.modified = true
 	if r, ok := n.(recursive); ok {
 		n = r.Node
-	} else {
-		c.replaced = true
 	}
 	c.node = n
 }
@@ -536,9 +533,6 @@ type applier struct {
 	before func(Cursor) bool
 	after  func(Cursor) bool
 
-	commentStack []commentFrame
-	current      commentFrame
-
 	fieldValueMap map[ast.Node]ast.Node
 }
 
@@ -549,55 +543,17 @@ func (f *applier) Mapping(before, after ast.Node) {
 	f.fieldValueMap[before] = after
 }
 
-type commentFrame struct {
-	cg  []*ast.CommentGroup
-	pos int8
-}
-
 func (f *applier) Before(c Cursor) applyVisitor {
 	node := c.Node()
 	if f.before == nil || (f.before(c) && node == c.Node()) {
-		f.commentStack = append(f.commentStack, f.current)
-		f.current = commentFrame{cg: ast.Comments(node)}
-		f.visitComments(c, f.current.pos)
 		return f
 	}
 	return nil
 }
 
 func (f *applier) After(c Cursor) bool {
-	f.visitComments(c, 127)
-	p := len(f.commentStack) - 1
-	f.current = f.commentStack[p]
-	f.commentStack = f.commentStack[:p]
-	f.current.pos++
 	if f.after != nil {
 		f.after(c)
 	}
 	return true
-}
-
-func (f *applier) visitComments(p Cursor, pos int8) {
-	c := &f.current
-	for i, cg := range c.cg {
-		if cg.Position == pos {
-			continue
-		}
-		cursor := newCursor(p, cg, cg)
-		if f.before == nil || (f.before(cursor) && !cursor.replaced) {
-			for j, c := range cg.List {
-				cursor := newCursor(p, c, &c)
-				if f.before == nil || (f.before(cursor) && !cursor.replaced) {
-					if f.after != nil {
-						f.after(cursor)
-					}
-				}
-				cg.List[j] = cursor.node.(*ast.Comment)
-			}
-			if f.after != nil {
-				f.after(cursor)
-			}
-		}
-		c.cg[i] = cursor.node.(*ast.CommentGroup)
-	}
 }

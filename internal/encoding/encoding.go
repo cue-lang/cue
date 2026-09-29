@@ -141,8 +141,7 @@ func (i *Decoder) doInterpret() {
 		if i.hasValue {
 			v = i.value
 		} else {
-			i.file = i.File()
-			v = i.ctx.BuildFile(i.file)
+			v = i.ctx.BuildFile(i.EvalFile())
 		}
 		if !i.autoInterpret || !i.hasValue {
 			if err := v.Err(); err != nil {
@@ -216,6 +215,10 @@ func (i *Decoder) setValueSyntax() {
 	}
 }
 
+// File returns the current document as a CUE file, as it would be written:
+// the fields of a top-level struct literal become the file's declarations.
+// This suits printing or rewriting the document; see [Decoder.EvalFile]
+// for evaluating it.
 func (i *Decoder) File() *ast.File {
 	if i.hasValue && i.file == nil && i.expr == nil {
 		i.setValueSyntax()
@@ -232,6 +235,20 @@ func (i *Decoder) File() *ast.File {
 		return &ast.File{}
 	}
 	return internal.ToFile(i.expr, false)
+}
+
+// EvalFile is like [Decoder.File], but for evaluating the document rather
+// than printing it. A file built from the fields of a top-level struct literal
+// starts at its first field, so when the struct's opening brace is elsewhere,
+// as in JSON, the struct is embedded in the file instead. This keeps the
+// position for errors which point at the struct.
+func (i *Decoder) EvalFile() *ast.File {
+	f := i.File()
+	if s, ok := i.expr.(*ast.StructLit); ok && i.file == nil &&
+		s.Lbrace.IsValid() && s.Lbrace.Compare(f.Pos()) != 0 {
+		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: s}}}
+	}
+	return f
 }
 
 // SourceExpr returns the expression decoded from the source, before any

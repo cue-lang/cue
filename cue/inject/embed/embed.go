@@ -425,7 +425,7 @@ func (c *injector) decodeFile(file, scope string) (adt.Expr, errors.Error) {
 
 	defer d.Close()
 
-	n := d.File()
+	n := d.EvalFile()
 	// File can record an error lazily (for example when projecting a
 	// value-plane document to syntax fails), so the earlier Err check
 	// does not cover it; recheck before using the file.

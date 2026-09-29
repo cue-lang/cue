@@ -23,7 +23,6 @@ cmp stderr expect-stderr5
 cmp stderr expect-stderr6
 
 # Likewise for a data file embedded via @embed.
-# TODO: point at the opening brace of the JSON object.
 cd embed
 ! exec cue vet -c .
 cmp stderr ../expect-stderr7
@@ -77,6 +76,7 @@ some instances are incomplete; use the -c flag to show errors or -c=false to all
 -- expect-stdout3 --
 -- expect-stderr3 --
 x: field is required but not present:
+    ./data.json:1:1
     ./in.cue:1:1
 -- expect-stdout4 --
 -- expect-stderr4 --
@@ -94,7 +94,7 @@ nested.req: field is required but not present:
     ./data2.yaml:3:3
     ./schema.cue:3:2
 name: field is required but not present:
-    ./data3.json:2:3
+    ./data3.json:1:1
     ./schema.cue:1:1
 -- expect-stderr6 --
 name: field is required but not present:
@@ -106,4 +106,4 @@ nested.req: field is required but not present:
 -- expect-stderr7 --
 x.name: field is required but not present:
     ./x.cue:4:5
-    x.json:2:3
+    x.json:1:1

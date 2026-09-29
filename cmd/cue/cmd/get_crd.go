@@ -94,7 +94,7 @@ func runCRD(cmd *Command, args []string) error {
 	for _, f := range inst.OrphanedFiles {
 		d := encoding.NewDecoder(cmd.ctx, f, nil)
 		for ; !d.Done(); d.Next() {
-			v := cmd.ctx.BuildFile(d.File())
+			v := cmd.ctx.BuildFile(d.EvalFile())
 			if err := v.Err(); err != nil {
 				return err
 			}

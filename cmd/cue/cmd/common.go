@@ -259,7 +259,7 @@ func (i *streamingIterator) scan() bool {
 		i.f = nil
 	} else {
 		i.f = i.dec.File()
-		v := i.b.cmd.ctx.BuildFile(i.f)
+		v := i.b.cmd.ctx.BuildFile(i.dec.EvalFile())
 		if err := v.Err(); err != nil {
 			i.e = err
 			return false

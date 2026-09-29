@@ -114,7 +114,13 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 
 		// Filter only need to filter files that can stream:
 		for ; !d.Done(); d.Next() {
-			if f := d.File(); f != nil {
+			var f *ast.File
+			if b.importing {
+				f = d.File() // imported files get printed, not only evaluated
+			} else {
+				f = d.EvalFile()
+			}
+			if f != nil {
 				f.Filename = newName(d.Filename(), 0)
 				objs = append(objs, f)
 				srcs = append(srcs, d.SourceExpr())

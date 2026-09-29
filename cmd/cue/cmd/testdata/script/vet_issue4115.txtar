@@ -1,0 +1,27 @@
+# https://cuelang.org/issue/4115
+#
+# A validator on a list or struct must not hide the errors of all but the
+# first erroneous element or field.
+#
+# The validators themselves do not run on a list or struct with erroneous
+# children, so their own errors are not reported.
+
+! exec cue vet x.cue
+stderr 'list1\.1: conflicting values 1 and string'
+# TODO: the errors of later elements and fields are missing.
+! stderr 'list1\.3: conflicting values 2 and string'
+stderr 'struct1\.b: conflicting values 1 and string'
+! stderr 'struct1\.d: conflicting values 2 and string'
+! stderr 'does not satisfy'
+
+-- x.cue --
+import (
+	"list"
+	"struct"
+)
+
+list1: [...string] & list.MaxItems(2)
+list1: ["a", 1, "b", 2]
+
+struct1: {[string]: string} & struct.MaxFields(2)
+struct1: {a: "x", b: 1, c: "y", d: 2}

@@ -424,6 +424,14 @@ var selectorTests = []struct {
 	isHidden:     true,
 	isDefinition: true,
 	pkgPath:      "example.com",
+}, {
+	sel:          cue.Hid("_foo", "example.com").Optional(),
+	stype:        cue.HiddenLabel | cue.OptionalConstraint,
+	string:       "_foo?",
+	isHidden:     true,
+	isConstraint: true,
+	// TODO: the constraint hides the package scope; this should be "example.com".
+	pkgPath: "",
 }}
 
 func TestSelector(t *testing.T) {

@@ -324,8 +324,8 @@ package bar
 }
 
 // TestTokenRefreshCanceledRequest checks that refreshing an OAuth token
-// should not depend on the context of the request which first used the login,
-// and that it should not be cut short when the request which needs it is canceled.
+// does not depend on the context of the request which first used the login,
+// and that it is not cut short when the request which needs it is canceled.
 func TestTokenRefreshCanceledRequest(t *testing.T) {
 	// The third refresh cancels the request which needs it.
 	ctx3, cancel3 := context.WithCancel(context.Background())
@@ -346,28 +346,26 @@ func TestTokenRefreshCanceledRequest(t *testing.T) {
 	qt.Assert(t, qt.DeepEquals(versions, []string{"v0.0.1"}))
 	cancel1()
 
-	// TODO: the refresh uses the first request's canceled context.
 	versions, err = reg.ModuleVersions(context.Background(), "foo.mod@v0")
-	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
-	qt.Assert(t, qt.IsNil(versions))
-	qt.Assert(t, qt.Equals(refreshes.Load(), 1))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(versions, []string{"v0.0.1"}))
+	qt.Assert(t, qt.Equals(refreshes.Load(), 2))
 
-	// A request which is already canceled should not start a refresh.
+	// A request which is already canceled does not start a refresh.
 	_, err = reg.ModuleVersions(ctx1, "foo.mod@v0")
 	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
-	qt.Assert(t, qt.Equals(refreshes.Load(), 1))
+	qt.Assert(t, qt.Equals(refreshes.Load(), 2))
 
-	// A request canceled while it refreshes the token should fail,
-	// but the refresh should still complete and the new token be stored.
-	// TODO: no refresh is attempted, for the same reason as above.
+	// A request canceled while it refreshes the token fails,
+	// but the refresh still completes and the new token is stored.
 	_, err = reg.ModuleVersions(ctx3, "foo.mod@v0")
 	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
-	qt.Assert(t, qt.Equals(refreshes.Load(), 1))
-	qt.Assert(t, qt.Equals(storedToken(), "access_1"))
+	qt.Assert(t, qt.Equals(refreshes.Load(), 3))
+	qt.Assert(t, qt.Equals(storedToken(), "access_3"))
 }
 
 // TestTokenRefreshWaiterDeadline checks that a request waiting for another
-// request's token refresh should stop waiting once its own context is done.
+// request's token refresh stops waiting once its own context is done.
 func TestTokenRefreshWaiterDeadline(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
@@ -390,15 +388,14 @@ func TestTokenRefreshWaiterDeadline(t *testing.T) {
 		_, err := reg.ModuleVersions(ctx, "foo.mod@v0")
 		second <- err
 	}()
-	// TODO: the request keeps waiting for the refresh past its deadline.
 	select {
 	case err := <-second:
-		t.Errorf("request stopped waiting for the refresh: %v", err)
-	case <-time.After(200 * time.Millisecond):
+		qt.Assert(t, qt.ErrorIs(err, context.DeadlineExceeded))
+	case <-time.After(10 * time.Second):
+		t.Error("request is still waiting for the refresh")
 	}
 	close(release)
 	qt.Assert(t, qt.IsNil(<-first))
-	qt.Assert(t, qt.ErrorIs(<-second, context.DeadlineExceeded))
 }
 
 // newLoginRegistry returns a registry holding the module foo.mod@v0.0.1

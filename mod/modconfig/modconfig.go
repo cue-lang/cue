@@ -12,6 +12,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"time"
 
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ociauth"
@@ -239,11 +240,9 @@ type cueLoginsTransport struct {
 	// mu guards the fields below.
 	mu sync.Mutex
 
-	// cachedTransports holds a transport per host.
-	// This is needed because the oauth2 API requires a
-	// different client for each host. Each of these transports
-	// wraps the transport above.
-	cachedTransports map[string]http.RoundTripper
+	// cachedTransports holds a transport per host, as each host
+	// has its own token. Each of them wraps the transport above.
+	cachedTransports map[string]*loginTransport
 }
 
 func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -273,26 +272,17 @@ func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error
 	t.mu.Lock()
 	transport := t.cachedTransports[host]
 	if transport == nil {
-		tok := cueconfig.TokenFromLogin(login)
-		oauthCfg := cueconfig.RegistryOAuthConfig(Host{
-			Name:     host,
-			Insecure: req.URL.Scheme == "http",
-		})
-
-		// Make the oauth client use the transport that was set up
-		// in init.
-		ctx := context.WithValue(req.Context(), oauth2.HTTPClient, &http.Client{
-			Transport: t.transport,
-		})
-		transport = oauth2.NewClient(ctx,
-			&cachingTokenSource{
-				updateFunc: func(tok *oauth2.Token) error {
-					return t.updateLogin(host, tok)
-				},
-				base: oauthCfg.TokenSource(ctx, tok),
-				t:    tok,
+		transport = &loginTransport{
+			base: t.transport,
+			oauthCfg: cueconfig.RegistryOAuthConfig(Host{
+				Name:     host,
+				Insecure: req.URL.Scheme == "http",
+			}),
+			updateFunc: func(tok *oauth2.Token) error {
+				return t.updateLogin(host, tok)
 			},
-		).Transport
+			tok: cueconfig.TokenFromLogin(login),
+		}
 		t.cachedTransports[host] = transport
 	}
 	// Unlock immediately so we don't hold the lock for the entire
@@ -360,7 +350,7 @@ func (t *cueLoginsTransport) _init() error {
 		return fmt.Errorf("cannot load CUE registry logins: %v", err)
 	}
 	t.logins = logins
-	t.cachedTransports = make(map[string]http.RoundTripper)
+	t.cachedTransports = make(map[string]*loginTransport)
 	return nil
 }
 
@@ -460,39 +450,111 @@ func newRef[T any](x *T) *T {
 	return &x1
 }
 
-// cachingTokenSource works similar to oauth2.ReuseTokenSource, except that it
-// also exposes a hook to get a hold of the refreshed token, so that it can be
-// stored in persistent storage.
-type cachingTokenSource struct {
-	updateFunc func(tok *oauth2.Token) error
-	base       oauth2.TokenSource // called when t is expired
+// tokenRefreshTimeout bounds each refresh of an OAuth token.
+const tokenRefreshTimeout = time.Minute
 
-	mu sync.Mutex // guards t
-	t  *oauth2.Token
+// loginTransport implements [http.RoundTripper] for a single registry host
+// by authorizing each request with the token from the CUE login information.
+// It works like [oauth2.Transport] with an [oauth2.ReuseTokenSource],
+// except that each refresh of the token uses the context of the request
+// which needs it, and that the refreshed token is stored via updateFunc.
+//
+// TODO: use [oauth2.Transport] again once its token sources take a context
+// per call; see https://github.com/golang/oauth2/issues/262.
+type loginTransport struct {
+	base       http.RoundTripper // also used to refresh the token
+	oauthCfg   oauth2.Config
+	updateFunc func(tok *oauth2.Token) error
+
+	mu      sync.Mutex // guards the fields below
+	tok     *oauth2.Token
+	refresh *tokenRefresh // the refresh in flight, if any
 }
 
-func (s *cachingTokenSource) Token() (*oauth2.Token, error) {
-	s.mu.Lock()
-	t := s.t
+// tokenRefresh is a refresh of an expired token,
+// shared by all the requests which need the new token.
+type tokenRefresh struct {
+	done chan struct{} // closed once tok and err are set
+	tok  *oauth2.Token
+	err  error
+}
 
-	if t.Valid() {
-		s.mu.Unlock()
-		return t, nil
-	}
-
-	t, err := s.base.Token()
+func (t *loginTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	tok, err := t.token(req.Context())
 	if err != nil {
-		s.mu.Unlock()
+		if req.Body != nil {
+			req.Body.Close()
+		}
 		return nil, err
 	}
+	req = req.Clone(req.Context())
+	tok.SetAuthHeader(req)
+	return t.base.RoundTrip(req)
+}
 
-	s.t = t
-	s.mu.Unlock()
-
-	err = s.updateFunc(t)
-	if err != nil {
+// token returns the current token, refreshing it first if it has expired.
+func (t *loginTransport) token(ctx context.Context) (*oauth2.Token, error) {
+	// A canceled request must not start a refresh, which would outlive it.
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	tok, r, start := t.tokenOrRefresh()
+	if r == nil {
+		return tok, nil
+	}
+	if start {
+		// Run the refresh here rather than in the background, so that
+		// the new token is stored by the time the request returns.
+		t.runRefresh(ctx, r, tok)
+		return r.tok, r.err
+	}
+	select {
+	case <-r.done:
+		return r.tok, r.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
 
-	return t, nil
+// tokenOrRefresh returns the current token and, if it has expired,
+// the refresh which replaces it. If no refresh was in flight, a new one
+// is returned along with start set to true, and the caller must run it.
+func (t *loginTransport) tokenOrRefresh() (tok *oauth2.Token, r *tokenRefresh, start bool) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.tok.Valid() {
+		return t.tok, nil, false
+	}
+	if t.refresh == nil {
+		t.refresh = &tokenRefresh{done: make(chan struct{})}
+		start = true
+	}
+	return t.tok, t.refresh, start
+}
+
+// runRefresh runs the refresh r of the expired token old.
+func (t *loginTransport) runRefresh(ctx context.Context, r *tokenRefresh, old *oauth2.Token) {
+	// Abandoning a refresh halfway can lose a rotated refresh token and
+	// force a new login, so ignore cancellation and use a timeout instead.
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), tokenRefreshTimeout)
+	defer cancel()
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{
+		Transport: t.base,
+	})
+	tok, err := t.oauthCfg.TokenSource(ctx, old).Token()
+	if err == nil {
+		// Store the token before the next refresh can start,
+		// so that an older token never overwrites a newer one.
+		err = t.updateFunc(tok)
+	}
+
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if tok != nil {
+		// Keep using the new token even if it could not be stored.
+		t.tok = tok
+	}
+	r.tok, r.err = tok, err
+	t.refresh = nil
+	close(r.done)
 }

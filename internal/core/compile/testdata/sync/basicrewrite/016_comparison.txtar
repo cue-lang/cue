@@ -196,6 +196,9 @@ diffTypes: {
 	iNe2: [_int] != [1]
 	iNe3: {a: 1} != {a: _int}
 	iNe4: {a: _int} != {a: 1}
+
+	// Errors in the right-hand operand name its kind.
+	iNe5: 1 != [_int] // wrong kind: the operand is a list
 }
 -- out/compile --
 --- in.cue
@@ -829,5 +832,8 @@ diffTypes: {
     } != {
       a: 1
     })
+    iNe5: (1 != [
+      〈1;_int〉,
+    ])
   }
 }

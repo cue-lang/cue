@@ -581,6 +581,10 @@ type state struct {
 
 	patterns []ast.Expr
 
+	// patternSkipped holds whether "patternProperties" has a regexp
+	// which could not be expressed, leaving its properties unknown.
+	patternSkipped bool
+
 	// list holds the list literal generated for the array form of
 	// "items" or for "prefixItems", holding the elements of the prefix
 	// that are guaranteed to be present. It's non-nil once such a

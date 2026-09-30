@@ -2,8 +2,6 @@
 # without #strictFeatures, leaving no way to tell its properties from
 # the rest. "additionalProperties" may then not constrain the rest,
 # or valid instances would be rejected.
-#
-# TODO: test/err-lookahead.json is a valid instance.
 
 -- schema.json --
 {
@@ -32,7 +30,7 @@
         }
     }
 }
--- test/err-lookahead.json --
+-- test/lookahead.json --
 {
     "additional": {
         "foo": 1
@@ -44,17 +42,12 @@
 }
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
-additional?: close({})
-additionalSchema?: [string]: _#defs."/properties/additionalSchema/additionalProperties"
-value?: _#defs."/properties/additionalSchema/additionalProperties"
+additional?:       {...}
+additionalSchema?: {...}
+value?:            _#defs."/properties/additionalSchema/additionalProperties"
 
 _#defs: "/properties/additionalSchema/additionalProperties": {
 	@jsonschema(id="https://example.com/value")
 	string
 }
 ...
--- out/decode/testerr/err-lookahead --
-additionalSchema.foo: conflicting values 1 and string (mismatched types int and string):
-    generated.cue:3:30
-    generated.cue:8:2
-    test/err-lookahead.json:6:16

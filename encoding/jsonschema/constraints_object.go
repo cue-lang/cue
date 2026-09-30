@@ -86,6 +86,13 @@ func constraintGroupVersionKind(key string, n cue.Value, s *state) {
 }
 
 func constraintAdditionalProperties(key string, n cue.Value, s *state) {
+	if s.patternSkipped && (n.Kind() != cue.BoolKind || !s.boolValue(n)) {
+		// The properties of a skipped pattern cannot be told apart from
+		// the remaining ones, so applying n could reject valid data.
+		// Still decode n, which may hold errors or referenced schemas.
+		s.schema(n)
+		return
+	}
 	switch n.Kind() {
 	case cue.BoolKind:
 		if s.boolValue(n) {
@@ -320,6 +327,7 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 	obj := s.object(n)
 	s.processMap(n, func(key string, n cue.Value) {
 		if !s.checkRegexp(n, key) {
+			s.patternSkipped = true
 			return
 		}
 

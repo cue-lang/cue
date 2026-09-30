@@ -251,7 +251,7 @@ dataNodes: {
 
 	PatternExclusions: {
 		description: "Pattern exclusions derived from patternProperties."
-		stateField:  "s.patterns"
+		stateField:  "s.patterns / s.patternSkipped"
 		producers:   ["patternProperties"]
 		consumers:   ["additionalProperties"]
 	}

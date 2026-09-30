@@ -1255,7 +1255,7 @@ func (s *state) listItems(name string, n cue.Value, allowEmpty bool) (a []cue.Va
 	return a
 }
 
-// excludeFields returns either an empty slice (if decls is empty)
+// excludeFields returns either an empty slice (if decls has no named fields)
 // or a slice containing a CUE expression that can be used to exclude the
 // fields of the given declaration in a label expression. For instance, for
 //
@@ -1270,9 +1270,6 @@ func (s *state) listItems(name string, n cue.Value, allowEmpty bool) (a []cue.Va
 //
 //	[!~"^(foo|bar)$"]: string
 func excludeFields(decls []ast.Decl) []ast.Expr {
-	if len(decls) == 0 {
-		return nil
-	}
 	var buf strings.Builder
 	first := true
 	buf.WriteString("^(")
@@ -1289,6 +1286,9 @@ func excludeFields(decls []ast.Decl) []ast.Expr {
 			buf.WriteString(regexp.QuoteMeta(str))
 			first = false
 		}
+	}
+	if first {
+		return nil
 	}
 	buf.WriteString(")$")
 	return []ast.Expr{

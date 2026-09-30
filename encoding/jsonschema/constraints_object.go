@@ -118,6 +118,9 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 		}
 		// [!~(properties|patternProperties)]: schema
 		existing := append(s.patterns, excludeFields(obj.Elts)...)
+		if len(existing) == 0 {
+			existing = append(existing, ast.NewIdent("string"))
+		}
 		expr, _ := s.schemaState(n, allTypes, func(s *state) {
 			s.preserveUnknownFields = false
 		})

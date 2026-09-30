@@ -6,6 +6,7 @@
 package par
 
 import (
+	"context"
 	"errors"
 	"math/rand/v2"
 	"sync"
@@ -112,14 +113,38 @@ type ErrCache[K comparable, V any] struct {
 type errValue[V any] struct {
 	v   V
 	err error
+
+	// canceled is set if the result was not cached; see [ErrCache.DoContext].
+	canceled bool
 }
 
 func (c *ErrCache[K, V]) Do(key K, f func() (V, error)) (V, error) {
 	v := c.Cache.Do(key, func() errValue[V] {
 		v, err := f()
-		return errValue[V]{v, err}
+		return errValue[V]{v: v, err: err}
 	})
 	return v.v, v.err
+}
+
+// DoContext is like [ErrCache.Do], except that a failure of f while ctx is
+// canceled is not cached. As ctx belongs to the one caller whose f ran,
+// callers waiting on the same key, and later callers, call their own f.
+func (c *ErrCache[K, V]) DoContext(ctx context.Context, key K, f func() (V, error)) (V, error) {
+	for {
+		v := c.Cache.Do(key, func() errValue[V] {
+			v, err := f()
+			canceled := err != nil && ctx.Err() != nil
+			if canceled {
+				// Forget the entry before Do marks it as done,
+				// so that only the callers already waiting see it.
+				c.m.Delete(key)
+			}
+			return errValue[V]{v, err, canceled}
+		})
+		if !v.canceled || ctx.Err() != nil {
+			return v.v, v.err
+		}
+	}
 }
 
 var ErrCacheEntryNotFound = errors.New("cache entry not found")

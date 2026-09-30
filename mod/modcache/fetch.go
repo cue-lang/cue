@@ -68,7 +68,7 @@ func (c *Cache) Requirements(ctx context.Context, mv module.Version) ([]module.V
 // ModFile returns the parsed module file for the given module version,
 // downloading it if necessary. Results are cached.
 func (c *Cache) ModFile(ctx context.Context, mv module.Version) (*modfile.File, error) {
-	return c.modFileCache.Do(mv, func() (*modfile.File, error) {
+	return c.modFileCache.DoContext(ctx, mv, func() (*modfile.File, error) {
 		data, err := c.fetchModFileData(ctx, mv)
 		if err != nil {
 			return nil, err
@@ -104,7 +104,7 @@ func (c *Cache) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc,
 	// process, mirroring the download cache in Go's cmd/go/internal/modfetch.
 	// This also keeps repeated fetches away from the transient stat errors
 	// described in downloadDir (https://cuelang.org/issue/3413).
-	return c.fetchCache.Do(mv, func() (module.SourceLoc, error) {
+	return c.fetchCache.DoContext(ctx, mv, func() (module.SourceLoc, error) {
 		return c.fetch(ctx, mv)
 	})
 }
@@ -204,7 +204,7 @@ func (c *Cache) ModuleVersions(ctx context.Context, mpath string) ([]string, err
 }
 
 func (c *Cache) downloadZip(ctx context.Context, mv module.Version) (zipfile string, err error) {
-	return c.downloadZipCache.Do(mv, func() (string, error) {
+	return c.downloadZipCache.DoContext(ctx, mv, func() (string, error) {
 		zipfile, err := c.cachePath(mv, "zip")
 		if err != nil {
 			return "", err

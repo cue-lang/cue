@@ -210,7 +210,7 @@ package example
 
 func TestCanceledNotMemoized(t *testing.T) {
 	// A failure caused by one caller's context being canceled
-	// should not be returned to later callers with a live context.
+	// must not be returned to later callers with a live context.
 	dir := t.TempDir()
 	t.Cleanup(func() {
 		RemoveAll(dir)
@@ -234,12 +234,11 @@ package example
 	_, err = cr.Fetch(canceledCtx, mv)
 	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
 
-	// TODO: the canceled failures are memoized, so these fail too.
 	ctx := context.Background()
 	_, err = cr.ModFile(ctx, mv)
-	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	qt.Assert(t, qt.IsNil(err))
 	_, err = cr.Fetch(ctx, mv)
-	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	qt.Assert(t, qt.IsNil(err))
 }
 
 func fsSub(fsys fs.FS, sub string) fs.FS {

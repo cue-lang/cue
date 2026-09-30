@@ -86,6 +86,12 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  tag, in that order. A --codec flag can be used to change the priority of
 	  the tag search.
 
+	- the "jsonv2" codec reads "json" tags like the "json" codec, but follows
+	  encoding/json/v2 rather than the v1 API of encoding/json. For example,
+	  an "omitempty" option does not make a boolean or number optional, and
+	  types which encoding/json/v2 rejects are dropped, such as time.Duration
+	  or a struct whose json tags have invalid options.
+
 	- the tag found for a field also decides how it is encoded: the field
 	  is optional if the tag has an "omitempty" or "omitzero" option,
 	  a "json" tag with a "string" option encodes a boolean, number, or
@@ -245,7 +251,7 @@ restrictive enum interpretation of #Switch remains.
 	cmd.Flags().String(string(flagOutFile), "", "generate one CUE file for a single Go package")
 
 	cmd.Flags().String(string(flagCodec), defaultCodec,
-		"comma-separated priority list of struct tags to use for field names")
+		"comma-separated priority list of codecs, such as json, jsonv2, yaml, or toml")
 
 	return cmd
 }
@@ -297,6 +303,14 @@ type extractor struct {
 	exclude    string
 
 	codecs []*codec
+
+	// jsonV2 is whether types are encoded following encoding/json/v2,
+	// as the jsonv2 codec is in use.
+	jsonV2 bool
+
+	// jsonV2Errors records why encoding/json/v2 rejects a struct type,
+	// or the empty string if it does not.
+	jsonV2Errors map[*types.Struct]string
 }
 
 // codec describes how a Go encoding library selected via --codec
@@ -318,12 +332,17 @@ type codec struct {
 	// stringOption is whether a "string" tag option encodes
 	// a boolean, number, or string as a string.
 	stringOption bool
+
+	// jsonV2 is whether the codec follows encoding/json/v2
+	// rather than the v1 API of encoding/json.
+	jsonV2 bool
 }
 
 // knownCodecs lists the codecs with semantics other than
 // those of encoding/json, which any other struct tag key follows.
 var knownCodecs = []*codec{
 	{name: "json", tagKey: "json", stringOption: true},
+	{name: "jsonv2", tagKey: "json", stringOption: true, jsonV2: true},
 	// YAML libraries such as gopkg.in/yaml.v3.
 	{name: "yaml", tagKey: "yaml", inlineOption: true},
 	// TOML libraries such as github.com/BurntSushi/toml.
@@ -478,8 +497,16 @@ func extract(cmd *Command, args []string) error {
 	e.initExclusions(flagExclude.String(cmd))
 
 	for name := range strings.SplitSeq(flagCodec.String(cmd), ",") {
-		e.codecs = append(e.codecs, lookupCodec(name))
+		c := lookupCodec(name)
+		for _, c2 := range e.codecs {
+			if c.tagKey == c2.tagKey {
+				return fmt.Errorf("codecs %s and %s both read %q tags", c2.name, c.name, c.tagKey)
+			}
+		}
+		e.codecs = append(e.codecs, c)
+		e.jsonV2 = e.jsonV2 || c.jsonV2
 	}
+	e.jsonV2Errors = make(map[*types.Struct]string)
 
 	e.done = map[string]bool{}
 
@@ -1113,7 +1140,13 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 		switch pkg.Path() {
 		case "time":
 			switch obj.Name() {
-			case "Time", "Duration", "Location", "Month", "Weekday":
+			case "Duration":
+				if e.jsonV2 {
+					e.logf("    %v has no default representation in encoding/json/v2", obj)
+					return false
+				}
+				return true
+			case "Time", "Location", "Month", "Weekday":
 				return true
 			}
 			return false
@@ -1147,8 +1180,16 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 		if !supportedMapKey(t.Key()) {
 			return false
 		}
+		if e.jsonV2 && !e.supportedType(stack, t.Key()) {
+			return false
+		}
 		return e.supportedType(stack, t.Elem())
 	case *types.Struct:
+		if e.jsonV2 {
+			if e.jsonV2Error(t) != "" {
+				return false
+			}
+		}
 		// Eliminate structs with fields for which all fields are filtered.
 		if t.NumFields() == 0 {
 			return true
@@ -1269,10 +1310,11 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 			// Note that this means we aren't compatible with CUE's own time.Duration,
 			// which is rather unfortunate, but we have to choose one or the other.
 			//
-			// TODO(mvdan): reconsider once 'cue get go' is more configurable,
-			// and especially once encoding/json/v2 becomes a reality,
-			// as it does encode time.Duration via strings rather than integers.
-			// For example, could we generate types like 'int | *time.Duration'
+			// The jsonv2 codec drops time.Duration instead, as encoding/json/v2
+			// has no default representation for it; see https://go.dev/issue/71631.
+			//
+			// TODO(mvdan): once encoding/json/v2 chooses a representation,
+			// could we generate types like 'int | *time.Duration'
 			// and constants like '300 | *"300ns"' to support both at the same time?
 			return e.ident("int", false)
 
@@ -1895,8 +1937,107 @@ func isJSONTextValue(t types.Type) bool {
 		n.Obj().Pkg().Path() == "encoding/json/jsontext" && n.Obj().Name() == "Value"
 }
 
+// jsonV2Error returns why encoding/json/v2 rejects the struct type x,
+// or the empty string if it does not.
+func (e *extractor) jsonV2Error(x *types.Struct) string {
+	msg, ok := e.jsonV2Errors[x]
+	if !ok {
+		msg = e.findJSONV2Error(x)
+		e.jsonV2Errors[x] = msg
+		if msg != "" {
+			e.logf("    encoding/json/v2 rejects %v: %s", x, msg)
+		}
+	}
+	return msg
+}
+
+func (e *extractor) findJSONV2Error(x *types.Struct) string {
+	names := make(map[string]bool)
+	hasTag, hasField, fallbacks := false, false, 0
+	for i := range x.NumFields() {
+		f := x.Field(i)
+		tag, tagged := reflect.StructTag(x.Tag(i)).Lookup("json")
+		hasTag = hasTag || tagged
+		if tag == "-" {
+			continue
+		}
+		if !f.Exported() && tagged {
+			return fmt.Sprintf("unexported field %s has a json tag", f.Name())
+		}
+		name, opts, _ := strings.Cut(tag, ",")
+		if strings.HasSuffix(tag, ",") {
+			return fmt.Sprintf("field %s has a json tag with a trailing comma", f.Name())
+		}
+		var embed bool
+		if opts != "" {
+			for opt := range strings.SplitSeq(opts, ",") {
+				switch opt {
+				case "omitzero", "omitempty", "string", "case:ignore", "case:strict":
+				case "embed":
+					embed = true
+				default:
+					// Unknown options are ignored, but not misspelled known ones.
+					// A format option is only supported via a runtime option.
+					key, _, _ := strings.Cut(opt, ":")
+					for _, known := range []string{"omitzero", "omitempty", "string", "case", "embed", "format"} {
+						if strings.EqualFold(key, known) {
+							return fmt.Sprintf("field %s has an unsupported json tag option %q", f.Name(), opt)
+						}
+					}
+				}
+			}
+		}
+		if embed && (name != "" || opts != "embed") {
+			return fmt.Sprintf("field %s has other json tag options besides embed", f.Name())
+		}
+		typ := f.Type()
+		if p, ok := typ.(*types.Pointer); ok {
+			typ = p.Elem()
+		}
+		if hasFlag(x.Tag(i), "json", "string", 1) && e.altType(typ) == nil {
+			if b, ok := typ.Underlying().(*types.Basic); !ok || b.Info()&types.IsNumeric == 0 {
+				return fmt.Sprintf("field %s has a json string option but is not a number", f.Name())
+			}
+		}
+		if !f.Exported() && !f.Anonymous() {
+			continue
+		}
+		hasField = true
+		_, isStruct := typ.Underlying().(*types.Struct)
+		if f.Anonymous() && name == "" && !isStruct && !embed {
+			return fmt.Sprintf("embedded field %s is not a struct and has no json name", f.Name())
+		}
+		if (f.Anonymous() && name == "") || embed {
+			if e.altType(typ) != nil && e.altType(x) == nil {
+				return fmt.Sprintf("embedded field %s has its own marshal or unmarshal methods", f.Name())
+			}
+			if !isStruct {
+				if !isFallback(typ) {
+					return fmt.Sprintf("embedded field %s is not a struct, a map with string keys, nor a jsontext.Value", f.Name())
+				}
+				if fallbacks++; fallbacks > 1 {
+					return "more than one embedded field holds other object members"
+				}
+			}
+			continue
+		}
+		if name == "" {
+			name = f.Name()
+		}
+		if names[name] {
+			return fmt.Sprintf("more than one field is named %q", name)
+		}
+		names[name] = true
+	}
+	if !hasField && !hasTag && x.NumFields() > 0 {
+		return "no exported fields and no json tags"
+	}
+	return ""
+}
+
 // isStringified reports whether a field of type typ with the given tag
 // is encoded as a string due to a "string" tag option.
+// encoding/json/v2 only allows the option for numbers.
 func (e *extractor) isStringified(typ types.Type, tag string, codec *codec) bool {
 	if !codec.stringOption || !hasFlag(tag, codec.tagKey, "string", 1) {
 		return false
@@ -1907,8 +2048,12 @@ func (e *extractor) isStringified(typ types.Type, tag string, codec *codec) bool
 	if e.altType(typ) != nil {
 		return false // encoded via its own methods
 	}
+	kinds := types.IsBoolean | types.IsNumeric | types.IsString
+	if codec.jsonV2 {
+		kinds = types.IsNumeric
+	}
 	b, ok := typ.Underlying().(*types.Basic)
-	return ok && b.Info()&(types.IsBoolean|types.IsNumeric|types.IsString) != 0
+	return ok && b.Info()&kinds != 0
 }
 
 // isEmbedded reports whether the governing codec promotes the fields of f,
@@ -1986,12 +2131,24 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty";
 	// TOML and YAML libraries such as BurntSushi/toml and goccy/go-yaml support it too.
 	// TODO: also when the type is a list or other kind of pointer.
-	if hasFlag(tag, codec.tagKey, "omitempty", 1) ||
-		hasFlag(tag, codec.tagKey, "omitzero", 1) {
+	if hasFlag(tag, codec.tagKey, "omitzero", 1) ||
+		(hasFlag(tag, codec.tagKey, "omitempty", 1) && e.omitsEmpty(f.Type(), codec)) {
 		attrs |= optional
 	}
 
 	return attrs, nil
+}
+
+// omitsEmpty reports whether a field of type typ with the given tag
+// may be omitted due to an "omitempty" tag option.
+// encoding/json/v2 only omits values encoded as an empty JSON value,
+// which booleans and numbers never are.
+func (e *extractor) omitsEmpty(typ types.Type, codec *codec) bool {
+	if !codec.jsonV2 || e.altType(typ) != nil {
+		return true
+	}
+	b, ok := typ.Underlying().(*types.Basic)
+	return !ok || b.Info()&(types.IsBoolean|types.IsNumeric) == 0
 }
 
 func hasFlag(tag, key, flag string, offset int) bool {

@@ -121,7 +121,8 @@ type Foozer struct {
 
 	OptionalOmitZeroJSON time.Time `json:"optionalOmitZeroJSON,omitzero"`
 
-	OptionalOmitEmptyYAML string `yaml:"optionalOmitEmptyYAML,omitempty"`
+	// The YAML tag is ignored, as the struct has JSON tags.
+	IgnoredOmitEmptyYAML string `yaml:"ignoredOmitEmptyYAML,omitempty"`
 
 	// +optional
 	OptionalComment string `json:"optionalComment"`
@@ -384,7 +385,9 @@ import (
 	MapKeyNamedString:      {[string]: #MyString} @go(,map[MyString]MyString)
 	optionalOmitEmptyJSON?: string                @go(OptionalOmitEmptyJSON)
 	optionalOmitZeroJSON?:  time.Time             @go(OptionalOmitZeroJSON)
-	optionalOmitEmptyYAML?: string                @go(OptionalOmitEmptyYAML)
+
+	// The YAML tag is ignored, as the struct has JSON tags.
+	IgnoredOmitEmptyYAML: string
 
 	// +optional
 	optionalComment?: string @go(OptionalComment)

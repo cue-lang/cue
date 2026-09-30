@@ -44,8 +44,8 @@ type Disjoint struct {
 	F2 int `yaml:"f2_yaml"`
 }
 
-// Only the tag which names a field, or the first tag present, decides
-// whether the field is optional.
+// Only the tags of the codec governing the struct
+// decide whether its fields are optional.
 type Optional struct {
 	F1 int `json:"f1_json,omitempty"`
 	F2 int `json:"f2_json,omitzero"`
@@ -117,21 +117,21 @@ package pkg
 
 #Disjoint: {
 	f1_json: int @go(F1)
-	f2_yaml: int @go(F2)
+	F2:      int
 }
 
-// Only the tag which names a field, or the first tag present, decides
-// whether the field is optional.
+// Only the tags of the codec governing the struct
+// decide whether its fields are optional.
 #Optional: {
 	f1_json?: int @go(F1)
 	f2_json?: int @go(F2)
-	f3_yaml?: int @go(F3)
-	f4_yaml?: int @go(F4)
+	F3:       int
+	F4:       int
 	F5:       int @toml(f5_toml,omitempty)
 	F6:       int @toml(f6_toml,omitzero)
 	f7_json?: int @go(F7)
 	f8_json:  int @go(F8)
-	f9_yaml:  int @go(F9)
+	F9?:      int
 }
 
 // Pointer fields are nullable except under TOML, which has no null.
@@ -147,20 +147,20 @@ package pkg
 // YAML tags also require an "inline" option.
 #Embedded: {#Base}
 
-#EmbeddedInline: {#Base}
+#EmbeddedInline: b_yaml: int @go(B) @toml(b_toml)
 
 #Map: [string]: int
 
 // A YAML inline map holds any other keys.
 #EmbeddedInlineMap: {
-	[!="s_json"]: int
-	s_json:       string @go(S)
+	Map:    #Map
+	s_json: string @go(S)
 }
 
 // All fields of a struct follow the same codec, including embedded ones
 // whose tags are only for another codec.
 #EmbeddedOtherTag: {
-	base:   #Base  @go(Base)
+	#Base
 	s_json: string @go(S)
 }
 -- pkg/pkg_go_gen_yaml.cue.golden --
@@ -182,19 +182,19 @@ package pkg
 
 #Overlapping: {
 	f1_yaml: int @go(F1)
-	f2_json: int @go(F2)
+	F2:      int
 }
 
 #Disjoint: {
-	f1_json: int @go(F1)
+	F1:      int
 	f2_yaml: int @go(F2)
 }
 
-// Only the tag which names a field, or the first tag present, decides
-// whether the field is optional.
+// Only the tags of the codec governing the struct
+// decide whether its fields are optional.
 #Optional: {
-	f1_json?: int @go(F1)
-	f2_json?: int @go(F2)
+	F1:       int
+	F2:       int
 	f3_yaml?: int @go(F3)
 	f4_yaml?: int @go(F4)
 	F5:       int @toml(f5_toml,omitempty)
@@ -260,8 +260,8 @@ package pkg
 	f2_yaml: int @go(F2)
 }
 
-// Only the tag which names a field, or the first tag present, decides
-// whether the field is optional.
+// Only the tags of the codec governing the struct
+// decide whether its fields are optional.
 #Optional: {
 	F1:       int
 	F2:       int
@@ -330,8 +330,8 @@ package pkg
 	F2: int
 }
 
-// Only the tag which names a field, or the first tag present, decides
-// whether the field is optional.
+// Only the tags of the codec governing the struct
+// decide whether its fields are optional.
 #Optional: {
 	F1:       int
 	F2:       int

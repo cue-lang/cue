@@ -82,9 +82,10 @@ Rules of Converting Go types to CUE
 
 Go structs are converted to cue structs adhering to the following conventions:
 
-	- field names are translated based on the definition of a "json" or "yaml"
-	  tag, in that order. A --codec flag can be used to change the priority of
-	  the tag search.
+	- each struct follows a single codec: the first one in the priority list
+	  given by the --codec flag, "json,yaml" by default, whose tag appears
+	  on any of its fields, or else the first codec. Field names are
+	  translated based on the tags of that codec.
 
 	- the "jsonv2" codec reads "json" tags like the "json" codec, but follows
 	  encoding/json/v2 rather than the v1 API of encoding/json. For example,
@@ -92,17 +93,15 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  types which encoding/json/v2 rejects are dropped, such as time.Duration
 	  or a struct whose json tags have invalid options.
 
-	- the tag found for a field also decides how it is encoded: the field
-	  is optional if the tag has an "omitempty" or "omitzero" option,
-	  a "json" tag with a "string" option encodes a boolean, number, or
-	  string as a string, and a pointer field is not nullable if it is a
-	  "toml" tag, as TOML has no null. Fields without any such tag follow
-	  the first codec.
+	- the codec also decides how the fields are encoded: a field is optional
+	  if its tag has an "omitempty" or "omitzero" option, a "json" tag with
+	  a "string" option encodes a boolean, number, or string as a string,
+	  and a pointer field is not nullable under "toml", as TOML has no null.
 
 	- the fields of an embedded struct, or pointer to struct, are promoted
-	  like encoding/json does, unless the tag found for it gives a name.
-	  YAML tags only promote them with an "inline" option, following
-	  libraries like gopkg.in/yaml.v3. For instance, the Go struct
+	  like encoding/json does, unless the field's tag gives it a name.
+	  Under the "yaml" codec, they are only promoted with an "inline" option,
+	  following libraries like gopkg.in/yaml.v3. For instance, the Go struct
 
 	    type MyStruct struct {
 			Common
@@ -304,10 +303,6 @@ type extractor struct {
 
 	codecs []*codec
 
-	// jsonV2 is the jsonv2 codec when in use, in which case
-	// types are encoded following encoding/json/v2.
-	jsonV2 *codec
-
 	// jsonV2Errors records why encoding/json/v2 rejects a struct type,
 	// or the empty string if it does not.
 	jsonV2Errors map[*types.Struct]string
@@ -508,9 +503,6 @@ func extract(cmd *Command, args []string) error {
 			}
 		}
 		e.codecs = append(e.codecs, c)
-		if c.jsonV2 {
-			e.jsonV2 = c
-		}
 	}
 	e.jsonV2Errors = make(map[*types.Struct]string)
 	e.ownEncodings = make(map[types.Type]ownEncoding)
@@ -848,7 +840,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				fallthrough
 
 			default:
-				if !e.supportedType(nil, typ) {
+				if !e.supportedType(nil, typ, e.codecs[0]) {
 					e.logf("    Dropped declaration %v of unsupported type %v", name, typ)
 					continue
 				}
@@ -1152,7 +1144,9 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 	return &cueast.CommentGroup{Doc: isDoc, List: a}
 }
 
-func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
+// supportedType reports whether t can be encoded with the codec c,
+// the one governing the struct field or declaration of type t.
+func (e *extractor) supportedType(stack []types.Type, t types.Type, c *codec) (ok bool) {
 	if s := e.altType(t); s != nil {
 		// t implements a supported interface.
 		return true
@@ -1175,7 +1169,7 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 		case "time":
 			switch obj.Name() {
 			case "Duration":
-				if e.jsonV2 != nil {
+				if c.jsonV2 {
 					e.logf("    %v has no default representation in encoding/json/v2", obj)
 					return false
 				}
@@ -1201,33 +1195,35 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 	case *types.Basic:
 		return true
 	case *types.Named:
-		return e.supportedType(stack, t.Underlying())
+		return e.supportedType(stack, t.Underlying(), c)
 	case *types.TypeParam:
-		return e.supportedType(stack, t.Underlying())
+		return e.supportedType(stack, t.Underlying(), c)
 	case *types.Pointer:
-		return e.supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem(), c)
 	case *types.Slice:
-		return e.supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem(), c)
 	case *types.Array:
-		return e.supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem(), c)
 	case *types.Map:
 		if !supportedMapKey(t.Key()) {
 			return false
 		}
-		if !e.supportedType(stack, t.Key()) {
+		if !e.supportedType(stack, t.Key(), c) {
 			return false
 		}
-		return e.supportedType(stack, t.Elem())
+		return e.supportedType(stack, t.Elem(), c)
 	case *types.Struct:
-		if e.jsonV2 != nil && e.jsonV2Error(t) != "" {
+		if e.jsonV2Error(t) != "" {
 			return false
 		}
+		// The fields of a struct follow its own codec.
+		c := e.structCodec(t)
 		// Eliminate structs with fields for which all fields are filtered.
 		if t.NumFields() == 0 {
 			return true
 		}
 		for f := range t.Fields() {
-			if f.Exported() && e.supportedType(stack, f.Type()) {
+			if f.Exported() && e.supportedType(stack, f.Type(), c) {
 				return true
 			}
 		}
@@ -1621,11 +1617,11 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 	for i := 0; i < x.NumFields(); i++ {
 		f := x.Field(i)
 		index := fmt.Sprint(prefix, i)
-		typ, viaPointer, embedded := e.embedded(f, x.Tag(i))
+		typ, viaPointer, embedded := e.embedded(enc.codec, f, x.Tag(i))
 		if !embedded && !ast.IsExported(f.Name()) {
 			continue
 		}
-		if !e.supportedType(nil, f.Type()) {
+		if !e.supportedType(nil, f.Type(), enc.codec) {
 			e.logf("    Dropped field %v for unsupported type %v", f.Name(), f.Type())
 			continue
 		}
@@ -1657,8 +1653,7 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 			continue
 		}
 		tag := x.Tag(i)
-		codec, tagName := e.fieldCodec(tag)
-		if tagName == "-" {
+		if enc.codec.fieldName(tag) == "-" {
 			continue
 		}
 		name, ok := enc.names[index]
@@ -1670,7 +1665,7 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 		doc := docs[i]
 
 		// TODO: check referrers
-		attrs, err := e.detectFieldAttributes(f, doc, tag, codec)
+		attrs, err := e.detectFieldAttributes(f, doc, tag, enc.codec)
 		if err != nil {
 			e.logf("error parsing field %q: %v", f.Name(), err)
 			continue
@@ -1679,7 +1674,7 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 			attrs = attrs&^required | optional
 		}
 		ftyp := f.Type()
-		if e.isStringified(ftyp, tag, codec) {
+		if e.isStringified(ftyp, tag, enc.codec) {
 			ftyp = types.Typ[types.String]
 		}
 		field, cueType := e.makeField(name, regular, attrs, ftyp, doc, count > 0)
@@ -1777,6 +1772,9 @@ func (e *extractor) canReference(t *types.Named) bool {
 // structEncoding describes which fields of a struct are encoded,
 // following the rules of encoding/json for embedding.
 type structEncoding struct {
+	// codec is the codec which the struct is encoded with.
+	codec *codec
+
 	// names holds the names of the encoded fields,
 	// keyed by their dot-separated index paths.
 	names map[string]string
@@ -1800,12 +1798,12 @@ func (enc *structEncoding) within(prefix string) bool {
 }
 
 // embedsAsIs reports whether x, found at the index path prefix,
-// can be embedded as its own definition: when all of the fields
-// that x encodes on its own are also encoded at the prefix,
+// can be embedded as its own definition: when x follows the same codec,
+// all of the fields that x encodes on its own are also encoded at the prefix,
 // and x has no fallback, which would constrain the other fields.
 func (e *extractor) embedsAsIs(x *types.Struct, prefix string, enc *structEncoding) bool {
 	sub := e.structEncoding(x)
-	if sub.fallback != "" {
+	if sub.codec != enc.codec || sub.fallback != "" {
 		return false
 	}
 	for index := range sub.names {
@@ -1820,17 +1818,19 @@ func (e *extractor) embedsAsIs(x *types.Struct, prefix string, enc *structEncodi
 // A field hides deeper fields with the same name. Of multiple fields with
 // the same name at the same depth, a single one named by a tag hides the rest,
 // or else they are all dropped. Fallbacks follow the same rules by depth.
+// The struct follows the codec given by [extractor.structCodec],
+// and so do any structs embedded in it.
 // The result is cached, as embedded structs are checked for each parent.
 func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 	enc, ok := e.structEncodings[x]
 	if !ok {
-		enc = e.findStructEncoding(x)
+		enc = e.findStructEncoding(x, e.structCodec(x))
 		e.structEncodings[x] = enc
 	}
 	return enc
 }
 
-func (e *extractor) findStructEncoding(x *types.Struct) *structEncoding {
+func (e *extractor) findStructEncoding(x *types.Struct, c *codec) *structEncoding {
 	type field struct {
 		name   string
 		index  string
@@ -1858,7 +1858,7 @@ func (e *extractor) findStructEncoding(x *types.Struct) *structEncoding {
 				f := emb.x.Field(i)
 				tag := emb.x.Tag(i)
 				index := fmt.Sprint(emb.index, i)
-				if typ, _, ok := e.embedded(f, tag); ok {
+				if typ, _, ok := e.embedded(c, f, tag); ok {
 					st, ok := typ.Underlying().(*types.Struct)
 					if !ok {
 						if isFallback(typ) {
@@ -1878,7 +1878,7 @@ func (e *extractor) findStructEncoding(x *types.Struct) *structEncoding {
 				if !ast.IsExported(f.Name()) {
 					continue
 				}
-				_, name := e.fieldCodec(tag)
+				name := c.fieldName(tag)
 				if name == "-" {
 					continue
 				}
@@ -1896,7 +1896,7 @@ func (e *extractor) findStructEncoding(x *types.Struct) *structEncoding {
 	for _, f := range fields {
 		byName[f.name] = append(byName[f.name], f)
 	}
-	enc := &structEncoding{names: make(map[string]string)}
+	enc := &structEncoding{codec: c, names: make(map[string]string)}
 	for _, fs := range byName {
 		// The fields were added in order of depth.
 		fs = slices.DeleteFunc(fs, func(f field) bool { return f.depth > fs[0].depth })
@@ -1967,11 +1967,15 @@ func derefPointer(t types.Type) (_ types.Type, isPointer bool) {
 }
 
 // jsonV2Error returns why encoding/json/v2 rejects the struct type x,
-// or the empty string if it does not.
+// or the empty string if it does not, or x does not follow the jsonv2 codec.
 func (e *extractor) jsonV2Error(x *types.Struct) string {
+	c := e.structCodec(x)
+	if !c.jsonV2 {
+		return ""
+	}
 	msg, ok := e.jsonV2Errors[x]
 	if !ok {
-		msg = e.findJSONV2Error(x)
+		msg = e.findJSONV2Error(x, c)
 		e.jsonV2Errors[x] = msg
 		if msg != "" {
 			e.logf("    encoding/json/v2 rejects %v: %s", x, msg)
@@ -1980,12 +1984,12 @@ func (e *extractor) jsonV2Error(x *types.Struct) string {
 	return msg
 }
 
-func (e *extractor) findJSONV2Error(x *types.Struct) string {
+func (e *extractor) findJSONV2Error(x *types.Struct, c *codec) string {
 	names := make(map[string]bool)
 	hasTag, hasField, fallbacks := false, false, 0
 	for i := range x.NumFields() {
 		f := x.Field(i)
-		tag, tagged := reflect.StructTag(x.Tag(i)).Lookup(e.jsonV2.tagKey)
+		tag, tagged := reflect.StructTag(x.Tag(i)).Lookup(c.tagKey)
 		hasTag = hasTag || tagged
 		if tag == "-" {
 			continue
@@ -2021,7 +2025,7 @@ func (e *extractor) findJSONV2Error(x *types.Struct) string {
 		}
 		typ, _ := derefPointer(f.Type())
 		ownEncoding := e.ownEncoding(typ) != noOwnEncoding
-		if stringOpt && !ownEncoding && !hasBasicInfo(typ, e.jsonV2.stringKinds) {
+		if stringOpt && !ownEncoding && !hasBasicInfo(typ, c.stringKinds) {
 			return fmt.Sprintf("field %s has a json string option but is not a number", f.Name())
 		}
 		if !f.Exported() && !f.Anonymous() {
@@ -2071,18 +2075,17 @@ func (e *extractor) isStringified(typ types.Type, tag string, codec *codec) bool
 	return e.ownEncoding(typ) == noOwnEncoding && hasBasicInfo(typ, codec.stringKinds)
 }
 
-// embedded reports whether the governing codec promotes the fields of f,
+// embedded reports whether the codec promotes the fields of f,
 // with the given struct tag, into its parent struct.
 // If so, it returns the type of f, and whether that is via a pointer.
-func (e *extractor) embedded(f *types.Var, tag string) (typ types.Type, viaPointer, ok bool) {
-	codec, name := e.fieldCodec(tag)
+func (e *extractor) embedded(codec *codec, f *types.Var, tag string) (typ types.Type, viaPointer, ok bool) {
 	typ, viaPointer = derefPointer(f.Type())
 	if codec.inlineOption {
 		return typ, viaPointer, f.Anonymous() && hasFlag(tag, codec.tagKey, "inline", 1)
 	}
 	// Like encoding/json, promote the fields of an embedded struct
 	// or pointer to struct, unless the tag gives it a name.
-	if name != "" {
+	if codec.fieldName(tag) != "" {
 		return nil, false, false
 	}
 	_, isStruct := typ.Underlying().(*types.Struct)
@@ -2140,7 +2143,7 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 	}
 	attrs |= typeAttrs
 
-	// Only the codec which governs the field decides whether it may be omitted.
+	// Only the codec which governs the struct decides whether a field may be omitted.
 	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty";
 	// TOML and YAML libraries such as BurntSushi/toml and goccy/go-yaml support it too.
 	// TODO: also when the type is a list or other kind of pointer.
@@ -2176,32 +2179,23 @@ func hasFlag(tag, key, flag string, offset int) bool {
 	return false
 }
 
-// fieldCodec returns the codec from [extractor.codecs] which governs a field
-// with the given struct tag, and the field name given by that codec's tag, if any.
-// The governing codec is the first one whose tag gives a name, else the first
-// one with a tag at all, else the first codec.
-func (e *extractor) fieldCodec(tag string) (c *codec, name string) {
-	tags := reflect.StructTag(tag)
-	// TODO: We should probably never use a combination of names from different
-	// codecs in a single struct. For example, with `--codec json,yaml`, if a
-	// struct has any field with a JSON tag, we should ignore any YAML tags in
-	// that struct at that point. Do this in a separate change in the future,
-	// to aid in bisecting.
-	for _, c2 := range e.codecs {
-		t, ok := tags.Lookup(c2.tagKey)
-		if !ok {
-			continue
-		}
-		if name, _, _ := strings.Cut(t, ","); name != "" {
-			return c2, name
-		}
-		if c == nil {
-			c = c2
+// structCodec returns the codec from [extractor.codecs] which governs
+// the fields of x: the first one whose tag key appears on any field of x,
+// else the first codec. A struct is encoded by a single library,
+// so its fields follow a single codec, even when their tags differ.
+func (e *extractor) structCodec(x *types.Struct) *codec {
+	for _, c := range e.codecs {
+		for i := range x.NumFields() {
+			if _, ok := reflect.StructTag(x.Tag(i)).Lookup(c.tagKey); ok {
+				return c
+			}
 		}
 	}
-	if c == nil {
-		c = e.codecs[0]
-	}
-	// TODO: should we also consider to protobuf name? Probably not.
-	return c, ""
+	return e.codecs[0]
+}
+
+// fieldName returns the field name given by the codec's tag, if any.
+func (c *codec) fieldName(tag string) string {
+	name, _, _ := strings.Cut(reflect.StructTag(tag).Get(c.tagKey), ",")
+	return name
 }

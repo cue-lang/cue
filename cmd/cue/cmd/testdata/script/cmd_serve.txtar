@@ -1,74 +1,73 @@
-exec cue cmd serve &
+exec cue cmd serve &serve&
+waitmatch -stderr serve 'listening on (\S+)$' SERVE_ADDR
 
-wait-port localhost:8082
-
-curl -X GET http://localhost:8082/test
+curl -X GET http://${SERVE_ADDR}/test
 stdout 'ack: using method GET'
 
-curl -X GET http://localhost:8082/one/1/two/i/i
+curl -X GET http://${SERVE_ADDR}/one/1/two/i/i
 stdout 'ack: one/1 two/i/i'
 
-curl -X GET http://localhost:8082/authz/alice
+curl -X GET http://${SERVE_ADDR}/authz/alice
 stdout 'true'
 
-curl -X GET http://localhost:8082/authz/bob
+curl -X GET http://${SERVE_ADDR}/authz/bob
 stdout 'false'
 
-curl -w '\n' -X GET http://localhost:8082/schema/api/vm?r=research
+curl -w '\n' -X GET http://${SERVE_ADDR}/schema/api/vm?r=research
 cmp stdout out/vm-research
 
-curl -L 'http://localhost:8082/api/vm?u=alice' -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"access": {"public":true}}'
+curl -L http://${SERVE_ADDR}/api/vm?u=alice -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"access": {"public":true}}'
 stdout 'OK'
 
-curl -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d '{"user":"alice"}'
+curl -L http://${SERVE_ADDR}/authz -H 'Content-Type: application/json' -d '{"user":"alice"}'
 stdout 'true'
 
-curl -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d '{"user":"bob"}'
+curl -L http://${SERVE_ADDR}/authz -H 'Content-Type: application/json' -d '{"user":"bob"}'
 stdout 'false'
 
 # Sibling task pattern - request data flows to another task
-curl -L 'http://localhost:8082/echo' -H 'Content-Type: text/plain' -d 'hello from sibling task'
+curl -L http://${SERVE_ADDR}/echo -H 'Content-Type: text/plain' -d 'hello from sibling task'
 stdout 'hello from sibling task'
 
 # Custom status code examples
 
 # Valid request returns 201 Created
-curl -w '\n' -L 'http://localhost:8082/api/vm/create?u=alice' -H 'Content-Type: application/json' -d '{}'
+curl -w '\n' -L http://${SERVE_ADDR}/api/vm/create?u=alice -H 'Content-Type: application/json' -d '{}'
 cmp stdout out/create-201
 
 # Custom error endpoint returns 400 Bad Request
-! curl -f -w '\n' -L 'http://localhost:8082/api/error' -H 'Content-Type: application/json' -d '{}'
+! curl -f -w '\n' -L http://${SERVE_ADDR}/api/error -H 'Content-Type: application/json' -d '{}'
 cmp stdout out/create-400
 
 # A response without a body sends no content rather than an error
-curl -w '%{http_code}' -X GET 'http://localhost:8082/api/nocontent'
+curl -w '%{http_code}' -X GET http://${SERVE_ADDR}/api/nocontent
 stdout '^204$'
 
 # Status codes out of the three-digit HTTP range are rejected by the schema
 # rather than crashing the server; see cue-lang/cue#4465
-curl -w '\n%{http_code}' -X GET 'http://localhost:8082/api/status?code=201'
+curl -w '\n%{http_code}' -X GET http://${SERVE_ADDR}/api/status?code=201
 stdout '^201$'
 
-! curl -f -w '\n%{http_code}' -X GET 'http://localhost:8082/api/status?code=0'
+! curl -f -w '\n%{http_code}' -X GET http://${SERVE_ADDR}/api/status?code=0
 stdout 'response\.statusCode: invalid value 0 \(out of bound >=100\)'
 stdout '^500$'
 
-! curl -f -w '\n%{http_code}' -X GET 'http://localhost:8082/api/status?code=1000'
+! curl -f -w '\n%{http_code}' -X GET http://${SERVE_ADDR}/api/status?code=1000
 stdout 'response\.statusCode: invalid value 1000 \(out of bound <=999\)'
 stdout '^500$'
 
 # Error cases
 
 # Malformed JSON input
-! curl -f -L 'http://localhost:8082/authz' -H 'Content-Type: application/json' -d 'not valid json'
+! curl -f -L http://${SERVE_ADDR}/authz -H 'Content-Type: application/json' -d 'not valid json'
 cmp stdout out/error-malformed-json
 
 # Research user (bob) trying to create a public VM - violates access: public: false constraint
-! curl -f -L 'http://localhost:8082/api/vm?u=bob' -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"access":{"public":true}}'
+! curl -f -L http://${SERVE_ADDR}/api/vm?u=bob -H 'Content-Type: application/json' -d '{"os":"Linux","arch":"x86","mem":10000000000,"disk":20000000000,"access":{"public":true}}'
 cmp stdout out/error-public-vm
 
 # Invalid OS value
-! curl -f -L 'http://localhost:8082/api/vm?u=alice' -H 'Content-Type: application/json' -d '{"os":"FreeBSD","arch":"x86","mem":10000000000,"disk":20000000000,"access":{"public":true}}'
+! curl -f -L http://${SERVE_ADDR}/api/vm?u=alice -H 'Content-Type: application/json' -d '{"os":"FreeBSD","arch":"x86","mem":10000000000,"disk":20000000000,"access":{"public":true}}'
 cmp stdout out/error-invalid-os
 
 stop
@@ -319,7 +318,7 @@ ServeJSON: {
 // All our endpoints serve from the same address.
 // We take the convention that the name of the "subcommand" is the path prefix.
 command: serve: [string]~(Prefix,_): http.Serve & {
-	listenAddr: ":8082"
+	listenAddr: "localhost:0"
 	routing: path: Prefix
 }
 -- out/create-201 --

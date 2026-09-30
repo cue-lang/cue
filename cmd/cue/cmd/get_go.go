@@ -290,7 +290,43 @@ type extractor struct {
 	exclusions []*regexp.Regexp
 	exclude    string
 
-	codecs []string
+	codecs []*codec
+}
+
+// codec describes how a Go encoding library selected via --codec
+// encodes struct fields.
+type codec struct {
+	// name is how the codec is selected via --codec.
+	name string
+
+	// tagKey is the struct tag key which the codec reads.
+	tagKey string
+
+	// inlineOption is whether the fields of an embedded struct are only
+	// promoted into its parent when its tag has an "inline" option.
+	inlineOption bool
+
+	// noNull is whether the encoding has no null value.
+	noNull bool
+}
+
+// knownCodecs lists the codecs with semantics other than
+// those of encoding/json, which any other struct tag key follows.
+var knownCodecs = []*codec{
+	{name: "json", tagKey: "json"},
+	// YAML libraries such as gopkg.in/yaml.v3.
+	{name: "yaml", tagKey: "yaml", inlineOption: true},
+	// TOML libraries such as github.com/BurntSushi/toml.
+	{name: "toml", tagKey: "toml", noNull: true},
+}
+
+func lookupCodec(name string) *codec {
+	for _, c := range knownCodecs {
+		if c.name == name {
+			return c
+		}
+	}
+	return &codec{name: name, tagKey: name}
 }
 
 type pkgInfo struct {
@@ -431,7 +467,9 @@ func extract(cmd *Command, args []string) error {
 
 	e.initExclusions(flagExclude.String(cmd))
 
-	e.codecs = strings.Split(flagCodec.String(cmd), ",")
+	for name := range strings.SplitSeq(flagCodec.String(cmd), ",") {
+		e.codecs = append(e.codecs, lookupCodec(name))
+	}
 
 	e.done = map[string]bool{}
 
@@ -1742,9 +1780,8 @@ func (e *extractor) isEmbedded(f *types.Var, tag string) bool {
 		return false
 	}
 	codec, name := e.fieldCodec(tag)
-	if codec == "yaml" {
-		// YAML libraries such as gopkg.in/yaml.v3 require an explicit option.
-		return hasFlag(tag, codec, "inline", 1)
+	if codec.inlineOption {
+		return hasFlag(tag, codec.tagKey, "inline", 1)
 	}
 	// Like encoding/json, promote the fields of an embedded struct
 	// or pointer to struct, unless the tag gives it a name.
@@ -1772,7 +1809,7 @@ func (e *extractor) fieldAttributesFromType(f types.Type) (attrs fieldAttributes
 	return attrs
 }
 
-func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, tag, codec string) (fieldAttributes, error) {
+func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, tag string, codec *codec) (fieldAttributes, error) {
 	var attrs fieldAttributes
 	// See k8s docs https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
 	for line := range strings.SplitSeq(doc.Text(), "\n") {
@@ -1795,8 +1832,8 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 	}
 
 	typeAttrs := e.fieldAttributesFromType(f.Type())
-	if codec == "toml" {
-		// TOML has no null; encoders omit nil pointers instead.
+	if codec.noNull {
+		// Encoders omit nil pointers instead.
 		typeAttrs &^= nullable
 	}
 	attrs |= typeAttrs
@@ -1805,8 +1842,8 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 	// Go 1.24 added the "omitzero" option to encoding/json, an improvement over "omitempty";
 	// TOML and YAML libraries such as BurntSushi/toml and goccy/go-yaml support it too.
 	// TODO: also when the type is a list or other kind of pointer.
-	if hasFlag(tag, codec, "omitempty", 1) ||
-		hasFlag(tag, codec, "omitzero", 1) {
+	if hasFlag(tag, codec.tagKey, "omitempty", 1) ||
+		hasFlag(tag, codec.tagKey, "omitzero", 1) {
 		attrs |= optional
 	}
 
@@ -1830,28 +1867,28 @@ func hasFlag(tag, key, flag string, offset int) bool {
 // with the given struct tag, and the field name given by that codec's tag, if any.
 // The governing codec is the first one whose tag gives a name, else the first
 // one with a tag at all, else the first codec.
-func (e *extractor) fieldCodec(tag string) (codec, name string) {
+func (e *extractor) fieldCodec(tag string) (c *codec, name string) {
 	tags := reflect.StructTag(tag)
 	// TODO: We should probably never use a combination of names from different
 	// codecs in a single struct. For example, with `--codec json,yaml`, if a
 	// struct has any field with a JSON tag, we should ignore any YAML tags in
 	// that struct at that point. Do this in a separate change in the future,
 	// to aid in bisecting.
-	for _, s := range e.codecs {
-		t, ok := tags.Lookup(s)
+	for _, c2 := range e.codecs {
+		t, ok := tags.Lookup(c2.tagKey)
 		if !ok {
 			continue
 		}
 		if name, _, _ := strings.Cut(t, ","); name != "" {
-			return s, name
+			return c2, name
 		}
-		if codec == "" {
-			codec = s
+		if c == nil {
+			c = c2
 		}
 	}
-	if codec == "" {
-		codec = e.codecs[0]
+	if c == nil {
+		c = e.codecs[0]
 	}
 	// TODO: should we also consider to protobuf name? Probably not.
-	return codec, ""
+	return c, ""
 }

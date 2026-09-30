@@ -1,7 +1,5 @@
-# TODO: use a random unused port
-env CUE_REGISTRY=localhost:41331
-exec cue mod registry ${CUE_REGISTRY} &
-wait-port ${CUE_REGISTRY}
+exec cue mod registry localhost:0 &registry&
+waitmatch registry '^listening on (\S+)$' CUE_REGISTRY
 exec cue mod publish v0.0.1
 cmpenv stdout expect-stdout
 

@@ -208,6 +208,40 @@ package example
 	qt.Assert(t, qt.IsNil(err))
 }
 
+func TestCanceledNotMemoized(t *testing.T) {
+	// A failure caused by one caller's context being canceled
+	// should not be returned to later callers with a live context.
+	dir := t.TempDir()
+	t.Cleanup(func() {
+		RemoveAll(dir)
+	})
+	registryFS, err := txtar.FS(txtar.Parse([]byte(`
+-- example.com_foo_v0.0.1/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.8.0"
+-- example.com_foo_v0.0.1/example.cue --
+package example
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	cr, err := New(modregistry.NewClient(newRegistry(t, registryFS)), dir)
+	qt.Assert(t, qt.IsNil(err))
+	mv := module.MustNewVersion("example.com/foo", "v0.0.1")
+
+	canceledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err = cr.ModFile(canceledCtx, mv)
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	_, err = cr.Fetch(canceledCtx, mv)
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+
+	// TODO: the canceled failures are memoized, so these fail too.
+	ctx := context.Background()
+	_, err = cr.ModFile(ctx, mv)
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	_, err = cr.Fetch(ctx, mv)
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+}
+
 func fsSub(fsys fs.FS, sub string) fs.FS {
 	fsys, err := fs.Sub(fsys, sub)
 	if err != nil {

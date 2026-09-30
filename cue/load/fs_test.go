@@ -1,15 +1,22 @@
 package load
 
 import (
+	"cmp"
+	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 	"testing/fstest"
 
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
+
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 )
 
 func TestIOFS(t *testing.T) {
@@ -336,6 +343,62 @@ package z
 				got = append(got, inst.ImportPath)
 			}
 			qt.Assert(t, qt.DeepEquals(got, tc.want))
+		})
+	}
+}
+
+func TestLoadFromFSLocalPackages(t *testing.T) {
+	// Packages in the main module's cue.mod/{gen,usr,pkg} directories
+	// belong to the "local" pseudo-module, and their instance root is the
+	// main module root within the [io/fs.FS] namespace.
+	ar := txtar.Parse([]byte(`
+-- cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.14.0"
+-- main.cue --
+package main
+
+import (
+	"example.com/fromgen"
+	"example.com/frompkg"
+	"example.com/fromusr"
+)
+
+out: [fromgen.x, frompkg.x, fromusr.x]
+-- cue.mod/gen/example.com/fromgen/x.cue --
+package fromgen
+
+x: "gen"
+-- cue.mod/pkg/example.com/frompkg/x.cue --
+package frompkg
+
+x: "pkg"
+-- cue.mod/usr/example.com/fromusr/x.cue --
+package fromusr
+
+x: "usr"
+`))
+	for _, dir := range []string{"", "/mymod"} {
+		t.Run(dir, func(t *testing.T) {
+			files := slices.Clone(ar.Files)
+			for i := range files {
+				files[i].Name = path.Join(strings.TrimPrefix(dir, "/"), files[i].Name)
+			}
+			fsys, err := txtar.FS(&txtar.Archive{Files: files})
+			qt.Assert(t, qt.IsNil(err))
+			insts := Instances([]string{"."}, &Config{FS: fsys, Dir: dir})
+			qt.Assert(t, qt.HasLen(insts, 1))
+			// Issue https://cuelang.org/issue/4494: the instance root of a
+			// local package cannot be resolved within [Config.FS], failing
+			// the load.
+			qt.Assert(t, qt.ErrorMatches(insts[0].Err, `import failed: cannot get absolute path for FS of type \*load.fsIOFS`))
+			qt.Assert(t, qt.HasLen(insts[0].Imports, 0))
+			for _, imp := range insts[0].Imports {
+				qt.Assert(t, qt.IsNil(imp.Err))
+				qt.Assert(t, qt.Equals(imp.Root, cmp.Or(dir, "/")))
+			}
+			v := cuecontext.New().BuildInstance(insts[0])
+			qt.Assert(t, qt.Equals(fmt.Sprint(v.LookupPath(cue.ParsePath("out"))), `_|_ // field not found: out`))
 		})
 	}
 }

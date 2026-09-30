@@ -262,10 +262,10 @@ issue4115: {
 	struct1: {a: "x", b: 1, c: "y", d: 2}
 
 	list2: [...string] & !=null
-	list2: ["a", 1, "b", 2] // The bound's error hides the other child errors.
+	list2: ["a", 1, "b", 2]
 
 	struct2: {[string]: string} & !=null
-	struct2: {a: "x", b: 1, c: "y", d: 2} // The bound's error hides the other child errors.
+	struct2: {a: "x", b: 1, c: "y", d: 2}
 }
 -- out/compile --
 --- in.cue

@@ -428,15 +428,17 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 			// in a validator.
 			checks := n.checks
 			n.checks = n.checks[:0]
+			// Validators do not run on an erroneous value. Adding the error
+			// of a validator given one would replace a child error with a
+			// copy that no longer leads to the other child errors.
+			if isError(v) {
+				checks = nil
+			}
 			for _, v := range checks {
 				// TODO(errors): make Validate return bottom and generate
 				// optimized conflict message. Also track and inject IDs
 				// to determine origin location.s
-				//
-				// A validator given an erroneous value returns that value's
-				// error. Adding it again would replace a child error with
-				// a copy that no longer leads to the other child errors.
-				if b := c.Validate(v, n.node); b != nil && b != n.node.Bottom() {
+				if b := c.Validate(v, n.node); b != nil {
 					n.addBottom(b)
 				}
 			}

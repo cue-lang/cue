@@ -305,14 +305,12 @@ issue4115: {
 	list2: [...string] & !=null
 	list2: ["a", 1, "b", 2] @test(err, code=eval,
 		suberr=(contains="conflicting values 1 and string", pos=[-1:13, 0:15]),
-		suberr=(contains="invalid left-hand value to '!='", pos=[-1:23]),
-	) // The bound's error hides the other child errors.
+	)
 
 	struct2: {[string]: string} & !=null
 	struct2: {a: "x", b: 1, c: "y", d: 2} @test(err, code=eval,
 		suberr=(contains="conflicting values 1 and string", pos=[-1:22, 0:23]),
-		suberr=(contains="invalid left-hand value to '!='", pos=[-1:32]),
-	) // The bound's error hides the other child errors.
+	)
 }
 -- out/errors.txt --
 [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
@@ -398,13 +396,15 @@ issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN)
 [eval] issue4115.list2.1: conflicting values 1 and string (mismatched types int and string):
     ./issue4115.cue:18:13
     ./issue4115.cue:19:15
-issue4115.list2: invalid left-hand value to '!=' (type _|_): issue4115.list2.1: conflicting values 1 and string (mismatched types int and string):
-    ./issue4115.cue:18:23
+[eval] issue4115.list2.3: conflicting values 2 and string (mismatched types int and string):
+    ./issue4115.cue:18:13
+    ./issue4115.cue:19:23
 [eval] issue4115.struct2.b: conflicting values 1 and string (mismatched types int and string):
-    ./issue4115.cue:24:22
-    ./issue4115.cue:25:23
-issue4115.struct2: invalid left-hand value to '!=' (type _|_): issue4115.struct2.b: conflicting values 1 and string (mismatched types int and string):
-    ./issue4115.cue:24:32
+    ./issue4115.cue:23:22
+    ./issue4115.cue:24:23
+[eval] issue4115.struct2.d: conflicting values 2 and string (mismatched types int and string):
+    ./issue4115.cue:23:22
+    ./issue4115.cue:24:37
 -- out/todo.txt --
 issue3474.topValidator.failType.A: v2 reports "conflicting values >10 and {C:1}" (number and struct order), v3 reports "{C:1} and >10" (struct and number order).
 -- out/eval/stats --

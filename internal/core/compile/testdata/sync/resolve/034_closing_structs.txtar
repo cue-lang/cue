@@ -17,6 +17,21 @@ ctot: ct & ot
 cpct: cp & ct
 ctcp: ct & cp
 ctct: ct & ct
+
+// An ellipsis only opens the struct it is part of, also below the top level.
+nested: {
+	#cp: a: {x: int}
+	#ct: a: {x: int, ...}
+
+	otcp: #cp
+	otcp: a: {...}
+	opct: #ct
+	opct: a: {x: 1}
+	otct: #ct
+	otct: a: {...}
+	cpct: #cp & #ct
+	cpct: a: _
+}
 -- out/compile --
 --- in.cue
 {
@@ -47,4 +62,39 @@ ctct: ct & ct
   cpct: (〈0;cp〉 & 〈0;ct〉)
   ctcp: (〈0;ct〉 & 〈0;cp〉)
   ctct: (〈0;ct〉 & 〈0;ct〉)
+  nested: {
+    #cp: {
+      a: {
+        x: int
+      }
+    }
+    #ct: {
+      a: {
+        x: int
+        ...
+      }
+    }
+    otcp: 〈0;#cp〉
+    otcp: {
+      a: {
+        ...
+      }
+    }
+    opct: 〈0;#ct〉
+    opct: {
+      a: {
+        x: 1
+      }
+    }
+    otct: 〈0;#ct〉
+    otct: {
+      a: {
+        ...
+      }
+    }
+    cpct: (〈0;#cp〉 & 〈0;#ct〉)
+    cpct: {
+      a: _
+    }
+  }
 }

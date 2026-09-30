@@ -1877,6 +1877,94 @@ func TestAllows(t *testing.T) {
 		#PC: [>" "]: int
 		`,
 		sel: cue.AnyString,
+	}, {
+		// An ellipsis only opens the struct it is part of.
+		// https://cuelang.org/issue/4496
+		desc: "disallow new field in definition with open struct",
+		in: `
+		x: {...} & #Def
+		#Def: a: int
+		`,
+		sel:   cue.Str("b"),
+		allow: true, // TODO: should be disallowed
+	}, {
+		desc: "disallow new field in open struct with definition",
+		in: `
+		x: #Def & {...}
+		#Def: a: int
+		`,
+		sel:   cue.Str("b"),
+		allow: true, // TODO: should be disallowed
+	}, {
+		desc: "disallow any field in definition with open struct",
+		in: `
+		x: #Def & {...}
+		#Def: a: int
+		`,
+		sel:   cue.AnyString,
+		allow: true, // TODO: should be disallowed
+	}, {
+		desc: "disallow new field in closed struct with open definition",
+		in: `
+		x: #Def & close({a: int})
+		#Def: {a: int, ...}
+		`,
+		sel:   cue.Str("b"),
+		allow: true, // TODO: should be disallowed
+	}, {
+		desc: "disallow new field in reference to definition with open struct",
+		in: `
+		x: y
+		y: #Def & {...}
+		#Def: a: int
+		`,
+		sel:   cue.Str("b"),
+		allow: true, // TODO: should be disallowed
+	}, {
+		desc: "disallow new field in unevaluated reference to definition with open struct",
+		in: `
+		x: z.f
+		z: {k: 1, f: y} | {k: 2}
+		z: k: 1
+		y: #Def & {...}
+		#Def: a: int
+		`,
+		sel:   cue.Str("b"),
+		allow: true, // TODO: should be disallowed
+	}, {
+		desc: "allow new field in open definition",
+		in: `
+		x: #Def
+		#Def: {a: int, ...}
+		`,
+		sel:   cue.Str("b"),
+		allow: true,
+	}, {
+		desc: "allow new field in open definitions",
+		in: `
+		x: #Def1 & #Def2
+		#Def1: {a: int, ...}
+		#Def2: {b: int, ...}
+		`,
+		sel:   cue.Str("c"),
+		allow: true,
+	}, {
+		desc: "allow new field in open definition with open struct",
+		in: `
+		x: #Def & {...}
+		#Def: {a: int, ...}
+		`,
+		sel:   cue.Str("b"),
+		allow: true,
+	}, {
+		desc: "allow new field in nested open definition",
+		in: `
+		x: y.a
+		y: #Def
+		#Def: a: {b: int, ...}
+		`,
+		sel:   cue.Str("c"),
+		allow: true,
 	}}
 
 	path := cue.ParsePath("x")
@@ -2287,6 +2375,17 @@ func TestSubsume(t *testing.T) {
 		pathA: a,
 		pathB: b,
 		want:  false,
+	}, {
+		// An ellipsis only opens the struct it is part of.
+		// https://cuelang.org/issue/4496
+		value: `
+		#Def: a: int
+		a: #Def & {...}
+		b: {a: 1, b: 2}
+		`,
+		pathA: a,
+		pathB: b,
+		want:  true, // TODO: should be false
 	}, {
 		// Issue #566
 		// Closed struct subsuming open struct.

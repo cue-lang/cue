@@ -17,6 +17,21 @@ ctot: ct & ot @test(eq, {x: int}) @test(closed) @test(allows, string)
 cpct: cp & ct @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
 ctcp: ct & cp @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
 ctct: ct & ct @test(eq, {x: int}) @test(closed) @test(shareID=ctct) @test(allows, string)
+
+// An ellipsis only opens the struct it is part of, also below the top level.
+nested: {
+	#cp: a: {x: int}
+	#ct: a: {x: int, ...}
+
+	otcp: #cp
+	otcp: a: {...} @test(allows, string) @test(allows:todo=false, string)
+	opct: #ct
+	opct: a: {x: 1} @test(allows, string)
+	otct: #ct
+	otct: a: {...} @test(allows, string)
+	cpct: #cp & #ct
+	cpct: a: _ @test(allows, string) @test(allows:todo=false, string)
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  90

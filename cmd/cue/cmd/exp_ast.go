@@ -15,13 +15,11 @@
 package cmd
 
 import (
-	"fmt"
-	"io"
-	"os"
 	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
@@ -74,62 +72,67 @@ still has its partial syntax tree printed.
 }
 
 func runExpASTPrint(cmd *Command, args []string) error {
-	lcfg := &load.Config{
-		// cue exp ast only cares about syntax trees; loading the imports just causes
-		// extra work and may lead to errors we don't care about.
-		SkipImports: true,
-		Stdin:       cmd.InOrStdin(),
-	}
 	cfg := astinternal.DebugConfig{
 		OmitEmpty:       flagOmitEmpty.Bool(cmd),
 		IncludeNodeRefs: flagRefs.Bool(cmd),
 		AllPositions:    flagPos.Bool(cmd),
 	}
+	w := cmd.OutOrStdout()
+	printFile := func(file *ast.File) error {
+		_, err := w.Write(astinternal.AppendDebug(nil, file, cfg))
+		return err
+	}
 	if flagFiles.Bool(cmd) {
-		for _, f := range args {
-			var data []byte
-			var err error
-			if f == "-" {
-				data, err = io.ReadAll(cmd.InOrStdin())
-			} else {
-				data, err = os.ReadFile(f)
+		var errs errors.Error
+		for _, name := range args {
+			var src any // nil reads the named file
+			if name == "-" {
+				src = cmd.InOrStdin()
+			}
+			file, err := parser.ParseFile(name, src, parser.ParseComments)
+			if file == nil {
+				return err // the source could not be read
 			}
 			if err != nil {
+				errs = errors.Append(errs, errors.Promote(err, "parse error"))
+			}
+			// Even if there are errors, it can still be useful to
+			// show a (possibly) partial AST.
+			if err := printFile(file); err != nil {
 				return err
 			}
-			astf, err := parser.ParseFile(f, data, parser.ParseComments)
-			if err != nil {
-				fmt.Fprint(cmd.Stderr(), errors.Details(err, nil))
-			}
-			if astf != nil {
-				// Even if there are errors, it can still be useful to
-				// show a (possibly) partial AST.
-				out := astinternal.AppendDebug(nil, astf, cfg)
-				cmd.OutOrStdout().Write(out)
-			}
 		}
-		return nil
+		return errs
 	}
 	// TODO: should we produce output in txtar form for the sake of
 	// more clearly separating the AST for each file?
 	// [ast.File.Filename] already has the full filename,
 	// but as one of the first fields it's not a great separator.
-	insts := load.Instances(args, lcfg)
-	for _, inst := range insts {
+	for _, inst := range loadExpASTInstances(cmd, args) {
 		if err := inst.Err; err != nil {
 			return err
 		}
 		for _, file := range inst.Files {
-			out := astinternal.AppendDebug(nil, file, cfg)
-			cmd.OutOrStdout().Write(out)
+			if err := printFile(file); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
+func loadExpASTInstances(cmd *Command, args []string) []*build.Instance {
+	return load.Instances(args, &load.Config{
+		// cue exp ast only cares about syntax trees; loading the imports just causes
+		// extra work and may lead to errors we don't care about.
+		SkipImports: true,
+		Stdin:       cmd.InOrStdin(),
+	})
+}
+
 func newExpASTJoinCmd(c *Command) *cobra.Command {
-	// TODO: add a flag drop comments, which is useful when reducing bug reproducers.
-	cmd := &cobra.Command{
+	// TODO: add a flag to drop comments, which is useful when reducing bug reproducers.
+	return &cobra.Command{
 		Use:   "join [flags] [inputs]",
 		Short: "join a package into a single file",
 		Long: `
@@ -141,19 +144,10 @@ See 'cue help inputs' as well.
 `[1:],
 		RunE: mkRunE(c, runExpASTJoin),
 	}
-	return cmd
 }
 
 func runExpASTJoin(cmd *Command, args []string) error {
-	lcfg := &load.Config{
-		// cue exp ast only cares about syntax trees; loading the imports just causes
-		// extra work and may lead to errors we don't care about.
-		SkipImports: true,
-		Stdin:       cmd.InOrStdin(),
-	}
-	var jointImports []*ast.ImportSpec
-	var jointFields []ast.Decl
-	insts := load.Instances(args, lcfg)
+	insts := loadExpASTInstances(cmd, args)
 	if len(insts) != 1 {
 		return errors.New("joining multiple instances is not possible yet")
 	}
@@ -161,27 +155,23 @@ func runExpASTJoin(cmd *Command, args []string) error {
 	if err := inst.Err; err != nil {
 		return err
 	}
-	for _, file := range inst.Files {
-		jointImports = slices.Concat(jointImports, slices.Collect(file.ImportSpecs()))
-
-		fields := file.Decls[len(file.Preamble()):]
-		jointFields = slices.Concat(jointFields, fields)
-	}
 	// TODO: we should sort and deduplicate imports.
-	joint := &ast.File{Decls: slices.Concat([]ast.Decl{
-		&ast.ImportDecl{Specs: jointImports},
-	}, jointFields)}
+	imports := &ast.ImportDecl{}
+	joint := &ast.File{Decls: []ast.Decl{imports}}
+	for _, file := range inst.Files {
+		imports.Specs = slices.AppendSeq(imports.Specs, file.ImportSpecs())
+		joint.Decls = append(joint.Decls, file.Decls[len(file.Preamble()):]...)
+	}
 
 	// Sanitize the resulting file so that, for example,
 	// multiple packages imported as the same name avoid collisions.
-	if err := astutil.Sanitize(joint); err != nil {
+	if err := astutil.SanitizeFiles([]*ast.File{joint}); err != nil {
 		return err
 	}
-
 	out, err := format.Node(joint)
 	if err != nil {
 		return err
 	}
-	cmd.OutOrStdout().Write(out)
-	return nil
+	_, err = cmd.OutOrStdout().Write(out)
+	return err
 }

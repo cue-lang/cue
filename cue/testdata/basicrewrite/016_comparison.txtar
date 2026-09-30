@@ -201,7 +201,7 @@ diffTypes: {
 	iNe4: {a: _int} != {a: 1} @test(err, code=incomplete, contains="incomplete value int", pos=[0:8])
 
 	// Errors in the right-hand operand name its kind.
-	iNe5: 1 != [_int]         @test(err, code=incomplete, contains="invalid right-hand value to '!=' (type int)", pos=[0:8]) // wrong kind: the operand is a list
+	iNe5: 1 != [_int]         @test(err, code=incomplete, contains="invalid right-hand value to '!=' (type list)", pos=[0:8])
 }
 -- out/errors.txt --
 [incomplete] lists.eIncompat: invalid left-hand value to '==' (type list): 0: incomplete value int:
@@ -236,7 +236,7 @@ lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflict
     ./typediff.cue:42:8
 [incomplete] diffTypes.iNe4: invalid left-hand value to '!=' (type struct): a: incomplete value int:
     ./typediff.cue:43:8
-[incomplete] diffTypes.iNe5: invalid right-hand value to '!=' (type int): 0: incomplete value int:
+[incomplete] diffTypes.iNe5: invalid right-hand value to '!=' (type list): 0: incomplete value int:
     ./typediff.cue:46:8
 -- out/diff-v2-v3.txt --
 lists.eIncompat: v3 reports "incomplete" (list element type is abstract) while v2 reports "eval" (permanent type mismatch [int] vs [string]).

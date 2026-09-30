@@ -66,7 +66,7 @@ func BinOp(c *OpContext, node Node, op Op, left, right Value) Value {
 	}
 	if err := validateValue(c, right, checkConcrete); err != nil {
 		const msg = "invalid right-hand value to '%s' (type %s): %v"
-		b := c.NewErrf(msg, op, leftKind, err.Err)
+		b := c.NewErrf(msg, op, rightKind, err.Err)
 		b.Code = err.Code
 		return b
 	}

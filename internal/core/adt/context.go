@@ -1433,15 +1433,6 @@ func (c *OpContext) regexp(v Value) *regexp.Regexp {
 	return re
 }
 
-// newNum creates a new number of the given kind. It reports an error value
-// instead if any error occurred.
-func (c *OpContext) newNum(d *apd.Decimal, k Kind, sources ...Node) Value {
-	if c.HasErr() {
-		return c.Err()
-	}
-	return &Num{Src: c.src, X: *d, K: k}
-}
-
 func (c *OpContext) NewInt64(n int64, sources ...Node) Value {
 	if c.HasErr() {
 		return c.Err()

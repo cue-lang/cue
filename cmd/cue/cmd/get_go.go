@@ -304,13 +304,17 @@ type extractor struct {
 
 	codecs []*codec
 
-	// jsonV2 is whether types are encoded following encoding/json/v2,
-	// as the jsonv2 codec is in use.
-	jsonV2 bool
+	// jsonV2 is the jsonv2 codec when in use, in which case
+	// types are encoded following encoding/json/v2.
+	jsonV2 *codec
 
 	// jsonV2Errors records why encoding/json/v2 rejects a struct type,
 	// or the empty string if it does not.
 	jsonV2Errors map[*types.Struct]string
+
+	// Caches for [extractor.ownEncoding] and [extractor.structEncoding].
+	ownEncodings    map[types.Type]ownEncoding
+	structEncodings map[*types.Struct]*structEncoding
 }
 
 // codec describes how a Go encoding library selected via --codec
@@ -329,20 +333,20 @@ type codec struct {
 	// noNull is whether the encoding has no null value.
 	noNull bool
 
-	// stringOption is whether a "string" tag option encodes
-	// a boolean, number, or string as a string.
-	stringOption bool
+	// stringKinds are the kinds of basic types which a "string" tag option
+	// encodes as a string.
+	stringKinds types.BasicInfo
 
 	// jsonV2 is whether the codec follows encoding/json/v2
 	// rather than the v1 API of encoding/json.
 	jsonV2 bool
 }
 
-// knownCodecs lists the codecs with semantics other than
-// those of encoding/json, which any other struct tag key follows.
+// knownCodecs lists the codecs with their own semantics. Any other struct tag
+// key follows encoding/json for embedding and omission, without a "string" option.
 var knownCodecs = []*codec{
-	{name: "json", tagKey: "json", stringOption: true},
-	{name: "jsonv2", tagKey: "json", stringOption: true, jsonV2: true},
+	{name: "json", tagKey: "json", stringKinds: types.IsBoolean | types.IsNumeric | types.IsString},
+	{name: "jsonv2", tagKey: "json", stringKinds: types.IsNumeric, jsonV2: true},
 	// YAML libraries such as gopkg.in/yaml.v3.
 	{name: "yaml", tagKey: "yaml", inlineOption: true},
 	// TOML libraries such as github.com/BurntSushi/toml.
@@ -504,9 +508,13 @@ func extract(cmd *Command, args []string) error {
 			}
 		}
 		e.codecs = append(e.codecs, c)
-		e.jsonV2 = e.jsonV2 || c.jsonV2
+		if c.jsonV2 {
+			e.jsonV2 = c
+		}
 	}
 	e.jsonV2Errors = make(map[*types.Struct]string)
+	e.ownEncodings = make(map[types.Type]ownEncoding)
+	e.structEncodings = make(map[*types.Struct]*structEncoding)
 
 	e.done = map[string]bool{}
 
@@ -985,7 +993,38 @@ func shortTypeName(t types.Type) string {
 	return t.String() // anonymous, e.g. "interface{Method() []byte}"
 }
 
+// ownEncoding describes whether a type encodes itself via its own methods.
+type ownEncoding int
+
+const (
+	noOwnEncoding   ownEncoding = iota
+	encodesAsTop                // e.g. via MarshalJSON
+	encodesAsString             // e.g. via MarshalText
+)
+
+// altType returns the CUE type for typ if it encodes itself via its own methods.
 func (e *extractor) altType(typ types.Type) cueast.Expr {
+	switch e.ownEncoding(typ) {
+	case encodesAsTop:
+		return e.ident("_", false)
+	case encodesAsString:
+		return e.ident("string", false)
+	}
+	return nil
+}
+
+// ownEncoding reports whether typ encodes itself via its own methods, and how.
+// The result is cached, as the same types are checked for many fields.
+func (e *extractor) ownEncoding(typ types.Type) ownEncoding {
+	enc, ok := e.ownEncodings[typ]
+	if !ok {
+		enc = e.findOwnEncoding(typ)
+		e.ownEncodings[typ] = enc
+	}
+	return enc
+}
+
+func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
 	// We need to check whether T or *T implement each interface I.
 	// Typically we would just need to check whether *T implements I,
 	// as the method set of *T includes the method set of T,
@@ -999,21 +1038,21 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to _", t, iface)
-			return e.ident("_", false)
+			return encodesAsTop
 		}
 	}
 	if name := jsontextMethod(typ); name != "" {
 		e.logf("    %v has method %s; setting type to _", shortTypeName(typ), name)
-		return e.ident("_", false)
+		return encodesAsTop
 	}
 	for _, iface := range toString {
 		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to string", t, iface)
-			return e.ident("string", false)
+			return encodesAsString
 		}
 	}
-	return nil
+	return noOwnEncoding
 }
 
 // jsontextMethod returns the name of the method of typ or *typ implementing
@@ -1025,25 +1064,20 @@ func jsontextMethod(typ types.Type) string {
 		{"MarshalJSONTo", "Encoder"},
 		{"UnmarshalJSONFrom", "Decoder"},
 	} {
-		for _, t := range []types.Type{typ, types.NewPointer(typ)} {
-			sel := types.NewMethodSet(t).Lookup(nil, m.name)
-			if sel == nil {
-				continue
-			}
-			sig := sel.Obj().(*types.Func).Signature()
-			if sig.Params().Len() != 1 || sig.Results().Len() != 1 ||
-				!types.Identical(sig.Results().At(0).Type(), typeError) {
-				continue
-			}
-			p, ok := sig.Params().At(0).Type().(*types.Pointer)
-			if !ok {
-				continue
-			}
-			n, ok := p.Elem().(*types.Named)
-			if ok && n.Obj().Pkg() != nil && n.Obj().Pkg().Path() == "encoding/json/jsontext" &&
-				n.Obj().Name() == m.param {
-				return m.name
-			}
+		// Look up the method as if typ were addressable,
+		// covering the method sets of both typ and *typ.
+		obj, _, _ := types.LookupFieldOrMethod(typ, true, nil, m.name)
+		fn, ok := obj.(*types.Func)
+		if !ok {
+			continue
+		}
+		sig := fn.Signature()
+		if sig.Params().Len() != 1 || sig.Results().Len() != 1 ||
+			!types.Identical(sig.Results().At(0).Type(), typeError) {
+			continue
+		}
+		if p, ok := sig.Params().At(0).Type().(*types.Pointer); ok && isJSONTextType(p.Elem(), m.param) {
+			return m.name
 		}
 	}
 	return ""
@@ -1141,7 +1175,7 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 		case "time":
 			switch obj.Name() {
 			case "Duration":
-				if e.jsonV2 {
+				if e.jsonV2 != nil {
 					e.logf("    %v has no default representation in encoding/json/v2", obj)
 					return false
 				}
@@ -1180,15 +1214,13 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 		if !supportedMapKey(t.Key()) {
 			return false
 		}
-		if e.jsonV2 && !e.supportedType(stack, t.Key()) {
+		if !e.supportedType(stack, t.Key()) {
 			return false
 		}
 		return e.supportedType(stack, t.Elem())
 	case *types.Struct:
-		if e.jsonV2 {
-			if e.jsonV2Error(t) != "" {
-				return false
-			}
+		if e.jsonV2 != nil && e.jsonV2Error(t) != "" {
+			return false
 		}
 		// Eliminate structs with fields for which all fields are filtered.
 		if t.NumFields() == 0 {
@@ -1211,7 +1243,7 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 // Go 1.27 also added floats, and interfaces holding any of those.
 // All are encoded as string labels in CUE.
 func supportedMapKey(t types.Type) bool {
-	if b, ok := t.Underlying().(*types.Basic); ok && b.Info()&(types.IsString|types.IsInteger|types.IsFloat) != 0 {
+	if hasBasicInfo(t, types.IsString|types.IsInteger|types.IsFloat) {
 		return true
 	}
 	if i, ok := t.Underlying().(*types.Interface); ok && i.Empty() {
@@ -1576,24 +1608,20 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 
 	// Structs from other packages, which we only see when their fields
 	// are promoted into ours, have no docs available.
-	docs := make([]*ast.CommentGroup, x.NumFields())
+	docs := make([]*ast.CommentGroup, 0, x.NumFields())
 	if s := e.orig[x]; s != nil {
-		docs = docs[:0]
 		for _, f := range s.Fields.List {
-			if len(f.Names) == 0 {
+			for range max(1, len(f.Names)) {
 				docs = append(docs, f.Doc)
-			} else {
-				for range f.Names {
-					docs = append(docs, f.Doc)
-				}
 			}
 		}
 	}
+	docs = docs[:x.NumFields()]
 	count := 0
 	for i := 0; i < x.NumFields(); i++ {
 		f := x.Field(i)
 		index := fmt.Sprint(prefix, i)
-		embedded := e.isEmbedded(f, x.Tag(i))
+		typ, viaPointer, embedded := e.embedded(f, x.Tag(i))
 		if !embedded && !ast.IsExported(f.Name()) {
 			continue
 		}
@@ -1602,25 +1630,17 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 			continue
 		}
 		if embedded {
-			typ := f.Type()
-			viaPointer := false
-			if p, ok := typ.(*types.Pointer); ok {
-				typ = p.Elem()
-				viaPointer = true
-			}
+			nilable := viaNilable || viaPointer
 			fields, isStruct := typ.Underlying().(*types.Struct)
 			named, isNamed := types.Unalias(typ).(*types.Named)
 			switch {
+			case !isStruct && index == enc.fallback:
+				add(e.makeFallback(typ, enc.names))
+			case !isStruct && isFallback(typ):
+				e.logf("    Dropped embedded field %v as another holds any other object members", f.Name())
 			case !isStruct:
-				switch {
-				case index == enc.fallback:
-					add(e.makeFallback(typ, enc.names))
-				case isFallback(typ):
-					e.logf("    Dropped embedded field %v as another holds any other object members", f.Name())
-				default:
-					e.logf("    Dropped embedded field %v for unsupported type %v", f.Name(), f.Type())
-				}
-			case isNamed && !viaNilable && !viaPointer && e.canReference(named) && e.embedsAsIs(fields, index+".", enc):
+				e.logf("    Dropped embedded field %v for unsupported type %v", f.Name(), f.Type())
+			case isNamed && !nilable && e.canReference(named) && e.embedsAsIs(fields, index+".", enc):
 				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
 				if len(st.Elts) > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
@@ -1632,19 +1652,17 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 				if isNamed {
 					e.logf("    Promoted the fields of %v individually", f.Name())
 				}
-				e.addFieldsAt(fields, st, index+".", enc, viaNilable || viaPointer)
+				e.addFieldsAt(fields, st, index+".", enc, nilable)
 			}
 			continue
 		}
 		tag := x.Tag(i)
-		codec, name := e.fieldCodec(tag)
-		if name == "" {
-			name = f.Name()
-		}
-		if name == "-" {
+		codec, tagName := e.fieldCodec(tag)
+		if tagName == "-" {
 			continue
 		}
-		if _, ok := enc.names[index]; !ok {
+		name, ok := enc.names[index]
+		if !ok {
 			e.logf("    Dropped field %v as it is hidden by another with the same name", f.Name())
 			continue
 		}
@@ -1660,16 +1678,12 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 		if viaNilable {
 			attrs = attrs&^required | optional
 		}
-		field, cueType := e.makeField(name, regular, attrs, f.Type(), doc, count > 0)
-		add(field)
-
-		if e.isStringified(f.Type(), tag, codec) {
-			field.Value = e.ident("string", false)
-			if attrs&nullable != 0 {
-				field.Value = cueast.NewBinExpr(cuetoken.OR, cueast.NewNull(), field.Value)
-			}
-			cueType = "string"
+		ftyp := f.Type()
+		if e.isStringified(ftyp, tag, codec) {
+			ftyp = types.Typ[types.String]
 		}
+		field, cueType := e.makeField(name, regular, attrs, ftyp, doc, count > 0)
+		add(field)
 
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
 			expr, err := parser.ParseExpr("get go", s)
@@ -1806,7 +1820,17 @@ func (e *extractor) embedsAsIs(x *types.Struct, prefix string, enc *structEncodi
 // A field hides deeper fields with the same name. Of multiple fields with
 // the same name at the same depth, a single one named by a tag hides the rest,
 // or else they are all dropped. Fallbacks follow the same rules by depth.
+// The result is cached, as embedded structs are checked for each parent.
 func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
+	enc, ok := e.structEncodings[x]
+	if !ok {
+		enc = e.findStructEncoding(x)
+		e.structEncodings[x] = enc
+	}
+	return enc
+}
+
+func (e *extractor) findStructEncoding(x *types.Struct) *structEncoding {
 	type field struct {
 		name   string
 		index  string
@@ -1818,17 +1842,15 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 		index string
 	}
 	var fields, fallbacks []field
+	// Visit the embedded structs by depth, each only at the first depth
+	// it is found at, counting how many times it is found at that depth.
 	next := []embedding{{x, ""}}
 	nextCount := map[*types.Struct]int{x: 1}
-	visited := map[*types.Struct]bool{}
+	visited := map[*types.Struct]bool{x: true}
 	for depth := 0; len(next) > 0; depth++ {
 		current, count := next, nextCount
 		next, nextCount = nil, map[*types.Struct]int{}
 		for _, emb := range current {
-			if visited[emb.x] {
-				continue
-			}
-			visited[emb.x] = true
 			// If the same struct is embedded more than once at this depth,
 			// its fields conflict with themselves.
 			copies := min(count[emb.x], 2)
@@ -1836,12 +1858,8 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 				f := emb.x.Field(i)
 				tag := emb.x.Tag(i)
 				index := fmt.Sprint(emb.index, i)
-				if e.isEmbedded(f, tag) {
-					typ := f.Type()
-					if p, ok := typ.(*types.Pointer); ok {
-						typ = p.Elem()
-					}
-					x, ok := typ.Underlying().(*types.Struct)
+				if typ, _, ok := e.embedded(f, tag); ok {
+					st, ok := typ.Underlying().(*types.Struct)
 					if !ok {
 						if isFallback(typ) {
 							for range copies {
@@ -1850,9 +1868,10 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 						}
 						continue
 					}
-					nextCount[x]++
-					if nextCount[x] == 1 {
-						next = append(next, embedding{x, index + "."})
+					nextCount[st]++
+					if !visited[st] {
+						visited[st] = true
+						next = append(next, embedding{st, index + "."})
 					}
 					continue
 				}
@@ -1897,17 +1916,17 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 // isFallback reports whether an embedded field of type typ can hold
 // the object members not encoded by any of the other fields.
 func isFallback(typ types.Type) bool {
-	if isJSONTextValue(typ) {
+	if isJSONTextType(typ, "Value") {
 		return true
 	}
 	m, ok := typ.Underlying().(*types.Map)
-	return ok && isStringKind(m.Key())
+	return ok && hasBasicInfo(m.Key(), types.IsString)
 }
 
 // makeFallback returns the CUE declaration for an embedded field of type typ,
 // which must satisfy [isFallback], given the fields that are encoded.
 func (e *extractor) makeFallback(typ types.Type, encoded map[string]string) cueast.Decl {
-	if isJSONTextValue(typ) {
+	if isJSONTextType(typ, "Value") {
 		return &cueast.Ellipsis{}
 	}
 	m := typ.Underlying().(*types.Map)
@@ -1926,15 +1945,25 @@ func (e *extractor) makeFallback(typ types.Type, encoded map[string]string) cuea
 	}
 }
 
-func isStringKind(t types.Type) bool {
+// hasBasicInfo reports whether t is a basic type with any of the given kinds.
+func hasBasicInfo(t types.Type, info types.BasicInfo) bool {
 	b, ok := t.Underlying().(*types.Basic)
-	return ok && b.Info()&types.IsString != 0
+	return ok && b.Info()&info != 0
 }
 
-func isJSONTextValue(t types.Type) bool {
+// isJSONTextType reports whether t is the named type from encoding/json/jsontext.
+func isJSONTextType(t types.Type, name string) bool {
 	n, ok := types.Unalias(t).(*types.Named)
 	return ok && n.Obj().Pkg() != nil &&
-		n.Obj().Pkg().Path() == "encoding/json/jsontext" && n.Obj().Name() == "Value"
+		n.Obj().Pkg().Path() == "encoding/json/jsontext" && n.Obj().Name() == name
+}
+
+// derefPointer returns the element type of t if it is a pointer.
+func derefPointer(t types.Type) (_ types.Type, isPointer bool) {
+	if p, ok := t.(*types.Pointer); ok {
+		return p.Elem(), true
+	}
+	return t, false
 }
 
 // jsonV2Error returns why encoding/json/v2 rejects the struct type x,
@@ -1956,7 +1985,7 @@ func (e *extractor) findJSONV2Error(x *types.Struct) string {
 	hasTag, hasField, fallbacks := false, false, 0
 	for i := range x.NumFields() {
 		f := x.Field(i)
-		tag, tagged := reflect.StructTag(x.Tag(i)).Lookup("json")
+		tag, tagged := reflect.StructTag(x.Tag(i)).Lookup(e.jsonV2.tagKey)
 		hasTag = hasTag || tagged
 		if tag == "-" {
 			continue
@@ -1968,21 +1997,21 @@ func (e *extractor) findJSONV2Error(x *types.Struct) string {
 		if strings.HasSuffix(tag, ",") {
 			return fmt.Sprintf("field %s has a json tag with a trailing comma", f.Name())
 		}
-		var embed bool
-		if opts != "" {
-			for opt := range strings.SplitSeq(opts, ",") {
-				switch opt {
-				case "omitzero", "omitempty", "string", "case:ignore", "case:strict":
-				case "embed":
-					embed = true
-				default:
-					// Unknown options are ignored, but not misspelled known ones.
-					// A format option is only supported via a runtime option.
-					key, _, _ := strings.Cut(opt, ":")
-					for _, known := range []string{"omitzero", "omitempty", "string", "case", "embed", "format"} {
-						if strings.EqualFold(key, known) {
-							return fmt.Sprintf("field %s has an unsupported json tag option %q", f.Name(), opt)
-						}
+		var embed, stringOpt bool
+		for opt := range strings.SplitSeq(opts, ",") {
+			switch opt {
+			case "", "omitzero", "omitempty", "case:ignore", "case:strict":
+			case "string":
+				stringOpt = true
+			case "embed":
+				embed = true
+			default:
+				// Unknown options are ignored, but not misspelled known ones.
+				// A format option is only supported via a runtime option.
+				key, _, _ := strings.Cut(opt, ":")
+				for _, known := range []string{"omitzero", "omitempty", "string", "case", "embed", "format"} {
+					if strings.EqualFold(key, known) {
+						return fmt.Sprintf("field %s has an unsupported json tag option %q", f.Name(), opt)
 					}
 				}
 			}
@@ -1990,25 +2019,21 @@ func (e *extractor) findJSONV2Error(x *types.Struct) string {
 		if embed && (name != "" || opts != "embed") {
 			return fmt.Sprintf("field %s has other json tag options besides embed", f.Name())
 		}
-		typ := f.Type()
-		if p, ok := typ.(*types.Pointer); ok {
-			typ = p.Elem()
-		}
-		if hasFlag(x.Tag(i), "json", "string", 1) && e.altType(typ) == nil {
-			if b, ok := typ.Underlying().(*types.Basic); !ok || b.Info()&types.IsNumeric == 0 {
-				return fmt.Sprintf("field %s has a json string option but is not a number", f.Name())
-			}
+		typ, _ := derefPointer(f.Type())
+		ownEncoding := e.ownEncoding(typ) != noOwnEncoding
+		if stringOpt && !ownEncoding && !hasBasicInfo(typ, e.jsonV2.stringKinds) {
+			return fmt.Sprintf("field %s has a json string option but is not a number", f.Name())
 		}
 		if !f.Exported() && !f.Anonymous() {
 			continue
 		}
 		hasField = true
 		_, isStruct := typ.Underlying().(*types.Struct)
-		if f.Anonymous() && name == "" && !isStruct && !embed {
-			return fmt.Sprintf("embedded field %s is not a struct and has no json name", f.Name())
-		}
 		if (f.Anonymous() && name == "") || embed {
-			if e.altType(typ) != nil && e.altType(x) == nil {
+			if !isStruct && !embed {
+				return fmt.Sprintf("embedded field %s is not a struct and has no json name", f.Name())
+			}
+			if ownEncoding && e.ownEncoding(x) == noOwnEncoding {
 				return fmt.Sprintf("embedded field %s has its own marshal or unmarshal methods", f.Name())
 			}
 			if !isStruct {
@@ -2039,50 +2064,38 @@ func (e *extractor) findJSONV2Error(x *types.Struct) string {
 // is encoded as a string due to a "string" tag option.
 // encoding/json/v2 only allows the option for numbers.
 func (e *extractor) isStringified(typ types.Type, tag string, codec *codec) bool {
-	if !codec.stringOption || !hasFlag(tag, codec.tagKey, "string", 1) {
+	if codec.stringKinds == 0 || !hasFlag(tag, codec.tagKey, "string", 1) {
 		return false
 	}
-	if p, ok := typ.(*types.Pointer); ok {
-		typ = p.Elem()
-	}
-	if e.altType(typ) != nil {
-		return false // encoded via its own methods
-	}
-	kinds := types.IsBoolean | types.IsNumeric | types.IsString
-	if codec.jsonV2 {
-		kinds = types.IsNumeric
-	}
-	b, ok := typ.Underlying().(*types.Basic)
-	return ok && b.Info()&kinds != 0
+	typ, _ = derefPointer(typ)
+	return e.ownEncoding(typ) == noOwnEncoding && hasBasicInfo(typ, codec.stringKinds)
 }
 
-// isEmbedded reports whether the governing codec promotes the fields of f,
+// embedded reports whether the governing codec promotes the fields of f,
 // with the given struct tag, into its parent struct.
-func (e *extractor) isEmbedded(f *types.Var, tag string) bool {
+// If so, it returns the type of f, and whether that is via a pointer.
+func (e *extractor) embedded(f *types.Var, tag string) (typ types.Type, viaPointer, ok bool) {
 	codec, name := e.fieldCodec(tag)
+	typ, viaPointer = derefPointer(f.Type())
 	if codec.inlineOption {
-		return f.Anonymous() && hasFlag(tag, codec.tagKey, "inline", 1)
+		return typ, viaPointer, f.Anonymous() && hasFlag(tag, codec.tagKey, "inline", 1)
 	}
 	// Like encoding/json, promote the fields of an embedded struct
 	// or pointer to struct, unless the tag gives it a name.
 	if name != "" {
-		return false
-	}
-	typ := f.Type()
-	if p, ok := typ.(*types.Pointer); ok {
-		typ = p.Elem()
+		return nil, false, false
 	}
 	_, isStruct := typ.Underlying().(*types.Struct)
 	if f.Anonymous() && isStruct {
-		return true
+		return typ, viaPointer, true
 	}
 	// Go 1.27 added the "embed" option to encoding/json, which does the same
 	// for any exported field, and also allows a map with string keys or
 	// a jsontext.Value to hold the object members not encoded by other fields.
 	if !f.Exported() || !hasFlag(tag, codec.tagKey, "embed", 1) {
-		return false
+		return nil, false, false
 	}
-	return isStruct || isFallback(typ)
+	return typ, viaPointer, isStruct || isFallback(typ)
 }
 
 func (e *extractor) fieldAttributesFromType(f types.Type) (attrs fieldAttributes) {
@@ -2144,11 +2157,10 @@ func (e *extractor) detectFieldAttributes(f *types.Var, doc *ast.CommentGroup, t
 // encoding/json/v2 only omits values encoded as an empty JSON value,
 // which booleans and numbers never are.
 func (e *extractor) omitsEmpty(typ types.Type, codec *codec) bool {
-	if !codec.jsonV2 || e.altType(typ) != nil {
+	if !codec.jsonV2 || e.ownEncoding(typ) != noOwnEncoding {
 		return true
 	}
-	b, ok := typ.Underlying().(*types.Basic)
-	return !ok || b.Info()&(types.IsBoolean|types.IsNumeric) == 0
+	return !hasBasicInfo(typ, types.IsBoolean|types.IsNumeric)
 }
 
 func hasFlag(tag, key, flag string, offset int) bool {

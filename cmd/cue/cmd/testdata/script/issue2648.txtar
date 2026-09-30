@@ -1,7 +1,8 @@
 # Various edge cases for `cue def` where references across files
 # must still work in the self-contained result.
 # We also include cases where joining the file values without
-# lexical scopes can introduce duplicate names, such as aliases and lets.
+# lexical scopes can introduce duplicate names, such as aliases, lets,
+# and fields.
 
 exec cue export .
 cmp stdout export.stdout
@@ -12,6 +13,46 @@ stdin stdout
 # TODO: this should succeed, and show output equivalent to the earlier export.
 ! exec cue export -
 cmp stderr stderr-bug.golden
+
+# Once the files share one scope, their aliases must not clash with names
+# declared at any depth of the other files.
+exec cue export ./nested
+cmp stdout nested-export.stdout
+exec cue def ./nested
+cmp stdout nested-def.stdout
+stdin stdout
+exec cue export -
+cmp stdout nested-def-export.stdout
+
+# A field of one file may be shadowed by a nested field of another file.
+exec cue def ./shadow
+cmp stdout shadow-def.stdout
+stdin stdout
+exec cue export -
+# TODO: outer.ref should be "top".
+cmp stdout shadow-def-export.stdout
+
+# A quoted label declares a field in scope as well.
+exec cue def ./quoted
+stdin stdout
+# TODO: this should succeed.
+! exec cue export -
+cmp stderr quoted-def-export.stderr
+
+# A field shadows a predeclared identifier only in its own file.
+exec cue def ./predeclared
+cmp stdout predeclared-def.stdout
+cp stdout predeclared-check/def.cue
+! exec cue vet -c=false ./predeclared-check
+stderr 'conflicting values'
+
+# Hidden fields are qualified by their package, but clash with aliases all
+# the same.
+exec cue def ./hidden
+cmp stdout hidden-def.stdout
+stdin stdout
+exec cue export -
+cmp stdout hidden-def-export.stdout
 
 -- def.stdout --
 package p
@@ -31,6 +72,20 @@ let L_1 = false
 	"another non ident"~(A): false
 	crossfile_alias_ref:     crossfile_alias
 	alias2_mark_used:        A
+}
+
+{
+
+	"third non ident"~(A):    3
+	"fourth non ident"~(A_1): 4
+	alias3_mark_used:         [A, A_1]
+}
+
+{
+
+	"let non ident"~(L):                  "alias"
+	"field non ident"~(crossfile_simple): "alias"
+	alias4_mark_used:                     [L, crossfile_simple]
 }
 {
 	crossfile_let: "referenced from sibling file"
@@ -57,19 +112,31 @@ let2_mark_used:       L_1
     "crossfile_let_ref": "referenced from sibling file",
     "crossfile_simple": true,
     "crossfile_simple_ref": true,
+    "let non ident": "alias",
+    "field non ident": "alias",
+    "alias4_mark_used": [
+        "alias",
+        "alias"
+    ],
     "let1_used": true,
     "let2_mark_used": false,
     "non ident": true,
     "alias1_used": true,
-    "simple1_used": true
+    "simple1_used": true,
+    "third non ident": 3,
+    "fourth non ident": 4,
+    "alias3_mark_used": [
+        3,
+        4
+    ]
 }
 -- stderr-bug.golden --
 crossfile_alias_ref: reference "crossfile_alias" not found:
     -:16:27
 crossfile_let_ref: reference "crossfile_let" not found:
-    -:31:23
+    -:45:23
 crossfile_simple_ref: reference "crossfile_simple" not found:
-    -:32:23
+    -:46:23
 -- simple_1.cue --
 package p
 
@@ -95,6 +162,18 @@ package p
 "another non ident"~(A): false
 crossfile_alias_ref:     crossfile_alias
 alias2_mark_used:        A
+-- alias_3.cue --
+package p
+
+"third non ident"~(A):    3
+"fourth non ident"~(A_1): 4
+alias3_mark_used:         [A, A_1]
+-- alias_4.cue --
+package p
+
+"let non ident"~(L):                  "alias"
+"field non ident"~(crossfile_simple): "alias"
+alias4_mark_used: [L, crossfile_simple]
 -- let_1.cue --
 package p
 
@@ -109,3 +188,217 @@ package p
 crossfile_let_ref: crossfile_let
 let L = false
 let2_mark_used: L
+-- nested-export.stdout --
+{
+    "B": "b",
+    "alias a": 1,
+    "alias b": 2,
+    "alias c": 3,
+    "alias_refs": [
+        1,
+        2,
+        3
+    ],
+    "field": "top",
+    "field_comprehension": true,
+    "nested_alias": {
+        "alias field": "nested",
+        "ref": "nested"
+    },
+    "nested_field": {
+        "A": "a"
+    },
+    "for_var": [
+        1
+    ]
+}
+-- nested-def.stdout --
+package nested
+
+{
+
+	"alias a"~(A): 1
+	"alias b"~(B): 2
+	"alias c"~(C): 3
+	alias_refs:    [A, B, C]
+}
+{
+	field: "top"
+	if true {
+		field_comprehension: true
+	}
+}
+{
+	nested_field: A: "a"
+	if true {
+		B: "b"
+	}
+	for_var: [for C in [1] {
+		C
+	}]
+}
+nested_alias: {
+	"alias field"~(field): "nested"
+	ref:                   field
+}
+-- nested-def-export.stdout --
+{
+    "alias a": 1,
+    "alias b": 2,
+    "alias c": 3,
+    "alias_refs": [
+        1,
+        2,
+        3
+    ],
+    "field": "top",
+    "field_comprehension": true,
+    "B": "b",
+    "nested_field": {
+        "A": "a"
+    },
+    "for_var": [
+        1
+    ],
+    "nested_alias": {
+        "alias field": "nested",
+        "ref": "nested"
+    }
+}
+-- shadow-def.stdout --
+package shadow
+
+{
+	shadowed: "top"
+	if true {
+		comprehension: true
+	}
+}
+outer: {
+	shadowed: "nested"
+	ref:      shadowed
+}
+-- shadow-def-export.stdout --
+{
+    "shadowed": "top",
+    "comprehension": true,
+    "outer": {
+        "shadowed": "nested",
+        "ref": "nested"
+    }
+}
+-- quoted-def-export.stderr --
+explicit error (_|_ literal) in source:
+    -:17:1
+-- predeclared-def.stdout --
+package predeclared
+
+{
+	int: _
+	if true {
+		comprehension: true
+	}
+}
+ref: int
+-- hidden-def.stdout --
+package hidden
+
+{
+	alias~(_A): "alias"
+	alias_ref:  _A
+}
+{
+	_A: "field"
+	if true {
+		comprehension: true
+	}
+	field_ref: _A
+}
+-- hidden-def-export.stdout --
+{
+    "alias": "alias",
+    "alias_ref": "alias",
+    "comprehension": true,
+    "field_ref": "field"
+}
+-- nested/alias.cue --
+package nested
+
+"alias a"~(A): 1
+"alias b"~(B): 2
+"alias c"~(C): 3
+alias_refs: [A, B, C]
+-- nested/names.cue --
+package nested
+
+nested_field: A: "a"
+if true {
+	B: "b"
+}
+for_var: [for C in [1] {C}]
+-- nested/field.cue --
+package nested
+
+field: "top"
+if true {
+	field_comprehension: true
+}
+-- nested/nested_alias.cue --
+package nested
+
+nested_alias: {
+	"alias field"~(field): "nested"
+	ref: field
+}
+-- shadow/field.cue --
+package shadow
+
+shadowed: "top"
+if true {
+	comprehension: true
+}
+-- shadow/ref.cue --
+package shadow
+
+outer: ref: shadowed
+-- shadow/nested.cue --
+package shadow
+
+outer: shadowed: "nested"
+-- quoted/alias.cue --
+package quoted
+
+"alias a"~(A): 1
+ref: A
+-- quoted/quoted.cue --
+package quoted
+
+"A": "quoted"
+-- predeclared/field.cue --
+package predeclared
+
+int: _
+if true {
+	comprehension: true
+}
+-- predeclared/ref.cue --
+package predeclared
+
+ref: __int
+-- predeclared-check/check.cue --
+package predeclared
+
+ref: "not an int"
+-- hidden/field.cue --
+package hidden
+
+_A: "field"
+if true {
+	comprehension: true
+}
+field_ref: _A
+-- hidden/alias.cue --
+package hidden
+
+"alias"~(_A): "alias"
+alias_ref: _A

@@ -53,6 +53,7 @@ as the objective is to gain experience and then move the feature elsewhere.
 
 	// Commands which are never meant to be promoted out of `cue exp`.
 	cmd.AddCommand(newExpWritefsCmd(c))
+	cmd.AddCommand(newExpASTCmd(c))
 
 	// Hidden commands which are only meant for integration tests.
 	cmd.AddCommand(&cobra.Command{

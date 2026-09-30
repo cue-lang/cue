@@ -1,0 +1,239 @@
+# Test "cue exp ast print" and "cue exp ast join".
+
+# Loaded packages have absolute filenames, which are printed as quoted strings,
+# so the separators in Windows paths are escaped.
+exec cue exp ast print --omitempty ./a
+[!windows] cmpenv stdout print-omitempty.stdout
+
+exec cue exp ast print --omitempty --pos --refs --files ref/ref.cue
+cmp stdout print-pos-refs.stdout
+
+# In --files mode, a file with syntax errors still has its partial tree printed.
+stdin bad/invalid.cue
+! exec cue exp ast print --files -
+cmp stdout print-bad.stdout
+cmp stderr print-bad.stderr
+
+exec cue exp ast join ./a
+cmp stdout join.stdout
+
+! exec cue exp ast join ./a ./b
+stderr '^joining multiple instances is not possible yet$'
+
+-- cue.mod/module.cue --
+module: "mod.test/test"
+language: version: "v0.14.0"
+-- a/one.cue --
+package a
+
+import "strings"
+
+x: strings.ToUpper("foo")
+-- a/two.cue --
+package a
+
+import "example.com/other/strings"
+
+// y is a field.
+y: strings.Foo
+-- b/b.cue --
+package b
+-- ref/ref.cue --
+x: 1
+y: x
+-- bad/invalid.cue --
+a: 1
+b: +
+-- print-omitempty.stdout --
+*ast.File{
+	Filename: "$WORK/a/one.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			PackagePos: token.Pos("$WORK/a/one.cue:1:1", nospace)
+			Name: *ast.Ident{
+				NamePos: token.Pos("$WORK/a/one.cue:1:9", blank)
+				Name: "a"
+			}
+		}
+		*ast.ImportDecl{
+			Import: token.Pos("$WORK/a/one.cue:3:1", section)
+			Specs: []*ast.ImportSpec{
+				{
+					Path: *ast.BasicLit{
+						ValuePos: token.Pos("$WORK/a/one.cue:3:8", blank)
+						Kind: token.Token("STRING")
+						Value: "\"strings\""
+					}
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("$WORK/a/one.cue:5:1", section)
+				Name: "x"
+			}
+			TokenPos: token.Pos("$WORK/a/one.cue:5:2", nospace)
+			Value: *ast.CallExpr{
+				Fun: *ast.SelectorExpr{
+					X: *ast.Ident{
+						NamePos: token.Pos("$WORK/a/one.cue:5:4", blank)
+						Name: "strings"
+					}
+					Period: token.Pos("$WORK/a/one.cue:5:11", nospace)
+					Sel: *ast.Ident{
+						NamePos: token.Pos("$WORK/a/one.cue:5:12", nospace)
+						Name: "ToUpper"
+					}
+				}
+				Lparen: token.Pos("$WORK/a/one.cue:5:19", nospace)
+				Args: []ast.Expr{
+					*ast.BasicLit{
+						ValuePos: token.Pos("$WORK/a/one.cue:5:20", nospace)
+						Kind: token.Token("STRING")
+						Value: "\"foo\""
+					}
+				}
+				Rparen: token.Pos("$WORK/a/one.cue:5:25", nospace)
+			}
+		}
+	}
+}
+*ast.File{
+	Filename: "$WORK/a/two.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			PackagePos: token.Pos("$WORK/a/two.cue:1:1", nospace)
+			Name: *ast.Ident{
+				NamePos: token.Pos("$WORK/a/two.cue:1:9", blank)
+				Name: "a"
+			}
+		}
+		*ast.ImportDecl{
+			Import: token.Pos("$WORK/a/two.cue:3:1", section)
+			Specs: []*ast.ImportSpec{
+				{
+					Path: *ast.BasicLit{
+						ValuePos: token.Pos("$WORK/a/two.cue:3:8", blank)
+						Kind: token.Token("STRING")
+						Value: "\"example.com/other/strings\""
+					}
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("$WORK/a/two.cue:6:1", newline)
+				Name: "y"
+			}
+			TokenPos: token.Pos("$WORK/a/two.cue:6:2", nospace)
+			Value: *ast.SelectorExpr{
+				X: *ast.Ident{
+					NamePos: token.Pos("$WORK/a/two.cue:6:4", blank)
+					Name: "strings"
+				}
+				Period: token.Pos("$WORK/a/two.cue:6:11", nospace)
+				Sel: *ast.Ident{
+					NamePos: token.Pos("$WORK/a/two.cue:6:12", nospace)
+					Name: "Foo"
+				}
+			}
+			Comments: []*ast.CommentGroup{
+				{
+					Doc: true
+					List: []*ast.Comment{
+						{
+							Slash: token.Pos("$WORK/a/two.cue:5:1", section)
+							Text: "// y is a field."
+						}
+					}
+				}
+			}
+		}
+	}
+}
+-- print-pos-refs.stdout --
+*ast.File[ref/ref.cue:1:1,2:5]{
+	Filename: "ref/ref.cue"
+	Decls: []ast.Decl{
+		*ast.Field[ref/ref.cue:1:1,1:5]{
+			Label: *ast.Ident[ref/ref.cue:1:1,1:2]{
+				NamePos: token.Pos("ref/ref.cue:1:1", nospace)
+				Name: "x"
+			}
+			TokenPos: token.Pos("ref/ref.cue:1:2", nospace)
+			Value: *ast.BasicLit@ref001[ref/ref.cue:1:4,1:5]{
+				ValuePos: token.Pos("ref/ref.cue:1:4", blank)
+				Kind: token.Token("INT")
+				Value: "1"
+			}
+		}
+		*ast.Field[ref/ref.cue:2:1,2:5]{
+			Label: *ast.Ident[ref/ref.cue:2:1,2:2]{
+				NamePos: token.Pos("ref/ref.cue:2:1", newline)
+				Name: "y"
+			}
+			TokenPos: token.Pos("ref/ref.cue:2:2", nospace)
+			Value: *ast.Ident[ref/ref.cue:2:4,2:5]{
+				NamePos: token.Pos("ref/ref.cue:2:4", blank)
+				Name: "x"
+				Node: @ref001 (*ast.BasicLit)
+			}
+		}
+	}
+}
+-- print-bad.stdout --
+*ast.File{
+	Filename: "-"
+	Decls: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-:1:1", nospace)
+				Name: "a"
+			}
+			Alias: nil
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-:1:2", nospace)
+			Value: *ast.BasicLit{
+				ValuePos: token.Pos("-:1:4", blank)
+				Kind: token.Token("INT")
+				Value: "1"
+			}
+			Equal: token.Pos("-")
+			Default: nil
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-:2:1", newline)
+				Name: "b"
+			}
+			Alias: nil
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-:2:2", nospace)
+			Value: *ast.UnaryExpr{
+				OpPos: token.Pos("-:2:4", blank)
+				Op: token.Token("+")
+				X: *ast.BadExpr{
+					From: token.Pos("-:2:6", newline)
+					To: token.Pos("-:2:6", newline)
+				}
+			}
+			Equal: token.Pos("-")
+			Default: nil
+			Attrs: []*ast.Attribute{}
+		}
+	}
+}
+-- print-bad.stderr --
+expected operand, found 'EOF':
+    -:2:6
+-- join.stdout --
+import (
+	"strings"
+	strings_9 "example.com/other/strings"
+)
+
+x: strings.ToUpper("foo")
+
+// y is a field.
+y: strings_9.Foo

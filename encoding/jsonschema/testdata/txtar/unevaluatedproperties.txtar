@@ -1,0 +1,160 @@
+# The properties which "unevaluatedProperties" leaves out are those
+# evaluated by the sibling keywords and by the subschemas reached
+# through "allOf" and "$ref".
+#strictFeatures
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "$defs": {
+        "base": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "string"
+                }
+            },
+            "patternProperties": {
+                "^x-": {}
+            }
+        },
+        "extra": {
+            "type": "object",
+            "properties": {
+                "ports": {
+                    "type": "array"
+                }
+            }
+        },
+        "named": {
+            "properties": {
+                "$id": {
+                    "type": "string"
+                },
+                "nested": {
+                    "properties": {
+                        "q": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "map": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": {
+                "type": "number"
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/$defs/base"
+        },
+        {
+            "$ref": "#/$defs/extra"
+        }
+    ],
+    "properties": {
+        "restart": {
+            "type": "string"
+        },
+        "labels": {
+            "type": "object",
+            "$ref": "#/$defs/extra",
+            "unevaluatedProperties": {
+                "type": "string"
+            }
+        },
+        "covered": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/map"
+                }
+            ],
+            "unevaluatedProperties": false
+        },
+        "open": {
+            "$ref": "#/$defs/extra",
+            "unevaluatedProperties": true
+        },
+        "nested": {
+            "type": "object",
+            "$ref": "#/$defs/named/properties/nested",
+            "unevaluatedProperties": false
+        },
+        "dependent": {
+            "type": "object",
+            "properties": {
+                "a": {
+                    "type": "string"
+                }
+            },
+            "dependencies": {
+                "a": [
+                    "b"
+                ]
+            },
+            "unevaluatedProperties": false
+        }
+    },
+    "required": [
+        "image"
+    ],
+    "unevaluatedProperties": false
+}
+-- test/ok.json --
+{
+    "image": "redis",
+    "ports": [80],
+    "restart": "always",
+    "x-custom": true,
+    "labels": {
+        "ports": [],
+        "env": "prod"
+    },
+    "covered": {
+        "name": "a",
+        "other": 1
+    },
+    "open": {
+        "other": 1
+    },
+    "nested": {
+        "q": "x"
+    },
+    "dependent": {
+        "a": "x"
+    }
+}
+-- test/err-misspelled.json --
+{
+    "image": "redis",
+    "imagee": "redis"
+}
+-- test/err-labels.json --
+{
+    "image": "redis",
+    "labels": {
+        "env": 1
+    }
+}
+-- out/decode/extract --
+ERROR:
+keyword "unevaluatedProperties" not yet implemented:
+    schema.json:64:14
+keyword "unevaluatedProperties" not yet implemented:
+    schema.json:74:14
+keyword "unevaluatedProperties" not yet implemented:
+    schema.json:78:14
+keyword "unevaluatedProperties" not yet implemented:
+    schema.json:83:14
+keyword "unevaluatedProperties" not yet implemented:
+    schema.json:97:14
+keyword "unevaluatedProperties" not yet implemented:
+    schema.json:103:6

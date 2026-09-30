@@ -529,8 +529,9 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 
 func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromModule module.Version) (string, error) {
 	if l.cfg.FS != nil {
-		if l.cfg.modFile != nil && fromModule.Path() == l.cfg.modFile.QualifiedModule() {
-			// It's a path in the main module and files are coming from [Config.FS].
+		if fromModule.IsLocal() || l.cfg.modFile != nil && fromModule.Path() == l.cfg.modFile.QualifiedModule() {
+			// It's a path in the main module, or in its cue.mod/{gen,usr,pkg}
+			// directories, and files are coming from [Config.FS].
 			// Join with ModuleRoot to make the path absolute within the FS namespace.
 			// Note: FromFSPath is not applied here because this path is used for
 			// FS lookups, not for display purposes.

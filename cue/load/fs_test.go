@@ -388,17 +388,14 @@ x: "usr"
 			qt.Assert(t, qt.IsNil(err))
 			insts := Instances([]string{"."}, &Config{FS: fsys, Dir: dir})
 			qt.Assert(t, qt.HasLen(insts, 1))
-			// Issue https://cuelang.org/issue/4494: the instance root of a
-			// local package cannot be resolved within [Config.FS], failing
-			// the load.
-			qt.Assert(t, qt.ErrorMatches(insts[0].Err, `import failed: cannot get absolute path for FS of type \*load.fsIOFS`))
-			qt.Assert(t, qt.HasLen(insts[0].Imports, 0))
+			qt.Assert(t, qt.IsNil(insts[0].Err))
+			qt.Assert(t, qt.HasLen(insts[0].Imports, 3))
 			for _, imp := range insts[0].Imports {
 				qt.Assert(t, qt.IsNil(imp.Err))
 				qt.Assert(t, qt.Equals(imp.Root, cmp.Or(dir, "/")))
 			}
 			v := cuecontext.New().BuildInstance(insts[0])
-			qt.Assert(t, qt.Equals(fmt.Sprint(v.LookupPath(cue.ParsePath("out"))), `_|_ // field not found: out`))
+			qt.Assert(t, qt.Equals(fmt.Sprint(v.LookupPath(cue.ParsePath("out"))), `["gen", "pkg", "usr"]`))
 		})
 	}
 }

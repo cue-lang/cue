@@ -1621,6 +1621,15 @@ type FuncValue struct {
 	// the environment it was bound in, which may differ from the environment
 	// of a later completing call.
 	args []funcArg
+
+	// born is the cycle-reference chain in effect when the closure was
+	// created. It records the calls in progress at that time, which lets
+	// [nodeContext.detectCycle] recognize a closure created by a call that
+	// is still in progress: calling it at the same call site is recursion,
+	// even though the closure has an environment of its own. Arguments are
+	// evaluated with the caller's chain (see [CycleInfo.IsFuncArg]), so a
+	// closure built by an argument is not attributed to the callee.
+	born *RefNode
 }
 
 // A funcArg is an argument bound to a function parameter by a partial
@@ -1643,9 +1652,10 @@ func (x *Function) evaluate(c *OpContext, state Flags) Value {
 		return b
 	}
 	return &FuncValue{
-		Src: x.Src,
-		Fn:  x,
-		Env: env,
+		Src:  x.Src,
+		Fn:   x,
+		Env:  env,
+		born: c.ci.Refs,
 	}
 }
 
@@ -2151,6 +2161,9 @@ type FuncCallRef struct {
 	fn     *Function
 	types  []FuncType // extra signature constraints of the called value
 	target *Vertex
+
+	// born is the creation chain of the called closure; see [FuncValue.born].
+	born *RefNode
 }
 
 func (x *FuncCallRef) Source() ast.Node { return x.src }
@@ -2166,6 +2179,28 @@ func (x *FuncCallRef) Func() *Function { return x.fn }
 // by [FuncCallRef.Func], their expressions are reachable through the call
 // and must be visited by traversals outside this package.
 func (x *FuncCallRef) Types() []FuncType { return x.types }
+
+// calledAt reports whether the in-progress reference r, recorded in the
+// cycle-reference chain, is a call of the function literal of x at the call
+// site of x, other than through x itself.
+//
+// Calls reach the structural cycle detector through an anchor per function
+// literal and closure environment (see [OpContext.funcAnchor]), so a closure
+// with an environment of its own gets an anchor of its own. Every call
+// creates a fresh environment, though, so a call that creates a closure of
+// its own literal and calls it at the same call site — as a fixed-point
+// combinator does on every unrolling — would never re-reach an anchor. Such
+// a closure is recognized instead by its creation chain (x.born) containing
+// r: it was created while r was in progress, so calling it at the call site
+// of r is recursion, and a structural cycle like any other. See
+// [nodeContext.detectCycle].
+//
+// A closure of the same literal created before r started, such as one of a
+// nested composition comp(comp(f, g), h), is ordinary nesting.
+func (x *FuncCallRef) calledAt(r *RefNode) bool {
+	y, ok := r.Ref.(*FuncCallRef)
+	return ok && y != x && y.fn == x.fn && y.src == x.src
+}
 
 func (x *FuncCallRef) resolve(c *OpContext, state Flags) *Vertex {
 	return x.target
@@ -2295,7 +2330,7 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 		if reportUnusedArg() {
 			return nil
 		}
-		return &FuncValue{Src: x.Src, Fn: x.Fn, Env: x.Env, Types: x.Types, args: bindings}
+		return &FuncValue{Src: x.Src, Fn: x.Fn, Env: x.Env, Types: x.Types, args: bindings, born: x.born}
 	}
 
 	// Phase 2: complete the call.
@@ -2496,7 +2531,7 @@ func (c *OpContext) funcCallRef(call *CallExpr, anchor *Vertex, x *FuncValue) *F
 			return r
 		}
 	}
-	r := &FuncCallRef{src: call.Source(), fn: x.Fn, types: x.Types, target: anchor}
+	r := &FuncCallRef{src: call.Source(), fn: x.Fn, types: x.Types, target: anchor, born: x.born}
 	c.funcCallRefs[key] = append(c.funcCallRefs[key], r)
 	return r
 }

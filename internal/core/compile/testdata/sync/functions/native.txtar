@@ -334,6 +334,49 @@ cycles: {
 		out: fn(2, 2)
 	}
 
+	// Self-application recurses through a fresh closure on every unrolling:
+	// each call of g creates a new closure of the same literal capturing an
+	// equal argument. Such closures are the same function value, so the
+	// recursion is a structural cycle like the direct forms above.
+	// See https://cuelang.org/issue/4495.
+	selfApply: {
+		w:     func(x: _): x(x)
+		omega: w(w)
+
+		fix: func(f: _): {
+			let g = func(x: _): f(func(n: _): x(x)(n))
+			g(g)
+		}
+		forever: fix(func(self: _): func(n: int): self(n + 1))
+		out:     forever(0)
+
+		fact: func(self: _): func(n: int): [
+			if n == 0 {1},
+			if n > 0 {n * self(n - 1)},
+		][0]
+		fact5: fix(fact)(5)
+
+		// The same, with the recursing closure bound by a let in the body.
+		fixLet: func(f: _): {
+			let g = func(x: _): {
+				let h = func(n: _): x(x)(n)
+				f(h)
+			}
+			g(g)
+		}
+		factLet: fixLet(fact)(5)
+
+		// The same, with the recursing closure nested in a struct of the body.
+		fixDeep: func(f: _): {
+			let g = func(x: _): {
+				inner: {h: func(n: _): x(x)(n)}
+				out: f(inner.h)
+			}.out
+			g(g)
+		}
+		factDeep: fixDeep(fact)(5)
+	}
+
 	// A recursive call in a disjunct of the function body is a structural
 	// cycle and is eliminated from the disjunction, like any other erroring
 	// disjunct. It must not be absorbed and survive as the function's
@@ -389,6 +432,19 @@ cycles: {
 		// function.
 		f:     func(v: int) -> int: v
 		ident: f(f(f(3)))
+
+		// Closures of the same literal nest freely when they capture
+		// different values, even when reached through the same call site.
+		comp:     func(f: _, g: _): func(x: _): f(g(x))
+		inc:      func(n: int) -> int: n + 1
+		composed: comp(comp(comp(inc, inc), inc), inc)(1)
+
+		// Equal closures nest freely at distinct call sites, or when one is
+		// an argument of the other.
+		mk:      func(k: int): func(v: int) -> int: v + k
+		apply:   func(f: _, v: _): f(v)
+		closures: mk(1)(mk(1)(1))
+		applied:  apply(mk(1), apply(mk(1), 1))
 	}
 }
 
@@ -835,6 +891,43 @@ partial: {
       fn: func(m: int, n: int) -> int: 〈1;fn〉((〈0;m〉 - 1), 〈1;fn〉(〈0;m〉, (〈0;n〉 - 1)))
       out: 〈0;fn〉(2, 2)
     }
+    selfApply: {
+      w: func(x: _): 〈0;x〉(〈0;x〉)
+      omega: 〈0;w〉(〈0;w〉)
+      fix: func(f: _): {
+        let g#1 = func(x: _): 〈2;f〉(func(n: _): 〈1;x〉(〈1;x〉)(〈0;n〉))
+        〈0;let g#1〉(〈0;let g#1〉)
+      }
+      forever: 〈0;fix〉(func(self: _): func(n: int): 〈1;self〉((〈0;n〉 + 1)))
+      out: 〈0;forever〉(0)
+      fact: func(self: _): func(n: int): [
+        if (〈1;n〉 == 0) {
+          1
+        },
+        if (〈1;n〉 > 0) {
+          (〈2;n〉 * 〈3;self〉((〈2;n〉 - 1)))
+        },
+      ][0]
+      fact5: 〈0;fix〉(〈0;fact〉)(5)
+      fixLet: func(f: _): {
+        let g#2 = func(x: _): {
+          let h#3 = func(n: _): 〈2;x〉(〈2;x〉)(〈0;n〉)
+          〈3;f〉(〈0;let h#3〉)
+        }
+        〈0;let g#2〉(〈0;let g#2〉)
+      }
+      factLet: 〈0;fixLet〉(〈0;fact〉)(5)
+      fixDeep: func(f: _): {
+        let g#5 = func(x: _): {
+          inner: {
+            h: func(n: _): 〈3;x〉(〈3;x〉)(〈0;n〉)
+          }
+          out: 〈3;f〉(〈0;inner〉.h)
+        }.out
+        〈0;let g#5〉(〈0;let g#5〉)
+      }
+      factDeep: 〈0;fixDeep〉(〈0;fact〉)(5)
+    }
     disjunct: {
       f: func(n: int) -> int: (〈0;n〉|〈1;f〉(〈0;n〉))
       out: 〈0;f〉(1)
@@ -859,6 +952,13 @@ partial: {
       outer: 〈0;twice〉(〈0;twice〉(〈0;mid〉))
       f: func(v: int) -> int: 〈0;v〉
       ident: 〈0;f〉(〈0;f〉(〈0;f〉(3)))
+      comp: func(f: _, g: _): func(x: _): 〈1;f〉(〈1;g〉(〈0;x〉))
+      inc: func(n: int) -> int: (〈0;n〉 + 1)
+      composed: 〈0;comp〉(〈0;comp〉(〈0;comp〉(〈0;inc〉, 〈0;inc〉), 〈0;inc〉), 〈0;inc〉)(1)
+      mk: func(k: int): func(v: int) -> int: (〈0;v〉 + 〈1;k〉)
+      apply: func(f: _, v: _): 〈0;f〉(〈0;v〉)
+      closures: 〈0;mk〉(1)(〈0;mk〉(1)(1))
+      applied: 〈0;apply〉(〈0;mk〉(1), 〈0;apply〉(〈0;mk〉(1), 1))
     }
   }
   disjunction: {

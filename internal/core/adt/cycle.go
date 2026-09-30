@@ -432,6 +432,10 @@ type RefNode struct {
 
 	Next  *RefNode
 	Depth int32
+
+	// Len is the length of the chain starting at this node. A node r is part
+	// of a chain if and only if the node of that chain with r.Len is r.
+	Len int32
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -522,7 +526,7 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 	// (vertex, reference) cycle rules below, which already distinguish
 	// same-call-site recursion (a structural cycle) from distinct-call-site
 	// nesting such as twice(twice(2)).
-	_, isFuncCall := x.(*FuncCallRef)
+	fx, isFuncCall := x.(*FuncCallRef)
 
 	// As long as a node-wide cycle has not yet been detected, we allow cycles
 	// in optional fields to proceed unchecked.
@@ -534,7 +538,24 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 	// below. Older occurrences would spuriously fail that check.
 	chainStep := false
 
+	// born tracks the creation chain of a called closure to detect recursion
+	// through closures created by an in-progress call; see
+	// [FuncCallRef.calledAt]. The candidates r are visited in order of
+	// decreasing chain length, so a single pass over born suffices.
+	var born *RefNode
+	if isFuncCall {
+		born = fx.born
+	}
+
 	for r := ci.Refs; r != nil; r = r.Next {
+		if born != nil && fx.calledAt(r) {
+			for born != nil && born.Len > r.Len {
+				born = born.Next
+			}
+			if born == r {
+				return n.markCyclicPath(arc, env, x, ci)
+			}
+		}
 		if equalDeref(r.Arc, arc) {
 			if equalDeref(r.Node, n.node) {
 				// A reference cycle: the same reference reoccurring on the
@@ -639,13 +660,18 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 		}
 	}
 
-	ci.Refs = &RefNode{
+	r := &RefNode{
 		Arc:   deref(arc),
 		Ref:   x,
 		Node:  deref(n.node),
 		Next:  ci.Refs,
 		Depth: n.depth,
+		Len:   1,
 	}
+	if r.Next != nil {
+		r.Len = r.Next.Len + 1
+	}
+	ci.Refs = r
 
 	return ci, false
 }

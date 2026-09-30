@@ -343,6 +343,49 @@ cycles: {
 		out: fn(2, 2) @test(err, code=structural_cycle, contains="structural cycle")
 	}
 
+	// Self-application recurses through a fresh closure on every unrolling:
+	// each call of g creates a new closure of the same literal capturing an
+	// equal argument. Such closures are the same function value, so the
+	// recursion is a structural cycle like the direct forms above.
+	// See https://cuelang.org/issue/4495.
+	selfApply: {
+		w:     func(x: _): x(x)
+		omega: w(w) @test(err, code=structural_cycle, contains="structural cycle")
+
+		fix: func(f: _): {
+			let g = func(x: _): f(func(n: _): x(x)(n))
+			g(g)
+		}
+		forever: fix(func(self: _): func(n: int): self(n + 1))
+		out:     forever(0) @test(err, code=structural_cycle, contains="structural cycle")
+
+		fact: func(self: _): func(n: int): [
+			if n == 0 {1},
+			if n > 0 {n * self(n - 1)},
+		][0]
+		fact5: fix(fact)(5) @test(err, code=structural_cycle, contains="structural cycle")
+
+		// The same, with the recursing closure bound by a let in the body.
+		fixLet: func(f: _): {
+			let g = func(x: _): {
+				let h = func(n: _): x(x)(n)
+				f(h)
+			}
+			g(g)
+		}
+		factLet: fixLet(fact)(5) @test(err, code=structural_cycle, contains="structural cycle")
+
+		// The same, with the recursing closure nested in a struct of the body.
+		fixDeep: func(f: _): {
+			let g = func(x: _): {
+				inner: {h: func(n: _): x(x)(n)}
+				out: f(inner.h)
+			}.out
+			g(g)
+		}
+		factDeep: fixDeep(fact)(5) @test(err, code=structural_cycle, contains="structural cycle")
+	}
+
 	// A recursive call in a disjunct of the function body is a structural
 	// cycle and is eliminated from the disjunction, like any other erroring
 	// disjunct. It must not be absorbed and survive as the function's
@@ -398,6 +441,19 @@ cycles: {
 		// function.
 		f:     func(v: int) -> int: v
 		ident: f(f(f(3))) @test(eq, 3)
+
+		// Closures of the same literal nest freely when they capture
+		// different values, even when reached through the same call site.
+		comp:     func(f: _, g: _): func(x: _): f(g(x))
+		inc:      func(n: int) -> int: n + 1
+		composed: comp(comp(comp(inc, inc), inc), inc)(1) @test(eq, 5)
+
+		// Equal closures nest freely at distinct call sites, or when one is
+		// an argument of the other.
+		mk:      func(k: int): func(v: int) -> int: v + k
+		apply:   func(f: _, v: _): f(v)
+		closures: mk(1)(mk(1)(1)) @test(eq, 3)
+		applied:  apply(mk(1), apply(mk(1), 1)) @test(eq, 3)
 	}
 }
 
@@ -664,61 +720,72 @@ structural cycle:
     ./in.cue:336:40
 [structural_cycle] structural cycle:
     ./in.cue:341:37
-[structural_cycle] 2 errors in empty disjunction::
-    ./in.cue:354:29
-structural cycle:
-    ./in.cue:354:29
-2 errors in empty disjunction::
-    ./in.cue:354:38
-structural cycle:
-    ./in.cue:354:38
-4 errors in empty disjunction::
-    ./in.cue:355:8
-[incomplete] disjunction.ambiguous.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | func(a: int) -> int: ... (type func):
-    ./in.cue:415:8
-[incomplete] disjunction.builtins.out: cannot call h: unresolved disjunction strings.ToUpper | strings.ToLower (type func):
-    ./in.cue:435:8
-[incomplete] disjunction.mixed.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | 1 (type (int|func)):
-    ./in.cue:439:8
-[eval] conflicting values 2 and 1:
-    ./in.cue:444:12
-    ./in.cue:444:16
-[incomplete] disjunction.callee.incomplete.out: cannot call non-concrete value x (type _):
-    ./in.cue:447:9
-[incomplete] a: undefined field: q:
-    ./in.cue:487:9
-    ./in.cue:486:2
-[incomplete] incompleteArgs.z: undefined field: q:
-    ./in.cue:490:11
-    ./in.cue:486:2
-[eval] declarations.open.bad: cannot call function without implementation:
-    ./in.cue:529:8
-[eval] partial.missing: missing argument c:
-    ./in.cue:565:11
-[eval] b: invalid value 50 (out of bound <10):
-    ./in.cue:568:27
-    ./in.cue:570:18
-[eval] partial.tooMany: too many positional arguments in function call:
-    ./in.cue:574:11
 [structural_cycle] structural cycle:
-    ./in.cue:578:31
+    ./in.cue:351:22
+[structural_cycle] structural cycle:
+    ./in.cue:355:38
+[structural_cycle] structural cycle:
+    ./in.cue:355:38
+[structural_cycle] structural cycle:
+    ./in.cue:370:25
+[structural_cycle] structural cycle:
+    ./in.cue:380:28
+[structural_cycle] 2 errors in empty disjunction::
+    ./in.cue:397:29
+structural cycle:
+    ./in.cue:397:29
+2 errors in empty disjunction::
+    ./in.cue:397:38
+structural cycle:
+    ./in.cue:397:38
+4 errors in empty disjunction::
+    ./in.cue:398:8
+[incomplete] disjunction.ambiguous.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | func(a: int) -> int: ... (type func):
+    ./in.cue:471:8
+[incomplete] disjunction.builtins.out: cannot call h: unresolved disjunction strings.ToUpper | strings.ToLower (type func):
+    ./in.cue:491:8
+[incomplete] disjunction.mixed.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | 1 (type (int|func)):
+    ./in.cue:495:8
+[eval] conflicting values 2 and 1:
+    ./in.cue:500:12
+    ./in.cue:500:16
+[incomplete] disjunction.callee.incomplete.out: cannot call non-concrete value x (type _):
+    ./in.cue:503:9
+[incomplete] a: undefined field: q:
+    ./in.cue:543:9
+    ./in.cue:542:2
+[incomplete] incompleteArgs.z: undefined field: q:
+    ./in.cue:546:11
+    ./in.cue:542:2
+[eval] declarations.open.bad: cannot call function without implementation:
+    ./in.cue:585:8
+[eval] partial.missing: missing argument c:
+    ./in.cue:621:11
+[eval] b: invalid value 50 (out of bound <10):
+    ./in.cue:624:27
+    ./in.cue:626:18
+[eval] partial.tooMany: too many positional arguments in function call:
+    ./in.cue:630:11
+[structural_cycle] structural cycle:
+    ./in.cue:634:31
 [eval] partial.conflictArgs: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:537:7
+    ./in.cue:593:7
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:537:7
-    ./in.cue:590:17
+    ./in.cue:593:7
+    ./in.cue:646:17
 -- out/eval/stats --
-Leaks:  78
-Freed:  1137
-Reused: 1093
-Allocs: 122
+Leaks:  109
+Freed:  1356
+Reused: 1309
+Allocs: 156
 Retain: 0
 
-Unifications: 956
-Conjuncts:    2942
+Unifications: 1185
+Conjuncts:    3421
 Disjuncts:    224
+Notifications: 8
 
-NumCloseIDs: 505
+NumCloseIDs: 592
 
-ConjunctInfos:       1159
+ConjunctInfos:       1355
 MaxConjunctInfos:    8

@@ -130,7 +130,7 @@ package pkg
 
 // Embedded structs have their fields promoted unless a tag names them;
 // YAML tags also require an "inline" option.
-#Embedded: Base: #Base
+#Embedded: {#Base}
 
 #EmbeddedInline: {#Base}
 -- pkg/pkg_go_gen_yaml.cue.golden --
@@ -295,6 +295,6 @@ package pkg
 
 // Embedded structs have their fields promoted unless a tag names them;
 // YAML tags also require an "inline" option.
-#Embedded: Base: #Base
+#Embedded: {#Base}
 
 #EmbeddedInline: {#Base}

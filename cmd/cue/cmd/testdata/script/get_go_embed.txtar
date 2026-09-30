@@ -5,11 +5,9 @@ exec cue get go --local ./...
 cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 
 # Marshal via Go's encoding/json and validate with the generated CUE schema.
-# The schema rejects promoted fields: https://cuelang.org/issue/1026
 exec go run ./marshal
 cmp stdout go_marshal.json
-! exec cue vet -c schema.cue go_marshal.json
-cmp stderr vet_stderr.golden
+exec cue vet -c schema.cue go_marshal.json
 
 -- schema.cue --
 package schema
@@ -205,29 +203,6 @@ func main() {
 	}
 	fmt.Printf("%s\n", data)
 }
--- vet_stderr.golden --
-Ambiguous.apiVersion: field not allowed:
-    ./go_marshal.json:49:10
-EmptyTag.apiVersion: field not allowed:
-    ./go_marshal.json:8:10
-EmptyTag.kind: field not allowed:
-    ./go_marshal.json:7:10
-Mutual.y: field not allowed:
-    ./go_marshal.json:55:10
-ObjectShadowed.name: field not allowed:
-    ./go_marshal.json:59:10
-ObjectShadowed.status: field not allowed:
-    ./go_marshal.json:60:10
-OmitEmpty.kind: field not allowed:
-    ./go_marshal.json:17:10
-Pointer.kind: field not allowed:
-    ./go_marshal.json:30:10
-Shadowed.other: field not allowed:
-    ./go_marshal.json:45:10
-Unexported.hidden: field not allowed:
-    ./go_marshal.json:41:10
-Untagged.kind: field not allowed:
-    ./go_marshal.json:3:10
 -- go_marshal.json --
 {
     "Untagged": {
@@ -312,13 +287,13 @@ import "mod.test/meta"
 _#inner: hidden: string @go(Hidden)
 
 #Untagged: {
-	Base: #Base
-	x:    int @go(X)
+	#Base
+	x: int @go(X)
 }
 
 #EmptyTag: {
-	TypeMeta: meta.#TypeMeta
-	x:        int @go(X)
+	meta.#TypeMeta
+	x: int @go(X)
 }
 
 #Inline: {
@@ -327,8 +302,8 @@ _#inner: hidden: string @go(Hidden)
 }
 
 #OmitEmpty: {
-	Base?: #Base
-	x:     int @go(X)
+	#Base
+	x: int @go(X)
 }
 
 #Named: {
@@ -339,8 +314,8 @@ _#inner: hidden: string @go(Hidden)
 #Ignored: x: int @go(X)
 
 #Pointer: {
-	Base?: null | #Base @go(,*Base)
-	x:     int          @go(X)
+	kind?: string @go(Kind)
+	x:     int    @go(X)
 }
 
 #NonStruct: {
@@ -348,42 +323,39 @@ _#inner: hidden: string @go(Hidden)
 	x:   int @go(X)
 }
 
-#Unexported: x: int @go(X)
+#Unexported: {
+	_#inner
+	x: int @go(X)
+}
 
 // Shadowed hides the kind field of Base.
 #Shadowed: {
-	Base:  #Base
-	Other: #Other
-	kind:  int @go(Kind)
+	#Other
+	kind: int @go(Kind)
 }
 
 // Ambiguous drops the kind field, as it is embedded twice at the same depth.
-#Ambiguous: {
-	Base:     #Base
-	TypeMeta: meta.#TypeMeta
-}
+#Ambiguous: apiVersion: string @go(APIVersion)
 
 // ObjectShadowed hides the kind field of meta.Object, whose other fields
 // are promoted individually, even when their types are not exported.
 #ObjectShadowed: {
-	Object: meta.#Object
-	kind:   int @go(Kind)
+	name:   string @go(Name)
+	status: _      @go(Status,meta.status)
+	kind:   int    @go(Kind)
 }
 
 // Recursive embeds itself, whose fields are all hidden.
-#Recursive: {
-	Recursive?: null | #Recursive @go(,*Recursive)
-	value:      int               @go(Value)
-}
+#Recursive: value: int @go(Value)
 
 #Mutual1: {
-	Mutual2?: null | #Mutual2 @go(,*Mutual2)
-	x:        int             @go(X)
+	y?: int @go(Y)
+	x:  int @go(X)
 }
 
 #Mutual2: {
-	Mutual1?: null | #Mutual1 @go(,*Mutual1)
-	y:        int             @go(Y)
+	x?: int @go(X)
+	y:  int @go(Y)
 }
 
 #Root: {

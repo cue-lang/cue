@@ -90,19 +90,25 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  a pointer field is not nullable if it is a "toml" tag, as TOML has no
 	  null. Fields without any such tag follow the first codec.
 
-	- embedded structs marked with a json inline tag unify with struct
-	  definition. For instance, the Go struct
+	- the fields of an embedded struct, or pointer to struct, are promoted
+	  like encoding/json does, unless the tag found for it gives a name.
+	  YAML tags only promote them with an "inline" option, following
+	  libraries like gopkg.in/yaml.v3. For instance, the Go struct
 
-	    struct MyStruct {
-			Common  ` + "json:\",inline\"" + `
+	    type MyStruct struct {
+			Common
 			Field string
-		 }
+		}
 
 	  translates to the CUE struct
 
-		 #MyStruct: Common & {
-			 Field: string
-		 }
+		#MyStruct: {
+			#Common
+			Field: string
+		}
+
+	  When some of the promoted fields are hidden by other fields
+	  with the same name, the remaining ones are added individually.
 
 	- a type that implements MarshalJSON, UnmarshalJSON, MarshalYAML, or
 	  UnmarshalYAML is translated to top (_) to indicate it may be any
@@ -1215,6 +1221,12 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 			}
 		}
 
+		if !e.canReference(typ) {
+			// Such as the type of a field promoted from another package,
+			// whose hidden definition cannot be referenced from here.
+			e.logf("    %v is not exported; setting type to _", obj)
+			return e.ident("_", false)
+		}
 		result = e.ident(obj.Name(), true)
 		if pkg != e.pkg.Types {
 			info := e.pkgNames[pkg.Path()]
@@ -1418,51 +1430,77 @@ func attrBodyNeedsQuoting(s string) bool {
 }
 
 func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
+	e.addFieldsAt(x, st, "", e.structEncoding(x), false)
+}
+
+// addFieldsAt adds the fields of x, found at the index path prefix
+// within the struct being generated, to st.
+// Only the fields encoded as described by enc are added.
+// The fields are optional when viaNilable is set, as they are promoted
+// via an embedded pointer which may be nil.
+func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix string, enc *structEncoding, viaNilable bool) {
 	add := func(x cueast.Decl) {
 		st.Elts = append(st.Elts, x)
 	}
 
-	s := e.orig[x]
-	docs := []*ast.CommentGroup{}
-	for _, f := range s.Fields.List {
-		if len(f.Names) == 0 {
-			docs = append(docs, f.Doc)
-		} else {
-			for range f.Names {
+	// Structs from other packages, which we only see when their fields
+	// are promoted into ours, have no docs available.
+	docs := make([]*ast.CommentGroup, x.NumFields())
+	if s := e.orig[x]; s != nil {
+		docs = docs[:0]
+		for _, f := range s.Fields.List {
+			if len(f.Names) == 0 {
 				docs = append(docs, f.Doc)
+			} else {
+				for range f.Names {
+					docs = append(docs, f.Doc)
+				}
 			}
 		}
 	}
 	count := 0
 	for i := 0; i < x.NumFields(); i++ {
 		f := x.Field(i)
-		if !ast.IsExported(f.Name()) {
+		index := fmt.Sprint(prefix, i)
+		embedded := e.isEmbedded(f, x.Tag(i))
+		if !embedded && !ast.IsExported(f.Name()) {
 			continue
 		}
 		if !e.supportedType(nil, f.Type()) {
 			e.logf("    Dropped field %v for unsupported type %v", f.Name(), f.Type())
 			continue
 		}
-		if f.Anonymous() && e.isInline(x.Tag(i)) {
+		if embedded {
 			typ := f.Type()
-			for {
-				p, ok := typ.(*types.Pointer)
-				if !ok {
-					break
-				}
+			viaPointer := false
+			if p, ok := typ.(*types.Pointer); ok {
 				typ = p.Elem()
+				viaPointer = true
 			}
-			switch typ := types.Unalias(typ).(type) {
-			case *types.Named:
-				embed := &cueast.EmbedDecl{Expr: e.makeType(typ, regular, required)}
-				if i > 0 {
+			fields, isStruct := typ.Underlying().(*types.Struct)
+			named, isNamed := types.Unalias(typ).(*types.Named)
+			switch {
+			case isNamed && !isStruct:
+				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
+				if len(st.Elts) > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
 				}
 				add(embed)
-			case *types.Struct:
-				e.addFields(typ, st)
+			case !isStruct:
+				e.logf("    Dropped embedded field %v for unsupported type %v", f.Name(), f.Type())
+			case isNamed && !viaNilable && !viaPointer && e.canReference(named) && e.embedsAsIs(fields, index+".", enc):
+				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
+				if len(st.Elts) > 0 {
+					cueast.SetRelPos(embed, cuetoken.NewSection)
+				}
+				add(embed)
+			case !enc.within(index + "."):
+				// None of its fields are encoded, such as when x embeds itself.
 			default:
-				panic(fmt.Sprintf("unimplemented embedding for type %T", x))
+				if isNamed {
+					e.logf("    Promoted the fields of %v individually", f.Name())
+				}
+				e.addFieldsAt(fields, st, index+".", enc, viaNilable || viaPointer)
 			}
 			continue
 		}
@@ -1474,14 +1512,21 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		if name == "-" {
 			continue
 		}
+		if _, ok := enc.names[index]; !ok {
+			e.logf("    Dropped field %v as it is hidden by another with the same name", f.Name())
+			continue
+		}
 
 		doc := docs[i]
 
 		// TODO: check referrers
 		attrs, err := e.detectFieldAttributes(f, doc, tag, codec)
 		if err != nil {
-			e.logf("error parsing field %q:", s, err)
+			e.logf("error parsing field %q: %v", f.Name(), err)
 			continue
+		}
+		if viaNilable {
+			attrs = attrs&^required | optional
 		}
 		field, cueType := e.makeField(name, regular, attrs, f.Type(), doc, count > 0)
 		add(field)
@@ -1568,9 +1613,150 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 	}
 }
 
-func (e *extractor) isInline(tag string) bool {
-	return hasFlag(tag, "json", "inline", 1) ||
-		hasFlag(tag, "yaml", "inline", 1)
+// canReference reports whether the definition for t can be referenced
+// from the package being generated, which is not the case for
+// unexported types from other packages, as their definitions are hidden.
+func (e *extractor) canReference(t *types.Named) bool {
+	return t.Obj().Pkg() == e.pkg.Types || t.Obj().Exported()
+}
+
+// structEncoding describes which fields of a struct are encoded,
+// following the rules of encoding/json for embedding.
+type structEncoding struct {
+	// names holds the names of the encoded fields,
+	// keyed by their dot-separated index paths.
+	names map[string]string
+}
+
+// within reports whether any encoded field is at the index path prefix.
+func (enc *structEncoding) within(prefix string) bool {
+	for index := range enc.names {
+		if strings.HasPrefix(index, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+// embedsAsIs reports whether x, found at the index path prefix,
+// can be embedded as its own definition: when all of the fields
+// that x encodes on its own are also encoded at the prefix.
+func (e *extractor) embedsAsIs(x *types.Struct, prefix string, enc *structEncoding) bool {
+	sub := e.structEncoding(x)
+	for index := range sub.names {
+		if _, ok := enc.names[prefix+index]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+// structEncoding returns which fields of x are encoded.
+// A field hides deeper fields with the same name. Of multiple fields with
+// the same name at the same depth, a single one named by a tag hides the rest,
+// or else they are all dropped.
+func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
+	type field struct {
+		name   string
+		index  string
+		depth  int
+		tagged bool
+	}
+	type embedding struct {
+		x     *types.Struct
+		index string
+	}
+	var fields []field
+	next := []embedding{{x, ""}}
+	nextCount := map[*types.Struct]int{x: 1}
+	visited := map[*types.Struct]bool{}
+	for depth := 0; len(next) > 0; depth++ {
+		current, count := next, nextCount
+		next, nextCount = nil, map[*types.Struct]int{}
+		for _, emb := range current {
+			if visited[emb.x] {
+				continue
+			}
+			visited[emb.x] = true
+			// If the same struct is embedded more than once at this depth,
+			// its fields conflict with themselves.
+			copies := min(count[emb.x], 2)
+			for i := range emb.x.NumFields() {
+				f := emb.x.Field(i)
+				tag := emb.x.Tag(i)
+				index := fmt.Sprint(emb.index, i)
+				if e.isEmbedded(f, tag) {
+					typ := f.Type()
+					if p, ok := typ.(*types.Pointer); ok {
+						typ = p.Elem()
+					}
+					x, ok := typ.Underlying().(*types.Struct)
+					if !ok {
+						continue // e.g. a YAML inline map
+					}
+					nextCount[x]++
+					if nextCount[x] == 1 {
+						next = append(next, embedding{x, index + "."})
+					}
+					continue
+				}
+				if !ast.IsExported(f.Name()) {
+					continue
+				}
+				_, name := e.fieldCodec(tag)
+				if name == "-" {
+					continue
+				}
+				tagged := name != ""
+				if !tagged {
+					name = f.Name()
+				}
+				for range copies {
+					fields = append(fields, field{name, index, depth, tagged})
+				}
+			}
+		}
+	}
+	byName := make(map[string][]field)
+	for _, f := range fields {
+		byName[f.name] = append(byName[f.name], f)
+	}
+	enc := &structEncoding{names: make(map[string]string)}
+	for _, fs := range byName {
+		// The fields were added in order of depth.
+		fs = slices.DeleteFunc(fs, func(f field) bool { return f.depth > fs[0].depth })
+		if len(fs) > 1 {
+			fs = slices.DeleteFunc(fs, func(f field) bool { return !f.tagged })
+		}
+		if len(fs) == 1 {
+			enc.names[fs[0].index] = fs[0].name
+		}
+	}
+	return enc
+}
+
+// isEmbedded reports whether the governing codec promotes the fields of f,
+// with the given struct tag, into its parent struct.
+func (e *extractor) isEmbedded(f *types.Var, tag string) bool {
+	if !f.Anonymous() {
+		return false
+	}
+	codec, name := e.fieldCodec(tag)
+	if codec == "yaml" {
+		// YAML libraries such as gopkg.in/yaml.v3 require an explicit option.
+		return hasFlag(tag, codec, "inline", 1)
+	}
+	// Like encoding/json, promote the fields of an embedded struct
+	// or pointer to struct, unless the tag gives it a name.
+	if name != "" {
+		return false
+	}
+	typ := f.Type()
+	if p, ok := typ.(*types.Pointer); ok {
+		typ = p.Elem()
+	}
+	_, ok := typ.Underlying().(*types.Struct)
+	return ok
 }
 
 func (e *extractor) fieldAttributesFromType(f types.Type) (attrs fieldAttributes) {

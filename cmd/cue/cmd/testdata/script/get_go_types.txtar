@@ -338,7 +338,8 @@ import (
 	String: string
 
 	#Inline
-	NoInline:      #NoInline
+
+	#NoInline
 	CustomJSON:    #CustomJSON
 	CustomYAML?:   null | #CustomYAML @go(,*CustomYAML)
 	AnyJSON:       _                  @go(,json.Marshaler)
@@ -376,14 +377,14 @@ import (
 
 	// Even though this struct as a type implements MarshalJSON, it is known
 	// that it is really only implemented by the embedded field.
-	Embed:                  {CustomJSON: #CustomJSON} @go(,struct{CustomJSON})
-	MapKeyNamedInt:         {[string]: #MyString}     @go(,map[MyInt]MyString)
-	MapKeyInt:              {[string]: string}        @go(,map[int]string)
+	Embed:                  {#CustomJSON}         @go(,struct{CustomJSON})
+	MapKeyNamedInt:         {[string]: #MyString} @go(,map[MyInt]MyString)
+	MapKeyInt:              {[string]: string}    @go(,map[int]string)
 	NamedMapKeyInt:         #MyIntMap
-	MapKeyNamedString:      {[string]: #MyString}     @go(,map[MyString]MyString)
-	optionalOmitEmptyJSON?: string                    @go(OptionalOmitEmptyJSON)
-	optionalOmitZeroJSON?:  time.Time                 @go(OptionalOmitZeroJSON)
-	optionalOmitEmptyYAML?: string                    @go(OptionalOmitEmptyYAML)
+	MapKeyNamedString:      {[string]: #MyString} @go(,map[MyString]MyString)
+	optionalOmitEmptyJSON?: string                @go(OptionalOmitEmptyJSON)
+	optionalOmitZeroJSON?:  time.Time             @go(OptionalOmitZeroJSON)
+	optionalOmitEmptyYAML?: string                @go(OptionalOmitEmptyYAML)
 
 	// +optional
 	optionalComment?: string @go(OptionalComment)
@@ -558,8 +559,7 @@ import t "time"
 	Slashes:   _ @go(,any) @xml("https://foo.test/bar#fragment")
 	Parens:    _ @go(,any) @xml("closing)parens)")
 	InjectCUE: _ @go(,any) @xml("), x: 4 @x(")
-
-	#Inline
+	A?:        int
 }
 
 #Perm: 0o755

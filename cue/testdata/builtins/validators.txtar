@@ -284,6 +284,24 @@ issue3981: matchWithClose: {
 		out: {#openStruct: {}, f1: {foo: ["bar"]}}
 	})
 }
+-- issue4115.cue --
+import (
+	"list"
+	"struct"
+)
+
+// A validator on a list or struct must not hide the errors of all but the
+// first erroneous element or field, as out/errors.txt shows.
+// The validators themselves do not run on a list or struct with erroneous
+// children, so their own errors are not reported.
+// https://cuelang.org/issue/4115
+issue4115: {
+	list1: [...string] & list.MaxItems(2)
+	list1: ["a", 1, "b", 2] @test(err, code=eval, contains="conflicting values 1 and string", pos=[-1:13, 0:15])
+
+	struct1: {[string]: string} & struct.MaxFields(2)
+	struct1: {a: "x", b: 1, c: "y", d: 2} @test(err, code=eval, contains="conflicting values 1 and string", pos=[-1:22, 0:23])
+}
 -- out/errors.txt --
 [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
     ./in.cue:26:7
@@ -353,6 +371,18 @@ issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN)
     ./issue3474.cue:59:5
     ./issue3474.cue:59:12
     ./issue3474.cue:60:5
+[eval] issue4115.list1.1: conflicting values 1 and string (mismatched types int and string):
+    ./issue4115.cue:12:13
+    ./issue4115.cue:13:15
+[eval] issue4115.list1.3: conflicting values 2 and string (mismatched types int and string):
+    ./issue4115.cue:12:13
+    ./issue4115.cue:13:23
+[eval] issue4115.struct1.b: conflicting values 1 and string (mismatched types int and string):
+    ./issue4115.cue:15:22
+    ./issue4115.cue:16:23
+[eval] issue4115.struct1.d: conflicting values 2 and string (mismatched types int and string):
+    ./issue4115.cue:15:22
+    ./issue4115.cue:16:37
 -- out/todo.txt --
 issue3474.topValidator.failType.A: v2 reports "conflicting values >10 and {C:1}" (number and struct order), v3 reports "{C:1} and >10" (struct and number order).
 -- out/eval/stats --

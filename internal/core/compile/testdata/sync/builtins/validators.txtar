@@ -243,6 +243,24 @@ issue3981: matchWithClose: {
 	}
 	out: f1: foo: ["bar"]
 }
+-- issue4115.cue --
+import (
+	"list"
+	"struct"
+)
+
+// A validator on a list or struct must not hide the errors of all but the
+// first erroneous element or field, as out/errors.txt shows.
+// The validators themselves do not run on a list or struct with erroneous
+// children, so their own errors are not reported.
+// https://cuelang.org/issue/4115
+issue4115: {
+	list1: [...string] & list.MaxItems(2)
+	list1: ["a", 1, "b", 2]
+
+	struct1: {[string]: string} & struct.MaxFields(2)
+	struct1: {a: "x", b: 1, c: "y", d: 2}
+}
 -- out/compile --
 --- in.cue
 {
@@ -489,6 +507,29 @@ issue3981: matchWithClose: {
           }
         }
       }
+    }
+  }
+}
+--- issue4115.cue
+{
+  issue4115: {
+    list1: ([
+      ...string,
+    ] & 〈import;list〉.MaxItems(2))
+    list1: [
+      "a",
+      1,
+      "b",
+      2,
+    ]
+    struct1: ({
+      [string]: string
+    } & 〈import;struct〉.MaxFields(2))
+    struct1: {
+      a: "x"
+      b: 1
+      c: "y"
+      d: 2
     }
   }
 }

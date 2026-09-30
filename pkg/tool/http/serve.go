@@ -97,7 +97,7 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 		muxers[addr] = mux
 		listeners[addr] = ln
 
-		log.Printf("listening on %v\n", addr)
+		log.Printf("listening on %v\n", ln.Addr())
 
 		// Only accept requests once all ready Serve tasks have run, as otherwise
 		// a request could arrive before its handler is registered.

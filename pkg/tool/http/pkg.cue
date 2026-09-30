@@ -85,6 +85,9 @@ Serve: {
 
 	// listenAddr is the address to listen on (e.g., ":8080", "localhost:8000").
 	// This field is required to avoid accidentally binding to privileged ports.
+	// A port of 0, as in "localhost:0", picks an unused port;
+	// the address listened on is logged to standard error.
+	// Serve tasks with the same listenAddr share a single listener.
 	listenAddr!: string
 
 	// routing configures the HTTP routes that are served.

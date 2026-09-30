@@ -323,6 +323,157 @@ package bar
 	qt.Assert(t, qt.Equals(int(counter), len(registries)))
 }
 
+// TestTokenRefreshCanceledRequest checks that refreshing an OAuth token
+// should not depend on the context of the request which first used the login,
+// and that it should not be cut short when the request which needs it is canceled.
+func TestTokenRefreshCanceledRequest(t *testing.T) {
+	// The third refresh cancels the request which needs it.
+	ctx3, cancel3 := context.WithCancel(context.Background())
+	defer cancel3()
+	var refreshes atomic.Int32
+	// The tokens expire within oauth2's expiry delta,
+	// so every request refreshes the token.
+	reg, storedToken := newLoginRegistry(t, 1, func(n int32) {
+		refreshes.Store(n)
+		if n == 3 {
+			cancel3()
+		}
+	})
+
+	ctx1, cancel1 := context.WithCancel(context.Background())
+	versions, err := reg.ModuleVersions(ctx1, "foo.mod@v0")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(versions, []string{"v0.0.1"}))
+	cancel1()
+
+	// TODO: the refresh uses the first request's canceled context.
+	versions, err = reg.ModuleVersions(context.Background(), "foo.mod@v0")
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	qt.Assert(t, qt.IsNil(versions))
+	qt.Assert(t, qt.Equals(refreshes.Load(), 1))
+
+	// A request which is already canceled should not start a refresh.
+	_, err = reg.ModuleVersions(ctx1, "foo.mod@v0")
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	qt.Assert(t, qt.Equals(refreshes.Load(), 1))
+
+	// A request canceled while it refreshes the token should fail,
+	// but the refresh should still complete and the new token be stored.
+	// TODO: no refresh is attempted, for the same reason as above.
+	_, err = reg.ModuleVersions(ctx3, "foo.mod@v0")
+	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
+	qt.Assert(t, qt.Equals(refreshes.Load(), 1))
+	qt.Assert(t, qt.Equals(storedToken(), "access_1"))
+}
+
+// TestTokenRefreshWaiterDeadline checks that a request waiting for another
+// request's token refresh should stop waiting once its own context is done.
+func TestTokenRefreshWaiterDeadline(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	reg, _ := newLoginRegistry(t, 300, func(n int32) {
+		close(started)
+		<-release
+	})
+
+	first := make(chan error, 1)
+	go func() {
+		_, err := reg.ModuleVersions(context.Background(), "foo.mod@v0")
+		first <- err
+	}()
+	<-started
+
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+	second := make(chan error, 1)
+	go func() {
+		_, err := reg.ModuleVersions(ctx, "foo.mod@v0")
+		second <- err
+	}()
+	// TODO: the request keeps waiting for the refresh past its deadline.
+	select {
+	case err := <-second:
+		t.Errorf("request stopped waiting for the refresh: %v", err)
+	case <-time.After(200 * time.Millisecond):
+	}
+	close(release)
+	qt.Assert(t, qt.IsNil(<-first))
+	qt.Assert(t, qt.ErrorIs(<-second, context.DeadlineExceeded))
+}
+
+// newLoginRegistry returns a registry holding the module foo.mod@v0.0.1
+// on a host with an expired login. Each refresh of the login's token calls
+// onRefresh with the number of refreshes so far, n, and results in the
+// access token "access_n", which expires after the given number of seconds.
+// The returned function reads the access token stored in logins.json.
+func newLoginRegistry(t *testing.T, expiresIn int64, onRefresh func(n int32)) (_ Registry, storedToken func() string) {
+	fsys, err := txtar.FS(txtar.Parse([]byte(`
+-- foo.mod_v0.0.1/cue.mod/module.cue --
+module: "foo.mod@v0"
+language: version: "v0.8.0"
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	r := ocimem.New()
+	err = modregistrytest.Upload(context.Background(), r, fsys)
+	qt.Assert(t, qt.IsNil(err))
+	rh := ociserver.New(r, nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/v2/", func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasPrefix(r.Header.Get("Authorization"), "Bearer access_") {
+			w.WriteHeader(401)
+			return
+		}
+		rh.ServeHTTP(w, r)
+	})
+	var refreshes atomic.Int32
+	mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
+		n := refreshes.Add(1)
+		onRefresh(n)
+		writeJSON(w, 200, oauth2.Token{
+			AccessToken:  fmt.Sprintf("access_%d", n),
+			TokenType:    "Bearer",
+			RefreshToken: "refresh",
+			ExpiresIn:    expiresIn,
+		})
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	u, err := url.Parse(srv.URL)
+	qt.Assert(t, qt.IsNil(err))
+
+	dir := t.TempDir()
+	configDir := filepath.Join(dir, "config")
+	err = os.MkdirAll(configDir, 0o777)
+	qt.Assert(t, qt.IsNil(err))
+	t.Setenv("CUE_CONFIG_DIR", configDir)
+	loginsPath := filepath.Join(configDir, "logins.json")
+	err = cueconfig.WriteLogins(loginsPath, &cueconfig.Logins{
+		Registries: map[string]cueconfig.RegistryLogin{
+			u.Host: {
+				AccessToken:  "expired",
+				TokenType:    "Bearer",
+				RefreshToken: "refresh",
+				Expiry:       time.Now(),
+			},
+		},
+	})
+	qt.Assert(t, qt.IsNil(err))
+	t.Setenv("CUE_REGISTRY", u.Host+"+insecure")
+	cacheDir := filepath.Join(dir, "cache")
+	t.Setenv("CUE_CACHE_DIR", cacheDir)
+	t.Cleanup(func() {
+		modcache.RemoveAll(cacheDir)
+	})
+
+	reg, err := NewRegistry(nil)
+	qt.Assert(t, qt.IsNil(err))
+	return reg, func() string {
+		logins, err := cueconfig.ReadLogins(loginsPath)
+		qt.Assert(t, qt.IsNil(err))
+		return logins.Registries[u.Host].AccessToken
+	}
+}
+
 // dockerConfig describes the minimal subset of the docker
 // configuration file necessary to check that authentication
 // is correction hooked up.

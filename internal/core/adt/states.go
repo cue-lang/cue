@@ -224,6 +224,11 @@ const (
 	// At the moment this is equal to 'scalarKnown'.
 	concreteKnown = scalarKnown
 
+	// arcTypeKnownIdx is the bit-position index of arcTypeKnown, for use as
+	// a scheduler.counters index.
+	// It must equal bits.TrailingZeros16(uint16(arcTypeKnown)).
+	arcTypeKnownIdx = 1
+
 	// fieldConjunctsKnownIdx is the bit-position index of
 	// fieldConjunctsKnown, for use as a scheduler.counters index.
 	// It must equal bits.TrailingZeros16(uint16(fieldConjunctsKnown)).
@@ -330,7 +335,7 @@ func stateCompletions(s *scheduler) condition {
 		// it may still become not pending if 'b' becomes a regular arc.
 		// A pending arc with no active parent task has nothing left that
 		// could declare it, such as when its comprehension yielded nothing.
-		if s.counters[arcTypeKnown] == 0 && (x.meets(subFieldsProcessed) ||
+		if s.counters[arcTypeKnownIdx] == 0 && (x.meets(subFieldsProcessed) ||
 			v.ArcType == ArcPending && !s.hasActiveParentTask()) {
 			x |= arcTypeKnown
 		}

@@ -30,6 +30,18 @@ missingFieldNestedInInterpolation: {
 	// a location, ensure it doesn't alphabetically sort and pick `c` instead.
 	r2: "\(a.d.c)"
 }
+
+// Selecting from a struct with erroneous fields reports all of their errors.
+erroneousFields: {
+	#a: {b: 1 & 2, c: 3 & 4}
+	r: #a.d // The error of field c is missing.
+}
+
+// As above, with erroneous fields in a nested struct.
+nestedFields: {
+	#a: {b: {p: 1 & 2, q: 3 & 4}, c: 5 & 6}
+	r: #a.d // The errors of fields b.q and c are missing.
+}
 -- out/compile --
 --- references.cue
 {
@@ -53,5 +65,22 @@ missingFieldNestedInInterpolation: {
     a: {}
     r1: "\(〈0;a〉.b.c)"
     r2: "\(〈0;a〉.d.c)"
+  }
+  erroneousFields: {
+    #a: {
+      b: (1 & 2)
+      c: (3 & 4)
+    }
+    r: 〈0;#a〉.d
+  }
+  nestedFields: {
+    #a: {
+      b: {
+        p: (1 & 2)
+        q: (3 & 4)
+      }
+      c: (5 & 6)
+    }
+    r: 〈0;#a〉.d
   }
 }

@@ -30,6 +30,22 @@ missingFieldNestedInInterpolation: {
 	// a location, ensure it doesn't alphabetically sort and pick `c` instead.
 	r2: "\(a.d.c)" @test(err, code=incomplete, contains="invalid interpolation: undefined field: d", pos=[0:6, -5:2, 0:11])
 }
+
+// Selecting from a struct with erroneous fields reports all of their errors.
+erroneousFields: {
+	#a: {b: 1 & 2, c: 3 & 4}
+	r: #a.d @test(err, code=eval,
+		suberr=(contains="conflicting values 2 and 1", pos=[-1:10, -1:14]),
+	) // The error of field c is missing.
+}
+
+// As above, with erroneous fields in a nested struct.
+nestedFields: {
+	#a: {b: {p: 1 & 2, q: 3 & 4}, c: 5 & 6}
+	r: #a.d @test(err, code=eval,
+		suberr=(path=nestedFields.#a.b.p, contains="conflicting values 2 and 1", pos=[-1:14, -1:18]),
+	) // The errors of fields b.q and c are missing.
+}
 -- out/errors.txt --
 [incomplete] missingField.r: undefined field: b:
     ./references.cue:3:7
@@ -51,6 +67,27 @@ missingFieldNestedInInterpolation: {
     ./references.cue:30:6
     ./references.cue:25:2
     ./references.cue:30:11
+[eval] erroneousFields.#a.b: conflicting values 2 and 1:
+    ./references.cue:35:10
+    ./references.cue:35:14
+[eval] erroneousFields.#a.c: conflicting values 4 and 3:
+    ./references.cue:35:20
+    ./references.cue:35:24
+[eval] erroneousFields.#a.b: conflicting values 2 and 1:
+    ./references.cue:35:10
+    ./references.cue:35:14
+[eval] nestedFields.#a.b.p: conflicting values 2 and 1:
+    ./references.cue:43:14
+    ./references.cue:43:18
+[eval] nestedFields.#a.b.q: conflicting values 4 and 3:
+    ./references.cue:43:24
+    ./references.cue:43:28
+[eval] nestedFields.#a.c: conflicting values 6 and 5:
+    ./references.cue:43:35
+    ./references.cue:43:39
+[eval] nestedFields.#a.b.p: conflicting values 2 and 1:
+    ./references.cue:43:14
+    ./references.cue:43:18
 -- out/eval/stats --
 Leaks:  0
 Freed:  17

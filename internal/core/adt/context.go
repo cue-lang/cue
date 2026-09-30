@@ -1017,6 +1017,10 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 
 		if v, ok := result.(*Vertex); ok {
 			if b := v.Bottom(); b != nil && !b.IsIncomplete() {
+				// TODO: a child error only holds the error of the first
+				// erroneous child of v. Report all of them, without
+				// validating v again for every reference to it.
+				// See erroneousFields in references/errors.txtar.
 				result = b
 			}
 		}

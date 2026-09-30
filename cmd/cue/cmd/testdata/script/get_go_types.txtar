@@ -246,7 +246,7 @@ type Inline struct {
 }
 
 type NoInline struct {
-	Kind string
+	Name string
 }
 
 type Interface interface {
@@ -505,7 +505,7 @@ _#localConst: _#localType & 1
 
 #Inline: Kind: string
 
-#NoInline: Kind: string
+#NoInline: Name: string
 
 #Interface: _
 -- pkg2/add_gen.cue.golden --

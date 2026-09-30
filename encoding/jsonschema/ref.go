@@ -115,6 +115,42 @@ func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
 	return v, nil
 }
 
+// localRefTarget returns the schema referred to by the "$ref" value n,
+// as long as it is a JSON Pointer into the schema resource rooted at s.
+// Unlike [state.resolveURI], it reports no errors. Such a pointer is
+// resolved like in [cueLocationForRef], except that a target inside
+// a nested resource with an "$id" of its own is not returned.
+func (s *state) localRefTarget(n cue.Value) (cue.Value, bool) {
+	str, err := n.String()
+	if err != nil {
+		return cue.Value{}, false
+	}
+	u, err := url.Parse(str)
+	if err != nil {
+		return cue.Value{}, false
+	}
+	u = s.id.ResolveReference(u)
+	if !sameSchemaRoot(u, s.id) || (u.Fragment != "" && !strings.HasPrefix(u.Fragment, "/")) {
+		return cue.Value{}, false
+	}
+	target, err := lookupJSONPointer(s.pos, u.Fragment)
+	if err != nil {
+		return cue.Value{}, false
+	}
+	// A schema with its own ID on the way to the target means that the
+	// target is part of another resource. The ID must be a string, unlike
+	// a schema for a property which happens to be named "$id".
+	v := s.pos
+	sels := relPath(target, s.pos).Selectors()
+	for _, sel := range sels[:max(len(sels)-1, 0)] {
+		v = v.LookupPath(cue.MakePath(sel))
+		if v.LookupPath(cue.MakePath(cue.Str("$id"))).Kind() == cue.StringKind {
+			return cue.Value{}, false
+		}
+	}
+	return target, true
+}
+
 func sameSchemaRoot(u1, u2 *url.URL) bool {
 	return u1.Host == u2.Host && u1.Path == u2.Path && u1.Opaque == u2.Opaque
 }

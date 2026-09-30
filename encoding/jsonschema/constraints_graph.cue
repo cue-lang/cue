@@ -119,7 +119,7 @@ constraints: [
 	{key: "title", fn: "constraintTitle", versions: "allVersions|openAPILike"},
 	{key: "type", fn: "constraintType", versions: "allVersions|openAPILike"},
 	{key: "unevaluatedItems", versions: "vfrom(VersionDraft2019_09)"},
-	{key: "unevaluatedProperties", versions: "vfrom(VersionDraft2019_09)"},
+	{key: "unevaluatedProperties", fn: "constraintUnevaluatedProperties", versions: "vfrom(VersionDraft2019_09)"},
 	{key: "uniqueItems", fn: "constraintUniqueItems", versions: "allVersions|openAPILike"},
 	{key: "writeOnly", versions: "vfrom(VersionDraft7)|openAPI"},
 	{key: "xml", versions: "openAPI"},
@@ -175,6 +175,7 @@ dataNodes: {
 			"dependencies",
 			"dependentSchemas",
 			"dependentRequired",
+			"unevaluatedProperties",
 		]
 	}
 
@@ -237,6 +238,7 @@ dataNodes: {
 			"dependentSchemas",
 			"dependentRequired",
 			"additionalProperties",
+			"unevaluatedProperties",
 			"x-kubernetes-embedded-resource",
 		]
 		consumers: [
@@ -244,8 +246,8 @@ dataNodes: {
 		]
 		notes: [
 			"dependencies currently inject placeholder fields into obj.Elts,",
-			"so additionalProperties observes them (likely semantically wrong,",
-			"but reflects current behavior).",
+			"so additionalProperties and unevaluatedProperties observe them",
+			"(likely semantically wrong, but reflects current behavior).",
 		]
 	}
 
@@ -253,7 +255,7 @@ dataNodes: {
 		description: "Pattern exclusions derived from patternProperties."
 		stateField:  "s.patterns / s.patternSkipped"
 		producers:   ["patternProperties"]
-		consumers:   ["additionalProperties"]
+		consumers:   ["additionalProperties", "unevaluatedProperties"]
 	}
 
 	PreserveUnknownFields: {

@@ -6,30 +6,18 @@
 			"type": "object",
 			"unevaluatedProperties": true
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -43,41 +31,25 @@
 				"minLength": 3
 			}
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with valid unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with invalid unevaluated properties",
 				"data": {
 					"foo": "fo"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -88,30 +60,18 @@
 			"type": "object",
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -127,21 +87,13 @@
 			},
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
@@ -149,11 +101,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -169,21 +117,13 @@
 			},
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
@@ -191,11 +131,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -212,21 +148,13 @@
 			"additionalProperties": true,
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no additional properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with additional properties",
@@ -234,11 +162,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -263,10 +187,6 @@
 			],
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no additional properties",
@@ -274,11 +194,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with additional properties",
@@ -289,8 +205,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -316,10 +231,6 @@
 			],
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no additional properties",
@@ -327,11 +238,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with additional properties",
@@ -342,8 +249,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -365,21 +271,13 @@
 			],
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no additional properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with additional properties",
@@ -387,11 +285,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -415,21 +309,13 @@
 				"maxLength": 2
 			}
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with nested unevaluated properties",
@@ -437,11 +323,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -490,7 +372,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"anyOf\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -583,7 +465,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"oneOf\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -639,7 +521,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: cannot compile resulting schema: invalid value {foo?:string} (does not satisfy matchN): 1 matched, expected 0:\n    generated.cue:3:1\n    generated.cue:1:1\n    generated.cue:3:8\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -695,7 +577,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"if\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -777,7 +659,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"if\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -859,7 +741,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"if\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -938,7 +820,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"dependentSchemas\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -982,32 +864,20 @@
 			],
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
 				"data": {
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1033,10 +903,6 @@
 				}
 			}
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
@@ -1044,11 +910,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
@@ -1059,8 +921,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -1087,10 +948,6 @@
 				}
 			}
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no unevaluated properties",
@@ -1098,11 +955,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with unevaluated properties",
@@ -1113,8 +966,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -1201,21 +1053,13 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "always fails",
 				"data": {
 					"foo": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1234,21 +1078,13 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "always fails",
 				"data": {
 					"foo": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1269,21 +1105,13 @@
 			],
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with nested unevaluated properties",
@@ -1291,11 +1119,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -1316,21 +1140,13 @@
 			],
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with nested unevaluated properties",
@@ -1338,11 +1154,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -1363,10 +1175,6 @@
 			],
 			"unevaluatedProperties": true
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
@@ -1375,8 +1183,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -1387,8 +1194,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -1410,21 +1216,13 @@
 			],
 			"unevaluatedProperties": true
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with nested unevaluated properties",
@@ -1434,8 +1232,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -1459,10 +1256,6 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
@@ -1471,8 +1264,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -1483,8 +1275,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -1508,21 +1299,13 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "with no nested unevaluated properties",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "with nested unevaluated properties",
@@ -1530,11 +1313,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1569,10 +1348,6 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "no extra properties",
@@ -1581,11 +1356,7 @@
 						"bar": "test"
 					}
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "uncle keyword evaluation is not significant",
@@ -1595,11 +1366,7 @@
 						"faz": "test"
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1624,10 +1391,6 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "base case: both properties present",
@@ -1637,8 +1400,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -1646,11 +1408,7 @@
 				"data": {
 					"foo": 1
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "in place applicator siblings, foo is missing",
@@ -1659,8 +1417,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			}
 		]
@@ -1686,10 +1443,6 @@
 				}
 			]
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "base case: both properties present",
@@ -1699,8 +1452,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -1710,8 +1462,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
@@ -1719,11 +1470,7 @@
 				"data": {
 					"bar": 1
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -1739,30 +1486,18 @@
 			},
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "Empty is valid",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Single is valid",
 				"data": {
 					"x": {}
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Unevaluated on 1st level is invalid",
@@ -1770,11 +1505,7 @@
 					"x": {},
 					"y": {}
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "Nested is valid",
@@ -1783,11 +1514,7 @@
 						"x": {}
 					}
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Unevaluated on 2nd level is invalid",
@@ -1797,11 +1524,7 @@
 						"y": {}
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "Deep nested is valid",
@@ -1812,11 +1535,7 @@
 						}
 					}
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Unevaluated on 3rd level is invalid",
@@ -1828,11 +1547,7 @@
 						}
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1883,7 +1598,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"oneOf\" (and 1 more errors)",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -2057,7 +1772,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"oneOf\" (and 1 more errors)",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -2312,64 +2027,36 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"unevaluatedProperties": false
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "ignores booleans",
 				"data": true,
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores integers",
 				"data": 123,
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores floats",
 				"data": 1.0,
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores arrays",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores strings",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores null",
 				"data": null,
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -2381,21 +2068,13 @@
 				"type": "null"
 			}
 		},
-		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "allows null valued properties",
 				"data": {
 					"foo": null
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -2411,7 +2090,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:43\n",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -2453,7 +2132,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"if\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [
@@ -2499,7 +2178,7 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"dependentSchemas\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

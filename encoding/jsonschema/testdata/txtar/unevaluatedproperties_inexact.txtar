@@ -1,0 +1,185 @@
+# Without #strictFeatures, keywords such as "anyOf" contribute the
+# properties of all their subschemas to "unevaluatedProperties", even
+# though only the subschemas which succeed should. This accepts some
+# invalid instances, like test/lax.json, but never rejects a valid one.
+# A "dependentSchemas" subschema which applies leaves the object open.
+#
+# The keyword is ignored where there is no telling which properties
+# are evaluated, such as alongside "$dynamicRef".
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+        "inexact": {
+            "type": "object",
+            "anyOf": [
+                {
+                    "properties": {
+                        "a": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "a"
+                    ]
+                },
+                {
+                    "properties": {
+                        "b": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "b"
+                    ]
+                }
+            ],
+            "unevaluatedProperties": false
+        },
+        "conditional": {
+            "type": "object",
+            "if": {
+                "properties": {
+                    "a": {
+                        "const": "x"
+                    }
+                },
+                "required": [
+                    "a"
+                ]
+            },
+            "then": {
+                "properties": {
+                    "b": {
+                        "type": "number"
+                    }
+                }
+            },
+            "unevaluatedProperties": false
+        },
+        "dependent": {
+            "type": "object",
+            "properties": {
+                "a": {
+                    "type": "string"
+                }
+            },
+            "dependentSchemas": {
+                "a": {
+                    "properties": {
+                        "b": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "unevaluatedProperties": false
+        },
+        "unknown": {
+            "type": "object",
+            "$dynamicRef": "#node",
+            "unevaluatedProperties": false
+        }
+    }
+}
+-- test/ok.json --
+{
+    "inexact": {
+        "a": "x",
+        "b": 1
+    },
+    "conditional": {
+        "a": "x",
+        "b": 1
+    },
+    "dependent": {
+        "a": "x",
+        "b": 1
+    },
+    "unknown": {
+        "other": 1
+    }
+}
+-- test/lax.json --
+{
+    "inexact": {
+        "a": "x",
+        "b": "not evaluated"
+    },
+    "conditional": {
+        "a": "y",
+        "b": 1
+    },
+    "dependent": {
+        "a": "x",
+        "c": 1
+    }
+}
+-- test/err-inexact.json --
+{
+    "inexact": {
+        "a": "x",
+        "c": 1
+    }
+}
+-- test/err-conditional.json --
+{
+    "conditional": {
+        "c": 1
+    }
+}
+-- test/err-dependent.json --
+{
+    "dependent": {
+        "c": 1
+    }
+}
+-- out/decode/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+inexact?: matchN(>=1, [{
+	a!: string
+	...
+}, {
+	b!: number
+	...
+}]) & close({
+	a?: _
+	b?: _
+})
+conditional?: matchIf({
+	a!: "x"
+	...
+}, {
+	b?: number
+	...
+}, _) & close({
+	a?: _
+	b?: _
+})
+dependent?: close({
+	"a"?: string
+	a?:   _
+	if a != _|_ {
+		null | bool | number | string | [...] | {
+			b?: number
+			...
+		}
+	}
+	{}
+	b?: _
+})
+unknown?: {...}
+...
+-- out/decode/testerr/err-conditional --
+conditional.c: field not allowed:
+    generated.cue:12:15
+    test/err-conditional.json:3:10
+-- out/decode/testerr/err-dependent --
+dependent.c: field not allowed:
+    test/err-dependent.json:3:10
+-- out/decode/testerr/err-inexact --
+inexact.c: field not allowed:
+    generated.cue:2:11
+    test/err-inexact.json:4:10

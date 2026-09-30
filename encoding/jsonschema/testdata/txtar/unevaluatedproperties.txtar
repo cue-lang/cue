@@ -145,16 +145,63 @@
     }
 }
 -- out/decode/extract --
-ERROR:
-keyword "unevaluatedProperties" not yet implemented:
-    schema.json:64:14
-keyword "unevaluatedProperties" not yet implemented:
-    schema.json:74:14
-keyword "unevaluatedProperties" not yet implemented:
-    schema.json:78:14
-keyword "unevaluatedProperties" not yet implemented:
-    schema.json:83:14
-keyword "unevaluatedProperties" not yet implemented:
-    schema.json:97:14
-keyword "unevaluatedProperties" not yet implemented:
-    schema.json:103:6
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+
+matchN(2, [#base & {...}, #extra & {...}]) & close({
+	restart?: string
+	labels?: #extra & {
+		ports?: _
+		{[!~"^(ports)$"]: string}
+	}
+	covered?: #map
+	open?:    #extra & (null | bool | number | string | [...] | {...})
+	nested?:  _#defs."/$defs/named/properties/nested" & close({q?: _})
+	dependent?: close({
+		"a"?: string
+		a?:   _
+		if a != _|_ {
+			b!: _
+		}
+		{}
+	})
+	image!: _
+	ports?: _
+
+	{[=~"^x-"]: _}
+})
+
+#base: {
+	image?: string
+
+	{[=~"^x-"]: _}
+	...
+}
+
+#extra: {
+	ports?: [...]
+	...
+}
+
+#map: null | bool | number | string | [...] | {
+	name?: string
+	{[!~"^(name)$"]: number}
+}
+
+#named: null | bool | number | string | [...] | {
+	$id?:    string
+	nested?: _#defs."/$defs/named/properties/nested"
+	...
+}
+
+_#defs: "/$defs/named/properties/nested": null | bool | number | string | [...] | {
+	q?: string
+	...
+}
+-- out/decode/testerr/err-labels --
+labels.env: conflicting values 1 and string (mismatched types int and string):
+    generated.cue:7:21
+    test/err-labels.json:4:16
+-- out/decode/testerr/err-misspelled --
+imagee: field not allowed:
+    generated.cue:3:1
+    test/err-misspelled.json:3:6

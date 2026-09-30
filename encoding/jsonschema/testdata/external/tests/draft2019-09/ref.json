@@ -673,8 +673,7 @@
 			"$ref": "#/$defs/A"
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3-roundtrip": "inital extract failed"
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
 		},
 		"tests": [
 			{
@@ -684,7 +683,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
 					"v3-roundtrip": "could not extract schema"
 				}
 			}

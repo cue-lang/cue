@@ -69,7 +69,7 @@ var constraints = []*constraint{
 	p1("title", constraintTitle, allVersions|openAPILike),
 	p1("type", constraintType, allVersions|openAPILike),
 	px("unevaluatedItems", constraintTODO, vfrom(VersionDraft2019_09)),
-	px("unevaluatedProperties", constraintTODO, vfrom(VersionDraft2019_09)),
+	p3("unevaluatedProperties", constraintUnevaluatedProperties, vfrom(VersionDraft2019_09)),
 	p1("uniqueItems", constraintUniqueItems, allVersions|openAPILike),
 	px("writeOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),
 	p1("x-kubernetes-embedded-resource", constraintEmbeddedResource, k8s),

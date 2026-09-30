@@ -321,7 +321,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented in combination with \"anyOf\"",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

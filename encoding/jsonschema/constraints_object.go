@@ -15,7 +15,11 @@
 package jsonschema
 
 import (
+	"cmp"
 	"fmt"
+	"regexp/syntax"
+	"slices"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -85,6 +89,9 @@ func constraintGroupVersionKind(key string, n cue.Value, s *state) {
 	}
 }
 
+// constraintAdditionalProperties applies n to the properties that match
+// none of the fields and patterns which the object has so far.
+// [constraintUnevaluatedProperties] ends with that same step.
 func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 	if s.patternSkipped && (n.Kind() != cue.BoolKind || !s.boolValue(n)) {
 		// The properties of a skipped pattern cannot be told apart from
@@ -117,7 +124,11 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 			return
 		}
 		// [!~(properties|patternProperties)]: schema
-		existing := append(s.patterns, excludeFields(obj.Elts)...)
+		var existing []ast.Expr
+		for _, pattern := range s.patterns {
+			existing = append(existing, &ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(pattern)})
+		}
+		existing = append(existing, excludeFields(obj.Elts)...)
 		if len(existing) == 0 {
 			existing = append(existing, ast.NewIdent("string"))
 		}
@@ -132,10 +143,176 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 		s.openness = allFieldsCovered
 
 	default:
-		s.errf(n, `value of "additionalProperties" must be an object or boolean`)
+		s.errf(n, `value of %q must be an object or boolean`, key)
 		return
 	}
 	s.hasAdditionalProperties = true
+}
+
+// constraintUnevaluatedProperties implements "unevaluatedProperties" by
+// declaring the properties that [evaluatedProps] finds and then treating
+// the keyword like "additionalProperties".
+func constraintUnevaluatedProperties(key string, n cue.Value, s *state) {
+	if s.declareEvaluated(key, n) {
+		constraintAdditionalProperties(key, n, s)
+	} else {
+		// Still decode n, which may hold errors or referenced schemas.
+		s.schema(n)
+	}
+}
+
+// declareEvaluated declares the properties evaluated by the in-place
+// applicators of the schema in its object. It reports whether n, the
+// value of the given keyword, can then be applied to the remaining ones.
+//
+// The fields which the object has already count as evaluated, including
+// those added for "dependencies", just like for "additionalProperties".
+func (s *state) declareEvaluated(key string, n cue.Value) bool {
+	if s.pos.LookupPath(cue.MakePath(cue.Str("additionalProperties"))).Exists() {
+		// A sibling "additionalProperties" evaluates every property
+		// that "properties" and "patternProperties" do not.
+		return false
+	}
+	if n.Kind() == cue.BoolKind && s.boolValue(n) {
+		return true
+	}
+	if s.patternSkipped {
+		return false // As in [constraintAdditionalProperties].
+	}
+	ev := evaluatedProps{
+		root: s.schemaRoot(),
+		seen: map[string]bool{s.pos.Path().String(): true},
+	}
+	ev.addApplicators(s.pos)
+	if blocker := cmp.Or(ev.unknown, ev.inexact); blocker != "" && s.cfg.StrictFeatures {
+		s.errf(n, "keyword %q not yet implemented in combination with %s", key, blocker)
+		return false
+	}
+	if ev.unknown != "" || ev.all {
+		// Either there is nothing left to constrain, or we cannot tell
+		// what is left, where a partial answer would reject valid data.
+		return false
+	}
+	obj := s.object(n)
+	declared := fieldsByName(obj.Elts)
+	for _, name := range ev.names {
+		if declared[name] != nil {
+			continue
+		}
+		f := &ast.Field{
+			Label:      ast.NewString(name),
+			Constraint: token.OPTION,
+			Value:      top(),
+		}
+		declared[name] = f
+		obj.Elts = append(obj.Elts, f)
+	}
+	for _, pattern := range ev.patterns {
+		if !slices.Contains(s.patterns, pattern) {
+			s.addPattern(obj, pattern, top())
+		}
+	}
+	return true
+}
+
+// evaluatedProps collects the properties that the in-place applicators of
+// a schema evaluate, which "unevaluatedProperties" then leaves alone.
+//
+// Which subschemas apply is only known statically for "allOf" and "$ref".
+// The others, such as "anyOf", contribute the properties of those of
+// their subschemas that an instance satisfies; these are all included,
+// which never rejects a valid instance but does accept some invalid ones.
+type evaluatedProps struct {
+	// root is the root of the schema resource being inspected,
+	// which "$ref" values are resolved against.
+	root *state
+
+	names    []string // keys of "properties"
+	patterns []string // keys of "patternProperties"
+
+	// all holds whether every property is evaluated.
+	all bool
+
+	// inexact describes the first instance-dependent keyword found, if any.
+	inexact string
+
+	// unknown describes the first keyword found, if any,
+	// whose evaluated properties cannot be determined.
+	unknown string
+
+	// seen holds the paths of the schemas visited so far,
+	// starting with the schema whose applicators are inspected.
+	seen map[string]bool
+}
+
+// addApplicators adds the properties evaluated by the subschemas which
+// the in-place applicators of the schema n apply to the same instance.
+func (ev *evaluatedProps) addApplicators(n cue.Value) {
+	ev.root.processMap(n, func(key string, n cue.Value) {
+		switch key {
+		case "$ref":
+			if target, ok := ev.root.localRefTarget(n); ok {
+				ev.addSchema(target)
+			} else {
+				ev.unknown = cmp.Or(ev.unknown, fmt.Sprintf("%q: %v", key, n))
+			}
+		case "$dynamicRef", "$recursiveRef":
+			ev.unknown = cmp.Or(ev.unknown, strconv.Quote(key))
+		case "allOf", "anyOf", "oneOf":
+			if key != "allOf" {
+				ev.inexact = cmp.Or(ev.inexact, strconv.Quote(key))
+			}
+			for i, _ := n.List(); i.Next(); {
+				ev.addSchema(i.Value())
+			}
+		case "if", "then", "else":
+			ev.inexact = cmp.Or(ev.inexact, strconv.Quote(key))
+			ev.addSchema(n)
+		case "dependentSchemas", "dependencies":
+			ev.root.processMap(n, func(_ string, n cue.Value) {
+				if n.Kind() == cue.ListKind {
+					return // Required properties are not evaluated.
+				}
+				ev.inexact = cmp.Or(ev.inexact, strconv.Quote(key))
+				ev.addSchema(n)
+			})
+		}
+	})
+}
+
+// addSchema adds the properties evaluated by the subschema n itself
+// as well as by its in-place applicators.
+func (ev *evaluatedProps) addSchema(n cue.Value) {
+	path := n.Path().String()
+	if n.Kind() != cue.StructKind || ev.seen[path] {
+		return // A boolean schema evaluates no properties.
+	}
+	ev.seen[path] = true
+	ev.root.processMap(n, func(key string, v cue.Value) {
+		switch key {
+		case "$id":
+			if path != ev.root.pos.Path().String() {
+				// References inside another schema resource
+				// resolve against its own base URI.
+				ev.unknown = cmp.Or(ev.unknown, `a nested "$id"`)
+			}
+		case "properties":
+			ev.root.processMap(v, func(name string, _ cue.Value) {
+				ev.names = append(ev.names, name)
+			})
+		case "patternProperties":
+			ev.root.processMap(v, func(pattern string, _ cue.Value) {
+				if _, err := syntax.Parse(pattern, syntax.Perl); err != nil {
+					ev.unknown = cmp.Or(ev.unknown, fmt.Sprintf("%q: %q", key, pattern))
+					return
+				}
+				ev.patterns = append(ev.patterns, pattern)
+			})
+		case "additionalProperties", "unevaluatedProperties":
+			ev.all = true
+		}
+	})
+	ev.addApplicators(n)
 }
 
 func embedStruct(s *ast.StructLit) *ast.EmbedDecl {
@@ -333,22 +510,24 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 			s.patternSkipped = true
 			return
 		}
-
-		// Record the pattern for potential use by
-		// additionalProperties because patternProperties are
-		// considered before additionalProperties.
-		s.patterns = append(s.patterns,
-			&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(key)})
-
-		// We'll make a pattern constraint of the form:
-		// 	[pattern]: schema
-		f := embedStruct(ast.NewStruct(&ast.Field{
-			Label: ast.NewList(&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)}),
-			Value: s.schema(n),
-		}))
-		ast.SetRelPos(f, token.NewSection)
-		obj.Elts = append(obj.Elts, f)
+		s.addPattern(obj, key, s.schema(n))
 	})
+}
+
+// addPattern adds a pattern constraint of the form
+//
+//	[=~pattern]: value
+//
+// to obj, recording the pattern for potential use by additionalProperties
+// because patternProperties are considered before additionalProperties.
+func (s *state) addPattern(obj *ast.StructLit, pattern string, value ast.Expr) {
+	s.patterns = append(s.patterns, pattern)
+	f := embedStruct(ast.NewStruct(&ast.Field{
+		Label: ast.NewList(&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(pattern)}),
+		Value: value,
+	}))
+	ast.SetRelPos(f, token.NewSection)
+	obj.Elts = append(obj.Elts, f)
 }
 
 func constraintEmbeddedResource(key string, n cue.Value, s *state) {
@@ -454,17 +633,10 @@ func constraintPropertyNames(key string, n cue.Value, s *state) {
 	}
 }
 
-func constraintRequired(key string, n cue.Value, s *state) {
-	if n.Kind() != cue.ListKind {
-		s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind())
-		return
-	}
-
-	obj := s.object(n)
-
-	// Create field map
+// fieldsByName returns the fields among decls, keyed by name.
+func fieldsByName(decls []ast.Decl) map[string]*ast.Field {
 	fields := map[string]*ast.Field{}
-	for _, d := range obj.Elts {
+	for _, d := range decls {
 		f, ok := d.(*ast.Field)
 		if !ok {
 			continue // Could be embedding? See cirrus.json
@@ -474,6 +646,17 @@ func constraintRequired(key string, n cue.Value, s *state) {
 			fields[str] = f
 		}
 	}
+	return fields
+}
+
+func constraintRequired(key string, n cue.Value, s *state) {
+	if n.Kind() != cue.ListKind {
+		s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind())
+		return
+	}
+
+	obj := s.object(n)
+	fields := fieldsByName(obj.Elts)
 
 	for _, n := range s.listItems("required", n, true) {
 		str, ok := s.strValue(n)

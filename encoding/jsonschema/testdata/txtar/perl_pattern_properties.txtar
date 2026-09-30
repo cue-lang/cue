@@ -1,7 +1,7 @@
 # A "patternProperties" regexp which cannot be expressed is dropped
 # without #strictFeatures, leaving no way to tell its properties from
-# the rest. "additionalProperties" may then not constrain the rest,
-# or valid instances would be rejected.
+# the rest. Neither "additionalProperties" nor "unevaluatedProperties"
+# may then constrain the rest, or valid instances would be rejected.
 
 -- schema.json --
 {
@@ -27,6 +27,22 @@
         },
         "value": {
             "$ref": "https://example.com/value"
+        },
+        "unevaluated": {
+            "type": "object",
+            "allOf": [
+                {
+                    "properties": {
+                        "a": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ],
+            "patternProperties": {
+                "^(?!x)": {}
+            },
+            "unevaluatedProperties": false
         }
     }
 }
@@ -38,13 +54,20 @@
     "additionalSchema": {
         "foo": 1
     },
-    "value": "foo"
+    "value": "foo",
+    "unevaluated": {
+        "foo": 1
+    }
 }
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 additional?:       {...}
 additionalSchema?: {...}
 value?:            _#defs."/properties/additionalSchema/additionalProperties"
+unevaluated?: {
+	a?: string
+	...
+} & {...}
 
 _#defs: "/properties/additionalSchema/additionalProperties": {
 	@jsonschema(id="https://example.com/value")

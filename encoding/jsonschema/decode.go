@@ -579,7 +579,8 @@ type state struct {
 	obj  *ast.StructLit
 	objN cue.Value // used for adding obj to constraints
 
-	patterns []ast.Expr
+	// patterns holds the regexps of the pattern constraints in obj.
+	patterns []string
 
 	// patternSkipped holds whether "patternProperties" has a regexp
 	// which could not be expressed, leaving its properties unknown.

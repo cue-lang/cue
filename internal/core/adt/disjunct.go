@@ -177,6 +177,10 @@ func combineDefault(a, b defaultMode) defaultMode {
 func (n *nodeContext) disjunctError() errors.Error {
 	ctx := n.ctx
 
+	// TODO: a disjunct with erroneous fields fails with its child error,
+	// which only holds the error of the first one. Report all of them, kept
+	// apart for selectErrors, without slowing down disjunctions which succeed.
+	// See structFields and the tests after it in disjunctions/errors.txtar.
 	disjuncts := selectErrors(n.disjunctErrs)
 	var pos errors.Error
 

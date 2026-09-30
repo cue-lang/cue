@@ -85,6 +85,34 @@ issue4477: {
 		suberr=(contains="conflicting values 4 and 0", pos=[-1:5, 0:32]),
 	)
 }
+
+// Each failed disjunct reports all of its erroneous fields, not only the
+// first.
+structFields: {
+	x: {a: 1 & 2, b: 3 & 4} | {a: 5 & 6, b: 7 & 8} @test(err, code=eval, contains="2 errors in empty disjunction",
+		suberr=(contains="conflicting values 2 and 1", pos=[0:9, 0:13]),
+		suberr=(contains="conflicting values 6 and 5", pos=[0:32, 0:36]),
+	) // The errors of field b are missing.
+}
+
+// As above, where the disjuncts fail at the same positions.
+generatedFields: {
+	x: {a: 0, b: 0}
+	x: or([for i in [1, 2, 3, 4] {a: i * 1, b: i * 1}]) @test(err, code=eval, contains="4 errors in empty disjunction",
+		suberr=(path=generatedFields.x.a, contains="conflicting values 1 and 0", pos=[-1:9, 0:35]),
+		suberr=(path=generatedFields.x.a, contains="conflicting values 2 and 0", pos=[-1:9, 0:35]),
+		suberr=(path=generatedFields.x.a, contains="conflicting values 3 and 0", pos=[-1:9, 0:35]),
+		suberr=(path=generatedFields.x.a, contains="conflicting values 4 and 0", pos=[-1:9, 0:35]),
+	) // The errors of field b are missing.
+}
+
+// As above, with erroneous fields in a nested struct.
+nestedFields: {
+	x: {a: {p: 1 & 2, q: 3 & 4}, b: 5 & 6} | {a: {p: 7 & 8}} @test(err, code=eval, contains="2 errors in empty disjunction",
+		suberr=(path=nestedFields.x.a.p, contains="conflicting values 2 and 1", pos=[0:13, 0:17]),
+		suberr=(path=nestedFields.x.a.p, contains="conflicting values 8 and 7", pos=[0:51, 0:55]),
+	) // The errors of fields a.q and b are missing.
+}
 -- issue3581.cue --
 // evalv3: tools/flow unexpected error when a flow task result field is used as
 // a list item; string interpolation in a list element caused a spurious error.
@@ -307,6 +335,33 @@ issue4477.x: conflicting values 3 and 0:
 issue4477.x: conflicting values 4 and 0:
     ./in.cue:79:5
     ./in.cue:80:32
+[eval] structFields.x: 2 errors in empty disjunction:
+structFields.x.a: conflicting values 2 and 1:
+    ./in.cue:91:9
+    ./in.cue:91:13
+structFields.x.a: conflicting values 6 and 5:
+    ./in.cue:91:32
+    ./in.cue:91:36
+[eval] generatedFields.x: 4 errors in empty disjunction:
+generatedFields.x.a: conflicting values 1 and 0:
+    ./in.cue:99:9
+    ./in.cue:100:35
+generatedFields.x.a: conflicting values 2 and 0:
+    ./in.cue:99:9
+    ./in.cue:100:35
+generatedFields.x.a: conflicting values 3 and 0:
+    ./in.cue:99:9
+    ./in.cue:100:35
+generatedFields.x.a: conflicting values 4 and 0:
+    ./in.cue:99:9
+    ./in.cue:100:35
+[eval] nestedFields.x: 2 errors in empty disjunction:
+nestedFields.x.a.p: conflicting values 2 and 1:
+    ./in.cue:110:13
+    ./in.cue:110:17
+nestedFields.x.a.p: conflicting values 8 and 7:
+    ./in.cue:110:51
+    ./in.cue:110:55
 [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
 issue3581.reduced.list: incompatible list lengths (0 and 1):
     ./issue3581.cue:5:17
@@ -318,16 +373,16 @@ issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
     ./optionalerror.cue:30:16
 -- out/eval/stats --
 Leaks:  31
-Freed:  221
-Reused: 199
-Allocs: 53
+Freed:  265
+Reused: 240
+Allocs: 56
 Retain: 0
 
-Unifications: 126
-Conjuncts:    292
-Disjuncts:    78
+Unifications: 150
+Conjuncts:    345
+Disjuncts:    86
 Notifications: 2
 
-NumCloseIDs: 26
+NumCloseIDs: 30
 -- out/todo.txt --
 issue4022: only evaluated by v3 evaluator.

@@ -72,6 +72,23 @@ issue4477: {
 	x: 0
 	x: or([for i in [1, 2, 3, 4] {i * 1}])
 }
+
+// Each failed disjunct reports all of its erroneous fields, not only the
+// first.
+structFields: {
+	x: {a: 1 & 2, b: 3 & 4} | {a: 5 & 6, b: 7 & 8} // The errors of field b are missing.
+}
+
+// As above, where the disjuncts fail at the same positions.
+generatedFields: {
+	x: {a: 0, b: 0}
+	x: or([for i in [1, 2, 3, 4] {a: i * 1, b: i * 1}]) // The errors of field b are missing.
+}
+
+// As above, with erroneous fields in a nested struct.
+nestedFields: {
+	x: {a: {p: 1 & 2, q: 3 & 4}, b: 5 & 6} | {a: {p: 7 & 8}} // The errors of fields a.q and b are missing.
+}
 -- issue3581.cue --
 // evalv3: tools/flow unexpected error when a flow task result field is used as
 // a list item; string interpolation in a list element caused a spurious error.
@@ -263,6 +280,45 @@ issue4022: full: {
         (〈1;i〉 * 1)
       },
     ])
+  }
+  structFields: {
+    x: ({
+      a: (1 & 2)
+      b: (3 & 4)
+    }|{
+      a: (5 & 6)
+      b: (7 & 8)
+    })
+  }
+  generatedFields: {
+    x: {
+      a: 0
+      b: 0
+    }
+    x: or([
+      for _, i in [
+        1,
+        2,
+        3,
+        4,
+      ] {
+        a: (〈1;i〉 * 1)
+        b: (〈1;i〉 * 1)
+      },
+    ])
+  }
+  nestedFields: {
+    x: ({
+      a: {
+        p: (1 & 2)
+        q: (3 & 4)
+      }
+      b: (5 & 6)
+    }|{
+      a: {
+        p: (7 & 8)
+      }
+    })
   }
 }
 --- issue3576.cue

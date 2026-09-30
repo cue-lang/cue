@@ -4,8 +4,8 @@
 # field set.
 #
 # A guard reading a struct with a comprehension nested in another's body must
-# likewise see the field the inner comprehension declares. It instead reports
-# a cyclic reference to that field. https://cuelang.org/issue/4487
+# likewise see the field the inner comprehension declares.
+# https://cuelang.org/issue/4487
 -- in.cue --
 empty: {
 	q: {
@@ -138,8 +138,7 @@ nested: {
 	if len(n) != 0 {
 		out: n
 	}
-	@test(err, code=incomplete, path=q, contains="cyclic reference to field c")
-	@test(eq:todo, {
+	@test(eq, {
 		q: {a: 0, c: 2}
 		n: [{a: 0, c: 2}]
 		out: [{a: 0, c: 2}]
@@ -156,8 +155,7 @@ nestedGuard: {
 	if len(q) > 1 {
 		out: q
 	}
-	@test(err, code=incomplete, path=q, contains="cyclic reference to field c")
-	@test(eq:todo, {q: {a: 0, c: 2}, out: {a: 0, c: 2}})
+	@test(eq, {q: {a: 0, c: 2}, out: {a: 0, c: 2}})
 }
 
 deepNested: {
@@ -174,8 +172,7 @@ deepNested: {
 	if len(n) != 0 {
 		out: n
 	}
-	@test(err, code=incomplete, path=q, contains="cyclic reference to field c")
-	@test(eq:todo, {
+	@test(eq, {
 		q: {a: 0, c: 2}
 		n: [{a: 0, c: 2}]
 		out: [{a: 0, c: 2}]
@@ -194,31 +191,8 @@ deepNestedGuard: {
 	if len(q) > 1 {
 		out: q
 	}
-	@test(err, code=incomplete, path=q, contains="cyclic reference to field c")
-	@test(eq:todo, {q: {a: 0, c: 2}, out: {a: 0, c: 2}})
+	@test(eq, {q: {a: 0, c: 2}, out: {a: 0, c: 2}})
 }
--- out/errors.txt --
-[incomplete] nested.q: cyclic reference to field c:
-    ./in.cue:124:14
-    ./in.cue:121:2
-nested.q.c: cyclic reference to field c:
-    ./in.cue:124:14
-    ./in.cue:121:2
-[incomplete] nestedGuard.q: cyclic reference to field c:
-    ./in.cue:144:12
-    ./in.cue:141:2
-nestedGuard.q.c: cyclic reference to field c:
-    ./in.cue:144:12
-    ./in.cue:141:2
-[incomplete] deepNested.q: cyclic reference to field c:
-    ./in.cue:158:17
-    ./in.cue:155:2
-[incomplete] deepNestedGuard.q: cyclic reference to field c:
-    ./in.cue:180:12
-    ./in.cue:177:2
-deepNestedGuard.q: cyclic reference to field c:
-    ./in.cue:185:9
-    ./in.cue:177:2
 -- out/eval/stats --
 Leaks:  39
 Freed:  60

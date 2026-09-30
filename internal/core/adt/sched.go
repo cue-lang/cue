@@ -461,13 +461,7 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 		}
 	}
 
-	ranParent := false
-	for _, t := range s.parentTasks {
-		if t.state == taskREADY {
-			runTask(t, mode)
-			ranParent = true
-		}
-	}
+	ranParent := s.runReadyParentTasks(mode)
 
 	// If a parent task ran (e.g. a comprehension that pushes fields into
 	// this node via its parent), re-process ancestors so the parent
@@ -477,7 +471,7 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 		s.handleParents(needs, mode)
 	}
 
-	if s.node != nil && s.node.node != nil && s.node.node.ArcType == ArcPending {
+	if s.isPendingArc() {
 		if mode == finalize {
 			s.tasks = s.tasks[:0]
 		}
@@ -682,6 +676,16 @@ func (s *scheduler) unblockTasks(deferred []taskBlock) []taskBlock {
 		// The types of the node can no longer be altered. Unblock tasks
 		// waiting for types, such as lists, before freezing other conditions.
 		for _, b := range blocking {
+			if !canUnblock(b) {
+				continue
+			}
+			// A parent task which has not run yet may still declare a
+			// pending arc, so try it before forcing the arc's type. Like the
+			// tasks run below, it waits rather than being forced.
+			if n := b.task.blockedOn; n.isPendingArc() {
+				n.runReadyParentTasks(attemptOnly)
+			}
+			// Running a parent task can itself resolve the wait.
 			if canUnblock(b) {
 				b.task.blockedOn.signal(c.autoUnblock)
 			}
@@ -727,6 +731,23 @@ func (s *scheduler) unblockTasks(deferred []taskBlock) []taskBlock {
 		}
 	}
 	return deferred
+}
+
+// isPendingArc reports whether s evaluates an arc whose type is ArcPending.
+func (s *scheduler) isPendingArc() bool {
+	return s.node != nil && s.node.node != nil && s.node.node.ArcType == ArcPending
+}
+
+// runReadyParentTasks runs the parent tasks of s which have not run yet,
+// including those registered while running them, and reports whether any ran.
+func (s *scheduler) runReadyParentTasks(mode runMode) (ran bool) {
+	for i := 0; i < len(s.parentTasks); i++ {
+		if t := s.parentTasks[i]; t.state == taskREADY {
+			runTask(t, mode)
+			ran = true
+		}
+	}
+	return ran
 }
 
 // releaseDeferred hands the waits held back by [scheduler.unblockTasks] to the

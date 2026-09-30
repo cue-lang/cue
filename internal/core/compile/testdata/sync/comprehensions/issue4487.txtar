@@ -4,8 +4,8 @@
 # field set.
 #
 # A guard reading a struct with a comprehension nested in another's body must
-# likewise see the field the inner comprehension declares. It instead reports
-# a cyclic reference to that field. https://cuelang.org/issue/4487
+# likewise see the field the inner comprehension declares.
+# https://cuelang.org/issue/4487
 -- in.cue --
 empty: {
 	q: {

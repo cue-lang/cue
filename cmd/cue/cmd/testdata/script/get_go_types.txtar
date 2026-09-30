@@ -115,7 +115,7 @@ type Foozer struct {
 	MapKeyInt         map[int]string
 	NamedMapKeyInt    MyIntMap
 	MapKeyNamedString map[MyString]MyString
-	MapKeyUnsupported map[float64]string
+	MapKeyUnsupported map[bool]string
 
 	OptionalOmitEmptyJSON string `json:"optionalOmitEmptyJSON,omitempty"`
 

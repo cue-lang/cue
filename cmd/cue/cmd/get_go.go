@@ -21,6 +21,7 @@ import (
 	"go/constant"
 	"go/token"
 	"go/types"
+	"maps"
 	"os"
 	"path"
 	"path/filepath"
@@ -109,11 +110,14 @@ Go structs are converted to cue structs adhering to the following conventions:
 
 	  When some of the promoted fields are hidden by other fields
 	  with the same name, the remaining ones are added individually.
+	  An "embed" option also promotes the fields of a named field,
+	  or holds any other object members in a map or jsontext.Value.
 
-	- a type that implements MarshalJSON, UnmarshalJSON, MarshalYAML, or
-	  UnmarshalYAML is translated to top (_) to indicate it may be any
-	  value. For some Go core types for which the implementation of these
-	  methods is known, like time.Time, the type may be more specific.
+	- a type that implements MarshalJSON, UnmarshalJSON, MarshalJSONTo,
+	  UnmarshalJSONFrom, MarshalYAML, or UnmarshalYAML is translated to
+	  top (_) to indicate it may be any value. For some Go core types for
+	  which the implementation of these methods is known, like time.Time,
+	  the type may be more specific.
 
 	- a type implementing MarshalText or UnmarshalText is represented as
 	  the CUE type string
@@ -125,8 +129,8 @@ Go structs are converted to cue structs adhering to the following conventions:
 
 	- Maps translate to a CUE struct, where all elements are constrained to
 	  be of Go map element type. Like for JSON, map keys must be strings,
-	  integers, or types implementing MarshalText or UnmarshalText, and are
-	  all translated to string labels.
+	  integers, floats, or types implementing MarshalText or UnmarshalText,
+	  and are all translated to string labels.
 
 	- Pointers translate to a sum type with the default value of null and
 	  the Go type as an alternative value.
@@ -965,6 +969,10 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 			return e.ident("_", false)
 		}
 	}
+	if name := jsontextMethod(typ); name != "" {
+		e.logf("    %v has method %s; setting type to _", shortTypeName(typ), name)
+		return e.ident("_", false)
+	}
 	for _, iface := range toString {
 		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
 			t := shortTypeName(typ)
@@ -973,6 +981,39 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 		}
 	}
 	return nil
+}
+
+// jsontextMethod returns the name of the method of typ or *typ implementing
+// json.MarshalerTo or json.UnmarshalerFrom, added in Go 1.27, if any.
+// Those interfaces use types from encoding/json/jsontext, which may not
+// be available to us, so we cannot construct them like [toTop].
+func jsontextMethod(typ types.Type) string {
+	for _, m := range []struct{ name, param string }{
+		{"MarshalJSONTo", "Encoder"},
+		{"UnmarshalJSONFrom", "Decoder"},
+	} {
+		for _, t := range []types.Type{typ, types.NewPointer(typ)} {
+			sel := types.NewMethodSet(t).Lookup(nil, m.name)
+			if sel == nil {
+				continue
+			}
+			sig := sel.Obj().(*types.Func).Signature()
+			if sig.Params().Len() != 1 || sig.Results().Len() != 1 ||
+				!types.Identical(sig.Results().At(0).Type(), typeError) {
+				continue
+			}
+			p, ok := sig.Params().At(0).Type().(*types.Pointer)
+			if !ok {
+				continue
+			}
+			n, ok := p.Elem().(*types.Named)
+			if ok && n.Obj().Pkg() != nil && n.Obj().Pkg().Path() == "encoding/json/jsontext" &&
+				n.Obj().Name() == m.param {
+				return m.name
+			}
+		}
+	}
+	return ""
 }
 
 func addDoc(g *ast.CommentGroup, x cueast.Node) {
@@ -1120,9 +1161,13 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type) (ok bool) {
 // supportedMapKey reports whether a map key type is supported by
 // encoding/json: strings, integers, and types implementing
 // encoding.TextMarshaler or encoding.TextUnmarshaler.
+// Go 1.27 also added floats, and interfaces holding any of those.
 // All are encoded as string labels in CUE.
 func supportedMapKey(t types.Type) bool {
-	if b, ok := t.Underlying().(*types.Basic); ok && b.Info()&(types.IsString|types.IsInteger) != 0 {
+	if b, ok := t.Underlying().(*types.Basic); ok && b.Info()&(types.IsString|types.IsInteger|types.IsFloat) != 0 {
+		return true
+	}
+	if i, ok := t.Underlying().(*types.Interface); ok && i.Empty() {
 		return true
 	}
 	ptr := types.NewPointer(t)
@@ -1518,14 +1563,15 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 			fields, isStruct := typ.Underlying().(*types.Struct)
 			named, isNamed := types.Unalias(typ).(*types.Named)
 			switch {
-			case isNamed && !isStruct:
-				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
-				if len(st.Elts) > 0 {
-					cueast.SetRelPos(embed, cuetoken.NewSection)
-				}
-				add(embed)
 			case !isStruct:
-				e.logf("    Dropped embedded field %v for unsupported type %v", f.Name(), f.Type())
+				switch {
+				case index == enc.fallback:
+					add(e.makeFallback(typ, enc.names))
+				case isFallback(typ):
+					e.logf("    Dropped embedded field %v as another holds any other object members", f.Name())
+				default:
+					e.logf("    Dropped embedded field %v for unsupported type %v", f.Name(), f.Type())
+				}
 			case isNamed && !viaNilable && !viaPointer && e.canReference(named) && e.embedsAsIs(fields, index+".", enc):
 				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
 				if len(st.Elts) > 0 {
@@ -1664,10 +1710,17 @@ type structEncoding struct {
 	// names holds the names of the encoded fields,
 	// keyed by their dot-separated index paths.
 	names map[string]string
+
+	// fallback is the index path of the embedded field which holds
+	// any other object members, if any.
+	fallback string
 }
 
 // within reports whether any encoded field is at the index path prefix.
 func (enc *structEncoding) within(prefix string) bool {
+	if strings.HasPrefix(enc.fallback, prefix) {
+		return true
+	}
 	for index := range enc.names {
 		if strings.HasPrefix(index, prefix) {
 			return true
@@ -1678,9 +1731,13 @@ func (enc *structEncoding) within(prefix string) bool {
 
 // embedsAsIs reports whether x, found at the index path prefix,
 // can be embedded as its own definition: when all of the fields
-// that x encodes on its own are also encoded at the prefix.
+// that x encodes on its own are also encoded at the prefix,
+// and x has no fallback, which would constrain the other fields.
 func (e *extractor) embedsAsIs(x *types.Struct, prefix string, enc *structEncoding) bool {
 	sub := e.structEncoding(x)
+	if sub.fallback != "" {
+		return false
+	}
 	for index := range sub.names {
 		if _, ok := enc.names[prefix+index]; !ok {
 			return false
@@ -1692,7 +1749,7 @@ func (e *extractor) embedsAsIs(x *types.Struct, prefix string, enc *structEncodi
 // structEncoding returns which fields of x are encoded.
 // A field hides deeper fields with the same name. Of multiple fields with
 // the same name at the same depth, a single one named by a tag hides the rest,
-// or else they are all dropped.
+// or else they are all dropped. Fallbacks follow the same rules by depth.
 func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 	type field struct {
 		name   string
@@ -1704,7 +1761,7 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 		x     *types.Struct
 		index string
 	}
-	var fields []field
+	var fields, fallbacks []field
 	next := []embedding{{x, ""}}
 	nextCount := map[*types.Struct]int{x: 1}
 	visited := map[*types.Struct]bool{}
@@ -1730,7 +1787,12 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 					}
 					x, ok := typ.Underlying().(*types.Struct)
 					if !ok {
-						continue // e.g. a YAML inline map
+						if isFallback(typ) {
+							for range copies {
+								fallbacks = append(fallbacks, field{index: index, depth: depth})
+							}
+						}
+						continue
 					}
 					nextCount[x]++
 					if nextCount[x] == 1 {
@@ -1770,18 +1832,61 @@ func (e *extractor) structEncoding(x *types.Struct) *structEncoding {
 			enc.names[fs[0].index] = fs[0].name
 		}
 	}
+	if len(fallbacks) == 1 || (len(fallbacks) > 1 && fallbacks[0].depth != fallbacks[1].depth) {
+		enc.fallback = fallbacks[0].index
+	}
 	return enc
+}
+
+// isFallback reports whether an embedded field of type typ can hold
+// the object members not encoded by any of the other fields.
+func isFallback(typ types.Type) bool {
+	if isJSONTextValue(typ) {
+		return true
+	}
+	m, ok := typ.Underlying().(*types.Map)
+	return ok && isStringKind(m.Key())
+}
+
+// makeFallback returns the CUE declaration for an embedded field of type typ,
+// which must satisfy [isFallback], given the fields that are encoded.
+func (e *extractor) makeFallback(typ types.Type, encoded map[string]string) cueast.Decl {
+	if isJSONTextValue(typ) {
+		return &cueast.Ellipsis{}
+	}
+	m := typ.Underlying().(*types.Map)
+	names := slices.Sorted(maps.Values(encoded))
+	var label cueast.Expr = e.ident("string", false)
+	if len(names) > 0 {
+		var exprs []cueast.Expr
+		for _, name := range names {
+			exprs = append(exprs, &cueast.UnaryExpr{Op: cuetoken.NEQ, X: cueast.NewString(name)})
+		}
+		label = cueast.NewBinExpr(cuetoken.AND, exprs...)
+	}
+	return &cueast.Field{
+		Label: cueast.NewList(label),
+		Value: e.makeType(m.Elem(), regular, e.fieldAttributesFromType(m.Elem())),
+	}
+}
+
+func isStringKind(t types.Type) bool {
+	b, ok := t.Underlying().(*types.Basic)
+	return ok && b.Info()&types.IsString != 0
+}
+
+func isJSONTextValue(t types.Type) bool {
+	n, ok := types.Unalias(t).(*types.Named)
+	return ok && n.Obj().Pkg() != nil &&
+		n.Obj().Pkg().Path() == "encoding/json/jsontext" && n.Obj().Name() == "Value"
 }
 
 // isEmbedded reports whether the governing codec promotes the fields of f,
 // with the given struct tag, into its parent struct.
 func (e *extractor) isEmbedded(f *types.Var, tag string) bool {
-	if !f.Anonymous() {
-		return false
-	}
 	codec, name := e.fieldCodec(tag)
 	if codec.inlineOption {
-		return hasFlag(tag, codec.tagKey, "inline", 1)
+		return f.Anonymous() && hasFlag(tag, codec.tagKey, "inline", 1)
 	}
 	// Like encoding/json, promote the fields of an embedded struct
 	// or pointer to struct, unless the tag gives it a name.
@@ -1792,8 +1897,17 @@ func (e *extractor) isEmbedded(f *types.Var, tag string) bool {
 	if p, ok := typ.(*types.Pointer); ok {
 		typ = p.Elem()
 	}
-	_, ok := typ.Underlying().(*types.Struct)
-	return ok
+	_, isStruct := typ.Underlying().(*types.Struct)
+	if f.Anonymous() && isStruct {
+		return true
+	}
+	// Go 1.27 added the "embed" option to encoding/json, which does the same
+	// for any exported field, and also allows a map with string keys or
+	// a jsontext.Value to hold the object members not encoded by other fields.
+	if !f.Exported() || !hasFlag(tag, codec.tagKey, "embed", 1) {
+		return false
+	}
+	return isStruct || isFallback(typ)
 }
 
 func (e *extractor) fieldAttributesFromType(f types.Type) (attrs fieldAttributes) {

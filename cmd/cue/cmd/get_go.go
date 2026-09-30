@@ -87,9 +87,11 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  the tag search.
 
 	- the tag found for a field also decides how it is encoded: the field
-	  is optional if the tag has an "omitempty" or "omitzero" option, and
-	  a pointer field is not nullable if it is a "toml" tag, as TOML has no
-	  null. Fields without any such tag follow the first codec.
+	  is optional if the tag has an "omitempty" or "omitzero" option,
+	  a "json" tag with a "string" option encodes a boolean, number, or
+	  string as a string, and a pointer field is not nullable if it is a
+	  "toml" tag, as TOML has no null. Fields without any such tag follow
+	  the first codec.
 
 	- the fields of an embedded struct, or pointer to struct, are promoted
 	  like encoding/json does, unless the tag found for it gives a name.
@@ -312,12 +314,16 @@ type codec struct {
 
 	// noNull is whether the encoding has no null value.
 	noNull bool
+
+	// stringOption is whether a "string" tag option encodes
+	// a boolean, number, or string as a string.
+	stringOption bool
 }
 
 // knownCodecs lists the codecs with semantics other than
 // those of encoding/json, which any other struct tag key follows.
 var knownCodecs = []*codec{
-	{name: "json", tagKey: "json"},
+	{name: "json", tagKey: "json", stringOption: true},
 	// YAML libraries such as gopkg.in/yaml.v3.
 	{name: "yaml", tagKey: "yaml", inlineOption: true},
 	// TOML libraries such as github.com/BurntSushi/toml.
@@ -1615,6 +1621,14 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 		field, cueType := e.makeField(name, regular, attrs, f.Type(), doc, count > 0)
 		add(field)
 
+		if e.isStringified(f.Type(), tag, codec) {
+			field.Value = e.ident("string", false)
+			if attrs&nullable != 0 {
+				field.Value = cueast.NewBinExpr(cuetoken.OR, cueast.NewNull(), field.Value)
+			}
+			cueType = "string"
+		}
+
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
 			expr, err := parser.ParseExpr("get go", s)
 			if err != nil {
@@ -1879,6 +1893,22 @@ func isJSONTextValue(t types.Type) bool {
 	n, ok := types.Unalias(t).(*types.Named)
 	return ok && n.Obj().Pkg() != nil &&
 		n.Obj().Pkg().Path() == "encoding/json/jsontext" && n.Obj().Name() == "Value"
+}
+
+// isStringified reports whether a field of type typ with the given tag
+// is encoded as a string due to a "string" tag option.
+func (e *extractor) isStringified(typ types.Type, tag string, codec *codec) bool {
+	if !codec.stringOption || !hasFlag(tag, codec.tagKey, "string", 1) {
+		return false
+	}
+	if p, ok := typ.(*types.Pointer); ok {
+		typ = p.Elem()
+	}
+	if e.altType(typ) != nil {
+		return false // encoded via its own methods
+	}
+	b, ok := typ.Underlying().(*types.Basic)
+	return ok && b.Info()&(types.IsBoolean|types.IsNumeric|types.IsString) != 0
 }
 
 // isEmbedded reports whether the governing codec promotes the fields of f,

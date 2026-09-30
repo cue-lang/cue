@@ -912,11 +912,8 @@ issue4015: full: {
 			bar: barField: "x"
 		}
 
-		// This one is rather confusing, but true. Note that this should no
-		// longer hold if this is converted to the explicitopen semantics, in
-		// which case #Schema applies "monotonically" limiting to its fields.
-		@test(allows, string)
-		@test(allows:todo=false, string, hint="for explicit open")
+		// The ellipsis in #MoreCapacity does not open #Schema.
+		@test(allows=false, string)
 		@test(closed)
 	}
 

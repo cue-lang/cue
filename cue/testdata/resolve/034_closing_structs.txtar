@@ -10,12 +10,12 @@ opcp: op & cp @test(eq, {x: int}) @test(closed) @test(allows=false, string)
 cpop: cp & op @test(eq, {x: int}) @test(closed) @test(allows=false, string)
 opct: op & ct @test(eq, {x: int}) @test(closed) @test(allows, string)
 ctop: ct & op @test(eq, {x: int}) @test(closed) @test(allows, string)
-otcp: ot & cp @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
-cpot: cp & ot @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
+otcp: ot & cp @test(eq, {x: int}) @test(closed) @test(allows=false, string)
+cpot: cp & ot @test(eq, {x: int}) @test(closed) @test(allows=false, string)
 otct: ot & ct @test(eq, {x: int}) @test(closed) @test(allows, string)
 ctot: ct & ot @test(eq, {x: int}) @test(closed) @test(allows, string)
-cpct: cp & ct @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
-ctcp: ct & cp @test(eq, {x: int}) @test(closed) @test(allows, string) @test(allows:todo=false, string)
+cpct: cp & ct @test(eq, {x: int}) @test(closed) @test(allows=false, string)
+ctcp: ct & cp @test(eq, {x: int}) @test(closed) @test(allows=false, string)
 ctct: ct & ct @test(eq, {x: int}) @test(closed) @test(shareID=ctct) @test(allows, string)
 
 // An ellipsis only opens the struct it is part of, also below the top level.
@@ -24,13 +24,13 @@ nested: {
 	#ct: a: {x: int, ...}
 
 	otcp: #cp
-	otcp: a: {...} @test(allows, string) @test(allows:todo=false, string)
+	otcp: a: {...} @test(allows=false, string)
 	opct: #ct
 	opct: a: {x: 1} @test(allows, string)
 	otct: #ct
 	otct: a: {...} @test(allows, string)
 	cpct: #cp & #ct
-	cpct: a: _ @test(allows, string) @test(allows:todo=false, string)
+	cpct: a: _ @test(allows=false, string)
 }
 -- out/eval/stats --
 Leaks:  0
@@ -46,4 +46,3 @@ Disjuncts:    0
 NumCloseIDs: 38
 -- out/todo.txt --
 ctct: v2 evaluator expands ctct to a full struct; v3 shares the vertex with ct.
-Note that the output of Allows is incorrect for various cases.

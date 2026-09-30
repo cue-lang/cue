@@ -204,6 +204,8 @@ type Vertex struct {
 	OpenedShared bool
 
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
+	// Until the Vertex is typo checked, it is set if any conjunct has an
+	// ellipsis, even if another conjunct closes the Vertex regardless.
 	// TODO: combine this field with Closed once we removed the old evaluator.
 	HasEllipsis bool
 

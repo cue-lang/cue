@@ -491,9 +491,6 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		}
 		// NOTE: setting ClosedNonRecursive is not necessary, as it is
 		// handled by scheduleValue.
-		if w.HasEllipsis {
-			v.HasEllipsis = true
-		}
 
 		v.status = w.status
 
@@ -518,6 +515,9 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		// Ensure that shared nodes comply to the same requirements as we
 		// need for the current node.
 		w.unify(c, Flags{condition: needs, mode: mode, checkTypos: checkTypos})
+
+		// Copy HasEllipsis once w had the chance to clear it.
+		v.HasEllipsis = w.HasEllipsis
 
 		return true
 	}
@@ -572,6 +572,9 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 
 	if checkTypos {
 		n.checkTypos()
+		if n.node.HasEllipsis && !n.openByEllipsis() {
+			n.node.HasEllipsis = false
+		}
 	}
 
 	// After this we no longer need the defIDs of the conjuncts. By clearing

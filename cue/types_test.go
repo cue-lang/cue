@@ -1885,32 +1885,28 @@ func TestAllows(t *testing.T) {
 		x: {...} & #Def
 		#Def: a: int
 		`,
-		sel:   cue.Str("b"),
-		allow: true, // TODO: should be disallowed
+		sel: cue.Str("b"),
 	}, {
 		desc: "disallow new field in open struct with definition",
 		in: `
 		x: #Def & {...}
 		#Def: a: int
 		`,
-		sel:   cue.Str("b"),
-		allow: true, // TODO: should be disallowed
+		sel: cue.Str("b"),
 	}, {
 		desc: "disallow any field in definition with open struct",
 		in: `
 		x: #Def & {...}
 		#Def: a: int
 		`,
-		sel:   cue.AnyString,
-		allow: true, // TODO: should be disallowed
+		sel: cue.AnyString,
 	}, {
 		desc: "disallow new field in closed struct with open definition",
 		in: `
 		x: #Def & close({a: int})
 		#Def: {a: int, ...}
 		`,
-		sel:   cue.Str("b"),
-		allow: true, // TODO: should be disallowed
+		sel: cue.Str("b"),
 	}, {
 		desc: "disallow new field in reference to definition with open struct",
 		in: `
@@ -1918,8 +1914,7 @@ func TestAllows(t *testing.T) {
 		y: #Def & {...}
 		#Def: a: int
 		`,
-		sel:   cue.Str("b"),
-		allow: true, // TODO: should be disallowed
+		sel: cue.Str("b"),
 	}, {
 		desc: "disallow new field in unevaluated reference to definition with open struct",
 		in: `
@@ -1929,8 +1924,7 @@ func TestAllows(t *testing.T) {
 		y: #Def & {...}
 		#Def: a: int
 		`,
-		sel:   cue.Str("b"),
-		allow: true, // TODO: should be disallowed
+		sel: cue.Str("b"),
 	}, {
 		desc: "allow new field in open definition",
 		in: `
@@ -2385,7 +2379,7 @@ func TestSubsume(t *testing.T) {
 		`,
 		pathA: a,
 		pathB: b,
-		want:  true, // TODO: should be false
+		want:  false,
 	}, {
 		// Issue #566
 		// Closed struct subsuming open struct.

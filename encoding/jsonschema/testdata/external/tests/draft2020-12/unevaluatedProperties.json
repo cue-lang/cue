@@ -203,10 +203,7 @@
 					"bar": "bar",
 					"baz": "baz"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -247,10 +244,7 @@
 					"bar": "bar",
 					"baz": "baz"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -919,10 +913,7 @@
 					"bar": "bar",
 					"baz": "baz"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -964,10 +955,7 @@
 					"bar": "bar",
 					"baz": "baz"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1192,10 +1180,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1230,10 +1215,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

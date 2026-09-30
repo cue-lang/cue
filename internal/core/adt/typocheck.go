@@ -1184,10 +1184,39 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 	})
 }
 
+// openByEllipsis reports whether n admits fields which none of its conjuncts
+// declare. An ellipsis only opens the struct or definition it is part of, so
+// this requires each typo-checked struct of n to be opened by one.
+func (n *nodeContext) openByEllipsis() bool {
+	// A vertex which is not closed admits any field without an ellipsis.
+	if v := n.node; n.ctx.OpenDef || !(v.ClosedRecursive || v.ClosedNonRecursive) {
+		return true
+	}
+	required := getReqSets(n)
+	if !slices.ContainsFunc(required, func(a reqSet) bool {
+		return !a.ignored && !a.removed
+	}) {
+		return true
+	}
+	// As in checkTypos, but without marking the sets shared with the arcs.
+	// The copy rarely has more than a few sets, and it stays on the stack
+	// as long as it is not ranged over via elemPtrs.
+	var buf [8]reqSet
+	required = append(buf[:0], required...)
+	for i := range required {
+		if hasParentEllipsis(n, &required[i], n.conjunctInfo) != 0 {
+			required[i].removed = true
+		}
+	}
+	// The zero conjunctInfo stands for a field added from outside of any
+	// definition or embedding.
+	return n.hasEvidenceForAll(required, []conjunctInfo{{}})
+}
+
 // hasParentEllipsis reports if the parent has any conjuncts from an ellipsis
 // matching any of the ids in a.
 //
-// TODO: this is currently called twice. Consider an approach where we only need
+// TODO: this is currently called thrice. Consider an approach where we only need
 // to filter this once for each node. Luckily we can avoid quadratic checks
 // for any conjunct that is not an ellipsis, which is most.
 func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) defID {

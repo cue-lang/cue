@@ -12,6 +12,11 @@ cmp decls/p_go_gen.cue decls/p_go_gen_json.cue.golden
 exec cue get go --local --codec=jsonv2 ./decls
 cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 
+# The jsonv2 codec does not apply to structs with only YAML tags.
+# Its rules for time.Duration apply to every struct, dropping T.
+exec cue get go --local --codec=jsonv2,yaml ./yamldecls
+! exists yamldecls/p_go_gen.cue
+
 # Marshal via Go's encoding/json/v2 and validate with the generated CUE schema.
 exec go run ./marshal
 cmp stdout go_marshal.json
@@ -270,4 +275,12 @@ import "time"
 	Misspelled:  #Misspelled
 	Format:      #Format
 	EmbeddedInt: #EmbeddedInt
+}
+-- yamldecls/p.go --
+package yamldecls
+
+import "time"
+
+type T struct {
+	D time.Duration `yaml:"d"`
 }

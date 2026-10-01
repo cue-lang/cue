@@ -7,7 +7,9 @@ cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 # Marshal via Go's encoding/json and validate with the generated CUE schema.
 exec go run ./marshal
 cmp stdout go_marshal.json
-exec cue vet -c schema.cue go_marshal.json
+# The schema rejects the fields of ConflictingMethods, which it embeds as top.
+! exec cue vet -c schema.cue go_marshal.json
+stderr 'ConflictingMethods.kind: field not allowed'
 
 -- schema.cue --
 package schema
@@ -145,6 +147,25 @@ type Mutual2 struct {
 	Y int `json:"y"`
 }
 
+type Marshaler1 struct {
+	Kind string `json:"kind"`
+}
+
+func (Marshaler1) MarshalJSON() ([]byte, error) { return []byte(`"1"`), nil }
+
+type Marshaler2 struct {
+	Value string `json:"value"`
+}
+
+func (Marshaler2) MarshalJSON() ([]byte, error) { return []byte(`"2"`), nil }
+
+// ConflictingMethods has the fields of both embedded structs, as their
+// MarshalJSON methods conflict at the same depth, so neither is promoted.
+type ConflictingMethods struct {
+	Marshaler1
+	Marshaler2
+}
+
 type Root struct {
 	Untagged   Untagged
 	EmptyTag   EmptyTag
@@ -161,7 +182,8 @@ type Root struct {
 	Recursive  Recursive
 	Mutual     Mutual1
 
-	ObjectShadowed ObjectShadowed
+	ObjectShadowed     ObjectShadowed
+	ConflictingMethods ConflictingMethods
 }
 -- marshal/main.go --
 package main
@@ -195,6 +217,10 @@ func main() {
 		Mutual:     decls.Mutual1{Mutual2: &decls.Mutual2{Y: 2}, X: 1},
 
 		ObjectShadowed: decls.ObjectShadowed{Kind: 3},
+		ConflictingMethods: decls.ConflictingMethods{
+			Marshaler1: decls.Marshaler1{Kind: "k"},
+			Marshaler2: decls.Marshaler2{Value: "v"},
+		},
 	}
 	// Mimic the formatting of `cue export` to be able to compare bytes.
 	data, err := json.MarshalIndent(r, "", "    ")
@@ -267,6 +293,10 @@ func main() {
             "phase": ""
         },
         "kind": 3
+    },
+    "ConflictingMethods": {
+        "kind": "k",
+        "value": "v"
     }
 }
 -- decls/p_go_gen.cue.golden --
@@ -358,20 +388,33 @@ _#inner: hidden: string @go(Hidden)
 	y:  int @go(Y)
 }
 
+#Marshaler1: _
+
+#Marshaler2: _
+
+// ConflictingMethods has the fields of both embedded structs, as their
+// MarshalJSON methods conflict at the same depth, so neither is promoted.
+#ConflictingMethods: {
+	#Marshaler1
+
+	#Marshaler2
+}
+
 #Root: {
-	Untagged:       #Untagged
-	EmptyTag:       #EmptyTag
-	Inline:         #Inline
-	OmitEmpty:      #OmitEmpty
-	Named:          #Named
-	Ignored:        #Ignored
-	Pointer:        #Pointer
-	PointerNil:     #Pointer
-	NonStruct:      #NonStruct
-	Unexported:     #Unexported
-	Shadowed:       #Shadowed
-	Ambiguous:      #Ambiguous
-	Recursive:      #Recursive
-	Mutual:         #Mutual1
-	ObjectShadowed: #ObjectShadowed
+	Untagged:           #Untagged
+	EmptyTag:           #EmptyTag
+	Inline:             #Inline
+	OmitEmpty:          #OmitEmpty
+	Named:              #Named
+	Ignored:            #Ignored
+	Pointer:            #Pointer
+	PointerNil:         #Pointer
+	NonStruct:          #NonStruct
+	Unexported:         #Unexported
+	Shadowed:           #Shadowed
+	Ambiguous:          #Ambiguous
+	Recursive:          #Recursive
+	Mutual:             #Mutual1
+	ObjectShadowed:     #ObjectShadowed
+	ConflictingMethods: #ConflictingMethods
 }

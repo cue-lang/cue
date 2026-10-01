@@ -40,7 +40,7 @@ a:
 (x)!: "foo"
 
 // (k4) refers to the outer k4, past the quoted "k4" in v, so those
-// quotes must stay. TODO: they are removed.
+// quotes must stay.
 nestedLabelRefs: {
     k4: "d"
     v: {
@@ -103,14 +103,16 @@ y: {
 labelRefs: {
     k1: "a"
     k2: "b"
+    k3: "c"
     v: {
         // Label expressions reference fields in this scope, so these
-        // quotes must stay. TODO: they are removed, changing what the
-        // label expressions refer to.
+        // quotes must stay.
         "k1": "x"
         (k1): 1
         "k2": "y"
         "\(k2)z": 2
+        "k3": "z"
+        [k3]: string
     }
 }
 -- out/format/simplify.golden --
@@ -151,11 +153,11 @@ quux: 5
 (x)!: "foo"
 
 // (k4) refers to the outer k4, past the quoted "k4" in v, so those
-// quotes must stay. TODO: they are removed.
+// quotes must stay.
 nestedLabelRefs: {
 	k4: "d"
 	v: {
-		k4: "w"
+		"k4": "w"
 		nested: (k4): 3
 	}
 }
@@ -212,13 +214,15 @@ y: {
 labelRefs: {
 	k1: "a"
 	k2: "b"
+	k3: "c"
 	v: {
 		// Label expressions reference fields in this scope, so these
-		// quotes must stay. TODO: they are removed, changing what the
-		// label expressions refer to.
-		k1:       "x"
+		// quotes must stay.
+		"k1":     "x"
 		(k1):     1
-		k2:       "y"
+		"k2":     "y"
 		"\(k2)z": 2
+		"k3":     "z"
+		[k3]:     string
 	}
 }

@@ -77,18 +77,40 @@ func (s *labelSimplifier) markReferences(n ast.Node) bool {
 		return false
 
 	case *ast.Ident:
-		// We walk outwards through enclosing scopes and invalidate the
-		// candidate in the innermost scope that has this name. Outer
-		// scopes that happen to also use the name stay valid (shadowing
-		// semantics).
-		for c := s; c != nil; c = c.parent {
-			if _, ok := c.scope[x.Name]; ok {
-				c.scope[x.Name] = false
-				break
-			}
-		}
+		s.markReference(x)
 	}
 	return true
+}
+
+// markLabelReferences is the reference visitor for label expressions
+// such as `(x)`, `[x]`, or `"\(x)"`, which resolve references in the
+// scope of the field they label. Unlike [labelSimplifier.markReferences],
+// it does not process any struct within the label as a scope of its own,
+// so it leaves the struct's labels alone and treats each identifier in it
+// as a reference.
+func (s *labelSimplifier) markLabelReferences(n ast.Node) bool {
+	switch x := n.(type) {
+	case *ast.SelectorExpr:
+		ast.Walk(x.X, s.markLabelReferences, nil)
+		return false
+
+	case *ast.Ident:
+		s.markReference(x)
+	}
+	return true
+}
+
+// markReference invalidates the candidate for a referenced name. We walk
+// outwards through enclosing scopes and invalidate the candidate in the
+// innermost scope that has this name. Outer scopes that happen to also
+// use the name stay valid (shadowing semantics).
+func (s *labelSimplifier) markReference(x *ast.Ident) {
+	for c := s; c != nil; c = c.parent {
+		if _, ok := c.scope[x.Name]; ok {
+			c.scope[x.Name] = false
+			break
+		}
+	}
 }
 
 // processDecls runs the three sub-passes we apply to one body.
@@ -103,10 +125,18 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 		}
 	}
 
-	// Sub-pass 2: collect references from values.
+	// Sub-pass 2: collect references from values and label expressions.
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
+			var label ast.Node = x.Label
+			if a, ok := label.(*ast.Alias); ok {
+				label = a.Expr
+			}
+			// An identifier label is not a reference to itself.
+			if _, ok := label.(*ast.Ident); !ok {
+				ast.Walk(label, sc.markLabelReferences, nil)
+			}
 			ast.Walk(x.Value, sc.markReferences, nil)
 		default:
 			ast.Walk(x, sc.markReferences, nil)
@@ -138,9 +168,10 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 }
 
 // markStrings walks a label subtree, recording every unquotable string
-// and every identifier as a candidate for the current scope. ListLit
-// and Interpolation labels (pattern constraints, interpolated strings)
-// are not candidates, so we stop the walk there.
+// and every identifier as a candidate for the current scope. ListLit,
+// Interpolation, and ParenExpr labels (pattern constraints, interpolated
+// strings, dynamic labels) are not candidates, and the identifiers in
+// them are references, so we stop the walk there.
 func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.BasicLit:
@@ -153,7 +184,7 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	case *ast.Ident:
 		s.scope[x.Name] = true
 
-	case *ast.ListLit, *ast.Interpolation:
+	case *ast.ListLit, *ast.Interpolation, *ast.ParenExpr:
 		return false
 	}
 	return true

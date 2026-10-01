@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 )
 
 func (e *exporter) bareValue(v adt.Value) ast.Expr {
@@ -351,7 +352,12 @@ func (e *exporter) bytes(n *adt.Bytes, orig []adt.Conjunct) *ast.BasicLit {
 
 func (e *exporter) basicType(n *adt.BasicType) ast.Expr {
 	// TODO: allow multi-bit types?
-	return ast.NewIdent(n.K.String())
+	name := n.K.String()
+	if compile.Predeclared(name) != nil {
+		// Like a builtin, the type may be shadowed by a field.
+		return ast.NewPredeclared(name)
+	}
+	return ast.NewIdent(name)
 }
 
 func (e *exporter) boundValue(n *adt.BoundValue) ast.Expr {

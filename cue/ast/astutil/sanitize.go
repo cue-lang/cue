@@ -103,6 +103,7 @@ func sanitize(f *ast.File, names map[string]bool) error {
 		rand:           rand.New(rand.NewPCG(123, 456)), // ensure determinism between runs
 
 		names:      map[string]bool{},
+		pkgNames:   names,
 		importMap:  map[string]*ast.ImportSpec{},
 		referenced: map[ast.Node]bool{},
 		altMap:     map[ast.Node]string{},
@@ -156,7 +157,9 @@ type sanitizer struct {
 	rand *rand.Rand
 
 	// names is all used names. Can be used to determine a new unique name.
-	names      map[string]bool
+	names map[string]bool
+	// pkgNames holds the top-level field names of all files in the package.
+	pkgNames   map[string]bool
 	referenced map[ast.Node]bool
 
 	// altMap defines an alternative name for an existing entry link (a field,
@@ -293,7 +296,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		if n.IsPredeclared() {
 			// Check if the predeclared name is shadowed by a top-level field
 			// in another file of the same package.
-			if z.names[n.Name] {
+			if z.pkgNames[n.Name] {
 				n.Name = "__" + n.Name
 			}
 			n.Scope = nil

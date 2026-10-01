@@ -10,9 +10,8 @@ cmp stdout export.stdout
 exec cue def .
 cmp stdout def.stdout
 stdin stdout
-# TODO: this should succeed, and show output equivalent to the earlier export.
-! exec cue export -
-cmp stderr stderr-bug.golden
+exec cue export -
+cmp stdout def-export.stdout
 
 # Once the files share one scope, their aliases must not clash with names
 # declared at any depth of the other files.
@@ -29,15 +28,13 @@ exec cue def ./shadow
 cmp stdout shadow-def.stdout
 stdin stdout
 exec cue export -
-# TODO: outer.ref should be "top".
 cmp stdout shadow-def-export.stdout
 
 # A quoted label declares a field in scope as well.
 exec cue def ./quoted
 stdin stdout
-# TODO: this should succeed.
-! exec cue export -
-cmp stderr quoted-def-export.stderr
+exec cue export -
+cmp stdout quoted-def-export.stdout
 
 # A field shadows a predeclared identifier only in its own file.
 exec cue def ./predeclared
@@ -57,51 +54,36 @@ cmp stdout hidden-def-export.stdout
 -- def.stdout --
 package p
 
-let L = true
-let L_1 = false
-{
-	crossfile_alias: "referenced from sibling file"
-	"non ident"~(A): true
-	if A {
-		alias1_used: true
-	}
+let L_1 = true
+let L_2 = false
+crossfile_alias: "referenced from sibling file"
+"non ident"~(A): true
+if A {
+	alias1_used: true
 }
 
-{
+"another non ident"~(A_1): false
+crossfile_alias_ref:       crossfile_alias
+alias2_mark_used:          A_1
 
-	"another non ident"~(A): false
-	crossfile_alias_ref:     crossfile_alias
-	alias2_mark_used:        A
+"third non ident"~(A_2):    3
+"fourth non ident"~(A_1_1): 4
+alias3_mark_used:           [A_2, A_1_1]
+
+"let non ident"~(L):                    "alias"
+"field non ident"~(crossfile_simple_1): "alias"
+alias4_mark_used:                       [L, crossfile_simple_1]
+crossfile_let:                          "referenced from sibling file"
+if L_1 {
+	let1_used: true
 }
-
-{
-
-	"third non ident"~(A):    3
-	"fourth non ident"~(A_1): 4
-	alias3_mark_used:         [A, A_1]
-}
-
-{
-
-	"let non ident"~(L):                  "alias"
-	"field non ident"~(crossfile_simple): "alias"
-	alias4_mark_used:                     [L, crossfile_simple]
-}
-{
-	crossfile_let: "referenced from sibling file"
-	if L {
-		let1_used: true
-	}
-}
-{
-	crossfile_simple: true
-	if crossfile_simple {
-		simple1_used: true
-	}
+crossfile_simple: true
+if crossfile_simple {
+	simple1_used: true
 }
 crossfile_let_ref:    crossfile_let
 crossfile_simple_ref: crossfile_simple
-let2_mark_used:       L_1
+let2_mark_used:       L_2
 -- export.stdout --
 {
     "another non ident": false,
@@ -130,13 +112,34 @@ let2_mark_used:       L_1
         4
     ]
 }
--- stderr-bug.golden --
-crossfile_alias_ref: reference "crossfile_alias" not found:
-    -:16:27
-crossfile_let_ref: reference "crossfile_let" not found:
-    -:45:23
-crossfile_simple_ref: reference "crossfile_simple" not found:
-    -:46:23
+-- def-export.stdout --
+{
+    "alias1_used": true,
+    "let1_used": true,
+    "simple1_used": true,
+    "crossfile_alias": "referenced from sibling file",
+    "non ident": true,
+    "another non ident": false,
+    "crossfile_alias_ref": "referenced from sibling file",
+    "alias2_mark_used": false,
+    "third non ident": 3,
+    "fourth non ident": 4,
+    "alias3_mark_used": [
+        3,
+        4
+    ],
+    "let non ident": "alias",
+    "field non ident": "alias",
+    "alias4_mark_used": [
+        "alias",
+        "alias"
+    ],
+    "crossfile_let": "referenced from sibling file",
+    "crossfile_simple": true,
+    "crossfile_let_ref": "referenced from sibling file",
+    "crossfile_simple_ref": true,
+    "let2_mark_used": false
+}
 -- simple_1.cue --
 package p
 
@@ -215,34 +218,29 @@ let2_mark_used: L
 -- nested-def.stdout --
 package nested
 
-{
-
-	"alias a"~(A): 1
-	"alias b"~(B): 2
-	"alias c"~(C): 3
-	alias_refs:    [A, B, C]
+"alias a"~(A_1): 1
+"alias b"~(B_1): 2
+"alias c"~(C_1): 3
+alias_refs:      [A_1, B_1, C_1]
+field:           "top"
+if true {
+	field_comprehension: true
 }
-{
-	field: "top"
-	if true {
-		field_comprehension: true
-	}
+nested_field: A: "a"
+if true {
+	B: "b"
 }
-{
-	nested_field: A: "a"
-	if true {
-		B: "b"
-	}
-	for_var: [for C in [1] {
-		C
-	}]
-}
+for_var: [for C in [1] {
+	C
+}]
 nested_alias: {
-	"alias field"~(field): "nested"
-	ref:                   field
+	"alias field"~(field_1): "nested"
+	ref:                     field_1
 }
 -- nested-def-export.stdout --
 {
+    "field_comprehension": true,
+    "B": "b",
     "alias a": 1,
     "alias b": 2,
     "alias c": 3,
@@ -252,8 +250,6 @@ nested_alias: {
         3
     ],
     "field": "top",
-    "field_comprehension": true,
-    "B": "b",
     "nested_field": {
         "A": "a"
     },
@@ -268,57 +264,52 @@ nested_alias: {
 -- shadow-def.stdout --
 package shadow
 
-{
-	shadowed: "top"
-	if true {
-		comprehension: true
-	}
+shadowed~(shadowed_9): "top"
+if true {
+	comprehension: true
 }
 outer: {
 	shadowed: "nested"
-	ref:      shadowed
+	ref:      shadowed_9
 }
 -- shadow-def-export.stdout --
 {
-    "shadowed": "top",
     "comprehension": true,
+    "shadowed": "top",
     "outer": {
         "shadowed": "nested",
-        "ref": "nested"
+        "ref": "top"
     }
 }
--- quoted-def-export.stderr --
-explicit error (_|_ literal) in source:
-    -:17:1
+-- quoted-def-export.stdout --
+{
+    "alias a": 1,
+    "ref": 1,
+    "A": "quoted"
+}
 -- predeclared-def.stdout --
 package predeclared
 
-{
-	int: _
-	if true {
-		comprehension: true
-	}
+int: _
+if true {
+	comprehension: true
 }
-ref: int
+ref: __int
 -- hidden-def.stdout --
 package hidden
 
-{
-	alias~(_A): "alias"
-	alias_ref:  _A
+alias~(_A_1): "alias"
+alias_ref:    _A_1
+_A:           "field"
+if true {
+	comprehension: true
 }
-{
-	_A: "field"
-	if true {
-		comprehension: true
-	}
-	field_ref: _A
-}
+field_ref: _A
 -- hidden-def-export.stdout --
 {
+    "comprehension": true,
     "alias": "alias",
     "alias_ref": "alias",
-    "comprehension": true,
     "field_ref": "field"
 }
 -- nested/alias.cue --

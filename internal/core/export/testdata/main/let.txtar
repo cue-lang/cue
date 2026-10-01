@@ -135,14 +135,12 @@ unresolvedDisjunction: {
 let X = 1 + 1
 let Y = x
 let Y_1 = x
-{
-	cfgs: [for crd in ["one", "two"] {
-		metadata: name: crd
-	}]
-	for cfg in cfgs {
-		let filepath = "kind-\(cfg.name)"
-		files: "\(filepath)": patches: cfg
-	}
+cfgs: [for crd in ["one", "two"] {
+	metadata: name: crd
+}]
+for cfg in cfgs {
+	let filepath = "kind-\(cfg.name)"
+	files: "\(filepath)": patches: cfg
 }
 comprehension: {
 	for cfg in [{a: "one"}] {

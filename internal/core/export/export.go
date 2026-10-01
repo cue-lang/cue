@@ -15,6 +15,7 @@
 package export
 
 import (
+	"cmp"
 	"fmt"
 	"math/rand/v2"
 	"slices"
@@ -646,9 +647,9 @@ func (e *exporter) bindValueAlias(name string, value ast.Expr) ast.Expr {
 func (e *exporter) markLets(n ast.Node, scope *ast.StructLit) {
 	switch x := n.(type) {
 	case *ast.StructLit:
-		e.markLetDecls(x.Elts, scope)
+		e.markLetDecls(x.Elts, scope, false)
 	case *ast.File:
-		e.markLetDecls(x.Decls, scope)
+		e.markLetDecls(x.Decls, scope, true)
 	case *ast.ParenExpr:
 		e.markLets(x.X, scope)
 	case *ast.BinaryExpr:
@@ -659,11 +660,13 @@ func (e *exporter) markLets(n ast.Node, scope *ast.StructLit) {
 	}
 }
 
-func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit) {
+// markLetDecls marks the lets and field aliases of decls, which are those at
+// the top level of a file if topLevel is set, or those of a struct literal.
+func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit, topLevel bool) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			e.prepareAliasedField(x, scope)
+			e.prepareAliasedField(x, scope, topLevel)
 		case *ast.LetClause:
 			e.markLetAlias(x)
 		case *ast.EmbedDecl:
@@ -677,8 +680,9 @@ func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit) {
 // occurs earlier in a struct can already refer to it.
 //
 // It is assumed that the same alias names can be used. We rely on Sanitize
-// to do any renaming of aliases in case of shadowing.
-func (e *exporter) prepareAliasedField(f *ast.Field, scope ast.Node) {
+// to do any renaming of aliases in case of shadowing, except where files are
+// merged into one scope; see [exporter.fileAliasName].
+func (e *exporter) prepareAliasedField(f *ast.Field, scope ast.Node, topLevel bool) {
 	if _, ok := e.fieldAlias[f]; ok {
 		return
 	}
@@ -688,6 +692,12 @@ func (e *exporter) prepareAliasedField(f *ast.Field, scope ast.Node) {
 	if !ok || label == nil {
 		return // not aliased
 	}
+	// Only the aliases of fields with a fixed label are referenced via
+	// fieldAlias; the others are named as they are referenced.
+	switch label.(type) {
+	case *ast.Ident, *ast.BasicLit:
+		name = e.fileAliasName(topLevel, name)
+	}
 	field := &ast.Field{Label: label}
 	e.setValueAlias(field, name)
 
@@ -696,6 +706,40 @@ func (e *exporter) prepareAliasedField(f *ast.Field, scope ast.Node) {
 	}
 
 	e.fieldAlias[f] = fieldAndScope{field: field, scope: scope}
+}
+
+// mergesFiles reports whether a, the conjuncts of a struct, holds more than
+// one file.
+func mergesFiles(a []conjunct) bool {
+	n := 0
+	for _, c := range a {
+		if _, ok := c.c.Expr().Source().(*ast.File); ok {
+			n++
+		}
+	}
+	return n > 1
+}
+
+// fileAliasName returns the name to give an alias named name, which is at
+// the top level of a file if topLevel is set, or nested in one.
+//
+// An alias may not be named like a field, or any other declaration, in any
+// enclosing scope. Once files are merged into one scope, an alias at the top
+// level of a file is also in scope for the other files, so it is given a name
+// which is not used anywhere. A nested alias is renamed if it is named like a
+// field at the top level of the files.
+func (e *exporter) fileAliasName(topLevel bool, name string) string {
+	var merged *adt.Vertex
+	for i := len(e.stack) - 1; i >= 0; i-- {
+		if f := e.stack[i]; f.mergesFiles {
+			merged = f.node
+			break
+		}
+	}
+	if merged == nil || !topLevel && merged.Lookup(e.identFeature(name)) == nil {
+		return name
+	}
+	return e.uniqueAlias(name)
 }
 
 func (e *exporter) getFixedField(f *adt.Field) *ast.Field {
@@ -780,7 +824,7 @@ func (e *exporter) uniqueLetIdent(f adt.Feature, x adt.Expr) adt.Feature {
 }
 
 func (e *exporter) uniqueAlias(name string) string {
-	f := adt.MakeIdentLabel(e.ctx, name, "")
+	f := e.identFeature(name)
 
 	if _, ok := e.usedFeature[f]; !ok {
 		e.usedFeature[f] = nil
@@ -805,8 +849,14 @@ func (e *exporter) intn(n int) int {
 	return e.rand.IntN(n)
 }
 
+// identFeature returns the feature of an identifier named s, which, if hidden,
+// belongs to the package being exported.
+func (e *exporter) identFeature(s string) adt.Feature {
+	return adt.MakeIdentLabel(e.ctx, s, cmp.Or(e.pkgID, "_"))
+}
+
 func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
-	f = adt.MakeIdentLabel(e.ctx, s, "")
+	f = e.identFeature(s)
 	_, exists := e.usedFeature[f]
 	if !exists {
 		e.usedFeature[f] = nil
@@ -875,6 +925,14 @@ type frame struct {
 
 	// field to new field
 	mapped map[adt.Node]ast.Node
+
+	// spliced reports whether the declarations of this frame are spliced into
+	// the struct of the enclosing frame, rather than embedded in it.
+	spliced bool
+
+	// mergesFiles reports whether more than one file is merged into the
+	// scope of this frame.
+	mergesFiles bool
 }
 
 type entry struct {

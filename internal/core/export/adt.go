@@ -398,7 +398,7 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		if x.Src != nil {
 			if f, ok := x.Src.Node.(*ast.Field); ok {
 				if entry, ok := e.fieldAlias[f]; ok {
-					name, _ := valueAliasName(f)
+					name, _ := valueAliasName(entry.field)
 					ident := ast.NewIdent(name)
 					ident.Node = entry.field
 					ident.Scope = entry.scope
@@ -569,30 +569,25 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 		f.Attrs = extractFieldAttrs(nil, x)
 
-		st, ok := x.Value.(*adt.StructLit)
-		if !ok {
-			f.Value = e.expr(env, x.Value)
-			return f
-
-		}
-
-		top := e.frame(0, false)
+		// Fields spliced into the enclosing struct are referenced from its
+		// scope, so Sanitize must know of them to detect shadowing.
+		st, isStruct := x.Value.(*adt.StructLit)
 		var src *adt.Vertex
-		if top.node != nil {
-			src = top.node.Lookup(x.Label)
-		}
-
-		// Instead of calling e.expr directly, we inline the case for
-		// *adt.StructLit, so that we can pass src.
-		c := adt.MakeRootConjunct(env, st)
-		f.Value = e.mergeValues(adt.InvalidLabel, src, []conjunct{{c: c, up: 0}}, c)
-
-		if top.node != nil {
-			if v := top.node.Lookup(x.Label); v != nil {
-				e.linkField(v, f)
+		if isStruct || e.top().spliced {
+			if top := e.frame(0, false); top.node != nil {
+				src = top.node.Lookup(x.Label)
 			}
 		}
 
+		if isStruct {
+			// Instead of calling e.expr directly, we inline the case for
+			// *adt.StructLit, so that we can pass src.
+			c := adt.MakeRootConjunct(env, st)
+			f.Value = e.mergeValues(adt.InvalidLabel, src, []conjunct{{c: c, up: 0}}, c)
+		} else {
+			f.Value = e.expr(env, x.Value)
+		}
+		e.linkField(src, f)
 		return f
 
 	case *adt.LetField:

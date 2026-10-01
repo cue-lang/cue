@@ -64,6 +64,26 @@ multilineCall: multiline(
     a: 1,
     b: 2,
 )
+namedComments: add(
+    // doc a
+    a: 1, // trailing a
+    b: // after colon
+        2,
+)
+colonComment: add(a: // after colon
+    1)
+colonCommentNext: add(a: // after colon
+    1, b: 2)
+valueDoc: add(a:
+    // before the value
+    1, b: 2,
+)
+valueDocBlank: add(1,
+
+    b:
+    // before the value
+    2,
+)
 partialBreak: func(a: int,
     b: int) -> int
 partialBreakCall: add(a: 1,
@@ -125,8 +145,34 @@ openMulti: func(
 
 // Parameters and named arguments keep their line breaks, and a named
 // argument keeps the comments around its label.
-multiline: func(a: int, b: int) -> int: a + b
-multilineCall: multiline(a: 1, b: 2,
+multiline: func(
+	a: int,
+	b: int,
+) -> int: a + b
+multilineCall: multiline(
+	// the first operand
+	a: 1,
+	b: 2,
 )
-partialBreak:     func(a: int, b: int) -> int
-partialBreakCall: add(a: 1, b: 2)
+namedComments: add(
+	// doc a
+	a: 1, // trailing a
+	b: 2, // after colon
+)
+colonComment: add(a: 1, // after colon
+)
+colonCommentNext: add(a: 1, // after colon
+	b: 2)
+valueDoc: add(
+	// before the value
+	a: 1, b: 2,
+)
+valueDocBlank: add(1,
+
+	// before the value
+	b: 2,
+)
+partialBreak: func(a: int,
+	b: int) -> int
+partialBreakCall: add(a: 1,
+	b: 2)

@@ -1634,7 +1634,7 @@ func (c *converter) elementRows(elems []ast.Expr, trailingComma, wrapLinked, omi
 	prevLackRelPos := false
 	prevHasComment := false
 	for i, e := range elems {
-		row, postCgs := c.listElemRow(e, i == lastIdx, trailingComma, omitCommas)
+		row, postCgs := c.listElemRow(nil, e, i == lastIdx, trailingComma, omitCommas)
 		if wrapLinked && len(row.cells) > 0 {
 			row.cells[0] = nextGroupNoop(row.cells[0])
 		}
@@ -1694,7 +1694,12 @@ func (c *converter) elementRows(elems []ast.Expr, trailingComma, wrapLinked, omi
 // land after the `//` and be absorbed). They are returned in the
 // second result to be emitted as separate Raw rows after the
 // element's row.
-func (c *converter) listElemRow(e ast.Expr, last, trailing, omitCommas bool) (row, []*ast.CommentGroup) {
+//
+// label is a named call argument's label, or nil. A named argument
+// starts at its label, which carries the argument's leading RelPos and
+// any comment before it; a comment after the label's colon trails the
+// row, as one after a parameter's colon does (see [funcParamComments]).
+func (c *converter) listElemRow(label ast.Label, e ast.Expr, last, trailing, omitCommas bool) (row, []*ast.CommentGroup) {
 	var comma doc
 	switch {
 	case !last && omitCommas:
@@ -1760,6 +1765,21 @@ func (c *converter) listElemRow(e ast.Expr, last, trailing, omitCommas bool) (ro
 			postComments = append(postComments, cg)
 		}
 	}
+	docRel := e.Pos().RelPos()
+	if label != nil {
+		core = cats(c.label(label), colonLit, spaceLit, core)
+		ls := classifyComments(label)
+		// The label follows its own doc comments, or else the value's,
+		// which are moved before the label.
+		docRel = token.Newline
+		if len(ls.doc) > 0 {
+			docRel = label.Pos().RelPos()
+		}
+		slots.doc = append(ls.doc, slots.doc...)
+		for _, cg := range ls.nonDoc() {
+			routeNonDoc(cg)
+		}
+	}
 	if !skipInterior {
 		for _, cg := range slots.prefix {
 			routeNonDoc(cg)
@@ -1784,7 +1804,7 @@ func (c *converter) listElemRow(e ast.Expr, last, trailing, omitCommas bool) (ro
 	}
 
 	return row{
-		docComment: c.docCommentBlock(slots.doc, e.Pos().RelPos()),
+		docComment: c.docCommentBlock(slots.doc, docRel),
 		cells:      cells,
 		hasComment: hasComment,
 	}, postComments
@@ -2484,9 +2504,38 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		}
 		return cats(fun, stringLit("()"))
 	}
-	if arg := x.Args[0]; len(x.Args) == 1 && c.shouldHug(arg) && x.Ellipsis == token.NoPos {
+	// A named argument hugs only if its label could too.
+	if arg, l := x.Args[0], callArgLabel(x, 0); len(x.Args) == 1 && c.shouldHug(arg) && x.Ellipsis == token.NoPos &&
+		(l == nil || (!l.Pos().IsNewline() && len(ast.Comments(l)) == 0)) {
 		return cats(fun, lParenLit, c.callArg(x, 0), rParenLit)
 	}
+	anyDoc := anyHasDocComment(x.Args)
+	anyPost := anyHasPostComment(x.Args)
+	closerRel := x.Rparen.RelPos()
+	var sameLineOpen, noElemNewline bool
+	if len(x.ArgLabels) == 0 {
+		sameLineOpen = hasSameLineOpener(c, x.Args)
+		noElemNewline = noElemHasNewline(x.Args)
+	} else {
+		// A comment after a label's colon moves to the end of the
+		// argument's row, so whatever follows starts on a new line.
+		leads := make([]ast.Node, len(x.Args))
+		movesComment, lastMovesComment := false, false
+		for i := range x.Args {
+			leads[i] = callArgLead(x, i)
+			l := callArgLabel(x, i)
+			lastMovesComment = l != nil && nodeEndsWithLineComment(l)
+			movesComment = movesComment || lastMovesComment
+		}
+		anyDoc = anyDoc || anyHasDocComment(leads)
+		anyPost = anyPost || anyHasPostComment(leads)
+		sameLineOpen = hasSameLineOpener(c, leads)
+		noElemNewline = !movesComment && noElemHasNewline(leads)
+		if lastMovesComment && x.Ellipsis == token.NoPos && closerRel < token.Newline {
+			closerRel = token.Newline
+		}
+	}
+	first := callArgLead(x, 0)
 
 	layout := bracketedLayout{
 		node:          x,
@@ -2494,20 +2543,20 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		open:          lParenLit,
 		close:         rParenLit,
 		openerRel:     x.Lparen.RelPos(),
-		closerRel:     x.Rparen.RelPos(),
-		firstElem:     x.Args[0],
-		lastElem:      x.Args[len(x.Args)-1],
+		closerRel:     closerRel,
+		firstElem:     first,
+		lastElem:      callArgLead(x, len(x.Args)-1),
 		numElems:      len(x.Args),
 		hasInterior:   false, // calls don't carry PosPrefix/PosSuffix interior comments
-		anyDoc:        anyHasDocComment(x.Args),
-		anyPost:       anyHasPostComment(x.Args),
-		sameLineOpen:  hasSameLineOpener(c, x.Args),
-		noElemNewline: noElemHasNewline(x.Args),
+		anyDoc:        anyDoc,
+		anyPost:       anyPost,
+		sameLineOpen:  sameLineOpen,
+		noElemNewline: noElemNewline,
 		// CallExpr carries no interior comments of its own - the
 		// parser hangs Position 1/2 comments on the args themselves,
 		// not on the call. Pass an empty commentSlots so only the
 		// first arg's leading doc-comment is inspected.
-		lineHeader:          hasLineLeadingComment(commentSlots{}, x.Args[0]),
+		lineHeader:          hasLineLeadingComment(commentSlots{}, first),
 		allowsTrailingComma: true,
 	}
 	policy := c.computeBracketedPolicy(layout)
@@ -2524,10 +2573,38 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 
 func (c *converter) callArg(x *ast.CallExpr, i int) doc {
 	arg := c.expr(x.Args[i])
-	if i < len(x.ArgLabels) && x.ArgLabels[i] != nil {
-		return cats(c.label(x.ArgLabels[i]), colonLit, spaceLit, arg)
+	if l := callArgLabel(x, i); l != nil {
+		return cats(c.label(l), colonLit, spaceLit, arg)
 	}
 	return arg
+}
+
+// callArgLabel returns the label of the i'th argument of x, or nil if
+// the argument is positional.
+func callArgLabel(x *ast.CallExpr, i int) ast.Label {
+	if i < len(x.ArgLabels) {
+		return x.ArgLabels[i]
+	}
+	return nil
+}
+
+// callArgLead returns the node that starts the i'th argument of x. A
+// named argument starts at its label, which carries the argument's
+// leading RelPos and the comments before it, unless only its value has
+// a doc comment: [converter.listElemRow] moves that comment before the
+// label, so the argument starts there. The label still leads when its
+// RelPos is the stronger one, so that a blank line before it is kept.
+func callArgLead(x *ast.CallExpr, i int) ast.Node {
+	l := callArgLabel(x, i)
+	if l == nil {
+		return x.Args[i]
+	}
+	if !HasDocComment(l) {
+		if cg := FirstCommentAt(x.Args[i], PosDoc); cg != nil && cg.Pos().RelPos() >= l.Pos().RelPos() {
+			return cg
+		}
+	}
+	return l
 }
 
 func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool) []row {
@@ -2547,11 +2624,13 @@ func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool)
 	}
 	prevLackRelPos := false
 	prevHasComment := false
+	// A row ending in a comment must be followed by a line break, as the
+	// comment would otherwise swallow what follows. The comment may have
+	// moved there from after a label's colon, so the next argument's own
+	// RelPos does not tell.
+	soft := lineBreakOrSpace
 	for i, e := range x.Args {
-		row, postCgs := c.listElemRow(e, i == lastIdx, trailingComma, false)
-		if i < len(x.ArgLabels) && x.ArgLabels[i] != nil && len(row.cells) > 0 {
-			row.cells[0] = cats(c.label(x.ArgLabels[i]), colonLit, spaceLit, row.cells[0])
-		}
+		row, postCgs := c.listElemRow(callArgLabel(x, i), e, i == lastIdx, trailingComma, false)
 		if wrapLinked && len(row.cells) > 0 {
 			row.cells[0] = nextGroupNoop(row.cells[0])
 		}
@@ -2561,18 +2640,22 @@ func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool)
 			case prevLackRelPos && curLackRelPos && !prevHasComment && row.docComment == nil:
 				row.sep = spaceLit
 			default:
-				row.sep = elemBreak(e)
+				row.sep = relBreakOr(LeadingRelPos(callArgLead(x, i)), soft)
 			}
 		}
 		prevLackRelPos = curLackRelPos
 		prevHasComment = row.hasComment || len(postCgs) > 0
+		soft = lineBreakOrSpace
+		if prevHasComment {
+			soft = lineBreakHard
+		}
 		rows = append(rows, row)
 		rows = append(rows, c.postCommentRows(postCgs)...)
 	}
 	if open {
 		r := row{cells: []doc{ellipsisLit}}
 		if len(rows) > 0 {
-			r.sep = relBreakOr(x.Ellipsis.RelPos(), lineBreakOrSpace)
+			r.sep = relBreakOr(x.Ellipsis.RelPos(), soft)
 		}
 		rows = append(rows, r)
 	}
@@ -2889,14 +2972,16 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 	if len(params) == 0 && !open {
 		return c.funcResult(cats(stringLit("func"), lParenLit, rParenLit), x)
 	}
-	// A parameter list with a comment renders as a table, one row per
-	// parameter: a // comment then sits after the row's comma and can
-	// swallow neither the next parameter nor the closing parenthesis, and
-	// a comment on its own line keeps that line. Comments on a parameter's
-	// constraint or default count as the parameter's own; see
-	// [funcParamComments]. params may contain nil entries when the AST is
-	// constructed programmatically; skip them, as funcParamRows does.
-	var anyComment, anyDoc, anyPost, firstHoistedDoc bool
+	// A parameter list with a comment or a line break renders as a table,
+	// one row per parameter, laid out like call arguments: a parameter
+	// written on its own line stays there, a // comment sits after the
+	// row's comma and can swallow neither the next parameter nor the
+	// closing parenthesis, and a comment on its own line keeps that line.
+	// Comments on a parameter's constraint or default count as the
+	// parameter's own; see [funcParamComments]. params may contain nil
+	// entries when the AST is constructed programmatically; skip them, as
+	// funcParamRows does.
+	var anyComment, anyNewline, anyDoc, anyPost, firstHoistedDoc bool
 	first := true
 	for _, p := range params {
 		if p == nil {
@@ -2905,6 +2990,9 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 		slots := funcParamComments(p)
 		if slots.any() {
 			anyComment = true
+		}
+		if funcParamLeadingRelPos(p, slots) >= token.Newline {
+			anyNewline = true
 		}
 		if len(slots.doc) > 0 {
 			anyDoc = true
@@ -2919,49 +3007,49 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 			}
 		}
 	}
-	if anyComment {
-		// The list closes on its own line: a // comment on the last row
-		// would swallow a closing parenthesis on the same line, and the
-		// comment may have moved to the row's end from after ":" or "=",
-		// so the authored position of ")" does not tell. The rows' trailing
-		// comma is emitted whenever the table breaks, which any comment
-		// makes it do, and belongs before a closer on its own line.
-		closerRel := x.Rparen.RelPos()
-		if closerRel < token.Newline {
-			closerRel = token.Newline
+	closerRel := x.Rparen.RelPos()
+	if !anyComment && !anyNewline && x.Ellipsis.RelPos() < token.Newline && closerRel < token.Newline {
+		args := make([]doc, 0, len(params)+1)
+		for _, p := range params {
+			if p == nil {
+				continue
+			}
+			args = append(args, c.funcParamCore(p))
 		}
-		layout := bracketedLayout{
-			node:                x,
-			openPrefix:          stringLit("func"),
-			open:                lParenLit,
-			close:               rParenLit,
-			openerRel:           x.Lparen.RelPos(),
-			closerRel:           closerRel,
-			firstElem:           firstFuncParam(params),
-			lastElem:            lastFuncParam(params),
-			numElems:            len(params),
-			anyDoc:              anyDoc,
-			anyPost:             anyPost,
-			lineHeader:          hasLineLeadingComment(commentSlots{}, firstFuncParam(params)),
-			forceOpenBreak:      firstHoistedDoc,
-			allowsTrailingComma: true,
-			inner:               table(c.funcParamRows(params, x.Ellipsis, true)),
+		if open {
+			args = append(args, ellipsisLit)
 		}
-		return c.funcResult(c.applyBracketed(layout, c.computeBracketedPolicy(layout)), x)
+		argDoc := sep(commaSpaceLit, args...)
+		return c.funcResult(cats(stringLit("func"), lParenLit, argDoc, rParenLit), x)
 	}
-	args := make([]doc, 0, len(params)+1)
-	for _, p := range params {
-		if p == nil {
-			continue
-		}
-		args = append(args, c.funcParamCore(p))
+	if anyComment && closerRel < token.Newline {
+		// A parameter list with a comment closes on its own line: a //
+		// comment on the last row would swallow a closing parenthesis on
+		// the same line, and the comment may have moved to the row's end
+		// from after ":" or "=", so the authored position of ")" does not
+		// tell.
+		closerRel = token.Newline
 	}
-	if open {
-		args = append(args, ellipsisLit)
+	firstParam := firstFuncParam(params)
+	layout := bracketedLayout{
+		node:                x,
+		openPrefix:          stringLit("func"),
+		open:                lParenLit,
+		close:               rParenLit,
+		openerRel:           x.Lparen.RelPos(),
+		closerRel:           closerRel,
+		firstElem:           firstParam,
+		lastElem:            lastFuncParam(params),
+		numElems:            len(params),
+		anyDoc:              anyDoc,
+		anyPost:             anyPost,
+		lineHeader:          hasLineLeadingComment(commentSlots{}, firstParam),
+		forceOpenBreak:      firstHoistedDoc,
+		allowsTrailingComma: true,
 	}
-	argDoc := sep(commaSpaceLit, args...)
-	d := cats(stringLit("func"), lParenLit, argDoc, rParenLit)
-	return c.funcResult(d, x)
+	policy := c.computeBracketedPolicy(layout)
+	layout.inner = table(c.funcParamRows(params, x.Ellipsis, policy.wantTrailingComma))
+	return c.funcResult(c.applyBracketed(layout, policy), x)
 }
 
 func (c *converter) funcResult(d doc, x *ast.Func) doc {

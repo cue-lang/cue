@@ -18,6 +18,12 @@ t4: {
 	x: y: z: {a}.y
 	a: x
 }
+// An unknown argument prevents the same-instantiation comparison. The
+// inline ancestor-cycle rule must still catch this recursion.
+t5: {
+	let N = int
+	a: b: c: {a & {n: N + 1}}.b
+}
 -- out/compile --
 --- in.cue
 {
@@ -59,5 +65,17 @@ t4: {
       }
     }
     a: 〈0;x〉
+  }
+  t5: {
+    let N#1 = int
+    a: {
+      b: {
+        c: {
+          (〈3;a〉 & {
+            n: (〈4;let N#1〉 + 1)
+          })
+        }.b
+      }
+    }
   }
 }

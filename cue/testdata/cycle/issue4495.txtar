@@ -1,0 +1,339 @@
+# An inline struct that is re-instantiated by the same expression with the
+# same arguments, while the earlier instantiation is still being evaluated,
+# is a structural cycle, however fresh its vertices. This is how a fixed-point
+# combinator recurses when functions are written as structs: a call f(a) is
+# (f & {param: a}).out. These cases must report a structural cycle.
+#
+# Recursion that binds a different value at each level — bounded by data, or
+# guarded by a comprehension — must keep evaluating, as must nested,
+# non-recursive use of one template.
+# https://cuelang.org/issue/4495
+-- in.cue --
+// g(g), where g returns a struct that applies x(x) again.
+selfApply: {
+	g: {
+		x: _
+		let X = x
+		out: {n: _, out: (X & {x: X}).out}
+	}
+	out: (g & {x: g}).out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[4:20])
+}
+
+// The same, with the result wrapped in a struct.
+wrapped: {
+	g: {x: _, let X = x, out: {r: (X & {x: X}).out}}
+	out: (g & {x: g}).out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:32])
+}
+
+// omega: w(w) with w = func(x): x(x).
+omega: {
+	w: {x: _, let X = x, out: (X & {x: X}).out}
+	out: (w & {x: w}).out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:29])
+}
+
+// The Z combinator: fix(f) = g(g), with g = func(x): f(func(n): x(x)(n)).
+fix: {
+	fix: {
+		f: _
+		g: {
+			x: _
+			let X = x
+			out: (f & {self: {n: _, let N = n, out: ((X & {x: X}).out & {n: N}).out}}).out
+		}
+		out: (g & {x: g}).out
+	}
+	fact: {
+		self: _
+		let S = self
+		out: {
+			n: int
+			let N = n
+			out: [
+				if N == 0 {1},
+				if N > 0 {N * (S & {n: N - 1}).out},
+			][0]
+		}
+	}
+	out: ((fix & {f: fact}).out & {n: 5}).out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[6:45])
+}
+
+// Direct recursion that selects into its own nested result, with the
+// instantiation declared before the template so that nothing else reports
+// it first.
+directSelect: {
+	out: (f & {n: 1}).out
+	f: {n: _, let N = n, out: {r: (f & {n: N}).out.r}}
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[2:32])
+}
+
+// A self-reference: the inner #type is the literal's own field, so the
+// recursion binds ["list", _] at every level, under a disjunction.
+selfRef: {
+	#T: {
+		#type!: "string" | "number"
+		out: type: #type
+	} | {
+		#type!: ["list", _]
+		out: {
+			type:  "array"
+			items: (#T & {#type: #type[1]}).out
+		}
+	}
+	out: (#T & {#type: ["list", ["list", "string"]]}).out
+	@test(err, code=structural_cycle, contains="empty disjunction", pos=[11:8])
+}
+
+// Recursion bounded by data, through a disjunction, without a comprehension.
+dataBounded: {
+	#T: {
+		#type!: "string" | "number"
+		out: type: #type
+	} | {
+		#type!: ["list", _]
+		out: {
+			type: "array"
+			let value = #type[1]
+			items: (#T & {#type: value}).out
+		}
+	}
+	out: (#T & {#type: ["list", ["list", "string"]]}).out @test(eq, {type: "array", items: {type: "array", items: {type: "string"}}})
+}
+
+// Recursion guarded by a comprehension, binding a smaller value each level.
+guarded: {
+	f: {
+		n: _
+		let N = n
+		out: {
+			if N > 0 {
+				r: (f & {n: N - 1}).out
+			}
+		}
+	}
+	out: (f & {n: 3}).out @test(eq, {r: {r: {r: {}}}})
+}
+
+// Recursion over finite data terminates, at any depth.
+data: {
+	#Copy: {
+		param: {...}
+		result: {
+			for k, v in param {
+				(k): (#Copy & {param: v}).result
+			}
+		}
+	} | {
+		param: [...]
+		result: [
+			for v in param {
+				(#Copy & {param: v}).result
+			},
+		]
+	} | {
+		param:  number
+		result: param
+	}
+
+	foo: #Copy
+	foo: param: a: [{b: [{c: [{d: 134}]}]}]
+	out: foo.result @test(eq, {a: [{b: [{c: [{d: 134}]}]}]})
+}
+
+// An argument passed through a field of the template rather than written
+// at the instantiation: shrinking each level, it terminates. The constant
+// variant below preserves an existing cycle diagnostic while evaluating f;
+// it does not assert detection of a call evaluated before the template.
+viaField: {
+	f: {
+		n: int
+		let N = n
+		args: {n: N - 1}
+		out: {
+			if N > 0 {
+				r: (f & args).out
+			}
+		}
+	}
+	out: (f & {n: 3}).out @test(eq, {r: {r: {r: {}}}})
+}
+viaFieldSame: {
+	f: {
+		n: int
+		let N = n
+		args: {n: N}
+		out: {r: (f & args).out}
+	}
+	out: (f & {n: 3}).out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+}
+
+// Nested use of one template is not recursion.
+nesting: {
+	inc: {x: _, out: x + 1}
+	h: {in: _, let I = in, out: (inc & {x: I}).out}
+	out: (h & {in: (h & {in: (h & {in: 1}).out}).out}).out @test(eq, 4)
+
+}
+
+// The template named by a selector rather than a reference.
+selectorTemplate: {
+	fns: g: {x: _, let X = x, out: {n: _, out: (fns.g & {x: X}).out}}
+	out: (fns.g & {x: fns.g}).out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:45])
+}
+
+// The template embedded in the literal that supplies its arguments.
+embedTemplate: {
+	f: {n: _, let N = n, out: {r: {f, n: N}.out}}
+	out: {f, n: 1}.out
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:32])
+}
+-- review.cue --
+// Equal results of sequential applications do not imply recursion.
+sequential: {
+	h: {in: _, out: {if in.ok {({x: in}).x}}}
+	c: ok: true
+	mid: (h & {in: c}).out
+	out: (h & {in: mid}).out @test(eq, {ok: true})
+}
+
+// A field's lexical environment need not contain its parent vertex.
+viaSub: {
+	S: {m: int, args: {n: m}}
+	f: {
+		n: int
+		let N = n
+		sub: S & {m: N - 1}
+		out: {
+			if N > 0 {r: (f & sub.args).out}
+		}
+	}
+	out: (f & {n: 4}).out @test(eq, {r: {r: {r: {r: {}}}}})
+}
+
+// A let in a comprehension binds a different value in each iteration.
+multiLet: {
+	f: {
+		n: _
+		let N = n
+		out: {
+			for k, x in N {
+				let Y = x
+				(k): (f & {n: Y}).out
+			}
+		}
+	}
+	out: (f & {n: {a: {p: {}}, b: {a: {p: {}}, c: {q: {}}}}}).out
+	out: _ @test(eq, {a: {p: {}}, b: {a: {p: {}}, c: {q: {}}}})
+}
+
+// Re-entry while evaluating a scalar is a value cycle, not a structural one.
+valueCycle: {
+	g: {x: _, let X = x, out: {r: (X & {x: X}).out.r + 1}}
+	y: (g & {x: g}).out
+	y: r: _ @test(err, code=incomplete)
+}
+-- out/errors.txt --
+[incomplete] selfApply.g.out.out: undefined field: out:
+    ./in.cue:6:33
+    ./in.cue:6:21
+[structural_cycle] selfApply.out.out.out: structural cycle:
+    ./in.cue:6:20
+[incomplete] wrapped.g.out.r: undefined field: out:
+    ./in.cue:14:45
+    ./in.cue:14:33
+[structural_cycle] wrapped.out.r.r: structural cycle:
+    ./in.cue:14:32
+[incomplete] omega.w.out: undefined field: out:
+    ./in.cue:21:41
+    ./in.cue:21:29
+[structural_cycle] structural cycle:
+    ./in.cue:21:29
+[incomplete] fix.fix.g.out: undefined field: out:
+    ./in.cue:33:79
+    ./in.cue:33:10
+[structural_cycle] structural cycle:
+    ./in.cue:33:45
+[incomplete] non-concrete value int in operand to ==:
+    ./in.cue:44:8
+    ./in.cue:41:7
+[structural_cycle] structural cycle:
+    ./in.cue:33:45
+[structural_cycle] directSelect.out.r: structural cycle:
+    ./in.cue:58:32
+[structural_cycle] directSelect.f.out.r: structural cycle:
+    ./in.cue:58:32
+[structural_cycle] #type: conflicting values ["list",["list","string"]] and "number" (mismatched types list and string):
+    ./in.cue:66:22
+    ./in.cue:75:8
+    ./in.cue:75:21
+#type: conflicting values ["list",["list","string"]] and "string" (mismatched types list and string):
+    ./in.cue:66:11
+    ./in.cue:75:8
+    ./in.cue:75:21
+out.items.items: structural cycle:
+    ./in.cue:72:11
+4 errors in empty disjunction::
+    ./in.cue:75:8
+#type: 2 errors in empty disjunction::
+    ./in.cue:75:8
+[incomplete] guarded.f.out: non-concrete value _ in operand to >:
+    ./in.cue:101:7
+    ./in.cue:98:6
+[incomplete] viaField.f.args.n: non-concrete value int in operand to -:
+    ./in.cue:143:13
+    ./in.cue:141:6
+[incomplete] viaField.f.out: non-concrete value int in operand to >:
+    ./in.cue:145:7
+    ./in.cue:141:6
+[structural_cycle] viaFieldSame.f.out.r.r: structural cycle
+[structural_cycle] viaFieldSame.f.out.r.r: structural cycle
+[incomplete] nesting.inc.out: non-concrete value _ in operand to +:
+    ./in.cue:165:19
+    ./in.cue:165:11
+[incomplete] nesting.h.out: non-concrete value _ in operand to +:
+    ./in.cue:165:19
+    ./in.cue:166:10
+[structural_cycle] selectorTemplate.fns.g.out.out.out: structural cycle:
+    ./in.cue:173:45
+[structural_cycle] selectorTemplate.fns.g.out.out.out: structural cycle:
+    ./in.cue:173:45
+[structural_cycle] embedTemplate.f.out.r.r: structural cycle:
+    ./in.cue:180:32
+[structural_cycle] embedTemplate.f.out.r.r: structural cycle:
+    ./in.cue:180:32
+[incomplete] sequential.h.out: in.ok undefined as in is incomplete (type _):
+    ./review.cue:3:22
+[incomplete] viaSub.f.sub.m: non-concrete value int in operand to -:
+    ./review.cue:15:16
+    ./review.cue:13:6
+[incomplete] viaSub.f.sub.m: non-concrete value int in operand to -:
+    ./review.cue:15:16
+    ./review.cue:13:6
+[incomplete] viaSub.f.out: non-concrete value int in operand to >:
+    ./review.cue:17:7
+    ./review.cue:13:6
+[incomplete] multiLet.f.out: cannot range over N (incomplete type _):
+    ./review.cue:29:16
+[incomplete] valueCycle.g.out.r: undefined field: out:
+    ./review.cue:41:45
+    ./review.cue:41:33
+[incomplete] out.r: undefined field: out:
+    ./review.cue:41:45
+    ./review.cue:41:33
+-- out/eval/stats --
+Leaks:  183
+Freed:  850
+Reused: 811
+Allocs: 222
+Retain: 0
+
+Unifications: 653
+Conjuncts:    1513
+Disjuncts:    105
+
+NumCloseIDs: 396

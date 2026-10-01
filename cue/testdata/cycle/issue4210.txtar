@@ -7,26 +7,38 @@
 -- in.cue --
 t1: {
 	a: b: c: {a}.b
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:11])
 }
 t2: {
 	a: b: c: {a & _}.b
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:11])
 }
 t3: {
 	a: b: c: d: {a.b}.c
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:14])
 }
 t4: {
 	x: y: z: {a}.y
 	a: x
-	@test(err, code=structural_cycle, contains="structural cycle", pos=[])
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:11])
+}
+// An unknown argument prevents the same-instantiation comparison. The
+// inline ancestor-cycle rule must still catch this recursion.
+t5: {
+	let N = int
+	a: b: c: {a & {n: N + 1}}.b
+	@test(err, code=structural_cycle, contains="structural cycle")
 }
 -- out/errors.txt --
-[structural_cycle] t1.a.b.c.c: structural cycle
-[structural_cycle] t2.a.b.c.c: structural cycle
-[structural_cycle] t3.a.b.c.d.d: structural cycle
-[structural_cycle] t4.x.y.z.z: structural cycle
+[structural_cycle] t1.a.b.c.c: structural cycle:
+    ./in.cue:2:11
+[structural_cycle] t2.a.b.c.c: structural cycle:
+    ./in.cue:6:11
+[structural_cycle] t3.a.b.c.d.d: structural cycle:
+    ./in.cue:10:14
+[structural_cycle] t4.x.y.z.z: structural cycle:
+    ./in.cue:14:11
+[structural_cycle] t5.a.b.c.c: structural cycle
 -- out/eval/stats --
 Leaks:  0
 Freed:  39

@@ -626,6 +626,23 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 			return n.markCyclicPath(arc, env, x, ci)
 		}
 		if r.Ref == x && arc.nonRooted {
+			// An equal instantiation made within the evaluation of the
+			// earlier one is the same computation re-entered: structural
+			// expansion. An equal instantiation made beside it may instead
+			// consume the earlier one's result, which happens to equal its
+			// input, and is left to the chain-step rule below. Already
+			// cyclic conjuncts must retain their evidence accounting (in
+			// particular for value cycles). The optional affordance does
+			// not apply: an identical re-instantiation reproduces the same
+			// situation, so another iteration cannot resolve it.
+			if p, q := inlineRoots(arc, r.Arc); p != nil &&
+				!ci.IsCyclic() && instantiatedWithin(p, q) && n.ctx.sameInstantiation(p, q) {
+				ci, _ = n.markCyclicPath(arc, env, x, ci)
+				// The equal template contributes no new structure; do not
+				// let its fresh literal override the cyclic marking.
+				n.reportCycleError()
+				return ci, true
+			}
 			if equalDeref(r.Node, n.node) {
 				if chainStep {
 					continue
@@ -651,7 +668,10 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 			// (e.g. {a}.b), where each evaluation creates a fresh
 			// vertex that prevents matching by identity above.
 			// We identify these as IsDynamic with no Parent (unlike
-			// let vertices which have Parent set).
+			// let vertices which have Parent set). This remains needed
+			// beside the re-instantiation check above for an inline
+			// vertex that reaches an ancestor while its arguments differ
+			// or cannot be compared yet.
 			if p := arc.Parent; r.Arc.nonRooted &&
 				p != nil && p.IsDynamic && p.Parent == nil &&
 				p.state != nil && p.state.hasAncestorCycle {
@@ -919,4 +939,183 @@ func (n *nodeContext) markDepth() (saved int) {
 // See markDepth.
 func (n *nodeContext) unmarkDepth(saved int) {
 	n.evalDepth = saved
+}
+
+// inlineRoots returns the inline vertices that the non-rooted arcs a and b
+// are selected from, if both are reached along the same labels (as for the
+// selectors of one expression, such as .out.r); otherwise nil.
+func inlineRoots(a, b *Vertex) (p, q *Vertex) {
+	if !b.nonRooted {
+		return nil, nil
+	}
+	for a.Parent != nil && b.Parent != nil {
+		if a.Label != b.Label {
+			return nil, nil
+		}
+		a, b = a.Parent, b.Parent
+	}
+	if a.Parent != nil || b.Parent != nil || !a.IsDynamic || !b.IsDynamic {
+		return nil, nil
+	}
+	return a, b
+}
+
+// instantiatedWithin reports whether the inline vertex v was instantiated
+// within the evaluation of the inline vertex w: some scope v is evaluated in
+// is w or a field of w, however deep.
+func instantiatedWithin(v, w *Vertex) bool {
+	c, count := v.SingleConjunct()
+	if count != 1 {
+		return false
+	}
+	for e := c.Env; e != nil; e = e.Up {
+		for a := e.Vertex; a != nil; a = a.Parent {
+			if equalDeref(a, w) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// sameInstantiation reports whether the inline vertex v, as returned by
+// inlineRoots, is a re-instantiation of prev with the same arguments. Both
+// must evaluate the same expression, a conjunction of references and struct
+// literals: the form of a call written as a struct, where the references
+// name the template and the literals supply its arguments, or an inline
+// struct such as {a}.b, which embeds its template. Every operand must then
+// be the same in both: a reference must name the same vertex, found by
+// lookup without evaluating, and every field of a literal must hold the
+// same value. This compares values, not evaluation history: the
+// caller must distinguish structural expansion from sequential applications
+// that happen to return equal values.
+//
+// Any other expression, a reference that cannot be looked up, or an argument
+// that cannot be compared yet is taken to differ, so that this never reports
+// a cycle for recursion that is bounded by data it has not seen.
+func (c *OpContext) sameInstantiation(v, prev *Vertex) bool {
+	cv, nv := v.SingleConjunct()
+	cp, np := prev.SingleConjunct()
+	if v == prev || nv != 1 || np != 1 || cv.Expr() != cp.Expr() {
+		return false
+	}
+	return c.sameOperands(cv.Expr(), cv.Env, cp.Env, v, prev)
+}
+
+// sameOperands compares the operands of the instantiation expression x of v
+// and prev, evaluated in the environments ev and ep respectively. The
+// fields of a struct literal are its arguments; an expression embedded in
+// it is an operand like any other, evaluated in the literal's environment.
+func (c *OpContext) sameOperands(x Expr, ev, ep *Environment, v, prev *Vertex) bool {
+	switch x := x.(type) {
+	case *Top:
+		return true
+	case *BinaryExpr:
+		return x.Op == AndOp &&
+			c.sameOperands(x.X, ev, ep, v, prev) &&
+			c.sameOperands(x.Y, ev, ep, v, prev)
+	case *StructLit:
+		le, lp := Environment{Up: ev, Vertex: v}, Environment{Up: ep, Vertex: prev}
+		for _, d := range x.Decls {
+			switch d := d.(type) {
+			case *Field:
+				a, b := v.LookupRaw(d.Label), prev.LookupRaw(d.Label)
+				if a == nil || b == nil || !c.sameArgument(a, b) {
+					return false
+				}
+			case Expr:
+				if !c.sameOperands(d, &le, &lp, v, prev) {
+					return false
+				}
+			default:
+				return false
+			}
+		}
+		return true
+	default:
+		a, b := c.refTarget(ev, x), c.refTarget(ep, x)
+		return a != nil && b != nil && c.sameArgument(a, b)
+	}
+}
+
+// sameArgument reports whether the arcs a and b hold the same value: they
+// resolve to the same vertex, following structure sharing and chains of arcs
+// that consist of a single reference, or both are finalized without error
+// and structurally equal.
+func (c *OpContext) sameArgument(a, b *Vertex) bool {
+	fa, fb := c.followReferences(a), c.followReferences(b)
+	if fa == fb {
+		return true
+	}
+	return fa.status == finalized && fb.status == finalized &&
+		fa.Bottom() == nil && fb.Bottom() == nil &&
+		Equal(c, fa, fb, CheckStructural)
+}
+
+// followReferences returns the vertex that v stands for: v itself, or, if v
+// holds nothing but a single reference (and top), the arc that reference
+// names, followed transitively. An arc that is not such a reference, or a
+// self reference, ends the chain, which is bounded against loops of
+// references.
+//
+// Structure sharing would make such arcs dereference to their target
+// directly, but is disabled for non-rooted and dynamic targets and for
+// lets (see shareIfPossible and https://cuelang.org/issue/3801), which are
+// exactly the arcs compared here.
+func (c *OpContext) followReferences(v *Vertex) *Vertex {
+	for range 64 {
+		v = v.DerefValue()
+		var ref Conjunct
+		found := false
+		for x := range v.LeafConjuncts() {
+			if _, ok := x.Elem().(*Top); ok {
+				continue
+			}
+			if found {
+				return v
+			}
+			ref, found = x, true
+		}
+		if !found || ref.Env == nil {
+			return v
+		}
+		w := c.refTarget(ref.Env, ref.Expr())
+		if w == nil || w == v {
+			return v
+		}
+		v = w
+	}
+	return v
+}
+
+// refTarget returns the arc that the reference x names when evaluated in
+// env, found by looking it up in the scope it refers to, which neither
+// evaluates nor allocates. It is nil for an arc that does not exist yet and
+// for any expression that is not a field or let reference or a selection
+// from one: a selection from any other value would need its operand
+// evaluated, and so can the resolution of a ValueReference. A MultiLet also
+// yields nil: its raw arc holds only one comprehension iteration, whereas
+// resolution uses a copy for each environment.
+//
+// This is the arc-side counterpart of [refScope], which returns the scope.
+func (c *OpContext) refTarget(env *Environment, x Expr) *Vertex {
+	var w *Vertex
+	switch r := x.(type) {
+	case *FieldReference:
+		if e := env.up(c, r.UpCount); e != nil {
+			w = e.DerefVertex(c).LookupRaw(r.Label)
+		}
+	case *LetReference:
+		if e := env.up(c, r.UpCount); e != nil {
+			w = e.DerefVertex(c).LookupRaw(r.Label)
+			if w != nil && w.MultiLet {
+				return nil
+			}
+		}
+	case *SelectorExpr:
+		if w = c.refTarget(env, r.X); w != nil {
+			w = c.followReferences(w).LookupRaw(r.Sel)
+		}
+	}
+	return w
 }

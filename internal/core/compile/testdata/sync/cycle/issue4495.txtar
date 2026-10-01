@@ -1,0 +1,634 @@
+# An inline struct that is re-instantiated by the same expression with the
+# same arguments, while the earlier instantiation is still being evaluated,
+# is a structural cycle, however fresh its vertices. This is how a fixed-point
+# combinator recurses when functions are written as structs: a call f(a) is
+# (f & {param: a}).out. These cases must report a structural cycle.
+#
+# Recursion that binds a different value at each level — bounded by data, or
+# guarded by a comprehension — must keep evaluating, as must nested,
+# non-recursive use of one template.
+# https://cuelang.org/issue/4495
+-- in.cue --
+// g(g), where g returns a struct that applies x(x) again.
+selfApply: {
+	g: {
+		x: _
+		let X = x
+		out: {n: _, out: (X & {x: X}).out}
+	}
+	out: (g & {x: g}).out
+}
+
+// The same, with the result wrapped in a struct.
+wrapped: {
+	g: {x: _, let X = x, out: {r: (X & {x: X}).out}}
+	out: (g & {x: g}).out
+}
+
+// omega: w(w) with w = func(x): x(x).
+omega: {
+	w: {x: _, let X = x, out: (X & {x: X}).out}
+	out: (w & {x: w}).out
+}
+
+// The Z combinator: fix(f) = g(g), with g = func(x): f(func(n): x(x)(n)).
+fix: {
+	fix: {
+		f: _
+		g: {
+			x: _
+			let X = x
+			out: (f & {self: {n: _, let N = n, out: ((X & {x: X}).out & {n: N}).out}}).out
+		}
+		out: (g & {x: g}).out
+	}
+	fact: {
+		self: _
+		let S = self
+		out: {
+			n: int
+			let N = n
+			out: [
+				if N == 0 {1},
+				if N > 0 {N * (S & {n: N - 1}).out},
+			][0]
+		}
+	}
+	out: ((fix & {f: fact}).out & {n: 5}).out
+}
+
+// Direct recursion that selects into its own nested result, with the
+// instantiation declared before the template so that nothing else reports
+// it first.
+directSelect: {
+	out: (f & {n: 1}).out
+	f: {n: _, let N = n, out: {r: (f & {n: N}).out.r}}
+}
+
+// A self-reference: the inner #type is the literal's own field, so the
+// recursion binds ["list", _] at every level, under a disjunction.
+selfRef: {
+	#T: {
+		#type!: "string" | "number"
+		out: type: #type
+	} | {
+		#type!: ["list", _]
+		out: {
+			type:  "array"
+			items: (#T & {#type: #type[1]}).out
+		}
+	}
+	out: (#T & {#type: ["list", ["list", "string"]]}).out
+}
+
+// Recursion bounded by data, through a disjunction, without a comprehension.
+dataBounded: {
+	#T: {
+		#type!: "string" | "number"
+		out: type: #type
+	} | {
+		#type!: ["list", _]
+		out: {
+			type: "array"
+			let value = #type[1]
+			items: (#T & {#type: value}).out
+		}
+	}
+	out: (#T & {#type: ["list", ["list", "string"]]}).out
+}
+
+// Recursion guarded by a comprehension, binding a smaller value each level.
+guarded: {
+	f: {
+		n: _
+		let N = n
+		out: {
+			if N > 0 {
+				r: (f & {n: N - 1}).out
+			}
+		}
+	}
+	out: (f & {n: 3}).out
+}
+
+// Recursion over finite data terminates, at any depth.
+data: {
+	#Copy: {
+		param: {...}
+		result: {
+			for k, v in param {
+				(k): (#Copy & {param: v}).result
+			}
+		}
+	} | {
+		param: [...]
+		result: [
+			for v in param {
+				(#Copy & {param: v}).result
+			},
+		]
+	} | {
+		param:  number
+		result: param
+	}
+
+	foo: #Copy
+	foo: param: a: [{b: [{c: [{d: 134}]}]}]
+	out: foo.result
+}
+
+// An argument passed through a field of the template rather than written
+// at the instantiation: shrinking each level, it terminates. The constant
+// variant below preserves an existing cycle diagnostic while evaluating f;
+// it does not assert detection of a call evaluated before the template.
+viaField: {
+	f: {
+		n: int
+		let N = n
+		args: {n: N - 1}
+		out: {
+			if N > 0 {
+				r: (f & args).out
+			}
+		}
+	}
+	out: (f & {n: 3}).out
+}
+viaFieldSame: {
+	f: {
+		n: int
+		let N = n
+		args: {n: N}
+		out: {r: (f & args).out}
+	}
+	out: (f & {n: 3}).out
+}
+
+// Nested use of one template is not recursion.
+nesting: {
+	inc: {x: _, out: x + 1}
+	h: {in: _, let I = in, out: (inc & {x: I}).out}
+	out: (h & {in: (h & {in: (h & {in: 1}).out}).out}).out
+
+}
+
+// The template named by a selector rather than a reference.
+selectorTemplate: {
+	fns: g: {x: _, let X = x, out: {n: _, out: (fns.g & {x: X}).out}}
+	out: (fns.g & {x: fns.g}).out
+}
+
+// The template embedded in the literal that supplies its arguments.
+embedTemplate: {
+	f: {n: _, let N = n, out: {r: {f, n: N}.out}}
+	out: {f, n: 1}.out
+}
+-- review.cue --
+// Equal results of sequential applications do not imply recursion.
+sequential: {
+	h: {in: _, out: {if in.ok {({x: in}).x}}}
+	c: ok: true
+	mid: (h & {in: c}).out
+	out: (h & {in: mid}).out
+}
+
+// A field's lexical environment need not contain its parent vertex.
+viaSub: {
+	S: {m: int, args: {n: m}}
+	f: {
+		n: int
+		let N = n
+		sub: S & {m: N - 1}
+		out: {
+			if N > 0 {r: (f & sub.args).out}
+		}
+	}
+	out: (f & {n: 4}).out
+}
+
+// A let in a comprehension binds a different value in each iteration.
+multiLet: {
+	f: {
+		n: _
+		let N = n
+		out: {
+			for k, x in N {
+				let Y = x
+				(k): (f & {n: Y}).out
+			}
+		}
+	}
+	out: (f & {n: {a: {p: {}}, b: {a: {p: {}}, c: {q: {}}}}}).out
+	out: _
+}
+
+// Re-entry while evaluating a scalar is a value cycle, not a structural one.
+valueCycle: {
+	g: {x: _, let X = x, out: {r: (X & {x: X}).out.r + 1}}
+	y: (g & {x: g}).out
+	y: r: _
+}
+-- out/compile --
+--- in.cue
+{
+  selfApply: {
+    g: {
+      x: _
+      let X#1 = 〈0;x〉
+      out: {
+        n: _
+        out: (〈1;let X#1〉 & {
+          x: 〈2;let X#1〉
+        }).out
+      }
+    }
+    out: (〈0;g〉 & {
+      x: 〈1;g〉
+    }).out
+  }
+  wrapped: {
+    g: {
+      x: _
+      let X#2 = 〈0;x〉
+      out: {
+        r: (〈1;let X#2〉 & {
+          x: 〈2;let X#2〉
+        }).out
+      }
+    }
+    out: (〈0;g〉 & {
+      x: 〈1;g〉
+    }).out
+  }
+  omega: {
+    w: {
+      x: _
+      let X#3 = 〈0;x〉
+      out: (〈0;let X#3〉 & {
+        x: 〈1;let X#3〉
+      }).out
+    }
+    out: (〈0;w〉 & {
+      x: 〈1;w〉
+    }).out
+  }
+  fix: {
+    fix: {
+      f: _
+      g: {
+        x: _
+        let X#4 = 〈0;x〉
+        out: (〈1;f〉 & {
+          self: {
+            n: _
+            let N#5 = 〈0;n〉
+            out: ((〈2;let X#4〉 & {
+              x: 〈3;let X#4〉
+            }).out & {
+              n: 〈1;let N#5〉
+            }).out
+          }
+        }).out
+      }
+      out: (〈0;g〉 & {
+        x: 〈1;g〉
+      }).out
+    }
+    fact: {
+      self: _
+      let S#6 = 〈0;self〉
+      out: {
+        n: int
+        let N#7 = 〈0;n〉
+        out: [
+          if (〈1;let N#7〉 == 0) {
+            1
+          },
+          if (〈1;let N#7〉 > 0) {
+            (〈2;let N#7〉 * (〈3;let S#6〉 & {
+              n: (〈3;let N#7〉 - 1)
+            }).out)
+          },
+        ][0]
+      }
+    }
+    out: ((〈0;fix〉 & {
+      f: 〈1;fact〉
+    }).out & {
+      n: 5
+    }).out
+  }
+  directSelect: {
+    out: (〈0;f〉 & {
+      n: 1
+    }).out
+    f: {
+      n: _
+      let N#8 = 〈0;n〉
+      out: {
+        r: (〈2;f〉 & {
+          n: 〈2;let N#8〉
+        }).out.r
+      }
+    }
+  }
+  selfRef: {
+    #T: ({
+      #type!: ("string"|"number")
+      out: {
+        type: 〈1;#type〉
+      }
+    }|{
+      #type!: [
+        "list",
+        _,
+      ]
+      out: {
+        type: "array"
+        items: (〈2;#T〉 & {
+          #type: 〈0;#type〉[1]
+        }).out
+      }
+    })
+    out: (〈0;#T〉 & {
+      #type: [
+        "list",
+        [
+          "list",
+          "string",
+        ],
+      ]
+    }).out
+  }
+  dataBounded: {
+    #T: ({
+      #type!: ("string"|"number")
+      out: {
+        type: 〈1;#type〉
+      }
+    }|{
+      #type!: [
+        "list",
+        _,
+      ]
+      out: {
+        type: "array"
+        let value#9 = 〈1;#type〉[1]
+        items: (〈2;#T〉 & {
+          #type: 〈1;let value#9〉
+        }).out
+      }
+    })
+    out: (〈0;#T〉 & {
+      #type: [
+        "list",
+        [
+          "list",
+          "string",
+        ],
+      ]
+    }).out
+  }
+  guarded: {
+    f: {
+      n: _
+      let N#A = 〈0;n〉
+      out: {
+        if (〈1;let N#A〉 > 0) {
+          r: (〈3;f〉 & {
+            n: (〈3;let N#A〉 - 1)
+          }).out
+        }
+      }
+    }
+    out: (〈0;f〉 & {
+      n: 3
+    }).out
+  }
+  data: {
+    #Copy: ({
+      param: {
+        ...
+      }
+      result: {
+        for k, v in 〈1;param〉 {
+          〈1;k〉: (〈4;#Copy〉 & {
+            param: 〈2;v〉
+          }).result
+        }
+      }
+    }|{
+      param: [
+        ...,
+      ]
+      result: [
+        for _, v in 〈1;param〉 {
+          (〈4;#Copy〉 & {
+            param: 〈2;v〉
+          }).result
+        },
+      ]
+    }|{
+      param: number
+      result: 〈0;param〉
+    })
+    foo: 〈0;#Copy〉
+    foo: {
+      param: {
+        a: [
+          {
+            b: [
+              {
+                c: [
+                  {
+                    d: 134
+                  },
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+    out: 〈0;foo〉.result
+  }
+  viaField: {
+    f: {
+      n: int
+      let N#B = 〈0;n〉
+      args: {
+        n: (〈1;let N#B〉 - 1)
+      }
+      out: {
+        if (〈1;let N#B〉 > 0) {
+          r: (〈3;f〉 & 〈2;args〉).out
+        }
+      }
+    }
+    out: (〈0;f〉 & {
+      n: 3
+    }).out
+  }
+  viaFieldSame: {
+    f: {
+      n: int
+      let N#C = 〈0;n〉
+      args: {
+        n: 〈1;let N#C〉
+      }
+      out: {
+        r: (〈2;f〉 & 〈1;args〉).out
+      }
+    }
+    out: (〈0;f〉 & {
+      n: 3
+    }).out
+  }
+  nesting: {
+    inc: {
+      x: _
+      out: (〈0;x〉 + 1)
+    }
+    h: {
+      in: _
+      let I#D = 〈0;in〉
+      out: (〈1;inc〉 & {
+        x: 〈1;let I#D〉
+      }).out
+    }
+    out: (〈0;h〉 & {
+      in: (〈1;h〉 & {
+        in: (〈2;h〉 & {
+          in: 1
+        }).out
+      }).out
+    }).out
+  }
+  selectorTemplate: {
+    fns: {
+      g: {
+        x: _
+        let X#E = 〈0;x〉
+        out: {
+          n: _
+          out: (〈3;fns〉.g & {
+            x: 〈2;let X#E〉
+          }).out
+        }
+      }
+    }
+    out: (〈0;fns〉.g & {
+      x: 〈1;fns〉.g
+    }).out
+  }
+  embedTemplate: {
+    f: {
+      n: _
+      let N#F = 〈0;n〉
+      out: {
+        r: {
+          〈3;f〉
+          n: 〈2;let N#F〉
+        }.out
+      }
+    }
+    out: {
+      〈1;f〉
+      n: 1
+    }.out
+  }
+}
+--- review.cue
+{
+  sequential: {
+    h: {
+      in: _
+      out: {
+        if 〈1;in〉.ok {
+          {
+            x: 〈3;in〉
+          }.x
+        }
+      }
+    }
+    c: {
+      ok: true
+    }
+    mid: (〈0;h〉 & {
+      in: 〈1;c〉
+    }).out
+    out: (〈0;h〉 & {
+      in: 〈1;mid〉
+    }).out
+  }
+  viaSub: {
+    S: {
+      m: int
+      args: {
+        n: 〈1;m〉
+      }
+    }
+    f: {
+      n: int
+      let N#10 = 〈0;n〉
+      sub: (〈1;S〉 & {
+        m: (〈1;let N#10〉 - 1)
+      })
+      out: {
+        if (〈1;let N#10〉 > 0) {
+          r: (〈3;f〉 & 〈2;sub〉.args).out
+        }
+      }
+    }
+    out: (〈0;f〉 & {
+      n: 4
+    }).out
+  }
+  multiLet: {
+    f: {
+      n: _
+      let N#11 = 〈0;n〉
+      out: {
+        for k, x in 〈1;let N#11〉 {
+          let Y#12multi = 〈1;x〉
+          〈1;k〉: (〈4;f〉 & {
+            n: 〈1;let Y#12〉
+          }).out
+        }
+      }
+    }
+    out: (〈0;f〉 & {
+      n: {
+        a: {
+          p: {}
+        }
+        b: {
+          a: {
+            p: {}
+          }
+          c: {
+            q: {}
+          }
+        }
+      }
+    }).out
+    out: _
+  }
+  valueCycle: {
+    g: {
+      x: _
+      let X#13 = 〈0;x〉
+      out: {
+        r: ((〈1;let X#13〉 & {
+          x: 〈2;let X#13〉
+        }).out.r + 1)
+      }
+    }
+    y: (〈0;g〉 & {
+      x: 〈1;g〉
+    }).out
+    y: {
+      r: _
+    }
+  }
+}

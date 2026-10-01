@@ -444,9 +444,10 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 				}
 			}
 
-			// Since CUE fields using double quotes or commas in their names are rare,
-			// and the upcoming encoding/json/v2 will support field tags with name quoting,
-			// we choose to ignore such fields with a clear note for now.
+			// Neither version of encoding/json can express names with double quotes,
+			// commas, backticks, or newlines in a struct tag; supporting such fields
+			// would require generating marshal methods. They are rare, so we skip them
+			// with a clear note.
 			if strings.ContainsAny(cueName, "\\\"`,\n") {
 				g.def.printf("// CUE field %q: encoding/json does not support this field name\n\n", cueName)
 				continue
@@ -470,11 +471,11 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 
 			// TODO: should we generate cuego tags like `cue:"expr"`?
 			// If not, at least move the /* CUE */ comments to the end of the line.
-			omitEmpty := ""
+			omitZero := ""
 			if optional {
-				omitEmpty = ",omitempty"
+				omitZero = ",omitzero"
 			}
-			g.def.printf(" `json:\"%s%s\"`", cueName, omitEmpty)
+			g.def.printf(" `json:\"%s%s\"`", cueName, omitZero)
 			g.def.printf("\n\n")
 		}
 		g.def.printf("}")

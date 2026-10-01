@@ -381,7 +381,7 @@ func main() {
 
 	zeroRoot.Fields.OptionalInlineMapAttrNillable = (map[string]int64)(nil)
 	zeroRoot.Fields.OptionalLocalMapAttrNillable = (root.LocalMap)(nil)
-	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F []string `json:"f,omitempty"`})(nil)
+	zeroRoot.Fields.OptionalInlineNestedAttrNillable = (*struct{F []string `json:"f,omitzero"`})(nil)
 	zeroRoot.Fields.OptionalLocalNestedAttrNillable = (*root.LocalNested)(nil)
 
 	// #localNested is not affected by one of the references using optional=nullable.
@@ -747,99 +747,99 @@ import (
 )
 
 type RootImports struct {
-	Inst imported.InstanceStruct `json:"inst,omitempty"`
+	Inst imported.InstanceStruct `json:"inst,omitzero"`
 
-	LowerRegular int64 `json:"lowerRegular,omitempty"`
+	LowerRegular int64 `json:"lowerRegular,omitzero"`
 
-	UpperRegular int64 `json:"UpperRegular,omitempty"`
+	UpperRegular int64 `json:"UpperRegular,omitzero"`
 
-	LowerDef imported.LowerDef `json:"lowerDef,omitempty"`
+	LowerDef imported.LowerDef `json:"lowerDef,omitzero"`
 
-	UpperDef imported.UpperDef `json:"UpperDef,omitempty"`
+	UpperDef imported.UpperDef `json:"UpperDef,omitzero"`
 
-	MultiOne multipkg.One `json:"multiOne,omitempty"`
+	MultiOne multipkg.One `json:"multiOne,omitzero"`
 
-	MultiTwo multipkg.Two `json:"multiTwo,omitempty"`
+	MultiTwo multipkg.Two `json:"multiTwo,omitzero"`
 
-	OptionalRemoteMapAttrNillable *imported.RemoteMap `json:"optionalRemoteMapAttrNillable,omitempty"`
+	OptionalRemoteMapAttrNillable *imported.RemoteMap `json:"optionalRemoteMapAttrNillable,omitzero"`
 
-	OptionalRemoteNestedAttrNillable *imported.RemoteNested `json:"optionalRemoteNestedAttrNillable,omitempty"`
+	OptionalRemoteNestedAttrNillable *imported.RemoteNested `json:"optionalRemoteNestedAttrNillable,omitzero"`
 }
 
 // Embedding an imported definition whose fields reference sibling definitions
 // in its own package used to panic; see https://cuelang.org/issue/4436.
 type EmbedImported struct {
-	Extra string `json:"extra,omitempty"`
+	Extra string `json:"extra,omitzero"`
 
 	Name string `json:"name"`
 
-	Inner imported.RefInner `json:"inner,omitempty"`
+	Inner imported.RefInner `json:"inner,omitzero"`
 }
 
 type Types struct {
-	Top any/* CUE top */ `json:"Top,omitempty"`
+	Top any/* CUE top */ `json:"Top,omitzero"`
 
-	Null *struct{}/* CUE null */ `json:"Null,omitempty"`
+	Null *struct{}/* CUE null */ `json:"Null,omitzero"`
 
-	Bool bool `json:"Bool,omitempty"`
+	Bool bool `json:"Bool,omitzero"`
 
-	Int int64 `json:"Int,omitempty"`
+	Int int64 `json:"Int,omitzero"`
 
-	Float float64 `json:"Float,omitempty"`
+	Float float64 `json:"Float,omitzero"`
 
-	String string `json:"String,omitempty"`
+	String string `json:"String,omitzero"`
 
-	Bytes []byte `json:"Bytes,omitempty"`
+	Bytes []byte `json:"Bytes,omitzero"`
 
-	Number any/* CUE number; int64 or float64 */ `json:"Number,omitempty"`
+	Number any/* CUE number; int64 or float64 */ `json:"Number,omitzero"`
 
-	Uint int64 `json:"Uint,omitempty"`
+	Uint int64 `json:"Uint,omitzero"`
 
-	Int8 int64 `json:"Int8,omitempty"`
+	Int8 int64 `json:"Int8,omitzero"`
 
-	Int32 int64 `json:"Int32,omitempty"`
+	Int32 int64 `json:"Int32,omitzero"`
 
-	Float64 any/* CUE number; int64 or float64 */ `json:"Float64,omitempty"`
+	Float64 any/* CUE number; int64 or float64 */ `json:"Float64,omitzero"`
 
-	Rune int64 `json:"Rune,omitempty"`
+	Rune int64 `json:"Rune,omitzero"`
 
-	IntList []int64 `json:"IntList,omitempty"`
+	IntList []int64 `json:"IntList,omitzero"`
 
-	IntListClosed2 []any/* CUE closed list */ `json:"IntListClosed2,omitempty"`
+	IntListClosed2 []any/* CUE closed list */ `json:"IntListClosed2,omitzero"`
 
-	IntMap map[string]int64 `json:"IntMap,omitempty"`
+	IntMap map[string]int64 `json:"IntMap,omitzero"`
 
-	Time time.Time `json:"Time,omitempty"`
+	Time time.Time `json:"Time,omitzero"`
 
-	Duration string/* CUE time.Duration */ `json:"Duration,omitempty"`
+	Duration string/* CUE time.Duration */ `json:"Duration,omitzero"`
 
-	StringOrInt any/* CUE disjunction: (int|string) */ `json:"StringOrInt,omitempty"`
+	StringOrInt any/* CUE disjunction: (int|string) */ `json:"StringOrInt,omitzero"`
 
-	StringOrIntDefault any/* CUE disjunction: (int|string) */ `json:"StringOrIntDefault,omitempty"`
+	StringOrIntDefault any/* CUE disjunction: (int|string) */ `json:"StringOrIntDefault,omitzero"`
 
-	NullOrStruct any/* CUE disjunction: (null|struct) */ `json:"NullOrStruct,omitempty"`
+	NullOrStruct any/* CUE disjunction: (null|struct) */ `json:"NullOrStruct,omitzero"`
 
-	NullOrString any/* CUE disjunction: (null|string) */ `json:"NullOrString,omitempty"`
+	NullOrString any/* CUE disjunction: (null|string) */ `json:"NullOrString,omitzero"`
 
-	NumericBounds any/* CUE number; int64 or float64 */ `json:"NumericBounds,omitempty"`
+	NumericBounds any/* CUE number; int64 or float64 */ `json:"NumericBounds,omitzero"`
 
-	NonEmptyString string `json:"NonEmptyString,omitempty"`
+	NonEmptyString string `json:"NonEmptyString,omitzero"`
 
-	UniqueStrings []string `json:"UniqueStrings,omitempty"`
+	UniqueStrings []string `json:"UniqueStrings,omitzero"`
 
-	LinkedList LinkedList `json:"LinkedList,omitempty"`
+	LinkedList LinkedList `json:"LinkedList,omitzero"`
 
-	GraphNode GraphNode `json:"GraphNode,omitempty"`
+	GraphNode GraphNode `json:"GraphNode,omitzero"`
 }
 
 type LinkedList struct {
-	Item any/* CUE top */ `json:"item,omitempty"`
+	Item any/* CUE top */ `json:"item,omitzero"`
 
-	Next *LinkedList `json:"next,omitempty"`
+	Next *LinkedList `json:"next,omitzero"`
 }
 
 type GraphNode struct {
-	Edges []*GraphNode `json:"edges,omitempty"`
+	Edges []*GraphNode `json:"edges,omitzero"`
 }
 
 // emptyStruct has a doc comment.
@@ -847,80 +847,80 @@ type EmptyStruct struct {
 }
 
 type Root struct {
-	Embedded1 int64 `json:"embedded1,omitempty"`
+	Embedded1 int64 `json:"embedded1,omitzero"`
 
-	Embedded2 int64 `json:"embedded2,omitempty"`
+	Embedded2 int64 `json:"embedded2,omitzero"`
 
-	Types Types `json:"types,omitempty"`
+	Types Types `json:"types,omitzero"`
 
 	Fields struct {
 		Regular int64 `json:"regular"`
 
-		Required int64 `json:"required,omitempty"`
+		Required int64 `json:"required,omitzero"`
 
-		OptionalBasic int64 `json:"optionalBasic,omitempty"`
+		OptionalBasic int64 `json:"optionalBasic,omitzero"`
 
-		OptionalList []int64 `json:"optionalList,omitempty"`
+		OptionalList []int64 `json:"optionalList,omitzero"`
 
-		OptionalMap map[string]int64 `json:"optionalMap,omitempty"`
+		OptionalMap map[string]int64 `json:"optionalMap,omitzero"`
 
-		OptionalTopAttrNillable any/* CUE top */ `json:"optionalTopAttrNillable,omitempty"`
+		OptionalTopAttrNillable any/* CUE top */ `json:"optionalTopAttrNillable,omitzero"`
 
-		OptionalNullAttrNillable *struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitempty"`
+		OptionalNullAttrNillable *struct{}/* CUE null */ `json:"optionalNullAttrNillable,omitzero"`
 
-		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitempty"`
+		OptionalBasicAttrNillable *int64 `json:"optionalBasicAttrNillable,omitzero"`
 
-		OptionalListAttrNillable []int64 `json:"optionalListAttrNillable,omitempty"`
+		OptionalListAttrNillable []int64 `json:"optionalListAttrNillable,omitzero"`
 
-		OptionalInlineMapAttrNillable map[string]int64 `json:"optionalInlineMapAttrNillable,omitempty"`
+		OptionalInlineMapAttrNillable map[string]int64 `json:"optionalInlineMapAttrNillable,omitzero"`
 
-		OptionalLocalMapAttrNillable LocalMap `json:"optionalLocalMapAttrNillable,omitempty"`
+		OptionalLocalMapAttrNillable LocalMap `json:"optionalLocalMapAttrNillable,omitzero"`
 
 		OptionalInlineNestedAttrNillable *struct {
-			F []string `json:"f,omitempty"`
-		} `json:"optionalInlineNestedAttrNillable,omitempty"`
+			F []string `json:"f,omitzero"`
+		} `json:"optionalInlineNestedAttrNillable,omitzero"`
 
-		OptionalLocalNestedAttrNillable *LocalNested `json:"optionalLocalNestedAttrNillable,omitempty"`
+		OptionalLocalNestedAttrNillable *LocalNested `json:"optionalLocalNestedAttrNillable,omitzero"`
 
-		OptionalStruct EmptyStruct `json:"optionalStruct,omitempty"`
+		OptionalStruct EmptyStruct `json:"optionalStruct,omitzero"`
 
-		OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
+		OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitzero"`
 
-		OptionalStructAttrZero EmptyStruct `json:"optionalStructAttrZero,omitempty"`
+		OptionalStructAttrZero EmptyStruct `json:"optionalStructAttrZero,omitzero"`
 
-		OptionalStructAttrNillable *EmptyStruct `json:"optionalStructAttrNillable,omitempty"`
+		OptionalStructAttrNillable *EmptyStruct `json:"optionalStructAttrNillable,omitzero"`
 
 		NestedStructAttrNillable struct {
-			OptionalStruct *EmptyStruct `json:"optionalStruct,omitempty"`
+			OptionalStruct *EmptyStruct `json:"optionalStruct,omitzero"`
 
-			OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
+			OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitzero"`
 
-			OptionalStructAttrZero EmptyStruct `json:"optionalStructAttrZero,omitempty"`
+			OptionalStructAttrZero EmptyStruct `json:"optionalStructAttrZero,omitzero"`
 		} `json:"nestedStructAttrNillable"`
 
 		RegularStruct struct {
-			Field int64 `json:"field,omitempty"`
+			Field int64 `json:"field,omitzero"`
 		} `json:"regularStruct"`
 
-		UseRegular int64 `json:"useRegular,omitempty"`
+		UseRegular int64 `json:"useRegular,omitzero"`
 
 		UseRegularStruct struct {
-			Field int64 `json:"field,omitempty"`
-		} `json:"useRegularStruct,omitempty"`
-	} `json:"fields,omitempty"`
+			Field int64 `json:"field,omitzero"`
+		} `json:"useRegularStruct,omitzero"`
+	} `json:"fields,omitzero"`
 
-	AttrChangedName int64 `json:"attrName,omitempty"`
+	AttrChangedName int64 `json:"attrName,omitzero"`
 
-	AttrChangedNameNested int64 `json:"attrNameNested,omitempty"`
+	AttrChangedNameNested int64 `json:"attrNameNested,omitzero"`
 
-	AttrType constant.Kind `json:"attrType,omitempty"`
+	AttrType constant.Kind `json:"attrType,omitzero"`
 
 	// For compatibility with `cue get go`, an unnamed second value is also a type.
-	AttrTypeCompat token.Token `json:"attrTypeCompat,omitempty"`
+	AttrTypeCompat token.Token `json:"attrTypeCompat,omitzero"`
 
-	AttrTypeNested map[any]any `json:"attrTypeNested,omitempty"`
+	AttrTypeNested map[any]any `json:"attrTypeNested,omitzero"`
 
-	AttrTypeComplex *[]*constant.Kind `json:"attrTypeComplex,omitempty"`
+	AttrTypeComplex *[]*constant.Kind `json:"attrTypeComplex,omitzero"`
 
 	// doc is a great field.
 	//
@@ -928,40 +928,40 @@ type Root struct {
 	// as there is a lot to write about it.
 	//
 	// Actually, this field needed even more documentation.
-	Doc int64 `json:"doc,omitempty"`
+	Doc int64 `json:"doc,omitzero"`
 
-	InlineDoc int64 `json:"inlineDoc,omitempty"`
+	InlineDoc int64 `json:"inlineDoc,omitzero"`
 
 	InnerDoc struct {
-		InnerDocField int64 `json:"innerDocField,omitempty"`
-	} `json:"innerDoc,omitempty"`
+		InnerDocField int64 `json:"innerDocField,omitzero"`
+	} `json:"innerDoc,omitzero"`
 
-	UseInnerStruct Root_innerStruct `json:"useInnerStruct,omitempty"`
+	UseInnerStruct Root_innerStruct `json:"useInnerStruct,omitzero"`
 
-	UseHiddenInnerStruct root_hiddenInnerStruct `json:"useHiddenInnerStruct,omitempty"`
+	UseHiddenInnerStruct root_hiddenInnerStruct `json:"useHiddenInnerStruct,omitzero"`
 
 	DeeplyNested struct {
 		One struct {
 			Two struct {
-				Three int64 `json:"three,omitempty"`
-			} `json:"two,omitempty"`
-		} `json:"one,omitempty"`
-	} `json:"deeplyNested,omitempty"`
+				Three int64 `json:"three,omitzero"`
+			} `json:"two,omitzero"`
+		} `json:"one,omitzero"`
+	} `json:"deeplyNested,omitzero"`
 
-	UseHiddenStruct hiddenStruct `json:"useHiddenStruct,omitempty"`
+	UseHiddenStruct hiddenStruct `json:"useHiddenStruct,omitzero"`
 
-	DiscriminatorField map[string]any `json:"discriminatorField,omitempty"`
+	DiscriminatorField map[string]any `json:"discriminatorField,omitzero"`
 
-	MustEqual1 int64 `json:"mustEqual1,omitempty"`
+	MustEqual1 int64 `json:"mustEqual1,omitzero"`
 
-	MustEqual2 any/* TODO: IncompleteKind: _|_ */ `json:"mustEqual2,omitempty"`
+	MustEqual2 any/* TODO: IncompleteKind: _|_ */ `json:"mustEqual2,omitzero"`
 
 	// Various forms of quoted fields which we can represent in Go with encoding/json.
-	With_dashes string `json:"with-dashes,omitempty"`
+	With_dashes string `json:"with-dashes,omitzero"`
 
-	WithDashesNewName string `json:"with-dashes-attr,omitempty"`
+	WithDashesNewName string `json:"with-dashes-attr,omitzero"`
 
-	F123LeadingNumber string `json:"123LeadingNumber,omitempty"`
+	F123LeadingNumber string `json:"123LeadingNumber,omitzero"`
 
 	// We could represent some of these with a future encoding/json/v2,
 	// but not with encoding/json today, and they seem unlikely to happen in practice.
@@ -980,32 +980,32 @@ type Root struct {
 type LocalMap map[string]int64
 
 type LocalNested struct {
-	F []string `json:"f,omitempty"`
+	F []string `json:"f,omitzero"`
 }
 
 type Root_innerStruct struct {
-	InnerStructField int64 `json:"innerStructField,omitempty"`
+	InnerStructField int64 `json:"innerStructField,omitzero"`
 }
 
 type root_hiddenInnerStruct struct {
-	InnerStructField int64 `json:"innerStructField,omitempty"`
+	InnerStructField int64 `json:"innerStructField,omitzero"`
 }
 
 // All definitions underneath here must not be exported.
 type hiddenStruct struct {
-	InnerField int64 `json:"innerField,omitempty"`
+	InnerField int64 `json:"innerField,omitzero"`
 
-	InnerStruct hiddenStruct_innerStruct `json:"innerStruct,omitempty"`
+	InnerStruct hiddenStruct_innerStruct `json:"innerStruct,omitzero"`
 }
 
 type hiddenStruct_innerStruct struct {
-	Field int64 `json:"field,omitempty"`
+	Field int64 `json:"field,omitzero"`
 }
 
 type EmbeddedStruct struct {
-	Embedded1 int64 `json:"embedded1,omitempty"`
+	Embedded1 int64 `json:"embedded1,omitzero"`
 
-	Embedded2 int64 `json:"embedded2,omitempty"`
+	Embedded2 int64 `json:"embedded2,omitzero"`
 }
 
 // A conditional that narrows a field of a referenced type should not
@@ -1013,13 +1013,13 @@ type EmbeddedStruct struct {
 type ConditionalNarrow struct {
 	Nested LocalNested `json:"nested"`
 
-	Flag bool `json:"flag,omitempty"`
+	Flag bool `json:"flag,omitzero"`
 }
 
 type AttrChangedName int64
 
 type AttrChangedNameEmbed struct {
-	Field int64 `json:"field,omitempty"`
+	Field int64 `json:"field,omitzero"`
 }
 
 type AttrType constant.Kind
@@ -1079,13 +1079,13 @@ type UpperDef int64
 type RemoteMap map[string]int64
 
 type RemoteNested struct {
-	F []string `json:"f,omitempty"`
+	F []string `json:"f,omitzero"`
 }
 
 type RefOuter struct {
 	Name string `json:"name"`
 
-	Inner RefInner `json:"inner,omitempty"`
+	Inner RefInner `json:"inner,omitzero"`
 }
 
 type RefInner struct {

@@ -556,7 +556,48 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "TypedValues/RejectedNumberForms",
+		name:   "Delimiters/EqualsAndColon",
+		config: ini.Config{Delimiters: "=:"},
+		input: `
+			[options]
+			python_requires: >=3.9
+			url = https://example.com:8080/x
+			both: a = b
+			`,
+		wantCUE: `
+			options: {
+				python_requires: ">=3.9"
+				url:             "https://example.com:8080/x"
+				both:            "a = b"
+			}
+			`,
+	}, {
+		name:   "Delimiters/ColonOnly",
+		config: ini.Config{Delimiters: ":"},
+		input: `
+			key: value
+			equals = stays
+			`,
+		wantErr: `
+			invalid line: equals = stays:
+			    test.ini:2:1
+			`,
+	}, {
+		name:   "InlineComments/QuotedValueKeepsIt",
+		config: ini.Config{InlineComments: true, Quotes: ini.QuotesStripped},
+		input: `
+			kept = "one ; two"
+			trailing = "one ; two" ; a comment
+			color = #fff
+			flags = -a #b
+			`,
+		wantCUE: `
+			kept:     "one ; two"
+			trailing: "one ; two"
+			color:    "#fff"
+			flags:    "-a"
+			`,
+	}, {name: "TypedValues/RejectedNumberForms",
 		config: ini.Config{Values: ini.ValuesTyped},
 		input: `
 			hex = 0x10

@@ -135,8 +135,6 @@ type Config struct {
 	// Delimiters holds the bytes accepted between a key and its value;
 	// the first occurrence of any of them splits the line.
 	// The empty string means "=".
-	//
-	// Not implemented yet; "=" is always the delimiter.
 	Delimiters string
 
 	// InlineComments reports whether a ";" or "#" preceded by a space or
@@ -186,6 +184,9 @@ type Config struct {
 // NewDecoder creates a decoder for the INI flavor cfg describes.
 // The decoder keeps its own copy of cfg; later changes to cfg have no effect.
 func NewDecoder(filename string, r io.Reader, cfg Config) *Decoder {
+	if cfg.Delimiters == "" {
+		cfg.Delimiters = "="
+	}
 	d := &Decoder{r: r, filename: filename, cfg: cfg}
 	switch cfg.Continuations {
 	case ContinuationsBackslash:
@@ -581,21 +582,21 @@ func (d *Decoder) decodeValue(p *property) (ast.Expr, error) {
 	return d.makeValueLit(value, p.valuePos), nil
 }
 
-// parseKeyValue splits a line, its indentation removed, into key and value
-// using "=" as delimiter. It returns the trimmed key, the value with its
-// leading whitespace removed, the index of the value within line, whether
-// the line held no delimiter at all, and whether the line is a property. A
+// parseKeyValue splits text, a line without its indentation, at the first
+// of [Config.Delimiters]. It returns the trimmed key, the value with its
+// leading whitespace removed, the index of the value within text, whether the
+// line held no delimiter at all, and whether the line is a property. A
 // comment starting before any delimiter ends the line, leaving a bare key.
-func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, bare, ok bool) {
-	i := strings.IndexByte(line, '=')
+func (d *Decoder) parseKeyValue(text string) (key, value string, valueIdx int, bare, ok bool) {
+	i := strings.IndexAny(text, d.cfg.Delimiters)
 	keyEnd := i
 	if keyEnd < 0 {
-		keyEnd = len(line)
+		keyEnd = len(text)
 	}
-	if c := d.keyComment(line[:keyEnd]); c >= 0 {
+	if c := d.keyComment(text[:keyEnd]); c >= 0 {
 		i, keyEnd = -1, c
 	}
-	key = strings.TrimSpace(line[:keyEnd])
+	key = strings.TrimSpace(text[:keyEnd])
 	if i < 0 {
 		switch d.cfg.BareKeys {
 		case BareKeysNull, BareKeysTrue:
@@ -606,8 +607,8 @@ func (d *Decoder) parseKeyValue(line string) (key, value string, valueIdx int, b
 	if key == "" {
 		return "", "", 0, false, false
 	}
-	value = strings.TrimLeft(line[i+1:], " \t")
-	return key, value, len(line) - len(value), false, true
+	value = strings.TrimLeft(text[i+1:], " \t")
+	return key, value, len(text) - len(value), false, true
 }
 
 // keyComment returns the index of the comment that starts in s, the text

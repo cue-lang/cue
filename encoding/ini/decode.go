@@ -14,29 +14,94 @@
 
 // Package ini converts INI to CUE.
 //
-// INI files are a simple configuration format consisting of sections,
-// properties (key-value pairs), and comments. Since there is no single
-// standard for INI files, the zero [Config] accepts the subset every
-// flavor shares:
+// INI files hold sections, properties, and comments. There is no INI
+// specification, so the zero [Config] accepts only the subset that every
+// flavor shares and transforms nothing beyond trimming:
 //
-//   - Sections are declared with [name] headers; a repeated header
-//     reopens the section it names.
-//   - Properties use "key = value" syntax.
-//   - Lines whose first non-blank character is ; or # are comments;
-//     comments do not start within a value.
-//   - Values are the source text after the delimiter with leading and
-//     trailing whitespace trimmed and nothing else changed, so quotes,
-//     backslashes, ";" and "#" are all literal.
-//   - Blank lines are ignored, and a leading byte order mark is removed.
-//   - Duplicate keys within the same section are an error, as are an
-//     empty section name, text after "]", a line with no delimiter, and
-//     an empty key.
+//   - a section is introduced by a [name] header, and a repeated header
+//     reopens the section it names;
+//   - a property is "key = value";
+//   - a line whose first non-blank character is ";" or "#" is a comment,
+//     and a comment never starts within a value;
+//   - a value is the text after the delimiter with leading and trailing
+//     whitespace removed and nothing else changed, so quotes,
+//     backslashes, ";" and "#" are all literal;
+//   - blank lines are ignored, a leading byte order mark is removed, and
+//     lines may end in LF or CRLF;
+//   - a key repeated within a section, an empty section name, text after
+//     "]", a line with no delimiter, and an empty key are each an error
+//     carrying the position of the offending line.
 //
-// Flavor differences are selected through the fields of [Config].
+// Properties before the first header become top-level fields, and each
+// section becomes a struct field.
 //
-// Properties defined before any section header are placed at the
-// top level of the resulting CUE struct. Section names become nested
-// CUE struct fields.
+// # Options
+//
+// Every flavor difference is one field of [Config], selectable
+// independently of the others. The first value listed is the default:
+//
+//   - [Config.Delimiters]: the bytes splitting a key from its value, "="
+//     by default;
+//   - [Config.Comments]: [CommentsWholeLine], [CommentsInline],
+//     [CommentsAnywhere];
+//   - [Config.Quotes]: [QuotesLiteral], [QuotesStripped], [QuotesEscaped];
+//   - [Config.Case]: [CasePreserve], [CaseLowerKeys], [CaseLower],
+//     [CaseInsensitive];
+//   - [Config.DottedSections]: whether a dot in a section name nests, off
+//     by default;
+//   - [Config.QuotedSubsections]: whether a quoted part of a section name
+//     nests, off by default;
+//   - [Config.TrailingHeaderText]: whether text after a section header is
+//     ignored, off by default;
+//   - [Config.DuplicateKeys]: [DuplicatesError], [DuplicatesList],
+//     [DuplicatesFirst], [DuplicatesLast];
+//   - [Config.DuplicateSections]: [DuplicateSectionsMerge],
+//     [DuplicateSectionsError], [DuplicateSectionsFirst];
+//   - [Config.Continuations]: [ContinuationsNone],
+//     [ContinuationsBackslash], [ContinuationsBackslashSpace],
+//     [ContinuationsIndented];
+//   - [Config.BareKeys]: [BareKeysError], [BareKeysNull], [BareKeysTrue];
+//   - [Config.Values]: [ValuesStrings], [ValuesTyped];
+//   - [Config.Booleans]: [BooleansTrueFalse], [BooleansExtended].
+//
+// The same options describe the flavor for writing as well as reading.
+//
+// # Flavors
+//
+// A flavor is a complete [Config]. These functions each return the flavor
+// of one tool, reading a file as that tool does, so combining one with an
+// explicit option is an ordinary assignment:
+//
+//   - [GitConfig] sets [CommentsAnywhere], [QuotesEscaped], [CaseLower],
+//     [Config.DottedSections], [Config.QuotedSubsections],
+//     [DuplicatesList], [ContinuationsBackslash], and [BareKeysTrue];
+//   - [PythonConfig] sets [Config.Delimiters] to "=:", [CaseLowerKeys],
+//     [Config.TrailingHeaderText], [DuplicateSectionsError], and
+//     [ContinuationsIndented];
+//   - [SystemdConfig] sets [DuplicatesList] and
+//     [ContinuationsBackslashSpace];
+//   - [WindowsConfig] sets [QuotesStripped], [CaseInsensitive],
+//     [Config.TrailingHeaderText], [DuplicatesFirst], and
+//     [DuplicateSectionsFirst].
+//
+// A flavor aims to be compatible with its tool rather than identical to
+// it: a file the tool accepts decodes to the values the tool reads, while
+// some input the tool rejects may decode too. Each flavor documents where
+// it departs from its tool.
+//
+// On the command line the flavor tag of the ini file type names one, as
+// in "cue export ini+flavor=git: .gitconfig".
+//
+// # Unsupported
+//
+// These features of particular flavors are out of scope:
+//
+//   - value interpolation, such as configparser's %(name)s;
+//   - directives including another file, such as git's include.path;
+//   - configparser's [DEFAULT] fallbacks, so a [DEFAULT] header decodes
+//     as an ordinary section;
+//   - PHP's "key[] = value" arrays, whose key decodes literally;
+//   - input that is not valid UTF-8.
 //
 // WARNING: THIS PACKAGE IS EXPERIMENTAL.
 // ITS API MAY CHANGE AT ANY TIME.
@@ -65,7 +130,7 @@ const (
 	CommentsAnywhere                     // also any ";" or "#" outside quotes
 )
 
-// QuoteMode controls how the decoder treats quotation marks around a value.
+// QuoteMode controls how the decoder treats quotation marks in a value.
 type QuoteMode int
 
 const (
@@ -146,70 +211,131 @@ const (
 	BooleansExtended                     // also yes, no, on, off, 1, and 0
 )
 
-// Config describes an INI flavor. The zero value is the common subset
-// described in the package documentation; each field selects one flavor
-// difference, independently of all others.
+// Config describes an INI flavor. The zero value is the generic flavor,
+// the common subset described in the package documentation; each field
+// selects one flavor difference, independently of all others.
 //
 // Config is passed and returned by value, so a flavor such as [GitConfig]
-// combined with an explicit option is an ordinary assignment.
+// combined with an explicit option is an ordinary assignment. It describes
+// the flavor for writing as well as for reading; each field below states
+// its writing meaning where that is not simply the reverse of its reading
+// meaning.
 type Config struct {
 	// Delimiters holds the bytes accepted between a key and its value;
 	// the first occurrence of any of them splits the line.
-	// The empty string means "=".
+	// The empty string means "=", the default.
+	//
+	// When writing, the first byte is the one used.
 	Delimiters string
 
-	// Comments controls where a comment may start. By default only a
-	// whole line is a comment ([CommentsWholeLine]), so that no value is
-	// silently truncated.
+	// Comments controls where a comment may start. Under
+	// [CommentsWholeLine], the default, only a whole line is a comment, so
+	// that no value is silently truncated. [CommentsInline] also ends a
+	// line at a ";" or "#" that follows a space or tab, and
+	// [CommentsAnywhere] at any ";" or "#", as git does; under either, one
+	// within a quoted part of a value starts nothing. A comment may follow
+	// a section header, and one before the delimiter makes the line a bare
+	// key. Since a value is trimmed first, under [CommentsInline] a value
+	// whose first character is ";" or "#" is never a comment.
 	Comments CommentMode
 
-	// Quotes controls how quotation marks around a value are treated.
-	// By default they are ordinary characters ([QuotesLiteral]).
+	// Quotes controls how quotation marks in a value are treated:
+	// [QuotesLiteral], the default, leaves them as ordinary characters.
+	// [QuotesStripped] removes the first and last characters of a value
+	// that starts and ends with the same " or ', as the Windows profile API
+	// does. [QuotesEscaped] reads quotes as git does: a " anywhere opens or
+	// closes a quoted part of the value and is removed, and the escape
+	// sequences \\ \" \n \t and \b are interpreted throughout the value,
+	// any other being an error, as is a quoted part left open. A ' is then
+	// an ordinary character. A value holding a quote it removed stays a
+	// string under [ValuesTyped].
 	Quotes QuoteMode
 
-	// Case controls the case of keys and section names.
-	// By default the source case is preserved ([CasePreserve]).
+	// Case controls the case of keys and section names: [CasePreserve],
+	// the default, keeps the source case, [CaseLowerKeys] lowercases keys
+	// only, and [CaseLower] lowercases section names too.
+	// [CaseInsensitive] keeps the case of each name as first written, but
+	// a later name differing only in case is the same name, as the Windows
+	// profile API compares them. A quoted subsection name is never folded.
+	//
+	// When writing, two names in one scope that differ only in case are an
+	// error under [CaseInsensitive], as they are under folding.
 	Case CaseMode
 
 	// DottedSections reports whether dots in a section name separate
-	// nested sections. By default they are ordinary characters.
+	// nested sections, to any depth. By default they are ordinary
+	// characters.
 	DottedSections bool
 
 	// QuotedSubsections reports whether a section name of the form
-	// `a "b"` nests b one level below a, a backslash within the quotes
-	// escaping the character after it. By default it does not.
+	// `a "b"` nests b exactly one level below a, keeping its case. Within
+	// the quotes a backslash escapes the character after it, so \" and \\
+	// stand for a quote and a backslash, as git reads a subsection name.
+	// By default it does not.
 	QuotedSubsections bool
 
 	// TrailingHeaderText reports whether text after a section header is
-	// ignored, the name then ending at the last "]" on the line. By
-	// default such text is an error, unless [Config.Comments] makes it a
-	// comment.
+	// ignored, as configparser and the Windows profile API ignore it; the
+	// name then ends at the last "]" on the line. By default such text is
+	// an error, unless [Config.Comments] makes it a comment.
+	//
+	// It has no effect on writing, which never puts text after a header.
 	TrailingHeaderText bool
 
 	// DuplicateKeys controls what happens when a key recurs within a
-	// section. By default the second occurrence is an error
-	// ([DuplicatesError]).
+	// section: [DuplicatesError], the default, rejects the second
+	// occurrence, while [DuplicatesList], [DuplicatesFirst] and
+	// [DuplicatesLast] collect, keep, or replace.
+	//
+	// Only [DuplicatesList] lets a list be written; under the other three
+	// a list has no INI spelling, so writing one is an error.
 	DuplicateKeys DuplicateMode
 
-	// DuplicateSections controls what happens when a section header names
-	// a section an earlier header named. By default the section is
-	// reopened ([DuplicateSectionsMerge]).
+	// DuplicateSections controls what happens when a section header names a
+	// section an earlier header named: [DuplicateSectionsMerge], the
+	// default, reopens the section, [DuplicateSectionsError] rejects the
+	// header, as configparser does, and [DuplicateSectionsFirst] ignores the
+	// properties under it, as the Windows profile API does.
+	//
+	// It has no effect on writing, which writes each section once.
 	DuplicateSections DuplicateSectionMode
 
-	// Continuations controls how a value may span several lines.
-	// By default it may not ([ContinuationsNone]).
+	// Continuations controls how a value may span several lines: not at all
+	// ([ContinuationsNone], the default), through a trailing backslash that
+	// is dropped ([ContinuationsBackslash], as git config reads one) or
+	// that becomes a space ([ContinuationsBackslashSpace], as systemd reads
+	// one), or through lines indented further than the key
+	// ([ContinuationsIndented], as configparser reads them). A backslash is
+	// only a continuation within the value, so one inside an inline comment
+	// continues nothing, and a value ends at a blank line or the end of the
+	// input even after one.
+	//
+	// It selects the form a multi-line string is written in, and under
+	// [ContinuationsNone] such a value cannot be written.
 	Continuations ContinuationMode
 
-	// BareKeys controls what a line holding a key and no delimiter means.
-	// By default it is an error ([BareKeysError]).
+	// BareKeys controls what a line holding a key and no delimiter means:
+	// an error ([BareKeysError], the default), null ([BareKeysNull]), or
+	// true ([BareKeysTrue]). It is distinct from "key =", which is the
+	// empty string under every mode. No flavor described here reads a
+	// valueless key as null; [BareKeysNull] is for callers whose flavor
+	// treats one as unset rather than as enabled.
+	//
+	// Under [BareKeysTrue], true is written as a bare key when values are
+	// untyped.
 	BareKeys BareKeyMode
 
-	// Values controls whether the type of a value is interpreted.
-	// By default every value is a string ([ValuesStrings]).
+	// Values controls whether the type of a value is interpreted:
+	// [ValuesStrings], the default, makes every value a string, while
+	// [ValuesTyped] recognizes booleans and numbers.
 	Values ValueMode
 
 	// Booleans selects the vocabulary [ValuesTyped] recognizes as
-	// booleans. By default only true and false ([BooleansTrueFalse]).
+	// booleans: true and false only ([BooleansTrueFalse], the default),
+	// or also yes, no, on, off, 1 and 0 ([BooleansExtended]). It has no
+	// effect until [ValuesTyped] asks for values to be typed.
+	//
+	// It affects acceptance only; true and false are what gets written.
 	Booleans BooleanMode
 }
 

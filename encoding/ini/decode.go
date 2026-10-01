@@ -170,6 +170,11 @@ type Config struct {
 	// escaping the character after it. By default it does not.
 	QuotedSubsections bool
 
+	// TrailingHeaderText reports whether text after a section header is
+	// ignored, the name then ending at the last "]" on the line. By
+	// default such text is an error, unless it is an inline comment.
+	TrailingHeaderText bool
+
 	// DuplicateKeys controls what happens when a key recurs within a
 	// section. By default the second occurrence is an error
 	// ([DuplicatesError]).
@@ -719,9 +724,13 @@ func (d *Decoder) closingQuote(text string, from int, quote byte) int {
 }
 
 // sectionClose returns the index of the "]" closing a section header, or -1.
-// A quoted subsection name may hold a "]", so the scan skips quoted spans,
-// and the escapes within them, when [Config.QuotedSubsections] is set.
+// Under [Config.TrailingHeaderText] that is the last one on the line. A
+// quoted subsection name may hold a "]", so the scan otherwise skips quoted
+// spans, and the escapes within them, when [Config.QuotedSubsections] is set.
 func (d *Decoder) sectionClose(trimmed string) int {
+	if d.cfg.TrailingHeaderText {
+		return strings.LastIndexByte(trimmed, ']')
+	}
 	if !d.cfg.QuotedSubsections {
 		return strings.IndexByte(trimmed, ']')
 	}
@@ -750,7 +759,7 @@ func (d *Decoder) openSection(top *section, trimmed string, pos token.Pos) (*sec
 	if closeIdx < 0 {
 		return nil, errors.Newf(pos, "missing closing bracket for section header")
 	}
-	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" {
+	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" && !d.cfg.TrailingHeaderText {
 		if !d.cfg.InlineComments || !isComment(rest) {
 			return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
 		}

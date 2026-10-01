@@ -1868,6 +1868,24 @@ func TestDecoder(t *testing.T) {
 			s: key: "value"
 			`,
 	}, {
+		// configparser and the profile API end a header at its last "]" and
+		// ignore what follows it.
+		name:   "TrailingHeaderText",
+		config: ini.Config{TrailingHeaderText: true},
+		input: `
+			[s] ; a comment
+			a = 1
+			[t] anything
+			b = 2
+			[c]d]
+			e = 3
+			`,
+		wantCUE: `
+			s: a: "1"
+			t: b: "2"
+			"c]d": e: "3"
+			`,
+	}, {
 		name:  "LeadingBOM",
 		input: "\ufeffkey = value\n",
 		wantCUE: `

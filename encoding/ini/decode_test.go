@@ -1423,6 +1423,50 @@ func TestDecoder(t *testing.T) {
 			    test.ini:3:1
 			`,
 	}, {
+		// Names compare regardless of case, and keep the spelling they were
+		// first written with.
+		name:   "Case/Insensitive",
+		config: ini.Config{Case: ini.CaseInsensitive, DuplicateKeys: ini.DuplicatesFirst},
+		input: `
+			[Network]
+			Timeout = 30
+			timeout = 5
+			[NETWORK]
+			Proxy = example.com
+			`,
+		wantCUE: `
+			Network: {
+				Timeout: "30"
+				Proxy:   "example.com"
+			}
+			`,
+	}, {
+		name:   "Case/Insensitive/DuplicateAfterFolding",
+		config: ini.Config{Case: ini.CaseInsensitive},
+		input: `
+			Key = 1
+			KEY = 2
+			`,
+		wantErr: `
+			duplicate key: KEY:
+			    test.ini:2:1
+			`,
+	}, {
+		name:   "Case/Insensitive/QuotedSubsectionIsNeverFolded",
+		config: ini.Config{Case: ini.CaseInsensitive, QuotedSubsections: true},
+		input: `
+			[a "X"]
+			k = 1
+			[A "x"]
+			k = 2
+			`,
+		wantCUE: `
+			a: {
+				X: k: "1"
+				x: k: "2"
+			}
+			`,
+	}, {
 		name:   "TypedValues/IntegerValues",
 		config: ini.Config{Values: ini.ValuesTyped},
 		input: `

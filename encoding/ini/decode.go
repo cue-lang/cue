@@ -69,10 +69,11 @@ const (
 type CaseMode int
 
 const (
-	caseUnset     CaseMode = iota // default zero value; equal to [CasePreserve] for now
-	CasePreserve                  // keys and section names keep their source case
-	CaseLowerKeys                 // keys are lowercased, section names are not
-	CaseLower                     // keys and section names are lowercased
+	caseUnset       CaseMode = iota // default zero value; equal to [CasePreserve] for now
+	CasePreserve                    // keys and section names keep their source case
+	CaseLowerKeys                   // keys are lowercased, section names are not
+	CaseLower                       // keys and section names are lowercased
+	CaseInsensitive                 // keys and section names compare regardless of case, keeping their first spelling
 )
 
 // DuplicateMode controls how the decoder treats a key repeated within a section.
@@ -243,7 +244,7 @@ type section struct {
 	// holds the sections nested directly in this one, so that a section
 	// path is followed one segment at a time. A name in either map is a
 	// name taken, which is how a property and a section of the same name
-	// are found to collide.
+	// are found to collide. Both are keyed by [Decoder.fold].
 	props    map[string]*ast.Field
 	children map[string]*section
 	// headed reports whether a header has named this section, rather than
@@ -340,6 +341,15 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 // pos turns an offset into the input into a position.
 func (d *Decoder) pos(offset int) token.Pos {
 	return d.tokenFile.Pos(offset, token.NoRelPos)
+}
+
+// fold returns the name under which a key or section name is looked up,
+// which under [CaseInsensitive] ignores its case.
+func (d *Decoder) fold(name string) string {
+	if d.cfg.Case == CaseInsensitive {
+		return strings.ToLower(name)
+	}
+	return name
 }
 
 // line is one logical input line: the text to classify, and the offset at
@@ -563,10 +573,11 @@ func (d *Decoder) addProperty(p *property) error {
 	if err != nil {
 		return err
 	}
-	if p.sec.children[p.key] != nil {
+	name := d.fold(p.key)
+	if p.sec.children[name] != nil {
 		return errors.Newf(p.keyPos, "property %s conflicts with section of the same name", p.key)
 	}
-	if field := p.sec.props[p.key]; field != nil {
+	if field := p.sec.props[name]; field != nil {
 		return d.addDuplicate(p, field, v)
 	}
 	field := &ast.Field{
@@ -575,7 +586,7 @@ func (d *Decoder) addProperty(p *property) error {
 		TokenPos: p.keyPos,
 	}
 	p.sec.fields.Elts = append(p.sec.fields.Elts, field)
-	p.sec.props[p.key] = field
+	p.sec.props[name] = field
 	return nil
 }
 
@@ -748,36 +759,36 @@ func (d *Decoder) openSection(top *section, trimmed string, pos token.Pos) (*sec
 	if name == "" {
 		return nil, errors.Newf(pos, "empty section name")
 	}
-	parts, err := d.sectionPath(name, pos)
+	parts, quoted, err := d.sectionPath(name, pos)
 	if err != nil {
 		return nil, err
 	}
-	return d.buildNestedSection(top, parts, pos)
+	return d.buildNestedSection(top, parts, quoted, pos)
 }
 
 // sectionPath splits a section name into the path of struct fields it names.
 // Dots separate nested sections only under [Config.DottedSections], and a
 // quoted subsection name contributes exactly one segment, never case-folded,
-// only under [Config.QuotedSubsections].
-func (d *Decoder) sectionPath(name string, pos token.Pos) ([]string, error) {
+// only under [Config.QuotedSubsections]; quoted reports whether the last
+// segment is such a name.
+func (d *Decoder) sectionPath(name string, pos token.Pos) (parts []string, quoted bool, _ error) {
 	base, sub := name, ""
-	quoted := false
 	if d.cfg.QuotedSubsections {
 		if i := strings.IndexByte(name, '"'); i >= 0 {
 			var err error
 			if sub, err = subsection(name[i:]); err != nil {
-				return nil, errors.Newf(pos, "%v: %s", err, name)
+				return nil, false, errors.Newf(pos, "%v: %s", err, name)
 			}
 			base, quoted = strings.TrimSpace(name[:i]), true
 		}
 	}
-	parts := []string{base}
+	parts = []string{base}
 	if d.cfg.DottedSections {
 		parts = strings.Split(base, ".")
 	}
 	for i, part := range parts {
 		if part == "" {
-			return nil, errors.Newf(pos, "empty section name")
+			return nil, false, errors.Newf(pos, "empty section name")
 		}
 		if d.cfg.Case == CaseLower {
 			parts[i] = strings.ToLower(part)
@@ -786,7 +797,7 @@ func (d *Decoder) sectionPath(name string, pos token.Pos) ([]string, error) {
 	if quoted {
 		parts = append(parts, sub)
 	}
-	return parts, nil
+	return parts, quoted, nil
 }
 
 // subsection reads the quoted subsection name s, which starts with its
@@ -814,18 +825,24 @@ func subsection(s string) (string, error) {
 
 // buildNestedSection walks the section path down from top, creating the
 // sections along the way that do not exist yet, and returns the innermost
-// one. An error is returned if any segment collides with a property in its
-// parent, or if the header repeats under [DuplicateSectionsError]. Under
-// [DuplicateSectionsFirst] a repeated header returns a section attached to
-// nothing, so that its properties are read and then dropped.
-func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos) (*section, error) {
+// one; quoted reports whether the last segment is a quoted subsection name,
+// which [Decoder.fold] leaves alone. An error is returned if any segment
+// collides with a property in its parent, or if the header repeats under
+// [DuplicateSectionsError]. Under [DuplicateSectionsFirst] a repeated header
+// returns a section attached to nothing, so that its properties are read and
+// then dropped.
+func (d *Decoder) buildNestedSection(top *section, parts []string, quoted bool, pos token.Pos) (*section, error) {
 	cur := top
-	for _, part := range parts {
-		if child := cur.children[part]; child != nil {
+	for i, part := range parts {
+		name := part
+		if !quoted || i < len(parts)-1 {
+			name = d.fold(part)
+		}
+		if child := cur.children[name]; child != nil {
 			cur = child
 			continue
 		}
-		if cur.props[part] != nil {
+		if cur.props[name] != nil {
 			return nil, errors.Newf(pos, "section %s conflicts with property of the same name", part)
 		}
 		inner := &ast.StructLit{}
@@ -835,7 +852,7 @@ func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos
 			TokenPos: pos,
 		})
 		child := newSection(inner)
-		cur.children[part] = child
+		cur.children[name] = child
 		cur = child
 	}
 	if cur.headed {

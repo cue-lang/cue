@@ -19,9 +19,9 @@ stderr '^invalid --omit selector "main.": must not have empty elements$'
 ! exec cue get go --local --omit='main.[' .
 stderr '^invalid --omit selector "main.\[": syntax error in pattern$'
 ! exec cue get go --local --omit=a.b.c.Hidden .
-stderr '^invalid --omit selector "a.b.c.Hidden": must be pkg.Name$'
+stderr '^invalid --omit selector "a.b.c.Hidden": must be pkg.Name or pkg.Name.Method$'
 ! exec cue get go --local --omit=mod.test/blah .
-stderr '^invalid --omit selector "mod.test/blah": must be pkg.Name$'
+stderr '^invalid --omit selector "mod.test/blah": must be pkg.Name or pkg.Name.Method$'
 
 # Selectors must be able to match Go identifiers and import paths.
 ! exec cue get go --local --omit=main.Foo-Bar .

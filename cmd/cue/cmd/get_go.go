@@ -124,7 +124,8 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  UnmarshalJSONFrom, MarshalYAML, or UnmarshalYAML is translated to
 	  top (_) to indicate it may be any value. For some Go core types for
 	  which the implementation of these methods is known, like time.Time,
-	  the type may be more specific.
+	  the type may be more specific. These methods can be omitted with the
+	  --omit flag, as described below.
 
 	- a type implementing MarshalText or UnmarshalText is represented as
 	  the CUE type string
@@ -148,7 +149,7 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  between the generated CUE and the original Go.
 
 
-Omitting Declarations
+Omitting Declarations and Methods
 
 The --omit flag leaves out the type and constant declarations matched by
 any of its selectors written as pkg.Name. The package is given either by
@@ -162,6 +163,19 @@ package, as understood by Go's path.Match. For example:
 
 References to omitted types are translated to top, and the fields of an
 omitted embedded struct are added individually.
+
+A selector written as pkg.Name.Method instead translates the matched types
+as if they lacked the matched methods among those which make a type
+translate to top or string, such as MarshalJSON or UnmarshalText.
+This is useful when a type only implements them to validate its input,
+or to encode it the same way. For example:
+
+	--omit='v1.PodSpec.*'                # all encoding methods
+	--omit=v1.PodSpec.UnmarshalJSON      # just one of them
+	--omit='*.*.*YAML'                   # YAML methods of all types
+
+Note how --omit=v1.PodSpec omits the type, whereas --omit='v1.PodSpec.*'
+keeps the type and omits its encoding methods.
 A selector which matches nothing is an error.
 
 
@@ -257,7 +271,7 @@ restrictive enum interpretation of #Switch remains.
 		"print information about progress")
 
 	cmd.Flags().StringArray(string(flagOmit), nil,
-		"comma-separated selectors of declarations to omit, such as pkg.Name")
+		"comma-separated selectors of declarations or methods to omit, such as pkg.Name or pkg.Name.Method")
 
 	cmd.Flags().StringP(string(flagExclude), "e", "",
 		"comma-separated list of regexps of identifiers to omit")
@@ -333,6 +347,8 @@ type extractor struct {
 	omits []omitSelector
 	// omitted holds the declarations matched by --omit or --exclude.
 	omitted map[types.Object]bool
+	// omittedMethods holds the methods of named types matched by --omit.
+	omittedMethods map[omittedMethod]bool
 
 	codecs []*codec
 
@@ -521,10 +537,11 @@ func extract(cmd *Command, args []string) error {
 	}
 
 	e := extractor{
-		cmd:     cmd,
-		allPkgs: map[string]*packages.Package{},
-		orig:    map[types.Type]*ast.StructType{},
-		omitted: map[types.Object]bool{},
+		cmd:            cmd,
+		allPkgs:        map[string]*packages.Package{},
+		orig:           map[types.Type]*ast.StructType{},
+		omitted:        map[types.Object]bool{},
+		omittedMethods: map[omittedMethod]bool{},
 	}
 
 	for name := range strings.SplitSeq(flagCodec.String(cmd), ",") {
@@ -1059,24 +1076,30 @@ func (e *extractor) ownEncoding(typ types.Type) ownEncoding {
 
 func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
 	for _, iface := range toTop {
-		if implementsEither(typ, iface) {
+		if e.implements(typ, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to _", t, iface)
 			return encodesAsTop
 		}
 	}
-	if name := jsontextMethod(typ); name != "" {
+	if name := e.jsontextMethod(typ); name != "" {
 		e.logf("    %v has method %s; setting type to _", shortTypeName(typ), name)
 		return encodesAsTop
 	}
 	for _, iface := range toString {
-		if implementsEither(typ, iface) {
+		if e.implements(typ, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to string", t, iface)
 			return encodesAsString
 		}
 	}
 	return noOwnEncoding
+}
+
+// implements reports whether typ or *typ implements iface,
+// which has a single encoding method, unless that method is omitted.
+func (e *extractor) implements(typ types.Type, iface *types.Interface) bool {
+	return !e.omitsMethod(typ, iface.Method(0).Name()) && implementsEither(typ, iface)
 }
 
 // implementsEither reports whether typ or *typ implements iface.
@@ -1101,10 +1124,10 @@ var jsontextMethods = []struct{ name, param string }{
 }
 
 // jsontextMethod returns the name of the method of typ or *typ
-// from [jsontextMethods], if any.
-func jsontextMethod(typ types.Type) string {
+// from [jsontextMethods], if any, unless that method is omitted.
+func (e *extractor) jsontextMethod(typ types.Type) string {
 	for _, m := range jsontextMethods {
-		if hasJSONTextMethod(typ, m.name, m.param) {
+		if !e.omitsMethod(typ, m.name) && hasJSONTextMethod(typ, m.name, m.param) {
 			return m.name
 		}
 	}
@@ -1267,7 +1290,7 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type, c *codec) (o
 	case *types.Array:
 		return e.supportedType(stack, t.Elem(), c)
 	case *types.Map:
-		if !supportedMapKey(t.Key()) {
+		if !e.supportedMapKey(t.Key()) {
 			return false
 		}
 		if !e.supportedType(stack, t.Key(), c) {
@@ -1300,7 +1323,7 @@ func (e *extractor) supportedType(stack []types.Type, t types.Type, c *codec) (o
 // encoding.TextMarshaler or encoding.TextUnmarshaler.
 // Go 1.27 also added floats, and interfaces holding any of those.
 // All are encoded as string labels in CUE.
-func supportedMapKey(t types.Type) bool {
+func (e *extractor) supportedMapKey(t types.Type) bool {
 	if hasBasicInfo(t, types.IsString|types.IsInteger|types.IsFloat) {
 		return true
 	}
@@ -1308,7 +1331,7 @@ func supportedMapKey(t types.Type) bool {
 		return true
 	}
 	for _, iface := range toString {
-		if implementsEither(t, iface) {
+		if e.implements(t, iface) {
 			return true
 		}
 	}
@@ -1555,7 +1578,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		}
 
 	case *types.Map:
-		if !supportedMapKey(typ.Key()) {
+		if !e.supportedMapKey(typ.Key()) {
 			panic(fmt.Sprintf("unsupported map key type %v", typ.Key()))
 		}
 

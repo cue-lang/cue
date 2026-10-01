@@ -148,6 +148,23 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  between the generated CUE and the original Go.
 
 
+Omitting Declarations
+
+The --omit flag leaves out the type and constant declarations matched by
+any of its selectors written as pkg.Name. The package is given either by
+its name, such as "v1", or by its import path, such as
+"k8s.io/api/core/v1". Each element is a glob, such as "*" to match any
+package, as understood by Go's path.Match. For example:
+
+	--omit='*.Internal*'                 # declarations in any package
+	--omit=v1.PodSpec                    # by package name
+	--omit=k8s.io/api/core/v1.PodSpec    # by import path
+
+References to omitted types are translated to top, and the fields of an
+omitted embedded struct are added individually.
+A selector which matches nothing is an error.
+
+
 Native CUE Constraints
 
 Native CUE constraints may be defined in separate cue files alongside the
@@ -239,8 +256,12 @@ restrictive enum interpretation of #Switch remains.
 	cmd.Flags().BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
 
+	cmd.Flags().StringArray(string(flagOmit), nil,
+		"comma-separated selectors of declarations to omit, such as pkg.Name")
+
 	cmd.Flags().StringP(string(flagExclude), "e", "",
 		"comma-separated list of regexps of identifiers to omit")
+	cmd.Flags().MarkDeprecated(string(flagExclude), "use --omit instead")
 
 	cmd.Flags().Bool(string(flagLocal), false,
 		"generates files in the main module locally")
@@ -257,14 +278,17 @@ restrictive enum interpretation of #Switch remains.
 
 const (
 	flagExclude flagName = "exclude"
+	flagOmit    flagName = "omit"
 	flagLocal   flagName = "local"
 	flagCodec   flagName = "codec"
 
 	defaultCodec = "json,yaml"
 )
 
+// initExclusions records the declarations whose names match any of
+// the comma-separated regular expressions in str as omitted.
 func (e *extractor) initExclusions(str string) error {
-	e.exclude = str
+	var exclusions []*regexp.Regexp
 	for expr := range strings.SplitSeq(str, ",") {
 		if expr == "" {
 			continue
@@ -273,20 +297,19 @@ func (e *extractor) initExclusions(str string) error {
 		if err != nil {
 			return fmt.Errorf("invalid --%s regexp %q: %v", flagExclude, expr, err)
 		}
-		e.exclusions = append(e.exclusions, re)
+		exclusions = append(exclusions, re)
 	}
-	return nil
-}
-
-// omitsDecl reports whether the declaration of obj is left out,
-// in which case references to it are translated to top.
-func (e *extractor) omitsDecl(obj types.Object) bool {
-	for _, ex := range e.exclusions {
-		if ex.MatchString(obj.Name()) {
-			return true
+	if len(exclusions) == 0 {
+		return nil
+	}
+	for obj := range e.genDecls() {
+		for _, re := range exclusions {
+			if re.MatchString(obj.Name()) {
+				e.omitted[obj] = true
+			}
 		}
 	}
-	return false
+	return nil
 }
 
 type extractor struct {
@@ -306,8 +329,10 @@ type extractor struct {
 	cmap     ast.CommentMap
 	pkgNames map[string]pkgInfo
 
-	exclusions []*regexp.Regexp
-	exclude    string
+	// omits holds the --omit selectors, along with the packages they matched in.
+	omits []omitSelector
+	// omitted holds the declarations matched by --omit or --exclude.
+	omitted map[types.Object]bool
 
 	codecs []*codec
 
@@ -499,10 +524,7 @@ func extract(cmd *Command, args []string) error {
 		cmd:     cmd,
 		allPkgs: map[string]*packages.Package{},
 		orig:    map[types.Type]*ast.StructType{},
-	}
-
-	if err := e.initExclusions(flagExclude.String(cmd)); err != nil {
-		return err
+		omitted: map[types.Object]bool{},
 	}
 
 	for name := range strings.SplitSeq(flagCodec.String(cmd), ",") {
@@ -523,6 +545,12 @@ func extract(cmd *Command, args []string) error {
 	for _, p := range pkgs {
 		e.done[p.PkgPath] = true
 		e.addPackage(p)
+	}
+	if err := e.initExclusions(flagExclude.String(cmd)); err != nil {
+		return err
+	}
+	if err := e.initOmissions(flagOmit.StringArray(cmd)); err != nil {
+		return err
 	}
 
 	for _, p := range pkgs {
@@ -610,8 +638,11 @@ outer:
 	if val := flagCodec.String(e.cmd); val != defaultCodec {
 		args += " --" + string(flagCodec) + "=" + val
 	}
-	if e.exclude != "" {
-		args += " --exclude=" + e.exclude
+	if omits := e.omitsFor(p); len(omits) > 0 {
+		args += " --" + string(flagOmit) + "=" + strings.Join(omits, ",")
+	}
+	if val := flagExclude.String(e.cmd); val != "" {
+		args += " --" + string(flagExclude) + "=" + val
 	}
 
 	pName := flagPackage.String(e.cmd)
@@ -789,7 +820,7 @@ func (e *extractor) recordConsts(x *ast.GenDecl) {
 			continue
 		}
 		for _, n := range v.Names {
-			if n.Name == "_" || e.omitsDecl(e.pkg.TypesInfo.Defs[n]) {
+			if n.Name == "_" || e.omitted[e.pkg.TypesInfo.Defs[n]] {
 				continue
 			}
 			typ := e.pkg.TypesInfo.TypeOf(n)
@@ -826,7 +857,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 	case token.TYPE:
 		for _, s := range x.Specs {
 			v, ok := s.(*ast.TypeSpec)
-			if !ok || e.omitsDecl(e.pkg.TypesInfo.Defs[v.Name]) {
+			if !ok || e.omitted[e.pkg.TypesInfo.Defs[v.Name]] {
 				continue
 			}
 
@@ -922,7 +953,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			for i, name := range v.Names {
-				if name.Name == "_" || e.omitsDecl(e.pkg.TypesInfo.Defs[name]) {
+				if name.Name == "_" || e.omitted[e.pkg.TypesInfo.Defs[name]] {
 					continue
 				}
 				f := e.def(v.Doc, name.Name, nil, k == 0)
@@ -1083,6 +1114,13 @@ func jsontextMethod(typ types.Type) string {
 		}
 	}
 	return ""
+}
+
+// isStdPkg reports whether path is part of the Go standard library,
+// which Go defines as having no dot in the first path element.
+func isStdPkg(path string) bool {
+	firstElem, _, _ := strings.Cut(path, "/")
+	return !strings.Contains(firstElem, ".")
 }
 
 func addDoc(g *ast.CommentGroup, x cueast.Node) {
@@ -1381,8 +1419,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 			// TODO: for cases where the Go std type could be supported, we could still generate
 			// and import it under a non-std CUE package, such as cue.mod/gen/pkg.go.dev/time.
 			// TODO: Doc?
-			firstElem, _, _ := strings.Cut(pkg.Path(), "/")
-			if !strings.ContainsAny(firstElem, ".") {
+			if isStdPkg(pkg.Path()) {
 				if s := e.altType(obj.Type()); s != nil {
 					return s
 				}
@@ -1782,7 +1819,7 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 // nor for unexported types from other packages, as their definitions are hidden.
 func (e *extractor) canReference(t *types.Named) bool {
 	obj := t.Obj()
-	return !e.omitsDecl(obj) && (obj.Pkg() == e.pkg.Types || obj.Exported())
+	return !e.omitted[obj] && (obj.Pkg() == e.pkg.Types || obj.Exported())
 }
 
 // structEncoding describes which fields of a struct are encoded,

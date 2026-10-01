@@ -7,9 +7,7 @@ cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 # Marshal via Go's encoding/json and validate with the generated CUE schema.
 exec go run ./marshal
 cmp stdout go_marshal.json
-# The schema rejects the fields of ConflictingMethods, which it embeds as top.
-! exec cue vet -c schema.cue go_marshal.json
-stderr 'ConflictingMethods.kind: field not allowed'
+exec cue vet -c schema.cue go_marshal.json
 
 -- schema.cue --
 package schema
@@ -395,9 +393,8 @@ _#inner: hidden: string @go(Hidden)
 // ConflictingMethods has the fields of both embedded structs, as their
 // MarshalJSON methods conflict at the same depth, so neither is promoted.
 #ConflictingMethods: {
-	#Marshaler1
-
-	#Marshaler2
+	kind:  string @go(Kind)
+	value: string @go(Value)
 }
 
 #Root: {

@@ -1636,7 +1636,12 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 				e.logf("    Dropped embedded field %v as another holds any other object members", f.Name())
 			case !isStruct:
 				e.logf("    Dropped embedded field %v for unsupported type %v", f.Name(), f.Type())
-			case isNamed && !nilable && e.canReference(named) && e.embedsAsIs(fields, index+".", enc):
+			case isNamed && !nilable && e.canReference(named) &&
+				// The definition of a type which encodes itself is top or
+				// string, which only fits when the struct being generated
+				// encodes itself too. Otherwise, its fields are encoded.
+				(enc.encodesItself || e.ownEncoding(named) == noOwnEncoding) &&
+				e.embedsAsIs(fields, index+".", enc):
 				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
 				if len(st.Elts) > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
@@ -1782,6 +1787,10 @@ type structEncoding struct {
 	// fallback is the index path of the embedded field which holds
 	// any other object members, if any.
 	fallback string
+
+	// encodesItself is whether the struct has encoding methods of its own,
+	// such as those promoted from its embedded fields.
+	encodesItself bool
 }
 
 // within reports whether any encoded field is at the index path prefix.
@@ -1896,7 +1905,11 @@ func (e *extractor) findStructEncoding(x *types.Struct, c *codec) *structEncodin
 	for _, f := range fields {
 		byName[f.name] = append(byName[f.name], f)
 	}
-	enc := &structEncoding{codec: c, names: make(map[string]string)}
+	enc := &structEncoding{
+		codec:         c,
+		names:         make(map[string]string),
+		encodesItself: e.ownEncoding(x) != noOwnEncoding,
+	}
 	for _, fs := range byName {
 		// The fields were added in order of depth.
 		fs = slices.DeleteFunc(fs, func(f field) bool { return f.depth > fs[0].depth })

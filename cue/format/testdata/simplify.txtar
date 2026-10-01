@@ -61,6 +61,30 @@ layout: {
     "foo": 1 @attr()
 }
 
+quoting: {
+    // "#x" and "_y" are regular fields; unquoted, they would be a
+    // definition and a hidden field instead.
+    // TODO: they are unquoted.
+    #x: 1
+    "#x": 2
+    _y: 1
+    "_y": 2
+}
+
+shadow: {
+    s1: 1
+    v: {
+        // A quoted label does not bind references, so result refers to
+        // the outer s1 and the quotes on "s1" in v must stay.
+        // TODO: they are removed, so result refers to v.s1 instead.
+        "s1": 2
+        child: {
+            "s1": int
+            result: s1
+        }
+    }
+}
+
 x: {
 @tag0(foo)
     r1: baz1
@@ -177,6 +201,30 @@ a: {
 // An unquoted label keeps its position on its own line.
 layout: {
 	foo: 1 @attr()
+}
+
+quoting: {
+	// "#x" and "_y" are regular fields; unquoted, they would be a
+	// definition and a hidden field instead.
+	// TODO: they are unquoted.
+	#x: 1
+	#x: 2
+	_y: 1
+	_y: 2
+}
+
+shadow: {
+	s1: 1
+	v: {
+		// A quoted label does not bind references, so result refers to
+		// the outer s1 and the quotes on "s1" in v must stay.
+		// TODO: they are removed, so result refers to v.s1 instead.
+		s1: 2
+		child: {
+			"s1":   int
+			result: s1
+		}
+	}
 }
 
 x: {

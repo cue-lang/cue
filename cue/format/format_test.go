@@ -171,6 +171,48 @@ func TestFuncParamComments(t *testing.T) {
 	}
 }
 
+// TestClosingBracketComma checks that a bracketed list whose first element
+// starts on its own line closes on its own line too, after a trailing comma,
+// even when the source closes the list on the line of its last element.
+// Without the comma, formatting the output again would add one.
+func TestClosingBracketComma(t *testing.T) {
+	const head = "@experiment(functions)\n\n"
+	tests := []struct{ name, in, want string }{{
+		// The comma is missing, so formatting this again adds it.
+		name: "list",
+		in:   head + "x: [\n\t1, 2]\n",
+		want: head + "x: [\n\t1, 2\n]\n",
+	}, {
+		// The comma is missing, so formatting this again adds it.
+		name: "call",
+		in:   head + "x: f(\n\t1, 2)\n",
+		want: head + "x: f(\n\t1, 2\n)\n",
+	}, {
+		// The comma is missing, so formatting this again adds it.
+		name: "named call",
+		in:   head + "x: f(\n\ta: 1, b: 2)\n",
+		want: head + "x: f(\n\ta: 1, b: 2\n)\n",
+	}, {
+		// The comma is missing, so formatting this again adds it.
+		name: "func",
+		in:   head + "x: func(\n\ta: int, b: int) -> int\n",
+		want: head + "x: func(\n\ta: int, b: int\n) -> int\n",
+	}, {
+		// The list opens on the line of its first element, so it
+		// closes on the line of its last one, without a comma.
+		name: "open inline",
+		in:   head + "x: [1,\n\t2]\n",
+		want: head + "x: [1,\n\t2]\n",
+	}}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := format.Source([]byte(tc.in))
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(got), tc.want))
+		})
+	}
+}
+
 // TestClosedLiterals checks that both formatters keep the "#" of closed
 // literals, which the openlists experiment enables, for parsed and for
 // constructed nodes.

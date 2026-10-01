@@ -150,7 +150,7 @@ const (
 // described in the package documentation; each field selects one flavor
 // difference, independently of all others.
 //
-// Config is passed and returned by value, so a preset such as [GitConfig]
+// Config is passed and returned by value, so a flavor such as [GitConfig]
 // combined with an explicit option is an ordinary assignment.
 type Config struct {
 	// Delimiters holds the bytes accepted between a key and its value;

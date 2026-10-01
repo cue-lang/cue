@@ -1,3 +1,4 @@
+#flavor: systemd
 -- in.ini --
 # Sample systemd service unit, modelled on a .service file read per
 # systemd.syntax(7).
@@ -22,3 +23,15 @@ WantedBy=multi-user.target
 -- out/decode/default --
 duplicate key: Environment:
     in.ini:10:1
+-- out/decode/flavor --
+Unit: {
+	Description: "Example service"
+	After:       "network.target"
+}
+Service: {
+	Environment: ["FIRST=1", "SECOND=2", "THIRD=3"]
+	ExecStart:   "/bin/sh -c 'echo one ; echo two'"
+	ExecReload:  "/bin/kill -HUP $MAINPID  \t--timeout 5"
+	Restart:     "on-failure"
+}
+Install: WantedBy: "multi-user.target"

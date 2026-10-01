@@ -1,3 +1,4 @@
+#flavor: git
 -- in.ini --
 ; Sample git configuration, modelled on a .git/config file read by
 ; git-config.
@@ -19,6 +20,32 @@
 	insteadOf = ex:
 [alias]
 	ci = commit --verbose
+	say = !echo "one ; two" # prints both
+	cwd = !pwd#a comment needs no space
+[branch "fix/\"quoted\""]
+	remote = origin
 -- out/decode/default --
 duplicate key: fetch:
     in.ini:6:1
+-- out/decode/flavor --
+remote: origin: {
+	url:   "https://example.com/project.git"
+	fetch: ["+refs/heads/*:refs/remotes/origin/*", "+refs/tags/*:refs/tags/*"]
+}
+core: {
+	ignorecase:     "true"
+	sparsecheckout: true
+	excludesfile:   "~/.gitignore"
+}
+alias: {
+	lg:  "log --graph \t\t--oneline"
+	ci:  "commit --verbose"
+	say: "!echo one ; two"
+	cwd: "!pwd"
+}
+user: {
+	name:      "Jane \"JD\" Doe"
+	signature: "first line\nsecond line"
+}
+url: "https://example.com/": insteadof: "ex:"
+branch: "fix/\"quoted\"": remote:       "origin"

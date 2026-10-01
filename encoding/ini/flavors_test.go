@@ -33,9 +33,10 @@ import (
 )
 
 // TestFlavors decodes in.ini of each archive in testdata/flavors under the
-// zero Config into out/decode/default. An archive tagged #crlf is decoded with
-// CRLF line endings, which the archive does not store so that git cannot
-// convert them.
+// zero Config into out/decode/default, and under the flavor the archive
+// names with #flavor into out/decode/flavor. An archive tagged #crlf is
+// decoded with CRLF line endings, which the archive does not store so that
+// git cannot convert them.
 //
 // A file the zero Config accepts must also decode with every value equal to
 // its trimmed source text.
@@ -43,6 +44,12 @@ func TestFlavors(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "testdata/flavors",
 		Name: "decode",
+	}
+	flavors := map[string]func() ini.Config{
+		"git":     ini.GitConfig,
+		"python":  ini.PythonConfig,
+		"systemd": ini.SystemdConfig,
+		"windows": ini.WindowsConfig,
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
 		var data []byte
@@ -59,6 +66,11 @@ func TestFlavors(t *testing.T) {
 		expr := decode(t, t.Writer("default"), data, ini.Config{})
 		if expr != nil {
 			checkTrimmedValues(t, expr, data)
+		}
+		if name, ok := t.Value("flavor"); ok {
+			config := flavors[name]
+			qt.Assert(t, qt.IsNotNil(config), qt.Commentf("unknown flavor %q", name))
+			decode(t, t.Writer("flavor"), data, config())
 		}
 	})
 }
@@ -125,4 +137,70 @@ func flattenStrings(t testing.TB, expr ast.Expr, path []string, out map[string]s
 		out[strings.Join(path, "\x00")] = s
 	}
 	return out
+}
+
+// TestFlavorFields pins the option set of each flavor, which its
+// documentation states, and checks that two calls are independent values.
+func TestFlavorFields(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		got  ini.Config
+		want ini.Config
+	}{{
+		name: "GitConfig",
+		got:  ini.GitConfig(),
+		want: ini.Config{
+			Comments:          ini.CommentsAnywhere,
+			Quotes:            ini.QuotesEscaped,
+			Case:              ini.CaseLower,
+			DottedSections:    true,
+			QuotedSubsections: true,
+			DuplicateKeys:     ini.DuplicatesList,
+			Continuations:     ini.ContinuationsBackslash,
+			BareKeys:          ini.BareKeysTrue,
+		},
+	}, {
+		name: "PythonConfig",
+		got:  ini.PythonConfig(),
+		want: ini.Config{
+			Delimiters:         "=:",
+			Case:               ini.CaseLowerKeys,
+			TrailingHeaderText: true,
+			DuplicateSections:  ini.DuplicateSectionsError,
+			Continuations:      ini.ContinuationsIndented,
+		},
+	}, {
+		name: "SystemdConfig",
+		got:  ini.SystemdConfig(),
+		want: ini.Config{
+			DuplicateKeys: ini.DuplicatesList,
+			Continuations: ini.ContinuationsBackslashSpace,
+		},
+	}, {
+		name: "WindowsConfig",
+		got:  ini.WindowsConfig(),
+		want: ini.Config{
+			Quotes:             ini.QuotesStripped,
+			Case:               ini.CaseInsensitive,
+			TrailingHeaderText: true,
+			DuplicateKeys:      ini.DuplicatesFirst,
+			DuplicateSections:  ini.DuplicateSectionsFirst,
+		},
+	}}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			qt.Assert(t, qt.Equals(test.got, test.want))
+		})
+	}
+
+	// A flavor is a value, so overriding one option cannot affect the next
+	// caller.
+	cfg := ini.GitConfig()
+	cfg.Comments = ini.CommentsWholeLine
+	qt.Assert(t, qt.Equals(cfg.Comments, ini.CommentsWholeLine))
+	qt.Assert(t, qt.Equals(ini.GitConfig().Comments, ini.CommentsAnywhere))
 }

@@ -1,3 +1,4 @@
+#flavor: python
 -- in.ini --
 # Sample setup.cfg, modelled on a Python packaging configuration read by
 # configparser with its default settings.
@@ -10,13 +11,32 @@ long_description = The first line of the description
     the third line
 license = Apache-2.0
 
-[options]
+[options] ; read by setuptools
 python_requires: >=3.9
 zip_safe: False
 include_package_data: True
+install_requires =
+    requests
+
+    click
 
 [DEFAULT]
 verbose = 1
 -- out/decode/default --
 invalid line: the second line:
     in.ini:8:1
+-- out/decode/flavor --
+metadata: {
+	name:             "mypkg"
+	version:          "1.2.3"
+	summary:          "A sample package"
+	long_description: "The first line of the description\nthe second line\nthe third line"
+	license:          "Apache-2.0"
+}
+options: {
+	python_requires:      ">=3.9"
+	zip_safe:             "False"
+	include_package_data: "True"
+	install_requires:     "\nrequests\n\nclick"
+}
+DEFAULT: verbose: "1"

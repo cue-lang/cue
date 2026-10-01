@@ -633,7 +633,43 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "Delimiters/EqualsAndColon",
+		// A flavor is a starting point: assigning one field after the call
+		// changes exactly that behavior.
+		name:   "Override/GitWithoutInlineComments",
+		config: override(ini.GitConfig(), func(c *ini.Config) { c.Comments = ini.CommentsWholeLine }),
+		input: `
+			[remote "origin"]
+			fetch = +refs/heads/*:refs/remotes/origin/*
+			fetch = +refs/tags/*:refs/tags/*
+			[Core]
+			excludesFile = ~/.gitignore ; the user-wide ignore list
+			`,
+		wantCUE: `
+			remote: origin: fetch: ["+refs/heads/*:refs/remotes/origin/*", "+refs/tags/*:refs/tags/*"]
+			core: excludesfile: "~/.gitignore ; the user-wide ignore list"
+			`,
+	}, {
+		name:   "Override/PythonWithDuplicateLists",
+		config: override(ini.PythonConfig(), func(c *ini.Config) { c.DuplicateKeys = ini.DuplicatesList }),
+		input: `
+			[options]
+			install_requires: one
+			install_requires: two
+			`,
+		wantCUE: `
+			options: install_requires: ["one", "two"]
+			`,
+	}, {
+		name:   "Override/PythonKeepsItsOtherOptions",
+		config: override(ini.PythonConfig(), func(c *ini.Config) { c.DuplicateKeys = ini.DuplicatesList }),
+		input: `
+			[metadata]
+			Name = mypkg
+			`,
+		wantCUE: `
+			metadata: name: "mypkg"
+			`,
+	}, {name: "Delimiters/EqualsAndColon",
 		config: ini.Config{Delimiters: "=:"},
 		input: `
 			[options]
@@ -1972,6 +2008,13 @@ func TestPositions(t *testing.T) {
 	field := sec.Value.(*ast.StructLit).Elts[0].(*ast.Field)
 	qt.Assert(t, qt.Equals(field.Label.Pos().String(), "test.ini:2:1"))
 	qt.Assert(t, qt.Equals(field.Value.Pos().String(), "test.ini:2:7"))
+}
+
+// override applies fn to a copy of cfg, so that a table case can state a
+// flavor plus the one option it changes.
+func override(cfg ini.Config, fn func(*ini.Config)) ini.Config {
+	fn(&cfg)
+	return cfg
 }
 
 // unindent strips the common leading whitespace from a multi-line raw string,

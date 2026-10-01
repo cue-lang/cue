@@ -33,12 +33,16 @@ func (w *walker) simplifyLabels(n ast.Node) {
 	ls.markReferences(n)
 }
 
-// labelSimplifier tracks, per scope, a map from candidate names to
-// whether they are still eligible for unquoting (true means no
+// labelSimplifier tracks, per scope, a map from the names of quoted
+// labels to whether they are still eligible for unquoting (true means no
 // reference observed yet).
 type labelSimplifier struct {
 	parent *labelSimplifier
 	scope  map[string]bool
+
+	// bound holds the names which identifier labels bind in this scope.
+	// Quoted labels do not bind references.
+	bound map[string]bool
 
 	// walker is shared by every scope of one simplification run; it
 	// holds the permission to rewrite a label.
@@ -100,14 +104,17 @@ func (s *labelSimplifier) markLabelReferences(n ast.Node) bool {
 	return true
 }
 
-// markReference invalidates the candidate for a referenced name. We walk
-// outwards through enclosing scopes and invalidate the candidate in the
-// innermost scope that has this name. Outer scopes that happen to also
-// use the name stay valid (shadowing semantics).
+// markReference invalidates the candidates for a referenced name. We
+// walk outwards through enclosing scopes and invalidate the candidate in
+// each scope up to the innermost one binding this name, as the reference
+// resolves past any quoted labels. Outer scopes that happen to also use
+// the name stay valid (shadowing semantics).
 func (s *labelSimplifier) markReference(x *ast.Ident) {
 	for c := s; c != nil; c = c.parent {
 		if _, ok := c.scope[x.Name]; ok {
 			c.scope[x.Name] = false
+		}
+		if c.bound[x.Name] {
 			break
 		}
 	}
@@ -115,9 +122,9 @@ func (s *labelSimplifier) markReference(x *ast.Ident) {
 
 // processDecls runs the three sub-passes we apply to one body.
 func (s *labelSimplifier) processDecls(decls []ast.Decl) {
-	sc := &labelSimplifier{parent: s, scope: map[string]bool{}, walker: s.walker}
+	sc := &labelSimplifier{parent: s, scope: map[string]bool{}, bound: map[string]bool{}, walker: s.walker}
 
-	// Sub-pass 1: collect candidates from labels.
+	// Sub-pass 1: collect candidates and bound names from labels.
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
@@ -168,10 +175,10 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 }
 
 // markStrings walks a label subtree, recording every unquotable string
-// and every identifier as a candidate for the current scope. ListLit,
-// Interpolation, and ParenExpr labels (pattern constraints, interpolated
-// strings, dynamic labels) are not candidates, and the identifiers in
-// them are references, so we stop the walk there.
+// as a candidate for the current scope, and every identifier as a name
+// bound by it. ListLit, Interpolation, and ParenExpr labels (pattern
+// constraints, interpolated strings, dynamic labels) are not candidates,
+// and the identifiers in them are references, so we stop the walk there.
 func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.BasicLit:
@@ -182,7 +189,7 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 		s.scope[str] = true
 
 	case *ast.Ident:
-		s.scope[x.Name] = true
+		s.bound[x.Name] = true
 
 	case *ast.ListLit, *ast.Interpolation, *ast.ParenExpr:
 		return false

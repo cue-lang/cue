@@ -64,7 +64,6 @@ layout: {
 quoting: {
     // "#x" and "_y" are regular fields; unquoted, they would be a
     // definition and a hidden field instead.
-    // TODO: they are unquoted.
     #x: 1
     "#x": 2
     _y: 1
@@ -76,7 +75,6 @@ shadow: {
     v: {
         // A quoted label does not bind references, so result refers to
         // the outer s1 and the quotes on "s1" in v must stay.
-        // TODO: they are removed, so result refers to v.s1 instead.
         "s1": 2
         child: {
             "s1": int
@@ -206,11 +204,10 @@ layout: {
 quoting: {
 	// "#x" and "_y" are regular fields; unquoted, they would be a
 	// definition and a hidden field instead.
-	// TODO: they are unquoted.
-	#x: 1
-	#x: 2
-	_y: 1
-	_y: 2
+	#x:   1
+	"#x": 2
+	_y:   1
+	"_y": 2
 }
 
 shadow: {
@@ -218,8 +215,7 @@ shadow: {
 	v: {
 		// A quoted label does not bind references, so result refers to
 		// the outer s1 and the quotes on "s1" in v must stay.
-		// TODO: they are removed, so result refers to v.s1 instead.
-		s1: 2
+		"s1": 2
 		child: {
 			"s1":   int
 			result: s1

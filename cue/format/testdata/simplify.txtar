@@ -57,7 +57,6 @@ a: {
 "#A": dontSimplify
 
 // An unquoted label keeps its position on its own line.
-// TODO: it is pulled onto the line of the opening brace.
 layout: {
     "foo": 1 @attr()
 }
@@ -176,8 +175,8 @@ a: {
 "#A": dontSimplify
 
 // An unquoted label keeps its position on its own line.
-// TODO: it is pulled onto the line of the opening brace.
-layout: {foo: 1 @attr()
+layout: {
+	foo: 1 @attr()
 }
 
 x: {
@@ -200,6 +199,7 @@ y: {
 		bar:       "a-value"
 		[!="bar"]: {}
 	}
+
 	b: {
 		x: {
 			bar: "bar"
@@ -208,6 +208,7 @@ y: {
 				"a": "baz"
 			}.a & !="bar"]: {}
 		}
+
 		y: {
 			bar: "a-value"
 			({

@@ -922,7 +922,6 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				var named []cueast.Decl
 				for _, v := range enums {
 					label := cueast.NewString(v)
-					cueast.SetRelPos(label, cuetoken.Blank)
 
 					x := e.ident(v, true)
 					cueast.SetRelPos(x, cuetoken.Newline)

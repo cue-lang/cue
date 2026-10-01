@@ -163,7 +163,7 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 		if !s.walker.tryMutate() {
 			return
 		}
-		f.Label = ast.NewIdent(str)
+		f.Label = &ast.Ident{NamePos: bl.ValuePos, Name: str}
 	}
 }
 

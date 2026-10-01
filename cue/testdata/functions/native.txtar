@@ -448,6 +448,11 @@ cycles: {
 		inc:      func(n: int) -> int: n + 1
 		composed: comp(comp(comp(inc, inc), inc), inc)(1) @test(eq, 5)
 
+		// The same holds for closures created at a single call site, by
+		// separate calls of one helper.
+		wrap:    func(f: _): comp(f, inc)
+		wrapped: wrap(wrap(wrap(inc)))(1) @test(eq, 5)
+
 		// Equal closures nest freely at distinct call sites, or when one is
 		// an argument of the other.
 		mk:      func(k: int): func(v: int) -> int: v + k
@@ -741,51 +746,51 @@ structural cycle:
 4 errors in empty disjunction::
     ./in.cue:398:8
 [incomplete] disjunction.ambiguous.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | func(a: int) -> int: ... (type func):
-    ./in.cue:471:8
+    ./in.cue:476:8
 [incomplete] disjunction.builtins.out: cannot call h: unresolved disjunction strings.ToUpper | strings.ToLower (type func):
-    ./in.cue:491:8
+    ./in.cue:496:8
 [incomplete] disjunction.mixed.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | 1 (type (int|func)):
-    ./in.cue:495:8
+    ./in.cue:500:8
 [eval] conflicting values 2 and 1:
-    ./in.cue:500:12
-    ./in.cue:500:16
+    ./in.cue:505:12
+    ./in.cue:505:16
 [incomplete] disjunction.callee.incomplete.out: cannot call non-concrete value x (type _):
-    ./in.cue:503:9
+    ./in.cue:508:9
 [incomplete] a: undefined field: q:
-    ./in.cue:543:9
-    ./in.cue:542:2
+    ./in.cue:548:9
+    ./in.cue:547:2
 [incomplete] incompleteArgs.z: undefined field: q:
-    ./in.cue:546:11
-    ./in.cue:542:2
+    ./in.cue:551:11
+    ./in.cue:547:2
 [eval] declarations.open.bad: cannot call function without implementation:
-    ./in.cue:585:8
+    ./in.cue:590:8
 [eval] partial.missing: missing argument c:
-    ./in.cue:621:11
+    ./in.cue:626:11
 [eval] b: invalid value 50 (out of bound <10):
-    ./in.cue:624:27
-    ./in.cue:626:18
+    ./in.cue:629:27
+    ./in.cue:631:18
 [eval] partial.tooMany: too many positional arguments in function call:
-    ./in.cue:630:11
+    ./in.cue:635:11
 [structural_cycle] structural cycle:
-    ./in.cue:634:31
+    ./in.cue:639:31
 [eval] partial.conflictArgs: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:593:7
+    ./in.cue:598:7
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:593:7
-    ./in.cue:646:17
+    ./in.cue:598:7
+    ./in.cue:651:17
 -- out/eval/stats --
-Leaks:  109
-Freed:  1356
-Reused: 1309
-Allocs: 156
+Leaks:  115
+Freed:  1397
+Reused: 1349
+Allocs: 163
 Retain: 0
 
-Unifications: 1185
-Conjuncts:    3421
+Unifications: 1232
+Conjuncts:    3558
 Disjuncts:    224
 Notifications: 8
 
-NumCloseIDs: 592
+NumCloseIDs: 624
 
-ConjunctInfos:       1355
+ConjunctInfos:       1401
 MaxConjunctInfos:    8

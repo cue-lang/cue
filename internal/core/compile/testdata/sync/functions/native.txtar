@@ -439,6 +439,11 @@ cycles: {
 		inc:      func(n: int) -> int: n + 1
 		composed: comp(comp(comp(inc, inc), inc), inc)(1)
 
+		// The same holds for closures created at a single call site, by
+		// separate calls of one helper.
+		wrap:    func(f: _): comp(f, inc)
+		wrapped: wrap(wrap(wrap(inc)))(1)
+
 		// Equal closures nest freely at distinct call sites, or when one is
 		// an argument of the other.
 		mk:      func(k: int): func(v: int) -> int: v + k
@@ -955,6 +960,8 @@ partial: {
       comp: func(f: _, g: _): func(x: _): 〈1;f〉(〈1;g〉(〈0;x〉))
       inc: func(n: int) -> int: (〈0;n〉 + 1)
       composed: 〈0;comp〉(〈0;comp〉(〈0;comp〉(〈0;inc〉, 〈0;inc〉), 〈0;inc〉), 〈0;inc〉)(1)
+      wrap: func(f: _): 〈1;comp〉(〈0;f〉, 〈1;inc〉)
+      wrapped: 〈0;wrap〉(〈0;wrap〉(〈0;wrap〉(〈0;inc〉)))(1)
       mk: func(k: int): func(v: int) -> int: (〈0;v〉 + 〈1;k〉)
       apply: func(f: _, v: _): 〈0;f〉(〈0;v〉)
       closures: 〈0;mk〉(1)(〈0;mk〉(1)(1))

@@ -220,7 +220,7 @@ y1: {
 		for x in src
 		let y = x {
 			y
-		}
+		},
 	]
 }
 preserveKeyFieldInComprehension: {

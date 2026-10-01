@@ -22,7 +22,7 @@ info: {
 }
 
 paths: "/x": get: responses: "400": content: "application/json": schema: #: strings.MinRunes(
-	1
+	1,
 )
 -- out/TestExtractV2-v3-noshare/out.cue --
 import "strings"
@@ -34,5 +34,5 @@ info: {
 }
 
 paths: "/x": get: responses: "400": content: "application/json": schema: #: strings.MinRunes(
-	1
+	1,
 )

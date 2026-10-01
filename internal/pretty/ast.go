@@ -1241,14 +1241,12 @@ type bracketedLayout struct {
 	// or default does (see [funcParamComments]).
 	forceOpenBreak bool
 
-	// allowsTrailingComma reports whether CUE syntax permits a
-	// trailing comma before the closing bracket. True for list
-	// literals only; struct fields are separated by commas/newlines
-	// but `}` itself does not accept a trailing comma, and `f(a,)`
-	// is a parse error. Centralising the rule here means the policy
-	// for "do we want one on the last element?" lives in
+	// allowsTrailingComma reports whether the last element may carry
+	// a trailing comma before the closing bracket: true for calls,
+	// parameter lists, and lists other than comma-free ones; false
+	// for structs. Whether it does is decided by
 	// computeBracketedPolicy as policy.wantTrailingComma rather than
-	// scattered in each callsite.
+	// at each callsite.
 	allowsTrailingComma bool
 
 	inner doc // body content; interior comments already prepended/appended for struct/list
@@ -1503,30 +1501,6 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	// opener lands on its own line, so dropping the [docNest] would
 	// under-indent the body - hence the infiniteWidth gate.
 	shareIndent := infiniteWidth && shareIndentPermitted && !hugFirst && !forceOpen && (b.sameLineOpen || b.noElemNewline)
-	// Trailing comma policy. The if-condition excludes brackets whose
-	// syntax disallows a trailing comma (allowsTrailingComma) and
-	// brackets where hugging the closer to the last element (`{a:1}]`)
-	// would place the comma against the closer. Inside the if-block:
-	//
-	//   - !authored => no RelPos in subtree: always want one. The
-	//     runtime [docSwitchMode] inside commaWhenBroken resolves to
-	//     "" when the bracket fits flat, so emitting unconditionally
-	//     here is safe.
-	//   - otherwise the comma must be decided statically - only when
-	//     the closing bracket has Newline/NewSection RelPos (i.e.
-	//     lands on its own line). commaWhenBroken's [docSwitchMode]
-	//     cannot be trusted here: it follows the enclosing group's
-	//     mode, and under [infiniteWidth] that group renders broken
-	//     whenever *any* hard break exists in the subtree - including
-	//     layouts where the closer still hugs the last element on a
-	//     shared line (`[a,\n b]`), where a comma must not appear. The
-	//     closer's placement in authored-mode is static (closerRel),
-	//     so the comma keys off the same signal.
-	wantTrailingComma := false
-	authored := c.authored(b.node)
-	if b.allowsTrailingComma && !hugLast {
-		wantTrailingComma = !authored || b.closerRel >= token.Newline
-	}
 	// A bracketed body that opens broken must also close broken: when
 	// the first element starts on its own line (or
 	// interior/line-header comments force the open break), the closing
@@ -1549,6 +1523,16 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	}
 	openBreaks := b.lineHeader || b.hasInterior || leadRel >= token.Newline || forceOpen
 	forceClose := openBreaks || b.closerRel >= token.Newline
+	// The last element carries a trailing comma when the closer lands
+	// on its own line, unless the closer hugs it (`{a:1}]`). Without
+	// RelPos in the subtree, the runtime [docSwitchMode] inside
+	// commaWhenBroken drops the comma when the bracket fits flat.
+	// Otherwise the decision is static: under [infiniteWidth] the
+	// enclosing group renders broken whenever any hard break exists in
+	// the subtree, even where the closer shares a line with the last
+	// element (`[a,\n b]`), so the comma follows forceClose instead.
+	wantTrailingComma := b.allowsTrailingComma && !hugLast &&
+		(forceClose || !c.authored(b.node))
 	return bracketedPolicy{
 		hugFirst:          hugFirst,
 		hugLast:           hugLast,

@@ -86,7 +86,7 @@ _out: [
     for k, v in X
     if k =~ K.#x {
         v
-    }
+    },
 ]
 
 //cue:path: x

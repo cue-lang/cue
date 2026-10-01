@@ -178,25 +178,21 @@ func TestFuncParamComments(t *testing.T) {
 func TestClosingBracketComma(t *testing.T) {
 	const head = "@experiment(functions)\n\n"
 	tests := []struct{ name, in, want string }{{
-		// The comma is missing, so formatting this again adds it.
 		name: "list",
 		in:   head + "x: [\n\t1, 2]\n",
-		want: head + "x: [\n\t1, 2\n]\n",
+		want: head + "x: [\n\t1, 2,\n]\n",
 	}, {
-		// The comma is missing, so formatting this again adds it.
 		name: "call",
 		in:   head + "x: f(\n\t1, 2)\n",
-		want: head + "x: f(\n\t1, 2\n)\n",
+		want: head + "x: f(\n\t1, 2,\n)\n",
 	}, {
-		// The comma is missing, so formatting this again adds it.
 		name: "named call",
 		in:   head + "x: f(\n\ta: 1, b: 2)\n",
-		want: head + "x: f(\n\ta: 1, b: 2\n)\n",
+		want: head + "x: f(\n\ta: 1, b: 2,\n)\n",
 	}, {
-		// The comma is missing, so formatting this again adds it.
 		name: "func",
 		in:   head + "x: func(\n\ta: int, b: int) -> int\n",
-		want: head + "x: func(\n\ta: int, b: int\n) -> int\n",
+		want: head + "x: func(\n\ta: int, b: int,\n) -> int\n",
 	}, {
 		// The list opens on the line of its first element, so it
 		// closes on the line of its last one, without a comma.

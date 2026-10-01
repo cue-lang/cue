@@ -38,7 +38,7 @@ let EXTRACT = {
 			{
 				FEATURES
 			},
-			{devMode: false}
+			{devMode: false},
 		][0]
 	}
 }
@@ -58,7 +58,7 @@ let EXTRACT = {
 			{
 				FEATURES
 			},
-			{devMode: false}
+			{devMode: false},
 		][0]
 	}
 }

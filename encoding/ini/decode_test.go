@@ -175,7 +175,7 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name: "InlineComments/OffByDefault",
+		name: "Comments/WholeLineByDefault",
 		input: `
 			[Service]
 			ExecStart=/bin/echo one ; /bin/echo two
@@ -190,8 +190,8 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
-		name:   "InlineComments/On",
-		config: ini.Config{InlineComments: true},
+		name:   "Comments/Inline",
+		config: ini.Config{Comments: ini.CommentsInline},
 		input: `
 			[section]
 			key1 = value1 ; this is an inline comment
@@ -206,9 +206,40 @@ func TestDecoder(t *testing.T) {
 			}
 			`,
 	}, {
+		// git ends a value at any ";" or "#" outside quotes, so a value
+		// starting with one is empty.
+		name:   "Comments/Anywhere",
+		config: ini.Config{Comments: ini.CommentsAnywhere},
+		input: `
+			[section]
+			x = a#b
+			color = #fff
+			z = a;b
+			quoted = "a#b";c
+			`,
+		wantCUE: `
+			section: {
+				x:      "a"
+				color:  ""
+				z:      "a"
+				quoted: "\"a#b\""
+			}
+			`,
+	}, {
+		// Under git's quoting an escaped quote opens nothing, so a comment
+		// after it still ends the value.
+		name:   "Comments/Anywhere/EscapedQuote",
+		config: ini.Config{Comments: ini.CommentsAnywhere, Quotes: ini.QuotesEscaped},
+		input: `
+			x = a\" # "b
+			`,
+		wantCUE: `
+			x: "a\""
+			`,
+	}, {
 		// A comment before the delimiter ends the line, leaving a bare key.
 		name:   "Comments/BeforeTheDelimiter",
-		config: ini.Config{InlineComments: true, BareKeys: ini.BareKeysTrue},
+		config: ini.Config{Comments: ini.CommentsInline, BareKeys: ini.BareKeysTrue},
 		input: `
 			[core]
 			autocrlf # a comment
@@ -222,7 +253,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "Comments/BeforeTheDelimiter/BareKeysOff",
-		config: ini.Config{InlineComments: true},
+		config: ini.Config{Comments: ini.CommentsInline},
 		input: `
 			flag ; see a=b
 			`,
@@ -629,8 +660,8 @@ func TestDecoder(t *testing.T) {
 			    test.ini:2:1
 			`,
 	}, {
-		name:   "InlineComments/QuotedValueKeepsIt",
-		config: ini.Config{InlineComments: true, Quotes: ini.QuotesStripped},
+		name:   "Comments/Inline/QuotedValueKeepsIt",
+		config: ini.Config{Comments: ini.CommentsInline, Quotes: ini.QuotesStripped},
 		input: `
 			kept = "one ; two"
 			trailing = "one ; two" ; a comment
@@ -823,7 +854,7 @@ func TestDecoder(t *testing.T) {
 		// A backslash reached only by ignoring an inline comment is part of
 		// the comment, so it continues nothing and the next property stands.
 		name:   "Continuations/Backslash/BackslashInsideAnInlineComment",
-		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, Comments: ini.CommentsInline},
 		input: `
 			[core]
 			a = one ; a comment \
@@ -838,7 +869,7 @@ func TestDecoder(t *testing.T) {
 	}, {
 		// Inline comments apply to continued text too.
 		name:   "Continuations/Backslash/ContinuedTextCarriesAComment",
-		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, Comments: ini.CommentsInline},
 		input: `
 			a = one\
 			two ; a comment
@@ -848,7 +879,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "Continuations/Backslash/QuotedValueSpansLines",
-		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true, Quotes: ini.QuotesEscaped},
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, Comments: ini.CommentsInline, Quotes: ini.QuotesEscaped},
 		input: `
 			[a]
 			key = "one ; two \
@@ -862,7 +893,7 @@ func TestDecoder(t *testing.T) {
 		// line the value continues onto, as git reads a double quote, while
 		// one with no match anywhere stays an ordinary character.
 		name:   "Continuations/Backslash/QuotedSpanWithinAValueSpansLines",
-		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true, Quotes: ini.QuotesEscaped},
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, Comments: ini.CommentsInline, Quotes: ini.QuotesEscaped},
 		input: `
 			[alias]
 			demo = !echo "one \
@@ -885,7 +916,7 @@ func TestDecoder(t *testing.T) {
 		// next property stands. Both backslashes stay in the value, since
 		// nothing unescapes an unquoted one.
 		name:   "Continuations/Backslash/EscapedTrailingBackslash",
-		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, Comments: ini.CommentsInline},
 		input: `
 			[core]
 			a = path\\
@@ -911,7 +942,7 @@ func TestDecoder(t *testing.T) {
 		// A comment may open the line a value continues onto, which ends the
 		// value there, keeping the space before the backslash as git does.
 		name:   "Continuations/Backslash/CommentOpensTheContinuedLine",
-		config: ini.Config{Continuations: ini.ContinuationsBackslash, InlineComments: true},
+		config: ini.Config{Continuations: ini.ContinuationsBackslash, Comments: ini.CommentsInline},
 		input: `
 			[a]
 			k = one \
@@ -1036,7 +1067,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "Continuations/Indented/InlineCommentInContinuedText",
-		config: ini.Config{Continuations: ini.ContinuationsIndented, InlineComments: true},
+		config: ini.Config{Continuations: ini.ContinuationsIndented, Comments: ini.CommentsInline},
 		input: `
 			key = first ; a comment
 			    second ; another
@@ -1046,7 +1077,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "Continuations/Indented/QuotedSpanWithinAValueSpansLines",
-		config: ini.Config{Continuations: ini.ContinuationsIndented, InlineComments: true},
+		config: ini.Config{Continuations: ini.ContinuationsIndented, Comments: ini.CommentsInline},
 		input: `
 			key = one "two
 			    three ; four" ; a comment
@@ -1773,7 +1804,7 @@ func TestDecoder(t *testing.T) {
 		// A quoted span protects its contents wherever it sits in the value,
 		// not only when it opens the value.
 		name:   "Quotes/Stripped/QuotedSpanWithinAValue",
-		config: ini.Config{Quotes: ini.QuotesStripped, InlineComments: true},
+		config: ini.Config{Quotes: ini.QuotesStripped, Comments: ini.CommentsInline},
 		input: `
 			[alias]
 			show = !echo "one # two"
@@ -1791,7 +1822,7 @@ func TestDecoder(t *testing.T) {
 		// An unmatched quote that does not open the value is an ordinary
 		// character, so an apostrophe does not protect what follows it.
 		name:   "Quotes/Stripped/ApostropheIsNotAQuote",
-		config: ini.Config{Quotes: ini.QuotesStripped, InlineComments: true},
+		config: ini.Config{Quotes: ini.QuotesStripped, Comments: ini.CommentsInline},
 		input: `
 			apos = don't ; a comment
 			`,
@@ -1802,7 +1833,7 @@ func TestDecoder(t *testing.T) {
 		// The closing quote may only arrive on a continuation line, so until
 		// it does the whole remainder is quoted and holds no comment.
 		name:   "Quotes/Stripped/UnfinishedQuoteHoldsNoComment",
-		config: ini.Config{Quotes: ini.QuotesStripped, InlineComments: true},
+		config: ini.Config{Quotes: ini.QuotesStripped, Comments: ini.CommentsInline},
 		input: `
 			[section]
 			foo = "one ; two
@@ -1812,7 +1843,7 @@ func TestDecoder(t *testing.T) {
 			`,
 	}, {
 		name:   "Quotes/Literal/UnfinishedQuoteHoldsNoComment",
-		config: ini.Config{InlineComments: true},
+		config: ini.Config{Comments: ini.CommentsInline},
 		input: `
 			[section]
 			foo = "one ; two
@@ -1858,8 +1889,8 @@ func TestDecoder(t *testing.T) {
 			    test.ini:1:1
 			`,
 	}, {
-		name:   "HeaderTrailingComment/AcceptedWithInlineComments",
-		config: ini.Config{InlineComments: true},
+		name:   "HeaderTrailingComment/AcceptedWithComments",
+		config: ini.Config{Comments: ini.CommentsInline},
 		input: `
 			[s] ; c
 			key = value

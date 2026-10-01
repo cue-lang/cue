@@ -55,6 +55,16 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+// CommentMode controls where the decoder recognizes a comment.
+type CommentMode int
+
+const (
+	commentsUnset     CommentMode = iota // default zero value; equal to [CommentsWholeLine] for now
+	CommentsWholeLine                    // only a line whose first non-blank character is ";" or "#"
+	CommentsInline                       // also a ";" or "#" outside quotes that follows a space or tab
+	CommentsAnywhere                     // also any ";" or "#" outside quotes
+)
+
 // QuoteMode controls how the decoder treats quotation marks around a value.
 type QuoteMode int
 
@@ -148,10 +158,10 @@ type Config struct {
 	// The empty string means "=".
 	Delimiters string
 
-	// InlineComments reports whether a ";" or "#" preceded by a space or
-	// tab, outside a quoted value, starts a comment. It is off by default,
-	// so that no value is silently truncated.
-	InlineComments bool
+	// Comments controls where a comment may start. By default only a
+	// whole line is a comment ([CommentsWholeLine]), so that no value is
+	// silently truncated.
+	Comments CommentMode
 
 	// Quotes controls how quotation marks around a value are treated.
 	// By default they are ordinary characters ([QuotesLiteral]).
@@ -172,7 +182,8 @@ type Config struct {
 
 	// TrailingHeaderText reports whether text after a section header is
 	// ignored, the name then ending at the last "]" on the line. By
-	// default such text is an error, unless it is an inline comment.
+	// default such text is an error, unless [Config.Comments] makes it a
+	// comment.
 	TrailingHeaderText bool
 
 	// DuplicateKeys controls what happens when a key recurs within a
@@ -389,11 +400,17 @@ type property struct {
 	open byte
 }
 
+// inlineComments reports whether a comment may start after other text on a
+// line, as [CommentsInline] and [CommentsAnywhere] allow.
+func (d *Decoder) inlineComments() bool {
+	return d.cfg.Comments == CommentsInline || d.cfg.Comments == CommentsAnywhere
+}
+
 // addFragment appends text, from line i, to p's value, dropping an inline
 // comment it starts and carrying the quote it leaves open. It reports whether
 // text ends in a line continuation, whose backslash it drops.
 func (d *Decoder) addFragment(p *property, text string, i int) (continued bool) {
-	if d.cfg.InlineComments {
+	if d.inlineComments() {
 		prev := p.prev
 		if len(p.parts) > 0 && d.sep != "" {
 			prev = d.sep[len(d.sep)-1]
@@ -648,25 +665,34 @@ func (d *Decoder) parseKeyValue(text string) (key, value string, valueIdx int, b
 
 // keyComment returns the index of the comment that starts in s, the text
 // before a line's delimiter, or -1 when there is none. A key holds no quotes,
-// so only [Config.InlineComments] decides.
+// so only [Config.Comments] decides.
 func (d *Decoder) keyComment(s string) int {
-	if !d.cfg.InlineComments {
-		return -1
-	}
 	for i := 1; i < len(s); i++ {
-		if (s[i] == ';' || s[i] == '#') && (s[i-1] == ' ' || s[i-1] == '\t') {
+		if (s[i] == ';' || s[i] == '#') && d.commentAfter(s[i-1]) {
 			return i
 		}
 	}
 	return -1
 }
 
+// commentAfter reports whether a ";" or "#" outside quotes that follows prev
+// starts a comment, prev being zero at the start of a value.
+func (d *Decoder) commentAfter(prev byte) bool {
+	switch d.cfg.Comments {
+	case CommentsAnywhere:
+		return true
+	case CommentsInline:
+		return prev == ' ' || prev == '\t'
+	}
+	return false
+}
+
 // stripInlineComment trims text, the fragment of p's value from line, before
-// the first ";" or "#" that is preceded by a space or tab and sits outside a
-// quoted span, so that a comment character within a quoted part of the value
-// is kept. prev is the byte before text within the value, zero at the start
-// of one. It returns the text to keep and the quote left open after it, which
-// p.open holds for the next fragment.
+// the first ";" or "#" that starts a comment under [Config.Comments] and sits
+// outside a quoted span, so that a comment character within a quoted part of
+// the value is kept. prev is the byte before text within the value, zero at
+// the start of one. It returns the text to keep and the quote left open after
+// it, which p.open holds for the next fragment.
 //
 // Under [QuotesEscaped] every " that no backslash escapes opens or closes a
 // span, as git reads one. Otherwise either quote opens a span when its match
@@ -700,7 +726,7 @@ func (d *Decoder) stripInlineComment(p *property, text string, line int, prev by
 				// no comment.
 				return text, c
 			}
-		case (c == ';' || c == '#') && (prev == ' ' || prev == '\t'):
+		case (c == ';' || c == '#') && d.commentAfter(prev):
 			return strings.TrimRight(text[:i], " \t"), open
 		}
 	}
@@ -759,10 +785,8 @@ func (d *Decoder) openSection(top *section, trimmed string, pos token.Pos) (*sec
 	if closeIdx < 0 {
 		return nil, errors.Newf(pos, "missing closing bracket for section header")
 	}
-	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" && !d.cfg.TrailingHeaderText {
-		if !d.cfg.InlineComments || !isComment(rest) {
-			return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
-		}
+	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" && !d.cfg.TrailingHeaderText && !(d.inlineComments() && isComment(rest)) {
+		return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
 	}
 	name := strings.TrimSpace(trimmed[1:closeIdx])
 	if name == "" {

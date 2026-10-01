@@ -15,6 +15,20 @@ x: [{
 	{
 		a: _
 	}]
+
+// An element which starts a new line without an opener of its own
+// keeps the indent, as nothing else would indent it.
+y: [{
+	a: _
+},
+	2]
+z: f({
+	a: _
+},
+	2)
+w: [1, 2
+	// post
+]
 -- out/relpos --
 x: [{
 	a: _
@@ -22,5 +36,28 @@ x: [{
 {
 	a: _
 }]
+
+// An element which starts a new line without an opener of its own
+// keeps the indent, as nothing else would indent it.
+y: [{
+	a: _
+},
+2]
+z: f({
+	a: _
+},
+2)
+w: [1, 2,
+// post
+]
 -- out/norelpos --
 x: [{a: _}, {a: _}]
+// An element which starts a new line without an opener of its own
+// keeps the indent, as nothing else would indent it.
+y: [{a: _}, 2]
+z: f({a: _}, 2)
+w: [
+	1,
+	2,
+	// post
+]

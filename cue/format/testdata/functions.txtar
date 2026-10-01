@@ -88,6 +88,29 @@ partialBreak: func(a: int,
     b: int) -> int
 partialBreakCall: add(a: 1,
     b: 2)
+
+// After an argument or parameter which ends in an opener on the line
+// of "(", one which starts a new line keeps the indent, as do "..."
+// and comments.
+shareNamed: add(a: {
+    x: 1
+},
+    b: 2)
+shareEllipsis: add(1, 2,
+    ...)
+shareEllipsisComment: add(1, // c
+    ...)
+sharePost: add(x, b: 1
+    // post
+)
+shareFunc: func(a: {
+    x: int
+},
+    b: int) -> int
+shareFuncOpen: func(a: [
+    int,
+],
+    ...) -> int
 -- out/format/functions.golden --
 @experiment(functions)
 
@@ -176,3 +199,26 @@ partialBreak: func(a: int,
 	b: int) -> int
 partialBreakCall: add(a: 1,
 	b: 2)
+
+// After an argument or parameter which ends in an opener on the line
+// of "(", one which starts a new line keeps the indent, as do "..."
+// and comments.
+shareNamed: add(a: {
+		x: 1
+	},
+	b: 2)
+shareEllipsis: add(1, 2,
+...)
+shareEllipsisComment: add(1, // c
+...)
+sharePost: add(x, b: 1,
+// post
+)
+shareFunc: func(a: {
+		x: int
+	},
+	b: int) -> int
+shareFuncOpen: func(a: [
+		int,
+	],
+	...) -> int

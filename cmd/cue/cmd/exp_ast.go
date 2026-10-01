@@ -15,7 +15,9 @@
 package cmd
 
 import (
+	"path/filepath"
 	"slices"
+	"testing"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -76,6 +78,7 @@ func runExpASTPrint(cmd *Command, args []string) error {
 		OmitEmpty:       flagOmitEmpty.Bool(cmd),
 		IncludeNodeRefs: flagRefs.Bool(cmd),
 		AllPositions:    flagPos.Bool(cmd),
+		Filename:        relativeFilename,
 	}
 	w := cmd.OutOrStdout()
 	printFile := func(file *ast.File) error {
@@ -128,6 +131,19 @@ func loadExpASTInstances(cmd *Command, args []string) []*build.Instance {
 		SkipImports: true,
 		Stdin:       cmd.InOrStdin(),
 	})
+}
+
+// relativeFilename makes absolute filenames relative to the working directory.
+// Like the errors printed by the CLI, it uses forward slashes in tests.
+func relativeFilename(name string) string {
+	rel, err := filepath.Rel(rootWorkingDir(), name)
+	if err != nil {
+		return name // for example, a relative filename or "-"
+	}
+	if testing.Testing() {
+		rel = filepath.ToSlash(rel)
+	}
+	return rel
 }
 
 func newExpASTJoinCmd(c *Command) *cobra.Command {

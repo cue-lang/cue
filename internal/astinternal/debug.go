@@ -28,6 +28,9 @@ import (
 // AppendDebug writes a multi-line Go-like representation of a syntax tree node,
 // including node position information and any relevant Go types.
 func AppendDebug(dst []byte, node ast.Node, config DebugConfig) []byte {
+	if config.Filename == nil {
+		config.Filename = func(name string) string { return name }
+	}
 	d := &debugPrinter{
 		cfg: config,
 		buf: dst,
@@ -64,6 +67,10 @@ type DebugConfig struct {
 	// AllPositions causes all [ast.Node] implementions to emit their start
 	// and end positions.
 	AllPositions bool
+
+	// Filename, if set, rewrites [ast.File.Filename]
+	// and the filenames in positions before they are printed.
+	Filename func(string) string
 }
 
 type debugPrinter struct {
@@ -127,7 +134,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 	switch v := v.Interface().(type) {
 	// Simple types which can stringify themselves.
 	case token.Pos:
-		d.printf("%s(%q", t, v)
+		d.printf("%s(%q", t, d.position(v))
 		// Show relative positions too, if there are any, as they affect formatting.
 		if v.HasRelPos() {
 			d.printf(", %v", v.RelPos())
@@ -167,7 +174,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 			d.printf("@%s", refName)
 		}
 		if d.cfg.AllPositions && startPos.IsValid() {
-			d.printf("[%v]", positionRange(startPos, endPos))
+			d.printf("[%v]", d.positionRange(startPos, endPos))
 		}
 		d.printf("{")
 		d.level++
@@ -192,11 +199,11 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 // positionRange returns a string representing the range
 // of positions between p0 and p1, as returned
 // by [ast.Node.Pos] and [ast.Node.End] respectively.
-func positionRange(p0, p1 token.Pos) string {
+func (d *debugPrinter) positionRange(p0, p1 token.Pos) string {
 	if !p1.IsValid() {
-		return p0.String()
+		return d.position(p0).String()
 	}
-	pos0, pos1 := p0.Position(), p1.Position()
+	pos0, pos1 := d.position(p0), d.position(p1)
 	if pos1.Filename != pos0.Filename {
 		return fmt.Sprintf("%v,%v", pos0, pos1)
 	}
@@ -207,6 +214,12 @@ func positionRange(p0, p1 token.Pos) string {
 	}
 	fmt.Fprintf(&buf, "%d:%d,%d:%d", pos0.Line, pos0.Column, pos1.Line, pos1.Column)
 	return buf.String()
+}
+
+func (d *debugPrinter) position(p token.Pos) token.Position {
+	pos := p.Position()
+	pos.Filename = d.cfg.Filename(pos.Filename)
+	return pos
 }
 
 func (d *debugPrinter) sliceElems(v reflect.Value, elemType reflect.Type) (anyElems bool) {
@@ -251,6 +264,9 @@ func (d *debugPrinter) structFields(v reflect.Value) (anyElems bool) {
 		// These fields are cyclic, and they don't represent the syntax anyway.
 		case "Scope", "Unresolved":
 			continue
+		}
+		if f.Name == "Filename" && v.Type() == reflect.TypeFor[ast.File]() {
+			fv = reflect.ValueOf(d.cfg.Filename(fv.String()))
 		}
 		elemStart := d.pos()
 		d.newline()

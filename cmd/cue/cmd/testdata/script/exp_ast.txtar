@@ -1,9 +1,7 @@
 # Test "cue exp ast print" and "cue exp ast join".
 
-# Loaded packages have absolute filenames, which are printed as quoted strings,
-# so the separators in Windows paths are escaped.
 exec cue exp ast print --omitempty ./a
-[!windows] cmpenv stdout print-omitempty.stdout
+cmp stdout print-omitempty.stdout
 
 exec cue exp ast print --omitempty --pos --refs --files ref/ref.cue
 cmp stdout print-pos-refs.stdout
@@ -46,21 +44,21 @@ a: 1
 b: +
 -- print-omitempty.stdout --
 *ast.File{
-	Filename: "$WORK/a/one.cue"
+	Filename: "a/one.cue"
 	Decls: []ast.Decl{
 		*ast.Package{
-			PackagePos: token.Pos("$WORK/a/one.cue:1:1", nospace)
+			PackagePos: token.Pos("a/one.cue:1:1", nospace)
 			Name: *ast.Ident{
-				NamePos: token.Pos("$WORK/a/one.cue:1:9", blank)
+				NamePos: token.Pos("a/one.cue:1:9", blank)
 				Name: "a"
 			}
 		}
 		*ast.ImportDecl{
-			Import: token.Pos("$WORK/a/one.cue:3:1", section)
+			Import: token.Pos("a/one.cue:3:1", section)
 			Specs: []*ast.ImportSpec{
 				{
 					Path: *ast.BasicLit{
-						ValuePos: token.Pos("$WORK/a/one.cue:3:8", blank)
+						ValuePos: token.Pos("a/one.cue:3:8", blank)
 						Kind: token.Token("STRING")
 						Value: "\"strings\""
 					}
@@ -69,51 +67,51 @@ b: +
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("$WORK/a/one.cue:5:1", section)
+				NamePos: token.Pos("a/one.cue:5:1", section)
 				Name: "x"
 			}
-			TokenPos: token.Pos("$WORK/a/one.cue:5:2", nospace)
+			TokenPos: token.Pos("a/one.cue:5:2", nospace)
 			Value: *ast.CallExpr{
 				Fun: *ast.SelectorExpr{
 					X: *ast.Ident{
-						NamePos: token.Pos("$WORK/a/one.cue:5:4", blank)
+						NamePos: token.Pos("a/one.cue:5:4", blank)
 						Name: "strings"
 					}
-					Period: token.Pos("$WORK/a/one.cue:5:11", nospace)
+					Period: token.Pos("a/one.cue:5:11", nospace)
 					Sel: *ast.Ident{
-						NamePos: token.Pos("$WORK/a/one.cue:5:12", nospace)
+						NamePos: token.Pos("a/one.cue:5:12", nospace)
 						Name: "ToUpper"
 					}
 				}
-				Lparen: token.Pos("$WORK/a/one.cue:5:19", nospace)
+				Lparen: token.Pos("a/one.cue:5:19", nospace)
 				Args: []ast.Expr{
 					*ast.BasicLit{
-						ValuePos: token.Pos("$WORK/a/one.cue:5:20", nospace)
+						ValuePos: token.Pos("a/one.cue:5:20", nospace)
 						Kind: token.Token("STRING")
 						Value: "\"foo\""
 					}
 				}
-				Rparen: token.Pos("$WORK/a/one.cue:5:25", nospace)
+				Rparen: token.Pos("a/one.cue:5:25", nospace)
 			}
 		}
 	}
 }
 *ast.File{
-	Filename: "$WORK/a/two.cue"
+	Filename: "a/two.cue"
 	Decls: []ast.Decl{
 		*ast.Package{
-			PackagePos: token.Pos("$WORK/a/two.cue:1:1", nospace)
+			PackagePos: token.Pos("a/two.cue:1:1", nospace)
 			Name: *ast.Ident{
-				NamePos: token.Pos("$WORK/a/two.cue:1:9", blank)
+				NamePos: token.Pos("a/two.cue:1:9", blank)
 				Name: "a"
 			}
 		}
 		*ast.ImportDecl{
-			Import: token.Pos("$WORK/a/two.cue:3:1", section)
+			Import: token.Pos("a/two.cue:3:1", section)
 			Specs: []*ast.ImportSpec{
 				{
 					Path: *ast.BasicLit{
-						ValuePos: token.Pos("$WORK/a/two.cue:3:8", blank)
+						ValuePos: token.Pos("a/two.cue:3:8", blank)
 						Kind: token.Token("STRING")
 						Value: "\"example.com/other/strings\""
 					}
@@ -122,18 +120,18 @@ b: +
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("$WORK/a/two.cue:6:1", newline)
+				NamePos: token.Pos("a/two.cue:6:1", newline)
 				Name: "y"
 			}
-			TokenPos: token.Pos("$WORK/a/two.cue:6:2", nospace)
+			TokenPos: token.Pos("a/two.cue:6:2", nospace)
 			Value: *ast.SelectorExpr{
 				X: *ast.Ident{
-					NamePos: token.Pos("$WORK/a/two.cue:6:4", blank)
+					NamePos: token.Pos("a/two.cue:6:4", blank)
 					Name: "strings"
 				}
-				Period: token.Pos("$WORK/a/two.cue:6:11", nospace)
+				Period: token.Pos("a/two.cue:6:11", nospace)
 				Sel: *ast.Ident{
-					NamePos: token.Pos("$WORK/a/two.cue:6:12", nospace)
+					NamePos: token.Pos("a/two.cue:6:12", nospace)
 					Name: "Foo"
 				}
 			}
@@ -142,7 +140,7 @@ b: +
 					Doc: true
 					List: []*ast.Comment{
 						{
-							Slash: token.Pos("$WORK/a/two.cue:5:1", section)
+							Slash: token.Pos("a/two.cue:5:1", section)
 							Text: "// y is a field."
 						}
 					}

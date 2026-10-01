@@ -272,9 +272,11 @@ func (e *extractor) initExclusions(str string) {
 	}
 }
 
-func (e *extractor) filter(name string) bool {
+// omitsDecl reports whether the declaration of obj is left out,
+// in which case references to it are translated to top.
+func (e *extractor) omitsDecl(obj types.Object) bool {
 	for _, ex := range e.exclusions {
-		if ex.MatchString(name) {
+		if ex.MatchString(obj.Name()) {
 			return true
 		}
 	}
@@ -779,7 +781,7 @@ func (e *extractor) recordConsts(x *ast.GenDecl) {
 			continue
 		}
 		for _, n := range v.Names {
-			if n.Name == "_" {
+			if n.Name == "_" || e.omitsDecl(e.pkg.TypesInfo.Defs[n]) {
 				continue
 			}
 			typ := e.pkg.TypesInfo.TypeOf(n)
@@ -816,7 +818,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 	case token.TYPE:
 		for _, s := range x.Specs {
 			v, ok := s.(*ast.TypeSpec)
-			if !ok || e.filter(v.Name.Name) {
+			if !ok || e.omitsDecl(e.pkg.TypesInfo.Defs[v.Name]) {
 				continue
 			}
 
@@ -912,7 +914,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			for i, name := range v.Names {
-				if name.Name == "_" || e.filter(name.Name) {
+				if name.Name == "_" || e.omitsDecl(e.pkg.TypesInfo.Defs[name]) {
 					continue
 				}
 				f := e.def(v.Doc, name.Name, nil, k == 0)
@@ -1383,7 +1385,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		if !e.canReference(typ) {
 			// Such as the type of a field promoted from another package,
 			// whose hidden definition cannot be referenced from here.
-			e.logf("    %v is not exported; setting type to _", obj)
+			e.logf("    %v cannot be referenced; setting type to _", obj)
 			return e.ident("_", false)
 		}
 		result = e.ident(obj.Name(), true)
@@ -1768,10 +1770,11 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 }
 
 // canReference reports whether the definition for t can be referenced
-// from the package being generated, which is not the case for
-// unexported types from other packages, as their definitions are hidden.
+// from the package being generated, which is not the case for omitted types,
+// nor for unexported types from other packages, as their definitions are hidden.
 func (e *extractor) canReference(t *types.Named) bool {
-	return t.Obj().Pkg() == e.pkg.Types || t.Obj().Exported()
+	obj := t.Obj()
+	return !e.omitsDecl(obj) && (obj.Pkg() == e.pkg.Types || obj.Exported())
 }
 
 // structEncoding describes which fields of a struct are encoded,

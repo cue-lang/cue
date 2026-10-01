@@ -261,6 +261,23 @@ This tells CUE that only the values enumerated by #enumSwitch are valid values
 for #Switch. Note that there are now two definitions of #Switch. CUE handles
 this in the usual way by unifying the two definitions, in which case the more
 restrictive enum interpretation of #Switch remains.
+
+
+Alternatives
+
+Go types cannot express enums, sum types, defaults, or most constraints,
+so converting them to CUE is lossy. Use this command only when the schemas
+you depend on are solely defined as Go types.
+
+When the schemas are also defined in a format such as JSON Schema or OpenAPI,
+"cue import" gives much more precise results. Schemas for many well-known
+projects, such as Kubernetes or GitHub Actions, are already imported this way
+and published as curated modules in the Central Registry. See:
+
+	https://cue.dev/getting-started/schema-library/
+
+When writing or maintaining the schemas yourself, write them in CUE and
+generate Go types from them with "cue exp gengotypes".
 `,
 		// - TODO: interpret cuego's struct tags and annotations.
 

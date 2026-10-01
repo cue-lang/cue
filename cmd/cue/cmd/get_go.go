@@ -263,13 +263,19 @@ const (
 	defaultCodec = "json,yaml"
 )
 
-func (e *extractor) initExclusions(str string) {
+func (e *extractor) initExclusions(str string) error {
 	e.exclude = str
-	for re := range strings.SplitSeq(str, ",") {
-		if re != "" {
-			e.exclusions = append(e.exclusions, regexp.MustCompile(re))
+	for expr := range strings.SplitSeq(str, ",") {
+		if expr == "" {
+			continue
 		}
+		re, err := regexp.Compile(expr)
+		if err != nil {
+			return fmt.Errorf("invalid --%s regexp %q: %v", flagExclude, expr, err)
+		}
+		e.exclusions = append(e.exclusions, re)
 	}
+	return nil
 }
 
 // omitsDecl reports whether the declaration of obj is left out,
@@ -495,7 +501,9 @@ func extract(cmd *Command, args []string) error {
 		orig:    map[types.Type]*ast.StructType{},
 	}
 
-	e.initExclusions(flagExclude.String(cmd))
+	if err := e.initExclusions(flagExclude.String(cmd)); err != nil {
+		return err
+	}
 
 	for name := range strings.SplitSeq(flagCodec.String(cmd), ",") {
 		c := lookupCodec(name)

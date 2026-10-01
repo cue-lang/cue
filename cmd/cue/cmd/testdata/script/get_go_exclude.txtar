@@ -6,9 +6,9 @@ cmp sub/sub_go_gen.cue sub/sub.cue.golden
 # and excluded constants are left out of enums.
 exec cue vet -c=false ./...
 
-# An invalid regular expression causes a panic.
+# An invalid regular expression is an error.
 ! exec cue get go --local --exclude '[' .
-stderr '^panic: regexp: Compile\(`\[`\): error parsing regexp: missing closing \]: `\[`$'
+stderr '^invalid --exclude regexp "\[": error parsing regexp: missing closing \]: `\[`$'
 
 -- go.mod --
 module mod.test/blah

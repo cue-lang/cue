@@ -490,7 +490,7 @@ a: {
     ./validator.cue:11:9
     ./validator.cue:11:8
     ./validator.cue:15:8
-[eval] cyclicErr.err3: invalid operands {err3:_|_(cyclicErr.err3: invalid operands value at path 'cyclicErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+[eval] cyclicErr.err3: invalid operands {err3:_|_} and 1 to '+' (type struct and int):
     ./validator.cue:19:12
     ./validator.cue:18:12
     ./validator.cue:19:19

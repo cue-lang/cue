@@ -184,9 +184,17 @@ func (w *printer) compactNode(n adt.Node) {
 	case *adt.Bottom:
 		w.string(`_|_`)
 		if x.Err != nil {
+			// An error whose message includes a value being printed, such as
+			// an enclosing struct, would repeat itself; print it as bottom.
+			start, saved := len(w.dst), w.cyclic
+			w.cyclic = false
 			w.string("(")
 			w.shortError(x.Err, false)
 			w.string(")")
+			if w.cyclic {
+				w.dst = w.dst[:start]
+			}
+			w.cyclic = saved
 		}
 
 	case *adt.Null:

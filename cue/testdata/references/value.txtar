@@ -24,7 +24,7 @@ cycleErr: {
 	@test(err, code=eval, contains="invalid operands", pos=[2:11, 0:11, 2:15])
 }
 -- out/errors.txt --
-[eval] cycleErr.err3: invalid operands {let X#1=_|_(cycleErr.X: structural cycle),err3:_|_(cycleErr.err3: invalid operands value at path 'cycleErr' and 1 to '+' (type struct and int))} and 1 to '+' (type struct and int):
+[eval] cycleErr.err3: invalid operands {let X#1=_|_(cycleErr.X: structural cycle),err3:_|_} and 1 to '+' (type struct and int):
     ./err.cue:5:11
     ./err.cue:3:11
     ./err.cue:5:15

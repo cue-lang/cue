@@ -116,7 +116,7 @@ let _globalScope = self
 #manifests: error in call to encoding/yaml.MarshalStream: 4 errors in empty disjunction::
     ./export.cue:18:14
     ./export.cue:16:4
-#manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,let this#4=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#6=_|_(#entries.0.argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),let this#3=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#2=_|_(#entries.0.argocd.app.apps.this: structural cycle),name:string}:
+#manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,let this#4=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#6=_|_(#entries.0.argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_,let this#3=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#2=_|_(#entries.0.argocd.app.apps.this: structural cycle),name:string}:
     ./export.cue:18:14
     ./in.cue:17:33
     ./in.cue:19:8

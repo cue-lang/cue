@@ -411,7 +411,7 @@ issue4037.cycle.f: invalid value "1233" (does not satisfy matchN): 0 matched, ex
 [structural_cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
-[eval] listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): {y:_|_(listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): value at path 'listMatchN.structCycle.x' matches 0 list items, want 1)} matches 0 list items, want 1:
+[eval] listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): {y:_|_} matches 0 list items, want 1:
     ./listmatchncycle.cue:4:8
     ./listmatchncycle.cue:4:5
     ./listmatchncycle.cue:4:20

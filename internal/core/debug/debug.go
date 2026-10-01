@@ -104,6 +104,9 @@ type printer struct {
 	// keep track of vertices to avoid cycles.
 	stack []*adt.Vertex
 
+	// cyclic is set when a vertex is not printed as it is already on stack.
+	cyclic bool
+
 	// modes:
 	// - show vertex
 	// - show original conjuncts
@@ -156,6 +159,9 @@ func (f formatter) String() string {
 		stack:           f.p.stack,
 	}
 	p.node(f.x)
+	if p.cyclic {
+		f.p.cyclic = true
+	}
 	return string(p.dst)
 }
 
@@ -252,6 +258,7 @@ func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
 
 func (w *printer) pushVertex(v *adt.Vertex) bool {
 	if slices.Contains(w.stack, v) {
+		w.cyclic = true
 		w.string("value at path '")
 		w.path(v)
 		w.string("'")

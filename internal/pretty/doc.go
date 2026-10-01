@@ -575,6 +575,7 @@ func asInfiniteWidth(d doc) doc {
 				docComment:      asInfiniteWidth(r.docComment),
 				cells:           cells,
 				hasComment:      r.hasComment,
+				opener:          r.opener,
 				allowRowBreak:   r.allowRowBreak,
 				mergedFirstCell: asInfiniteWidth(r.mergedFirstCell),
 			}
@@ -672,6 +673,10 @@ type row struct {
 	// group to break, because a // comment runs to end of line and
 	// would otherwise swallow subsequent tokens in flat-mode.
 	hasComment bool
+
+	// opener is true when the row starts with a contiguous opener (see
+	// [isContiguousOpener]), whose own [docNest] indents what it holds.
+	opener bool
 
 	// allowRowBreak permits the renderer to break the row before its
 	// second cell when the row's flat width would exceed the available

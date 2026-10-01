@@ -1250,6 +1250,11 @@ type bracketedLayout struct {
 	allowsTrailingComma bool
 
 	inner doc // body content; interior comments already prepended/appended for struct/list
+
+	// rows holds the rows of inner when it is a single table of
+	// elements, as for lists and calls, so that a shared indent can
+	// end partway through them; see [sharedIndentBody].
+	rows []row
 }
 
 // bracketedPolicy holds the layout decisions derived from a
@@ -1342,7 +1347,7 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 		hasInterior:   hasInterior,
 		anyDoc:        anyHasDocComment(elems),
 		anyPost:       anyHasPostComment(elems),
-		sameLineOpen:  hasSameLineOpener(c, elems),
+		sameLineOpen:  hasSameLineOpener(c, elems, elems),
 		noElemNewline: noElemHasNewline(elems),
 		lineHeader:    hasLineLeadingComment(slots, firstElem),
 		inner:         inner,
@@ -1411,7 +1416,7 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 		hasInterior:         hasInterior,
 		anyDoc:              anyHasDocComment(elems),
 		anyPost:             anyHasPostComment(elems),
-		sameLineOpen:        hasSameLineOpener(c, elems),
+		sameLineOpen:        hasSameLineOpener(c, elems, elems),
 		noElemNewline:       noElemHasNewline(elems),
 		lineHeader:          hasLineLeadingComment(slots, firstElem),
 		allowsTrailingComma: !omitCommas,
@@ -1433,6 +1438,7 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 	var inner doc
 	if rows := c.elementRows(elems, policy.wantTrailingComma, useBodyShape, omitCommas); rows != nil {
 		inner = table(rows)
+		layout.rows = rows
 	}
 	layout.inner = c.wrapInteriorComments(inner, slots.prefix, slots.suffix)
 
@@ -1488,12 +1494,15 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	//     [docNest] so the two layers don't compound.
 	//   - noElemNewline: every element shares a line with its
 	//     predecessor, so under asInfiniteWidth the parent's openBreak
-	//     and row separators emit no newlines. The parent's [docNest] is
-	//     then unused for its own structure, and stacking it on top of
-	//     an inner break (e.g. an inner list whose body is multi-line
-	//     in `{a: 1, b: [\n c\n]}`) would push that break one indent
-	//     level too deep. Drop the [docNest] in this case too.
+	//     and the separators between elements emit no newlines. The
+	//     parent's [docNest] is then unused for its own structure, and
+	//     stacking it on top of an inner break (e.g. an inner list whose
+	//     body is multi-line in `{a: 1, b: [\n c\n]}`) would push that
+	//     break one indent level too deep. Drop the [docNest] in this
+	//     case too.
 	//
+	// Rows which still start a new line, such as post-element comments
+	// or later elements, keep the [docNest]; see [sharedIndentBody].
 	// Both flavours assume the inner opener hugs the parent bracket so
 	// its own [docNest] supplies the indent. That only holds under
 	// infiniteWidth: a synthesised bracket renders under finiteWidth,
@@ -1543,9 +1552,26 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	}
 }
 
+// sharedIndentBody returns the table of rows for a bracket which shares
+// its indent with a same-line opener (see [bracketedPolicy.shareIndent]).
+// The shared indent holds only up to the first row which starts on a
+// new line without an opener of its own: as nothing else would indent
+// that row and those after it, they nest as usual. Under
+// [infiniteWidth], which shareIndent requires, only a hard separator
+// starts a new line.
+func sharedIndentBody(rows []row) doc {
+	for i := 1; i < len(rows); i++ {
+		if r := rows[i]; !r.opener && (r.sep == lineBreakHard || r.sep == blankLine) {
+			return cat(table(rows[:i]), nest(cat(r.sep, table(rows[i:]))))
+		}
+	}
+	return table(rows)
+}
+
 // applyBracketed assembles the final Doc using a precomputed policy.
 // Drops the parent's [docNest] under hugFirst/shareIndent (the inner
-// element's [docNest] provides the indent); drops closeBreak under
+// element's [docNest] provides the indent; see [sharedIndentBody] for
+// the rows that keep it); drops closeBreak under
 // hugLast so `}]` / `)]` / `}}` stay adjacent. When p.useBodyShape
 // is set, the inner content is wrapped in [docBodyShape] which
 // picks one of the three shapes (flat, indented, hug; see
@@ -1576,8 +1602,13 @@ func (c *converter) applyBracketed(b bracketedLayout, p bracketedPolicy) doc {
 	case p.shareIndent:
 		// Keep openBreak so leading non-opener elements render
 		// normally, but skip the parent's [docNest] so the same-line
-		// opener's content shares indent.
-		inner = cat(p.openBreak, b.inner)
+		// opener's content shares indent, up to the first row which
+		// needs it again.
+		body := b.inner
+		if b.rows != nil {
+			body = sharedIndentBody(b.rows)
+		}
+		inner = cat(p.openBreak, body)
 	default:
 		inner = nest(cat(p.openBreak, b.inner))
 	}
@@ -1619,6 +1650,7 @@ func (c *converter) elementRows(elems []ast.Expr, trailingComma, wrapLinked, omi
 	prevHasComment := false
 	for i, e := range elems {
 		row, postCgs := c.listElemRow(nil, e, i == lastIdx, trailingComma, omitCommas)
+		row.opener = isContiguousOpener(e)
 		if wrapLinked && len(row.cells) > 0 {
 			row.cells[0] = nextGroupNoop(row.cells[0])
 		}
@@ -2498,7 +2530,7 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 	closerRel := x.Rparen.RelPos()
 	var sameLineOpen, noElemNewline bool
 	if len(x.ArgLabels) == 0 {
-		sameLineOpen = hasSameLineOpener(c, x.Args)
+		sameLineOpen = hasSameLineOpener(c, x.Args, x.Args)
 		noElemNewline = noElemHasNewline(x.Args)
 	} else {
 		// A comment after a label's colon moves to the end of the
@@ -2513,7 +2545,7 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		}
 		anyDoc = anyDoc || anyHasDocComment(leads)
 		anyPost = anyPost || anyHasPostComment(leads)
-		sameLineOpen = hasSameLineOpener(c, leads)
+		sameLineOpen = hasSameLineOpener(c, leads, x.Args)
 		noElemNewline = !movesComment && noElemHasNewline(leads)
 		if lastMovesComment && x.Ellipsis == token.NoPos && closerRel < token.Newline {
 			closerRel = token.Newline
@@ -2551,7 +2583,8 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 	policy.useBodyShape = useBodyShape
 	// Call arguments are always comma-separated; comma-free style is a
 	// list-literal feature only.
-	layout.inner = table(c.callArgRows(x, policy.wantTrailingComma, useBodyShape))
+	layout.rows = c.callArgRows(x, policy.wantTrailingComma, useBodyShape)
+	layout.inner = table(layout.rows)
 	return c.applyBracketed(layout, policy)
 }
 
@@ -2614,7 +2647,9 @@ func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool)
 	// RelPos does not tell.
 	soft := lineBreakOrSpace
 	for i, e := range x.Args {
-		row, postCgs := c.listElemRow(callArgLabel(x, i), e, i == lastIdx, trailingComma, false)
+		label := callArgLabel(x, i)
+		row, postCgs := c.listElemRow(label, e, i == lastIdx, trailingComma, false)
+		row.opener = label == nil && isContiguousOpener(e)
 		if wrapLinked && len(row.cells) > 0 {
 			row.cells[0] = nextGroupNoop(row.cells[0])
 		}
@@ -3014,6 +3049,16 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 		// tell.
 		closerRel = token.Newline
 	}
+	// As named call arguments, parameters may share their indent with
+	// an opener which ends one of them on the line of "(".
+	leads := make([]*ast.FuncParam, 0, len(params))
+	ends := make([]ast.Node, 0, len(params))
+	for _, p := range params {
+		if p != nil {
+			leads = append(leads, p)
+			ends = append(ends, funcParamEnd(p))
+		}
+	}
 	firstParam := firstFuncParam(params)
 	layout := bracketedLayout{
 		node:                x,
@@ -3027,13 +3072,29 @@ func (c *converter) funcExpr(x *ast.Func) doc {
 		numElems:            len(params),
 		anyDoc:              anyDoc,
 		anyPost:             anyPost,
+		sameLineOpen:        hasSameLineOpener(c, leads, ends),
+		noElemNewline:       !anyNewline,
 		lineHeader:          hasLineLeadingComment(commentSlots{}, firstParam),
 		forceOpenBreak:      firstHoistedDoc,
 		allowsTrailingComma: true,
 	}
 	policy := c.computeBracketedPolicy(layout)
-	layout.inner = table(c.funcParamRows(params, x.Ellipsis, policy.wantTrailingComma))
+	layout.rows = c.funcParamRows(params, x.Ellipsis, policy.wantTrailingComma)
+	layout.inner = table(layout.rows)
 	return c.funcResult(c.applyBracketed(layout, policy), x)
+}
+
+// funcParamEnd returns the node which ends a parameter's rendering: its
+// constraint, its default if it has one, or the parameter itself when
+// attributes follow.
+func funcParamEnd(p *ast.FuncParam) ast.Node {
+	switch {
+	case len(p.Attrs) > 0:
+		return p
+	case p.Default != nil:
+		return p.Default
+	}
+	return p.Value
 }
 
 func (c *converter) funcResult(d doc, x *ast.Func) doc {
@@ -3119,6 +3180,7 @@ func (c *converter) funcParamRows(params []*ast.FuncParam, ellipsis token.Pos, t
 			docComment: c.docCommentBlock(slots.doc, p.Pos().RelPos()),
 			cells:      cells,
 			hasComment: slots.any(),
+			opener:     p.Label == nil && nodeIsContiguousOpener(funcParamEnd(p)),
 		}
 		if len(rows) > 0 {
 			r.sep = relBreakOr(funcParamLeadingRelPos(p, slots), soft)
@@ -4350,19 +4412,22 @@ func nodeIsContiguousOpener(n ast.Node) bool {
 	return false
 }
 
-// hasSameLineOpener reports whether any element is a contiguous opener
-// that the user wrote on the parent's opener line. It walks elements
-// left-to-right and stops at the first element with a
+// hasSameLineOpener reports whether any element ends in a contiguous
+// opener that the user wrote on the parent's opener line. It walks
+// elements left-to-right and stops at the first element with a
 // Newline-or-stronger leading RelPos (including a Newline carried by a
 // doc comment), since that element and all later ones are on new lines.
+// leads[i] is the node which starts the i'th element, and values[i] the
+// node which ends it, such as the value of a named call argument; both
+// are the element itself otherwise.
 //
 // The opener must also break across lines to qualify: an opener that
 // stays inline (e.g. a short embedded list `[1, 3]`) supplies no
 // indent, so the same-line-opener rule that drops the parent's
 // [docNest] must not fire for it.
-func hasSameLineOpener[T ast.Node](c *converter, elems []T) bool {
-	for _, e := range elems {
-		if LeadingRelPos(e) >= token.Newline {
+func hasSameLineOpener[L, V ast.Node](c *converter, leads []L, values []V) bool {
+	for i, e := range values {
+		if LeadingRelPos(leads[i]) >= token.Newline {
 			return false
 		}
 		if nodeIsContiguousOpener(e) && c.hasNewlineInSubtree(e) {

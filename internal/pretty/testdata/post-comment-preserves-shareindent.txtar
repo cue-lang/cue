@@ -8,7 +8,8 @@
 # the no-post-comment gate - otherwise `]` would land on a comment
 # line and `//` would swallow the bracket. shareIndent keeps
 # closeBreak, so post-element comments render as their own rows
-# safely above the closer.
+# safely above the closer, indented like any other row which starts a
+# new line after the shared opener.
 -- in --
 c: [{
 	name: "n1"
@@ -21,9 +22,9 @@ c: [{
 c: [{
 	name: "n1"
 },
-// {
-// 	name: "n2"
-// },
+	// {
+	// 	name: "n2"
+	// },
 ]
 -- out/norelpos --
 c: [

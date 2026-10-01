@@ -1058,17 +1058,8 @@ func (e *extractor) ownEncoding(typ types.Type) ownEncoding {
 }
 
 func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
-	// We need to check whether T or *T implement each interface I.
-	// Typically we would just need to check whether *T implements I,
-	// as the method set of *T includes the method set of T,
-	// but that doesn't work when T is an interface type.
-	// See https://go.dev/ref/spec#Method_sets.
-	//
-	// TODO(mvdan): perhaps check with T when it's an interface,
-	// and with *T otherwise, avoiding double calls to types.Implements.
-	ptr := types.NewPointer(typ)
 	for _, iface := range toTop {
-		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
+		if implementsEither(typ, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to _", t, iface)
 			return encodesAsTop
@@ -1079,7 +1070,7 @@ func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
 		return encodesAsTop
 	}
 	for _, iface := range toString {
-		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
+		if implementsEither(typ, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to string", t, iface)
 			return encodesAsString
@@ -1088,32 +1079,55 @@ func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
 	return noOwnEncoding
 }
 
-// jsontextMethod returns the name of the method of typ or *typ implementing
-// json.MarshalerTo or json.UnmarshalerFrom, added in Go 1.27, if any.
+// implementsEither reports whether typ or *typ implements iface.
+func implementsEither(typ types.Type, iface *types.Interface) bool {
+	// Typically we would just need to check whether *T implements I,
+	// as the method set of *T includes the method set of T,
+	// but that doesn't work when T is an interface type.
+	// See https://go.dev/ref/spec#Method_sets.
+	//
+	// TODO(mvdan): perhaps check with T when it's an interface,
+	// and with *T otherwise, avoiding double calls to types.Implements.
+	return types.Implements(typ, iface) || types.Implements(types.NewPointer(typ), iface)
+}
+
+// jsontextMethods lists the methods of json.MarshalerTo and json.UnmarshalerFrom,
+// added in Go 1.27, along with the jsontext type they take a pointer to.
 // Those interfaces use types from encoding/json/jsontext, which may not
 // be available to us, so we cannot construct them like [toTop].
+var jsontextMethods = []struct{ name, param string }{
+	{"MarshalJSONTo", "Encoder"},
+	{"UnmarshalJSONFrom", "Decoder"},
+}
+
+// jsontextMethod returns the name of the method of typ or *typ
+// from [jsontextMethods], if any.
 func jsontextMethod(typ types.Type) string {
-	for _, m := range []struct{ name, param string }{
-		{"MarshalJSONTo", "Encoder"},
-		{"UnmarshalJSONFrom", "Decoder"},
-	} {
-		// Look up the method as if typ were addressable,
-		// covering the method sets of both typ and *typ.
-		obj, _, _ := types.LookupFieldOrMethod(typ, true, nil, m.name)
-		fn, ok := obj.(*types.Func)
-		if !ok {
-			continue
-		}
-		sig := fn.Signature()
-		if sig.Params().Len() != 1 || sig.Results().Len() != 1 ||
-			!types.Identical(sig.Results().At(0).Type(), typeError) {
-			continue
-		}
-		if p, ok := sig.Params().At(0).Type().(*types.Pointer); ok && isJSONTextType(p.Elem(), m.param) {
+	for _, m := range jsontextMethods {
+		if hasJSONTextMethod(typ, m.name, m.param) {
 			return m.name
 		}
 	}
 	return ""
+}
+
+// hasJSONTextMethod reports whether typ or *typ has the method name
+// which takes a pointer to the jsontext type param and returns an error.
+func hasJSONTextMethod(typ types.Type, name, param string) bool {
+	// Look up the method as if typ were addressable,
+	// covering the method sets of both typ and *typ.
+	obj, _, _ := types.LookupFieldOrMethod(typ, true, nil, name)
+	fn, ok := obj.(*types.Func)
+	if !ok {
+		return false
+	}
+	sig := fn.Signature()
+	if sig.Params().Len() != 1 || sig.Results().Len() != 1 ||
+		!types.Identical(sig.Results().At(0).Type(), typeError) {
+		return false
+	}
+	p, ok := sig.Params().At(0).Type().(*types.Pointer)
+	return ok && isJSONTextType(p.Elem(), param)
 }
 
 // isStdPkg reports whether path is part of the Go standard library,
@@ -1293,9 +1307,8 @@ func supportedMapKey(t types.Type) bool {
 	if i, ok := t.Underlying().(*types.Interface); ok && i.Empty() {
 		return true
 	}
-	ptr := types.NewPointer(t)
 	for _, iface := range toString {
-		if types.Implements(t, iface) || types.Implements(ptr, iface) {
+		if implementsEither(t, iface) {
 			return true
 		}
 	}

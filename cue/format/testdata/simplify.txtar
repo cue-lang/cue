@@ -56,6 +56,12 @@ a: {
 
 "#A": dontSimplify
 
+// An unquoted label keeps its position on its own line.
+// TODO: it is pulled onto the line of the opening brace.
+layout: {
+    "foo": 1 @attr()
+}
+
 x: {
 @tag0(foo)
     r1: baz1
@@ -168,6 +174,11 @@ a: {
 }
 
 "#A": dontSimplify
+
+// An unquoted label keeps its position on its own line.
+// TODO: it is pulled onto the line of the opening brace.
+layout: {foo: 1 @attr()
+}
 
 x: {
 	@tag0(foo)

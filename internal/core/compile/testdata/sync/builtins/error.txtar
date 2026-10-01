@@ -56,10 +56,40 @@ multi: a: 1
 
 // When error() interpolates "self" which is the enclosing struct
 // containing the error value itself (a cycle), the custom error
-// should still be shown.
+// should still be shown, with the nested copy of the error elided.
 errorSelf: {
 	v: "x" | "y" | error("bad: \(self)")
 	v: "z"
+}
+
+// issue4240: self in a field which is not a struct refers to the enclosing
+// struct, not to the value being validated. Wrapping the value in a struct
+// makes self refer to the value itself. https://cuelang.org/issue/4240
+issue4240: {
+	#options: "one" | "two" | "three" | error("invalid option \(self)")
+	bad: #options & "four"
+
+	#optionsSelf: {"one" | "two" | "three" | error("invalid option \(self)")}
+	good: #optionsSelf & "four"
+}
+
+// A validator interpolating the enclosing struct should show its other
+// fields, which identify the offending value.
+errorSelfStruct: {
+	#V: {name: string, kind: "x" | error("bad kind in \(self)")}
+	item: #V
+	item: {
+		name: "n"
+		kind: "q"
+	}
+}
+
+// A value which contains the error without being an ancestor of it,
+// such as a sibling referring to the erroring field, elides the error too.
+errorSibling: {
+	v: "x" | error("bad: \(w)")
+	v: "z"
+	w: x: v
 }
 -- issues.cue --
 import "list"
@@ -164,5 +194,31 @@ issue4490: {
   errorSelf: {
     v: ("x"|"y"|error("bad: \(〈1〉)"))
     v: "z"
+  }
+  issue4240: {
+    #options: ("one"|"two"|"three"|error("invalid option \(〈1〉)"))
+    bad: (〈0;#options〉 & "four")
+    #optionsSelf: {
+      ("one"|"two"|"three"|error("invalid option \(〈1〉)"))
+    }
+    good: (〈0;#optionsSelf〉 & "four")
+  }
+  errorSelfStruct: {
+    #V: {
+      name: string
+      kind: ("x"|error("bad kind in \(〈1〉)"))
+    }
+    item: 〈0;#V〉
+    item: {
+      name: "n"
+      kind: "q"
+    }
+  }
+  errorSibling: {
+    v: ("x"|error("bad: \(〈0;w〉)"))
+    v: "z"
+    w: {
+      x: 〈1;v〉
+    }
   }
 }

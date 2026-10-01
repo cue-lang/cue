@@ -62,11 +62,40 @@ multi: a: 1
 
 // When error() interpolates "self" which is the enclosing struct
 // containing the error value itself (a cycle), the custom error
-// should still be shown.
+// should still be shown, with the nested copy of the error elided.
 errorSelf: {
 	v: "x" | "y" | error("bad: \(self)")
-	v: "z"
-	@test(err, code=eval, contains="bad:", pos=[1:17, 0:12, 1:5, 2:5])
+	v: "z" @test(err, code=eval, contains="bad: {v:_|_(", pos=[-1:17, -2:12, -1:5, 0:5], incorrect) @test(err:todo, code=eval, contains="bad: {v:_|_}")
+}
+
+// issue4240: self in a field which is not a struct refers to the enclosing
+// struct, not to the value being validated. Wrapping the value in a struct
+// makes self refer to the value itself. https://cuelang.org/issue/4240
+issue4240: {
+	#options: "one" | "two" | "three" | error("invalid option \(self)")
+	bad: #options & "four" @test(err, code=eval, contains="bad:_|_(", pos=[-1:38, -2:12, -1:12, 0:7, 0:18], incorrect) @test(err:todo, code=eval, contains="bad:_|_,")
+
+	#optionsSelf: {"one" | "two" | "three" | error("invalid option \(self)")}
+	good: #optionsSelf & "four" @test(err, code=eval, contains="invalid option four", pos=[-1:43, -1:16, -1:17, 0:8, 0:23])
+}
+
+// A validator interpolating the enclosing struct should show its other
+// fields, which identify the offending value.
+errorSelfStruct: {
+	#V: {name: string, kind: "x" | error("bad kind in \(self)")}
+	item: #V
+	item: {
+		name: "n" @test(eq, "n")
+		kind: "q" @test(err, code=eval, contains="bad kind in {name:\"n\",kind:_|_(", incorrect) @test(err:todo, code=eval, contains="bad kind in {name:\"n\",kind:_|_}")
+	}
+}
+
+// A value which contains the error without being an ancestor of it,
+// such as a sibling referring to the erroring field, elides the error too.
+errorSibling: {
+	v: "x" | error("bad: \(w)")
+	v: "z" @test(err, code=eval, contains="bad: {x:_|_(", incorrect) @test(err:todo, code=eval, contains="bad: {x:_|_}")
+	w: x: v
 }
 -- issues.cue --
 import "list"
@@ -107,14 +136,16 @@ issue4490: {
 }
 -- out/eval/stats --
 Leaks:  3
-Freed:  95
-Reused: 67
-Allocs: 31
+Freed:  126
+Reused: 95
+Allocs: 34
 Retain: 0
 
-Unifications: 49
-Conjuncts:    110
-Disjuncts:    43
+Unifications: 60
+Conjuncts:    151
+Disjuncts:    65
+
+NumCloseIDs: 6
 -- out/errors.txt --
 [eval] selection.useCustomError: use me:
     ./in.cue:4:24
@@ -186,3 +217,31 @@ issue3983.x: I wanted more than 10:
     ./self.cue:6:12
     ./self.cue:7:5
     ./self.cue:8:5
+[eval] issue4240.bad: invalid option {#options:"one" | "two" | "three",bad:_|_(issue4240.bad: invalid option value at path 'issue4240'),#optionsSelf:"one" | "two" | "three",good:_|_(issue4240.good: invalid option four)}:
+    ./self.cue:15:38
+    ./self.cue:14:12
+    ./self.cue:15:12
+    ./self.cue:16:7
+    ./self.cue:16:18
+[eval] issue4240.good: invalid option four:
+    ./self.cue:18:43
+    ./self.cue:18:16
+    ./self.cue:18:17
+    ./self.cue:19:8
+    ./self.cue:19:23
+[eval] errorSelfStruct.item.kind: bad kind in {name:"n",kind:_|_(errorSelfStruct.item.kind: bad kind in value at path 'errorSelfStruct.item')}:
+    ./self.cue:25:33
+    ./self.cue:25:27
+    ./self.cue:26:8
+    ./self.cue:27:8
+    ./self.cue:29:9
+[eval] errorSibling.v: bad: {x:_|_(errorSibling.v: bad: value at path 'errorSibling.w')}:
+    ./self.cue:36:11
+    ./self.cue:36:5
+    ./self.cue:37:5
+    ./self.cue:38:5
+[eval] errorSibling.v: bad: {x:_|_(errorSibling.v: bad: value at path 'errorSibling.w')}:
+    ./self.cue:36:11
+    ./self.cue:36:5
+    ./self.cue:37:5
+    ./self.cue:38:5

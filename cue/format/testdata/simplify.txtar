@@ -39,6 +39,16 @@ a:
 (x)?: "foo"
 (x)!: "foo"
 
+// (k4) refers to the outer k4, past the quoted "k4" in v, so those
+// quotes must stay. TODO: they are removed.
+nestedLabelRefs: {
+    k4: "d"
+    v: {
+        "k4": "w"
+        nested: (k4): 3
+    }
+}
+
 a: {
     [string]: _
     foo: 2
@@ -89,6 +99,20 @@ y: {
     foo: {}
     bar: "foo": foo // removing the quotes would cause a cyclic reference
 }
+
+labelRefs: {
+    k1: "a"
+    k2: "b"
+    v: {
+        // Label expressions reference fields in this scope, so these
+        // quotes must stay. TODO: they are removed, changing what the
+        // label expressions refer to.
+        "k1": "x"
+        (k1): 1
+        "k2": "y"
+        "\(k2)z": 2
+    }
+}
 -- out/format/simplify.golden --
 import "time"
 
@@ -125,6 +149,16 @@ quux: 5
 (x):  "foo"
 (x)?: "foo"
 (x)!: "foo"
+
+// (k4) refers to the outer k4, past the quoted "k4" in v, so those
+// quotes must stay. TODO: they are removed.
+nestedLabelRefs: {
+	k4: "d"
+	v: {
+		k4: "w"
+		nested: (k4): 3
+	}
+}
 
 a: {
 	foo: 2
@@ -173,4 +207,18 @@ y: {
 {
 	foo: {}
 	bar: "foo": foo // removing the quotes would cause a cyclic reference
+}
+
+labelRefs: {
+	k1: "a"
+	k2: "b"
+	v: {
+		// Label expressions reference fields in this scope, so these
+		// quotes must stay. TODO: they are removed, changing what the
+		// label expressions refer to.
+		k1:       "x"
+		(k1):     1
+		k2:       "y"
+		"\(k2)z": 2
+	}
 }

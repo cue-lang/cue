@@ -52,6 +52,22 @@ openMulti: func(
     b?: string,
     ...
 ) -> int
+
+// Parameters and named arguments keep their line breaks, and a named
+// argument keeps the comments around its label.
+multiline: func(
+    a: int,
+    b: int,
+) -> int: a + b
+multilineCall: multiline(
+    // the first operand
+    a: 1,
+    b: 2,
+)
+partialBreak: func(a: int,
+    b: int) -> int
+partialBreakCall: add(a: 1,
+    b: 2)
 -- out/format/functions.golden --
 @experiment(functions)
 
@@ -106,3 +122,11 @@ openMulti: func(
 	b?: string,
 	...
 ) -> int
+
+// Parameters and named arguments keep their line breaks, and a named
+// argument keeps the comments around its label.
+multiline: func(a: int, b: int) -> int: a + b
+multilineCall: multiline(a: 1, b: 2,
+)
+partialBreak:     func(a: int, b: int) -> int
+partialBreakCall: add(a: 1, b: 2)

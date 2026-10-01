@@ -45,7 +45,9 @@ import (
 // [ASTStyle.Labels] rewrites string labels to identifier labels where no
 // reference in the same scope would bind to a different value. A label
 // like `"foo"` becomes `foo` when exposing it as an identifier
-// preserves the semantics.
+// preserves the semantics. It also rewrites a pattern constraint
+// matching a single string, like `["foo"]: v`, as the equivalent
+// optional field `foo?: v`.
 //
 // [ASTStyle.Ellipsis] defers and merges `...` / `[string]: _` / `[_]: _`
 // patterns within each struct body, so multiple equivalent "open"
@@ -97,7 +99,8 @@ import (
 // When several flags are enabled in one [ASTStyle.Apply] call, we run
 // the rewrites in this order:
 //
-//  1. Labels: BasicLit labels become Idents where safe.
+//  1. Labels: single-string patterns become optional fields, and
+//     BasicLit labels become Idents where safe.
 //  2. ClearPositions / ClearComments: a single pass wipes layout hints
 //     and/or comments from the whole tree.
 //  3. Ellipsis: open-marker patterns collapse to a trailing `...`.
@@ -140,6 +143,9 @@ type ASTStyle struct {
 
 	// Labels rewrites string labels to identifier labels where the
 	// identifier would not collide with any in-scope reference.
+	// Beforehand, it rewrites a pattern constraint whose pattern is a
+	// single string literal, like `["foo"]: v`, as the optional field
+	// `"foo"?: v`.
 	Labels bool
 
 	// Ellipsis defers and merges `...` / `[string]: _` / `[_]: _`

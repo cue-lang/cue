@@ -16,14 +16,17 @@ package format
 
 import (
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 // simplifyLabels rewrites string labels to identifier labels where the
 // identifier would not collide with any in-scope reference. Nested
 // struct bodies form child scopes that inherit candidates from their
-// parents.
+// parents. Single-string pattern constraints are rewritten as optional
+// fields first; see [labelSimplifier.simplifyPatternLabel].
 //
 // This backs both the [ASTStyle] Labels flag and the [Simplify] option
 // of the pre-v2 formatter, which drives it from [printNode] through a
@@ -124,10 +127,14 @@ func (s *labelSimplifier) markReference(x *ast.Ident) {
 func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 	sc := &labelSimplifier{parent: s, scope: map[string]bool{}, bound: map[string]bool{}, walker: s.walker}
 
-	// Sub-pass 1: collect candidates and bound names from labels.
+	// Sub-pass 1: collect candidates and bound names from labels, after
+	// rewriting single-string pattern constraints as optional fields.
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
+			if !s.simplifyPatternLabel(x) {
+				return
+			}
 			ast.Walk(x.Label, sc.markStrings, nil)
 		}
 	}
@@ -172,6 +179,40 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 		}
 		f.Label = &ast.Ident{NamePos: bl.ValuePos, Name: str}
 	}
+}
+
+// simplifyPatternLabel rewrites a pattern constraint whose pattern is a
+// single string literal, such as `["k"]: v`, as the equivalent optional
+// field `"k"?: v`. A pattern like this is often a mistake for a regular
+// expression match such as `[=~"k"]`, which the rewrite makes apparent.
+//
+// We leave aliased patterns alone, as well as those carrying comments
+// which the rewrite would have nowhere to put. We report false if the
+// rewrite was refused, stopping the passes.
+func (s *labelSimplifier) simplifyPatternLabel(f *ast.Field) bool {
+	l, ok := f.Label.(*ast.ListLit)
+	if !ok || len(l.Elts) != 1 || f.Alias != nil || f.Constraint != token.ILLEGAL {
+		return true
+	}
+	lit, ok := l.Elts[0].(*ast.BasicLit)
+	if !ok || len(ast.Comments(l)) > 0 || len(ast.Comments(lit)) > 0 {
+		return true
+	}
+	// Only allow double-quoted, single-line strings. strconv.Unquote alone
+	// would also accept a single-character bytes literal like 'k'.
+	if !strings.HasPrefix(lit.Value, `"`) {
+		return true
+	}
+	if _, err := strconv.Unquote(lit.Value); err != nil {
+		return true
+	}
+	if !s.walker.tryMutate() {
+		return false
+	}
+	lit.ValuePos = l.Lbrack
+	f.Label = lit
+	f.Constraint = token.OPTION
+	return true
 }
 
 // markStrings walks a label subtree, recording every unquotable string

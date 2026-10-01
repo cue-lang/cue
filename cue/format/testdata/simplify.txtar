@@ -142,6 +142,27 @@ labelRefs: {
         [k3]: string
     }
 }
+
+// A pattern matching a single string is an optional field.
+patterns: {
+    ["^t"]: 5
+    ["opt"]: 6
+    ["ref"]: 7
+    r: ref
+    ["lbl"]: 12
+    (lbl): 13
+    #d: 14
+    ["#d"]: 15
+    #D: ["def"]: int
+
+    // These are not simple double-quoted strings, or the rewrite would
+    // lose an alias.
+    [=~"^t"]: 8
+    ["alias"]~(K,_): K
+    ['bytes']: 9
+    ['b']: 11
+    [#"raw"#]: 10
+}
 -- out/format/simplify.golden --
 import "time"
 
@@ -281,4 +302,25 @@ labelRefs: {
 		"k3":     "z"
 		[k3]:     string
 	}
+}
+
+// A pattern matching a single string is an optional field.
+patterns: {
+	"^t"?:  5
+	opt?:   6
+	"ref"?: 7
+	r:      ref
+	"lbl"?: 12
+	(lbl):  13
+	#d:     14
+	"#d"?:  15
+	#D: def?: int
+
+	// These are not simple double-quoted strings, or the rewrite would
+	// lose an alias.
+	[=~"^t"]:        8
+	["alias"]~(K,_): K
+	['bytes']:       9
+	['b']:           11
+	[#"raw"#]:       10
 }

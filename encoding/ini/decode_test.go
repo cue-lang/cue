@@ -399,6 +399,52 @@ func TestDecoder(t *testing.T) {
 			    test.ini:5:1
 			`,
 	}, {
+		name:   "DuplicateSections/Error",
+		config: ini.Config{DuplicateSections: ini.DuplicateSectionsError},
+		input: `
+			[s]
+			a = 1
+			[s]
+			b = 2
+			`,
+		wantErr: `
+			duplicate section: s:
+			    test.ini:3:1
+			`,
+	}, {
+		// A section that a dotted header only passes through has not been
+		// named by a header, so a first header naming it is no repeat.
+		name:   "DuplicateSections/Error/PathThroughASection",
+		config: ini.Config{DuplicateSections: ini.DuplicateSectionsError, DottedSections: true},
+		input: `
+			[a.b]
+			x = 1
+			[a]
+			y = 2
+			`,
+		wantCUE: `
+			a: {
+				b: x: "1"
+				y: "2"
+			}
+			`,
+	}, {
+		name:   "DuplicateSections/First",
+		config: ini.Config{DuplicateSections: ini.DuplicateSectionsFirst},
+		input: `
+			[s]
+			a = 1
+			[t]
+			c = 3
+			[s]
+			a = 9
+			b = 2
+			`,
+		wantCUE: `
+			s: a: "1"
+			t: c: "3"
+			`,
+	}, {
 		name:   "PropertyShadowsExistingSubsection",
 		config: ini.Config{DottedSections: true},
 		input: `

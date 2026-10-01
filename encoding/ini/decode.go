@@ -86,6 +86,16 @@ const (
 	DuplicatesLast                       // later values replace earlier ones
 )
 
+// DuplicateSectionMode controls how the decoder treats a repeated section header.
+type DuplicateSectionMode int
+
+const (
+	duplicateSectionsUnset DuplicateSectionMode = iota // default zero value; equal to [DuplicateSectionsMerge] for now
+	DuplicateSectionsMerge                             // a repeated header reopens its section
+	DuplicateSectionsError                             // a repeated header is an error
+	DuplicateSectionsFirst                             // the properties under a repeated header are ignored
+)
+
 // ContinuationMode controls how the decoder joins a value spanning several lines.
 type ContinuationMode int
 
@@ -164,6 +174,11 @@ type Config struct {
 	// ([DuplicatesError]).
 	DuplicateKeys DuplicateMode
 
+	// DuplicateSections controls what happens when a section header names
+	// a section an earlier header named. By default the section is
+	// reopened ([DuplicateSectionsMerge]).
+	DuplicateSections DuplicateSectionMode
+
 	// Continuations controls how a value may span several lines.
 	// By default it may not ([ContinuationsNone]).
 	Continuations ContinuationMode
@@ -218,7 +233,7 @@ type Decoder struct {
 }
 
 // section tracks per-section state needed to detect name collisions.
-// It outlives any one [name] header, since a repeated header reopens the
+// It outlives any one [name] header, since a repeated header may reopen the
 // section rather than starting a new one.
 type section struct {
 	// fields holds this section's fields.
@@ -231,6 +246,10 @@ type section struct {
 	// are found to collide.
 	props    map[string]*ast.Field
 	children map[string]*section
+	// headed reports whether a header has named this section, rather than
+	// only a longer path through it, so that a repeated header is told
+	// apart from the first.
+	headed bool
 }
 
 // newSection starts an empty section holding the given struct.
@@ -795,8 +814,10 @@ func subsection(s string) (string, error) {
 
 // buildNestedSection walks the section path down from top, creating the
 // sections along the way that do not exist yet, and returns the innermost
-// one. An existing section is reused, so a repeated header reopens it; an
-// error is returned if any segment collides with a property in its parent.
+// one. An error is returned if any segment collides with a property in its
+// parent, or if the header repeats under [DuplicateSectionsError]. Under
+// [DuplicateSectionsFirst] a repeated header returns a section attached to
+// nothing, so that its properties are read and then dropped.
 func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos) (*section, error) {
 	cur := top
 	for _, part := range parts {
@@ -817,6 +838,15 @@ func (d *Decoder) buildNestedSection(top *section, parts []string, pos token.Pos
 		cur.children[part] = child
 		cur = child
 	}
+	if cur.headed {
+		switch d.cfg.DuplicateSections {
+		case DuplicateSectionsError:
+			return nil, errors.Newf(pos, "duplicate section: %s", strings.Join(parts, "."))
+		case DuplicateSectionsFirst:
+			return newSection(&ast.StructLit{}), nil
+		}
+	}
+	cur.headed = true
 	return cur, nil
 }
 

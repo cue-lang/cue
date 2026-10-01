@@ -58,7 +58,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 
 	var attrs []*ast.Attribute
 	if e.cfg.ShowAttributes {
-		attrs = ExtractDeclAttrs(n)
+		attrs = e.exportAttrs(ExtractDeclAttrs(n))
 	}
 
 	s, saved := e.pushFrame(n, n.Conjuncts)
@@ -634,7 +634,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		}
 
 		if p.ShowAttributes {
-			f.Attrs = ExtractFieldAttrs(arc)
+			f.Attrs = e.exportAttrs(ExtractFieldAttrs(arc))
 		}
 
 		if p.ShowDocs {

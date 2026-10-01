@@ -178,3 +178,15 @@ func containsAttr(a []*ast.Attribute, x *ast.Attribute) bool {
 	}
 	return false
 }
+
+// exportAttrs drops attributes consumed by an injection, such as @embed.
+// The injected value is already part of the output, which does not carry
+// the file-level @extern declaration that the attribute requires.
+func (e *exporter) exportAttrs(attrs []*ast.Attribute) []*ast.Attribute {
+	if e.isInjectionKind == nil {
+		return attrs
+	}
+	return slices.DeleteFunc(attrs, func(a *ast.Attribute) bool {
+		return e.isInjectionKind(a.Name())
+	})
+}

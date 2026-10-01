@@ -567,7 +567,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		f.Constraint = x.ArcType.Token()
 		e.setField(x.Label, f)
 
-		f.Attrs = extractFieldAttrs(nil, x)
+		f.Attrs = e.exportAttrs(extractFieldAttrs(nil, x))
 
 		// Fields spliced into the enclosing struct are referenced from its
 		// scope, so Sanitize must know of them to detect shadowing.
@@ -623,7 +623,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		}
 
 		f.Value = e.expr(env, x.Value)
-		f.Attrs = extractFieldAttrs(nil, x)
+		f.Attrs = e.exportAttrs(extractFieldAttrs(nil, x))
 
 		return f
 
@@ -666,7 +666,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		})
 
 		f.Value = e.expr(env, x.Value)
-		f.Attrs = extractFieldAttrs(nil, x)
+		f.Attrs = e.exportAttrs(extractFieldAttrs(nil, x))
 
 		return f
 

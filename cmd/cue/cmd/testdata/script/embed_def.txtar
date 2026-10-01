@@ -1,0 +1,52 @@
+# The output of cue def includes embedded values, so it omits the @embed
+# attributes, which would require an @extern(embed) declaration and embed
+# the files again. Other attributes are kept.
+exec cue def
+cmp stdout out/def
+
+# The output evaluates on its own.
+cp stdout def/x.cue
+exec cue export ./def/x.cue
+cmp stdout out/export
+
+-- cue.mod/module.cue --
+module: "cue.example"
+language: version: "v0.11.0"
+
+-- x.cue --
+@extern(embed)
+
+package p
+
+a: _ @embed(file=a.txt, type=text) @other(a)
+b: {
+	@embed(file=b.json)
+	@other(b)
+}
+[=~"^c"]: _ @embed(file=b.json)
+c: _
+-- a.txt --
+hello
+-- b.json --
+{"x": 1}
+-- def/.keep --
+-- out/def --
+package p
+
+a: "hello\n" @other(a)
+b: {
+	@other(b)
+	x: 1
+}
+[=~"^c"]: x: 1
+c: _
+-- out/export --
+{
+    "a": "hello\n",
+    "b": {
+        "x": 1
+    },
+    "c": {
+        "x": 1
+    }
+}

@@ -339,6 +339,10 @@ type exporter struct {
 	index adt.StringIndexer
 	rand  *rand.Rand
 
+	// isInjectionKind reports whether an attribute name is a registered
+	// injection kind, such as "embed"; see [exporter.exportAttrs].
+	isInjectionKind func(name string) bool
+
 	// For resolving references.
 	stack []frame
 
@@ -440,6 +444,10 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 		postfixAliases: exp != nil && exp.AliasV2,
 
 		references: map[*adt.Vertex]*referenceInfo{},
+	}
+
+	if r, ok := r.(interface{ IsInjectionKind(string) bool }); ok {
+		e.isInjectionKind = r.IsInjectionKind
 	}
 
 	e.markUsedFeatures(v)

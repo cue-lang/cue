@@ -280,6 +280,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			for _, c := range a {
 				d.Attrs = extractFieldAttrs(d.Attrs, c.Field())
 			}
+			d.Attrs = x.exportAttrs(d.Attrs)
 		}
 		s.Elts = append(s.Elts, d)
 	}
@@ -377,7 +378,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 		e.top().upCount++
 
 		if e.cfg.ShowAttributes {
-			e.attrs = extractDeclAttrs(e.attrs, x.Src)
+			e.attrs = e.exportAttrs(extractDeclAttrs(e.attrs, x.Src))
 		}
 
 		// Only add if it only has no bulk fields or ellipsis.

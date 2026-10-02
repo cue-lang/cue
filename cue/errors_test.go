@@ -15,10 +15,14 @@
 package cue_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"github.com/go-quicktest/qt"
 )
 
@@ -135,6 +139,63 @@ func TestIsIncomplete(t *testing.T) {
 
 			qt.Check(t, qt.Equals(cue.IsIncomplete(err), tc.isIncomplete),
 				qt.Commentf("IsIncomplete mismatch for error: %v", err))
+		})
+	}
+}
+
+func TestIsIncompleteCombined(t *testing.T) {
+	ctx := cuecontext.New()
+	incomplete := ctx.CompileString(`a: int`).Validate(cue.Concrete(true)).(errors.Error)
+	plain := errors.Newf(token.NoPos, "plain error")
+
+	v := ctx.CompileString(`a: int, b: 1 & 2`)
+	marshal := func(path string) errors.Error {
+		_, err := v.LookupPath(cue.ParsePath(path)).MarshalJSON()
+		return err.(errors.Error)
+	}
+	_, jsonErr := json.Marshal(v.LookupPath(cue.ParsePath("a")))
+
+	testCases := []struct {
+		name         string
+		err          error
+		isIncomplete bool
+	}{{
+		name:         "incomplete error",
+		err:          incomplete,
+		isIncomplete: true,
+	}, {
+		name:         "plain error",
+		err:          plain,
+		isIncomplete: false,
+	}, {
+		name:         "non-CUE error",
+		err:          fmt.Errorf("plain error"),
+		isIncomplete: false,
+	}, {
+		name: "incomplete marshal error",
+		err:  marshal("a"),
+		// Marshaling a non-concrete value fails with an incomplete error,
+		// so this should be incomplete.
+		isIncomplete: false,
+	}, {
+		name: "incomplete marshal error via encoding/json",
+		err:  jsonErr,
+		// Marshaling a non-concrete value fails with an incomplete error,
+		// so this should be incomplete.
+		isIncomplete: false,
+	}, {
+		name:         "permanent marshal error",
+		err:          marshal("b"),
+		isIncomplete: false,
+	}, {
+		name:         "incomplete and incomplete marshal errors",
+		err:          errors.Append(incomplete, marshal("a")),
+		isIncomplete: true,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			qt.Check(t, qt.Equals(cue.IsIncomplete(tc.err), tc.isIncomplete))
 		})
 	}
 }

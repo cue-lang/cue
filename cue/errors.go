@@ -106,18 +106,25 @@ func IsIncomplete(err error) bool {
 		return false
 	}
 	// Fast path:
-	if ve, ok := err.(*valueError); ok {
-		return ve.err.IsIncomplete()
+	if b, ok := err.(bottomer); ok {
+		return b.Bottom().IsIncomplete()
 	}
 	// Handle combined errors
 	for _, e := range errors.Errors(err) {
-		if ve, ok := e.(*valueError); ok {
-			if ve.err.IsIncomplete() {
+		if b, ok := e.(bottomer); ok {
+			if b.Bottom().IsIncomplete() {
 				return true
 			}
 		}
 	}
 	return false
+}
+
+// bottomer is implemented by errors which carry an [adt.Bottom],
+// such as [valueError] and [marshalError].
+type bottomer interface {
+	error
+	Bottom() *adt.Bottom
 }
 
 func mkErr(src adt.Node, args ...interface{}) *adt.Bottom {

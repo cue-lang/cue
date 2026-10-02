@@ -172,17 +172,13 @@ func TestIsIncompleteCombined(t *testing.T) {
 		err:          fmt.Errorf("plain error"),
 		isIncomplete: false,
 	}, {
-		name: "incomplete marshal error",
-		err:  marshal("a"),
-		// Marshaling a non-concrete value fails with an incomplete error,
-		// so this should be incomplete.
-		isIncomplete: false,
+		name:         "incomplete marshal error",
+		err:          marshal("a"),
+		isIncomplete: true,
 	}, {
-		name: "incomplete marshal error via encoding/json",
-		err:  jsonErr,
-		// Marshaling a non-concrete value fails with an incomplete error,
-		// so this should be incomplete.
-		isIncomplete: false,
+		name:         "incomplete marshal error via encoding/json",
+		err:          jsonErr,
+		isIncomplete: true,
 	}, {
 		name:         "permanent marshal error",
 		err:          marshal("b"),

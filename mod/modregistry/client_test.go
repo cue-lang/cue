@@ -15,6 +15,7 @@
 package modregistry
 
 import (
+	"archive/zip"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -27,6 +28,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -413,6 +415,63 @@ x: 42
 	zipData := createZip(t, mv, testMod)
 	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
 	qt.Assert(t, qt.IsNil(err))
+}
+
+func TestPutModuleAgainWithDifferentZip(t *testing.T) {
+	const testMod = `
+-- cue.mod/module.cue --
+module: "example.com/module@v1"
+language: version: "v0.8.0"
+
+-- x.cue --
+x: 42
+`
+	ctx := context.Background()
+	c := newTestClient(t)
+	mv := module.MustParseVersion("example.com/module@v1.0.0")
+	meta := &Metadata{
+		VCSType:       "git",
+		VCSCommit:     "2ff5afa7cda41bf030654ab03caeba3fadf241ae",
+		VCSCommitTime: time.Date(2024, 4, 23, 15, 16, 17, 0, time.UTC),
+	}
+	zipData := createZip(t, mv, testMod)
+	err := c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(zipData), int64(len(zipData)), meta)
+	qt.Assert(t, qt.IsNil(err))
+	m, err := c.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+	digest := m.ManifestDigest()
+
+	// The same files in a different archive should reuse the tagged manifest.
+	storedZip := createStoredZip(t, testMod)
+	qt.Assert(t, qt.Not(qt.DeepEquals(storedZip, zipData)))
+	err = c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(storedZip), int64(len(storedZip)), meta)
+	qt.Assert(t, qt.ErrorMatches(err, `.*cannot overwrite tag.*`))
+	m, err = c.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(m.ManifestDigest(), digest))
+
+	// Different metadata or files are still refused.
+	meta2 := *meta
+	meta2.VCSCommit = "0000000000000000000000000000000000000000"
+	err = c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(storedZip), int64(len(storedZip)), &meta2)
+	qt.Assert(t, qt.ErrorMatches(err, `.*cannot overwrite tag.*`))
+	otherZip := createStoredZip(t, strings.Replace(testMod, "x: 42", "x: 43", 1))
+	err = c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(otherZip), int64(len(otherZip)), meta)
+	qt.Assert(t, qt.ErrorMatches(err, `.*cannot overwrite tag.*`))
+}
+
+// createStoredZip is like createZip, but stores the files uncompressed.
+func createStoredZip(t *testing.T, txtarData string) []byte {
+	var buf bytes.Buffer
+	zw := zip.NewWriter(&buf)
+	for _, f := range txtar.Parse([]byte(txtarData)).Files {
+		w, err := zw.CreateHeader(&zip.FileHeader{Name: f.Name, Method: zip.Store})
+		qt.Assert(t, qt.IsNil(err))
+		_, err = w.Write(f.Data)
+		qt.Assert(t, qt.IsNil(err))
+	}
+	qt.Assert(t, qt.IsNil(zw.Close()))
+	return buf.Bytes()
 }
 
 // noBlobOverwriteRegistry rejects pushes of blobs that already exist.

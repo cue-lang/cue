@@ -1,0 +1,25 @@
+# Test that a dependency can be updated when its current version
+# does not exist in the registry.
+# TODO(https://cuelang.org/issue/3965): the update fails because the
+# current version is fetched before it is replaced.
+-- versions --
+bar.com
+-- want --
+error: cannot determine module graph: module bar.com@v0.0.2 not found
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.0.2"
+	}
+}
+-- main.cue --
+package main
+
+-- _registry/bar.com_v0.5.0/cue.mod/module.cue --
+module: "bar.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/bar.com_v0.5.0/bar/x.cue --
+package bar

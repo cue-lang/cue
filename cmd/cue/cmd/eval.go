@@ -89,7 +89,10 @@ const (
 )
 
 func runEval(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, &config{mode: filetypes.Eval})
+	b, err := parseArgs(cmd, args, &config{
+		mode:     filetypes.Eval,
+		concrete: flagConcrete.Bool(cmd),
+	})
 	if err != nil {
 		return err
 	}

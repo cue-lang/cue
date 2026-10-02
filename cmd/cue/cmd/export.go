@@ -109,7 +109,10 @@ See "cue help filetypes" for more information on values accepted by --out.
 }
 
 func runExport(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, &config{mode: filetypes.Export})
+	b, err := parseArgs(cmd, args, &config{
+		mode:     filetypes.Export,
+		concrete: true,
+	})
 	if err != nil {
 		return err
 	}

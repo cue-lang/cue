@@ -270,7 +270,7 @@ func (i *streamingIterator) scan() bool {
 		i.v = i.v.Unify(schema) // TODO(required fields): don't merge in schema
 		i.e = i.v.Err()
 		if i.e != nil {
-			if err := i.v.Validate(); err != nil {
+			if err := i.v.Validate(cue.Concrete(i.b.cfg.concrete)); err != nil {
 				// Validate should always be non-nil, but just in case.
 				i.e = err
 			}
@@ -343,6 +343,10 @@ type config struct {
 	overrideDefault bool
 
 	noMerge bool // do not merge individual data files.
+
+	// concrete reports incomplete errors when data files fail to unify
+	// with a schema, for commands which require concrete values.
+	concrete bool
 
 	loadCfg *load.Config
 }

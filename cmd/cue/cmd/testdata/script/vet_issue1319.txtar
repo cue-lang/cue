@@ -19,8 +19,6 @@ cmp stderr unique-stderr
 # https://cuelang.org/issue/692: the same applies when data files are
 # checked against a schema without merging them, for the commands which
 # require concrete values.
-# The incomplete error for "@id" should also be reported, but only the
-# conflict for "min" is.
 ! exec cue vet -c data.json schema.cue
 cmp stderr data-stderr
 
@@ -88,6 +86,8 @@ max: number & >min
 -- data.json --
 {"min": "test"}
 -- data-stderr --
+"@id": incomplete value string:
+    ./schema.cue:1:8
 min: 2 errors in empty disjunction:
 min: conflicting values "test" and 0 (mismatched types string and int):
     ./data.json:1:9

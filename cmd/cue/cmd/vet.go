@@ -88,6 +88,8 @@ func newVetCmd(c *Command) *cobra.Command {
 func doVet(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, &config{
 		noMerge: true,
+		// Data files are always checked to be concrete; see vetFiles.
+		concrete: true,
 	})
 	if err != nil {
 		return err

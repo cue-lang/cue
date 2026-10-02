@@ -1,6 +1,6 @@
 An allOf member which only restricts the type adds no subschema to the
-matchN validator, so it should not count towards the number of
-subschemas which must match. It does, so no value is valid.
+matchN validator, so it does not count towards the number of subschemas
+which must match.
 
 -- schema.json --
 {
@@ -11,7 +11,7 @@ subschemas which must match. It does, so no value is valid.
         {"maxLength": 5}
     ]
 }
--- test/err-valid.json --
+-- test/valid.json --
 "abc"
 -- test/err-empty.json --
 ""
@@ -22,9 +22,9 @@ import "strings"
 
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 
-matchN(3, [strings.MinRunes(1), strings.MaxRunes(5)])
+matchN(2, [strings.MinRunes(1), strings.MaxRunes(5)])
 -- out/decode/testerr/err-empty --
-invalid value "" (does not satisfy matchN): 1 matched, expected 3:
+invalid value "" (does not satisfy matchN): 1 matched, expected 2:
     generated.cue:5:1
     generated.cue:1:1
     generated.cue:5:8
@@ -44,14 +44,8 @@ conflicting values 5 and strings.MinRunes(1) (mismatched types int and string):
     generated.cue:5:1
     generated.cue:5:12
     test/err-number.json:1:1
-invalid value 5 (does not satisfy matchN): 0 matched, expected 3:
+invalid value 5 (does not satisfy matchN): 0 matched, expected 2:
     generated.cue:5:1
     generated.cue:1:1
     generated.cue:5:8
     test/err-number.json:1:1
--- out/decode/testerr/err-valid --
-invalid value "abc" (does not satisfy matchN): 2 matched, expected 3:
-    generated.cue:5:1
-    generated.cue:1:1
-    generated.cue:5:8
-    test/err-valid.json:1:1

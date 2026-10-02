@@ -61,7 +61,7 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 			// here rather than redundantly encoding the length of the list.
 			&ast.BasicLit{
 				Kind:  token.INT,
-				Value: strconv.Itoa(len(items)),
+				Value: strconv.Itoa(len(a)),
 			},
 			ast.NewList(a...),
 		))

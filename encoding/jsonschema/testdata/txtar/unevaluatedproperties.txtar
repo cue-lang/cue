@@ -147,7 +147,7 @@
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 
-matchN(2, [#base, #extra]) & close({
+#base & #extra & close({
 	restart?: string
 	labels?: #extra & {
 		ports?: _
@@ -203,5 +203,4 @@ labels.env: conflicting values 1 and string (mismatched types int and string):
     test/err-labels.json:4:16
 -- out/decode/testerr/err-misspelled --
 imagee: field not allowed:
-    generated.cue:3:1
     test/err-misspelled.json:3:6

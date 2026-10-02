@@ -51,9 +51,13 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 	// as that's a known-impossible assertion?
 	if len(a) > 0 {
 		s.knownTypes &= knownTypes
-		if len(a) == 1 {
-			// Only one possibility. Use that.
-			s.all.add(n, a[0])
+		// Unify the subschemas so that their fields and docs stay reachable,
+		// unless the object is closed: unifying would then declare fields only
+		// to disallow them, which the generator cannot tell from allowed ones.
+		if len(a) == 1 || !s.schemaRoot().closesRoot(s.pos, make(map[string]bool), s.preserveUnknownFields) {
+			for _, x := range a {
+				s.all.add(n, x)
+			}
 			return
 		}
 		s.all.add(n, matchN(
@@ -66,6 +70,60 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 			ast.NewList(a...),
 		))
 	}
+}
+
+// closesRoot reports whether the schema n disallows or constrains the
+// properties it does not declare, following "$ref" and the subschemas
+// unified with it, which inherit preserve like [state.preserveUnknownFields].
+func (s *state) closesRoot(n cue.Value, seen map[string]bool, preserve bool) bool {
+	path := n.Path().String()
+	if n.Kind() != cue.StructKind || seen[path] {
+		return false
+	}
+	// The first schema holds the "allOf", and its "unevaluatedProperties"
+	// accounts for the properties of the subschemas.
+	holder := len(seen) == 0
+	seen[path] = true
+	lookup := func(key string) cue.Value {
+		return n.LookupPath(cue.MakePath(cue.Str(key)))
+	}
+	isTrueBool := func(v cue.Value) bool {
+		ok, _ := v.Bool()
+		return ok
+	}
+	additional := lookup("additionalProperties")
+	if additional.Exists() && !isTrueBool(additional) {
+		return true
+	}
+	if v := lookup("unevaluatedProperties"); !holder && v.Exists() && !isTrueBool(v) {
+		return true
+	}
+	preserve = preserve || isTrueBool(lookup("x-kubernetes-preserve-unknown-fields"))
+	if s.cfg.OpenOnlyWhenExplicit && !preserve && !additional.Exists() {
+		// The schema does not open the object which it gives, if any.
+		if typ := lookup("type"); typ.Exists() {
+			if typeKinds(typ)&cue.StructKind != 0 {
+				return true
+			}
+		} else if lookup("properties").Exists() || lookup("patternProperties").Exists() || lookup("required").Exists() {
+			return true
+		}
+	}
+	if target, ok := s.localRefTarget(lookup("$ref")); ok && s.closesRoot(target, seen, false) {
+		return true
+	}
+	for _, key := range []string{"allOf", "anyOf", "oneOf"} {
+		subs := lookup(key)
+		if count, _ := subs.Len().Int64(); key != "allOf" && count > 1 {
+			continue // Multiple alternatives only validate the instance.
+		}
+		for i, _ := subs.List(); i.Next(); {
+			if s.closesRoot(i.Value(), seen, preserve) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func constraintAnyOf(key string, n cue.Value, s *state) {

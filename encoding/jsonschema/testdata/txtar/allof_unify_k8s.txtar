@@ -1,8 +1,9 @@
 # The subschemas of "allOf" are not unified with each other when one of
-# them reaches "x-kubernetes-group-version-kind", whose regular fields
-# would otherwise fill in the result, nor when one of them or the schema
-# itself is an object which is closed as it is not explicitly opened.
-# Subschemas inherit "x-kubernetes-preserve-unknown-fields" from the schema.
+# them or the schema itself is an object which is closed as it is not
+# explicitly opened. Subschemas inherit
+# "x-kubernetes-preserve-unknown-fields" from the schema.
+# The regular fields of "x-kubernetes-group-version-kind" fill in the
+# result of unified subschemas, as they do via any other reference.
 
 #version: k8sAPI
 
@@ -163,13 +164,13 @@ _#defs: "/components/schemas/ClosedOneOf": matchN(2, [
 	_#defs."/components/schemas/Size",
 ])
 
-_#defs: "/components/schemas/Inherited": matchN(2, [{
+_#defs: "/components/schemas/Inherited": {
 	name?: string
 	...
-}, {
+} & {
 	size?: int
 	...
-}])
+}
 
 _#defs: "/components/schemas/Kind": {
 	apiVersion: "example.com/v1"
@@ -190,15 +191,9 @@ _#defs: "/components/schemas/OpenSize": {
 
 _#defs: "/components/schemas/Size": size?: int
 
-_#defs: "/components/schemas/Unified": matchN(2, [
-	_#defs."/components/schemas/OpenName",
-	_#defs."/components/schemas/OpenSize",
-])
+_#defs: "/components/schemas/Unified": _#defs."/components/schemas/OpenName" & _#defs."/components/schemas/OpenSize"
 
-_#defs: "/components/schemas/Validated": matchN(2, [
-	_#defs."/components/schemas/OpenName",
-	{
-		spec?: _#defs."/components/schemas/Kind"
-		...
-	}
-])
+_#defs: "/components/schemas/Validated": _#defs."/components/schemas/OpenName" & {
+	spec?: _#defs."/components/schemas/Kind"
+	...
+}

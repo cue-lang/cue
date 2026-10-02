@@ -66,7 +66,7 @@ directRef?: #a & {
 	y?: string
 	...
 }
-allOfRefs?: matchN(2, [#a, #b]) & {
+allOfRefs?: #a & #b & {
 	y?: string
 	...
 }
@@ -91,11 +91,11 @@ aliasRef?: #alias & {
 allOfRef: conflicting values {y?:string,...} and "foo" (mismatched types struct and string):
     generated.cue:2:17
     test/err-allofref.json:1:14
--- out/decode/testerr/err-directref --
-directRef: conflicting values {y?:string,...} and 1 (mismatched types struct and int):
-    generated.cue:13:18
-    test/err-directref.json:1:15
 -- out/decode/testerr/err-allofrefs --
 allOfRefs.y: conflicting values string and 1 (mismatched types string and int):
     generated.cue:18:6
     test/err-allofrefs.json:1:21
+-- out/decode/testerr/err-directref --
+directRef: conflicting values {y?:string,...} and 1 (mismatched types struct and int):
+    generated.cue:13:18
+    test/err-directref.json:1:15

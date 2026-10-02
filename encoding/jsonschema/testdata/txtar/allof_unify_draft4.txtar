@@ -1,6 +1,6 @@
 # Before draft-06, "id" starts a schema resource of its own, like "$id"
-# does later, so a subschema with references inside such a resource keeps
-# each subschema as a separate validator.
+# does later. Unifying a subschema which is such a resource leaves the
+# references inside it resolving against its own ID.
 
 -- schema.json --
 {
@@ -24,13 +24,10 @@
 -- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-04/schema#")
 @jsonschema(id="http://example.test/root")
-matchN(2, [
-	#other,
-	null | bool | number | string | [...] | {
-		b?: string
-		...
-	}
-])
+#other & (null | bool | number | string | [...] | {
+	b?: string
+	...
+})
 
 #foo: string
 

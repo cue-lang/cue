@@ -1,5 +1,9 @@
-# Each subschema of "allOf" is a separate validator, so the fields and
-# documentation of the subschemas are only reachable through it.
+# The subschemas of "allOf" are unified with each other, so that their
+# fields and the documentation of those are reachable, including via
+# a reference to another schema resource.
+# A subschema which closes the object at its root, including via a single
+# "anyOf" alternative, keeps each subschema as a separate validator,
+# as does a schema which closes the object itself.
 
 -- schema.json --
 {
@@ -187,10 +191,10 @@
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 
-matchN(2, [#a, #b]) & close({
-	defaults?:     matchN(2, [#a, #withDefault])
+#a & #b & close({
+	defaults?:     #a & #withDefault
 	closed?:       matchN(2, [#a, #closed])
-	bundled?:      matchN(2, [#a, #bundled & {...}])
+	bundled?:      #a & #bundled & {...}
 	closedAnyOf?:  matchN(2, [#a, #closed & {...}])
 	closedHolder?: matchN(2, [#a, #b]) & close({own?: string})
 	x?:            _
@@ -223,13 +227,9 @@ matchN(2, [#a, #b]) & close({
 }
 -- out/decode/testerr/err-bundled --
 bundled.z: conflicting values 1 and bool (mismatched types int and bool):
-    generated.cue:6:32
+    generated.cue:6:22
     generated.cue:27:6
     test/err-bundled.json:3:14
-bundled: invalid value {z:1} (does not satisfy matchN): 1 matched, expected 2:
-    generated.cue:6:17
-    generated.cue:6:24
-    test/err-bundled.json:2:16
 -- out/decode/testerr/err-closed-anyof --
 closedAnyOf: invalid value {x:"a"} (does not satisfy matchN): 1 matched, expected 2:
     generated.cue:7:17
@@ -252,24 +252,14 @@ closed.x: field not allowed:
     test/err-closed.json:3:14
 -- out/decode/testerr/err-default --
 defaults.d: conflicting values "s" and int (mismatched types string and int):
-    generated.cue:4:32
+    generated.cue:4:22
     generated.cue:34:6
     test/err-default.json:3:14
-defaults: invalid value {d:"s"} (does not satisfy matchN): 1 matched, expected 2:
-    generated.cue:4:17
-    generated.cue:4:24
-    test/err-default.json:2:17
 -- out/decode/testerr/err-unevaluated --
 z: field not allowed:
-    generated.cue:3:1
     test/err-unevaluated.json:2:6
 -- out/decode/testerr/err-x --
 x: conflicting values 5 and string (mismatched types int and string):
-    generated.cue:3:12
+    generated.cue:3:1
     generated.cue:15:6
     test/err-x.json:2:10
-invalid value {#a:{x?:string},#b:{y?:string},#bundled:{z?:bool},#closed:{c?:string},#withDefault:{d?:int},x:5,defaults?:matchN(2, [#a,#withDefault]),closed?:matchN(2, [#a,#closed]),bundled?:matchN(2, [#a,(#bundled & {...})]),closedAnyOf?:matchN(2, [#a,(#closed & {...})]),closedHolder?:{own?:string},y?:_} (does not satisfy matchN): 1 matched, expected 2:
-    generated.cue:3:1
-    generated.cue:1:1
-    generated.cue:3:8
-    test/err-x.json:1:1

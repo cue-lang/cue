@@ -103,10 +103,7 @@ errPairOrder.data.foo.pair.1: conflicting values "a" and int (mismatched types s
     1:419
 -- out/generate-v3/ok1 --
 -- out/generate-v3/errScore --
-errScore.data.score: invalid value 0 (does not satisfy matchN): 1 matched, expected 2:
-    1:456
-    ./datatest/tests.cue:23:15
 errScore.data.score: invalid value 0 (out of bound >0):
-    1:513
+    1:456
     ./datatest/tests.cue:23:15
 -- out/generate-v3/okScore --

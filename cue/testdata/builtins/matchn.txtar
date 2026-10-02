@@ -532,7 +532,7 @@ kindConflict: {
 	optional: {
 		v: matchN(1, [#a]) & (null | {x?: _})
 		v: x: 5
-		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[1:6, 2:6]), hint="spurious: matchN runs on the conflicting value",
+		@test(err, code=eval, at=v,
 			suberr=(contains="conflicting values", args=[struct, null], pos=[1:25, 2:6]),
 			suberr=(contains="conflicting values", args=[int, string], pos=[-2:11, 1:17, 2:9]),
 			suberr=(contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]))
@@ -540,7 +540,7 @@ kindConflict: {
 	required: {
 		v: matchN(1, [#a]) & (null | {x: _})
 		v: x: 5
-		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[1:6, 2:6]), hint="spurious: matchN runs on the conflicting value",
+		@test(err, code=eval, at=v,
 			suberr=(contains="conflicting values", args=[struct, null], pos=[1:25, 2:6]),
 			suberr=(contains="conflicting values", args=[int, string], pos=[-10:11, 1:17, 2:9]),
 			suberr=(contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]))
@@ -548,7 +548,7 @@ kindConflict: {
 	list: {
 		v: matchN(1, [#a]) & ([...] | {x?: _})
 		v: x: 5
-		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[1:6, 2:6]), hint="spurious: matchN runs on the conflicting value",
+		@test(err, code=eval, at=v,
 			suberr=(contains="conflicting values", args=[struct, list], pos=[1:25, 2:6]),
 			suberr=(contains="conflicting values", args=[int, string], pos=[-18:11, 1:17, 2:9]),
 			suberr=(contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]))
@@ -557,7 +557,7 @@ kindConflict: {
 	reference: {
 		n: null
 		v: matchN(1, [#a]) & {x: 5} & n
-		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[2:6]), hint="spurious: matchN runs on the conflicting value",
+		@test(err, code=eval, at=v,
 			suberr=(contains="conflicting values", args=[struct, null], pos=[1:6, 2:24, 2:33]))
 	}
 }
@@ -830,10 +830,7 @@ issue3694.full.#step.uses: field is required but not present:
 issue3694.simple.#step.uses: field is required but not present:
     ./issue3694.cue:25:9
     ./issue3694.cue:26:3
-[eval] kindConflict.optional.v: 4 errors in empty disjunction:
-kindConflict.optional.v: cannot use {x:_|_(cycle error)} (type _|_) as _ in argument 1 to matchN:
-    ./kindconflict.cue:8:6
-    ./kindconflict.cue:9:6
+[eval] kindConflict.optional.v: 3 errors in empty disjunction:
 kindConflict.optional.v: conflicting values {x:5} and null (mismatched types struct and null):
     ./kindconflict.cue:8:25
     ./kindconflict.cue:9:6
@@ -845,10 +842,7 @@ kindConflict.optional.v: invalid value {x:5} (does not satisfy matchN): 0 matche
     ./kindconflict.cue:8:6
     ./kindconflict.cue:8:13
     ./kindconflict.cue:9:6
-[eval] kindConflict.required.v: 4 errors in empty disjunction:
-kindConflict.required.v: cannot use {x:_|_(cycle error)} (type _|_) as _ in argument 1 to matchN:
-    ./kindconflict.cue:16:6
-    ./kindconflict.cue:17:6
+[eval] kindConflict.required.v: 3 errors in empty disjunction:
 kindConflict.required.v: conflicting values {x:5} and null (mismatched types struct and null):
     ./kindconflict.cue:16:25
     ./kindconflict.cue:17:6
@@ -860,10 +854,7 @@ kindConflict.required.v: invalid value {x:5} (does not satisfy matchN): 0 matche
     ./kindconflict.cue:16:6
     ./kindconflict.cue:16:13
     ./kindconflict.cue:17:6
-[eval] kindConflict.list.v: 4 errors in empty disjunction:
-kindConflict.list.v: cannot use {x:_|_(cycle error)} (type _|_) as _ in argument 1 to matchN:
-    ./kindconflict.cue:24:6
-    ./kindconflict.cue:25:6
+[eval] kindConflict.list.v: 3 errors in empty disjunction:
 kindConflict.list.v: conflicting values {x:5} and [...] (mismatched types struct and list):
     ./kindconflict.cue:24:25
     ./kindconflict.cue:25:6
@@ -875,9 +866,7 @@ kindConflict.list.v: invalid value {x:5} (does not satisfy matchN): 0 matched, e
     ./kindconflict.cue:24:6
     ./kindconflict.cue:24:13
     ./kindconflict.cue:25:6
-[eval] kindConflict.reference.v: cannot use {x:5} (type _|_) as _ in argument 1 to matchN:
-    ./kindconflict.cue:34:6
-kindConflict.reference.v: conflicting values {x:5} and null (mismatched types struct and null):
+[eval] kindConflict.reference.v: conflicting values {x:5} and null (mismatched types struct and null):
     ./kindconflict.cue:33:6
     ./kindconflict.cue:34:24
     ./kindconflict.cue:34:33

@@ -431,7 +431,9 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 			// Validators do not run on an erroneous value. Adding the error
 			// of a validator given one would replace a child error with a
 			// copy that no longer leads to the other child errors.
-			if isError(v) {
+			// A node with conflicting kinds is erroneous too, even if its
+			// error is only set as its value below.
+			if isError(v) || n.kind == BottomKind {
 				checks = nil
 			}
 			for _, v := range checks {

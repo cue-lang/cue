@@ -178,22 +178,19 @@ closednessInversion: {
     ./noclose.cue:51:4
 [eval] fieldNotAllowed.t2.#AddTwo.objs.two.extra: field not allowed:
     ./noclose.cue:43:5
-[eval] fieldNotAllowed.t2.out.objs.one.name: field not allowed:
-    ./noclose.cue:58:5
-[eval] fieldNotAllowed.t2.out.objs.one.extra: field not allowed:
-    ./noclose.cue:43:5
+[eval] fieldNotAllowed.t2.out.objs.one: field not allowed:
+    ./noclose.cue:42:10
+    ./noclose.cue:57:10
 [eval] fieldNotAllowed.t2.out.objs.one.extra: field not allowed:
     ./noclose.cue:43:5
 fieldNotAllowed.t2.out.objs.one.name: field not allowed:
     ./noclose.cue:58:5
-[eval] fieldNotAllowed.t2.out.objs.two.extra.unused: field not allowed:
-    ./noclose.cue:43:12
-[eval] fieldNotAllowed.t3.w.y.z.b: field not allowed:
-    ./noclose.cue:81:5
-    ./noclose.cue:92:7
-[eval] fieldNotAllowed.t3.w.y.z.a: field not allowed:
-    ./noclose.cue:80:5
-    ./noclose.cue:94:7
+[eval] fieldNotAllowed.t2.out.objs.two.extra: field not allowed:
+    ./noclose.cue:43:5
+[eval] fieldNotAllowed.t3.w.y.z: field not allowed:
+    ./noclose.cue:79:4
+    ./noclose.cue:92:4
+    ./noclose.cue:94:4
 [eval] fieldNotAllowed.t3.w.y.z.a: field not allowed:
     ./noclose.cue:80:5
     ./noclose.cue:94:7

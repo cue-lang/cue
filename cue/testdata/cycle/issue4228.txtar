@@ -100,11 +100,26 @@ let _globalScope = self
 
 @test(err, code=eval)
 -- out/errors.txt --
-[eval] #manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,let this#4=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#6=_|_(#entries.0.argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),let this#3=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#2=_|_(#entries.0.argocd.app.apps.this: structural cycle),name:string}:
+[eval] #manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+    ./export.cue:18:14
+    ./export.cue:16:4
+    ./in.cue:27:3
+#manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+    ./export.cue:18:14
+    ./export.cue:16:4
+    ./in.cue:28:3
+#manifests: error in call to encoding/yaml.MarshalStream: field not allowed:
+    ./export.cue:18:14
+    ./export.cue:16:4
+    ./in.cue:6:7
+    ./in.cue:13:7
+#manifests: error in call to encoding/yaml.MarshalStream: 4 errors in empty disjunction::
+    ./export.cue:18:14
+    ./export.cue:16:4
+#manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,let this#4=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#6=_|_(#entries.0.argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_(#entries.0.argocd.app.apps: <- invalid value at path '#entries.0.argocd.app.apps'),let this#3=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#2=_|_(#entries.0.argocd.app.apps.this: structural cycle),name:string}:
     ./export.cue:18:14
     ./in.cue:17:33
     ./in.cue:19:8
-    ./in.cue:27:3
     ./in.cue:44:8
     ./in.cue:51:22
     ./in.cue:70:13

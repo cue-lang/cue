@@ -674,8 +674,9 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
-	// Avoid unnecessary errors.
-	if b, ok := v.BaseValue.(*Bottom); ok && !b.CloseCheck {
+	// Avoid unnecessary errors if the struct itself is in error. Errors in
+	// its fields, recorded with ChildError, should not hide its typos.
+	if b, ok := v.BaseValue.(*Bottom); ok && !b.CloseCheck && !b.ChildError {
 		return
 	}
 

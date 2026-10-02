@@ -271,9 +271,12 @@ func mergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
 		case !c.Doc:
 			comments1 = append(comments1, c)
 		case docComment == nil:
-			docComment = c
+			// Copy the group, as c may belong to the source AST.
+			cg := *c
+			cg.List = slices.Clone(c.List)
+			docComment = &cg
 		default:
-			docComment.List = append(slices.Clip(docComment.List), &ast.Comment{Text: "//"})
+			docComment.List = append(docComment.List, &ast.Comment{Text: "//"})
 			docComment.List = append(docComment.List, c.List...)
 		}
 	}

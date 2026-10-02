@@ -204,8 +204,6 @@ Reordering.
 // foobar also defines bar.
 //
 // foobar defines at least foo.
-//
-// foobar defines at least foo.
 package foobar
 
 // A Foo fooses stuff.

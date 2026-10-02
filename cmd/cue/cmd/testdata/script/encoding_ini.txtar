@@ -48,10 +48,11 @@ cmp stderr bogus.stderr
 ! exec cue export ini+flavor=git+flavor=systemd: git.ini
 cmp stderr two-flavors.stderr
 
-# The encoding and the flavor tag are documented.
+# The encoding and the flavor tag are documented, as experimental.
 exec cue help filetypes
 stdout '\n    ini         \.ini            INI files\.\n'
 stdout '\n    flavor=<name>   read INI as the named tool does: git for\n'
+stdout '\nNote that ini is currently experimental: '
 -- svc.ini --
 [Service]
 ExecStart=/bin/echo one ; /bin/echo two

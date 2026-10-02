@@ -632,6 +632,9 @@ possibly prefixed with a qualifier.
 Note that jsonschema is currently experimental as an output type: the
 form of generated schemas may change from release to release.
 
+Note that ini is currently experimental: its flavors and the CUE it
+decodes to may change from release to release.
+
 Examples:
 
 # Interpret bar.cue and foo.yaml as OpenAPI data.

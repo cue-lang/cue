@@ -16,6 +16,23 @@ cmp stderr vet-nonconcrete-stderr
 ! exec cue vet -c unique.cue
 cmp stderr unique-stderr
 
+# https://cuelang.org/issue/692: the same applies when data files are
+# checked against a schema without merging them, for the commands which
+# require concrete values.
+# The incomplete error for "@id" should also be reported, but only the
+# conflict for "min" is.
+! exec cue vet -c data.json schema.cue
+cmp stderr data-stderr
+
+! exec cue export --merge=false data.json schema.cue
+cmp stderr data-stderr
+
+! exec cue eval -c --merge=false data.json schema.cue
+cmp stderr data-stderr
+
+! exec cue eval --merge=false data.json schema.cue
+cmp stderr data-nonconcrete-stderr
+
 -- errors.cue --
 s: "hello"
 s: "world" // conflicting values
@@ -64,3 +81,25 @@ scalars: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value 
 structs: invalid value [{X:1,O:2},{X:2,O:1},{X:1,O:2}] (does not satisfy list.UniqueItems): equal values at position 0 and 2:
     ./unique.cue:3:6
     ./unique.cue:6:10
+-- schema.cue --
+"@id": string
+min: *0 | number
+max: number & >min
+-- data.json --
+{"min": "test"}
+-- data-stderr --
+min: 2 errors in empty disjunction:
+min: conflicting values "test" and 0 (mismatched types string and int):
+    ./data.json:1:9
+    ./schema.cue:2:7
+min: conflicting values "test" and number (mismatched types string and number):
+    ./data.json:1:9
+    ./schema.cue:2:11
+-- data-nonconcrete-stderr --
+min: 2 errors in empty disjunction:
+min: conflicting values "test" and 0 (mismatched types string and int):
+    ./data.json:1:9
+    ./schema.cue:2:7
+min: conflicting values "test" and number (mismatched types string and number):
+    ./data.json:1:9
+    ./schema.cue:2:11

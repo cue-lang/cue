@@ -56,6 +56,17 @@ violation: {
 	}
 }
 
+// Validators whose arguments differ only in their pattern constraints,
+// such as the element type of a list, are distinct. They are deduplicated
+// as if they were equal, so only one of them is checked.
+uniqueConstrains3: {
+	list: matchN(1, [[...>=5]]) & matchN(1, [[...]])
+	list: [3]
+
+	struct: matchN(1, [{[string]: int}]) & matchN(1, [{...}])
+	struct: {a: "s"}
+}
+
 conjuncts: {
 	kv: struct.MinFields(1)
 	kv: struct.MaxFields(3)
@@ -321,6 +332,32 @@ issue4115: {
         tony: "testing"
       }
     })
+  }
+  uniqueConstrains3: {
+    list: (matchN(1, [
+      [
+        ...>=5,
+      ],
+    ]) & matchN(1, [
+      [
+        ...,
+      ],
+    ]))
+    list: [
+      3,
+    ]
+    struct: (matchN(1, [
+      {
+        [string]: int
+      },
+    ]) & matchN(1, [
+      {
+        ...
+      },
+    ]))
+    struct: {
+      a: "s"
+    }
   }
   conjuncts: {
     kv: 〈import;struct〉.MinFields(1)

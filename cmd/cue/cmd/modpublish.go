@@ -453,13 +453,19 @@ func (r *publishRegistryResolverShim) ResolveToRegistry(mpath, vers string) (mod
 	defer r.mu.Unlock()
 	r.registryName = loc.Host
 	r.insecure = loc.Insecure
+	funcs := &ociregistry.Funcs{
+		NewError: func(ctx context.Context, methodName, repo string) error {
+			return fmt.Errorf("unexpected OCI method %q invoked when publishing module", methodName)
+		},
+	}
+	if !r.dryRun {
+		// Let modregistry check whether the tag already holds the same module.
+		funcs.GetTag_ = regLoc.Registry.GetTag
+		funcs.GetBlob_ = regLoc.Registry.GetBlob
+	}
 	return modregistry.RegistryLocation{
 		Registry: &publishRegistryShim{
-			Funcs: &ociregistry.Funcs{
-				NewError: func(ctx context.Context, methodName, repo string) error {
-					return fmt.Errorf("unexpected OCI method %q invoked when publishing module", methodName)
-				},
-			},
+			Funcs:    funcs,
 			resolver: r,
 			registry: regLoc.Registry,
 		},

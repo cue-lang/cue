@@ -37,6 +37,7 @@ import (
 	digest "github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"golang.org/x/mod/sumdb/dirhash"
 	"golang.org/x/sync/errgroup"
 
 	"cuelang.org/go/cue/ast"
@@ -399,7 +400,13 @@ func (c *Client) putCheckedModule(ctx context.Context, loc RegistryLocation, m *
 		Annotations: annotations,
 	}
 
-	if err := pushBlob(ctx, loc, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
+	// A registry with immutable tags refuses to tag a different manifest,
+	// yet the same files can produce a different zip archive,
+	// for example as compress/flate output changes between Go versions.
+	// When the tag already holds the same files, refer to its archive.
+	if desc, ok := c.sameTaggedZip(ctx, m, manifest.Layers[0]); ok {
+		manifest.Layers[0] = desc
+	} else if err := pushBlob(ctx, loc, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
 		return fmt.Errorf("cannot push module contents: %v", err)
 	}
 	if err := pushBlob(ctx, loc, manifest.Layers[1], bytes.NewReader(m.modFileContent)); err != nil {
@@ -409,15 +416,72 @@ func (c *Client) putCheckedModule(ctx context.Context, loc RegistryLocation, m *
 	if err != nil {
 		return fmt.Errorf("cannot marshal manifest: %v", err)
 	}
+	// TODO: if any registry with immutable tags refuses a manifest identical
+	// to the one already tagged, skip PushManifest in that case.
 	if _, err := loc.Registry.PushManifest(ctx, loc.Repository, loc.Tag, manifestData, ocispec.MediaTypeImageManifest); err != nil {
 		return fmt.Errorf("cannot tag %v: %v", m.mv, registryError(err))
 	}
 	return nil
 }
 
+// sameTaggedZip reports whether the module tagged as m's version holds
+// the same files as m, whose zip archive is described by desc.
+// If so, it returns desc updated to describe the tagged archive,
+// which may differ from desc even when the files are the same.
+// Any error, such as the tag not existing, is treated as a mismatch.
+func (c *Client) sameTaggedZip(ctx context.Context, m *checkedModule, desc ocispec.Descriptor) (ocispec.Descriptor, bool) {
+	tagged, err := c.GetModule(ctx, m.mv)
+	if err != nil {
+		return desc, false
+	}
+	taggedDesc := tagged.manifest.Layers[0]
+	if taggedDesc.Digest == desc.Digest {
+		// The tag already refers to this very archive.
+		return desc, true
+	}
+	if taggedDesc.Size > modzip.MaxZipFile ||
+		tagged.manifest.Layers[1].Digest != digest.FromBytes(m.modFileContent) {
+		return desc, false
+	}
+	blob, err := tagged.GetZip(ctx)
+	if err != nil {
+		return desc, false
+	}
+	defer blob.Close()
+	data, err := io.ReadAll(io.LimitReader(blob, taggedDesc.Size))
+	if err != nil {
+		return desc, false
+	}
+	taggedZip, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		return desc, false
+	}
+	taggedHash, err1 := zipHash(taggedZip)
+	hash, err2 := zipHash(m.zipr)
+	if err1 != nil || err2 != nil || hash != taggedHash {
+		return desc, false
+	}
+	desc.Digest, desc.Size = taggedDesc.Digest, taggedDesc.Size
+	return desc, true
+}
+
+// zipHash returns the [dirhash.Hash1] of the files in z.
+func zipHash(z *zip.Reader) (string, error) {
+	names := make([]string, len(z.File))
+	for i, f := range z.File {
+		names[i] = f.Name
+	}
+	return dirhash.Hash1(names, func(name string) (io.ReadCloser, error) {
+		return z.Open(name)
+	})
+}
+
 // PutModule puts a module whose contents are held as a zip archive inside f.
 // It assumes all the module dependencies are correctly resolved and present
 // inside the cue.mod/module.cue file.
+//
+// If the module's tag already refers to the same module with the same files
+// in a different zip archive, that archive is kept and r is not uploaded.
 func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt, size int64) error {
 	return c.PutModuleWithMetadata(ctx, m, r, size, nil)
 }

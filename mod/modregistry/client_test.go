@@ -441,11 +441,11 @@ x: 42
 	qt.Assert(t, qt.IsNil(err))
 	digest := m.ManifestDigest()
 
-	// The same files in a different archive should reuse the tagged manifest.
+	// The same files in a different archive reuse the tagged manifest.
 	storedZip := createStoredZip(t, testMod)
 	qt.Assert(t, qt.Not(qt.DeepEquals(storedZip, zipData)))
 	err = c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(storedZip), int64(len(storedZip)), meta)
-	qt.Assert(t, qt.ErrorMatches(err, `.*cannot overwrite tag.*`))
+	qt.Assert(t, qt.IsNil(err))
 	m, err = c.GetModule(ctx, mv)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(m.ManifestDigest(), digest))

@@ -378,6 +378,31 @@ issue3694: simple: {
 		uses?: string
 	})
 }
+-- kindconflict.cue --
+// Validators do not run on a value whose kinds conflict, even when its
+// fields are added before the conflicting kind and the conflict only
+// becomes its value after the validators run.
+kindConflict: {
+	#a: {x?: string}
+
+	optional: {
+		v: matchN(1, [#a]) & (null | {x?: _})
+		v: x: 5
+	}
+	required: {
+		v: matchN(1, [#a]) & (null | {x: _})
+		v: x: 5
+	}
+	list: {
+		v: matchN(1, [#a]) & ([...] | {x?: _})
+		v: x: 5
+	}
+	// The conflicting kind is added through a reference, after the fields.
+	reference: {
+		n: null
+		v: matchN(1, [#a]) & {x: 5} & n
+	}
+}
 -- out/compile --
 --- closedness.cue
 {
@@ -1022,6 +1047,54 @@ issue3694: simple: {
       #step: close({
         uses?: string
       })
+    }
+  }
+}
+--- kindconflict.cue
+{
+  kindConflict: {
+    #a: {
+      x?: string
+    }
+    optional: {
+      v: (matchN(1, [
+        〈2;#a〉,
+      ]) & (null|{
+        x?: _
+      }))
+      v: {
+        x: 5
+      }
+    }
+    required: {
+      v: (matchN(1, [
+        〈2;#a〉,
+      ]) & (null|{
+        x: _
+      }))
+      v: {
+        x: 5
+      }
+    }
+    list: {
+      v: (matchN(1, [
+        〈2;#a〉,
+      ]) & ([
+        ...,
+      ]|{
+        x?: _
+      }))
+      v: {
+        x: 5
+      }
+    }
+    reference: {
+      n: null
+      v: ((matchN(1, [
+        〈2;#a〉,
+      ]) & {
+        x: 5
+      }) & 〈0;n〉)
     }
   }
 }

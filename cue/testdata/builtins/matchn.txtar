@@ -522,18 +522,57 @@ issue3694: simple: {
 }
 @test(err, code=incomplete, at=issue3694.full.#step, contains="does not satisfy matchN", pos=[-29:9, -29:16, -22:9])
 @test(err, code=incomplete, at=issue3694.simple.#step, contains="does not satisfy matchN", pos=[-9:9, -9:16, -6:9])
+-- kindconflict.cue --
+// Validators do not run on a value whose kinds conflict, even when its
+// fields are added before the conflicting kind and the conflict only
+// becomes its value after the validators run.
+kindConflict: {
+	#a: {x?: string}
+
+	optional: {
+		v: matchN(1, [#a]) & (null | {x?: _})
+		v: x: 5
+		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[1:6, 2:6]), hint="spurious: matchN runs on the conflicting value",
+			suberr=(contains="conflicting values", args=[struct, null], pos=[1:25, 2:6]),
+			suberr=(contains="conflicting values", args=[int, string], pos=[-2:11, 1:17, 2:9]),
+			suberr=(contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]))
+	}
+	required: {
+		v: matchN(1, [#a]) & (null | {x: _})
+		v: x: 5
+		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[1:6, 2:6]), hint="spurious: matchN runs on the conflicting value",
+			suberr=(contains="conflicting values", args=[struct, null], pos=[1:25, 2:6]),
+			suberr=(contains="conflicting values", args=[int, string], pos=[-10:11, 1:17, 2:9]),
+			suberr=(contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]))
+	}
+	list: {
+		v: matchN(1, [#a]) & ([...] | {x?: _})
+		v: x: 5
+		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[1:6, 2:6]), hint="spurious: matchN runs on the conflicting value",
+			suberr=(contains="conflicting values", args=[struct, list], pos=[1:25, 2:6]),
+			suberr=(contains="conflicting values", args=[int, string], pos=[-18:11, 1:17, 2:9]),
+			suberr=(contains="does not satisfy matchN", pos=[1:6, 1:13, 2:6]))
+	}
+	// The conflicting kind is added through a reference, after the fields.
+	reference: {
+		n: null
+		v: matchN(1, [#a]) & {x: 5} & n
+		@test(err, code=eval, at=v, suberr=(contains="cannot use", pos=[2:6]), hint="spurious: matchN runs on the conflicting value",
+			suberr=(contains="conflicting values", args=[struct, null], pos=[1:6, 2:24, 2:33]))
+	}
+}
 -- out/eval/stats --
-Leaks:  126
-Freed:  874
-Reused: 844
-Allocs: 156
+Leaks:  129
+Freed:  916
+Reused: 887
+Allocs: 158
 Retain: 0
 
-Unifications: 907
-Conjuncts:    1487
-Disjuncts:    16
+Unifications: 938
+Conjuncts:    1552
+Disjuncts:    22
 
-NumCloseIDs: 447
+NumCloseIDs: 460
 -- out/errors.txt --
 [eval] openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):
     ./closedness.cue:37:13
@@ -791,6 +830,57 @@ issue3694.full.#step.uses: field is required but not present:
 issue3694.simple.#step.uses: field is required but not present:
     ./issue3694.cue:25:9
     ./issue3694.cue:26:3
+[eval] kindConflict.optional.v: 4 errors in empty disjunction:
+kindConflict.optional.v: cannot use {x:_|_(cycle error)} (type _|_) as _ in argument 1 to matchN:
+    ./kindconflict.cue:8:6
+    ./kindconflict.cue:9:6
+kindConflict.optional.v: conflicting values {x:5} and null (mismatched types struct and null):
+    ./kindconflict.cue:8:25
+    ./kindconflict.cue:9:6
+kindConflict.optional.v.x: conflicting values 5 and string (mismatched types int and string):
+    ./kindconflict.cue:5:11
+    ./kindconflict.cue:8:17
+    ./kindconflict.cue:9:9
+kindConflict.optional.v: invalid value {x:5} (does not satisfy matchN): 0 matched, expected 1:
+    ./kindconflict.cue:8:6
+    ./kindconflict.cue:8:13
+    ./kindconflict.cue:9:6
+[eval] kindConflict.required.v: 4 errors in empty disjunction:
+kindConflict.required.v: cannot use {x:_|_(cycle error)} (type _|_) as _ in argument 1 to matchN:
+    ./kindconflict.cue:16:6
+    ./kindconflict.cue:17:6
+kindConflict.required.v: conflicting values {x:5} and null (mismatched types struct and null):
+    ./kindconflict.cue:16:25
+    ./kindconflict.cue:17:6
+kindConflict.required.v.x: conflicting values 5 and string (mismatched types int and string):
+    ./kindconflict.cue:5:11
+    ./kindconflict.cue:16:17
+    ./kindconflict.cue:17:9
+kindConflict.required.v: invalid value {x:5} (does not satisfy matchN): 0 matched, expected 1:
+    ./kindconflict.cue:16:6
+    ./kindconflict.cue:16:13
+    ./kindconflict.cue:17:6
+[eval] kindConflict.list.v: 4 errors in empty disjunction:
+kindConflict.list.v: cannot use {x:_|_(cycle error)} (type _|_) as _ in argument 1 to matchN:
+    ./kindconflict.cue:24:6
+    ./kindconflict.cue:25:6
+kindConflict.list.v: conflicting values {x:5} and [...] (mismatched types struct and list):
+    ./kindconflict.cue:24:25
+    ./kindconflict.cue:25:6
+kindConflict.list.v.x: conflicting values 5 and string (mismatched types int and string):
+    ./kindconflict.cue:5:11
+    ./kindconflict.cue:24:17
+    ./kindconflict.cue:25:9
+kindConflict.list.v: invalid value {x:5} (does not satisfy matchN): 0 matched, expected 1:
+    ./kindconflict.cue:24:6
+    ./kindconflict.cue:24:13
+    ./kindconflict.cue:25:6
+[eval] kindConflict.reference.v: cannot use {x:5} (type _|_) as _ in argument 1 to matchN:
+    ./kindconflict.cue:34:6
+kindConflict.reference.v: conflicting values {x:5} and null (mismatched types struct and null):
+    ./kindconflict.cue:33:6
+    ./kindconflict.cue:34:24
+    ./kindconflict.cue:34:33
 -- out/todo.txt --
 v2/v3 differences:
 - explicitClose.err1, openArguments.err2, closedByDefinition.err5: argument order in conflicting values error differs between v2 and v3

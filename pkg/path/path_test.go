@@ -129,7 +129,8 @@ func TestClean(t *testing.T) {
 		}
 
 		if testing.Short() {
-			t.Skip("skipping malloc count in short mode")
+			t.Log("skipping malloc count in short mode")
+			return
 		}
 		if runtime.GOMAXPROCS(0) > 1 {
 			t.Log("skipping AllocsPerRun checks; GOMAXPROCS>1")

@@ -252,23 +252,25 @@ func (f *File) documentSymbols() []protocol.DocumentSymbol {
 		return nil
 	}
 
-	stack := []*protocol.DocumentSymbol{{Kind: protocol.File}}
+	// Each symbol on the stack is paired with the field it was pushed for,
+	// so that fields without a symbol are not popped.
+	type entry struct {
+		field *ast.Field
+		sym   *protocol.DocumentSymbol
+	}
+	stack := []entry{{sym: &protocol.DocumentSymbol{Kind: protocol.File}}}
 
-	peek := func() *protocol.DocumentSymbol {
+	peek := func() entry {
 		return stack[len(stack)-1]
 	}
 
-	push := func() *protocol.DocumentSymbol {
-		parent := peek()
+	push := func(field *ast.Field) *protocol.DocumentSymbol {
+		parent := peek().sym
 		i := len(parent.Children)
 		parent.Children = append(parent.Children, protocol.DocumentSymbol{})
 		child := &parent.Children[i]
-		stack = append(stack, child)
+		stack = append(stack, entry{field, child})
 		return child
-	}
-
-	pop := func() {
-		stack = stack[:len(stack)-1]
 	}
 
 	mapper := f.mapper
@@ -279,29 +281,37 @@ func (f *File) documentSymbols() []protocol.DocumentSymbol {
 			if !ok {
 				return true
 			}
-			child := push()
-			child.Kind = protocol.Field
-
+			// A field without positions has no symbol,
+			// but its children may still have one.
 			label := field.Label
-			labelStartOffset, labelEndOffset := label.Pos().Offset(), label.End().Offset()
-			child.Name = string(content[labelStartOffset:labelEndOffset])
-
-			fieldStartOffset, fieldEndOffset := field.Pos().Offset(), field.End().Offset()
-			var err error
-			child.Range, err = mapper.OffsetRange(fieldStartOffset, fieldEndOffset)
-			if err != nil {
-				return false
+			if !label.Pos().HasAbsPos() || !field.End().HasAbsPos() {
+				return true
 			}
-			child.SelectionRange, err = mapper.OffsetRange(labelStartOffset, labelEndOffset)
-			return err == nil
+			labelStartOffset, labelEndOffset := label.Pos().Offset(), label.End().Offset()
+			fieldStartOffset, fieldEndOffset := field.Pos().Offset(), field.End().Offset()
+			fieldRange, err := mapper.OffsetRange(fieldStartOffset, fieldEndOffset)
+			if err != nil {
+				return true
+			}
+			labelRange, err := mapper.OffsetRange(labelStartOffset, labelEndOffset)
+			if err != nil {
+				return true
+			}
+
+			child := push(field)
+			child.Kind = protocol.Field
+			child.Name = string(content[labelStartOffset:labelEndOffset])
+			child.Range = fieldRange
+			child.SelectionRange = labelRange
+			return true
 		},
 		func(n ast.Node) {
-			if _, ok := n.(*ast.Field); ok {
-				pop()
+			if peek().field == n {
+				stack = stack[:len(stack)-1]
 			}
 		})
 
-	f.symbols = peek().Children
+	f.symbols = peek().sym.Children
 	return f.symbols
 }
 

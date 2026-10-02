@@ -1,0 +1,57 @@
+Like refsiblingtypes, but with OpenAPI's "nullable", which allows null
+only when it is true.
+
+The output is wrong: the object keywords next to each reference allow
+every other type, not only null when the referenced schema is nullable.
+
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    NotNullable:
+      type: object
+      nullable: false
+      properties:
+        x:
+          type: string
+    Nullable:
+      type: object
+      nullable: true
+      properties:
+        x:
+          type: string
+    RefNotNullable:
+      allOf:
+      - $ref: "#/components/schemas/NotNullable"
+      properties:
+        y:
+          type: string
+    RefNullable:
+      allOf:
+      - $ref: "#/components/schemas/Nullable"
+      properties:
+        y:
+          type: string
+-- out/decode/extract --
+#NotNullable: {
+	x?: string
+	...
+}
+
+#Nullable: null | {
+	x?: string
+	...
+}
+
+#RefNotNullable: #NotNullable &
+(null | bool | number | string | [...] | {
+	y?: string
+	...
+})
+
+#RefNullable: #Nullable &
+(null | bool | number | string | [...] | {
+	y?: string
+	...
+})

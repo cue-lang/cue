@@ -343,10 +343,9 @@ func unparen(expr ast.Expr) ast.Expr {
 // the closing in place.
 //
 // One comprehension body is one conjunct, so its own declarations of a field
-// intersect rather than widen each other; only an explicit ellipsis in one of
-// them, or a value whose declarations cannot be known, reopens the field. Each
-// body is therefore a widening group of its own, beside the group formed by
-// the literal holding them and the literals it embeds.
+// intersect rather than widen each other, even when one of them has an
+// ellipsis. Each body is therefore a widening group of its own, beside the
+// group formed by the literal holding them and the literals it embeds.
 //
 // A field nested below one reached through a comprehension is decided the same
 // way, one level down: the declarations which can widen it are those of its
@@ -462,16 +461,10 @@ func oldClosedCompFields(f *ast.File) map[*ast.Field]bool {
 				// A declaration from another group is a conjunct of its
 				// own and widens the field by the fields it declares, so
 				// one declaring none leaves the closing in place; one from
-				// the same group is unified into this conjunct, so only an
-				// explicit ellipsis in it reopens the field.
+				// the same group is unified into this conjunct and does
+				// not widen it.
 				widened := slices.ContainsFunc(decls, func(other groupField) bool {
-					switch {
-					case other.field == gf.field:
-						return false
-					case other.group != gf.group:
-						return declaresFields(other.field.Value)
-					}
-					return mayReopen(other.field.Value)
+					return other.group != gf.group && declaresFields(other.field.Value)
 				})
 				if !widened {
 					closed[gf.field] = true
@@ -557,32 +550,6 @@ func declaresFields(expr ast.Expr) bool {
 	for _, d := range s.Elts {
 		if _, ok := d.(*ast.Attribute); !ok {
 			return true
-		}
-	}
-	return false
-}
-
-// mayReopen reports whether a value unified into a closed one may reopen it.
-// The old semantics intersected the closedness of the conjuncts one
-// comprehension body contributed, so only an explicit ellipsis, or a value
-// whose declarations cannot be known, widened what the field allowed.
-func mayReopen(expr ast.Expr) bool {
-	s, ok := expr.(*ast.StructLit)
-	if !ok {
-		return true
-	}
-	for _, d := range s.Elts {
-		switch d := d.(type) {
-		case *ast.Ellipsis:
-			return true
-		case *ast.EmbedDecl:
-			if mayReopen(d.Expr) {
-				return true
-			}
-		case *ast.Comprehension:
-			if mayReopen(d.Value) {
-				return true
-			}
 		}
 	}
 	return false

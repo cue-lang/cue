@@ -380,83 +380,70 @@ issue2241: {
 embedOpenConjunct: closeAfter: {
 	s: {{a: {...} & close({x?: _})}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: closeBefore: {
 	s: {{a: close({x?: _}) & {...}}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: definition: {
 	s: {{a: {...} & #C}}
 	s: a: y: 1
 	#C: x?: _
-	@test(eq, {s: {a: {y: 1, x?: _}}, #C: {x?: _}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: pattern: {
 	s: {{a: {...} & close({{[=~"^x-"]: _}})}}
 	s: a: "x-1": 1
 	s: a: y:     1
-	@test(eq, {s: {a: {"x-1": 1, y: 1}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[3:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[3:8])
 }
 embedOpenConjunct: deeper: {
 	s: {{{a: {...} & close({x?: _})}}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: nestedField: {
 	s: {{a: b: {...} & close({x?: _})}}
 	s: a: b: y: 1
-	@test(eq, {s: {a: {b: {y: 1, x?: _}}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.b.y, contains="field not allowed", pos=[2:11])
+	@test(err, code=eval, path=s.a.b.y, contains="field not allowed", pos=[2:11])
 }
 embedOpenConjunct: viaReference: {
 	s: {#E}
 	s: a: y: 1
 	#E: a: {...} & close({x?: _})
-	@test(eq, {s: {a: {y: 1, x?: _}}, #E: {a: {x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: sibling: {
 	s: {{a: {...} & close({x?: _})}, z: 1}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}, z: 1}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: openOuter: {
 	s: {{a: {...} & close({x?: _})}, ...}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: comprehension: {
 	s: {if true {a: {...} & close({x?: _})}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: siblingEmbed: {
 	s: {{a: close({x?: _}), {a: {...}}}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: twoSiblingEmbeds: {
 	s: {{a: close({x?: _}), {a: {...}}, {a: {...}}}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: twoNestedEmbeds: {
 	s: {{a: close({x?: _}), {{a: {...}}}, {{a: {...}}}}}
 	s: a: y: 1
-	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
-	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
 embedOpenConjunct: notEmbedded: {
 	s: {a: {...} & close({x?: _})}
@@ -537,8 +524,34 @@ indirect: {
 	}
 }
 -- out/errors.txt --
+[eval] embedOpenConjunct.closeAfter.s.a.y: field not allowed:
+    ./ellipsis.cue:6:8
+[eval] embedOpenConjunct.closeBefore.s.a.y: field not allowed:
+    ./ellipsis.cue:11:8
+[eval] embedOpenConjunct.definition.s.a.y: field not allowed:
+    ./ellipsis.cue:16:8
+[eval] embedOpenConjunct.pattern.s.a.y: field not allowed:
+    ./ellipsis.cue:23:8
+[eval] embedOpenConjunct.deeper.s.a.y: field not allowed:
+    ./ellipsis.cue:28:8
+[eval] embedOpenConjunct.nestedField.s.a.b.y: field not allowed:
+    ./ellipsis.cue:33:11
+[eval] embedOpenConjunct.viaReference.s.a.y: field not allowed:
+    ./ellipsis.cue:38:8
+[eval] embedOpenConjunct.sibling.s.a.y: field not allowed:
+    ./ellipsis.cue:44:8
+[eval] embedOpenConjunct.openOuter.s.a.y: field not allowed:
+    ./ellipsis.cue:49:8
+[eval] embedOpenConjunct.comprehension.s.a.y: field not allowed:
+    ./ellipsis.cue:54:8
+[eval] embedOpenConjunct.siblingEmbed.s.a.y: field not allowed:
+    ./ellipsis.cue:59:8
+[eval] embedOpenConjunct.twoSiblingEmbeds.s.a.y: field not allowed:
+    ./ellipsis.cue:64:8
+[eval] embedOpenConjunct.twoNestedEmbeds.s.a.y: field not allowed:
+    ./ellipsis.cue:69:8
 [eval] embedOpenConjunct.notEmbedded.s.a.y: field not allowed:
-    ./ellipsis.cue:87:8
+    ./ellipsis.cue:74:8
 [eval] patterns.shallow.single.err.j: field not allowed:
     ./embed.cue:10:8
 [eval] patterns.shallow.and.p1.err.j: field not allowed:

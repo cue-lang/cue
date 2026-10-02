@@ -528,7 +528,7 @@ compBodyField: {
 	t1: twice & {c: true, f: {a: 1}} @test(eq, {c: true, f: {a: 1}})
 	t2: twice & {c: true, f: {b: 2}} @test(err, code=eval, contains="field not allowed")
 
-	// An explicit ellipsis in it does.
+	// Nor does an explicit ellipsis in it.
 	twiceOpen: {
 		c: bool
 		if c {
@@ -536,7 +536,7 @@ compBodyField: {
 			f: {b?: int, ...}
 		}
 	}
-	t3: twiceOpen & {c: true, f: {b: 2}} @test(eq, {c: true, f: {a: int, b: 2}})
+	t3: twiceOpen & {c: true, f: {b: 2}} @test(err, code=eval, contains="field not allowed")
 
 	// Another comprehension body widens the field, whether it stands
 	// beside the first or below it.
@@ -610,7 +610,7 @@ compNestedField: {
 	}
 	t5: sameBody & {c: true, f: g: b: 2} @test(err, code=eval, contains="field not allowed")
 
-	// An explicit ellipsis at the nested path in the same body does.
+	// Nor does an explicit ellipsis at the nested path in the same body.
 	sameBodyOpen: {
 		c: bool
 		if c {
@@ -618,7 +618,7 @@ compNestedField: {
 			f: g: {...}
 		}
 	}
-	t6: sameBodyOpen & {c: true, f: g: b: 2} @test(eq, {c: true, f: {g: {a: int, b: 2}}})
+	t6: sameBodyOpen & {c: true, f: g: b: 2} @test(err, code=eval, contains="field not allowed")
 }
 
 // A nested literal with fields of its own beside an embedding takes the
@@ -1031,6 +1031,9 @@ compExtends: {
     ./in.cue:515:28
 [incomplete] compBodyField.twiceOpen: incomplete bool: bool:
     ./in.cue:519:6
+[eval] compBodyField.t3.f.b: field not allowed:
+    ./in.cue:522:8
+    ./in.cue:525:32
 [incomplete] compBodyField.otherBody: incomplete bool: bool:
     ./in.cue:530:6
 [incomplete] compBodyField.nestedBody: incomplete bool: bool:
@@ -1052,6 +1055,8 @@ compExtends: {
     ./in.cue:597:33
 [incomplete] compNestedField.sameBodyOpen: incomplete bool: bool:
     ./in.cue:601:6
+[eval] compNestedField.t6.f.g.b: field not allowed:
+    ./in.cue:607:37
 [eval] nestedUnwrap.t2.c: field not allowed:
     ./in.cue:619:11
 [eval] nestedOpen.t2.foo.other: field not allowed:
@@ -1631,15 +1636,15 @@ compBodyField: {
 	t1: twice & {c: true, f: {a: 1}} @test(eq, {c: true, f: {a: 1}})
 	t2: twice & {c: true, f: {b: 2}} @test(err, code=eval, contains="field not allowed")
 
-	// An explicit ellipsis in it does.
+	// Nor does an explicit ellipsis in it.
 	twiceOpen: {
 		c: bool
 		if c {
-			f: #A...
+			f: #A
 			f: {b?: int, ...}
 		}
 	}
-	t3: twiceOpen & {c: true, f: {b: 2}} @test(eq, {c: true, f: {a: int, b: 2}})
+	t3: twiceOpen & {c: true, f: {b: 2}} @test(err, code=eval, contains="field not allowed")
 
 	// Another comprehension body widens the field, whether it stands
 	// beside the first or below it.
@@ -1713,15 +1718,15 @@ compNestedField: {
 	}
 	t5: sameBody & {c: true, f: g: b: 2} @test(err, code=eval, contains="field not allowed")
 
-	// An explicit ellipsis at the nested path in the same body does.
+	// Nor does an explicit ellipsis at the nested path in the same body.
 	sameBodyOpen: {
 		c: bool
 		if c {
-			f: g: #A...
+			f: g: #A
 			f: g: {...}
 		}
 	}
-	t6: sameBodyOpen & {c: true, f: g: b: 2} @test(eq, {c: true, f: {g: {a: int, b: 2}}})
+	t6: sameBodyOpen & {c: true, f: g: b: 2} @test(err, code=eval, contains="field not allowed")
 }
 
 // A nested literal with fields of its own beside an embedding takes the

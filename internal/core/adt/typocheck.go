@@ -708,8 +708,8 @@ func (n *nodeContext) checkTypos() {
 		}
 
 		for a := range required.elemPtrs() {
-			if id := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
-				a.removed = true
+			if id, embed := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
+				n.removeSet(a, embed)
 			}
 		}
 
@@ -799,6 +799,9 @@ func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conju
 	}
 
 	outerScope, ok := all.lookupSet(a.parent)
+	// Whether the outer struct is open, and not just within the embedding.
+	outerOpen := ok && outerScope.removed && (outerScope.removedEmbed == 0 ||
+		!n.containsDefID(embedScope.id, outerScope.removedEmbed))
 
 outer:
 	for _, c := range conjuncts {
@@ -821,7 +824,7 @@ outer:
 		if !ok {
 			return true
 		}
-		if outerScope.removed {
+		if outerOpen {
 			return true
 		}
 
@@ -982,6 +985,11 @@ type reqSet struct {
 	// we still need to track the group memberships for embeddings or enclosing
 	// structs.
 	removed bool
+	// removedEmbed is the embedding scope of the ellipsis which removed this
+	// reqSet, or zero if it is outside of any embedding. It is only used when
+	// checking fields added outside of an embedding against its closedness,
+	// which an ellipsis within the embedding does not open.
+	removedEmbed defID
 
 	// conjunctOpened indicates this requirement is from an opened conjunction
 	// operand. See [refInfo.conjunctOpened].
@@ -1163,10 +1171,10 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 			return true
 		}
 
-		switch id := hasParentEllipsis(n, a, parentConjuncts); {
+		switch id, embed := hasParentEllipsis(n, a, parentConjuncts); {
 		case id == 0:
 		case !hasAny:
-			a.removed = true
+			n.removeSet(a, embed)
 		case a.kind != defStruct:
 			// The following logic should only apply to non-structs.
 		default:
@@ -1177,7 +1185,7 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 				}
 			}
 			if !hasAny {
-				a.removed = true
+				n.removeSet(a, embed)
 			}
 		}
 
@@ -1205,8 +1213,8 @@ func (n *nodeContext) openByEllipsis() bool {
 	var buf [8]reqSet
 	required = append(buf[:0], required...)
 	for i := range required {
-		if hasParentEllipsis(n, &required[i], n.conjunctInfo) != 0 {
-			required[i].removed = true
+		if id, embed := hasParentEllipsis(n, &required[i], n.conjunctInfo); id != 0 {
+			n.removeSet(&required[i], embed)
 		}
 	}
 	// The zero conjunctInfo stands for a field added from outside of any
@@ -1215,18 +1223,51 @@ func (n *nodeContext) openByEllipsis() bool {
 }
 
 // hasParentEllipsis reports if the parent has any conjuncts from an ellipsis
-// matching any of the ids in a.
+// matching any of the ids in a. It returns the id of the first such conjunct,
+// and the outermost embedding scope of all of them; see [nodeContext.outerEmbed].
 //
 // TODO: this is currently called thrice. Consider an approach where we only need
 // to filter this once for each node. Luckily we can avoid quadratic checks
 // for any conjunct that is not an ellipsis, which is most.
-func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) defID {
+func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) (id, embed defID) {
 	for _, c := range conjuncts {
-		if !c.flags.hasEllipsis() {
+		if !c.flags.hasEllipsis() || !n.containsDefID(a.id, c.id) {
 			continue
 		}
-		if n.containsDefID(a.id, c.id) {
-			return c.id
+		if id == 0 {
+			id, embed = c.id, c.embed
+		} else {
+			embed = n.outerEmbed(embed, c.embed)
+		}
+		if embed == 0 {
+			// Already outside of any embedding; no scope can widen that.
+			break
+		}
+	}
+	return id, embed
+}
+
+// removeSet marks a as removed by an ellipsis from the embedding scope embed.
+func (n *nodeContext) removeSet(a *reqSet, embed defID) {
+	if a.removed {
+		embed = n.outerEmbed(a.removedEmbed, embed)
+	}
+	a.removed = true
+	a.removedEmbed = embed
+}
+
+// outerEmbed returns the innermost scope which contains both of the embedding
+// scopes x and y, or zero, meaning outside of any embedding, if none does.
+func (n *nodeContext) outerEmbed(x, y defID) defID {
+	if x == 0 || y == 0 {
+		return 0
+	}
+	if n.containsDefID(y, x) {
+		return y
+	}
+	for p := x; p != 0; p = n.ctx.containments[p].id {
+		if n.containsDefID(p, y) {
+			return p
 		}
 	}
 	return 0

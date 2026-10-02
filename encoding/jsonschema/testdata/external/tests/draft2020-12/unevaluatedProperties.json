@@ -1244,10 +1244,7 @@
 				"data": {
 					"foo": "foo"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "with nested unevaluated properties",
@@ -1255,10 +1252,7 @@
 					"foo": "foo",
 					"bar": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

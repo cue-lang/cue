@@ -9,8 +9,8 @@ v3:
 
 v3-roundtrip:
 	schema extract (pass / total): 269 / 1363 = 19.7%
-	tests (pass / total): 951 / 4803 = 19.8%
-	tests on extracted schemas (pass / total): 951 / 990 = 96.1%
+	tests (pass / total): 953 / 4803 = 19.8%
+	tests on extracted schemas (pass / total): 953 / 990 = 96.3%
 
 Optional tests:
 

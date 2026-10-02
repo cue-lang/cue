@@ -46,25 +46,28 @@ nestedCross: open: {
 //
 // An additional improvement would be to stop processing disjunctions if we see
 // there are more than two solutions.
+//
+// The second disjunct is {id: {}} unified with {[string]: D}. It is subsumed
+// by each of the other two, but equal to neither, so it is not deduplicated.
 nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
 	D: {id: {}} | {[string]: D}
-} @test(eq, {D: {id: {}} | {}})
+} @test(eq, {D: {id: {}} | {id: {}} | {}})
 -- out/eval/stats --
 Leaks:  6817
-Freed:  17978
-Reused: 17867
+Freed:  17983
+Reused: 17872
 Allocs: 6928
 Retain: 0
 
-Unifications: 3175
-Conjuncts:    22523
+Unifications: 3174
+Conjuncts:    22520
 Disjuncts:    6402
 
 NumCloseIDs: 4099
 
-ConjunctInfos:       7460
+ConjunctInfos:       7458
 MaxConjunctInfos:    4
 MaxReqSets:          12
 MaxRedirect:         6

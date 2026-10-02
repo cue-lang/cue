@@ -57,14 +57,45 @@ violation: {
 }
 
 // Validators whose arguments differ only in their pattern constraints,
-// such as the element type of a list, are distinct. They are deduplicated
-// as if they were equal, so only one of them is checked.
+// such as the element type of a list, are distinct.
 uniqueConstrains3: {
 	list: matchN(1, [[...>=5]]) & matchN(1, [[...]])
 	list: [3]
 
 	struct: matchN(1, [{[string]: int}]) & matchN(1, [{...}])
 	struct: {a: "s"}
+}
+
+// Comparing the pattern constraints of recursive arguments terminates.
+uniqueConstrainsRecursive: {
+	#S1: {[string]: #S1}
+	#S2: {[string]: #S2}
+	struct: matchN(1, [#S1]) & matchN(1, [#S2])
+	struct: {a: {}}
+
+	#L1: [...#L1]
+	#L2: [...#L2]
+	list: matchN(1, [#L1]) & matchN(1, [#L2])
+	list: [[]]
+
+	#I: {[string]: #I | int}
+	differ: matchN(1, [#S1]) & matchN(1, [#I])
+	differ: {a: 1}
+
+	// Mutual recursion.
+	#A1: {[string]: #B1}
+	#B1: {[string]: #A1}
+	#A2: {[string]: #B2}
+	#B2: {[string]: #A2}
+	mutual: matchN(1, [#A1]) & matchN(1, [#A2])
+	mutual: {a: b: {}}
+
+	// A recursive definition equals itself, but not another like it,
+	// so only the latter reports an error per validator.
+	same: matchN(1, [#S1]) & matchN(1, [#S1])
+	same: {a: 1}
+	distinct: matchN(1, [#S1]) & matchN(1, [#S2])
+	distinct: {a: 1}
 }
 
 conjuncts: {
@@ -357,6 +388,85 @@ issue4115: {
     ]))
     struct: {
       a: "s"
+    }
+  }
+  uniqueConstrainsRecursive: {
+    #S1: {
+      [string]: 〈1;#S1〉
+    }
+    #S2: {
+      [string]: 〈1;#S2〉
+    }
+    struct: (matchN(1, [
+      〈1;#S1〉,
+    ]) & matchN(1, [
+      〈1;#S2〉,
+    ]))
+    struct: {
+      a: {}
+    }
+    #L1: [
+      ...〈1;#L1〉,
+    ]
+    #L2: [
+      ...〈1;#L2〉,
+    ]
+    list: (matchN(1, [
+      〈1;#L1〉,
+    ]) & matchN(1, [
+      〈1;#L2〉,
+    ]))
+    list: [
+      [],
+    ]
+    #I: {
+      [string]: (〈1;#I〉|int)
+    }
+    differ: (matchN(1, [
+      〈1;#S1〉,
+    ]) & matchN(1, [
+      〈1;#I〉,
+    ]))
+    differ: {
+      a: 1
+    }
+    #A1: {
+      [string]: 〈1;#B1〉
+    }
+    #B1: {
+      [string]: 〈1;#A1〉
+    }
+    #A2: {
+      [string]: 〈1;#B2〉
+    }
+    #B2: {
+      [string]: 〈1;#A2〉
+    }
+    mutual: (matchN(1, [
+      〈1;#A1〉,
+    ]) & matchN(1, [
+      〈1;#A2〉,
+    ]))
+    mutual: {
+      a: {
+        b: {}
+      }
+    }
+    same: (matchN(1, [
+      〈1;#S1〉,
+    ]) & matchN(1, [
+      〈1;#S1〉,
+    ]))
+    same: {
+      a: 1
+    }
+    distinct: (matchN(1, [
+      〈1;#S1〉,
+    ]) & matchN(1, [
+      〈1;#S2〉,
+    ]))
+    distinct: {
+      a: 1
     }
   }
   conjuncts: {

@@ -911,24 +911,11 @@ func equalPartialNode(ctx *OpContext, x, y *Vertex) bool {
 		return false
 	}
 
-	switch cx, cy := x.PatternConstraints, y.PatternConstraints; {
-	case cx == nil && cy == nil:
-	case cx == nil || cy == nil:
+	if len(x.Arcs) != len(y.Arcs) {
 		return false
-	case len(cx.Pairs) != len(cy.Pairs):
-		return false
-	default:
-		// Assume patterns are in the same order.
-		for i, p := range cx.Pairs {
-			p.Constraint.Finalize(ctx)
-			cy.Pairs[i].Constraint.Finalize(ctx)
-			if !Equal(ctx, p.Constraint, cy.Pairs[i].Constraint, CheckStructural) {
-				return false
-			}
-		}
 	}
 
-	if len(x.Arcs) != len(y.Arcs) {
+	if !equalPatterns(ctx, x, y, CheckStructural) {
 		return false
 	}
 

@@ -21,7 +21,8 @@ const (
 	// applies when CheckStructural is given.
 	IgnoreOptional Flag = 1 << iota
 
-	// CheckStructural indicates that closedness information should be
+	// CheckStructural indicates that closedness information and pattern
+	// constraints, including the element constraints of lists, should be
 	// considered for equality. Equal may return false even when values are
 	// equal.
 	CheckStructural
@@ -29,6 +30,10 @@ const (
 	// RegularOnly indicates that only regular fields should be considered,
 	// thus excluding hidden and definition fields.
 	RegularOnly
+
+	// sharedByIdentity is set by [equalPatterns] to require that vertices
+	// reached via structure sharing are the same vertex.
+	sharedByIdentity
 )
 
 func Equal(ctx *OpContext, v, w Value, flags Flag) bool {
@@ -61,11 +66,15 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 		return false
 	}
 
+	x0, y0 := x, y
 	x = x.DerefValue()
 	y = y.DerefValue()
 
 	if x == y {
 		return true
+	}
+	if flags&sharedByIdentity != 0 && (x != x0 || y != y0) {
+		return false
 	}
 
 	xk := x.Kind()
@@ -135,6 +144,10 @@ loop2:
 		return false
 	}
 
+	if flags&CheckStructural != 0 && !equalPatterns(ctx, x, y, flags) {
+		return false
+	}
+
 	v, ok1 := x.BaseValue.(Value)
 	w, ok2 := y.BaseValue.(Value)
 	if !ok1 && !ok2 {
@@ -142,6 +155,39 @@ loop2:
 	}
 
 	return equalTerminal(ctx, v, w, flags)
+}
+
+// equalPatterns reports whether x and y have equal pattern constraints,
+// in the same order.
+//
+// The constraints are compared recursively. Those of recursive values lead
+// back to the vertices being compared via structure sharing, so shared
+// vertices within a constraint must be the same vertex rather than equal
+// ones, which keeps the recursion finite.
+func equalPatterns(ctx *OpContext, x, y *Vertex, flags Flag) bool {
+	var px, py []PatternConstraint
+	if x.PatternConstraints != nil {
+		px = x.PatternConstraints.Pairs
+	}
+	if y.PatternConstraints != nil {
+		py = y.PatternConstraints.Pairs
+	}
+	if len(px) != len(py) {
+		return false
+	}
+	flags |= sharedByIdentity
+	for i, p := range px {
+		q := py[i]
+		if !Equal(ctx, p.Pattern, q.Pattern, flags) {
+			return false
+		}
+		p.Constraint.Finalize(ctx)
+		q.Constraint.Finalize(ctx)
+		if !Equal(ctx, p.Constraint, q.Constraint, flags) {
+			return false
+		}
+	}
+	return true
 }
 
 func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {

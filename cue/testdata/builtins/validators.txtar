@@ -67,14 +67,45 @@ violation: {
 }
 
 // Validators whose arguments differ only in their pattern constraints,
-// such as the element type of a list, are distinct. They are deduplicated
-// as if they were equal, so only one of them is checked.
+// such as the element type of a list, are distinct.
 uniqueConstrains3: {
 	list: matchN(1, [[...>=5]]) & matchN(1, [[...]])
-	list: [3] @test(eq, [3], incorrect) @test(err:todo, code=eval, contains="does not satisfy matchN")
+	list: [3] @test(err, code=eval, contains="does not satisfy matchN")
 
 	struct: matchN(1, [{[string]: int}]) & matchN(1, [{...}])
-	struct: {a: "s"} @test(eq, {a: "s"}, incorrect) @test(err:todo, code=eval, contains="does not satisfy matchN")
+	struct: {a: "s"} @test(err, code=eval, contains="does not satisfy matchN")
+}
+
+// Comparing the pattern constraints of recursive arguments terminates.
+uniqueConstrainsRecursive: {
+	#S1: {[string]: #S1}
+	#S2: {[string]: #S2}
+	struct: matchN(1, [#S1]) & matchN(1, [#S2])
+	struct: {a: {}} @test(eq, {a: {}})
+
+	#L1: [...#L1]
+	#L2: [...#L2]
+	list: matchN(1, [#L1]) & matchN(1, [#L2])
+	list: [[]] @test(eq, [[]])
+
+	#I: {[string]: #I | int}
+	differ: matchN(1, [#S1]) & matchN(1, [#I])
+	differ: {a: 1} @test(err, code=eval, contains="does not satisfy matchN")
+
+	// Mutual recursion.
+	#A1: {[string]: #B1}
+	#B1: {[string]: #A1}
+	#A2: {[string]: #B2}
+	#B2: {[string]: #A2}
+	mutual: matchN(1, [#A1]) & matchN(1, [#A2])
+	mutual: {a: b: {}} @test(eq, {a: b: {}})
+
+	// A recursive definition equals itself, but not another like it,
+	// so only the latter reports an error per validator.
+	same: matchN(1, [#S1]) & matchN(1, [#S1])
+	same: {a: 1} @test(err, code=eval, contains="does not satisfy matchN")
+	distinct: matchN(1, [#S1]) & matchN(1, [#S2])
+	distinct: {a: 1} @test(err, code=eval, contains="does not satisfy matchN")
 }
 
 conjuncts: {
@@ -332,12 +363,63 @@ issue4115: {
     ./in.cue:59:7
     ./in.cue:58:7
     ./in.cue:59:24
+[eval] uniqueConstrains3.list: invalid value [3] (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:71:8
+    ./in.cue:71:15
+    ./in.cue:72:8
+uniqueConstrains3.list: invalid value [3] (does not satisfy matchN): 1 matched, expected 1:
+    ./in.cue:71:32
+    ./in.cue:71:8
+    ./in.cue:71:39
+    ./in.cue:72:8
+[eval] uniqueConstrains3.struct: invalid value {a:"s"} (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:74:10
+    ./in.cue:74:17
+    ./in.cue:75:10
+uniqueConstrains3.struct: invalid value {a:"s"} (does not satisfy matchN): 1 matched, expected 1:
+    ./in.cue:74:41
+    ./in.cue:74:10
+    ./in.cue:74:48
+    ./in.cue:75:10
+[eval] uniqueConstrainsRecursive.differ: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:91:10
+    ./in.cue:91:17
+    ./in.cue:92:10
+uniqueConstrainsRecursive.differ: invalid value {a:1} (does not satisfy matchN): 1 matched, expected 1:
+    ./in.cue:91:29
+    ./in.cue:91:10
+    ./in.cue:91:36
+    ./in.cue:92:10
+[eval] uniqueConstrainsRecursive.same.a: conflicting values 1 and {[string]:#S1} (mismatched types int and struct):
+    ./in.cue:80:7
+    ./in.cue:80:18
+    ./in.cue:104:38
+    ./in.cue:105:12
+uniqueConstrainsRecursive.same: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:104:27
+    ./in.cue:104:8
+    ./in.cue:104:34
+    ./in.cue:105:8
+[eval] uniqueConstrainsRecursive.distinct.a: conflicting values 1 and {[string]:#S2} (mismatched types int and struct):
+    ./in.cue:81:7
+    ./in.cue:81:18
+    ./in.cue:106:42
+    ./in.cue:107:16
+uniqueConstrainsRecursive.distinct: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:106:12
+    ./in.cue:106:19
+    ./in.cue:107:12
+uniqueConstrainsRecursive.distinct: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:106:31
+    ./in.cue:106:12
+    ./in.cue:106:38
+    ./in.cue:107:12
 [eval] callOfCallToValidator.e: cannot call previously called validator b:
-    ./in.cue:120:5
+    ./in.cue:151:5
 [incomplete] issue2098.incomplete1: index out of range [0] with length 0:
-    ./in.cue:143:5
-    ./in.cue:141:2
-    ./in.cue:142:2
+    ./in.cue:174:5
+    ./in.cue:172:2
+    ./in.cue:173:2
 [eval] issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
     ./issue3418.cue:4:24
     ./issue3418.cue:4:16
@@ -419,15 +501,15 @@ issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN)
 -- out/todo.txt --
 issue3474.topValidator.failType.A: v2 reports "conflicting values >10 and {C:1}" (number and struct order), v3 reports "{C:1} and >10" (struct and number order).
 -- out/eval/stats --
-Leaks:  13
-Freed:  175
-Reused: 143
-Allocs: 45
+Leaks:  29
+Freed:  300
+Reused: 265
+Allocs: 64
 Retain: 0
 
-Unifications: 180
-Conjuncts:    319
-Disjuncts:    0
+Unifications: 317
+Conjuncts:    587
+Disjuncts:    4
 Notifications: 1
 
-NumCloseIDs: 76
+NumCloseIDs: 118

@@ -355,22 +355,14 @@ func appendToList(a list, err Error) list {
 // The zero value for an list is an empty list ready to use.
 type list []Error
 
-func (p list) Is(target error) bool {
-	for _, e := range p {
-		if errors.Is(e, target) {
-			return true
-		}
+// Unwrap returns the errors in the list, so that [errors.Is] and
+// [errors.As] look at each of them.
+func (p list) Unwrap() []error {
+	errs := make([]error, len(p))
+	for i, e := range p {
+		errs[i] = e
 	}
-	return false
-}
-
-func (p list) As(target interface{}) bool {
-	for _, e := range p {
-		if errors.As(e, target) {
-			return true
-		}
-	}
-	return false
+	return errs
 }
 
 // Sanitize sorts multiple errors and removes duplicates on a best effort basis.

@@ -168,3 +168,21 @@ func TestPrintError(t *testing.T) {
 		})
 	}
 }
+
+func TestListUnwrap(t *testing.T) {
+	a := Newf(token.NoPos, "a")
+	b := Newf(token.NoPos, "b")
+	err := Append(a, b)
+
+	got := err.(interface{ Unwrap() []error }).Unwrap()
+	if want := []error{a, b}; !slices.Equal(got, want) {
+		t.Errorf("Unwrap() = %v, want %v", got, want)
+	}
+	if !Is(err, b) {
+		t.Errorf("Is(err, b) = false, want true")
+	}
+	var pe *posError
+	if !As(err, &pe) || pe != a {
+		t.Errorf("As(err, &pe) gave %v, want %v", pe, a)
+	}
+}

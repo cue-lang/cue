@@ -19,8 +19,8 @@ exec cue vet got.json want.cue
 	version!: "example.com@v0.0.1"
 	ref!: =~ "^registry.example/example.com:v0.0.1@sha256:[a-f0-9]+$"
 	files!: [
-		"cue.mod/module.cue",
 		"foo.cue",
+		"cue.mod/module.cue",
 	]
 }
 #schema

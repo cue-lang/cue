@@ -557,9 +557,7 @@ func Create[F any](w io.Writer, m module.Version, files []F, fio FileIO[F]) (err
 	slices.SortFunc(files, func(a, b F) int {
 		ap := fio.Path(a)
 		bp := fio.Path(b)
-		ca := strings.Count(ap, string(filepath.Separator))
-		cb := strings.Count(ap, string(filepath.Separator))
-		if c := cmp.Compare(ca, cb); c != 0 {
+		if c := cmp.Compare(strings.Count(ap, "/"), strings.Count(bp, "/")); c != 0 {
 			return c
 		}
 		return cmp.Compare(ap, bp)

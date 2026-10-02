@@ -62,8 +62,8 @@ exec cue mod publish v0.0.2 # idempotent check
 
 -- filelist.golden --
 [
-    "cue.mod/module.cue",
-    "root.cue"
+    "root.cue",
+    "cue.mod/module.cue"
 ]
 -- v0.0.1 --
 package root

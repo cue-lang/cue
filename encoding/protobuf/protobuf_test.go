@@ -153,3 +153,17 @@ func TestBuild(t *testing.T) {
 		t.Errorf("did not expect file %q", filename)
 	}
 }
+
+func TestExtractErrorPath(t *testing.T) {
+	src := `syntax = "proto3";
+message Foo {
+	message Bar {
+		Baz baz = 1;
+	}
+}
+`
+	_, err := Extract("x.proto", src, nil)
+	// The path should be Foo.Bar.baz.
+	qt.Assert(t, qt.ErrorMatches(err, `protobuf: x.proto:4:3: name "Baz" not found`))
+	qt.Assert(t, qt.IsNil(errors.Path(err)))
+}

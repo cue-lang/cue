@@ -551,11 +551,24 @@ func TestPathAppend(t *testing.T) {
 		path:     cue.MakePath(cue.Str("list")),
 		selector: cue.AnyIndex,
 		want:     "list.[_]",
+	}, {
+		// The paths below have spare capacity.
+		name:     "append to a parsed path",
+		path:     cue.ParsePath("a.b.c"),
+		selector: cue.Str("x"),
+		want:     "a.b.c.other", // The later append overwrites x.
+	}, {
+		name:     "append to a value's path",
+		path:     cuecontext.New().CompileString("a: b: c: x: 1").LookupPath(cue.ParsePath("a.b.c")).Path(),
+		selector: cue.Str("x"),
+		want:     "a.b.c.other", // The later append overwrites x.
 	}}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := tc.path.Append(tc.selector)
+			// Appending to the same base again must not affect result.
+			tc.path.Append(cue.Str("other"))
 			if got := result.String(); got != tc.want {
 				t.Errorf("Path.Append().String() = %q, want %q", got, tc.want)
 			}

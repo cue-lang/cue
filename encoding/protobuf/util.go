@@ -16,6 +16,7 @@ package protobuf
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"text/scanner"
 
@@ -27,17 +28,17 @@ import (
 
 // failf panics with a marked error that can be intercepted upon returning
 // from parsing.
-func failf(pos scanner.Position, format string, args ...interface{}) {
-	panic(protoError{pos, fmt.Errorf(format, args...)})
+func (p *protoConverter) failf(pos scanner.Position, format string, args ...interface{}) {
+	p.fail(pos, fmt.Errorf(format, args...))
 }
 
-func fail(pos scanner.Position, err error) {
-	panic(protoError{pos, err})
-}
-
-type protoError struct {
-	pos scanner.Position
-	error
+func (p *protoConverter) fail(pos scanner.Position, err error) {
+	// Copy the path now, as deferred calls restore p.path while panicking.
+	panic(&protobufError{
+		path: slices.Clone(p.path),
+		pos:  p.toCUEPos(pos),
+		err:  err,
+	})
 }
 
 var newSection = token.NewSection.Pos()

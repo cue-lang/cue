@@ -163,7 +163,6 @@ message Foo {
 }
 `
 	_, err := Extract("x.proto", src, nil)
-	// The path should be Foo.Bar.baz.
-	qt.Assert(t, qt.ErrorMatches(err, `protobuf: x.proto:4:3: name "Baz" not found`))
-	qt.Assert(t, qt.IsNil(errors.Path(err)))
+	qt.Assert(t, qt.ErrorMatches(err, `protobuf: x.proto:4:3:Foo.Bar.baz: name "Baz" not found`))
+	qt.Assert(t, qt.DeepEquals(errors.Path(err), []string{"Foo", "Bar", "baz"}))
 }

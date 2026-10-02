@@ -76,12 +76,8 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	defer func() {
 		switch x := recover().(type) {
 		case nil:
-		case protoError:
-			err = &protobufError{
-				path: p.path,
-				pos:  p.toCUEPos(x.pos),
-				err:  x.error,
-			}
+		case *protobufError:
+			err = x
 		default:
 			panic(x)
 		}
@@ -100,7 +96,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 			if x.Name == "go_package" {
 				str, err := strconv.Unquote(x.Constant.SourceRepresentation())
 				if err != nil {
-					failf(x.Position, "unquoting package filed: %v", err)
+					p.failf(x.Position, "unquoting package filed: %v", err)
 				}
 				split := strings.Split(str, ";")
 				switch {
@@ -112,14 +108,14 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 					case 2:
 						p.shortPkgName = split[1]
 					default:
-						failf(x.Position, "unexpected ';' in %q", str)
+						p.failf(x.Position, "unexpected ';' in %q", str)
 					}
 
 				case len(split) == 1:
 					p.shortPkgName = split[0]
 
 				default:
-					failf(x.Position, "malformed go_package clause %s", str)
+					p.failf(x.Position, "malformed go_package clause %s", str)
 				}
 				// name.AddComment(comment(x.Comment, true))
 				// name.AddComment(comment(x.InlineComment, false))
@@ -259,7 +255,7 @@ func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
 func (p *protoConverter) addRef(pos scanner.Position, name string, cue func() ast.Expr) {
 	top := p.scope[len(p.scope)-1]
 	if _, ok := top[name]; ok {
-		failf(pos, "entity %q already defined", name)
+		p.failf(pos, "entity %q already defined", name)
 	}
 	top[name] = mapping{cue: cue}
 }
@@ -357,7 +353,7 @@ func (p *protoConverter) resolveUsingScopes(pos scanner.Position, name string, s
 			return expr
 		}
 	}
-	failf(pos, "name %q not found", name)
+	p.failf(pos, "name %q not found", name)
 	return nil
 }
 
@@ -385,7 +381,7 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 
 	imp, err := p.state.parse(filename, nil)
 	if err != nil {
-		fail(v.Position, err)
+		p.fail(v.Position, err)
 	}
 
 	var pkgNamespace, curNamespace []string
@@ -501,7 +497,7 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 		// no need to handle
 
 	default:
-		failf(scanner.Position{}, "unsupported type %T", x)
+		p.failf(scanner.Position{}, "unsupported type %T", x)
 	}
 }
 
@@ -584,7 +580,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		}
 		addComments(f, i, x.Comment, x.InlineComment)
 
-		o := optionParser{message: s, field: f}
+		o := optionParser{conv: p, message: s, field: f}
 		o.tags = fmt.Sprintf(`%d,map[%s]%s`, x.Sequence, x.KeyType, x.Type)
 		if x.Name != name.Name {
 			o.tags += "," + x.Name
@@ -619,7 +615,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		s.Elts = append(s.Elts, attr)
 
 	default:
-		failf(scanner.Position{}, "unsupported field type %T", v)
+		p.failf(scanner.Position{}, "unsupported field type %T", v)
 	}
 }
 
@@ -644,7 +640,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 func (p *protoConverter) enum(x *proto.Enum) {
 
 	if len(x.Elements) == 0 {
-		failf(x.Position, "empty enum")
+		p.failf(x.Position, "empty enum")
 	}
 
 	name := p.subref(x.Position, x.Name)
@@ -815,7 +811,7 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 	f.Value = typ
 	s.Elts = append(s.Elts, f)
 
-	o := optionParser{message: s, field: f}
+	o := optionParser{conv: p, message: s, field: f}
 
 	// body of @protobuf tag: sequence,type[,name=<name>][,...]
 	o.tags += fmt.Sprintf("%v,%s", x.Sequence, x.Type)
@@ -832,6 +828,7 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 }
 
 type optionParser struct {
+	conv     *protoConverter
 	message  *ast.StructLit
 	field    *ast.Field
 	required bool
@@ -853,7 +850,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 			// TODO: set filename and base offset.
 			expr, err := parser.ParseExpr("", o.Constant.Source)
 			if err != nil {
-				failf(o.Position, "invalid cue.val value: %v", err)
+				p.conv.failf(o.Position, "invalid cue.val value: %v", err)
 			}
 			// Any further checks will be done at the end.
 			constraint := &ast.Field{Label: p.field.Label, Value: expr}

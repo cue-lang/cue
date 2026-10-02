@@ -37,7 +37,7 @@ func (e *protobufError) InputPositions() []token.Pos {
 }
 
 func (e *protobufError) Error() string {
-	if e.path == nil {
+	if len(e.path) == 0 {
 		return fmt.Sprintf("protobuf: %s: %v", e.pos, e.err)
 	}
 	path := strings.Join(e.path, ".")

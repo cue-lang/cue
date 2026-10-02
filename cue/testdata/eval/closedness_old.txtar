@@ -1,7 +1,8 @@
 # Pinned to v0.17.0: these groups cover how several embeddings union the
-# fields a closed struct allows and how an embedded definition closes its
-# embedder recursively, which explicitopen changes from v0.18.0 on; the new
-# semantics are covered by definitions/explicitopen.txtar.
+# fields a closed struct allows, how an embedded definition closes its
+# embedder recursively, and which fields an embedding exempts from the
+# closedness of a field it declares, which explicitopen changes from v0.18.0
+# on; the new semantics are covered by definitions/explicitopen.txtar.
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.17.0"
@@ -372,6 +373,134 @@ issue2241: {
 	b: a
 	b: x: r: 4
 } @test(err, code=eval, path=b.x.r, contains="field not allowed", pos=[9:8])
+-- ellipsis.cue --
+// An ellipsis in a conjunct of a field of an embedded struct opens only that
+// conjunct; the field's other conjuncts still close it against fields added
+// from outside the embedding.
+embedOpenConjunct: closeAfter: {
+	s: {{a: {...} & close({x?: _})}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: closeBefore: {
+	s: {{a: close({x?: _}) & {...}}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: definition: {
+	s: {{a: {...} & #C}}
+	s: a: y: 1
+	#C: x?: _
+	@test(eq, {s: {a: {y: 1, x?: _}}, #C: {x?: _}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: pattern: {
+	s: {{a: {...} & close({{[=~"^x-"]: _}})}}
+	s: a: "x-1": 1
+	s: a: y:     1
+	@test(eq, {s: {a: {"x-1": 1, y: 1}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[3:8])
+}
+embedOpenConjunct: deeper: {
+	s: {{{a: {...} & close({x?: _})}}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: nestedField: {
+	s: {{a: b: {...} & close({x?: _})}}
+	s: a: b: y: 1
+	@test(eq, {s: {a: {b: {y: 1, x?: _}}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.b.y, contains="field not allowed", pos=[2:11])
+}
+embedOpenConjunct: viaReference: {
+	s: {#E}
+	s: a: y: 1
+	#E: a: {...} & close({x?: _})
+	@test(eq, {s: {a: {y: 1, x?: _}}, #E: {a: {x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: sibling: {
+	s: {{a: {...} & close({x?: _})}, z: 1}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}, z: 1}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: openOuter: {
+	s: {{a: {...} & close({x?: _})}, ...}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: comprehension: {
+	s: {if true {a: {...} & close({x?: _})}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: siblingEmbed: {
+	s: {{a: close({x?: _}), {a: {...}}}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: twoSiblingEmbeds: {
+	s: {{a: close({x?: _}), {a: {...}}, {a: {...}}}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: twoNestedEmbeds: {
+	s: {{a: close({x?: _}), {{a: {...}}}, {{a: {...}}}}}
+	s: a: y: 1
+	@test(eq, {s: {a: {y: 1, x?: _}}}, incorrect)
+	@test(err:todo, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: notEmbedded: {
+	s: {a: {...} & close({x?: _})}
+	s: a: y: 1
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+
+// Without a closed conjunct, the ellipsis leaves the field open.
+embedOpenConjunct: openOnly: {
+	s: {{a: {...}}}
+	s: a: y: 1
+	@test(eq, {s: a: y: 1})
+}
+
+// A field declared beside the embedding, or opened by an ellipsis beside it,
+// is not checked against the closedness of the embedding.
+embedOpenConjunct: declaredBeside: {
+	s: {{a: {...} & close({x?: _})}, a: y: 1}
+	@test(eq, {s: a: {x?: _, y: 1}})
+}
+embedOpenConjunct: openBeside: {
+	s: {{a: close({x?: _})}, a: {...}}
+	s: a: y: 1
+	@test(eq, {s: a: {x?: _, y: 1}})
+}
+
+// An ellipsis beside an embedded definition allows fields added from outside
+// the embedding, along with anything below them.
+embedOpenConjunct: openNested: {
+	s: {{v: {#B, ...}}}
+	s: v: other: [true]
+	s: v: more: z: 1
+	#B: k?: string
+	@test(eq, {
+		s: {
+			v: {
+				other: [true]
+				more: {z: 1}
+				k?: string
+			}
+		}
+		#B: {k?: string}
+	})
+}
 -- reroot.cue --
 // indirect tests cases where a reference indirectly crosses a node that
 // references a definition, thereby indirectly referencing it.
@@ -408,6 +537,8 @@ indirect: {
 	}
 }
 -- out/errors.txt --
+[eval] embedOpenConjunct.notEmbedded.s.a.y: field not allowed:
+    ./ellipsis.cue:87:8
 [eval] patterns.shallow.single.err.j: field not allowed:
     ./embed.cue:10:8
 [eval] patterns.shallow.and.p1.err.j: field not allowed:
@@ -476,13 +607,13 @@ indirect: {
     ./reroot.cue:24:7
 -- out/eval/stats --
 Leaks:  0
-Freed:  373
-Reused: 335
-Allocs: 38
+Freed:  537
+Reused: 497
+Allocs: 40
 Retain: 0
 
-Unifications: 373
-Conjuncts:    1180
+Unifications: 507
+Conjuncts:    1440
 Disjuncts:    0
 
-NumCloseIDs: 407
+NumCloseIDs: 486

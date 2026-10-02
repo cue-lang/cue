@@ -66,6 +66,19 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 		}
 		mversionsMap[v.Path()] = v
 	}
+	// A version being replaced may no longer exist in the registry.
+	// Leave any such version out of the current requirements,
+	// as loading their module graph would otherwise fail to fetch it.
+	roots := slices.DeleteFunc(slices.Clone(rs.RootModules()), func(v module.Version) bool {
+		if _, ok := mversionsMap[v.Path()]; !ok {
+			return false
+		}
+		_, err := reg.ModFile(ctx, v)
+		return errors.Is(err, modregistry.ErrNotFound)
+	})
+	if len(roots) < len(rs.RootModules()) {
+		rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, roots, mf.DefaultMajorVersions())
+	}
 	g, err := rs.Graph(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot determine module graph: %v", err)

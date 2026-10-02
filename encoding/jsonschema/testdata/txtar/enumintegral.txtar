@@ -1,0 +1,61 @@
+JSON Schema compares numbers by value, so an enum member written as a
+float with no fractional part, such as 1.0, is also an integer.
+
+The output is wrong: such members are dropped next to an integer type,
+leaving no members at all for direct and allOf.
+
+-- schema.json --
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "$defs": {
+    "int": {"type": "integer"}
+  },
+  "properties": {
+    "direct": {"type": "integer", "enum": [1.0, 2.5]},
+    "allOf": {"type": "integer", "allOf": [{"enum": [1.0, 2.0]}]},
+    "ref": {"$ref": "#/$defs/int", "allOf": [{"enum": [1.0, 2.0]}]}
+  }
+}
+-- test/err-direct-integral.json --
+{"direct": 1}
+-- test/err-allof-integral.json --
+{"allOf": 2}
+-- test/ok-ref-integral.json --
+{"ref": 1}
+-- test/err-direct.json --
+{"direct": 3}
+-- test/err-allof.json --
+{"allOf": 3}
+-- test/err-ref.json --
+{"ref": 3}
+-- out/decode/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+direct?: error("disallowed")
+allOf?:  error("disallowed")
+ref?:    #int & (==1.0 | ==2.0)
+
+#int: int
+...
+-- out/decode/testerr/err-allof-integral --
+allOf: disallowed:
+    generated.cue:3:10
+-- out/decode/testerr/err-allof --
+allOf: disallowed:
+    generated.cue:3:10
+-- out/decode/testerr/err-direct-integral --
+direct: disallowed:
+    generated.cue:2:10
+-- out/decode/testerr/err-direct --
+direct: disallowed:
+    generated.cue:2:10
+-- out/decode/testerr/err-ref --
+ref: 2 errors in empty disjunction:
+ref: invalid value 3 (out of bound ==1.0):
+    generated.cue:4:18
+    generated.cue:4:10
+    test/err-ref.json:1:9
+ref: invalid value 3 (out of bound ==2.0):
+    generated.cue:4:26
+    generated.cue:4:10
+    test/err-ref.json:1:9

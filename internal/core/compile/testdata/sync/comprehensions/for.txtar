@@ -12,7 +12,37 @@ comprehensionBinds: {
 	a: {for _ in [1] {a: _}}
 	b: {for _, _ in [1] {a: _}}
 }
+-- guard.cue --
+import "encoding/json"
+
+// A guard which finalizes the struct being ranged over, dropping its
+// pending arc p, must not disturb the loop over the remaining fields.
+guardFinalizesSource: {
+	out: [for k, _ in src if json.Marshal(src) != "" {k}]
+	src: {
+		a: 1
+		if a > 5 {p: 1}
+		b: 2
+	}
+}
 -- out/compile --
+--- guard.cue
+{
+  guardFinalizesSource: {
+    out: [
+      for k, _ in 〈1;src〉 if (〈import;"encoding/json"〉.Marshal(〈2;src〉) != "") {
+        〈1;k〉
+      },
+    ]
+    src: {
+      a: 1
+      if (〈0;a〉 > 5) {
+        p: 1
+      }
+      b: 2
+    }
+  }
+}
 --- in.cue
 {
   b: {

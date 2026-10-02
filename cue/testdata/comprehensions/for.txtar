@@ -13,6 +13,19 @@ comprehensionBinds: {
 	a: {for _ in [1] {a: _}}
 	b: {for _, _ in [1] {a: _}}
 }
+-- guard.cue --
+import "encoding/json"
+
+// A guard which finalizes the struct being ranged over, dropping its
+// pending arc p, must not disturb the loop over the remaining fields.
+guardFinalizesSource: {
+	out: [for k, _ in src if json.Marshal(src) != "" {k}] @test(eq, ["a", "b"])
+	src: {
+		a: 1
+		if a > 5 {p: 1}
+		b: 2
+	}
+}
 -- out/errors.txt --
 [eval] k: cannot range over e (found int, want list or struct):
     ./in.cue:7:14

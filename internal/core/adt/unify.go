@@ -728,9 +728,12 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		}
 	}
 
-	n.node.Arcs = slices.DeleteFunc(n.node.Arcs, func(a *Vertex) bool {
-		return a.ArcType == ArcNotPresent
-	})
+	// Do not delete in place: a caller further up the stack may be ranging
+	// over the arcs, such as a for clause whose guard finalizes this node.
+	notPresent := func(a *Vertex) bool { return a.ArcType == ArcNotPresent }
+	if slices.ContainsFunc(n.node.Arcs, notPresent) {
+		n.node.Arcs = slices.DeleteFunc(slices.Clone(n.node.Arcs), notPresent)
+	}
 
 	for _, a := range n.node.Arcs {
 		// Errors are allowed in let fields. Handle errors and failure to

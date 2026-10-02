@@ -993,21 +993,50 @@ issue4006: {
 		out: {fieldA: string}
 	})
 }
+-- siblingerror.cue --
+// A field not allowed by a closed definition is reported even when other
+// fields of the same struct, or their descendants, have errors of their own.
+siblingError: {
+	#D: {X: float, Y: float}
+	v: #D
+	v: X: 1 @test(err, code=eval, contains="conflicting values", pos=[-2:10, -1:5, 0:8])
+	v: Y: 2 @test(err, code=eval, contains="conflicting values", pos=[-3:20, -2:5, 0:8])
+	v: Z: 3 @test(eq, 3, incorrect) @test(err:todo, code=eval, contains="field not allowed", pos=[0:5]) // Z is not reported as not allowed.
+}
+grandchildError: {
+	#D: a: b: int
+	v: #D
+	v: a: b: "x" @test(err, code=eval, contains="conflicting values")
+	v: z: 1 @test(eq, 1, incorrect) @test(err:todo, code=eval, contains="field not allowed", pos=[0:5]) // z is not reported as not allowed.
+}
+nestedSiblingError: {
+	#D: a: b: int
+	v: #D
+	v: a: b: "x" @test(err, code=eval, contains="conflicting values")
+	v: a: c: 1 @test(eq, 1, incorrect) @test(err:todo, code=eval, contains="field not allowed", pos=[0:8]) // c is not reported as not allowed.
+}
+closednessSiblingError: {
+	#D: {a: b: int, x: int}
+	v: #D
+	v: a: c: 1 @test(err, code=eval, contains="field not allowed", pos=[0:8])
+	v: x: "s"  @test(err, code=eval, contains="conflicting values")
+	v: z: 1 @test(eq, 1, incorrect) @test(err:todo, code=eval, contains="field not allowed", pos=[0:5]) // z is not reported as not allowed.
+}
 -- out/eval/stats --
 Leaks:  77
-Freed:  868
-Reused: 812
-Allocs: 133
+Freed:  903
+Reused: 843
+Allocs: 137
 Retain: 0
 
-Unifications: 773
-Conjuncts:    1536
+Unifications: 808
+Conjuncts:    1595
 Disjuncts:    84
 Notifications: 7
 
-NumCloseIDs: 441
+NumCloseIDs: 445
 
-ConjunctInfos:       1126
+ConjunctInfos:       1173
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -1075,6 +1104,28 @@ full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(f
 [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
     ./large.cue:21:28
     ./large.cue:19:15
+[eval] siblingError.v.X: conflicting values 1 and float (mismatched types int and float):
+    ./siblingerror.cue:4:10
+    ./siblingerror.cue:5:5
+    ./siblingerror.cue:6:8
+[eval] siblingError.v.Y: conflicting values 2 and float (mismatched types int and float):
+    ./siblingerror.cue:4:20
+    ./siblingerror.cue:5:5
+    ./siblingerror.cue:7:8
+[eval] grandchildError.v.a.b: conflicting values "x" and int (mismatched types string and int):
+    ./siblingerror.cue:11:12
+    ./siblingerror.cue:12:5
+    ./siblingerror.cue:13:11
+[eval] nestedSiblingError.v.a.b: conflicting values "x" and int (mismatched types string and int):
+    ./siblingerror.cue:17:12
+    ./siblingerror.cue:18:5
+    ./siblingerror.cue:19:11
+[eval] closednessSiblingError.v.a.c: field not allowed:
+    ./siblingerror.cue:25:8
+[eval] closednessSiblingError.v.x: conflicting values "s" and int (mismatched types string and int):
+    ./siblingerror.cue:23:21
+    ./siblingerror.cue:24:5
+    ./siblingerror.cue:26:8
 [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
 disjunction.withErr.t1.out.b1: conflicting values {b2:{b3:params.mayExistLater}} and null (mismatched types struct and null):
     ./validators.cue:39:7

@@ -733,6 +733,35 @@ issue4006: {
 	out: #C & #B
 
 }
+-- siblingerror.cue --
+// A field not allowed by a closed definition is reported even when other
+// fields of the same struct, or their descendants, have errors of their own.
+siblingError: {
+	#D: {X: float, Y: float}
+	v: #D
+	v: X: 1
+	v: Y: 2
+	v: Z: 3 // Z is not reported as not allowed.
+}
+grandchildError: {
+	#D: a: b: int
+	v: #D
+	v: a: b: "x"
+	v: z: 1 // z is not reported as not allowed.
+}
+nestedSiblingError: {
+	#D: a: b: int
+	v: #D
+	v: a: b: "x"
+	v: a: c: 1 // c is not reported as not allowed.
+}
+closednessSiblingError: {
+	#D: {a: b: int, x: int}
+	v: #D
+	v: a: c: 1
+	v: x: "s"
+	v: z: 1 // z is not reported as not allowed.
+}
 -- out/compile --
 --- chaineddef.cue
 {
@@ -1747,6 +1776,79 @@ issue4006: {
     out: (〈0;#Main〉 & {
       namespace: "ns1"
     }).output
+  }
+}
+--- siblingerror.cue
+{
+  siblingError: {
+    #D: {
+      X: float
+      Y: float
+    }
+    v: 〈0;#D〉
+    v: {
+      X: 1
+    }
+    v: {
+      Y: 2
+    }
+    v: {
+      Z: 3
+    }
+  }
+  grandchildError: {
+    #D: {
+      a: {
+        b: int
+      }
+    }
+    v: 〈0;#D〉
+    v: {
+      a: {
+        b: "x"
+      }
+    }
+    v: {
+      z: 1
+    }
+  }
+  nestedSiblingError: {
+    #D: {
+      a: {
+        b: int
+      }
+    }
+    v: 〈0;#D〉
+    v: {
+      a: {
+        b: "x"
+      }
+    }
+    v: {
+      a: {
+        c: 1
+      }
+    }
+  }
+  closednessSiblingError: {
+    #D: {
+      a: {
+        b: int
+      }
+      x: int
+    }
+    v: 〈0;#D〉
+    v: {
+      a: {
+        c: 1
+      }
+    }
+    v: {
+      x: "s"
+    }
+    v: {
+      z: 1
+    }
   }
 }
 --- validators.cue

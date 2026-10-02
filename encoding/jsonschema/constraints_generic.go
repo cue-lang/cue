@@ -17,6 +17,7 @@ package jsonschema
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/url"
 	"strings"
 
@@ -71,8 +72,15 @@ func constraintEnum(key string, n cue.Value, s *state) {
 	for _, x := range s.listItems("enum", n, true) {
 		// Note that this asks for the kind as written, not the wider one
 		// [constValueKind] reports, so a float member of an integer enum
-		// is still dropped. See cuelang.org/issue/4121.
-		if (s.allowedTypes & x.Kind()) == 0 {
+		// is still dropped, unless it has no fractional part: JSON Schema
+		// compares numbers by value, so 1.0 is an integer too.
+		kind := x.Kind()
+		if f, err := x.Float64(); err == nil && kind == cue.FloatKind {
+			if _, frac := math.Modf(f); frac == 0 {
+				kind |= cue.IntKind
+			}
+		}
+		if (s.allowedTypes & kind) == 0 {
 			// Enum value is redundant because it's
 			// not in the allowed type set.
 			continue

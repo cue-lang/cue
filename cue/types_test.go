@@ -953,6 +953,62 @@ func TestFields(t *testing.T) {
 		opts:  []cue.Option{cue.Patterns(true)},
 		value: `{[1, 2, ...int], [string]: int}`,
 		res:   `{[>=2]:int,[string]:int,0:1,1:2,}`,
+	}, {
+		// Unification distributes over disjunction, so a struct embedding
+		// a disjunction is a disjunction of structs. Iterating over it,
+		// much like a for comprehension, needs it to resolve to one struct.
+		//
+		// TODO: report an incomplete "unresolved disjunction" error,
+		// as the evaluator does for a for comprehension.
+		value: `{a: 1, {b: 2} | {c: 3}}`,
+		err:   "non-concrete value struct",
+	}, {
+		// TODO: report an incomplete "unresolved disjunction" error.
+		value: `{b: 2} | {c: 3}`,
+		err:   "non-concrete value struct",
+	}, {
+		// TODO: report an incomplete "unresolved disjunction" error.
+		opts:  []cue.Option{cue.Optional(true)},
+		value: `{a?: 1, {b: 2} | {c: 3}}`,
+		err:   "non-concrete value struct",
+	}, {
+		// TODO: report an incomplete "unresolved disjunction" error.
+		opts:  []cue.Option{cue.Final()},
+		value: `{a: 1, {b: 2} | {c: 3}}`,
+		err:   "non-concrete value struct",
+	}, {
+		// TODO: report an incomplete "unresolved disjunction" error
+		// rather than no fields at all.
+		opts:  []cue.Option{cue.Definitions(true)},
+		value: `{a: 1, #d: 4, {b: 2} | {c: 3}}`,
+		res:   `{}`,
+	}, {
+		// TODO: report an incomplete "unresolved disjunction" error
+		// rather than no fields at all.
+		opts:  []cue.Option{cue.Hidden(true)},
+		value: `{a: 1, _h: 4, {b: 2} | {c: 3}}`,
+		res:   `{}`,
+	}, {
+		// TODO: report an incomplete "unresolved disjunction" error
+		// rather than the pattern constraint without any fields.
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `{a: 1, [=~"^x"]: 4, {b: 2} | {c: 3}}`,
+		res:   `{[=~"^x"]:4,}`,
+	}, {
+		// Like a selector, iteration uses the default of a disjunction.
+		value: `{a: 1, *{b: 2} | {c: 3}}`,
+		res:   `{a:1,b:2,}`,
+	}, {
+		opts:  []cue.Option{cue.Definitions(true)},
+		value: `{a: 1, #d: 4, *{b: 2} | {c: 3}}`,
+		res:   `{a:1,#d:4,b:2,}`,
+	}, {
+		value: `*{b: 2} | {c: 3}`,
+		res:   `{b:2,}`,
+	}, {
+		// Each disjunct is the same struct, so the disjunction resolves.
+		value: `{a: 1, {b: 2} | {b: 2}}`,
+		res:   `{a:1,b:2,}`,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.SmallMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
@@ -994,6 +1050,9 @@ func TestFields(t *testing.T) {
 			}
 
 			iter, _ = obj.Fields(tc.opts...)
+			// TODO: look up from obj directly once LookupPath uses defaults,
+			// like a selector does; see TestLookupPath.
+			def, _ := obj.Default()
 			for iter.Next() {
 				v := iter.Value()
 				if !checkFailed(t, v.Err(), tc.err, "Obj.At2") {
@@ -1001,7 +1060,7 @@ func TestFields(t *testing.T) {
 				}
 				want := fmt.Sprintf("%#v", v)
 
-				got := obj.LookupPath(cue.MakePath(iter.Selector()))
+				got := def.LookupPath(cue.MakePath(iter.Selector()))
 				if iter.FieldType().ConstraintType() == cue.PatternConstraint {
 					// Can't look up iterated pattern constraints.
 					qt.Assert(t, qt.ErrorMatches(

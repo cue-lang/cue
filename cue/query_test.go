@@ -171,6 +171,30 @@ func TestLookupPath(t *testing.T) {
 		path:   cue.ParsePath("z"),
 		err:    `z: required field missing: x`,
 		exists: true,
+	}, {
+		// The operand of a selector may be associated with a default,
+		// so the CUE expression x.b evaluates to 2.
+		//
+		// TODO: look up from the default, giving 2.
+		in:     `x: *{b: 2} | {c: 3}`,
+		path:   cue.ParsePath("x.b"),
+		err:    `x: field not found: b`,
+		exists: false,
+	}, {
+		// TODO: look up from the default, giving 1.
+		in:     `x: {a: 1, *{b: 2} | {c: 3}}`,
+		path:   cue.ParsePath("x.a"),
+		err:    `x: field not found: a`,
+		exists: false,
+	}, {
+		// Without a default, x is ambiguous even though every disjunct has a.
+		//
+		// TODO: report that the disjunction is unresolved, as the evaluator
+		// does, rather than that the field is not found.
+		in:     `x: {a: 1, {b: 2} | {c: 3}}`,
+		path:   cue.ParsePath("x.a"),
+		err:    `x: field not found: a`,
+		exists: false,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.path.String(), func(t *testing.T, m *cuetdtest.M) {

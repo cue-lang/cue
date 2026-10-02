@@ -1,0 +1,275 @@
+# Each subschema of "allOf" is a separate validator, so the fields and
+# documentation of the subschemas are only reachable through it.
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+        "a": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "string",
+                    "description": "The x field."
+                }
+            }
+        },
+        "b": {
+            "type": "object",
+            "properties": {
+                "y": {
+                    "type": "string",
+                    "description": "The y field."
+                }
+            }
+        },
+        "withDefault": {
+            "type": "object",
+            "properties": {
+                "d": {
+                    "type": "integer",
+                    "default": 1
+                }
+            }
+        },
+        "closed": {
+            "type": "object",
+            "properties": {
+                "c": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "bundled": {
+            "$id": "https://example.com/bundled",
+            "type": "object",
+            "properties": {
+                "z": {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "#/$defs/a"
+        },
+        {
+            "$ref": "#/$defs/b"
+        }
+    ],
+    "properties": {
+        "defaults": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/a"
+                },
+                {
+                    "$ref": "#/$defs/withDefault"
+                }
+            ]
+        },
+        "closed": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/a"
+                },
+                {
+                    "$ref": "#/$defs/closed"
+                }
+            ]
+        },
+        "bundled": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/a"
+                },
+                {
+                    "$ref": "https://example.com/bundled"
+                }
+            ]
+        },
+        "closedAnyOf": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/a"
+                },
+                {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/closed"
+                        }
+                    ]
+                }
+            ]
+        },
+        "closedHolder": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/a"
+                },
+                {
+                    "$ref": "#/$defs/b"
+                }
+            ],
+            "properties": {
+                "own": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "unevaluatedProperties": false
+}
+-- test/ok.json --
+{
+    "x": "a",
+    "y": "b",
+    "defaults": {
+        "x": "a",
+        "d": 2
+    },
+    "closed": {
+        "c": "s"
+    },
+    "bundled": {
+        "x": "a",
+        "z": true
+    },
+    "closedAnyOf": {
+        "c": "s"
+    },
+    "closedHolder": {
+        "own": "s"
+    }
+}
+-- test/err-x.json --
+{
+    "x": 5
+}
+-- test/err-unevaluated.json --
+{
+    "z": 1
+}
+-- test/err-default.json --
+{
+    "defaults": {
+        "d": "s"
+    }
+}
+-- test/err-closed.json --
+{
+    "closed": {
+        "x": "a"
+    }
+}
+-- test/err-closed-anyof.json --
+{
+    "closedAnyOf": {
+        "x": "a"
+    }
+}
+-- test/err-closed-holder.json --
+{
+    "closedHolder": {
+        "x": "a"
+    }
+}
+-- test/err-bundled.json --
+{
+    "bundled": {
+        "z": 1
+    }
+}
+-- out/decode/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+
+matchN(2, [#a, #b]) & close({
+	defaults?:     matchN(2, [#a, #withDefault])
+	closed?:       matchN(2, [#a, #closed])
+	bundled?:      matchN(2, [#a, #bundled & {...}])
+	closedAnyOf?:  matchN(2, [#a, #closed & {...}])
+	closedHolder?: matchN(2, [#a, #b]) & close({own?: string})
+	x?:            _
+	y?:            _
+})
+
+#a: {
+	// The x field.
+	x?: string
+	...
+}
+
+#b: {
+	// The y field.
+	y?: string
+	...
+}
+
+#bundled: {
+	@jsonschema(id="https://example.com/bundled")
+	z?: bool
+	...
+}
+
+#closed: close({c?: string})
+
+#withDefault: {
+	d?: int
+	...
+}
+-- out/decode/testerr/err-bundled --
+bundled.z: conflicting values 1 and bool (mismatched types int and bool):
+    generated.cue:6:32
+    generated.cue:27:6
+    test/err-bundled.json:3:14
+bundled: invalid value {z:1} (does not satisfy matchN): 1 matched, expected 2:
+    generated.cue:6:17
+    generated.cue:6:24
+    test/err-bundled.json:2:16
+-- out/decode/testerr/err-closed-anyof --
+closedAnyOf: invalid value {x:"a"} (does not satisfy matchN): 1 matched, expected 2:
+    generated.cue:7:17
+    generated.cue:7:24
+    test/err-closed-anyof.json:2:20
+closedAnyOf.x: field not allowed:
+    generated.cue:7:17
+    test/err-closed-anyof.json:3:14
+-- out/decode/testerr/err-closed-holder --
+closedHolder.x: field not allowed:
+    generated.cue:8:17
+    test/err-closed-holder.json:3:10
+-- out/decode/testerr/err-closed --
+closed: invalid value {x:"a"} (does not satisfy matchN): 1 matched, expected 2:
+    generated.cue:5:17
+    generated.cue:5:24
+    test/err-closed.json:2:15
+closed.x: field not allowed:
+    generated.cue:5:17
+    test/err-closed.json:3:14
+-- out/decode/testerr/err-default --
+defaults.d: conflicting values "s" and int (mismatched types string and int):
+    generated.cue:4:32
+    generated.cue:34:6
+    test/err-default.json:3:14
+defaults: invalid value {d:"s"} (does not satisfy matchN): 1 matched, expected 2:
+    generated.cue:4:17
+    generated.cue:4:24
+    test/err-default.json:2:17
+-- out/decode/testerr/err-unevaluated --
+z: field not allowed:
+    generated.cue:3:1
+    test/err-unevaluated.json:2:6
+-- out/decode/testerr/err-x --
+x: conflicting values 5 and string (mismatched types int and string):
+    generated.cue:3:12
+    generated.cue:15:6
+    test/err-x.json:2:10
+invalid value {#a:{x?:string},#b:{y?:string},#bundled:{z?:bool},#closed:{c?:string},#withDefault:{d?:int},x:5,defaults?:matchN(2, [#a,#withDefault]),closed?:matchN(2, [#a,#closed]),bundled?:matchN(2, [#a,(#bundled & {...})]),closedAnyOf?:matchN(2, [#a,(#closed & {...})]),closedHolder?:{own?:string},y?:_} (does not satisfy matchN): 1 matched, expected 2:
+    generated.cue:3:1
+    generated.cue:1:1
+    generated.cue:3:8
+    test/err-x.json:1:1

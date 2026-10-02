@@ -1,0 +1,204 @@
+# The subschemas of "allOf" are not unified with each other when one of
+# them reaches "x-kubernetes-group-version-kind", whose regular fields
+# would otherwise fill in the result, nor when one of them or the schema
+# itself is an object which is closed as it is not explicitly opened.
+# Subschemas inherit "x-kubernetes-preserve-unknown-fields" from the schema.
+
+#version: k8sAPI
+
+-- schema.json --
+{
+  "components": {
+    "schemas": {
+      "Kind": {
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "x-kubernetes-group-version-kind": [
+          {
+            "group": "example.com",
+            "kind": "Widget",
+            "version": "v1"
+          }
+        ]
+      },
+      "Name": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Size": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer"
+          }
+        }
+      },
+      "OpenName": {
+        "type": "object",
+        "x-kubernetes-preserve-unknown-fields": true,
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "OpenSize": {
+        "type": "object",
+        "x-kubernetes-preserve-unknown-fields": true,
+        "properties": {
+          "size": {
+            "type": "integer"
+          }
+        }
+      },
+      "Closed": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Name"
+          },
+          {
+            "$ref": "#/components/schemas/Size"
+          }
+        ]
+      },
+      "Unified": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OpenName"
+          },
+          {
+            "$ref": "#/components/schemas/OpenSize"
+          }
+        ]
+      },
+      "ClosedHolder": {
+        "type": "object",
+        "properties": {
+          "own": {
+            "type": "string"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OpenName"
+          },
+          {
+            "$ref": "#/components/schemas/OpenSize"
+          }
+        ]
+      },
+      "ClosedOneOf": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OpenName"
+          },
+          {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Size"
+              }
+            ]
+          }
+        ]
+      },
+      "Inherited": {
+        "type": "object",
+        "x-kubernetes-preserve-unknown-fields": true,
+        "allOf": [
+          {
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "properties": {
+              "size": {
+                "type": "integer"
+              }
+            }
+          }
+        ]
+      },
+      "Validated": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OpenName"
+          },
+          {
+            "x-kubernetes-preserve-unknown-fields": true,
+            "properties": {
+              "spec": {
+                "$ref": "#/components/schemas/Kind"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+-- out/decode/extract --
+_#defs: "/components/schemas/Closed": matchN(2, [_#defs."/components/schemas/Name", _#defs."/components/schemas/Size"])
+
+_#defs: "/components/schemas/ClosedHolder": matchN(2, [
+	_#defs."/components/schemas/OpenName",
+	_#defs."/components/schemas/OpenSize",
+]) & {own?: string}
+
+_#defs: "/components/schemas/ClosedOneOf": matchN(2, [
+	_#defs."/components/schemas/OpenName",
+	_#defs."/components/schemas/Size",
+])
+
+_#defs: "/components/schemas/Inherited": matchN(2, [{
+	name?: string
+	...
+}, {
+	size?: int
+	...
+}])
+
+_#defs: "/components/schemas/Kind": {
+	apiVersion: "example.com/v1"
+	kind:       "Widget"
+}
+
+_#defs: "/components/schemas/Name": name?: string
+
+_#defs: "/components/schemas/OpenName": {
+	name?: string
+	...
+}
+
+_#defs: "/components/schemas/OpenSize": {
+	size?: int
+	...
+}
+
+_#defs: "/components/schemas/Size": size?: int
+
+_#defs: "/components/schemas/Unified": matchN(2, [
+	_#defs."/components/schemas/OpenName",
+	_#defs."/components/schemas/OpenSize",
+])
+
+_#defs: "/components/schemas/Validated": matchN(2, [
+	_#defs."/components/schemas/OpenName",
+	{
+		spec?: _#defs."/components/schemas/Kind"
+		...
+	}
+])

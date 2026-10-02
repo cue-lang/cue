@@ -129,6 +129,11 @@ func constraintRef(key string, n cue.Value, s *state) {
 	}
 	if e := s.refExpr(n, importPath, path); e != nil {
 		s.all.add(n, e)
+		// The reference only allows the types of the schema it refers to,
+		// so other keywords need not allow any other types.
+		types := schemaRoot.refTypes(n)
+		s.allowedTypes &= types
+		s.knownTypes &= types
 	}
 }
 

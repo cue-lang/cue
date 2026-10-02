@@ -1,8 +1,8 @@
 Like refsiblingtypes, but with OpenAPI's "nullable", which allows null
 only when it is true.
 
-The output is wrong: the object keywords next to each reference allow
-every other type, not only null when the referenced schema is nullable.
+The object keywords next to each reference only allow null as well when
+the referenced schema is nullable.
 
 #version: openapi
 
@@ -44,14 +44,13 @@ components:
 	...
 }
 
-#RefNotNullable: #NotNullable &
-(null | bool | number | string | [...] | {
+#RefNotNullable: #NotNullable & {
 	y?: string
 	...
-})
+}
 
 #RefNullable: #Nullable &
-(null | bool | number | string | [...] | {
+(null | {
 	y?: string
 	...
 })

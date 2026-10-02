@@ -436,7 +436,6 @@ x?: blah.#Foo.bar
 func TestMapRefExternalRefForInternalSchema(t *testing.T) {
 	t.Parallel()
 	v := cuecontext.New().CompileString(`
-type: "object"
 $id: "https://this.test"
 $defs: foo: {
 	description: "foo can be a number or a string"
@@ -487,7 +486,7 @@ $ref: "#/$defs/foo"
 import "otherpkg.example/foo"
 
 @jsonschema(id="https://this.test")
-foo.#x & {...}
+foo.#x
 `[1:]))
 	qt.Check(t, qt.DeepEquals(defines, map[string]string{
 		"otherpkg.example/bar.#x": "bool",

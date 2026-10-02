@@ -30,7 +30,7 @@ float with no fractional part, such as 1.0, is also an integer.
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 direct?: ==1.0 & int
 allOf?:  (==1.0 | ==2.0) & number & int
-ref?:    #int & (==1.0 | ==2.0)
+ref?:    #int & (==1.0 | ==2.0) & number
 
 #int: int
 ...

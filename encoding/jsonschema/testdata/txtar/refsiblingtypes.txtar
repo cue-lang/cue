@@ -2,10 +2,6 @@
 // just like the subschema it refers to would when written inline.
 // Object keywords next to such a reference therefore add no disjunction
 // over the other types.
-//
-// The output is wrong: unlike allOfInline, the object keywords next to
-// each reference allow every other type, which adds a disjunct for each
-// of them to the errors for allOfRefs.
 
 -- schema.json --
 {
@@ -55,11 +51,10 @@
 {"directRef": 1}
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
-allOfRef?: #a &
-(null | bool | number | string | [...] | {
+allOfRef?: #a & {
 	y?: string
 	...
-})
+}
 allOfInline?: {
 	x?: string
 	...
@@ -67,21 +62,18 @@ allOfInline?: {
 	y?: string
 	...
 }
-directRef?: #a &
-(null | bool | number | string | [...] | {
+directRef?: #a & {
 	y?: string
 	...
-})
-allOfRefs?: matchN(2, [#a, #b]) &
-(null | bool | number | string | [...] | {
+}
+allOfRefs?: matchN(2, [#a, #b]) & {
 	y?: string
 	...
-})
-aliasRef?: #alias &
-(null | bool | number | string | [...] | {
+}
+aliasRef?: #alias & {
 	y?: string
 	...
-})
+}
 
 #a: {
 	x?: string
@@ -96,32 +88,14 @@ aliasRef?: #alias &
 }
 ...
 -- out/decode/testerr/err-allofref --
-allOfRef: conflicting values "foo" and {x?:string,...} (mismatched types string and struct):
-    generated.cue:2:12
-    generated.cue:30:5
+allOfRef: conflicting values {y?:string,...} and "foo" (mismatched types struct and string):
+    generated.cue:2:17
     test/err-allofref.json:1:14
 -- out/decode/testerr/err-directref --
-directRef: conflicting values 1 and {x?:string,...} (mismatched types int and struct):
-    generated.cue:14:13
-    generated.cue:30:5
+directRef: conflicting values {y?:string,...} and 1 (mismatched types struct and int):
+    generated.cue:13:18
     test/err-directref.json:1:15
 -- out/decode/testerr/err-allofrefs --
-allOfRefs: 6 errors in empty disjunction:
-allOfRefs: conflicting values {y:1} and [...] (mismatched types struct and list):
-    generated.cue:20:34
-    test/err-allofrefs.json:1:15
-allOfRefs: conflicting values {y:1} and bool (mismatched types struct and bool):
-    generated.cue:20:9
-    test/err-allofrefs.json:1:15
-allOfRefs: conflicting values {y:1} and null (mismatched types struct and null):
-    generated.cue:20:2
-    test/err-allofrefs.json:1:15
-allOfRefs: conflicting values {y:1} and number (mismatched types struct and number):
-    generated.cue:20:16
-    test/err-allofrefs.json:1:15
-allOfRefs: conflicting values {y:1} and string (mismatched types struct and string):
-    generated.cue:20:25
-    test/err-allofrefs.json:1:15
-allOfRefs.y: conflicting values 1 and string (mismatched types int and string):
-    generated.cue:21:6
+allOfRefs.y: conflicting values string and 1 (mismatched types string and int):
+    generated.cue:18:6
     test/err-allofrefs.json:1:21

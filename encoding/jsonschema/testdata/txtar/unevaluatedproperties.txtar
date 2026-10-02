@@ -147,14 +147,14 @@
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 
-matchN(2, [#base & {...}, #extra & {...}]) & close({
+matchN(2, [#base, #extra]) & close({
 	restart?: string
 	labels?: #extra & {
 		ports?: _
 		{[!~"^(ports)$"]: string}
 	}
 	covered?: #map
-	open?:    #extra & (null | bool | number | string | [...] | {...})
+	open?:    #extra & {...}
 	nested?:  _#defs."/$defs/named/properties/nested" & close({q?: _})
 	dependent?: close({
 		"a"?: string

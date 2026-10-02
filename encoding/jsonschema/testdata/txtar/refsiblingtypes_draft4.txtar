@@ -1,0 +1,38 @@
+Before draft-06, "id" gives a schema an ID of its own, so references
+inside it resolve against that ID rather than the root. Narrowing the
+types by a reference follows such a reference only within its resource.
+
+-- schema.json --
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://example.test/root",
+  "definitions": {
+    "foo": {"type": "string"},
+    "other": {
+      "id": "http://example.test/other",
+      "definitions": {
+        "foo": {"type": "integer"},
+        "alias": {"$ref": "#/definitions/foo"}
+      }
+    }
+  },
+  "type": "integer",
+  "allOf": [{"$ref": "#/definitions/other/definitions/alias"}]
+}
+-- test/ok.json --
+5
+-- out/decode/extract --
+@jsonschema(schema="http://json-schema.org/draft-04/schema#")
+@jsonschema(id="http://example.test/root")
+_#defs."/definitions/other/definitions/alias" & number & int
+
+#foo: string
+
+#other: {
+	@jsonschema(id="http://example.test/other")
+	_
+}
+
+_#defs: "/definitions/other/definitions/alias": _#defs."/definitions/other/definitions/foo"
+
+_#defs: "/definitions/other/definitions/foo": int

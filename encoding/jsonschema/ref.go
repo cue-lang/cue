@@ -119,7 +119,7 @@ func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
 // as long as it is a JSON Pointer into the schema resource rooted at s.
 // Unlike [state.resolveURI], it reports no errors. Such a pointer is
 // resolved like in [cueLocationForRef], except that a target inside
-// a nested resource with an "$id" of its own is not returned.
+// a nested resource with an ID of its own is not returned.
 func (s *state) localRefTarget(n cue.Value) (cue.Value, bool) {
 	str, err := n.String()
 	if err != nil {
@@ -138,17 +138,98 @@ func (s *state) localRefTarget(n cue.Value) (cue.Value, bool) {
 		return cue.Value{}, false
 	}
 	// A schema with its own ID on the way to the target means that the
-	// target is part of another resource. The ID must be a string, unlike
-	// a schema for a property which happens to be named "$id".
+	// target is part of another resource.
 	v := s.pos
 	sels := relPath(target, s.pos).Selectors()
 	for _, sel := range sels[:max(len(sels)-1, 0)] {
 		v = v.LookupPath(cue.MakePath(sel))
-		if v.LookupPath(cue.MakePath(cue.Str("$id"))).Kind() == cue.StringKind {
+		if s.hasOwnID(v) {
 			return cue.Value{}, false
 		}
 	}
 	return target, true
+}
+
+// hasOwnID reports whether the schema v has an ID of its own, starting a new
+// schema resource: "$id", or "id" in the versions which define it. The ID must
+// be a string, unlike a schema for a property which happens to be named "$id".
+func (s *state) hasOwnID(v cue.Value) bool {
+	isID := func(key string) bool {
+		return v.LookupPath(cue.MakePath(cue.Str(key))).Kind() == cue.StringKind
+	}
+	return isID("$id") || s.schemaVersion.is(constraintMap["id"].versions) && isID("id")
+}
+
+// refTypes returns the types allowed by the schema referred to by the
+// "$ref" value n, as resolved by [state.localRefTarget], following any
+// chain of references. Only the "type" keyword is inspected, so the
+// result may allow more types than the schema does. It is [allTypes]
+// when nothing can be determined.
+func (s *state) refTypes(n cue.Value) cue.Kind {
+	var seen map[string]bool // Only needed for chains of references.
+	for {
+		target, ok := s.localRefTarget(n)
+		if !ok || target.Kind() != cue.StructKind {
+			return allTypes
+		}
+		path := target.Path().String()
+		if seen[path] {
+			return allTypes
+		}
+		lookup := func(key string) cue.Value {
+			return target.LookupPath(cue.MakePath(cue.Str(key)))
+		}
+		if ref := lookup("$ref"); ref.Exists() {
+			// Before 2019-09, the keywords alongside "$ref" are ignored,
+			// so follow the reference alone. A reference next to an ID
+			// is resolved against that ID instead.
+			if s.hasOwnID(target) {
+				return allTypes
+			}
+			if seen == nil {
+				seen = make(map[string]bool)
+			}
+			seen[path] = true
+			n = ref
+			continue
+		}
+		typ := lookup("type")
+		if !typ.Exists() {
+			return allTypes
+		}
+		types := typeKinds(typ)
+		if nullable := lookup("nullable"); nullable.Kind() == cue.BoolKind && s.boolValue(nullable) {
+			// OpenAPI's "nullable" also allows null.
+			types |= cue.NullKind
+		}
+		return types
+	}
+}
+
+// typeKinds returns the types allowed by the "type" keyword value typ,
+// a type or a list of types, or [allTypes] if it is neither.
+func typeKinds(typ cue.Value) cue.Kind {
+	switch typ.Kind() {
+	case cue.StringKind:
+		return typeKind(typ)
+	case cue.ListKind:
+		var types cue.Kind
+		for i, _ := typ.List(); i.Next(); {
+			types |= typeKind(i.Value())
+		}
+		return types
+	}
+	return allTypes
+}
+
+// typeKind returns the types allowed by the type name n,
+// or [allTypes] if n is not a known type.
+func typeKind(n cue.Value) cue.Kind {
+	str, _ := n.String()
+	if kind, ok := jsonSchemaTypeKinds[str]; ok {
+		return kind
+	}
+	return allTypes
 }
 
 func sameSchemaRoot(u1, u2 *url.URL) bool {

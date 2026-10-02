@@ -556,12 +556,12 @@ func TestPathAppend(t *testing.T) {
 		name:     "append to a parsed path",
 		path:     cue.ParsePath("a.b.c"),
 		selector: cue.Str("x"),
-		want:     "a.b.c.other", // The later append overwrites x.
+		want:     "a.b.c.x",
 	}, {
 		name:     "append to a value's path",
 		path:     cuecontext.New().CompileString("a: b: c: x: 1").LookupPath(cue.ParsePath("a.b.c")).Path(),
 		selector: cue.Str("x"),
-		want:     "a.b.c.other", // The later append overwrites x.
+		want:     "a.b.c.x",
 	}}
 
 	for _, tc := range testCases {

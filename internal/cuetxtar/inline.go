@@ -956,7 +956,7 @@ func (r *inlineRunner) runEqInline(t testing.TB, path cue.Path, val cue.Value, p
 			t.Errorf("path %s: @test(eq, at=%s): sub-path not found", path, atStr)
 			return
 		}
-		path = cue.MakePath(append(path.Selectors(), atPath.Selectors()...)...)
+		path = path.Append(atPath.Selectors()...)
 		val = sub
 	}
 

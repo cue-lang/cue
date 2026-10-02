@@ -484,25 +484,12 @@ func TestRunShareIDChecks_Negative(t *testing.T) {
 	})
 }
 
-// TestShareIDPathAliasing is a regression test for a cue.Path backing-array
-// aliasing bug in appendPath. When a parent path has excess backing capacity,
-// cue.Path.Append reuses the same underlying array for all children, so a
-// later sibling's append overwrites position len(parent) for all previously
-// stored paths. The result: every @test(shareID=...) record for the same
-// parent ends up with the path of the last child visited.
-//
-// The test verifies that collectShareIDsForRoot records the correct path for
-// each annotated sibling — not the last one — by checking that the collected
-// paths match the expected field names.
+// TestShareIDPathAliasing checks that collectShareIDsForRoot records the
+// path of each annotated sibling, not that of the last sibling visited,
+// when the parent path has spare capacity which appended children could
+// share.
 func TestShareIDPathAliasing(t *testing.T) {
-	// The aliasing requires the parent path to have excess backing capacity.
-	// Go doubles slice capacity on growth: len 2 → cap 4 at the third append.
-	// So a path of length 3 (e.g. "p.q.r") has cap 4, meaning all children
-	// of "p.q.r" share backing-array index 3 without the fix.
-	//
-	// Four siblings under "p.q.r". @test(shareID=AB) is on "a" and "b" (not
-	// the last field "d"), so without the fix both records end up with path
-	// "p.q.r.d" instead of "p.q.r.a" / "p.q.r.b".
+	// @test(shareID=AB) is on "a" and "b", not on the last field "d".
 	src := `p: q: r: {
 	a: {x: 1}         @test(shareID=AB)
 	b: a               @test(shareID=AB)
@@ -529,9 +516,7 @@ func TestShareIDPathAliasing(t *testing.T) {
 	want := []string{"p.q.r.a", "p.q.r.b"}
 	got := []string{paths[0].String(), paths[1].String()}
 	if !slices.Equal(got, want) {
-		t.Errorf("path aliasing: got %v, want %v\n"+
-			"(if both paths show 'root.d', appendPath is aliasing sibling paths)",
-			got, want)
+		t.Errorf("got %v, want %v", got, want)
 	}
 }
 

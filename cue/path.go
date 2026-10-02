@@ -18,6 +18,7 @@ import (
 	"cmp"
 	"fmt"
 	"math/bits"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -339,9 +340,13 @@ func (p Path) Compare(other Path) int {
 	return cmp.Compare(len(p.path), len(other.path))
 }
 
-// Append adds sel as a path component to p.
+// Append returns a path made of the selectors of p followed by sel.
+// Unlike the builtin append, it does not modify p, and the result does not
+// share storage with p, so the same path can be appended to any number of times.
+// Each call copies the selectors, so to build a long path one selector at a time,
+// collect the selectors in a slice and use [MakePath] instead.
 func (p Path) Append(sel ...Selector) Path {
-	return Path{path: append(p.path, sel...)}
+	return Path{path: slices.Concat(p.path, sel)}
 }
 
 // ParsePath parses a CUE expression into a Path. Any error resulting from
@@ -373,7 +378,8 @@ func ParsePath(s string) Path {
 
 // Selectors reports the individual selectors of a path.
 func (p Path) Selectors() []Selector {
-	return p.path
+	// Clip so that appending to the result cannot write into p.
+	return slices.Clip(p.path)
 }
 
 // String reports the CUE representation of p.

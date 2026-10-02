@@ -304,7 +304,7 @@ func (ex *attrExtractor) walkStruct(sl *ast.StructLit, path cue.Path) {
 			ex.processAttr(e, path, true, false, structBaseLine)
 
 		case *ast.Field:
-			subPath := appendPath(path, e.Label, ex.hidPkg)
+			subPath := path.Append(labelSelector(e.Label, ex.hidPkg))
 			if subPath.Err() == nil {
 				ex.walkField(e, subPath)
 			} else {
@@ -394,7 +394,7 @@ func extractTestAttrs(f *ast.File, fileName string) []attrRecord {
 	// Walk top-level fields.
 	for _, decl := range f.Decls {
 		if d, ok := decl.(*ast.Field); ok {
-			fieldPath := appendPath(cue.Path{}, d.Label, ex.hidPkg)
+			fieldPath := cue.MakePath(labelSelector(d.Label, ex.hidPkg))
 			if fieldPath.Err() == nil {
 				ex.walkField(d, fieldPath)
 			}
@@ -470,21 +470,6 @@ func labelSelector(label ast.Label, hidPkg string) cue.Selector {
 		return cue.Hid(name, pkg)
 	}
 	return cue.Label(label)
-}
-
-// appendPath appends a selector for label to path.
-// hidPkg is forwarded to labelSelector; see its documentation.
-//
-// NOTE: a fresh slice is allocated intentionally so that multiple calls with
-// the same base do not share the same backing array. cue.Path.Append reuses
-// excess capacity, so callers that store the result and then append again from
-// the same base would silently overwrite each other's stored paths.
-func appendPath(base cue.Path, label ast.Label, hidPkg string) cue.Path {
-	sels := base.Selectors()
-	fresh := make([]cue.Selector, len(sels)+1)
-	copy(fresh, sels)
-	fresh[len(sels)] = labelSelector(label, hidPkg)
-	return cue.MakePath(fresh...)
 }
 
 // directiveKey returns the deduplication key for a directive. Two directives

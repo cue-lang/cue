@@ -441,7 +441,7 @@ func (r *inlineRunner) runErrAssertion(t testing.TB, path cue.Path, val cue.Valu
 			t.Errorf("path %s: @test(err, at=%s): sub-path not found", path, ea.at)
 			return
 		}
-		subFullPath := cue.MakePath(append(path.Selectors(), subPath.Selectors()...)...)
+		subFullPath := path.Append(subPath.Selectors()...)
 		subPA := pa
 		subPA.errArgs = &errArgs{
 			codes:    ea.codes,

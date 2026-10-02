@@ -61,6 +61,9 @@ func TestDefinition(t *testing.T) {
 		p := *export.All
 		p.TargetLanguageVersion = a.LanguageVersion()
 
+		// Export twice and record the second result,
+		// which must not be affected by the first export.
+		_, _ = p.Def(r, "", v)
 		file, errs := p.Def(r, "", v)
 		errors.Print(t, errs, nil)
 		_, _ = t.Write(formatNode(t.T, file))

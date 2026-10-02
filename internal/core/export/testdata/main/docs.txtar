@@ -64,9 +64,14 @@ sub: {
 	}
 
 }
+-- b.cue --
+// foobar also defines bar.
+package foobar
 -- out.txt --
 -- out/doc-v3 --
 []
+- foobar also defines bar.
+
 - foobar defines at least foo.
 
 [Foo]
@@ -121,7 +126,14 @@ sub: {
 diff old new
 --- old
 +++ new
-@@ -37,10 +37,10 @@
+@@ -1,4 +1,6 @@
+ []
++- foobar also defines bar.
++
+ - foobar defines at least foo.
+ 
+ [Foo]
+@@ -37,10 +39,10 @@
  
  [baz]
  [baz field1]
@@ -189,6 +201,10 @@ Reordering.
 
 [sub innerField]
 -- out/definition --
+// foobar also defines bar.
+//
+// foobar defines at least foo.
+//
 // foobar defines at least foo.
 package foobar
 

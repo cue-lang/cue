@@ -94,6 +94,9 @@ func constraintExamples(key string, n cue.Value, s *state) {
 }
 
 func constraintNullable(key string, n cue.Value, s *state) {
+	if !s.boolValue(n) {
+		return
+	}
 	null := ast.NewNull()
 	setPos(null, n)
 	s.nullable = null

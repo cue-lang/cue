@@ -1,7 +1,5 @@
 OpenAPI's "nullable" allows null only when it is true.
 
-The output is wrong: "nullable": false allows null too.
-
 #version: openapi
 
 -- schema.yaml --
@@ -16,13 +14,17 @@ components:
 -- test/ok-not-nullable.json --
 #schema #NotNullable
 "foo"
--- test/ok-not-nullable-null.json --
+-- test/err-not-nullable-null.json --
 #schema #NotNullable
 null
 -- test/ok-nullable-null.json --
 #schema #Nullable
 null
 -- out/decode/extract --
-#NotNullable: null | string
+#NotNullable: string
 
 #Nullable: null | string
+-- out/decode/testerr/err-not-nullable-null --
+#NotNullable: conflicting values string and null (mismatched types string and null):
+    generated.cue:1:15
+    test/err-not-nullable-null.json:2:1

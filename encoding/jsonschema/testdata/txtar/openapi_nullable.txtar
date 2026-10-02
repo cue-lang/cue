@@ -1,0 +1,28 @@
+OpenAPI's "nullable" allows null only when it is true.
+
+The output is wrong: "nullable": false allows null too.
+
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    NotNullable:
+      type: string
+      nullable: false
+    Nullable:
+      type: string
+      nullable: true
+-- test/ok-not-nullable.json --
+#schema #NotNullable
+"foo"
+-- test/ok-not-nullable-null.json --
+#schema #NotNullable
+null
+-- test/ok-nullable-null.json --
+#schema #Nullable
+null
+-- out/decode/extract --
+#NotNullable: null | string
+
+#Nullable: null | string

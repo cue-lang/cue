@@ -682,19 +682,25 @@ func TestString(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			str, err := getValue(m, tc.value).String()
-			checkFatal(t, err, tc.err, "init")
+			if !checkErr(t, err, tc.err, "init") {
+				return
+			}
 			if str != tc.str {
 				t.Errorf("String: got %q; want %q", str, tc.str)
 			}
 
 			b, err := getValue(m, tc.value).Bytes()
-			checkFatal(t, err, tc.err, "init")
+			if !checkErr(t, err, tc.err, "init") {
+				return
+			}
 			if got := string(b); got != tc.str {
 				t.Errorf("Bytes: got %q; want %q", got, tc.str)
 			}
 
 			r, err := getValue(m, tc.value).Reader()
-			checkFatal(t, err, tc.err, "init")
+			if !checkErr(t, err, tc.err, "init") {
+				return
+			}
 			b, _ = io.ReadAll(r)
 			if got := string(b); got != tc.str {
 				t.Errorf("Reader: got %q; want %q", got, tc.str)
@@ -814,7 +820,9 @@ func TestList(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			l, err := getValue(m, tc.value).List()
-			checkFatal(t, err, tc.err, "init")
+			if !checkFailed(t, err, tc.err, "init") {
+				return
+			}
 
 			buf := []byte{'['}
 			for wantIdx := 0; l.Next(); wantIdx++ {
@@ -823,7 +831,9 @@ func TestList(t *testing.T) {
 					t.Errorf("Index got %v; want %v", got, wantIdx)
 				}
 				b, err := l.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "list.Value")
+				if !checkFailed(t, err, tc.err, "list.Value") {
+					return
+				}
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -951,7 +961,9 @@ func TestFields(t *testing.T) {
 			obj := f.LookupPath(cue.ParsePath(tc.path))
 
 			iter, err := obj.Fields(tc.opts...)
-			checkFatal(t, err, tc.err, "init")
+			if !checkFailed(t, err, tc.err, "init") {
+				return
+			}
 
 			buf := []byte{'{'}
 			for iter.Next() {
@@ -970,7 +982,9 @@ func TestFields(t *testing.T) {
 				buf = append(buf, sel.String()...)
 				buf = append(buf, ':')
 				v := iter.Value()
-				checkFatal(t, v.Err(), tc.err, "Obj.At")
+				if !checkFailed(t, v.Err(), tc.err, "Obj.At") {
+					return
+				}
 				buf = fmt.Appendf(buf, "%#v", v)
 				buf = append(buf, ',')
 			}
@@ -982,7 +996,9 @@ func TestFields(t *testing.T) {
 			iter, _ = obj.Fields(tc.opts...)
 			for iter.Next() {
 				v := iter.Value()
-				checkFatal(t, v.Err(), tc.err, "Obj.At2")
+				if !checkFailed(t, v.Err(), tc.err, "Obj.At2") {
+					return
+				}
 				want := fmt.Sprintf("%#v", v)
 
 				got := obj.LookupPath(cue.MakePath(iter.Selector()))
@@ -993,7 +1009,6 @@ func TestFields(t *testing.T) {
 						`.*cannot look up pattern constraints.*`,
 					))
 				} else {
-					checkFatal(t, err, tc.err, "Obj.At2")
 					qt.Assert(t, qt.Equals(fmt.Sprintf("%#v", got), want))
 				}
 			}
@@ -1031,14 +1046,18 @@ func TestAllFields(t *testing.T) {
 
 			var iter *cue.Iterator // Verify that the returned iterator is a pointer.
 			iter, err := obj.Fields(cue.All())
-			checkFatal(t, err, tc.err, "init")
+			if !checkFailed(t, err, tc.err, "init") {
+				return
+			}
 
 			buf := []byte{'{'}
 			for iter.Next() {
 				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At")
+				if !checkFailed(t, err, tc.err, "Obj.At") {
+					return
+				}
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -3719,7 +3738,9 @@ func TestMarshalJSON(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
 			val := getValue(m, tc.value)
 			b, err := val.MarshalJSON()
-			checkFatal(t, err, tc.err, "init")
+			if !checkErr(t, err, tc.err, "init") {
+				return
+			}
 
 			if got := string(b); got != tc.json {
 				t.Errorf("\n got %v;\nwant %v", got, tc.json)
@@ -4463,6 +4484,8 @@ func TestPathCorrection(t *testing.T) {
 // 	}
 // }
 
+// checkErr checks that err contains str, or is nil when str is empty,
+// and reports whether err is nil.
 func checkErr(t *testing.T, err error, str, name string) bool {
 	t.Helper()
 	if err == nil {
@@ -4474,13 +4497,8 @@ func checkErr(t *testing.T, err error, str, name string) bool {
 	return checkFailed(t, err, str, name)
 }
 
-func checkFatal(t *testing.T, err error, str, name string) {
-	t.Helper()
-	if !checkFailed(t, err, str, name) {
-		t.SkipNow()
-	}
-}
-
+// checkFailed is like [checkErr], but accepts a nil err even when str is set,
+// for tests where the wanted error may come from a later step.
 func checkFailed(t *testing.T, err error, str, name string) bool {
 	t.Helper()
 	if err != nil {

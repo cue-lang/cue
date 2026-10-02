@@ -336,7 +336,9 @@ func TestDecode(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			err := getValue(m, tc.value).Decode(tc.dst)
-			checkFatal(t, err, tc.err, "init")
+			if !checkErr(t, err, tc.err, "init") {
+				return
+			}
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
 			qt.Assert(t, qt.CmpEquals(got, tc.want,

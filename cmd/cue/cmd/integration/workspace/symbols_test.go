@@ -14,6 +14,11 @@ import (
 
 func TestDocumentSymbols(t *testing.T) {
 	t.Parallel()
+	// The syntax errors leave field b without an end position.
+	// syntaxerr.cue: b is never popped, so the result is a's children;
+	// should be a and c.
+	// syntaxerrstart.cue: b gets an empty range rather than no symbol;
+	// should be empty.
 	const files = `
 -- m/cue.mod/module.cue --
 module: "mod.example/x"
@@ -44,6 +49,18 @@ b.cat: range:1:2-1:10 selectionRange:1:2-1:5
 a: range:3:0-3:6 selectionRange:3:0-3:1
 b: range:4:0-4:9 selectionRange:4:0-4:1
 b.dog: range:4:3-4:9 selectionRange:4:3-4:6
+-- standalone/syntaxerr.cue --
+a: {
+  b: (1
+}
+c: 2
+-- standalone/syntaxerr.cue.golden --
+b: range:0:0-0:0 selectionRange:0:0-0:0
+c: range:3:0-3:4 selectionRange:3:0-3:1
+-- standalone/syntaxerrstart.cue --
+b: (1
+-- standalone/syntaxerrstart.cue.golden --
+b: range:0:0-0:0 selectionRange:0:0-0:1
 `
 
 	archive := make(map[string][]byte)

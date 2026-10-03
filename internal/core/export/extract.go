@@ -99,8 +99,9 @@ func withLeadingRelPos(cg *ast.CommentGroup, rel token.RelPos) *ast.CommentGroup
 	}
 	clone := *cg
 	clone.List = slices.Clone(cg.List)
-	first := clone.List[0]
+	first := *clone.List[0]
 	first.Slash = first.Slash.WithRel(rel)
+	clone.List[0] = &first
 	return &clone
 }
 

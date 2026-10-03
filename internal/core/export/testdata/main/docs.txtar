@@ -305,15 +305,6 @@ diff before after
                Text: "// foobar defines at least foo."
              }
            }
-@@ -662,7 +662,7 @@
-                 Position: 5
-                 List: []*ast.Comment{
-                   {
--                    Slash: token.Pos("in.cue:70:2", section)
-+                    Slash: token.Pos("in.cue:70:2", blank)
-                     Text: "// end"
-                   }
-                 }
 -- out/value-v3 --
 == Simplified
 {

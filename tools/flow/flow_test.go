@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -229,6 +230,44 @@ func TestFlowNonRootValue(t *testing.T) {
 	if done, err := c.Value().LookupPath(cue.MakePath(cue.Str("done"))).Bool(); err != nil || !done {
 		t.Errorf("done: got (%v, %v), want (true, nil)", done, err)
 	}
+}
+
+// TestFlowCallerAppendsToSlices tests whether appending to the slices
+// returned by [flow.Controller.Tasks] and [flow.Task.Dependencies]
+// writes into storage shared with other results.
+func TestFlowCallerAppendsToSlices(t *testing.T) {
+	v := cuecontext.New().CompileString(`
+a1: {$id: "a", out: string}
+a2: {$id: "a", out: string}
+a3: {$id: "a", out: string}
+b: {$id: "b", in: a1.out + a2.out + a3.out}
+c: {$id: "c"}
+`)
+	ctrl := flow.New(nil, v, taskFunc)
+	paths := func(ts []*flow.Task) (s []string) {
+		for _, t := range ts {
+			s = append(s, t.Path().String())
+		}
+		return s
+	}
+	check := func(what string, ts []*flow.Task, want ...string) {
+		if got := paths(ts); !slices.Equal(got, want) {
+			t.Errorf("%s: got %v, want %v", what, got, want)
+		}
+	}
+	tasks := ctrl.Tasks()
+	check("Tasks", tasks, "a1", "a2", "a3", "b", "c")
+	b, c := tasks[3], tasks[4]
+
+	// Each result has spare capacity, so a second append to the same
+	// result writes into the slot used by the first.
+	tasksB := append(ctrl.Tasks(), b)
+	_ = append(ctrl.Tasks(), c)
+	check("Tasks appended", tasksB, "a1", "a2", "a3", "b", "c", "c")
+
+	depsB := append(b.Dependencies(), b)
+	_ = append(b.Dependencies(), c)
+	check("Dependencies appended", depsB, "a1", "a2", "a3", "c")
 }
 
 // TestFlowRunStopsEarly tests that when Run stops early, it returns without

@@ -211,9 +211,8 @@ func TestWrappedInputPositionsSharedParent(t *testing.T) {
 
 	got1 := w[0].InputPositions()
 	got2 := w[1].InputPositions()
-	// Both results append into the parent's spare capacity,
-	// so got2 overwrites the last position of got1.
-	if want := []token.Pos{pos(1), pos(20)}; !slices.Equal(got1, want) {
+	// Computing got2 leaves got1 unchanged.
+	if want := []token.Pos{pos(1), pos(10)}; !slices.Equal(got1, want) {
 		t.Errorf("first InputPositions() = %v, want %v", got1, want)
 	}
 	if want := []token.Pos{pos(1), pos(20)}; !slices.Equal(got2, want) {

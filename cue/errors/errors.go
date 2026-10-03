@@ -111,7 +111,7 @@ type Error interface {
 
 	// InputPositions reports positions that contributed to an error, including
 	// the expressions resulting in the conflict, as well as values that were
-	// the input to this expression.
+	// the input to this expression. The result must not be modified.
 	InputPositions() []token.Pos
 
 	// Error reports the error message without position information.
@@ -250,7 +250,8 @@ func (e *wrapped) Path() []string {
 }
 
 func (e *wrapped) InputPositions() []token.Pos {
-	return append(e.main.InputPositions(), Positions(e.wrap)...)
+	// Do not append to the parent's positions, which other errors share.
+	return slices.Concat(e.main.InputPositions(), Positions(e.wrap))
 }
 
 func (e *wrapped) Position() token.Pos {

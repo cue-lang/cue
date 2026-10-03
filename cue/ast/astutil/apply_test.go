@@ -339,14 +339,11 @@ a: [
 a: // label
 	1 // trailing
 `,
-		// The comment added to b reorders the comments of a, dropping the
-		// trailing one.
+		// The comment added to b leaves the comments of a alone.
 		out: `
 // doc
-//
-// added
 a: // label
-	1
+	1 // trailing
 
 // doc
 //
@@ -370,8 +367,7 @@ b: // label
 a: // label
 	1 // trailing
 `,
-		// The comment added to a reorders the comments of b, dropping the
-		// trailing one.
+		// The comment added to a leaves the comments of b alone.
 		out: `
 // doc
 //
@@ -380,10 +376,8 @@ a: // label
 	1 // trailing
 
 // doc
-//
-// added
 b: // label
-	2
+	2 // trailing
 `,
 		before: func(c astutil.Cursor) bool {
 			if x, ok := c.Node().(*ast.Field); ok && x.Label.(*ast.Ident).Name == "a" {

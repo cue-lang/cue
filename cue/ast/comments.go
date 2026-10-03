@@ -37,6 +37,7 @@ func AddComment(n Node, cg *CommentGroup) {
 }
 
 // SetComments replaces all comments of n with the given set of comments.
+// The node keeps cgs, which must not be modified afterwards.
 // If a node does not support comments, such as for CommentGroup or Comment,
 // this call has no effect.
 func SetComments(n Node, cgs []*CommentGroup) {

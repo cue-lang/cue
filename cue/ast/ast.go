@@ -189,8 +189,10 @@ func (c *comments) AddComment(cg *CommentGroup) {
 		return
 	}
 
-	*c.syntacticGroups = append(*c.syntacticGroups, cg)
-	a := *c.syntacticGroups
+	// Other nodes may share the slice via [SetComments] and reordering
+	// writes into it, so clip it to make append copy.
+	a := append(slices.Clip(*c.syntacticGroups), cg)
+	*c.syntacticGroups = a
 	for i := len(a) - 2; i >= 0 && a[i].Position > cg.Position; i-- {
 		a[i], a[i+1] = a[i+1], a[i]
 	}

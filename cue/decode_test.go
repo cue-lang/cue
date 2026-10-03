@@ -41,6 +41,15 @@ func TestDecode(t *testing.T) {
 		M map[string]interface{}
 		*Nested
 	}
+	type Untagged struct{ X int }
+	type Tagged struct {
+		X int `json:"X"`
+	}
+	// A tagged field dominates an untagged one at the same depth.
+	type embedTagged struct {
+		Untagged
+		Tagged
+	}
 	one := 1
 	intList := func(ints ...int) *[]int {
 		ints = append([]int{}, ints...)
@@ -131,6 +140,11 @@ func TestDecode(t *testing.T) {
 		value: `{p: 1}`,
 		dst:   &fields{},
 		want:  fields{Nested: &Nested{P: &one}},
+	}, {
+		value: `{X: 1}`,
+		dst:   &embedTagged{},
+		// The untagged field wrongly dominates.
+		want: embedTagged{Untagged: Untagged{X: 1}},
 	}, {
 		value: `{for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,

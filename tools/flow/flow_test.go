@@ -259,15 +259,14 @@ c: {$id: "c"}
 	check("Tasks", tasks, "a1", "a2", "a3", "b", "c")
 	b, c := tasks[3], tasks[4]
 
-	// Each result has spare capacity, so a second append to the same
-	// result writes into the slot used by the first.
+	// Appending to one result leaves the other results unchanged.
 	tasksB := append(ctrl.Tasks(), b)
 	_ = append(ctrl.Tasks(), c)
-	check("Tasks appended", tasksB, "a1", "a2", "a3", "b", "c", "c")
+	check("Tasks appended", tasksB, "a1", "a2", "a3", "b", "c", "b")
 
 	depsB := append(b.Dependencies(), b)
 	_ = append(b.Dependencies(), c)
-	check("Dependencies appended", depsB, "a1", "a2", "a3", "c")
+	check("Dependencies appended", depsB, "a1", "a2", "a3", "b")
 }
 
 // TestFlowRunStopsEarly tests that when Run stops early, it returns without

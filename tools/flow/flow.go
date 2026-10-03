@@ -230,8 +230,9 @@ func (c *Controller) Stats() (counts stats.Counts) {
 // This may currently only be called before Run is called or from within
 // a call to UpdateFunc. Task pointers returned by this call are not guaranteed
 // to be the same between successive calls to this method.
+// The result must not be modified.
 func (c *Controller) Tasks() []*Task {
-	return c.tasks
+	return slices.Clip(c.tasks)
 }
 
 func (c *Controller) cancel() {
@@ -512,18 +513,19 @@ func (t *Task) Value() cue.Value {
 //
 // This method may currently only be called before Run is called or after a
 // Task completed, or from within a call to UpdateFunc.
+// The result must not be modified.
 func (t *Task) Dependencies() []*Task {
 	// TODO: add synchronization.
-	return t.depTasks
+	return slices.Clip(t.depTasks)
 }
 
 // PathDependencies reports the dependencies found for a value at the given
 // path.
 //
 // This may currently only be called before Run is called or from within
-// a call to UpdateFunc.
+// a call to UpdateFunc. The result must not be modified.
 func (t *Task) PathDependencies(p cue.Path) []*Task {
-	return t.pathDeps[p.String()]
+	return slices.Clip(t.pathDeps[p.String()])
 }
 
 // Err returns the error of a completed Task.

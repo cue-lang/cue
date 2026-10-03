@@ -86,6 +86,11 @@ func TestQuote(t *testing.T) {
 		{form: String.WithOptionalHashes(), in: `x "# y`, out: `##"x "# y"##`},
 		{form: String.WithOptionalHashes(), in: `x \# y`, out: `##"x \# y"##`},
 		{form: String.WithOptionalHashes(), in: `x \## y`, out: `###"x \## y"###`},
+		{form: String.WithOptionalHashes(), in: `x""`, out: `#"x"""#`},
+		// A leading "" would open a multi-line string such as #""".
+		{form: String.WithOptionalHashes(), in: `""`, out: `"\"\""`},
+		{form: String.WithOptionalHashes(), in: `""x`, out: `"\"\"x"`},
+		{form: String.WithOptionalHashes(), in: `"""x`, out: `"\"\"\"x"`},
 		// Fall back to regular quoting when escapes are needed anyway.
 		{form: String.WithOptionalHashes(), in: "a \"b\"\tc", out: `"a \"b\"\tc"`},
 		{form: String.WithOptionalHashes(), in: "say \"hi\"\nbye", out: `"say \"hi\"\nbye"`},
@@ -96,6 +101,7 @@ func TestQuote(t *testing.T) {
 			"""`},
 		{form: Bytes.WithOptionalHashes(), in: `a'b`, out: `#'a'b'#`},
 		{form: Bytes.WithOptionalHashes(), in: "a\xff'b", out: `'a\xff\'b'`},
+		{form: Bytes.WithOptionalHashes(), in: `''x`, out: `'\'\'x'`},
 
 		// Issue #541
 		{form: String.WithTabIndent(3), in: "foo\n\"bar\"", out: `"""

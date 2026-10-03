@@ -296,6 +296,10 @@ func (f *Form) singleLineHashCount(s string) int {
 	if !strings.ContainsAny(s, `\`+string(f.quote)) {
 		return 0
 	}
+	if len(s) >= 2 && s[0] == f.quote && s[1] == f.quote {
+		// A leading "" would form the opening #""" of a multi-line string.
+		return 0
+	}
 	hashCount := 1
 	for i := 0; i < len(s); {
 		r := rune(s[i])

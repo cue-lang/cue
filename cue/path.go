@@ -315,6 +315,8 @@ type Path struct {
 }
 
 // MakePath creates a Path from a sequence of selectors.
+// The path retains the selectors slice without copying it,
+// so the caller must not modify the slice afterwards.
 func MakePath(selectors ...Selector) Path {
 	return Path{path: selectors}
 }
@@ -377,8 +379,9 @@ func ParsePath(s string) Path {
 }
 
 // Selectors reports the individual selectors of a path.
+// The result shares storage with p and must not be modified;
+// appending to it is safe, as it does not write into p.
 func (p Path) Selectors() []Selector {
-	// Clip so that appending to the result cannot write into p.
 	return slices.Clip(p.path)
 }
 

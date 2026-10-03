@@ -46,3 +46,14 @@ env CUE_REGISTRY=mycorp.tld=registry.mycorp.tld,registry.cue.works
 stderr 'need a single CUE registry to log into'
 
 ! grep 'validtoken_neverused' cueconfig/logins.json
+
+# A logins.json file with a null registries field is treated like an empty one.
+# TODO: the login panics with an assignment to a nil map.
+env CUE_REGISTRY=
+cp logins_null.json cueconfig/logins.json
+! exec cue login --token=appv1_validtoken_null registry.mycorp.tld
+stderr 'assignment to entry in nil map'
+! grep 'validtoken_null' cueconfig/logins.json
+
+-- logins_null.json --
+{"registries": null}

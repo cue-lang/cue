@@ -433,6 +433,16 @@ null:   1
 		"'1': '\"2\"'",
 		`"1": #""2""#`,
 	}, {
+		// A leading "" cannot use the #"..."# form,
+		// as #""" opens a multi-line string.
+		// The output is invalid CUE.
+		`v: '""x'`,
+		`v: #"""x"#`,
+	}, {
+		// The output is invalid CUE.
+		`v: '""'`,
+		`v: #""""#`,
+	}, {
 		"v:\n- A\n- 'B\n\n  C'\n",
 		`v: [
 	"A",

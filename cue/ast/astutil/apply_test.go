@@ -417,6 +417,25 @@ b: // label
 			return true
 		},
 	}, {
+		name: "append to preamble",
+		// Appending to the preamble overwrites the declaration which follows it.
+		in: `
+package p
+
+a: 1
+`,
+		out: `
+package p
+
+x
+`,
+		before: func(c astutil.Cursor) bool {
+			if f, ok := c.Node().(*ast.File); ok {
+				_ = append(f.Preamble(), &ast.EmbedDecl{Expr: ast.NewIdent("x")})
+			}
+			return true
+		},
+	}, {
 		name: "after stops",
 		in: `
 a: 1

@@ -426,6 +426,36 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+func TestCreateOrder(t *testing.T) {
+	t.Parallel()
+	var files []fakeFile
+	for _, name := range []string{"a/b/c.cue", "b/a.cue", "z.cue", "cue.mod/module.cue", "a/z.cue"} {
+		data := []byte("package p\n")
+		if name == "cue.mod/module.cue" {
+			data = []byte(`module: "example.com/m"` + "\n")
+		}
+		files = append(files, fakeFile{name: name, size: uint64(len(data)), data: data})
+	}
+	var buf bytes.Buffer
+	m := module.MustNewVersion("example.com/m@v1", "v1.0.0")
+	qt.Assert(t, qt.IsNil(modzip.Create(&buf, m, files, fakeFileIO{})))
+	z, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	qt.Assert(t, qt.IsNil(err))
+	var names []string
+	for _, f := range z.File {
+		names = append(names, f.Name)
+	}
+	// Files with fewer path separators should come first,
+	// but the separators of only one path are counted.
+	qt.Assert(t, qt.DeepEquals(names, []string{
+		"a/b/c.cue",
+		"a/z.cue",
+		"b/a.cue",
+		"cue.mod/module.cue",
+		"z.cue",
+	}))
+}
+
 func assertNoExcludedFiles(t *testing.T, zf string) {
 	z, err := zip.OpenReader(zf)
 	if err != nil {

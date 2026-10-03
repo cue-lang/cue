@@ -2612,12 +2612,28 @@ func TestSubsume(t *testing.T) {
 func TestUnify(t *testing.T) {
 	a := "a"
 	b := "b"
+	// validated holds a closed value, values to unify with it, and validators,
+	// for the validator cases below.
+	validated := `
+		#D: {a: int, #def: 5}
+		x: #D
+		y: a: 1
+		cField: b: 2
+		cDef: #def: 6
+		vN: matchN(1, [{...}])
+		vIf: matchIf({...}, {...}, _)
+		`
 	type testCase struct {
 		value string
 		pathA string
 		pathB string
 		pathC string
-		want  string
+
+		// pathV, if set, is the path of a validator which must accept
+		// the unification of A and B before it is unified with C.
+		pathV string
+
+		want string // JSON, or the error from MarshalJSON
 	}
 	testCases := []testCase{{
 		value: `4`,
@@ -2737,6 +2753,37 @@ func TestUnify(t *testing.T) {
 		pathA: a,
 		pathB: "b.sub",
 		want:  `{"a":1,"b":2}`,
+	}, {
+		// A validator which converts the value it validates to data,
+		// such as matchN or matchIf, rewrites the conjuncts of that value
+		// in place, so it is no longer closed and loses its definitions.
+		value: validated,
+		pathA: "x",
+		pathB: "y",
+		pathV: "vN",
+		pathC: "cField",
+		want:  `{"a":1,"b":2}`,
+	}, {
+		value: validated,
+		pathA: "x",
+		pathB: "y",
+		pathV: "vN",
+		pathC: "cDef",
+		want:  `{"a":1}`,
+	}, {
+		value: validated,
+		pathA: "x",
+		pathB: "y",
+		pathV: "vIf",
+		pathC: "cField",
+		want:  `{"a":1,"b":2}`,
+	}, {
+		value: validated,
+		pathA: "x",
+		pathB: "y",
+		pathV: "vIf",
+		pathC: "cDef",
+		want:  `{"a":1}`,
 	}}
 
 	matrix := cuetdtest.FullMatrix
@@ -2751,13 +2798,19 @@ func TestUnify(t *testing.T) {
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
 			y := v.LookupPath(cue.ParsePath(tc.pathB))
 			x = x.Unify(y)
+			if tc.pathV != "" {
+				val := v.LookupPath(cue.ParsePath(tc.pathV))
+				if err := val.Unify(x).Validate(); err != nil {
+					t.Fatal(err)
+				}
+			}
 			if tc.pathC != "" {
 				z := v.LookupPath(cue.ParsePath(tc.pathC))
 				x = x.Unify(z)
 			}
 			b, err := x.MarshalJSON()
 			if err != nil {
-				t.Fatal(err)
+				b = []byte(err.Error())
 			}
 			t.Equal(string(b), tc.want)
 		})

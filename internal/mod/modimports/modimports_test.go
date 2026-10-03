@@ -93,6 +93,11 @@ package x
 import (
 	"imported-from-sub.com/foo"
 )
+-- s/x.cue --
+package x
+import (
+	"imported-from-s.com/foo"
+)
 `))
 	tfs, err := txtar.FS(dirContents)
 	qt.Assert(t, qt.IsNil(err))
@@ -118,4 +123,9 @@ import (
 	imps, err = AllImports(PackageFiles(tfs, "sub", "x"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(imps, []string{"bar.com/baz", "foo", "imported-from-sub.com/foo", "something.else:other"}))
+	// A one-letter directory should also include package files from its parent,
+	// but the root directory is wrongly skipped.
+	imps, err = AllImports(PackageFiles(tfs, "s", "x"))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(imps, []string{"imported-from-s.com/foo"}))
 }

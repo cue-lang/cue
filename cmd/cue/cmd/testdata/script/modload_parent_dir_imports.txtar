@@ -1,0 +1,35 @@
+# Imports from package files in the module root are resolved
+# for a package in a subdirectory, whatever the length of its name.
+
+exec cue export ./ab
+cmp stdout want-stdout
+
+# The root file's import is wrongly not resolved for a one-letter directory.
+! exec cue export ./a
+stderr 'no dependency found for package "example.com/foo"'
+
+-- want-stdout --
+{
+    "x": "foo"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+deps: "example.com@v0": v: "v0.0.1"
+-- root.cue --
+package p
+
+import "example.com/foo"
+
+x: foo.x
+-- a/a.cue --
+package p
+-- ab/ab.cue --
+package p
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+-- _registry/example.com_v0.0.1/foo/foo.cue --
+package foo
+
+x: "foo"

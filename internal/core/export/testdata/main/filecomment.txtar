@@ -1,0 +1,64 @@
+# Without a package clause or doc comments, the first file comment is used
+# as the doc comment of the output.
+-- in.cue --
+// file
+
+a: 1
+-- out/doc-v3 --
+[]
+- file
+
+[a]
+-- out/value-v3 --
+== Simplified
+{a: 1}
+== Raw
+{a: 1}
+== Final
+{a: 1}
+== All
+{a: 1}
+== Eval
+{a: 1}
+export modified its input:
+diff before after
+--- before
++++ after
+@@ -19,6 +19,7 @@
+   }
+   Comments: []*ast.CommentGroup{
+     {
++      Doc: true
+       List: []*ast.Comment{
+         {
+           Slash: token.Pos("in.cue:1:1", newline)
+-- out/definition-v3 --
+// file
+a: 1
+export modified its input:
+diff before after
+--- before
++++ after
+@@ -19,6 +19,7 @@
+   }
+   Comments: []*ast.CommentGroup{
+     {
++      Doc: true
+       List: []*ast.Comment{
+         {
+           Slash: token.Pos("in.cue:1:1", newline)
+-- out/definition-v3-noshare --
+// file
+a: 1
+export modified its input:
+diff before after
+--- before
++++ after
+@@ -19,6 +19,7 @@
+   }
+   Comments: []*ast.CommentGroup{
+     {
++      Doc: true
+       List: []*ast.Comment{
+         {
+           Slash: token.Pos("in.cue:1:1", newline)

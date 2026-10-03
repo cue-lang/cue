@@ -289,37 +289,6 @@ sub: {
 #X: {
 	[string]: int // end
 }
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -40,7 +40,7 @@
-           Doc: true
-           List: []*ast.Comment{
-             {
--              Slash: token.Pos("b.cue:1:1", newline)
-+              Slash: token.Pos("b.cue:1:1", section)
-               Text: "// foobar also defines bar."
-             }
-           }
-@@ -63,7 +63,7 @@
-           Doc: true
-           List: []*ast.Comment{
-             {
--              Slash: token.Pos("in.cue:1:1", newline)
-+              Slash: token.Pos("in.cue:1:1", section)
-               Text: "// foobar defines at least foo."
-             }
-           }
-@@ -73,7 +73,7 @@
-           Position: 3
-           List: []*ast.Comment{
-             {
--              Slash: token.Pos("in.cue:2:16", blank)
-+              Slash: token.Pos("in.cue:2:16", section)
-               Text: "// line comment"
-             }
-           }
 -- out/value-v3 --
 == Simplified
 {
@@ -528,37 +497,6 @@ diff before after
 	}
 	#X: {}
 }
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -40,7 +40,7 @@
-           Doc: true
-           List: []*ast.Comment{
-             {
--              Slash: token.Pos("b.cue:1:1", newline)
-+              Slash: token.Pos("b.cue:1:1", section)
-               Text: "// foobar also defines bar."
-             }
-           }
-@@ -63,7 +63,7 @@
-           Doc: true
-           List: []*ast.Comment{
-             {
--              Slash: token.Pos("in.cue:1:1", newline)
-+              Slash: token.Pos("in.cue:1:1", section)
-               Text: "// foobar defines at least foo."
-             }
-           }
-@@ -73,7 +73,7 @@
-           Position: 3
-           List: []*ast.Comment{
-             {
--              Slash: token.Pos("in.cue:2:16", blank)
-+              Slash: token.Pos("in.cue:2:16", section)
-               Text: "// line comment"
-             }
-           }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
@@ -864,7 +802,7 @@ diff old new
  }
  == Eval
  {
-@@ -176,23 +186,53 @@
+@@ -176,23 +186,22 @@
  		field2: int
  		dup3:   int
  	}
@@ -887,7 +825,6 @@ diff old new
 -		field1:     int
 -		innerField: 1
 -	}
--}
 +	foos: MyFoo: {
 +		field1: 0
 +		field2: 1
@@ -906,38 +843,7 @@ diff old new
 +		innerField: 1
 +	}
 +	#X: {}
-+}
-+export modified its input:
-+diff before after
-+--- before
-++++ after
-+@@ -40,7 +40,7 @@
-+           Doc: true
-+           List: []*ast.Comment{
-+             {
-+-              Slash: token.Pos("b.cue:1:1", newline)
-++              Slash: token.Pos("b.cue:1:1", section)
-+               Text: "// foobar also defines bar."
-+             }
-+           }
-+@@ -63,7 +63,7 @@
-+           Doc: true
-+           List: []*ast.Comment{
-+             {
-+-              Slash: token.Pos("in.cue:1:1", newline)
-++              Slash: token.Pos("in.cue:1:1", section)
-+               Text: "// foobar defines at least foo."
-+             }
-+           }
-+@@ -73,7 +73,7 @@
-+           Position: 3
-+           List: []*ast.Comment{
-+             {
-+-              Slash: token.Pos("in.cue:2:16", blank)
-++              Slash: token.Pos("in.cue:2:16", section)
-+               Text: "// line comment"
-+             }
-+           }
+ }
 -- diff/value/explanation --
 Reordering.
 -- out/value --

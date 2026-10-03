@@ -222,8 +222,7 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 
 				for _, c := range pkgComments {
 					// add a newline between previous file comment and the pkg comments
-					c.List[0].Slash = c.List[0].Slash.WithRel(token.NewSection)
-					ast.AddComment(pkg, c)
+					ast.AddComment(pkg, withLeadingRelPos(c, token.NewSection))
 				}
 				for _, c := range fileComments {
 					ast.AddComment(fout, c)

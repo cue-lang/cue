@@ -273,6 +273,25 @@ func TestGenerated(t *testing.T) {
 				return v, nil
 			},
 			out: ``, // empty file
+		}, {
+			// The result of a call is a vertex holding a single reference to
+			// the called function, which exports as the source of the call.
+			// No public API is known to export such a vertex.
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				v := ctx.CompileString(`
+				@experiment(functions)
+
+				f:   func(n: int) -> _: {a: n, b: int}
+				out: f(1)
+				`).LookupPath(cue.ParsePath("out"))
+				_, n := value.ToInternal(v)
+				c, _ := n.SingleConjunct()
+				x, _ := r.Evaluate(c.Env, c.Expr())
+				return x, nil
+			},
+			// The export places the source call in the output, and sanitizing
+			// the output clears the reference of the source identifier.
+			out: `f(1) (export modified its input)`,
 		}}
 		for _, tc := range testCases {
 			t.Run("", func(t *testing.T) {

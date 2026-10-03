@@ -1317,7 +1317,7 @@ outer:
 			p = i + 1
 		}
 	}
-	return f.Decls[:p]
+	return slices.Clip(f.Decls[:p])
 }
 
 // VisitImports iterates through the import declarations in the file.

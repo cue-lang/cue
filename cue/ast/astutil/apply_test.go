@@ -418,7 +418,7 @@ b: // label
 		},
 	}, {
 		name: "append to preamble",
-		// Appending to the preamble overwrites the declaration which follows it.
+		// Appending to the preamble leaves the declarations which follow it alone.
 		in: `
 package p
 
@@ -427,7 +427,7 @@ a: 1
 		out: `
 package p
 
-x
+a: 1
 `,
 		before: func(c astutil.Cursor) bool {
 			if f, ok := c.Node().(*ast.File); ok {

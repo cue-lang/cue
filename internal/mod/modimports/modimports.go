@@ -136,8 +136,8 @@ func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) iter.Seq2[ModuleF
 				return matchedPackages[pkgName]
 			}
 			parent := path.Dir(dir)
-			if len(parent) >= len(dir) {
-				// No more parent directories.
+			if parent == dir {
+				// No more parent directories; dir is "." or "/".
 				return
 			}
 			dir = parent

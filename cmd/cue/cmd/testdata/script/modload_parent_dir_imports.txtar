@@ -4,9 +4,8 @@
 exec cue export ./ab
 cmp stdout want-stdout
 
-# The root file's import is wrongly not resolved for a one-letter directory.
-! exec cue export ./a
-stderr 'no dependency found for package "example.com/foo"'
+exec cue export ./a
+cmp stdout want-stdout
 
 -- want-stdout --
 {

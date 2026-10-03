@@ -123,9 +123,8 @@ import (
 	imps, err = AllImports(PackageFiles(tfs, "sub", "x"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(imps, []string{"bar.com/baz", "foo", "imported-from-sub.com/foo", "something.else:other"}))
-	// A one-letter directory should also include package files from its parent,
-	// but the root directory is wrongly skipped.
+	// A one-letter directory also includes package files from its parent.
 	imps, err = AllImports(PackageFiles(tfs, "s", "x"))
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.DeepEquals(imps, []string{"imported-from-s.com/foo"}))
+	qt.Assert(t, qt.DeepEquals(imps, []string{"bar.com/baz", "foo", "imported-from-s.com/foo", "something.else:other"}))
 }

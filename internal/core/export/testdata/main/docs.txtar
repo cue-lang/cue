@@ -261,6 +261,28 @@ sub: {
 		innerField: y
 	}
 }
+export modified its input:
+diff before after
+--- before
++++ after
+@@ -38,7 +38,7 @@
+           Doc: true
+           List: []*ast.Comment{
+             {
+-              Slash: token.Pos("b.cue:1:1", newline)
++              Slash: token.Pos("b.cue:1:1", section)
+               Text: "// foobar also defines bar."
+             }
+           }
+@@ -61,7 +61,7 @@
+           Doc: true
+           List: []*ast.Comment{
+             {
+-              Slash: token.Pos("in.cue:1:1", newline)
++              Slash: token.Pos("in.cue:1:1", section)
+               Text: "// foobar defines at least foo."
+             }
+           }
 -- out/value-v3 --
 == Simplified
 {
@@ -462,6 +484,28 @@ sub: {
 		innerField: 1
 	}
 }
+export modified its input:
+diff before after
+--- before
++++ after
+@@ -38,7 +38,7 @@
+           Doc: true
+           List: []*ast.Comment{
+             {
+-              Slash: token.Pos("b.cue:1:1", newline)
++              Slash: token.Pos("b.cue:1:1", section)
+               Text: "// foobar also defines bar."
+             }
+           }
+@@ -61,7 +61,7 @@
+           Doc: true
+           List: []*ast.Comment{
+             {
+-              Slash: token.Pos("in.cue:1:1", newline)
++              Slash: token.Pos("in.cue:1:1", section)
+               Text: "// foobar defines at least foo."
+             }
+           }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
@@ -725,7 +769,7 @@ diff old new
  		field1: int
  		// comment from bar on field 2
  		field2: int
-@@ -176,12 +180,10 @@
+@@ -176,23 +180,43 @@
  		field2: int
  		dup3:   int
  	}
@@ -735,13 +779,60 @@ diff old new
 -			field2: 1
 -			dup3:   int
 -		}
+-	}
+-	bar: {
+-		field1: int
+-		field2: int
+-	}
+-	baz: {
+-		field1: int
+-		field2: int
+-	}
+-	sub: {
+-		field1:     int
+-		innerField: 1
+-	}
+-}
 +	foos: MyFoo: {
 +		field1: 0
 +		field2: 1
 +		dup3:   int
- 	}
- 	bar: {
- 		field1: int
++	}
++	bar: {
++		field1: int
++		field2: int
++	}
++	baz: {
++		field1: int
++		field2: int
++	}
++	sub: {
++		field1:     int
++		innerField: 1
++	}
++}
++export modified its input:
++diff before after
++--- before
+++++ after
++@@ -38,7 +38,7 @@
++           Doc: true
++           List: []*ast.Comment{
++             {
++-              Slash: token.Pos("b.cue:1:1", newline)
+++              Slash: token.Pos("b.cue:1:1", section)
++               Text: "// foobar also defines bar."
++             }
++           }
++@@ -61,7 +61,7 @@
++           Doc: true
++           List: []*ast.Comment{
++             {
++-              Slash: token.Pos("in.cue:1:1", newline)
+++              Slash: token.Pos("in.cue:1:1", section)
++               Text: "// foobar defines at least foo."
++             }
++           }
 -- diff/value/explanation --
 Reordering.
 -- out/value --

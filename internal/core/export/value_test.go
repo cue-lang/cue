@@ -91,6 +91,7 @@ if false {
 			TargetLanguageVersion: a.LanguageVersion(),
 		}
 
+		before := describeInput(r, v)
 		for _, tc := range []struct {
 			name string
 			fn   func(r adt.Runtime, id string, v adt.Value) (ast.Expr, errors.Error)
@@ -107,6 +108,7 @@ if false {
 			_, _ = t.Write(formatNode(t.T, x))
 			fmt.Fprintln(t)
 		}
+		writeInputChange(t, before, describeInput(r, v))
 	})
 }
 

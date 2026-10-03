@@ -15,8 +15,12 @@
 package export_test
 
 import (
+	"bytes"
+	"fmt"
+	"path/filepath"
 	"testing"
 
+	"github.com/rogpeppe/go-internal/diff"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -30,6 +34,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
@@ -63,11 +68,47 @@ func TestDefinition(t *testing.T) {
 
 		// Export twice and record the second result,
 		// which must not be affected by the first export.
+		before := describeInput(r, v)
 		_, _ = p.Def(r, "", v)
 		file, errs := p.Def(r, "", v)
 		errors.Print(t, errs, nil)
 		_, _ = t.Write(formatNode(t.T, file))
+		writeInputChange(t, before, describeInput(r, v))
 	})
+}
+
+// describeInput describes the value x and the syntax it was built from,
+// so that a test can check that exporting x leaves both as they are.
+func describeInput(r adt.StringIndexer, x adt.Expr) []byte {
+	b := debug.AppendNode(nil, r, x, nil)
+	b = append(b, '\n')
+	appendSrc := func(src ast.Node) {
+		if src != nil {
+			b = astinternal.AppendDebug(b, src, astinternal.DebugConfig{
+				OmitEmpty:       true,
+				IncludeNodeRefs: true,
+				Filename:        filepath.Base,
+			})
+		}
+	}
+	if v, ok := x.(*adt.Vertex); ok {
+		for c := range v.LeafConjuncts() {
+			appendSrc(c.Source())
+		}
+	} else {
+		appendSrc(x.Source())
+	}
+	// Indent with spaces, as a diff of tab-indented lines prefixes
+	// unchanged lines with a space before a tab.
+	return bytes.ReplaceAll(b, []byte("\t"), []byte("  "))
+}
+
+// writeInputChange records in the test output how the input of an export
+// changed, given its descriptions before and after the export.
+func writeInputChange(t *cuetxtar.Test, before, after []byte) {
+	if !bytes.Equal(before, after) {
+		fmt.Fprintf(t, "export modified its input:\n%s", diff.Diff("before", before, "after", after))
+	}
 }
 
 func formatNode(t *testing.T, n ast.Node) []byte {
@@ -246,6 +287,7 @@ func TestGenerated(t *testing.T) {
 					p = export.Simplified
 				}
 
+				before := describeInput(ctx, v)
 				var n ast.Node
 				switch x := v.(type) {
 				case *adt.Vertex:
@@ -257,6 +299,9 @@ func TestGenerated(t *testing.T) {
 					t.Fatal("failed export: ", err)
 				}
 				got := astinternal.DebugStr(n)
+				if !bytes.Equal(before, describeInput(ctx, v)) {
+					got += " (export modified its input)"
+				}
 				if got != tc.out {
 					t.Errorf("got:  %s\nwant: %s", got, tc.out)
 				}

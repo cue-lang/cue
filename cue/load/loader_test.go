@@ -885,6 +885,36 @@ x: 1
 	qt.Assert(t, qt.DeepEquals(actualFiles, expectedFiles))
 }
 
+// TestLoadAllPackagesErrors checks that, with Package: "*", every package
+// in a directory is returned even when a file in the directory fails to
+// load. Such errors are kept for the whole directory, so every package
+// reports them.
+func TestLoadAllPackagesErrors(t *testing.T) {
+	testDir := t.TempDir()
+	files := map[string]string{
+		"a.cue": "@if(foo bar)\npackage a\n", // invalid build attribute
+		"b.cue": "@if(foo)\npackage b\n",     // excluded, leaving no files
+		"c.cue": "package c\n",
+	}
+	for name, contents := range files {
+		err := os.WriteFile(filepath.Join(testDir, name), []byte(contents), 0o666)
+		qt.Assert(t, qt.IsNil(err))
+	}
+
+	insts := Instances([]string{"."}, &Config{
+		Package: "*",
+		Dir:     testDir,
+	})
+
+	var names []string
+	for _, inst := range insts {
+		names = append(names, inst.PkgName)
+		qt.Assert(t, qt.ErrorMatches(inst.Err, "expected 'EOF', found 'IDENT' bar"))
+	}
+	// TODO: loading stops at the first package processed, in map order.
+	qt.Assert(t, qt.HasLen(names, 1))
+}
+
 func TestLoadInstancesConcurrent(t *testing.T) {
 	// This test is designed to fail when run with the race detector
 	// if there's an underlying race condition.

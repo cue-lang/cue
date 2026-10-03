@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 func TestApply(t *testing.T) {
@@ -325,6 +326,71 @@ a: [
 				c.Replace(lit)
 			case "2":
 				c.Replace(&ast.BasicLit{ValuePos: x.ValuePos, Kind: token.INT, Value: "4"})
+			}
+			return true
+		},
+	}, {
+		name: "copy comments then add",
+		// Three comment groups leave spare capacity in the slice which
+		// CopyComments and CopyMeta share between a and b, and adding a
+		// comment to either node must not write into it.
+		in: `
+// doc
+a: // label
+	1 // trailing
+`,
+		// The comment added to b reorders the comments of a, dropping the
+		// trailing one.
+		out: `
+// doc
+//
+// added
+a: // label
+	1
+
+// doc
+//
+// added
+b: // label
+	2 // trailing
+`,
+		before: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.Field); ok && x.Label.(*ast.Ident).Name == "a" {
+				b := &ast.Field{Label: ast.NewIdent("b"), Value: ast.NewLit(token.INT, "2")}
+				astutil.CopyComments(b, x)
+				ast.AddComment(b, internal.NewComment(true, "added"))
+				c.InsertAfter(b)
+			}
+			return true
+		},
+	}, {
+		name: "copy meta then add",
+		in: `
+// doc
+a: // label
+	1 // trailing
+`,
+		// The comment added to a reorders the comments of b, dropping the
+		// trailing one.
+		out: `
+// doc
+//
+// added
+a: // label
+	1 // trailing
+
+// doc
+//
+// added
+b: // label
+	2
+`,
+		before: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.Field); ok && x.Label.(*ast.Ident).Name == "a" {
+				b := &ast.Field{Label: ast.NewIdent("b"), Value: ast.NewLit(token.INT, "2")}
+				astutil.CopyMeta(b, x)
+				ast.AddComment(x, internal.NewComment(true, "added"))
+				c.InsertAfter(b)
 			}
 			return true
 		},

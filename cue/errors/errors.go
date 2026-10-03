@@ -312,7 +312,7 @@ func Append(a, b Error) Error {
 // Errors reports the individual errors associated with an error, which is
 // the error itself if there is only one or, if the underlying type is list,
 // its individual elements. If the given error is not an Error, it will be
-// promoted to one.
+// promoted to one. The result must not be modified.
 func Errors(err error) []Error {
 	if err == nil {
 		return nil
@@ -323,7 +323,7 @@ func Errors(err error) []Error {
 	case As(err, &listErr):
 		// TODO if err itself wraps a list, then the wrapping
 		// error information will be lost here.
-		return listErr
+		return slices.Clip(listErr)
 	case As(err, &errorErr):
 		// TODO similar error loss here.
 		return []Error{errorErr}

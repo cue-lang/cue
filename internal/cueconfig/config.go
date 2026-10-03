@@ -81,12 +81,14 @@ func ReadLogins(path string) (*Logins, error) {
 	if err != nil {
 		return nil, err
 	}
-	logins := &Logins{
-		// Initialize the map so we can insert entries.
-		Registries: map[string]RegistryLogin{},
-	}
+	logins := &Logins{}
 	if err := json.Unmarshal(body, logins); err != nil {
 		return nil, err
+	}
+	// Initialize the map so we can insert entries, even if the file
+	// omitted the field or set it to null.
+	if logins.Registries == nil {
+		logins.Registries = map[string]RegistryLogin{}
 	}
 	// Sanity-check the read data.
 	for regName, regLogin := range logins.Registries {

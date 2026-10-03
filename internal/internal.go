@@ -232,9 +232,10 @@ func FileComments(f *ast.File) (docs, rest []*ast.CommentGroup) {
 	}
 
 	if !hasPkg && len(docs) == 0 && len(rest) > 0 {
-		// use the first file comment group as as doc comment.
-		docs, rest = rest[:1], rest[1:]
-		docs[0].Doc = true
+		// Use a copy of the first file comment group as a doc comment.
+		doc := *rest[0]
+		doc.Doc = true
+		docs, rest = []*ast.CommentGroup{&doc}, rest[1:]
 	}
 
 	return

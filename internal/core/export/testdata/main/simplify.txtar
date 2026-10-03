@@ -93,18 +93,6 @@ Benign change in error message.
 		}
 	}
 }
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -1,6 +1,6 @@
- (struct){
-   x: (struct){
--    y: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-+    y: (int){ &(int, >=-9223372036854775808, <=9223372036854775807) }
-   }
-   s: (string){ &(strings.MinRunes(4), strings.MaxRunes(7)) }
-   additional: (struct){
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
@@ -154,42 +142,17 @@ diff old new
  	s: strings.MinRunes(4) & strings.MaxRunes(7)
  	additional: {
  		env: _
-@@ -50,14 +42,24 @@
+@@ -50,9 +42,7 @@
  }
  == Eval
  {
 -	x: {
 -		y: int & >=-9223372036854775808 & <=9223372036854775807
 -	}
--	s: strings.MinRunes(4) & strings.MaxRunes(7)
--	additional: {
--		env: _
--		confs: {
--			if env {}
--		}
--	}
--}
 +	x: y: int & >=-9223372036854775808 & <=9223372036854775807
-+	s: strings.MinRunes(4) & strings.MaxRunes(7)
-+	additional: {
-+		env: _
-+		confs: {
-+			if env {}
-+		}
-+	}
-+}
-+export modified its input:
-+diff before after
-+--- before
-++++ after
-+@@ -1,6 +1,6 @@
-+ (struct){
-+   x: (struct){
-+-    y: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-++    y: (int){ &(int, >=-9223372036854775808, <=9223372036854775807) }
-+   }
-+   s: (string){ &(strings.MinRunes(4), strings.MaxRunes(7)) }
-+   additional: (struct){
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
 -- out/value --
 == Simplified
 {

@@ -212,16 +212,3 @@ posTieBreaker: {
 		}
 	}
 }
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -46,7 +46,7 @@
-     p2: (struct){
-       b: (list){ list.MinItems(3) }
-       a: (list){ list.UniqueItems() }
--      c: (list){ &(list.UniqueItems(), list.MinItems(3)) }
-+      c: (list){ &(list.MinItems(3), list.UniqueItems()) }
-     }
-   }
- }

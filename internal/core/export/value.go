@@ -238,7 +238,8 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 
 		result = b.expr(e.ctx)
 		if result == nil {
-			a = x.Values
+			// Copy into a, as x belongs to the exported value.
+			a = append(a[:0], x.Values...)
 		}
 
 		slices.SortStableFunc(a, cmpLeafNodes)

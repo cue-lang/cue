@@ -501,9 +501,10 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		// anchor vertex; the call it schedules is described by its source,
 		// the original call expression. Note that the generic adt.Resolver
 		// case dispatches here before the type switch in adt reaches any
-		// more specific case.
+		// more specific case. The source is cloned, as finalize edits the
+		// output in place.
 		if src, ok := x.Source().(ast.Expr); ok {
-			return src
+			return ast.Clone(src)
 		}
 		return ast.NewIdent("_")
 

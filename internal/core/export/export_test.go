@@ -289,9 +289,7 @@ func TestGenerated(t *testing.T) {
 				x, _ := r.Evaluate(c.Env, c.Expr())
 				return x, nil
 			},
-			// The export places the source call in the output, and sanitizing
-			// the output clears the reference of the source identifier.
-			out: `f(1) (export modified its input)`,
+			out: `f(1)`,
 		}}
 		for _, tc := range testCases {
 			t.Run("", func(t *testing.T) {

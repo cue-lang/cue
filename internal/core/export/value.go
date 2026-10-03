@@ -433,7 +433,16 @@ func (e *exporter) funcSrc(src *ast.Func) ast.Expr {
 	if src == nil {
 		return ast.NewIdent("_")
 	}
+	if expr := reparseFunc(src); expr != nil {
+		return expr
+	}
+	// The source is cloned, as finalize edits the output in place.
+	return ast.Clone(src)
+}
 
+// reparseFunc returns the function literal src re-parsed from its formatted
+// source, with its import references bound as in src, or nil on failure.
+func reparseFunc(src *ast.Func) ast.Expr {
 	// Collect the import bindings of the original literal by name.
 	var imports map[string]*ast.ImportSpec
 	ast.Walk(src, func(n ast.Node) bool {
@@ -450,7 +459,7 @@ func (e *exporter) funcSrc(src *ast.Func) ast.Expr {
 
 	b, err := format.Node(src)
 	if err != nil {
-		return src
+		return nil
 	}
 	// The re-parse must have the functions experiment active: without it,
 	// the expression after the colon of a literal written without "->" is
@@ -462,7 +471,7 @@ func (e *exporter) funcSrc(src *ast.Func) ast.Expr {
 		fmt.Sprintf("@experiment(functions)\n\n%s", b),
 		parser.ParseComments)
 	if err != nil {
-		return src
+		return nil
 	}
 	// ParseFile resolves the copy internally, binding parameters and other
 	// local declarations within the literal; what remains unresolved is
@@ -476,7 +485,7 @@ func (e *exporter) funcSrc(src *ast.Func) ast.Expr {
 		}
 	}
 	if expr == nil {
-		return src
+		return nil
 	}
 	// The blank line following the attribute leaves the literal positioned
 	// at a section start, which would render it on its own line.

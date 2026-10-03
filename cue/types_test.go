@@ -2755,35 +2755,35 @@ func TestUnify(t *testing.T) {
 		want:  `{"a":1,"b":2}`,
 	}, {
 		// A validator which converts the value it validates to data,
-		// such as matchN or matchIf, rewrites the conjuncts of that value
-		// in place, so it is no longer closed and loses its definitions.
+		// such as matchN or matchIf, leaves that value intact:
+		// it stays closed and keeps its definitions.
 		value: validated,
 		pathA: "x",
 		pathB: "y",
 		pathV: "vN",
 		pathC: "cField",
-		want:  `{"a":1,"b":2}`,
+		want:  `cue: marshal error: x.b: field not allowed`,
 	}, {
 		value: validated,
 		pathA: "x",
 		pathB: "y",
 		pathV: "vN",
 		pathC: "cDef",
-		want:  `{"a":1}`,
+		want:  `cue: marshal error: x.#def: conflicting values 5 and 6`,
 	}, {
 		value: validated,
 		pathA: "x",
 		pathB: "y",
 		pathV: "vIf",
 		pathC: "cField",
-		want:  `{"a":1,"b":2}`,
+		want:  `cue: marshal error: x.b: field not allowed`,
 	}, {
 		value: validated,
 		pathA: "x",
 		pathB: "y",
 		pathV: "vIf",
 		pathC: "cDef",
-		want:  `{"a":1}`,
+		want:  `cue: marshal error: x.#def: conflicting values 5 and 6`,
 	}}
 
 	matrix := cuetdtest.FullMatrix

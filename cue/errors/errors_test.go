@@ -186,3 +186,37 @@ func TestListUnwrap(t *testing.T) {
 		t.Errorf("As(err, &pe) gave %v, want %v", pe, a)
 	}
 }
+
+// inputsError is a [posError] with input positions, which it returns without
+// copying them, like the evaluator's errors do.
+type inputsError struct {
+	posError
+	inputs []token.Pos
+}
+
+func (e *inputsError) InputPositions() []token.Pos { return e.inputs }
+
+// TestWrappedInputPositionsSharedParent checks the input positions of errors
+// wrapping the same parent, whose own input positions have spare capacity.
+func TestWrappedInputPositionsSharedParent(t *testing.T) {
+	f := token.NewFile("x.cue", 0, 100)
+	pos := func(off int) token.Pos { return f.Pos(off, token.NoRelPos) }
+
+	inputs := make([]token.Pos, 1, 4)
+	inputs[0] = pos(1)
+	parent := &inputsError{inputs: inputs}
+	c1 := Newf(pos(10), "c1")
+	c2 := Newf(pos(20), "c2")
+	w := Errors(Wrap(parent, Append(c1, c2)))
+
+	got1 := w[0].InputPositions()
+	got2 := w[1].InputPositions()
+	// Both results append into the parent's spare capacity,
+	// so got2 overwrites the last position of got1.
+	if want := []token.Pos{pos(1), pos(20)}; !slices.Equal(got1, want) {
+		t.Errorf("first InputPositions() = %v, want %v", got1, want)
+	}
+	if want := []token.Pos{pos(1), pos(20)}; !slices.Equal(got2, want) {
+		t.Errorf("second InputPositions() = %v, want %v", got2, want)
+	}
+}

@@ -1,7 +1,7 @@
 
 -- in.cue --
 // foobar defines at least foo.
-package foobar
+package foobar // line comment
 
 // A Foo fooses stuff.
 Foo: {
@@ -81,6 +81,8 @@ package foobar
 
 - foobar defines at least foo.
 
+- line comment
+
 [Foo]
 - A Foo fooses stuff.
 
@@ -136,14 +138,18 @@ package foobar
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,6 @@
+@@ -1,6 +1,10 @@
  []
 +- foobar also defines bar.
 +
  - foobar defines at least foo.
  
++- line comment
++
  [Foo]
-@@ -37,10 +39,10 @@
+ - A Foo fooses stuff.
+ 
+@@ -37,10 +41,10 @@
  
  [baz]
  [baz field1]
@@ -156,7 +162,7 @@ diff old new
  [baz field2]
  - comment from bar on field 2
  
-@@ -49,3 +51,6 @@
+@@ -49,3 +53,6 @@
  - comment inside of if comprehension
  
  [sub innerField]
@@ -221,7 +227,7 @@ Reordering.
 // foobar also defines bar.
 //
 // foobar defines at least foo.
-package foobar
+package foobar // line comment
 
 // A Foo fooses stuff.
 Foo: {
@@ -303,6 +309,15 @@ diff before after
 -              Slash: token.Pos("in.cue:1:1", newline)
 +              Slash: token.Pos("in.cue:1:1", section)
                Text: "// foobar defines at least foo."
+             }
+           }
+@@ -73,7 +73,7 @@
+           Position: 3
+           List: []*ast.Comment{
+             {
+-              Slash: token.Pos("in.cue:2:16", blank)
++              Slash: token.Pos("in.cue:2:16", section)
+               Text: "// line comment"
              }
            }
 -- out/value-v3 --
@@ -533,6 +548,15 @@ diff before after
 -              Slash: token.Pos("in.cue:1:1", newline)
 +              Slash: token.Pos("in.cue:1:1", section)
                Text: "// foobar defines at least foo."
+             }
+           }
+@@ -73,7 +73,7 @@
+           Position: 3
+           List: []*ast.Comment{
+             {
+-              Slash: token.Pos("in.cue:2:16", blank)
++              Slash: token.Pos("in.cue:2:16", section)
+               Text: "// line comment"
              }
            }
 -- diff/-out/value-v3<==>+out/value --
@@ -840,7 +864,7 @@ diff old new
  }
  == Eval
  {
-@@ -176,23 +186,44 @@
+@@ -176,23 +186,53 @@
  		field2: int
  		dup3:   int
  	}
@@ -903,6 +927,15 @@ diff old new
 +-              Slash: token.Pos("in.cue:1:1", newline)
 ++              Slash: token.Pos("in.cue:1:1", section)
 +               Text: "// foobar defines at least foo."
++             }
++           }
++@@ -73,7 +73,7 @@
++           Position: 3
++           List: []*ast.Comment{
++             {
++-              Slash: token.Pos("in.cue:2:16", blank)
+++              Slash: token.Pos("in.cue:2:16", section)
++               Text: "// line comment"
 +             }
 +           }
 -- diff/value/explanation --

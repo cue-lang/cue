@@ -353,20 +353,21 @@ func (d *Decoder) findArray(rkey rootedKey) *openTableArray {
 	return nil
 }
 
-// findArray returns an existing table array if one exists at exactly the given key
+// findArrayPrefix returns an existing table array if one exists at exactly the given key
 // or as a prefix to the given key.
 func (d *Decoder) findArrayPrefix(rkey rootedKey) *openTableArray {
 	// TODO(mvdan): see the performance TODO on [Decoder.openTableArrays].
 
 	// Prefer an exact match over a relative prefix match.
-	if arr := d.findArray(rkey); arr != nil {
+	if d.findArray(rkey) != nil {
 		// When we find an exact match, we must forget about its subkeys
 		// because we're starting an entirely new array element.
 		// The seen keys include the index of the previous element, so they can stay.
 		d.openTableArrays = slices.DeleteFunc(d.openTableArrays, func(arr openTableArray) bool {
 			return strings.HasPrefix(arr.rkey, rkey+".")
 		})
-		return arr
+		// Deleting may have moved the exact match within the slice.
+		return d.findArray(rkey)
 	}
 	// The longest relative key match wins.
 	maxLevel := 0

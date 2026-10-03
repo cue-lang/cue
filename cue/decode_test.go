@@ -143,8 +143,7 @@ func TestDecode(t *testing.T) {
 	}, {
 		value: `{X: 1}`,
 		dst:   &embedTagged{},
-		// The untagged field wrongly dominates.
-		want: embedTagged{Untagged: Untagged{X: 1}},
+		want:  embedTagged{Tagged: Tagged{X: 1}},
 	}, {
 		value: `{for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,

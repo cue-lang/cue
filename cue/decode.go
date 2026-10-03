@@ -647,9 +647,9 @@ func typeFields(t reflect.Type) structFields {
 		}
 		if a.tag != b.tag {
 			if a.tag {
-				return 1
-			} else {
 				return -1
+			} else {
+				return 1
 			}
 		}
 		return compareFieldByIndex(a, b)

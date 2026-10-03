@@ -17,6 +17,7 @@ package toml_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"path"
 	"reflect"
@@ -46,7 +47,11 @@ func TestDecoder(t *testing.T) {
 		name    string
 		input   string
 		wantCUE string
-		wantErr string
+		wantErr string // also "panic: ..." for a panic
+
+		// invalidTOML means that go-toml rejects the input even though
+		// the decoder produces wantCUE, which is not checked any further.
+		invalidTOML bool
 	}{{
 		name:    "Empty",
 		input:   "",
@@ -849,6 +854,184 @@ line two.\
 			    test.toml:5:2
 			`,
 	}, {
+		// In the cases below, a table array is declared at a key
+		// which is already implicitly a table. The decoder accepts this
+		// invalid TOML, and records the new table array after its child,
+		// so a later [[foo]] deletes the child from before it and reuses
+		// a stale pointer into the shifted slice.
+		name: "RedeclareImplicitTableAsTableArrayTwice",
+		input: `
+			[[foo.bar]]
+			[[foo]]
+			[[foo]]
+			`,
+		wantErr: `
+			panic: runtime error: invalid memory address or nil pointer dereference
+			`,
+	}, {
+		name: "RedeclareImplicitTableAsTableArrayWithSibling",
+		input: `
+			[[foo.bar]]
+			[[foo]]
+			[[sibling]]
+			[[foo]]
+			baz = "baz value"
+			`,
+		wantCUE: `
+			foo: bar: [
+				{},
+			]
+			foo: [
+				{},
+			]
+			sibling: [
+				{},
+				{
+					baz: "baz value"
+				},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "RedeclareImplicitTableAsTableArraySubTable",
+		input: `
+			[foo.bar]
+			[[foo]]
+			`,
+		wantCUE: `
+			foo: bar: {}
+			foo: [
+				{},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "RedeclareImplicitTableAsTableArrayDottedKey",
+		input: `
+			foo.bar = "bar value"
+			[[foo]]
+			`,
+		wantCUE: `
+			foo: bar: "bar value"
+			foo: [
+				{},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "RedeclareImplicitTableAsTableArrayNested",
+		input: `
+			[[foo]]
+			[[foo.bar.baz]]
+			[[foo.bar]]
+			`,
+		wantCUE: `
+			foo: [
+				{
+					bar: baz: [
+						{},
+					]
+					bar: [
+						{},
+					]
+				},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "RedeclareImplicitTableAsTableArrayNestedSubTable",
+		input: `
+			[[foo]]
+			[foo.bar.baz]
+			[[foo.bar]]
+			`,
+		wantCUE: `
+			foo: [
+				{
+					bar: baz: {}
+					bar: [
+						{},
+					]
+				},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "RedeclareImplicitTableAsTableArrayNestedDottedKey",
+		input: `
+			[[foo]]
+			bar.baz = "baz value"
+			[[foo.bar]]
+			`,
+		wantCUE: `
+			foo: [
+				{
+					bar: baz: "baz value"
+					bar: [
+						{},
+					]
+				},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "RedeclareKeyAsTableArrayNested",
+		input: `
+			[[foo]]
+			bar = "bar value"
+			[[foo.bar]]
+			`,
+		wantCUE: `
+			foo: [
+				{
+					bar: "bar value"
+					bar: [
+						{},
+					]
+				},
+			]
+			`,
+		invalidTOML: true,
+	}, {
+		name: "ArrayTablesNestedImplicitTableNewElement",
+		input: `
+			[[foo]]
+			[[foo.bar.baz]]
+			[[foo]]
+			[[foo.bar]]
+			`,
+		wantCUE: `
+			foo: [
+				{
+					bar: baz: [
+						{},
+					]
+				},
+				{
+					bar: [
+						{},
+					]
+				},
+			]
+			`,
+	}, {
+		name: "ArrayTablesNumericKey",
+		input: `
+			[[foo]]
+			bar = "bar value"
+			[[foo.0]]
+			`,
+		wantCUE: `
+			foo: [
+				{
+					bar: "bar value"
+					"0": [
+						{},
+					]
+				},
+			]
+			`,
+	}, {
 		name: "KeysNotDuplicateTableArrays",
 		input: `
 			[[foo]]
@@ -896,7 +1079,14 @@ line two.\
 			input := unindentMultiline(test.input)
 			dec := toml.NewDecoder("test.toml", strings.NewReader(input))
 
-			node, err := dec.Decode()
+			node, err := func() (_ ast.Expr, err error) {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				return dec.Decode()
+			}()
 			if test.wantErr != "" {
 				gotErr := strings.TrimSuffix(errors.Details(err, nil), "\n")
 				wantErr := unindentMultiline(test.wantErr)
@@ -927,6 +1117,12 @@ line two.\
 			qt.Assert(t, qt.IsNil(err))
 			t.Logf("CUE:\n%s", formatted)
 			qt.Assert(t, qt.Equals(string(formatted), string(wantFormatted)))
+
+			if test.invalidTOML {
+				err = gotoml.Unmarshal([]byte(input), new(any))
+				qt.Assert(t, qt.IsNotNil(err))
+				return
+			}
 
 			// Ensure that the CUE node can be compiled into a cue.Value and validated.
 			ctx := cuecontext.New()

@@ -8,6 +8,11 @@ e4: [0][1:2]   @test(err, code=eval, contains="index 2 out of range", pos=[0:5])
 e5: 4[1:2]     @test(err, code=eval, contains="cannot slice 4", pos=[0:5])
 e6: [2]["":] @test(err, code=eval, contains="cannot use \"\"", pos=[0:5, 0:9])
 e7: [2][:"9"]  @test(err, code=eval, contains="cannot use \"9\"", pos=[0:5, 0:10])
+
+// Slice indices must be integers, like list indices.
+f1: [1, 2, 3][0.5:2.7] @test(eq, [2, 3], incorrect) @test(err:todo, code=eval, contains="cannot use 0.5 (type float) as type int in slice index")
+f2: [1, 2, 3][:2.0]    @test(eq, [1, 2], incorrect) @test(err:todo, code=eval, contains="cannot use 2.0 (type float) as type int in slice index")
+f3: 'abcd'[1.5:]       @test(eq, 'cd', incorrect) @test(err:todo, code=eval, contains="cannot use 1.5 (type float) as type int in slice index")
 -- out/errors.txt --
 [eval] e1: index 1 out of range:
     ./in.cue:3:5

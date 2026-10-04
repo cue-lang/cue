@@ -7,14 +7,24 @@
 ! exec cue mod tidy
 stderr 'local-only'
 
+# Checking does not fetch the missing dependency, so it cannot tell whether
+# it is in a registry; module.cue is not tidy either way.
+# TODO: this is reported as a failure to resolve.
+! exec cue mod tidy --check
+cmp stderr want-check-stderr
+
 exec cue mod tidy --local-only
 cmp cue.mod/module.cue want-module
 cmp cue.mod/local-module.cue want-local
+exec cue mod tidy --check --local-only
 
 # The build uses the local directory's content.
 exec cue export .
 cmp stdout want-stdout
 
+-- want-check-stderr --
+cannot resolve published module.cue: module is not tidy: missing dependency providing package example.com/dep@v0:lib
+	(if a replaced module is not available in a registry, use 'cue mod tidy --local-only')
 -- want-module --
 module: "main.org@v0"
 language: version: "v0.17.0"

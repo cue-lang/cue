@@ -69,6 +69,12 @@ t6: error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need 
 t8: error in call to math.Asin: cannot use 2.0E+400 (type float) as float64 in argument 0: value was rounded up:
     ./in.cue:7:6
     ./in.cue:7:16
+t59: error in call to math.Pow10: int 2147483648 overflows int32 in argument 0:
+    ./in.cue:57:6
+t60: error in call to math.Pow10: int 4294967295 overflows int32 in argument 0:
+    ./in.cue:58:6
+t61: error in call to math.Pow10: int -2147483649 overflows int32 in argument 0:
+    ./in.cue:59:6
 
 Result:
 t2:  3
@@ -125,6 +131,6 @@ t57: 0.0
 // Copysign moves the sign only, so it must not round a wide integer either.
 t58: 12345678901234567890123456789012345678901
 // An argument outside the range of int32 must be an error rather than wrap.
-t59: 1e-2147483648
-t60: 0.1
-t61: 1e+2147483647
+t59: _|_ // t59: error in call to math.Pow10: t59: int 2147483648 overflows int32 in argument 0
+t60: _|_ // t60: error in call to math.Pow10: t60: int 4294967295 overflows int32 in argument 0
+t61: _|_ // t61: error in call to math.Pow10: t61: int -2147483649 overflows int32 in argument 0

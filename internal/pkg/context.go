@@ -16,8 +16,8 @@ package pkg
 
 import (
 	"io"
+	"math"
 	"math/big"
-	"math/bits"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -100,18 +100,30 @@ func (c *CallCtxt) Struct(i int) Struct {
 	return Struct{}
 }
 
-func (c *CallCtxt) Int(i int) int     { return int(c.intValue(i, 64, "int64")) }
-func (c *CallCtxt) Int8(i int) int8   { return int8(c.intValue(i, 8, "int8")) }
-func (c *CallCtxt) Int16(i int) int16 { return int16(c.intValue(i, 16, "int16")) }
-func (c *CallCtxt) Int32(i int) int32 { return int32(c.intValue(i, 32, "int32")) }
-func (c *CallCtxt) Rune(i int) rune   { return rune(c.intValue(i, 32, "rune")) }
-func (c *CallCtxt) Int64(i int) int64 { return c.intValue(i, 64, "int64") }
+func (c *CallCtxt) Int(i int) int {
+	return int(c.intValue(i, math.MinInt, math.MaxInt, "int"))
+}
+func (c *CallCtxt) Int8(i int) int8 {
+	return int8(c.intValue(i, math.MinInt8, math.MaxInt8, "int8"))
+}
+func (c *CallCtxt) Int16(i int) int16 {
+	return int16(c.intValue(i, math.MinInt16, math.MaxInt16, "int16"))
+}
+func (c *CallCtxt) Int32(i int) int32 {
+	return int32(c.intValue(i, math.MinInt32, math.MaxInt32, "int32"))
+}
+func (c *CallCtxt) Rune(i int) rune {
+	return rune(c.intValue(i, math.MinInt32, math.MaxInt32, "rune"))
+}
+func (c *CallCtxt) Int64(i int) int64 {
+	return c.intValue(i, math.MinInt64, math.MaxInt64, "int64")
+}
 
-func (c *CallCtxt) intValue(i, bitLen int, typ string) int64 {
+func (c *CallCtxt) intValue(i int, minVal, maxVal int64, typ string) int64 {
 	arg := c.BuiltinCallContext.Value(i)
-	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil && num.K == adt.IntKind {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
-		if n, err := num.X.Int64(); err == nil && bits.Len64(uint64(n)) <= bitLen {
+		if n, ok := num.Int64(); ok && n >= minVal && n <= maxVal {
 			return n
 		}
 	}
@@ -121,29 +133,41 @@ func (c *CallCtxt) intValue(i, bitLen int, typ string) int64 {
 		c.invalidArgType(arg, i, typ, err)
 		return 0
 	}
-	if n.BitLen() > bitLen {
-		c.errf(err, "int %s overflows %s in argument %d",
-			n, typ, i)
+	if n.IsInt64() {
+		if v := n.Int64(); v >= minVal && v <= maxVal {
+			return v
+		}
 	}
-	res, _ := x.Int64()
-	return res
+	c.errf(err, "int %s overflows %s in argument %d",
+		n, typ, i)
+	return 0
 }
 
-func (c *CallCtxt) Uint(i int) uint     { return uint(c.uintValue(i, 64, "uint64")) }
-func (c *CallCtxt) Uint8(i int) uint8   { return uint8(c.uintValue(i, 8, "uint8")) }
-func (c *CallCtxt) Byte(i int) uint8    { return byte(c.uintValue(i, 8, "byte")) }
-func (c *CallCtxt) Uint16(i int) uint16 { return uint16(c.uintValue(i, 16, "uint16")) }
-func (c *CallCtxt) Uint32(i int) uint32 { return uint32(c.uintValue(i, 32, "uint32")) }
-func (c *CallCtxt) Uint64(i int) uint64 { return c.uintValue(i, 64, "uint64") }
+func (c *CallCtxt) Uint(i int) uint {
+	return uint(c.uintValue(i, math.MaxUint, "uint"))
+}
+func (c *CallCtxt) Uint8(i int) uint8 {
+	return uint8(c.uintValue(i, math.MaxUint8, "uint8"))
+}
+func (c *CallCtxt) Byte(i int) uint8 {
+	return byte(c.uintValue(i, math.MaxUint8, "byte"))
+}
+func (c *CallCtxt) Uint16(i int) uint16 {
+	return uint16(c.uintValue(i, math.MaxUint16, "uint16"))
+}
+func (c *CallCtxt) Uint32(i int) uint32 {
+	return uint32(c.uintValue(i, math.MaxUint32, "uint32"))
+}
+func (c *CallCtxt) Uint64(i int) uint64 {
+	return c.uintValue(i, math.MaxUint64, "uint64")
+}
 
-func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
+func (c *CallCtxt) uintValue(i int, maxVal uint64, typ string) uint64 {
 	arg := c.BuiltinCallContext.Value(i)
-	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil {
+	if num, _ := c.ctx.EvaluateKeepState(arg).(*adt.Num); num != nil && num.K == adt.IntKind {
 		// In the happy path, avoid converting to the public [cue.Value] API, which is wasteful.
-		// Note that [apd.Decimal] has an Int64 method, but no Uint64 method,
-		// so any uint64 value that doesn't fit in an int64 skips the shortcut.
-		if n, err := num.X.Int64(); err == nil && n >= 0 && bits.Len64(uint64(n)) <= bitLen {
-			return uint64(n)
+		if n, ok := num.Uint64(); ok && n <= maxVal {
+			return n
 		}
 	}
 	x := value.Make(c.ctx, arg)
@@ -152,12 +176,14 @@ func (c *CallCtxt) uintValue(i, bitLen int, typ string) uint64 {
 		c.invalidArgType(arg, i, typ, err)
 		return 0
 	}
-	if n.BitLen() > bitLen {
-		c.errf(err, "int %s overflows %s in argument %d",
-			n, typ, i)
+	if n.IsUint64() {
+		if v := n.Uint64(); v <= maxVal {
+			return v
+		}
 	}
-	res, _ := x.Uint64()
-	return res
+	c.errf(err, "int %s overflows %s in argument %d",
+		n, typ, i)
+	return 0
 }
 
 func (c *CallCtxt) Decimal(i int) *apd.Decimal {

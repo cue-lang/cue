@@ -59,6 +59,12 @@ toUnix.badSeconds: error in call to time.ToUnix: parsing time "2019-01-02T15:04:
     ./in.cue:34:15
 toUnix.garbage: error in call to time.ToUnixNano: parsing time "not a time" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "not a time" as "2006":
     ./in.cue:35:15
+unixRange.underflow: error in call to time.Unix: int -9223372036854775809 overflows int64 in argument 1:
+    ./in.cue:43:13
+unixRange.overflow: error in call to time.Unix: int 9223372036854775808 overflows int64 in argument 1:
+    ./in.cue:44:13
+unixRange.uint64: error in call to time.Unix: int 18446744073709551615 overflows int64 in argument 1:
+    ./in.cue:45:13
 unixRange.wide: error in call to time.Unix: int 18446744073709551616 overflows int64 in argument 1:
     ./in.cue:46:13
 
@@ -97,8 +103,8 @@ toUnix: {
 unixRange: {
 	min:       "1677-09-21T00:12:43.145224192Z"
 	max:       "2262-04-11T23:47:16.854775807Z"
-	underflow: "1677-09-21T00:12:43.145224192Z"
-	overflow:  "2262-04-11T23:47:16.854775807Z"
-	uint64:    "2262-04-11T23:47:16.854775807Z"
+	underflow: _|_ // unixRange.underflow: error in call to time.Unix: unixRange.underflow: int -9223372036854775809 overflows int64 in argument 1
+	overflow:  _|_ // unixRange.overflow: error in call to time.Unix: unixRange.overflow: int 9223372036854775808 overflows int64 in argument 1
+	uint64:    _|_ // unixRange.uint64: error in call to time.Unix: unixRange.uint64: int 18446744073709551615 overflows int64 in argument 1
 	wide:      _|_ // unixRange.wide: error in call to time.Unix: unixRange.wide: int 18446744073709551616 overflows int64 in argument 1
 }

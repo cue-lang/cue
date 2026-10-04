@@ -554,7 +554,7 @@ func TestFloat(t *testing.T) {
 		float:   "-4.940656458412465441765687928682213723650e-324",
 		mant:    "-4940656458412465441765687928682213723650",
 		exp:     -363,
-		float64: 0,
+		float64: 0, // TODO: should be negative zero
 		prec:    -1,
 		fmt:     'g',
 		kind:    cue.FloatKind,
@@ -585,7 +585,7 @@ func TestFloat(t *testing.T) {
 
 			f, err := n.Float64()
 			checkErr(t, err, tc.err, "Float64")
-			if f != tc.float64 {
+			if f != tc.float64 || math.Signbit(f) != math.Signbit(tc.float64) {
 				t.Errorf("Float64: got %v; want %v", f, tc.float64)
 			}
 		})

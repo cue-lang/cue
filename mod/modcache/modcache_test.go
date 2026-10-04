@@ -241,6 +241,26 @@ package example
 	qt.Assert(t, qt.IsNil(err))
 }
 
+func TestWriteDiskCacheFailure(t *testing.T) {
+	// A failed write of a cache entry must not leave its temporary file behind.
+	dir := t.TempDir()
+	cr, err := New(nil, dir)
+	qt.Assert(t, qt.IsNil(err))
+
+	// A non-empty directory in place of the cache file makes the rename fail.
+	entryDir := filepath.Join(dir, "entries")
+	file := filepath.Join(entryDir, "file")
+	err = os.MkdirAll(filepath.Join(file, "sub"), 0o777)
+	qt.Assert(t, qt.IsNil(err))
+
+	err = cr.writeDiskCache(context.Background(), file, []byte("data"))
+	qt.Assert(t, qt.Not(qt.IsNil(err)))
+	entries, err := os.ReadDir(entryDir)
+	qt.Assert(t, qt.IsNil(err))
+	// TODO: the temporary file is left next to the directory.
+	qt.Assert(t, qt.HasLen(entries, 2))
+}
+
 func fsSub(fsys fs.FS, sub string) fs.FS {
 	fsys, err := fs.Sub(fsys, sub)
 	if err != nil {

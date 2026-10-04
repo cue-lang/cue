@@ -117,11 +117,11 @@ func (c *Context) load(x interface{}) cue.Value {
 		return value.(cue.Value)
 	}
 
-	// fromGoType should prevent the work is done no more than once, but even
-	// if it is, there is no harm done.
-	v := fromGoType(x)
-	c.typeCache.Store(t, v)
-	return v
+	// The work may be done more than once, which is harmless.
+	// Do not overwrite an entry stored in the meantime,
+	// as it may hold constraints set by [Context.Constrain].
+	value, _ := c.typeCache.LoadOrStore(t, fromGoType(x))
+	return value.(cue.Value)
 }
 
 // TODO: should we require that Constrain be defined on exported,

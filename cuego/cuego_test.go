@@ -16,6 +16,7 @@ package cuego
 
 import (
 	"reflect"
+	"sync"
 	"testing"
 )
 
@@ -99,6 +100,32 @@ func TestValidate(t *testing.T) {
 			err := c.Validate(tc.value)
 			checkErr(t, err, tc.err)
 		})
+	}
+}
+
+// TestConstrainConcurrent checks that constraints registered while other
+// goroutines first use the same type are not lost.
+// The race is timing-dependent, so try a number of fresh contexts.
+func TestConstrainConcurrent(t *testing.T) {
+	for range 200 {
+		c := &Context{}
+		var wg sync.WaitGroup
+		for range 4 {
+			wg.Go(func() {
+				if err := c.Validate([]string{"a", "b"}); err != nil {
+					t.Error(err)
+				}
+			})
+		}
+		wg.Go(func() {
+			if err := c.Constrain([]string{}, `[_, "b", ...]`); err != nil {
+				t.Error(err)
+			}
+		})
+		wg.Wait()
+		if err := c.Validate([]string{"a", "c"}); err == nil {
+			t.Fatal("constraints are not applied after concurrent use")
+		}
 	}
 }
 

@@ -56,6 +56,10 @@ t56: math.Copysign(2.0, -1)
 t57: math.Copysign(-0.0, 1.0)
 // Copysign moves the sign only, so it must not round a wide integer either.
 t58: math.Copysign(-12345678901234567890123456789012345678901, 1)
+// An argument outside the range of int32 must be an error rather than wrap.
+t59: math.Pow10(2147483648)
+t60: math.Pow10(4294967295)
+t61: math.Pow10(-2147483649)
 -- out/math-v3 --
 Errors:
 t3: cannot call non-function math.Pi (type float):
@@ -120,3 +124,7 @@ t56: -2.0
 t57: 0.0
 // Copysign moves the sign only, so it must not round a wide integer either.
 t58: 12345678901234567890123456789012345678901
+// An argument outside the range of int32 must be an error rather than wrap.
+t59: 1e-2147483648
+t60: 0.1
+t61: 1e+2147483647

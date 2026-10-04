@@ -70,6 +70,9 @@ t53: strconv.ParseNumber("0xG")
 // An integer computed beyond the 34 digits of the decimal context must still
 // convert exactly; see https://cuelang.org/issue/3787.
 t59: strconv.FormatInt(10000000000000000000000000000000000 + 1, 10)
+// A rune outside the range of int32 must be an error rather than wrap.
+t60: strconv.QuoteRune(97)
+t61: strconv.QuoteRune(2147483745)
 -- out/strconv-v3 --
 Errors:
 t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]:
@@ -187,6 +190,9 @@ t53: _|_ // t53: error in call to strconv.ParseNumber: strconv.ParseNumber: pars
 // An integer computed beyond the 34 digits of the decimal context must still
 // convert exactly; see https://cuelang.org/issue/3787.
 t59: "10000000000000000000000000000000001"
+// A rune outside the range of int32 must be an error rather than wrap.
+t60: "'a'"
+t61: "'�'"
 -- diff/-out/strconv-v3<==>+out/strconv --
 diff old new
 --- old
@@ -298,7 +304,7 @@ diff old new
  // Test ParseUint with various bit widths
  t34: 255
  t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range
-@@ -41,3 +104,13 @@
+@@ -41,3 +104,16 @@
  t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
  t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
  t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range
@@ -312,6 +318,9 @@ diff old new
 +// An integer computed beyond the 34 digits of the decimal context must still
 +// convert exactly; see https://cuelang.org/issue/3787.
 +t59: "10000000000000000000000000000000001"
++// A rune outside the range of int32 must be an error rather than wrap.
++t60: "'a'"
++t61: "'�'"
 -- out/strconv --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:

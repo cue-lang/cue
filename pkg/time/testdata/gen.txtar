@@ -37,6 +37,17 @@ toUnix: {
 	badSeconds:  time.ToUnix("2019-01-02T15:04:61Z")
 	garbage:     time.ToUnixNano("not a time")
 }
+
+// An argument outside the range of int64 must be an error rather than saturate.
+// Unlike sec, every int64 nsec has a corresponding time.
+unixRange: {
+	min:       time.Unix(0, -9223372036854775808)
+	max:       time.Unix(0, 9223372036854775807)
+	underflow: time.Unix(0, -9223372036854775809)
+	overflow:  time.Unix(0, 9223372036854775808)
+	uint64:    time.Unix(0, 18446744073709551615)
+	wide:      time.Unix(0, 18446744073709551616)
+}
 -- out/time-v3 --
 Errors:
 t2: invalid value "no time" (does not satisfy time.Time): invalid time "no time":
@@ -48,6 +59,8 @@ toUnix.badSeconds: error in call to time.ToUnix: parsing time "2019-01-02T15:04:
     ./in.cue:34:15
 toUnix.garbage: error in call to time.ToUnixNano: parsing time "not a time" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "not a time" as "2006":
     ./in.cue:35:15
+unixRange.wide: error in call to time.Unix: int 18446744073709551616 overflows int64 in argument 1:
+    ./in.cue:46:13
 
 Result:
 t1: "1937-01-01T12:00:27.87+00:20"
@@ -77,4 +90,15 @@ toUnix: {
 	missingZone: _|_ // toUnix.missingZone: error in call to time.ToUnix: parsing time "2019-01-02T15:04:05" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "" as "Z07:00"
 	badSeconds:  _|_ // toUnix.badSeconds: error in call to time.ToUnix: parsing time "2019-01-02T15:04:61Z": second out of range
 	garbage:     _|_ // toUnix.garbage: error in call to time.ToUnixNano: parsing time "not a time" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "not a time" as "2006"
+}
+
+// An argument outside the range of int64 must be an error rather than saturate.
+// Unlike sec, every int64 nsec has a corresponding time.
+unixRange: {
+	min:       "1677-09-21T00:12:43.145224192Z"
+	max:       "2262-04-11T23:47:16.854775807Z"
+	underflow: "1677-09-21T00:12:43.145224192Z"
+	overflow:  "2262-04-11T23:47:16.854775807Z"
+	uint64:    "2262-04-11T23:47:16.854775807Z"
+	wide:      _|_ // unixRange.wide: error in call to time.Unix: unixRange.wide: int 18446744073709551616 overflows int64 in argument 1
 }

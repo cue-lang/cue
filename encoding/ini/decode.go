@@ -339,18 +339,160 @@ type Config struct {
 	Booleans BooleanMode
 }
 
-// NewDecoder creates a decoder for the INI flavor cfg describes.
-// The decoder keeps its own copy of cfg; later changes to cfg have no effect.
-func NewDecoder(filename string, r io.Reader, cfg Config) *Decoder {
+// The methods below hold the parts of a flavor's grammar that depend only on
+// the [Config], so that the decoder and the encoder share them.
+
+// withDefaults returns cfg with an empty [Config.Delimiters] set to "=", the
+// one option whose zero value is not its default.
+func (cfg Config) withDefaults() Config {
 	if cfg.Delimiters == "" {
 		cfg.Delimiters = "="
 	}
+	return cfg
+}
+
+// keyName returns a key as it decodes, lowercased under [CaseLowerKeys] and
+// [CaseLower].
+func (cfg Config) keyName(key string) string {
+	if cfg.Case == CaseLowerKeys || cfg.Case == CaseLower {
+		return strings.ToLower(key)
+	}
+	return key
+}
+
+// sectionName returns a section name outside quotes as it decodes,
+// lowercased under [CaseLower].
+func (cfg Config) sectionName(name string) string {
+	if cfg.Case == CaseLower {
+		return strings.ToLower(name)
+	}
+	return name
+}
+
+// fold returns the name under which a decoded key or section name is looked
+// up, which under [CaseInsensitive] ignores its case.
+func (cfg Config) fold(name string) string {
+	if cfg.Case == CaseInsensitive {
+		return strings.ToLower(name)
+	}
+	return name
+}
+
+// sectionKey returns the name under which a section path segment is looked
+// up once decoded; a quoted subsection name is never folded.
+func (cfg Config) sectionKey(part string, quoted bool) string {
+	if quoted {
+		return part
+	}
+	return cfg.fold(cfg.sectionName(part))
+}
+
+// backslashJoins reports whether a trailing backslash continues a value onto
+// the next line.
+func (cfg Config) backslashJoins() bool {
+	return cfg.Continuations == ContinuationsBackslash || cfg.Continuations == ContinuationsBackslashSpace
+}
+
+// inlineComments reports whether a comment may start after other text on a
+// line, as [CommentsInline] and [CommentsAnywhere] allow.
+func (cfg Config) inlineComments() bool {
+	return cfg.Comments == CommentsInline || cfg.Comments == CommentsAnywhere
+}
+
+// commentAfter reports whether a ";" or "#" outside quotes that follows prev
+// starts a comment, prev being zero at the start of a value.
+func (cfg Config) commentAfter(prev byte) bool {
+	switch cfg.Comments {
+	case CommentsAnywhere:
+		return true
+	case CommentsInline:
+		return prev == ' ' || prev == '\t'
+	}
+	return false
+}
+
+// keyComment returns the index of the comment that starts in s, the text
+// before a line's delimiter, or -1 when there is none. A key holds no quotes,
+// so only [Config.Comments] decides.
+func (cfg Config) keyComment(s string) int {
+	for i := 1; i < len(s); i++ {
+		if (s[i] == ';' || s[i] == '#') && cfg.commentAfter(s[i-1]) {
+			return i
+		}
+	}
+	return -1
+}
+
+// commentStart returns the index in text, one fragment of a value, of the ";"
+// or "#" that starts a comment under [Config.Comments] outside a quoted span,
+// or -1 when there is none, and the quote left open at the end of text. prev
+// is the byte before text within the value, zero at the start of one, and
+// open the quote an earlier fragment left open. closesLater reports whether a
+// quote that text leaves unmatched is matched on a line continuing the value.
+//
+// Under [QuotesEscaped] every " that no backslash escapes opens or closes a
+// span, as git reads one. Otherwise either quote opens a span when its match
+// follows within the value, which may be on a continuation line, and a quote
+// opening the value does so even without one; an unmatched quote anywhere
+// else, such as the apostrophe of "don't", is an ordinary character.
+func (cfg Config) commentStart(text string, prev, open byte, closesLater func(quote byte) bool) (int, byte) {
+	escaped := cfg.Quotes == QuotesEscaped
+	i := 0
+	if open != 0 {
+		end := cfg.closingQuote(text, 0, open)
+		if end < 0 {
+			// The whole fragment sits inside the span.
+			return -1, open
+		}
+		i = end + 1
+	}
+	for ; i < len(text); i++ {
+		if i > 0 {
+			prev = text[i-1]
+		}
+		switch c := text[i]; {
+		case c == '\\' && escaped:
+			// The escaped byte neither quotes nor starts a comment.
+			i++
+		case c == '"' || (c == '\'' && !escaped):
+			if end := cfg.closingQuote(text, i+1, c); end >= 0 {
+				i = end
+			} else if escaped || (i == 0 && prev == 0) || closesLater(c) {
+				// The span reaches the end of the fragment, so it holds
+				// no comment.
+				return -1, c
+			}
+		case (c == ';' || c == '#') && cfg.commentAfter(prev):
+			return i, 0
+		}
+	}
+	return -1, 0
+}
+
+// closingQuote returns the index of the first quote byte in text at or after
+// from, or -1 when there is none. Under [QuotesEscaped] a backslash escapes
+// the byte after it, so an escaped quote closes nothing.
+func (cfg Config) closingQuote(text string, from int, quote byte) int {
+	for i := from; i < len(text); i++ {
+		if text[i] == '\\' && cfg.Quotes == QuotesEscaped {
+			i++
+			continue
+		}
+		if text[i] == quote {
+			return i
+		}
+	}
+	return -1
+}
+
+// NewDecoder creates a decoder for the INI flavor cfg describes.
+// The decoder keeps its own copy of cfg; later changes to cfg have no effect.
+func NewDecoder(filename string, r io.Reader, cfg Config) *Decoder {
+	cfg = cfg.withDefaults()
 	d := &Decoder{r: r, filename: filename, cfg: cfg}
 	switch cfg.Continuations {
-	case ContinuationsBackslash:
-		d.backslashJoins = true
 	case ContinuationsBackslashSpace:
-		d.backslashJoins, d.sep = true, " "
+		d.sep = " "
 	case ContinuationsIndented:
 		d.sep = "\n"
 	}
@@ -368,11 +510,9 @@ type Decoder struct {
 	tokenFile *token.File
 	lines     []line
 
-	// sep joins the fragments of a value, and backslashJoins reports
-	// whether a trailing backslash continues one. Both follow from
-	// [Config.Continuations], so they are resolved once.
-	sep            string
-	backslashJoins bool
+	// sep joins the fragments of a value. It follows from
+	// [Config.Continuations], so it is resolved once.
+	sep string
 }
 
 // section tracks per-section state needed to detect name collisions.
@@ -386,7 +526,7 @@ type section struct {
 	// holds the sections nested directly in this one, so that a section
 	// path is followed one segment at a time. A name in either map is a
 	// name taken, which is how a property and a section of the same name
-	// are found to collide. Both are keyed by [Decoder.fold].
+	// are found to collide. Both are keyed by [Config.fold].
 	props    map[string]*ast.Field
 	children map[string]*section
 	// headed reports whether a header has named this section, rather than
@@ -456,9 +596,7 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		if !ok {
 			return nil, errors.Newf(pos, "invalid line: %s", trimmed)
 		}
-		if d.cfg.Case == CaseLowerKeys || d.cfg.Case == CaseLower {
-			key = strings.ToLower(key)
-		}
+		key = d.cfg.keyName(key)
 		p := &property{
 			sec:      cur,
 			key:      key,
@@ -483,15 +621,6 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 // pos turns an offset into the input into a position.
 func (d *Decoder) pos(offset int) token.Pos {
 	return d.tokenFile.Pos(offset, token.NoRelPos)
-}
-
-// fold returns the name under which a key or section name is looked up,
-// which under [CaseInsensitive] ignores its case.
-func (d *Decoder) fold(name string) string {
-	if d.cfg.Case == CaseInsensitive {
-		return strings.ToLower(name)
-	}
-	return name
 }
 
 // line is one logical input line: the text to classify, and the offset at
@@ -526,24 +655,18 @@ type property struct {
 	open byte
 }
 
-// inlineComments reports whether a comment may start after other text on a
-// line, as [CommentsInline] and [CommentsAnywhere] allow.
-func (d *Decoder) inlineComments() bool {
-	return d.cfg.Comments == CommentsInline || d.cfg.Comments == CommentsAnywhere
-}
-
 // addFragment appends text, from line i, to p's value, dropping an inline
 // comment it starts and carrying the quote it leaves open. It reports whether
 // text ends in a line continuation, whose backslash it drops.
 func (d *Decoder) addFragment(p *property, text string, i int) (continued bool) {
-	if d.inlineComments() {
+	if d.cfg.inlineComments() {
 		prev := p.prev
 		if len(p.parts) > 0 && d.sep != "" {
 			prev = d.sep[len(d.sep)-1]
 		}
 		text, p.open = d.stripInlineComment(p, text, i, prev)
 	}
-	if d.backslashJoins && continues(text) {
+	if d.cfg.backslashJoins() && continues(text) {
 		text, continued = text[:len(text)-1], true
 	}
 	// An empty fragment contributes no bytes, so it leaves prev alone.
@@ -681,7 +804,7 @@ func (d *Decoder) closesLater(p *property, text string, i int, quote byte) bool 
 	switch d.cfg.Continuations {
 	case ContinuationsIndented:
 		for i = d.nextIndented(p, i); i >= 0; i = d.nextIndented(p, i) {
-			if d.closingQuote(d.lines[i].text, 0, quote) >= 0 {
+			if d.cfg.closingQuote(d.lines[i].text, 0, quote) >= 0 {
 				return true
 			}
 		}
@@ -691,7 +814,7 @@ func (d *Decoder) closesLater(p *property, text string, i int, quote byte) bool 
 				return false
 			}
 			text = d.lines[i].text
-			if d.closingQuote(text, 0, quote) >= 0 {
+			if d.cfg.closingQuote(text, 0, quote) >= 0 {
 				return true
 			}
 		}
@@ -721,7 +844,7 @@ func (d *Decoder) addProperty(p *property) error {
 	if err != nil {
 		return err
 	}
-	name := d.fold(p.key)
+	name := d.cfg.fold(p.key)
 	if p.sec.children[name] != nil {
 		return errors.Newf(p.keyPos, "property %s conflicts with section of the same name", p.key)
 	}
@@ -750,9 +873,9 @@ func (d *Decoder) decodeValue(p *property) (ast.Expr, error) {
 		ast.SetPos(v, p.valuePos)
 		return v, nil
 	}
-	value, quoted, err := d.applyQuotes(d.value(p), p.valuePos)
+	value, quoted, err := d.cfg.applyQuotes(d.value(p))
 	if err != nil {
-		return nil, err
+		return nil, errors.Newf(p.valuePos, "%v", err)
 	}
 	if d.cfg.Values != ValuesTyped || quoted {
 		return newStringLit(value, p.valuePos), nil
@@ -771,7 +894,7 @@ func (d *Decoder) parseKeyValue(text string) (key, value string, valueIdx int, b
 	if keyEnd < 0 {
 		keyEnd = len(text)
 	}
-	if c := d.keyComment(text[:keyEnd]); c >= 0 {
+	if c := d.cfg.keyComment(text[:keyEnd]); c >= 0 {
 		i, keyEnd = -1, c
 	}
 	key = strings.TrimSpace(text[:keyEnd])
@@ -789,90 +912,18 @@ func (d *Decoder) parseKeyValue(text string) (key, value string, valueIdx int, b
 	return key, value, len(text) - len(value), false, true
 }
 
-// keyComment returns the index of the comment that starts in s, the text
-// before a line's delimiter, or -1 when there is none. A key holds no quotes,
-// so only [Config.Comments] decides.
-func (d *Decoder) keyComment(s string) int {
-	for i := 1; i < len(s); i++ {
-		if (s[i] == ';' || s[i] == '#') && d.commentAfter(s[i-1]) {
-			return i
-		}
-	}
-	return -1
-}
-
-// commentAfter reports whether a ";" or "#" outside quotes that follows prev
-// starts a comment, prev being zero at the start of a value.
-func (d *Decoder) commentAfter(prev byte) bool {
-	switch d.cfg.Comments {
-	case CommentsAnywhere:
-		return true
-	case CommentsInline:
-		return prev == ' ' || prev == '\t'
-	}
-	return false
-}
-
 // stripInlineComment trims text, the fragment of p's value from line, before
-// the first ";" or "#" that starts a comment under [Config.Comments] and sits
-// outside a quoted span, so that a comment character within a quoted part of
-// the value is kept. prev is the byte before text within the value, zero at
-// the start of one. It returns the text to keep and the quote left open after
-// it, which p.open holds for the next fragment.
-//
-// Under [QuotesEscaped] every " that no backslash escapes opens or closes a
-// span, as git reads one. Otherwise either quote opens a span when its match
-// follows within the value, which may be on a continuation line, and a quote
-// opening the value does so even without one; an unmatched quote anywhere
-// else, such as the apostrophe of "don't", is an ordinary character.
+// the comment [Config.commentStart] finds in it. prev is the byte before text
+// within the value, zero at the start of one. It returns the text to keep and
+// the quote left open after it, which p.open holds for the next fragment.
 func (d *Decoder) stripInlineComment(p *property, text string, line int, prev byte) (string, byte) {
-	escaped := d.cfg.Quotes == QuotesEscaped
-	i, open := 0, p.open
-	if open != 0 {
-		end := d.closingQuote(text, 0, open)
-		if end < 0 {
-			// The whole fragment sits inside the span.
-			return text, open
-		}
-		i, open = end+1, 0
-	}
-	for ; i < len(text); i++ {
-		if i > 0 {
-			prev = text[i-1]
-		}
-		switch c := text[i]; {
-		case c == '\\' && escaped:
-			// The escaped byte neither quotes nor starts a comment.
-			i++
-		case c == '"' || (c == '\'' && !escaped):
-			if end := d.closingQuote(text, i+1, c); end >= 0 {
-				i = end
-			} else if escaped || (i == 0 && prev == 0) || d.closesLater(p, text, line, c) {
-				// The span reaches the end of the fragment, so it holds
-				// no comment.
-				return text, c
-			}
-		case (c == ';' || c == '#') && d.commentAfter(prev):
-			return strings.TrimRight(text[:i], " \t"), open
-		}
+	start, open := d.cfg.commentStart(text, prev, p.open, func(quote byte) bool {
+		return d.closesLater(p, text, line, quote)
+	})
+	if start >= 0 {
+		return strings.TrimRight(text[:start], " \t"), open
 	}
 	return text, open
-}
-
-// closingQuote returns the index of the first quote byte in text at or after
-// from, or -1 when there is none. Under [QuotesEscaped] a backslash escapes
-// the byte after it, so an escaped quote closes nothing.
-func (d *Decoder) closingQuote(text string, from int, quote byte) int {
-	for i := from; i < len(text); i++ {
-		if text[i] == '\\' && d.cfg.Quotes == QuotesEscaped {
-			i++
-			continue
-		}
-		if text[i] == quote {
-			return i
-		}
-	}
-	return -1
 }
 
 // sectionClose returns the index of the "]" closing a section header, or -1.
@@ -911,7 +962,7 @@ func (d *Decoder) openSection(top *section, trimmed string, pos token.Pos) (*sec
 	if closeIdx < 0 {
 		return nil, errors.Newf(pos, "missing closing bracket for section header")
 	}
-	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" && !d.cfg.TrailingHeaderText && !(d.inlineComments() && isComment(rest)) {
+	if rest := strings.TrimSpace(trimmed[closeIdx+1:]); rest != "" && !d.cfg.TrailingHeaderText && !(d.cfg.inlineComments() && isComment(rest)) {
 		return nil, errors.Newf(pos, "unexpected text after section header: %s", rest)
 	}
 	name := strings.TrimSpace(trimmed[1:closeIdx])
@@ -949,9 +1000,7 @@ func (d *Decoder) sectionPath(name string, pos token.Pos) (parts []string, quote
 		if part == "" {
 			return nil, false, errors.Newf(pos, "empty section name")
 		}
-		if d.cfg.Case == CaseLower {
-			parts[i] = strings.ToLower(part)
-		}
+		parts[i] = d.cfg.sectionName(part)
 	}
 	if quoted {
 		parts = append(parts, sub)
@@ -985,7 +1034,7 @@ func subsection(s string) (string, error) {
 // buildNestedSection walks the section path down from top, creating the
 // sections along the way that do not exist yet, and returns the innermost
 // one; quoted reports whether the last segment is a quoted subsection name,
-// which [Decoder.fold] leaves alone. An error is returned if any segment
+// which [Config.sectionKey] leaves alone. An error is returned if any segment
 // collides with a property in its parent, or if the header repeats under
 // [DuplicateSectionsError]. Under [DuplicateSectionsFirst] a repeated header
 // returns a section attached to nothing, so that its properties are read and
@@ -993,10 +1042,7 @@ func subsection(s string) (string, error) {
 func (d *Decoder) buildNestedSection(top *section, parts []string, quoted bool, pos token.Pos) (*section, error) {
 	cur := top
 	for i, part := range parts {
-		name := part
-		if !quoted || i < len(parts)-1 {
-			name = d.fold(part)
-		}
+		name := d.cfg.sectionKey(part, quoted && i == len(parts)-1)
 		if child := cur.children[name]; child != nil {
 			cur = child
 			continue
@@ -1030,20 +1076,30 @@ func (d *Decoder) buildNestedSection(top *section, parts []string, quoted bool, 
 // and, under [QuotesEscaped], interprets the value's escape sequences. It
 // reports whether it removed a quote, which keeps the value a string under
 // [ValuesTyped].
-func (d *Decoder) applyQuotes(value string, pos token.Pos) (_ string, quoted bool, _ error) {
-	switch d.cfg.Quotes {
+func (cfg Config) applyQuotes(value string) (_ string, quoted bool, _ error) {
+	switch cfg.Quotes {
 	case QuotesStripped:
 		if len(value) >= 2 && (value[0] == '"' || value[0] == '\'') && value[len(value)-1] == value[0] {
 			return value[1 : len(value)-1], true, nil
 		}
 	case QuotesEscaped:
-		value, quoted, err := unquote(value)
-		if err != nil {
-			return "", false, errors.Newf(pos, "%v", err)
-		}
-		return value, quoted, nil
+		return unquote(value)
 	}
 	return value, false, nil
+}
+
+// escapes pairs each byte that [QuotesEscaped] spells as an escape sequence
+// with the byte following the backslash.
+var escapes = [...][2]byte{{'\\', '\\'}, {'"', '"'}, {'\n', 'n'}, {'\t', 't'}, {'\b', 'b'}}
+
+// unescape returns the byte that a backslash followed by e stands for.
+func unescape(e byte) (_ byte, ok bool) {
+	for _, pair := range escapes {
+		if pair[1] == e {
+			return pair[0], true
+		}
+	}
+	return 0, false
 }
 
 // unquote reads value as git-config does: each " that no backslash escapes
@@ -1068,18 +1124,11 @@ func unquote(value string) (_ string, quoted bool, _ error) {
 			if i == len(value) {
 				return "", false, fmt.Errorf("value ends with a backslash: %s", value)
 			}
-			switch e := value[i]; e {
-			case '\\', '"':
-				b.WriteByte(e)
-			case 'n':
-				b.WriteByte('\n')
-			case 't':
-				b.WriteByte('\t')
-			case 'b':
-				b.WriteByte('\b')
-			default:
-				return "", false, fmt.Errorf("unknown escape sequence: \\%c", e)
+			c, ok := unescape(value[i])
+			if !ok {
+				return "", false, fmt.Errorf("unknown escape sequence: \\%c", value[i])
 			}
+			b.WriteByte(c)
 		default:
 			b.WriteByte(c)
 		}
@@ -1120,7 +1169,7 @@ func (d *Decoder) addDuplicate(p *property, field *ast.Field, v ast.Expr) error 
 //   - port=443 -> port is parsed as an int
 //   - portString="443" -> portString stays as a string "443"
 func (d *Decoder) makeValueLit(s string, pos token.Pos) ast.Expr {
-	if b, ok := d.parseBool(s); ok {
+	if b, ok := d.cfg.parseBool(s); ok {
 		lit := ast.NewBool(b)
 		ast.SetPos(lit, pos)
 		return lit
@@ -1139,8 +1188,8 @@ func (d *Decoder) makeValueLit(s string, pos token.Pos) ast.Expr {
 
 // parseBool recognizes the boolean vocabulary [Config.Booleans] selects,
 // ignoring case.
-func (d *Decoder) parseBool(s string) (_ bool, ok bool) {
-	extended := d.cfg.Booleans == BooleansExtended
+func (cfg Config) parseBool(s string) (_ bool, ok bool) {
+	extended := cfg.Booleans == BooleansExtended
 	switch strings.ToLower(s) {
 	case "true":
 		return true, true

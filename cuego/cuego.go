@@ -141,7 +141,7 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 	}
 
 	v := runtime.BuildExpr(expr)
-	if v.Err() != nil {
+	if err := v.Err(); err != nil {
 		return err
 	}
 

@@ -75,11 +75,10 @@ func TestValidate(t *testing.T) {
 		constraints:  `[`,
 		constrainErr: fail,
 	}, {
-		// TODO: Constrain should report the unresolved reference.
 		name:         "constraints which fail to compile",
 		value:        []string{"a"},
 		constraints:  `[...missing]`,
-		constrainErr: "",
+		constrainErr: fail,
 	}, {
 		name:         "constraints incompatible with the type",
 		value:        []string{"a"},

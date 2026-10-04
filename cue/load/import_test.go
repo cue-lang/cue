@@ -19,7 +19,9 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
+	"time"
 
 	"cuelang.org/go/cue/build"
 	"github.com/go-quicktest/qt"
@@ -101,24 +103,15 @@ func TestLocalDirectory(t *testing.T) {
 	}
 }
 
+// rooted joins path to the root directory of the filesystem;
+// "/" on Unix-like systems, something like "C:\\" on Windows.
+func rooted(path string) string {
+	return filepath.Join(filepath.VolumeName(pkgRootDir)+string(filepath.Separator), path)
+}
+
 // Test that ModuleRoot can be at the root of the filesystem when
 // using an overlay, and the loading should work just fine.
 func TestOverlayModuleRoot(t *testing.T) {
-	// Find the root directory; "/" on Unix-like systems,
-	// something like "C:\\" on Windows.
-	root, _ := os.Getwd()
-	for {
-		parent := filepath.Dir(root)
-		if parent == root {
-			break // reached the top
-		}
-		root = parent
-	}
-	t.Logf("root directory: %s", root)
-
-	rooted := func(path string) string {
-		return filepath.Join(root, path)
-	}
 	conf := &Config{
 		Dir:        rooted(""),
 		ModuleRoot: rooted(""),
@@ -142,4 +135,62 @@ language: version: "v0.11.0"
 	qt.Assert(t, qt.IsNil(insts[0].Err))
 	qt.Assert(t, qt.Equals(insts[0].Module, "mod.test@v0"))
 	qt.Assert(t, qt.Equals(insts[0].ImportPath, "mod.test/pkgdir@v0:pkgname"))
+}
+
+// TestSiblingDirWithModuleRootPrefix checks that a directory whose path
+// has the module root as a string prefix, but not as a path prefix,
+// is reported as outside of the module.
+func TestSiblingDirWithModuleRootPrefix(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// TODO: the wrong results asserted below do not reproduce on Windows.
+		t.Skip("the sibling directory is already seen as outside the module on Windows")
+	}
+	const timedOut = "Instances did not return"
+	tests := []struct {
+		name      string
+		arg       string
+		parentMod bool
+		want      string
+	}{{
+		name: "Unrelated",
+		arg:  "../other",
+		want: `cannot determine import path for "../other" (dir outside of root)`,
+	}, {
+		name: "SharedPrefix",
+		arg:  "../foobar",
+		want: timedOut, // TODO: should fail with "dir outside of root"
+	}, {
+		name: "SharedPrefixPattern",
+		arg:  "../foobar/...",
+		want: timedOut, // TODO: should fail with "dir outside of root"
+	}, {
+		name:      "SharedPrefixParentModule",
+		arg:       "../foobar",
+		parentMod: true,
+		want:      `cannot determine import path for "../foobar" (directory is in a nested module)`, // TODO: should fail with "dir outside of root"
+	}}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			overlay := map[string]Source{
+				rooted("r/foo/cue.mod/module.cue"): FromString(`module: "mod.test@v0", language: version: "v0.11.0"`),
+				rooted("r/foo/x.cue"):              FromString(`package x`),
+				rooted("r/foobar/x.cue"):           FromString(`package x`),
+				rooted("r/other/x.cue"):            FromString(`package x`),
+			}
+			if test.parentMod {
+				overlay[rooted("r/cue.mod/module.cue")] = FromString(`module: "parent.test@v0", language: version: "v0.11.0"`)
+			}
+			done := make(chan string, 1)
+			go func() {
+				insts := Instances([]string{test.arg}, &Config{Dir: rooted("r/foo"), Overlay: overlay})
+				done <- fmt.Sprint(insts[0].Err)
+			}()
+			got := timedOut
+			select {
+			case got = <-done:
+			case <-time.After(2 * time.Second):
+			}
+			qt.Assert(t, qt.Equals(got, test.want))
+		})
+	}
 }

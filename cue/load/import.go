@@ -95,7 +95,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	var dirs [][2]string
 	genDir := genPath(cfg.ModuleRoot, cfg.pathOS)
 	pDir := fsDir(cfg, p)
-	if strings.HasPrefix(pDir, genDir) {
+	if hasFilepathPrefix(pDir, genDir, cfg.pathOS) {
 		dirs = append(dirs, [2]string{genDir, pDir})
 		// && p.PkgName != "_"
 		for _, sub := range []string{"pkg", "usr"} {
@@ -372,10 +372,11 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 	}
 
 	absDir = pkgpath.Clean(absDir, c.pathOS)
-	subdir, ok := strings.CutPrefix(absDir, c.ModuleRoot)
-	if !ok {
+	root := pkgpath.Clean(c.ModuleRoot, c.pathOS)
+	if !hasFilepathPrefix(absDir, root, c.pathOS) {
 		return "", fmt.Errorf("cannot determine import path for %q (dir outside of root)", origPath)
 	}
+	subdir := absDir[len(root):]
 
 	pkg := pkgpath.ToSlash(subdir, c.pathOS)
 	if pkg != "" && !strings.HasPrefix(pkg, "/") {
@@ -396,7 +397,6 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 		// Reject directories that are inside a nested module (a subdirectory
 		// containing its own cue.mod/module.cue). Such a directory belongs to
 		// a different module and is not part of c.Module.
-		root := pkgpath.Clean(c.ModuleRoot, c.pathOS)
 		for dir := absDir; dir != root; dir = pkgpath.Dir(dir, c.pathOS) {
 			modCue := pkgpath.Join([]string{dir, modDir, moduleFile}, c.pathOS)
 			if _, err := c.fileSystem.stat(modCue); err == nil {

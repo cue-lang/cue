@@ -19,7 +19,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"testing"
 	"time"
 
@@ -141,10 +140,6 @@ language: version: "v0.11.0"
 // has the module root as a string prefix, but not as a path prefix,
 // is reported as outside of the module.
 func TestSiblingDirWithModuleRootPrefix(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		// TODO: the wrong results asserted below do not reproduce on Windows.
-		t.Skip("the sibling directory is already seen as outside the module on Windows")
-	}
 	const timedOut = "Instances did not return"
 	tests := []struct {
 		name      string
@@ -158,16 +153,16 @@ func TestSiblingDirWithModuleRootPrefix(t *testing.T) {
 	}, {
 		name: "SharedPrefix",
 		arg:  "../foobar",
-		want: timedOut, // TODO: should fail with "dir outside of root"
+		want: `cannot determine import path for "../foobar" (dir outside of root)`,
 	}, {
 		name: "SharedPrefixPattern",
 		arg:  "../foobar/...",
-		want: timedOut, // TODO: should fail with "dir outside of root"
+		want: `cannot determine import path for "../foobar/..." (dir outside of root)`,
 	}, {
 		name:      "SharedPrefixParentModule",
 		arg:       "../foobar",
 		parentMod: true,
-		want:      `cannot determine import path for "../foobar" (directory is in a nested module)`, // TODO: should fail with "dir outside of root"
+		want:      `cannot determine import path for "../foobar" (dir outside of root)`,
 	}}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

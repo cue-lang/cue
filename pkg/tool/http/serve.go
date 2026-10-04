@@ -15,6 +15,7 @@
 package http
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -129,15 +130,17 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 
 	log.Printf("adding handler for %v\n", url)
 	mux.HandleFunc(url, func(w http.ResponseWriter, req *http.Request) {
-		err := req.ParseForm()
-		if err != nil {
-			http.Error(w, fmt.Sprintf("cannot parse form: %v", err), http.StatusBadRequest)
-			return
-		}
-
+		// Read the body before parsing the form, which consumes a form body,
+		// and then give the form parser a copy.
 		data, err := io.ReadAll(req.Body)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("cannot read body: %v", err), http.StatusBadRequest)
+			return
+		}
+		req.Body = io.NopCloser(bytes.NewReader(data))
+
+		if err := req.ParseForm(); err != nil {
+			http.Error(w, fmt.Sprintf("cannot parse form: %v", err), http.StatusBadRequest)
 			return
 		}
 

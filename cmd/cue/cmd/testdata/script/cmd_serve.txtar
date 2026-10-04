@@ -30,9 +30,8 @@ curl -L http://${SERVE_ADDR}/echo -H 'Content-Type: text/plain' -d 'hello from s
 stdout 'hello from sibling task'
 
 # A urlencoded form body is available both raw and parsed
-# TODO: the raw body is empty, as parsing the form consumes it.
 curl http://${SERVE_ADDR}/form?q=query -H 'Content-Type: application/x-www-form-urlencoded' -d 'a=1&b=two'
-stdout '^body="" a=1 b=two q=query$'
+stdout '^body="a=1&b=two" a=1 b=two q=query$'
 
 # Custom status code examples
 

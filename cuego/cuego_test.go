@@ -38,6 +38,8 @@ func TestValidate(t *testing.T) {
 		value       interface{}
 		constraints string
 		err         string
+		// constrainErr is the error expected from Constrain, if any.
+		constrainErr string
 	}{{
 		name:  "Sum",
 		value: Sum{A: 1, B: 4, C: 5},
@@ -67,6 +69,22 @@ func TestValidate(t *testing.T) {
 		name:        "string list",
 		value:       []string{"a", "b", "c"},
 		constraints: `[_, "b", ...]`,
+	}, {
+		name:         "constraints with a syntax error",
+		value:        []string{"a"},
+		constraints:  `[`,
+		constrainErr: fail,
+	}, {
+		// TODO: Constrain should report the unresolved reference.
+		name:         "constraints which fail to compile",
+		value:        []string{"a"},
+		constraints:  `[...missing]`,
+		constrainErr: "",
+	}, {
+		name:         "constraints incompatible with the type",
+		value:        []string{"a"},
+		constraints:  `{}`,
+		constrainErr: fail,
 	}}
 
 	for _, tc := range testCases {
@@ -74,8 +92,9 @@ func TestValidate(t *testing.T) {
 			c := &Context{}
 			if tc.constraints != "" {
 				err := c.Constrain(tc.value, tc.constraints)
-				if err != nil {
-					t.Fatal(err)
+				checkErr(t, err, tc.constrainErr)
+				if err != nil || tc.constrainErr != "" {
+					return
 				}
 			}
 			err := c.Validate(tc.value)

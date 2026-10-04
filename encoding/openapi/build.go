@@ -14,6 +14,10 @@
 
 package openapi
 
+// This file implements the original OpenAPI generator behind [Generate] and
+// [Gen], which [GenerateV2] supersedes. It is no longer maintained: fix bugs
+// and add features in the new generator instead.
+
 import (
 	"cmp"
 	"fmt"

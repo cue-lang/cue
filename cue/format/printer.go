@@ -14,6 +14,10 @@
 
 package format
 
+// This file implements the pre-v2 formatter, used when the formatv2 experiment
+// is disabled. It is no longer maintained: fix bugs and add features in the v2
+// formatter instead.
+
 import (
 	"fmt"
 	"os"

@@ -106,6 +106,8 @@ func Gen(inst cue.InstanceOrValue, c *Config) ([]byte, error) {
 //
 // Note: only a limited number of top-level types are supported so far.
 func Generate(inst cue.InstanceOrValue, c *Config) (*ast.File, error) {
+	// TODO(v0.19): enable the openapiv2 experiment by default,
+	// and deprecate Generate and Gen in favor of GenerateV2.
 	if c == nil {
 		c = defaultConfig
 	}

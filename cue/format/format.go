@@ -282,6 +282,7 @@ func (cfg *config) style() ASTStyle {
 }
 
 // formatV2 reports whether this call uses the v2 formatter.
+// The pre-v2 formatter is no longer maintained.
 func (cfg *config) formatV2() bool {
 	return cueexperiment.Flags.FormatV2 || cfg.forceV2
 }

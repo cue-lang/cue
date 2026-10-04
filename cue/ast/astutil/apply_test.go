@@ -390,8 +390,7 @@ b: // label
 		},
 	}, {
 		name: "append to comments twice",
-		// Three comment groups leave spare capacity in the comments of a,
-		// which two appends to the result of ast.Comments both write into.
+		// Two appends to the result of ast.Comments each get their own slot.
 		in: `
 // doc
 a: // label
@@ -404,7 +403,7 @@ a: // label
 
 // doc
 //
-// c
+// b
 b: // label
 	2 // trailing
 `,

@@ -17,6 +17,7 @@ package ast
 import "slices"
 
 // Comments returns all comments associated with a given node.
+// The result must not be modified.
 func Comments(n Node) []*CommentGroup {
 	c := n.commentInfo()
 	if c == nil {

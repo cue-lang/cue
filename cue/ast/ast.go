@@ -175,7 +175,7 @@ func (c *comments) Comments() []*CommentGroup {
 	if c.syntacticGroups == nil {
 		return []*CommentGroup{}
 	}
-	return *c.syntacticGroups
+	return slices.Clip(*c.syntacticGroups)
 }
 
 // Deprecated: use [AddComment].

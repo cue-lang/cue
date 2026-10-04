@@ -170,10 +170,9 @@ x: 42
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v1.2.3"}))
 
 	// A failure to push the manifest to the destination must be reported.
-	// TODO: the error is dropped, so the mirror appears to succeed.
 	c3 := NewClient(noManifestPushRegistry{ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})})
 	err = c.Mirror(ctx, c3, mv)
-	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.ErrorMatches(err, `cannot tag example.com/module@v1.2.3: manifest push rejected`))
 }
 
 // noManifestPushRegistry rejects all manifest pushes.

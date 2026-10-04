@@ -144,7 +144,7 @@ func (src *Client) Mirror(ctx context.Context, dst *Client, mv module.Version) e
 		return src.mirrorReferrers(ctx, dst, m.loc, dstLoc, m.manifestDigest)
 	}
 	if _, err := dstLoc.Registry.PushManifest(ctx, dstLoc.Repository, dstLoc.Tag, m.manifestContents, ocispec.MediaTypeImageManifest); err != nil {
-		return nil
+		return fmt.Errorf("cannot tag %v: %v", mv, registryError(err))
 	}
 
 	// Mirror any referrers that point to this manifest

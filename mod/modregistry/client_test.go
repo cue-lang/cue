@@ -168,6 +168,21 @@ x: 42
 	tags, err := c2.ModuleVersions(ctx, mv.Path())
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v1.2.3"}))
+
+	// A failure to push the manifest to the destination must be reported.
+	// TODO: the error is dropped, so the mirror appears to succeed.
+	c3 := NewClient(noManifestPushRegistry{ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})})
+	err = c.Mirror(ctx, c3, mv)
+	qt.Assert(t, qt.IsNil(err))
+}
+
+// noManifestPushRegistry rejects all manifest pushes.
+type noManifestPushRegistry struct {
+	ociregistry.Interface
+}
+
+func (r noManifestPushRegistry) PushManifest(ctx context.Context, repo string, tag string, contents []byte, mediaType string) (ociregistry.Descriptor, error) {
+	return ociregistry.Descriptor{}, fmt.Errorf("manifest push rejected")
 }
 
 func TestNotFound(t *testing.T) {

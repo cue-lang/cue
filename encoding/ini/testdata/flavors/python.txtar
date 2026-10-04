@@ -22,6 +22,17 @@ install_requires =
 
 [DEFAULT]
 verbose = 1
+-- in.cue --
+// A setup.cfg as one would write it in CUE for configparser.
+metadata: {
+	Name:             "mypkg"
+	version:          "1.2.3"
+	long_description: "The first line of the description\nthe second line"
+}
+options: {
+	python_requires:  ">=3.9"
+	install_requires: "\nrequests\n\nclick"
+}
 -- out/decode/default --
 invalid line: the second line:
     in.ini:8:1
@@ -40,3 +51,19 @@ options: {
 	install_requires:     "\nrequests\n\nclick"
 }
 DEFAULT: verbose: "1"
+-- out/encode/default --
+cannot write string at metadata.long_description: no spelling decodes back to it; set Config.Quotes to QuotesEscaped to allow it:
+    in.cue:5:2
+-- out/encode/flavor --
+[metadata]
+Name = mypkg
+version = 1.2.3
+long_description = The first line of the description
+	the second line
+
+[options]
+python_requires = >=3.9
+install_requires =
+	requests
+
+	click

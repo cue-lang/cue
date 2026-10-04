@@ -23,8 +23,10 @@ import (
 
 	"github.com/go-quicktest/qt"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
@@ -70,9 +72,51 @@ func TestFlavors(t *testing.T) {
 		if name, ok := t.Value("flavor"); ok {
 			config := flavors[name]
 			qt.Assert(t, qt.IsNotNil(config), qt.Commentf("unknown flavor %q", name))
-			decode(t, t.Writer("flavor"), data, config())
+			if expr := decode(t, t.Writer("flavor"), data, config()); expr != nil {
+				// The decoded file, encoded again, reads back.
+				v := cuecontext.New().BuildExpr(expr)
+				out, err := encode(config(), v)
+				qt.Assert(t, qt.IsNil(err))
+				roundTrip(t, config(), v, out)
+			}
 		}
 	})
+
+	// Each archive's in.cue is a reference document, hand-written for its
+	// flavor's tool; it is encoded under the generic flavor and under the
+	// archive's flavor, and each output reads back.
+	test = cuetxtar.TxTarTest{
+		Root: "testdata/flavors",
+		Name: "encode",
+	}
+	test.Run(t, func(t *cuetxtar.Test) {
+		var data []byte
+		for _, f := range t.Archive.Files {
+			if f.Name == "in.cue" {
+				data = f.Data
+			}
+		}
+		qt.Assert(t, qt.IsNotNil(data))
+		v := cuecontext.New().CompileBytes(data, cue.Filename("in.cue"))
+		qt.Assert(t, qt.IsNil(v.Err()))
+
+		encodeTo(t, t.Writer("default"), ini.Config{}, v)
+		if name, ok := t.Value("flavor"); ok {
+			encodeTo(t, t.Writer("flavor"), flavors[name](), v)
+		}
+	})
+}
+
+// encodeTo writes v encoded under cfg to w, or the encoding error, and
+// checks that the encoded output reads back.
+func encodeTo(t *cuetxtar.Test, w io.Writer, cfg ini.Config, v cue.Value) {
+	out, err := encode(cfg, v)
+	if err != nil {
+		fmt.Fprint(w, errors.Details(err, nil))
+		return
+	}
+	w.Write(out)
+	roundTrip(t, cfg, v, out)
 }
 
 // decode decodes data under cfg and writes the formatted CUE, or the error

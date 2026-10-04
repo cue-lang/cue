@@ -20,6 +20,18 @@ Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+-- in.cue --
+// A service unit as one would write it in CUE for systemd.
+Unit: {
+	Description: "Example service"
+	After:       "network.target"
+}
+Service: {
+	Environment: ["FIRST=1", "SECOND=2"]
+	ExecStart:   "/bin/sh -c 'echo one ; echo two'"
+	Restart:     "on-failure"
+}
+Install: WantedBy: "multi-user.target"
 -- out/decode/default --
 duplicate key: Environment:
     in.ini:10:1
@@ -35,3 +47,19 @@ Service: {
 	Restart:     "on-failure"
 }
 Install: WantedBy: "multi-user.target"
+-- out/encode/default --
+cannot write list at Service.Environment: lists are repeated keys; set Config.DuplicateKeys to DuplicatesList to allow it:
+    in.cue:7:2
+-- out/encode/flavor --
+[Unit]
+Description = Example service
+After = network.target
+
+[Service]
+Environment = FIRST=1
+Environment = SECOND=2
+ExecStart = /bin/sh -c 'echo one ; echo two'
+Restart = on-failure
+
+[Install]
+WantedBy = multi-user.target

@@ -24,6 +24,24 @@
 	cwd = !pwd#a comment needs no space
 [branch "fix/\"quoted\""]
 	remote = origin
+-- in.cue --
+// A git configuration as one would write it in CUE for git-config(1).
+core: {
+	repositoryformatversion: "0"
+	autoCRLF:                true
+}
+remote: origin: {
+	url:   "https://example.com/project.git"
+	fetch: ["+refs/heads/*:refs/remotes/origin/*", "+refs/tags/*:refs/tags/*"]
+}
+user: {
+	name:      " Jane \"JD\" Doe"
+	signature: "first line\nsecond line"
+}
+alias: say: "!echo \"one ; two\""
+branch: "fix/\"quoted\"": remote:       "origin"
+url: "https://example.com/": insteadOf: "ex:"
+include: extra: config: path: "~/.gitconfig.extra"
 -- out/decode/default --
 duplicate key: fetch:
     in.ini:6:1
@@ -49,3 +67,31 @@ user: {
 }
 url: "https://example.com/": insteadof: "ex:"
 branch: "fix/\"quoted\"": remote:       "origin"
+-- out/encode/default --
+cannot write section at remote.origin: nested sections need a nesting option; set Config.QuotedSubsections or Config.DottedSections to true to allow it:
+    in.cue:6:9
+-- out/encode/flavor --
+[core]
+repositoryformatversion = 0
+autoCRLF = true
+
+[remote "origin"]
+url = https://example.com/project.git
+fetch = +refs/heads/*:refs/remotes/origin/*
+fetch = +refs/tags/*:refs/tags/*
+
+[user]
+name = " Jane \"JD\" Doe"
+signature = first line\nsecond line
+
+[alias]
+say = "!echo \"one ; two\""
+
+[branch "fix/\"quoted\""]
+remote = origin
+
+[url "https://example.com/"]
+insteadOf = ex:
+
+[include.extra.config]
+path = ~/.gitconfig.extra

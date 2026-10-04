@@ -24,6 +24,17 @@ LogFile=C:\ProgramData\MyApp\log.txt
 
 [network]
 Retries=3
+-- in.cue --
+// A profile as one would write it in CUE for GetPrivateProfileString.
+Settings: {
+	WindowTitle: "My Application"
+	StatusText:  "  Ready  "
+	WindowWidth: 1024
+}
+Paths: {
+	InstallDir: "C:\\Program Files\\MyApp"
+	DataDir:    "\"C:\\ProgramData\""
+}
 -- out/decode/default --
 Settings: {
 	WindowTitle:  "\"My Application\""
@@ -64,3 +75,15 @@ Logging: {
 	Timeout: "5"
 	LogFile: "C:\\ProgramData\\MyApp\\log.txt"
 }
+-- out/encode/default --
+cannot write string at Settings.StatusText: no spelling decodes back to it; set Config.Quotes to QuotesEscaped to allow it:
+    in.cue:4:2
+-- out/encode/flavor --
+[Settings]
+WindowTitle = My Application
+StatusText = "  Ready  "
+WindowWidth = 1024
+
+[Paths]
+InstallDir = C:\Program Files\MyApp
+DataDir = ""C:\ProgramData""

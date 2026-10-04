@@ -16,6 +16,30 @@ session.cookie_secure = On
 [Extensions]
 extension[] = mysqli
 extension[] = curl
+-- in.cue --
+// A php.ini as one would write it in CUE for the generic flavor.
+PHP: {
+	engine:            "On"
+	precision:         14
+	error_reporting:   "E_ALL & ~E_DEPRECATED"
+	include_path:      ".:/usr/share/php"
+	disable_functions: ""
+}
+Session: {
+	"session.save_handler":  "files"
+	"session.cookie_secure": "On"
+}
 -- out/decode/default --
 duplicate key: extension[]:
     in.ini:17:1
+-- out/encode/default --
+[PHP]
+engine = On
+precision = 14
+error_reporting = E_ALL & ~E_DEPRECATED
+include_path = .:/usr/share/php
+disable_functions =
+
+[Session]
+session.save_handler = files
+session.cookie_secure = On

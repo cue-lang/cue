@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package ini converts INI to CUE.
+// Package ini converts between INI and CUE.
 //
 // INI files hold sections, properties, and comments. There is no INI
 // specification, so the zero [Config] accepts only the subset that every
@@ -91,6 +91,27 @@
 //
 // On the command line the flavor tag of the ini file type names one, as
 // in "cue export ini+flavor=git: .gitconfig".
+//
+// # Encoding
+//
+// An [Encoder] writes a concrete CUE struct as INI in the flavor a [Config]
+// describes, and what it writes decodes back under the same [Config]. The
+// struct's scalar and list fields are written first, before any header,
+// and each struct field becomes a section, in source order. Every flavor
+// shares one layout: "key = value" with the first of [Config.Delimiters],
+// no indentation but before a continuation line, and one blank line
+// between sections. Names keep their CUE spelling, since a flavor that
+// folds names does so when reading them.
+//
+// A value is written as its text when the options give that text no other
+// reading, and is otherwise escaped, quoted, or spread over indented lines
+// as the options allow. A value the options cannot write is an error naming
+// its path and, where one exists, the option that would allow it, and
+// nothing is written.
+//
+// Since a key repeated once is read as a single value, a list of one
+// element decodes back as that element; a schema such as
+// "string | [...string]" reads both.
 //
 // # Unsupported
 //
@@ -258,8 +279,9 @@ type Config struct {
 	// a later name differing only in case is the same name, as the Windows
 	// profile API compares them. A quoted subsection name is never folded.
 	//
-	// When writing, two names in one scope that differ only in case are an
-	// error under [CaseInsensitive], as they are under folding.
+	// When writing, names keep their spelling under every mode, since a
+	// reader folds them itself; two names in one scope that the mode would
+	// make the same are an error.
 	Case CaseMode
 
 	// DottedSections reports whether dots in a section name separate
@@ -310,8 +332,10 @@ type Config struct {
 	// continues nothing, and a value ends at a blank line or the end of the
 	// input even after one.
 	//
-	// It selects the form a multi-line string is written in, and under
-	// [ContinuationsNone] such a value cannot be written.
+	// When writing, a string holding a line break is written as indented
+	// lines under [ContinuationsIndented]. The backslash forms join lines
+	// without a line break, so under them, as under [ContinuationsNone],
+	// such a string is written through [Config.Quotes] or not at all.
 	Continuations ContinuationMode
 
 	// BareKeys controls what a line holding a key and no delimiter means:
@@ -321,8 +345,8 @@ type Config struct {
 	// valueless key as null; [BareKeysNull] is for callers whose flavor
 	// treats one as unset rather than as enabled.
 	//
-	// Under [BareKeysTrue], true is written as a bare key when values are
-	// untyped.
+	// When writing, null is a bare key under [BareKeysNull] and an error
+	// otherwise; a boolean is never written as a bare key.
 	BareKeys BareKeyMode
 
 	// Values controls whether the type of a value is interpreted:

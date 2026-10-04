@@ -22,6 +22,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/ini"
@@ -36,6 +37,10 @@ func TestDecoder(t *testing.T) {
 		input   string
 		wantCUE string
 		wantErr string
+		// noEncode, when set, is why the decoded value has no spelling
+		// under config, so that encoding it fails rather than reading
+		// back.
+		noEncode string
 	}{{
 		name:    "Empty",
 		input:   "",
@@ -886,6 +891,7 @@ func TestDecoder(t *testing.T) {
 		wantCUE: `
 			key: "value "
 			`,
+		noEncode: "a trailing space has no spelling under literal quotes",
 	}, {
 		// A backslash reached only by ignoring an inline comment is part of
 		// the comment, so it continues nothing and the next property stands.
@@ -987,6 +993,7 @@ func TestDecoder(t *testing.T) {
 		wantCUE: `
 			a: k: "one "
 			`,
+		noEncode: "a trailing space has no spelling under literal quotes",
 	}, {
 		// A blank line after a backslash ends the value, as git and systemd
 		// read one.
@@ -1054,6 +1061,7 @@ func TestDecoder(t *testing.T) {
 			a: "one \\"
 			b: "two"
 			`,
+		noEncode: "a trailing backslash continues the value under literal quotes",
 	}, {
 		name:   "Continuations/BackslashSpace/BlankLineAfterTheBackslash",
 		config: ini.Config{Continuations: ini.ContinuationsBackslashSpace},
@@ -1309,6 +1317,7 @@ func TestDecoder(t *testing.T) {
 		wantCUE: `
 			a: b: "c.d": key: "value"
 			`,
+		noEncode: "a quoted subsection name is written only at depth two, and a dotted header cannot hold a dot in a name",
 	}, {
 		name:   "QuotedSubsections/CaseLowerKeepsSubsectionCase",
 		config: ini.Config{QuotedSubsections: true, Case: ini.CaseLower},
@@ -1992,6 +2001,16 @@ func TestDecoder(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 
 			qt.Assert(t, qt.Equals(string(actualCue), string(wantFormatted)))
+
+			// The decoded value, encoded under the same flavor, reads back.
+			v := cuecontext.New().BuildExpr(cueExpr)
+			out, err := encode(test.config, v)
+			if test.noEncode != "" {
+				qt.Assert(t, qt.ErrorMatches(err, `cannot write .*`), qt.Commentf("%s", test.noEncode))
+				return
+			}
+			qt.Assert(t, qt.IsNil(err))
+			roundTrip(t, test.config, v, out)
 		})
 	}
 }

@@ -1281,7 +1281,7 @@ func (c *OpContext) uint64(v Value, as string) uint64 {
 		return 0
 	}
 	x, ok := v.(*Num)
-	if !ok {
+	if !ok || x.K != IntKind {
 		c.typeErrorAs(v, IntKind, as)
 		return 0
 	}

@@ -10,9 +10,9 @@ e6: [2]["":] @test(err, code=eval, contains="cannot use \"\"", pos=[0:5, 0:9])
 e7: [2][:"9"]  @test(err, code=eval, contains="cannot use \"9\"", pos=[0:5, 0:10])
 
 // Slice indices must be integers, like list indices.
-f1: [1, 2, 3][0.5:2.7] @test(eq, [2, 3], incorrect) @test(err:todo, code=eval, contains="cannot use 0.5 (type float) as type int in slice index")
-f2: [1, 2, 3][:2.0]    @test(eq, [1, 2], incorrect) @test(err:todo, code=eval, contains="cannot use 2.0 (type float) as type int in slice index")
-f3: 'abcd'[1.5:]       @test(eq, 'cd', incorrect) @test(err:todo, code=eval, contains="cannot use 1.5 (type float) as type int in slice index")
+f1: [1, 2, 3][0.5:2.7] @test(err, code=eval, contains="cannot use 0.5 (type float) as type int in slice index")
+f2: [1, 2, 3][:2.0]    @test(err, code=eval, contains="cannot use 2.0 (type float) as type int in slice index")
+f3: 'abcd'[1.5:]       @test(err, code=eval, contains="cannot use 1.5 (type float) as type int in slice index")
 -- out/errors.txt --
 [eval] e1: index 1 out of range:
     ./in.cue:3:5
@@ -30,6 +30,15 @@ f3: 'abcd'[1.5:]       @test(eq, 'cd', incorrect) @test(err:todo, code=eval, con
 [eval] e7: cannot use "9" (type string) as type int in slice index:
     ./in.cue:9:5
     ./in.cue:9:10
+[eval] f1: cannot use 0.5 (type float) as type int in slice index:
+    ./in.cue:12:5
+    ./in.cue:12:15
+[eval] f2: cannot use 2.0 (type float) as type int in slice index:
+    ./in.cue:13:5
+    ./in.cue:13:16
+[eval] f3: cannot use 1.5 (type float) as type int in slice index:
+    ./in.cue:14:5
+    ./in.cue:14:12
 -- out/eval/stats --
 Leaks:  0
 Freed:  25

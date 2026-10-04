@@ -17,7 +17,9 @@ package cueexperiment
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -140,7 +142,8 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 		}
 	}
 
-	for name := range experiments {
+	// Report the remaining experiments in a stable order.
+	for _, name := range slices.Sorted(maps.Keys(experiments)) {
 		errs = append(errs, fmt.Errorf("unknown experiment %q", name))
 	}
 

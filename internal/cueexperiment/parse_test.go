@@ -124,6 +124,17 @@ func TestParseConfig(t *testing.T) {
 		wantErr:     true,
 		errSubstr:   "cannot set experiment",
 	}, {
+		// Unknown experiments are reported in a stable order.
+		name:        "multiple_unknown_experiments",
+		version:     "v1.0.0",
+		experiments: "unknown5,unknown3,unknown1,unknown4,unknown2",
+		wantErr:     true,
+		errSubstr: `unknown experiment "unknown1"
+unknown experiment "unknown2"
+unknown experiment "unknown3"
+unknown experiment "unknown4"
+unknown experiment "unknown5"`,
+	}, {
 		name:        "default_experiment_enabled_by_version",
 		version:     "v0.2.0",
 		experiments: "",

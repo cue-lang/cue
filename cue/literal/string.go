@@ -305,7 +305,7 @@ func isSimple(s string, quote rune) bool {
 	// faster than converting to code points. At the very least there should
 	// be an ASCII fast path.
 	for _, r := range s {
-		if r == quote || r == '\\' || r == 0 || r == utf8.RuneError {
+		if r == quote || r == '\\' || r == '\r' || r == 0 || r == utf8.RuneError {
 			return false
 		}
 		if surHigh <= r && r < surEnd {

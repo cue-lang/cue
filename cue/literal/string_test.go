@@ -27,9 +27,9 @@ func TestUnquote(t *testing.T) {
 		{``, "", errSyntax},
 		{`"Hello"`, "Hello", nil},
 		// Carriage returns are discarded from the string value.
-		{"\"\r\"", "\r", nil},     // TODO: should be ""
-		{"\"a\rb\"", "a\rb", nil}, // TODO: should be "ab"
-		{"'a\rb'", "a\rb", nil},   // TODO: should be "ab"
+		{"\"\r\"", "", nil},
+		{"\"a\rb\"", "ab", nil},
+		{"'a\rb'", "ab", nil},
 		{"\"a\rb\\n\"", "ab\n", nil},
 		{"#\"a\rb\"#", "ab", nil},
 		{`'Hello'`, "Hello", nil},

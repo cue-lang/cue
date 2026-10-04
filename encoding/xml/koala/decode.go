@@ -33,7 +33,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -56,8 +55,10 @@ type Decoder struct {
 	ancestors []currFieldInfo
 	// CUE model of current XML element being processed.
 	currField currFieldInfo
-	// CUE model of current XML element's inner content ($$ attribute).
-	currInnerText *ast.Field
+	// Position of the pending text content of the current XML element, or [token.NoPos].
+	currInnerTextPos token.Pos
+	// The pending text content, which may span comments and CDATA sections.
+	currInnerTextContent []byte
 }
 
 // currFieldInfo encapsulates details of the CUE field for the current XML element being processed.
@@ -71,11 +72,10 @@ type currFieldInfo struct {
 // xmlElement models an XML Element hierarchy.
 // It is used for tracking namespace prefixes.
 type xmlElement struct {
-	xmlName                 xml.Name
-	attr                    []xml.Attr
-	parent                  *xmlElement
-	children                []*xmlElement
-	textContentIsWhiteSpace bool
+	xmlName  xml.Name
+	attr     []xml.Attr
+	parent   *xmlElement
+	children []*xmlElement
 }
 
 // The prefix used to model the inner text content within an XML element.
@@ -144,43 +144,55 @@ func (dec *Decoder) Decode() (ast.Expr, error) {
 }
 
 func (dec *Decoder) decoderInnerText(xmlToken xml.CharData, contentOffset int64) error {
-	// If this is text content within an XML element.
-	textContent := string(xml.CharData(xmlToken))
+	// Text outside of any XML element is only allowed if it is whitespace.
 	if dec.currField.field == nil {
-		if isWhiteSpace(textContent) {
+		if isWhiteSpace(xmlToken) {
 			return nil
 		}
 		return fmt.Errorf("text content outside of an XML element is not supported")
 	}
-	pos := dec.tokenFile.Pos(int(contentOffset), token.NoRelPos)
+	if dec.currInnerTextPos == token.NoPos {
+		dec.currInnerTextPos = dec.tokenFile.Pos(int(contentOffset), token.NoRelPos)
+		dec.currInnerTextContent = dec.currInnerTextContent[:0]
+	}
+	// The text may continue after a comment, a CDATA section, or the like.
+	dec.currInnerTextContent = append(dec.currInnerTextContent, xmlToken...)
+	return nil
+}
+
+// endInnerText finishes any pending text content of the current XML element,
+// adding it to the element's value. Only whitespace is supported within
+// an element which has sub-elements.
+func (dec *Decoder) endInnerText(hasChildren bool) error {
+	pos := dec.currInnerTextPos
+	if pos == token.NoPos {
+		return nil
+	}
+	dec.currInnerTextPos = token.NoPos
+	if hasChildren {
+		if !isWhiteSpace(dec.currInnerTextContent) {
+			return mixedContentError()
+		}
+		return nil
+	}
 	txtLabel := ast.NewStringLabel(contentAttribute)
 	ast.SetPos(txtLabel, pos)
-	val := toBasicLit(textContent)
+	val := toBasicLit(string(dec.currInnerTextContent))
 	ast.SetPos(val, pos)
-	textContentNode := &ast.Field{
+	dec.appendToCurrFieldStruct(&ast.Field{
 		Label:    txtLabel,
 		Value:    val,
 		TokenPos: pos,
-	}
-	dec.currInnerText = textContentNode
-	dec.currXmlElement.textContentIsWhiteSpace = isWhiteSpace(textContent)
+	})
 	return nil
 }
 
 func (dec *Decoder) decodeEndElement() error {
-	// If there is text content within the element, add it to the element's value.
-	if dec.currXmlElement != nil && dec.currInnerText != nil {
-		// Only support text content within an element that has no sub-elements.
-		if len(dec.currXmlElement.children) == 0 {
-			dec.appendToCurrFieldStruct(dec.currInnerText)
-			dec.currInnerText = nil
-		} else if len(dec.currXmlElement.children) > 0 && !dec.currXmlElement.textContentIsWhiteSpace {
-			// If there is text content within an element that has sub-elements, return an error.
-			return mixedContentError()
-		}
-	}
 	// For the xmlElement hierarchy: step back up the XML hierarchy.
 	if dec.currXmlElement != nil {
+		if err := dec.endInnerText(len(dec.currXmlElement.children) > 0); err != nil {
+			return err
+		}
 		dec.currXmlElement = dec.currXmlElement.parent
 	}
 	// For the CUE ast: end current element, and step back up the XML hierarchy.
@@ -201,12 +213,10 @@ func (dec *Decoder) decodeStartElement(xmlToken xml.StartElement, startOffset in
 		ast.SetPos(dec.astRoot, dec.tokenFile.Pos(0, token.NoRelPos))
 		return nil
 	}
-	// If this is not the root node, check if there is text content within the element.
-	if dec.currInnerText != nil && !dec.currXmlElement.textContentIsWhiteSpace {
-		return mixedContentError()
+	// If this is not the root node, any text content so far must be whitespace.
+	if err := dec.endInnerText(true); err != nil {
+		return err
 	}
-	// Clear any whitespace text content.
-	dec.currInnerText = nil
 	// For xmlElement hierarchy: step down the XML hierarchy.
 	parentXmlNode := dec.currXmlElement
 	dec.currXmlElement = &xmlElement{xmlName: xmlToken.Name, attr: xmlToken.Attr, parent: parentXmlNode}
@@ -243,13 +253,8 @@ func mixedContentError() error {
 	return fmt.Errorf("text content within an XML element that has sub-elements is not supported")
 }
 
-func isWhiteSpace(s string) bool {
-	for _, r := range s {
-		if !unicode.IsSpace(r) {
-			return false
-		}
-	}
-	return true
+func isWhiteSpace(b []byte) bool {
+	return len(bytes.TrimSpace(b)) == 0
 }
 
 // cueFieldFromXmlElement creates a new [ast.Field] to model the given xml element information

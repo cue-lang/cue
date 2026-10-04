@@ -16,14 +16,20 @@ package load
 
 import (
 	"fmt"
+	iofs "io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+	"testing/fstest"
 	"time"
 
-	"cuelang.org/go/cue/build"
 	"github.com/go-quicktest/qt"
+
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 func testdata(elems ...string) string {
@@ -188,4 +194,54 @@ func TestSiblingDirWithModuleRootPrefix(t *testing.T) {
 			qt.Assert(t, qt.Equals(got, test.want))
 		})
 	}
+}
+
+// TestExpandPackageArgsWindows checks that relative package arguments
+// are resolved against a Windows [Config.Dir] using its path separators.
+func TestExpandPackageArgsWindows(t *testing.T) {
+	c := &Config{
+		Dir:        `C:\mod\sub`,
+		ModuleRoot: `C:\mod`,
+		Module:     "mod.test@v0",
+		pathOS:     pkgpath.Windows,
+		fileSystem: noFileSystem{},
+	}
+	tests := []struct {
+		arg     string
+		want    string
+		wantErr string
+	}{
+		{arg: "./pkg:x", want: "mod.test/sub/pkg@v0:x"},
+		{arg: "./pkg", want: "mod.test/sub/pkg@v0"},
+		// TODO: the parent directory is not resolved, as Dir is joined
+		// as if it used forward slashes.
+		{arg: "../other:x", wantErr: `cannot determine import path for "../other:x" \(dir outside of root\)`},
+		{arg: "../other", wantErr: `cannot determine import path for "../other" \(dir outside of root\)`},
+		{arg: "../../out:x", wantErr: `cannot determine import path for "../../out:x" \(dir outside of root\)`},
+	}
+	for _, test := range tests {
+		t.Run(test.arg, func(t *testing.T) {
+			got, err := expandPackageArgs(c, []string{test.arg}, "", nil)
+			if test.wantErr != "" {
+				qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
+				return
+			}
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.HasLen(got, 1))
+			qt.Assert(t, qt.Equals(got[0].resolvedCanonical, test.want))
+		})
+	}
+}
+
+// noFileSystem is a [fileSystem] in which no file exists.
+type noFileSystem struct {
+	fileSystem
+}
+
+func (noFileSystem) stat(path string) (iofs.FileInfo, errors.Error) {
+	return nil, errors.Newf(token.NoPos, "%s does not exist", path)
+}
+
+func (noFileSystem) ioFS(root string, languageVersion string) iofs.FS {
+	return fstest.MapFS{}
 }

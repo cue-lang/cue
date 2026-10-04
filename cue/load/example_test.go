@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modregistrytest"
 )
 
@@ -141,10 +142,15 @@ value: "world"
 	}
 	env = append(env, "CUE_REGISTRY="+registry.Host()+"+insecure")
 	// We also set up a temporary cache directory to fetch and extract modules into.
-	dir, err := os.MkdirTemp("", "")
+	dir, err := os.MkdirTemp("", "cue-load-example-")
 	if err != nil {
 		panic(err)
 	}
 	env = append(env, "CUE_CACHE_DIR="+dir)
-	return env, registry.Close
+	return env, func() {
+		registry.Close()
+		if err := modcache.RemoveAll(dir); err != nil {
+			panic(err)
+		}
+	}
 }

@@ -182,12 +182,12 @@ selfRef: {
 	pattern: {
 		D: {a: 1} | {y: 1}
 		D: {[string]: D} | {x: 1}
-	} @test(eq, {D: {a: 1} | {a: 1, x: 1} | {y: 1} | {y: 1, x: 1}}, incorrect) @test(eq:todo, {D: {a: 1, x: 1} | {y: 1, x: 1}})
+	} @test(eq, {D: {a: 1, x: 1} | {y: 1, x: 1}})
 
 	field: {
 		D: {a: 1} | {x: 1}
 		D: {a: D} | {x: 1}
-	} @test(eq, {D: {a: 1} | {a: 1, x: 1} | {x: 1}}, incorrect) @test(eq:todo, {D: {a: 1, x: 1} | {x: 1}})
+	} @test(eq, {D: {a: 1, x: 1} | {x: 1}})
 
 	// A struct literal with an embedding may be a scalar, so the field is
 	// no conflict here.

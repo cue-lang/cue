@@ -219,6 +219,48 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	n.hasDisjunction = true
 }
 
+// applyDisjunctionKinds constrains the kind of n to the kinds which the
+// disjuncts of each of its disjunctions can have, as far as those are known
+// without evaluating them.
+func (n *nodeContext) applyDisjunctionKinds() {
+	for _, d := range n.disjunctions {
+		if len(d.disjuncts) == 0 {
+			continue
+		}
+		k := BottomKind
+		for _, dj := range d.disjuncts {
+			k |= unevaluatedKind(dj.expr)
+		}
+		if k != TopKind {
+			n.updateNodeType(k, d.disjuncts[0].expr, d.cloneID)
+		}
+	}
+}
+
+// unevaluatedKind reports the kind which x is known to have without
+// evaluating it, or [TopKind] if it is not known.
+func unevaluatedKind(x Expr) Kind {
+	switch x := x.(type) {
+	case *StructLit:
+		// An embedding may make the struct literal a scalar.
+		for _, d := range x.Decls {
+			switch d.(type) {
+			case *Comprehension, Expr:
+				return TopKind
+			}
+		}
+		return StructKind
+	case *ListLit:
+		return ListKind
+	case *Builtin:
+		// A builtin may act as a validator, whose kind is not that of
+		// the function itself.
+	case Value:
+		return x.Kind()
+	}
+	return TopKind
+}
+
 func initArcs(ctx *OpContext, v *Vertex) bool {
 	for _, a := range v.Arcs {
 		s := a.getState(ctx)

@@ -64,7 +64,7 @@ Disjuncts:    6402
 
 NumCloseIDs: 4099
 
-ConjunctInfos:       7472
+ConjunctInfos:       7460
 MaxConjunctInfos:    4
 MaxReqSets:          12
 MaxRedirect:         6

@@ -1095,6 +1095,8 @@ func runTask(t *task, mode runMode) {
 	//     in [cue/testdata/disjunctions/edge.txtar] documents that this
 	//     must surface as an unresolved-disjunction error per the spec,
 	//     not as a successful resolution via the back-edge.
+	//     The kinds of the disjuncts still apply, so that for example a
+	//     scalar conflicts with a disjunction of structs.
 	//
 	// Other task kinds (Resolver, StructLit body, Field, ListLit, etc.)
 	// contribute bounded structure or constraints that downstream lookups
@@ -1113,6 +1115,7 @@ func runTask(t *task, mode runMode) {
 				return
 			}
 		case handleDisjunctions:
+			t.node.applyDisjunctionKinds()
 			t.state = taskSUCCESS
 			return
 		}

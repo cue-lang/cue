@@ -911,8 +911,7 @@ func TestLoadAllPackagesErrors(t *testing.T) {
 		names = append(names, inst.PkgName)
 		qt.Assert(t, qt.ErrorMatches(inst.Err, "expected 'EOF', found 'IDENT' bar"))
 	}
-	// TODO: loading stops at the first package processed, in map order.
-	qt.Assert(t, qt.HasLen(names, 1))
+	qt.Assert(t, qt.DeepEquals(names, []string{"a", "b", "c"}))
 }
 
 func TestLoadInstancesConcurrent(t *testing.T) {

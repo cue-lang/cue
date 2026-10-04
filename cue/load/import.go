@@ -219,7 +219,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		setFSLoc(cfg, p)
 		if errs := fp.finalize(p); errs != nil {
 			p.ReportError(errs)
-			return all
+			continue
 		}
 
 		l.addFiles(p)

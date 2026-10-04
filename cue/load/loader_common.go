@@ -246,8 +246,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	if countCUEFiles(fp.c, p) == 0 &&
 		!fp.c.DataFiles &&
 		(p.PkgName != "_" || !fp.allPackages) {
-		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, pathOS: fp.c.pathOS, ignored: len(p.IgnoredFiles) > 0})
-		return fp.err
+		return &NoFilesError{Package: p, pathOS: fp.c.pathOS, ignored: len(p.IgnoredFiles) > 0}
 	}
 
 	p.ImportPaths = slices.Sorted(maps.Keys(fp.imported))

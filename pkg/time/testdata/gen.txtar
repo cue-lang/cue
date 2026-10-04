@@ -48,6 +48,17 @@ unixRange: {
 	uint64:    time.Unix(0, 18446744073709551615)
 	wide:      time.Unix(0, 18446744073709551616)
 }
+
+// Times beyond the years 1678 to 2262 do not fit in 64 bits as nanoseconds,
+// yet a CUE integer holds them exactly.
+toUnixNanoWide: {
+	min:    time.ToUnixNano("1677-09-21T00:12:43.145224192Z")
+	max:    time.ToUnixNano("2262-04-11T23:47:16.854775807Z")
+	before: time.ToUnixNano("1677-09-21T00:12:43.145224191Z")
+	after:  time.ToUnixNano("2262-04-11T23:47:16.854775808Z")
+	early:  time.ToUnixNano("0001-01-01T00:00:00Z")
+	late:   time.ToUnixNano("9999-12-31T23:59:59.999999999Z")
+}
 -- out/time-v3 --
 Errors:
 t2: invalid value "no time" (does not satisfy time.Time): invalid time "no time":
@@ -107,4 +118,15 @@ unixRange: {
 	overflow:  _|_ // unixRange.overflow: error in call to time.Unix: unixRange.overflow: int 9223372036854775808 overflows int64 in argument 1
 	uint64:    _|_ // unixRange.uint64: error in call to time.Unix: unixRange.uint64: int 18446744073709551615 overflows int64 in argument 1
 	wide:      _|_ // unixRange.wide: error in call to time.Unix: unixRange.wide: int 18446744073709551616 overflows int64 in argument 1
+}
+
+// Times beyond the years 1678 to 2262 do not fit in 64 bits as nanoseconds,
+// yet a CUE integer holds them exactly.
+toUnixNanoWide: {
+	min:    -9223372036854775808
+	max:    9223372036854775807
+	before: 9223372036854775807
+	after:  -9223372036854775808
+	early:  -6795364578871345152
+	late:   -4852116231933722625
 }

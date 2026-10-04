@@ -174,6 +174,34 @@ panic1: {
 		out: {name: "foo", foo_field: string} | {bar_field?: string, name: "bar"}
 	})
 }
+-- selfref.cue --
+// A disjunct with a field which unifies a scalar with a reference to the
+// enclosing disjunction is eliminated, as the scalar conflicts with every
+// disjunct. Here all conjuncts of D are disjunctions.
+selfRef: {
+	pattern: {
+		D: {a: 1} | {y: 1}
+		D: {[string]: D} | {x: 1}
+	} @test(eq, {D: {a: 1} | {a: 1, x: 1} | {y: 1} | {y: 1, x: 1}}, incorrect) @test(eq:todo, {D: {a: 1, x: 1} | {y: 1, x: 1}})
+
+	field: {
+		D: {a: 1} | {x: 1}
+		D: {a: D} | {x: 1}
+	} @test(eq, {D: {a: 1} | {a: 1, x: 1} | {x: 1}}, incorrect) @test(eq:todo, {D: {a: 1, x: 1} | {x: 1}})
+
+	// A struct literal with an embedding may be a scalar, so the field is
+	// no conflict here.
+	embedScalar: {
+		D: {a: 1} | {int}
+		D: {a: D} | int
+	} @test(eq, {D: {a: 1} | int})
+
+	// The same conflict is found when one conjunct is not a disjunction.
+	oneDisjunction: {
+		D: {a: 1} | {y: 1} | {}
+		D: {[string]: D}
+	} @test(eq, {D: {}})
+}
 -- out/errors.txt --
 [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
     ./in.cue:54:6
@@ -190,18 +218,18 @@ panic1: {
     ./in.cue:125:9
     ./in.cue:127:3
 -- out/eval/stats --
-Leaks:  27
-Freed:  184
-Reused: 153
-Allocs: 58
+Leaks:  28
+Freed:  235
+Reused: 204
+Allocs: 59
 Retain: 0
 
-Unifications: 89
-Conjuncts:    234
-Disjuncts:    53
+Unifications: 109
+Conjuncts:    306
+Disjuncts:    74
 Notifications: 9
 
-NumCloseIDs: 64
+NumCloseIDs: 42
 -- out/todo.txt --
 issue4251_notC, issue4251_notB, issue4251_notB_reversed: these are only evaluated correctly by v3.
 cyclicalInsertInDisjunction.err1: should be an error for both evaluators but both produce concrete values.

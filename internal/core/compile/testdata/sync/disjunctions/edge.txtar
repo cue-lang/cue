@@ -134,6 +134,34 @@ panic1: {
 	out: #TypeFoo | #TypeBar
 	out: objs["obj1"].type
 }
+-- selfref.cue --
+// A disjunct with a field which unifies a scalar with a reference to the
+// enclosing disjunction is eliminated, as the scalar conflicts with every
+// disjunct. Here all conjuncts of D are disjunctions.
+selfRef: {
+	pattern: {
+		D: {a: 1} | {y: 1}
+		D: {[string]: D} | {x: 1}
+	}
+
+	field: {
+		D: {a: 1} | {x: 1}
+		D: {a: D} | {x: 1}
+	}
+
+	// A struct literal with an embedding may be a scalar, so the field is
+	// no conflict here.
+	embedScalar: {
+		D: {a: 1} | {int}
+		D: {a: D} | int
+	}
+
+	// The same conflict is found when one conjunct is not a disjunction.
+	oneDisjunction: {
+		D: {a: 1} | {y: 1} | {}
+		D: {[string]: D}
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -281,5 +309,54 @@ panic1: {
     }
     out: (〈0;#TypeFoo〉|〈0;#TypeBar〉)
     out: 〈0;objs〉["obj1"].type
+  }
+}
+--- selfref.cue
+{
+  selfRef: {
+    pattern: {
+      D: ({
+        a: 1
+      }|{
+        y: 1
+      })
+      D: ({
+        [string]: 〈1;D〉
+      }|{
+        x: 1
+      })
+    }
+    field: {
+      D: ({
+        a: 1
+      }|{
+        x: 1
+      })
+      D: ({
+        a: 〈1;D〉
+      }|{
+        x: 1
+      })
+    }
+    embedScalar: {
+      D: ({
+        a: 1
+      }|{
+        int
+      })
+      D: ({
+        a: 〈1;D〉
+      }|int)
+    }
+    oneDisjunction: {
+      D: ({
+        a: 1
+      }|{
+        y: 1
+      }|{})
+      D: {
+        [string]: 〈1;D〉
+      }
+    }
   }
 }

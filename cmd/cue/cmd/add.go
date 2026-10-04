@@ -178,6 +178,8 @@ func doAdd(cmd *Command, args []string) (err error) {
 			return i.Err
 		}
 		if err := i.Value().Validate(); err != nil {
+			// TODO: i.Err is nil here, so a validation failure is not
+			// reported and the files are not restored; return err instead.
 			return i.Err
 		}
 	}
@@ -199,6 +201,9 @@ func restoreOriginals(cmd *Command, originals []originalFile) {
 }
 
 func (fo *originalFile) restore() error {
+	// TODO: an existing empty file is removed rather than restored,
+	// and a created file is not removed, as its filename is not recorded;
+	// record whether the file existed separately from its contents.
 	if len(fo.contents) == 0 {
 		return os.Remove(fo.filename)
 	}
@@ -240,6 +245,8 @@ func initFile(cmd *Command, file string, getBuild func(path string) *build.Insta
 		if pkg == "" {
 			return nil, errors.New("must specify package using -p for new files")
 		}
+		// TODO: this checks the new file on its own, so references to other
+		// files of its package fail, and tool and test files are excluded.
 		todo.buildArg = file
 		fmt.Fprintf(todo.contents, "package %s\n\n", pkg)
 	} else {

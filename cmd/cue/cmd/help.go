@@ -619,8 +619,8 @@ valid with is mentioned in parentheses at the end.
                     indent sequence elements relative to their
                     enclosing mapping key; true by default (yaml)
 
-    flavor=<name>   read INI as the named tool does: git for
-                    git-config, python for Python's configparser,
+    flavor=<name>   read or write INI as the named tool does: git
+                    for git-config, python for Python's configparser,
                     systemd for systemd unit files, or windows for
                     the Windows profile API (ini)
 
@@ -632,8 +632,9 @@ possibly prefixed with a qualifier.
 Note that jsonschema is currently experimental as an output type: the
 form of generated schemas may change from release to release.
 
-Note that ini is currently experimental: its flavors and the CUE it
-decodes to may change from release to release.
+Note that ini is currently experimental: its flavors, the CUE it
+decodes to, and the INI it encodes to may change from release to
+release.
 
 Examples:
 

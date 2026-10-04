@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/ini"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
@@ -249,6 +250,10 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		e.concrete = true
 		enc := toml.NewEncoder(w)
 		e.encValue = enc.Encode
+
+	case build.INI:
+		e.concrete = true
+		e.encValue = ini.NewEncoder(w, iniConfig(f)).Encode
 
 	case build.TextProto:
 		// TODO: verify that the schema is given. Otherwise err out.

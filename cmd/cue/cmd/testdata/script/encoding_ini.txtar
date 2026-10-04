@@ -51,8 +51,193 @@ cmp stderr two-flavors.stderr
 # The encoding and the flavor tag are documented, as experimental.
 exec cue help filetypes
 stdout '\n    ini         \.ini            INI files\.\n'
-stdout '\n    flavor=<name>   read INI as the named tool does: git for\n'
+stdout '\n    flavor=<name>   read or write INI as the named tool does: git\n'
 stdout '\nNote that ini is currently experimental: '
+
+# INI output writes the global properties, then one section per struct,
+# selected by --out or by the extension or qualifier of an -o file name.
+# The output decodes back to the same data, every scalar as a string.
+exec cue export --out ini grafana.cue
+cmp stdout grafana.ini
+exec cue export -o out.ini grafana.cue
+cmp out.ini grafana.ini
+exec cue export out.ini
+cmp stdout grafana.json
+exec cue export -o ini:out.conf grafana.cue
+cmp out.conf grafana.ini
+
+# The flavor tag selects a flavor for output as it does for input, and
+# each flavor's output decodes back under the same flavor.
+exec cue export --out ini+flavor=git export-git.cue
+cmp stdout export-git.ini
+exec cue export ini+flavor=git: export-git.ini
+cmp stdout export-git.json
+exec cue export -o ini+flavor=git:out.cfg export-git.cue
+cmp out.cfg export-git.ini
+exec cue export --out ini+flavor=python export-python.cue
+cmp stdout export-python.ini
+exec cue export ini+flavor=python: export-python.ini
+cmp stdout export-python.json
+exec cue export --out ini+flavor=systemd export-systemd.cue
+cmp stdout export-systemd.ini
+exec cue export ini+flavor=systemd: export-systemd.ini
+cmp stdout export-systemd.json
+exec cue export --out ini+flavor=windows export-windows.cue
+cmp stdout export-windows.ini
+exec cue export ini+flavor=windows: export-windows.ini
+cmp stdout export-windows.json
+
+# A value the flavor cannot write fails naming its path and the option that
+# would allow it, and nothing is written: not to standard output, and no
+# -o file.
+! exec cue export --out ini nested.cue
+! stdout .
+cmp stderr nested.stderr
+! exec cue export -o bad.ini nested.cue
+! exists bad.ini
+cmp stderr nested.stderr
+-- nested.cue --
+name: "app"
+remote: origin: url: "https://example.com/project.git"
+-- nested.stderr --
+cannot write section at remote.origin: nested sections need a nesting option; set Config.QuotedSubsections or Config.DottedSections to true to allow it:
+    ./nested.cue:2:9
+-- export-git.cue --
+core: autoCRLF: true
+remote: origin: {
+	url: "https://example.com/project.git"
+	fetch: ["+refs/heads/*:refs/remotes/origin/*", "+refs/tags/*:refs/tags/*"]
+}
+user: signature: "first line\nsecond line"
+-- export-git.ini --
+[core]
+autoCRLF = true
+
+[remote "origin"]
+url = https://example.com/project.git
+fetch = +refs/heads/*:refs/remotes/origin/*
+fetch = +refs/tags/*:refs/tags/*
+
+[user]
+signature = first line\nsecond line
+-- export-git.json --
+{
+    "core": {
+        "autocrlf": "true"
+    },
+    "remote": {
+        "origin": {
+            "url": "https://example.com/project.git",
+            "fetch": [
+                "+refs/heads/*:refs/remotes/origin/*",
+                "+refs/tags/*:refs/tags/*"
+            ]
+        }
+    },
+    "user": {
+        "signature": "first line\nsecond line"
+    }
+}
+-- export-python.cue --
+metadata: Name: "mypkg"
+options: install_requires: "\nrequests\nclick"
+-- export-python.ini --
+[metadata]
+Name = mypkg
+
+[options]
+install_requires =
+	requests
+	click
+-- export-python.json --
+{
+    "metadata": {
+        "name": "mypkg"
+    },
+    "options": {
+        "install_requires": "\nrequests\nclick"
+    }
+}
+-- export-systemd.cue --
+Service: {
+	Environment: ["A=1", "B=2"]
+	ExecStart: "/bin/true"
+}
+-- export-systemd.ini --
+[Service]
+Environment = A=1
+Environment = B=2
+ExecStart = /bin/true
+-- export-systemd.json --
+{
+    "Service": {
+        "Environment": [
+            "A=1",
+            "B=2"
+        ],
+        "ExecStart": "/bin/true"
+    }
+}
+-- export-windows.cue --
+Settings: {
+	WindowTitle: "  My Application  "
+	InstallDir:  "C:\\Program Files\\MyApp"
+}
+-- export-windows.ini --
+[Settings]
+WindowTitle = "  My Application  "
+InstallDir = C:\Program Files\MyApp
+-- export-windows.json --
+{
+    "Settings": {
+        "WindowTitle": "  My Application  ",
+        "InstallDir": "C:\\Program Files\\MyApp"
+    }
+}
+-- grafana.cue --
+app_mode:      "production"
+instance_name: "grafana.example.com"
+server: {
+	protocol:  "https"
+	http_port: 3000
+	domain:    "example.com"
+}
+database: {
+	type:          "postgres"
+	host:          "db:5432"
+	ssl_mode:      "require"
+	max_open_conn: 10
+}
+-- grafana.ini --
+app_mode = production
+instance_name = grafana.example.com
+
+[server]
+protocol = https
+http_port = 3000
+domain = example.com
+
+[database]
+type = postgres
+host = db:5432
+ssl_mode = require
+max_open_conn = 10
+-- grafana.json --
+{
+    "app_mode": "production",
+    "instance_name": "grafana.example.com",
+    "server": {
+        "protocol": "https",
+        "http_port": "3000",
+        "domain": "example.com"
+    },
+    "database": {
+        "type": "postgres",
+        "host": "db:5432",
+        "ssl_mode": "require",
+        "max_open_conn": "10"
+    }
+}
 -- svc.ini --
 [Service]
 ExecStart=/bin/echo one ; /bin/echo two

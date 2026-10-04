@@ -145,6 +145,8 @@ outer:
 		*decls = a
 	}
 
+	// Insert a copy, as spec may belong to another file.
+	spec = ast.Clone(spec)
 	if orig != nil {
 		CopyComments(spec, orig)
 	}

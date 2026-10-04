@@ -194,19 +194,6 @@ out7: td()
 	td:   (func(a: int) -> int: a) & (func(a: int = 2, ...) -> int)
 	out7: 2
 }
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -40,7 +40,7 @@
-       Specs: []*ast.ImportSpec{
-         @ref003{
-           Path: *ast.BasicLit{
--            ValuePos: token.Pos("in.cue:3:8", blank)
-+            ValuePos: token.Pos("in.cue:3:8")
-             Kind: token.Token("STRING")
-             Value: "\"strings\""
-           }
 -- out/definition-v3-noshare --
 import "strings"
 
@@ -239,19 +226,6 @@ out6: dflt(1)
 D:    func(a: int = 2, ...) -> int
 td:   D & (func(a: int) -> int: a)
 out7: td()
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -40,7 +40,7 @@
-       Specs: []*ast.ImportSpec{
-         @ref003{
-           Path: *ast.BasicLit{
--            ValuePos: token.Pos("in.cue:3:8", blank)
-+            ValuePos: token.Pos("in.cue:3:8")
-             Kind: token.Token("STRING")
-             Value: "\"strings\""
-           }
 -- out/doc-v3 --
 []
 [a]
@@ -313,16 +287,3 @@ out6: dflt(1)
 D:    func(a: int = 2, ...) -> int
 td:   D & (func(a: int) -> int: a)
 out7: td()
-export modified its input:
-diff before after
---- before
-+++ after
-@@ -40,7 +40,7 @@
-       Specs: []*ast.ImportSpec{
-         @ref003{
-           Path: *ast.BasicLit{
--            ValuePos: token.Pos("in.cue:3:8", blank)
-+            ValuePos: token.Pos("in.cue:3:8")
-             Kind: token.Token("STRING")
-             Value: "\"strings\""
-           }

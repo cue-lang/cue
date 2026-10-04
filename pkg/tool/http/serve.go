@@ -252,13 +252,13 @@ func (c *serveCmd) Run(ctx *task.Context) (res any, err error) {
 
 	for k, vs := range headers {
 		for _, v := range vs {
-			c.w.Header().Set(k, v)
+			c.w.Header().Add(k, v)
 		}
 	}
 
 	for k, vs := range trailers {
 		for _, v := range vs {
-			c.w.Header().Set(k, v)
+			c.w.Header().Add(k, v)
 		}
 	}
 

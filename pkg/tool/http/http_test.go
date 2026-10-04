@@ -370,7 +370,6 @@ func TestServeResponse(t *testing.T) {
 		wantCode: 204,
 	}, {
 		// Every value of a multi-valued header is sent.
-		// TODO: only the last value is sent.
 		name: "multi-valued header",
 		expr: `{response: {
 			header: "Set-Cookie": ["a=1", "b=2"]
@@ -380,7 +379,7 @@ func TestServeResponse(t *testing.T) {
 		wantCode: 200,
 		wantBody: "ok",
 		wantHeader: http.Header{
-			"Set-Cookie": {"b=2"},
+			"Set-Cookie": {"a=1", "b=2"},
 			"X-Single":   {"one"},
 		},
 	}, {

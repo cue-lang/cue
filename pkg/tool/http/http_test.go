@@ -351,6 +351,8 @@ func TestServeResponse(t *testing.T) {
 		wantErr  string
 		wantCode int
 		wantBody string
+		// wantHeader holds the values expected for some response header keys.
+		wantHeader http.Header
 	}{{
 		name:     "default status code",
 		expr:     `{response: body: "ok"}`,
@@ -366,6 +368,21 @@ func TestServeResponse(t *testing.T) {
 		name:     "no body",
 		expr:     `{response: statusCode: 204}`,
 		wantCode: 204,
+	}, {
+		// Every value of a multi-valued header is sent.
+		// TODO: only the last value is sent.
+		name: "multi-valued header",
+		expr: `{response: {
+			header: "Set-Cookie": ["a=1", "b=2"]
+			header: "X-Single":   "one"
+			body: "ok"
+		}}`,
+		wantCode: 200,
+		wantBody: "ok",
+		wantHeader: http.Header{
+			"Set-Cookie": {"b=2"},
+			"X-Single":   {"one"},
+		},
 	}, {
 		// net/http panics when given a status code outside [100, 999].
 		name:    "status code too low",
@@ -411,6 +428,11 @@ func TestServeResponse(t *testing.T) {
 			}
 			if got := w.Body.String(); got != tc.wantBody {
 				t.Errorf("got body %q, want %q", got, tc.wantBody)
+			}
+			for key, want := range tc.wantHeader {
+				if got := w.Header().Values(key); !slices.Equal(got, want) {
+					t.Errorf("header %s: got %q, want %q", key, got, want)
+				}
 			}
 		})
 	}

@@ -29,6 +29,11 @@ stdout 'false'
 curl -L http://${SERVE_ADDR}/echo -H 'Content-Type: text/plain' -d 'hello from sibling task'
 stdout 'hello from sibling task'
 
+# A urlencoded form body is available both raw and parsed
+# TODO: the raw body is empty, as parsing the form consumes it.
+curl http://${SERVE_ADDR}/form?q=query -H 'Content-Type: application/x-www-form-urlencoded' -d 'a=1&b=two'
+stdout '^body="" a=1 b=two q=query$'
+
 # Custom status code examples
 
 # Valid request returns 201 Created
@@ -305,6 +310,14 @@ command: echo: exec.Run & {
 	cmd:    ["cat"]
 	stdin:  command.serve."/echo".request.body
 	stdout: string // Explicitly capture stdout
+}
+
+// This endpoint demonstrates a form body, which is parsed into request.form
+// alongside the query parameters, and is also available via request.body.
+command: serve: "/form": http.Serve & {
+	routing: method: "POST"
+	request: _
+	response: body: "body=\(json.Marshal("\(request.body)")) a=\(request.form.a[0]) b=\(request.form.b[0]) q=\(request.form.q[0])"
 }
 
 // ServeJSON is a helper for endpoints that serve JSON.

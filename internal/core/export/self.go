@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -292,9 +293,18 @@ func (p *pivotter) makeParentPath(d *depData) {
 	if f.IsInt() {
 		str = fmt.Sprintf("Index%d", f.Index())
 	} else {
-		str = f.IdentString(p.x.ctx)
-		str = strings.TrimLeft(str, "_#")
-		str = strings.ToUpper(str)
+		// A string label need not be a valid identifier.
+		str = strings.Map(func(r rune) rune {
+			if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '$' {
+				return r
+			}
+			return '_'
+		}, f.IdentString(p.x.ctx))
+		str = strings.ToUpper(strings.TrimLeft(str, "_"))
+		if !ast.IsValidIdent(str) {
+			// Empty, or starting with a digit.
+			str = "X" + str
+		}
 	}
 	uf, _ := p.x.uniqueFeature(str)
 

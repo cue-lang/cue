@@ -1,0 +1,50 @@
+#path: root
+-- x.cue --
+// Let names derived from string labels must be valid identifiers.
+root: {
+	a: X
+	b: X
+	c: y["1x"]
+	d: y["1x"]
+	e: y["-"]
+	f: y["-"]
+}
+
+"foo-bar"~X: s: int
+
+y: {
+	"1x": s: int
+	"-": s:  int
+}
+-- out/self-v3/default --
+a: FOO_BAR
+b: FOO_BAR
+c: X1X
+d: X1X
+e: X
+f: X
+
+//cue:path: "foo-bar"
+let FOO_BAR = {s: int}
+
+//cue:path: y."1x"
+let X1X = {s: int}
+
+//cue:path: y."-"
+let X = {s: int}
+-- out/self-v3-noshare/default --
+a: FOO_BAR
+b: FOO_BAR
+c: X1X
+d: X1X
+e: X
+f: X
+
+//cue:path: "foo-bar"
+let FOO_BAR = {s: int}
+
+//cue:path: y."1x"
+let X1X = {s: int}
+
+//cue:path: y."-"
+let X = {s: int}

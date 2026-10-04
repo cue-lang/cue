@@ -209,6 +209,10 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 }
 
 func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
+	// A Bottomer holding no Bottom is handled like any other error below.
+	if b, ok := errVal.(Bottomer); ok && b.Bottom() != nil {
+		errVal = b.Bottom()
+	}
 	switch err := errVal.(type) {
 	case nil:
 	case ValidationError:
@@ -225,9 +229,6 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 				ret = b
 			}
 		}
-	case Bottomer:
-		ret = err.Bottom()
-
 	case errors.Error:
 		// Convert lists of errors to a combined Bottom error.
 		if list := errors.Errors(err); len(list) != 0 && list[0] != errVal {

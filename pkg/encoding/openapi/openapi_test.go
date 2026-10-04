@@ -53,6 +53,8 @@ result: openapi.MarshalSchema(config, schema)
 		v := cuecontext.New().CompileString(src, cue.Filename("in.cue"))
 		return errors.Details(v.LookupPath(cue.ParsePath("result")).Err(), nil)
 	}()
-	// The call panics instead of reporting the openapi error.
-	qt.Assert(t, qt.Equals(got, "panic: runtime error: invalid memory address or nil pointer dereference"))
+	qt.Assert(t, qt.Equals(got, `result: error in call to encoding/openapi.MarshalSchema: could not retrieve int: schema.#S.s: non-concrete value int:
+    in.cue:10:9
+    in.cue:7:4
+`))
 }

@@ -22,6 +22,7 @@ package time
 
 import (
 	"fmt"
+	"math/big"
 	"time"
 
 	"cuelang.org/go/internal/pkg"
@@ -211,6 +212,10 @@ func Parse(layout, value string) (string, error) {
 	return t.UTC().Format(time.RFC3339Nano), nil
 }
 
+// TODO: nsec is an int64, so a [ToUnixNano] result for a year before 1678 or
+// after 2262 cannot be passed back as nsec alone, and must first be split into
+// seconds and nanoseconds. Consider accepting an arbitrary-precision nsec.
+
 // Unix returns the Time, in UTC, corresponding to the given Unix time,
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
 // It is valid to pass nsec outside the range [0, 999999999].
@@ -233,12 +238,14 @@ func ToUnix(value string) (int64, error) {
 
 // ToUnixNano returns the given time value as a Unix time in nanoseconds
 // elapsed since January 1, 1970 UTC.
-func ToUnixNano(value string) (int64, error) {
+func ToUnixNano(value string) (*big.Int, error) {
 	t, err := time.Parse(time.RFC3339Nano, value)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return t.UnixNano(), nil
+	// [time.Time.UnixNano] overflows for years outside 1678 to 2262.
+	n := new(big.Int).Mul(big.NewInt(t.Unix()), big.NewInt(1e9))
+	return n.Add(n, big.NewInt(int64(t.Nanosecond()))), nil
 }
 
 // Parts holds individual parts of a parsed time stamp.

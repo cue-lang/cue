@@ -1991,12 +1991,17 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 		}
 
 		// Add field tag to convert back to Go.
-		typeName := f.Type().String()
-		// simplify type names:
-		for path, info := range e.pkgNames {
-			typeName = strings.ReplaceAll(typeName, path+".", info.name+".")
-		}
-		typeName = strings.ReplaceAll(typeName, e.pkg.Types.Path()+".", "")
+		// Packages are named as the Go file imports them, or by their full path
+		// if it does not import them.
+		typeName := types.TypeString(f.Type(), func(pkg *types.Package) string {
+			if pkg == e.pkg.Types {
+				return ""
+			}
+			if info, ok := e.pkgNames[pkg.Path()]; ok {
+				return info.name
+			}
+			return pkg.Path()
+		})
 
 		cueStr := strings.ReplaceAll(cueType, "_#", "")
 		cueStr = strings.ReplaceAll(cueStr, "#", "")

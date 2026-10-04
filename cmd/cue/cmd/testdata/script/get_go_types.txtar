@@ -713,7 +713,6 @@ package uptime
 
 // The path of this package ends with the path of a package it imports
 // under a different name.
-// TODO: the Go type for Previous is wrongly rewritten with that name.
 
 import gotime "time"
 
@@ -732,7 +731,7 @@ import gotime "time"
 
 #Uptime: {
 	Since:     gotime.Time
-	Previous?: null | #Uptime @go(,*mod.test/upgotime.Uptime)
+	Previous?: null | #Uptime @go(,*Uptime)
 }
 -- pkg_generics/pkg_generics.go --
 package pkg_generics

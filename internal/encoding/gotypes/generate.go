@@ -433,11 +433,7 @@ func (g *generator) emitType(val cue.Value, optionalStg optionalStrategy) (typeF
 				// TODO: why does removing [cue.Definitions] above break the tests?
 				continue
 			}
-			cueName := sel.String()
-			if sel.IsString() {
-				cueName = sel.Unquoted()
-			}
-			cueName = strings.TrimRight(cueName, "?!")
+			cueName := selectorName(sel)
 			emitDocs(g.def.printf, cueName, val.Doc())
 
 			// We want the Go name from just this selector, even when it's not a definition.
@@ -640,6 +636,15 @@ func cutLast(s, sep string) (before, after string, found bool) {
 	return "", s, false
 }
 
+// selectorName returns the name of sel without the trailing "?" or "!"
+// for optional or required, which is part of the name in a string label.
+func selectorName(sel cue.Selector) string {
+	if sel.IsString() {
+		return sel.Unquoted()
+	}
+	return strings.TrimRight(sel.String(), "?!")
+}
+
 // goNameFromPath transforms a CUE path, such as "#foo.bar?",
 // into a suitable name for a generated Go type, such as "Foo_bar".
 // When defsOnly is true, all path elements must be definitions, or "" is returned.
@@ -654,19 +659,13 @@ func goNameFromPath(path cue.Path, defsOnly bool) string {
 			// To aid in readability, nested names are separated with underscores.
 			sb.WriteString("_")
 		}
-		str := sel.String()
-		if sel.IsString() {
-			str = sel.Unquoted()
-		}
-		str, hidden := strings.CutPrefix(str, "_")
+		str, hidden := strings.CutPrefix(selectorName(sel), "_")
 		if hidden {
 			// If any part of the path is hidden, we are not exporting.
 			export = false
 		}
-		// Leading or trailing characters for definitions, optional, or required
-		// are not included as part of Go names.
+		// Leading characters for definitions are not included as part of Go names.
 		str = strings.TrimPrefix(str, "#")
-		str = strings.TrimRight(str, "?!")
 		// CUE allows quoted field names such as "foo-bar" or "123baz",
 		// none of which are valid Go identifiers per https://go.dev/ref/spec#Identifiers.
 		// Replace forbidden characters with underscores, like `go test` does with subtest names,

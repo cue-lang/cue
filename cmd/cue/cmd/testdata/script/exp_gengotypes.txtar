@@ -245,11 +245,11 @@ fail.both."44_GraphNode".types.GraphNode.edges: conflicting values {} and [...#g
 fail.both.notList: conflicting values [1,2,3] and {doc?:_} (mismatched types list and struct):
     ./cuetest/all.cue:5:24
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:129:8
+    ./root/root.cue:128:8
 fail.both.notString: conflicting values "not_a_struct" and {doc?:_} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:129:8
+    ./root/root.cue:128:8
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -584,7 +584,6 @@ _#overridenNeverGenerate: string
 	"123LeadingNumber"?: string
 
 	// Trailing constraint characters which are part of the field name.
-	// TODO: the generated json names drop them.
 	"endsInQuestion?"?: string
 	"endsInBang!"?:     string
 
@@ -969,10 +968,9 @@ type Root struct {
 	F123LeadingNumber string `json:"123LeadingNumber,omitzero"`
 
 	// Trailing constraint characters which are part of the field name.
-	// TODO: the generated json names drop them.
-	EndsInQuestion string `json:"endsInQuestion,omitzero"`
+	EndsInQuestion_ string `json:"endsInQuestion?,omitzero"`
 
-	EndsInBang string `json:"endsInBang,omitzero"`
+	EndsInBang_ string `json:"endsInBang!,omitzero"`
 
 	// We could represent some of these with a future encoding/json/v2,
 	// but not with encoding/json today, and they seem unlikely to happen in practice.

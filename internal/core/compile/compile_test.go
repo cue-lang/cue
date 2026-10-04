@@ -114,6 +114,37 @@ f: func(a: int) -> int: a
 	}
 }
 
+// TestUnreferencedLetOrder checks that the errors for unreferenced let
+// clauses in one scope are reported in source order.
+func TestUnreferencedLetOrder(t *testing.T) {
+	file, err := parser.ParseFile("test.cue", `
+let E = 1
+let D = 2
+let C = 3
+let B = 4
+let A = 5
+`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := runtime.New()
+	_, err = compile.Files(nil, r, "", file)
+	var got []string
+	for _, e := range errors.Errors(err) {
+		got = append(got, e.Error())
+	}
+	want := []string{
+		"test.cue:2:1: unreferenced alias or let clause E",
+		"test.cue:3:1: unreferenced alias or let clause D",
+		"test.cue:4:1: unreferenced alias or let clause C",
+		"test.cue:5:1: unreferenced alias or let clause B",
+		"test.cue:6:1: unreferenced alias or let clause A",
+	}
+	if !slices.Equal(got, want) {
+		t.Fatalf("got errors:\n%s\nwant:\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+	}
+}
+
 func syncTestdataInputsCUE(t *testing.T) {
 	t.Helper()
 

@@ -15,6 +15,8 @@
 package compile
 
 import (
+	"cmp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -275,10 +277,21 @@ func (c *compiler) pushScope(n labeler, upCount int32, id ast.Node) *frame {
 func (c *compiler) popScope() {
 	k := len(c.stack) - 1
 	f := c.stack[k]
-	for k, v := range f.aliases {
+	var unused []string
+	for name, v := range f.aliases {
 		if !v.used {
-			c.errf(v.source, "unreferenced alias or let clause %s", k)
+			unused = append(unused, name)
 		}
+	}
+	// Report the errors in source order rather than map order.
+	slices.SortFunc(unused, func(a, b string) int {
+		return cmp.Or(
+			f.aliases[a].source.Pos().Compare(f.aliases[b].source.Pos()),
+			cmp.Compare(a, b),
+		)
+	})
+	for _, name := range unused {
+		c.errf(f.aliases[name].source, "unreferenced alias or let clause %s", name)
 	}
 	c.stack = c.stack[:k]
 }

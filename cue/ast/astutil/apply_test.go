@@ -389,6 +389,35 @@ b: // label
 			return true
 		},
 	}, {
+		name: "append to comments twice",
+		// Three comment groups leave spare capacity in the comments of a,
+		// which two appends to the result of ast.Comments both write into.
+		in: `
+// doc
+a: // label
+	1 // trailing
+`,
+		out: `
+// doc
+a: // label
+	1 // trailing
+
+// doc
+//
+// c
+b: // label
+	2 // trailing
+`,
+		before: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.Field); ok && x.Label.(*ast.Ident).Name == "a" {
+				b := &ast.Field{Label: ast.NewIdent("b"), Value: ast.NewLit(token.INT, "2")}
+				ast.SetComments(b, append(ast.Comments(x), internal.NewComment(true, "b")))
+				_ = append(ast.Comments(x), internal.NewComment(true, "c"))
+				c.InsertAfter(b)
+			}
+			return true
+		},
+	}, {
 		name: "after stops",
 		in: `
 a: 1

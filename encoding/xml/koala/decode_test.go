@@ -453,6 +453,22 @@ func TestElementDecoding(t *testing.T) {
 }
 `,
 		},
+		{
+			// Text split by a comment or a CDATA section is one text content.
+			// TODO: the text before the comment or CDATA section is dropped.
+			name: "Text around comments and CDATA",
+			inputXML: `<root>
+	<a>foo<!-- c -->bar</a>
+	<b>foo<![CDATA[<bar>]]>baz</b>
+	<c><!-- c -->foo</c>
+</root>`,
+			wantCUE: `root: {
+	a: $$: "bar"
+	b: $$: "baz"
+	c: $$: "foo"
+}
+`,
+		},
 	}
 
 	for _, test := range tests {
@@ -503,6 +519,15 @@ func TestErrors(t *testing.T) {
 		<body>Don't forget me this weekend!</body>
 	</note>`,
 			expectedError: `text content within an XML element that has sub-elements is not supported`,
+		},
+		{
+			// Text followed by a comment and then a sub-element is mixed content.
+			// TODO: the text is dropped instead.
+			name: "Text before a comment followed by subelements",
+			inputXML: `<note>foo<!-- c -->
+		<from>Jani</from>
+	</note>`,
+			expectedError: `(?s)unexpected result .*`,
 		},
 		{
 			name: "Nested mixed content",

@@ -462,6 +462,8 @@ func (r *publishRegistryResolverShim) ResolveToRegistry(mpath, vers string) (mod
 		// Let modregistry check whether the tag already holds the same module.
 		funcs.GetTag_ = regLoc.Registry.GetTag
 		funcs.GetBlob_ = regLoc.Registry.GetBlob
+		// Let modregistry skip pushing blobs which are already present.
+		funcs.ResolveBlob_ = regLoc.Registry.ResolveBlob
 	}
 	return modregistry.RegistryLocation{
 		Registry: &publishRegistryShim{

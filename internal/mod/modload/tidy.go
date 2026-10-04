@@ -159,7 +159,14 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *T
 		rsPub, err = ld.tidyOnce(ctx, rootPkgPaths, origRs)
 		if err != nil {
 			if localMF != nil && hasReplace(localMF) {
-				return nil, fmt.Errorf("cannot resolve published module.cue: %v\n\t(if a replaced module is not available in a registry, use 'cue mod tidy --local-only')", err)
+				const hint = "\n\t(if a replaced module is not available in a registry, use 'cue mod tidy --local-only')"
+				// Keep a not-tidy error recognizable as such. Checking does
+				// not fetch a missing dependency, so the hint may apply too.
+				if notTidy, ok := errors.AsType[*ErrModuleNotTidy](err); ok {
+					notTidy.Reason += hint
+					return nil, notTidy
+				}
+				return nil, fmt.Errorf("cannot resolve published module.cue: %v%s", err, hint)
 			}
 			return nil, err
 		}

@@ -7,7 +7,6 @@
 #     the replacement) in module.cue.
 
 # module.cue does not list the dependency yet, so the module is not tidy.
-# TODO: this is reported as a failure to resolve, suggesting --local-only.
 ! exec cue mod tidy --check
 cmp stderr want-check-stderr
 
@@ -23,7 +22,7 @@ cmp stdout want-stdout
 exec cue mod tidy --check
 
 -- want-check-stderr --
-cannot resolve published module.cue: module is not tidy: missing dependency providing package example.com/dep@v0:lib
+module is not tidy, use 'cue mod tidy': missing dependency providing package example.com/dep@v0:lib
 	(if a replaced module is not available in a registry, use 'cue mod tidy --local-only')
 -- want-module --
 module: "main.org@v0"

@@ -554,7 +554,7 @@ func TestFloat(t *testing.T) {
 		float:   "-4.940656458412465441765687928682213723650e-324",
 		mant:    "-4940656458412465441765687928682213723650",
 		exp:     -363,
-		float64: 0, // TODO: should be negative zero
+		float64: math.Copysign(0, -1),
 		prec:    -1,
 		fmt:     'g',
 		kind:    cue.FloatKind,

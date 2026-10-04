@@ -561,7 +561,7 @@ func (v Value) Float64() (float64, error) {
 	}
 	if n.X.Negative {
 		if n.X.Cmp(smallestNegFloat64) == 1 {
-			return -0, ErrAbove
+			return math.Copysign(0, -1), ErrAbove
 		}
 		if n.X.Cmp(maxNegFloat64) == -1 {
 			return math.Inf(-1), ErrBelow

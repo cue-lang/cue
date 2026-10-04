@@ -53,7 +53,7 @@ func (c *Cache) readDiskCache(mv module.Version, suffix string) (file string, da
 
 // writeDiskCache is the generic "write to a cache file" implementation.
 // The file must have been returned by a previous call to readDiskCache.
-func (c *Cache) writeDiskCache(ctx context.Context, file string, data []byte) error {
+func (c *Cache) writeDiskCache(ctx context.Context, file string, data []byte) (err error) {
 	if file == "" {
 		return nil
 	}
@@ -78,16 +78,14 @@ func (c *Cache) writeDiskCache(ctx context.Context, file string, data []byte) er
 		}
 	}()
 
-	if _, err := f.Write(data); err != nil {
+	// Assign to the named result, which the deferred cleanup inspects.
+	if _, err = f.Write(data); err != nil {
 		return err
 	}
-	if err := f.Close(); err != nil {
+	if err = f.Close(); err != nil {
 		return err
 	}
-	if err := robustio.Rename(f.Name(), file); err != nil {
-		return err
-	}
-	return nil
+	return robustio.Rename(f.Name(), file)
 }
 
 // downloadDir returns the directory for storing.

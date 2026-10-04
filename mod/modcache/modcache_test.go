@@ -257,8 +257,7 @@ func TestWriteDiskCacheFailure(t *testing.T) {
 	qt.Assert(t, qt.Not(qt.IsNil(err)))
 	entries, err := os.ReadDir(entryDir)
 	qt.Assert(t, qt.IsNil(err))
-	// TODO: the temporary file is left next to the directory.
-	qt.Assert(t, qt.HasLen(entries, 2))
+	qt.Assert(t, qt.HasLen(entries, 1))
 }
 
 func fsSub(fsys fs.FS, sub string) fs.FS {

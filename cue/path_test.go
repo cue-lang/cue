@@ -488,19 +488,10 @@ func TestSelector(t *testing.T) {
 			}
 			// None of the selectors are patterns obtained from an iterator,
 			// so they all report the sentinel error, which is a usable value.
-			got := func() (s string) {
-				defer func() {
-					if e := recover(); e != nil {
-						s = fmt.Sprintf("panic: %v", e)
-					}
-				}()
-				v := sel.Pattern()
-				return fmt.Sprintf("%v: %v", v == cue.ErrNotAPattern, v.Err())
-			}()
-			// Wrong: the sentinel has no runtime, so most of its methods panic.
-			want := "panic: runtime error: invalid memory address or nil pointer dereference"
-			if got != want {
-				t.Errorf("unexpected sel.Pattern result; got %q want %q", got, want)
+			if v := sel.Pattern(); v != cue.ErrNotAPattern {
+				t.Errorf("unexpected sel.Pattern result; got %v", v)
+			} else if got, want := v.Err().Error(), "selector is not a pattern"; got != want {
+				t.Errorf("unexpected sel.Pattern error; got %q want %q", got, want)
 			}
 		})
 	}

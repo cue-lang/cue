@@ -602,7 +602,7 @@ type parent struct {
 func (v Value) parent() Value {
 	switch {
 	case v.v == nil:
-		return Value{}
+		return Value{idx: v.idx}
 	case v.parent_ != nil:
 		return Value{v.idx, v.parent_.v, v.parent_.p}
 	default:

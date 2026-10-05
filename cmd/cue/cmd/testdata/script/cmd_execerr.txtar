@@ -14,6 +14,11 @@ stdout '^"fail\\n"$'
 exec cue cmd stderrSucceed
 stdout '^"succeed\\n"$'
 
+# The captured stderr of a command which must succeed is part of the error.
+# TODO: it is currently lost.
+! exec cue cmd stderrFatal
+cmp stderr stderrFatal-stderr.golden
+
 -- cue.mod/module.cue --
 module: "example.com"
 language: version: "v0.9.0"
@@ -30,6 +35,8 @@ success=false
 hasStderr=true
 -- withSpaces-stderr.golden --
 command.withSpaces: task failed: command ["false" "with an ignored argument"] failed: exit status 1
+-- stderrFatal-stderr.golden --
+command.stderrFatal: task failed: command ["sh" "-c" "echo '  indented' >&2; echo fail >&2; exit 1"] failed: exit status 1
 -- foo_tool.cue --
 package foo
 
@@ -84,6 +91,11 @@ command: stderrSucceed: {
 		stderr: string
 	}
 	print: cli.Print & {text: strconv.Quote(run.stderr)}
+}
+
+command: stderrFatal: exec.Run & {
+	cmd: ["sh", "-c", "echo '  indented' >&2; echo fail >&2; exit 1"]
+	stderr: string
 }
 
 command: withSpaces: exec.Run & {

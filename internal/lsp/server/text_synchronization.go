@@ -6,7 +6,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"cuelang.org/go/internal/golangorgx/gopls/file"
@@ -143,12 +142,6 @@ func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modifi
 	if s.Options().VerboseWorkDoneProgress {
 		work := s.progress.Start(ctx, DiagnosticWorkTitle(cause), "Calculating file diagnostics...", nil, nil)
 		defer work.EndAsync(ctx, "Done.")
-	}
-
-	if s.state == serverShutDown {
-		// This state check does not prevent races below, and exists
-		// only to produce a better error message.
-		return errors.New("server is shut down")
 	}
 
 	err := s.workspace.DidModifyFiles(ctx, modifications)

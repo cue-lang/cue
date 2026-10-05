@@ -49,7 +49,7 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 
 	handlers, enqueue := protocol.HandlersWithEnqueue(
 		handshaker(svrID, s.daemon,
-			protocol.ServerHandler(svr, jsonrpc2.MethodNotFound)))
+			svr.Handler(jsonrpc2.MethodNotFound)))
 	svr.SetEnqueuer(enqueue.Enqueue)
 
 	// Clients may or may not send a shutdown message. Make sure the

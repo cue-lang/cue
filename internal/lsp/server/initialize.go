@@ -151,6 +151,7 @@ func (s *server) Initialized(ctx context.Context, params *protocol.InitializedPa
 		return fmt.Errorf("%w: initialized called while server in %v state", jsonrpc2.ErrInvalidRequest, s.state)
 	}
 	s.state = serverInitialized
+	s.workspace = cache.NewWorkspace(s.cache, s.client, s.debugLog, s.enqueue, s.options.DiagnosticsDelay)
 
 	err := s.maybeShowPendingMessages(ctx)
 	if err != nil {
@@ -165,12 +166,12 @@ func (s *server) Initialized(ctx context.Context, params *protocol.InitializedPa
 				Method: "workspace/didChangeConfiguration",
 			}},
 		})
+		// The registration is optional: without it, the server is not
+		// told when the configuration changes.
 		if err != nil {
-			return err
+			s.debugLog(err.Error())
 		}
 	}
-
-	s.workspace = cache.NewWorkspace(s.cache, s.client, s.debugLog, s.enqueue, s.options.DiagnosticsDelay)
 
 	err = s.maybeUseWorkspaceFolders(ctx)
 	// Initialized is a notification, so if there's an error, we show

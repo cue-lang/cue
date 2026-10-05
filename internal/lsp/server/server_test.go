@@ -134,26 +134,22 @@ func TestLifecycle(t *testing.T) {
 	}{{
 		name: "RequestBeforeInitialize",
 		steps: []step{
-			// Wrong: the server is not initialized, which is error -32002.
-			{hover, "panic"},
+			{hover, "error -32002"},
 			{initialize, "ok"},
 		},
 	}, {
 		name: "NotificationBeforeInitialize",
 		steps: []step{
-			// Wrong: these notifications should be dropped.
-			{progressCancel, "panic"},
-			{didOpen, "panic"},
+			{progressCancel, "ok"},
+			{didOpen, "ok"},
 			{initialize, "ok"},
 		},
 	}, {
 		name: "RequestBeforeInitialized",
 		steps: []step{
 			{initialize, "ok"},
-			// Wrong: the server is not initialized, which is error -32002
-			// for the request, and the notification should be dropped.
-			{hover, "panic"},
-			{didOpen, "panic"},
+			{hover, "error -32002"},
+			{didOpen, "ok"},
 			{initialized, "ok"},
 			{hover, "ok"},
 		},
@@ -171,11 +167,9 @@ func TestLifecycle(t *testing.T) {
 		client: testClient{failRegisterCapability: true},
 		steps: []step{
 			{initialize, "ok"},
-			// Wrong: the registration is optional, so the server should
-			// be initialized and usable without it.
-			{initialized, "error: registerCapability rejected"},
-			{didOpen, "panic"},
-			{hover, "panic"},
+			{initialized, "ok"},
+			{didOpen, "ok"},
+			{hover, "ok"},
 		},
 	}, {
 		name: "RequestAfterShutdown",
@@ -183,10 +177,8 @@ func TestLifecycle(t *testing.T) {
 			{initialize, "ok"},
 			{initialized, "ok"},
 			{shutdown, "ok"},
-			// Wrong: the server is shut down, which is error -32600 for
-			// the request, and the notification should be dropped.
-			{hover, "ok"},
-			{didOpen, "error: server is shut down"},
+			{hover, "error -32600"},
+			{didOpen, "ok"},
 			{shutdown, "ok"},
 		},
 	}}
@@ -200,7 +192,7 @@ func TestLifecycle(t *testing.T) {
 			s := New(c, &test.client, settings.DefaultOptions())
 			// Nothing waits for the work which the server defers.
 			s.SetEnqueuer(func(func()) {})
-			handler := protocol.ServerHandler(s, jsonrpc2.MethodNotFound)
+			handler := s.Handler(jsonrpc2.MethodNotFound)
 
 			for i, step := range test.steps {
 				if got := send(handler, step.req); got != step.want {

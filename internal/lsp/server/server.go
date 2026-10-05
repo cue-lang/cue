@@ -16,6 +16,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
+	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/lsp/cache"
 )
 
@@ -27,6 +28,11 @@ type ServerWithID interface {
 	// ID returns a unique, human-readable string for this server, for
 	// the purpose of log messages and debugging.
 	ID() string
+
+	// Handler returns the handler for messages from the client. It
+	// dispatches each message to the matching server method, passing
+	// unknown methods on to fallback.
+	Handler(fallback jsonrpc2.Handler) jsonrpc2.Handler
 
 	// SetEnqueuer allows the server's enqueue function to be set. This
 	// exists only because of awkwardness around the creation of the
@@ -114,6 +120,40 @@ func (s *server) ID() string { return s.id }
 
 func (s *server) SetEnqueuer(enqueue func(func())) {
 	s.enqueue = enqueue
+}
+
+// errServerNotInitialized is the error for requests which arrive
+// before the server is initialized.
+var errServerNotInitialized = jsonrpc2.NewError(int64(protocol.ServerNotInitialized), "server not initialized")
+
+// Handler implements [ServerWithID]. It is the one place which
+// enforces the server's lifecycle: other than the lifecycle messages
+// themselves, requests get an error unless the server is initialized
+// and not shut down, and notifications are dropped.
+//
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#lifeCycleMessages
+func (s *server) Handler(fallback jsonrpc2.Handler) jsonrpc2.Handler {
+	dispatch := protocol.ServerHandler(s, fallback)
+	return func(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
+		switch req.Method() {
+		case "initialize", "initialized", "shutdown", "exit":
+			// These check the server's state themselves.
+			return dispatch(ctx, reply, req)
+		}
+		var err error
+		switch s.state {
+		case serverInitialized:
+			return dispatch(ctx, reply, req)
+		case serverShutDown:
+			err = fmt.Errorf("%w: %q received after shutdown", jsonrpc2.ErrInvalidRequest, req.Method())
+		default:
+			err = fmt.Errorf("%w: %q received while server in %v state", errServerNotInitialized, req.Method(), s.state)
+		}
+		if _, ok := req.(*jsonrpc2.Call); !ok {
+			err = nil // a notification has no response
+		}
+		return reply(ctx, nil, err)
+	}
 }
 
 // Shutdown implements the 'shutdown' LSP handler. It releases resources

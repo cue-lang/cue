@@ -115,7 +115,23 @@ type Environment struct {
 
 // Equal reports whether e and f refer to the same node.
 func (e *Environment) Equal(ctx *OpContext, f *Environment) bool {
-	return e.Up == f.Up && e.DerefVertex(ctx) == f.DerefVertex(ctx)
+	return e.key(ctx) == f.key(ctx)
+}
+
+// envKey is the identity of an environment as [Environment.Equal] compares
+// it: its parent environment and the vertex it resolves to. Environment
+// pointers are shared across disjunct branches (overlay cloning copies task
+// environments), where they resolve to a different clone of their vertex in
+// each, so the pointer alone does not identify an environment; see
+// [Environment.DerefVertex]. The per-environment caches of function calls
+// are keyed by it.
+type envKey struct {
+	up     *Environment
+	vertex *Vertex
+}
+
+func (e *Environment) key(ctx *OpContext) envKey {
+	return envKey{up: e.Up, vertex: e.DerefVertex(ctx)}
 }
 
 type cacheKey struct {

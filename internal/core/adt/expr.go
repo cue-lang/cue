@@ -1715,7 +1715,7 @@ func (x *Function) scheduleDefaultCheck(c *OpContext, env *Environment) *Bottom 
 // itself an error, or that conflicts with the constraint, is reported at the
 // default's position.
 func (x *Function) checkDefaults(c *OpContext, env *Environment) *Bottom {
-	key := funcAnchorKey{fn: x, env: env}
+	key := funcAnchorKey{fn: x, envKey: env.key(c)}
 	if c.checkingDefaults[key] || c.funcDefaultsChecked[key] {
 		return nil
 	}
@@ -2104,46 +2104,46 @@ func (n *nodeContext) scheduleComposedBody(t FuncType, fn *Function, types []Fun
 // funcAnchorKey identifies the cached anchor vertex for a function literal
 // captured in a particular closure environment.
 type funcAnchorKey struct {
-	fn  *Function
-	env *Environment
+	fn *Function
+	envKey
 }
 
-// funcCallRefKey identifies the cached call reference for a function call
-// site captured in a particular closure environment.
+// funcCallRefKey identifies the cached call references for a function call
+// site reaching a particular anchor vertex, which stands for a function
+// literal in a closure environment (see [OpContext.funcAnchor]).
 type funcCallRefKey struct {
-	call *CallExpr
-	env  *Environment
+	call   *CallExpr
+	anchor *Vertex
 }
 
 // funcCallResultKey identifies the memo bucket of a call site: the AST call
-// node and the caller environment in which the call's arguments resolve.
-// Environment pointers may be shared across disjunct branches (overlay
-// cloning copies task environments), so the same key may be dispatched to
-// different callees; the entries within a bucket are therefore additionally
-// matched on callee identity. See [OpContext.funcCallResults].
+// node and the caller environment in which the call's arguments resolve. The
+// callee is a value resolved at each call rather than part of the key; the
+// entries within a bucket record the callee that produced them and are
+// matched on that identity. See [OpContext.funcCallResults].
 type funcCallResultKey struct {
 	call *CallExpr
-	env  *Environment
+	envKey
 }
 
 // A funcCallResult memoizes the finalized result of a completed function
 // call together with the identity of the callee that produced it. The callee
-// is matched the way [equalTerminal] compares function values: the function
-// literal, its closure environment, its recorded type constraints, and the
-// arguments bound by partial application.
+// is matched much as [equalTerminal] compares function values: the function
+// literal, its closure environment (as an [envKey]), its recorded type
+// constraints, and the arguments bound by partial application.
 type funcCallResult struct {
 	fn     *Function
-	env    *Environment
+	env    envKey
 	types  []FuncType
 	args   []funcArg
 	result *Vertex
 }
 
 // matches reports whether a memoized result was produced by the given
-// callee.
-func (r *funcCallResult) matches(c *OpContext, x *FuncValue) bool {
+// callee, whose closure environment is identified by env.
+func (r *funcCallResult) matches(x *FuncValue, env envKey) bool {
 	return r.fn == x.Fn &&
-		(r.env == x.Env || r.env.Equal(c, x.Env)) &&
+		r.env == env &&
 		equalFuncTypes(r.types, x.Types) &&
 		equalFuncArgs(r.args, x.args)
 }
@@ -2234,9 +2234,11 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 	// re-entered through recursion — which the structural cycle detector must
 	// observe on the shared anchor — has no entry and is never
 	// short-circuited here.
-	resultKey := funcCallResultKey{call: call, env: callEnv}
-	for i := range c.funcCallResults[resultKey] {
-		if r := &c.funcCallResults[resultKey][i]; r.matches(c, x) {
+	resultKey := funcCallResultKey{call: call, envKey: callEnv.key(c)}
+	calleeEnv := x.Env.key(c)
+	results := c.funcCallResults[resultKey]
+	for i := range results {
+		if r := &results[i]; r.matches(x, calleeEnv) {
 			return r.result
 		}
 	}
@@ -2349,7 +2351,7 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 	// call site re-entered through recursion is flagged as a structural
 	// cycle. This mirrors `(f & {n: (f & {...}).out}).out`, where the two `f`
 	// references are distinct AST nodes.
-	anchor := c.funcAnchor(x.Fn, x.Env)
+	anchor := c.funcAnchor(x.Fn, calleeEnv)
 	ref := c.funcCallRef(call, anchor, x)
 
 	arcs := make([]*Vertex, 0, len(x.Fn.Params))
@@ -2478,29 +2480,29 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			c.funcCallResults = map[funcCallResultKey][]funcCallResult{}
 		}
 		c.funcCallResults[resultKey] = append(c.funcCallResults[resultKey],
-			funcCallResult{fn: x.Fn, env: x.Env, types: x.Types, args: x.args, result: result})
+			funcCallResult{fn: x.Fn, env: calleeEnv, types: x.Types, args: x.args, result: result})
 	}
 
 	return result
 }
 
 // funcAnchor returns the stable anchor vertex for the given function literal
-// captured in environment env. The anchor deliberately carries no conjuncts —
-// the payload of a call travels on the FuncCallRef and is dispatched by
-// scheduleFuncCall — but creating it once per (literal, closure) and reusing
-// it across (recursive) calls lets the structural cycle detector observe
-// re-entry, because every call reaches the same arc.
-func (c *OpContext) funcAnchor(fn *Function, env *Environment) *Vertex {
+// captured in the environment identified by env. The anchor deliberately
+// carries no conjuncts — the payload of a call travels on the FuncCallRef and
+// is dispatched by scheduleFuncCall — but creating it once per (literal,
+// closure) and reusing it across (recursive) calls lets the structural cycle
+// detector observe re-entry, because every call reaches the same arc.
+func (c *OpContext) funcAnchor(fn *Function, env envKey) *Vertex {
 	if c.funcAnchors == nil {
 		c.funcAnchors = map[funcAnchorKey]*Vertex{}
 	}
-	key := funcAnchorKey{fn: fn, env: env}
+	key := funcAnchorKey{fn: fn, envKey: env}
 	if v := c.funcAnchors[key]; v != nil {
 		return v
 	}
 
 	v := &Vertex{
-		Parent:    env.DerefVertex(c),
+		Parent:    env.vertex,
 		ArcType:   ArcMember,
 		IsDynamic: true,
 	}
@@ -2509,7 +2511,7 @@ func (c *OpContext) funcAnchor(fn *Function, env *Environment) *Vertex {
 }
 
 // funcCallRef returns the stable reference used to reach the anchor vertex
-// from a particular call site. It is cached per (call site, closure) so that
+// from a particular call site. It is cached per (call site, anchor) so that
 // re-entry through the SAME call site (recursion) is detected as a cycle
 // (r.Ref == x), while distinct call sites reaching the same anchor (nesting,
 // e.g. twice(twice(2))) are treated as ordinary structure (r.Ref != x).
@@ -2518,16 +2520,16 @@ func (c *OpContext) funcAnchor(fn *Function, env *Environment) *Vertex {
 // dispatched together with the call payload by scheduleFuncCall. A call site
 // may in principle reach FuncValues that share a literal and closure but
 // were tightened by different types, so refs are matched on those
-// constraints as well; refs for the same (call site, closure) are kept in a
+// constraints as well; refs for the same (call site, anchor) are kept in a
 // small list. Recursion through a consistently tightened value reuses one
 // ref, preserving cycle detection.
 func (c *OpContext) funcCallRef(call *CallExpr, anchor *Vertex, x *FuncValue) *FuncCallRef {
 	if c.funcCallRefs == nil {
 		c.funcCallRefs = map[funcCallRefKey][]*FuncCallRef{}
 	}
-	key := funcCallRefKey{call: call, env: x.Env}
+	key := funcCallRefKey{call: call, anchor: anchor}
 	for _, r := range c.funcCallRefs[key] {
-		if r.target == anchor && slices.Equal(r.types, x.Types) {
+		if slices.Equal(r.types, x.Types) {
 			return r
 		}
 	}

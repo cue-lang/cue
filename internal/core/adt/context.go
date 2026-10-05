@@ -177,13 +177,14 @@ type OpContext struct {
 	ci CloseInfo
 
 	// funcAnchors caches the stable anchor vertex for each native CUE
-	// function literal, keyed by literal and closure environment. Reusing it
-	// across (recursive) calls lets the regular structural cycle detector
-	// observe recursion. See [OpContext.funcAnchor].
+	// function literal, keyed by literal and closure environment (see
+	// [envKey] for what identifies an environment). Reusing it across
+	// (recursive) calls lets the regular structural cycle detector observe
+	// recursion. See [OpContext.funcAnchor].
 	funcAnchors map[funcAnchorKey]*Vertex
 
 	// funcCallRefs caches the stable reference to an anchor vertex for each
-	// call site, keyed by call expression and closure environment. A
+	// call site, keyed by call expression and anchor vertex. A
 	// per-call-site reference keeps the (vertex, source-reference) distinction
 	// the structural cycle detector relies on, so that recursion (same call
 	// site) is a cycle while nesting (distinct call sites) is not. Each entry
@@ -204,12 +205,8 @@ type OpContext struct {
 	// Only finalized, error-free results are stored: a call still in progress
 	// (in particular one re-entered through recursion, which the structural
 	// cycle detector must observe on the shared anchor) has no entry, so
-	// memoization never short-circuits cycle detection. The map is keyed by
-	// the AST call node and the *Environment pointer; overlay cloning shares
-	// environment pointers across disjunct branches (see
-	// [overlayContext.cloneTask]), so the entries under a key additionally
-	// record the callee that produced them and are matched on that identity.
-	// See [FuncValue.call] and [funcCallResult].
+	// memoization never short-circuits cycle detection. See
+	// [funcCallResultKey], [funcCallResult] and [FuncValue.call].
 	funcCallResults map[funcCallResultKey][]funcCallResult
 
 	// anonParamLabels caches the labels of the synthetic activation arcs

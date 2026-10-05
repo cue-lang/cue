@@ -674,7 +674,7 @@ disjunctEnv: {
 		x: {v: int, r: inc(v)}
 		x: {v: 1, k: "x"} | {v: 2, k: "y"}
 		x: k: "y"
-		out: x.r @test(eq, 2, incorrect) @test(eq:todo, 3)
+		out: x.r @test(eq, 3)
 	}
 
 	// The same holds for a call in a nested struct, and across the product
@@ -684,7 +684,7 @@ disjunctEnv: {
 		x: {v: 1, k: "x"} | {v: 2, k: "y"}
 		x: {w: 10, j: "x"} | {w: 20, j: "y"}
 		x: {k: "y", j: "y"}
-		out: x.s.r @test(eq, 13, incorrect) @test(eq:todo, 23)
+		out: x.s.r @test(eq, 23)
 	}
 
 	// The default of a function literal is checked in each branch, as it
@@ -693,7 +693,7 @@ disjunctEnv: {
 		x: {k: int, fn: func(a: <5 = k) -> int: 7}
 		x: {k: 1, j: 1} | {k: 9, j: 2}
 		x: j: 2
-		out: x.j @test(eq, 2, incorrect) @test(err:todo, code=eval,
+		out: x.j @test(err, code=eval,
 			suberr=(contains="conflicting values"),
 			suberr=(contains="invalid default for parameter a"))
 	}
@@ -821,19 +821,35 @@ structural cycle:
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
     ./in.cue:606:7
     ./in.cue:659:17
+[eval] disjunctEnv.defaults.x: 2 errors in empty disjunction:
+disjunctEnv.defaults.x.j: conflicting values 1 and 2:
+    ./in.cue:693:16
+    ./in.cue:694:9
+invalid default for parameter a: invalid value 9 (out of bound <5):
+    ./in.cue:692:32
+    ./in.cue:692:27
+    ./in.cue:693:25
+[eval] disjunctEnv.defaults.x: 2 errors in empty disjunction:
+disjunctEnv.defaults.x.j: conflicting values 1 and 2:
+    ./in.cue:693:16
+    ./in.cue:694:9
+invalid default for parameter a: invalid value 9 (out of bound <5):
+    ./in.cue:692:32
+    ./in.cue:692:27
+    ./in.cue:693:25
 -- out/eval/stats --
-Leaks:  132
-Freed:  1471
-Reused: 1439
+Leaks:  126
+Freed:  1482
+Reused: 1444
 Allocs: 164
 Retain: 0
 
-Unifications: 1279
-Conjuncts:    3669
+Unifications: 1284
+Conjuncts:    3685
 Disjuncts:    232
 Notifications: 8
 
-NumCloseIDs: 634
+NumCloseIDs: 636
 
-ConjunctInfos:       1449
+ConjunctInfos:       1455
 MaxConjunctInfos:    8

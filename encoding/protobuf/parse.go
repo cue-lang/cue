@@ -639,7 +639,13 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 // will be prefixed with the name of its parent and an underscore.
 func (p *protoConverter) enum(x *proto.Enum) {
 
-	if len(x.Elements) == 0 {
+	numEnums := 0
+	for _, v := range x.Elements {
+		if _, ok := v.(*proto.EnumField); ok {
+			numEnums++
+		}
+	}
+	if numEnums == 0 {
 		p.failf(x.Position, "empty enum")
 	}
 
@@ -673,13 +679,6 @@ func (p *protoConverter) enum(x *proto.Enum) {
 		panic(name.Name)
 	}
 	p.addDecl(enum)
-
-	numEnums := 0
-	for _, v := range x.Elements {
-		if _, ok := v.(*proto.EnumField); ok {
-			numEnums++
-		}
-	}
 
 	lastSingle := false
 

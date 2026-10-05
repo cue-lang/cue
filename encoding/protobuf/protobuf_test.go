@@ -179,18 +179,17 @@ enum E {}
 		wantErr: `protobuf: x.proto:2:1: empty enum`,
 	}, {
 		// An enum without any values is empty, whatever else it holds.
-		// The three cases below wrongly panic.
 		name: "enum with only an option",
 		src: `syntax = "proto3";
 enum E { option allow_alias = true; }
 `,
-		wantErr: `panic: runtime error: invalid memory address or nil pointer dereference`,
+		wantErr: `protobuf: x.proto:2:1: empty enum`,
 	}, {
 		name: "enum with only a reserved range",
 		src: `syntax = "proto3";
 enum E { reserved 1; }
 `,
-		wantErr: `panic: runtime error: invalid memory address or nil pointer dereference`,
+		wantErr: `protobuf: x.proto:2:1: empty enum`,
 	}, {
 		name: "enum with only a comment",
 		src: `syntax = "proto3";
@@ -198,19 +197,11 @@ enum E {
 	// No values.
 }
 `,
-		wantErr: `panic: runtime error: invalid memory address or nil pointer dereference`,
+		wantErr: `protobuf: x.proto:2:1: empty enum`,
 	}}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := func() (err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				_, err = Extract("x.proto", test.src, nil)
-				return err
-			}()
+			_, err := Extract("x.proto", test.src, nil)
 			qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
 			qt.Assert(t, qt.DeepEquals(errors.Path(err), test.wantPath))
 		})

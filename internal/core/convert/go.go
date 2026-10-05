@@ -339,15 +339,13 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// It is a bit tricky, as we would also need to pass down the result of rounding.
 		// So more likely an API must return explicitly whether a value is a float or an int after all.
 		// The code to autodetect whether something is an integer can be done with this:
-		kind := adt.FloatKind
-		var d apd.Decimal
-		res, _ := internal.BaseContext.RoundToIntegralExact(&d, v)
-		if !res.Inexact() {
-			kind = adt.IntKind
-			v = &d
+		n := &adt.Num{Src: src, K: adt.IntKind}
+		res, _ := internal.BaseContext.RoundToIntegralExact(&n.X, v)
+		if res.Inexact() {
+			n.K = adt.FloatKind
+			// Copying the struct could share its coefficient with v.
+			n.X.Set(v)
 		}
-		n := &adt.Num{Src: src, K: kind}
-		n.X = *v
 		return n
 	}
 

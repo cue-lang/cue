@@ -175,9 +175,7 @@ func TestConvert(t *testing.T) {
 		&n36, "(int){ -36 }",
 	}, {
 		// A coefficient too large for apd to store inline.
-		// The result wrongly ends in 790.5 rather than 789.5,
-		// as it shares the coefficient modified after the conversion.
-		d42, "(float){ 1234567890123456789012345678901234567890123456790.5 }",
+		d42, "(float){ 1234567890123456789012345678901234567890123456789.5 }",
 	}, {
 		r38, "(int){ 38 }",
 	}, {

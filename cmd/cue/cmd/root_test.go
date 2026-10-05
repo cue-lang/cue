@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -105,6 +106,58 @@ func TestCommand(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		err = c.Execute()
 		qt.Assert(t, qt.IsNil(err))
+	})
+
+	// Verify that searching for the module root reports an ancestor directory
+	// which cannot be accessed as an error.
+	t.Run("FixUnreadableAncestor", func(t *testing.T) {
+		// os.Getwd is only known to succeed under such a directory on Linux.
+		if runtime.GOOS != "linux" {
+			t.Skip("requires Linux")
+		}
+		top := filepath.Join(t.TempDir(), "top")
+		dir := filepath.Join(top, "parent", "child")
+		qt.Assert(t, qt.IsNil(os.MkdirAll(dir, 0o777)))
+		t.Chdir(dir)
+		qt.Assert(t, qt.IsNil(os.Chmod(top, 0)))
+		t.Cleanup(func() { os.Chmod(top, 0o777) })
+		if _, err := os.Stat(dir); err == nil {
+			t.Skip("file permissions do not deny access, such as for root")
+		}
+
+		c, err = cmd.New([]string{"fix"})
+		qt.Assert(t, qt.IsNil(err))
+		c.SetOutput(io.Discard)
+		// The search dereferences a nil pointer rather than failing
+		// with a "permission denied" error.
+		qt.Assert(t, qt.PanicMatches(func() { err = c.Run(ctx) }, `.*nil pointer dereference`))
+	})
+
+	// Verify that searching for the module root outside of a module
+	// reports an error.
+	t.Run("FixOutsideModule", func(t *testing.T) {
+		dir := t.TempDir()
+		for d := dir; ; d = filepath.Dir(d) {
+			if _, err := os.Stat(filepath.Join(d, "cue.mod")); err == nil {
+				t.Skipf("%s is inside a module", dir)
+			}
+			if filepath.Dir(d) == d {
+				break
+			}
+		}
+		t.Chdir(dir)
+
+		c, err = cmd.New([]string{"fix"})
+		qt.Assert(t, qt.IsNil(err))
+		c.SetOutput(io.Discard)
+		errc := make(chan error, 1)
+		go func() { errc <- c.Run(ctx) }()
+		select {
+		case err := <-errc:
+			t.Fatalf("unexpected result: %v", err)
+		case <-time.After(100 * time.Millisecond):
+			// The search never terminates.
+		}
 	})
 }
 

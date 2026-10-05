@@ -162,6 +162,5 @@ func isCloseArg(c astutil.Cursor) bool {
 	if !ok || len(call.Args) != 1 || call.Args[0] != c.Node() {
 		return false
 	}
-	id, ok := call.Fun.(*ast.Ident)
-	return ok && id.Name == "close"
+	return isCloseCall(call)
 }

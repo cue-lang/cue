@@ -161,6 +161,14 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 		case *ast.LetClause, *ast.ListLit, *ast.Alias:
 			pushScope(closeInfo{wholeValue: true})
 
+		case *ast.CallExpr:
+			// An argument is a value of its own, like a list element.
+			// The argument of close() is not: an embedded call is hoisted
+			// to wrapper level along with the literal it closes.
+			if !isCloseCall(n) {
+				pushScope(closeInfo{wholeValue: true})
+			}
+
 		case *ast.Comprehension:
 			// Comprehensions are a scope boundary like conjunctions:
 			// embedFlags collected inside the comprehension value must
@@ -209,6 +217,11 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 
 		case *ast.LetClause, *ast.ListLit, *ast.Alias, *ast.Comprehension:
 			popScope(c)
+
+		case *ast.CallExpr:
+			if !isCloseCall(n) {
+				popScope(c)
+			}
 
 		case *ast.EmbedDecl:
 			info.suspendReclose--
@@ -323,6 +336,12 @@ func compReferringToStruct(s *ast.StructLit) *ast.Comprehension {
 		}
 	}
 	return nil
+}
+
+// isCloseCall reports whether call is a call to the close builtin.
+func isCloseCall(call *ast.CallExpr) bool {
+	id, ok := call.Fun.(*ast.Ident)
+	return ok && id.Name == "close"
 }
 
 // unparen returns expr with any enclosing parentheses removed.
@@ -718,7 +737,7 @@ func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, fl
 		return expr, false, collectEmbedFlags(x)
 
 	case *ast.CallExpr:
-		if id, ok := x.Fun.(*ast.Ident); ok && id.Name == "close" {
+		if isCloseCall(x) {
 			// Under the old semantics, embedding close(X) closed the
 			// enclosing struct while still allowing its literal
 			// fields; a strict embedding of close(X) would deny them.

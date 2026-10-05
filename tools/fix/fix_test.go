@@ -801,15 +801,13 @@ e1: {f(1, {#A, b: 1}), z: 1}
 e2: {f({#A, b: 1}, 1), z: 1}
 e3: f({#A, b: 1})
 `,
-			// Wrong: the embedded calls leave their literal open, and e2
-			// closes the struct which embeds the call instead.
 			out: `@experiment(explicitopen)
 
 package foo
 
 #A: a: int
-e1: {f(1, {#A..., b: 1}), z: 1}
-e2: __closeAll({f({#A..., b: 1}, 1), z: 1})
+e1: {f(1, __closeAll({#A..., b: 1})), z: 1}
+e2: {f(__closeAll({#A..., b: 1}), 1), z: 1}
 e3: f(__closeAll({#A..., b: 1}))
 `,
 		},

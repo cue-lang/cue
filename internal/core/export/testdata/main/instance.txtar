@@ -1,0 +1,124 @@
+# A struct literal may be exported more than once: where it is declared, and
+# where it is unified into another value. Each of these has its own scope.
+#
+# Wrong: in out/value-v3, lets.d1.o refers to the let clause L of lets.#D,
+# which is not in scope.
+
+-- in.cue --
+inp: string
+
+// A let clause is only declared where its struct literal is exported in full.
+lets: {
+	#D: {
+		k: string
+		let L = k + inp
+		o: L
+	}
+	d1: #D & {k: "1"}
+}
+-- out/doc-v3 --
+[]
+[inp]
+[lets]
+- A let clause is only declared where its struct literal is exported in full.
+
+[lets #D]
+[lets #D k]
+[lets #D L]
+[lets #D o]
+[lets d1]
+[lets d1 k]
+[lets d1 L]
+[lets d1 o]
+-- out/value-v3 --
+== Simplified
+{
+	inp: string
+
+	// A let clause is only declared where its struct literal is exported in full.
+	lets: d1: {
+		k: "1"
+		o: k + inp
+	}
+}
+== Raw
+{
+	inp: string
+
+	// A let clause is only declared where its struct literal is exported in full.
+	lets: {
+		#D: {
+			let L = k + inp
+			k: string
+			o: L
+		}
+		d1: {
+			k: "1"
+			o: L
+		}
+	}
+}
+== Final
+{
+	inp: string
+	lets: d1: {
+		k: "1"
+		o: _|_ // lets.d1.o: non-concrete value string in operand to +
+	}
+}
+== All
+{
+	inp: string
+
+	// A let clause is only declared where its struct literal is exported in full.
+	lets: {
+		#D: {
+			let L = k + inp
+			k: string
+			o: L
+		}
+		d1: {
+			k: "1"
+			o: L
+		}
+	}
+}
+== Eval
+{
+	inp: string
+	lets: {
+		#D: {
+			let L = k + inp
+			k: string
+			o: L
+		}
+		d1: {
+			k: "1"
+			o: L
+		}
+	}
+}
+-- out/definition-v3 --
+inp: string
+
+// A let clause is only declared where its struct literal is exported in full.
+lets: {
+	#D: {
+		let L = k + inp
+		k: string
+		o: L
+	}
+	d1: #D & {k: "1"}
+}
+-- out/definition-v3-noshare --
+inp: string
+
+// A let clause is only declared where its struct literal is exported in full.
+lets: {
+	#D: {
+		let L = k + inp
+		k: string
+		o: L
+	}
+	d1: #D & {k: "1"}
+}

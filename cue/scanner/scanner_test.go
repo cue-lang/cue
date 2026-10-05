@@ -870,10 +870,17 @@ var errorTests = []struct {
 	// {"123456789012345678890_i", IMAG, 21, "123456789012345678890_i", "illegal '_' in number"},
 	{"\"abc\x00def\"", token.STRING, 4, "\"abc\x00def\"", "illegal character NUL"},
 	{"\"abc\x80def\"", token.STRING, 4, "\"abc\x80def\"", "illegal UTF-8 encoding"},
-	{"\ufeff\ufeff", token.ILLEGAL, 3, "\ufeff\ufeff", "illegal byte order mark"}, // only first BOM is ignored
-	{"//\ufeff", token.COMMENT, 2, "//\ufeff", "illegal byte order mark"},         // only first BOM is ignored
-	// {"`a\ufeff`", IDENT, 2, "`a\ufeff`", "illegal byte order mark"},                                // only first BOM is ignored
-	{`"` + "abc\ufeffdef" + `"`, token.STRING, 4, `"` + "abc\ufeffdef" + `"`, "illegal byte order mark"}, // only first BOM is ignored
+	// A BOM is ignored at the start of the source and allowed inside
+	// strings and comments, but is illegal anywhere else.
+	{"\ufeff\ufeff", token.ILLEGAL, 3, "", "illegal byte order mark"},
+	{"a\ufeff", token.IDENT, 1, "a", "illegal byte order mark"},
+	{"@foo(\ufeff)", token.ATTRIBUTE, 5, "@foo(\ufeff)", "illegal byte order mark"},
+	{`"\(` + "\ufeff" + `)"`, token.INTERPOLATION, 3, `"\(`, "illegal byte order mark"},
+	// The cases below are wrongly rejected; see https://cuelang.org/issue/3399.
+	{"//\ufeff", token.COMMENT, 2, "//\ufeff", "illegal byte order mark"},
+	{`"` + "abc\ufeffdef" + `"`, token.STRING, 4, `"` + "abc\ufeffdef" + `"`, "illegal byte order mark"},
+	{"\"\"\"\n\ufeff\n\"\"\"", token.STRING, 4, "\"\"\"\n\ufeff\n\"\"\"", "illegal byte order mark"},
+	{`"a\(1)` + "\ufeff" + `b"`, token.INTERPOLATION, 6, `"a\(`, "illegal byte order mark"},
 }
 
 func TestScanErrors(t *testing.T) {

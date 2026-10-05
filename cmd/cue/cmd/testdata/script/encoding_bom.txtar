@@ -1,0 +1,9 @@
+# A byte order mark is valid JSON inside a string, and is ignored at the
+# start of a file. The file is generated with strconv-unquote so that
+# the otherwise invisible character is explicit.
+# This case is wrongly rejected; see https://cuelang.org/issue/3399.
+
+strconv-unquote '"﻿{\"a\": \"x﻿y\"}"'
+cp stdout x.json
+! exec cue export x.json
+stderr 'invalid JSON'

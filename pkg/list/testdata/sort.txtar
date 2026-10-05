@@ -28,7 +28,53 @@ t3: {
 	l2: l
 	l3: ls
 }
+// An error in the comparator must be an error in the result.
+// Wrong: IsSorted and a less which is not a bool give a result.
+lessErr: {
+	s:  list.Sort([{a: 2}, {b: 1}], {x: _, y: _, less: x.a < y.a})
+	ss: list.SortStable([{a: 2}, {b: 1}], {x: _, y: _, less: x.a < y.a})
+	is: list.IsSorted([{a: 2}, {b: 1}], {x: _, y: _, less: x.a < y.a})
+}
+lessString: {
+	s:  list.Sort([2, 1], {x: _, y: _, less: "foo"})
+	ss: list.SortStable([2, 1], {x: _, y: _, less: "foo"})
+	is: list.IsSorted([2, 1], {x: _, y: _, less: "foo"})
+	v:  [2, 1] & list.IsSorted({x: _, y: _, less: "foo"})
+}
+lessNonConcrete: {
+	s:  list.Sort([2, 1], {x: _, y: _, less: bool})
+	is: list.IsSorted([2, 1], {x: _, y: _, less: bool})
+}
+lessMissing: {
+	s:  list.Sort([2, 1], {x: _, y: _})
+	is: list.IsSorted([2, 1], {x: _, y: _})
+}
+// A less field which is not yet concrete must be an incomplete error,
+// so that the comparator may still be completed.
+// Wrong: the less field is treated as false.
+lessRef: {
+	#S: {
+		cond: bool
+		s:    list.Sort([2, 1], {x: _, y: _, less: cond})
+	}
+	v: #S & {cond: true}
+}
 -- out/list --
+Errors:
+lessErr.s: error in call to list.Sort: undefined field: a:
+    ./in.cue:32:6
+    ./in.cue:32:25
+    ./in.cue:32:35
+    ./in.cue:32:55
+lessErr.ss: error in call to list.SortStable: undefined field: a:
+    ./in.cue:33:6
+    ./in.cue:33:31
+    ./in.cue:33:41
+    ./in.cue:33:61
+lessMissing.s: error in call to list.Sort: field not found: less:
+    ./in.cue:47:6
+
+Result:
 t1: {
 	l:   ["c", "b", "a"]
 	ls:  ["a", "b", "c"]
@@ -49,4 +95,38 @@ t3: {
 	ils: true
 	l2:  ["c", "b", "a", "e"]
 	l3:  ["a", "b", "c", "e"]
+}
+// An error in the comparator must be an error in the result.
+// Wrong: IsSorted and a less which is not a bool give a result.
+lessErr: {
+	s:  _|_ // lessErr.s: error in call to list.Sort: less: undefined field: a
+	ss: _|_ // lessErr.ss: error in call to list.SortStable: less: undefined field: a
+	is: false
+}
+lessString: {
+	s:  [2, 1]
+	ss: [2, 1]
+	is: true
+	v:  [2, 1]
+}
+lessNonConcrete: {
+	s:  [2, 1]
+	is: true
+}
+lessMissing: {
+	s:  _|_ // lessMissing.s: error in call to list.Sort: field not found: less
+	is: true
+}
+// A less field which is not yet concrete must be an incomplete error,
+// so that the comparator may still be completed.
+// Wrong: the less field is treated as false.
+lessRef: {
+	#S: {
+		cond: bool
+		s:    [2, 1]
+	}
+	v: {
+		cond: true
+		s:    [1, 2]
+	}
 }

@@ -350,12 +350,12 @@ func applyList[N ast.NilableNode](v applyVisitor, parent Cursor, list []N) {
 		}
 		c.index = i
 		c.node = node
+		c.typ = &list[i]
+		applyCursor(v, c)
 		if c.modified {
 			parent.self().modified = true
 			c.modified = false
 		}
-		c.typ = &list[i]
-		applyCursor(v, c)
 		if ast.Node(node) != c.node {
 			v.Mapping(node, c.node)
 			list[i] = c.node.(N)

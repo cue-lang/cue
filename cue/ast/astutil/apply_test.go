@@ -574,11 +574,10 @@ b: [3, 2, 1]
 c: f(1, 3)
 d: f(3, 1)
 `,
-		// Wrong: a change to the last element is not reported.
 		out: `
-a: [1, 2, 4]
+a: [1, 2, 4] @modified()
 b: [4, 2, 1] @modified()
-c: f(1, 4)
+c: f(1, 4)   @modified()
 d: f(4, 1)   @modified()
 `,
 		after: func(c astutil.Cursor) bool {

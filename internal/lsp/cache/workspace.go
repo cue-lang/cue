@@ -131,8 +131,9 @@ func (w *Workspace) debugLogf(format string, args ...any) {
 // within this workspace. The name is for display purposes only and
 // does not have any semantics attached to it. This method is
 // idempotent: if the workspace already includes a workspace folder at
-// dir, then this method is a noop and returns nil.
-func (w *Workspace) EnsureFolder(dir protocol.DocumentURI, name string) (*WorkspaceFolder, error) {
+// dir, then this method is a noop and returns nil. A new folder starts
+// with the options opts.
+func (w *Workspace) EnsureFolder(dir protocol.DocumentURI, name string, opts *settings.Options) (*WorkspaceFolder, error) {
 	inode1, err := os.Stat(dir.FilePath())
 	if err != nil {
 		return nil, err
@@ -150,7 +151,7 @@ func (w *Workspace) EnsureFolder(dir protocol.DocumentURI, name string) (*Worksp
 		}
 	}
 
-	folder, err := NewWorkspaceFolder(dir, name)
+	folder, err := NewWorkspaceFolder(dir, name, opts)
 	if err != nil {
 		return nil, err
 	}

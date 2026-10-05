@@ -26,13 +26,14 @@ func (s *server) AddFolders(ctx context.Context, folders map[protocol.WorkspaceF
 	folderErrs := make(map[protocol.DocumentURI]error)
 
 	for folder, uri := range folders {
-		wf, err := s.workspace.EnsureFolder(uri, folder.Name)
+		wf, err := s.workspace.EnsureFolder(uri, folder.Name, s.Options())
 		if err != nil {
 			folderErrs[uri] = err
 			continue
 		}
 		options, err := s.fetchFolderOptions(ctx, uri)
 		if err != nil {
+			// The folder stays usable, with the options it already has.
 			folderErrs[uri] = err
 			continue
 		}

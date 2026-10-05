@@ -177,9 +177,7 @@ func TestLifecycle(t *testing.T) {
 		steps: []step{
 			{initialize, "ok"},
 			{initialized, "ok"},
-			// Wrong: the workspace folder should be usable without the
-			// client's configuration.
-			{didOpen, "panic"},
+			{didOpen, "ok"},
 			{hover, "ok"},
 		},
 	}, {

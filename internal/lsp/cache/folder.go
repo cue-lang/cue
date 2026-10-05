@@ -33,7 +33,8 @@ type WorkspaceFolder struct {
 
 // NewWorkspaceFolder creates a new workspace folder. The name is
 // entirely decorative and does not have any semantics attached to it.
-func NewWorkspaceFolder(dir protocol.DocumentURI, name string) (*WorkspaceFolder, error) {
+// The folder uses opts until [WorkspaceFolder.UpdateOptions] is called.
+func NewWorkspaceFolder(dir protocol.DocumentURI, name string, opts *settings.Options) (*WorkspaceFolder, error) {
 	dirPath := dir.FilePath()
 	err := checkPathValid(dirPath)
 	if err != nil {
@@ -41,8 +42,9 @@ func NewWorkspaceFolder(dir protocol.DocumentURI, name string) (*WorkspaceFolder
 	}
 
 	return &WorkspaceFolder{
-		dir:  dir,
-		name: name,
+		dir:     dir,
+		name:    name,
+		options: opts,
 	}, nil
 }
 

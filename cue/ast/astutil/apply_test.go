@@ -538,6 +538,36 @@ b: a
 			}
 			return true
 		},
+	}, {
+		// A replacement which wraps the old node takes over its comments,
+		// rather than both nodes holding them.
+		name: "replace with wrapper",
+		in: `
+x: [
+	// doc
+	y, // line
+	// trailing
+]
+`,
+		// Wrong: the comments are printed twice.
+		out: `
+x: [
+	// doc
+	f(
+		// doc
+		y, // line
+		// trailing
+	), // line
+	// trailing
+]
+`,
+		after: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.Ident); ok && x.Name == "y" {
+				ast.SetRelPos(x, token.NoSpace)
+				c.Replace(ast.NewCall(ast.NewIdent("f"), x))
+			}
+			return true
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

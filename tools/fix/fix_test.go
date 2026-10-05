@@ -689,6 +689,41 @@ w: __closeAll({
 		},
 
 		{
+			// The wrapper takes the place of the literal, and so do the
+			// comments attached to it.
+			name:    "comments on a wrapped struct literal (fixExplicitOpen)",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+
+W: [ // open list
+	// doc elem
+	{#A, e: 1}, // line elem
+	// trailing list
+]
+`,
+			// Wrong: the comments are printed twice.
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+
+W: [ // open list
+	// doc elem
+	__closeAll( // open list
+		// doc elem
+		{#A..., e: 1}, // line elem
+		// trailing list
+	), // line elem
+	// trailing list
+]
+`,
+		},
+
+		{
 			// Blank aliases bind nothing that can be referenced; they must be
 			// dropped rather than converted to blank postfix aliases, which
 			// Sanitize rejects, or to an invalid "let _ = self".

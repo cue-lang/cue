@@ -733,16 +733,16 @@ W: [
 	{#A, e: 2}, // two
 ]
 `,
-			// Wrong: the elements are joined, and a comment swallows the
-			// closing bracket.
 			out: `@experiment(explicitopen)
 
 package foo
 
 #A: a: int
 
-W: [__closeAll({#A..., e: 1}), // one
-__closeAll({#A..., e: 2})  // two]
+W: [
+	__closeAll({#A..., e: 1}), // one
+	__closeAll({#A..., e: 2}), // two
+]
 `,
 		},
 
@@ -759,7 +759,6 @@ x: [
 	// trailing
 ]
 `,
-			// Wrong: a comment swallows the start of the second element.
 			out: `@experiment(openlists)
 
 package foo
@@ -767,11 +766,8 @@ package foo
 y: #[1, 2, 3]
 x: #[
 	// doc
-	close(
-		y[0:1],
-	), // one close(
-		y[1:2],
-	), // two
+	close(y[0:1]), // one
+	close(y[1:2]), // two
 	// trailing
 ]
 `,

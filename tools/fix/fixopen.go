@@ -267,22 +267,28 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 					}
 				}
 
-				ast.SetRelPos(n, token.NoSpace)
 				if comp := compReferringToStruct(n); comp != nil {
 					ast.AddComment(comp, todoComment(
 						"a wrapper builtin evaluates its argument on its own, so a comprehension guard that depends on a field unified into the struct from elsewhere stays incomplete."))
 				}
+				// The wrapper takes the place of the literal being replaced,
+				// which n is the sole embedding of when its braces were
+				// dropped above.
+				pos := c.Node().Pos()
 				var wrapper ast.Expr = n
 				switch {
 				case flags.def && !flags.forceReclose:
-					wrapper = ast.NewCall(ast.NewIdent("__closeAll"), n)
+					wrapper = wrapCall("__closeAll", n)
 				case flags.other || flags.forceReclose:
-					wrapper = ast.NewCall(ast.NewIdent("__reclose"), n)
+					wrapper = wrapCall("__reclose", n)
 					if flags.close {
-						wrapper = ast.NewCall(ast.NewIdent("close"), wrapper)
+						wrapper = wrapCall("close", wrapper)
 					}
 				case flags.close:
-					wrapper = ast.NewCall(ast.NewIdent("close"), n)
+					wrapper = wrapCall("close", n)
+				}
+				if call, ok := wrapper.(*ast.CallExpr); ok {
+					ast.SetPos(call, pos)
 				}
 				c.Replace(wrapper)
 				c.ClearEnclosingModified()

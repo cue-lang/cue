@@ -76,17 +76,29 @@ func rewriteOpenLists(f *ast.File, returnsList func(*ast.CallExpr) bool) bool {
 			if isCloseArg(c) || isStringLit(n.X) {
 				break
 			}
-			c.Replace(ast.NewCall(ast.NewIdent("close"), n))
+			c.Replace(wrapCall("close", n))
 			changed = true
 		case *ast.CallExpr:
 			if !isCloseArg(c) && returnsList != nil && returnsList(n) {
-				c.Replace(ast.NewCall(ast.NewIdent("close"), n))
+				c.Replace(wrapCall("close", n))
 				changed = true
 			}
 		}
 		return true
 	})
 	return changed
+}
+
+// wrapCall returns a call to the builtin name with x as its only argument,
+// to take the place of x: the call spans the positions x spanned, so that
+// the formatter lays it out as it did x.
+func wrapCall(name string, x ast.Expr) *ast.CallExpr {
+	pos := x.Pos()
+	ast.SetRelPos(x, token.NoSpace)
+	call := ast.NewCall(ast.NewIdent(name), x)
+	ast.SetPos(call, pos)
+	call.Rparen = x.End()
+	return call
 }
 
 // hasEllipsis reports whether a list literal ends in an ellipsis, which

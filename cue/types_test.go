@@ -4736,12 +4736,11 @@ func TestExpr(t *testing.T) {
 		want:  `[:](.(〈〉 "a") 2 5)`,
 	}, {
 		// An omitted bound is the zero Value.
-		// Wrong: these panic, as the missing bound is treated as an expression.
 		input: "v: a[2:], a: [1, 2, 3, 4, 5]",
-		want:  `panic: invalid Node type <nil>`,
+		want:  `[:](.(〈〉 "a") 2 <nil>)`,
 	}, {
 		input: "v: a[:5], a: [1, 2, 3, 4, 5]",
-		want:  `panic: invalid Node type <nil>`,
+		want:  `[:](.(〈〉 "a") <nil> 5)`,
 	}, {
 		input: "v: len([])",
 		want:  "()(len [])",
@@ -4828,14 +4827,7 @@ func TestExpr(t *testing.T) {
 				path = "v"
 			}
 			v := getValue(m, tc.input).LookupPath(cue.ParsePath(path))
-			got := func() (s string) {
-				defer func() {
-					if e := recover(); e != nil {
-						s = fmt.Sprintf("panic: %v", e)
-					}
-				}()
-				return exprStr(v)
-			}()
+			got := exprStr(v)
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}

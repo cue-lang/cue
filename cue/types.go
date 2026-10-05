@@ -2361,6 +2361,9 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 // For selector and index expressions it returns the subject and then the index.
 // For selectors, the index is the string value of the identifier.
 //
+// For slice expressions it returns the subject, the low bound, and the high
+// bound, in that order. An omitted bound is the zero Value.
+//
 // For interpolations it returns a sequence of values to be concatenated, some
 // of which will be literal strings and some unevaluated expressions.
 //
@@ -2509,9 +2512,13 @@ process:
 		a = append(a, remakeValue(v, env, x.Index))
 		op = IndexOp
 	case *adt.SliceExpr:
-		a = append(a, remakeValue(v, env, x.X))
-		a = append(a, remakeValue(v, env, x.Lo))
-		a = append(a, remakeValue(v, env, x.Hi))
+		a = append(a, remakeValue(v, env, x.X), Value{}, Value{})
+		if x.Lo != nil {
+			a[1] = remakeValue(v, env, x.Lo)
+		}
+		if x.Hi != nil {
+			a[2] = remakeValue(v, env, x.Hi)
+		}
 		op = SliceOp
 	case *adt.CallExpr:
 		// Interpret "and" and "or" builtin semantically.

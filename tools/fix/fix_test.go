@@ -813,6 +813,55 @@ e3: f(__closeAll({#A..., b: 1}))
 		},
 
 		{
+			// The argument of a hoisted close() call keeps its comments,
+			// beside those of the call it takes the place of.
+			name:    "comments on the argument of a hoisted close (fixExplicitOpen)",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+Y: {
+	close(
+		// doc on struct
+		{
+			#A
+		})
+	z: 1
+}
+V: {
+	// doc on close
+	close(
+		// doc on struct
+		{
+			#A
+		}) // line on close
+	z: 1
+}
+`,
+			// Wrong: the comments on the struct literals are dropped.
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+Y: __closeAll({
+	{
+		#A...
+	}
+	z: 1
+})
+V: __closeAll({
+	// doc on close
+	{
+		#A...
+	} // line on close
+	z: 1
+})
+`,
+		},
+
+		{
 			// The wrapper starts on the line the literal started on, so
 			// that a line comment does not swallow the next element.
 			name:    "wrapped list elements keep their lines (fixExplicitOpen)",

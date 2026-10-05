@@ -56,5 +56,6 @@ Run: {
 
 	// mustSucceed indicates whether a command must succeed, in which case success==false results in a fatal error.
 	// This option is enabled by default, but may be disabled to control what is done when a command execution fails.
+	// The fatal error includes any captured stderr.
 	mustSucceed: bool | *true
 }

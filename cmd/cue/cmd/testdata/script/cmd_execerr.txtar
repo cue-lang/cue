@@ -15,7 +15,6 @@ exec cue cmd stderrSucceed
 stdout '^"succeed\\n"$'
 
 # The captured stderr of a command which must succeed is part of the error.
-# TODO: it is currently lost.
 ! exec cue cmd stderrFatal
 cmp stderr stderrFatal-stderr.golden
 
@@ -37,6 +36,8 @@ hasStderr=true
 command.withSpaces: task failed: command ["false" "with an ignored argument"] failed: exit status 1
 -- stderrFatal-stderr.golden --
 command.stderrFatal: task failed: command ["sh" "-c" "echo '  indented' >&2; echo fail >&2; exit 1"] failed: exit status 1
+    indented
+  fail
 -- foo_tool.cue --
 package foo
 

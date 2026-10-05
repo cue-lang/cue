@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"unicode"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -89,6 +90,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	err = cmd.Run()
+	isExit := errors.As(err, new(*exec.ExitError))
 
 	update := map[string]interface{}{}
 	if captureOut {
@@ -97,7 +99,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	if captureErr {
 		// An error other than a non-zero exit status, such as a missing
 		// program, is reported via stderr too.
-		if exit := (*exec.ExitError)(nil); err != nil && !errors.As(err, &exit) {
+		if err != nil && !isExit {
 			stderr.WriteString(err.Error())
 		}
 		update["stderr"] = output(stderrVal, stderr.Bytes())
@@ -108,6 +110,12 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		return update, nil
 	}
 
+	// The captured stderr is otherwise lost, hiding why the command failed.
+	// Indent its lines to set them apart from the surrounding error output.
+	if msg := bytes.TrimRightFunc(stderr.Bytes(), unicode.IsSpace); isExit && len(msg) > 0 {
+		msg = bytes.ReplaceAll(msg, []byte("\n"), []byte("\n  "))
+		err = fmt.Errorf("%v\n  %s", err, msg)
+	}
 	return nil, fmt.Errorf("command %q failed: %v", doc, err)
 }
 

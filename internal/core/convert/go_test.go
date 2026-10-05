@@ -120,6 +120,8 @@ func TestConvert(t *testing.T) {
 	r39 := big.NewRat(39, 2)
 	r40 := big.NewRat(-4000, 100)
 	r41 := big.NewRat(100, 1)
+	d42, _, err := apd.NewFromString("1234567890123456789012345678901234567890123456789.5")
+	qt.Assert(t, qt.IsNil(err))
 	testCases := []struct {
 		goVal interface{}
 		want  string
@@ -171,6 +173,11 @@ func TestConvert(t *testing.T) {
 		&d35, "(int){ 35 }",
 	}, {
 		&n36, "(int){ -36 }",
+	}, {
+		// A coefficient too large for apd to store inline.
+		// The result wrongly ends in 790.5 rather than 789.5,
+		// as it shares the coefficient modified after the conversion.
+		d42, "(float){ 1234567890123456789012345678901234567890123456790.5 }",
 	}, {
 		r38, "(int){ 38 }",
 	}, {
@@ -374,6 +381,12 @@ func TestConvert(t *testing.T) {
 		ctx := adt.NewContext(r, &adt.Vertex{})
 		t.Run("", func(t *testing.T) {
 			v := convert.FromGoValue(ctx, tc.goVal, true)
+			// The result does not alias the Go value,
+			// so modifying the latter has no effect.
+			if d, ok := tc.goVal.(*apd.Decimal); ok && d != nil {
+				_, err := apd.BaseContext.Add(d, d, apd.New(1, 0))
+				qt.Assert(t, qt.IsNil(err))
+			}
 			n, ok := v.(*adt.Vertex)
 			if !ok {
 				n = &adt.Vertex{BaseValue: v}

@@ -575,9 +575,8 @@ x: 1 // on-field
 				})
 				return &ast.File{Decls: []ast.Decl{b}}
 			}(),
-			cfg: &pretty.Config{Width: 80},
-			// TODO: the comment is printed twice.
-			want: "_|_ // error // error",
+			cfg:  &pretty.Config{Width: 80},
+			want: "_|_ // error",
 		},
 		{
 			// We exercise node()'s ast.Expr dispatch branch by passing a

@@ -3415,8 +3415,9 @@ func (c *converter) decl(d ast.Decl) doc {
 		// interface satisfies [ast.Decl], so programmatic AST builders
 		// (notably the evaluator's value-to-syntax conversion) can put a
 		// bare expression directly into [ast.StructLit.Elts] without
-		// wrapping it in an [*ast.EmbedDecl].
-		return c.expr(x)
+		// wrapping it in an [*ast.EmbedDecl]. The caller handles its
+		// comments, like for any other declaration.
+		return c.exprCore(x)
 	}
 	return nil
 }

@@ -120,14 +120,13 @@ v: p.foo
 		qt.Check(t, qt.DeepEquals(got, []protocol.Location{{URI: rootURI + "/real/x.cue", Range: fooRange}}))
 
 		// The package in link then reads the same file as link/x.cue.
-		// Wrong: the definition is in link/x.cue, the file which c imports.
 		env.OpenFile("c/c.cue")
 		env.Await(env.DoneWithOpen())
 		got = env.Definition(protocol.Location{
 			URI:   rootURI + "/c/c.cue",
 			Range: protocol.Range{Start: protocol.Position{Line: 4, Character: 5}},
 		})
-		qt.Check(t, qt.DeepEquals(got, []protocol.Location{{URI: rootURI + "/real/x.cue", Range: fooRange}}))
+		qt.Check(t, qt.DeepEquals(got, []protocol.Location{{URI: rootURI + "/link/x.cue", Range: fooRange}}))
 	})
 }
 

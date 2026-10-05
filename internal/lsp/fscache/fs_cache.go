@@ -52,10 +52,11 @@ type diskFileEntry struct {
 	uri     protocol.DocumentURI
 	modTime time.Time
 
-	// cueFileParser is a pointer because it is shared between several
-	// file entries (e.g. when symlinks mean you have several uris that
-	// resolve to the same underlying file).
-	*cueFileParser
+	// Each entry has its own parser, as the ASTs it produces carry
+	// the entry's own filename. Entries for several uris which resolve
+	// to the same underlying file (e.g. via symlinks) share only the
+	// content.
+	cueFileParser
 }
 
 var _ FileHandle = (*diskFileEntry)(nil)
@@ -304,9 +305,7 @@ func (fs *CUECacheFS) ReadFile(uri protocol.DocumentURI) (FileHandle, error) {
 		}
 		// No file handle for this exact URI. Create an alias, but share content.
 		if entry == nil {
-			entryCopy := *files[0]
-			entryCopy.uri = uri
-			entry = &entryCopy
+			entry = newDiskFileEntry(uri, mtime, files[0].content)
 			files = append(files, entry)
 			fs.cueFilesByID[id] = files
 		}
@@ -362,21 +361,27 @@ func readFile(uri protocol.DocumentURI, mtime time.Time) (*diskFileEntry, error)
 	if err != nil {
 		return nil, err
 	}
+	return newDiskFileEntry(uri, mtime, content), nil
+}
 
-	parser := &cueFileParser{content: content}
+// newDiskFileEntry creates the entry for the file at uri with the
+// given content, which must not be modified.
+func newDiskFileEntry(uri protocol.DocumentURI, mtime time.Time, content []byte) *diskFileEntry {
+	filePath := uri.FilePath()
+
+	entry := &diskFileEntry{
+		modTime:       mtime,
+		uri:           uri,
+		cueFileParser: cueFileParser{content: content},
+	}
 	if bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input); err == nil {
 		bf.Source = content
-		parser.buildFile = bf
+		entry.buildFile = bf
 	}
 	// A nil buildFile records that this uri can never be converted to
 	// a CUE AST. The content is still available via
 	// [FileHandle.Content].
-
-	return &diskFileEntry{
-		modTime:       mtime,
-		uri:           uri,
-		cueFileParser: parser,
-	}, nil
+	return entry
 }
 
 // IoFS implements [RootableFS]

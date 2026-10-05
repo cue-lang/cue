@@ -1,8 +1,5 @@
 # A struct literal may be exported more than once: where it is declared, and
 # where it is unified into another value. Each of these has its own scope.
-#
-# Wrong: in out/value-v3, lets.d1.o refers to the let clause L of lets.#D,
-# which is not in scope.
 
 -- in.cue --
 inp: string
@@ -54,7 +51,7 @@ lets: {
 		}
 		d1: {
 			k: "1"
-			o: L
+			o: k + inp
 		}
 	}
 }
@@ -79,7 +76,7 @@ lets: {
 		}
 		d1: {
 			k: "1"
-			o: L
+			o: k + inp
 		}
 	}
 }
@@ -94,7 +91,7 @@ lets: {
 		}
 		d1: {
 			k: "1"
-			o: L
+			o: k + inp
 		}
 	}
 }

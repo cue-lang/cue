@@ -372,7 +372,6 @@ type exporter struct {
 	postfixAliases bool
 	// fieldAlias is used to track original alias names of regular fields.
 	fieldAlias map[*ast.Field]fieldAndScope
-	letAlias   map[*ast.LetClause]*ast.LetClause
 	references map[*adt.Vertex]*referenceInfo
 
 	pivotter *pivotter
@@ -770,13 +769,13 @@ func (e *exporter) markLetAlias(x *ast.LetClause) {
 	// later if never referenced.
 	let := &ast.LetClause{}
 
-	if e.letAlias == nil {
-		e.letAlias = make(map[*ast.LetClause]*ast.LetClause)
+	top := e.top()
+	if top.letAlias == nil {
+		top.letAlias = make(map[*ast.LetClause]*ast.LetClause)
 	}
-	e.letAlias[x] = let
+	top.letAlias[x] = let
 
-	scope := e.top().scope
-	scope.Elts = append(scope.Elts, let)
+	top.scope.Elts = append(top.scope.Elts, let)
 }
 
 // In value mode, lets are only used if there wasn't an error.
@@ -787,11 +786,24 @@ func filterUnusedLets(s *ast.StructLit) {
 	})
 }
 
+// lookupLetAlias returns the let clause added for the source let clause x by
+// the innermost struct being exported that declares it. A let clause is only
+// in scope while exporting such a struct: the same source clause is not
+// declared where the struct is reached through a reference, for instance.
+func (e *exporter) lookupLetAlias(x *ast.LetClause) *ast.LetClause {
+	for i := len(e.stack) - 1; i >= 0; i-- {
+		if let, ok := e.stack[i].letAlias[x]; ok {
+			return let
+		}
+	}
+	return nil
+}
+
 // resolveLet actually parses the let expression.
 // If there was no recorded let expression, it expands the expression in place.
 func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Expr {
 	letClause, _ := x.Src.Node.(*ast.LetClause)
-	let := e.letAlias[letClause]
+	let := e.lookupLetAlias(letClause)
 
 	switch {
 	case let == nil:
@@ -932,6 +944,10 @@ type frame struct {
 
 	// labeled fields
 	fields map[adt.Feature]entry
+
+	// letAlias maps the source let clauses declared in this scope to the
+	// ones in the output.
+	letAlias map[*ast.LetClause]*ast.LetClause
 
 	// field to new field
 	mapped map[adt.Node]ast.Node

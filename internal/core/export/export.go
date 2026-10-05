@@ -218,11 +218,15 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 			}
 
 			if e.cfg.ShowDocs {
+				// Copy the comments, as they belong to the source.
 				pkgComments, fileComments := internal.FileComments(f)
+				pkgComments = cloneComments(pkgComments)
+				fileComments = cloneComments(fileComments)
 
 				for _, c := range pkgComments {
 					// add a newline between previous file comment and the pkg comments
-					ast.AddComment(pkg, withLeadingRelPos(c, token.NewSection))
+					setLeadingRelPos(c, token.NewSection)
+					ast.AddComment(pkg, c)
 				}
 				for _, c := range fileComments {
 					ast.AddComment(fout, c)
@@ -257,6 +261,7 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 }
 
 // mergeDocs merges multiple doc comments into one single doc comment.
+// The comments must belong to the output, as they may be modified.
 func mergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
 	if len(comments) <= 1 || !hasDocComment(comments) {
 		return comments
@@ -270,10 +275,7 @@ func mergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
 		case !c.Doc:
 			comments1 = append(comments1, c)
 		case docComment == nil:
-			// Copy the group, as c may belong to the source AST.
-			cg := *c
-			cg.List = slices.Clone(c.List)
-			docComment = &cg
+			docComment = c
 		default:
 			docComment.List = append(docComment.List, &ast.Comment{Text: "//"})
 			docComment.List = append(docComment.List, c.List...)
@@ -691,17 +693,20 @@ func (e *exporter) prepareAliasedField(f *ast.Field, topLevel bool) {
 	}
 
 	name, ok := valueAliasName(f)
-	label := aliasedLabel(f)
-	if !ok || label == nil {
+	if !ok {
 		return // not aliased
 	}
 	// Only the aliases of fields with a fixed label are referenced via
 	// fieldAlias; the others are named as they are referenced.
+	label := aliasedLabel(f)
 	switch label.(type) {
 	case *ast.Ident, *ast.BasicLit:
-		name = e.fileAliasName(topLevel, name)
+	default:
+		return
 	}
-	field := &ast.Field{Label: label}
+	name = e.fileAliasName(topLevel, name)
+	// Copy the label, as it belongs to the source.
+	field := &ast.Field{Label: ast.Clone(label)}
 	e.setValueAlias(field, name)
 
 	if top.fieldAlias == nil {

@@ -521,7 +521,7 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 
 		if e.cfg.ShowDocs {
 			docs := ExtractDoc(a)
-			ast.SetComments(elem, docs)
+			setComments(elem, docs)
 		}
 
 		l.Elts = append(l.Elts, elem)
@@ -649,7 +649,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 
 		if p.ShowDocs {
 			docs := ExtractDoc(arc)
-			ast.SetComments(f, docs)
+			setComments(f, docs)
 		}
 
 		s.Elts = append(s.Elts, f)

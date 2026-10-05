@@ -170,6 +170,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		}
 	}
 
+	e.attrs = e.exportAttrs(e.attrs)
 	for _, a := range e.attrs {
 		s.Elts = append(s.Elts, a)
 	}
@@ -274,7 +275,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		if x.cfg.ShowDocs {
 			v := &adt.Vertex{Conjuncts: a}
 			docs := extractDocs(v)
-			ast.SetComments(d, docs)
+			setComments(d, docs)
 		}
 		if x.cfg.ShowAttributes {
 			for _, c := range a {
@@ -378,7 +379,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 		e.top().upCount++
 
 		if e.cfg.ShowAttributes {
-			e.attrs = e.exportAttrs(extractDeclAttrs(e.attrs, x.Src))
+			e.attrs = extractDeclAttrs(e.attrs, x.Src)
 		}
 
 		// Only add if it only has no bulk fields or ellipsis.

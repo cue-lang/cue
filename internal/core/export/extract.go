@@ -73,16 +73,36 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 	return docs
 }
 
-// leadingDocComments returns the doc-position comment groups in cgs,
-// in order. When non-doc comment groups that the exporter discards
-// precede the first doc comment, that first doc comment inherits the
-// leading RelPos of cgs[0].
+// setComments sets the comments of dst to copies of cgs, which belong to the
+// source syntax tree and must not be shared with the output: the output may
+// be edited in place, such as by [cuelang.org/go/cue/format.NodeInPlace].
+func setComments(dst ast.Node, cgs []*ast.CommentGroup) {
+	ast.SetComments(dst, cloneComments(cgs))
+}
+
+// cloneComments returns copies of cgs; see [setComments].
+func cloneComments(cgs []*ast.CommentGroup) []*ast.CommentGroup {
+	if len(cgs) == 0 {
+		return nil
+	}
+	a := make([]*ast.CommentGroup, len(cgs))
+	for i, cg := range cgs {
+		a[i] = ast.Clone(cg)
+	}
+	return a
+}
+
+// leadingDocComments returns copies of the doc-position comment groups
+// in cgs, in order; see [setComments]. When non-doc comment groups that
+// the exporter discards precede the first doc comment, that first doc
+// comment inherits the leading RelPos of cgs[0].
 func leadingDocComments(cgs []*ast.CommentGroup) []*ast.CommentGroup {
 	var docs []*ast.CommentGroup
 	for i, cg := range cgs {
 		if cg.Doc {
+			cg = ast.Clone(cg)
 			if i > 0 && len(docs) == 0 {
-				cg = withLeadingRelPos(cg, cgs[0].Pos().RelPos())
+				setLeadingRelPos(cg, cgs[0].Pos().RelPos())
 			}
 			docs = append(docs, cg)
 		}
@@ -90,19 +110,12 @@ func leadingDocComments(cgs []*ast.CommentGroup) []*ast.CommentGroup {
 	return docs
 }
 
-// withLeadingRelPos returns cg with the RelPos of its first comment's
-// slash set to rel. It clones cg so the input is unaltered. cg is
-// returned unchanged when it is empty or already carries rel.
-func withLeadingRelPos(cg *ast.CommentGroup, rel token.RelPos) *ast.CommentGroup {
-	if cg == nil || len(cg.List) == 0 || cg.Pos().RelPos() == rel {
-		return cg
+// setLeadingRelPos sets the RelPos of the first comment of cg, which
+// must belong to the output, to rel.
+func setLeadingRelPos(cg *ast.CommentGroup, rel token.RelPos) {
+	if len(cg.List) > 0 {
+		cg.List[0].Slash = cg.List[0].Slash.WithRel(rel)
 	}
-	clone := *cg
-	clone.List = slices.Clone(cg.List)
-	first := *clone.List[0]
-	first.Slash = first.Slash.WithRel(rel)
-	clone.List[0] = &first
-	return &clone
 }
 
 func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
@@ -180,14 +193,21 @@ func containsAttr(a []*ast.Attribute, x *ast.Attribute) bool {
 	return false
 }
 
-// exportAttrs drops attributes consumed by an injection, such as @embed.
-// The injected value is already part of the output, which does not carry
-// the file-level @extern declaration that the attribute requires.
+// exportAttrs returns the attributes to export out of attrs, which it
+// modifies. Those are copies, as attrs belong to the source syntax tree and
+// the output may be edited in place.
+//
+// Attributes consumed by an injection, such as @embed, are dropped. The
+// injected value is already part of the output, which does not carry the
+// file-level @extern declaration that the attribute requires.
 func (e *exporter) exportAttrs(attrs []*ast.Attribute) []*ast.Attribute {
-	if e.isInjectionKind == nil {
-		return attrs
+	if e.isInjectionKind != nil {
+		attrs = slices.DeleteFunc(attrs, func(a *ast.Attribute) bool {
+			return e.isInjectionKind(a.Name())
+		})
 	}
-	return slices.DeleteFunc(attrs, func(a *ast.Attribute) bool {
-		return e.isInjectionKind(a.Name())
-	})
+	for i, a := range attrs {
+		attrs[i] = ast.Clone(a)
+	}
+	return attrs
 }

@@ -56,7 +56,6 @@ func TestSyntax(t *testing.T) {
 		}
 		`,
 		options: o(cue.Docs(true)),
-		// Wrong: the result shares nodes with the source.
 		out: `
 {
 
@@ -70,8 +69,7 @@ func TestSyntax(t *testing.T) {
 			hello2: "world"
 		}
 	}
-}
-(editing the result modified the source)`,
+}`,
 	}, {
 		name: "partially resolvable",
 		in: `
@@ -272,7 +270,6 @@ if true {
 		x: {p: t.foo, q: t.bar}
 		`,
 		path: "x",
-		// Wrong: the result shares nodes with the source.
 		out: `
 {
 	p: {
@@ -294,8 +291,7 @@ if true {
 
 	//cue:path: inp
 	let INP = string
-}
-(editing the result modified the source)`,
+}`,
 	}, {
 		name: "docs and attributes of a value",
 		in: `
@@ -309,7 +305,6 @@ if true {
 		`,
 		path:    "b",
 		options: o(cue.Final(), cue.Docs(true), cue.Attributes(true)),
-		// Wrong: the result shares nodes with the source.
 		out: `
 {
 
@@ -317,8 +312,7 @@ if true {
 
 	// doc y
 	y: 2 @foo(bar)
-}
-(editing the result modified the source)`,
+}`,
 	}, {
 		name: "docs and attributes of a schema",
 		in: `
@@ -332,7 +326,6 @@ if true {
 		`,
 		path:    "b",
 		options: o(cue.Docs(true), cue.Attributes(true)),
-		// Wrong: the result shares nodes with the source.
 		out: `
 {
 
@@ -343,8 +336,7 @@ if true {
 } & {
 	#D: 1
 	y:  int
-}
-(editing the result modified the source)`,
+}`,
 	}, {
 		name: "docs of a file",
 		in: `
@@ -360,7 +352,6 @@ if true {
 		]
 		`,
 		options: o(cue.Raw(), cue.Docs(true)),
-		// Wrong: the result shares nodes with the source.
 		out: `
 // file comment
 
@@ -368,8 +359,7 @@ if true {
 package foo
 
 // doc a
-a: [1]
-(editing the result modified the source)`,
+a: [1]`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

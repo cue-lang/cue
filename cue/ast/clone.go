@@ -295,6 +295,11 @@ func clone[N NilableNode](c *cloner, n N) N {
 }
 
 // cloneList returns a clone of the list.
+//
+// TODO: consider exporting this as CloneList. Cloning the elements one
+// by one with [Clone], as internal/core/export does for comment groups
+// and attributes, leaves the references between elements unmapped, so
+// it is only correct for nodes which hold none.
 func cloneList[N NilableNode](c *cloner, list []N) []N {
 	if list == nil {
 		return nil

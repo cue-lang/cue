@@ -106,6 +106,10 @@ func TestExtract(t *testing.T) {
 		in:   `[3_]`,
 		out:  "invalid JSON: invalid character '_' after array element",
 	}, {
+		name: "byte order mark inside a string",
+		in:   `{"a": "x` + "\ufeff" + `y"}`,
+		out:  `{a: "x` + "\ufeff" + `y"}`,
+	}, {
 		name: "numeric keys: Issue #219",
 		in:   `{"20": "a"}`,
 		out:  `{"20": "a"}`,

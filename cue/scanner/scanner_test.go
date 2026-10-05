@@ -876,11 +876,10 @@ var errorTests = []struct {
 	{"a\ufeff", token.IDENT, 1, "a", "illegal byte order mark"},
 	{"@foo(\ufeff)", token.ATTRIBUTE, 5, "@foo(\ufeff)", "illegal byte order mark"},
 	{`"\(` + "\ufeff" + `)"`, token.INTERPOLATION, 3, `"\(`, "illegal byte order mark"},
-	// The cases below are wrongly rejected; see https://cuelang.org/issue/3399.
-	{"//\ufeff", token.COMMENT, 2, "//\ufeff", "illegal byte order mark"},
-	{`"` + "abc\ufeffdef" + `"`, token.STRING, 4, `"` + "abc\ufeffdef" + `"`, "illegal byte order mark"},
-	{"\"\"\"\n\ufeff\n\"\"\"", token.STRING, 4, "\"\"\"\n\ufeff\n\"\"\"", "illegal byte order mark"},
-	{`"a\(1)` + "\ufeff" + `b"`, token.INTERPOLATION, 6, `"a\(`, "illegal byte order mark"},
+	{"//\ufeff", token.COMMENT, 0, "//\ufeff", ""},
+	{`"` + "abc\ufeffdef" + `"`, token.STRING, 0, `"` + "abc\ufeffdef" + `"`, ""},
+	{"\"\"\"\n\ufeff\n\"\"\"", token.STRING, 0, "\"\"\"\n\ufeff\n\"\"\"", ""},
+	{`"a\(1)` + "\ufeff" + `b"`, token.INTERPOLATION, 0, `"a\(`, ""},
 }
 
 func TestScanErrors(t *testing.T) {

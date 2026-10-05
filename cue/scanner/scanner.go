@@ -70,7 +70,7 @@ type quoteInfo struct {
 	minLineWS   []byte // shortest whitespace prefix of any non-empty content line; nil if none
 }
 
-const bom = 0xFEFF // byte order mark, only permitted as very first character
+const bom = 0xFEFF // byte order mark, only allowed first or inside strings and comments
 
 // Read the next Unicode char into s.ch.
 // s.ch < 0 means end-of-file.
@@ -99,8 +99,6 @@ func (s *Scanner) next() {
 				} else {
 					s.errf(s.offset, "illegal UTF-8 encoding")
 				}
-			} else if r == bom && s.offset > 0 {
-				s.errf(s.offset, "illegal byte order mark")
 			}
 		}
 		s.rdOffset += w
@@ -1065,7 +1063,7 @@ scanAgain:
 		default:
 			switch ch {
 			case bom:
-				// next reports unexpected BOMs - don't repeat
+				s.errf(s.file.Offset(pos), "illegal byte order mark")
 			case '“', '”':
 				// Report an informative error for curly quotation marks,
 				// which are easily introduced via copy and paste.

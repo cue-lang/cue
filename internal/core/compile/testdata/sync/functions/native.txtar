@@ -529,6 +529,14 @@ memoization: {
 		y: x & {out: 12}
 		check: y.out
 	}
+
+	// A call site evaluated in distinct environments of one struct, such as
+	// the body of a comprehension, is memoized per environment.
+	perEnv: {
+		x:  {for v in [1, 2] {"k\(v)": f(v)}}
+		k1: x.k1
+		k2: x.k2
+	}
 }
 
 // An argument that is not yet defined makes the call incomplete, exactly like
@@ -645,6 +653,39 @@ partial: {
 	// A partial application does unify with itself.
 	same:    step1 & step1
 	sameOut: same(2, 3)
+}
+
+// What is cached per environment must not carry over from one disjunct
+// branch to another, even when the callee is the same in each branch.
+disjunctEnv: {
+	inc: func(n: int) -> int: n + 1
+
+	// The argument of the call differs per branch.
+	args: {
+		x: {v: int, r: inc(v)}
+		x: {v: 1, k: "x"} | {v: 2, k: "y"}
+		x: k: "y"
+		out: x.r
+	}
+
+	// The same holds for a call in a nested struct, and across the product
+	// of two disjunctions.
+	nested: {
+		x: {v: int, w: int, s: r: inc(v + w)}
+		x: {v: 1, k: "x"} | {v: 2, k: "y"}
+		x: {w: 10, j: "x"} | {w: 20, j: "y"}
+		x: {k: "y", j: "y"}
+		out: x.s.r
+	}
+
+	// The default of a function literal is checked in each branch, as it
+	// refers to a field that differs per branch.
+	defaults: {
+		x: {k: int, fn: func(a: <5 = k) -> int: 7}
+		x: {k: 1, j: 1} | {k: 9, j: 2}
+		x: j: 2
+		out: x.j
+	}
 }
 -- out/compile --
 --- in.cue
@@ -1031,6 +1072,18 @@ partial: {
       })
       check: 〈0;y〉.out
     }
+    perEnv: {
+      x: {
+        for _, v in [
+          1,
+          2,
+        ] {
+          "k\(〈1;v〉)": 〈4;f〉(〈1;v〉)
+        }
+      }
+      k1: 〈0;x〉.k1
+      k2: 〈0;x〉.k2
+    }
   }
   incompleteArgs: {
     f: func(a: int) -> string: "ok"
@@ -1090,5 +1143,70 @@ partial: {
     conflictPlain: (〈0;add〉 & 〈0;add〉(1))
     same: (〈0;step1〉 & 〈0;step1〉)
     sameOut: 〈0;same〉(2, 3)
+  }
+  disjunctEnv: {
+    inc: func(n: int) -> int: (〈0;n〉 + 1)
+    args: {
+      x: {
+        v: int
+        r: 〈2;inc〉(〈0;v〉)
+      }
+      x: ({
+        v: 1
+        k: "x"
+      }|{
+        v: 2
+        k: "y"
+      })
+      x: {
+        k: "y"
+      }
+      out: 〈0;x〉.r
+    }
+    nested: {
+      x: {
+        v: int
+        w: int
+        s: {
+          r: 〈3;inc〉((〈1;v〉 + 〈1;w〉))
+        }
+      }
+      x: ({
+        v: 1
+        k: "x"
+      }|{
+        v: 2
+        k: "y"
+      })
+      x: ({
+        w: 10
+        j: "x"
+      }|{
+        w: 20
+        j: "y"
+      })
+      x: {
+        k: "y"
+        j: "y"
+      }
+      out: 〈0;x〉.s.r
+    }
+    defaults: {
+      x: {
+        k: int
+        fn: func(a: <5 = 〈0;k〉) -> int: 7
+      }
+      x: ({
+        k: 1
+        j: 1
+      }|{
+        k: 9
+        j: 2
+      })
+      x: {
+        j: 2
+      }
+      out: 〈0;x〉.j
+    }
   }
 }

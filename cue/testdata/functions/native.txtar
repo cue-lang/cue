@@ -538,6 +538,14 @@ memoization: {
 		y: x & {out: 12}
 		check: y.out @test(eq, 12)
 	}
+
+	// A call site evaluated in distinct environments of one struct, such as
+	// the body of a comprehension, is memoized per environment.
+	perEnv: {
+		x:  {for v in [1, 2] {"k\(v)": f(v)}}
+		k1: x.k1 @test(eq, 2)
+		k2: x.k2 @test(eq, 3)
+	}
 }
 
 // An argument that is not yet defined makes the call incomplete, exactly like
@@ -655,6 +663,41 @@ partial: {
 	same:    step1 & step1
 	sameOut: same(2, 3) @test(eq, 6)
 }
+
+// What is cached per environment must not carry over from one disjunct
+// branch to another, even when the callee is the same in each branch.
+disjunctEnv: {
+	inc: func(n: int) -> int: n + 1
+
+	// The argument of the call differs per branch.
+	args: {
+		x: {v: int, r: inc(v)}
+		x: {v: 1, k: "x"} | {v: 2, k: "y"}
+		x: k: "y"
+		out: x.r @test(eq, 2, incorrect) @test(eq:todo, 3)
+	}
+
+	// The same holds for a call in a nested struct, and across the product
+	// of two disjunctions.
+	nested: {
+		x: {v: int, w: int, s: r: inc(v + w)}
+		x: {v: 1, k: "x"} | {v: 2, k: "y"}
+		x: {w: 10, j: "x"} | {w: 20, j: "y"}
+		x: {k: "y", j: "y"}
+		out: x.s.r @test(eq, 13, incorrect) @test(eq:todo, 23)
+	}
+
+	// The default of a function literal is checked in each branch, as it
+	// refers to a field that differs per branch.
+	defaults: {
+		x: {k: int, fn: func(a: <5 = k) -> int: 7}
+		x: {k: 1, j: 1} | {k: 9, j: 2}
+		x: j: 2
+		out: x.j @test(eq, 2, incorrect) @test(err:todo, code=eval,
+			suberr=(contains="conflicting values"),
+			suberr=(contains="invalid default for parameter a"))
+	}
+}
 -- out/errors.txt --
 [eval] arguments.sum.tooMany: too many positional arguments in function call:
     ./in.cue:13:19
@@ -757,40 +800,40 @@ structural cycle:
 [incomplete] disjunction.callee.incomplete.out: cannot call non-concrete value x (type _):
     ./in.cue:508:9
 [incomplete] a: undefined field: q:
-    ./in.cue:548:9
-    ./in.cue:547:2
+    ./in.cue:556:9
+    ./in.cue:555:2
 [incomplete] incompleteArgs.z: undefined field: q:
-    ./in.cue:551:11
-    ./in.cue:547:2
+    ./in.cue:559:11
+    ./in.cue:555:2
 [eval] declarations.open.bad: cannot call function without implementation:
-    ./in.cue:590:8
+    ./in.cue:598:8
 [eval] partial.missing: missing argument c:
-    ./in.cue:626:11
+    ./in.cue:634:11
 [eval] b: invalid value 50 (out of bound <10):
-    ./in.cue:629:27
-    ./in.cue:631:18
+    ./in.cue:637:27
+    ./in.cue:639:18
 [eval] partial.tooMany: too many positional arguments in function call:
-    ./in.cue:635:11
+    ./in.cue:643:11
 [structural_cycle] structural cycle:
-    ./in.cue:639:31
+    ./in.cue:647:31
 [eval] partial.conflictArgs: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:598:7
+    ./in.cue:606:7
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
-    ./in.cue:598:7
-    ./in.cue:651:17
+    ./in.cue:606:7
+    ./in.cue:659:17
 -- out/eval/stats --
-Leaks:  115
-Freed:  1397
-Reused: 1349
-Allocs: 163
+Leaks:  132
+Freed:  1471
+Reused: 1439
+Allocs: 164
 Retain: 0
 
-Unifications: 1232
-Conjuncts:    3558
-Disjuncts:    224
+Unifications: 1279
+Conjuncts:    3669
+Disjuncts:    232
 Notifications: 8
 
-NumCloseIDs: 624
+NumCloseIDs: 634
 
-ConjunctInfos:       1401
+ConjunctInfos:       1449
 MaxConjunctInfos:    8

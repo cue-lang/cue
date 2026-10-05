@@ -19,6 +19,7 @@ package convert_test
 import (
 	"encoding"
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"sync"
 	"testing"
@@ -27,6 +28,8 @@ import (
 	"github.com/cockroachdb/apd/v3"
 	"github.com/go-quicktest/qt"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
@@ -349,17 +352,42 @@ func TestConvert(t *testing.T) {
 		{&jsonMarshaller{b: "bar"}, `(string){ "bar" }`},
 		{textMarshaller{b: "bar"}, `(string){ "bar" }`},
 		{ptrError{msg: "bad"}, "(_|_){\n  // [eval] bad\n}"},
+
+		// A nil pointer encodes like an untyped nil, whatever its type
+		// and wherever it appears.
+		// These wrongly panic, as the nil pointers are used before being checked.
+		{(*big.Int)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{[]*big.Int{nil}, "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*big.Rat)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*big.Float)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*apd.Decimal)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*ast.File)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*ast.Ident)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*time.Time)(nil), "panic: value method time.Time.MarshalJSON called using nil *Time pointer"},
+		{[]*time.Time{nil}, "panic: value method time.Time.MarshalJSON called using nil *Time pointer"},
+		{map[string]*time.Time{"a": nil}, "panic: value method time.Time.MarshalJSON called using nil *Time pointer"},
+		{(*jsonMarshaller)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*textMarshaller)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*ptrError)(nil), "panic: runtime error: invalid memory address or nil pointer dereference"},
+		{(*cue.Value)(nil), "panic: value method cuelang.org/go/cue.Value.Core called using nil *Value pointer"},
 	}
 	r := runtime.New()
 	for _, tc := range testCases {
 		ctx := adt.NewContext(r, &adt.Vertex{})
 		t.Run("", func(t *testing.T) {
-			v := convert.FromGoValue(ctx, tc.goVal, true)
-			n, ok := v.(*adt.Vertex)
-			if !ok {
-				n = &adt.Vertex{BaseValue: v}
-			}
-			got := debug.NodeString(ctx, n, nil)
+			got := func() (s string) {
+				defer func() {
+					if e := recover(); e != nil {
+						s = fmt.Sprintf("panic: %v", e)
+					}
+				}()
+				v := convert.FromGoValue(ctx, tc.goVal, true)
+				n, ok := v.(*adt.Vertex)
+				if !ok {
+					n = &adt.Vertex{BaseValue: v}
+				}
+				return debug.NodeString(ctx, n, nil)
+			}()
 			qt.Assert(t, qt.Equals(got, tc.want))
 		})
 	}

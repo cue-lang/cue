@@ -129,7 +129,6 @@ func sanitize(f *ast.File, names map[string]bool) error {
 	// Add imports and unshadow.
 	stack = stack[:0]
 	s = &scope{
-		file:       f,
 		errFn:      z.errf,
 		identFn:    z.handleIdent,
 		index:      make(map[string]entry),

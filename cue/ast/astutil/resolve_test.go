@@ -81,7 +81,6 @@ func TestResolve(t *testing.T) {
 
 			// Resolving the file again leaves each unresolved identifier
 			// recorded once.
-			// Wrong: each call records them again, and this is the third.
 			astutil.Resolve(f, func(token.Pos, string, ...any) {})
 			for _, x := range f.Unresolved {
 				fmt.Fprintf(w, "Unresolved: %d[%s]\n",

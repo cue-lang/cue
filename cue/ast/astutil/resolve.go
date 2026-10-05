@@ -85,37 +85,36 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 // Resolve resolves all identifiers in a file, populating [ast.Ident.Node] fields.
 // Unresolved identifiers are recorded in [ast.File.Unresolved].
 // It will not overwrite already resolved identifiers.
+// Resolving a file again replaces the list of unresolved identifiers
+// rather than appending to it.
 func Resolve(f *ast.File, errFn ErrFunc) {
-	stack := make([]*scope, 0, 8)
-	visitor := &scope{
-		index:      make(map[string]entry),
-		errFn:      errFn,
-		identFn:    resolveIdent,
-		scopeStack: &stack,
-	}
-	ast.Walk(f, visitor.Before, nil)
+	f.Unresolved = resolve(f, errFn)
 }
 
 // ResolveExpr resolves all identifiers in an expression.
 // It will not overwrite already resolved values.
 func ResolveExpr(e ast.Expr, errFn ErrFunc) {
-	f := &ast.File{}
+	resolve(e, errFn)
+}
+
+// resolve resolves all identifiers in n, returning those it could not resolve.
+func resolve(n ast.Node, errFn ErrFunc) (unresolved []*ast.Ident) {
 	stack := make([]*scope, 0, 8)
 	visitor := &scope{
-		file:       f,
 		index:      make(map[string]entry),
 		errFn:      errFn,
 		identFn:    resolveIdent,
+		unresolved: &unresolved,
 		scopeStack: &stack,
 	}
-	ast.Walk(e, visitor.Before, nil)
+	ast.Walk(n, visitor.Before, nil)
+	return unresolved
 }
 
 // A scope maintains the set of named language entities declared
 // in the scope and a link to the immediately surrounding (outer)
 // scope.
 type scope struct {
-	file    *ast.File
 	outer   *scope
 	node    ast.Node
 	index   map[string]entry
@@ -124,6 +123,11 @@ type scope struct {
 	identFn func(s *scope, n *ast.Ident) bool
 	nameFn  func(name string)
 	errFn   func(p token.Pos, msg string, args ...interface{})
+
+	// unresolved collects the identifiers which [resolveIdent] cannot
+	// resolve. The pointer is shared between the root scope and all its
+	// children.
+	unresolved *[]*ast.Ident
 
 	// scopeStack is used to reuse scope allocations.
 	// The pointer is shared between the root scope and all its children.
@@ -168,15 +172,15 @@ func (s *scope) freeScopesUntil(ancestor *scope) {
 	}
 }
 
-func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope {
+func newScope(outer *scope, node ast.Node, decls []ast.Decl) *scope {
 	s := outer.allocScope()
-	s.file = f
 	s.outer = outer
 	s.node = node
 	s.inField = false
 	s.identFn = outer.identFn
 	s.nameFn = outer.nameFn
 	s.errFn = outer.errFn
+	s.unresolved = outer.unresolved
 
 	for _, d := range decls {
 		switch x := d.(type) {
@@ -232,15 +236,15 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 	return s
 }
 
-func newFuncScope(f *ast.File, outer *scope, fn *ast.Func) *scope {
+func newFuncScope(outer *scope, fn *ast.Func) *scope {
 	s := outer.allocScope()
-	s.file = f
 	s.outer = outer
 	s.node = fn
 	s.inField = false
 	s.identFn = outer.identFn
 	s.nameFn = outer.nameFn
 	s.errFn = outer.errFn
+	s.unresolved = outer.unresolved
 
 	insertParam := func(name string, p *ast.FuncParam) {
 		if name == "" || name == "_" {
@@ -407,7 +411,7 @@ func insertPostfixAliases(s *scope, x *ast.Field, expr ast.Node) {
 func (s *scope) Before(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.File:
-		s = newScope(x, s, x, x.Decls)
+		s = newScope(s, x, x.Decls)
 		defer s.freeScope()
 		// Support imports.
 		for _, d := range x.Decls {
@@ -416,7 +420,7 @@ func (s *scope) Before(n ast.Node) bool {
 		return false
 
 	case *ast.StructLit:
-		s = newScope(s.file, s, x, x.Elts)
+		s = newScope(s, x, x.Elts)
 		defer s.freeScope()
 		for _, elt := range x.Elts {
 			ast.Walk(elt, s.Before, nil)
@@ -431,7 +435,7 @@ func (s *scope) Before(n ast.Node) bool {
 		// reported as an error rather than silently binding to a like-named
 		// field of an enclosing scope.
 		if params := x.Parameters(); len(params) > 0 {
-			cs := newFuncScope(s.file, s, x)
+			cs := newFuncScope(s, x)
 			cs.identFn = paramConstraintIdentFn(cs, cs.identFn)
 			for _, p := range params {
 				if p == nil {
@@ -452,7 +456,7 @@ func (s *scope) Before(n ast.Node) bool {
 			ast.Walk(x.Ret, s.Before, nil)
 		}
 		if x.Body != nil {
-			s = newFuncScope(s.file, s, x)
+			s = newFuncScope(s, x)
 			defer s.freeScope()
 			ast.Walk(x.Body, s.Before, nil)
 		}
@@ -488,7 +492,7 @@ func (s *scope) Before(n ast.Node) bool {
 			if len(label.Elts) != 1 {
 				break
 			}
-			s = newScope(s.file, s, x, nil)
+			s = newScope(s, x, nil)
 			defer s.freeScope()
 			if alias != nil {
 				if name, _, _ := ast.LabelName(alias.Ident); name != "" {
@@ -536,7 +540,7 @@ func (s *scope) Before(n ast.Node) bool {
 			if alias, ok := x.Value.(*ast.Alias); ok {
 				// TODO: this should move into Before once decl attributes
 				// have been fully deprecated and embed attributes are introduced.
-				s = newScope(s.file, s, x, nil)
+				s = newScope(s, x, nil)
 				defer s.freeScope()
 				s.insert(alias.Ident.Name, alias, x, nil)
 				n = alias.Expr
@@ -636,12 +640,12 @@ func resolveIdent(s *scope, x *ast.Ident) bool {
 		default: // x.Node != node
 			scope, _, ok := s.resolveScope(name, x.Node)
 			if !ok {
-				s.file.Unresolved = append(s.file.Unresolved, x)
+				*s.unresolved = append(*s.unresolved, x)
 			}
 			x.Scope = scope
 		}
 	} else {
-		s.file.Unresolved = append(s.file.Unresolved, x)
+		*s.unresolved = append(*s.unresolved, x)
 	}
 	return true
 }
@@ -651,7 +655,7 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 		switch x := c.(type) {
 		case *ast.ForClause:
 			ast.Walk(x.Source, s.Before, nil)
-			s = newScope(s.file, s, x, nil)
+			s = newScope(s, x, nil)
 			if x.Key != nil {
 				s.insert(x.Key.Name, x.Key, x, nil)
 			}
@@ -659,14 +663,14 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 
 		case *ast.LetClause:
 			ast.Walk(x.Expr, s.Before, nil)
-			s = newScope(s.file, s, x, nil)
+			s = newScope(s, x, nil)
 			s.insert(x.Ident.Name, x.Ident, x, nil)
 
 		case *ast.TryClause:
 			// For the assignment form (try x = expr), handle scope like LetClause.
 			if x.Ident != nil {
 				ast.Walk(x.Expr, s.Before, nil)
-				s = newScope(s.file, s, x, nil)
+				s = newScope(s, x, nil)
 				s.insert(x.Ident.Name, x.Ident, x, nil)
 			} else {
 				// For the struct form (try { ... }), just walk normally.

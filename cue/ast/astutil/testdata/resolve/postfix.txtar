@@ -42,12 +42,6 @@ y:          X
 Unresolved: 3[string]
 Unresolved: 5[int]
 Unresolved: 8[X]
-Unresolved: 3[string]
-Unresolved: 5[int]
-Unresolved: 8[X]
-Unresolved: 3[string]
-Unresolved: 5[int]
-Unresolved: 8[X]
 -- pattern_dual.cue --
 @experiment(aliasv2)
 
@@ -63,14 +57,6 @@ z:               V
 9[K]:      Scope: 0[<nil>] Node: 0[]
 11[z]:     Scope: 0[<nil>] Node: 0[]
 12[V]:     Scope: 0[<nil>] Node: 0[]
-Unresolved: 3[string]
-Unresolved: 6[int]
-Unresolved: 9[K]
-Unresolved: 12[V]
-Unresolved: 3[string]
-Unresolved: 6[int]
-Unresolved: 9[K]
-Unresolved: 12[V]
 Unresolved: 3[string]
 Unresolved: 6[int]
 Unresolved: 9[K]

@@ -32,7 +32,3 @@ y: {for aa in a {}}
 14[a]:  Scope: 0[<nil>] Node: 0[]
 Unresolved: 7[a]
 Unresolved: 14[a]
-Unresolved: 7[a]
-Unresolved: 14[a]
-Unresolved: 7[a]
-Unresolved: 14[a]

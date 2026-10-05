@@ -5,26 +5,23 @@ maxExp:      1e100000
 minExp:      1e-100000
 zeroExp:     0e100001
 fracExp:     0.1e-99999
-
-// These are wrong: they evaluate to the number without its exponent.
 overExp:     1e100001
 underExp:    1e-100020
 overAdjExp:  123e99999
 overExpExpr: 9e200000 + 1
 hugeExp:     1e2147483648
-// This is wrong: the exponent of the last digit is also limited,
-// as arithmetic fails beyond it.
+// The exponent of the last digit is also limited, as arithmetic fails beyond it.
 fracUnderExp: 1.5e-100000
 -- out/evalalpha --
-(struct){
-  maxExp: (float){ 1E+100000 }
-  minExp: (float){ 1E-100000 }
-  zeroExp: (float){ 0.0 }
-  fracExp: (float){ 1E-100000 }
-  overExp: (float){ 1.0 }
-  underExp: (float){ 1.0 }
-  overAdjExp: (float){ 123.0 }
-  overExpExpr: (float){ 10.0 }
-  hugeExp: (float){ NaN.0 }
-  fracUnderExp: (float){ 1.5E-100000 }
-}
+overExp: error converting number to decimal: exponent out of range in number "1e100001":
+    ./in.cue:6:14
+underExp: error converting number to decimal: exponent out of range in number "1e-100020":
+    ./in.cue:7:14
+overAdjExp: error converting number to decimal: exponent out of range in number "123e99999":
+    ./in.cue:8:14
+overExpExpr: error converting number to decimal: exponent out of range in number "9e200000":
+    ./in.cue:9:14
+hugeExp: error converting number to decimal: exponent out of range in number "1e2147483648":
+    ./in.cue:10:14
+fracUnderExp: error converting number to decimal: exponent out of range in number "1.5e-100000":
+    ./in.cue:12:15

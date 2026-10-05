@@ -67,7 +67,12 @@ func (p *NumInfo) decimal(v *apd.Decimal) error {
 		v.Coeff.SetString(string(b), int(p.base))
 		return nil
 	}
-	_ = v.UnmarshalText(p.buf)
+	// The syntax is already validated, so this fails only for an exponent
+	// out of apd's range, leaving v as NaN or as the coefficient alone.
+	// A zero coefficient is still zero with any exponent.
+	if err := v.UnmarshalText(p.buf); err != nil && !v.IsZero() {
+		return p.errorf("exponent out of range in number %q", p.src)
+	}
 	if p.mul != 0 {
 		// apd.BaseContext has no precision, so it never rounds: a literal
 		// keeps every digit however wide it is, as the spec requires.

@@ -124,15 +124,14 @@ func TestNumbers(t *testing.T) {
 		// A zero is zero with any exponent.
 		{"0e100001", "0"},
 		// The exponent of the last digit is also limited, as arithmetic fails
-		// beyond it. This is wrong: the number is accepted.
-		{"1.5e-100000", "1.5E-100000"},
+		// beyond it.
+		{"1.5e-100000", `exponent out of range in number "1.5e-100000"`},
 		// An exponent out of range must not result in another number.
-		// These are wrong: the exponent is dropped without an error.
-		{"1e100001", "1"},
-		{"1e-100020", "1"},
-		{"123e99999", "123"},
-		{"0.001e100003", "1"},
-		{"1e2147483648", "NaN"},
+		{"1e100001", `exponent out of range in number "1e100001"`},
+		{"1e-100020", `exponent out of range in number "1e-100020"`},
+		{"123e99999", `exponent out of range in number "123e99999"`},
+		{"0.001e100003", `exponent out of range in number "0.001e100003"`},
+		{"1e2147483648", `exponent out of range in number "1e2147483648"`},
 	}
 	for _, tc := range decCases {
 		t.Run("Decimal/"+tc.lit, func(t *testing.T) {

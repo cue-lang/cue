@@ -5,27 +5,36 @@ maxExp:      1e100000
 minExp:      1e-100000
 zeroExp:     0e100001
 fracExp:     0.1e-99999
-
-// These are wrong: they evaluate to the number without its exponent.
 overExp:     1e100001
 underExp:    1e-100020
 overAdjExp:  123e99999
 overExpExpr: 9e200000 + 1
 hugeExp:     1e2147483648
-// This is wrong: the exponent of the last digit is also limited,
-// as arithmetic fails beyond it.
+// The exponent of the last digit is also limited, as arithmetic fails beyond it.
 fracUnderExp: 1.5e-100000
 -- out/compile --
+overExp: error converting number to decimal: exponent out of range in number "1e100001":
+    ./in.cue:6:14
+underExp: error converting number to decimal: exponent out of range in number "1e-100020":
+    ./in.cue:7:14
+overAdjExp: error converting number to decimal: exponent out of range in number "123e99999":
+    ./in.cue:8:14
+overExpExpr: error converting number to decimal: exponent out of range in number "9e200000":
+    ./in.cue:9:14
+hugeExp: error converting number to decimal: exponent out of range in number "1e2147483648":
+    ./in.cue:10:14
+fracUnderExp: error converting number to decimal: exponent out of range in number "1.5e-100000":
+    ./in.cue:12:15
 --- in.cue
 {
   maxExp: 1E+100000
   minExp: 1E-100000
   zeroExp: 0.0
   fracExp: 1E-100000
-  overExp: 1.0
-  underExp: 1.0
-  overAdjExp: 123.0
-  overExpExpr: (9.0 + 1)
-  hugeExp: NaN.0
-  fracUnderExp: 1.5E-100000
+  overExp: _|_(error converting number to decimal: exponent out of range in number "1e100001")
+  underExp: _|_(error converting number to decimal: exponent out of range in number "1e-100020")
+  overAdjExp: _|_(error converting number to decimal: exponent out of range in number "123e99999")
+  overExpExpr: (_|_(error converting number to decimal: exponent out of range in number "9e200000") + 1)
+  hugeExp: _|_(error converting number to decimal: exponent out of range in number "1e2147483648")
+  fracUnderExp: _|_(error converting number to decimal: exponent out of range in number "1.5e-100000")
 }

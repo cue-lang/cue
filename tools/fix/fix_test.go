@@ -736,8 +736,6 @@ y: x.b
 l: L=[1] + [2]
 m: l
 `,
-			// Wrong: the references to x and l are left dangling, so they
-			// are renamed and bound by spurious let clauses.
 			out: `@experiment(explicitopen)
 
 package foo
@@ -750,13 +748,9 @@ x: X=__closeAll({
 	b: 1
 	c: X.b
 })
-y: x_9.b
+y: x.b
 l: L=list.Concat([[1], [2]])
-m: l_B
-
-let x_9 = x
-
-let l_B = l
+m: l
 `,
 		},
 
@@ -774,7 +768,6 @@ x: X={
 }
 y: x.b
 `,
-			// Wrong: as above.
 			out: `@experiment(aliasv2)
 
 @experiment(explicitopen)
@@ -790,9 +783,7 @@ x: {
 		c: X.b
 	})
 }
-y: x_9.b
-
-let x_9 = x
+y: x.b
 `,
 		},
 

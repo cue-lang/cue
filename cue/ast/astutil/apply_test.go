@@ -551,12 +551,9 @@ b: a
 a: X={b: 1, c: X.b}
 d: a.b
 `,
-		// Wrong: the reference is left dangling, so Sanitize adds a let.
 		out: `
 a: X={b: 2, c: X.b}
-d: a_9.b
-
-let a_9 = a
+d: a.b
 `,
 		after: func(c astutil.Cursor) bool {
 			if x, ok := c.Node().(*ast.BasicLit); ok {

@@ -221,10 +221,8 @@ func Apply(node ast.Node, before, after func(Cursor) bool) ast.Node {
 // A applyVisitor's Before method is invoked for each node encountered by Walk.
 // If the result applyVisitor w is true, Walk visits each of the children
 // of node with the applyVisitor w, followed by a call of w.After.
-// The Mapping method is used to record changes to values that affect
-// Ident.Node and Ident.Scope fields.
-// TODO: currently, Mapping is only used to record Field.Value changes. Track
-// more changes in the future.
+// The Mapping method records a node which was replaced by another, so that
+// identifiers bound to the old node are bound to the new one.
 type applyVisitor interface {
 	Before(Cursor) applyVisitor
 	After(Cursor)
@@ -275,6 +273,9 @@ func applyDeclList(v applyVisitor, parent Cursor, list []ast.Decl) []ast.Decl {
 		c.typ = &list[i]
 		applyCursor(v, c)
 		if !c.delete {
+			if ast.Node(x) != c.node {
+				v.Mapping(x, c.node)
+			}
 			c.decls = append(c.decls, c.node.(ast.Decl))
 		}
 		c.delete = false
@@ -335,6 +336,7 @@ func apply[N ast.NilableNode](v applyVisitor, parent Cursor, nodePtr *N) {
 		parent.self().modified = true
 	}
 	if ast.Node(node) != c.node {
+		v.Mapping(node, c.node)
 		*nodePtr = c.node.(N)
 	}
 }
@@ -355,6 +357,7 @@ func applyList[N ast.NilableNode](v applyVisitor, parent Cursor, list []N) {
 		c.typ = &list[i]
 		applyCursor(v, c)
 		if ast.Node(node) != c.node {
+			v.Mapping(node, c.node)
 			list[i] = c.node.(N)
 		}
 	}
@@ -526,6 +529,7 @@ func applyCursor(v applyVisitor, c Cursor) {
 	}
 
 	v.After(c)
+	// The value of a field may also be changed in place.
 	if f, ok := node.(*ast.Field); ok && beforeValue != f.Value {
 		v.Mapping(beforeValue, f.Value)
 	}

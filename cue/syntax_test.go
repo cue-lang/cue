@@ -252,6 +252,48 @@ if true {
 	_#cond: true
 	a:      1
 }`,
+	}, {
+		// Each instance of a pattern constraint gets its own copy of a field
+		// with an alias.
+		name: "field alias in pattern constraint",
+		in: `
+		inp: string
+		t: [string]: {
+			a:   string
+			y~Y: a + inp
+			z:   "x" + Y
+		}
+		t: foo: a: "1"
+		t: bar: a: "2"
+		x: {p: t.foo, q: t.bar}
+		`,
+		path: "x",
+		// Wrong: the field y is one syntax node shared by p and q, so its
+		// reference to a is bound to a let clause which does not resolve.
+		out: `
+{
+	p: {
+		{
+			a:     string
+			y~(Y): a_9 + INP
+			z:     "x" + Y
+		}
+		a: "1"
+	}
+	q: {
+		{
+			a:     string
+			y~(Y): a_9 + INP
+			z:     "x" + Y
+		}
+		a: "2"
+	}
+
+	//cue:path: inp
+	let INP = string
+
+	let a_9 = a
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

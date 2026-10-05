@@ -30,9 +30,10 @@ cd ..
 # A time.Time field promoted from a struct declared in another Go file
 # which, unlike the file declaring the embedding struct, imports time.
 # The package is generated on its own, as ./... skips testdata directories.
-# Generating the field fails rather than importing the package.
-! exec cue get go --local ./testdata/promoted
-stderr 'invalid identifier ""'
+exec cue get go --local ./testdata/promoted
+cmp ./testdata/promoted/a_go_gen.cue ./testdata/promoted/a_go_gen.cue.golden
+cmp ./testdata/promoted/b_go_gen.cue ./testdata/promoted/b_go_gen.cue.golden
+exec cue vet -c=false ./testdata/promoted
 
 # Verify dependencies did not change
 cmp go.mod go.mod.golden

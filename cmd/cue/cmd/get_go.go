@@ -27,7 +27,6 @@ import (
 	"maps"
 	"math/big"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -372,8 +371,10 @@ type extractor struct {
 	k8sSemantic bool
 
 	// per file
-	cmap     ast.CommentMap
-	pkgNames map[string]pkgInfo
+	cmap ast.CommentMap
+	// pkgNames maps the paths of the packages imported by the current Go file
+	// to the names they are imported as.
+	pkgNames map[string]string
 
 	// omits holds the --omit selectors, along with the packages they matched in.
 	omits []omitSelector
@@ -459,11 +460,6 @@ func lookupCodec(name string) *codec {
 		}
 	}
 	return &codec{name: name, tagKey: name}
-}
-
-type pkgInfo struct {
-	id   string
-	name string
 }
 
 func (e *extractor) logf(format string, args ...any) {
@@ -863,22 +859,15 @@ outer:
 	for i, f := range p.Syntax {
 		e.cmap = ast.NewCommentMap(p.Fset, f, f.Comments)
 
-		e.pkgNames = map[string]pkgInfo{}
+		e.pkgNames = map[string]string{}
 
 		for _, spec := range f.Imports {
 			pkgPath, _ := strconv.Unquote(spec.Path.Value)
-			pkg := p.Imports[pkgPath]
-
-			info := pkgInfo{id: pkgPath, name: pkg.Name}
-			if path.Base(pkgPath) != pkg.Name {
-				info.id += ":" + pkg.Name
-			}
-
+			name := p.Imports[pkgPath].Name
 			if spec.Name != nil {
-				info.name = spec.Name.Name
+				name = spec.Name.Name
 			}
-
-			e.pkgNames[pkgPath] = info
+			e.pkgNames[pkgPath] = name
 		}
 
 		pkgDoc := makeDoc(f.Doc, true)
@@ -1601,6 +1590,25 @@ func (e *extractor) makeType(typ types.Type, kind fieldKind, attrs fieldAttribut
 	return e.makeType2(typ, kind, attrs)
 }
 
+// pkgRef returns an identifier referring to pkg, resolving to its import.
+// A package which the current Go file does not import, such as one used
+// by a type alias or by a promoted field declared in another file,
+// is referred to by its own name.
+func (e *extractor) pkgRef(pkg *types.Package) *cueast.Ident {
+	name, ok := e.pkgNames[pkg.Path()]
+	if !ok {
+		name = pkg.Name()
+	}
+	ref := e.ident(name, false)
+	var alias *cueast.Ident
+	if name != pkg.Name() {
+		alias = e.ident(name, false)
+	}
+	id := cueast.ImportPath{Path: pkg.Path(), Qualifier: pkg.Name()}.String()
+	ref.Node = cueast.NewImport(alias, id)
+	return ref
+}
+
 func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttributes) (result cueast.Expr) {
 	switch typ := types.Unalias(typ).(type) {
 	case *types.Named:
@@ -1612,13 +1620,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		// Check for builtin packages.
 		switch {
 		case pkg.Path() == "time" && obj.Name() == "Time":
-			ref := e.ident(e.pkgNames[pkg.Path()].name, false)
-			var name *cueast.Ident
-			if ref.Name != "time" {
-				name = e.ident(ref.Name, false)
-			}
-			ref.Node = cueast.NewImport(name, "time")
-			return cueast.NewSel(ref, obj.Name())
+			return cueast.NewSel(e.pkgRef(pkg), obj.Name())
 
 		case pkg.Path() == "time" && obj.Name() == "Duration":
 			// Go's time.Duration is an int64 to represent nanoseconds,
@@ -1680,27 +1682,9 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		}
 		result = e.ident(obj.Name(), true)
 		if pkg != e.pkg.Types {
-			info := e.pkgNames[pkg.Path()]
-			if info.name == "" {
-				info.name = pkg.Name()
-			}
-			p := e.ident(info.name, false)
-			var name *cueast.Ident
-			if info.name != pkg.Name() {
-				name = e.ident(info.name, false)
-			}
-			if info.id == "" {
-				// This may happen if an alias is defined in a different file
-				// within this package referring to yet another package.
-				info.id = pkg.Path()
-				if path.Base(info.id) != pkg.Name() {
-					info.id += ":" + pkg.Name()
-				}
-			}
-			p.Node = cueast.NewImport(name, info.id)
 			// makeType is always called to describe a type, so whatever
 			// this is referring to, it must be a definition.
-			result = cueast.NewSel(p, "#"+obj.Name())
+			result = cueast.NewSel(e.pkgRef(pkg), "#"+obj.Name())
 			e.usedPkg(pkg.Path())
 		}
 
@@ -1997,8 +1981,8 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 			if pkg == e.pkg.Types {
 				return ""
 			}
-			if info, ok := e.pkgNames[pkg.Path()]; ok {
-				return info.name
+			if name, ok := e.pkgNames[pkg.Path()]; ok {
+				return name
 			}
 			return pkg.Path()
 		})

@@ -15,6 +15,7 @@
 package cue_test
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -24,6 +25,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	cueload "cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
 )
@@ -54,6 +56,7 @@ func TestSyntax(t *testing.T) {
 		}
 		`,
 		options: o(cue.Docs(true)),
+		// Wrong: the result shares nodes with the source.
 		out: `
 {
 
@@ -67,7 +70,8 @@ func TestSyntax(t *testing.T) {
 			hello2: "world"
 		}
 	}
-}`,
+}
+(editing the result modified the source)`,
 	}, {
 		name: "partially resolvable",
 		in: `
@@ -268,6 +272,7 @@ if true {
 		x: {p: t.foo, q: t.bar}
 		`,
 		path: "x",
+		// Wrong: the result shares nodes with the source.
 		out: `
 {
 	p: {
@@ -289,12 +294,92 @@ if true {
 
 	//cue:path: inp
 	let INP = string
-}`,
+}
+(editing the result modified the source)`,
+	}, {
+		name: "docs and attributes of a value",
+		in: `
+		a: {
+			// doc y
+			y: 2 @foo(bar)
+
+			@decl(a)
+		}
+		b: {#D: 1, y: int} & a
+		`,
+		path:    "b",
+		options: o(cue.Final(), cue.Docs(true), cue.Attributes(true)),
+		// Wrong: the result shares nodes with the source.
+		out: `
+{
+
+	@decl(a)
+
+	// doc y
+	y: 2 @foo(bar)
+}
+(editing the result modified the source)`,
+	}, {
+		name: "docs and attributes of a schema",
+		in: `
+		a: {
+			// doc y
+			y: 2 @foo(bar)
+
+			@decl(a)
+		}
+		b: {#D: 1, y: int} & a
+		`,
+		path:    "b",
+		options: o(cue.Docs(true), cue.Attributes(true)),
+		// Wrong: the result shares nodes with the source.
+		out: `
+{
+
+	@decl(a)
+
+	// doc y
+	y: 2 @foo(bar)
+} & {
+	#D: 1
+	y:  int
+}
+(editing the result modified the source)`,
+	}, {
+		name: "docs of a file",
+		in: `
+		// file comment
+
+		// package doc
+		package foo
+
+		// doc a
+		a: [
+			// doc elem
+			1,
+		]
+		`,
+		options: o(cue.Raw(), cue.Docs(true)),
+		// Wrong: the result shares nodes with the source.
+		out: `
+// file comment
+
+// package doc
+package foo
+
+// doc a
+a: [1]
+(editing the result modified the source)`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := cuecontext.New()
-			v := ctx.CompileString(tc.in)
+			f, err := parser.ParseFile("", tc.in, parser.ParseComments)
+			if err != nil {
+				t.Fatal(err)
+			}
+			v := ctx.BuildFile(f)
+			src := ast.Clone(f)
 			v = v.LookupPath(cue.ParsePath(tc.path))
 
 			syntax := v.Syntax(tc.options...)
@@ -303,6 +388,29 @@ if true {
 				t.Fatal(err)
 			}
 			got := strings.TrimSpace(string(b))
+
+			// The result may be edited in place, so it must not share any
+			// nodes with the source.
+			ast.Walk(syntax, func(n ast.Node) bool {
+				switch x := n.(type) {
+				case *ast.Comment:
+					x.Text = "// edited"
+				case *ast.Attribute:
+					x.Text = "@edited()"
+				case *ast.Ident:
+					x.Name = "edited"
+				case *ast.BasicLit:
+					x.Value = `"edited"`
+				}
+				return true
+			}, nil)
+			if _, err := format.NodeInPlace(syntax, format.Compact()); err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(f, src) {
+				got += "\n(editing the result modified the source)"
+			}
+
 			want := strings.TrimSpace(tc.out)
 			if got != want {
 				t.Errorf("got: %v; want %v", got, want)

@@ -316,7 +316,10 @@ func TestConvert(t *testing.T) {
 			A int
 			B int `json:"-"`
 			C int `json:",omitempty"`
-		}{3, 4, 0},
+			//lint:ignore SA5008 the field is named "-"
+			D int `json:"-,"`
+		}{3, 4, 0, 5},
+		// Wrong: the field named "-" is missing.
 		`(struct){
   A: (int){ 3 }
 }`,
@@ -760,12 +763,15 @@ func TestConvertType(t *testing.T) {
 	}, {
 		goTyp: struct {
 			A int `json:"-"` // skip
+			//lint:ignore SA5008 the field is named "-"
+			N int `json:"-,"`
 			D *apd.Decimal
 			P ***apd.Decimal
 			I interface{ Foo() }
 			T string `cue:""` // allowed
 			h int
 		}{},
+		// Wrong: the field named "-" is missing.
 		want: `(struct){
   D?: (number){ number }
   P?: ((null|number)){ |(*(null){ null }, (number){ number }) }

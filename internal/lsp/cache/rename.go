@@ -63,12 +63,13 @@ func (w *Workspace) Rename(file *File, fe *eval.FileEvaluator, srcMapper *protoc
 	}
 
 	changes := make(map[protocol.DocumentURI]*versionedEdits)
+	mappers := make(map[*token.File]*protocol.Mapper)
 	for _, target := range targets {
 		startPos := target.Pos().Position()
 		endPos := target.End().Position()
 
 		targetFile := target.Pos().File()
-		targetMapper := w.mappers[targetFile]
+		targetMapper := w.mapperFor(mappers, targetFile)
 		if targetMapper == nil {
 			w.debugLog("mapper not found: " + targetFile.Name())
 			return nil
@@ -142,8 +143,9 @@ func (w *Workspace) PrepareRename(file *File, fe *eval.FileEvaluator, srcMapper 
 	// and return its range.
 	posRange := protocol.Range{Start: pos, End: pos}
 	for _, target := range targets {
-		targetFile := target.Pos().File()
-		if targetFile != tokFile {
+		// Compare by filename, as tokFile or target may come from
+		// a stale parse of this file.
+		if target.Pos().Filename() != tokFile.Name() {
 			continue
 		}
 

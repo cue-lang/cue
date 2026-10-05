@@ -56,12 +56,13 @@ func (w *Workspace) Definition(file *File, fe *eval.FileEvaluator, srcMapper *pr
 	}
 
 	locations := make([]protocol.Location, len(targets))
+	mappers := make(map[*token.File]*protocol.Mapper)
 	for i, target := range targets {
 		startPos := target.Pos().Position()
 		endPos := target.End().Position()
 
 		targetFile := target.Pos().File()
-		targetMapper := w.mappers[targetFile]
+		targetMapper := w.mapperFor(mappers, targetFile)
 		if targetMapper == nil {
 			w.debugLog("mapper not found: " + targetFile.Name())
 			return nil
@@ -108,12 +109,13 @@ func (w *Workspace) References(file *File, fe *eval.FileEvaluator, srcMapper *pr
 	}
 
 	var locations []protocol.Location
+	mappers := make(map[*token.File]*protocol.Mapper)
 	for _, target := range targets {
 		startPos := target.Pos().Position()
 		endPos := target.End().Position()
 
 		targetFile := target.Pos().File()
-		targetMapper := w.mappers[targetFile]
+		targetMapper := w.mapperFor(mappers, targetFile)
 		if targetMapper == nil {
 			// The target may have no mapper, such as a declaration
 			// within a standard library package, which has no on-disk
@@ -495,8 +497,8 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadExtra 
 		w.debugLog("file not found: " + string(fileUri))
 		return nil, nil, nil, nil
 	}
-	srcMapper := w.mappers[file.tokFile]
-	if srcMapper == nil {
+	srcMapper := file.mapper
+	if srcMapper == nil || file.tokFile == nil {
 		w.debugLog("mapper not found: " + string(fileUri))
 		return nil, nil, nil, nil
 	}

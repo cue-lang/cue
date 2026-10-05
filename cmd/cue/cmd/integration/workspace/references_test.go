@@ -205,23 +205,21 @@ baz: 2
 		loc := locations(2)
 
 		// Finding references loads the package in a/b too.
-		// Wrong: the references are the declaration and the usage.
 		env.OpenFile("a/x.cue")
 		env.Await(env.DoneWithOpen())
 		qt.Check(t, qt.DeepEquals(env.Definition(loc.from), []protocol.Location{loc.decl}))
-		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location(nil)))
+		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location{loc.decl, loc.usage}))
 
 		// Opening or editing a/b/y.cue reloads only the package in a/b.
-		// Wrong: the definition and the references are as above.
 		env.OpenFile("a/b/y.cue")
 		env.Await(env.DoneWithOpen())
-		qt.Check(t, qt.DeepEquals(env.Definition(loc.from), []protocol.Location(nil)))
-		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location(nil)))
+		qt.Check(t, qt.DeepEquals(env.Definition(loc.from), []protocol.Location{loc.decl}))
+		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location{loc.decl, loc.usage}))
 
 		env.EditBuffer("a/b/y.cue", fake.NewEdit(0, 0, 0, 0, "\n"))
 		env.Await(env.DoneWithChange())
-		qt.Check(t, qt.DeepEquals(env.Definition(loc.from), []protocol.Location(nil)))
-		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location(nil)))
+		qt.Check(t, qt.DeepEquals(env.Definition(loc.from), []protocol.Location{loc.decl}))
+		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location{loc.decl, loc.usage}))
 
 		// Editing a/x.cue reloads both packages.
 		env.EditBuffer("a/x.cue", fake.NewEdit(0, 0, 0, 0, "\n"))
@@ -230,7 +228,6 @@ baz: 2
 		qt.Check(t, qt.DeepEquals(env.Definition(loc.from), []protocol.Location{loc.decl}))
 		qt.Check(t, qt.DeepEquals(env.References(loc.from), []protocol.Location{loc.decl, loc.usage}))
 
-		// Wrong: foo can be renamed, which edits a/x.cue.
 		env.EditBuffer("a/b/y.cue", fake.NewEdit(0, 0, 0, 0, "\n"))
 		env.Await(env.DoneWithChange())
 		pos := protocol.TextDocumentPositionParams{
@@ -239,13 +236,13 @@ baz: 2
 		}
 		placeholder, err := env.Editor.Server.PrepareRename(env.Ctx, &protocol.PrepareRenameParams{TextDocumentPositionParams: pos})
 		qt.Assert(t, qt.IsNil(err))
-		qt.Check(t, qt.IsNil(placeholder))
+		qt.Check(t, qt.DeepEquals(placeholder, &protocol.PrepareRenamePlaceholder{Range: loc.decl.Range, Placeholder: "foo"}))
 		edit, err := env.Editor.Server.Rename(env.Ctx, &protocol.RenameParams{
 			TextDocument: pos.TextDocument,
 			Position:     pos.Position,
 			NewName:      "qux",
 		})
 		qt.Assert(t, qt.IsNil(err))
-		qt.Check(t, qt.IsNil(edit))
+		qt.Check(t, qt.IsNotNil(edit))
 	})
 }

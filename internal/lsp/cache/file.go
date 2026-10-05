@@ -199,10 +199,38 @@ func (f *File) maybeDelete() {
 			w.client.PublishDiagnostics(context.Background(), params)
 		})
 	}
-	if tokFile := f.tokFile; tokFile != nil {
-		delete(w.mappers, tokFile)
-	}
 	delete(w.files, f.uri)
+}
+
+// mapperFor returns the mapper for positions within tokFile, or nil
+// if tokFile is not a parse of one of the workspace's files, such as
+// a standard library file.
+//
+// A [File] can have several parses in use at once, each with its own
+// [token.File]: every package which includes the file parses it on
+// load, and they are not all reloaded together. So the File is found
+// by name, and a parse other than the File's most recent one gets a
+// mapper for its own content. Such mappers are kept in built, so that
+// a request which maps many positions builds each one once.
+func (w *Workspace) mapperFor(built map[*token.File]*protocol.Mapper, tokFile *token.File) *protocol.Mapper {
+	// Only files read via the workspace's file system have content.
+	content := tokFile.Content()
+	if content == nil {
+		return nil
+	}
+	f := w.files[protocol.URIFromPath(tokFile.Name())]
+	if f == nil {
+		return nil
+	}
+	if f.tokFile == tokFile {
+		return f.mapper
+	}
+	m := built[tokFile]
+	if m == nil {
+		m = protocol.NewMapper(f.uri, content)
+		built[tokFile] = m
+	}
+	return m
 }
 
 // setSyntax updates this state with the provided syntax. All derived
@@ -214,10 +242,6 @@ func (f *File) maybeDelete() {
 // is used to build the file's mapper, so that errors can still be
 // converted to diagnostics for this file.
 func (f *File) setSyntax(syntax *ast.File, content []byte) {
-	w := f.workspace
-	if oldTokFile := f.tokFile; oldTokFile != nil {
-		delete(w.mappers, oldTokFile)
-	}
 	f.syntax = syntax
 	var tokFile *token.File
 	if syntax != nil {
@@ -234,9 +258,6 @@ func (f *File) setSyntax(syntax *ast.File, content []byte) {
 		f.mapper = nil
 	} else {
 		f.mapper = protocol.NewMapper(f.uri, content)
-		if tokFile != nil {
-			w.mappers[tokFile] = f.mapper
-		}
 	}
 	f.symbols = nil
 }

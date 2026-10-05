@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/build"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -57,7 +56,6 @@ type Workspace struct {
 	// separate from code which deals with cue modules+packages.
 	folders []*WorkspaceFolder
 	modules map[protocol.DocumentURI]*Module
-	mappers map[*token.File]*protocol.Mapper
 
 	// deletedPkgs holds the packages deleted since
 	// [Workspace.reloadPackages] last marked their importers and
@@ -110,7 +108,6 @@ func NewWorkspace(cache *Cache, client protocol.Client, debugLog func(string), e
 		overlayFS:        overlayFS,
 		debugLog:         debugLog,
 		modules:          make(map[protocol.DocumentURI]*Module),
-		mappers:          make(map[*token.File]*protocol.Mapper),
 		files:            make(map[protocol.DocumentURI]*File),
 		enqueue:          enqueue,
 		diagnosticsDelay: diagnosticsDelay,

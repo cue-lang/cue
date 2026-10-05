@@ -228,8 +228,7 @@ func (f *standaloneFile) delete() {
 }
 
 // reload reloads the file, reparses it and updates its state,
-// updating the syntax and definitions fields, along with the
-// workspace's mappers.
+// updating the syntax and definitions fields.
 //
 // If the file cannot be read at all then the file is deleted and
 // [ErrBadFile] is returned.

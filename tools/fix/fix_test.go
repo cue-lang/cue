@@ -839,13 +839,13 @@ V: {
 	z: 1
 }
 `,
-			// Wrong: the comments on the struct literals are dropped.
 			out: `@experiment(explicitopen)
 
 package foo
 
 #A: a: int
 Y: __closeAll({
+	// doc on struct
 	{
 		#A...
 	}
@@ -853,6 +853,7 @@ Y: __closeAll({
 })
 V: __closeAll({
 	// doc on close
+	// doc on struct
 	{
 		#A...
 	} // line on close

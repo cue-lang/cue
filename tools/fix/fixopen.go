@@ -753,7 +753,12 @@ func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, fl
 					return expr, false, embedFlags{}
 				}
 				f.close = true
-				astutil.CopyMeta(newArg, x)
+				// The argument takes the place of the call, and keeps
+				// its own comments beside those of the call.
+				astutil.CopyPosition(newArg, x)
+				for _, cg := range ast.Comments(x) {
+					ast.AddComment(newArg, cg)
+				}
 				return newArg, true, f
 			}
 			return expr, true, embedFlags{close: true}

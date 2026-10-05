@@ -16,11 +16,17 @@ package load
 
 import (
 	"bytes"
+	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/diff"
 )
@@ -118,6 +124,154 @@ func TestTags(t *testing.T) {
 					t.Error(b)
 				}
 			}
+		})
+	}
+
+	// The syntax trees of the loaded instances hold each injected value once,
+	// and loading does not modify the syntax trees given via [FromFile],
+	// so the result is the same when loading a second time.
+	syntaxCases := []struct {
+		name    string
+		overlay map[string]string
+		// fromString gives the overlay via [FromString] rather than [FromFile],
+		// so that the loader parses the files like it does files on disk.
+		fromString bool
+		args       []string
+		want       string
+	}{{
+		name: "FromFile",
+		overlay: map[string]string{
+			"x.cue": "package x\n\na: string @tag(foo)\nb: a\n",
+		},
+		args: []string{"."},
+		// The value is injected into the given syntax tree on each load.
+		want: `== x.cue
+package x
+
+a: string & "bar" & "bar" @tag(foo)
+b: a
+`,
+	}, {
+		// Both instances share the file in the parent directory.
+		// The value is injected once per instance as well as on each load.
+		name: "SharedParentFile",
+		overlay: map[string]string{
+			"x.cue":     "package x\n\na: string @tag(foo)\n",
+			"sub/y.cue": "package x\n\nb: a\n",
+		},
+		args: []string{"./..."},
+		want: `== x.cue
+package x
+
+a: string & "bar" & "bar" & "bar" & "bar" @tag(foo)
+== x.cue
+package x
+
+a: string & "bar" & "bar" & "bar" & "bar" @tag(foo)
+== y.cue
+package x
+
+b: a
+`,
+	}, {
+		// Both instances share the file parsed by the loader.
+		// The value is injected once per instance.
+		name: "SharedParentFileFromString",
+		overlay: map[string]string{
+			"x.cue":     "package x\n\na: string @tag(foo)\n",
+			"sub/y.cue": "package x\n\nb: a\n",
+		},
+		fromString: true,
+		args:       []string{"./..."},
+		want: `== x.cue
+package x
+
+a: string & "bar" & "bar" @tag(foo)
+== x.cue
+package x
+
+a: string & "bar" & "bar" @tag(foo)
+== y.cue
+package x
+
+b: a
+`,
+	}, {
+		// The value is injected via the second of the field's tags.
+		name: "SharedParentFileMultipleTags",
+		overlay: map[string]string{
+			"x.cue":     "package x\n\na: string @tag(other) @tag(foo)\n",
+			"sub/y.cue": "package x\n\nb: a\n",
+		},
+		fromString: true,
+		args:       []string{"./..."},
+		want: `== x.cue
+package x
+
+a: string & "bar" & "bar" @tag(other) @tag(foo)
+== x.cue
+package x
+
+a: string & "bar" & "bar" @tag(other) @tag(foo)
+== y.cue
+package x
+
+b: a
+`,
+	}, {
+		// A tag variable is injected alongside the other tag.
+		name: "SharedParentFileTagVar",
+		overlay: map[string]string{
+			"x.cue":     "package x\n\na: string @tag(foo) @tag(v,var=os)\n",
+			"sub/y.cue": "package x\n\nb: a\n",
+		},
+		fromString: true,
+		args:       []string{"./..."},
+		want: `== x.cue
+package x
+
+a: string & "bar" & "bar" & "m1" & "m1" @tag(foo) @tag(v,var=os)
+== x.cue
+package x
+
+a: string & "bar" & "bar" & "m1" & "m1" @tag(foo) @tag(v,var=os)
+== y.cue
+package x
+
+b: a
+`,
+	}}
+	for _, tc := range syntaxCases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := &Config{
+				Dir: dir,
+				Overlay: map[string]Source{
+					filepath.Join(dir, "cue.mod", "module.cue"): FromString(`module: "mod.test", language: version: "v0.9.0"`),
+				},
+				Tags:    []string{"foo=bar"},
+				TagVars: testTagVars,
+			}
+			for name, src := range tc.overlay {
+				name = filepath.Join(dir, filepath.FromSlash(name))
+				if tc.fromString {
+					cfg.Overlay[name] = FromString(src)
+					continue
+				}
+				f, err := parser.ParseFile(name, src)
+				qt.Assert(t, qt.IsNil(err))
+				cfg.Overlay[name] = FromFile(f)
+			}
+			Instances(tc.args, cfg) // the result is checked on the second load
+			var buf strings.Builder
+			for _, inst := range Instances(tc.args, cfg) {
+				qt.Assert(t, qt.IsNil(inst.Err))
+				for _, f := range inst.Files {
+					b, err := format.Node(f)
+					qt.Assert(t, qt.IsNil(err))
+					fmt.Fprintf(&buf, "== %s\n%s", filepath.Base(f.Filename), b)
+				}
+			}
+			qt.Assert(t, qt.Equals(buf.String(), tc.want))
 		})
 	}
 }

@@ -565,6 +565,36 @@ d: a.b
 			return true
 		},
 	}, {
+		// A change to any element of a list of nodes marks the enclosing
+		// nodes as modified, here shown by an attribute on the field.
+		name: "modified list element",
+		in: `
+a: [1, 2, 3]
+b: [3, 2, 1]
+c: f(1, 3)
+d: f(3, 1)
+`,
+		// Wrong: a change to the last element is not reported.
+		out: `
+a: [1, 2, 4]
+b: [4, 2, 1] @modified()
+c: f(1, 4)
+d: f(4, 1)   @modified()
+`,
+		after: func(c astutil.Cursor) bool {
+			switch x := c.Node().(type) {
+			case *ast.BasicLit:
+				if x.Value == "3" {
+					c.Replace(ast.NewLit(token.INT, "4"))
+				}
+			case *ast.Field:
+				if c.Modified() {
+					x.Attrs = append(x.Attrs, &ast.Attribute{Text: "@modified()"})
+				}
+			}
+			return true
+		},
+	}, {
 		// A replacement which wraps the old node takes over its comments,
 		// rather than both nodes holding them.
 		name: "replace with wrapper",

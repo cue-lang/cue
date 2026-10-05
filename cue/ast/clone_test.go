@@ -303,6 +303,17 @@ func TestCloneExpr(t *testing.T) {
 	x1 := ast.Clone(x)
 	qt.Assert(t, qt.Equals(formatNode(t, x1), formatNode(t, x)))
 	qt.Assert(t, qt.Not(qt.Equals(x1, x)))
+
+	// The parser never sets the default expression of a field, but a
+	// constructed one is cloned like any other child.
+	// Wrong: the clone shares it with the original.
+	f := &ast.Field{
+		Label:   ast.NewIdent("a"),
+		Value:   ast.NewIdent("int"),
+		Default: ast.NewIdent("d"),
+	}
+	f1 := ast.Clone(f)
+	qt.Assert(t, qt.Equals(f1.Default, f.Default))
 }
 
 func TestClonePredeclared(t *testing.T) {

@@ -15,7 +15,6 @@
 package textproto
 
 import (
-	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -428,7 +427,8 @@ func (d *decoder) decodeValue(f *fieldInfo, n *pbast.Node) (x ast.Expr) {
 			if pbinternal.MatchBySymbol(f.Value, s, &x) {
 				return &x
 			}
-			d.addErrf(n.Start, "invalid number %s", s)
+			d.addErrf(n.Start, "invalid number %q", s)
+			return &ast.BottomLit{}
 		}
 		if !info.IsInt() {
 			return &ast.BasicLit{Kind: token.FLOAT, Value: s}
@@ -436,6 +436,7 @@ func (d *decoder) decodeValue(f *fieldInfo, n *pbast.Node) (x ast.Expr) {
 		return &ast.BasicLit{Kind: token.INT, Value: info.String()}
 
 	default:
-		panic(fmt.Sprintf("unexpected type %v", f.ValueType))
+		d.addErrf(n.Start, "unsupported type for field %s", f.Name)
+		return &ast.BottomLit{}
 	}
 }

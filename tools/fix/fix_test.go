@@ -719,6 +719,84 @@ W: [ // open list
 		},
 
 		{
+			// References to a field whose aliased value is rewritten keep
+			// referring to the field.
+			name:    "references to fields with a rewritten aliased value",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+x: X={
+	#A
+	b: 1
+	c: X.b
+}
+y: x.b
+l: L=[1] + [2]
+m: l
+`,
+			// Wrong: the references to x and l are left dangling, so they
+			// are renamed and bound by spurious let clauses.
+			out: `@experiment(explicitopen)
+
+package foo
+
+import "list"
+
+#A: a: int
+x: X=__closeAll({
+	#A...
+	b: 1
+	c: X.b
+})
+y: x_9.b
+l: L=list.Concat([[1], [2]])
+m: l_B
+
+let x_9 = x
+
+let l_B = l
+`,
+		},
+
+		{
+			name:    "references to fields with a rewritten aliased value (aliasv2)",
+			exps:    []string{"explicitopen", "aliasv2"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+x: X={
+	#A
+	b: 1
+	c: X.b
+}
+y: x.b
+`,
+			// Wrong: as above.
+			out: `@experiment(aliasv2)
+
+@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+x: {
+	let X = self
+	__closeAll({
+		#A...
+		b: 1
+		c: X.b
+	})
+}
+y: x_9.b
+
+let x_9 = x
+`,
+		},
+
+		{
 			// The wrapper starts on the line the literal started on, so
 			// that a line comment does not swallow the next element.
 			name:    "wrapped list elements keep their lines (fixExplicitOpen)",

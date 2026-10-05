@@ -35,6 +35,10 @@ func TestApply(t *testing.T) {
 		out    string
 		before func(astutil.Cursor) bool
 		after  func(astutil.Cursor) bool
+
+		// version pins the language version used to parse in, for inputs
+		// using syntax which the latest version no longer accepts.
+		version string
 	}{{
 		// This should pass
 	}, {
@@ -539,6 +543,31 @@ b: a
 			return true
 		},
 	}, {
+		// A reference to a field with a value alias is bound to the
+		// expression of the alias, and follows its replacement.
+		name:    "patch identifiers of value alias",
+		version: "v0.17.0",
+		in: `
+a: X={b: 1, c: X.b}
+d: a.b
+`,
+		// Wrong: the reference is left dangling, so Sanitize adds a let.
+		out: `
+a: X={b: 2, c: X.b}
+d: a_9.b
+
+let a_9 = a
+`,
+		after: func(c astutil.Cursor) bool {
+			if x, ok := c.Node().(*ast.BasicLit); ok {
+				x.Value = "2"
+			}
+			if x, ok := c.Node().(*ast.StructLit); ok {
+				c.Replace(&ast.StructLit{Elts: x.Elts})
+			}
+			return true
+		},
+	}, {
 		// A replacement which wraps the old node takes over its comments,
 		// rather than both nodes holding them.
 		name: "replace with wrapper",
@@ -566,7 +595,8 @@ x: [
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := parser.ParseFile(tc.name, tc.in, parser.ParseComments)
+			f, err := parser.ParseFile(tc.name, tc.in,
+				parser.ParseComments, parser.Version(tc.version))
 			if err != nil {
 				t.Fatal(err)
 			}

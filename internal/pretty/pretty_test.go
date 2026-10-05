@@ -562,6 +562,24 @@ x: 1 // on-field
      // on-value`[1:],
 		},
 		{
+			// A bare expression in a Decl slot, as the evaluator's
+			// value-to-syntax conversion produces, prints its comments
+			// once.
+			name: "bare_expr_decl_comment",
+			node: func() *ast.File {
+				b := &ast.BottomLit{}
+				ast.AddComment(b, &ast.CommentGroup{
+					Line:     true,
+					Position: 2,
+					List:     []*ast.Comment{{Text: "// error"}},
+				})
+				return &ast.File{Decls: []ast.Decl{b}}
+			}(),
+			cfg: &pretty.Config{Width: 80},
+			// TODO: the comment is printed twice.
+			want: "_|_ // error // error",
+		},
+		{
 			// We exercise node()'s ast.Expr dispatch branch by passing a
 			// bare expression directly.
 			name: "node_as_expr",

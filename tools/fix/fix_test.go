@@ -788,6 +788,33 @@ y: x.b
 		},
 
 		{
+			// An argument of a call is a value of its own, even when the
+			// call is embedded: the literal is closed where it stands, and
+			// does not close the struct which embeds the call.
+			name:    "struct literals in call arguments (fixExplicitOpen)",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+e1: {f(1, {#A, b: 1}), z: 1}
+e2: {f({#A, b: 1}, 1), z: 1}
+e3: f({#A, b: 1})
+`,
+			// Wrong: the embedded calls leave their literal open, and e2
+			// closes the struct which embeds the call instead.
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+e1: {f(1, {#A..., b: 1}), z: 1}
+e2: __closeAll({f({#A..., b: 1}, 1), z: 1})
+e3: f(__closeAll({#A..., b: 1}))
+`,
+		},
+
+		{
 			// The wrapper starts on the line the literal started on, so
 			// that a line comment does not swallow the next element.
 			name:    "wrapped list elements keep their lines (fixExplicitOpen)",

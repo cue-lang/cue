@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/token"
+	"github.com/cockroachdb/apd/v3"
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -105,6 +106,45 @@ func TestNumbers(t *testing.T) {
 			n.ch = 0
 			qt.Assert(t, qt.CmpEquals(n, tc.n, diffOpts...))
 			qt.Assert(t, qt.Equals(n.String(), tc.norm))
+		})
+	}
+
+	// dec is the result of [NumInfo.Decimal], or its error.
+	decCases := []struct {
+		lit string
+		dec string
+	}{
+		{"1.5Mi", "1572864"},
+		{"0x1234", "4660"},
+		{"1.3e-5", "0.000013"},
+		{"1e100000", "1E+100000"},
+		{"1e-100000", "1E-100000"},
+		{"123e99998", "1.23E+100000"},
+		{"0.1e-99999", "1E-100000"},
+		// A zero is zero with any exponent.
+		{"0e100001", "0"},
+		// The exponent of the last digit is also limited, as arithmetic fails
+		// beyond it. This is wrong: the number is accepted.
+		{"1.5e-100000", "1.5E-100000"},
+		// An exponent out of range must not result in another number.
+		// These are wrong: the exponent is dropped without an error.
+		{"1e100001", "1"},
+		{"1e-100020", "1"},
+		{"123e99999", "123"},
+		{"0.001e100003", "1"},
+		{"1e2147483648", "NaN"},
+	}
+	for _, tc := range decCases {
+		t.Run("Decimal/"+tc.lit, func(t *testing.T) {
+			qt.Assert(t, qt.IsNil(ParseNum(tc.lit, &n)))
+			var d apd.Decimal
+			var got string
+			if err := n.Decimal(&d); err != nil {
+				got = err.Error()
+			} else {
+				got = d.String()
+			}
+			qt.Assert(t, qt.Equals(got, tc.dec))
 		})
 	}
 }

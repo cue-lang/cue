@@ -1,0 +1,31 @@
+#inlinetest:exclude skip — compile errors.
+-- in.cue --
+// A float literal's exponent is limited to what decimal arithmetic supports.
+maxExp:      1e100000
+minExp:      1e-100000
+zeroExp:     0e100001
+fracExp:     0.1e-99999
+
+// These are wrong: they evaluate to the number without its exponent.
+overExp:     1e100001
+underExp:    1e-100020
+overAdjExp:  123e99999
+overExpExpr: 9e200000 + 1
+hugeExp:     1e2147483648
+// This is wrong: the exponent of the last digit is also limited,
+// as arithmetic fails beyond it.
+fracUnderExp: 1.5e-100000
+-- out/compile --
+--- in.cue
+{
+  maxExp: 1E+100000
+  minExp: 1E-100000
+  zeroExp: 0.0
+  fracExp: 1E-100000
+  overExp: 1.0
+  underExp: 1.0
+  overAdjExp: 123.0
+  overExpExpr: (9.0 + 1)
+  hugeExp: NaN.0
+  fracUnderExp: 1.5E-100000
+}

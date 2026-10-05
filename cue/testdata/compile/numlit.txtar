@@ -1,0 +1,30 @@
+#inlinetest:exclude skip — compile errors.
+-- in.cue --
+// A float literal's exponent is limited to what decimal arithmetic supports.
+maxExp:      1e100000
+minExp:      1e-100000
+zeroExp:     0e100001
+fracExp:     0.1e-99999
+
+// These are wrong: they evaluate to the number without its exponent.
+overExp:     1e100001
+underExp:    1e-100020
+overAdjExp:  123e99999
+overExpExpr: 9e200000 + 1
+hugeExp:     1e2147483648
+// This is wrong: the exponent of the last digit is also limited,
+// as arithmetic fails beyond it.
+fracUnderExp: 1.5e-100000
+-- out/evalalpha --
+(struct){
+  maxExp: (float){ 1E+100000 }
+  minExp: (float){ 1E-100000 }
+  zeroExp: (float){ 0.0 }
+  fracExp: (float){ 1E-100000 }
+  overExp: (float){ 1.0 }
+  underExp: (float){ 1.0 }
+  overAdjExp: (float){ 123.0 }
+  overExpExpr: (float){ 10.0 }
+  hugeExp: (float){ NaN.0 }
+  fracUnderExp: (float){ 1.5E-100000 }
+}

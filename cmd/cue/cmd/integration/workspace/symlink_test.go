@@ -66,6 +66,71 @@ package a
 	})
 }
 
+// TestSymlinksDefinition checks that a file which is reachable via
+// two paths is treated as two files, each with positions under its
+// own path.
+func TestSymlinksDefinition(t *testing.T) {
+	t.Parallel()
+	const files = `
+-- cue.mod/module.cue --
+module: "mod.example/x"
+language: version: "v0.11.0"
+-- real/x.cue --
+package p
+
+foo: 1
+-- real/y.cue --
+package p
+
+bar: foo
+-- c/c.cue --
+package c
+
+import "mod.example/x/link:p"
+
+v: p.foo
+`
+	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
+		rootURI := env.Sandbox.Workdir.RootURI()
+		rootFilePath := rootURI.FilePath()
+
+		// Need to wind the mtime of x.cue back into the past so that
+		// fs_cache will cache the file.
+		xCueFilePath := filepath.Join(rootFilePath, "real", "x.cue")
+		then := time.Now().Add(-10 * time.Second)
+		err := os.Chtimes(xCueFilePath, then, then)
+		qt.Assert(t, qt.IsNil(err))
+		err = os.Mkdir(filepath.Join(rootFilePath, "link"), 0o777)
+		qt.Assert(t, qt.IsNil(err))
+		err = os.Symlink(xCueFilePath, filepath.Join(rootFilePath, "link", "x.cue"))
+		qt.Assert(t, qt.IsNil(err))
+
+		fooRange := protocol.Range{
+			Start: protocol.Position{Line: 2, Character: 0},
+			End:   protocol.Position{Line: 2, Character: 3},
+		}
+
+		// The package in real reads x.cue first, as real/x.cue.
+		env.OpenFile("real/y.cue")
+		env.Await(env.DoneWithOpen())
+		got := env.Definition(protocol.Location{
+			URI:   rootURI + "/real/y.cue",
+			Range: protocol.Range{Start: protocol.Position{Line: 2, Character: 5}},
+		})
+		qt.Check(t, qt.DeepEquals(got, []protocol.Location{{URI: rootURI + "/real/x.cue", Range: fooRange}}))
+
+		// The package in link then reads the same file as link/x.cue.
+		// Wrong: the definition is in link/x.cue, the file which c imports.
+		env.OpenFile("c/c.cue")
+		env.Await(env.DoneWithOpen())
+		got = env.Definition(protocol.Location{
+			URI:   rootURI + "/c/c.cue",
+			Range: protocol.Range{Start: protocol.Position{Line: 4, Character: 5}},
+		})
+		qt.Check(t, qt.DeepEquals(got, []protocol.Location{{URI: rootURI + "/real/x.cue", Range: fooRange}}))
+	})
+}
+
 func TestSymlinksAncestor(t *testing.T) {
 	t.Parallel()
 	const files = `

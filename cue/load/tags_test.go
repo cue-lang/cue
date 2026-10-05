@@ -144,16 +144,14 @@ func TestTags(t *testing.T) {
 			"x.cue": "package x\n\na: string @tag(foo)\nb: a\n",
 		},
 		args: []string{"."},
-		// The value is injected into the given syntax tree on each load.
 		want: `== x.cue
 package x
 
-a: string & "bar" & "bar" @tag(foo)
+a: string & "bar" @tag(foo)
 b: a
 `,
 	}, {
 		// Both instances share the file in the parent directory.
-		// The value is injected once per instance as well as on each load.
 		name: "SharedParentFile",
 		overlay: map[string]string{
 			"x.cue":     "package x\n\na: string @tag(foo)\n",
@@ -163,11 +161,11 @@ b: a
 		want: `== x.cue
 package x
 
-a: string & "bar" & "bar" & "bar" & "bar" @tag(foo)
+a: string & "bar" @tag(foo)
 == x.cue
 package x
 
-a: string & "bar" & "bar" & "bar" & "bar" @tag(foo)
+a: string & "bar" @tag(foo)
 == y.cue
 package x
 
@@ -175,7 +173,6 @@ b: a
 `,
 	}, {
 		// Both instances share the file parsed by the loader.
-		// The value is injected once per instance.
 		name: "SharedParentFileFromString",
 		overlay: map[string]string{
 			"x.cue":     "package x\n\na: string @tag(foo)\n",
@@ -186,11 +183,11 @@ b: a
 		want: `== x.cue
 package x
 
-a: string & "bar" & "bar" @tag(foo)
+a: string & "bar" @tag(foo)
 == x.cue
 package x
 
-a: string & "bar" & "bar" @tag(foo)
+a: string & "bar" @tag(foo)
 == y.cue
 package x
 
@@ -208,11 +205,11 @@ b: a
 		want: `== x.cue
 package x
 
-a: string & "bar" & "bar" @tag(other) @tag(foo)
+a: string & "bar" @tag(other) @tag(foo)
 == x.cue
 package x
 
-a: string & "bar" & "bar" @tag(other) @tag(foo)
+a: string & "bar" @tag(other) @tag(foo)
 == y.cue
 package x
 
@@ -230,11 +227,11 @@ b: a
 		want: `== x.cue
 package x
 
-a: string & "bar" & "bar" & "m1" & "m1" @tag(foo) @tag(v,var=os)
+a: string & "bar" & "m1" @tag(foo) @tag(v,var=os)
 == x.cue
 package x
 
-a: string & "bar" & "bar" & "m1" & "m1" @tag(foo) @tag(v,var=os)
+a: string & "bar" & "m1" @tag(foo) @tag(v,var=os)
 == y.cue
 package x
 

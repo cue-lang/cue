@@ -35,8 +35,9 @@ func FromBytes(b []byte) Source {
 	return bytesSource(b)
 }
 
-// FromFile creates a Source from the given *ast.File. The file should not be
-// modified. It is assumed the file is error-free.
+// FromFile creates a Source from the given *ast.File. It is assumed the file
+// is error-free. Each call to [Instances] copies the file without modifying it,
+// so the loaded instances do not share any syntax with the caller.
 func FromFile(f *ast.File) Source {
 	return (*fileSource)(f)
 }
@@ -56,7 +57,9 @@ func (s bytesSource) contents() ([]byte, *ast.File, error) {
 type fileSource ast.File
 
 func (s *fileSource) contents() ([]byte, *ast.File, error) {
-	f := (*ast.File)(s)
+	// The loader modifies the syntax trees it hands out, such as when
+	// injecting tags, so it must not share them with the caller.
+	f := ast.Clone((*ast.File)(s))
 	// TODO: wasteful formatting, but needed for now.
 	b, err := format.Node(f)
 	return b, f, err

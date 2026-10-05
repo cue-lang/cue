@@ -26,6 +26,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modimports"
@@ -177,12 +178,23 @@ func Instances(args []string, c *Config) []*build.Instance {
 		a = append(a, l.cueFilesPackage(otherFiles))
 	}
 
+	// A file may be shared by multiple instances, such as one inherited from
+	// a parent directory, so collect the tags in each file once to inject each
+	// value once. Each instance still reports the errors in its files.
+	fileErrs := make(map[*ast.File]errors.Error)
 	for _, p := range a {
-		tags, err := findTags(p)
-		if err != nil {
-			p.ReportError(err)
+		for _, f := range p.Files {
+			err, seen := fileErrs[f]
+			if !seen {
+				var tags []*tag
+				tags, err = findTags(f)
+				fileErrs[f] = err
+				tg.tags = append(tg.tags, tags...)
+			}
+			if err != nil {
+				p.ReportError(err)
+			}
 		}
-		tg.tags = append(tg.tags, tags...)
 	}
 
 	// TODO(api): have API call that returns an error which is the aggregate
@@ -198,16 +210,14 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return a
 	}
 
-	for _, p := range a {
-		for _, f := range p.Files {
-			ast.Walk(f, nil, func(n ast.Node) {
-				if ident, ok := n.(*ast.Ident); ok {
-					if v, ok := tg.replacements[ident.Node]; ok {
-						ident.Node = v
-					}
+	for f := range fileErrs {
+		ast.Walk(f, nil, func(n ast.Node) {
+			if ident, ok := n.(*ast.Ident); ok {
+				if v, ok := tg.replacements[ident.Node]; ok {
+					ident.Node = v
 				}
-			})
-		}
+			}
+		})
 	}
 
 	return a

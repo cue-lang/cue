@@ -26,7 +26,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -232,7 +231,7 @@ func (t *tag) injectValue(x ast.Expr, tg *tagger) {
 // findTags defines which fields may be associated with tags.
 //
 // TODO: should we limit the depth at which tags may occur?
-func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
+func findTags(f *ast.File) (tags []*tag, errs errors.Error) {
 	findInvalidTags := func(x ast.Node, msg string) {
 		ast.Walk(x, nil, func(n ast.Node) {
 			if f, ok := n.(*ast.Field); ok {
@@ -245,41 +244,39 @@ func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
 			}
 		})
 	}
-	for _, f := range b.Files {
-		ast.Walk(f, func(n ast.Node) bool {
-			switch x := n.(type) {
-			case *ast.ListLit:
-				findInvalidTags(n, "@tag not allowed within lists")
+	ast.Walk(f, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.ListLit:
+			findInvalidTags(n, "@tag not allowed within lists")
+			return false
+
+		case *ast.Comprehension:
+			findInvalidTags(n, "@tag not allowed within comprehension")
+			return false
+
+		case *ast.Field:
+			// TODO: allow optional fields?
+			_, _, err := ast.LabelName(x.Label)
+			if err != nil || x.Constraint != token.ILLEGAL {
+				findInvalidTags(n, "@tag not allowed within field constraint")
 				return false
-
-			case *ast.Comprehension:
-				findInvalidTags(n, "@tag not allowed within comprehension")
-				return false
-
-			case *ast.Field:
-				// TODO: allow optional fields?
-				_, _, err := ast.LabelName(x.Label)
-				if err != nil || x.Constraint != token.ILLEGAL {
-					findInvalidTags(n, "@tag not allowed within field constraint")
-					return false
-				}
-
-				for _, a := range x.Attrs {
-					if a.Name() != "tag" {
-						continue
-					}
-					t, err := parseTag(a)
-					if err != nil {
-						errs = errors.Append(errs, err)
-						continue
-					}
-					t.field = x
-					tags = append(tags, t)
-				}
 			}
-			return true
-		}, nil)
-	}
+
+			for _, a := range x.Attrs {
+				if a.Name() != "tag" {
+					continue
+				}
+				t, err := parseTag(a)
+				if err != nil {
+					errs = errors.Append(errs, err)
+					continue
+				}
+				t.field = x
+				tags = append(tags, t)
+			}
+		}
+		return true
+	}, nil)
 	return tags, errs
 }
 

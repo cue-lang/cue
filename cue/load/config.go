@@ -286,7 +286,8 @@ type Config struct {
 	//
 	// An application may supply a custom implementation of ParseFile to change
 	// the effective file contents or the behavior of the parser, or to modify
-	// the syntax tree.
+	// the syntax tree. The loader owns the returned file and may modify it,
+	// such as when injecting tags, so ParseFile must not share it.
 	ParseFile func(name string, src interface{}, cfg parser.Config) (*ast.File, error)
 
 	// Overlay provides a mapping of absolute file paths to file contents,

@@ -1,0 +1,8 @@
+# A number field with an empty value.
+# The decoder panics rather than reporting an error.
+-- errors.cue --
+a?: int
+-- input.textproto --
+a:
+-- out/decode --
+panic: runtime error: index out of range [0] with length 0

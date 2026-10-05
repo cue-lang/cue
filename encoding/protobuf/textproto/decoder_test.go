@@ -19,9 +19,11 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -56,7 +58,14 @@ func TestParse(t *testing.T) {
 			}
 		}
 
-		x, err := d.Parse(schema, filename, b)
+		x, err := func() (x ast.Expr, err error) {
+			defer func() {
+				if r := recover(); r != nil {
+					err = errors.Newf(token.NoPos, "panic: %v", r)
+				}
+			}()
+			return d.Parse(schema, filename, b)
+		}()
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, "test"))
 			return

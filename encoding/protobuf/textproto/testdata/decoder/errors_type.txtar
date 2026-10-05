@@ -1,0 +1,8 @@
+# A field whose schema allows several scalar kinds has no protobuf type.
+# The decoder panics rather than reporting an error.
+-- errors.cue --
+a?: string | int
+-- input.textproto --
+a: 1
+-- out/decode --
+panic: unexpected type 0

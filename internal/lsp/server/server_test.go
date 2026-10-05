@@ -172,6 +172,17 @@ func TestLifecycle(t *testing.T) {
 			{hover, "ok"},
 		},
 	}, {
+		name:   "ConfigurationFails",
+		client: testClient{failConfiguration: true},
+		steps: []step{
+			{initialize, "ok"},
+			{initialized, "ok"},
+			// Wrong: the workspace folder should be usable without the
+			// client's configuration.
+			{didOpen, "panic"},
+			{hover, "ok"},
+		},
+	}, {
 		name: "RequestAfterShutdown",
 		steps: []step{
 			{initialize, "ok"},

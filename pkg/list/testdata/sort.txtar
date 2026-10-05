@@ -28,8 +28,8 @@ t3: {
 	l2: l
 	l3: ls
 }
-// An error in the comparator must be an error in the result.
-// Wrong: IsSorted and a less which is not a bool give a result.
+// An error in the comparator is an error in the result,
+// including a less field which is not a concrete bool.
 lessErr: {
 	s:  list.Sort([{a: 2}, {b: 1}], {x: _, y: _, less: x.a < y.a})
 	ss: list.SortStable([{a: 2}, {b: 1}], {x: _, y: _, less: x.a < y.a})
@@ -49,9 +49,8 @@ lessMissing: {
 	s:  list.Sort([2, 1], {x: _, y: _})
 	is: list.IsSorted([2, 1], {x: _, y: _})
 }
-// A less field which is not yet concrete must be an incomplete error,
+// A less field which is not yet concrete is an incomplete error,
 // so that the comparator may still be completed.
-// Wrong: the less field is treated as false.
 lessRef: {
 	#S: {
 		cond: bool
@@ -61,20 +60,27 @@ lessRef: {
 }
 -- out/list --
 Errors:
-lessErr.s: error in call to list.Sort: undefined field: a:
-    ./in.cue:32:6
-    ./in.cue:32:25
-    ./in.cue:32:35
-    ./in.cue:32:55
-lessErr.ss: error in call to list.SortStable: undefined field: a:
-    ./in.cue:33:6
-    ./in.cue:33:31
-    ./in.cue:33:41
-    ./in.cue:33:61
+lessString.s: error in call to list.Sort: cannot use "foo" (type string) as type bool:
+    ./in.cue:37:6
+    ./in.cue:37:43
+lessString.ss: error in call to list.SortStable: cannot use "foo" (type string) as type bool:
+    ./in.cue:38:6
+    ./in.cue:38:49
+lessString.is: error in call to list.IsSorted: cannot use "foo" (type string) as type bool:
+    ./in.cue:39:6
+    ./in.cue:39:47
+lessString.v: invalid value [2,1] (does not satisfy list.IsSorted({x:_,y:_,less:"foo"})): cannot use "foo" (type string) as type bool:
+    ./in.cue:40:15
+    ./in.cue:40:6
+    ./in.cue:40:48
 lessMissing.s: error in call to list.Sort: field not found: less:
     ./in.cue:47:6
+lessMissing.is: error in call to list.IsSorted: field not found: less:
+    ./in.cue:48:6
 
 Result:
+import "list"
+
 t1: {
 	l:   ["c", "b", "a"]
 	ls:  ["a", "b", "c"]
@@ -96,34 +102,72 @@ t3: {
 	l2:  ["c", "b", "a", "e"]
 	l3:  ["a", "b", "c", "e"]
 }
-// An error in the comparator must be an error in the result.
-// Wrong: IsSorted and a less which is not a bool give a result.
+// An error in the comparator is an error in the result,
+// including a less field which is not a concrete bool.
 lessErr: {
-	s:  _|_ // lessErr.s: error in call to list.Sort: less: undefined field: a
-	ss: _|_ // lessErr.ss: error in call to list.SortStable: less: undefined field: a
-	is: false
+	s: list.Sort([
+		{a: 2}, {b: 1},
+	], {
+		x:    _
+		y:    _
+		less: x.a < y.a
+	})
+	ss: list.SortStable([
+		{a: 2}, {b: 1},
+	], {
+		x:    _
+		y:    _
+		less: x.a < y.a
+	})
+	is: list.IsSorted([
+		{a: 2}, {b: 1},
+	], {
+		x:    _
+		y:    _
+		less: x.a < y.a
+	})
 }
 lessString: {
-	s:  [2, 1]
-	ss: [2, 1]
-	is: true
-	v:  [2, 1]
+	s:  _|_ // lessString.s: error in call to list.Sort: cannot use "foo" (type string) as type bool
+	ss: _|_ // lessString.ss: error in call to list.SortStable: cannot use "foo" (type string) as type bool
+	is: _|_ // lessString.is: error in call to list.IsSorted: cannot use "foo" (type string) as type bool
+	v:  _|_ // lessString.v: invalid value [2,1] (does not satisfy list.IsSorted({x:_,y:_,less:"foo"})): cannot use "foo" (type string) as type bool
 }
 lessNonConcrete: {
-	s:  [2, 1]
-	is: true
+	s: list.Sort([
+		2,
+		1,
+	], {
+		x:    _
+		y:    _
+		less: bool
+	})
+	is: list.IsSorted([
+		2,
+		1,
+	], {
+		x:    _
+		y:    _
+		less: bool
+	})
 }
 lessMissing: {
 	s:  _|_ // lessMissing.s: error in call to list.Sort: field not found: less
-	is: true
+	is: _|_ // lessMissing.is: error in call to list.IsSorted: field not found: less
 }
-// A less field which is not yet concrete must be an incomplete error,
+// A less field which is not yet concrete is an incomplete error,
 // so that the comparator may still be completed.
-// Wrong: the less field is treated as false.
 lessRef: {
 	#S: {
 		cond: bool
-		s:    [2, 1]
+		s: list.Sort([
+			2,
+			1,
+		], {
+			x:    _
+			y:    _
+			less: cond
+		})
 	}
 	v: {
 		cond: true

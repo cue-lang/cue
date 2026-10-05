@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/value"
 )
 
 // valueSorter defines a sort.Interface; implemented in cue/builtinutil.go.
@@ -91,11 +92,17 @@ func (s *valueSorter) lessNew(i, j int) bool {
 	// s.y.BaseValue = y.V.BaseValue
 	// s.y.Arcs = y.V.Arcs
 
-	less.Finalize(s.ctx)
-
-	isLess := s.ctx.BoolValue(less)
-	if b := less.Err(s.ctx); b != nil && s.err == nil {
-		s.err = b.Err
+	// Err finalizes less, and BoolValue then records an error for a value
+	// which is not a concrete bool. Keep the error as a [cue.Value] error so
+	// that its code is preserved, as a non-concrete less field is an
+	// incomplete error rather than a fatal one.
+	b := less.Err(ctx)
+	isLess := ctx.BoolValue(less)
+	if b == nil {
+		b = ctx.Err()
+	}
+	if b != nil {
+		s.err = value.Make(ctx, b).Err()
 		return true
 	}
 
@@ -180,9 +187,13 @@ func SortStrings(a []string) []string {
 // IsSorted tests whether a list is sorted.
 //
 // See Sort for an example comparator.
-func IsSorted(list []cue.Value, cmp cue.Value) bool {
+func IsSorted(list []cue.Value, cmp cue.Value) (bool, error) {
 	s := makeValueSorter(list, cmp)
-	return sort.IsSorted(&s)
+	sorted := sort.IsSorted(&s)
+	if s.err != nil {
+		return false, s.err
+	}
+	return sorted, nil
 }
 
 // IsSortedStrings tests whether a list is a sorted list of strings.

@@ -15,6 +15,7 @@
 package koala_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -523,6 +524,23 @@ func TestErrors(t *testing.T) {
 	</note>`,
 			expectedError: `text content within an XML element that has sub-elements is not supported`,
 		},
+		// A document without a root element is not well-formed XML.
+		// The cases below wrongly succeed with a nil *ast.StructLit as the result.
+		{
+			name:          "Empty input",
+			inputXML:      ``,
+			expectedError: `unexpected result \(\*ast\.StructLit\)\(nil\)`,
+		},
+		{
+			name:          "Only a prolog",
+			inputXML:      `<?xml version="1.0"?>`,
+			expectedError: `unexpected result \(\*ast\.StructLit\)\(nil\)`,
+		},
+		{
+			name:          "Only a comment",
+			inputXML:      `<!-- comment -->`,
+			expectedError: `unexpected result \(\*ast\.StructLit\)\(nil\)`,
+		},
 	}
 
 	for _, test := range tests {
@@ -530,7 +548,10 @@ func TestErrors(t *testing.T) {
 			t.Parallel()
 
 			dec := koala.NewDecoder("input.xml", strings.NewReader(test.inputXML))
-			_, err := dec.Decode()
+			expr, err := dec.Decode()
+			if err == nil {
+				err = fmt.Errorf("unexpected result %#v", expr)
+			}
 
 			qt.Assert(t, qt.ErrorMatches(err, test.expectedError))
 		})

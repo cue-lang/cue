@@ -1,6 +1,12 @@
 exec cue eval -i in.cue
 cmp stdout expect/stdout
 
+# With --concrete, non-concrete values and incomplete errors such as
+# cycles are errors as well, including when a struct itself is incomplete.
+# TODO(https://cuelang.org/issue/2342): none of them is reported.
+exec cue eval -i -c incomplete.cue
+cmp stdout expect/stdout-concrete
+
 # Issue #1981
 # Issue #1786
 -- in.cue --
@@ -21,3 +27,29 @@ l: [
 ]
 list: [0, 1, 2]
 val:  _|_ // val: index out of range [3] with length 3
+-- incomplete.cue --
+x: 200
+x: y + 100
+y: x - 100
+
+a: b + 100
+b: a - 100
+
+s: string
+d: *string | int
+l: [string, 1]
+if s == "" {
+	q: 1
+}
+-- expect/stdout-concrete --
+x: 200
+x: y + 100
+y: x - 100
+a: b + 100
+b: a - 100
+s: string
+d: *string | int
+l: [string, 1]
+if s == "" {
+    q: 1
+}

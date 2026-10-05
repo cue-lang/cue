@@ -360,6 +360,95 @@ package foo
 
 // doc a
 a: [1]`,
+	}, {
+		// Reference cycles and non-concrete values become errors.
+		// TODO(https://cuelang.org/issue/2342): a, b, d, e, l.0, s.a, t.a,
+		// r.a, and r.b should be errors.
+		name: "concrete incomplete errors as values",
+		in: `
+		a: b + 100
+		b: a - 100
+		c: 1
+		d: string
+		e: {f: 2, if d == "" {g: 3}}
+		f: *1 | int
+		l: [string, 1]
+		s: {a: string}
+		t: s
+		r: {a!: int, b!: 1, c: 2}
+		`,
+		options: o(cue.Concrete(true), cue.ErrorsAsValues(true)),
+		out: `{
+	a: b + 100
+	b: a - 100
+	c: 1
+	d: string
+	e: {
+		f: 2
+		if d == "" {
+			g: 3
+		}
+	}
+	f: 1
+	l: [string, 1]
+	s: a: string
+	t: a: string
+	r: {
+		a!: int
+		b!: 1
+		c:  2
+	}
+}`,
+	}, {
+		// Without ErrorsAsValues, the error of an incomplete struct replaces it.
+		// TODO(https://cuelang.org/issue/2342): a, b, d, and e should be errors.
+		name: "concrete incomplete errors",
+		in: `
+		a: b + 100
+		b: a - 100
+		c: 1
+		d: string
+		e: {f: 2, if d == "" {g: 3}}
+		`,
+		options: o(cue.Concrete(true)),
+		out: `{
+	a: b + 100
+	b: a - 100
+	c: 1
+	d: string
+	e: {
+		f: 2
+		if d == "" {
+			g: 3
+		}
+	}
+}`,
+	}, {
+		// Errors report the path of the value being exported,
+		// even when it is structure-shared.
+		// TODO(https://cuelang.org/issue/2342): x.a should be an error.
+		name: "concrete incomplete errors of a shared value",
+		in: `
+		y: {a: string, b: 1}
+		x: y
+		`,
+		path:    "x",
+		options: o(cue.Concrete(true), cue.ErrorsAsValues(true)),
+		out: `{
+	a: string
+	b: 1
+}`,
+	}, {
+		// The errors of each disjunct are shown along with the disjunction's.
+		name: "disjunction errors as values",
+		in: `
+		a: {b: int} | {c: string}
+		a: {b: "x", c: 1}
+		`,
+		options: o(cue.Concrete(true), cue.ErrorsAsValues(true)),
+		out: `{
+	a: _|_ // a: 2 errors in empty disjunction: (and 2 more errors)
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

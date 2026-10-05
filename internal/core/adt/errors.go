@@ -223,6 +223,19 @@ func addPositions(ctx *OpContext, err *ValueError, c Conjunct) {
 	err.AddPos(c.CloseInfo.Location(ctx))
 }
 
+// NewIncompleteValueError returns the error for a non-concrete value where a
+// concrete one is required, positioned at each of its conjuncts.
+func NewIncompleteValueError(ctx *OpContext, v *Vertex, morePositions ...Node) *Bottom {
+	err := ctx.Newf("incomplete value %v", v.Value())
+	for c := range v.LeafConjuncts() {
+		err.AddPosition(c.Elem())
+	}
+	for _, p := range morePositions {
+		err.AddPosition(p)
+	}
+	return &Bottom{Code: IncompleteError, Err: err}
+}
+
 // NewRequiredNotPresentError reports that the required field v is missing.
 // Besides the required field itself, the error points at the structs unified
 // into v's parent which do not declare it, such as a data file validated

@@ -98,11 +98,22 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 				result = e.structComposite(n, attrs)
 			}
 
+		case e.cfg.ShowErrors && e.cfg.Final && x.IsIncomplete() && len(n.Arcs) > 0 && !n.Arcs[0].Label.IsInt():
+			// Keep showing the fields of a struct which is itself incomplete,
+			// such as due to a comprehension.
+			result = e.structComposite(n, attrs)
+
 		case !x.IsIncomplete() || !n.HasConjuncts() || e.cfg.Final:
-			result = e.bottom(x)
+			result = e.vertexBottom(n, x)
 		}
 
 	case adt.Value:
+		// Check the default value directly, as the default vertex may be
+		// a copy. The error is positioned at the arc pushed by the caller.
+		if e.cfg.Concrete && e.inDefinition == 0 && !adt.IsConcrete(adt.Default(x)) {
+			result = e.bottom(adt.NewIncompleteValueError(e.ctx, n.Default()))
+			break
+		}
 		if e.showArcs(n) || attrs != nil {
 			result = e.structComposite(n, attrs)
 		} else {
@@ -275,6 +286,47 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 	// TODO: Add comments from original.
 
 	return result
+}
+
+// pushArc tracks arc as the one being exported in Concrete mode, so that the
+// errors created for non-concrete values report its path. Other modes create
+// no such errors, so they do not pay for the paths of other errors.
+func (e *exporter) pushArc(arc *adt.Vertex) (saved *adt.Vertex) {
+	if !e.cfg.Concrete {
+		return nil
+	}
+	return e.ctx.PushArcAndLabel(arc)
+}
+
+// popArc undoes pushArc.
+func (e *exporter) popArc(saved *adt.Vertex) {
+	if e.cfg.Concrete {
+		e.ctx.PopArcAndLabel(saved)
+	}
+}
+
+// vertexBottom is like bottom for the error value of v. In Concrete mode,
+// when b combines the errors of other fields with those at or below the path
+// of v, such as the other fields of a reference cycle, only the latter are
+// shown, as the other fields show their own.
+func (e *exporter) vertexBottom(v *adt.Vertex, b *adt.Bottom) *ast.BottomLit {
+	if !e.cfg.Concrete {
+		return e.bottom(b)
+	}
+	var path []string
+	for _, f := range v.Path() {
+		path = append(path, f.SelectorString(e.ctx))
+	}
+	var own errors.Error
+	for _, err := range errors.Errors(b.Err) {
+		if p := err.Path(); len(p) >= len(path) && slices.Equal(p[:len(path)], path) {
+			own = errors.Append(own, err)
+		}
+	}
+	if own == nil {
+		return e.bottom(b)
+	}
+	return e.bottom(&adt.Bottom{Err: own})
 }
 
 func (e *exporter) bottom(n *adt.Bottom) *ast.BottomLit {
@@ -517,7 +569,9 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 		if !a.Label.IsInt() {
 			continue
 		}
+		saved := e.pushArc(a)
 		elem := e.vertex(a)
+		e.popArc(saved)
 
 		if e.cfg.ShowDocs {
 			docs := ExtractDoc(a)
@@ -571,11 +625,15 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		// As lists may be long, put them at the end.
 		defer e.addEmbed(e.listComposite(v))
 	case *adt.Bottom:
-		if !e.cfg.ShowErrors || !x.ChildError {
+		if !e.cfg.ShowErrors {
 			// Should not be reachable, but just in case. The output will be
 			// correct.
 			e.addEmbed(e.value(x))
 			return s
+		}
+		if !x.ChildError {
+			// The struct itself is in error; show it next to its fields.
+			e.addEmbed(e.bottom(x))
 		}
 		// Always also show regular fields, even when list, as we are in
 		// debugging mode.
@@ -637,7 +695,16 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 
 		f.Constraint = arc.ArcType.Token()
 
-		f.Value = e.vertex(arc.DerefValue())
+		// Errors created while exporting a structure-shared arc report
+		// the arc's own path rather than that of the shared vertex.
+		saved := e.pushArc(arc)
+		if e.cfg.Concrete && arc.ArcType == adt.ArcRequired && e.inDefinition == 0 {
+			// Like validation, report that a required field is not present.
+			f.Value = e.bottom(adt.NewRequiredNotPresentError(e.ctx, arc))
+		} else {
+			f.Value = e.vertex(arc.DerefValue())
+		}
+		e.popArc(saved)
 
 		if label.IsDef() {
 			e.inDefinition--

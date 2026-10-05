@@ -3,7 +3,6 @@ cmp stdout expect/stdout
 
 # With --concrete, non-concrete values and incomplete errors such as
 # cycles are errors as well, including when a struct itself is incomplete.
-# TODO(https://cuelang.org/issue/2342): none of them is reported.
 exec cue eval -i -c incomplete.cue
 cmp stdout expect/stdout-concrete
 
@@ -42,14 +41,14 @@ if s == "" {
 	q: 1
 }
 -- expect/stdout-concrete --
+_|_ // non-concrete value string in operand to ==
 x: 200
-x: y + 100
-y: x - 100
-a: b + 100
-b: a - 100
-s: string
-d: *string | int
-l: [string, 1]
-if s == "" {
-    q: 1
-}
+y: 100
+a: _|_ // a: cycle with field: b
+b: _|_ // b: cycle with field: a
+s: _|_ // s: incomplete value string
+d: _|_ // d: incomplete value string
+l: [
+    _|_, // l.0: incomplete value string
+    1,
+]

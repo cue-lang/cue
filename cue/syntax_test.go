@@ -362,8 +362,6 @@ package foo
 a: [1]`,
 	}, {
 		// Reference cycles and non-concrete values become errors.
-		// TODO(https://cuelang.org/issue/2342): a, b, d, e, l.0, s.a, t.a,
-		// r.a, and r.b should be errors.
 		name: "concrete incomplete errors as values",
 		in: `
 		a: b + 100
@@ -379,29 +377,29 @@ a: [1]`,
 		`,
 		options: o(cue.Concrete(true), cue.ErrorsAsValues(true)),
 		out: `{
-	a: b + 100
-	b: a - 100
+	a: _|_ // a: cycle with field: b
+	b: _|_ // b: cycle with field: a
 	c: 1
-	d: string
+	d: _|_ // d: incomplete value string
 	e: {
+		_|_ // e: non-concrete value string in operand to ==
 		f: 2
-		if d == "" {
-			g: 3
-		}
 	}
 	f: 1
-	l: [string, 1]
-	s: a: string
-	t: a: string
+	l: [
+		_|_, // l.0: incomplete value string
+		1,
+	]
+	s: a: _|_ // s.a: incomplete value string
+	t: a: _|_ // t.a: incomplete value string
 	r: {
-		a!: int
-		b!: 1
+		a!: _|_ // r.a: field is required but not present
+		b!: _|_ // r.b: field is required but not present
 		c:  2
 	}
 }`,
 	}, {
 		// Without ErrorsAsValues, the error of an incomplete struct replaces it.
-		// TODO(https://cuelang.org/issue/2342): a, b, d, and e should be errors.
 		name: "concrete incomplete errors",
 		in: `
 		a: b + 100
@@ -412,21 +410,15 @@ a: [1]`,
 		`,
 		options: o(cue.Concrete(true)),
 		out: `{
-	a: b + 100
-	b: a - 100
+	a: _|_ // a: cycle with field: b
+	b: _|_ // b: cycle with field: a
 	c: 1
-	d: string
-	e: {
-		f: 2
-		if d == "" {
-			g: 3
-		}
-	}
+	d: _|_ // d: incomplete value string
+	e: _|_ // e: non-concrete value string in operand to ==
 }`,
 	}, {
 		// Errors report the path of the value being exported,
 		// even when it is structure-shared.
-		// TODO(https://cuelang.org/issue/2342): x.a should be an error.
 		name: "concrete incomplete errors of a shared value",
 		in: `
 		y: {a: string, b: 1}
@@ -435,7 +427,7 @@ a: [1]`,
 		path:    "x",
 		options: o(cue.Concrete(true), cue.ErrorsAsValues(true)),
 		out: `{
-	a: string
+	a: _|_ // x.a: incomplete value string
 	b: 1
 }`,
 	}, {

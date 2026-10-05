@@ -167,8 +167,8 @@ func runEval(cmd *Command, args []string) error {
 				}
 			}
 
-			// v.Syntax below does not report non-concrete values as errors,
-			// so check for concreteness explicitly.
+			// v.Syntax below reports non-concrete values as errors in the
+			// output rather than failing, so check for concreteness explicitly.
 			if e.IsConcrete() || flagConcrete.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
 					errHeader()

@@ -102,12 +102,6 @@ type validator struct {
 	visited map[*Vertex]bool
 }
 
-func (v *validator) addPositions(err *ValueError) {
-	for _, p := range v.sharedPositions {
-		err.AddPosition(p)
-	}
-}
-
 func (v *validator) checkConcrete() bool {
 	return v.Concrete && v.inDefinition == 0
 }
@@ -189,15 +183,7 @@ func (v *validator) validate(x *Vertex) {
 	} else if v.checkConcrete() {
 		x = x.Default()
 		if !IsConcrete(x) {
-			err := v.ctx.Newf("incomplete value %v", x.Value())
-			for c := range x.LeafConjuncts() {
-				err.AddPosition(c.Elem())
-			}
-			v.addPositions(err)
-			v.add(&Bottom{
-				Code: IncompleteError,
-				Err:  err,
-			})
+			v.add(NewIncompleteValueError(v.ctx, x, v.sharedPositions...))
 		}
 	}
 

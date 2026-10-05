@@ -907,6 +907,8 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 
 	p := export.Profile{
 		Simplify:         !o.raw,
+		Final:            o.concrete,
+		Concrete:         o.concrete,
 		TakeDefaults:     o.final,
 		ShowOptional:     !o.omitOptional && !o.concrete,
 		ShowDefinitions:  !o.omitDefinitions && !o.concrete,

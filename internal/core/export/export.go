@@ -39,6 +39,10 @@ type Profile struct {
 	// Final reports incomplete errors as errors.
 	Final bool
 
+	// Concrete reports non-concrete values as errors, outside of
+	// definitions. It is meant to be used along with Final.
+	Concrete bool
+
 	// TakeDefaults is used in Value mode to drop non-default values.
 	TakeDefaults bool
 
@@ -306,6 +310,9 @@ func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (f *ast.Fil
 	e := newExporter(p, r, pkgID, n)
 	e.initPivot(n)
 
+	// Errors created while exporting report paths relative to n,
+	// even when n is structure-shared.
+	defer e.popArc(e.pushArc(n))
 	v := e.value(n, n.Conjuncts...)
 	return e.finalize(n, v)
 }

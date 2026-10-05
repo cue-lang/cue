@@ -53,8 +53,7 @@ type Cursor interface {
 
 	// Replace replaces the current Node with n.
 	// The replacement node is not walked by Apply. Comments of the old node
-	// are copied to the new node if it has not yet an comments associated
-	// with it.
+	// are moved to the new node if it has no comments of its own.
 	Replace(n ast.Node)
 
 	// Delete deletes the current Node from its containing struct.
@@ -165,12 +164,15 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 func (c *cursor) Replace(n ast.Node) {
 	// panic if the value cannot convert to the original type.
 	reflect.ValueOf(n).Convert(reflect.TypeOf(c.typ).Elem())
-	if len(ast.Comments(n)) == 0 {
-		CopyComments(n, c.node)
-	}
 	c.modified = true
 	if r, ok := n.(recursive); ok {
 		n = r.Node
+	}
+	if old := c.node; len(ast.Comments(n)) == 0 {
+		// The old node may stay in the tree, as when n wraps it;
+		// the comments must not be attached to both.
+		CopyComments(n, old)
+		ast.SetComments(old, nil)
 	}
 	c.node = n
 }

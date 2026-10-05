@@ -549,15 +549,10 @@ x: [
 	// trailing
 ]
 `,
-		// Wrong: the comments are printed twice.
 		out: `
 x: [
 	// doc
-	f(
-		// doc
-		y, // line
-		// trailing
-	), // line
+	f(y), // line
 	// trailing
 ]
 `,

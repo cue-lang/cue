@@ -704,7 +704,6 @@ W: [ // open list
 	// trailing list
 ]
 `,
-			// Wrong: the comments are printed twice.
 			out: `@experiment(explicitopen)
 
 package foo
@@ -713,11 +712,7 @@ package foo
 
 W: [ // open list
 	// doc elem
-	__closeAll( // open list
-		// doc elem
-		{#A..., e: 1}, // line elem
-		// trailing list
-	), // line elem
+	__closeAll({#A..., e: 1}), // line elem
 	// trailing list
 ]
 `,

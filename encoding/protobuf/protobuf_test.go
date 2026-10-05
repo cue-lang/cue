@@ -155,14 +155,64 @@ func TestBuild(t *testing.T) {
 }
 
 func TestExtractErrorPath(t *testing.T) {
-	src := `syntax = "proto3";
+	tests := []struct {
+		name     string
+		src      string
+		wantErr  string
+		wantPath []string
+	}{{
+		name: "unknown name",
+		src: `syntax = "proto3";
 message Foo {
 	message Bar {
 		Baz baz = 1;
 	}
 }
-`
-	_, err := Extract("x.proto", src, nil)
-	qt.Assert(t, qt.ErrorMatches(err, `protobuf: x.proto:4:3:Foo.Bar.baz: name "Baz" not found`))
-	qt.Assert(t, qt.DeepEquals(errors.Path(err), []string{"Foo", "Bar", "baz"}))
+`,
+		wantErr:  `protobuf: x.proto:4:3:Foo.Bar.baz: name "Baz" not found`,
+		wantPath: []string{"Foo", "Bar", "baz"},
+	}, {
+		name: "empty enum",
+		src: `syntax = "proto3";
+enum E {}
+`,
+		wantErr: `protobuf: x.proto:2:1: empty enum`,
+	}, {
+		// An enum without any values is empty, whatever else it holds.
+		// The three cases below wrongly panic.
+		name: "enum with only an option",
+		src: `syntax = "proto3";
+enum E { option allow_alias = true; }
+`,
+		wantErr: `panic: runtime error: invalid memory address or nil pointer dereference`,
+	}, {
+		name: "enum with only a reserved range",
+		src: `syntax = "proto3";
+enum E { reserved 1; }
+`,
+		wantErr: `panic: runtime error: invalid memory address or nil pointer dereference`,
+	}, {
+		name: "enum with only a comment",
+		src: `syntax = "proto3";
+enum E {
+	// No values.
+}
+`,
+		wantErr: `panic: runtime error: invalid memory address or nil pointer dereference`,
+	}}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := func() (err error) {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				_, err = Extract("x.proto", test.src, nil)
+				return err
+			}()
+			qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
+			qt.Assert(t, qt.DeepEquals(errors.Path(err), test.wantPath))
+		})
+	}
 }

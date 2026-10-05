@@ -36,10 +36,9 @@ type valueSorter struct {
 	a   []cue.Value
 	err error
 
-	cmp  *adt.Vertex
-	less *adt.Vertex
-	x    *adt.Vertex
-	y    *adt.Vertex
+	cmp *adt.Vertex
+	// The labels of the comparator fields.
+	less, x, y adt.Feature
 }
 
 func (s *valueSorter) ret() ([]cue.Value, error) {
@@ -68,29 +67,27 @@ func (s *valueSorter) lessNew(i, j int) bool {
 		Parent:    s.cmp.Parent,
 		Conjuncts: s.cmp.Conjuncts,
 	}
+	// Create the arcs x and y holding the inputs before anything may evaluate
+	// them, such as a comprehension. Resolving the arcs first and inserting
+	// the inputs into x and y would evaluate such a comprehension, and with it
+	// x and y, too early.
+	n.Arcs = []*adt.Vertex{
+		{Label: s.x, Parent: n, Conjuncts: s.a[i].Core().V.Conjuncts},
+		{Label: s.y, Parent: n, Conjuncts: s.a[j].Core().V.Conjuncts},
+	}
 
-	n.Init(ctx)
+	// Resolve the direct arcs like makeValueSorter does, as they may come
+	// from embeddings or unifications.
+	n.CompleteArcsShallow(ctx)
 
-	less := getArc(ctx, n, "less")
-	xa := getArc(ctx, n, "x")
-	ya := getArc(ctx, n, "y")
-
-	x := s.a[i].Core()
-	y := s.a[j].Core()
-
-	xa.InsertConjunctsFrom(x.V)
-	ya.InsertConjunctsFrom(y.V)
+	less := n.Lookup(s.less)
 
 	// TODO(perf): if we can determine that the comparator values for
 	// x and y are idempotent (no arcs and a basevalue being top or
 	// a struct or list marker), then we do not need to reevaluate the input.
-	// In that case, we can use the below code instead of the above two loops
-	// setting the conjuncts. This may improve performance significantly.
-	//
-	// s.x.BaseValue = x.V.BaseValue
-	// s.x.Arcs = x.V.Arcs
-	// s.y.BaseValue = y.V.BaseValue
-	// s.y.Arcs = y.V.Arcs
+	// In that case, the arcs x and y could take the BaseValue and Arcs of
+	// the inputs instead of their conjuncts. This may improve performance
+	// significantly.
 
 	// Err finalizes less, and BoolValue then records an error for a value
 	// which is not a concrete bool. Keep the error as a [cue.Value] error so
@@ -109,15 +106,7 @@ func (s *valueSorter) lessNew(i, j int) bool {
 	return isLess
 }
 
-var less = cue.ParsePath("less")
-
 func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
-	if v := cmp.LookupPath(less); !v.Exists() {
-		// The comparator is already concrete here, so a missing "less" field is
-		// fatal rather than incomplete.
-		return valueSorter{err: errors.Newf(token.NoPos, "field not found: less")}
-	}
-
 	v := cmp.Core()
 	ctx := eval.NewContext(v.R, v.V)
 
@@ -132,17 +121,17 @@ func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 		a:    list,
 		ctx:  ctx,
 		cmp:  n,
-		less: getArc(ctx, n, "less"),
-		x:    getArc(ctx, n, "x"),
-		y:    getArc(ctx, n, "y"),
+		less: ctx.StringLabel("less"),
+		x:    ctx.StringLabel("x"),
+		y:    ctx.StringLabel("y"),
 	}
-
-	// TODO(perf): see comment in the Less method. If we can determine
-	// the conjuncts for x and y are idempotent, we can pre finalize here and
-	// ignore the values in the Less method.
-	// s.x.UpdateStatus(adt.Finalized)
-	// s.y.UpdateStatus(adt.Finalized)
-
+	// The comparator is already concrete here, so a missing field is fatal
+	// rather than incomplete; a constraint such as less?: bool is no field.
+	for _, f := range []adt.Feature{s.less, s.x, s.y} {
+		if arc := n.Lookup(f); arc == nil || arc.ArcType != adt.ArcMember {
+			return valueSorter{err: errors.Newf(token.NoPos, "field not found: %s", f.StringValue(ctx))}
+		}
+	}
 	return s
 }
 
@@ -163,12 +152,6 @@ func Sort(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 	// The input slice is already a copy and that we can modify it safely.
 	sort.Stable(&s)
 	return s.ret()
-}
-
-func getArc(ctx *adt.OpContext, v *adt.Vertex, s string) *adt.Vertex {
-	f := ctx.StringLabel(s)
-	arc, _ := v.GetArc(ctx, f, 0)
-	return arc
 }
 
 // Deprecated: use [Sort], which is always stable

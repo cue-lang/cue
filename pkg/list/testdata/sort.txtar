@@ -58,14 +58,14 @@ lessRef: {
 	}
 	v: #S & {cond: true}
 }
-// Wrong: comparator fields from an embedding or a unification cause a panic.
+// The fields of a comparator may come from an embedding or a unification.
 cmpIndirect: {
 	embed: list.Sort(["b", "a"], {list.Ascending})
 	unify: list.Sort(["b", "a"], list.Ascending & {T: string})
 	is:    list.IsSorted(["b", "a"], {list.Descending})
 }
 
-// Wrong: a comparator without the fields x and y causes a panic.
+// A comparator without the fields x and y is an error.
 cmpMissing: {
 	s:   list.Sort([2, 1, 3], {less: true})
 	ss:  list.SortStable([2, 1, 3], {less: true})
@@ -75,7 +75,6 @@ cmpMissing: {
 }
 
 // A comparator field which is only a constraint is missing too.
-// Wrong: an optional or required x or y is treated as a regular field.
 cmpConstraint: {
 	lessOpt: list.Sort([2, 1], {x: _, y: _, less?: true})
 	lessReq: list.IsSorted([2, 1], {x: _, y: _, less!: true})
@@ -110,26 +109,24 @@ lessMissing.s: error in call to list.Sort: field not found: less:
     ./in.cue:47:6
 lessMissing.is: error in call to list.IsSorted: field not found: less:
     ./in.cue:48:6
-cmpIndirect.embed: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
-    ./in.cue:61:9
-cmpIndirect.unify: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
-    ./in.cue:62:9
-cmpIndirect.is: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
-    ./in.cue:63:9
-cmpMissing.s: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
+cmpMissing.s: error in call to list.Sort: field not found: x:
     ./in.cue:68:7
-cmpMissing.ss: error in call to list.SortStable: runtime error: invalid memory address or nil pointer dereference:
+cmpMissing.ss: error in call to list.SortStable: field not found: x:
     ./in.cue:69:7
-cmpMissing.is: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
+cmpMissing.is: error in call to list.IsSorted: field not found: x:
     ./in.cue:70:7
-cmpMissing.noX: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
+cmpMissing.noX: error in call to list.Sort: field not found: x:
     ./in.cue:71:7
-cmpMissing.noY: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
+cmpMissing.noY: error in call to list.Sort: field not found: y:
     ./in.cue:72:7
 cmpConstraint.lessOpt: error in call to list.Sort: field not found: less:
-    ./in.cue:78:11
+    ./in.cue:77:11
 cmpConstraint.lessReq: error in call to list.IsSorted: field not found: less:
+    ./in.cue:78:11
+cmpConstraint.xOpt: error in call to list.Sort: field not found: x:
     ./in.cue:79:11
+cmpConstraint.yReq: error in call to list.IsSorted: field not found: y:
+    ./in.cue:80:11
 
 Result:
 import "list"
@@ -227,29 +224,28 @@ lessRef: {
 		s:    [1, 2]
 	}
 }
-// Wrong: comparator fields from an embedding or a unification cause a panic.
+// The fields of a comparator may come from an embedding or a unification.
 cmpIndirect: {
-	embed: _|_ // cmpIndirect.embed: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
-	unify: _|_ // cmpIndirect.unify: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
-	is:    _|_ // cmpIndirect.is: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
+	embed: ["a", "b"]
+	unify: ["a", "b"]
+	is:    true
 }
 
-// Wrong: a comparator without the fields x and y causes a panic.
+// A comparator without the fields x and y is an error.
 cmpMissing: {
-	s:   _|_ // cmpMissing.s: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
-	ss:  _|_ // cmpMissing.ss: error in call to list.SortStable: runtime error: invalid memory address or nil pointer dereference
-	is:  _|_ // cmpMissing.is: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
-	noX: _|_ // cmpMissing.noX: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
-	noY: _|_ // cmpMissing.noY: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
+	s:   _|_ // cmpMissing.s: error in call to list.Sort: field not found: x
+	ss:  _|_ // cmpMissing.ss: error in call to list.SortStable: field not found: x
+	is:  _|_ // cmpMissing.is: error in call to list.IsSorted: field not found: x
+	noX: _|_ // cmpMissing.noX: error in call to list.Sort: field not found: x
+	noY: _|_ // cmpMissing.noY: error in call to list.Sort: field not found: y
 }
 
 // A comparator field which is only a constraint is missing too.
-// Wrong: an optional or required x or y is treated as a regular field.
 cmpConstraint: {
 	lessOpt: _|_ // cmpConstraint.lessOpt: error in call to list.Sort: field not found: less
 	lessReq: _|_ // cmpConstraint.lessReq: error in call to list.IsSorted: field not found: less
-	xOpt:    [1, 2]
-	yReq:    false
+	xOpt:    _|_ // cmpConstraint.xOpt: error in call to list.Sort: field not found: x
+	yReq:    _|_ // cmpConstraint.yReq: error in call to list.IsSorted: field not found: y
 }
 
 // A comparator may use x and y outside of less, such as in a comprehension,

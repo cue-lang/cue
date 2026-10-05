@@ -269,7 +269,10 @@ func isNil(x reflect.Value) bool {
 
 func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result adt.Value) {
 	src := ctx.Source()
-	if !val.IsValid() { // untyped nil, or dereferencing a nil pointer/interface
+	// An untyped nil, or dereferencing a nil interface. A nil pointer of any
+	// type is the same, and must not reach the types special-cased below.
+	// A nil map or slice is not, as those encode as empty.
+	if !val.IsValid() || val.Kind() == reflect.Pointer && val.IsNil() {
 		if nilIsTop {
 			ident, _ := src.(*ast.Ident)
 			return &adt.Top{Src: ident}

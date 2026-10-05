@@ -719,6 +719,65 @@ W: [ // open list
 		},
 
 		{
+			// The wrapper starts on the line the literal started on, so
+			// that a line comment does not swallow the next element.
+			name:    "wrapped list elements keep their lines (fixExplicitOpen)",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+
+W: [
+	{#A, e: 1}, // one
+	{#A, e: 2}, // two
+]
+`,
+			// Wrong: the elements are joined, and a comment swallows the
+			// closing bracket.
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+
+W: [__closeAll({#A..., e: 1}), // one
+__closeAll({#A..., e: 2})  // two]
+`,
+		},
+
+		{
+			name: "wrapped list elements keep their lines (openlists)",
+			exps: []string{"openlists"},
+			in: `package foo
+
+y: [1, 2, 3]
+x: [
+	// doc
+	y[0:1], // one
+	y[1:2], // two
+	// trailing
+]
+`,
+			// Wrong: a comment swallows the start of the second element.
+			out: `@experiment(openlists)
+
+package foo
+
+y: #[1, 2, 3]
+x: #[
+	// doc
+	close(
+		y[0:1],
+	), // one close(
+		y[1:2],
+	), // two
+	// trailing
+]
+`,
+		},
+
+		{
 			// Blank aliases bind nothing that can be referenced; they must be
 			// dropped rather than converted to blank postfix aliases, which
 			// Sanitize rejects, or to an invalid "let _ = self".

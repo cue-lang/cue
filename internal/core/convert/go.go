@@ -928,6 +928,9 @@ func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
 }
 
 func fromGoType(ctx *adt.OpContext, t reflect.Type) adt.Expr {
+	if t == nil { // an untyped nil
+		return nil
+	}
 	var errs []errors.Error
 	e := astFromGoType(t, true, &errs)
 	for _, err := range errs {

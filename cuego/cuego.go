@@ -168,8 +168,8 @@ func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
+	defer mutex.Unlock()
 	v = value.FromGoValue(runtime, x, nilIsNull)
-	mutex.Unlock()
 	if err := v.Err(); err != nil {
 		return v, err
 	}
@@ -196,7 +196,6 @@ func fromGoType(x interface{}) cue.Value {
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v := value.FromGoType(runtime, x)
-	mutex.Unlock()
-	return v
+	defer mutex.Unlock()
+	return value.FromGoType(runtime, x)
 }

@@ -15,7 +15,6 @@
 package cuego
 
 import (
-	"fmt"
 	"reflect"
 	"sync"
 	"testing"
@@ -107,22 +106,9 @@ func TestValidate(t *testing.T) {
 	// The package's mutex is not left locked either way,
 	// as that would block every later call.
 	t.Run("nil", func(t *testing.T) {
-		got := func() (s string) {
-			defer func() {
-				if e := recover(); e != nil {
-					s = fmt.Sprintf("panic: %v", e)
-				}
-			}()
-			checkErr(t, Validate(nil), fail)
-			return ""
-		}()
-		// Wrong: the conversion of a nil type panics.
-		if want := "panic: reflect: Zero(nil)"; got != want {
-			t.Errorf("Validate(nil): got %q, want %q", got, want)
-		}
-		// Wrong: the mutex is not unlocked when the conversion panics.
-		if mutex.TryLock() {
-			t.Error("Validate(nil) did not leave the mutex locked")
+		checkErr(t, Validate(nil), fail)
+		if !mutex.TryLock() {
+			t.Error("Validate(nil) left the mutex locked")
 		}
 		mutex.Unlock() // let the calls which follow proceed
 	})

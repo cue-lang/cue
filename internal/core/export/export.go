@@ -370,16 +370,9 @@ type exporter struct {
 	experiments    *cueexperiment.File
 	experimentsErr error
 	postfixAliases bool
-	// fieldAlias is used to track original alias names of regular fields.
-	fieldAlias map[*ast.Field]fieldAndScope
-	references map[*adt.Vertex]*referenceInfo
+	references     map[*adt.Vertex]*referenceInfo
 
 	pivotter *pivotter
-}
-
-type fieldAndScope struct {
-	field *ast.Field
-	scope ast.Node // StructLit or File
 }
 
 // referenceInfo is used to track which Field.Value fields should be linked
@@ -653,33 +646,33 @@ func (e *exporter) bindValueAlias(name string, value ast.Expr) ast.Expr {
 // markLets marks the lets and field aliases of struct literals which are
 // merged into scope. Any other struct literal, such as a list element or
 // a call argument, is exported with its own scope.
-func (e *exporter) markLets(n ast.Node, scope *ast.StructLit) {
+func (e *exporter) markLets(n ast.Node) {
 	switch x := n.(type) {
 	case *ast.StructLit:
-		e.markLetDecls(x.Elts, scope, false)
+		e.markLetDecls(x.Elts, false)
 	case *ast.File:
-		e.markLetDecls(x.Decls, scope, true)
+		e.markLetDecls(x.Decls, true)
 	case *ast.ParenExpr:
-		e.markLets(x.X, scope)
+		e.markLets(x.X)
 	case *ast.BinaryExpr:
 		if x.Op == token.AND {
-			e.markLets(x.X, scope)
-			e.markLets(x.Y, scope)
+			e.markLets(x.X)
+			e.markLets(x.Y)
 		}
 	}
 }
 
 // markLetDecls marks the lets and field aliases of decls, which are those at
 // the top level of a file if topLevel is set, or those of a struct literal.
-func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit, topLevel bool) {
+func (e *exporter) markLetDecls(decls []ast.Decl, topLevel bool) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			e.prepareAliasedField(x, scope, topLevel)
+			e.prepareAliasedField(x, topLevel)
 		case *ast.LetClause:
 			e.markLetAlias(x)
 		case *ast.EmbedDecl:
-			e.markLets(x.Expr, scope)
+			e.markLets(x.Expr)
 		}
 	}
 }
@@ -691,8 +684,9 @@ func (e *exporter) markLetDecls(decls []ast.Decl, scope *ast.StructLit, topLevel
 // It is assumed that the same alias names can be used. We rely on Sanitize
 // to do any renaming of aliases in case of shadowing, except where files are
 // merged into one scope; see [exporter.fileAliasName].
-func (e *exporter) prepareAliasedField(f *ast.Field, scope ast.Node, topLevel bool) {
-	if _, ok := e.fieldAlias[f]; ok {
+func (e *exporter) prepareAliasedField(f *ast.Field, topLevel bool) {
+	top := e.top()
+	if _, ok := top.fieldAlias[f]; ok {
 		return
 	}
 
@@ -710,11 +704,23 @@ func (e *exporter) prepareAliasedField(f *ast.Field, scope ast.Node, topLevel bo
 	field := &ast.Field{Label: label}
 	e.setValueAlias(field, name)
 
-	if e.fieldAlias == nil {
-		e.fieldAlias = make(map[*ast.Field]fieldAndScope)
+	if top.fieldAlias == nil {
+		top.fieldAlias = make(map[*ast.Field]*ast.Field)
 	}
 
-	e.fieldAlias[f] = fieldAndScope{field: field, scope: scope}
+	top.fieldAlias[f] = field
+}
+
+// lookupFieldAlias returns the aliased field prepared for the source field f
+// by the innermost struct being exported that declares it, and the scope of
+// that struct. It returns a nil field if there is none.
+func (e *exporter) lookupFieldAlias(f *ast.Field) (field *ast.Field, scope *ast.StructLit) {
+	for i := len(e.stack) - 1; i >= 0; i-- {
+		if field, ok := e.stack[i].fieldAlias[f]; ok {
+			return field, e.stack[i].scope
+		}
+	}
+	return nil, nil
 }
 
 // mergesFiles reports whether a, the conjuncts of a struct, holds more than
@@ -753,8 +759,8 @@ func (e *exporter) fileAliasName(topLevel bool, name string) string {
 
 func (e *exporter) getFixedField(f *adt.Field) *ast.Field {
 	if f.Src != nil {
-		if entry, ok := e.fieldAlias[f.Src]; ok {
-			return entry.field
+		if field, _ := e.lookupFieldAlias(f.Src); field != nil {
+			return field
 		}
 	}
 	return &ast.Field{
@@ -948,6 +954,10 @@ type frame struct {
 	// letAlias maps the source let clauses declared in this scope to the
 	// ones in the output.
 	letAlias map[*ast.LetClause]*ast.LetClause
+
+	// fieldAlias maps the source fields with an alias declared in this scope
+	// to the ones in the output.
+	fieldAlias map[*ast.Field]*ast.Field
 
 	// field to new field
 	mapped map[adt.Node]ast.Node

@@ -268,8 +268,6 @@ if true {
 		x: {p: t.foo, q: t.bar}
 		`,
 		path: "x",
-		// Wrong: the field y is one syntax node shared by p and q, so its
-		// reference to a is bound to a let clause which does not resolve.
 		out: `
 {
 	p: {
@@ -278,21 +276,19 @@ if true {
 			y~(Y): a_9 + INP
 			z:     "x" + Y
 		}
-		a: "1"
+		a~(a_9): "1"
 	}
 	q: {
 		{
 			a:     string
-			y~(Y): a_9 + INP
+			y~(Y): a_B + INP
 			z:     "x" + Y
 		}
-		a: "2"
+		a~(a_B): "2"
 	}
 
 	//cue:path: inp
 	let INP = string
-
-	let a_9 = a
 }`,
 	}}
 	for _, tc := range testCases {

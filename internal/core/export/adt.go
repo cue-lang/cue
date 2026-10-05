@@ -397,12 +397,19 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		// Special case when the original CUE already had an alias.
 		if x.Src != nil {
 			if f, ok := x.Src.Node.(*ast.Field); ok {
-				if entry, ok := e.fieldAlias[f]; ok {
-					name, _ := valueAliasName(entry.field)
+				if field, scope := e.lookupFieldAlias(f); field != nil {
+					name, _ := valueAliasName(field)
 					ident := ast.NewIdent(name)
-					ident.Node = entry.field
-					ident.Scope = entry.scope
+					ident.Node = field
+					ident.Scope = scope
 					return wrapIfOptional(ident, x.Optional)
+				}
+				// The field is not exported with its alias, such as when
+				// exporting the arcs of a value. Its label may be shadowed
+				// at the reference, so keep the alias, which fails to
+				// resolve rather than silently binding to another field.
+				if name, ok := valueAliasName(f); ok {
+					return wrapIfOptional(ast.NewIdent(name), x.Optional)
 				}
 			}
 		}

@@ -69,7 +69,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	}()
 
 	for c := range n.LeafConjuncts() {
-		e.markLets(c.Expr().Source(), s)
+		e.markLets(c.Expr().Source())
 	}
 
 	switch x := n.BaseValue.(type) {

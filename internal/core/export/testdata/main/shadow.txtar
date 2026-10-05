@@ -144,6 +144,22 @@ shadowField: issue2378: {
 		}
 	}
 }
+
+// The structs declaring the alias of a are exported from their arcs,
+// so y must not reference the label a, which b.a shadows.
+shadowField: recursive: {
+	T: {
+		a~(A): int
+		n?: {
+			T
+			b: {
+				a: string
+				y: A
+			}
+		}
+	}
+	v: T & {n: {}}
+}
 -- out/definition --
 shadowRef: {
 	t1: x~(x_9): x: x_9 | null
@@ -253,6 +269,22 @@ shadowField: {
 			c: A & a.z
 		}
 	}
+
+	// The structs declaring the alias of a are exported from their arcs,
+	// so y must not reference the label a, which b.a shadows.
+	recursive: {
+		T: {
+			a~(A): int
+			n?: {
+				T
+				b: {
+					a: string
+					y: A
+				}
+			}
+		}
+		v: T & {n: {}}
+	}
 }
 -- out/doc --
 []
@@ -345,6 +377,31 @@ or even
 [shadowField issue2378 a d]
 [shadowField issue2378 a d b]
 [shadowField issue2378 a d c]
+[shadowField recursive]
+- The structs declaring the alias of a are exported from their arcs,
+so y must not reference the label a, which b.a shadows.
+
+[shadowField recursive T]
+[shadowField recursive T a]
+[shadowField recursive T n]
+[shadowField recursive T n b]
+[shadowField recursive T n b a]
+[shadowField recursive T n b y]
+[shadowField recursive T n a]
+[shadowField recursive T n n]
+[shadowField recursive v]
+[shadowField recursive v n]
+[shadowField recursive v n b]
+[shadowField recursive v n b a]
+[shadowField recursive v n b y]
+[shadowField recursive v n a]
+[shadowField recursive v n n]
+[shadowField recursive v n n b]
+[shadowField recursive v n n b a]
+[shadowField recursive v n n b y]
+[shadowField recursive v n n a]
+[shadowField recursive v n n n]
+[shadowField recursive v a]
 -- out/value-v3 --
 == Simplified
 _|_ // shadowRef.e1.x.x: structural cycle
@@ -440,6 +497,52 @@ _|_ // shadowRef.e1.x.x: structural cycle
 			d: {
 				b: 1
 				c: A & a.z
+			}
+		}
+
+		// The structs declaring the alias of a are exported from their arcs,
+		// so y must not reference the label a, which b.a shadows.
+		recursive: {
+			T: {
+				a: int
+				n?: {
+					a: int
+					n?: {
+						T
+						b: {
+							a: string
+							y: A
+						}
+					}
+					b: {
+						a: string
+						y: int
+					}
+				}
+			}
+			v: {
+				a: int
+				n: {
+					a: int
+					n?: {
+						a: int
+						b: {
+							a: string
+							y: int
+						}
+						n?: {
+							T
+							b: {
+								a: string
+								y: A
+							}
+						}
+					}
+					b: {
+						a: string
+						y: int
+					}
+				}
 			}
 		}
 	}
@@ -585,7 +688,7 @@ diff old new
  			}
  		}
  
-@@ -121,22 +83,18 @@
+@@ -121,18 +83,60 @@
  		// or even
  		// 		b: 0
  		//  	c: b
@@ -601,7 +704,6 @@ diff old new
 -				d: {
 -					b: 1
 -					c: A & a.z
--				}
 +		t6: x: {
 +			b: 0
 +			c: 0
@@ -611,8 +713,55 @@ diff old new
 +			d: {
 +				b: 1
 +				c: A & a.z
++			}
++		}
++
++		// The structs declaring the alias of a are exported from their arcs,
++		// so y must not reference the label a, which b.a shadows.
++		recursive: {
++			T: {
++				a: int
++				n?: {
++					a: int
++					n?: {
++						T
++						b: {
++							a: string
++							y: A
++						}
++					}
++					b: {
++						a: string
++						y: int
++					}
++				}
++			}
++			v: {
++				a: int
++				n: {
++					a: int
++					n?: {
++						a: int
++						b: {
++							a: string
++							y: int
++						}
++						n?: {
++							T
++							b: {
++								a: string
++								y: A
++							}
++						}
++					}
++					b: {
++						a: string
++						y: int
++					}
+ 				}
  			}
  		}
+@@ -139,4 +143,4 @@
  	}
  }
  == Eval

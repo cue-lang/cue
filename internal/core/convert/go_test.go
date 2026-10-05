@@ -319,9 +319,9 @@ func TestConvert(t *testing.T) {
 			//lint:ignore SA5008 the field is named "-"
 			D int `json:"-,"`
 		}{3, 4, 0, 5},
-		// Wrong: the field named "-" is missing.
 		`(struct){
   A: (int){ 3 }
+  "-": (int){ 5 }
 }`,
 	}, {
 		struct {
@@ -771,8 +771,8 @@ func TestConvertType(t *testing.T) {
 			T string `cue:""` // allowed
 			h int
 		}{},
-		// Wrong: the field named "-" is missing.
 		want: `(struct){
+  "-": (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
   D?: (number){ number }
   P?: ((null|number)){ |(*(null){ null }, (number){ number }) }
   I?: (_){ _ }

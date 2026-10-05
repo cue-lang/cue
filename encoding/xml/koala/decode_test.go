@@ -525,21 +525,20 @@ func TestErrors(t *testing.T) {
 			expectedError: `text content within an XML element that has sub-elements is not supported`,
 		},
 		// A document without a root element is not well-formed XML.
-		// The cases below wrongly succeed with a nil *ast.StructLit as the result.
 		{
 			name:          "Empty input",
 			inputXML:      ``,
-			expectedError: `unexpected result \(\*ast\.StructLit\)\(nil\)`,
+			expectedError: `XML document has no root element`,
 		},
 		{
 			name:          "Only a prolog",
 			inputXML:      `<?xml version="1.0"?>`,
-			expectedError: `unexpected result \(\*ast\.StructLit\)\(nil\)`,
+			expectedError: `XML document has no root element`,
 		},
 		{
 			name:          "Only a comment",
 			inputXML:      `<!-- comment -->`,
-			expectedError: `unexpected result \(\*ast\.StructLit\)\(nil\)`,
+			expectedError: `XML document has no root element`,
 		},
 	}
 

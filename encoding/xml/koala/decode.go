@@ -137,6 +137,9 @@ func (dec *Decoder) Decode() (ast.Expr, error) {
 			break
 		}
 	}
+	if dec.astRoot == nil {
+		return nil, fmt.Errorf("XML document has no root element")
+	}
 	return dec.astRoot, nil
 }
 

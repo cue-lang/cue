@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"io/fs"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -25,7 +24,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/tools/fix"
 	"github.com/spf13/cobra"
 )
@@ -102,19 +100,12 @@ func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) (
 	if len(args) == 0 {
 		args = []string{"./..."}
 
-		dir := rootWorkingDir()
-		for {
-			if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
-				args = appendDirs(args, filepath.Join(dir, "cue.mod", "gen"))
-				args = appendDirs(args, filepath.Join(dir, "cue.mod", "pkg"))
-				args = appendDirs(args, filepath.Join(dir, "cue.mod", "usr"))
-				break
-			}
-
-			dir = filepath.Dir(dir)
-			if info, _ := os.Stat(dir); !info.IsDir() {
-				return nil, errors.Newf(token.NoPos, "no module root found")
-			}
+		dir, err := findModuleRoot()
+		if err != nil {
+			return nil, errors.Promote(err, "")
+		}
+		for _, sub := range []string{"gen", "pkg", "usr"} {
+			args = appendDirs(args, filepath.Join(dir, "cue.mod", sub))
 		}
 	}
 

@@ -128,9 +128,8 @@ func TestCommand(t *testing.T) {
 		c, err = cmd.New([]string{"fix"})
 		qt.Assert(t, qt.IsNil(err))
 		c.SetOutput(io.Discard)
-		// The search dereferences a nil pointer rather than failing
-		// with a "permission denied" error.
-		qt.Assert(t, qt.PanicMatches(func() { err = c.Run(ctx) }, `.*nil pointer dereference`))
+		err = c.Run(ctx)
+		qt.Assert(t, qt.ErrorMatches(err, `.*permission denied`))
 	})
 
 	// Verify that searching for the module root outside of a module
@@ -154,9 +153,9 @@ func TestCommand(t *testing.T) {
 		go func() { errc <- c.Run(ctx) }()
 		select {
 		case err := <-errc:
-			t.Fatalf("unexpected result: %v", err)
-		case <-time.After(100 * time.Millisecond):
-			// The search never terminates.
+			qt.Assert(t, qt.ErrorMatches(err, `module root not found`))
+		case <-time.After(5 * time.Second):
+			t.Fatal("searching for the module root does not terminate")
 		}
 	})
 }

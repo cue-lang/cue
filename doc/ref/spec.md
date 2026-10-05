@@ -2822,6 +2822,15 @@ expressions to be a part of the error message.
 a: 1/0 | error("infinity and beyond!: \(1/0)")
 ```
 
+To refer to the value being validated, enclose the validator in braces and use
+[`self`](#self-from-v0150):
+
+```cue
+#Option: {"one" | "two" | "three" | error("invalid option \(self)")}
+
+a: #Option & "four" // error: invalid option four
+```
+
 ### `len`
 
 The builtin function `len` takes arguments of various types and returns

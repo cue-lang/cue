@@ -2,6 +2,9 @@ In this file we test cases where references are shadowed:
 - x: x: x
 - a newly created dynamic field which ends up shadowing an existing field.
 
+Wrong: in out/definition, the let clause L of shadowLet.a refers to b via a
+let clause added at the top level, where b is not declared.
+
 -- in.cue --
 shadowRef: t1: {
 	x: "x": x | null
@@ -160,6 +163,19 @@ shadowField: recursive: {
 	}
 	v: T & {n: {}}
 }
+
+// The let clause is first used, and thus exported, where b is shadowed.
+shadowLet: {
+	b: 1
+	a: {
+		b: 10
+		let L = b
+		c: {
+			b: 20
+			d: L
+		}
+	}
+}
 -- out/definition --
 shadowRef: {
 	t1: x~(x_9): x: x_9 | null
@@ -286,6 +302,21 @@ shadowField: {
 		v: T & {n: {}}
 	}
 }
+
+// The let clause is first used, and thus exported, where b is shadowed.
+shadowLet: {
+	b: 1
+	a: {
+		let L = b_7
+		b: 10
+		c: {
+			b: 20
+			d: L
+		}
+	}
+}
+
+let b_7 = b
 -- out/doc --
 []
 [shadowRef]
@@ -402,6 +433,16 @@ so y must not reference the label a, which b.a shadows.
 [shadowField recursive v n n a]
 [shadowField recursive v n n n]
 [shadowField recursive v a]
+[shadowLet]
+- The let clause is first used, and thus exported, where b is shadowed.
+
+[shadowLet b]
+[shadowLet a]
+[shadowLet a b]
+[shadowLet a L]
+[shadowLet a c]
+[shadowLet a c b]
+[shadowLet a c d]
 -- out/value-v3 --
 == Simplified
 _|_ // shadowRef.e1.x.x: structural cycle
@@ -543,6 +584,18 @@ _|_ // shadowRef.e1.x.x: structural cycle
 						y: int
 					}
 				}
+			}
+		}
+	}
+
+	// The let clause is first used, and thus exported, where b is shadowed.
+	shadowLet: {
+		b: 1
+		a: {
+			b: 10
+			c: {
+				b: 20
+				d: 10
 			}
 		}
 	}
@@ -688,7 +741,7 @@ diff old new
  			}
  		}
  
-@@ -121,18 +83,60 @@
+@@ -121,22 +83,76 @@
  		// or even
  		// 		b: 0
  		//  	c: b
@@ -704,6 +757,7 @@ diff old new
 -				d: {
 -					b: 1
 -					c: A & a.z
+-				}
 +		t6: x: {
 +			b: 0
 +			c: 0
@@ -758,10 +812,21 @@ diff old new
 +						a: string
 +						y: int
 +					}
- 				}
++				}
++			}
++		}
++	}
++
++	// The let clause is first used, and thus exported, where b is shadowed.
++	shadowLet: {
++		b: 1
++		a: {
++			b: 10
++			c: {
++				b: 20
++				d: 10
  			}
  		}
-@@ -139,4 +143,4 @@
  	}
  }
  == Eval

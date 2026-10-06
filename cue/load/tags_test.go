@@ -149,6 +149,7 @@ package x
 
 a: string & "bar" @tag(foo)
 b: a
+-- a refers to string & "bar"
 `,
 	}, {
 		// Both instances share the file in the parent directory.
@@ -170,6 +171,7 @@ a: string & "bar" @tag(foo)
 package x
 
 b: a
+-- a refers to string & "bar"
 `,
 	}, {
 		// Both instances share the file parsed by the loader.
@@ -192,6 +194,7 @@ a: string & "bar" @tag(foo)
 package x
 
 b: a
+-- a refers to string & "bar"
 `,
 	}, {
 		// The value is injected via the second of the field's tags.
@@ -214,6 +217,7 @@ a: string & "bar" @tag(other) @tag(foo)
 package x
 
 b: a
+-- a refers to string & "bar"
 `,
 	}, {
 		// A tag variable is injected alongside the other tag.
@@ -224,6 +228,7 @@ b: a
 		},
 		fromString: true,
 		args:       []string{"./..."},
+		// The reference is left with a's value before the second injection.
 		want: `== x.cue
 package x
 
@@ -236,6 +241,7 @@ a: string & "bar" & "m1" @tag(foo) @tag(v,var=os)
 package x
 
 b: a
+-- a refers to string & "bar"
 `,
 	}}
 	for _, tc := range syntaxCases {
@@ -266,6 +272,14 @@ b: a
 					b, err := format.Node(f)
 					qt.Assert(t, qt.IsNil(err))
 					fmt.Fprintf(&buf, "== %s\n%s", filepath.Base(f.Filename), b)
+					ast.Walk(f, func(n ast.Node) bool {
+						if id, ok := n.(*ast.Ident); ok && id.Node != nil {
+							b, err := format.Node(id.Node)
+							qt.Assert(t, qt.IsNil(err))
+							fmt.Fprintf(&buf, "-- %s refers to %s\n", id.Name, b)
+						}
+						return true
+					}, nil)
 				}
 			}
 			qt.Assert(t, qt.Equals(buf.String(), tc.want))

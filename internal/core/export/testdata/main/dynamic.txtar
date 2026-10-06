@@ -1,3 +1,7 @@
+# Wrong: in out/definition and out/value-v3, nested.inner.ref refers to the
+# dynamic field with the alias K in nested, rather than the one in
+# nested.inner.
+
 -- in.cue --
 x:         string
 (x)~(X):   4
@@ -17,6 +21,21 @@ r1:          "r1"
 ("s-" + q)?: 1
 ("s-" + r)!: 2
 ("s-" + q1)?: (r1)!: 3
+
+// The alias of a dynamic field may be reused in a nested struct. The let
+// clause is first used, and thus exported, within the nested struct.
+nested: {
+	k:        "p"
+	k2:       "q"
+	(k)~(K):  1
+	outer:    K
+	let L = K
+	inner: {
+		(k2)~(K): 2
+		ref:      K
+		viaLet:   L
+	}
+}
 -- out/definition --
 x:       string
 (x)~(X): 4
@@ -35,6 +54,21 @@ r1:     "r1"
 "s-q"?: 1
 "s-r"!: 2
 "s-q1"?: (r1)!: 3
+
+// The alias of a dynamic field may be reused in a nested struct. The let
+// clause is first used, and thus exported, within the nested struct.
+nested: {
+	let L = K
+	k:       "p"
+	k2:      "q"
+	(k)~(K): 1
+	outer:   K
+	inner: {
+		(k2):   2
+		ref:    K
+		viaLet: L
+	}
+}
 -- out/doc-v3 --
 []
 [x]
@@ -46,6 +80,19 @@ r1:     "r1"
 [q1]
 [r]
 [r1]
+[nested]
+- The alias of a dynamic field may be reused in a nested struct. The let
+clause is first used, and thus exported, within the nested struct.
+
+[nested k]
+[nested k2]
+[nested outer]
+[nested L]
+[nested inner]
+[nested inner ref]
+[nested inner viaLet]
+[nested inner q]
+[nested p]
 [y]
 ["s-q1"]
 ["s-q1" r1]
@@ -55,11 +102,24 @@ r1:     "r1"
 diff old new
 --- old
 +++ new
-@@ -8,9 +8,8 @@
+@@ -8,9 +8,21 @@
  [q1]
  [r]
  [r1]
 -[_]
++[nested]
++- The alias of a dynamic field may be reused in a nested struct. The let
++clause is first used, and thus exported, within the nested struct.
++
++[nested k]
++[nested k2]
++[nested outer]
++[nested L]
++[nested inner]
++[nested inner ref]
++[nested inner viaLet]
++[nested inner q]
++[nested p]
  [y]
 -["s-q"]
 -["s-r"]
@@ -107,6 +167,21 @@ bogus field for a failed dynamic field.
 	("s-" + q)?: 1
 	("s-" + r)!: 2
 	("s-" + q1)?: (r1)!: 3
+
+	// The alias of a dynamic field may be reused in a nested struct. The let
+	// clause is first used, and thus exported, within the nested struct.
+	nested: {
+		let L = K
+		k:       "p"
+		k2:      "q"
+		(k)~(K): 1
+		outer:   K
+		inner: {
+			(k2):   2
+			ref:    K
+			viaLet: L
+		}
+	}
 }
 == Raw
 {
@@ -127,6 +202,21 @@ bogus field for a failed dynamic field.
 	("s-" + q)?: 1
 	("s-" + r)!: 2
 	("s-" + q1)?: (r1)!: 3
+
+	// The alias of a dynamic field may be reused in a nested struct. The let
+	// clause is first used, and thus exported, within the nested struct.
+	nested: {
+		let L = K
+		k:       "p"
+		k2:      "q"
+		(k)~(K): 1
+		outer:   K
+		inner: {
+			(k2):   2
+			ref:    K
+			viaLet: L
+		}
+	}
 }
 == Final
 _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 3 more errors)
@@ -149,6 +239,21 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 	("s-" + q)?: 1
 	("s-" + r)!: 2
 	("s-" + q1)?: (r1)!: 3
+
+	// The alias of a dynamic field may be reused in a nested struct. The let
+	// clause is first used, and thus exported, within the nested struct.
+	nested: {
+		let L = K
+		k:       "p"
+		k2:      "q"
+		(k)~(K): 1
+		outer:   K
+		inner: {
+			(k2):   2
+			ref:    K
+			viaLet: L
+		}
+	}
 }
 == Eval
 {
@@ -169,12 +274,24 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 	("s-" + q)?: 1
 	("s-" + r)!: 2
 	("s-" + q1)?: (r1)!: 3
+	nested: {
+		let L = K
+		k:       "p"
+		k2:      "q"
+		(k)~(K): 1
+		outer:   K
+		inner: {
+			(k2):   2
+			ref:    K
+			viaLet: L
+		}
+	}
 }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,82 @@
+@@ -1,10 +1,139 @@
  == Simplified
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
 +{
@@ -195,6 +312,21 @@ diff old new
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
 +	("s-" + q1)?: (r1)!: 3
++
++	// The alias of a dynamic field may be reused in a nested struct. The let
++	// clause is first used, and thus exported, within the nested struct.
++	nested: {
++		let L = K
++		k:       "p"
++		k2:      "q"
++		(k)~(K): 1
++		outer:   K
++		inner: {
++			(k2):   2
++			ref:    K
++			viaLet: L
++		}
++	}
 +}
  == Raw
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
@@ -216,6 +348,21 @@ diff old new
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
 +	("s-" + q1)?: (r1)!: 3
++
++	// The alias of a dynamic field may be reused in a nested struct. The let
++	// clause is first used, and thus exported, within the nested struct.
++	nested: {
++		let L = K
++		k:       "p"
++		k2:      "q"
++		(k)~(K): 1
++		outer:   K
++		inner: {
++			(k2):   2
++			ref:    K
++			viaLet: L
++		}
++	}
 +}
  == Final
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
@@ -240,6 +387,21 @@ diff old new
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
 +	("s-" + q1)?: (r1)!: 3
++
++	// The alias of a dynamic field may be reused in a nested struct. The let
++	// clause is first used, and thus exported, within the nested struct.
++	nested: {
++		let L = K
++		k:       "p"
++		k2:      "q"
++		(k)~(K): 1
++		outer:   K
++		inner: {
++			(k2):   2
++			ref:    K
++			viaLet: L
++		}
++	}
 +}
  == Eval
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
@@ -261,6 +423,18 @@ diff old new
 +	("s-" + q)?: 1
 +	("s-" + r)!: 2
 +	("s-" + q1)?: (r1)!: 3
++	nested: {
++		let L = K
++		k:       "p"
++		k2:      "q"
++		(k)~(K): 1
++		outer:   K
++		inner: {
++			(k2):   2
++			ref:    K
++			viaLet: L
++		}
++	}
 +}
 -- diff/value/todo/p0 --
 Ignored errors?

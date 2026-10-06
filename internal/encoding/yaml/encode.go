@@ -264,8 +264,10 @@ func encodeExprs(exprs []ast.Expr) (n *yaml.Node, err error) {
 
 // extractYAMLTag looks for @yaml(,tag="...") attribute and returns the tag value.
 // Returns an empty string if no @yaml attribute or no tag argument is found.
-// Returns an error if the attribute is malformed.
+// Returns an error if the attribute is malformed, or if the attributes
+// disagree on the tag.
 func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
+	tag := ""
 	for _, attr := range attrs {
 		if attr.Name() != "yaml" {
 			continue
@@ -274,13 +276,19 @@ func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 		if parsed.Err != nil {
 			return "", parsed.Err
 		}
-		if val, found, err := parsed.Lookup(1, "tag"); err != nil {
+		val, found, err := parsed.Lookup(1, "tag")
+		if err != nil {
 			return "", err
-		} else if found {
-			return val, nil
 		}
+		if !found || val == "" {
+			continue
+		}
+		if tag != "" && val != tag {
+			return "", errors.Newf(attr.Pos(), "yaml: conflicting tags %q and %q", tag, val)
+		}
+		tag = val
 	}
-	return "", nil
+	return tag, nil
 }
 
 // encodeDecls converts a sequence of declarations to a value. If it encounters
@@ -292,8 +300,13 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 
 	docForNext := strings.Builder{}
 	var lastHead, lastFoot *yaml.Node
+	var attrs []*ast.Attribute
 	hasEmbed := false
 	for _, d := range decls {
+		// [cue.Value.Syntax] emits embedded expressions bare.
+		if x, ok := d.(ast.Expr); ok {
+			d = &ast.EmbedDecl{Expr: x}
+		}
 		switch x := d.(type) {
 		default:
 			return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
@@ -310,6 +323,7 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			continue
 
 		case *ast.Attribute:
+			attrs = append(attrs, x)
 			continue
 
 		case *ast.Field:
@@ -354,14 +368,15 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			n.Content = append(n.Content, value)
 
 		case *ast.EmbedDecl:
-			if hasEmbed {
-				return nil, errors.Newf(x.Pos(), "yaml: multiple embedded values")
-			}
-			hasEmbed = true
+			// Encode first, to report an unsupported node as such.
 			e, err := encode(x.Expr)
 			if err != nil {
 				return nil, err
 			}
+			if hasEmbed {
+				return nil, errors.Newf(x.Pos(), "yaml: multiple embedded values")
+			}
+			hasEmbed = true
 			addDocs(x, e, e)
 			lastHead = e
 			lastFoot = e
@@ -383,9 +398,17 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 	}
 
 	if hasEmbed {
-		return n.Content[0], nil
+		n = n.Content[0]
 	}
-
+	// Declaration attributes tag the value as a whole; a tag on the
+	// enclosing field wins, as the caller applies it afterwards.
+	yamlTag, err := extractYAMLTag(attrs)
+	if err != nil {
+		return nil, err
+	}
+	if yamlTag != "" {
+		n.Tag = yamlTag
+	}
 	return n, nil
 }
 

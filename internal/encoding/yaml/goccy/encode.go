@@ -322,6 +322,9 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 				startCol = st.Position.Column
 			}
 			n.Values[i] = applyInfo(n.Values[i], e, startCol, n.IsFlowStyle)
+			if tn, ok := n.Values[i].(*yast.TagNode); ok && !n.IsFlowStyle {
+				n.Values[i] = seqTagNode{tn}
+			}
 			if len(e.line) > 0 {
 				n.Values[i].SetComment(commentGroup(e.line, false))
 			}
@@ -348,6 +351,24 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 		node = literalBlock(node, info.literal, col-1+indentWidth)
 	}
 	return node
+}
+
+// seqTagNode is a tag node which is an element of a block sequence.
+// It works around a bug in goccy's sequence printer, which shifts the
+// lines after an element's first by the indentation of that first
+// line: a tag line has none, so a tagged block value is indented
+// twice. The tag line is given the indentation of the value below it.
+//
+// It must not be used elsewhere, as goccy's mapping printer looks for
+// a [yast.TagNode] to keep a tag on the line of its key.
+type seqTagNode struct{ *yast.TagNode }
+
+func (n seqTagNode) String() string {
+	s := n.TagNode.String()
+	_, value, _ := strings.Cut(s, "\n")
+	value = strings.TrimLeft(value, "\n")
+	indent := len(value) - len(strings.TrimLeft(value, " "))
+	return value[:indent] + s
 }
 
 // clonePos returns a copy of the position of n's token, or nil.
@@ -841,8 +862,10 @@ func encodeExprs(exprs []ast.Expr) ([]any, *encInfo, error) {
 
 // extractYAMLTag looks for @yaml(,tag="...") attribute and returns the tag value.
 // Returns an empty string if no @yaml attribute or no tag argument is found.
-// Returns an error if the attribute is malformed.
+// Returns an error if the attribute is malformed, or if the attributes
+// disagree on the tag.
 func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
+	tag := ""
 	for _, attr := range attrs {
 		if attr.Name() != "yaml" {
 			continue
@@ -851,13 +874,19 @@ func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 		if parsed.Err != nil {
 			return "", parsed.Err
 		}
-		if val, found, err := parsed.Lookup(1, "tag"); err != nil {
+		val, found, err := parsed.Lookup(1, "tag")
+		if err != nil {
 			return "", err
-		} else if found {
-			return val, nil
 		}
+		if !found || val == "" {
+			continue
+		}
+		if tag != "" && val != tag {
+			return "", errors.Newf(attr.Pos(), "yaml: conflicting tags %q and %q", tag, val)
+		}
+		tag = val
 	}
-	return "", nil
+	return tag, nil
 }
 
 // encodeDecls converts a sequence of declarations to a value. If it encounters
@@ -871,9 +900,14 @@ func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
 	// docForNext collects the comment groups between fields, which
 	// become head comments of the next field.
 	var docForNext []commentLine
+	var attrs []*ast.Attribute
 	var embedValue any
 	var embedInfo *encInfo
 	for _, d := range decls {
+		// [cue.Value.Syntax] emits embedded expressions bare.
+		if x, ok := d.(ast.Expr); ok {
+			d = &ast.EmbedDecl{Expr: x}
+		}
 		switch x := d.(type) {
 		default:
 			return nil, nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
@@ -889,6 +923,7 @@ func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
 			continue
 
 		case *ast.Attribute:
+			attrs = append(attrs, x)
 			continue
 
 		case *ast.Field:
@@ -923,7 +958,9 @@ func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
 			if err != nil {
 				return nil, nil, err
 			}
-			valueInfo.tag = yamlTag
+			if yamlTag != "" {
+				valueInfo.tag = yamlTag
+			}
 
 			addDocs(x.Label, valueInfo)
 			addDocs(x, valueInfo)
@@ -939,12 +976,13 @@ func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
 			info.entries = append(info.entries, valueInfo)
 
 		case *ast.EmbedDecl:
-			if embedInfo != nil {
-				return nil, nil, errors.Newf(x.Pos(), "yaml: multiple embedded values")
-			}
+			// Encode first, to report an unsupported node as such.
 			e, eInfo, err := encode(x.Expr)
 			if err != nil {
 				return nil, nil, err
+			}
+			if embedInfo != nil {
+				return nil, nil, errors.Newf(x.Pos(), "yaml: multiple embedded values")
 			}
 			addDocs(x, eInfo)
 			if len(docForNext) > 0 {
@@ -955,6 +993,20 @@ func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
 			docForNext = nil
 			embedValue, embedInfo = e, eInfo
 		}
+	}
+
+	// Declaration attributes tag the value as a whole; a tag on the
+	// enclosing field wins, as the caller applies it afterwards.
+	yamlTag, err := extractYAMLTag(attrs)
+	if err != nil {
+		return nil, nil, err
+	}
+	tagged := info
+	if embedInfo != nil {
+		tagged = embedInfo
+	}
+	if yamlTag != "" {
+		tagged.tag = yamlTag
 	}
 
 	if embedInfo != nil {

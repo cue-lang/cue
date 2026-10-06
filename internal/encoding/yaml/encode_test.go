@@ -357,7 +357,6 @@ item: !%3Chttps://example.com/schema/v1%3E value
 	}, {
 		// Declaration attributes tag the enclosing value, and a field
 		// attribute on that value takes precedence over them.
-		// TODO: the tag on a is ignored; want "a: !A".
 		name: "yaml_tag_decl",
 		in: `
 		a: {
@@ -367,14 +366,12 @@ item: !%3Chttps://example.com/schema/v1%3E value
 		c: {"x", @yaml(,tag="!C")} @yaml(,tag="!D")
 		`,
 		out: `
-a:
+a: !A
   b: 1
 c: !D x
 		`,
 	}, {
 		// Tagged collections and block strings as sequence elements.
-		// TODO: the tags on the elements are ignored; want !Ref, !Join,
-		// !Env, !Text, and !Deep, each preceding its value.
 		name: "yaml_tag_decl_elements",
 		in: `
 		l: [{
@@ -402,41 +399,42 @@ c: !D x
 		`,
 		out: `
 l: !Format
-  - a: 1
+  - !Ref
+    a: 1
     b: 2
-  - - x
-    - z
-  - |
+  - !Join
+    - x
+    - !Env z
+  - !Text |
     line1
     line2
-  - - - c: 1
+  - - - !Deep
+        c: 1
         d: 2
 		`,
 	}, {
 		// A declaration attribute in a file tags the document.
-		// TODO: the tag is ignored; want "!Doc" on a first line.
 		name: "yaml_tag_decl_file",
 		in: `
 		@yaml(,tag="!Doc")
 		a: 1
 		`,
 		out: `
+!Doc
 a: 1
 		`,
 	}, {
-		// TODO: the first tag wins; want a conflicting tags error.
 		name: "yaml_tag_conflict_field",
 		in: `
 		a: "x" @yaml(,tag="!A") @yaml(,tag="!B")
 		`,
-		out: `a: !A x`,
+		out: `yaml: conflicting tags "!A" and "!B"`,
 	}, {
-		// TODO: the tags are ignored; want a conflicting tags error.
 		name: "yaml_tag_conflict_decl",
 		in: `
 		a: {"x", @yaml(,tag="!A"), @yaml(,tag="!B")}
 		`,
-		out: `a: x`,
+		out: `yaml: conflicting tags "!A" and "!B"`,
 	}, {
 		name: "yaml_attribute_without_tag",
 		in: `
@@ -508,7 +506,6 @@ true
 		`,
 	}, {
 		// [cue.Value.Syntax] emits embedded expressions bare.
-		// TODO: they are not supported; want "- first" and "- !Env second".
 		in: ast.NewList(
 			ast.NewString("first"),
 			&ast.StructLit{Elts: []ast.Decl{
@@ -516,20 +513,22 @@ true
 				&ast.Attribute{Text: `@yaml(,tag="!Env")`},
 			}},
 		),
-		out: `yaml: unsupported node "second" (*ast.BasicLit)`,
+		out: `
+- first
+- !Env second
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var got string
-			if n, err := encode(tc.in); err != nil {
-				got = err.Error()
-			} else {
-				b, err := yaml.Marshal(n)
-				if err != nil {
-					t.Fatal(err)
-				}
-				got = strings.TrimSpace(string(b))
+			n, err := encode(tc.in)
+			if err != nil {
+				t.Fatal(err)
 			}
+			b, err := yaml.Marshal(n)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
 			qt.Assert(t, qt.Equals(got, want))
 		})

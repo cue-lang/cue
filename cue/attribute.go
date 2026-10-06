@@ -46,7 +46,9 @@ func (v Value) Attribute(key string) Attribute {
 }
 
 func newAttr(k internal.AttrKind, a *ast.Attribute) Attribute {
-	return Attribute{*internal.ParseAttr(a)}
+	x := internal.ParseAttr(a)
+	x.Kind = k
+	return Attribute{*x}
 }
 
 func nonExistAttr(key string) Attribute {

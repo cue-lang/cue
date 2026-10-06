@@ -44,6 +44,10 @@ type recursiveA struct {
 	Val  int
 }
 
+type recursiveSlice [][]recursiveSlice
+
+type recursivePtr *recursivePtr
+
 type crossRefA struct {
 	Y string
 	B *crossRefB
@@ -374,6 +378,28 @@ func TestConvert(t *testing.T) {
 		{(*textMarshaller)(nil), "(_){ _ }"},
 		{(*ptrError)(nil), "(_){ _ }"},
 		{(*cue.Value)(nil), "(_){ _ }"},
+
+		// Cyclic Go values exceed the nesting limit.
+		{func() any {
+			n := &recursiveA{}
+			n.Next = n
+			return n
+		}(), "(_|_){\n  // [eval] unsupported Go value: exceeded max nesting depth of 10000\n}"},
+		{func() any {
+			var x any
+			x = &x
+			return x
+		}(), "(_|_){\n  // [eval] unsupported Go value: exceeded max nesting depth of 10000\n}"},
+		{func() any {
+			l := make([]any, 1)
+			l[0] = l
+			return l
+		}(), "(_|_){\n  // [eval] unsupported Go value: exceeded max nesting depth of 10000\n}"},
+		{func() any {
+			m := map[string]any{}
+			m["a"] = m
+			return m
+		}(), "(_|_){\n  // [eval] unsupported Go value: exceeded max nesting depth of 10000\n}"},
 	}
 	r := runtime.New()
 	for _, tc := range testCases {
@@ -434,9 +460,8 @@ func TestConvertNestingLimit(t *testing.T) {
 	}
 	qt.Assert(t, qt.Equals(valueErr(chain(5000)), ""))
 	qt.Assert(t, qt.Equals(typeErr(pointers(10000)), ""))
-	// Wrong: no limit is enforced, so a cyclic value or type recurses without bound.
-	qt.Assert(t, qt.Equals(valueErr(chain(5001)), ""))
-	qt.Assert(t, qt.Equals(typeErr(pointers(10001)), ""))
+	qt.Assert(t, qt.Equals(valueErr(chain(5001)), "unsupported Go value: exceeded max nesting depth of 10000"))
+	qt.Assert(t, qt.Equals(typeErr(pointers(10001)), "unsupported Go type (int): exceeded max nesting depth of 10000"))
 }
 
 func TestX(t *testing.T) {
@@ -595,6 +620,15 @@ func TestConvertType(t *testing.T) {
 		want: `(struct){
   Foobar: (string){ "foo,opt,bar" }
 }`,
+	}, {
+		// Recursive Go types which are not structs exceed the nesting limit.
+		goTyp:       recursiveSlice(nil),
+		want:        "(_|_){// _|_(unsupported Go type ([]convert_test.recursiveSlice): exceeded max nesting depth of 10000)\n}",
+		expectError: true,
+	}, {
+		goTyp:       recursivePtr(nil),
+		want:        "(_|_){// _|_(unsupported Go type (convert_test.recursivePtr): exceeded max nesting depth of 10000)\n}",
+		expectError: true,
 	}}
 
 	r := runtime.New()

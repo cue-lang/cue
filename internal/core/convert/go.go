@@ -58,7 +58,7 @@ var astTypeCache sync.Map // map[reflect.Type]ast.Expr
 // The returned CUE value is finalized and concrete.
 func FromGoValue(ctx *adt.OpContext, x any, nilIsTop bool) adt.Value {
 	val := reflect.ValueOf(x)
-	v := fromGoValue(ctx, nilIsTop, val)
+	v := fromGoValue(ctx, nilIsTop, val, 0)
 	if v == nil {
 		return ctx.AddErrf("unsupported Go type (%T)", x)
 	}
@@ -267,7 +267,17 @@ func isNil(x reflect.Value) bool {
 	return false
 }
 
-func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result adt.Value) {
+// maxNestingDepth bounds how deeply nested a Go value or type may be,
+// so that a cyclic one results in an error rather than unbounded recursion.
+// It matches the limit of [encoding/json].
+const maxNestingDepth = 10000
+
+// fromGoValue converts val, which is nested depth levels deep in the Go value
+// being converted.
+func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int) (result adt.Value) {
+	if depth > maxNestingDepth {
+		return ctx.AddErrf("unsupported Go value: exceeded max nesting depth of %d", maxNestingDepth)
+	}
 	src := ctx.Source()
 	// An untyped nil, or dereferencing a nil interface. A nil pointer of any
 	// type is the same, and must not reach the types special-cased below.
@@ -426,7 +436,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		return n
 
 	case reflect.Pointer, reflect.Interface:
-		return fromGoValue(ctx, nilIsTop, val.Elem())
+		return fromGoValue(ctx, nilIsTop, val.Elem(), depth+1)
 
 	case reflect.Struct:
 		// Grow the slices to match the number of fields in the Go struct,
@@ -458,7 +468,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			if isOmitZero(sf) && isZero(val) {
 				continue
 			}
-			sub := fromGoValue(ctx, nilIsTop, val)
+			sub := fromGoValue(ctx, nilIsTop, val, depth+1)
 			if sub == nil {
 				// mimic behavior of encoding/json: skip fields of unsupported types
 				continue
@@ -508,7 +518,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 			iter := val.MapRange()
 			for iter.Next() {
 				k, val := iter.Key(), iter.Value()
-				sub := fromGoValue(ctx, nilIsTop, val)
+				sub := fromGoValue(ctx, nilIsTop, val, depth+1)
 				// mimic behavior of encoding/json: report error of unsupported type.
 				if sub == nil {
 					return ctx.AddErrf("unsupported Go type (%T)", val.Interface())
@@ -566,7 +576,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 		// See the upstream bug report: https://go.dev/issue/76357
 		for i := range numElems {
 			val := val.Index(i)
-			x := fromGoValue(ctx, nilIsTop, val)
+			x := fromGoValue(ctx, nilIsTop, val, depth+1)
 			if x == nil {
 				return ctx.AddErrf("unsupported Go type (%T)", val.Interface())
 			}
@@ -674,6 +684,7 @@ type typeBuilder struct {
 	byType    map[reflect.Type]*namedType // lookup by Go type
 	nameCount map[string]int              // disambiguate same-named types from different packages
 	errs      *[]errors.Error
+	depth     int // nesting depth of the type being built, bounded by maxNestingDepth
 }
 
 type namedType struct {
@@ -743,6 +754,13 @@ func (b *typeBuilder) finalize(topExpr ast.Expr, errs *[]errors.Error) ast.Expr 
 
 // build recursively converts a Go type to a CUE AST expression.
 func (b *typeBuilder) build(t reflect.Type, allowNullDefault bool) ast.Expr {
+	if b.depth > maxNestingDepth {
+		*b.errs = append(*b.errs, errors.Newf(token.NoPos, "unsupported Go type (%v): exceeded max nesting depth of %d", t, maxNestingDepth))
+		return &ast.BadExpr{}
+	}
+	b.depth++
+	defer func() { b.depth-- }()
+
 	// Check special types first — these short-circuit regardless of being named.
 	switch reflect.Zero(t).Interface().(type) {
 	case *big.Int, big.Int:
@@ -763,11 +781,7 @@ func (b *typeBuilder) build(t reflect.Type, allowNullDefault bool) ast.Expr {
 
 	switch k := t.Kind(); k {
 	case reflect.Pointer:
-		elem := t.Elem()
-		for elem.Kind() == reflect.Pointer {
-			elem = elem.Elem()
-		}
-		e := b.build(elem, false)
+		e := b.build(t.Elem(), false)
 		if allowNullDefault {
 			e = wrapOrNull(e)
 		}
@@ -812,6 +826,9 @@ func (b *typeBuilder) build(t reflect.Type, allowNullDefault bool) ast.Expr {
 			if elem == nil {
 				*b.errs = append(*b.errs, errors.Newf(token.NoPos, "unsupported Go type (%v)", t.Elem()))
 				return &ast.BadExpr{}
+			}
+			if isBad(elem) {
+				return elem
 			}
 
 			if t.Kind() == reflect.Array {

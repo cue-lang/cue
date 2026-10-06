@@ -60,6 +60,9 @@ func Extract(filename string, src any) (*ast.File, error) {
 
 // Encode returns the YAML encoding of v.
 func Encode(v cue.Value) ([]byte, error) {
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, err
+	}
 	// Note that we use [cue.Concrete] in this package, which expands all references.
 	// If we want YAML to encode with anchors in the future, we can change this.
 	n := v.Syntax(cue.Concrete(true))
@@ -76,8 +79,7 @@ func EncodeStream(iter cue.Iterator) ([]byte, error) {
 		if i > 0 {
 			buf.WriteString("---\n")
 		}
-		n := iter.Value().Syntax(cue.Concrete(true))
-		b, err := cueyaml.Encode(n)
+		b, err := Encode(iter.Value())
 		if err != nil {
 			return nil, err
 		}

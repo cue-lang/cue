@@ -439,6 +439,11 @@ func TestYAMLValues(t *testing.T) {
 ".Inf": 4
 "y": 5`,
 		},
+
+		// Errors and non-concrete values fail to encode.
+		// TODO: report the errors of the value rather than unsupported nodes.
+		{`a: string`, `error: yaml: unsupported node string (*ast.Ident)`},
+		{`a: 1 & 2`, `error: yaml: unsupported node <[l2// a: conflicting values 2 and 1] _|_> (*ast.BottomLit)`},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.cue, func(t *testing.T) {
@@ -446,10 +451,11 @@ func TestYAMLValues(t *testing.T) {
 			v := c.CompileString(tc.cue)
 
 			b, err := yaml.Encode(v)
+			got := strings.TrimSpace(string(b))
 			if err != nil {
-				t.Error(err)
+				got = "error: " + err.Error()
 			}
-			if got := strings.TrimSpace(string(b)); got != tc.yaml {
+			if got != tc.yaml {
 				t.Errorf("Encode:\ngot  %q\nwant %q", got, tc.yaml)
 			}
 

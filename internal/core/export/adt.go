@@ -466,11 +466,14 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		if x.Src != nil {
 			name = x.Src.Name
 		}
+		// The innermost dynamic field with the alias is the one referenced.
 		var f *ast.Field
+	stack:
 		for i := len(e.stack) - 1; i >= 0; i-- {
 			for _, entry := range e.stack[i].dynamicFields {
 				if entry.alias == name {
 					f = entry.field
+					break stack
 				}
 			}
 		}

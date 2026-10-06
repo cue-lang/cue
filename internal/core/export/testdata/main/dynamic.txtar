@@ -1,7 +1,3 @@
-# Wrong: in out/definition and out/value-v3, nested.inner.ref refers to the
-# dynamic field with the alias K in nested, rather than the one in
-# nested.inner.
-
 -- in.cue --
 x:         string
 (x)~(X):   4
@@ -64,9 +60,9 @@ nested: {
 	(k)~(K): 1
 	outer:   K
 	inner: {
-		(k2):   2
-		ref:    K
-		viaLet: L
+		(k2)~(K_1): 2
+		ref:        K_1
+		viaLet:     L
 	}
 }
 -- out/doc-v3 --
@@ -177,9 +173,9 @@ bogus field for a failed dynamic field.
 		(k)~(K): 1
 		outer:   K
 		inner: {
-			(k2):   2
-			ref:    K
-			viaLet: L
+			(k2)~(K_1): 2
+			ref:        K_1
+			viaLet:     L
 		}
 	}
 }
@@ -212,9 +208,9 @@ bogus field for a failed dynamic field.
 		(k)~(K): 1
 		outer:   K
 		inner: {
-			(k2):   2
-			ref:    K
-			viaLet: L
+			(k2)~(K_1): 2
+			ref:        K_1
+			viaLet:     L
 		}
 	}
 }
@@ -249,9 +245,9 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 		(k)~(K): 1
 		outer:   K
 		inner: {
-			(k2):   2
-			ref:    K
-			viaLet: L
+			(k2)~(K_1): 2
+			ref:        K_1
+			viaLet:     L
 		}
 	}
 }
@@ -281,9 +277,9 @@ _|_ // key value of dynamic field must be concrete, found _|_(cycle error) (and 
 		(k)~(K): 1
 		outer:   K
 		inner: {
-			(k2):   2
-			ref:    K
-			viaLet: L
+			(k2)~(K_1): 2
+			ref:        K_1
+			viaLet:     L
 		}
 	}
 }
@@ -322,9 +318,9 @@ diff old new
 +		(k)~(K): 1
 +		outer:   K
 +		inner: {
-+			(k2):   2
-+			ref:    K
-+			viaLet: L
++			(k2)~(K_1): 2
++			ref:        K_1
++			viaLet:     L
 +		}
 +	}
 +}
@@ -358,9 +354,9 @@ diff old new
 +		(k)~(K): 1
 +		outer:   K
 +		inner: {
-+			(k2):   2
-+			ref:    K
-+			viaLet: L
++			(k2)~(K_1): 2
++			ref:        K_1
++			viaLet:     L
 +		}
 +	}
 +}
@@ -397,9 +393,9 @@ diff old new
 +		(k)~(K): 1
 +		outer:   K
 +		inner: {
-+			(k2):   2
-+			ref:    K
-+			viaLet: L
++			(k2)~(K_1): 2
++			ref:        K_1
++			viaLet:     L
 +		}
 +	}
 +}
@@ -430,9 +426,9 @@ diff old new
 +		(k)~(K): 1
 +		outer:   K
 +		inner: {
-+			(k2):   2
-+			ref:    K
-+			viaLet: L
++			(k2)~(K_1): 2
++			ref:        K_1
++			viaLet:     L
 +		}
 +	}
 +}

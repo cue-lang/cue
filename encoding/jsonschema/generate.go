@@ -917,7 +917,7 @@ func (g *generator) constExpr(v cue.Value, mode closedMode) (ast.Expr, bool) {
 	case cue.BottomKind:
 		return nil, false
 	case cue.StructKind:
-		if mode == open {
+		if mode == open || v.LookupPath(cue.MakePath(cue.AnyString)).Exists() {
 			// Open struct is not const.
 			return nil, false
 		}

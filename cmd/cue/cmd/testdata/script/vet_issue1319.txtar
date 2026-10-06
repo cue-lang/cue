@@ -31,6 +31,29 @@ cmp stderr data-stderr
 ! exec cue eval --merge=false data.json schema.cue
 cmp stderr data-nonconcrete-stderr
 
+# https://cuelang.org/issue/3358: the same applies to packages given as
+# arguments rather than files.
+# TODO: packages are first checked without requiring concrete values,
+# stopping there on any error, so the incomplete errors of
+# rule.required2, B, B.a, and B.b are missing.
+! exec cue vet -c ./pkg
+cmp stderr pkg-stderr
+
+! exec cue export ./pkg
+cmp stderr pkg-stderr
+
+! exec cue eval -c ./pkg
+cmp stderr pkg-stderr
+
+! exec cue vet ./pkg
+cmp stderr pkg-nonconcrete-stderr
+
+# With multiple packages, the ones before a failing package are still output.
+# TODO: the same up-front check stops before any package is output.
+! exec cue export ./ok ./pkg
+cmp stdout ok-stdout
+cmp stderr pkg-stderr
+
 -- errors.cue --
 s: "hello"
 s: "world" // conflicting values
@@ -103,3 +126,41 @@ min: conflicting values "test" and 0 (mismatched types string and int):
 min: conflicting values "test" and number (mismatched types string and number):
     ./data.json:1:9
     ./schema.cue:2:11
+-- pkg/pkg.cue --
+package pkg
+
+#Rule: {
+	required1!: string
+	required2!: string
+}
+rule: #Rule & {
+	required1: "value"
+	extra:     "value"
+}
+
+#S: {
+	a?: int
+	b?: int
+	matchN(1, [{a!: _}, {b!: _}])
+}
+A: #S & {a: 1, b: 2}
+B: #S & {}
+-- ok/ok.cue --
+package ok
+
+x: 1
+-- ok-stdout --
+-- pkg-stderr --
+rule.extra: field not allowed:
+    ./pkg/pkg.cue:9:2
+A: invalid value {a:1,b:2} (does not satisfy matchN): 2 matched, expected 1:
+    ./pkg/pkg.cue:15:2
+    ./pkg/pkg.cue:15:9
+    ./pkg/pkg.cue:17:4
+-- pkg-nonconcrete-stderr --
+rule.extra: field not allowed:
+    ./pkg/pkg.cue:9:2
+A: invalid value {a:1,b:2} (does not satisfy matchN): 2 matched, expected 1:
+    ./pkg/pkg.cue:15:2
+    ./pkg/pkg.cue:15:9
+    ./pkg/pkg.cue:17:4

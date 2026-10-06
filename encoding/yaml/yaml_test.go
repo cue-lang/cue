@@ -443,9 +443,8 @@ func TestYAMLValues(t *testing.T) {
 		// A tag on a list element is a declaration attribute by an embedding.
 		{`["first", {"second", @yaml(,tag="!Env")}]`, "- first\n- !Env second"},
 
-		// TODO: a tagged empty collection ends up on its own line, which
-		// is not valid YAML in a mapping; want "d: !Empty {}" and "- !L []".
-		{`{d: {} @yaml(,tag="!Empty"), l: [{[], @yaml(,tag="!L")}]}`, "d: !Empty\n{}\nl:\n  - !L\n    []"},
+		// A tagged empty collection stays on the line of its tag.
+		{`{d: {} @yaml(,tag="!Empty"), l: [{[], @yaml(,tag="!L")}]}`, "d: !Empty {}\nl:\n  - !L []"},
 
 		// Errors and non-concrete values fail to encode.
 		{`a: string`, `error: a: incomplete value string`},

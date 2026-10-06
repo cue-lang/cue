@@ -248,7 +248,9 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 	}
 	switch n := node.(type) {
 	case *yast.MappingNode:
-		if info.flow {
+		// goccy prints an empty collection as {} or [] regardless, but
+		// only the flag keeps it on the line of a tag.
+		if info.flow || len(n.Values) == 0 {
 			n.IsFlowStyle = true
 		}
 		for i, mv := range n.Values {
@@ -300,7 +302,7 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 			}
 		}
 	case *yast.SequenceNode:
-		if info.flow {
+		if info.flow || len(n.Values) == 0 {
 			n.IsFlowStyle = true
 		}
 		for i := range n.Values {

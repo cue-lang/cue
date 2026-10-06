@@ -863,6 +863,42 @@ V: __closeAll({
 		},
 
 		{
+			// A single embedding with comments keeps its braces when the
+			// wrapper is applied, so that the comments are not orphaned.
+			name:    "comments on a single embedding under a wrapper (fixExplicitOpen)",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+#A: a: int
+o: {}
+Y: {
+	// doc on embed
+	close({#A, b: 1})
+}
+W: {
+	// doc on embed
+	{#A, b: 1} // line on embed
+}
+V: {
+	// doc on embed
+	close({o, b: 1})
+}
+`,
+			// Wrong: the comments on the embeddings are dropped.
+			out: `@experiment(explicitopen)
+
+package foo
+
+#A: a: int
+o: {}
+Y: __closeAll({#A..., b: 1})
+W: __closeAll({#A..., b: 1})
+V: close(__reclose({o..., b: 1}))
+`,
+		},
+
+		{
 			// The wrapper starts on the line the literal started on, so
 			// that a line comment does not swallow the next element.
 			name:    "wrapped list elements keep their lines (fixExplicitOpen)",

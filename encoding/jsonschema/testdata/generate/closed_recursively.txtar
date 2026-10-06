@@ -1,5 +1,10 @@
 # Recursive closedness of the root value should propagate to nested
 # structs; see cuelang.org/issue/4349.
+#
+# Explicitly open structs stay open, so unlike the closed empty struct f,
+# they are not constants. The spread operator does not leave a struct open
+# within a definition by itself, as g shows; h adds an ellipsis to stay open.
+# TODO: c, e, and h are generated as constants.
 #path: #Schema
 -- test.cue --
 package test
@@ -7,6 +12,35 @@ package test
 #Schema: {
 	a?: string
 	b?: b2?: string
+	c?: {...}
+	d?: {x?: int, ...}
+	e?: x!: {...}
+	f?: {}
+	g?: #Closed...
+	h?: y!: {#Closed..., ...}
+}
+
+#Closed: x!: 1
+-- datatest/tests.cue --
+package datatest
+
+errorClosedEmptyStruct: {
+	data: f: x: 1
+	error: true
+}
+errorSpreadInDefinition: {
+	data: g: {x: 1, anything: 1}
+	error: true
+}
+openStructs: {
+	data: {
+		c: {anything: 1}
+		d: {x: 1, y: "z"}
+		e: x: anything: 1
+		h: y: {x: 1, anything: 1}
+	}
+	// TODO: this data should be accepted.
+	error: true
 }
 -- out/generate-v3/schema --
 {
@@ -20,5 +54,28 @@ package test
 			additionalProperties: false
 			properties: b2: type: "string"
 		}
+		c: const: {}
+		d: {
+			type:                 "object"
+			additionalProperties: true
+			properties: x: type: "integer"
+		}
+		e: const: x: {}
+		f: const: {}
+		g: const: x: 1
+		h: const: y: x: 1
 	}
 }
+-- out/generate-v3/errorClosedEmptyStruct --
+errorClosedEmptyStruct.data.f.x: field not allowed:
+    ./datatest/tests.cue:4:11
+-- out/generate-v3/openStructs --
+openStructs.data.c.anything: field not allowed:
+    ./datatest/tests.cue:13:7
+openStructs.data.e.x.anything: field not allowed:
+    ./datatest/tests.cue:15:9
+openStructs.data.h.y.anything: field not allowed:
+    ./datatest/tests.cue:16:16
+-- out/generate-v3/errorSpreadInDefinition --
+errorSpreadInDefinition.data.g.anything: field not allowed:
+    ./datatest/tests.cue:8:18

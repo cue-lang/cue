@@ -2,9 +2,6 @@ In this file we test cases where references are shadowed:
 - x: x: x
 - a newly created dynamic field which ends up shadowing an existing field.
 
-Wrong: in out/definition, the let clause L of shadowLet.a refers to b via a
-let clause added at the top level, where b is not declared.
-
 -- in.cue --
 shadowRef: t1: {
 	x: "x": x | null
@@ -307,7 +304,7 @@ shadowField: {
 shadowLet: {
 	b: 1
 	a: {
-		let L = b_7
+		let L = b
 		b: 10
 		c: {
 			b: 20
@@ -315,8 +312,6 @@ shadowLet: {
 		}
 	}
 }
-
-let b_7 = b
 -- out/doc --
 []
 [shadowRef]

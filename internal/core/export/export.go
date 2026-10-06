@@ -798,23 +798,24 @@ func filterUnusedLets(s *ast.StructLit) {
 }
 
 // lookupLetAlias returns the let clause added for the source let clause x by
-// the innermost struct being exported that declares it. A let clause is only
-// in scope while exporting such a struct: the same source clause is not
-// declared where the struct is reached through a reference, for instance.
-func (e *exporter) lookupLetAlias(x *ast.LetClause) *ast.LetClause {
+// the innermost struct being exported that declares it, and the index of its
+// frame. A let clause is only in scope while exporting such a struct: the same
+// source clause is not declared where the struct is reached through a
+// reference, for instance.
+func (e *exporter) lookupLetAlias(x *ast.LetClause) (*ast.LetClause, int) {
 	for i := len(e.stack) - 1; i >= 0; i-- {
 		if let, ok := e.stack[i].letAlias[x]; ok {
-			return let
+			return let, i
 		}
 	}
-	return nil
+	return nil, -1
 }
 
 // resolveLet actually parses the let expression.
 // If there was no recorded let expression, it expands the expression in place.
 func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Expr {
 	letClause, _ := x.Src.Node.(*ast.LetClause)
-	let := e.lookupLetAlias(letClause)
+	let, depth := e.lookupLetAlias(letClause)
 
 	switch {
 	case let == nil:
@@ -837,7 +838,16 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 		label := e.uniqueLetIdent(x.Label, x.X)
 
 		let.Ident = e.ident(label)
+
+		// The let clause is exported where it is first referenced, but its
+		// expression must be exported in the scope declaring it.
+		for range x.UpCount {
+			env = env.Up
+		}
+		saved := e.stack
+		e.stack = slices.Clip(e.stack[:depth+1])
 		let.Expr = e.expr(env, x.X)
+		e.stack = saved
 	}
 
 	ident := ast.NewIdent(let.Ident.Name)

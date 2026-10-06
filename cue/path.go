@@ -145,6 +145,8 @@ func (t SelectorType) IsDefinition() bool {
 
 // A Selector is a component of a path.
 type Selector struct {
+	// TODO: the zero Selector is undefined and most methods panic on it,
+	// much like the zero [Value].
 	sel selector
 }
 

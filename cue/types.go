@@ -584,6 +584,9 @@ func (v Value) Float64() (float64, error) {
 //
 // A Value is considered immutable: methods may be called concurrently.
 type Value struct {
+	// TODO: the zero Value is undefined and most methods panic on it.
+	// See https://cuelang.org/issue/3175.
+
 	idx *runtime.Runtime
 	v   *adt.Vertex
 	// Parent keeps track of the parent if the value corresponding to v.Parent

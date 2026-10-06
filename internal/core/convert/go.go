@@ -350,6 +350,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value) (result a
 	}
 
 	if v, ok := typeAssert[types.Interface](val); ok {
+		// TODO: the zero cue.Value holds no vertex, and nil panics later on.
+		// See https://cuelang.org/issue/3175.
 		t := v.Core()
 		return t.V
 	}

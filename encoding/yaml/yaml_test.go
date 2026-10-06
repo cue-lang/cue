@@ -440,6 +440,10 @@ func TestYAMLValues(t *testing.T) {
 "y": 5`,
 		},
 
+		// A tag on a list element is a declaration attribute by an embedding.
+		// TODO: this fails to encode; want "- first\n- !Env second".
+		{`["first", {"second", @yaml(,tag="!Env")}]`, `error: yaml: unsupported node "second" (*ast.BasicLit)`},
+
 		// Errors and non-concrete values fail to encode.
 		{`a: string`, `error: a: incomplete value string`},
 		{`a: 1 & 2`, `error: a: conflicting values 2 and 1`},

@@ -36,6 +36,10 @@ func TestAttributes(t *testing.T) {
 		@embedding(foo)
 		3
 	} @field(foo)
+	items: [
+		"first",
+		{"second", @yaml(,tag="!Env")},
+	]
 
 	c1: {} @step(1)
 	if true {
@@ -73,6 +77,18 @@ func TestAttributes(t *testing.T) {
 		flags: cue.ValueAttr,
 		path:  "b",
 		out:   "[@field(foo) @embedding(foo)]",
+	}, {
+		flags: cue.DeclAttr,
+		path:  "items[1]",
+		out:   `[@yaml(,tag="!Env")]`,
+	}, {
+		flags: cue.FieldAttr,
+		path:  "items[1]",
+		out:   "[]",
+	}, {
+		flags: cue.ValueAttr,
+		path:  "items[1]",
+		out:   `[@yaml(,tag="!Env")]`,
 	}, {
 		flags: cue.ValueAttr,
 		path:  "c1",

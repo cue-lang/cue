@@ -211,6 +211,13 @@ f4: {} # line 4
 		`,
 		out: "yaml: multiple embedded values",
 	}, {
+		// An unsupported node next to an embedding is reported as such.
+		name: "disallowEllipsis",
+		in: `
+		a: {"x", ...}
+		`,
+		out: "yaml: unsupported node ... (*ast.Ellipsis)",
+	}, {
 		name: "disallowDefinitions",
 		in:   `#a: 2 `,
 		out:  "yaml: definition or hidden fields not allowed",
@@ -339,6 +346,98 @@ custom: !%3Ctag:example.com,2000:app/foo%3E value
 item: !%3Chttps://example.com/schema/v1%3E value
 		`,
 	}, {
+		// An untagged embedding keeps the tag of its value.
+		name: "yaml_tag_embed_untagged",
+		in: `
+		{'\x80'}
+		`,
+		out: `
+!!binary gA==
+		`,
+	}, {
+		// Declaration attributes tag the enclosing value, and a field
+		// attribute on that value takes precedence over them.
+		// TODO: the tag on a is ignored; want "a: !A".
+		name: "yaml_tag_decl",
+		in: `
+		a: {
+			@yaml(,tag="!A")
+			b: 1
+		}
+		c: {"x", @yaml(,tag="!C")} @yaml(,tag="!D")
+		`,
+		out: `
+a:
+  b: 1
+c: !D x
+		`,
+	}, {
+		// Tagged collections and block strings as sequence elements.
+		// TODO: the tags on the elements are ignored; want !Ref, !Join,
+		// !Env, !Text, and !Deep, each preceding its value.
+		name: "yaml_tag_decl_elements",
+		in: `
+		l: [{
+			@yaml(,tag="!Ref")
+			a: 1
+			b: 2
+		}, {
+			[
+				"x",
+				{"z", @yaml(,tag="!Env")},
+			]
+			@yaml(,tag="!Join")
+		}, {
+			"""
+			line1
+			line2
+
+			"""
+			@yaml(,tag="!Text")
+		}, [[{
+			@yaml(,tag="!Deep")
+			c: 1
+			d: 2
+		}]]] @yaml(,tag="!Format")
+		`,
+		out: `
+l: !Format
+  - a: 1
+    b: 2
+  - - x
+    - z
+  - |
+    line1
+    line2
+  - - - c: 1
+        d: 2
+		`,
+	}, {
+		// A declaration attribute in a file tags the document.
+		// TODO: the tag is ignored; want "!Doc" on a first line.
+		name: "yaml_tag_decl_file",
+		in: `
+		@yaml(,tag="!Doc")
+		a: 1
+		`,
+		out: `
+a: 1
+		`,
+	}, {
+		// TODO: the first tag wins; want a conflicting tags error.
+		name: "yaml_tag_conflict_field",
+		in: `
+		a: "x" @yaml(,tag="!A") @yaml(,tag="!B")
+		`,
+		out: `a: !A x`,
+	}, {
+		// TODO: the tags are ignored; want a conflicting tags error.
+		name: "yaml_tag_conflict_decl",
+		in: `
+		a: {"x", @yaml(,tag="!A"), @yaml(,tag="!B")}
+		`,
+		out: `a: x`,
+	}, {
 		name: "yaml_attribute_without_tag",
 		in: `
 		field: "value" @yaml(,other="ignored")
@@ -407,18 +506,30 @@ field2: value
 
 true
 		`,
+	}, {
+		// [cue.Value.Syntax] emits embedded expressions bare.
+		// TODO: they are not supported; want "- first" and "- !Env second".
+		in: ast.NewList(
+			ast.NewString("first"),
+			&ast.StructLit{Elts: []ast.Decl{
+				ast.NewString("second"),
+				&ast.Attribute{Text: `@yaml(,tag="!Env")`},
+			}},
+		),
+		out: `yaml: unsupported node "second" (*ast.BasicLit)`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			n, err := encode(tc.in)
-			if err != nil {
-				t.Fatal(err)
+			var got string
+			if n, err := encode(tc.in); err != nil {
+				got = err.Error()
+			} else {
+				b, err := yaml.Marshal(n)
+				if err != nil {
+					t.Fatal(err)
+				}
+				got = strings.TrimSpace(string(b))
 			}
-			b, err := yaml.Marshal(n)
-			if err != nil {
-				t.Fatal(err)
-			}
-			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
 			qt.Assert(t, qt.Equals(got, want))
 		})

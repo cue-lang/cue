@@ -1,6 +1,5 @@
 # An @extern attribute is a file attribute anywhere in the file preamble,
 # including between the package clause and the imports.
-# TODO: it is rejected there.
 -- cue.mod/modules.cue --
 -- file1.cue --
 package foo
@@ -14,5 +13,7 @@ Foo: _ @testfn(file1.xx, abi=c, sig="func(int)int")
 Upper: strings.ToUpper("foo")
 
 -- out/extern --
-extern attribute must appear before package clause:
-    ./file1.cue:3:1
+{
+	Foo:   implFoo1
+	Upper: "FOO"
+}

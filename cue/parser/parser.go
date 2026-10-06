@@ -1149,14 +1149,19 @@ func (p *parser) parseAttribute(inPreamble bool) *ast.Attribute {
 	a := &ast.Attribute{At: p.pos, Text: p.lit}
 
 	if inPreamble {
-		key, body := a.Split()
-		if key == "experiment" {
-			p.expList = append(p.expList, body)
-		}
+		p.addExperiment(a)
 	}
 	p.next()
 	c.closeNode(p, a)
 	return a
+}
+
+// addExperiment records the experiments enabled by a, a file attribute,
+// if it is an @experiment attribute.
+func (p *parser) addExperiment(a *ast.Attribute) {
+	if key, body := a.Split(); key == "experiment" {
+		p.expList = append(p.expList, body)
+	}
 }
 
 func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.Decl, ok bool) {
@@ -2479,22 +2484,11 @@ func (p *parser) parseFile() *ast.File {
 
 	var decls []ast.Decl
 
+	// Attributes before the package clause are file attributes.
 	for p.tok == token.ATTRIBUTE {
 		decls = append(decls, p.parseAttribute(true))
 		p.consumeDeclComma()
 	}
-
-	v := p.cfg.Version
-	exp, err := cueexperiment.NewFile(v, p.expList...)
-	if err != nil {
-		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", v)
-		p.errors = errors.Append(p.errors, e)
-		// Do not proceed without setting p.experiments.
-		return nil
-	}
-	p.experiments = exp
-	p.file.SetExperiments(exp)
-	p.scanner.SetExperiments(p.scannerExperiments(false))
 
 	// The package clause is not a declaration: it does not appear in any
 	// scope.
@@ -2520,10 +2514,33 @@ func (p *parser) parseFile() *ast.File {
 		c.closeNode(p, pkg)
 	}
 
+	// Attributes after the package clause are file attributes only when an
+	// import declaration follows them; see [ast.File.Preamble]. Their
+	// experiments are read once that is known.
+	var attrs []*ast.Attribute
 	for p.tok == token.ATTRIBUTE {
-		decls = append(decls, p.parseAttribute(false))
+		a := p.parseAttribute(false)
+		attrs = append(attrs, a)
+		decls = append(decls, a)
 		p.consumeDeclComma()
 	}
+	if p.tok == token.IDENT && p.lit == "import" {
+		for _, a := range attrs {
+			p.addExperiment(a)
+		}
+	}
+
+	v := p.cfg.Version
+	exp, err := cueexperiment.NewFile(v, p.expList...)
+	if err != nil {
+		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", v)
+		p.errors = errors.Append(p.errors, e)
+		// Do not proceed without setting p.experiments.
+		return nil
+	}
+	p.experiments = exp
+	p.file.SetExperiments(exp)
+	p.scanner.SetExperiments(p.scannerExperiments(false))
 
 	if p.cfg.Mode&PackageClauseOnly == 0 {
 		// import decls

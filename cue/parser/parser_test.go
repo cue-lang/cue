@@ -1451,14 +1451,12 @@ bar: 2
 			out: "@experiment(functions), f: func(<*ast.BadExpr>, a: int) -> int: a\nlet declarations are not allowed in a parameter list",
 		},
 		{
-			// TODO: the attribute is a file attribute, so it should enable
-			// the experiment.
 			desc: "experiment attribute between package clause and imports",
 			in: `package p
 			@experiment(functions)
 			import "strings"
 			f: func(a: int) -> int: a`,
-			out: "package p, @experiment(functions), import \"strings\", f: func(a: int) -> int: a\nfunction syntax requires @experiment(functions)",
+			out: `package p, @experiment(functions), import "strings", f: func(a: int) -> int: a`,
 		},
 		{
 			// Without an import declaration, an attribute after the

@@ -1299,8 +1299,16 @@ func (f *hiddenFile) SetExperiments(experiments *cueexperiment.File) {
 	f.experiments = experiments
 }
 
-// Preamble returns the declarations of the preamble at the top of the file,
-// including any package clause or import declaration found in it.
+// Preamble returns the declarations of the preamble at the top of the file:
+// the package clause and import declarations, if any, along with the comments
+// and attributes preceding them. The attributes in the preamble are file
+// attributes, which apply to the file rather than to the package's value.
+//
+// An attribute is part of the preamble only when it precedes the package
+// clause or the first import declaration. In particular, attributes after the
+// package clause in a file without imports are package attributes, like any
+// later top-level attribute, as are the leading attributes of a file with
+// neither.
 func (f *File) Preamble() []Decl {
 	p := 0
 outer:

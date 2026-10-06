@@ -163,22 +163,25 @@ func checkMissingExtern(f *ast.File, kinds map[string]*internal.Attr, injections
 
 // findExternFileAttrs reports all extern kinds from file-level @extern(kind)
 // attributes in f, the position of each corresponding attribute, and f's
-// declarations from the package directive onwards. It's an error if duplicate
-// @extern attributes for the same kind are found. decls == nil signals that
-// this file should be skipped.
+// declarations after the preamble. It's an error if duplicate @extern
+// attributes for the same kind are found. decls == nil signals that this file
+// should be skipped.
+//
+// The file-level attributes are those in [ast.File.Preamble]: before the
+// package clause, or between it and the imports. An @extern attribute
+// anywhere else is an error, as it would be a package attribute.
 func findExternFileAttrs(f *ast.File) (kinds map[string]*internal.Attr, decls []ast.Decl, err errors.Error) {
 	var (
 		hasPkg    bool
-		p         int
 		fileAttrs []token.Pos
 	)
 
-loop:
-	for ; p < len(f.Decls); p++ {
-		switch a := f.Decls[p].(type) {
+	preamble := f.Preamble()
+	decls = f.Decls[len(preamble):]
+	for _, d := range preamble {
+		switch a := d.(type) {
 		case *ast.Package:
 			hasPkg = true
-			break loop
 
 		case *ast.Attribute:
 			if a.Name() != "extern" {
@@ -216,33 +219,35 @@ loop:
 		}
 	}
 
-	switch {
-	case len(fileAttrs) == 0 && !hasPkg:
-		return nil, nil, err
+	// Report any top-level @extern attributes outside the preamble.
+	var lateAttrs []*ast.Attribute
+	for _, d := range decls {
+		if x, ok := d.(*ast.Attribute); ok && x.Name() == "extern" {
+			lateAttrs = append(lateAttrs, x)
+		}
+	}
 
-	case len(fileAttrs) > 0 && !hasPkg:
-		for _, a := range fileAttrs {
-			err = errors.Append(err, errors.Newf(a,
+	switch {
+	case !hasPkg:
+		for _, pos := range fileAttrs {
+			err = errors.Append(err, errors.Newf(pos,
+				"extern attribute without package clause"))
+		}
+		for _, x := range lateAttrs {
+			err = errors.Append(err, errors.Newf(x.Pos(),
 				"extern attribute without package clause"))
 		}
 		return nil, nil, err
 
-	case len(fileAttrs) == 0 && hasPkg:
-		// Check that there are no top-level extern attributes.
-		for p++; p < len(f.Decls); p++ {
-			x, ok := f.Decls[p].(*ast.Attribute)
-			if !ok {
-				continue
-			}
-			if key, _ := x.Split(); key == "extern" {
-				err = errors.Append(err, errors.Newf(x.Pos(),
-					"extern attribute must appear before package clause"))
-			}
+	case len(fileAttrs) == 0:
+		for _, x := range lateAttrs {
+			err = errors.Append(err, errors.Newf(x.Pos(),
+				"extern attribute must appear before the package clause or the imports"))
 		}
 		return nil, nil, err
 	}
 
-	return kinds, f.Decls[p:], err
+	return kinds, decls, err
 }
 
 // initInjector initializes the injector for kind, if applicable. The pos

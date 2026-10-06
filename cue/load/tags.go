@@ -39,8 +39,10 @@ type tagger struct {
 	// are not associated with a value.
 	tagMap map[string]bool
 	// tags keeps a record of all the @tag attibutes found in files.
-	tags         []*tag // tags found in files
-	replacements map[ast.Node]ast.Node
+	tags []*tag // tags found in files
+	// replacements maps each field value replaced by injecting a tag value
+	// to its field, so that references can be pointed at the final value.
+	replacements map[ast.Node]*ast.Field
 
 	// mu guards the usedTags map.
 	mu sync.Mutex
@@ -221,9 +223,9 @@ func (t *tag) inject(value string, tg *tagger) errors.Error {
 func (t *tag) injectValue(x ast.Expr, tg *tagger) {
 	injected := ast.NewBinExpr(token.AND, t.field.Value, x)
 	if tg.replacements == nil {
-		tg.replacements = make(map[ast.Node]ast.Node)
+		tg.replacements = make(map[ast.Node]*ast.Field)
 	}
-	tg.replacements[t.field.Value] = injected
+	tg.replacements[t.field.Value] = t.field
 	t.field.Value = injected
 	t.hasReplacement = true
 }

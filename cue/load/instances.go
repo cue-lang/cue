@@ -213,8 +213,8 @@ func Instances(args []string, c *Config) []*build.Instance {
 	for f := range fileErrs {
 		ast.Walk(f, nil, func(n ast.Node) {
 			if ident, ok := n.(*ast.Ident); ok {
-				if v, ok := tg.replacements[ident.Node]; ok {
-					ident.Node = v
+				if field, ok := tg.replacements[ident.Node]; ok {
+					ident.Node = field.Value
 				}
 			}
 		})

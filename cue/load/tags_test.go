@@ -228,7 +228,6 @@ b: a
 		},
 		fromString: true,
 		args:       []string{"./..."},
-		// The reference is left with a's value before the second injection.
 		want: `== x.cue
 package x
 
@@ -241,7 +240,7 @@ a: string & "bar" & "m1" @tag(foo) @tag(v,var=os)
 package x
 
 b: a
--- a refers to string & "bar"
+-- a refers to string & "bar" & "m1"
 `,
 	}}
 	for _, tc := range syntaxCases {

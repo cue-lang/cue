@@ -117,9 +117,11 @@ func (b *buildPlan) instances() iterator {
 	case len(b.orphaned) > 0:
 		i = newStreamingIterator(b)
 	case len(b.insts) > 0:
-		// With -e, only the selected expressions need to evaluate; skip
-		// whole-instance validation so out-of-scope errors do not surface.
-		insts, err := buildInstances(b.cmd, b.insts, len(b.expressions) > 0)
+		// Leave validation to each command, as for CUE files given as
+		// arguments. Validating whole instances here would stop at the first
+		// error without requiring concrete values, hiding incomplete errors,
+		// as well as errors outside the expressions selected with -e.
+		insts, err := buildInstances(b.cmd, b.insts, true)
 		i = &instanceIterator{
 			inst: b.instance,
 			a:    insts,

@@ -73,6 +73,12 @@ func TestDecode(t *testing.T) {
 		//lint:ignore SA5008 the repeated option is what is being tested
 		Both int `json:"both,case:strict,case:ignore"`
 	}
+	// A case-insensitive match prefers the shallowest field.
+	type FoldInner struct{ Foo int }
+	type foldOuter struct {
+		FoldInner
+		FOO int `json:"fOO"`
+	}
 	// Names match case-insensitively with Unicode folding as well.
 	type foldUnicode struct {
 		Kelvin int `json:"kelvin"`
@@ -190,6 +196,10 @@ func TestDecode(t *testing.T) {
 		value:  `{loose: 1, strict: 2}`,
 		newDst: func() any { return &caseStrict{} },
 		want:   caseStrict{Loose: 1, Strict: 2},
+	}, {
+		value:  `{foo: 1}`,
+		newDst: func() any { return &foldOuter{} },
+		want:   foldOuter{FOO: 1},
 	}, {
 		value:  `{"\u212Aelvin": 1}`, // the Kelvin sign folds to k
 		newDst: func() any { return &foldUnicode{} },

@@ -493,9 +493,9 @@ func typeFields(t reflect.Type) structFields {
 		if f.JSON.CaseStrict {
 			continue
 		}
-		// The first field in index order wins.
+		// Prefer the shallowest field, like encoding/json since Go 1.27.
 		folded := string(foldName(f.Name))
-		if _, ok := byFoldedName[folded]; !ok {
+		if cur, ok := byFoldedName[folded]; !ok || len(f.Index) < len(cur) {
 			byFoldedName[folded] = f.Index
 		}
 	}

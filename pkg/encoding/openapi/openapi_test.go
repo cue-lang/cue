@@ -15,7 +15,6 @@
 package openapi_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -44,15 +43,8 @@ config: openapi.#Config & {version: "3.0.0", info: {title: "T", version: "1"}}
 schema: #S: s: strings.MinRunes(k)
 result: openapi.MarshalSchema(config, schema)
 `
-	got := func() (s string) {
-		defer func() {
-			if r := recover(); r != nil {
-				s = fmt.Sprintf("panic: %v", r)
-			}
-		}()
-		v := cuecontext.New().CompileString(src, cue.Filename("in.cue"))
-		return errors.Details(v.LookupPath(cue.ParsePath("result")).Err(), nil)
-	}()
+	v := cuecontext.New().CompileString(src, cue.Filename("in.cue"))
+	got := errors.Details(v.LookupPath(cue.ParsePath("result")).Err(), nil)
 	qt.Assert(t, qt.Equals(got, `result: error in call to encoding/openapi.MarshalSchema: could not retrieve int: schema.#S.s: non-concrete value int:
     in.cue:10:9
     in.cue:7:4

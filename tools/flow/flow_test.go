@@ -277,25 +277,11 @@ func TestFlowRunStopsEarly(t *testing.T) {
 	// How the "stop" task stops the run.
 	for _, stop := range []string{"fail", "update", "cancel"} {
 		t.Run(stop, func(t *testing.T) {
-			leaked := false
-			func() {
-				defer func() {
-					// synctest panics when goroutines in the bubble remain
-					// blocked after the test function returns.
-					if r := recover(); r != nil {
-						if err, ok := r.(error); !ok || !strings.Contains(err.Error(), "deadlock") {
-							panic(r)
-						}
-						leaked = true
-					}
-				}()
-				synctest.Test(t, func(t *testing.T) {
-					testFlowRunStopsEarly(t, stop)
-				})
-			}()
-			if want := false; leaked != want {
-				t.Errorf("task goroutines left blocked: got %v, want %v", leaked, want)
-			}
+			// synctest panics when goroutines in the bubble remain
+			// blocked after the test function returns.
+			synctest.Test(t, func(t *testing.T) {
+				testFlowRunStopsEarly(t, stop)
+			})
 		})
 	}
 }

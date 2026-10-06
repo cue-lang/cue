@@ -1595,7 +1595,8 @@ An attribute associates an identifier with a value, a balanced token sequence,
 which is a sequence of CUE tokens with balanced brackets (`()`, `[]`, and `{}`).
 The sequence may not contain interpolations.
 
-Fields, structs and packages can be associated with a set of attributes.
+Fields, structs, packages, and source files can be associated with
+a set of attributes.
 Attributes accumulate during unification, but implementations may remove
 duplicates that have the same source string representation.
 The interpretation of an attribute, including the handling of multiple
@@ -1605,19 +1606,35 @@ Field attributes define additional information about a field,
 such as a mapping to a protocol buffer <!-- TODO: add link --> tag or alternative
 name of the field when mapping to a different language.
 
+File attributes apply only to the source file in which they appear,
+such as enabling an experiment for that file,
+and are not part of the value of the package.
+They are the attributes in the preamble of a source file,
+as defined in [Source file organization](#source-file-organization).
+All other top-level attributes of a source file are package attributes,
+which belong to the value of the package
+in the same way that struct attributes belong to their struct.
+
 
 ```cue vet
-// Package attributes
+// File attribute
 @experiment(try)
+
+package example
+
+import "strings"
+
+// Package attribute
 @protobuf(proto3)
 
 myStruct1: {
-    // Struct attribute:
+    // Struct attribute
     @jsonschema(id="https://example.org/mystruct1.json")
 
     // Field attributes
     field: string @go(Field)
     attr:  int    @xml(,attr) @go(Attr)
+    name:  strings.ToTitle("example")
 }
 
 myStruct2: {
@@ -3309,20 +3326,27 @@ in other instances.
 
 ### Source file organization
 
-Each source file consists of an optional package clause defining collection
-of files to which it belongs,
+Each source file consists of an optional package clause defining the
+collection of files to which it belongs,
 followed by a possibly empty set of import declarations that declare
 packages whose contents it wishes to use, followed by a possibly empty set of
 declarations.
+The package clause and the import declarations form the preamble of the file,
+and attributes may precede the package clause and the first import declaration.
+The attributes in the preamble are [file attributes](#attributes);
+all other top-level attributes are package attributes,
+including those directly following the package clause
+of a file without import declarations.
 
 Like with a struct, a source file may contain embeddings.
 Unlike with a struct, the embedded expressions may be any value.
 If the result of the unification of all embedded values is not a struct,
 it will be output instead of its enclosing file when exporting CUE
-to a data format
+to a data format.
 
 ```ebnf
-SourceFile = { attribute "," } [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
+SourceFile = [ FileAttrs PackageClause "," ] [ FileAttrs ImportDecl "," { ImportDecl "," } ] { Declaration "," } .
+FileAttrs  = { attribute "," } .
 ```
 
 ```cue vet
@@ -3347,8 +3371,7 @@ The PackageName must not be a definition identifier.
 
 If the PackageName is the blank identifier (`_`), it is treated the same
 as if there were no package clause. This can be useful to allow adding
-package level attributes or doc comments to a CUE file without a package
-name.
+file attributes or doc comments to a CUE file without a package name.
 
 ```cue vet
 package math

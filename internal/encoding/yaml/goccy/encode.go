@@ -470,13 +470,10 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 		}
 
 	case *ast.StructLit:
-		v, info, err = encodeDecls(x.Elts)
-		if err == nil {
-			v = flowIfSingleLine(v, info, x.Lbrace, x.Rbrace)
-		}
+		v, info, err = encodeDecls(x.Elts, x.Lbrace, x.Rbrace)
 
 	case *ast.File:
-		v, info, err = encodeDecls(x.Decls)
+		v, info, err = encodeDecls(x.Decls, token.NoPos, token.NoPos)
 
 	case *ast.UnaryExpr:
 		b, ok := x.X.(*ast.BasicLit)
@@ -895,7 +892,11 @@ func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 // an embedded value, it will return this expression. This is more relaxed for
 // structs than is currently allowed for CUE, but the expectation is that this
 // will be allowed at some point. The input would still be illegal CUE.
-func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
+//
+// A mapping is laid out in flow style when the braces enclosing the
+// declarations, if any, are on one line; an embedded value keeps its
+// own layout.
+func encodeDecls(decls []ast.Decl, lbrace, rbrace token.Pos) (any, *encInfo, error) {
 	info := &encInfo{entries: make([]*encInfo, 0, len(decls))}
 	m := make(yaml.MapSlice, 0, len(decls))
 
@@ -1046,7 +1047,7 @@ func encodeDecls(decls []ast.Decl) (any, *encInfo, error) {
 		e.foot, e.footBlank = nil, false
 	}
 
-	return m, info, nil
+	return flowIfSingleLine(m, info, lbrace, rbrace), info, nil
 }
 
 // addDocs records a CUE node's comments: head (doc) comments, line

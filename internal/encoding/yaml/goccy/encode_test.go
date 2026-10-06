@@ -527,8 +527,8 @@ m: !M
   k: 1
 		`,
 	}, {
-		// TODO: a scalar embedded in a single-line struct is quoted as
-		// if it were in a flow collection; want "- http://x" twice.
+		// A scalar embedded in a single-line struct is not in a flow
+		// collection, so it needs no quoting.
 		name: "embed_single_line",
 		in: `
 		l: [
@@ -538,7 +538,7 @@ m: !M
 		`,
 		out: `
 l:
-  - 'http://x'
+  - http://x
   - http://x
 		`,
 	}, {

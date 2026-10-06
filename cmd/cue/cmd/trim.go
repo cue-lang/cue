@@ -106,9 +106,14 @@ func runTrim(cmd *Command, args []string) error {
 	if binst == nil {
 		return nil
 	}
-	instances, err := buildInstances(cmd, binst, false)
+	instances, err := buildInstances(cmd, binst)
 	if err != nil {
 		return err
+	}
+	if !flagIgnore.Bool(cmd) {
+		if err := validateInstances(instances); err != nil {
+			return err
+		}
 	}
 
 	dst := flagOutFile.String(cmd)
@@ -146,7 +151,7 @@ func runTrim(cmd *Command, args []string) error {
 		}
 	}
 
-	tinsts, err := buildInstances(cmd, load.Instances(args, &cfg), false)
+	tinsts, err := buildInstances(cmd, load.Instances(args, &cfg))
 	if err != nil {
 		return err
 	}
@@ -154,6 +159,9 @@ func runTrim(cmd *Command, args []string) error {
 		return errors.New("unexpected number of new instances")
 	}
 	if !flagIgnore.Bool(cmd) {
+		if err := validateInstances(tinsts); err != nil {
+			return err
+		}
 		for i, p := range instances {
 			k, script := diff.Final.Diff(p.Value(), tinsts[i].Value())
 			if k != diff.Identity {
@@ -203,6 +211,17 @@ func runTrim(cmd *Command, args []string) error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+	return nil
+}
+
+// validateInstances returns the errors of the first instance which fails
+// to validate.
+func validateInstances(insts []*instance) error {
+	for _, inst := range insts {
+		if err := inst.Value().Validate(); err != nil {
+			return err
 		}
 	}
 	return nil

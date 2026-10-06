@@ -100,10 +100,8 @@ func addOutFlags(cmd *cobra.Command) {
 func addGlobalFlags(cmd *cobra.Command) {
 	f := cmd.PersistentFlags()
 
-	// TODO: --ignore is only used by eval, export, def, vet, and trim,
-	// so it should not be a global flag. Before moving it, make
-	// buildInstances take its value from the callers rather than reading
-	// the flag itself, as not every caller would register it.
+	// TODO: --ignore is only used by eval and trim,
+	// so it should not be a global flag.
 	f.BoolP(string(flagIgnore), "i", false,
 		"proceed in the presence of errors")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")

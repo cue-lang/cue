@@ -117,11 +117,7 @@ func (b *buildPlan) instances() iterator {
 	case len(b.orphaned) > 0:
 		i = newStreamingIterator(b)
 	case len(b.insts) > 0:
-		// Leave validation to each command, as for CUE files given as
-		// arguments. Validating whole instances here would stop at the first
-		// error without requiring concrete values, hiding incomplete errors,
-		// as well as errors outside the expressions selected with -e.
-		insts, err := buildInstances(b.cmd, b.insts, true)
+		insts, err := buildInstances(b.cmd, b.insts)
 		i = &instanceIterator{
 			inst: b.instance,
 			a:    insts,
@@ -638,13 +634,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		}
 
 		if schema != nil && len(schema.Files) > 0 {
-			// TODO: ignore errors here for now until reporting of concreteness
-			// of errors is correct.
-			// See https://github.com/cue-lang/cue/issues/1483.
-			insts, err := buildInstances(
-				p.cmd,
-				[]*build.Instance{schema},
-				true)
+			insts, err := buildInstances(p.cmd, []*build.Instance{schema})
 			if err != nil {
 				return nil, err
 			}
@@ -755,7 +745,9 @@ func (b *buildPlan) parseFlags() (err error) {
 	return nil
 }
 
-func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([]*instance, error) {
+// buildInstances builds the given instances without validating them,
+// leaving it up to the callers to check their values for errors.
+func buildInstances(cmd *Command, binst []*build.Instance) ([]*instance, error) {
 	// TODO:
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
@@ -770,25 +762,6 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([
 			id:  binst[i].ID(),
 			err: binst[i].Err,
 			val: v,
-		}
-	}
-
-	// TODO: remove ignoreErrors flag and always return here, leaving it up to
-	// clients to check for errors down the road.
-	if ignoreErrors || flagIgnore.Bool(cmd) {
-		return insts, nil
-	}
-
-	for _, inst := range instances {
-		// TODO: consider merging errors of multiple files, but ensure
-		// duplicates are removed.
-		err := inst.Validate()
-		if err != nil {
-			if flagIgnore.Bool(cmd) {
-				printError(cmd, err)
-			} else {
-				return nil, err
-			}
 		}
 	}
 	return insts, nil

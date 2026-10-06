@@ -1,5 +1,19 @@
 exec cue export --out yaml ./hello
 cmp stdout expect-stdout
+
+# TODO: selecting a field drops the YAML tag from its field attribute,
+# unlike a tag from a declaration attribute; want "!Field x".
+exec cue export --out yaml -e f tags.cue
+cmp stdout expect-tag-field
+exec cue export --out yaml -e d tags.cue
+cmp stdout expect-tag-decl
+-- tags.cue --
+f: "x" @yaml(,tag="!Field")
+d: {"x", @yaml(,tag="!Decl")}
+-- expect-tag-field --
+x
+-- expect-tag-decl --
+!Decl x
 -- expect-stdout --
 message: Hello World!
 test: {}

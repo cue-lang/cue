@@ -1112,6 +1112,10 @@ var unmarshalErrorTests = []struct {
 	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", `test.yaml:1: invalid tag directive handle "!%79!"`},
 	// An alias node cannot carry a tag.
 	{"a: &x hi\nv: !!str *x", `test.yaml:2: cannot unmarshal tag "!!str" on alias node`},
+	// TODO: a custom tag on a scalar is an error, and one on a mapping
+	// or sequence is dropped, so the output of the encoder for a
+	// @yaml(,tag=) attribute cannot be read back.
+	{"a: !Env x", `test.yaml:1: cannot unmarshal tag "!Env"`},
 }
 
 func TestUnmarshalErrors(t *testing.T) {

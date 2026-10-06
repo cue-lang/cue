@@ -495,6 +495,53 @@ a: 1
 		`,
 		out: `yaml: conflicting tags "!A" and "!B"`,
 	}, {
+		// TODO: a tag without a leading "!" is emitted as is, becoming
+		// part of the value; want a verbatim tag, "a: !<Env> v".
+		name: "yaml_tag_without_bang",
+		in: `
+		a: "v" @yaml(,tag="Env")
+		`,
+		out: `
+a: Env v
+		`,
+	}, {
+		// TODO: comments on a tagged value, and on a @yaml declaration
+		// attribute, are dropped; want "# line1", "# line2", and "# doc".
+		name: "yaml_tag_comments",
+		in: `
+		l: [
+			{"x", @yaml(,tag="!Env")}, // line1
+		]
+		s: "v" @yaml(,tag="!S") // line2
+		m: {
+			// doc
+			@yaml(,tag="!M")
+			k: 1
+		}
+		`,
+		out: `
+l:
+  - !Env x
+s: !S v
+m: !M
+  k: 1
+		`,
+	}, {
+		// TODO: a scalar embedded in a single-line struct is quoted as
+		// if it were in a flow collection; want "- http://x" twice.
+		name: "embed_single_line",
+		in: `
+		l: [
+			{"http://x"},
+			"http://x",
+		]
+		`,
+		out: `
+l:
+  - 'http://x'
+  - http://x
+		`,
+	}, {
 		name: "yaml_attribute_without_tag",
 		in: `
 		field: "value" @yaml(,other="ignored")

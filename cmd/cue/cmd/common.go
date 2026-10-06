@@ -161,7 +161,6 @@ type iterator interface {
 
 type instance struct {
 	id  string
-	err error
 	val cue.Value
 }
 
@@ -639,9 +638,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				return nil, err
 			}
 			inst := insts[0]
-			if err := inst.err; err != nil {
-				return nil, err
-			}
 			p.instance = inst
 			p.encConfig.Schema = inst.Value()
 			// Each -d/--schema expression selects a schema within the
@@ -760,7 +756,6 @@ func buildInstances(cmd *Command, binst []*build.Instance) ([]*instance, error) 
 	for i, v := range instances {
 		insts[i] = &instance{
 			id:  binst[i].ID(),
-			err: binst[i].Err,
 			val: v,
 		}
 	}

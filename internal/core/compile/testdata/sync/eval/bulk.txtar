@@ -11,8 +11,6 @@ a: {
 		name: X
 	}
 
-
-	// TODO(eval): struct isn't closed, so this should be true.
 }
 d: a & {
 	"foobar": {

@@ -300,29 +300,14 @@ func TestFindPermFieldsAtPath(t *testing.T) {
 		})
 	}
 }
-func makeRec(path string, directive, version string) attrRecord {
-	return attrRecord{
-		path: testMakePath(path),
-		parsed: parsedTestAttr{
-			directive: directive,
-			version:   version,
-			raw:       internal.ParseAttr(&ast.Attribute{Text: "@test(" + directive + ")"}),
-		},
-	}
-}
 
-// makeRecAt creates an attrRecord whose @test directive includes an at= field.
-// This is used to test that directives with different at= values are treated
-// as independent assertions and both survive deduplication.
-func makeRecAt(path, directive, atVal string) attrRecord {
-	body := directive + ", at=" + atVal
-	return attrRecord{
-		path: testMakePath(path),
-		parsed: parsedTestAttr{
-			directive: directive,
-			raw:       internal.ParseAttr(&ast.Attribute{Text: "@test(" + body + ")"}),
-		},
+// makeRec creates an attrRecord from the body of a @test attribute.
+func makeRec(path, body string) attrRecord {
+	pa, err := parseTestAttr(&ast.Attribute{Text: "@test(" + body + ")"})
+	if err != nil {
+		panic(err)
 	}
+	return attrRecord{path: testMakePath(path), parsed: pa}
 }
 
 func TestSelectActiveDirectives(t *testing.T) {
@@ -336,7 +321,7 @@ func TestSelectActiveDirectives(t *testing.T) {
 	}{
 		{
 			name:     "unversioned applies to all",
-			records:  []attrRecord{makeRec("field1", "eq", "")},
+			records:  []attrRecord{makeRec("field1", "eq")},
 			path:     "field1",
 			version:  "v3",
 			wantDirs: []string{"eq"},
@@ -344,8 +329,8 @@ func TestSelectActiveDirectives(t *testing.T) {
 		{
 			name: "versioned overrides unversioned",
 			records: []attrRecord{
-				makeRec("field1", "eq", ""),
-				makeRec("field1", "eq", "v3"),
+				makeRec("field1", "eq"),
+				makeRec("field1", "eq:v3"),
 			},
 			path:     "field1",
 			version:  "v3",
@@ -354,8 +339,8 @@ func TestSelectActiveDirectives(t *testing.T) {
 		{
 			name: "versioned for other version skipped unversioned still applies",
 			records: []attrRecord{
-				makeRec("field1", "eq", ""),
-				makeRec("field1", "eq", "v2"),
+				makeRec("field1", "eq"),
+				makeRec("field1", "eq:v2"),
 			},
 			path:     "field1",
 			version:  "v3",
@@ -363,7 +348,7 @@ func TestSelectActiveDirectives(t *testing.T) {
 		},
 		{
 			name:     "wrong path excluded",
-			records:  []attrRecord{makeRec("field2", "eq", "")},
+			records:  []attrRecord{makeRec("field2", "eq")},
 			path:     "field1",
 			version:  "v3",
 			wantDirs: nil,
@@ -371,8 +356,8 @@ func TestSelectActiveDirectives(t *testing.T) {
 		{
 			name: "multiple directives at same path",
 			records: []attrRecord{
-				makeRec("field1", "eq", ""),
-				makeRec("field1", "err", ""),
+				makeRec("field1", "eq"),
+				makeRec("field1", "err"),
 			},
 			path:     "field1",
 			version:  "v3",
@@ -383,8 +368,8 @@ func TestSelectActiveDirectives(t *testing.T) {
 			// a single err without at= would be collapsed to one.
 			name: "multiple err directives with distinct at= values both survive",
 			records: []attrRecord{
-				makeRecAt("field1", "err", "path.a"),
-				makeRecAt("field1", "err", "path.b"),
+				makeRec("field1", "err, at=path.a"),
+				makeRec("field1", "err, at=path.b"),
 			},
 			path:      "field1",
 			version:   "v3",
@@ -395,12 +380,35 @@ func TestSelectActiveDirectives(t *testing.T) {
 			// Same at= value: treated as one directive, last wins.
 			name: "duplicate err directives with same at= value deduplicated",
 			records: []attrRecord{
-				makeRecAt("field1", "err", "path.a"),
-				makeRecAt("field1", "err", "path.a"),
+				makeRec("field1", "err, at=path.a"),
+				makeRec("field1", "err, at=path.a"),
 			},
 			path:      "field1",
 			version:   "v3",
 			wantDirs:  []string{"err"},
+			wantCount: 1,
+		},
+		{
+			// Each selector of an allows directive is its own assertion.
+			name: "allows directives with distinct selectors both survive",
+			records: []attrRecord{
+				makeRec("field1", "allows, foo"),
+				makeRec("field1", "allows, bar"),
+			},
+			path:      "field1",
+			version:   "v3",
+			wantDirs:  []string{"allows", "allows"},
+			wantCount: 2,
+		},
+		{
+			name: "duplicate allows directives with the same selector deduplicated",
+			records: []attrRecord{
+				makeRec("field1", "allows, foo"),
+				makeRec("field1", "allows=false, foo"),
+			},
+			path:      "field1",
+			version:   "v3",
+			wantDirs:  []string{"allows"},
 			wantCount: 1,
 		},
 	}

@@ -18,9 +18,7 @@ a: {
 	@test(allows, foo)
 	@test(allows, foobar)
 	@test(allows, string)
-
-	// TODO(eval): struct isn't closed, so this should be true.
-	@test(allows:todo=false, bar)
+	@test(allows, bar)
 }
 d: a & {
 	"foobar": {
@@ -231,9 +229,9 @@ issue3638: compare: {
 }
 -- out/errors.txt --
 [eval] t1.c.z: field not allowed:
-    ./in.cue:35:11
+    ./in.cue:33:11
 [eval] t2.c.z: field not allowed:
-    ./in.cue:45:11
+    ./in.cue:43:11
 [eval] issue3670.a.not_int: field not allowed:
     ./intpattern.cue:7:5
 [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):

@@ -1106,12 +1106,7 @@ func parseKindStr(s string) cue.Kind {
 // Syntax: @test(closed) for closed=true, @test(closed=false) for closed=false.
 func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
-	expected := true // bare @test(closed) means closed=true
-	if len(pa.raw.Fields) >= 1 && pa.raw.Fields[0].Key() == "closed" {
-		if pa.raw.Fields[0].Value() == "false" {
-			expected = false
-		}
-	}
+	expected := pa.value != "false"
 	got := val.IsClosed()
 	if got != expected {
 		t.Errorf("path %s: @test(closed): got closed=%v, want %v", path, got, expected)
@@ -1127,19 +1122,8 @@ func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.V
 //     path. Quoted values like "foo" or "string" select the literal string field.
 func (r *inlineRunner) runAllowsAssertion(t testing.TB, path cue.Path, val cue.Value, pa parsedTestAttr) {
 	t.Helper()
-	expected := true
-	if len(pa.raw.Fields) >= 1 && pa.raw.Fields[0].Key() == "allows" {
-		if pa.raw.Fields[0].Value() == "false" {
-			expected = false
-		}
-	}
-	var rawSel string
-	for _, kv := range pa.raw.Fields[1:] {
-		if kv.Key() == "" {
-			rawSel = kv.RawValue()
-			break
-		}
-	}
+	expected := pa.value != "false"
+	rawSel := allowsSelector(pa)
 	if rawSel == "" {
 		t.Errorf("path %s: @test(allows): missing selector argument", path)
 		return

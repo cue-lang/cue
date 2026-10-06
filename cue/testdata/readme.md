@@ -257,7 +257,8 @@ closedFalse: {x: 1}        @test(closed=false)
 ### `allows` — field allowance
 
 Checks whether `val.Allows(sel)` returns the expected result for the given
-selector expression. Valid on struct and list values.
+selector expression. Valid on struct and list values. Several `allows`
+directives on one field are independent assertions, one per selector.
 
 ```cue
 openStruct:   {a: 1}        @test(allows, b)           // open: any field allowed

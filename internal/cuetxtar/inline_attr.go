@@ -46,6 +46,10 @@ type parsedTestAttr struct {
 	// Empty means unversioned.
 	version string
 
+	// value is the value of a key-form directive, such as "false" for
+	// closed=false or "int" for kind=int. Empty for the positional form.
+	value string
+
 	// raw is the parsed internal.Attr for accessing remaining arguments.
 	raw *internal.Attr
 
@@ -120,6 +124,7 @@ func parseTestAttr(astAttr *ast.Attribute) (parsedTestAttr, error) {
 	f0 := attr.Fields[0]
 	if f0.Key() != "" {
 		dir := f0.Key()
+		result.value = f0.Value()
 		// Key-based directives may carry a version suffix: "shareID" → directive="shareID", version="v3".
 		if idx := strings.LastIndex(dir, ":"); idx >= 0 {
 			result.directive = dir[:idx]
@@ -473,15 +478,32 @@ func labelSelector(label ast.Label, hidPkg string) cue.Selector {
 }
 
 // directiveKey returns the deduplication key for a directive. Two directives
-// with the same name but different at= values are independent assertions and
-// must both survive deduplication in selectActiveDirectives.
+// with the same name but different at= values, or allows directives with
+// different selectors, are independent assertions and must both survive
+// deduplication in selectActiveDirectives.
 func directiveKey(pa parsedTestAttr) string {
+	key := pa.directive
+	if pa.directive == "allows" {
+		key += "\x01" + allowsSelector(pa)
+	}
 	for i := 1; i < len(pa.raw.Fields); i++ {
 		if kv := pa.raw.Fields[i]; kv.Key() == "at" {
-			return pa.directive + "\x00" + kv.Value()
+			return key + "\x00" + kv.Value()
 		}
 	}
-	return pa.directive
+	return key
+}
+
+// allowsSelector returns the raw selector argument of an allows directive,
+// its first positional argument after the directive itself, or "" if there
+// is none.
+func allowsSelector(pa parsedTestAttr) string {
+	for i := 1; i < len(pa.raw.Fields); i++ {
+		if kv := pa.raw.Fields[i]; kv.Key() == "" {
+			return kv.RawValue()
+		}
+	}
+	return ""
 }
 
 // parseAtPath parses an at= selector string into a cue.Path.

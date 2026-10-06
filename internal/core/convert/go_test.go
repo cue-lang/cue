@@ -20,6 +20,7 @@ import (
 	"encoding"
 	"encoding/json"
 	"math/big"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -393,6 +394,49 @@ func TestConvert(t *testing.T) {
 			qt.Assert(t, qt.Equals(got, tc.want))
 		})
 	}
+}
+
+// Go values and types nested up to 10000 levels deep convert, and anything
+// deeper is an error, which also catches cyclic ones that would otherwise
+// recurse without bound.
+func TestConvertNestingLimit(t *testing.T) {
+	// chain returns a linked list of n nodes, nested 2n levels deep,
+	// as each node is a struct behind a pointer.
+	chain := func(n int) *recursiveA {
+		var head *recursiveA
+		for range n {
+			head = &recursiveA{Next: head}
+		}
+		return head
+	}
+	// pointers returns the zero value of n nested pointer types to int.
+	pointers := func(n int) any {
+		typ := reflect.TypeFor[int]()
+		for range n {
+			typ = reflect.PointerTo(typ)
+		}
+		return reflect.Zero(typ).Interface()
+	}
+	r := runtime.New()
+	valueErr := func(goVal any) string {
+		ctx := adt.NewContext(r, &adt.Vertex{})
+		if b, ok := convert.FromGoValue(ctx, goVal, true).(*adt.Bottom); ok {
+			return b.Err.Error()
+		}
+		return ""
+	}
+	typeErr := func(goTyp any) string {
+		ctx := adt.NewContext(r, &adt.Vertex{})
+		if _, err := convert.FromGoType(ctx, goTyp); err != nil {
+			return err.Error()
+		}
+		return ""
+	}
+	qt.Assert(t, qt.Equals(valueErr(chain(5000)), ""))
+	qt.Assert(t, qt.Equals(typeErr(pointers(10000)), ""))
+	// Wrong: no limit is enforced, so a cyclic value or type recurses without bound.
+	qt.Assert(t, qt.Equals(valueErr(chain(5001)), ""))
+	qt.Assert(t, qt.Equals(typeErr(pointers(10001)), ""))
 }
 
 func TestX(t *testing.T) {

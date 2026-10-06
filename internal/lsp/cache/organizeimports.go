@@ -290,7 +290,7 @@ func buildOrganizedDecls(decls []*ast.ImportDecl, kept []*ast.ImportSpec, region
 			if off >= regionEnd {
 				continue
 			}
-			cg = cloneCommentGroup(cg)
+			cg = ast.Clone(cg)
 			switch {
 			case cg.Position == pretty.PosDoc && cg.Doc:
 				docGroups = append(docGroups, cg)
@@ -335,7 +335,7 @@ func buildOrganizedDecls(decls []*ast.ImportDecl, kept []*ast.ImportSpec, region
 					// Directly attached: travels - or is removed -
 					// with its import.
 					if keptSet[spec] {
-						direct = append(direct, cloneCommentGroup(cg))
+						direct = append(direct, ast.Clone(cg))
 					}
 					continue
 				}
@@ -346,12 +346,12 @@ func buildOrganizedDecls(decls []*ast.ImportDecl, kept []*ast.ImportSpec, region
 					// glued comment group falls through and re-homes
 					// as a detached comment group instead of being
 					// deleted.
-					direct = append(direct, cloneCommentGroup(cg))
+					direct = append(direct, ast.Clone(cg))
 					continue
 				}
 				// Detached: the parser attached it backward; re-place
 				// it by source position.
-				addDetached(cloneCommentGroup(cg), off, false)
+				addDetached(ast.Clone(cg), off, false)
 			}
 			if c, ok := clone[spec]; ok {
 				ast.SetComments(c, direct)
@@ -631,16 +631,6 @@ func cloneImportSpec(s *ast.ImportSpec) *ast.ImportSpec {
 		out.Path = &ast.BasicLit{ValuePos: s.Path.ValuePos, Kind: s.Path.Kind, Value: s.Path.Value}
 	}
 	return out
-}
-
-// cloneCommentGroup returns a copy of cg whose flags, position, and
-// comments can be freely modified.
-func cloneCommentGroup(cg *ast.CommentGroup) *ast.CommentGroup {
-	list := make([]*ast.Comment, len(cg.List))
-	for i, c := range cg.List {
-		list[i] = &ast.Comment{Slash: c.Slash, Text: c.Text}
-	}
-	return &ast.CommentGroup{Doc: cg.Doc, Line: cg.Line, Position: cg.Position, List: list}
 }
 
 // setSpecRelPos sets the leading relative position of an import spec:

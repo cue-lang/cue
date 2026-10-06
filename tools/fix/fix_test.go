@@ -885,16 +885,24 @@ V: {
 	close({o, b: 1})
 }
 `,
-			// Wrong: the comments on the embeddings are dropped.
 			out: `@experiment(explicitopen)
 
 package foo
 
 #A: a: int
 o: {}
-Y: __closeAll({#A..., b: 1})
-W: __closeAll({#A..., b: 1})
-V: close(__reclose({o..., b: 1}))
+Y: __closeAll({
+	// doc on embed
+	{#A..., b: 1}
+})
+W: __closeAll({
+	// doc on embed
+	{#A..., b: 1} // line on embed
+})
+V: close(__reclose({
+	// doc on embed
+	{o..., b: 1}
+}))
 `,
 		},
 

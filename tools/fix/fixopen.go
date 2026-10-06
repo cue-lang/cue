@@ -275,7 +275,9 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 						c.ClearEnclosingModified()
 						break
 					}
-					if s, ok := embed.Expr.(*ast.StructLit); ok {
+					// Dropping the braces would orphan comments on the
+					// embedding, so those keep the literal as it is.
+					if s, ok := embed.Expr.(*ast.StructLit); ok && len(ast.Comments(embed)) == 0 {
 						n = s
 					}
 				}

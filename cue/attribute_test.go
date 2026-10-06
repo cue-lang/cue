@@ -106,6 +106,12 @@ func TestAttributes(t *testing.T) {
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}
+			for _, attr := range a {
+				// TODO: Kind reports zero rather than the attribute's kind.
+				if kind := attr.Kind(); kind != 0 {
+					t.Errorf("attribute %v has kind %v; want one of %v", attr, kind, tc.flags)
+				}
+			}
 		})
 	}
 }
@@ -142,6 +148,10 @@ func TestAttributeErr(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, tc.path+"-"+tc.attr, func(t *testing.T, m *cuetdtest.M) {
 			v := getValue(m, config).Lookup("a", tc.path)
 			a := v.Attribute(tc.attr)
+			// TODO: Kind reports zero rather than FieldAttr.
+			if kind := a.Kind(); kind != 0 && tc.err == nil {
+				t.Errorf("got kind %v; want %v", kind, cue.FieldAttr)
+			}
 			err := a.Err()
 			if !cmpError(err, tc.err) {
 				t.Errorf("got %v; want %v", err, tc.err)

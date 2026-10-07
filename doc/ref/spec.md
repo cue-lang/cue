@@ -1537,40 +1537,39 @@ myValue.sub.feild: field not allowed:
 -->
 
 
-<!-- TODO: this example predates the strict embedding of language version
-     v0.18.0, under which B and #B may not declare `b` next to the
-     embedded #A. Embedding `#A...` instead leaves B open, so `x: d: 3`
-     is then allowed. -->
-
 ```cue ! vet
 #A: {a: int}
 
 B: {
     #A
-    b: c: int
+    a: 1
 }
 
 x: B
 x: d: 3  // not allowed, as closed by embedded #A
 
-y: B.b
-y: d: 3  // allowed as nothing closes b
-
-#B: {
-    #A
+C: {
+    #A...
     b: c: int
 }
 
-z: #B.b
-z: d: 3  // not allowed, as referencing #B closes b
+y: C
+y: d: 3  // allowed, as the spread operator does not close C
+
+z: C.b
+z: d: 3  // allowed, as nothing closes b
+
+#C: {
+    #A...
+    b: c: int
+}
+
+w: #C.b
+w: d: 3  // not allowed, as referencing #C closes b
 ```
 <!-- error:
-#B.b: field not allowed:
-    16:5
-B.b: field not allowed:
-    5:5
-x.b: field not allowed:
-    5:5
+w.d: field not allowed:
+    28:4
 x.d: field not allowed:
     9:4
 -->

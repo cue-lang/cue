@@ -1028,7 +1028,7 @@ func (v Value) BuildInstance() *build.Instance {
 	return v.idx.GetInstanceFromNode(v.v)
 }
 
-// Err returns the error represented by v or nil v is not an error.
+// Err returns the error represented by v, or nil if v is not an error.
 func (v Value) Err() error {
 	if err := v.checkKind(v.ctx(), adt.BottomKind); err != nil {
 		return v.toErr(err)
@@ -2285,15 +2285,14 @@ func (o *options) updateOptions(opts []Option) {
 	}
 }
 
-// Validate reports any errors, recursively. The returned error may represent
-// more than one error, retrievable with [errors.Errors], if more than one
-// exists.
+// Validate reports errors in v, recursively. The returned error may
+// represent more than one error, retrievable with [errors.Errors].
 //
-// Note that by default not all errors are reported, unless options like
-// [Concrete] are used. The [Final] option can be used to check for missing
-// required fields.
-//
-// It honors the [Concrete], [DisallowCycles], and [Final] options.
+// By default, incomplete values such as non-concrete fields are not
+// reported; use [Concrete] for that. Use [Final] to report missing
+// required fields. Cycles are only reported with [Concrete], [Final],
+// or [DisallowCycles]. Values in definitions and hidden fields never
+// need to be concrete.
 func (v Value) Validate(opts ...Option) error {
 	o := options{}
 	o.updateOptions(opts)

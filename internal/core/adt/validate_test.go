@@ -402,6 +402,20 @@ func TestValidate(t *testing.T) {
 				    test:2:11
 				    test:3:11`,
 		skipNoShare: true,
+	}, {
+		// A let is not validated by itself, so the shared value is only
+		// reachable through the hidden field. Without sharing, _h holds
+		// its own copy of the value.
+		name: "errors in structure shared node in hidden field",
+		all:  true,
+		in: `
+			let x = {y: {a: 1 & 2, b: 3 & 4}}
+			_h: x.y
+		`,
+		// TODO: both errors should be reported, but the validator skips
+		// structure-shared nodes within hidden fields and definitions.
+		out:         "",
+		skipNoShare: true,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

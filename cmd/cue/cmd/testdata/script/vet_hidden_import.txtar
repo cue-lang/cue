@@ -1,0 +1,23 @@
+# Errors in an imported package are reported even when it is only
+# referenced by a hidden field.
+# TODO: the errors are not reported, as the validator skips
+# structure-shared values within hidden fields.
+
+exec cue vet .
+cmp stderr vet-stderr
+
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.17.0"
+-- p.cue --
+package p
+
+import "test.example/sub"
+
+_v: sub
+-- sub/sub.cue --
+package sub
+
+a: 1 & 2
+b: 3 & 4
+-- vet-stderr --

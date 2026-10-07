@@ -94,13 +94,21 @@ type validator struct {
 
 	sharedPositions []Node
 
-	// shared vertices should be visited at least once if referenced by
-	// a non-definition.
+	// visited records how each structure-shared vertex has been validated.
 	// TODO: we could also keep track of the number of references to a
 	// shared vertex. This would allow us to report more than a single error
 	// per shared vertex.
-	visited map[*Vertex]bool
+	visited map[*Vertex]sharedVisit
 }
+
+type sharedVisit uint8
+
+// A full visit performs the checks that only apply outside definitions,
+// such as concreteness, on top of those a partial visit performs.
+const (
+	partialVisit sharedVisit = 1 + iota
+	fullVisit
+)
 
 func (v *validator) checkConcrete() bool {
 	return v.Concrete && v.inDefinition == 0
@@ -142,23 +150,23 @@ func (v *validator) validate(x *Vertex) {
 		}
 		defer func() { v.sharedPositions = saved }()
 	}
-	// Dereference values, but only those that are not shared. This includes let
-	// values. This prevents us from processing structure-shared nodes more than
-	// once and prevents potential cycles.
 	x = x.DerefValue()
 	if y != x {
-		// Ensure that each structure shared node is processed at least once
-		// in a position that is not a definition.
-		if v.inDefinition > 0 {
+		// Process each dereferenced node at most once per kind of visit,
+		// which bounds the work and prevents cycles. The node may not be
+		// reachable in any other way, such as a let or an imported package
+		// referenced by a hidden field.
+		visit := partialVisit
+		if v.checkFinal() {
+			visit = fullVisit
+		}
+		if v.visited[x] >= visit {
 			return
 		}
 		if v.visited == nil {
-			v.visited = make(map[*Vertex]bool)
+			v.visited = make(map[*Vertex]sharedVisit)
 		}
-		if v.visited[x] {
-			return
-		}
-		v.visited[x] = true
+		v.visited[x] = visit
 	}
 
 	if b := x.Bottom(); b != nil {

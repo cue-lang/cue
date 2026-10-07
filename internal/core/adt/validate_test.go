@@ -412,9 +412,14 @@ func TestValidate(t *testing.T) {
 			let x = {y: {a: 1 & 2, b: 3 & 4}}
 			_h: x.y
 		`,
-		// TODO: both errors should be reported, but the validator skips
-		// structure-shared nodes within hidden fields and definitions.
-		out:         "",
+		out: `eval
+				x.y.a: conflicting values 2 and 1:
+				    test:2:20
+				    test:2:24
+				eval
+				x.y.b: conflicting values 4 and 3:
+				    test:2:30
+				    test:2:34`,
 		skipNoShare: true,
 	}}
 

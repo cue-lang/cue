@@ -1,9 +1,7 @@
 # Errors in an imported package are reported even when it is only
 # referenced by a hidden field.
-# TODO: the errors are not reported, as the validator skips
-# structure-shared values within hidden fields.
 
-exec cue vet .
+! exec cue vet .
 cmp stderr vet-stderr
 
 -- cue.mod/module.cue --
@@ -21,3 +19,9 @@ package sub
 a: 1 & 2
 b: 3 & 4
 -- vet-stderr --
+a: conflicting values 2 and 1:
+    ./sub/sub.cue:3:4
+    ./sub/sub.cue:3:8
+b: conflicting values 4 and 3:
+    ./sub/sub.cue:4:4
+    ./sub/sub.cue:4:8

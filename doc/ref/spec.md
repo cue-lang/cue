@@ -1242,10 +1242,9 @@ defines that the value `v` should unify with any field in the resulting struct `
 whose label does not unify with any of the patterns of the pattern
 constraints defined for `a` _and_ for which there exists no field declaration
 in `a` with that label.
-The token `...` is a shorthand for `..._`.
-_Note_: default constraints of the form `..._` are not yet implemented.
+The token `...` is shorthand for `..._`, which allows any regular field.
+_Note_: no other default constraint is implemented yet.
 
-<!-- NOTE: default constraints not yet implemented -->
 ```cue ! parse
 a: {
     foo:      string  // foo is a string
@@ -1400,11 +1399,15 @@ A1: A & {
 
 A _closed struct_ `c` is a struct whose instances may not declare any field
 with a name that does not match the name of a field
-or the pattern of a pattern constraint defined in `c`.
+or the pattern of a pattern constraint defined in `c`,
+unless `c` declares a [`...`](#pattern-and-default-constraints).
 Hidden fields are excluded from this limitation.
-A struct that is the result of unifying any struct with a [`...`](#structs)
-declaration is defined for all regular fields.
-Closing a struct is equivalent to adding `..._|_` to it.
+A field is allowed in a unification of closed structs only if each of them
+allows it, so a `...` in one operand does not open another.
+Like any default constraint, a `...` applies only to the struct declaring it,
+not to those nested within it.
+Closing a struct is equivalent to adding `..._|_` to it;
+closing it recursively adds `..._|_` to every nested struct as well.
 
 Syntactically, structs are closed explicitly with the `close` builtin or
 implicitly and recursively by [definitions](#definitions-and-hidden-fields).
@@ -1426,6 +1429,13 @@ A2: A & {
     }
 }  // _|_ feild1 not defined for A
 
+A3: A & {
+    ...
+    feild1: string
+} // _|_ feild1 not defined for A
+
+A4: A & close({})  // _|_ field1 and field2 not allowed by the empty struct
+
 C: close({
     [_]: _
 })
@@ -1442,12 +1452,29 @@ D: close({
         "\(k)": v
     }
 })
+
+#E: {
+    e: {}
+    ...
+}
+
+E1: #E & {
+    e: feild1: string
+} // _|_ feild1 not defined for #E.e
 ```
 <!-- error:
 A1.feild1: field not allowed:
     7:5
 A2.feild1: field not allowed:
     12:9
+A3.feild1: field not allowed:
+    18:5
+A4.field1: field not allowed:
+    2:5
+A4.field2: field not allowed:
+    3:5
+E1.e.feild1: field not allowed:
+    46:8
 -->
 
 <!-- (jba) Somewhere it should be said that optional fields are only
@@ -1458,8 +1485,12 @@ A2.feild1: field not allowed:
 #### Embedding
 
 A struct may contain an _embedded value_, an operand used as a declaration.
-An embedded value of type struct is unified with the struct in which it is
-embedded.
+An embedded value of type struct is unified with the struct formed by the
+declarations around it. A [closed](#closed-structs) embedded value thus
+closes that struct, even one declaring a `...`,
+at each level where the value itself is closed.
+The [spread operator](#spread-operator) embeds a value without its
+closedness at any level.
 
 Embeddings can be useful for composing larger schemas from smaller ones.
 The order of specification may imply a documented field order.
@@ -1548,6 +1579,14 @@ B: {
 x: B
 x: d: 3  // not allowed, as closed by embedded #A
 
+D: {
+    #A
+    ...
+}
+
+v: D
+v: d: 3  // not allowed, as still closed by embedded #A
+
 C: {
     #A...
     b: c: int
@@ -1568,8 +1607,10 @@ w: #C.b
 w: d: 3  // not allowed, as referencing #C closes b
 ```
 <!-- error:
+v.d: field not allowed:
+    17:4
 w.d: field not allowed:
-    28:4
+    36:4
 x.d: field not allowed:
     9:4
 -->

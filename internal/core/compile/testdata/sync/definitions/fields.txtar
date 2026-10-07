@@ -207,7 +207,7 @@ import "struct"
 // allow a struct to "close" it. Basically, we any validator that takes a
 // schema as argument (is marked as NonConcrete) will open up the struct.
 //
-// TODO: we should aim to eliminate this discrepancy in the closedness redesign.
+// TODO: eliminate this discrepancy.
 validator: open: {
 	#Schema: {
 		matchN(1, [#x])

@@ -79,9 +79,8 @@ issue763a: {
 	})
 }
 -- out/todo.txt --
-staged.c: evalv3 gives *"a" | *"b" (two defaults), while evalv2 gives *"a" | "b".
-This is a known semantic difference in default handling; see diff/explanation in the
-original golden-file version. TODO(defaults): consider with a potential default redesign.
+staged.c: the evaluator gives *"a" | *"b" (two defaults), while the spec's
+default rules give *"a" | "b". TODO(defaults): consider with the defaults redesign.
 -- out/eval/stats --
 Leaks:  19
 Freed:  130

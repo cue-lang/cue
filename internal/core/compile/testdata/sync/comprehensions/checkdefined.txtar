@@ -44,7 +44,7 @@ oko3: {
 
 // Should Field s exist in okc or not? Depends on whether comparison to bottom
 // is recursive or not. It probably should not.
-// TODO: fix for new evaluator. But possibly address this with new builtins.
+// TODO: fix this, possibly with new builtins.
 // issue1969: Tests that comparing let-bound expressions involving undefined
 // fields to _|_ works correctly with list comprehensions.
 // https://cuelang.org/issue/1969

@@ -132,7 +132,8 @@ opt~X12?: {
 	b: X12 @test(err, code=incomplete, contains="field not found: opt", pos=[])
 }  @test(err, code=incomplete, contains="field not found: %v", args=[opt], pos=[])
 
-// TODO: seemingly wrong semantics, but matches old behavior.
+// TODO: Y13 resolves within each disjunct rather than to the field as a
+// whole, which the spec suggests it should.
 def~Y13: {
 	b: 2
 	c: Y13.b

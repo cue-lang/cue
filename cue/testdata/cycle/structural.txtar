@@ -258,7 +258,7 @@ b13: {
 
 // Issue #587
 // TODO: this should probably be okay if we allow shallow evaluation of
-// comprehension sources. See #1881.
+// comprehension sources.
 b14: {
 	root: {
 		a: [...int]

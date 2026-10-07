@@ -2,8 +2,7 @@
 a: {
 	{[string]~(A,_): {name: A}}
 
-	// TODO: allow duplicate alias here
-	{[string]~(X,_): {kind: X}}
+	{[string]~(A,_): {kind: A}}
 }
 a: "A": _          @test(eq, {name: "A", kind: "A"})
 a: "C": _          @test(eq, {name: "C", kind: "C"})

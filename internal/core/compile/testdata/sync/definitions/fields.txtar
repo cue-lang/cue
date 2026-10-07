@@ -69,7 +69,6 @@ ok: t7: {
 }
 
 ok: t8: {
-	// TODO: this should pass
 	foo: #X
 	#X: {
 
@@ -143,12 +142,8 @@ ok: t14: {
 
 }
 
-// TODO: move this test to "ok": _ means any and implicitly defines all fields
-// to be present as optional fields with _, recursively (as long as the type
-// has not been picked to be non-struct).
-// This was not observed in V2, but is now observed in V3. We should probably
-// either allow for an error variant that only "allows" all fields but does not
-// define them as optional top, or rethink the closedness model altogether.
+// Unifying with _ does not open a definition: only pattern constraints,
+// an ellipsis, or a spread do.
 err: t1: {
 	#D: _ & {a: 2}
 	a: #D
@@ -193,12 +188,6 @@ err: t6: {
 	b: b: c: d: e: h: 1
 }
 
-// TODO: move this test to "ok": _ means any and implicitly defines all fields
-// to be present as optional fields with _, recursively (as long as the type
-// has not been picked to be non-struct).
-// This was not observed in V2, but is now observed in V3. We should probably
-// either allow for an error variant that only "allows" all fields but does not
-// define them as optional top, or rethink the closedness model altogether.
 err: t7: {
 	#D: _ & {a: 2}
 	a: #D

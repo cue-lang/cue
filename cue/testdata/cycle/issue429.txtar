@@ -20,11 +20,6 @@ s0: #Size & {res: 1} @test(eq, {
 	max: *2 | >1 | >2
 })
 
-// This discards the default for max. This is correct, but unfortunate.
-// TODO: is there a tweak to the default mechanism possible that would fix that?
-//       Tread very carefully, though! Perhaps we could have a builtin that
-//       discards any default, so that we can at least manually override this
-//       behavior.
 s1: #Size & {min: 5}  @test(eq, {
 	min: 5
 	res: *0 | >=0 & int
@@ -44,9 +39,9 @@ es3: #Size & {
 	max: 5
 } @test(err, code=eval,
 	suberr=(code=eval, path=max, contains="%d errors in empty disjunction:", args=[2], pos=[]),
-	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[1, 5], pos=[-29:16, -28:15, 0:6, 2:7]),
-	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[10, 5], pos=[-28:15, 0:6, 1:7, 2:7]),
-	suberr=(code=eval, path=max, contains="invalid value %v (out of bound %s)", args=[5, >10], pos=[-28:7, 2:7]))
+	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[1, 5], pos=[-24:16, -23:15, 0:6, 2:7]),
+	suberr=(code=eval, path=max, contains="conflicting values %s and %s", args=[10, 5], pos=[-23:15, 0:6, 1:7, 2:7]),
+	suberr=(code=eval, path=max, contains="invalid value %v (out of bound %s)", args=[5, >10], pos=[-23:7, 2:7]))
 
 // Disjunctions with cycles
 // TODO: improve error message here. Logic is correct, though.
@@ -82,47 +77,47 @@ es3.max: 4 errors in empty disjunction:
 es3.max: conflicting values 1 and 5:
     ./in.cue:4:16
     ./in.cue:5:15
-    ./in.cue:33:6
-    ./in.cue:35:7
+    ./in.cue:28:6
+    ./in.cue:30:7
 es3.max: conflicting values 10 and 5:
     ./in.cue:5:15
-    ./in.cue:33:6
-    ./in.cue:34:7
-    ./in.cue:35:7
+    ./in.cue:28:6
+    ./in.cue:29:7
+    ./in.cue:30:7
 es3.max: invalid value 5 (out of bound >10):
     ./in.cue:5:7
-    ./in.cue:35:7
+    ./in.cue:30:7
 [cycle] #nonEmptyRange.min: cycle with field: max:
-    ./in.cue:46:8
+    ./in.cue:41:8
 #nonEmptyRange.max: cycle with field: min:
-    ./in.cue:47:8
+    ./in.cue:42:8
 [cycle] #nonEmptyRange.min: cycle with field: max:
-    ./in.cue:46:8
+    ./in.cue:41:8
 #nonEmptyRange.max: cycle with field: min:
-    ./in.cue:47:8
+    ./in.cue:42:8
 [incomplete] r1.min: 2 errors in empty disjunction:
 r1.min: conflicting values 1 and 3:
-    ./in.cue:45:8
-    ./in.cue:49:5
-    ./in.cue:50:7
+    ./in.cue:40:8
+    ./in.cue:44:5
+    ./in.cue:45:7
 r1.min: non-concrete value max for bound <:
-    ./in.cue:46:8
+    ./in.cue:41:8
 [eval] er3.min: 2 errors in empty disjunction:
 er3.min: conflicting values 1 and 5:
-    ./in.cue:45:8
-    ./in.cue:63:6
-    ./in.cue:64:7
+    ./in.cue:40:8
+    ./in.cue:58:6
+    ./in.cue:59:7
 er3.min: invalid value 5 (out of bound <5):
-    ./in.cue:46:7
-    ./in.cue:64:7
+    ./in.cue:41:7
+    ./in.cue:59:7
 [eval] er3.min: 2 errors in empty disjunction:
 er3.min: conflicting values 1 and 5:
-    ./in.cue:45:8
-    ./in.cue:63:6
-    ./in.cue:64:7
+    ./in.cue:40:8
+    ./in.cue:58:6
+    ./in.cue:59:7
 er3.min: invalid value 5 (out of bound <5):
-    ./in.cue:46:7
-    ./in.cue:64:7
+    ./in.cue:41:7
+    ./in.cue:59:7
 -- out/eval/stats --
 Leaks:  23
 Freed:  75

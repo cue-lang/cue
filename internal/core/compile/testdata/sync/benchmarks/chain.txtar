@@ -1,4 +1,3 @@
-// TODO(perf): reduce number of Conjunctions
 -- in.cue --
 f1: string
 f2: f1

@@ -75,8 +75,6 @@ issue3443: {
 	}
 
 	cycle2: {
-		// TODO: this should probably fail, or at least be consistent with
-		// cycle1.cycle.
 		fail: #S: matchN(1, [{n: #S}]) & {n: n: n: _}
 	}
 }

@@ -31,8 +31,8 @@ recursive: {
 		}
 	}
 
-	// Test with empty struct
-	// TODO(eval): is this correct?
+	// Without a closed spread embedding, __reclose is a no-op and the
+	// struct stays open.
 	e: __reclose({})
 	t5: err: e & {extra: "not allowed"}
 }

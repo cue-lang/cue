@@ -8,7 +8,7 @@ b: {
 	v: {}
 	w: {y: 0}
 }
-b: {[_]~(y,_): {}} // TODO: allow different name
+b: {[_]~(y,_): {}}
 c: {
 	{[_]~(Name,_): {name: Name, y: 1}}
 	foo: {}

@@ -36,8 +36,8 @@ recursive: {
 		}
 	} @test(err, code=eval, path=nested.extra, contains="field not allowed", pos=[3:4])
 
-	// Test with empty struct
-	// TODO(eval): is this correct?
+	// Without a closed spread embedding, __reclose is a no-op and the
+	// struct stays open.
 	e: __reclose({})
 	t5: err: e & {extra: "not allowed"} @test(eq, {extra: "not allowed"})
 }

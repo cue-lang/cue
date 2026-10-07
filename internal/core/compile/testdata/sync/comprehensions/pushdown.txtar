@@ -39,12 +39,6 @@ fail: {
 embed: {
 	fail1: #C1
 	#C1: {
-		// TODO(errors): don't include all positions of p in the normal list of
-		// positions, or rather categorize the positions to show:
-		// 1) position of denied fields
-		// 2) position of structs that deny them
-		// 3) points at which those structs where mixed in (perhaps as tree)
-		// 4) conditionals that could enable allowing a field.
 		if false {
 			p: _
 		}

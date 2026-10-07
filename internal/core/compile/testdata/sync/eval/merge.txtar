@@ -1,5 +1,4 @@
 # TODO: image field is not pre-evaluated (not a huge deal)
-# TODO: allow dynamic fields
 -- in.cue --
 key: "app01"
 manifests: [
@@ -9,8 +8,8 @@ manifests: [
 	},
 	{
 		deployment: #map: app01: image: "image01"
-		// TODO: allow
-		// deployment: #map: "\("app03")": image: "image01"
+		// A dynamic label only the pattern constraint covers.
+		deployment: #map: "\("app03")": image: "image01"
 	},
 ]
 // unify
@@ -45,6 +44,13 @@ for _, manifest in manifests {
       deployment: {
         #map: {
           app01: {
+            image: "image01"
+          }
+        }
+      }
+      deployment: {
+        #map: {
+          "\("app03")": {
             image: "image01"
           }
         }

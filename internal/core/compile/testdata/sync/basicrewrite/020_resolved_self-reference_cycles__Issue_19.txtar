@@ -8,8 +8,6 @@ z1: z2 + 1
 z2: z3 + 2
 z3: z1 - 3
 z3: 8
-
-// TODO: extensive tests with disjunctions.
 -- out/compile --
 --- in.cue
 {

@@ -13,8 +13,6 @@ import "mod.test/pkg"
 
 d: pkg.#D & {_name: d: int, _val: f: 4}
 
-// TODO: this should fail, as the _name restricting it is in this
-// package.
 e: pkg.#D & #def & {
 	// This should fail as c is disallowed by the _name defined
 	// in this package

@@ -12,12 +12,11 @@ disallowTopAsLabel: {
 	a: _ // Should not compile to a reference.
 }
 
-// TODO: disallow dollar as label? This is according to the spec, but it
-// will be a breaking change and $ was reserved for referring to the root of
-// a file, which we very likely will never implement.
-// disallowDollarAsLabel: {
-//   $: 1
-// }
+// $ is an ordinary identifier.
+dollarAsLabel: {
+	$: 1
+	a: $
+}
 
 // When printing errors with paths from the compiler or evaluator,
 // ensure that odd string labels get quoted correctly.
@@ -31,11 +30,11 @@ disallowTopAsLet: cannot use _ as alias or let clause:
 disallowTopAsLabel: cannot use _ as label:
     ./in.cue:9:2
 nested."_": cannot use _ as label:
-    ./in.cue:22:14
+    ./in.cue:21:14
 nested."_foo": cannot use _ as label:
-    ./in.cue:23:17
+    ./in.cue:22:17
 nested."#foo": cannot use _ as label:
-    ./in.cue:24:17
+    ./in.cue:23:17
 --- in.cue
 {
   disallowTopAsAlias: {
@@ -47,6 +46,10 @@ nested."#foo": cannot use _ as label:
   disallowTopAsLabel: {
     _|_(cannot use _ as label)
     a: _
+  }
+  dollarAsLabel: {
+    $: 1
+    a: 〈0;$〉
   }
   nested: {
     "_": {

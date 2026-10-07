@@ -69,13 +69,7 @@ b4: cond1: {
 	}
 }
 
-// This reports a structural cycle at b4.cond2.b, because the value it refers
-// has a structural cycle. Technically, this is incorrect, as the cycle
-// really only occurs in b4.cond2.x.y. But since structural cycles are
-// permanent, the entire configuration is invalidated, so the spurious
-// additional cycle is merely cosmetic. By most logical standards, one can prove
-// any fact from a contradiction. So assuming that, this is not incorrect.
-// TODO: fix this cosmetic blemish.
+// Only x.y reports the cycle; b, which refers to it, does not.
 b4: cond2: {
 	x: y: {
 		_z: *true | bool

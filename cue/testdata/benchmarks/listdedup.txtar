@@ -2,8 +2,6 @@
 # _ | {} twice) do not cause exponential blowup in conjuncts/disjuncts.
 # https://cuelang.org/issue/758
 # https://cuelang.org/issue/1044
-
-// TODO(perf): reduce number of conjunctions and disjunctions.
 -- in.cue --
 A: #Task
 B: #steps: #Script & {mount: [A]}

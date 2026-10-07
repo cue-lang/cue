@@ -104,7 +104,6 @@ ok: t7: {
 }
 
 ok: t8: {
-	// TODO: this should pass
 	foo: #X @test(shareID=ok_t8_foox)
 	#X: {
 		@test(shareID=ok_t8_foox)
@@ -221,12 +220,8 @@ ok: t14: {
 	})
 }
 
-// TODO: move this test to "ok": _ means any and implicitly defines all fields
-// to be present as optional fields with _, recursively (as long as the type
-// has not been picked to be non-struct).
-// This was not observed in V2, but is now observed in V3. We should probably
-// either allow for an error variant that only "allows" all fields but does not
-// define them as optional top, or rethink the closedness model altogether.
+// Unifying with _ does not open a definition: only pattern constraints,
+// an ellipsis, or a spread do.
 err: t1: {
 	@test(permute, count=6)
 	#D: _ & {a: 2}
@@ -277,12 +272,6 @@ err: t6: {
 	b: b: c: d: e: h: 1 @test(err, code=eval, contains="field not allowed", pos=[0:17])
 }
 
-// TODO: move this test to "ok": _ means any and implicitly defines all fields
-// to be present as optional fields with _, recursively (as long as the type
-// has not been picked to be non-struct).
-// This was not observed in V2, but is now observed in V3. We should probably
-// either allow for an error variant that only "allows" all fields but does not
-// define them as optional top, or rethink the closedness model altogether.
 err: t7: {
 	@test(permute)
 	#D: _ & {a: 2}
@@ -401,39 +390,39 @@ NumCloseIDs: 121
 [eval] ok.t5.x.c: field not allowed:
     ./in.cue:66:5
 [eval] ok.t13.x.c: field not allowed:
-    ./in.cue:196:5
+    ./in.cue:195:5
 [eval] err.t1.a.disallowed: field not allowed:
-    ./in.cue:232:5
+    ./in.cue:227:5
 [eval] err.t2.V.c.e: field not allowed:
-    ./in.cue:239:10
+    ./in.cue:234:10
 [eval] err.t3.a.c: field not allowed:
-    ./in.cue:246:5
+    ./in.cue:241:5
 [eval] err.t4.a.b.h: field not allowed:
-    ./in.cue:253:8
+    ./in.cue:248:8
 [eval] err.t5.a.b.f: field not allowed:
-    ./in.cue:261:9
+    ./in.cue:256:9
 [eval] err.t5.a.b.g: field not allowed:
-    ./in.cue:262:9
+    ./in.cue:257:9
 [eval] err.t5.b.b.h: field not allowed:
-    ./in.cue:264:8
+    ./in.cue:259:8
 [eval] err.t5.b.b.f: field not allowed:
-    ./in.cue:261:9
+    ./in.cue:256:9
 [eval] err.t5.b.b.g: field not allowed:
-    ./in.cue:262:9
+    ./in.cue:257:9
 [eval] err.t6.a.b.c.d.e.f: field not allowed:
-    ./in.cue:272:18
+    ./in.cue:267:18
 [eval] err.t6.a.b.c.d.e.g: field not allowed:
-    ./in.cue:273:18
+    ./in.cue:268:18
 [eval] err.t6.b.b.c.d.e.h: field not allowed:
-    ./in.cue:275:17
+    ./in.cue:270:17
 [eval] err.t6.b.b.c.d.e.f: field not allowed:
-    ./in.cue:272:18
+    ./in.cue:267:18
 [eval] err.t6.b.b.c.d.e.g: field not allowed:
-    ./in.cue:273:18
+    ./in.cue:268:18
 [eval] err.t7.a.b: field not allowed:
-    ./in.cue:288:5
+    ./in.cue:277:5
 [eval] err.t8.V.c.e: field not allowed:
-    ./in.cue:296:10
+    ./in.cue:285:10
 [eval] validator.keepClosed.x.c: field not allowed:
     ./validators.cue:31:3
     ./validators.cue:36:5

@@ -85,13 +85,7 @@ b4: cond1: {
 	@test(err, code=structural_cycle, path=x.y.0, contains="structural cycle", pos=[])
 }
 
-// This reports a structural cycle at b4.cond2.b, because the value it refers
-// has a structural cycle. Technically, this is incorrect, as the cycle
-// really only occurs in b4.cond2.x.y. But since structural cycles are
-// permanent, the entire configuration is invalidated, so the spurious
-// additional cycle is merely cosmetic. By most logical standards, one can prove
-// any fact from a contradiction. So assuming that, this is not incorrect.
-// TODO: fix this cosmetic blemish.
+// Only x.y reports the cycle; b, which refers to it, does not.
 b4: cond2: {
 	x: y: {
 		_z: *true | bool
@@ -101,6 +95,7 @@ b4: cond2: {
 	}
 	b: x.y & {_z: false, [1]}
 	@test(err, code=structural_cycle, path=x.y.0, contains="structural cycle", pos=[])
+	@test(err, at=b, code=structural_cycle, path=b4.cond2.x.y.0)
 }
 
 b5: {
@@ -856,16 +851,16 @@ resolveToAncestor: {
 [structural_cycle] b4.cond2.x.y.0: structural cycle
 [structural_cycle] b4.cond2.x.y.0: structural cycle
 [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
-    ./in.cue:112:5
-    ./in.cue:112:13
-    ./in.cue:112:14
-    ./in.cue:113:9
+    ./in.cue:107:5
+    ./in.cue:107:13
+    ./in.cue:107:14
+    ./in.cue:108:9
 [structural_cycle] b6.x.a.0: structural cycle
 [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-    ./in.cue:119:5
-    ./in.cue:119:11
-    ./in.cue:120:5
-    ./in.cue:120:6
+    ./in.cue:114:5
+    ./in.cue:114:11
+    ./in.cue:115:5
+    ./in.cue:115:6
 [structural_cycle] b7.a.0: structural cycle
 [structural_cycle] b12b.#list.tail: structural cycle
 [structural_cycle] b13.root.a.0.0: structural cycle
@@ -887,7 +882,7 @@ resolveToAncestor: {
 [structural_cycle] patternFail.issue2374.a.b: structural cycle
 [structural_cycle] withLetFail.schema.next: structural cycle
 [structural_cycle] fieldsSumInfinite.issue3310.total: error in call to list.Sum: error in call to list.Sum: structural cycle:
-    ./in.cue:487:9
+    ./in.cue:482:9
 [structural_cycle] listOptOK.list.tail: structural cycle
 [structural_cycle] issue2545.#B.A: structural cycle
 [structural_cycle] e1.a.c: structural cycle
@@ -895,58 +890,58 @@ resolveToAncestor: {
 [structural_cycle] e2.a.c: structural cycle
 [structural_cycle] e2.b.c: structural cycle
 [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-    ./in.cue:555:5
-    ./in.cue:556:5
+    ./in.cue:550:5
+    ./in.cue:551:5
 [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-    ./in.cue:558:5
-    ./in.cue:559:5
+    ./in.cue:553:5
+    ./in.cue:554:5
 [eval] e4.a.0: 2 errors in empty disjunction:
 e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:563:10
-    ./in.cue:564:6
+    ./in.cue:558:10
+    ./in.cue:559:6
 e4.a.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-    ./in.cue:563:6
-    ./in.cue:564:6
-    ./in.cue:564:7
+    ./in.cue:558:6
+    ./in.cue:559:6
+    ./in.cue:559:7
 [eval] e4.b.0: 2 errors in empty disjunction:
 e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:566:6
-    ./in.cue:567:10
+    ./in.cue:561:6
+    ./in.cue:562:10
 e4.b.0.0: conflicting values {c:1} and [{c:1}] (mismatched types struct and list):
-    ./in.cue:566:6
-    ./in.cue:566:7
-    ./in.cue:567:6
+    ./in.cue:561:6
+    ./in.cue:561:7
+    ./in.cue:562:6
 [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
 nestedList.v1e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-    ./in.cue:585:11
-    ./in.cue:586:6
-    ./in.cue:586:11
+    ./in.cue:580:11
+    ./in.cue:581:6
+    ./in.cue:581:11
 nestedList.v1e.y.0.0: 2 errors in empty disjunction:
 nestedList.v1e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-    ./in.cue:585:7
-    ./in.cue:585:11
-    ./in.cue:586:6
-    ./in.cue:586:12
+    ./in.cue:580:7
+    ./in.cue:580:11
+    ./in.cue:581:6
+    ./in.cue:581:12
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
-    ./in.cue:585:6
+    ./in.cue:580:6
 [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
 nestedList.v2e.y.0: conflicting values [[2],1] and int (mismatched types list and int):
-    ./in.cue:595:6
-    ./in.cue:595:11
-    ./in.cue:596:11
+    ./in.cue:590:6
+    ./in.cue:590:11
+    ./in.cue:591:11
 nestedList.v2e.y.0.0: 2 errors in empty disjunction:
 nestedList.v2e.y.0.0: conflicting values [2] and int (mismatched types list and int):
-    ./in.cue:595:6
-    ./in.cue:595:12
-    ./in.cue:596:7
-    ./in.cue:596:11
+    ./in.cue:590:6
+    ./in.cue:590:12
+    ./in.cue:591:7
+    ./in.cue:591:11
 nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
-    ./in.cue:596:6
+    ./in.cue:591:6
 [structural_cycle] z1.z.g: structural cycle
 [structural_cycle] z1.z.g: structural cycle
 [incomplete] crossRefNoCycle.t5.T.y: undefined field: x:
-    ./in.cue:783:8
-    ./in.cue:781:2
+    ./in.cue:778:8
+    ./in.cue:776:2
 -- out/todo.txt --
 Structural cycles are reported in all chains compared to old implementation.
 

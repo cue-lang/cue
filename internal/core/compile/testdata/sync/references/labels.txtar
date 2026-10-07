@@ -84,14 +84,13 @@ underscore: e: {
 	baz: #baz
 }
 
-// TODO: support. Also not yet supported in old implementation.
-// c10: {
-//  C=[string]: {
-//   name: "x"
-//   foo: C.name
-//  }
-// }
-// c2: c1 & { x: _ }
+valueAliasSelf: {
+	pattern: [string]~(_,C): {
+		name: "x"
+		foo:  C.name
+	}
+	applied: pattern & {x: _}
+}
 
 invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
@@ -243,6 +242,17 @@ invalidPattern: {
       }
       baz: 〈0;#baz〉
     }
+  }
+  valueAliasSelf: {
+    pattern: {
+      [string]: {
+        name: "x"
+        foo: 〈1;(〈0;-〉)〉.name
+      }
+    }
+    applied: (〈0;pattern〉 & {
+      x: _
+    })
   }
   invalidPattern: {
     [(=~"BAD)" & =~"x")]: string

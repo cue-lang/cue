@@ -16,11 +16,6 @@
 
 s0: #Size & {res: 1}
 
-// This discards the default for max. This is correct, but unfortunate.
-// TODO: is there a tweak to the default mechanism possible that would fix that?
-//       Tread very carefully, though! Perhaps we could have a builtin that
-//       discards any default, so that we can at least manually override this
-//       behavior.
 s1: #Size & {min: 5}
 s2: #Size & {max: 5}
 s3: #Size & {

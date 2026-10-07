@@ -104,14 +104,13 @@ underscore: e: {
 	@test(eq, {baz: {"_h": "any"}, #baz: {}})
 }
 
-// TODO: support. Also not yet supported in old implementation.
-// c10: {
-//  C=[string]: {
-//   name: "x"
-//   foo: C.name
-//  }
-// }
-// c2: c1 & { x: _ }
+valueAliasSelf: {
+	pattern: [string]~(_,C): {
+		name: "x"
+		foo:  C.name
+	}
+	applied: pattern & {x: _} @test(eq, {x: {name: "x", foo: "x"}})
+}
 
 invalidPattern: {
 	[=~"BAD)" & =~"x"]: string
@@ -120,7 +119,7 @@ invalidPattern: {
 }
 -- out/errors.txt --
 [eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
-    ./in.cue:116:22
+    ./in.cue:115:22
 -- out/eval/stats --
 Leaks:  1
 Freed:  60

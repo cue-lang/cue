@@ -319,26 +319,11 @@ incomplete: {
 // issue3389: Tests that matchN only reports schema errors of lesser severity,
 // not all constraint failures. https://cuelang.org/issue/3389
 issue3389: {
-	// only report schema errors that are of a lesser severity.
-	// TODO(inline): issue converting to tests. Documented later.
 	x: bar: 2
 	x: matchN(1, [{bar: 3}, {bar: 2, foo!: int}])
-
-	@test(debug, """
-		(struct){
-		  x: (_|_){
-		    // [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
-		    //     incomplete.cue:96:5
-		    //     incomplete.cue:95:5
-		    //     incomplete.cue:96:12
-		    // issue3389.x.foo: field is required but not present:
-		    //     incomplete.cue:96:5
-		    //     incomplete.cue:95:5
-		    //     incomplete.cue:96:35
-		    bar: (int){ 2 }
-		  }
-		}
-		""")
+	@test(err, code=incomplete, at=x,
+		suberr=(contains="does not satisfy matchN", pos=[2:5, 1:5, 2:12]),
+		suberr=(contains="field is required but not present", pos=[2:5, 1:5, 2:35]))
 }
 -- closedness.cue --
 ellipsis: ok: {
@@ -806,13 +791,13 @@ incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, e
     ./incomplete.cue:85:13
     ./incomplete.cue:86:6
 [incomplete] issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
-    ./incomplete.cue:96:5
-    ./incomplete.cue:95:5
-    ./incomplete.cue:96:12
+    ./incomplete.cue:94:5
+    ./incomplete.cue:93:5
+    ./incomplete.cue:94:12
 issue3389.x.foo: field is required but not present:
-    ./incomplete.cue:96:5
-    ./incomplete.cue:95:5
-    ./incomplete.cue:96:35
+    ./incomplete.cue:94:5
+    ./incomplete.cue:93:5
+    ./incomplete.cue:94:35
 [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3694.cue:4:9
     ./issue3694.cue:4:16

@@ -21,34 +21,18 @@ cycle: {
 }
 
 incompleteOne: {
-	@test(err, code=incomplete, pos=[9:5, 3:7, 4:3], at=r)
+	@test(err, code=incomplete, at=r, contains="invalid interpolation: invalid interpolation: non-concrete value string", pos=[10:5, 3:7, 4:3])
 	_t: {
 		#p: string
 		"""
 			hello \(#p)
 			"""
+		@test(err, code=incomplete, contains="invalid interpolation: non-concrete value string", pos=[2:3, 1:7])
 	}
 
 	r: """
 		\(_t)
 		"""
-	// TODO: we cannot check for errors on hidden fields yet.
-	@test(debugCheck, """
-		(struct){
-		  _t: (_|_){
-		    // [incomplete] incompleteOne._t: invalid interpolation: non-concrete value string (type string):
-		    //     in.cue:20:3
-		    //     in.cue:19:7
-		    #p: (string){ string }
-		  }
-		  r: (_|_){
-		    // [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-		    //     in.cue:25:5
-		    //     in.cue:19:7
-		    //     in.cue:20:3
-		  }
-		}
-		""")
 }
 
 incompleteTwo: {
@@ -76,16 +60,16 @@ cycle.b: cycle with field: a:
     ./in.cue:20:3
     ./in.cue:19:7
 [incomplete] incompleteOne._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:25:5
+    ./in.cue:26:5
     ./in.cue:19:7
     ./in.cue:20:3
 [incomplete] incompleteTwo._t: invalid interpolation: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:48:5
-    ./in.cue:53:7
-    ./in.cue:54:3
+    ./in.cue:32:5
+    ./in.cue:37:7
+    ./in.cue:38:3
 [incomplete] incompleteTwo._t: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:54:3
-    ./in.cue:53:7
+    ./in.cue:38:3
+    ./in.cue:37:7
 -- out/eval/stats --
 Leaks:  0
 Freed:  14

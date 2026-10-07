@@ -109,7 +109,6 @@ issue1972: {
 			patchs: _
 		}
 
-		// TODO(inline): support commas in arguments
 		@test(err, code=eval, contains="conflicting values %s and %s (mismatched types %s and %s)",
 			pos=[0:8, 2:18, 3:3]
 		)

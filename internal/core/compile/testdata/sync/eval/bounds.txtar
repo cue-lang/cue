@@ -23,7 +23,6 @@ b5: >=21 & >20
 b6: int & >5 & <=6
 
 simplifyExpr: {
-	// TODO: fill out later.
 	less1: <(<3)
 	less2: <(<=3)
 	less3: <=(<3)

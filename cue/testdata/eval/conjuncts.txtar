@@ -51,11 +51,7 @@ issue2351: hidden: {
 		in2: _in1
 		out: [for x in in2 {x}]
 	}.out
-	@test(skip, hint="TODO(inline): allow ignoring hidden values.")
-	@test(eq:todo, {
-		@test(final)
-		["foo"]
-	})
+	@test(eq, {_in1: ["foo"], ["foo"]})
 }
 
 -- issue2355.cue --

@@ -25,7 +25,6 @@ import "list"
 			}
 		},
 	]
-	// TODO(inline): generatign this value is broken: hand-spun.
 }
 
 #c1: {

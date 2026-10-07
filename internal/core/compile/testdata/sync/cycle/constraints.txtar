@@ -175,9 +175,6 @@ brokenRing: t2: p2: {
 cyclicRing: t1: {
 	D: a: T
 	T: b: D
-	// TODO(inline): fix shareID here.
-	// @test(shareID=T, at=D.a)
-	// @test(shareID=T, at=T)
 }
 -- issue3476.cue --
 // `cue def -e '#a'` causes a stack overflow. The definition #a selects a

@@ -250,11 +250,8 @@ incomplete: {
 // issue3389: Tests that matchN only reports schema errors of lesser severity,
 // not all constraint failures. https://cuelang.org/issue/3389
 issue3389: {
-	// only report schema errors that are of a lesser severity.
-	// TODO(inline): issue converting to tests. Documented later.
 	x: bar: 2
 	x: matchN(1, [{bar: 3}, {bar: 2, foo!: int}])
-
 }
 -- closedness.cue --
 ellipsis: ok: {

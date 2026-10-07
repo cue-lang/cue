@@ -32,18 +32,14 @@ import "list"
 			}
 		},
 	]
-	// TODO(inline): generatign this value is broken: hand-spun.
 	@test(eq, {
 		p: *"." | string
 		#c: [{
-			do: "f2"
 			from: {
-				as: [*"."| string]
-				#c: [{
-					do: "f1"
-					as: ["go", *"."| string]
-				}]
+				as: [*"." | string]
+				#c: [{as: ["go", *"." | string], do: "f1"}]
 			}
+			do: "f2"
 		}]
 	})
 }

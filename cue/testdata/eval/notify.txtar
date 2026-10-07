@@ -3,7 +3,6 @@ t1: {
 	@test(permute)
 	a
 	a: a: 2|1
-	// TODO(inline): fix args passing: match brackets
 	@test(err, code=eval, contains="empty disjunction",
 		suberr=(code=eval, contains="conflicting values", pos=[0:5, 2:2, 3:10]),
 		suberr=(code=eval, contains="conflicting values", pos=[0:5, 2:2, 3:8]),
@@ -77,13 +76,13 @@ t1: conflicting values {a,a:{a:(2|1)}} and 2 (mismatched types struct and int):
     ./in.cue:4:8
 [eval] t2.d: 2 errors in empty disjunction:
 t2.d: conflicting values {a:{a:(2|1)}} and 1 (mismatched types struct and int):
+    ./in.cue:12:5
     ./in.cue:13:5
-    ./in.cue:14:5
-    ./in.cue:14:13
+    ./in.cue:13:13
 t2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
+    ./in.cue:12:5
     ./in.cue:13:5
-    ./in.cue:14:5
-    ./in.cue:14:11
+    ./in.cue:13:11
 [incomplete] issue3437.r: undefined field: a:
     ./issue3437.cue:5:22
     ./issue3437.cue:5:2

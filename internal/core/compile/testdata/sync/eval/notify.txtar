@@ -2,7 +2,6 @@
 t1: {
 	a
 	a: a: 2|1
-	// TODO(inline): fix args passing: match brackets
 }
 t2: {
 	d: d.a

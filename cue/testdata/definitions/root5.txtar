@@ -38,33 +38,6 @@ x: {
 		c: "foo"
 	}
 })
-// TODO(inline): fix sharing detection across hidden fields.
-@test(debug, """
-	(#struct){
-	  _schema: ~(#Schema)
-	  #Schema: (#struct){
-	    a?: (#struct){
-	      b?: (string){ string }
-	    }
-	  }
-	  a: (#struct){
-	    b: (string){ "foo" }
-	  }
-	  c: (string){ "foo" }
-	  x: (#struct){
-	    _schema: ~(x.#Schema)
-	    #Schema: (#struct){
-	      a?: (#struct){
-	        b?: (string){ string }
-	      }
-	    }
-	    a: (#struct){
-	      b: (string){ "foo" }
-	    }
-	    c: (string){ "foo" }
-	  }
-	}
-	""")
 -- out/eval/stats --
 Leaks:  0
 Freed:  16

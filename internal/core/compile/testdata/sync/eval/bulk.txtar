@@ -23,7 +23,6 @@ t1: {
 		[>"e" & <"z"]: int
 	}
 
-	// TODO(inline): support allow on fields.
 	b: #a & {f: 4}
 	c: #a & {z: 4}
 }
@@ -33,7 +32,6 @@ t2: {
 		["x" | "y"]: int
 	}
 
-	// TODO(inline): support allow on fields.
 	b: #a & {x: 4}
 	c: #a & {z: 4}
 }

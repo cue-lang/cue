@@ -25,7 +25,6 @@ incompleteOne: {
 	r: """
 		\(_t)
 		"""
-	// TODO: we cannot check for errors on hidden fields yet.
 }
 
 incompleteTwo: {

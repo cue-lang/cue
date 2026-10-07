@@ -241,9 +241,8 @@ cyclicRing: t1: {
 	T: b: D
 	@test(err, at=T.b, code=structural_cycle)
 	@test(err, at=D.a.b, code=structural_cycle)
-	// TODO(inline): fix shareID here.
-	// @test(shareID=T, at=D.a)
-	// @test(shareID=T, at=T)
+	@test(shareID=ringT, at=D.a)
+	@test(shareID=ringT, at=T)
 }
 -- issue3476.cue --
 // `cue def -e '#a'` causes a stack overflow. The definition #a selects a

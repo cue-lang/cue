@@ -29,7 +29,6 @@ xa2: xa3 + 2
 xa3: 6 & xa1-2
 xa4: xa2 + 2
 
-// TODO(inline): make positions work here.
 xb1: (xb2 & 8) | (xb4 & 9)
 xb2: xb3 + 2
 xb3: (6 & (xb1 - 2)) | (xb4 & 9)

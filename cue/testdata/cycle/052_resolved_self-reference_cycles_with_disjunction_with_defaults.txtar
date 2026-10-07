@@ -8,12 +8,11 @@ xa2: xa3 + 2 @test(eq, 8)
 xa3: 6 & xa1-2 @test(eq, 6)
 xa4: xa2 + 2 @test(eq, 10)
 
-// TODO(inline): make positions work here.
-xb1: *(xb2 & 8) | (xb4 & 9) @test(err, code=cycle, pos=[],
-	suberr=(code=cycle, path=xb2, contains="unresolved disjunction: %v", args=[xb3]),
-	suberr=(code=cycle, path=xb3, contains="%d errors in empty disjunction:", args=[3]),
-	suberr=(code=cycle, path=xb3, contains="unresolved disjunction: %v", args=[xb1],),
-	suberr=(code=cycle, path=xb3, contains="cycle with field: %v", args=[xb2]))
+xb1: *(xb2 & 8) | (xb4 & 9) @test(err, code=cycle,
+	suberr=(code=cycle, path=xb2, contains="unresolved disjunction: %v", args=[xb3], pos=[5:6]),
+	suberr=(code=cycle, path=xb3, contains="%d errors in empty disjunction:", args=[3], pos=[5:6]),
+	suberr=(code=cycle, path=xb3, contains="unresolved disjunction: %v", args=[xb1], pos=[8:13]),
+	suberr=(code=cycle, path=xb3, contains="cycle with field: %v", args=[xb2], pos=[12:6]))
 xb2: xb3 + 2 @test(err, code=cycle,
 	suberr=(code=cycle, contains="unresolved disjunction: %v", args=[xb3]),
 	suberr=(code=cycle, path=xb3, contains="cycle with field: %v", args=[xb2]))
@@ -59,32 +58,32 @@ z3: 8 @test(eq, 8)
 -- out/errors.txt --
 [cycle] xb1: 4 errors in empty disjunction:
 xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:13:6
 xb3: 3 errors in empty disjunction::
-    ./in.cue:14:6
+    ./in.cue:13:6
 xb3: unresolved disjunction: xb1:
-    ./in.cue:17:13
+    ./in.cue:16:13
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:20:6
 [cycle] xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:13:6
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:20:6
 [cycle] xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:13:6
 xb3: 3 errors in empty disjunction::
-    ./in.cue:14:6
+    ./in.cue:13:6
 xb3: unresolved disjunction: xb1:
-    ./in.cue:17:13
+    ./in.cue:16:13
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:20:6
 [cycle] xb2: unresolved disjunction: xb3:
-    ./in.cue:14:6
+    ./in.cue:13:6
 xb3: cycle with field: xb2:
-    ./in.cue:21:6
+    ./in.cue:20:6
 [eval] xe3: conflicting values 7 and 6:
-    ./in.cue:47:6
-    ./in.cue:47:10
+    ./in.cue:46:6
+    ./in.cue:46:10
 -- out/todo.txt --
 xb* cycles: v2 evaluator resolves xb1=8, xb2=8, xb3=*(6|9), xb4=10; v3
 correctly identifies cycle errors in xb1-xb4.

@@ -17,8 +17,6 @@ withError: {
 	// Panic when running cue eval with a struct used in a string interpolation.
 	// https://cuelang.org/issue/799
 	issue799: {key: int32} & {"\(1 & 2)": 123}
-	// TODO(inline): access _wrapped_ error somehow: underlying error is
-	// "conflicting values 2 and 1".
 }
 
 parenExprRefParent: {

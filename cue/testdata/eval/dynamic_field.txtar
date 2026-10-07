@@ -17,9 +17,7 @@ withError: {
 	// Panic when running cue eval with a struct used in a string interpolation.
 	// https://cuelang.org/issue/799
 	issue799: {key: int32} & {"\(1 & 2)": 123}
-	// TODO(inline): access _wrapped_ error somehow: underlying error is
-	// "conflicting values 2 and 1".
-	@test(err, code=eval, contains="invalid interpolation", pos=[3:28, 3:31, 3:35])
+	@test(err, code=eval, contains="invalid interpolation: conflicting values 2 and 1", pos=[3:28, 3:31, 3:35])
 }
 
 parenExprRefParent: {
@@ -126,16 +124,16 @@ invalidKeyValue: {
     ./in.cue:14:31
     ./in.cue:14:35
 [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:46:8
-    ./in.cue:46:11
+    ./in.cue:44:8
+    ./in.cue:44:11
 noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string)):
-    ./in.cue:48:22
+    ./in.cue:46:22
 [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:46:8
-    ./in.cue:46:11
+    ./in.cue:44:8
+    ./in.cue:44:11
 [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:46:8
-    ./in.cue:46:11
+    ./in.cue:44:8
+    ./in.cue:44:11
 [eval] invalidKeyValue.x: invalid index k (invalid type bool):
     ./invalidkey.cue:5:10
     ./invalidkey.cue:5:6

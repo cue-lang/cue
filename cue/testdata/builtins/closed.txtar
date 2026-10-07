@@ -108,7 +108,7 @@ withSubfields: {
 issue3572: {
   t1: close({...}) & {a: 5} @test(eq, {a: 5}) @test(closed)
 
-  e: close({...}) @test(closed) // TODO: @test(allows=expr)
+  e: close({...}) @test(closed) @test(allows, string)
 
   t2: e & {a: 5} @test(eq, {a: 5}) @test(closed)
 }

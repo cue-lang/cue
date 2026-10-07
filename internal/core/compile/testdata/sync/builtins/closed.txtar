@@ -54,7 +54,7 @@ withSubfields: {
 issue3572: {
   t1: close({...}) & {a: 5}
 
-  e: close({...}) // TODO: @test(allows=expr)
+  e: close({...})
 
   t2: e & {a: 5}
 }

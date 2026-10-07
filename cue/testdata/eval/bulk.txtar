@@ -34,7 +34,6 @@ t1: {
 		[>"e" & <"z"]: int
 	}
 
-	// TODO(inline): support allow on fields.
 	b: #a & {f: 4} @test(eq, {f: 4}) @test(allows, f) @test(allows=false, a) @test(allows=false, string)
 	c: #a & {z: 4} @test(err, code=eval, at=z, contains="field not allowed", pos=[0:11])
 }
@@ -44,7 +43,6 @@ t2: {
 		["x" | "y"]: int
 	}
 
-	// TODO(inline): support allow on fields.
 	b: #a & {x: 4} @test(eq, {x: 4}) @test(allows, x) @test(allows=false, z) @test(allows=false, string)
 	c: #a & {z: 4} @test(err, code=eval, at=z, contains="field not allowed", pos=[0:11])
 }
@@ -229,9 +227,9 @@ issue3638: compare: {
 }
 -- out/errors.txt --
 [eval] t1.c.z: field not allowed:
-    ./in.cue:33:11
+    ./in.cue:32:11
 [eval] t2.c.z: field not allowed:
-    ./in.cue:43:11
+    ./in.cue:41:11
 [eval] issue3670.a.not_int: field not allowed:
     ./intpattern.cue:7:5
 [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):

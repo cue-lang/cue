@@ -16,7 +16,7 @@ b4: "foo"
 s1: !="b" & =~"c"
 s2: =~"c" & !="b"
 s3: !="b" & =~"[a-z]"
-s4: =~"[a-z]" & !="b" // TODO: allow different order
+s4: =~"[a-z]" & !="b"
 
 e1: "foo" =~ 1
 e2: "foo" !~ true

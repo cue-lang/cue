@@ -16,7 +16,7 @@ b4: "foo"
 s1: !="b" & =~"c"     @test(eq, =~"c")
 s2: =~"c" & !="b"     @test(eq, =~"c")
 s3: !="b" & =~"[a-z]" @test(eq, !="b" & =~"[a-z]")
-s4: =~"[a-z]" & !="b" @test(eq, =~"[a-z]" & !="b") // TODO: allow different order
+s4: =~"[a-z]" & !="b" @test(eq, =~"[a-z]" & !="b")
 
 e1: "foo" =~ 1     @test(err, code=eval,
         contains="cannot use 1", pos=[0:5, 0:14])

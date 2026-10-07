@@ -24,7 +24,6 @@ x: {
 	c: "foo"
 }
 
-// TODO(inline): fix sharing detection across hidden fields.
 -- out/compile --
 --- in.cue
 {

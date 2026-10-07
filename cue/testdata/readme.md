@@ -119,7 +119,8 @@ the engine resolves `cue.Hid("_vars", "foobar")`, which matches the
 sources.
 
 The `$pkg` suffix is only meaningful in `@test(eq, {...})` expected-value
-struct literals.  It is not valid CUE syntax in regular source files.
+struct literals and in `at=` paths.  It is not valid CUE syntax in regular
+source files.
 
 ---
 
@@ -156,9 +157,8 @@ outer: {
 } @test(err, at=inner.bad, code=eval, contains="conflicting values")
 ```
 
-The path must not include hidden fields (identifiers beginning with `_`); hidden
-fields cannot be accessed via `cue.ParsePath` and are silently skipped by the
-annotation infrastructure.
+Hidden fields are written as `_name`, or `_name$pkg` for a named package, as
+in `@test(eq, {...})` bodies.
 
 #### `path=<path>` — the error's own path
 

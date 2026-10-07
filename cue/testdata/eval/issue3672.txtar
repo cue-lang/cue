@@ -134,9 +134,8 @@ value0: Only: [{UseSectionName: true}]
 
 @test(err, at=#mkFinDefSet.#Type, code=incomplete, contains="error in call to %s", args=[or], pos=[-108:16, -108:32])
 
-// TODO(inline): test wrapped errors
-@test(err, at=#orgForConfigTextRules.orgSyntax, code=incomplete, path=elems, contains="invalid interpolation", pos=[-17:5, -19:18])
-@test(err, at=#FinDefSetConfigTextElem.toString._output, code=incomplete, path=elems, contains="invalid interpolation", pos=[-18:5, -20:18])
+@test(err, at=#orgForConfigTextRules.orgSyntax, code=incomplete, path=elems, contains="invalid interpolation: unresolved disjunction", pos=[-16:5, -18:18])
+@test(err, at=#FinDefSetConfigTextElem.toString._output, code=incomplete, path=elems, contains="invalid interpolation: unresolved disjunction", pos=[-17:5, -19:18])
 
 -- out/errors.txt --
 [incomplete] #mkFinDefSet.#Type: error in call to or: required field missing: #Definition:

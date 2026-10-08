@@ -3,7 +3,8 @@
 # before the attributes, and a trailing "..." marks an open signature. A
 # parameter list with doc comments breaks into a table with the "..." on
 # its own row. A call whose argument list ends in "..." is a partial
-# application.
+# application. A function's body spaces its operators at the top level,
+# even as an argument of a call with several, which compacts others.
 -- in --
 @experiment(functions)
 
@@ -46,6 +47,8 @@ partialLabel: add(a: 1, ...)
 partialPos:   add(1, ...)
 partialNone:  add(...)
 partialMany:  add(1, 2, ...)
+
+argument: g(func(x: int) -> int: x + 1, y)
 -- out/relpos --
 @experiment(functions)
 
@@ -88,6 +91,8 @@ partialLabel: add(a: 1, ...)
 partialPos:   add(1, ...)
 partialNone:  add(...)
 partialMany:  add(1, 2, ...)
+
+argument: g(func(x: int) -> int: x + 1, y)
 -- out/norelpos --
 @experiment(functions)
 tagged: func(a: int @tag(x), b: int @foo() @bar()) -> int: a + b
@@ -130,3 +135,4 @@ partialLabel: add(a: 1, ...)
 partialPos:   add(1, ...)
 partialNone:  add(...)
 partialMany:  add(1, 2, ...)
+argument:     g(func(x: int) -> int: x + 1, y)

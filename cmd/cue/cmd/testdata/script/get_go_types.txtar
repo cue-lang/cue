@@ -422,7 +422,7 @@ import (
 	Slice4:    [...int]                       @go(,[]*int)
 	Array1:    5 * [int]                      @go(,[5]int)
 	Array2:    5 * [_]                        @go(,[5]interface{})
-	Array3?:   null | 5 * [_]                 @go(,*[5]json.Marshaler)
+	Array3?:   null | 5*[_]                   @go(,*[5]json.Marshaler)
 	Array4:    bytes                          @go(,[5]byte)
 	Intf:      #Interface                     @protobuf(2,varint,name=intf)
 	Intf2:     _                              @go(,interface{})

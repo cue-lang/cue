@@ -607,7 +607,7 @@ func TestNodes(t *testing.T) {
 					ast.NewIdent("d")),
 			}
 		}(),
-		out: "x: a + b & // c\n\td",
+		out: "x: a+b & // c\n\td",
 	}, {
 		// A comment between a clause and the body, without a position,
 		// sits on its own line.

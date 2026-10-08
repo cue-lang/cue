@@ -431,8 +431,7 @@ func TestNodes(t *testing.T) {
 					ast.NewBinExpr(token.SUB, ast.NewIdent("b"), ast.NewIdent("c"))),
 			}
 		}(),
-		// The comment swallows the operator and the right operand.
-		out: `x: a // c - (b - c)`,
+		out: "x: a - // c\n\t(b - c)",
 	}, {
 		// As above, for a disjunct, such as the commented default
 		// error which cue def exports for `*_|_ | int | string`.
@@ -447,8 +446,7 @@ func TestNodes(t *testing.T) {
 					ast.NewIdent("int"), ast.NewIdent("string")),
 			}
 		}(),
-		// The comment swallows the operator.
-		out: "x: *_|_ // c |\n\tint |\n\tstring",
+		out: "x: *_|_ | // c\n\tint |\n\tstring",
 	}, {
 		// As above, for a conjunct ending with a nested binary
 		// expression.
@@ -463,8 +461,7 @@ func TestNodes(t *testing.T) {
 					ast.NewIdent("d")),
 			}
 		}(),
-		// The comment swallows the operator.
-		out: "x: a + b // c &\n\td",
+		out: "x: a + b & // c\n\td",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

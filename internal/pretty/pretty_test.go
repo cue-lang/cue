@@ -715,17 +715,14 @@ programmatic: {
 				}}
 			}(),
 			cfg: &pretty.Config{Width: 80, Indent: "\t"},
-			// The parentheses are lost in a, b, and f, changing the
-			// defaults of a and b and the result of f.
 			want: `
-a: *1 | *2 | 3
-b: 1 | *2 | 3
+a: *1 | (*2 | 3)
+b: 1 | (*2 | 3)
 c: 1 | 2 | 3
 d: a & b & c
 e: a - (b - c)
-f: a -
-	b - // c
-	c`[1:],
+f: a - (b - // c
+	c)`[1:],
 		},
 		{
 			// A trailing comment on a decl, in an [infiniteWidth] wrap,

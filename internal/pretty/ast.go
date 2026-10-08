@@ -154,6 +154,11 @@ const (
 	// comment. Propagated up only through the rightmost-rendered child
 	// of non-bracketed nodes, mirroring endsWithOwnLineComment.
 	endsWithLineComment
+	// afterCommentsLifted marks a node whose comments rendered after it
+	// were moved after a following operator by
+	// [converter.liftTailComments], so that
+	// [converter.withCommentsSlots] leaves them out.
+	afterCommentsLifted
 )
 
 // converter translates a CUE AST into the Doc algebra.
@@ -873,19 +878,22 @@ func (c *converter) withCommentsSlots(n ast.Node, body doc, slots commentSlots) 
 	// already places interior comments inside the body - skip the
 	// prefix/suffix slots here so the same comments aren't rendered
 	// both inside and outside the brackets.
-	skipInterior := nodeManagesInteriorComments(n)
-	trailing := make([]*ast.CommentGroup, 0,
-		len(slots.prefix)+len(slots.suffix)+len(slots.trailing))
-	if !skipInterior {
-		trailing = append(trailing, slots.prefix...)
-		trailing = append(trailing, slots.suffix...)
-	} else {
-		// Interior-managing nodes render prefix/suffix comments inside the
-		// node, except a prefix comment that is really trailing; emit that
-		// one here with the trailing comments. See [trailingPrefixComments].
-		trailing = append(trailing, trailingPrefixComments(n)...)
+	var trailing []*ast.CommentGroup
+	if flags := c.nodeFlags[n]; flags&afterCommentsLifted == 0 {
+		skipInterior := nodeManagesInteriorComments(n)
+		trailing = make([]*ast.CommentGroup, 0,
+			len(slots.prefix)+len(slots.suffix)+len(slots.trailing))
+		if !skipInterior {
+			trailing = append(trailing, slots.prefix...)
+			trailing = append(trailing, slots.suffix...)
+		} else {
+			// Interior-managing nodes render prefix/suffix comments inside the
+			// node, except a prefix comment that is really trailing; emit that
+			// one here with the trailing comments. See [trailingPrefixComments].
+			trailing = append(trailing, trailingPrefixComments(n)...)
+		}
+		trailing = append(trailing, slots.trailing...)
 	}
-	trailing = append(trailing, slots.trailing...)
 
 	var after []doc
 	if len(trailing) > 0 {
@@ -1915,7 +1923,7 @@ func (c *converter) binaryExpr(x *ast.BinaryExpr) doc {
 	// (normal spacing), inside `[...]` it is 2+ (compact spacing). The
 	// binary tree threads further +1 per operand level from here.
 	depth := 1 + c.subscript
-	arms, hasTrailing := flattenBinaryChain(x)
+	arms, hasTrailing := c.binaryChainArms(x)
 	if hasTrailing && c.chainAligns(x, arms) {
 		return c.binaryChainTable(x, arms, nil)
 	}
@@ -1956,6 +1964,11 @@ func (c *converter) chainAligns(x *ast.BinaryExpr, arms []chainArm) bool {
 // binaryChainTable lays out a comment-bearing chain as a [docTable]
 // with the trailing comments column-aligned.
 func (c *converter) binaryChainTable(x *ast.BinaryExpr, arms []chainArm, fieldTrailing doc) doc {
+	// Lift the comments ending every arm but the last, which
+	// [converter.binaryChainArms] moved to the arm's trailing comments.
+	for _, arm := range arms[:len(arms)-1] {
+		c.liftTailComments(arm.expr)
+	}
 	if x.Op == token.OR || x.Op == token.AND {
 		return c.chainTableExpr(x, arms, fieldTrailing)
 	}
@@ -1969,6 +1982,75 @@ type chainArm struct {
 	expr     ast.Expr
 	trailing []*ast.CommentGroup // Position>=2, Line=true: goes in this row's comment column
 	interior []*ast.CommentGroup // Position==1: interior of next arm (inject if possible)
+}
+
+// binaryChainArms is [flattenBinaryChain], except that the `//`
+// comments ending an arm other than the last, which would swallow the
+// operator after it, move to the start of the arm's trailing comments,
+// after the operator. [converter.binaryChainTable] lifts them out of
+// the arm when it renders the chain.
+func (c *converter) binaryChainArms(x *ast.BinaryExpr) (arms []chainArm, hasTrailing bool) {
+	arms, hasTrailing = flattenBinaryChain(x)
+	for i := range len(arms) - 1 {
+		arm := &arms[i]
+		if tail := c.tailComments(arm.expr); len(tail) > 0 {
+			arm.trailing = append(tail, arm.trailing...)
+			hasTrailing = true
+		}
+	}
+	return arms, hasTrailing
+}
+
+// tailComments returns the comments rendered at the end of n's output,
+// each of which runs to the end of its line; see [endsWithLineComment].
+// It descends only into the operands which their parent renders via
+// [converter.withCommentsSlots], and skips comments which are lifted
+// already.
+func (c *converter) tailComments(n ast.Node) []*ast.CommentGroup {
+	return c.tails(n, false)
+}
+
+// liftTailComments returns the [converter.tailComments] of operand e,
+// which would swallow an operator following e on the same line, and
+// lifts them out of e's rendering; the caller renders them after the
+// operator.
+func (c *converter) liftTailComments(e ast.Expr) []*ast.CommentGroup {
+	return c.tails(e, true)
+}
+
+// tails implements [converter.tailComments], marking the nodes whose
+// comments it returns with [afterCommentsLifted] if lift is set.
+func (c *converter) tails(n ast.Node, lift bool) []*ast.CommentGroup {
+	flags := c.nodeFlags[n]
+	if flags&endsWithLineComment == 0 {
+		return nil
+	}
+	var out []*ast.CommentGroup
+	switch n := n.(type) {
+	case *ast.BinaryExpr:
+		out = c.tails(n.Y, lift)
+	case *ast.UnaryExpr:
+		out = c.tails(n.X, lift)
+	case *ast.PostfixExpr:
+		out = c.tails(n.X, lift)
+	}
+	if flags&afterCommentsLifted != 0 {
+		return out // they render elsewhere
+	}
+	own := len(out)
+	slots := classifyComments(n)
+	if nodeManagesInteriorComments(n) {
+		out = append(out, trailingPrefixComments(n)...)
+	} else {
+		out = append(out, slots.prefix...)
+		out = append(out, slots.suffix...)
+	}
+	out = append(out, slots.trailing...)
+	if lift && len(out) > own {
+		// n has an entry already, so this does not grow the map.
+		c.nodeFlags[n] |= afterCommentsLifted
+	}
+	return out
 }
 
 // chainGroupArms formats a same-operator | or & chain as a [docGroup]
@@ -2001,7 +2083,7 @@ func (c *converter) chainGroupArms(x *ast.BinaryExpr, arms []chainArm) doc {
 	rest := make([]doc, 0, 2*len(arms)-1)
 	lastIdx := len(arms) - 1
 	for i, arm := range arms {
-		elem := c.armDoc(arm, outerPrec)
+		elem := c.armDoc(arm, outerPrec+1)
 		if i < lastIdx {
 			elem = cat(elem, opDoc)
 		}
@@ -2055,6 +2137,11 @@ func (c *converter) chainGroupArms(x *ast.BinaryExpr, arms []chainArm) doc {
 // following arm and are later injected into its body if it is a
 // braced StructLit.
 //
+// A right operand with operator x.Op, which the parser only produces
+// from parenthesized source, is flattened only where dropping its
+// parentheses keeps the meaning; see [flattensRight]. Otherwise it
+// stays a single arm, which the renderers parenthesize.
+//
 // On the outermost BinaryExpr (x), Position=PosDoc and
 // Position>=PosTrailingMin comments are the chain's outer doc/trailing
 // comments handled by the surrounding withComments wrap, so they are
@@ -2071,16 +2158,16 @@ func flattenBinaryChain(x *ast.BinaryExpr) (arms []chainArm, hasTrailing bool) {
 	lifted := trailingPrefixComments(x)
 
 	var pending []*ast.CommentGroup // interior comments pending for next arm
-	var walk func(e ast.Expr, outermost bool)
-	walk = func(e ast.Expr, outermost bool) {
+	var walk func(e ast.Expr, outermost, right bool)
+	walk = func(e ast.Expr, outermost, right bool) {
 		bin, ok := e.(*ast.BinaryExpr)
-		if !ok || bin.Op != x.Op {
+		if !ok || bin.Op != x.Op || (right && !flattensRight(bin)) {
 			arms = append(arms, chainArm{expr: e, interior: pending})
 			pending = nil
 			return
 		}
 
-		walk(bin.X, false)
+		walk(bin.X, false, false)
 		// Split this BinaryExpr's comments. Position=PosPrefix
 		// always means interior-of-next-arm (regardless of
 		// layout), matching the classification in binaryExprPrec;
@@ -2112,10 +2199,39 @@ func flattenBinaryChain(x *ast.BinaryExpr) (arms []chainArm, hasTrailing bool) {
 		prevArm := &arms[len(arms)-1]
 		prevArm.trailing = append(prevArm.trailing, trailing...)
 		pending = append(pending, interior...)
-		walk(bin.Y, false)
+		walk(bin.Y, false, true)
 	}
-	walk(x, true)
+	walk(x, true, false)
 	return arms, hasTrailing
+}
+
+// flattensRight reports whether y, the right operand of a BinaryExpr
+// with the same operator, can render without parentheses. That is the
+// case for &, which is associative, and for a | whose own arms carry
+// no default marker: `*1 | (*2 | 3)` has the single default 1, while
+// `*1 | *2 | 3` has two. The compiler flattens such an operand either
+// way, but the printed source is reparsed with the parentheses as
+// written.
+func flattensRight(y *ast.BinaryExpr) bool {
+	switch y.Op {
+	case token.AND:
+		return true
+	case token.OR:
+		return !hasMarkedDisjunct(y)
+	}
+	return false
+}
+
+// hasMarkedDisjunct reports whether e is a default-marked disjunct, or a
+// | chain with one among the arms reached without parentheses.
+func hasMarkedDisjunct(e ast.Expr) bool {
+	switch e := e.(type) {
+	case *ast.UnaryExpr:
+		return e.Op == token.MUL
+	case *ast.BinaryExpr:
+		return e.Op == token.OR && (hasMarkedDisjunct(e.X) || hasMarkedDisjunct(e.Y))
+	}
+	return false
 }
 
 // chainTableRow is one rendered row of a chain table: its cell content
@@ -2179,7 +2295,11 @@ func (c *converter) chainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrai
 	outerPrec := x.Op.Precedence()
 	rows := make([]chainTableRow, len(arms))
 	for i, arm := range arms {
-		rows[i] = chainTableRow{cell: c.armDoc(arm, outerPrec), trailing: arm.trailing}
+		prec := outerPrec
+		if i > 0 {
+			prec++ // a right operand at the chain's own precedence needs parens
+		}
+		rows[i] = chainTableRow{cell: c.armDoc(arm, prec), trailing: arm.trailing}
 	}
 	return c.maybeGroup(x, c.chainTable(rows, stringLit(" "+x.Op.String()), fieldTrailing))
 }
@@ -2225,9 +2345,11 @@ func (c *converter) arithChainTableExpr(x *ast.BinaryExpr, arms []chainArm, fiel
 
 // armDoc renders a single chainArm: its expression, with any interior
 // comments injected. outerPrec is the precedence of the chain's own
-// operator; when the arm is itself a [*ast.BinaryExpr] with a lower
-// precedence, the arm is wrapped in parens so the rendered output
-// re-parses to the same tree.
+// operator, plus one for every arm but the first; when the arm is
+// itself a [*ast.BinaryExpr] with a lower precedence, the arm is
+// wrapped in parens so the rendered output re-parses to the same tree.
+// The increment parenthesizes a right operand with the chain's own
+// operator, which [flattenBinaryChain] left unflattened.
 func (c *converter) armDoc(a chainArm, outerPrec int) doc {
 	body := c.armExpr(a.expr, outerPrec)
 	if len(a.interior) == 0 {
@@ -2326,6 +2448,9 @@ func (c *converter) injectInteriorComments(x ast.Expr, extra []*ast.CommentGroup
 func (c *converter) binaryExprPrec(x *ast.BinaryExpr, co, depth int) doc {
 	prec := x.Op.Precedence()
 
+	// Comments ending the left operand go after the operator, which
+	// they would otherwise swallow.
+	lifted := c.liftTailComments(x.X)
 	left := c.binaryOperand(x.X, prec, depth+binaryDiffPrec(x.X, prec))
 	right := c.binaryOperand(x.Y, prec+1, depth+1)
 
@@ -2363,7 +2488,7 @@ func (c *converter) binaryExprPrec(x *ast.BinaryExpr, co, depth int) doc {
 	interior := nonTrailingPrefix(x, slots.prefix)
 	var opInline []doc               // PosSuffix on the op's line (cg.Line or Blank)
 	var midBlock []*ast.CommentGroup // PosSuffix on its own line
-	for _, cg := range slots.suffix {
+	for _, cg := range slices.Concat(lifted, slots.suffix) {
 		if cg.Line || cg.Pos().RelPos() == token.Blank {
 			opInline = append(opInline, spaceLit, c.commentGroup(cg))
 		} else {
@@ -3648,7 +3773,7 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	var binArms []chainArm
 	binHasTrailing := false
 	if isBinChain {
-		binArms, binHasTrailing = flattenBinaryChain(bin)
+		binArms, binHasTrailing = c.binaryChainArms(bin)
 	}
 	sel, isSelChain := leaf.Value.(*ast.SelectorExpr)
 	isSelChain = isSelChain && len(trailingCommentDocs) > 0

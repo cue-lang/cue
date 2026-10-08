@@ -822,7 +822,7 @@ func TestNodes(t *testing.T) {
 		out: "o: [{\n\tf: a & b // c\n}]",
 	}, {
 		// A comment ending an operand which the formatter parenthesizes
-		// swallows the closing paren, so the output does not parse.
+		// goes after the closing paren, which it would swallow.
 		name: "parenthesized right operand ending in a comment",
 		in: func() ast.Node {
 			c := ast.NewIdent("c")
@@ -830,7 +830,7 @@ func TestNodes(t *testing.T) {
 			return &ast.Field{Label: ast.NewIdent("x"), Value: ast.NewBinExpr(token.SUB, ast.NewIdent("a"),
 				ast.NewBinExpr(token.SUB, ast.NewIdent("b"), c))}
 		}(),
-		out: "x: a - (b - c // c)",
+		out: "x: a - (b - c) // c",
 	}, {
 		// As with the commented bottom which cue def exports for an error.
 		name: "parenthesized disjunct ending in a comment",
@@ -840,7 +840,7 @@ func TestNodes(t *testing.T) {
 			return &ast.Field{Label: ast.NewIdent("x"), Value: ast.NewBinExpr(token.OR, ast.NewIdent("a"),
 				ast.NewBinExpr(token.OR, ast.NewIdent("b"), &ast.UnaryExpr{Op: token.MUL, X: bottom}))}
 		}(),
-		out: "x: a |\n\t(b |\n\t\t*_|_ // c)",
+		out: "x: a |\n\t(b | *_|_) // c",
 	}, {
 		name: "parenthesized unary operand ending in a comment",
 		in: func() ast.Node {
@@ -848,15 +848,17 @@ func TestNodes(t *testing.T) {
 			ast.AddComment(b, internal.NewComment(false, "c"))
 			return &ast.Field{Label: ast.NewIdent("x"), Value: &ast.UnaryExpr{Op: token.NOT, X: ast.NewBinExpr(token.AND, ast.NewIdent("a"), b)}}
 		}(),
-		out: "x: !(a &\n\tb // c)",
+		out: "x: !(a & b) // c",
 	}, {
+		// The comment trails the head segment of the selector chain, as
+		// it would swallow the period otherwise.
 		name: "parenthesized selector head ending in a comment",
 		in: func() ast.Node {
 			b := ast.NewIdent("b")
 			ast.AddComment(b, internal.NewComment(false, "c"))
 			return &ast.Field{Label: ast.NewIdent("x"), Value: ast.NewSel(ast.NewBinExpr(token.AND, ast.NewIdent("a"), b), "f")}
 		}(),
-		out: "x: (a &\n\tb // c).f",
+		out: "x: (a & b). // c\n\tf",
 	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the

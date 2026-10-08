@@ -1916,12 +1916,12 @@ func (c *converter) ellipsis(x *ast.Ellipsis) doc {
 // operator+operand unit, not between them. Comments which sit between
 // the operator and the operand in the source, and the operand's doc
 // comments, stay between them, with the operand on the next line. The
-// operand passes through [wrapForPrecedence] with [token.UnaryPrec] so
+// operand passes through [converter.wrapForPrecedence] with [token.UnaryPrec] so
 // a lower-precedence binary operand is parenthesised, preserving its
 // grouping (`!a & b` must not re-parse as `(!a) & b`).
 func (c *converter) unaryExpr(x *ast.UnaryExpr) doc {
 	op := x.Op.String()
-	xDoc := wrapForPrecedence(c.exprCore(x.X), x.X, token.UnaryPrec)
+	xDoc := c.wrapForPrecedence(x.X, token.UnaryPrec, c.exprCore)
 	xSlots := classifyComments(x.X)
 
 	if inner := slices.Concat(unaryInteriorComments(x), xSlots.doc); len(inner) > 0 {
@@ -1975,11 +1975,11 @@ func unaryInteriorComments(x *ast.UnaryExpr) []*ast.CommentGroup {
 // postfixExpr converts a PostfixExpr. The operand is obtained via
 // exprCore so that the suffix operator is placed before any trailing
 // comments on the operand. The operand passes through
-// [wrapForPrecedence] with [token.HighestPrec] so a lower-precedence
+// [converter.wrapForPrecedence] with [token.HighestPrec] so a lower-precedence
 // binary operand is parenthesised, preserving its grouping (`a & b ...`
 // must not re-parse as `a & (b ...)`).
 func (c *converter) postfixExpr(x *ast.PostfixExpr) doc {
-	xDoc := wrapForPrecedence(c.exprCore(x.X), x.X, token.HighestPrec)
+	xDoc := c.wrapForPrecedence(x.X, token.HighestPrec, c.exprCore)
 	body := cat(xDoc, stringLit(x.Op.String()))
 
 	return c.withComments(x.X, body)
@@ -2459,10 +2459,10 @@ func (c *converter) armDoc(a chainArm, outerPrec int) doc {
 // precedence outerPrec. A nested BinaryExpr at lower precedence, or a
 // function literal whose result or body would absorb the following
 // operator, is wrapped in parens so the chain shape `a OP_outer arm`
-// re-parses to the same tree on round-trip; see [wrapForPrecedence]
+// re-parses to the same tree on round-trip; see [converter.wrapForPrecedence]
 // and [converter.armDoc].
 func (c *converter) armExpr(e ast.Expr, outerPrec int) doc {
-	return wrapForPrecedence(c.expr(e), e, outerPrec)
+	return c.wrapForPrecedence(e, outerPrec, c.expr)
 }
 
 // injectInteriorComments renders a braced StructLit or bracketed
@@ -2627,13 +2627,13 @@ func (c *converter) binaryExprPrec(x *ast.BinaryExpr) doc {
 // binaryOperand formats one operand of a binary expression, recursing
 // into nested binary expressions at the same or higher precedence. A
 // nested binary at *lower* precedence is wrapped in parentheses by
-// [wrapForPrecedence] so the rendered output re-parses to the same
+// [converter.wrapForPrecedence] so the rendered output re-parses to the same
 // tree shape.
 func (c *converter) binaryOperand(e ast.Expr, prec int) doc {
 	if bin, ok := e.(*ast.BinaryExpr); ok && bin.Op.Precedence() >= prec {
 		return c.binaryExprPrec(bin)
 	}
-	return wrapForPrecedence(c.expr(e), e, prec)
+	return c.wrapForPrecedence(e, prec, c.expr)
 }
 
 // selArm is one segment of a flattened selector chain (a.b.c).
@@ -2669,7 +2669,11 @@ func (c *converter) flattenSelectorChain(x *ast.SelectorExpr) (arms []selArm, ha
 			// The head receiver is a primary expression: `.sel` binds
 			// tighter than any binary operator, so a binary head needs
 			// parens to keep its grouping (`(a & b).c`, not `a & b.c`).
-			arms = append(arms, selArm{doc: wrapForPrecedence(c.expr(e), e, token.HighestPrec)})
+			// A comment ending the head would swallow the period, so it
+			// trails the segment instead.
+			tail := c.liftTailComments(e)
+			hasTrailing = hasTrailing || len(tail) > 0
+			arms = append(arms, selArm{doc: c.wrapForPrecedence(e, token.HighestPrec, c.expr), trailing: tail})
 			return
 		}
 		walk(sel.X, false)
@@ -2736,7 +2740,7 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 	// The callee is a primary expression: `(...)` binds tighter than
 	// any binary operator, so a binary callee needs parens (`(a &
 	// b)(x)`).
-	fun := wrapForPrecedence(c.expr(x.Fun), x.Fun, token.HighestPrec)
+	fun := c.wrapForPrecedence(x.Fun, token.HighestPrec, c.expr)
 
 	if len(x.Args) == 0 {
 		if x.Ellipsis != token.NoPos {
@@ -2940,7 +2944,7 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	// The receiver is a primary expression: `[i]` binds tighter than
 	// any binary operator, so a binary receiver needs parens (`(a &
 	// b)[i]`).
-	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
+	recv := c.wrapForPrecedence(x.X, token.HighestPrec, c.expr)
 	index := c.expr(x.Index)
 	// The receiver stays out of the group, so that a receiver spanning
 	// lines does not break the line after the opening bracket.
@@ -2965,7 +2969,7 @@ func (c *converter) sliceExpr(x *ast.SliceExpr) doc {
 	// The receiver is a primary expression: the slice `[lo:hi]` binds
 	// tighter than any binary operator, so a binary receiver needs
 	// parens.
-	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
+	recv := c.wrapForPrecedence(x.X, token.HighestPrec, c.expr)
 	low := c.exprAfter(nil, nil, x.Low)
 	high := c.exprAfter(nil, nil, x.High)
 	return cats(recv, lBracketLit, low, colon, high, rBracketLit)
@@ -5123,7 +5127,7 @@ func listOmitsCommas(elems []ast.Expr, lbrack, rbrack token.Pos) bool {
 // The hazard arises only when the operand starts with an operator
 // character, which happens only when the operand is itself a
 // UnaryExpr. All other operand begins with a digit, letter, quote, or
-// bracket (a binary operand is parenthesised by [wrapForPrecedence],
+// bracket (a binary operand is parenthesised by [converter.wrapForPrecedence],
 // so it begins with `(`) and can never merge.
 //
 //   - op `<`, operand first byte `-`: forms `<-` (ARROW), e.g. `<-5`.
@@ -5334,12 +5338,24 @@ func isLeafLitValue(v ast.Expr) bool {
 	return false
 }
 
-// wrapForPrecedence wraps doc in parens when e's outer operator binds
-// less tightly than the surrounding precedence prec. The AST encodes
-// grouping by tree shape, but programmatic builders don't insert
-// [*ast.ParenExpr] wrappers, so each rendering site whose context binds
-// tighter than some binary operator must materialise the parens itself
-// or the output would re-parse to a differently-grouped tree.
+// wrapForPrecedence renders e with render, in parens when
+// [needsParens] says so. A comment ending e would swallow the closing
+// paren, so it is lifted out of e's rendering and placed after it.
+func (c *converter) wrapForPrecedence(e ast.Expr, prec int, render func(ast.Expr) doc) doc {
+	if !needsParens(e, prec) {
+		return render(e)
+	}
+	tail := c.liftTailComments(e)
+	return cats(lParenLit, render(e), rParenLit, c.trailingComments(tail))
+}
+
+// needsParens reports whether e needs parens when e's outer operator
+// binds less tightly than the surrounding precedence prec. The AST
+// encodes grouping by tree shape, but programmatic builders don't
+// insert [*ast.ParenExpr] wrappers, so each rendering site whose
+// context binds tighter than some binary operator must materialise the
+// parens itself or the output would re-parse to a differently-grouped
+// tree.
 //
 // Besides [*ast.BinaryExpr], an [*ast.Func] with a result constraint or
 // a body needs the wrap: both extend to the end of the expression and
@@ -5348,18 +5364,14 @@ func isLeafLitValue(v ast.Expr) bool {
 // Every other expression type either is itself bracketed, produces a
 // single token, or binds at least as tightly as the postfix / unary
 // contexts.
-func wrapForPrecedence(doc doc, e ast.Expr, prec int) doc {
+func needsParens(e ast.Expr, prec int) bool {
 	switch x := e.(type) {
 	case *ast.BinaryExpr:
-		if x.Op.Precedence() < prec {
-			return cats(lParenLit, doc, rParenLit)
-		}
+		return x.Op.Precedence() < prec
 	case *ast.Func:
-		if x.Ret != nil || x.Body != nil {
-			return cats(lParenLit, doc, rParenLit)
-		}
+		return x.Ret != nil || x.Body != nil
 	}
-	return doc
+	return false
 }
 
 // binaryCutoff determines the precedence cutoff for spacing
@@ -5414,15 +5426,14 @@ func binaryWalk(e *ast.BinaryExpr) (has6, has7 bool) {
 // level deeper, except for a left operand with the same precedence, as
 // are the subscripts of an index or slice expression, the elements of
 // an interpolation, and the arguments of a call with more than one.
-// Parentheses, including those added around a binary operand by
-// [wrapForPrecedence], undo one level.
+// Parentheses, including those added by [needsParens], undo one level.
 // An index or slice receiver, and any child of a node not listed here,
 // such as a struct or list element, starts afresh at depth 1.
 func operandDepth(parent ast.Node, depth int, child ast.Node) int {
 	// paren returns the depth of an operand e of an operator with
 	// precedence prec, which renders in parentheses if needed.
 	paren := func(e ast.Node, prec, depth int) int {
-		if e, ok := e.(*ast.BinaryExpr); ok && e.Op.Precedence() < prec {
+		if e, ok := e.(ast.Expr); ok && needsParens(e, prec) {
 			return max(depth-1, 1)
 		}
 		return depth

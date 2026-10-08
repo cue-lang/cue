@@ -12,11 +12,10 @@ cmp p/three.cue p/three.cue.fixed
 # With no arguments, fix the module's packages and those under cue.mod,
 # where nested directories without CUE files, or with only ignored ones,
 # are not packages.
-# TODO: the intermediate directory is wrongly loaded as a package,
-# so cue fix fails and fixes nothing.
 cd mod
-! exec cue fix
-stderr 'cannot find package "test.example/foo": cannot find module providing package test.example/foo'
+exec cue fix
+cmp x.cue x.cue.fixed
+cmp cue.mod/gen/test.example/foo/bar/bar.cue bar.cue.fixed
 
 -- p/one.cue --
 package one

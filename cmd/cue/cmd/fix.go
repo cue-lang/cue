@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"io/fs"
+	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -165,11 +167,24 @@ func appendDirs(a []string, base string) []string {
 	_ = filepath.WalkDir(base, func(path string, entry fs.DirEntry, err error) error {
 		if err == nil && entry.IsDir() && path != base {
 			short := filepath.ToSlash(path[len(base)+1:])
-			if strings.ContainsAny(short, "/") {
+			if strings.ContainsAny(short, "/") && hasCUEFiles(path) {
 				a = append(a, short)
 			}
 		}
 		return nil
 	})
 	return a
+}
+
+// hasCUEFiles reports whether dir directly contains any CUE files which
+// are not ignored by the loader. Intermediate directories such as
+// "github.com/foo" in a cue.mod tree are not packages, and loading them
+// would fail.
+func hasCUEFiles(dir string) bool {
+	entries, _ := os.ReadDir(dir)
+	return slices.ContainsFunc(entries, func(e fs.DirEntry) bool {
+		name := e.Name()
+		return !e.IsDir() && strings.HasSuffix(name, ".cue") &&
+			!strings.HasPrefix(name, "_") && !strings.HasPrefix(name, ".")
+	})
 }

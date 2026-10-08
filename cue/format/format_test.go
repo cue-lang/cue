@@ -657,6 +657,31 @@ func TestNodes(t *testing.T) {
 		}(),
 		out: "f: {for k, v in src // c\n{\n\t\"a\": v\n}}",
 	}, {
+		// The comment ending a field's value goes after the field's
+		// attributes, and the struct's closer after the comment.
+		//
+		// The comment swallows the attributes and the closer.
+		name: "field attributes after a value comment in a struct",
+		in: func() ast.Node {
+			y := ast.NewIdent("y")
+			ast.AddComment(y, &ast.CommentGroup{Line: true, Position: 2, List: []*ast.Comment{{Text: "// c"}}})
+			f := &ast.Field{Label: ast.NewIdent("a"), Value: ast.NewBinExpr(token.ADD, ast.NewIdent("x"), y)}
+			f.Attrs = []*ast.Attribute{{Text: "@x()"}}
+			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewStruct(f)}
+		}(),
+		out: "o: {a: x + y // c @x()}",
+	}, {
+		// As above, for a comment of a leaf value which is not on its line.
+		name: "field attributes after a leaf value comment in a struct",
+		in: func() ast.Node {
+			v := ast.NewLit(token.INT, "1")
+			ast.AddComment(v, &ast.CommentGroup{Position: 2, List: []*ast.Comment{{Text: "// c"}}})
+			f := &ast.Field{Label: ast.NewIdent("a"), Value: v}
+			f.Attrs = []*ast.Attribute{{Text: "@x()"}}
+			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewStruct(f, ast.NewIdent("b"), ast.NewIdent("z"))}
+		}(),
+		out: "o: {\n\ta: 1\n\n\t// c @x()\n\tb: z\n}",
+	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the
 		// receiver's last line.

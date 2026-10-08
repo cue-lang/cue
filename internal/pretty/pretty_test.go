@@ -568,6 +568,62 @@ x: 1 // on-field
      // on-value`[1:],
 		},
 		{
+			// A same-line comment on the rightmost operand of a field's
+			// value, as the exporter attaches to error sentinels, must
+			// not swallow the field's attributes.
+			//
+			// The comments swallow the attributes.
+			name: "field_attr_after_value_line_comment",
+			node: func() *ast.File {
+				field := func(name string, rel token.RelPos, val, leaf ast.Expr) *ast.Field {
+					ast.AddComment(leaf, &ast.CommentGroup{
+						Position: 10,
+						Line:     true,
+						List:     []*ast.Comment{{Text: "// boom"}},
+					})
+					return &ast.Field{
+						Label: &ast.Ident{NamePos: rel.Pos(), Name: name},
+						Value: val,
+						Attrs: []*ast.Attribute{{Text: "@foo(bar)"}},
+					}
+				}
+				bin := &ast.BottomLit{}
+				un := &ast.BottomLit{}
+				// A doc comment on the value takes the field out of
+				// the table layout.
+				docBin := &ast.BottomLit{}
+				docVal := &ast.BinaryExpr{
+					X:  &ast.Ident{Name: "a"},
+					Op: token.NEQ,
+					Y:  docBin,
+				}
+				ast.AddComment(docVal, &ast.CommentGroup{
+					List: []*ast.Comment{{Text: "// doc"}},
+				})
+				return &ast.File{Decls: []ast.Decl{
+					field("x", token.NoRelPos, &ast.BinaryExpr{
+						X:  &ast.Ident{Name: "a"},
+						Op: token.NEQ,
+						Y:  bin,
+					}, bin),
+					field("y", token.NewSection, &ast.UnaryExpr{
+						Op: token.NOT,
+						X:  un,
+					}, un),
+					field("z", token.NewSection, docVal, docBin),
+				}}
+			}(),
+			cfg: &pretty.Config{Width: 80, Indent: "\t"},
+			want: `
+x: a != _|_ // boom @foo(bar)
+
+y: !_|_ // boom @foo(bar)
+
+z:
+	// doc
+	a != _|_ // boom @foo(bar)`[1:],
+		},
+		{
 			// A bare expression in a Decl slot, as the evaluator's
 			// value-to-syntax conversion produces, prints its comments
 			// once.

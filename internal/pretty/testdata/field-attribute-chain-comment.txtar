@@ -1,0 +1,18 @@
+# The attributes of a field come before its trailing comment, also when
+# its value is a chain whose arms carry comments.
+# The trailing comments swallow the attributes.
+-- in --
+x: a | // c1
+	b @foo(bar) // c2
+y: a. // c1
+	b @foo(bar) // c2
+-- out/relpos --
+x: a | // c1
+	b // c2 @foo(bar)
+y: a. // c1
+	b // c2 @foo(bar)
+-- out/norelpos --
+x: a | // c1
+	b // c2 @foo(bar)
+y: a. // c1
+	b // c2 @foo(bar)

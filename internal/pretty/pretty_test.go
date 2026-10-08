@@ -682,6 +682,52 @@ programmatic: {
 }`[1:],
 		},
 		{
+			// A right operand with its parent's operator only parses from
+			// parenthesized source, so its parentheses can be dropped
+			// only where that keeps the meaning: for & and for a | with
+			// no default marker among its arms.
+			name: "right_nested_binary_parens",
+			node: func() *ast.File {
+				bin := func(x ast.Expr, op token.Token, y ast.Expr) *ast.BinaryExpr {
+					return &ast.BinaryExpr{X: x, Op: op, Y: y}
+				}
+				num := func(s string) ast.Expr { return ast.NewLit(token.INT, s) }
+				mark := func(x ast.Expr) ast.Expr { return &ast.UnaryExpr{Op: token.MUL, X: x} }
+				commented := bin(ast.NewIdent("b"), token.SUB, ast.NewIdent("c"))
+				ast.AddComment(commented, &ast.CommentGroup{
+					Line:     true,
+					Position: 2,
+					List:     []*ast.Comment{{Text: "// c"}},
+				})
+				field := func(name string, val ast.Expr) *ast.Field {
+					return &ast.Field{
+						Label: &ast.Ident{NamePos: token.Newline.Pos(), Name: name},
+						Value: val,
+					}
+				}
+				return &ast.File{Decls: []ast.Decl{
+					field("a", bin(mark(num("1")), token.OR, bin(mark(num("2")), token.OR, num("3")))),
+					field("b", bin(num("1"), token.OR, bin(mark(num("2")), token.OR, num("3")))),
+					field("c", bin(num("1"), token.OR, bin(num("2"), token.OR, num("3")))),
+					field("d", bin(ast.NewIdent("a"), token.AND, bin(ast.NewIdent("b"), token.AND, ast.NewIdent("c")))),
+					field("e", bin(ast.NewIdent("a"), token.SUB, bin(ast.NewIdent("b"), token.SUB, ast.NewIdent("c")))),
+					field("f", bin(ast.NewIdent("a"), token.SUB, commented)),
+				}}
+			}(),
+			cfg: &pretty.Config{Width: 80, Indent: "\t"},
+			// The parentheses are lost in a, b, and f, changing the
+			// defaults of a and b and the result of f.
+			want: `
+a: *1 | *2 | 3
+b: 1 | *2 | 3
+c: 1 | 2 | 3
+d: a & b & c
+e: a - (b - c)
+f: a -
+	b - // c
+	c`[1:],
+		},
+		{
 			// A trailing comment on a decl, in an [infiniteWidth] wrap,
 			// must not be followed on the same line by the next decl.
 			//

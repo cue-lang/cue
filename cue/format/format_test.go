@@ -418,6 +418,53 @@ func TestNodes(t *testing.T) {
 	// FOO
 	info: {version: "foo"}
 }`,
+	}, {
+		// A line comment runs to the end of the line, so an operator
+		// following an operand which ends with one must go before it.
+		name: "line comment ending a left operand",
+		in: func() ast.Node {
+			a := ast.NewIdent("a")
+			ast.AddComment(a, internal.NewComment(false, "c"))
+			return &ast.Field{
+				Label: ast.NewIdent("x"),
+				Value: ast.NewBinExpr(token.SUB, a,
+					ast.NewBinExpr(token.SUB, ast.NewIdent("b"), ast.NewIdent("c"))),
+			}
+		}(),
+		// The comment swallows the operator and the right operand.
+		out: `x: a // c - (b - c)`,
+	}, {
+		// As above, for a disjunct, such as the commented default
+		// error which cue def exports for `*_|_ | int | string`.
+		name: "line comment ending a disjunct",
+		in: func() ast.Node {
+			bottom := &ast.BottomLit{}
+			ast.AddComment(bottom, internal.NewComment(false, "c"))
+			return &ast.Field{
+				Label: ast.NewIdent("x"),
+				Value: ast.NewBinExpr(token.OR,
+					&ast.UnaryExpr{Op: token.MUL, X: bottom},
+					ast.NewIdent("int"), ast.NewIdent("string")),
+			}
+		}(),
+		// The comment swallows the operator.
+		out: "x: *_|_ // c |\n\tint |\n\tstring",
+	}, {
+		// As above, for a conjunct ending with a nested binary
+		// expression.
+		name: "line comment ending a conjunct",
+		in: func() ast.Node {
+			b := ast.NewIdent("b")
+			ast.AddComment(b, internal.NewComment(false, "c"))
+			return &ast.Field{
+				Label: ast.NewIdent("x"),
+				Value: ast.NewBinExpr(token.AND,
+					ast.NewBinExpr(token.ADD, ast.NewIdent("a"), b),
+					ast.NewIdent("d")),
+			}
+		}(),
+		// The comment swallows the operator.
+		out: "x: a + b // c &\n\td",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

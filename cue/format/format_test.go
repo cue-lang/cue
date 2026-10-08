@@ -386,10 +386,9 @@ func TestCommentPlacement(t *testing.T) {
 	}, {
 		// The parser attaches a comment after the "(" of a parenthesized
 		// label to the label.
-		// The comment is dropped.
 		name: "paren label line",
 		in:   "a: {\n\t( // c\n\tk): 1\n}\n",
-		want: "a: {\n\t(\n\t\tk): 1\n}\n",
+		want: "a: {\n\t( // c\n\t\tk): 1\n}\n",
 	}, {
 		name: "comprehension comment after clause in inline list",
 		in:   "a: [for x in y // c\n\tif x > 1 {x}]\n",
@@ -637,8 +636,6 @@ func TestNodes(t *testing.T) {
 	}, {
 		// The comments after the "(" of a parenthesized label stay
 		// there, each on its own line after the first.
-		//
-		// They are dropped.
 		name: "parenthesized label with two comments",
 		in: func() ast.Node {
 			p := &ast.ParenExpr{X: ast.NewIdent("k")}
@@ -646,24 +643,20 @@ func TestNodes(t *testing.T) {
 			ast.AddComment(p, &ast.CommentGroup{Position: 1, List: []*ast.Comment{{Text: "// c2"}}})
 			return &ast.Field{Label: p, Value: ast.NewIdent("v")}
 		}(),
-		out: "(k): v",
+		out: "( // c1\n\t// c2\n\tk): v",
 	}, {
 		// A comment ending the expression of a parenthesized label goes
 		// after its "(", as neither the ")" nor the ":" may start a line.
-		//
-		// The comment swallows the ":" and the value.
 		name: "parenthesized label ending in a comment",
 		in: func() ast.Node {
 			k := ast.NewIdent("k")
 			ast.AddComment(k, internal.NewComment(false, "c"))
 			return &ast.Field{Label: &ast.ParenExpr{X: k}, Value: ast.NewIdent("v")}
 		}(),
-		out: "(k) // c: v",
+		out: "( // c\n\tk): v",
 	}, {
 		// The other comments of a parenthesized label, which only a
 		// programmatic AST can carry, go after its "(" as well.
-		//
-		// They are dropped.
 		name: "parenthesized label with trailing comments",
 		in: func() ast.Node {
 			p := &ast.ParenExpr{X: ast.NewIdent("k")}
@@ -671,7 +664,7 @@ func TestNodes(t *testing.T) {
 			ast.AddComment(p, internal.NewComment(false, "c2"))
 			return &ast.Field{Label: p, Value: ast.NewIdent("v")}
 		}(),
-		out: "(k): v",
+		out: "( // c1\n\t// c2\n\tk): v",
 	}, {
 		// A chain which breaks across lines indents the arms after the
 		// first, including when only an arm carries relative

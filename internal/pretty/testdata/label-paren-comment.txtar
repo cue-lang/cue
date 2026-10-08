@@ -1,0 +1,27 @@
+# A comment after the "(" of a parenthesized label stays there, with the
+# label's expression on the next line. The parser attaches the comment to
+# the label rather than to the field.
+-- in --
+a: {
+	( // c
+	k): 1
+	( // c1
+	// c2
+	k)?: 2
+}
+-- out/relpos --
+a: {
+	( // c
+		k): 1
+	( // c1
+		// c2
+		k)?: 2
+}
+-- out/norelpos --
+a: {
+	( // c
+		k): 1
+	( // c1
+		// c2
+		k)?: 2
+}

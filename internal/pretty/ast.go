@@ -1138,7 +1138,17 @@ func (c *converter) label(l ast.Label) doc {
 		}
 		return c.listLit(x)
 	case *ast.ParenExpr:
-		return c.parenExpr(x)
+		// The parser attaches a comment after the "(" to the label, and
+		// it stays there. The label's other comments and those ending
+		// the inner expression follow it, as neither the ")" nor the
+		// ":" may start a line.
+		slots := classifyComments(x)
+		cgs := slices.Concat(slots.prefix, c.liftTailComments(x.X), slots.suffix, slots.trailing)
+		if len(cgs) == 0 {
+			return c.parenExpr(x)
+		}
+		inner := c.wrapInteriorComments(c.expr(x.X), cgs[1:], nil)
+		return cats(lParenLit, spaceLit, c.commentGroup(cgs[0]), nest(cat(lineBreakHard, inner)), rParenLit)
 	case *ast.Alias:
 		return c.aliasExpr(x.Ident.Name, x.Expr)
 	default:

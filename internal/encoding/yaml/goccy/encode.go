@@ -332,8 +332,7 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 			}
 		}
 	}
-	if info.tag != "" {
-		tag := escapeTag(info.tag)
+	if tag := info.tag; tag != "" {
 		// A pre-rendered scalar may already be a tag node: a CUE bytes
 		// value renders as `!!binary <base64>`, which goccy grafts as a
 		// tag node. Replace that tag rather than nesting a second one,
@@ -440,18 +439,75 @@ func writeCommentLines(sb *strings.Builder, lines []commentLine) {
 	}
 }
 
-// escapeTag percent-escapes the characters of a YAML tag that are not
-// valid tag characters, such as "<" and ">" in verbatim tags.
-func escapeTag(tag string) string {
+// yamlTag returns the YAML form of a @yaml tag: either local, starting
+// with "!", or global, a URI. A URI is written verbatim as "!<...>", or
+// with "!!" for the core tags. Characters a tag cannot carry are
+// percent-escaped.
+func yamlTag(tag string) (string, bool) {
+	uri := tag
+	if body, ok := strings.CutPrefix(tag, "!<"); ok {
+		if uri, ok = strings.CutSuffix(body, ">"); !ok {
+			return "", false
+		}
+	} else if suffix, ok := strings.CutPrefix(tag, "!!"); ok {
+		return "!!" + escapeTag(suffix, tagChars), suffix != ""
+	} else if suffix, ok := strings.CutPrefix(tag, "!"); ok {
+		return "!" + escapeTag(suffix, tagChars), true
+	}
+	if !isTagURI(uri) {
+		return "", false
+	}
+	if suffix, ok := strings.CutPrefix(uri, coreTagPrefix); ok && suffix != "" {
+		return "!!" + escapeTag(suffix, tagChars), true
+	}
+	return "!<" + escapeTag(uri, uriChars) + ">", true
+}
+
+// coreTagPrefix is the prefix of YAML's core tags, abbreviated by "!!".
+const coreTagPrefix = "tag:yaml.org,2002:"
+
+// isTagURI reports whether s can be the body of a verbatim tag: a named
+// local tag, or a URI with a scheme.
+func isTagURI(s string) bool {
+	if strings.HasPrefix(s, "!") {
+		return len(s) > 1
+	}
+	scheme, _, ok := strings.Cut(s, ":")
+	if !ok || scheme == "" || !isASCIILetter(scheme[0]) {
+		return false
+	}
+	for i := 1; i < len(scheme); i++ {
+		if c := scheme[i]; !isASCIILetter(c) && !isASCIIDigit(c) && strings.IndexByte("+-.", c) < 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func isASCIILetter(c byte) bool { return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' }
+func isASCIIDigit(c byte) bool  { return c >= '0' && c <= '9' }
+func isHexDigit(c byte) bool    { return isASCIIDigit(c) || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' }
+
+const (
+	// uriChars are the punctuation characters of YAML's ns-uri-char,
+	// which a verbatim tag may carry unescaped.
+	uriChars = "#;/?:@&=+$,_.!~*'()[]-"
+	// tagChars are those of ns-tag-char, which a tag shorthand may carry
+	// unescaped; it excludes "!" and the flow indicators.
+	tagChars = "#;/?:@&=+$_.~*'()-"
+)
+
+// escapeTag percent-escapes the bytes of s that are not ASCII letters,
+// digits, one of the allowed punctuation characters, or part of an
+// existing percent escape.
+func escapeTag(s, allowed string) string {
 	var sb strings.Builder
-	for i := 0; i < len(tag); i++ {
-		c := tag[i]
-		switch {
-		case c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z', c >= '0' && c <= '9':
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if isASCIILetter(c) || isASCIIDigit(c) || strings.IndexByte(allowed, c) >= 0 ||
+			c == '%' && i+2 < len(s) && isHexDigit(s[i+1]) && isHexDigit(s[i+2]) {
 			sb.WriteByte(c)
-		case strings.IndexByte("!;/?:@&=+$,_.~*'()-", c) >= 0:
-			sb.WriteByte(c)
-		default:
+		} else {
 			fmt.Fprintf(&sb, "%%%02X", c)
 		}
 	}
@@ -859,12 +915,14 @@ func encodeExprs(exprs []ast.Expr) ([]any, *encInfo, error) {
 	return vs, info, nil
 }
 
-// extractYAMLTag looks for @yaml(,tag="...") attribute and returns the tag value.
+// extractYAMLTag looks for @yaml(,tag="...") attribute and returns the tag
+// rendered as YAML; see [yamlTag].
 // Returns an empty string if no @yaml attribute or no tag argument is found.
 // Returns an error if the attribute is malformed, or if the attributes
 // disagree on the tag.
 func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 	tag := ""
+	var pos token.Pos
 	for _, attr := range attrs {
 		if attr.Name() != "yaml" {
 			continue
@@ -883,9 +941,16 @@ func extractYAMLTag(attrs []*ast.Attribute) (string, error) {
 		if tag != "" && val != tag {
 			return "", errors.Newf(attr.Pos(), "yaml: conflicting tags %q and %q", tag, val)
 		}
-		tag = val
+		tag, pos = val, attr.Pos()
 	}
-	return tag, nil
+	if tag == "" {
+		return "", nil
+	}
+	rendered, ok := yamlTag(tag)
+	if !ok {
+		return "", errors.Newf(pos, "yaml: invalid tag %q: must be a local tag starting with \"!\", or a URI", tag)
+	}
+	return rendered, nil
 }
 
 // encodeDecls converts a sequence of declarations to a value. If it encounters

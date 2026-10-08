@@ -389,22 +389,20 @@ nested:
   field: !Nested value
 		`,
 	}, {
-		// TODO: the verbatim tag is escaped into a local tag.
 		name: "yaml_tag_verbatim",
 		in: `
 		custom: "value" @yaml(,tag="!<tag:example.com,2000:app/foo>")
 		`,
 		out: `
-custom: !%3Ctag:example.com,2000:app/foo%3E value
+custom: !<tag:example.com,2000:app/foo> value
 		`,
 	}, {
-		// TODO: the verbatim tag is escaped into a local tag.
 		name: "yaml_tag_url",
 		in: `
 		item: "value" @yaml(,tag="!<https://example.com/schema/v1>")
 		`,
 		out: `
-item: !%3Chttps://example.com/schema/v1%3E value
+item: !<https://example.com/schema/v1> value
 		`,
 	}, {
 		// An untagged embedding keeps the tag of its value.
@@ -498,29 +496,23 @@ a: 1
 		out: `yaml: conflicting tags "!A" and "!B"`,
 	}, {
 		// A tag is either local, starting with "!", or global, a URI.
-		// TODO: "Env" is neither, yet it is emitted as part of the value.
 		name: "yaml_tag_without_bang",
 		in: `
 		a: "v" @yaml(,tag="Env")
 		`,
-		out: `
-a: Env v
-		`,
+		out: `yaml: invalid tag "Env": must be a local tag starting with "!", or a URI`,
 	}, {
 		// A URI is written as a verbatim tag.
-		// TODO: it is emitted as part of the value.
 		name: "yaml_tag_uri",
 		in: `
 		b: "v" @yaml(,tag="tag:example.com,2000:app/B")
 		`,
 		out: `
-b: tag:example.com,2000:app/B v
+b: !<tag:example.com,2000:app/B> v
 		`,
 	}, {
 		// Characters a tag cannot carry are percent-escaped: "!" would
 		// end a tag handle and "," a tag in a flow collection.
-		// TODO: "!" and "," are kept, a verbatim tag is turned into a
-		// local one, and an existing escape is escaped again.
 		name: "yaml_tag_escape",
 		in: `
 		a: "x" @yaml(,tag="!a!b,c")
@@ -529,34 +521,29 @@ b: tag:example.com,2000:app/B v
 		d: "w" @yaml(,tag="!a%21b")
 		`,
 		out: `
-a: !a!b,c x
+a: !a%21b%2Cc x
 b: !!my%20type ["y"]
-c: !%3C!a%20b%3E z
-d: !a%2521b w
+c: !<!a%20b> z
+d: !a%21b w
 		`,
 	}, {
 		// A tag shorthand needs a suffix.
-		// TODO: "!!" is emitted, which decoders such as yaml.v3 reject.
 		name: "yaml_tag_empty_suffix",
 		in: `
 		a: "v" @yaml(,tag="!!")
 		`,
-		out: `
-a: !! v
-		`,
+		out: `yaml: invalid tag "!!": must be a local tag starting with "!", or a URI`,
 	}, {
 		// The core tags are abbreviated with "!!", as given by YAML
 		// directly, so that decoders which support them recognize them.
-		// TODO: they are emitted as part of the value, or escaped into
-		// a local tag.
 		name: "yaml_tag_core_uri",
 		in: `
 		a: "v" @yaml(,tag="tag:yaml.org,2002:str")
 		b: "w" @yaml(,tag="!<tag:yaml.org,2002:str>")
 		`,
 		out: `
-a: tag:yaml.org,2002:str v
-b: !%3Ctag:yaml.org,2002:str%3E w
+a: !!str v
+b: !!str w
 		`,
 	}, {
 		// TODO: comments on a tagged value, and on a @yaml declaration

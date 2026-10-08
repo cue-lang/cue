@@ -1259,7 +1259,9 @@ type bracketedLayout struct {
 	// forceOpenBreak opens the body broken whatever the first element's
 	// RelPos says: the first row starts with a comment the element does
 	// not own, as a parameter's doc comment hoisted from its constraint
-	// or default does (see [funcParamComments]).
+	// or default does (see [funcParamComments]), or the closer of a
+	// synthesized struct must break after a comment (see
+	// [converter.structLit]).
 	forceOpenBreak bool
 
 	// allowsTrailingComma reports whether the last element may carry
@@ -1358,22 +1360,35 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 
 	inner := c.wrapInteriorComments(c.declSlice(elems), slots.prefix, slots.suffix)
 
+	// A comment ending the last element would swallow the closer. In a
+	// parsed struct the closer follows it on a new line, but not in a
+	// synthesized one, nor when the comment moved from inside the
+	// element. A closer without a position of its own also opens the
+	// body broken, as a synthesized struct has no layout to keep.
+	closerRel := x.Rbrace.RelPos()
+	forceOpenBreak := false
+	if lastElem != nil && closerRel < token.Newline && c.nodeFlags[lastElem]&endsWithLineComment != 0 {
+		forceOpenBreak = closerRel == token.NoRelPos
+		closerRel = token.Newline
+	}
+
 	layout := bracketedLayout{
-		node:          x,
-		open:          structOpener(x),
-		close:         rBraceLit,
-		openerRel:     x.Lbrace.RelPos(),
-		closerRel:     x.Rbrace.RelPos(),
-		firstElem:     firstElem,
-		lastElem:      lastElem,
-		numElems:      len(elems),
-		hasInterior:   hasInterior,
-		anyDoc:        anyHasDocComment(elems),
-		anyPost:       anyHasPostComment(elems),
-		sameLineOpen:  hasSameLineOpener(c, elems, elems),
-		noElemNewline: noElemHasNewline(elems),
-		lineHeader:    hasLineLeadingComment(slots, firstElem),
-		inner:         inner,
+		node:           x,
+		open:           structOpener(x),
+		close:          rBraceLit,
+		openerRel:      x.Lbrace.RelPos(),
+		closerRel:      closerRel,
+		firstElem:      firstElem,
+		lastElem:       lastElem,
+		numElems:       len(elems),
+		hasInterior:    hasInterior,
+		anyDoc:         anyHasDocComment(elems),
+		anyPost:        anyHasPostComment(elems),
+		sameLineOpen:   hasSameLineOpener(c, elems, elems),
+		noElemNewline:  noElemHasNewline(elems),
+		lineHeader:     hasLineLeadingComment(slots, firstElem),
+		forceOpenBreak: forceOpenBreak,
+		inner:          inner,
 	}
 	return c.applyBracketed(layout, c.computeBracketedPolicy(layout))
 }
@@ -1500,11 +1515,10 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	// `{field: {` (the label would sit between the braces). A Field
 	// first element only occurs in structs, so list/call/embed hugs
 	// are untouched. When it fires the body must keep the parent
-	// [docNest], so shareIndent is suppressed too.
-	forceOpen := false
-	if nodeType[*ast.Field](b.firstElem) && c.hasNewlineInSubtree(b.firstElem) {
-		forceOpen = true
-	}
+	// [docNest], so shareIndent is suppressed too. forceOpenBreak
+	// forces the same break.
+	forceOpen := b.forceOpenBreak ||
+		(nodeType[*ast.Field](b.firstElem) && c.hasNewlineInSubtree(b.firstElem))
 	// infiniteWidth reports whether this bracket renders under
 	// infiniteWidth - i.e. it has authored structure (a real Lbrace /
 	// Lbrack), the same signal maybeGroup keys off. It gates
@@ -1555,9 +1569,6 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	leadRel := b.openerRel
 	if b.firstElem != nil {
 		leadRel = LeadingRelPos(b.firstElem)
-	}
-	if b.forceOpenBreak && leadRel < token.Newline {
-		leadRel = token.Newline
 	}
 	openBreaks := b.lineHeader || b.hasInterior || leadRel >= token.Newline || forceOpen
 	forceClose := openBreaks || b.closerRel >= token.Newline
@@ -4808,7 +4819,18 @@ func anyHasPostComment[T ast.Node](nodes []T) bool {
 // hasPostComment reports whether n carries a post-element comment.
 // (See anyHasPostComment for the classification.)
 func hasPostComment(n ast.Node) bool {
+	// Most comments are doc or same-line comments, which do not qualify
+	// below, so we skip classifying the comments when they all are.
+	if !slices.ContainsFunc(ast.Comments(n), func(cg *ast.CommentGroup) bool {
+		return cg.Position != PosDoc && !isLineComment(cg)
+	}) {
+		return false
+	}
 	nManagesInteriorComments := nodeManagesInteriorComments(n)
+	var lifted []*ast.CommentGroup
+	if nManagesInteriorComments {
+		lifted = trailingPrefixComments(n)
+	}
 	for _, cg := range classifyComments(n).nonDoc() {
 		// Same-line comments are not post-element comments.
 		if isLineComment(cg) {
@@ -4816,9 +4838,12 @@ func hasPostComment(n ast.Node) bool {
 		}
 		// Bracketed nodes (StructLit/ListLit/BinaryExpr) handle their
 		// own PosPrefix/PosSuffix interior comments - those don't
-		// count as "post-element" because they're inside the body.
+		// count as "post-element" because they're inside the body -
+		// unless the comment trails the node; see
+		// [trailingPrefixComments].
 		if nManagesInteriorComments &&
-			(cg.Position == PosPrefix || cg.Position == PosSuffix) {
+			(cg.Position == PosPrefix || cg.Position == PosSuffix) &&
+			!slices.Contains(lifted, cg) {
 			continue
 		}
 		return true
@@ -5038,36 +5063,35 @@ func bracketClose(e ast.Expr) (close token.Pos, empty, bracketed bool) {
 //
 //   - No bracket (bracketed == false, e.g. a bare `a + b` operand):
 //     the comment cannot be interior, so it trails.
+//   - Without usable source offsets (a programmatic AST) we cannot
+//     tell the two forms apart. We prefer the trailing form
+//     `a & {}, // c` for a same-line comment, and keep an own-line one
+//     inside the brackets, where decoders and other producers place an
+//     interior comment.
 //   - Non-empty bracket: a genuine interior header attaches to the
 //     first element, not the bracket, so a comment on the bracket
 //     node itself trails.
 //   - Empty bracket: the trailing and interior forms collapse to the
 //     same node and RelPos (the parser has no inner element to anchor
-//     an interior comment to), so we compare source offsets. With no
-//     usable offsets (a programmatic AST that set cg.Line but no
-//     source positions) we cannot tell the two apart, and prefer the
-//     trailing form `a & {}, // c` over moving the comment inside the
-//     brackets.
+//     an interior comment to), so we compare source offsets.
 func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, empty, bracketed bool) bool {
-	if !bracketed || !empty {
+	if !bracketed {
 		return true
 	}
-	if len(cg.List) > 0 {
-		// This is the only place where we must look at the AbsPos.
-		if slash := cg.List[0].Slash; close.HasAbsPos() && slash.HasAbsPos() {
-			return slash.Offset() > close.Offset()
-		}
+	// This is the only place where we must look at the AbsPos.
+	if len(cg.List) == 0 || !close.HasAbsPos() || !cg.List[0].Slash.HasAbsPos() {
+		return cg.Line
 	}
-	return true
+	return !empty || cg.List[0].Slash.Offset() > close.Offset()
 }
 
-// trailingPrefixComments returns the same-line `//` comments the parser
-// hangs at PosPrefix on a call argument's outermost node, which
-// logically trail the whole argument rather than sitting interior to
-// it. In the call-argument context the parser attaches an argument's
-// trailing comment at PosPrefix on the argument node, uniformly across
-// node types (unlike the list-element context, where it uses trailing
-// positions that route correctly on their own).
+// trailingPrefixComments returns the `//` comments the parser hangs at
+// PosPrefix on a call argument's outermost node, on the same line or on
+// the following lines, which logically trail the whole argument rather
+// than sitting interior to it. In the call-argument context the parser
+// attaches an argument's trailing comment at PosPrefix on the argument
+// node, uniformly across node types (unlike the list-element context,
+// where it uses trailing positions that route correctly on their own).
 //
 // We lift such a comment to the argument's trailing-comment column;
 // the node's own renderer skips it so it is not also rendered inside
@@ -5082,16 +5106,18 @@ func trailingPrefixComments(n ast.Node) []*ast.CommentGroup {
 	switch n := n.(type) {
 	case *ast.BinaryExpr:
 		close, empty, bracketed = bracketClose(n.Y)
+	// A struct or list renders its brackets even when they have no
+	// position, as in a decoded AST.
 	case *ast.StructLit:
-		close, empty, bracketed = bracketClose(n)
+		close, empty, bracketed = n.Rbrace, len(n.Elts) == 0, true
 	case *ast.ListLit:
-		close, empty, bracketed = bracketClose(n)
+		close, empty, bracketed = n.Rbrack, len(n.Elts) == 0, true
 	default:
 		return nil
 	}
 	var out []*ast.CommentGroup
 	for _, cg := range ast.Comments(n) {
-		if cg.Position == PosPrefix && cg.Line && commentTrailsBracket(cg, close, empty, bracketed) {
+		if cg.Position == PosPrefix && commentTrailsBracket(cg, close, empty, bracketed) {
 			out = append(out, cg)
 		}
 	}

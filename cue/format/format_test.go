@@ -262,38 +262,31 @@ func TestCommentPlacement(t *testing.T) {
 		in:   head + "x: f(a: - // c\n\ty)\n",
 		want: head + "x: f(a: -y, // c\n)\n",
 	}, {
-		// The comment swallows the closer.
 		name: "struct operand",
 		in:   head + "x: {a & - // c\n\tb}\n",
-		want: head + "x: {a & -b // c}\n",
+		want: head + "x: {a & -b // c\n}\n",
 	}, {
 		// A comment on its own line after the last call argument stays
 		// there, rather than moving into the argument.
-		// The comment moves inside the argument.
 		name: "after struct argument",
 		in:   head + "x: f(\n\t{a: 1},\n\t// c\n)\n",
-		want: head + "x: f(\n\t{\n\t\t// c\n\t\ta: 1\n\t},\n)\n",
+		want: head + "x: f(\n\t{a: 1},\n\t// c\n)\n",
 	}, {
-		// The comment moves inside the argument.
 		name: "after list argument",
 		in:   head + "x: f(\n\t[1],\n\t// c\n)\n",
-		want: head + "x: f(\n\t[\n\t\t// c\n\t\t1\n\t],\n)\n",
+		want: head + "x: f(\n\t[1],\n\t// c\n)\n",
 	}, {
-		// The comment moves inside the argument.
 		name: "after empty struct argument",
 		in:   head + "x: f(\n\t{},\n\t// c\n)\n",
-		want: head + "x: f(\n\t{\n\t\t// c\n\t},\n)\n",
+		want: head + "x: f(\n\t{},\n\t// c\n)\n",
 	}, {
-		// The comment moves inside the argument, and formatting it
-		// again indents the operand further.
 		name: "after binary argument",
 		in:   head + "x: f(\n\ta & b,\n\t// c\n)\n",
-		want: head + "x: f(\n\ta & // c\n\tb,\n)\n",
+		want: head + "x: f(\n\ta & b,\n\t// c\n)\n",
 	}, {
-		// The comment moves inside the argument.
 		name: "after hugged struct argument",
 		in:   head + "x: f({a: 1}\n\t// c\n)\n",
-		want: head + "x: f({\n\t// c\n\ta: 1\n},\n)\n",
+		want: head + "x: f({a: 1},\n\t// c\n)\n",
 	}, {
 		// The parser attaches a doc comment before the inner label of a
 		// braceless chain to the label, which has no comment slot of its
@@ -562,16 +555,14 @@ func TestNodes(t *testing.T) {
 		}(),
 		out: "f: [\n\tfor x in y\n\t// c\n\t{\n\t\t\"a\": x\n\t}\n]",
 	}, {
-		// The comment swallows the closer.
 		name: "struct ending in a comment",
 		in: func() ast.Node {
 			v := ast.NewLit(token.INT, "1")
 			ast.AddComment(v, internal.NewComment(false, "c"))
 			return ast.NewStruct("a", v)
 		}(),
-		out: "{a: 1 // c}",
+		out: "{\n\ta: 1 // c\n}",
 	}, {
-		// The comment swallows the closer.
 		name: "disjunction of structs ending in a comment",
 		in: func() ast.Node {
 			v := &ast.BottomLit{}
@@ -581,7 +572,7 @@ func TestNodes(t *testing.T) {
 				ast.NewStruct(&ast.Field{Label: ast.NewIdent("b"), Value: ast.NewLit(token.INT, "1")}),
 			)
 		}(),
-		out: "{a?: _|_ // c} | {b: 1}",
+		out: "{\n\ta?: _|_ // c\n} | {b: 1}",
 	}, {
 		// As the YAML decoder builds a flow sequence with a comment.
 		name: "list ending in a comment",
@@ -591,6 +582,16 @@ func TestNodes(t *testing.T) {
 			return &ast.ListLit{Lbrack: token.Blank.Pos(), Rbrack: token.Blank.Pos(), Elts: []ast.Expr{v}}
 		}(),
 		out: "[\"a\", // c\n]",
+	}, {
+		// As decoders build a list with an interior comment, which
+		// stays inside the brackets.
+		name: "list with an interior comment",
+		in: func() ast.Node {
+			l := ast.NewList(ast.NewIdent("x"), ast.NewIdent("y"))
+			ast.AddComment(l, &ast.CommentGroup{Position: 1, List: []*ast.Comment{{Text: "// interior"}}})
+			return &ast.Field{Label: ast.NewIdent("f"), Value: l}
+		}(),
+		out: "f: [\n\t// interior\n\tx,\n\ty,\n]",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

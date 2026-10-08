@@ -21,11 +21,12 @@
 # to the closing bracket: `t & {}` (comment after `}`) lifts, while
 # `u & { ... }` (comment after `{`) stays interior.
 #
-# The RelPos-stripped (programmatic) rendering keeps each comment on its
-# own line / inside the brackets: stripping clears the same-line (Line)
-# signal, so the comment is treated as own-line content rather than
-# lifted. (A genuinely programmatic AST that sets Line without source
-# offsets instead falls back to the lifted `t & {}, // c` form.)
+# The RelPos-stripped (programmatic) rendering puts each comment on its
+# own line after its argument: stripping clears the same-line (Line)
+# signal, so the comment is lifted as own-line content. (A genuinely
+# programmatic AST without source offsets lifts a same-line comment on an
+# empty bracket to the `t & {}, // c` form, but keeps an own-line one
+# inside the brackets.)
 -- in --
 args: matchN(
 	a + b, // arithmetic
@@ -52,32 +53,20 @@ args: matchN(
 )
 -- out/norelpos --
 args: matchN(
-	a +
-		// arithmetic
-		b,
-	x ==
-		// comparison
-		y,
-	m |
-		n |
-		// multi-arm disjunction chain
-		o,
-	{
-		// struct arg
-		aa: 1
-	}, [
-		// list arg
-		1,
-		2,
-		3,
-	],
-	p & {
-		// conj, non-empty struct arm
-		q: 1
-	},
-	t & {
-		// conj, EMPTY arm: trailing (comment after })
-	},
+	a + b,
+	// arithmetic
+	x == y,
+	// comparison
+	m | n | o,
+	// multi-arm disjunction chain
+	{aa: 1},
+	// struct arg
+	[1, 2, 3],
+	// list arg
+	p & {q: 1},
+	// conj, non-empty struct arm
+	t & {},
+	// conj, EMPTY arm: trailing (comment after })
 	u & {
 		// conj, EMPTY arm: interior (comment after {)
 	},

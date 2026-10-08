@@ -567,6 +567,34 @@ func TestNodes(t *testing.T) {
 		}(),
 		out: "x: a + b & // c\n\td",
 	}, {
+		// As the JSON decoder builds a list without RelPos, which
+		// breaks as its struct element does.
+		// The trailing comma is missing, so formatting this again adds it.
+		name: "broken list without positions",
+		in: ast.NewList(
+			ast.NewStruct(
+				&ast.Field{Label: ast.NewIdent("a"), Value: ast.NewLit(token.INT, "1")},
+				&ast.Field{Label: ast.NewIdent("b"), Value: ast.NewLit(token.INT, "2")},
+			),
+			ast.NewLit(token.INT, "3"),
+		),
+		out: "[\n\t{\n\t\ta: 1\n\t\tb: 2\n\t},\n\t3\n]",
+	}, {
+		// A chain which breaks across lines indents the arms after the
+		// first, including when only an arm carries relative
+		// positions, as the braces of [ast.NewStruct] do.
+		name: "broken chain with a struct arm",
+		in: &ast.Field{
+			Label: ast.NewIdent("x"),
+			Value: ast.NewBinExpr(token.AND,
+				ast.NewIdent("#A"),
+				ast.NewStruct(ast.NewIdent("a"), ast.NewLit(token.INT, "1"),
+					ast.NewIdent("b"), ast.NewLit(token.INT, "2")),
+				ast.NewIdent("#B")),
+		},
+		// The arms after the first lose their indentation.
+		out: "x: #A &\n{\n\ta: 1\n\tb: 2\n} &\n#B",
+	}, {
 		// A comment between a clause and the body, without a position,
 		// sits on its own line.
 		name: "comprehension clause comment without position",

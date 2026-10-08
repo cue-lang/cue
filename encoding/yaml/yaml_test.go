@@ -281,6 +281,22 @@ list:
 	]
 }`,
 		},
+	}, {
+		// TODO: the valid input below is rejected;
+		// see https://github.com/goccy/go-yaml/issues/950.
+		name:    "quoted explicit key with a block scalar value",
+		yaml:    "? \"k\"\n: |\n  v\n",
+		wantErr: true,
+	}, {
+		// TODO: the two valid inputs below are rejected;
+		// see https://github.com/goccy/go-yaml/issues/951.
+		name:    "multi-line plain scalar in a nested flow mapping",
+		yaml:    "k: [{a: x, b: y-\n    z}]\n",
+		wantErr: true,
+	}, {
+		name:    "multi-line plain scalar with a blank line in a nested flow mapping",
+		yaml:    "k: {a: x\n\n  y}\n",
+		wantErr: true,
 	}}
 
 	for _, tc := range testCases {

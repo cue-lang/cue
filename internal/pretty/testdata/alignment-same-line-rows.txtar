@@ -1,0 +1,24 @@
+# Columns only align across lines: fields sharing a line are not padded,
+# even when the struct or list around them breaks.
+# The fields sharing a line are padded as if they were aligned rows.
+-- in --
+x: [
+	{at: "t", message: "m", paths: [
+		"a",
+	]},
+]
+y: {
+	name: "tsdb", mountPath: "/tsdb"
+}
+-- out/relpos --
+x: [
+	{at:      "t", message: "m", paths: [
+		"a",
+	]},
+]
+y: {
+	name:      "tsdb", mountPath: "/tsdb"
+}
+-- out/norelpos --
+x: [{at: "t", message: "m", paths: ["a"]}]
+y: {name: "tsdb", mountPath: "/tsdb"}

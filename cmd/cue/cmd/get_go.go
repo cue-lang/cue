@@ -116,6 +116,9 @@ Go structs are converted to cue structs adhering to the following conventions:
 			Field: string
 		}
 
+	  where the postfix spread keeps the struct open to its own fields,
+	  as embedding a definition closes it since language version v0.18.0.
+	  Older language versions embed #Common as is.
 	  When some of the promoted fields are hidden by other fields
 	  with the same name, the remaining ones are added individually.
 	  An "embed" option also promotes the fields of a named field,
@@ -1748,7 +1751,7 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 				(enc.encodesItself || e.ownEncoding(named) == noOwnEncoding) &&
 				e.embedsAsIs(fields, index+".", enc):
 				expr := e.makeType(named, regular, required)
-				if e.explicitOpen {
+				if e.explicitOpen && isDefinitionRef(expr) {
 					expr = &cueast.PostfixExpr{X: expr, Op: cuetoken.ELLIPSIS}
 				}
 				embed := &cueast.EmbedDecl{Expr: expr}
@@ -1874,6 +1877,19 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 
 		count++
 	}
+}
+
+// isDefinitionRef reports whether x refers to a definition, such as #T or
+// pkg.#T, rather than translating a type to top or a scalar, where a postfix
+// spread would be meaningless.
+func isDefinitionRef(x cueast.Expr) bool {
+	switch x := x.(type) {
+	case *cueast.Ident:
+		return internal.IsDef(x.Name)
+	case *cueast.SelectorExpr:
+		return internal.IsDefinition(x.Sel)
+	}
+	return false
 }
 
 // canReference reports whether the definition for t can be referenced

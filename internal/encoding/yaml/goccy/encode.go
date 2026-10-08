@@ -603,16 +603,15 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 
 	case *ast.UnaryExpr:
 		b, ok := x.X.(*ast.BasicLit)
-		if ok && x.Op == token.SUB && (b.Kind == token.INT || b.Kind == token.FLOAT) {
+		if ok && x.Op == token.SUB && (b.Kind == token.INT || b.Kind == token.FLOAT) &&
+			!strings.HasPrefix(b.Value, "-") {
 			var s string
-			s, err = yamlNumber(b)
+			s, err = yamlNumber(b, true)
 			if err != nil {
 				return nil, nil, err
 			}
-			if !strings.HasPrefix(s, "-") {
-				v = rawScalar("-" + s)
-				break
-			}
+			v = rawScalar(s)
+			break
 		}
 		return nil, nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
 	default:
@@ -746,7 +745,7 @@ func quoteScalar(s string) string {
 func encodeScalar(b *ast.BasicLit) (any, error) {
 	switch b.Kind {
 	case token.INT, token.FLOAT:
-		s, err := yamlNumber(b)
+		s, err := yamlNumber(b, false)
 		if err != nil {
 			return nil, err
 		}
@@ -795,27 +794,31 @@ func encodeScalar(b *ast.BasicLit) (any, error) {
 	}
 }
 
-// yamlNumber returns the YAML form of a CUE number literal: the literal
-// itself when YAML would parse it back as a number, or its normalized
-// form otherwise (for example, 1K becomes 1000).
-func yamlNumber(b *ast.BasicLit) (string, error) {
-	s := b.Value
-	if yamlIsNumber(s) {
+// yamlNumber returns the YAML form of a CUE number literal, negated if
+// neg is set: the literal itself when YAML's core schema resolves it as
+// a number, or its normalized form otherwise (for example, 1K becomes
+// 1000 and 0b101 becomes 5).
+func yamlNumber(b *ast.BasicLit, neg bool) (string, error) {
+	sign := ""
+	if neg {
+		sign = "-"
+	}
+	if s := sign + b.Value; rxCoreNumber().MatchString(s) {
 		return s, nil
 	}
 	var ni literal.NumInfo
-	if err := literal.ParseNum(s, &ni); err != nil {
-		return "", errors.Newf(b.Pos(), "invalid number literal %q: %v", s, err)
+	if err := literal.ParseNum(b.Value, &ni); err != nil {
+		return "", errors.Newf(b.Pos(), "invalid number literal %q: %v", b.Value, err)
 	}
-	return ni.String(), nil
+	return sign + ni.String(), nil
 }
 
-// yamlIsNumber reports whether YAML parses s as a single number scalar.
-// [ytoken.ToNumber] is the classifier goccy's own scanner applies to
-// plain scalars.
-func yamlIsNumber(s string) bool {
-	return ytoken.ToNumber(s) != nil
-}
+// rxCoreNumber matches the integers and floats of YAML's core schema,
+// leaving out infinities and NaN, which CUE numbers cannot be.
+var rxCoreNumber = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`^(?:[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+|` +
+		`[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?)$`)
+})
 
 // singleToken lexes s and returns its token when s lexes as exactly
 // one token.

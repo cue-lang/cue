@@ -83,7 +83,7 @@ seq: [1, 2, 3]
 map: {a: 3}
 str: str
 int: 1000
-bin: 0b11
+bin: 3
 hex: 0x11
 dec: .3
 dat: !!binary gA==
@@ -606,8 +606,6 @@ a: {'?0': x, b: '?y', c: ['a?b']}
 	}, {
 		// Number literals are kept only in forms which YAML's core
 		// schema resolves as numbers.
-		// TODO: binary literals, underscores, and signs before a base
-		// prefix are kept, which the core schema resolves as strings.
 		name: "number_literals",
 		in: `
 		a: 0b101
@@ -620,11 +618,11 @@ a: {'?0': x, b: '?y', c: ['a?b']}
 		h: 1Ki
 		`,
 		out: `
-a: 0b101
-b: 1_000
-c: 0x1_F
-d: -0x1F
-e: -0o17
+a: 5
+b: 1000
+c: 31
+d: -31
+e: -15
 "f": 0o17
 g: 1.5e3
 h: 1024

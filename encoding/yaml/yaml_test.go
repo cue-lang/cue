@@ -386,30 +386,23 @@ func TestYAMLValues(t *testing.T) {
 		{`"a\rb"`, `"a\rb"`},
 		// Characters which need escaping are double quoted, even when
 		// the string would otherwise be single quoted.
-		// TODO: they are single quoted raw, which is invalid for a C1
-		// control character, and folds line breaks into spaces.
-		{`"? \u0080"`, "'? \u0080'"},
-		{`"? a\rb"`, "'? a b'"},
-		{`{"? \u0085x": 1}`, "'? \u0085x': 1"},
+		{`"? \u0080"`, `"? \u0080"`},
+		{`"? a\rb"`, `"? a\rb"`},
+		{`{"? \u0085x": 1}`, `"? \u0085x": 1`},
 		// Strings quoted for any other reason are single quoted as they
 		// are: a single quoted scalar cannot carry escapes.
-		// TODO: characters such as no-break spaces and joiners are
-		// escaped, so they decode as backslash sequences.
-		{`"Price: 10\u00a0€"`, `'Price: 10\u00a0€'`},
-		{`"# 👨\u200d👩\u200d👧"`, `'# 👨\u200d👩\u200d👧'`},
-		{`{" lead\u200b": "key: \u00ad"}`, `' lead\u200b': 'key: \u00ad'`},
+		{`"Price: 10\u00a0€"`, "'Price: 10\u00a0€'"},
+		{`"# 👨\u200d👩\u200d👧"`, "'# 👨\u200d👩\u200d👧'"},
+		{`{" lead\u200b": "key: \u00ad"}`, "' lead\u200b': 'key: \u00ad'"},
 		// A key containing a newline is double quoted, even when it
 		// would otherwise be single quoted.
-		// TODO: the single quoted key spans lines, and is emitted as a
-		// literal block holding the whole entry as a string.
-		{`{"? x\ny": 1}`, "|-\n  '? x\n  y': 1"},
+		{`{"? x\ny": 1}`, `"? x\ny": 1`},
 		// C1 control characters and the byte order mark cannot appear
 		// unescaped in YAML; a leading byte order mark would be dropped
 		// as an encoding mark.
-		// TODO: they are emitted raw.
-		{`"x\u0080y"`, "x\u0080y"},
-		{`"\ufeffa"`, "\ufeffa"},
-		{`{"\ufeffk": "x\ufeffy"}`, "\ufeffk: x\ufeffy"},
+		{`"x\u0080y"`, `"x\u0080y"`},
+		{`"\ufeffa"`, `"\ufeffa"`},
+		{`{"\ufeffk": "x\ufeffy"}`, `"\ufeffk": "x\ufeffy"`},
 
 		// Blank lines within a literal block stay truly empty, with no
 		// trailing whitespace padding.

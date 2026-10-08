@@ -45,11 +45,12 @@ import (
 //
 // The value tree is a thin structural carrier only. goccy's nodes are
 // backed by tokens whose origin text drives printing, so building them
-// directly would mean synthesizing every token and reimplementing
-// goccy's scalar quoting and escaping. Aspects the value tree cannot
-// express, recorded in a parallel tree of encInfo nodes, are applied
-// to the YAML syntax tree before printing: forced double quoting of
-// keys, flow styles, tags, and comments.
+// directly would mean synthesizing every token. Strings needing quotes
+// are pre-rendered in the value tree, as goccy's own quoting escapes
+// characters inside single quotes, which cannot carry escapes; see
+// [quoteScalar]. Aspects the value tree cannot express, recorded in a
+// parallel tree of encInfo nodes, are applied to the YAML syntax tree
+// before printing: quoting of keys, flow styles, tags, and comments.
 
 // Encode converts a CUE AST to YAML.
 //
@@ -74,10 +75,6 @@ func Encode(n ast.Node, opts EncodeOptions) ([]byte, error) {
 		// Use idiomatic indentation.
 		yaml.Indent(indentWidth),
 		yaml.IndentSequence(!opts.CompactSequences),
-		// Prefer single quotes where goccy quotes on its own accord;
-		// strings quoted deliberately by this package are pre-rendered
-		// with double quotes.
-		yaml.UseSingleQuote(true),
 		yaml.UseLiteralStyleIfMultiline(true))
 	node, err := enc.EncodeToNode(v)
 	if err != nil {
@@ -555,7 +552,12 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 		info = &encInfo{}
 	}
 	if ls, ok := v.(literalString); ok {
+		// Where no block can be rendered, such as in a flow collection
+		// or under a tag, the string is quoted like any other.
 		v = string(ls)
+		if q := quoteScalar(string(ls)); q != "" {
+			v = rawScalar(q)
+		}
 		info.literal = string(ls)
 	}
 	addDocs(n, info)
@@ -577,10 +579,9 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 }
 
 // quoteFlowUnsafe walks the value tree of a flow-style collection and
-// quotes plain strings that flow context cannot carry: goccy decides
-// quoting in block context, before applyInfo switches the collection
-// to flow style, so characters such as commas, brackets, braces, and
-// colons would otherwise corrupt the output. Strings reaching here
+// quotes plain strings that flow context cannot carry: [quoteScalar]
+// decides quoting for block context, so characters such as commas,
+// brackets, braces, and colons would otherwise corrupt the output. Strings reaching here
 // hold no newlines, tabs, or unprintable characters, all of which the
 // earlier quoting rules route to double quotes.
 func quoteFlowUnsafe(v any, info *encInfo) any {
@@ -628,11 +629,9 @@ func flowIfSingleLine(v any, info *encInfo, l, r token.Pos) any {
 	return v
 }
 
-// singleQuoted returns s as a YAML single-quoted scalar. It is only
-// used where goccy applies no quoting of its own: the `?` and `<<`
-// forms of [needsSingleQuoting], and strings that are unsafe only in
-// the flow style applied after goccy's block-context quoting; see
-// [quoteFlowUnsafe].
+// singleQuoted returns s as a YAML single-quoted scalar, which keeps
+// every character as is. s must not contain characters that need
+// escaping, which [shouldQuote] routes to double quotes.
 func singleQuoted(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }
@@ -644,16 +643,27 @@ func needsSingleQuoting(s string) bool {
 	return s == "?" || strings.HasPrefix(s, "? ") || s == "<<"
 }
 
-// quoteScalar returns the pre-quoted rendering of a single-line string
-// scalar that cannot be left plain, or "" when no quoting is needed:
-// single quotes for the forms of [needsSingleQuoting], double quotes
-// for those of [shouldQuote].
+// quoteScalar returns the pre-quoted rendering of a string scalar that
+// cannot be left plain, or "" when no quoting is needed: double quotes
+// for a string containing newlines, which only a block scalar could
+// carry otherwise, or characters which need escaping, single quotes for
+// the forms of [needsSingleQuoting], double quotes for those of
+// [shouldQuote], and single quotes for any other string goccy would
+// quote.
+//
+// goccy's own quoting must never apply: it escapes characters such as
+// no-break spaces with backslashes even inside single quotes, where
+// escapes are not interpreted.
 func quoteScalar(s string) string {
 	switch {
+	case strings.Contains(s, "\n") || yamlUnprintable(s):
+		return strconv.Quote(s)
 	case needsSingleQuoting(s):
 		return singleQuoted(s)
 	case shouldQuote(s):
 		return strconv.Quote(s)
+	case ytoken.IsNeedQuoted(s):
+		return singleQuoted(s)
 	}
 	return ""
 }
@@ -773,16 +783,17 @@ func shouldQuote(str string) bool {
 }
 
 // yamlUnprintable reports whether the string contains characters that
-// YAML can only represent inside a double quoted scalar: control
-// characters other than tab and newline, line breaks other than '\n'
-// (parsers normalize '\r', and YAML 1.1 parsers treat NEL, LS, and PS
-// as line breaks too), noncharacters, or bytes that are not valid
-// UTF-8.
+// YAML can only represent inside a double quoted scalar: C0 and C1
+// control characters other than tab and newline, line breaks other
+// than '\n' (parsers normalize '\r', and YAML 1.1 parsers treat NEL,
+// LS, and PS as line breaks too), the byte order mark, noncharacters,
+// or bytes that are not valid UTF-8.
 func yamlUnprintable(s string) bool {
 	for i, r := range s {
 		switch {
 		case r == '\t' || r == '\n':
-		case r < 0x20 || r == 0x7F || r == 0x85 || r == 0x2028 || r == 0x2029 || r == 0xFFFE || r == 0xFFFF:
+		case r < 0x20 || 0x7F <= r && r <= 0x9F || r == 0x2028 || r == 0x2029 ||
+			r == 0xFEFF || r == 0xFFFE || r == 0xFFFF:
 			return true
 		case r == utf8.RuneError:
 			if _, size := utf8.DecodeRuneInString(s[i:]); size == 1 {
@@ -1014,12 +1025,10 @@ func encodeDecls(decls []ast.Decl, lbrace, rbrace token.Pos) (any, *encInfo, err
 				return nil, nil, err
 			}
 
+			// Unless quoted, goccy renders a key containing newlines as
+			// a literal block in key position.
 			if q := quoteScalar(name); q != "" {
 				valueInfo.quotedKey = q
-			} else if strings.ContainsRune(name, '\n') {
-				// A key containing newlines must be quoted, or goccy
-				// renders it as a literal block in key position.
-				valueInfo.quotedKey = strconv.Quote(name)
 			}
 
 			yamlTag, err := extractYAMLTag(x.Attrs)

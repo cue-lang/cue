@@ -585,14 +585,13 @@ l:
 	}, {
 		// A tagged single-line string written as a multi-line literal
 		// cannot be rendered as a block, and is quoted like any other.
-		// TODO: the no-break space is escaped, so it decodes as "\u00a0".
 		name: "literal_tagged_quoted",
 		in: `
 		a: """
 			x\u00a0#y
 			""" @yaml(,tag="!T")
 		`,
-		out: `a: !T 'x\u00a0#y'`,
+		out: "a: !T 'x\u00a0#y'",
 	}, {
 		name: "yaml_attribute_without_tag",
 		in: `

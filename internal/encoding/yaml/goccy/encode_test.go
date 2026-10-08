@@ -595,8 +595,6 @@ l:
 	}, {
 		// A literal block with keep chomping takes in the blank lines
 		// which follow it, so none separates it from a following comment.
-		// TODO: the blank line is emitted, adding a trailing newline to
-		// both values.
 		name: "keep_block_foot_comment",
 		in: `
 		a: {
@@ -623,11 +621,9 @@ a:
   b: |+
     x
 
-
   # c
 d: |+
   y
-
 
 # trailing
 e: 1

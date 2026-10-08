@@ -408,15 +408,12 @@ func TestYAMLValues(t *testing.T) {
 		// the block's chomping would drop, nor an indented first line
 		// after leading newlines, as the indentation of the first
 		// non-empty line sets the block's indentation.
-		// TODO: "\n" decodes as "", the indentation is lost or the
-		// output is invalid, and a "|+" block of only newlines followed
-		// by another entry fails to decode with this package.
-		{`"\n"`, "|"},
-		{`"\n\n"`, "|+"},
-		{`"\n  indented"`, "|-\n\n    indented"},
-		{`"\n  a\nb"`, "|-\n\n    a\n  b"},
-		{`"\n\tx"`, "|-\n\n  \tx"},
-		{`{a: "\n\n", b: 1}`, "a: |+\n\n\nb: 1"},
+		{`"\n"`, `"\n"`},
+		{`"\n\n"`, `"\n\n"`},
+		{`"\n  indented"`, `"\n  indented"`},
+		{`"\n  a\nb"`, `"\n  a\nb"`},
+		{`"\n\tx"`, `"\n\tx"`},
+		{`{a: "\n\n", b: 1}`, `a: "\n\n"` + "\nb: 1"},
 
 		// Blank lines within a literal block stay truly empty, with no
 		// trailing whitespace padding.

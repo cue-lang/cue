@@ -250,11 +250,19 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 		if info.flow || len(n.Values) == 0 {
 			n.IsFlowStyle = true
 		}
+		// A literal block with keep chomping takes in the blank lines
+		// which follow it, so none may separate it from a comment.
+		prevKeeps := false
 		for i, mv := range n.Values {
 			e := info.entry(i)
 			if e == nil {
 				continue
 			}
+			keeps := keepsTrailingLines(mv.Value)
+			if prevKeeps && len(e.head) > 0 {
+				e.head[0].gap = false
+			}
+			prevKeeps = keeps
 			if e.quotedKey != "" {
 				// Replace the key node wholesale: goccy may have
 				// rendered it as any scalar kind, such as a literal
@@ -273,7 +281,7 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 				}
 			}
 			if len(e.foot) > 0 {
-				mv.FootComment = commentGroup(e.foot, e.footBlank)
+				mv.FootComment = commentGroup(e.foot, e.footBlank && !keeps)
 			}
 			keyCol := 0
 			if tk := mv.Key.GetToken(); tk != nil && tk.Position != nil {
@@ -349,6 +357,15 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 		node = literalBlock(node, info.literal, col-1+indentWidth)
 	}
 	return node
+}
+
+// keepsTrailingLines reports whether n renders as a literal block with
+// keep chomping, whose value includes any blank lines following it.
+// goccy renders multi-line strings as literal blocks through string
+// nodes, so the rendered block header is checked.
+func keepsTrailingLines(n yast.Node) bool {
+	header, _, _ := strings.Cut(n.String(), "\n")
+	return strings.HasPrefix(header, "|") && strings.Contains(header, "+")
 }
 
 // seqTagNode is a tag node which is an element of a block sequence.
@@ -805,14 +822,14 @@ func yamlUnprintable(s string) bool {
 }
 
 // blockLiteralSafe reports whether a string survives a round-trip
-// through a YAML literal block scalar unchanged. No line may end
-// in a space: trailing whitespace is invisible padding in a block
-// scalar, and a final all-space line is dropped entirely. Characters
-// which require escaping need double quotes instead. A leading space
-// or tab would need an explicit indentation indicator, which goccy
-// does not emit.
+// through a YAML literal block scalar unchanged: it needs a non-empty
+// line, as empty lines are subject to chomping; no line may end in a
+// space, which would be invisible padding; its first non-empty line may
+// not start with a space or tab, as goccy emits no indentation
+// indicator; and it may not need escapes.
 func blockLiteralSafe(s string) bool {
-	if len(s) == 0 || s[0] == ' ' || s[0] == '\t' {
+	first := strings.TrimLeft(s, "\n")
+	if first == "" || first[0] == ' ' || first[0] == '\t' {
 		return false
 	}
 	if strings.Contains(s, " \n") || strings.HasSuffix(s, " ") {

@@ -565,7 +565,7 @@ func TestNodes(t *testing.T) {
 					ast.NewIdent("d")),
 			}
 		}(),
-		out: "x: a + b & // c\n\td",
+		out: "x: a+b & // c\n\td",
 	}, {
 		// As the JSON decoder builds a list without RelPos, which
 		// breaks as its struct element does.

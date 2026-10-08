@@ -3,9 +3,6 @@
 # nor in the arguments of a call with more than one. Parentheses undo
 # one level of compaction, and index receivers and list and struct
 # literals return to normal mode.
-#
-# The operands of | and & chains, and the arguments of calls, keep
-# normal mode, unlike the operands of a comparison.
 -- in --
 x:     a + b ==   c+d
 a: 6 & x-2
@@ -17,19 +14,19 @@ f: z | (x + 1) | [x + 1] | {a: x + 1}
 g: z + f(x + 1)[0]
 -- out/relpos --
 x: a+b == c+d
-a: 6 & x - 2
-b: x + 1 | y + 5
-c: f(i - n + 1, i + 1)
+a: 6 & x-2
+b: x+1 | y+5
+c: f(i-n+1, i+1)
 d: f(i - n + 1)
-e: z + f(x + 1)
+e: z + f(x+1)
 f: z | (x + 1) | [x + 1] | {a: x + 1}
 g: z + f(x + 1)[0]
 -- out/norelpos --
 x: a+b == c+d
-a: 6 & x - 2
-b: x + 1 | y + 5
-c: f(i - n + 1, i + 1)
+a: 6 & x-2
+b: x+1 | y+5
+c: f(i-n+1, i+1)
 d: f(i - n + 1)
-e: z + f(x + 1)
+e: z + f(x+1)
 f: z | (x + 1) | [x + 1] | {a: x + 1}
 g: z + f(x + 1)[0]

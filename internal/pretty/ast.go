@@ -160,6 +160,10 @@ const (
 	// [converter.liftTailComments], so that
 	// [converter.withCommentsSlots] leaves them out.
 	afterCommentsLifted
+	// compactOperators marks a binary or slice expression which renders
+	// its operators compactly, as it is nested in a compact context;
+	// see [operandDepth].
+	compactOperators
 )
 
 // converter translates a CUE AST into the Doc algebra.
@@ -171,17 +175,6 @@ type converter struct {
 	// [Config.Node] returns them to the caller. It is nil when no error
 	// occurred.
 	errs errors.Error
-
-	// subscript is the syntactic nesting depth inside index/slice
-	// subscripts. [converter.binaryExpr] reads it to compact operator
-	// spacing: a binary expression at the top of a value renders with
-	// normal spacing (`1 + 2`), but the same expression inside `[...]`
-	// renders compact (`1+2`). We bump it in indexExpr/sliceExpr around
-	// their contents and reset it to 0 at a struct/list (block)
-	// boundary, whose fields/elements start fresh at the top level. This
-	// is a layout property independent of RelPos, so it lives here
-	// rather than in the style pre-pass.
-	subscript int
 }
 
 // errf records a formatting error at pos.
@@ -244,6 +237,9 @@ func (c *converter) analyse(root ast.Node) {
 		hasRelPos                    bool
 		lastChildTrailingCommentLine bool
 		lastChildEndsLineComment     bool
+
+		node  ast.Node
+		depth int // see [operandDepth]
 	}
 	var stack stack[frame]
 
@@ -270,7 +266,18 @@ func (c *converter) analyse(root ast.Node) {
 				nodeFlags[x.Value] |= interiorPrefix
 			}
 
-			stack.push(frame{hasRelPos: hasRelPos})
+			f := frame{hasRelPos: hasRelPos, node: n, depth: 1}
+			if len(stack) > 0 {
+				parent := stack[len(stack)-1]
+				f.depth = operandDepth(parent.node, parent.depth, n)
+			}
+			switch n.(type) {
+			case *ast.BinaryExpr, *ast.SliceExpr:
+				if f.depth > 1 {
+					f.flags |= compactOperators
+				}
+			}
+			stack.push(f)
 			return true
 		},
 		func(n ast.Node) {
@@ -1304,14 +1311,6 @@ type bracketedPolicy struct {
 // inside the braces; doc and trailing comments on the StructLit itself
 // are wrapped around the result.
 func (c *converter) structLit(x *ast.StructLit) doc {
-	// A struct body is a block boundary: its fields start fresh at the
-	// top level, so the subscript depth resets (only relevant when
-	// this struct appears inside an index/slice subscript).
-	if c.subscript != 0 {
-		saved := c.subscript
-		c.subscript = 0
-		defer func() { c.subscript = saved }()
-	}
 	var firstElem, lastElem ast.Node
 	if len(x.Elts) > 0 {
 		firstElem = x.Elts[0]
@@ -1394,14 +1393,6 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 // listLit converts a ListLit. As with structLit, interior comments
 // attached directly to the ListLit are rendered inside the brackets.
 func (c *converter) listLit(x *ast.ListLit) doc {
-	// A list body is a block boundary: its elements start fresh at the
-	// top level, so the subscript depth resets (only relevant when
-	// this list appears inside an index/slice subscript).
-	if c.subscript != 0 {
-		saved := c.subscript
-		c.subscript = 0
-		defer func() { c.subscript = saved }()
-	}
 	var firstElem, lastElem ast.Node
 	if len(x.Elts) > 0 {
 		firstElem = x.Elts[0]
@@ -1981,37 +1972,32 @@ func (c *converter) postfixExpr(x *ast.PostfixExpr) doc {
 //   - any other BinaryExpr (precedence-sensitive +, -, *, ==, ...) goes
 //     to [converter.binaryExprPrec].
 func (c *converter) binaryExpr(x *ast.BinaryExpr) doc {
-	// The starting depth reflects how deeply the expression is nested
-	// inside index/slice subscripts: at the top of a value it is 1
-	// (normal spacing), inside `[...]` it is 2+ (compact spacing). The
-	// binary tree threads further +1 per operand level from here.
-	depth := 1 + c.subscript
 	arms, hasTrailing := c.binaryChainArms(x)
 	if hasTrailing && c.chainAligns(x, arms) {
 		return c.binaryChainTable(x, arms, nil)
 	}
 	if x.Op == token.OR || x.Op == token.AND {
 		if len(arms) > 1 && allBracketArms(arms[1:]) {
-			return c.binaryExprPrec(x, binaryCutoff(x, depth), depth)
+			return c.binaryExprPrec(x)
 		}
 		return c.chainGroupArms(x, arms)
 	}
-	return c.binaryExprPrec(x, binaryCutoff(x, depth), depth)
+	return c.binaryExprPrec(x)
 }
 
 // chainAligns reports whether a comment-bearing chain x should render as
 // a column-aligned [docTable] rather than via [converter.binaryExprPrec].
 // A | or & chain always does. For a precedence-sensitive operator we
-// require a top-level position (subscripts and interpolations stay
-// compact and inline) and that every arm's trailing comment is same-line
-// (Line): an own-line comment between operator and operand is not a
-// trailing comment of the arm and is left to binaryExprPrec, which gives
-// it its own line.
+// require a top-level position (compact contexts such as subscripts
+// and interpolations stay inline) and that every arm's trailing
+// comment is same-line (Line): an own-line comment between operator
+// and operand is not a trailing comment of the arm and is left to
+// binaryExprPrec, which gives it its own line.
 func (c *converter) chainAligns(x *ast.BinaryExpr, arms []chainArm) bool {
 	if x.Op == token.OR || x.Op == token.AND {
 		return true
 	}
-	if c.subscript != 0 {
+	if c.nodeFlags[x]&compactOperators != 0 {
 		return false
 	}
 	for _, arm := range arms {
@@ -2374,21 +2360,20 @@ func (c *converter) chainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrai
 // arithChainTableExpr renders a precedence-sensitive chain (+, -, *,
 // ==, ...) via [converter.chainTable] so the trailing comments
 // column-align.  Each arm is rendered through
-// [converter.binaryOperand] with the chain's precedence and depth,
-// matching [converter.binaryExprPrec]. This preserves spacing layout
+// [converter.binaryOperand] with the chain's precedence, matching
+// [converter.binaryExprPrec]. This preserves spacing layout
 // that signals precedence.
 func (c *converter) arithChainTableExpr(x *ast.BinaryExpr, arms []chainArm, fieldTrailing doc) doc {
-	depth := 1 + c.subscript
-	co := binaryCutoff(x, depth)
+	co := c.binaryCutoff(x)
 	prec := x.Op.Precedence()
 
 	rows := make([]chainTableRow, len(arms))
 	for i, arm := range arms {
 		var cell doc
 		if i == 0 {
-			cell = c.binaryOperand(arm.expr, prec, depth+binaryDiffPrec(arm.expr, prec))
+			cell = c.binaryOperand(arm.expr, prec)
 		} else {
-			cell = c.binaryOperand(arm.expr, prec+1, depth+1)
+			cell = c.binaryOperand(arm.expr, prec+1)
 		}
 		// Interior (Position==1) comments have no bracket to inject into on
 		// an arithmetic arm, so render them on their own line before it,
@@ -2512,14 +2497,15 @@ func (c *converter) injectInteriorComments(x ast.Expr, extra []*ast.CommentGroup
 // Spaces are always used at precedence 5 and below. At levels 6-7,
 // spaces are used when there's a mix of precedences (to distinguish
 // them visually).
-func (c *converter) binaryExprPrec(x *ast.BinaryExpr, co, depth int) doc {
+func (c *converter) binaryExprPrec(x *ast.BinaryExpr) doc {
 	prec := x.Op.Precedence()
+	co := c.binaryCutoff(x)
 
 	// Comments ending the left operand go after the operator, which
 	// they would otherwise swallow.
 	lifted := c.liftTailComments(x.X)
-	left := c.binaryOperand(x.X, prec, depth+binaryDiffPrec(x.X, prec))
-	right := c.binaryOperand(x.Y, prec+1, depth+1)
+	left := c.binaryOperand(x.X, prec)
+	right := c.binaryOperand(x.Y, prec+1)
 
 	op := x.Op.String()
 
@@ -2610,9 +2596,9 @@ func (c *converter) binaryExprPrec(x *ast.BinaryExpr, co, depth int) doc {
 // nested binary at *lower* precedence is wrapped in parentheses by
 // [wrapForPrecedence] so the rendered output re-parses to the same
 // tree shape.
-func (c *converter) binaryOperand(e ast.Expr, prec, depth int) doc {
+func (c *converter) binaryOperand(e ast.Expr, prec int) doc {
 	if bin, ok := e.(*ast.BinaryExpr); ok && bin.Op.Precedence() >= prec {
-		return c.binaryExprPrec(bin, binaryCutoff(bin, depth), depth)
+		return c.binaryExprPrec(bin)
 	}
 	return wrapForPrecedence(c.expr(e), e, prec)
 }
@@ -2920,12 +2906,9 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	}
 	// The receiver is a primary expression: `[i]` binds tighter than
 	// any binary operator, so a binary receiver needs parens (`(a &
-	// b)[i]`). It renders at the current depth; the subscript contents
-	// render one level deeper, compacting binary operators (`s[1+2]`).
+	// b)[i]`).
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
-	c.subscript++
 	index := c.expr(x.Index)
-	c.subscript--
 	return c.maybeGroup(x, cats(
 		recv,
 		lBracketLit,
@@ -2937,22 +2920,20 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 
 // sliceExpr converts a SliceExpr.
 func (c *converter) sliceExpr(x *ast.SliceExpr) doc {
-	// Blanks around ':' when this slice is at the top level (not
-	// nested in a subscript), both bounds are present, and either
+	// Blanks around ':' when this slice is in normal mode (see
+	// [operandDepth]), both bounds are present, and either
 	// bound is a binary expression (e.g. `s[1+2 : 2+4]`).
 	colon := colonLit
-	if c.subscript == 0 && x.Low != nil && x.High != nil &&
+	if c.nodeFlags[x]&compactOperators == 0 && x.Low != nil && x.High != nil &&
 		(nodeType[*ast.BinaryExpr](x.Low) || nodeType[*ast.BinaryExpr](x.High)) {
 		colon = cats(spaceLit, colonLit, spaceLit)
 	}
 	// The receiver is a primary expression: the slice `[lo:hi]` binds
 	// tighter than any binary operator, so a binary receiver needs
-	// parens. The bounds render one level deeper (compact operators).
+	// parens.
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
-	c.subscript++
 	low := c.exprAfter(nil, nil, x.Low)
 	high := c.exprAfter(nil, nil, x.High)
-	c.subscript--
 	return cats(recv, lBracketLit, low, colon, high, rBracketLit)
 }
 
@@ -3042,12 +3023,7 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 			if lit, ok := e.(*ast.BasicLit); ok && lit.Kind == token.STRING {
 				parts[i] = stringLit(lit.Value)
 			} else {
-				// An interpolation `\(...)` is a subscript-like context:
-				// its expression renders one level deeper, compacting
-				// binary operators (`"\(1+2)"`).
-				c.subscript++
 				parts[i] = c.expr(e)
-				c.subscript--
 			}
 		}
 		return cats(parts...)
@@ -3193,11 +3169,7 @@ func (c *converter) multiLineInterpolation(x *ast.Interpolation, multiLine bool)
 				emit(stringLit(line))
 			}
 		} else {
-			// Interpolation expressions render one level deeper (compact
-			// operators), as in the single-line case above.
-			c.subscript++
 			emit(c.expr(e))
-			c.subscript--
 		}
 
 		for _, cg := range after {
@@ -5326,22 +5298,17 @@ func wrapForPrecedence(doc doc, e ast.Expr, prec int) doc {
 // decisions. Only operators at precedences below the cutoff get
 // spaces.
 //
-// In normal mode (depth 1), spaces are always used unless there's a
-// mix of + and * (in which case only + gets spaces, making a*b + c*d
-// clear). In compact mode (depth > 1, inside a larger expression),
-// spaces are minimised.
-func binaryCutoff(e *ast.BinaryExpr, depth int) int {
-	has6, has7 := binaryWalk(e)
-	if has6 && has7 {
-		if depth == 1 {
-			return 7 // spaces around +/- but not */
-		}
-		return 6 // no spaces at all in compact mode
+// In normal mode, spaces are always used unless there's a mix of +
+// and * (in which case only + gets spaces, making a*b + c*d clear).
+// In compact mode ([compactOperators]), spaces are minimised.
+func (c *converter) binaryCutoff(e *ast.BinaryExpr) int {
+	if c.nodeFlags[e]&compactOperators != 0 {
+		return 6 // no spaces in compact mode
 	}
-	if depth == 1 {
-		return 8 // spaces around everything in normal mode
+	if has6, has7 := binaryWalk(e); has6 && has7 {
+		return 7 // spaces around +/- but not */
 	}
-	return 6 // no spaces in compact mode
+	return 8 // spaces around everything in normal mode
 }
 
 // binaryWalk scans a binary expression tree to determine whether
@@ -5369,12 +5336,75 @@ func binaryWalk(e *ast.BinaryExpr) (has6, has7 bool) {
 	return
 }
 
-// binaryDiffPrec returns 0 if expr is a BinaryExpr at the same
-// precedence as prec (used to avoid increasing depth for
-// same-precedence chains), and 1 otherwise.
-func binaryDiffPrec(expr ast.Expr, prec int) int {
-	if x, ok := expr.(*ast.BinaryExpr); ok && x.Op.Precedence() == prec {
-		return 0
+// operandDepth returns the depth at which child of parent renders,
+// given the depth of parent, following gofmt's rule for operator
+// spacing: binary and slice expressions at depth 1 render in normal
+// mode (`a + b`, `s[a+1 : b]`), and deeper ones in compact mode
+// (`a+b`, `s[a+1:b]`).
+//
+// As in the old printer, each operand of a binary expression is one
+// level deeper, except for a left operand with the same precedence, as
+// are the subscripts of an index or slice expression, the elements of
+// an interpolation, and the arguments of a call with more than one.
+// Parentheses, including those added around a binary operand by
+// [wrapForPrecedence], undo one level.
+// An index or slice receiver, and any child of a node not listed here,
+// such as a struct or list element, starts afresh at depth 1.
+func operandDepth(parent ast.Node, depth int, child ast.Node) int {
+	// paren returns the depth of an operand e of an operator with
+	// precedence prec, which renders in parentheses if needed.
+	paren := func(e ast.Node, prec, depth int) int {
+		if e, ok := e.(*ast.BinaryExpr); ok && e.Op.Precedence() < prec {
+			return max(depth-1, 1)
+		}
+		return depth
+	}
+	switch p := parent.(type) {
+	case *ast.BinaryExpr:
+		prec := p.Op.Precedence()
+		if child != p.X {
+			return paren(child, prec+1, depth+1)
+		}
+		if x, ok := child.(*ast.BinaryExpr); ok && x.Op.Precedence() == prec {
+			return depth
+		}
+		return paren(child, prec, depth+1)
+	case *ast.UnaryExpr:
+		return paren(child, token.UnaryPrec, depth)
+	case *ast.PostfixExpr, *ast.SelectorExpr:
+		return paren(child, token.HighestPrec, depth)
+	case *ast.ParenExpr:
+		if x, ok := child.(*ast.ParenExpr); ok && len(ast.Comments(x)) == 0 {
+			return depth // see [converter.parenExpr]
+		}
+		return max(depth-1, 1)
+	case *ast.IndexExpr:
+		if child == p.X {
+			return 1
+		}
+		return depth + 1
+	case *ast.SliceExpr:
+		if child == p.X {
+			return 1
+		}
+		return depth + 1
+	case *ast.Interpolation:
+		return depth + 1
+	case *ast.CallExpr:
+		if len(p.Args) > 1 {
+			depth++
+		}
+		if child == p.Fun {
+			return paren(child, token.HighestPrec, depth)
+		}
+		return depth
+	case *ast.Func:
+		if child == p.Ret || child == p.Body {
+			return 1
+		}
+		return depth
+	case *ast.FuncParam:
+		return depth
 	}
 	return 1
 }

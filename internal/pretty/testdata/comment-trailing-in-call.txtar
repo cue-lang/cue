@@ -41,7 +41,7 @@ args: matchN(
 )
 -- out/relpos --
 args: matchN(
-	a + b,      // arithmetic
+	a+b,        // arithmetic
 	x == y,     // comparison
 	m | n | o,  // multi-arm disjunction chain
 	{aa: 1},    // struct arg
@@ -53,7 +53,7 @@ args: matchN(
 )
 -- out/norelpos --
 args: matchN(
-	a + b,
+	a+b,
 	// arithmetic
 	x == y,
 	// comparison

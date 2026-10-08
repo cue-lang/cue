@@ -1,0 +1,92 @@
+# A doc comment before an operand which follows another token, such as
+# "=", "(", "[", or a unary operator, stays on a line of its own after
+# that token, with the operand indented below it.
+-- in --
+let X =
+// c
+1
+a: {
+	(
+	// c
+	k): 1
+	[
+	// c
+	string]: 1
+	[!
+	// c
+	x]: 1
+}
+b: !
+	// c
+	x
+c: x[
+	// c
+	1:2]
+d: x[1:
+	// c
+	2]
+e: [
+	for k, v in y
+	let x =
+	// c
+	k {x},
+]
+-- out/relpos --
+let X =
+	// c
+	1
+a: {
+	(
+		// c
+		k): 1
+	[
+		// c
+		string]: 1
+	[!
+		// c
+		x]: 1
+}
+b: !
+	// c
+	x
+c: x[
+	// c
+	1:2]
+d: x[1:
+	// c
+	2]
+e: [
+	for k, v in y
+	let x =
+		// c
+		k {x},
+]
+-- out/norelpos --
+let X =
+	// c
+	1
+a: {
+	(
+		// c
+		k): 1
+	[
+		// c
+		string]: 1
+	[!
+		// c
+		x]: 1
+}
+b: !
+	// c
+	x
+c: x[
+	// c
+	1:2]
+d: x[1:
+	// c
+	2]
+e: [
+	for k, v in y let x =
+		// c
+		k {x},
+]

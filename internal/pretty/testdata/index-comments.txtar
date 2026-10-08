@@ -1,0 +1,33 @@
+# Comments inside an index expression's brackets stay there, so that they
+# cannot swallow a postfix operator after the closing bracket. A comment
+# before the closing bracket is followed by a line break, which the parser
+# accepts as the auto-inserted comma after the index.
+-- in --
+a: b[ // after the open
+	c]
+d: b.c[e // before the close
+][1:2]
+f: b[c
+	// own line before the close
+].d(1)
+-- out/relpos --
+a: b[ // after the open
+	c]
+d: b.c[e // before the close
+][1:2]
+f: b[c
+	// own line before the close
+].d(1)
+-- out/norelpos --
+a: b[ // after the open
+	c]
+d: b.c[
+	e
+	// before the close
+][1:2]
+f: b[
+	c
+	// own line before the close
+].d(
+	1,
+)

@@ -303,7 +303,8 @@ func (c *converter) analyse(root ast.Node) {
 				parent.lastChildTrailingCommentLine = trailingCommentLine
 			}
 
-			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) || nodeEndsWithLineComment(n, slots)
+			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) ||
+				nodeEndsWithLineComment(n, slots) || liftsChildComment(n, nodeFlags)
 			if endsLineComment {
 				flags |= endsWithLineComment
 			}
@@ -783,6 +784,13 @@ const (
 	// [PosTrailingMin], and distinct from [posImportBeforeRparen],
 	// whose non-Line groups render inside the parentheses.
 	PosImportAfterRparen int8 = 5
+
+	// posIndexAfterLbrack and posIndexBeforeRbrack are where the parser
+	// files a comment group inside an index expression's brackets: after
+	// the opening one, and before the closing one, respectively.
+	// [converter.indexExpr] renders both in place.
+	posIndexAfterLbrack  int8 = 2
+	posIndexBeforeRbrack int8 = 4
 )
 
 type commentSlots struct {
@@ -1131,11 +1139,11 @@ func (c *converter) label(l ast.Label) doc {
 			if c.nodeFlags[elt]&endsWithLineComment != 0 {
 				closer = cat(lineBreakHard, rBracketLit)
 			}
-			return cats(listOpener(x), c.expr(elt), closer)
+			return cats(listOpener(x), c.exprAfter(nil, nil, elt), closer)
 		}
 		return c.listLit(x)
 	case *ast.ParenExpr:
-		return cats(lParenLit, c.expr(x.X), rParenLit)
+		return c.parenExpr(x)
 	case *ast.Alias:
 		return c.aliasExpr(x.Ident.Name, x.Expr)
 	default:
@@ -1897,14 +1905,31 @@ func (c *converter) ellipsis(x *ast.Ellipsis) doc {
 }
 
 // unaryExpr converts a UnaryExpr. The operand is obtained via
-// exprCore so that any comments on it are placed after the
-// operator+operand unit, not between them. The operand passes through
-// [wrapForPrecedence] with [token.UnaryPrec] so a lower-precedence
-// binary operand is parenthesised, preserving its grouping (`!a & b`
-// must not re-parse as `(!a) & b`).
+// exprCore so that its trailing comments are placed after the
+// operator+operand unit, not between them. Comments which sit between
+// the operator and the operand in the source, and the operand's doc
+// comments, stay between them, with the operand on the next line. The
+// operand passes through [wrapForPrecedence] with [token.UnaryPrec] so
+// a lower-precedence binary operand is parenthesised, preserving its
+// grouping (`!a & b` must not re-parse as `(!a) & b`).
 func (c *converter) unaryExpr(x *ast.UnaryExpr) doc {
 	op := x.Op.String()
 	xDoc := wrapForPrecedence(c.exprCore(x.X), x.X, token.UnaryPrec)
+	xSlots := classifyComments(x.X)
+
+	if inner := slices.Concat(unaryInteriorComments(x), xSlots.doc); len(inner) > 0 {
+		xSlots.doc = nil
+		parts := make([]doc, 0, 2*len(inner)+2)
+		for i, cg := range inner {
+			sep := doc(lineBreakHard)
+			if i == 0 && isLineComment(cg) {
+				sep = spaceLit
+			}
+			parts = append(parts, sep, c.commentGroup(cg))
+		}
+		parts = append(parts, lineBreakHard, xDoc)
+		return c.withCommentsSlots(x.X, cat(stringLit(op), nest(cats(parts...))), xSlots)
+	}
 
 	// A unary operator hugs its operand (`-10`, `!a`, `>=3`). CUE has
 	// no meaningful space there, so we neither emit nor preserve one,
@@ -1920,7 +1945,24 @@ func (c *converter) unaryExpr(x *ast.UnaryExpr) doc {
 		body = cats(stringLit(op), spaceLit, xDoc)
 	}
 
-	return c.withComments(x.X, body)
+	return c.withCommentsSlots(x.X, body, xSlots)
+}
+
+// unaryInteriorComments returns the comments attached to x which sit
+// between its operator and its operand, as in `- // c` followed by the
+// operand on the next line. The parser attaches these at [PosPrefix],
+// as it does with the trailing comment of a call argument, so only
+// their absolute positions tell them apart. [classifyComments] leaves
+// them out, as [converter.unaryExpr] renders them.
+func unaryInteriorComments(x *ast.UnaryExpr) []*ast.CommentGroup {
+	var out []*ast.CommentGroup
+	for _, cg := range ast.Comments(x) {
+		pos, xPos := cg.Pos(), x.X.Pos()
+		if cg.Position == PosPrefix && pos.HasAbsPos() && xPos.HasAbsPos() && pos.Compare(xPos) < 0 {
+			out = append(out, cg)
+		}
+	}
+	return out
 }
 
 // postfixExpr converts a PostfixExpr. The operand is obtained via
@@ -2630,7 +2672,14 @@ func (c *converter) flattenSelectorChain(x *ast.SelectorExpr) (arms []selArm, ha
 		hasTrailing = hasTrailing || len(trailing) > 0
 		prev := &arms[len(arms)-1]
 		prev.trailing = append(prev.trailing, trailing...)
-		arms = append(arms, selArm{doc: c.label(sel.Sel), rel: sel.Sel.Pos().RelPos()})
+		arm := selArm{doc: c.label(sel.Sel), rel: sel.Sel.Pos().RelPos()}
+		// A doc comment before the selected label starts its segment, on
+		// a line of its own.
+		if docs := classifyComments(sel.Sel).doc; len(docs) > 0 {
+			arm.doc = cat(c.docCommentBlock(docs, token.Newline), arm.doc)
+			arm.rel = max(arm.rel, token.Newline)
+		}
+		arms = append(arms, arm)
 	}
 	walk(x, true)
 	return arms, hasTrailing
@@ -2852,8 +2901,31 @@ func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool)
 // expression. A newline before ']' is not valid CUE (auto-comma
 // insertion triggers), so the index and closing bracket stay on the
 // same line.
+//
+// Comments inside the brackets stay there, so that they cannot swallow
+// a postfix operator following the closing bracket. One before the
+// closing bracket is followed by a line break; the parser accepts it as
+// the auto-inserted comma after the index.
 func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	openBreak := relBreak(x.Index.Pos().RelPos())
+	var closeBreak doc
+	var afterOpen, beforeClose []doc
+	for _, cg := range ast.Comments(x) {
+		switch cg.Position {
+		case posIndexAfterLbrack:
+			// The parser attaches an own-line comment after the opening
+			// bracket to the index instead.
+			afterOpen = append(afterOpen, spaceLit, c.commentGroup(cg))
+			openBreak = lineBreakHard
+		case posIndexBeforeRbrack:
+			var sep doc = spaceLit
+			if !isLineComment(cg) {
+				sep = relBreakOr(cg.Pos().RelPos(), lineBreakHard)
+			}
+			beforeClose = append(beforeClose, sep, c.commentGroup(cg))
+			closeBreak = lineBreakHard
+		}
+	}
 	// The receiver is a primary expression: `[i]` binds tighter than
 	// any binary operator, so a binary receiver needs parens (`(a &
 	// b)[i]`). It renders at the current depth; the subscript contents
@@ -2865,7 +2937,8 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	return c.maybeGroup(x, cats(
 		recv,
 		lBracketLit,
-		nest(cat(openBreak, index)),
+		nest(cats(cats(afterOpen...), openBreak, index, cats(beforeClose...))),
+		closeBreak,
 		rBracketLit,
 	))
 }
@@ -2885,8 +2958,8 @@ func (c *converter) sliceExpr(x *ast.SliceExpr) doc {
 	// parens. The bounds render one level deeper (compact operators).
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
 	c.subscript++
-	low := c.expr(x.Low)
-	high := c.expr(x.High)
+	low := c.exprAfter(nil, nil, x.Low)
+	high := c.exprAfter(nil, nil, x.High)
 	c.subscript--
 	return cats(recv, lBracketLit, low, colon, high, rBracketLit)
 }
@@ -2929,8 +3002,9 @@ func operatorsWouldMerge(op token.Token, rhs ast.Expr) bool {
 func (c *converter) parenExpr(x *ast.ParenExpr) doc {
 	// Omit redundant parentheses around an already-parenthesized
 	// expression: `((x))` renders as `(x)`. The outer paren's own
-	// comments are handled by the enclosing [converter.expr].
-	if x, ok := x.X.(*ast.ParenExpr); ok {
+	// comments are handled by the enclosing [converter.expr]. The inner
+	// paren's comments have nowhere else to go, so we keep both then.
+	if x, ok := x.X.(*ast.ParenExpr); ok && len(ast.Comments(x)) == 0 {
 		return c.parenExpr(x)
 	}
 	if LeadingRelPos(x.X) >= token.Newline {
@@ -2940,7 +3014,7 @@ func (c *converter) parenExpr(x *ast.ParenExpr) doc {
 			rParenLit,
 		)
 	}
-	return cats(lParenLit, c.expr(x.X), rParenLit)
+	return cats(lParenLit, c.exprAfter(nil, nil, x.X), rParenLit)
 }
 
 // interpolation converts an Interpolation node. Its elements alternate
@@ -3527,17 +3601,53 @@ func (c *converter) clause(cl ast.Clause) doc {
 
 // letClause converts a LetClause.
 func (c *converter) letClause(x *ast.LetClause) doc {
-	return cats(stringLit("let "), stringLit(x.Ident.Name), equalsSpaceLit, c.expr(x.Expr))
+	return cats(stringLit("let "), stringLit(x.Ident.Name), c.exprAfter(spaceEqualsLit, equalsSpaceLit, x.Expr))
 }
 
-// forClause converts a ForClause.
+// forClause converts a ForClause. The comments trailing the key or the
+// value go after the source, as they would otherwise swallow the
+// tokens which follow; see [liftsChildComment].
 func (c *converter) forClause(x *ast.ForClause) doc {
-	parts := []doc{stringLit("for ")}
-	if x.Key != nil {
-		parts = append(parts, stringLit(x.Key.Name), commaSpaceLit)
+	var tail []*ast.CommentGroup
+	ident := func(tok, tokSep doc, id *ast.Ident) doc {
+		slots := classifyComments(id)
+		tail = append(tail, slots.nonDoc()...)
+		d := c.withCommentsSlots(id, stringLit(id.Name), commentSlots{doc: slots.doc})
+		return docAfter(tok, tokSep, id, d)
 	}
-	parts = append(parts, stringLit(x.Value.Name), stringLit(" in "), c.expr(x.Source))
-	return cats(parts...)
+	var key doc
+	tok, tokSep := forLit, forSpaceLit
+	if x.Key != nil {
+		// The value may follow the comma after a comment.
+		key = ident(tok, tokSep, x.Key)
+		tok, tokSep = commaLit, commaSpaceLit
+	}
+	d := cats(key, ident(tok, tokSep, x.Value), inSpaceLit, c.expr(x.Source))
+	return c.withCommentsSlots(x, d, commentSlots{trailing: tail})
+}
+
+// exprAfter renders x after the token tok, and tokSep is tok followed
+// by its usual separator, or both are nil. A doc comment on x replaces
+// the separator with a break onto an indented line, as it needs a line
+// of its own, and [converter.withComments] only breaks the line after
+// it. A doc comment on the line of the preceding token stays there.
+// Taking tokSep as a single doc saves allocating their concatenation in
+// the common case without a doc comment.
+func (c *converter) exprAfter(tok, tokSep doc, x ast.Expr) doc {
+	return docAfter(tok, tokSep, x, c.expr(x))
+}
+
+// docAfter is like [converter.exprAfter], with x already rendered as d.
+func docAfter(tok, tokSep doc, x ast.Node, d doc) doc {
+	cg := FirstCommentAt(x, PosDoc)
+	if cg == nil {
+		return cat(tokSep, d)
+	}
+	var br doc = lineBreakHard
+	if cg.Line {
+		br = spaceLit
+	}
+	return cat(tok, nest(cat(br, d)))
 }
 
 // tryClause converts a TryClause.
@@ -4217,6 +4327,10 @@ var (
 	colonLit        = stringLit(":")
 	equalsLit       = stringLit("=")
 	equalsSpaceLit  = stringLit(" = ")
+	spaceEqualsLit  = stringLit(" =")
+	forLit          = stringLit("for")
+	forSpaceLit     = stringLit("for ")
+	inSpaceLit      = stringLit(" in ")
 	bottomLit       = stringLit("_|_")
 	ellipsisLit     = stringLit("...")
 )
@@ -4280,6 +4394,19 @@ func nodeEndsWithLineComment(n ast.Node, s commentSlots) bool {
 	}
 	if !nodeManagesInteriorComments(n) && (len(s.prefix) > 0 || len(s.suffix) > 0) {
 		return true
+	}
+	return false
+}
+
+// liftsChildComment reports whether n's renderer moves the comment
+// ending one of its children, which is not rendered last, to the end of
+// n's output, as it would otherwise swallow the tokens which follow.
+// flags holds the children's flags.
+func liftsChildComment(n ast.Node, flags map[ast.Node]nodeFlag) bool {
+	ends := func(x ast.Node) bool { return flags[x]&endsWithLineComment != 0 }
+	switch n := n.(type) {
+	case *ast.ForClause:
+		return (n.Key != nil && ends(n.Key)) || ends(n.Value)
 	}
 	return false
 }
@@ -4470,11 +4597,17 @@ func joinLines(acc, cd doc) doc {
 	return cats(acc, lineBreakHard, cd)
 }
 
-// classifyComments partitions n's attached comments into slots.
+// classifyComments partitions n's attached comments into slots. It
+// leaves out the comments which n's own renderer places, such as the
+// interior comments of an IndexExpr or a UnaryExpr, and includes the
+// label doc comments of a Field; see [fieldComments].
 // See commentSlots for the slot semantics.
 func classifyComments(n ast.Node) commentSlots {
 	var s commentSlots
-	if x, ok := n.(*ast.Comprehension); ok {
+	cgs := ast.Comments(n)
+	var skip func(*ast.CommentGroup) bool
+	switch x := n.(type) {
+	case *ast.Comprehension:
 		// A comprehension renders the comments between its clauses
 		// itself; see [comprehensionClauseComments]. Its other
 		// comments are doc comments or trail the whole comprehension,
@@ -4493,12 +4626,20 @@ func classifyComments(n ast.Node) commentSlots {
 		}
 		s.trailing = append(s.trailing, own...)
 		return s
-	}
-	cgs := ast.Comments(n)
-	if f, ok := n.(*ast.Field); ok {
-		cgs = fieldComments(f)
+	case *ast.Field:
+		cgs = fieldComments(x)
+	case *ast.IndexExpr:
+		skip = func(cg *ast.CommentGroup) bool { // rendered by [converter.indexExpr]
+			return cg.Position == posIndexAfterLbrack || cg.Position == posIndexBeforeRbrack
+		}
+	case *ast.UnaryExpr:
+		interior := unaryInteriorComments(x) // rendered by [converter.unaryExpr]
+		skip = func(cg *ast.CommentGroup) bool { return slices.Contains(interior, cg) }
 	}
 	for _, cg := range cgs {
+		if skip != nil && skip(cg) {
+			continue
+		}
 		switch cg.Position {
 		case PosDoc:
 			s.doc = append(s.doc, cg)

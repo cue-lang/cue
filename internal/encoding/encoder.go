@@ -22,6 +22,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -183,7 +184,16 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 				doc, rest := internal.FileComments(f)
 				ast.SetComments(pkg, doc)
 				ast.SetComments(f, rest)
-				f.Decls = append([]ast.Decl{pkg}, f.Decls...)
+				// Attributes before the package clause are file attributes,
+				// so the clause goes after any leading ones to keep them so.
+				i := 0
+				for i < len(f.Decls) {
+					if _, ok := f.Decls[i].(*ast.Attribute); !ok {
+						break
+					}
+					i++
+				}
+				f.Decls = slices.Insert(f.Decls, i, ast.Decl(pkg))
 			}
 			if compact {
 				opts = append(opts, format.Compact())

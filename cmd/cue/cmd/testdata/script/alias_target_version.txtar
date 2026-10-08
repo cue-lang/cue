@@ -49,6 +49,13 @@ cp stdout gen/pattern.cue
 exec cue eval gen/pattern.cue
 cmp stdout out-eval-pattern
 
+# A package clause added to the output goes after the file attributes,
+# which remain file attributes there.
+exec cue def -p label label.cue
+cmp stdout out-def-label-p
+cp stdout genp/label.cue
+exec cue vet ./genp
+
 # The attributes go first in the output, where they are file attributes,
 # even when a let clause goes before them in the value.
 exec cue def let.cue
@@ -214,10 +221,18 @@ package y
 X=a: {b: 1}
 c: X.b
 -- exp/gen/.keep --
+-- exp/genp/.keep --
 -- exp/genpkg/.keep --
 -- exp/genpkgy/.keep --
 -- exp/out-def-label --
 @experiment(aliasv2)
+
+a~(X): b: 1
+c: X.b
+-- exp/out-def-label-p --
+@experiment(aliasv2)
+
+package label
 
 a~(X): b: 1
 c: X.b

@@ -380,16 +380,13 @@ type exporter struct {
 	// output, where a let clause naming "self" takes its place.
 	valueAlias map[*ast.Alias]string
 	// experiments are those of cfg.TargetLanguageVersion plus any of
-	// carriedExperiments, resolved once in
-	// newExporter as they are fixed for the exporter's lifetime, along with
-	// the error from resolving them and the one decision taken from them.
+	// [carriedExperiments], resolved once in [newExporter] as they are fixed
+	// for the exporter's lifetime, along with the error from resolving them
+	// and the one decision taken from them.
 	experiments    *cueexperiment.File
 	experimentsErr error
 	postfixAliases bool
-	// carriesExperiments records whether experiments includes any of
-	// carriedExperiments.
-	carriesExperiments bool
-	references         map[*adt.Vertex]*referenceInfo
+	references     map[*adt.Vertex]*referenceInfo
 
 	pivotter *pivotter
 }
@@ -445,24 +442,24 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	// The experiments of the target language version decide which spellings
 	// the output may use; aliasv2 is the one that enables postfix aliases.
 	// finalize records them on the file it builds, so resolve them once here.
-	// Experiments carried into the output enable their syntax there too,
-	// unless they are invalid at the target language version.
-	carried := carriedExperiments(p, n)
+	// Experiments carried into the output enable their syntax there too.
+	// One invalid at the target language version is left out, so that the
+	// others still apply; its attribute is copied regardless, and the output
+	// reports it just like the source would at that version.
+	carried := slices.DeleteFunc(carriedExperiments(p, n), func(exp string) bool {
+		_, err := cueexperiment.NewFile(p.TargetLanguageVersion, exp)
+		return err != nil
+	})
 	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion, carried...)
-	if err != nil && len(carried) > 0 {
-		carried = nil
-		exp, err = cueexperiment.NewFile(p.TargetLanguageVersion)
-	}
 	e := &exporter{
 		cfg:   p,
 		ctx:   eval.NewContext(r, n),
 		index: r,
 		pkgID: pkgID,
 
-		experiments:        exp,
-		experimentsErr:     err,
-		carriesExperiments: len(carried) > 0,
-		postfixAliases:     exp != nil && exp.AliasV2,
+		experiments:    exp,
+		experimentsErr: err,
+		postfixAliases: exp != nil && exp.AliasV2,
 
 		references: map[*adt.Vertex]*referenceInfo{},
 	}
@@ -476,28 +473,21 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	return e
 }
 
-// carriedExperiments returns the experiments of the @experiment attributes
-// of the files of n that exporting n copies into an output without a package
-// clause, such as for a file without one. finalize moves them to the front of
-// the output, where they are file attributes. The attributes of a struct are
-// not carried, as they may stay nested in the output, such as within _#def.
+// carriedExperiments returns the experiments enabled by the files of n that
+// exporting n copies into an output without a package clause, such as for a
+// file without one. [exporter.finalize] moves their attributes to the front
+// of the output, where they are file attributes. The attributes of a struct
+// are not carried, as they may stay nested in the output, such as within
+// _#def.
 func carriedExperiments(p *Profile, n *adt.Vertex) []string {
 	if !p.ShowAttributes || n == nil || p.AddPackage && packageName(n) != "" {
 		return nil
 	}
 	var experiments []string
-	for _, st := range n.Structs {
-		if st.StructLit == nil {
-			continue
-		}
-		f, ok := st.Src.(*ast.File)
-		if !ok {
-			continue
-		}
-		for _, a := range extractDeclAttrs(nil, f) {
-			if key, body := a.Split(); key == "experiment" {
-				experiments = append(experiments, body)
-			}
+	for c := range n.LeafConjuncts() {
+		if f, _ := c.Source().(*ast.File); f != nil {
+			exp := f.Experiment()
+			experiments = append(experiments, exp.Experiments()...)
 		}
 	}
 	return experiments
@@ -536,7 +526,7 @@ func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.
 		return f, errors.Append(e.errs, err)
 	}
 
-	if e.carriesExperiments {
+	if f.PackageName() == "" {
 		// Only the attributes at the very top of a file without a package
 		// clause, before any let clause or import, enable experiments.
 		var exps, rest []ast.Decl
@@ -547,9 +537,7 @@ func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.
 				rest = append(rest, d)
 			}
 		}
-		if len(exps) > 0 {
-			f.Decls = append(exps, rest...)
-		}
+		f.Decls = append(exps, rest...)
 	}
 
 	return f, nil

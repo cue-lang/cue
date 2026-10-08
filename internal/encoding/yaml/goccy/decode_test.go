@@ -1032,6 +1032,14 @@ var decoderTests = []struct {
 }, {
 	"---\n'hello'\n...\n---\ngoodbye\n...\n",
 	`"hello"` + "\n" + `"goodbye"`,
+}, {
+	// TODO: a document holding only comments is dropped;
+	// see https://github.com/goccy/go-yaml/issues/870.
+	"---\n# c\n---\na: b\n",
+	"// c\na: \"b\"",
+}, {
+	"a: b\n---\n# c\n",
+	`a: "b"`,
 }}
 
 func TestDecoder(t *testing.T) {

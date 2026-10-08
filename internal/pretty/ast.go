@@ -237,6 +237,10 @@ func (c *converter) analyse(root ast.Node) {
 		hasRelPos                    bool
 		lastChildTrailingCommentLine bool
 		lastChildEndsLineComment     bool
+		// anyChildEndsLineComment reports whether any child, not only
+		// the last, ends with a line comment; see
+		// [converter.liftsChildComment].
+		anyChildEndsLineComment bool
 
 		node  ast.Node
 		depth int // see [operandDepth]
@@ -306,12 +310,14 @@ func (c *converter) analyse(root ast.Node) {
 			}
 
 			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) ||
-				nodeEndsWithLineComment(n, slots) || liftsChildComment(n, nodeFlags)
+				c.nodeEndsWithLineComment(n, slots) ||
+				(f.anyChildEndsLineComment && c.liftsChildComment(n))
 			if endsLineComment {
 				flags |= endsWithLineComment
 			}
 			if parent != nil {
 				parent.lastChildEndsLineComment = endsLineComment
+				parent.anyChildEndsLineComment = parent.anyChildEndsLineComment || endsLineComment
 			}
 
 			if flags != 0 {
@@ -1771,16 +1777,24 @@ func (c *converter) listElemRow(label ast.Label, e ast.Expr, last, trailing, omi
 	// comment.
 	slots := classifyComments(e)
 	var core doc
+	inner := e
+	if ell, ok := e.(*ast.Ellipsis); ok && ell.Type != nil {
+		inner = ell.Type
+	}
+	// A comment ending one of e's operands would be followed by the
+	// comma, so it moves to the end of the row too, before e's own.
+	// This includes those which e's renderer moves after a bracket.
+	tail := slices.Concat(c.liftOperandTails(inner), c.liftTailComments(lastOperand(e)))
 	// The parser attaches a trailing comment on `...T` to T (the
 	// rightmost token), not to the Ellipsis. exprCore would then
 	// render the comment inline after T, so the comma appended below
 	// would land inside the `//` comment and be lost. Render T's core
 	// instead and fold T's comments into this row's slots so the
 	// trailing comment is routed to the trailing cell, after the
-	// comma.
-	if ell, ok := e.(*ast.Ellipsis); ok && ell.Type != nil {
-		if ts := classifyComments(ell.Type); len(ts.doc)+len(ts.prefix)+len(ts.suffix)+len(ts.trailing) > 0 {
-			core = cat(ellipsisLit, c.exprCore(ell.Type))
+	// comma. The comments ending T's operands are lifted above.
+	if inner != e {
+		if ts := classifyComments(inner); len(ts.doc)+len(ts.prefix)+len(ts.suffix)+len(ts.trailing) > 0 {
+			core = cat(ellipsisLit, c.exprCore(inner))
 			slots.doc = append(slots.doc, ts.doc...)
 			slots.prefix = append(slots.prefix, ts.prefix...)
 			slots.suffix = append(slots.suffix, ts.suffix...)
@@ -1806,6 +1820,9 @@ func (c *converter) listElemRow(label ast.Label, e ast.Expr, last, trailing, omi
 		} else {
 			postComments = append(postComments, cg)
 		}
+	}
+	for _, cg := range tail {
+		routeNonDoc(cg)
 	}
 	docRel := e.Pos().RelPos()
 	if label != nil {
@@ -2042,21 +2059,30 @@ func (c *converter) binaryChainArms(x *ast.BinaryExpr) (arms []chainArm, hasTrai
 	return arms, hasTrailing
 }
 
-// tailComments returns the comments rendered at the end of n's output,
-// each of which runs to the end of its line; see [endsWithLineComment].
-// It descends only into the operands which their parent renders via
-// [converter.withCommentsSlots], and skips comments which are lifted
-// already.
+// tailComments returns the comments which end n's output, except for
+// those lifted already; see [endsWithLineComment].
 func (c *converter) tailComments(n ast.Node) []*ast.CommentGroup {
 	return c.tails(n, false)
 }
 
 // liftTailComments returns the [converter.tailComments] of e, which
 // would swallow a token following e on the same line, such as an
-// operator or a field's attributes, and lifts them out of e's
-// rendering; the caller renders them after that token.
+// operator, a comma, or a field's attributes, and lifts them out of
+// e's rendering; the caller renders them after that token.
 func (c *converter) liftTailComments(e ast.Expr) []*ast.CommentGroup {
 	return c.tails(e, true)
+}
+
+// liftOperandTails lifts the comments ending the [liftedOperands] of
+// n, for n's renderer to place at the end of its output.
+func (c *converter) liftOperandTails(n ast.Node) []*ast.CommentGroup {
+	var tail []*ast.CommentGroup
+	for _, x := range liftedOperands(n) {
+		if x != nil {
+			tail = append(tail, c.liftTailComments(x)...)
+		}
+	}
+	return tail
 }
 
 // tails implements [converter.tailComments], marking the nodes whose
@@ -2074,6 +2100,12 @@ func (c *converter) tails(n ast.Node, lift bool) []*ast.CommentGroup {
 		out = c.tails(n.X, lift)
 	case *ast.PostfixExpr:
 		out = c.tails(n.X, lift)
+	default:
+		for _, x := range liftedOperands(n) {
+			if x != nil {
+				out = append(out, c.tails(x, lift)...)
+			}
+		}
 	}
 	if flags&afterCommentsLifted != 0 {
 		return out // they render elsewhere
@@ -2692,6 +2724,13 @@ func (c *converter) selectorTableExpr(arms []selArm, fieldTrailing doc) doc {
 // and a trailing comma before ')' is emitted on the same terms as
 // lists.
 func (c *converter) callExpr(x *ast.CallExpr) doc {
+	tail := c.liftOperandTails(x)
+	return cat(c.callExprBody(x), c.trailingComments(tail))
+}
+
+// callExprBody renders x for [converter.callExpr], except for the
+// comments ending the callee.
+func (c *converter) callExprBody(x *ast.CallExpr) doc {
 	// The callee is a primary expression: `(...)` binds tighter than
 	// any binary operator, so a binary callee needs parens (`(a &
 	// b)(x)`).
@@ -2725,7 +2764,7 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		for i := range x.Args {
 			leads[i] = callArgLead(x, i)
 			l := callArgLabel(x, i)
-			lastMovesComment = l != nil && nodeEndsWithLineComment(l, classifyComments(l))
+			lastMovesComment = l != nil && c.nodeFlags[l]&endsWithLineComment != 0
 			movesComment = movesComment || lastMovesComment
 		}
 		anyDoc = anyDoc || anyHasDocComment(leads)
@@ -2899,16 +2938,18 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	// The receiver is a primary expression: `[i]` binds tighter than
 	// any binary operator, so a binary receiver needs parens (`(a &
 	// b)[i]`).
+	tail := c.liftOperandTails(x)
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
 	index := c.expr(x.Index)
 	// The receiver stays out of the group, so that a receiver spanning
 	// lines does not break the line after the opening bracket.
-	return cats(recv, c.maybeGroup(x, cats(
+	d := cats(recv, c.maybeGroup(x, cats(
 		lBracketLit,
 		nest(cats(cats(afterOpen...), openBreak, index, cats(beforeClose...))),
 		closeBreak,
 		rBracketLit,
 	)))
+	return cat(d, c.trailingComments(tail))
 }
 
 // sliceExpr converts a SliceExpr.
@@ -2924,10 +2965,11 @@ func (c *converter) sliceExpr(x *ast.SliceExpr) doc {
 	// The receiver is a primary expression: the slice `[lo:hi]` binds
 	// tighter than any binary operator, so a binary receiver needs
 	// parens.
+	tail := c.liftOperandTails(x)
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
 	low := c.exprAfter(nil, nil, x.Low)
 	high := c.exprAfter(nil, nil, x.High)
-	return cats(recv, lBracketLit, low, colon, high, rBracketLit)
+	return cats(recv, lBracketLit, low, colon, high, rBracketLit, c.trailingComments(tail))
 }
 
 // operatorsWouldMerge reports whether printing binary operator op
@@ -2973,14 +3015,14 @@ func (c *converter) parenExpr(x *ast.ParenExpr) doc {
 	if x, ok := x.X.(*ast.ParenExpr); ok && len(ast.Comments(x)) == 0 {
 		return c.parenExpr(x)
 	}
+	tail := c.liftOperandTails(x)
+	var inner doc
 	if LeadingRelPos(x.X) >= token.Newline {
-		return cats(
-			lParenLit,
-			nest(cat(lineBreakHard, c.expr(x.X))),
-			rParenLit,
-		)
+		inner = nest(cat(lineBreakHard, c.expr(x.X)))
+	} else {
+		inner = c.exprAfter(nil, nil, x.X)
 	}
-	return cats(lParenLit, c.exprAfter(nil, nil, x.X), rParenLit)
+	return cats(lParenLit, inner, rParenLit, c.trailingComments(tail))
 }
 
 // interpolation converts an Interpolation node. Its elements alternate
@@ -3563,25 +3605,18 @@ func (c *converter) letClause(x *ast.LetClause) doc {
 }
 
 // forClause converts a ForClause. The comments trailing the key or the
-// value go after the source, as they would otherwise swallow the
-// tokens which follow; see [liftsChildComment].
+// value go after the source; see [liftedOperands].
 func (c *converter) forClause(x *ast.ForClause) doc {
-	var tail []*ast.CommentGroup
-	ident := func(tok, tokSep doc, id *ast.Ident) doc {
-		slots := classifyComments(id)
-		tail = append(tail, slots.nonDoc()...)
-		d := c.withCommentsSlots(id, stringLit(id.Name), commentSlots{doc: slots.doc})
-		return docAfter(tok, tokSep, id, d)
-	}
+	tail := c.liftOperandTails(x)
 	var key doc
 	tok, tokSep := forLit, forSpaceLit
 	if x.Key != nil {
 		// The value may follow the comma after a comment.
-		key = ident(tok, tokSep, x.Key)
+		key = c.exprAfter(tok, tokSep, x.Key)
 		tok, tokSep = commaLit, commaSpaceLit
 	}
-	d := cats(key, ident(tok, tokSep, x.Value), inSpaceLit, c.expr(x.Source))
-	return c.withCommentsSlots(x, d, commentSlots{trailing: tail})
+	d := cats(key, c.exprAfter(tok, tokSep, x.Value), inSpaceLit, c.expr(x.Source))
+	return cat(d, c.trailingComments(tail))
 }
 
 // exprAfter renders x after the token tok, and tokSep is tok followed
@@ -3592,11 +3627,7 @@ func (c *converter) forClause(x *ast.ForClause) doc {
 // Taking tokSep as a single doc saves allocating their concatenation in
 // the common case without a doc comment.
 func (c *converter) exprAfter(tok, tokSep doc, x ast.Expr) doc {
-	return docAfter(tok, tokSep, x, c.expr(x))
-}
-
-// docAfter is like [converter.exprAfter], with x already rendered as d.
-func docAfter(tok, tokSep doc, x ast.Node, d doc) doc {
+	d := c.expr(x)
 	cg := FirstCommentAt(x, PosDoc)
 	if cg == nil {
 		return cat(tokSep, d)
@@ -4353,49 +4384,91 @@ func hasTrailingCommentLine(s commentSlots) bool {
 // selection mirrors withCommentsSlots: trailing comments (Position >=
 // PosTrailingMin) always render after the body, and for nodes that
 // don't manage their own interior comments the prefix/suffix slots are
-// emitted as trailing content too. CUE has only `//` line comments, so
-// any such tail comment runs to end-of-line.
-func nodeEndsWithLineComment(n ast.Node, s commentSlots) bool {
+// emitted as trailing content too, as is a prefix comment which
+// [trailingPrefixComments] lifts out of a node managing its interior
+// comments. CUE has only `//` line comments, so any such tail comment
+// runs to end-of-line.
+func (c *converter) nodeEndsWithLineComment(n ast.Node, s commentSlots) bool {
 	if len(s.trailing) > 0 {
 		return true
 	}
-	if !nodeManagesInteriorComments(n) && (len(s.prefix) > 0 || len(s.suffix) > 0) {
-		return true
+	if !nodeManagesInteriorComments(n) {
+		return len(s.prefix) > 0 || len(s.suffix) > 0
 	}
-	return false
+	// trailingPrefixComments only returns comments from s.prefix.
+	return len(s.prefix) > 0 && c.nodeFlags[n]&interiorPrefix == 0 && len(trailingPrefixComments(n)) > 0
 }
 
 // liftsChildComment reports whether n's renderer moves the comment
 // ending one of its children, which is not rendered last, to the end of
 // n's output, as it would otherwise swallow the tokens which follow.
-// flags holds the children's flags.
-func liftsChildComment(n ast.Node, flags map[ast.Node]nodeFlag) bool {
-	ends := func(x ast.Node) bool { return flags[x]&endsWithLineComment != 0 }
-	switch n := n.(type) {
-	case *ast.ForClause:
-		return (n.Key != nil && ends(n.Key)) || ends(n.Value)
-	case *ast.Field:
+func (c *converter) liftsChildComment(n ast.Node) bool {
+	ends := func(x ast.Node) bool { return x != nil && c.nodeFlags[x]&endsWithLineComment != 0 }
+	if f, ok := n.(*ast.Field); ok {
 		// A field's attributes go before its value's comments.
-		return len(n.Attrs) > 0 && n.Value != nil && ends(n.Value)
+		return len(f.Attrs) > 0 && ends(f.Value)
 	}
-	return false
+	ops := liftedOperands(n)
+	return ends(ops[0]) || ends(ops[1]) || ends(ops[2])
+}
+
+// liftedOperands returns the operands of n followed by a token which
+// cannot start a line, such as a closing paren, an index, or the `in`
+// of a for clause. n's renderer moves the comments ending them to the
+// end of its output; see [converter.liftOperandTails]. Missing operands
+// are nil.
+func liftedOperands(n ast.Node) (ops [3]ast.Expr) {
+	switch n := n.(type) {
+	case *ast.ParenExpr:
+		ops[0] = n.X
+	case *ast.IndexExpr:
+		ops[0] = n.X
+	case *ast.CallExpr:
+		ops[0] = n.Fun
+	case *ast.SliceExpr:
+		ops = [3]ast.Expr{n.X, n.Low, n.High}
+	case *ast.ForClause:
+		if n.Key != nil {
+			ops[0] = n.Key
+		}
+		ops[1] = n.Value
+	}
+	return ops
+}
+
+// lastOperand returns the operand which e renders last, or nil if e
+// has none. An operand of a binary expression with the same operator is
+// part of the same chain, whose renderer places its comments itself.
+// For `...T`, it is the last operand of T, as the ellipsis places T's
+// own comments.
+func lastOperand(e ast.Expr) ast.Expr {
+	switch x := e.(type) {
+	case *ast.BinaryExpr:
+		if y, ok := x.Y.(*ast.BinaryExpr); !ok || y.Op != x.Op {
+			return x.Y
+		}
+	case *ast.UnaryExpr:
+		return x.X
+	case *ast.Ellipsis:
+		if x.Type != nil {
+			return lastOperand(x.Type)
+		}
+	}
+	return nil
 }
 
 // rowEndsWithComment reports whether the row [converter.listElemRow]
 // builds for e ends in a `//` comment, including one which moves there
 // from inside e, such as from after a unary operator or an operand.
 func (c *converter) rowEndsWithComment(e ast.Node) bool {
-	return c.nodeFlags[e]&endsWithLineComment != 0 || len(trailingPrefixComments(e)) > 0
+	return c.nodeFlags[e]&endsWithLineComment != 0
 }
 
-// isBracketed reports whether n's rendered output ends with a
-// closing bracket - so descendant trailing comments are inside the
-// brackets and don't reach n's rendered end. Only n's own attached
-// trailing comments (rendered after the closer) can carry the tail
-// flag for these nodes. StructLit and ImportDecl can appear without
-// their delimiters (a braceless struct, e.g. a file body; a parenless
-// single-spec import); in that case the rendered end is the last
-// child and descendants do propagate.
+// isBracketed reports whether n's rendered output ends with a closing
+// bracket, so that only n's own trailing comments, and those its
+// renderer moves there (see [converter.liftsChildComment]), can end it.
+// A braceless struct, such as a file body, and a parenless import end
+// with their last child instead.
 func isBracketed(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.StructLit:

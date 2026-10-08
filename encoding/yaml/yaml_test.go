@@ -330,6 +330,7 @@ list:
 }
 
 func TestYAMLValues(t *testing.T) {
+	longKey := strings.Repeat("k", 1025)
 	testCases := []struct {
 		cue  string
 		yaml string
@@ -418,6 +419,14 @@ func TestYAMLValues(t *testing.T) {
 		{`"..."`, `"..."`},
 		{`"... x"`, `"... x"`},
 		{`{"...x": 1, "--- x": 2}`, `"...x": 1` + "\n" + `"--- x": 2`},
+		// A key longer than 1024 characters must be explicit.
+		// TODO: it is emitted as an implicit key, which is invalid.
+		{`{` + longKey + `: 1, b: [{` + longKey + `: 2}]}`,
+			longKey + ": 1\nb:\n  - " + longKey + ": 2"},
+		// goccy's decoder misreads a block literal after a quoted
+		// explicit key, so such a value is double quoted.
+		// TODO: the key is implicit, which is invalid.
+		{`{"#` + longKey + `": "a\nb"}`, "'#" + longKey + "': |-\n  a\n  b"},
 		// A key containing a newline is double quoted, even when it
 		// would otherwise be single quoted.
 		{`{"? x\ny": 1}`, `"? x\ny": 1`},

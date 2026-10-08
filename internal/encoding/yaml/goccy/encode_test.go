@@ -596,13 +596,12 @@ l:
 		// Decoders such as yaml.v3 read "?" in a flow collection as an
 		// explicit key indicator, even when it is followed by a
 		// character other than a space.
-		// TODO: such strings are left plain.
 		name: "flow_question_mark",
 		in: `
 		a: {"?0": "x", b: "?y", c: ["a?b"]}
 		`,
 		out: `
-a: {?0: x, b: ?y, c: [a?b]}
+a: {'?0': x, b: '?y', c: ['a?b']}
 		`,
 	}, {
 		// A literal block with keep chomping takes in the blank lines

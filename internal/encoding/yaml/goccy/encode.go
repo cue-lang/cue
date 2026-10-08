@@ -598,11 +598,13 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 // quoteFlowUnsafe walks the value tree of a flow-style collection and
 // quotes plain strings that flow context cannot carry: [quoteScalar]
 // decides quoting for block context, so characters such as commas,
-// brackets, braces, and colons would otherwise corrupt the output. Strings reaching here
-// hold no newlines, tabs, or unprintable characters, all of which the
-// earlier quoting rules route to double quotes.
+// brackets, braces, and colons would otherwise corrupt the output.
+// Decoders derived from libyaml, such as yaml.v3, also misread "?".
+// Strings reaching here hold no newlines, tabs, or unprintable
+// characters, all of which the earlier quoting rules route to double
+// quotes.
 func quoteFlowUnsafe(v any, info *encInfo) any {
-	const flowUnsafe = ",[]{}:"
+	const flowUnsafe = ",[]{}:?"
 	switch x := v.(type) {
 	case string:
 		if strings.ContainsAny(x, flowUnsafe) {
@@ -783,17 +785,22 @@ func isNumberTokenType(t ytoken.Type) bool {
 // shouldQuote indicates that a string must be double quoted to be
 // decoded back unharmed: it may be a YAML 1.1 legacy value, a scalar
 // that YAML decodes as another type such as a number or an infinity,
-// a broken YAML 1.1 octal that other decoders read as a float, or
-// contain characters that a plain scalar cannot carry, such as tabs
-// or unprintable characters.
+// a broken YAML 1.1 octal that other decoders read as a float, start
+// with a document marker, or contain characters that a plain scalar
+// cannot carry, such as tabs or unprintable characters.
 func shouldQuote(str string) bool {
 	if str == "" || legacyStrings[str] {
 		return true
 	}
-	// Both regular expressions can only match strings starting with
-	// one of these bytes; skip the regexp engine otherwise.
+	// Document markers start a line in keys and top-level values, and
+	// goccy's decoder also misreads "...x".
+	if strings.HasPrefix(str, "...") || strings.HasPrefix(str, "---") {
+		return true
+	}
+	// These checks can only match strings starting with one of these
+	// bytes; skip them otherwise.
 	if strings.IndexByte("-+0123456789:. \t", str[0]) >= 0 &&
-		(useQuote().MatchString(str) || rxAnyOctalYaml11().MatchString(str)) {
+		(useQuote().MatchString(str) || rxYAML11Number().MatchString(str) || goYAMLNumber(str)) {
 		return true
 	}
 	return decodesAsNonString(str) || strings.ContainsRune(str, '\t') || yamlUnprintable(str)
@@ -876,13 +883,69 @@ func decodesAsNonString(s string) bool {
 	}
 }
 
-// rxAnyOctalYaml11 uses the implicit tag resolution regular expression
-// for base-8 integers from YAML's 1.1 spec, but including the 8 and 9
-// digits which aren't valid for octal integers. Strings of this shape
-// resolve as floats in some YAML 1.1 decoders, so the encoder keeps
-// them quoted.
-var rxAnyOctalYaml11 = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[-+]?0[0-9_]+$`)
+// goYAMLNumber reports whether gopkg.in/yaml.v3 resolves a plain scalar
+// as a number, which it does for strings such as "0X1F" or "0o+1" that
+// YAML's schemas resolve as strings. Other go-yaml decoders, such as
+// yaml.v2, resolve a subset of these.
+func goYAMLNumber(s string) bool {
+	switch {
+	case s == "":
+		return false
+	case s[0] == '.':
+		_, err := strconv.ParseFloat(s, 64)
+		return err == nil
+	case strings.IndexByte("+-0123456789", s[0]) < 0:
+		return false
+	}
+	plain := strings.ReplaceAll(s, "_", "")
+	if _, err := strconv.ParseInt(plain, 0, 64); err == nil {
+		return true
+	}
+	if _, err := strconv.ParseUint(plain, 0, 64); err == nil {
+		return true
+	}
+	if rxGoYAMLFloat().MatchString(plain) {
+		if _, err := strconv.ParseFloat(plain, 64); err == nil {
+			return true
+		}
+	}
+	for _, p := range [...]struct {
+		prefix string
+		base   int
+	}{{"0b", 2}, {"0o", 8}} {
+		prefix, base := p.prefix, p.base
+		if rest, ok := strings.CutPrefix(plain, prefix); ok {
+			if _, err := strconv.ParseInt(rest, base, 64); err == nil {
+				return true
+			}
+			if _, err := strconv.ParseUint(rest, base, 64); err == nil {
+				return true
+			}
+		} else if rest, ok := strings.CutPrefix(plain, "-"+prefix); ok {
+			if _, err := strconv.ParseInt("-"+rest, base, 64); err == nil {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// rxGoYAMLFloat is the regular expression go-yaml uses for floats.
+var rxGoYAMLFloat = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$`)
+})
+
+// rxYAML11Number matches the integers and floats of YAML 1.1, using the
+// regular expressions of PyYAML, its reference implementation.
+var rxYAML11Number = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`^(?:` +
+		// Integers.
+		`[-+]?0b[0-1_]+|[-+]?0[0-7_]+|[-+]?(?:0|[1-9][0-9_]*)|[-+]?0x[0-9a-fA-F_]+|` +
+		`[-+]?[1-9][0-9_]*(?::[0-5]?[0-9])+|` +
+		// Floats.
+		`[-+]?[0-9][0-9_]*\.[0-9_]*(?:[eE][-+][0-9]+)?|\.[0-9_]+(?:[eE][-+][0-9]+)?|` +
+		`[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*|[-+]?\.(?:inf|Inf|INF)|\.(?:nan|NaN|NAN)` +
+		`)$`)
 })
 
 // This regular expression conservatively matches any date, time string,
@@ -924,6 +987,9 @@ var legacyStrings = map[string]bool{
 	"off":   true,
 	"Off":   true,
 	"OFF":   true,
+
+	// The default value key, which PyYAML fails to decode.
+	"=": true,
 
 	// Non-standard.
 	".Nan": true,

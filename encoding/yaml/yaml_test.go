@@ -370,24 +370,22 @@ func TestYAMLValues(t *testing.T) {
 		// Strings that YAML 1.1 decoders resolve as numbers or values:
 		// its integers and floats allow underscores, including in
 		// sexagesimal numbers, and "=" is the default value key.
-		// TODO: they are left plain.
-		{`"1_:0"`, `1_:0`},
-		{`"190_0:20"`, `190_0:20`},
-		{`"0x_"`, `0x_`},
-		{`"0b_"`, `0b_`},
-		{`"="`, `=`},
+		{`"1_:0"`, `"1_:0"`},
+		{`"190_0:20"`, `"190_0:20"`},
+		{`"0x_"`, `"0x_"`},
+		{`"0b_"`, `"0b_"`},
+		{`"="`, `"="`},
 		// Strings that go-yaml decoders, such as yaml.v3 and the one in
 		// sigs.k8s.io/yaml, resolve as numbers, as their resolvers accept
 		// base prefixes in any case, underscores anywhere, and signs
 		// after a prefix.
-		// TODO: they are left plain.
-		{`"0X1F"`, `0X1F`},
-		{`"0O17"`, `0O17`},
-		{`"0B11"`, `0B11`},
-		{`"-0Xb"`, `-0Xb`},
-		{`"0_Xa"`, `0_Xa`},
-		{`"0o+1"`, `0o+1`},
-		{`{"0X1F": 1}`, `0X1F: 1`},
+		{`"0X1F"`, `"0X1F"`},
+		{`"0O17"`, `"0O17"`},
+		{`"0B11"`, `"0B11"`},
+		{`"-0Xb"`, `"-0Xb"`},
+		{`"0_Xa"`, `"0_Xa"`},
+		{`"0o+1"`, `"0o+1"`},
+		{`{"0X1F": 1}`, `"0X1F": 1`},
 		// Strings that are valid CUE numbers but not YAML numbers, such as
 		// Kubernetes resource quantities, do not need quoting.
 		{`"1Gi"`, `1Gi`},
@@ -417,12 +415,9 @@ func TestYAMLValues(t *testing.T) {
 		{`{" lead\u200b": "key: \u00ad"}`, "' lead\u200b': 'key: \u00ad'"},
 		// Document markers at the start of a line end or start a
 		// document, so strings starting with them are quoted.
-		// TODO: strings starting with "..." are left plain, so that
-		// "..." decodes as null, "... x" is invalid, and this package
-		// decodes "...x: 1" as "x: 1".
-		{`"..."`, `...`},
-		{`"... x"`, `... x`},
-		{`{"...x": 1, "--- x": 2}`, `...x: 1` + "\n" + `'--- x': 2`},
+		{`"..."`, `"..."`},
+		{`"... x"`, `"... x"`},
+		{`{"...x": 1, "--- x": 2}`, `"...x": 1` + "\n" + `"--- x": 2`},
 		// A key containing a newline is double quoted, even when it
 		// would otherwise be single quoted.
 		{`{"? x\ny": 1}`, `"? x\ny": 1`},

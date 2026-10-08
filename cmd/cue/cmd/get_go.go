@@ -1080,7 +1080,7 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 	case encodesAsTop:
 		return e.ident("_", false)
 	case encodesAsString:
-		return e.ident("string", false)
+		return cueast.NewPredeclared("string")
 	}
 	return nil
 }
@@ -1450,10 +1450,10 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 			// TODO(mvdan): once encoding/json/v2 chooses a representation,
 			// could we generate types like 'int | *time.Duration'
 			// and constants like '300 | *"300ns"' to support both at the same time?
-			return e.ident("int", false)
+			return cueast.NewPredeclared("int")
 
 		case pkg.Path() == "math/big" && obj.Name() == "Int":
-			return e.ident("int", false)
+			return cueast.NewPredeclared("int")
 
 		case pkg.Path() == "cuelang.org/go/cue" && obj.Name() == "Value":
 			// A cue.Value can hold any CUE value, so it is translated to
@@ -1576,7 +1576,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		// TODO: reconsider this; both encoding/json and the future v2
 		// encode []uint8, or anything assignable to []byte, as bytes.
 		if typ.Elem() == typeByte {
-			return e.ident("bytes", false)
+			return cueast.NewPredeclared("bytes")
 		}
 		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(typ.Elem(), kind, attrs)})
 
@@ -1587,7 +1587,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 			//     fmt.Fprint(e.w, fmt.Sprintf("=~ '^\C{%d}$'", x.Len())),
 			// but regexp does not support that.
 			// But translate to bytes, instead of [...byte] to be consistent.
-			return e.ident("bytes", false)
+			return cueast.NewPredeclared("bytes")
 		} else {
 			return &cueast.BinaryExpr{
 				X: &cueast.BasicLit{
@@ -1605,7 +1605,7 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 		}
 
 		f := &cueast.Field{
-			Label: cueast.NewList(e.ident("string", false)),
+			Label: cueast.NewList(cueast.NewPredeclared("string")),
 			Value: e.makeType(typ.Elem(), kind, e.fieldAttributesFromType(typ.Elem())),
 		}
 		cueast.SetRelPos(f, cuetoken.Blank)
@@ -1618,13 +1618,13 @@ func (e *extractor) makeType2(typ types.Type, kind fieldKind, attrs fieldAttribu
 	case *types.Basic:
 		switch typ.Kind() {
 		case types.Uintptr, types.UnsafePointer:
-			return e.ident("uint64", false)
+			return cueast.NewPredeclared("uint64")
 		case types.Byte:
-			return e.ident("uint8", false)
+			return cueast.NewPredeclared("uint8")
 		case types.Complex64, types.Complex128:
 			return e.ident("_", false)
 		}
-		return e.ident(typ.Name(), false)
+		return cueast.NewPredeclared(typ.Name())
 
 	case *types.Union:
 		var exprs []cueast.Expr
@@ -2054,7 +2054,7 @@ func (e *extractor) makeFallback(typ types.Type, encoded map[string]string) cuea
 	}
 	m := typ.Underlying().(*types.Map)
 	names := slices.Sorted(maps.Values(encoded))
-	var label cueast.Expr = e.ident("string", false)
+	var label cueast.Expr = cueast.NewPredeclared("string")
 	if len(names) > 0 {
 		var exprs []cueast.Expr
 		for _, name := range names {

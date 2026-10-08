@@ -23,10 +23,7 @@ cmp go.mod go.mod.golden
 exec cue vet -c=false ./...
 
 # Fields named like predeclared types must not shadow the types.
-# TODO: the fields shadow the types, so the generated definition
-# rejects valid data.
-! exec cue vet -d '#Shadow' ./pkg5 pkg5/shadow.json
-stderr '^int: field not allowed'
+exec cue vet -d '#Shadow' ./pkg5 pkg5/shadow.json
 
 -- go.mod --
 module mod.test
@@ -631,14 +628,14 @@ type Shadow struct {
 package pkg5
 
 #Shadow: {
-	int:    int                @go(Int)
-	string: string             @go(String)
-	uint8:  uint8              @go(Uint8)
-	bytes?: bytes              @go(Bytes,[]byte)
-	map:    {[string]: string} @go(Map,map[string]string)
+	int:    __int                  @go(Int)
+	string: __string               @go(String)
+	uint8:  __uint8                @go(Uint8)
+	bytes?: __bytes                @go(Bytes,[]byte)
+	map:    {[__string]: __string} @go(Map,map[string]string)
 	sub: {
-		n: int    @go(N)
-		s: string @go(S)
+		n: __int    @go(N)
+		s: __string @go(S)
 	} @go(Sub,"struct{N int \"json:\\\"n\\\"\"; S string \"json:\\\"s\\\"\"}")
 }
 -- pkg_generics/pkg_generics.go --

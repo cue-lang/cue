@@ -32,6 +32,55 @@ exec cue import -f -p gen -o gen2/schema.cue schema.json
 cmp gen2/schema.cue out-import
 exec cue vet ./gen2
 
+cd ../exp
+
+# Without a package clause, "cue def" keeps the file attributes as
+# declarations of the file's value, so an @experiment attribute applies to its
+# output as well, and aliasv2 enables the postfix form there.
+# TODO(https://cuelang.org/issue/4434): the output uses the prefix form, which
+# the copied attribute rejects.
+exec cue def label.cue
+cmp stdout out-def-label
+cp stdout gen/label.cue
+! exec cue eval gen/label.cue
+stderr 'old-style alias syntax \(=\) is not allowed with @experiment\(aliasv2\)'
+
+exec cue def pattern.cue
+cmp stdout out-def-pattern
+cp stdout gen/pattern.cue
+! exec cue eval gen/pattern.cue
+stderr 'old-style alias syntax \(=\) is not allowed with @experiment\(aliasv2\)'
+
+# The attributes go first in the output, where they are file attributes,
+# even when a let clause goes before them in the value.
+# TODO: the let clause goes first, which only works because the output
+# uses the prefix form.
+exec cue def let.cue
+cmp stdout out-def-let
+cp stdout gen/let.cue
+exec cue vet gen/let.cue
+
+# The attributes of a struct stay within it in the output, such as within
+# _#def, so they do not enable aliasv2 there.
+exec cue def -e '#X' nested.cue
+cmp stdout out-def-nested
+cp stdout gen/nested.cue
+exec cue vet gen/nested.cue
+
+# With a package clause, the file attributes are not part of the output,
+# which takes the form of the module's language version.
+exec cue def ./x
+cmp stdout out-def
+cp stdout genpkg/gen.cue
+exec cue vet ./genpkg
+
+# Attributes after a package clause and without imports are not file
+# attributes, in the source nor in the output.
+exec cue def ./y
+cmp stdout out-def-y
+cp stdout genpkgy/gen.cue
+exec cue vet ./genpkgy
+
 -- old/cue.mod/module.cue --
 module: "old.example"
 language: version: "v0.14.0"
@@ -126,3 +175,85 @@ if _t0 != _|_ {
 }
 {}
 ...
+-- exp/cue.mod/module.cue --
+module: "exp.example"
+language: version: "v0.17.0"
+
+-- exp/label.cue --
+@experiment(aliasv2)
+
+a~X: {b: 1}
+c: X.b
+-- exp/pattern.cue --
+@experiment(aliasv2)
+
+#x: [string]~(x, _): {
+	name: x
+}
+y: #x & {foo: {}}
+-- exp/x/in.cue --
+@experiment(aliasv2)
+
+package x
+
+a~X: {b: 1}
+c: X.b
+-- exp/let.cue --
+@experiment(aliasv2)
+
+let L = 1
+a~X: {b: L}
+c: X.b
+-- exp/nested.cue --
+#X: {
+	@experiment(aliasv2)
+	X=a: 1
+	b:   X
+}
+-- exp/y/in.cue --
+package y
+
+@experiment(aliasv2)
+
+X=a: {b: 1}
+c: X.b
+-- exp/gen/.keep --
+-- exp/genpkg/.keep --
+-- exp/genpkgy/.keep --
+-- exp/out-def-label --
+@experiment(aliasv2)
+X=a: b: 1
+c: X.b
+-- exp/out-eval-label --
+a: b: 1
+c: 1
+-- exp/out-def-pattern --
+@experiment(aliasv2)
+#x: [x=string]: name: x
+y: #x & {foo: {}}
+-- exp/out-eval-pattern --
+#x: {}
+y: foo: name: "foo"
+-- exp/out-def --
+package x
+
+X=a: b: 1
+c: X.b
+-- exp/out-def-let --
+let L = 1
+@experiment(aliasv2)
+X=a: b: L
+c: X.b
+-- exp/out-def-y --
+package y
+
+@experiment(aliasv2)
+X=a: b: 1
+c: X.b
+-- exp/out-def-nested --
+_#def
+_#def: {
+	@experiment(aliasv2)
+	X=a: 1
+	b:   X
+}

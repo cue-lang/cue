@@ -193,7 +193,7 @@ alpha: {
 			delta: true
 			epsilon: #: "filled"
 		},
-		"x"
+		"x",
 	]
 }
 

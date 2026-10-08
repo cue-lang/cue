@@ -74,7 +74,7 @@ b: "two"`,
 		// The documents before and after the broken one still decode.
 		name: "broken document in stream",
 		yaml: "a: 1\n---\nb: \"x\n---\nc: 3",
-		want: "[\n\t{a: 1},\n\t{\n\n\t\tb: null\n\t},\n\t{\n\n\t\tc: 3\n\t}\n]",
+		want: "[\n\t{a: 1},\n\t{\n\n\t\tb: null\n\t},\n\t{\n\n\t\tc: 3\n\t},\n]",
 		errs: []string{"t.yaml:4: found unexpected document separator"},
 	}, {
 		name: "extraction error skips document",

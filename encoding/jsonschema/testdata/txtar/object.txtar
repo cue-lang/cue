@@ -104,9 +104,9 @@ close({
 		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
 	}
 	multi?: >=7 |
-	struct.MaxFields(5) & {
-		foo?: number
-		bar?: number
-		...
-	}
+		struct.MaxFields(5) & {
+			foo?: number
+			bar?: number
+			...
+		}
 })

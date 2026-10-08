@@ -1026,7 +1026,6 @@ f: func(
 		{
 			// A doc comment without a position, as the YAML decoder
 			// produces, goes on its own line before its element.
-			// The comment trails the previous element instead.
 			name: "list_elem_doc_comment_without_relpos",
 			node: func() *ast.File {
 				b := &ast.BasicLit{ValuePos: token.Newline.Pos(), Kind: token.STRING, Value: `"b"`}
@@ -1049,7 +1048,8 @@ f: func(
 			cfg: &pretty.Config{Width: 80, Indent: "\t"},
 			want: `
 l: [
-	"a", // doc for b
+	"a",
+	// doc for b
 	"b",
 ]`[1:],
 		},

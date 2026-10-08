@@ -569,7 +569,6 @@ func TestNodes(t *testing.T) {
 	}, {
 		// As the JSON decoder builds a list without RelPos, which
 		// breaks as its struct element does.
-		// The trailing comma is missing, so formatting this again adds it.
 		name: "broken list without positions",
 		in: ast.NewList(
 			ast.NewStruct(
@@ -578,7 +577,7 @@ func TestNodes(t *testing.T) {
 			),
 			ast.NewLit(token.INT, "3"),
 		),
-		out: "[\n\t{\n\t\ta: 1\n\t\tb: 2\n\t},\n\t3\n]",
+		out: "[\n\t{\n\t\ta: 1\n\t\tb: 2\n\t},\n\t3,\n]",
 	}, {
 		// A chain which breaks across lines indents the arms after the
 		// first, including when only an arm carries relative
@@ -592,8 +591,7 @@ func TestNodes(t *testing.T) {
 					ast.NewIdent("b"), ast.NewLit(token.INT, "2")),
 				ast.NewIdent("#B")),
 		},
-		// The arms after the first lose their indentation.
-		out: "x: #A &\n{\n\ta: 1\n\tb: 2\n} &\n#B",
+		out: "x: #A &\n\t{\n\t\ta: 1\n\t\tb: 2\n\t} &\n\t#B",
 	}, {
 		// A comment between a clause and the body, without a position,
 		// sits on its own line.
@@ -606,7 +604,7 @@ func TestNodes(t *testing.T) {
 			ast.AddComment(c, &ast.CommentGroup{Position: 2, List: []*ast.Comment{{Text: "// c"}}})
 			return &ast.Field{Label: ast.NewIdent("f"), Value: ast.NewList(c)}
 		}(),
-		out: "f: [\n\tfor x in y\n\t// c\n\t{\n\t\t\"a\": x\n\t}\n]",
+		out: "f: [\n\tfor x in y\n\t// c\n\t{\n\t\t\"a\": x\n\t},\n]",
 	}, {
 		name: "struct ending in a comment",
 		in: func() ast.Node {

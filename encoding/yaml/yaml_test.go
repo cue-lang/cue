@@ -63,7 +63,7 @@ c: baz
 	{
 		b: "bar"
 		c: "baz"
-	}
+	},
 ]`,
 		isStream: true,
 	}, {
@@ -97,7 +97,7 @@ null
 		b: "bar"
 		c: "baz"
 	},
-	null
+	null,
 ]`,
 		isStream: true,
 	}}

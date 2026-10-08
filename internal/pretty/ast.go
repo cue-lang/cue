@@ -117,20 +117,16 @@ import (
 type nodeFlag uint8
 
 const (
-	// relPosInChildren marks a node which has at least one strict
-	// descendant (i.e. excluding the node itself) that carries any
-	// RelPos at all (NoSpace, Blank, Newline, NewSection, Elided).
-	relPosInChildren nodeFlag = 1 << iota
-	// newlineInChildren refines relPosInChildren: it is used to mark a
-	// node which has at least one strict descendant (i.e. excluding
-	// the node itself) that carries a Newline or NewSection RelPos.
-	newlineInChildren
+	// newlineInChildren marks a node which has at least one strict
+	// descendant (i.e. excluding the node itself) that carries a
+	// Newline or NewSection RelPos.
+	newlineInChildren nodeFlag = 1 << iota
 	// isAuthored marks a node which is itself eligible for wrapping,
 	// and carries any RelPos, or has a descendent that carries any
 	// RelPos. Further, there is no such node on the path between this
 	// node and the RelPos node that is eligible for wrapping. I.e. we
 	// set isAuthored on the eligible node nearest a RelPos-containing
-	// subtree, and not any higher - in contrast to relPosInChildren,
+	// subtree, and not any higher - in contrast to newlineInChildren,
 	// which propagates up the tree to the very root once set.
 	isAuthored
 	// endsWithOwnLineComment marks a node whose rendered output ends
@@ -214,10 +210,9 @@ func (c *converter) node(n ast.Node) doc {
 }
 
 // analyse walks root to populate c.nodeFlags. We OR the
-// strict-descendants flags (newlineInChildren, relPosInChildren) onto
-// every ancestor up the current stack, short-circuiting at the first
-// ancestor that already carries every bit we're propagating, so total
-// work stays amortised O(N).
+// strict-descendants flag newlineInChildren onto every ancestor up the
+// current stack, short-circuiting at the first ancestor that already
+// carries it, so total work stays amortised O(N).
 //
 // We set isAuthored on the smallest wrap-eligible covering subtree for
 // each connected RelPos cluster: a wrap-eligible node that sees any
@@ -257,22 +252,17 @@ func (c *converter) analyse(root ast.Node) {
 			relPos := n.Pos().RelPos()
 			hasRelPos := relPos != 0
 
-			if hasRelPos {
-				ancestorsFlags := relPosInChildren
-				if relPos >= token.Newline {
-					ancestorsFlags |= newlineInChildren
-				}
-
+			if relPos >= token.Newline {
 				for i := len(stack) - 1; i >= 0; i-- {
-					// Propagate the flags up the stack.
+					// Propagate the flag up the stack.
 					f := &stack[i]
-					if missing := ancestorsFlags &^ f.flags; missing == 0 {
-						// Once a frame already has the flags we want, we
-						// know all its ancestors do too, so there is
+					if f.flags&newlineInChildren != 0 {
+						// Once a frame already has the flag, we know
+						// all its ancestors do too, so there is
 						// nothing further to do.
 						break
 					}
-					f.flags |= ancestorsFlags
+					f.flags |= newlineInChildren
 				}
 			}
 
@@ -642,8 +632,7 @@ func (c *converter) declSep(d ast.Decl, prev ast.Decl) doc {
 		return relBreakOr(rel, lineBreakOrComma)
 	}
 
-	const ownLineMask = relPosInChildren | endsWithOwnLineComment
-	prevOwnLineComment := c.nodeFlags[prev]&ownLineMask == ownLineMask
+	prevOwnLineComment := c.nodeFlags[prev]&endsWithOwnLineComment != 0
 
 	if rel < token.NewSection && prevOwnLineComment {
 		switch prev := prev.(type) {
@@ -666,15 +655,6 @@ func (c *converter) declSep(d ast.Decl, prev ast.Decl) doc {
 	}
 
 	return relBreakOr(rel, lineBreakOrComma)
-}
-
-// authored reports whether n's subtree carries any RelPos - that is,
-// whether the subtree came from the parser (or had RelPos info added
-// programmatically) rather than being built RelPos-free. The
-// [infiniteWidth] wrap is driven by the [isAuthored] flag, not this
-// function - see [converter.maybeGroup].
-func (c *converter) authored(n ast.Node) bool {
-	return c.nodeFlags[n]&relPosInChildren != 0
 }
 
 // shouldHug reports whether a bracketed construct with a single
@@ -1256,7 +1236,7 @@ func normaliseNumericLit(kind token.Token, data string) string {
 // [bracketedPolicy] from it and [converter.applyBracketed] assembles
 // the final Doc.
 type bracketedLayout struct {
-	node       ast.Node     // for maybeGroup + relPosInChildren lookup
+	node       ast.Node     // for maybeGroup + isAuthored lookup
 	openPrefix doc          // emitted before open (e.g. CallExpr's fun); nil otherwise
 	open       doc          // bracket open token (lBrace / lBracket / lParen)
 	close      doc          // bracket close token
@@ -1591,15 +1571,15 @@ func (c *converter) computeBracketedPolicy(b bracketedLayout) bracketedPolicy {
 	openBreaks := b.lineHeader || b.hasInterior || leadRel >= token.Newline || forceOpen
 	forceClose := openBreaks || b.closerRel >= token.Newline
 	// The last element carries a trailing comma when the closer lands
-	// on its own line, unless the closer hugs it (`{a:1}]`). Without
-	// RelPos in the subtree, the runtime [docSwitchMode] inside
-	// commaWhenBroken drops the comma when the bracket fits flat.
-	// Otherwise the decision is static: under [infiniteWidth] the
-	// enclosing group renders broken whenever any hard break exists in
-	// the subtree, even where the closer shares a line with the last
-	// element (`[a,\n b]`), so the comma follows forceClose instead.
+	// on its own line, unless the closer hugs it (`{a:1}]`). Under
+	// [finiteWidth], the runtime [docSwitchMode] inside commaWhenBroken
+	// drops the comma when the bracket fits flat. Otherwise the decision
+	// is static: under [infiniteWidth] the enclosing group renders
+	// broken whenever any hard break exists in the subtree, even where
+	// the closer shares a line with the last element (`[a,\n b]`), so
+	// the comma follows forceClose instead.
 	wantTrailingComma := b.allowsTrailingComma && !hugLast &&
-		(forceClose || !c.authored(b.node))
+		(forceClose || !infiniteWidth)
 	return bracketedPolicy{
 		hugFirst:          hugFirst,
 		hugLast:           hugLast,
@@ -2182,14 +2162,16 @@ func (c *converter) chainGroupArms(x *ast.BinaryExpr, arms []chainArm) doc {
 	// whose own body breaks) one indent level too deep - `a & b &
 	// {\n\t\tc: _\n\t}` instead of the wanted `a & b & {\n\tc: _\n}`.
 	//
-	// In an authored chain with no Newline/NewSection RelPos on any
-	// arm (chainBreaks below), the separators are soft and
-	// [asInfiniteWidth] bakes them to their flat text - they can never
-	// break. But the enclosing [docGroup] can still render broken: an
-	// arm containing a hard break (a bracketed arm whose body breaks)
-	// fails the flat-fit test. A [docSwitchMode] would then pick its
-	// broken branch and force the [docNest] onto a visually flat chain. So
-	// this case must skip the [docNest] statically.
+	// In a chain which [converter.maybeGroup] wraps in [infiniteWidth]
+	// (its own [isAuthored] flag is set, not merely a RelPos within an
+	// arm) with no Newline/NewSection RelPos on any arm (chainBreaks
+	// below), the separators are soft and [asInfiniteWidth] bakes them
+	// to their flat text - they can never break. But the enclosing
+	// [docGroup] can still render broken: an arm containing a hard break
+	// (a bracketed arm whose body breaks) fails the flat-fit test. A
+	// [docSwitchMode] would then pick its broken branch and force the
+	// [docNest] onto a visually flat chain. So this case must skip the
+	// [docNest] statically.
 	//
 	// In every other case the separators track the group's mode, so
 	// [docSwitchMode] applies the [docNest] exactly when they break: an
@@ -2205,7 +2187,7 @@ func (c *converter) chainGroupArms(x *ast.BinaryExpr, arms []chainArm) doc {
 	}
 	body := cats(rest...)
 	var wrapped doc
-	if c.authored(x) && !chainBreaks {
+	if c.nodeFlags[x]&isAuthored != 0 && !chainBreaks {
 		wrapped = body
 	} else {
 		wrapped = switchMode(nest(body), body)
@@ -4758,11 +4740,13 @@ func relBreak(rel token.RelPos) doc {
 
 // LeadingRelPos returns the RelPos that drives the separator placed
 // before n's first visible token. If n has a Position=0 doc comment,
-// the first visible token is that comment, so its RelPos wins;
-// otherwise n's own RelPos applies.
+// the first visible token is that comment, so its RelPos wins, unless
+// it has none, as in a decoded AST; otherwise n's own RelPos applies.
 func LeadingRelPos(n ast.Node) token.RelPos {
 	if cg := FirstCommentAt(n, PosDoc); cg != nil {
-		return cg.Pos().RelPos()
+		if rel := cg.Pos().RelPos(); rel != token.NoRelPos {
+			return rel
+		}
 	}
 	return n.Pos().RelPos()
 }

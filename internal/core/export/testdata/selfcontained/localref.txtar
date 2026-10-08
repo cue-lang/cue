@@ -51,7 +51,7 @@ let TEAM = {
 			if p {
 				(GAME.#x & {c: c_1}).out
 			},
-			""
+			"",
 		][0]
 	}
 }

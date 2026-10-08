@@ -128,6 +128,6 @@ e7?: matchN(>=1, [
 	} & {
 		ignoreMediaFeatureNames?: list.MinItems(1) & list.UniqueItems() & [...string]
 		...
-	}
+	},
 ])
 ...

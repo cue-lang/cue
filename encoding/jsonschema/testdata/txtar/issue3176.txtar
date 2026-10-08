@@ -22,7 +22,7 @@ matchN(1, [
 	{...},
 	strings.MaxRunes(
 		3,
-	)
+	),
 ]) & (string | {
 	{[=~"^x-"]: string}
 	...

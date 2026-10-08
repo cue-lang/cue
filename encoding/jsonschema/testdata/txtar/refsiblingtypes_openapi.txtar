@@ -50,7 +50,7 @@ components:
 }
 
 #RefNullable: #Nullable &
-(null | {
-	y?: string
-	...
-})
+	(null | {
+		y?: string
+		...
+	})

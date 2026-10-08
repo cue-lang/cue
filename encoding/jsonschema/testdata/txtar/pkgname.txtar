@@ -28,6 +28,7 @@ package somepkg
 
 // A person is a human being.
 person?: {...}
+
 // a telephone number
 #: "phone number": string
 ...

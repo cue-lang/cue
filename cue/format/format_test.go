@@ -348,6 +348,88 @@ func TestCommentPlacement(t *testing.T) {
 		in:   "a: [string // c\n]: 1\n",
 		want: "a:\n\t[string // c\n\t]: 1\n",
 	}, {
+		// Comments inside the brackets of an index expression stay there,
+		// as they would swallow a postfix operator after the brackets.
+		// The comment swallows the slice.
+		name: "index line before close",
+		in:   "a: b.c[d // c\n][1:2]\n",
+		want: "a: b.c[d] // c[1:2]\n",
+	}, {
+		// The comment swallows the selector.
+		name: "index line after open",
+		in:   "a: b[ // c\n\td].e\n",
+		want: "a: b[\n\td] // c.e\n",
+	}, {
+		// The comment is dropped.
+		name: "for value doc",
+		in:   "a: [\n\tfor k,\n\t// c\n\tv in y {k},\n]\n",
+		want: "a: [\n\tfor k, v in y {k},\n]\n",
+	}, {
+		// The comment is dropped.
+		name: "selector doc",
+		in:   "a: b.\n\t// c\n\tc\n",
+		want: "a: b.\n\tc\n",
+	}, {
+		// A doc comment before an operand which follows a token on the
+		// same line stays on a line of its own, after that token.
+		// The comment moves onto the line of the "=".
+		name: "let doc",
+		in:   "let X =\n// c\n1\n",
+		want: "let X = // c\n1\n",
+	}, {
+		// The comment moves onto the line of the "(".
+		name: "paren label doc",
+		in:   "a: {\n\t(\n\t// c\n\tk): 1\n}\n",
+		want: "a: {\n\t(// c\n\tk): 1\n}\n",
+	}, {
+		// The comment moves onto the line of the "(".
+		name: "nested paren label doc",
+		in:   "a: {\n\t(\n\t// c\n\t(k)): 1\n}\n",
+		want: "a: {\n\t(// c\n\t(k)): 1\n}\n",
+	}, {
+		// The comment is dropped.
+		name: "nested paren doc",
+		in:   "a: (\n\t// c\n\t(k))\n",
+		want: "a: (k)\n",
+	}, {
+		// The comment moves onto the line of the "[".
+		name: "pattern label doc",
+		in:   "a: {\n\t[\n\t// c\n\tstring]: 1\n}\n",
+		want: "a: {\n\t[// c\n\tstring]: 1\n}\n",
+	}, {
+		// The comment moves before the "!", onto the line of the "[".
+		name: "pattern label unary doc",
+		in:   "a: {\n\t[!\n\t// c\n\tx]: 1\n}\n",
+		want: "a: {\n\t[// c\n\t!x]: 1\n}\n",
+	}, {
+		// The comment moves before the "!", onto the line of the ":".
+		name: "unary doc",
+		in:   "a: !\n\t// c\n\tx\n",
+		want: "a: // c\n!x\n",
+	}, {
+		// The comment moves onto the line of the "[".
+		name: "slice low doc",
+		in:   "a: x[\n\t// c\n\t1:2]\n",
+		want: "a: x[// c\n1:2]\n",
+	}, {
+		// The comment moves onto the line of the ":".
+		name: "slice high doc",
+		in:   "a: x[1:\n\t// c\n\t2]\n",
+		want: "a: x[1:// c\n2]\n",
+	}, {
+		// A comment between a unary operator and its operand stays there,
+		// with the operand on the next line, rather than moving after the
+		// operand, where it could swallow the tokens which follow.
+		// The comment moves after the following operator.
+		name: "unary operand binary",
+		in:   "a: - // c\n\tx + y\n",
+		want: "a: -x + // c\n\ty\n",
+	}, {
+		// The comment moves after the following operator.
+		name: "unary operand default disjunct",
+		in:   "a: * // c\n\t1 | 2\n",
+		want: "a: *1 | // c\n\t2\n",
+	}, {
 		name: "comprehension comment after clause in inline list",
 		in:   "a: [for x in y // c\n\tif x > 1 {x}]\n",
 		want: "a: [for x in y // c\nif x > 1 {x}]\n",

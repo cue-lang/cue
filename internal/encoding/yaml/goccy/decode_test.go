@@ -845,6 +845,21 @@ a:
 		"%TAG !m! tag:yaml.org,2002:\n---\nbase: &b\n  x: 1\nout:\n  !m!merge \"<<\": *b",
 		"base: {\n\tx: 1\n}\nout: {x: 1}",
 	},
+
+	// CRLF line breaks.
+	// TODO: with CRLF line breaks, goccy counts lines wrongly after a
+	// comment, which misplaces the comment, and folds a multi-line
+	// quoted scalar as if its line breaks were literal. An input such as
+	// "a: 1 # c\r\n# d\r\nb: 2\r\n" even panics with an index out of
+	// range, so it is left out. See https://github.com/goccy/go-yaml/issues/560.
+	{
+		"a: 1\r\n# c\r\nb: 2\r\n",
+		"// c\na: 1\nb: 2",
+	},
+	{
+		"a: \"x\r\n  y\"\r\n",
+		"a: \"\"\"\n\tx\n\ty\n\t\"\"\"",
+	},
 }
 
 type M map[interface{}]interface{}

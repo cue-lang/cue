@@ -163,6 +163,10 @@ patterns: {
     ['b']: 11
     [#"raw"#]: 10
 }
+
+// An ellipsis has nowhere to put the attribute.
+// The pattern is wrongly rewritten as an ellipsis, losing the attribute.
+patternAttr: {[string]: _ @foo(bar)}
 -- out/format/simplify.golden --
 import "time"
 
@@ -324,3 +328,7 @@ patterns: {
 	['b']:           11
 	[#"raw"#]:       10
 }
+
+// An ellipsis has nowhere to put the attribute.
+// The pattern is wrongly rewritten as an ellipsis, losing the attribute.
+patternAttr: {...}

@@ -703,6 +703,42 @@ func TestASTStyleEllipsis(t *testing.T) {
 		}
 	})
 
+	t.Run("PatternWithSideDataIsKept", func(t *testing.T) {
+		// An ellipsis has nowhere to put a pattern field's attributes,
+		// nor the comments within its label and value.
+		for _, tc := range []struct {
+			name string
+			add  func(f *ast.Field)
+		}{
+			{"Attr", func(f *ast.Field) {
+				f.Attrs = []*ast.Attribute{{Text: "@foo(bar)"}}
+			}},
+			{"LabelComment", func(f *ast.Field) {
+				ast.AddComment(f.Label, docComment("label"))
+			}},
+			{"PatternComment", func(f *ast.Field) {
+				ast.AddComment(f.Label.(*ast.ListLit).Elts[0], docComment("pattern"))
+			}},
+			{"ValueComment", func(f *ast.Field) {
+				ast.AddComment(f.Value, docComment("value"))
+			}},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				patternField := &ast.Field{
+					Label: &ast.ListLit{Elts: []ast.Expr{ident("string")}},
+					Value: ident("_"),
+				}
+				tc.add(patternField)
+				f := &ast.File{Decls: []ast.Decl{patternField}}
+				annotate(t, cfg, f)
+				// The pattern field is replaced, losing its side data.
+				if _, ok := f.Decls[0].(*ast.Ellipsis); !ok {
+					t.Errorf("Decls[0] = %T, want *ast.Ellipsis", f.Decls[0])
+				}
+			})
+		}
+	})
+
 	t.Run("RemovedCommentsAllTransfer", func(t *testing.T) {
 		first := &ast.Ellipsis{}
 		ast.AddComment(first, docComment("first"))

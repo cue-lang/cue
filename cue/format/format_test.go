@@ -1108,6 +1108,30 @@ c: """
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(string(got), "a: b: 1\n"))
 	})
+
+	// Programmatic ASTs may hold comments as standalone declarations,
+	// which are discarded like any other comment.
+	t.Run("commentDecls", func(t *testing.T) {
+		f := &ast.File{Decls: []ast.Decl{
+			internal.NewComment(true, "Generated."),
+			&ast.Field{Label: ast.NewIdent("a"), Value: ast.NewLit(token.INT, "1")},
+			&ast.Field{Label: ast.NewIdent("b"), Value: ast.NewStruct(
+				internal.NewComment(true, "Inner."),
+				ast.NewIdent("c"), ast.NewLit(token.INT, "2"),
+				ast.NewIdent("d"), ast.NewLit(token.INT, "3"),
+			)},
+		}}
+		got, err := format.Node(f, format.Compact())
+		qt.Assert(t, qt.IsNil(err))
+		// The comment declarations are kept, swallowing the rest of their lines.
+		qt.Assert(t, qt.Equals(string(got), "// Generated., a: 1, b: {// Inner., c: 2, d: 3}\n"))
+
+		// Node leaves the comment declarations it was given alone.
+		again, err := format.Node(f)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.StringContains(string(again), "// Generated."))
+		qt.Assert(t, qt.StringContains(string(again), "// Inner."))
+	})
 }
 
 // parseCleared parses src and clears the positions it carries, leaving

@@ -206,7 +206,7 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	fout := &ast.File{}
 
 	if e.cfg.AddPackage {
-		pkgName := ""
+		pkgName := packageName(v)
 		pkg := &ast.Package{
 			// prevent the file comment from attaching to pkg when there is no pkg comment
 			PackagePos: token.NoPos.WithRel(token.NewSection),
@@ -215,10 +215,6 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 			f, _ := c.Source().(*ast.File)
 			if f == nil {
 				continue
-			}
-
-			if name := f.PackageName(); name != "" {
-				pkgName = name
 			}
 
 			if e.cfg.ShowDocs {
@@ -262,6 +258,16 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	}
 
 	return fout
+}
+
+// packageName returns the name of the package that v is defined in, if any.
+func packageName(v *adt.Vertex) string {
+	for c := range v.LeafConjuncts() {
+		if f, _ := c.Source().(*ast.File); f != nil && f.PackageName() != "" {
+			return f.PackageName()
+		}
+	}
+	return ""
 }
 
 // mergeDocs merges multiple doc comments into one single doc comment.
@@ -373,13 +379,17 @@ type exporter struct {
 	// valueAlias maps a source value alias to the name it is bound to in the
 	// output, where a let clause naming "self" takes its place.
 	valueAlias map[*ast.Alias]string
-	// experiments are those of cfg.TargetLanguageVersion, resolved once in
+	// experiments are those of cfg.TargetLanguageVersion plus any of
+	// carriedExperiments, resolved once in
 	// newExporter as they are fixed for the exporter's lifetime, along with
 	// the error from resolving them and the one decision taken from them.
 	experiments    *cueexperiment.File
 	experimentsErr error
 	postfixAliases bool
-	references     map[*adt.Vertex]*referenceInfo
+	// carriesExperiments records whether experiments includes any of
+	// carriedExperiments.
+	carriesExperiments bool
+	references         map[*adt.Vertex]*referenceInfo
 
 	pivotter *pivotter
 }
@@ -435,16 +445,24 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	// The experiments of the target language version decide which spellings
 	// the output may use; aliasv2 is the one that enables postfix aliases.
 	// finalize records them on the file it builds, so resolve them once here.
-	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion)
+	// Experiments carried into the output enable their syntax there too,
+	// unless they are invalid at the target language version.
+	carried := carriedExperiments(p, n)
+	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion, carried...)
+	if err != nil && len(carried) > 0 {
+		carried = nil
+		exp, err = cueexperiment.NewFile(p.TargetLanguageVersion)
+	}
 	e := &exporter{
 		cfg:   p,
 		ctx:   eval.NewContext(r, n),
 		index: r,
 		pkgID: pkgID,
 
-		experiments:    exp,
-		experimentsErr: err,
-		postfixAliases: exp != nil && exp.AliasV2,
+		experiments:        exp,
+		experimentsErr:     err,
+		carriesExperiments: len(carried) > 0,
+		postfixAliases:     exp != nil && exp.AliasV2,
 
 		references: map[*adt.Vertex]*referenceInfo{},
 	}
@@ -456,6 +474,33 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	e.markUsedFeatures(v)
 
 	return e
+}
+
+// carriedExperiments returns the experiments of the @experiment attributes
+// of the files of n that exporting n copies into an output without a package
+// clause, such as for a file without one. finalize moves them to the front of
+// the output, where they are file attributes. The attributes of a struct are
+// not carried, as they may stay nested in the output, such as within _#def.
+func carriedExperiments(p *Profile, n *adt.Vertex) []string {
+	if !p.ShowAttributes || n == nil || p.AddPackage && packageName(n) != "" {
+		return nil
+	}
+	var experiments []string
+	for _, st := range n.Structs {
+		if st.StructLit == nil {
+			continue
+		}
+		f, ok := st.Src.(*ast.File)
+		if !ok {
+			continue
+		}
+		for _, a := range extractDeclAttrs(nil, f) {
+			if key, body := a.Split(); key == "experiment" {
+				experiments = append(experiments, body)
+			}
+		}
+	}
+	return experiments
 }
 
 // initPivot initializes the pivotter to allow aligning a configuration around
@@ -489,6 +534,22 @@ func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.
 	if err := astutil.Sanitize(f); err != nil {
 		err := errors.Promote(err, "export")
 		return f, errors.Append(e.errs, err)
+	}
+
+	if e.carriesExperiments {
+		// Only the attributes at the very top of a file without a package
+		// clause, before any let clause or import, enable experiments.
+		var exps, rest []ast.Decl
+		for _, d := range f.Decls {
+			if a, ok := d.(*ast.Attribute); ok && a.Name() == "experiment" {
+				exps = append(exps, d)
+			} else {
+				rest = append(rest, d)
+			}
+		}
+		if len(exps) > 0 {
+			f.Decls = append(exps, rest...)
+		}
 	}
 
 	return f, nil

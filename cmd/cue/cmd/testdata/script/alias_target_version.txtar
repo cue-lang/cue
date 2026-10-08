@@ -37,24 +37,20 @@ cd ../exp
 # Without a package clause, "cue def" keeps the file attributes as
 # declarations of the file's value, so an @experiment attribute applies to its
 # output as well, and aliasv2 enables the postfix form there.
-# TODO(https://cuelang.org/issue/4434): the output uses the prefix form, which
-# the copied attribute rejects.
 exec cue def label.cue
 cmp stdout out-def-label
 cp stdout gen/label.cue
-! exec cue eval gen/label.cue
-stderr 'old-style alias syntax \(=\) is not allowed with @experiment\(aliasv2\)'
+exec cue eval gen/label.cue
+cmp stdout out-eval-label
 
 exec cue def pattern.cue
 cmp stdout out-def-pattern
 cp stdout gen/pattern.cue
-! exec cue eval gen/pattern.cue
-stderr 'old-style alias syntax \(=\) is not allowed with @experiment\(aliasv2\)'
+exec cue eval gen/pattern.cue
+cmp stdout out-eval-pattern
 
 # The attributes go first in the output, where they are file attributes,
 # even when a let clause goes before them in the value.
-# TODO: the let clause goes first, which only works because the output
-# uses the prefix form.
 exec cue def let.cue
 cmp stdout out-def-let
 cp stdout gen/let.cue
@@ -222,14 +218,15 @@ c: X.b
 -- exp/genpkgy/.keep --
 -- exp/out-def-label --
 @experiment(aliasv2)
-X=a: b: 1
+
+a~(X): b: 1
 c: X.b
 -- exp/out-eval-label --
 a: b: 1
 c: 1
 -- exp/out-def-pattern --
 @experiment(aliasv2)
-#x: [x=string]: name: x
+#x: [string]~(x,_): name: x
 y: #x & {foo: {}}
 -- exp/out-eval-pattern --
 #x: {}
@@ -240,9 +237,9 @@ package x
 X=a: b: 1
 c: X.b
 -- exp/out-def-let --
-let L = 1
 @experiment(aliasv2)
-X=a: b: L
+let L = 1
+a~(X): b: L
 c: X.b
 -- exp/out-def-y --
 package y

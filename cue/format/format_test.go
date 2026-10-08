@@ -321,6 +321,32 @@ func TestCommentPlacement(t *testing.T) {
 		name: "pattern label line chain",
 		in:   "a: [string // c\n]: 1\n",
 		want: "a:\n\t[string // c\n\t]: 1\n",
+	}, {
+		// The comment moves after the body.
+		name: "comprehension comment after clause in inline list",
+		in:   "a: [for x in y // c\n\tif x > 1 {x}]\n",
+		want: "a: [for x in y\nif x > 1 {x} // c\n]\n",
+	}, {
+		// The comment moves after the body.
+		name: "comprehension comment after clause in list",
+		in:   "a: [\n\tfor x in y // c\n\tif x > 1 {x},\n]\n",
+		want: "a: [\n\tfor x in y\n\tif x > 1 {x}, // c\n]\n",
+	}, {
+		// The comments move after the body, and swallow each other.
+		name: "comprehension comments after clauses",
+		in:   "a: {\n\tfor x in y // c1\n\tlet z = x // c2\n\tif z {\n\t\tb: z\n\t}\n}\n",
+		want: "a: {\n\tfor x in y\n\tlet z = x\n\tif z {\n\t\tb: z\n\t} // c1 // c2\n}\n",
+	}, {
+		// The comment moves after the body, and swallows the next field
+		// and the closing brace.
+		name: "comprehension comment after body brace",
+		in:   "a: {if x { // c\n\tb: 1\n}, c: 2}\n",
+		want: "a: {if x {\n\tb: 1\n} // c, c: 2}\n",
+	}, {
+		// The comment on its own line swallows the trailing comment.
+		name: "comprehension comments after body",
+		in:   "a: {\n\tif x {\n\t\tb: 1\n\t} // c1\n\t// c2\n}\n",
+		want: "a: {\n\tif x {\n\t\tb: 1\n\t}\n\t// c2 // c1\n}\n",
 	}}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

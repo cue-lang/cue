@@ -41,6 +41,7 @@ dropEmpty: {
 nested: {
 	if true
 	if true
+
 	let x = [1]
 	for y in x {
 		y

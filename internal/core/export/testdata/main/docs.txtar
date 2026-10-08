@@ -279,6 +279,7 @@ sub: {
 	let y = x
 	// nested for
 	for z in [y]
+
 	// nested if
 	if z == 1 {
 		innerField: y

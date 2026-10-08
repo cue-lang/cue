@@ -1,6 +1,5 @@
 # A blank line between comprehension clauses is kept, also before a
 # clause's doc comment.
-# The blank lines are dropped.
 -- in --
 for x in [1]
 let y = x
@@ -19,12 +18,14 @@ if y == 1 {
 -- out/relpos --
 for x in [1]
 let y = x
+
 if y == 1 {
 	a: y
 }
 
 for x in [1]
 let y = x
+
 // c
 if y == 1 {
 	b: y

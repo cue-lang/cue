@@ -154,6 +154,11 @@ const (
 	// comment. Propagated up only through the rightmost-rendered child
 	// of non-bracketed nodes, mirroring endsWithOwnLineComment.
 	endsWithLineComment
+	// interiorPrefix marks the body of a comprehension, on which the
+	// parser attaches a same-line comment following the opening brace
+	// at PosPrefix. Unlike in other contexts (see
+	// [trailingPrefixComments]), such a comment is interior.
+	interiorPrefix
 	// afterCommentsLifted marks a node whose comments rendered after it
 	// were moved after a following operator by
 	// [converter.liftTailComments], so that
@@ -266,6 +271,10 @@ func (c *converter) analyse(root ast.Node) {
 				}
 			}
 
+			if x, ok := n.(*ast.Comprehension); ok && x.Value != nil {
+				nodeFlags[x.Value] |= interiorPrefix
+			}
+
 			stack.push(frame{hasRelPos: hasRelPos})
 			return true
 		},
@@ -285,7 +294,8 @@ func (c *converter) analyse(root ast.Node) {
 				}
 			}
 
-			trailingCommentLine := (f.lastChildTrailingCommentLine && !isBracketed(n)) || hasTrailingCommentLine(n)
+			slots := classifyComments(n)
+			trailingCommentLine := (f.lastChildTrailingCommentLine && !isBracketed(n)) || hasTrailingCommentLine(slots)
 			if trailingCommentLine {
 				flags |= endsWithOwnLineComment
 			}
@@ -293,7 +303,7 @@ func (c *converter) analyse(root ast.Node) {
 				parent.lastChildTrailingCommentLine = trailingCommentLine
 			}
 
-			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) || nodeEndsWithLineComment(n)
+			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) || nodeEndsWithLineComment(n, slots)
 			if endsLineComment {
 				flags |= endsWithLineComment
 			}
@@ -303,7 +313,7 @@ func (c *converter) analyse(root ast.Node) {
 
 			if flags != 0 {
 				// only write if flags differs from the zero-value
-				nodeFlags[n] = flags
+				nodeFlags[n] |= flags
 			}
 		})
 }
@@ -890,7 +900,9 @@ func (c *converter) withCommentsSlots(n ast.Node, body doc, slots commentSlots) 
 			// Interior-managing nodes render prefix/suffix comments inside the
 			// node, except a prefix comment that is really trailing; emit that
 			// one here with the trailing comments. See [trailingPrefixComments].
-			trailing = append(trailing, trailingPrefixComments(n)...)
+			if flags&interiorPrefix == 0 {
+				trailing = append(trailing, trailingPrefixComments(n)...)
+			}
 		}
 		trailing = append(trailing, slots.trailing...)
 	}
@@ -1327,7 +1339,9 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 	slots := classifyComments(x)
 	// Keep only genuinely interior prefix comments; a trailing one is
 	// rendered by the container, not inside the braces.
-	slots.prefix = nonTrailingPrefix(x, slots.prefix)
+	if len(slots.prefix) > 0 && c.nodeFlags[x]&interiorPrefix == 0 {
+		slots.prefix = nonTrailingPrefix(x, slots.prefix)
+	}
 	hasInterior := slots.hasInterior()
 
 	switch {
@@ -2046,7 +2060,9 @@ func (c *converter) tails(n ast.Node, lift bool) []*ast.CommentGroup {
 	own := len(out)
 	slots := classifyComments(n)
 	if nodeManagesInteriorComments(n) {
-		out = append(out, trailingPrefixComments(n)...)
+		if flags&interiorPrefix == 0 {
+			out = append(out, trailingPrefixComments(n)...)
+		}
 	} else {
 		out = append(out, slots.prefix...)
 		out = append(out, slots.suffix...)
@@ -2679,7 +2695,7 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		for i := range x.Args {
 			leads[i] = callArgLead(x, i)
 			l := callArgLabel(x, i)
-			lastMovesComment = l != nil && nodeEndsWithLineComment(l)
+			lastMovesComment = l != nil && nodeEndsWithLineComment(l, classifyComments(l))
 			movesComment = movesComment || lastMovesComment
 		}
 		anyDoc = anyDoc || anyHasDocComment(leads)
@@ -3438,8 +3454,22 @@ func (c *converter) comprehension(x *ast.Comprehension) doc {
 		return inline
 	}
 
+	after := comprehensionClauseComments(x)
 	for i, clause := range x.Clauses {
+		var extra []*ast.CommentGroup
+		if after != nil {
+			extra = after[i]
+		}
 		clauseDoc := c.withComments(clause, c.clause(clause))
+		// A comment between clauses either shares the clause's line or
+		// sits on its own line, whatever its RelPos.
+		for _, cg := range extra {
+			var cgSep doc = lineBreakHard
+			if isLineComment(cg) {
+				cgSep = spaceLit
+			}
+			clauseDoc = cats(clauseDoc, cgSep, c.commentGroup(cg))
+		}
 		if i > 0 {
 			// LeadingRelPos gives the RelPos of the first visible token
 			// (the doc comment if any, otherwise the clause itself), so
@@ -3447,12 +3477,12 @@ func (c *converter) comprehension(x *ast.Comprehension) doc {
 			// its break. A clause that carries a doc comment must also
 			// start on its own line regardless of RelPos, or the `//`
 			// would absorb the inline separator and merge with whatever
-			// follows.
-			forced := HasDocComment(clause) || LeadingRelPos(clause) >= token.Newline
-			clauseDoc = cat(sep(forced, spaceLit), clauseDoc)
+			// follows. A NewSection RelPos keeps its blank line.
+			clauseSep := relBreakOr(LeadingRelPos(clause), sep(HasDocComment(clause), spaceLit))
+			clauseDoc = cat(clauseSep, clauseDoc)
 		}
 		parts = append(parts, clauseDoc)
-		prevEndsLineComment = c.nodeFlags[clause]&endsWithLineComment != 0
+		prevEndsLineComment = c.nodeFlags[clause]&endsWithLineComment != 0 || len(extra) > 0
 	}
 
 	if x.Value != nil {
@@ -4211,14 +4241,14 @@ func wrapEligibility(n ast.Node) (eligible, authored bool) {
 	return false, false
 }
 
-// hasTrailingCommentLine reports whether n has a trailing-position
-// comment that would render on its own line (Slash RelPos >= Newline
-// and !cg.Line). Same-line trailing comments don't qualify: the line
-// ends naturally after them, and the parser keeps them attached to n
-// on reparse.
-func hasTrailingCommentLine(n ast.Node) bool {
-	for _, cg := range ast.Comments(n) {
-		if cg.Position >= PosTrailingMin && !cg.Line && cg.Pos().RelPos() >= token.Newline {
+// hasTrailingCommentLine reports whether a node with the comment slots
+// s has a trailing-position comment that would render on its own line
+// (Slash RelPos >= Newline and !cg.Line). Same-line trailing comments
+// don't qualify: the line ends naturally after them, and the parser
+// keeps them attached to the node on reparse.
+func hasTrailingCommentLine(s commentSlots) bool {
+	for _, cg := range s.trailing {
+		if !cg.Line && cg.Pos().RelPos() >= token.Newline {
 			return true
 		}
 	}
@@ -4226,14 +4256,14 @@ func hasTrailingCommentLine(n ast.Node) bool {
 }
 
 // nodeEndsWithLineComment reports whether the comments that
-// [converter.withCommentsSlots] renders after n leave a `//` comment at
-// the tail of n's output. The slot selection mirrors withCommentsSlots:
-// trailing comments (Position >= PosTrailingMin) always render after the
-// body, and for nodes that don't manage their own interior comments the
-// prefix/suffix slots are emitted as trailing content too. CUE has only
-// `//` line comments, so any such tail comment runs to end-of-line.
-func nodeEndsWithLineComment(n ast.Node) bool {
-	s := classifyComments(n)
+// [converter.withCommentsSlots] renders after n, whose comment slots
+// are s, leave a `//` comment at the tail of n's output. The slot
+// selection mirrors withCommentsSlots: trailing comments (Position >=
+// PosTrailingMin) always render after the body, and for nodes that
+// don't manage their own interior comments the prefix/suffix slots are
+// emitted as trailing content too. CUE has only `//` line comments, so
+// any such tail comment runs to end-of-line.
+func nodeEndsWithLineComment(n ast.Node, s commentSlots) bool {
 	if len(s.trailing) > 0 {
 		return true
 	}
@@ -4433,6 +4463,26 @@ func joinLines(acc, cd doc) doc {
 // See commentSlots for the slot semantics.
 func classifyComments(n ast.Node) commentSlots {
 	var s commentSlots
+	if x, ok := n.(*ast.Comprehension); ok {
+		// A comprehension renders the comments between its clauses
+		// itself; see [comprehensionClauseComments]. Its other
+		// comments are doc comments or trail the whole comprehension,
+		// whatever their Position. A same-line comment comes first, as
+		// it trails the last token.
+		var own []*ast.CommentGroup
+		for _, cg := range comprehensionComments(x) {
+			switch {
+			case cg.Position == PosDoc:
+				s.doc = append(s.doc, cg)
+			case cg.Line:
+				s.trailing = append(s.trailing, cg)
+			default:
+				own = append(own, cg)
+			}
+		}
+		s.trailing = append(s.trailing, own...)
+		return s
+	}
 	cgs := ast.Comments(n)
 	if f, ok := n.(*ast.Field); ok {
 		cgs = fieldComments(f)
@@ -4450,6 +4500,56 @@ func classifyComments(n ast.Node) commentSlots {
 		}
 	}
 	return s
+}
+
+// comprehensionClauseComments returns, for each clause of x, the
+// comments attached to x which follow that clause and precede the next
+// clause or the body.
+//
+// The parser attaches these to the comprehension, numbering their
+// Position by counting the clauses and the body as one position each,
+// plus one for each comma consumed between them. A comment can only
+// follow a clause on a later line, so it always comes after the comma
+// which the line break implies. We count such a comma after the last
+// clause too: without one, the body takes that position instead, so
+// no comment can have it.
+func comprehensionClauseComments(x *ast.Comprehension) [][]*ast.CommentGroup {
+	cgs := ast.Comments(x)
+	if len(cgs) == 0 {
+		return nil
+	}
+	var after [][]*ast.CommentGroup
+	pos := 0
+	for i := range x.Clauses {
+		pos++ // the clause itself
+		if i+1 < len(x.Clauses) && LeadingRelPos(x.Clauses[i+1]) < token.Newline {
+			// The next clause follows on the same line.
+			continue
+		}
+		pos++ // the comma ending the clause's line
+		for _, cg := range cgs {
+			if int(cg.Position) == pos {
+				if after == nil {
+					after = make([][]*ast.CommentGroup, len(x.Clauses))
+				}
+				after[i] = append(after[i], cg)
+			}
+		}
+	}
+	return after
+}
+
+// comprehensionComments returns the comments attached to x, excluding
+// those which [comprehensionClauseComments] places between clauses.
+func comprehensionComments(x *ast.Comprehension) []*ast.CommentGroup {
+	cgs := ast.Comments(x)
+	after := slices.Concat(comprehensionClauseComments(x)...)
+	if len(after) == 0 {
+		return cgs
+	}
+	return slices.DeleteFunc(slices.Clone(cgs), func(cg *ast.CommentGroup) bool {
+		return slices.Contains(after, cg)
+	})
 }
 
 // partitionLineComments splits in into (line, other): CommentGroups
@@ -4709,11 +4809,9 @@ func anyHasPostComment[T ast.Node](nodes []T) bool {
 // (See anyHasPostComment for the classification.)
 func hasPostComment(n ast.Node) bool {
 	nManagesInteriorComments := nodeManagesInteriorComments(n)
-	for _, cg := range ast.Comments(n) {
-		// Doc comments and same-line comments are not post-element
-		// comments. The parser marks same-line with Blank RelPos;
-		// programmatically built ASTs may set only cg.Line.
-		if cg.Position == PosDoc || cg.Line || cg.Pos().RelPos() == token.Blank {
+	for _, cg := range classifyComments(n).nonDoc() {
+		// Same-line comments are not post-element comments.
+		if isLineComment(cg) {
 			continue
 		}
 		// Bracketed nodes (StructLit/ListLit/BinaryExpr) handle their

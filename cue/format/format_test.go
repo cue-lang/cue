@@ -224,11 +224,11 @@ func TestCommentPlacement(t *testing.T) {
 		// line than in the source.
 		name: "comprehension",
 		in:   head + "x: [\n\tif a // c\n\t{\n\t\t\"a\"\n\t}, \"b\",\n]\n",
-		want: head + "x: [\n\tif a {\n\t\t\"a\"\n\t}, // c\n\t\"b\",\n]\n",
+		want: head + "x: [\n\tif a // c\n\t{\n\t\t\"a\"\n\t}, \"b\",\n]\n",
 	}, {
 		name: "last comprehension",
 		in:   head + "x: [if a // c\n\t{b}]\n",
-		want: head + "x: [if a {b} // c\n]\n",
+		want: head + "x: [if a // c\n{b}]\n",
 	}, {
 		name: "unary",
 		in:   head + "x: [- // c\n\ty, z]\n",
@@ -322,31 +322,25 @@ func TestCommentPlacement(t *testing.T) {
 		in:   "a: [string // c\n]: 1\n",
 		want: "a:\n\t[string // c\n\t]: 1\n",
 	}, {
-		// The comment moves after the body.
 		name: "comprehension comment after clause in inline list",
 		in:   "a: [for x in y // c\n\tif x > 1 {x}]\n",
-		want: "a: [for x in y\nif x > 1 {x} // c\n]\n",
+		want: "a: [for x in y // c\nif x > 1 {x}]\n",
 	}, {
-		// The comment moves after the body.
 		name: "comprehension comment after clause in list",
 		in:   "a: [\n\tfor x in y // c\n\tif x > 1 {x},\n]\n",
-		want: "a: [\n\tfor x in y\n\tif x > 1 {x}, // c\n]\n",
+		want: "a: [\n\tfor x in y // c\n\tif x > 1 {x},\n]\n",
 	}, {
-		// The comments move after the body, and swallow each other.
 		name: "comprehension comments after clauses",
 		in:   "a: {\n\tfor x in y // c1\n\tlet z = x // c2\n\tif z {\n\t\tb: z\n\t}\n}\n",
-		want: "a: {\n\tfor x in y\n\tlet z = x\n\tif z {\n\t\tb: z\n\t} // c1 // c2\n}\n",
+		want: "a: {\n\tfor x in y // c1\n\tlet z = x // c2\n\tif z {\n\t\tb: z\n\t}\n}\n",
 	}, {
-		// The comment moves after the body, and swallows the next field
-		// and the closing brace.
 		name: "comprehension comment after body brace",
 		in:   "a: {if x { // c\n\tb: 1\n}, c: 2}\n",
-		want: "a: {if x {\n\tb: 1\n} // c, c: 2}\n",
+		want: "a: {if x { // c\n\tb: 1\n}, c: 2}\n",
 	}, {
-		// The comment on its own line swallows the trailing comment.
 		name: "comprehension comments after body",
 		in:   "a: {\n\tif x {\n\t\tb: 1\n\t} // c1\n\t// c2\n}\n",
-		want: "a: {\n\tif x {\n\t\tb: 1\n\t}\n\t// c2 // c1\n}\n",
+		want: "a: {\n\tif x {\n\t\tb: 1\n\t} // c1\n\t// c2\n}\n",
 	}}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -521,6 +515,19 @@ func TestNodes(t *testing.T) {
 			}
 		}(),
 		out: "x: a + b & // c\n\td",
+	}, {
+		// A comment between a clause and the body, without a position,
+		// sits on its own line.
+		name: "comprehension clause comment without position",
+		in: func() ast.Node {
+			c := &ast.Comprehension{
+				Clauses: []ast.Clause{&ast.ForClause{Value: ast.NewIdent("x"), Source: ast.NewIdent("y")}},
+				Value:   ast.NewStruct("a", ast.NewIdent("x")),
+			}
+			ast.AddComment(c, &ast.CommentGroup{Position: 2, List: []*ast.Comment{{Text: "// c"}}})
+			return &ast.Field{Label: ast.NewIdent("f"), Value: ast.NewList(c)}
+		}(),
+		out: "f: [\n\tfor x in y\n\t// c\n\t{\n\t\t\"a\": x\n\t}\n]",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

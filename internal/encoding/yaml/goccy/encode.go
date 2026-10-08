@@ -143,6 +143,10 @@ func stripBlankLinePadding(b []byte) []byte {
 // indentWidth is the number of spaces per indentation level.
 const indentWidth = 2
 
+// maxImplicitKey is the maximum length in characters of an implicit
+// mapping key in YAML.
+const maxImplicitKey = 1024
+
 // EncodeOptions configures [Encode]. The zero value is the default.
 type EncodeOptions struct {
 	// CompactSequences renders sequence (list) elements at the same
@@ -287,7 +291,18 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 			if tk := mv.Key.GetToken(); tk != nil && tk.Position != nil {
 				keyCol = tk.Position.Column
 			}
+			explicitKey := false
+			if key := mv.Key.String(); utf8.RuneCountInString(key) > maxImplicitKey {
+				mv.Key = newExplicitKeyNode(mv.Key, key, keyCol, n.IsFlowStyle)
+				explicitKey = true
+			}
 			mv.Value = applyInfo(mv.Value, e, keyCol, n.IsFlowStyle)
+			if explicitKey {
+				// goccy's parser misreads a block scalar as the value
+				// of a quoted explicit key. Explicit keys are rare, so
+				// their values are never blocks.
+				mv.Value = blockToQuoted(mv.Value)
+			}
 			if len(e.line) > 0 {
 				cg := commentGroup(e.line, false)
 				// A line comment on a block collection goes after the
@@ -299,7 +314,7 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 				case *yast.SequenceNode:
 					blockCollection = !v.IsFlowStyle && len(v.Values) > 0
 				}
-				if blockCollection {
+				if blockCollection && !explicitKey {
 					mv.Key.SetComment(cg)
 				} else {
 					mv.Value.SetComment(cg)
@@ -359,6 +374,28 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 	return node
 }
 
+// blockToQuoted returns n with a literal block scalar, possibly tagged,
+// replaced by the equivalent double quoted scalar.
+func blockToQuoted(n yast.Node) yast.Node {
+	var value string
+	switch x := n.(type) {
+	case *yast.TagNode:
+		x.Value = blockToQuoted(x.Value)
+		return x
+	case *yast.LiteralNode:
+		value = x.Value.Value
+	case *yast.StringNode:
+		if !strings.HasPrefix(x.String(), "|") {
+			return n
+		}
+		value = x.Value
+	default:
+		return n
+	}
+	q := strconv.Quote(value)
+	return yast.String(ytoken.New(q, q, clonePos(n)))
+}
+
 // keepsTrailingLines reports whether n renders as a literal block with
 // keep chomping, whose value includes any blank lines following it.
 // goccy renders multi-line strings as literal blocks through string
@@ -385,6 +422,25 @@ func (n seqTagNode) String() string {
 	indent := len(value) - len(strings.TrimLeft(value, " "))
 	return value[:indent] + s
 }
+
+// explicitKeyNode is a mapping key in explicit form, "? key", needed for
+// keys longer than [maxImplicitKey]. goccy would print the ":" on the
+// key's line, so the key carries the line break itself.
+type explicitKeyNode struct {
+	*yast.StringNode
+	text string
+}
+
+func newExplicitKeyNode(key yast.MapKeyNode, text string, col int, inFlow bool) explicitKeyNode {
+	sep := " "
+	if !inFlow {
+		sep = "\n" + strings.Repeat(" ", max(col-1, 0))
+	}
+	text = "? " + text + sep
+	return explicitKeyNode{yast.String(ytoken.New(text, text, clonePos(key))), text}
+}
+
+func (n explicitKeyNode) String() string { return n.text }
 
 // clonePos returns a copy of the position of n's token, or nil.
 func clonePos(n yast.Node) *ytoken.Position {

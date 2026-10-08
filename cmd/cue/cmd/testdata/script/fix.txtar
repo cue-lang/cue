@@ -9,6 +9,15 @@ cmp p/one.cue p/one.cue.fixed
 cmp p/two.cue p/two.cue.fixed
 cmp p/three.cue p/three.cue.fixed
 
+# With no arguments, fix the module's packages and those under cue.mod,
+# where nested directories without CUE files, or with only ignored ones,
+# are not packages.
+# TODO: the intermediate directory is wrongly loaded as a package,
+# so cue fix fails and fixes nothing.
+cd mod
+! exec cue fix
+stderr 'cannot find package "test.example/foo": cannot find module providing package test.example/foo'
+
 -- p/one.cue --
 package one
 
@@ -35,3 +44,39 @@ out: list.Repeat(["baz"], 3)
 import "list"
 
 out: list.Concat([["a"], (list.Concat([(list.Repeat(["a"], 7)), ["gh"]]))])
+-- mod/cue.mod/module.cue --
+module: "test.example/g"
+language: version: "v0.17.0"
+-- mod/cue.mod/gen/test.example/foo/bar/bar.cue --
+package bar
+
+#T: {name: string}
+
+out: ["foo"] + ["bar"]
+-- mod/cue.mod/pkg/test.example/ign/_ignored.cue --
+package ign
+-- mod/bar.cue.fixed --
+package bar
+
+import "list"
+
+#T: {name: string}
+
+out: list.Concat([["foo"], ["bar"]])
+-- mod/x.cue --
+package g
+
+import "test.example/foo/bar"
+
+p: bar.#T & {name: "x"}
+out: 3 * ["baz"]
+-- mod/x.cue.fixed --
+package g
+
+import (
+	"test.example/foo/bar"
+	"list"
+)
+
+p:   bar.#T & {name: "x"}
+out: list.Repeat(["baz"], 3)

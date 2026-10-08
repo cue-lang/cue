@@ -59,6 +59,16 @@ func Extract(filename string, src any) (*ast.File, error) {
 }
 
 // Encode returns the YAML encoding of v.
+//
+// The encoding is valid YAML 1.2, and decodes back to v both with this
+// package and with any decoder following YAML 1.2's core schema.
+// Strings are also quoted wherever YAML 1.1 decoders, or the widely used
+// go-yaml decoders, would read them as values of other types, such as
+// "yes", "0755", or "0X1F".
+//
+// A @yaml(,tag=T) attribute tags the encoding of the value it applies
+// to: T must either be a local tag, starting with "!", or a global tag
+// given as a URI. Decoders may reject tags they do not recognize.
 func Encode(v cue.Value) ([]byte, error) {
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return nil, err

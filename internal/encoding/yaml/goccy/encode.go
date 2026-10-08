@@ -50,6 +50,19 @@ import (
 // applied to the YAML syntax tree before printing: the rendering of
 // scalars and keys, flow styles, tags, and comments. All quoting is
 // decided by this package; see [quoteScalar].
+//
+// The output follows three rules, in order of priority:
+//
+//  1. It is valid YAML 1.2.2: for example, a byte order mark is always
+//     escaped, and a key longer than 1024 characters is explicit.
+//  2. It decodes back to the same values, both with this package and
+//     with YAML 1.2's core schema: for example, "\n" is never a literal
+//     block, and a number literal is normalized unless the core schema
+//     reads it as a number.
+//  3. Strings are quoted wherever YAML 1.1 decoders or the go-yaml
+//     decoders would read them as other values, such as "yes", "1_:0",
+//     or "0X1F", even where YAML 1.2 reads them as strings. Beyond
+//     that, decoders which deviate from YAML 1.2 are not accommodated.
 
 // Encode converts a CUE AST to YAML.
 //

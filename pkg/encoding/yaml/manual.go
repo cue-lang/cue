@@ -27,7 +27,8 @@ import (
 	"cuelang.org/go/internal/value"
 )
 
-// Marshal returns the YAML encoding of v.
+// Marshal returns the YAML encoding of v, following the same rules as
+// [cuelang.org/go/encoding/yaml.Encode].
 func Marshal(v cue.Value) (string, error) {
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return "", err

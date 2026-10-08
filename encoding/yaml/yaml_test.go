@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/yaml"
@@ -527,7 +528,20 @@ func TestYAMLValues(t *testing.T) {
 			if got != tc.yaml {
 				t.Errorf("Encode:\ngot  %q\nwant %q", got, tc.yaml)
 			}
-
+			if err != nil {
+				return
+			}
+			// The encoding decodes back to the same value.
+			f, err := yaml.Extract("x.yaml", b)
+			if err != nil && strings.Contains(tc.cue, "@yaml") {
+				return // decoding does not support custom tags on scalars
+			} else if err != nil {
+				t.Fatalf("Extract: %v", err)
+			}
+			dec := c.BuildFile(f)
+			if dec.Subsume(v, cue.Final()) != nil || v.Subsume(dec, cue.Final()) != nil {
+				t.Errorf("Extract:\ngot  %v\nwant %v", dec, v)
+			}
 		})
 	}
 }

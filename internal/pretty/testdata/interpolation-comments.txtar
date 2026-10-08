@@ -15,6 +15,9 @@
 # indented one level deeper, like a struct/list/call body. An expression
 # hugging `\(` (the `expr` and `binary` cases in out/norelpos) is not
 # indented, since nothing breaks after the delimiter.
+#
+# The same comments in a single-line string break it across lines too,
+# with only the interpolated expression indented.
 -- in --
 expr: """
 	\(
@@ -32,6 +35,13 @@ binary: """
 	2 // operand comment
 	)
 	"""
+single: "\( // after the open
+	1)"
+singleClose: "\(1 // after the expr
+	)"
+singleDoc: "\(
+	// doc
+	1)"
 -- out/relpos --
 expr: """
 	\(
@@ -49,6 +59,13 @@ binary: """
 			2 // operand comment
 	)
 	"""
+single: "\( // after the open
+	1)"
+singleClose: "\(1 // after the expr
+)"
+singleDoc: "\(
+	// doc
+	1)"
 -- out/norelpos --
 expr: """
 	\(1 // after the expr
@@ -64,3 +81,10 @@ binary: """
 		2 // operand comment
 	)
 	"""
+single: "\( // after the open
+	1)"
+singleClose: "\(1 // after the expr
+)"
+singleDoc: "\(
+	// doc
+	1)"

@@ -292,42 +292,35 @@ func TestCommentPlacement(t *testing.T) {
 		// The parser attaches a comment beside a `\(` or `)` delimiter to
 		// the string fragment ending or starting with it, so the comment
 		// forces a line break inside a single-line string.
-		// The comment is dropped.
 		name: "interpolation open",
 		in:   "a: \"\\( // c\n\tx)\"\n",
-		want: "a: \"\\(x)\"\n",
+		want: "a: \"\\( // c\n\tx)\"\n",
 	}, {
-		// The comment is dropped.
 		name: "interpolation close",
 		in:   "a: \"\\(x // c\n\t)\"\n",
-		want: "a: \"\\(x)\"\n",
+		want: "a: \"\\(x // c\n)\"\n",
 	}, {
-		// The comment is dropped.
 		name: "interpolation label",
 		in:   "a: {\n\t\"\\( // c\n\t\tk)\": 1\n}\n",
-		want: "a: {\n\t\"\\(k)\": 1\n}\n",
+		want: "a: {\n\t\"\\( // c\n\t\tk)\": 1\n}\n",
 	}, {
-		// The doc comment moves onto the line of the `\(`.
 		name: "interpolation doc",
 		in:   "a: \"x\\(\n// c\ny)z\"\n",
-		want: "a: \"x\\(// c\ny)z\"\n",
+		want: "a: \"x\\(\n\t// c\n\ty)z\"\n",
 	}, {
 		// A line comment after the expression of a pattern label puts
 		// the closing bracket on the next line.
-		// The comment swallows the closing bracket.
 		name: "pattern label line",
 		in:   "a: {\n\t[string // c\n\t]: 1\n}\n",
-		want: "a: {\n\t[string // c]: 1\n}\n",
+		want: "a: {\n\t[string // c\n\t]: 1\n}\n",
 	}, {
-		// The comment swallows the closing bracket.
 		name: "pattern label line inline struct",
 		in:   "a: {[string // c\n]: 1}\n",
-		want: "a: {[string // c]: 1}\n",
+		want: "a: {[string // c\n]: 1}\n",
 	}, {
-		// The comment swallows the closing bracket.
 		name: "pattern label line chain",
 		in:   "a: [string // c\n]: 1\n",
-		want: "a:\n\t[string // c]: 1\n",
+		want: "a:\n\t[string // c\n\t]: 1\n",
 	}}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

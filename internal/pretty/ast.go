@@ -1113,7 +1113,13 @@ func (c *converter) label(l ast.Label) doc {
 		return c.interpolation(x)
 	case *ast.ListLit:
 		if len(x.Elts) == 1 {
-			return cats(listOpener(x), c.expr(x.Elts[0]), rBracketLit)
+			elt := x.Elts[0]
+			// A `//` comment ending the element would swallow the `]`.
+			closer := rBracketLit
+			if c.nodeFlags[elt]&endsWithLineComment != 0 {
+				closer = cat(lineBreakHard, rBracketLit)
+			}
+			return cats(listOpener(x), c.expr(elt), closer)
 		}
 		return c.listLit(x)
 	case *ast.ParenExpr:
@@ -2930,7 +2936,13 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 		}
 	}
 
-	if !multiLine {
+	// A comment beside a `\(` or `)` delimiter, or before an
+	// interpolated expression, forces line breaks within the string,
+	// which the multi-line path knows how to place.
+	hasComments := slices.ContainsFunc(x.Elts, func(e ast.Expr) bool {
+		return len(ast.Comments(e)) > 0
+	})
+	if !multiLine && !hasComments {
 		parts := make([]doc, len(x.Elts))
 		for i, e := range x.Elts {
 			if lit, ok := e.(*ast.BasicLit); ok && lit.Kind == token.STRING {
@@ -2947,7 +2959,7 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 		return cats(parts...)
 	}
 
-	return c.multiLineInterpolation(x)
+	return c.multiLineInterpolation(x, multiLine)
 }
 
 // multiLineInterpolation handles the multi-line case of
@@ -2967,7 +2979,11 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 // `\(` and `)` delimiters end and start the surrounding string Elts, so a
 // comment beside one is a PosSuffix (after `\(`) or PosPrefix (before
 // `)`) comment on that Elt, rendered here in place.
-func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
+//
+// A single-line string whose Elts carry comments also comes here, with
+// multiLine false. Its lines after the first are not nested, as no
+// string fragment spans them: only the interpolated expressions indent.
+func (c *converter) multiLineInterpolation(x *ast.Interpolation, multiLine bool) doc {
 	stripPrefix := stripPrefixFromInterp(x)
 
 	var opener, body, interp []doc
@@ -3048,10 +3064,10 @@ func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
 		// Break before this Elt's content: an authored Newline / NewSection
 		// RelPos, or a forced break when a `//` comment - the previous Elt's
 		// trailing one or this Elt's leading one - would otherwise swallow
-		// the content.
+		// the content. An expression's doc comment needs a line of its own.
 		if idx > 0 {
 			br := relBreakOr(e.Pos().RelPos(), nil)
-			if br == nil && (forceBreak || len(before) > 0) {
+			if br == nil && (forceBreak || len(before) > 0 || (!isStr && HasDocComment(e))) {
 				br = lineBreakHard
 			}
 			if br != nil {
@@ -3104,7 +3120,8 @@ func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
 	}
 
 	if !inBody {
-		// Defensive: shouldn't happen since multiLine was true.
+		// Nothing broke the line, which can only happen when multiLine is
+		// false.
 		return cats(opener...)
 	}
 
@@ -3112,6 +3129,9 @@ func (c *converter) multiLineInterpolation(x *ast.Interpolation) doc {
 	// `)`); fold it defensively rather than drop its content.
 	closeInterp()
 
+	if !multiLine {
+		return cats(cats(opener...), cats(body...))
+	}
 	return cats(cats(opener...), nest(cats(body...)))
 }
 

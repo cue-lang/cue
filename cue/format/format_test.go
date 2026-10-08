@@ -1123,8 +1123,7 @@ c: """
 		}}
 		got, err := format.Node(f, format.Compact())
 		qt.Assert(t, qt.IsNil(err))
-		// The comment declarations are kept, swallowing the rest of their lines.
-		qt.Assert(t, qt.Equals(string(got), "// Generated., a: 1, b: {// Inner., c: 2, d: 3}\n"))
+		qt.Assert(t, qt.Equals(string(got), "a: 1, b: {c: 2, d: 3}\n"))
 
 		// Node leaves the comment declarations it was given alone.
 		again, err := format.Node(f)

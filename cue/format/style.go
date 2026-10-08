@@ -16,6 +16,7 @@ package format
 
 import (
 	"reflect"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -165,7 +166,8 @@ type ASTStyle struct {
 	// afresh.
 	ClearPositions bool
 
-	// ClearComments removes every comment in the tree. This is useful
+	// ClearComments removes every comment in the tree, including the
+	// standalone [*ast.CommentGroup] declarations. This is useful
 	// alongside ClearPositions, where line comments would otherwise force
 	// line breaks that defeat the compact layout.
 	ClearComments bool
@@ -212,8 +214,16 @@ func (cfg ASTStyle) apply(n ast.Node, allowChanges bool) bool {
 			if cfg.ClearPositions {
 				w.clearPositions(node)
 			}
-			if cfg.ClearComments && len(ast.Comments(node)) > 0 && w.tryMutate() {
-				ast.SetComments(node, nil)
+			if cfg.ClearComments {
+				if len(ast.Comments(node)) > 0 && w.tryMutate() {
+					ast.SetComments(node, nil)
+				}
+				switch node := node.(type) {
+				case *ast.File:
+					w.removeCommentDecls(&node.Decls)
+				case *ast.StructLit:
+					w.removeCommentDecls(&node.Elts)
+				}
 			}
 			return !w.stopped
 		}, nil)
@@ -364,6 +374,21 @@ func (w *walker) clearPositions(n ast.Node) {
 }
 
 var posType = reflect.TypeFor[token.Pos]()
+
+// removeCommentDecls removes the standalone [*ast.CommentGroup]
+// declarations from a body, which programmatic ASTs may hold alongside
+// the comments attached to nodes.
+func (w *walker) removeCommentDecls(decls *[]ast.Decl) {
+	if !slices.ContainsFunc(*decls, isCommentDecl) || !w.tryMutate() {
+		return
+	}
+	*decls = slices.DeleteFunc(*decls, isCommentDecl)
+}
+
+func isCommentDecl(d ast.Decl) bool {
+	_, ok := d.(*ast.CommentGroup)
+	return ok
+}
 
 // annotateInterpolation applies the house style to a string
 // interpolation, treating it as multi-line when a literal fragment (the

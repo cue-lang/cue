@@ -68,5 +68,11 @@ func isEllipsisDecl(d ast.Decl) bool {
 	if !ok {
 		return false
 	}
+	// An ellipsis has nowhere to put the field's attributes, nor the
+	// comments within its label and value.
+	if len(f.Attrs) > 0 || len(ast.Comments(l)) > 0 ||
+		len(ast.Comments(i)) > 0 || len(ast.Comments(v)) > 0 {
+		return false
+	}
 	return i.Name == "string" || i.Name == "_"
 }

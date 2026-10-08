@@ -731,9 +731,8 @@ func TestASTStyleEllipsis(t *testing.T) {
 				tc.add(patternField)
 				f := &ast.File{Decls: []ast.Decl{patternField}}
 				annotate(t, cfg, f)
-				// The pattern field is replaced, losing its side data.
-				if _, ok := f.Decls[0].(*ast.Ellipsis); !ok {
-					t.Errorf("Decls[0] = %T, want *ast.Ellipsis", f.Decls[0])
+				if _, ok := f.Decls[0].(*ast.Field); !ok {
+					t.Errorf("Decls[0] = %T, want *ast.Field", f.Decls[0])
 				}
 			})
 		}

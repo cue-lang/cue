@@ -40,17 +40,16 @@ import (
 
 // The encoder is built on goccy/go-yaml's Encoder: the CUE syntax tree
 // is converted to a Go value tree (yaml.MapSlice for mappings, []any
-// for sequences, and strings or pre-rendered scalars for values) which
-// goccy's EncodeToNode turns into a YAML syntax tree.
+// for sequences, and strings for scalars) which goccy's EncodeToNode
+// turns into a YAML syntax tree.
 //
 // The value tree is a thin structural carrier only. goccy's nodes are
 // backed by tokens whose origin text drives printing, so building them
-// directly would mean synthesizing every token. Strings needing quotes
-// are pre-rendered in the value tree, as goccy's own quoting escapes
-// characters inside single quotes, which cannot carry escapes; see
-// [quoteScalar]. Aspects the value tree cannot express, recorded in a
-// parallel tree of encInfo nodes, are applied to the YAML syntax tree
-// before printing: quoting of keys, flow styles, tags, and comments.
+// directly would mean synthesizing every token. Aspects the value tree
+// cannot express, recorded in a parallel tree of encInfo nodes, are
+// applied to the YAML syntax tree before printing: the rendering of
+// scalars and keys, flow styles, tags, and comments. All quoting is
+// decided by this package; see [quoteScalar].
 
 // Encode converts a CUE AST to YAML.
 //
@@ -155,20 +154,6 @@ type EncodeOptions struct {
 	CompactSequences bool
 }
 
-// rawScalar is a pre-rendered YAML scalar, emitted verbatim through
-// goccy's BytesMarshaler mechanism: the bytes are parsed as YAML and
-// grafted into the output tree. Used for numbers, quoted strings, and
-// tagged scalars such as !!binary.
-type rawScalar string
-
-// MarshalYAML implements [yaml.BytesMarshaler].
-func (r rawScalar) MarshalYAML() ([]byte, error) { return []byte(r), nil }
-
-// literalString is a single-line string to be rendered as a literal
-// block scalar. encode turns it into a plain string in the value tree
-// and records the request in [encInfo.literal]; see there for why.
-type literalString string
-
 // commentLine is one comment line: text excludes the leading "#" but
 // includes any space that follows it. Both renderers, [commentGroup]
 // for tree comments and [writeCommentLines] for around-document
@@ -184,10 +169,11 @@ type commentLine struct {
 // sequence elements, an invariant applyInfo relies on when pairing the
 // nodes goccy produced back up with their entries by index.
 type encInfo struct {
-	// quotedKey, when non-empty, replaces this mapping entry's key
-	// with the given pre-quoted form, overriding any quoting style
-	// chosen by goccy.
+	// quotedKey and rendered, when non-empty, replace this mapping
+	// entry's key and this scalar with their given YAML forms, such as
+	// a quoted string or a number, overriding goccy's rendering.
 	quotedKey string
+	rendered  string
 	// flow renders a mapping or sequence in flow style.
 	flow bool
 	// tag wraps the value in a YAML tag such as !!binary or a custom
@@ -241,11 +227,14 @@ func (e *encInfo) prependHead(lines []commentLine) {
 // produced by goccy's encoder, returning the node (wrapped in a tag
 // node when a tag applies). col is the column the node's layout is
 // anchored to — its mapping key, its sequence start, or column one at
-// the document root — or zero when unknown; inFlow reports whether the
-// node sits in a flow-style collection.
-func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
+// the document root — or zero when unknown; noBlock reports whether the
+// node cannot be a block scalar, such as in a flow-style collection.
+func applyInfo(node yast.Node, info *encInfo, col int, noBlock bool) yast.Node {
 	if info == nil {
 		return node
+	}
+	if info.rendered != "" {
+		node = stringNode(info.rendered, node)
 	}
 	switch n := node.(type) {
 	case *yast.MappingNode:
@@ -271,7 +260,7 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 				// Replace the key node wholesale: goccy may have
 				// rendered it as any scalar kind, such as a literal
 				// block for a key containing newlines.
-				mv.Key = yast.String(ytoken.New(e.quotedKey, e.quotedKey, clonePos(mv.Key)))
+				mv.Key = stringNode(e.quotedKey, mv.Key)
 			}
 			if len(e.head) > 0 {
 				mv.SetComment(commentGroup(e.head, false))
@@ -291,18 +280,15 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 			if tk := mv.Key.GetToken(); tk != nil && tk.Position != nil {
 				keyCol = tk.Position.Column
 			}
-			explicitKey := false
-			if key := mv.Key.String(); utf8.RuneCountInString(key) > maxImplicitKey {
-				mv.Key = newExplicitKeyNode(mv.Key, key, keyCol, n.IsFlowStyle)
-				explicitKey = true
-			}
-			mv.Value = applyInfo(mv.Value, e, keyCol, n.IsFlowStyle)
+			key := mv.Key.String()
+			explicitKey := len(key) > maxImplicitKey && utf8.RuneCountInString(key) > maxImplicitKey
 			if explicitKey {
-				// goccy's parser misreads a block scalar as the value
-				// of a quoted explicit key. Explicit keys are rare, so
-				// their values are never blocks.
-				mv.Value = blockToQuoted(mv.Value)
+				mv.Key = newExplicitKeyNode(mv.Key, key, keyCol, n.IsFlowStyle)
 			}
+			// goccy's parser misreads a block scalar as the value of a
+			// quoted explicit key. Explicit keys are rare, so their
+			// values are never blocks.
+			mv.Value = applyInfo(mv.Value, e, keyCol, n.IsFlowStyle || explicitKey)
 			if len(e.line) > 0 {
 				cg := commentGroup(e.line, false)
 				// A line comment on a block collection goes after the
@@ -352,57 +338,30 @@ func applyInfo(node yast.Node, info *encInfo, col int, inFlow bool) yast.Node {
 			}
 		}
 	}
+	if sn, ok := node.(*yast.StringNode); ok && noBlock && strings.Contains(sn.Value, "\n") {
+		// goccy renders a string with newlines as a literal block.
+		node = stringNode(strconv.Quote(sn.Value), node)
+	}
 	if tag := info.tag; tag != "" {
-		// A pre-rendered scalar may already be a tag node: a CUE bytes
-		// value renders as `!!binary <base64>`, which goccy grafts as a
-		// tag node. Replace that tag rather than nesting a second one,
-		// which would emit invalid YAML like `!custom !!binary <b64>`.
-		inner := node
-		if tn, ok := node.(*yast.TagNode); ok {
-			inner = tn.Value
-		}
 		// Copy the wrapped value's position so that rendering the tag
 		// node knows its column.
-		tn := yast.Tag(ytoken.New(tag, tag, clonePos(inner)))
-		tn.Value = inner
+		tn := yast.Tag(ytoken.New(tag, tag, clonePos(node)))
+		tn.Value = node
 		node = tn
 	}
-	if info.literal != "" && !inFlow && col > 0 {
+	if info.literal != "" && !noBlock && col > 0 {
 		// The block content sits one indent level past its anchor.
 		node = literalBlock(node, info.literal, col-1+indentWidth)
 	}
 	return node
 }
 
-// blockToQuoted returns n with a literal block scalar, possibly tagged,
-// replaced by the equivalent double quoted scalar.
-func blockToQuoted(n yast.Node) yast.Node {
-	var value string
-	switch x := n.(type) {
-	case *yast.TagNode:
-		x.Value = blockToQuoted(x.Value)
-		return x
-	case *yast.LiteralNode:
-		value = x.Value.Value
-	case *yast.StringNode:
-		if !strings.HasPrefix(x.String(), "|") {
-			return n
-		}
-		value = x.Value
-	default:
-		return n
-	}
-	q := strconv.Quote(value)
-	return yast.String(ytoken.New(q, q, clonePos(n)))
-}
-
-// keepsTrailingLines reports whether n renders as a literal block with
-// keep chomping, whose value includes any blank lines following it.
-// goccy renders multi-line strings as literal blocks through string
-// nodes, so the rendered block header is checked.
+// keepsTrailingLines reports whether n is a string goccy renders as a
+// literal block with keep chomping, whose value includes any blank
+// lines following it: one ending in more than one newline.
 func keepsTrailingLines(n yast.Node) bool {
-	header, _, _ := strings.Cut(n.String(), "\n")
-	return strings.HasPrefix(header, "|") && strings.Contains(header, "+")
+	sn, ok := n.(*yast.StringNode)
+	return ok && strings.HasSuffix(sn.Value, "\n\n")
 }
 
 // seqTagNode is a tag node which is an element of a block sequence.
@@ -426,10 +385,7 @@ func (n seqTagNode) String() string {
 // explicitKeyNode is a mapping key in explicit form, "? key", needed for
 // keys longer than [maxImplicitKey]. goccy would print the ":" on the
 // key's line, so the key carries the line break itself.
-type explicitKeyNode struct {
-	*yast.StringNode
-	text string
-}
+type explicitKeyNode struct{ *yast.StringNode }
 
 func newExplicitKeyNode(key yast.MapKeyNode, text string, col int, inFlow bool) explicitKeyNode {
 	sep := " "
@@ -437,10 +393,16 @@ func newExplicitKeyNode(key yast.MapKeyNode, text string, col int, inFlow bool) 
 		sep = "\n" + strings.Repeat(" ", max(col-1, 0))
 	}
 	text = "? " + text + sep
-	return explicitKeyNode{yast.String(ytoken.New(text, text, clonePos(key))), text}
+	return explicitKeyNode{stringNode(text, key)}
 }
 
-func (n explicitKeyNode) String() string { return n.text }
+func (n explicitKeyNode) String() string { return n.Value }
+
+// stringNode returns a string node with the given YAML text, positioned
+// like n.
+func stringNode(text string, n yast.Node) *yast.StringNode {
+	return yast.String(ytoken.String(text, text, clonePos(n)))
+}
 
 // clonePos returns a copy of the position of n's token, or nil.
 func clonePos(n yast.Node) *ytoken.Position {
@@ -587,12 +549,12 @@ func escapeTag(s, allowed string) string {
 func encode(n ast.Node) (v any, info *encInfo, err error) {
 	switch x := n.(type) {
 	case *ast.BasicLit:
-		v, err = encodeScalar(x)
+		v, info, err = encodeScalar(x)
 
 	case *ast.ListLit:
 		v, info, err = encodeExprs(x.Elts)
 		if err == nil {
-			v = flowIfSingleLine(v, info, x.Lbrack, x.Rbrack)
+			flowIfSingleLine(v, info, x.Lbrack, x.Rbrack)
 		}
 
 	case *ast.StructLit:
@@ -606,11 +568,11 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 		if ok && x.Op == token.SUB && (b.Kind == token.INT || b.Kind == token.FLOAT) &&
 			!strings.HasPrefix(b.Value, "-") {
 			var s string
-			s, err = yamlNumber(b, true)
+			s, err = yamlNumber(b, "-")
 			if err != nil {
 				return nil, nil, err
 			}
-			v = rawScalar(s)
+			v, info = s, &encInfo{rendered: s}
 			break
 		}
 		return nil, nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
@@ -622,15 +584,6 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 	}
 	if info == nil {
 		info = &encInfo{}
-	}
-	if ls, ok := v.(literalString); ok {
-		// Where no block can be rendered, such as in a flow collection
-		// or under a tag, the string is quoted like any other.
-		v = string(ls)
-		if q := quoteScalar(string(ls)); q != "" {
-			v = rawScalar(q)
-		}
-		info.literal = string(ls)
 	}
 	addDocs(n, info)
 	// Head comments on a block collection render above its first entry,
@@ -656,15 +609,12 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 // decides quoting for block context, so characters such as commas,
 // brackets, braces, and colons would otherwise corrupt the output.
 // Decoders derived from libyaml, such as yaml.v3, also misread "?".
-// Strings reaching here hold no newlines, tabs, or unprintable
-// characters, all of which the earlier quoting rules route to double
-// quotes.
-func quoteFlowUnsafe(v any, info *encInfo) any {
+func quoteFlowUnsafe(v any, info *encInfo) {
 	const flowUnsafe = ",[]{}:?"
 	switch x := v.(type) {
 	case string:
-		if strings.ContainsAny(x, flowUnsafe) {
-			return rawScalar(singleQuoted(x))
+		if info.rendered == "" && strings.ContainsAny(x, flowUnsafe) {
+			info.rendered = singleQuoted(x)
 		}
 	case yaml.MapSlice:
 		for i := range x {
@@ -679,7 +629,7 @@ func quoteFlowUnsafe(v any, info *encInfo) any {
 				// by its own pass.
 				continue
 			}
-			x[i].Value = quoteFlowUnsafe(x[i].Value, e)
+			quoteFlowUnsafe(x[i].Value, e)
 		}
 	case []any:
 		for i := range x {
@@ -687,26 +637,24 @@ func quoteFlowUnsafe(v any, info *encInfo) any {
 			if e != nil && e.flow {
 				continue
 			}
-			x[i] = quoteFlowUnsafe(x[i], e)
+			quoteFlowUnsafe(x[i], e)
 		}
 	}
-	return v
 }
 
 // flowIfSingleLine marks a collection written on a single source line
 // to render in flow style, quoting entries that flow context cannot
 // carry.
-func flowIfSingleLine(v any, info *encInfo, l, r token.Pos) any {
+func flowIfSingleLine(v any, info *encInfo, l, r token.Pos) {
 	if line := l.Line(); line > 0 && line == r.Line() {
 		info.flow = true
-		v = quoteFlowUnsafe(v, info)
+		quoteFlowUnsafe(v, info)
 	}
-	return v
 }
 
 // singleQuoted returns s as a YAML single-quoted scalar, which keeps
 // every character as is. s must not contain characters that need
-// escaping, which [shouldQuote] routes to double quotes.
+// escaping, which [quoteScalar] routes to double quotes.
 func singleQuoted(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }
@@ -719,12 +667,9 @@ func needsSingleQuoting(s string) bool {
 }
 
 // quoteScalar returns the pre-quoted rendering of a string scalar that
-// cannot be left plain, or "" when no quoting is needed: double quotes
-// for a string containing newlines, which only a block scalar could
-// carry otherwise, or characters which need escaping, single quotes for
-// the forms of [needsSingleQuoting], double quotes for those of
-// [shouldQuote], and single quotes for any other string goccy would
-// quote.
+// cannot be left plain, or "" when no quoting is needed. Double quotes
+// are used when escapes are needed, or to stay compatible with the
+// output of earlier encoders.
 //
 // goccy's own quoting must never apply: it escapes characters such as
 // no-break spaces with backslashes even inside single quotes, where
@@ -743,67 +688,62 @@ func quoteScalar(s string) string {
 	return ""
 }
 
-func encodeScalar(b *ast.BasicLit) (any, error) {
+// encodeScalar returns the value of a scalar for the value tree, and the
+// info rendering it when goccy's own rendering cannot be used.
+func encodeScalar(b *ast.BasicLit) (any, *encInfo, error) {
 	switch b.Kind {
 	case token.INT, token.FLOAT:
-		s, err := yamlNumber(b, false)
+		s, err := yamlNumber(b, "")
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return rawScalar(s), nil
+		return s, &encInfo{rendered: s}, nil
 
 	case token.TRUE:
-		return true, nil
+		return true, nil, nil
 	case token.FALSE:
-		return false, nil
+		return false, nil, nil
 	case token.NULL:
-		return nil, nil
+		return nil, nil, nil
 
 	case token.STRING:
-		info, nStart, _, err := literal.ParseQuotes(b.Value, b.Value)
+		qi, nStart, _, err := literal.ParseQuotes(b.Value, b.Value)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		str, err := info.Unquote(b.Value[nStart:])
+		str, err := qi.Unquote(b.Value[nStart:])
 		if err != nil {
 			panic(fmt.Sprintf("invalid string: %v", err))
 		}
 		switch {
-		case !info.IsDouble():
-			return rawScalar("!!binary " + base64.StdEncoding.EncodeToString([]byte(str))), nil
+		case !qi.IsDouble():
+			b64 := base64.StdEncoding.EncodeToString([]byte(str))
+			return b64, &encInfo{rendered: b64, tag: "!!binary"}, nil
 
-		case strings.Contains(str, "\n"):
-			if info.IsMulti() && blockLiteralSafe(str) {
-				// Preserve multi-line format: goccy renders plain strings
-				// containing newlines in literal style.
-				return str, nil
+		case qi.IsMulti() && blockLiteralSafe(str):
+			if strings.Contains(str, "\n") {
+				// Preserve multi-line format: goccy renders plain
+				// strings containing newlines in literal style.
+				return str, nil, nil
 			}
-			return rawScalar(strconv.Quote(str)), nil
-
-		case info.IsMulti() && blockLiteralSafe(str):
 			// A single-line string written as a multi-line CUE literal
-			// keeps its block form; see [encInfo.literal].
-			return literalString(str), nil
+			// keeps its block form where one can be rendered, and is
+			// quoted like any other string elsewhere; see
+			// [encInfo.literal].
+			return str, &encInfo{literal: str, rendered: quoteScalar(str)}, nil
 		}
-		if q := quoteScalar(str); q != "" {
-			return rawScalar(q), nil
-		}
-		return str, nil
+		return str, &encInfo{rendered: quoteScalar(str)}, nil
 
 	default:
-		return nil, errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
+		return nil, nil, errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
 	}
 }
 
-// yamlNumber returns the YAML form of a CUE number literal, negated if
-// neg is set: the literal itself when YAML's core schema resolves it as
-// a number, or its normalized form otherwise (for example, 1K becomes
+// yamlNumber returns the YAML form of a CUE number literal, prefixed by
+// sign: the literal itself when YAML's core schema resolves it as a
+// number, or its normalized form otherwise (for example, 1K becomes
 // 1000 and 0b101 becomes 5).
-func yamlNumber(b *ast.BasicLit, neg bool) (string, error) {
-	sign := ""
-	if neg {
-		sign = "-"
-	}
+func yamlNumber(b *ast.BasicLit, sign string) (string, error) {
 	if s := sign + b.Value; rxCoreNumber().MatchString(s) {
 		return s, nil
 	}
@@ -817,9 +757,12 @@ func yamlNumber(b *ast.BasicLit, neg bool) (string, error) {
 // rxCoreNumber matches the integers and floats of YAML's core schema,
 // leaving out infinities and NaN, which CUE numbers cannot be.
 var rxCoreNumber = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^(?:[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+|` +
-		`[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?)$`)
+	return regexp.MustCompile(`^(?:0o[0-7]+|0x[0-9a-fA-F]+|` + coreFloat + `)$`)
 })
+
+// coreFloat matches the floats of YAML's core schema, which include its
+// decimal integers, leaving out infinities and NaN.
+const coreFloat = `[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?`
 
 // singleToken lexes s and returns its token when s lexes as exactly
 // one token.
@@ -846,8 +789,8 @@ func isNumberTokenType(t ytoken.Type) bool {
 // decoded back unharmed: it may be a YAML 1.1 legacy value, a scalar
 // that YAML decodes as another type such as a number or an infinity,
 // a broken YAML 1.1 octal that other decoders read as a float, start
-// with a document marker, or contain characters that a plain scalar
-// cannot carry, such as tabs or unprintable characters.
+// with a document marker, or contain a tab, which YAML 1.1 does not
+// allow in a plain scalar.
 func shouldQuote(str string) bool {
 	if str == "" || legacyStrings[str] {
 		return true
@@ -863,7 +806,7 @@ func shouldQuote(str string) bool {
 		(useQuote().MatchString(str) || rxYAML11Number().MatchString(str) || goYAMLNumber(str)) {
 		return true
 	}
-	return decodesAsNonString(str) || strings.ContainsRune(str, '\t') || yamlUnprintable(str)
+	return decodesAsNonString(str) || strings.ContainsRune(str, '\t')
 }
 
 // yamlUnprintable reports whether the string contains characters that
@@ -969,30 +912,22 @@ func goYAMLNumber(s string) bool {
 			return true
 		}
 	}
-	for _, p := range [...]struct {
-		prefix string
-		base   int
-	}{{"0b", 2}, {"0o", 8}} {
-		prefix, base := p.prefix, p.base
-		if rest, ok := strings.CutPrefix(plain, prefix); ok {
-			if _, err := strconv.ParseInt(rest, base, 64); err == nil {
-				return true
-			}
-			if _, err := strconv.ParseUint(rest, base, 64); err == nil {
-				return true
-			}
-		} else if rest, ok := strings.CutPrefix(plain, "-"+prefix); ok {
-			if _, err := strconv.ParseInt("-"+rest, base, 64); err == nil {
-				return true
-			}
-		}
+	// A sign is also accepted after a lowercase binary or octal prefix.
+	if rest, ok := strings.CutPrefix(plain, "0b"); ok {
+		_, err := strconv.ParseInt(rest, 2, 64)
+		return err == nil
+	}
+	if rest, ok := strings.CutPrefix(plain, "0o"); ok {
+		_, err := strconv.ParseInt(rest, 8, 64)
+		return err == nil
 	}
 	return false
 }
 
-// rxGoYAMLFloat is the regular expression go-yaml uses for floats.
+// rxGoYAMLFloat is the regular expression go-yaml uses for floats, which
+// is the core schema's.
 var rxGoYAMLFloat = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$`)
+	return regexp.MustCompile(`^` + coreFloat + `$`)
 })
 
 // rxYAML11Number matches the integers and floats of YAML 1.1, using the
@@ -1011,7 +946,7 @@ var rxYAML11Number = sync.OnceValue(func() *regexp.Regexp {
 // This regular expression conservatively matches any date, time string,
 // or base60 float.
 var useQuote = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[\-+0-9:\. \t]+([-:]|[tT])[\-+0-9:\. \t]+[zZ]?$|^0x[a-fA-F0-9]+$`)
+	return regexp.MustCompile(`^[\-+0-9:\. \t]+([-:]|[tT])[\-+0-9:\. \t]+[zZ]?$`)
 })
 
 // legacyStrings contains a map of fixed strings with special meaning for any
@@ -1168,11 +1103,7 @@ func encodeDecls(decls []ast.Decl, lbrace, rbrace token.Pos) (any, *encInfo, err
 				return nil, nil, err
 			}
 
-			// Unless quoted, goccy renders a key containing newlines as
-			// a literal block in key position.
-			if q := quoteScalar(name); q != "" {
-				valueInfo.quotedKey = q
-			}
+			valueInfo.quotedKey = quoteScalar(name)
 
 			yamlTag, err := extractYAMLTag(x.Attrs)
 			if err != nil {
@@ -1264,7 +1195,8 @@ func encodeDecls(decls []ast.Decl, lbrace, rbrace token.Pos) (any, *encInfo, err
 		e.foot, e.footBlank = nil, false
 	}
 
-	return flowIfSingleLine(m, info, lbrace, rbrace), info, nil
+	flowIfSingleLine(m, info, lbrace, rbrace)
+	return m, info, nil
 }
 
 // addDocs records a CUE node's comments: head (doc) comments, line

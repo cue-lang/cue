@@ -504,6 +504,9 @@ func TestYAMLValues(t *testing.T) {
 		// A tag on a list element is a declaration attribute by an embedding.
 		{`["first", {"second", @yaml(,tag="!Env")}]`, "- first\n- !Env second"},
 
+		// Empty bytes are an empty quoted string with a binary tag.
+		{`a: ''`, `a: !!binary ""`},
+
 		// A tagged empty collection stays on the line of its tag.
 		{`{d: {} @yaml(,tag="!Empty"), l: [{[], @yaml(,tag="!L")}]}`, "d: !Empty {}\nl:\n  - !L []"},
 

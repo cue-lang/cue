@@ -193,7 +193,7 @@ func normalizeMergeKeys(tokens ytoken.Tokens) ytoken.Tokens {
 			active = nil
 		case ytoken.TagType:
 			isMergeTag := resolveTagWith(active, tk.Value) == "!!merge" ||
-				tk.Value == "!<tag:yaml.org,2002:merge>"
+				tk.Value == "!<"+coreTagPrefix+"merge>"
 			if isMergeTag && i+2 < len(tokens) &&
 				tokens[i+2].Type == ytoken.MappingValueType {
 				next := tokens[i+1]
@@ -1753,7 +1753,7 @@ func resolveTagWith(handles map[string]string, tag string) string {
 		return tag
 	}
 	long := prefix + suffix
-	if s, ok := strings.CutPrefix(long, "tag:yaml.org,2002:"); ok {
+	if s, ok := strings.CutPrefix(long, coreTagPrefix); ok {
 		return "!!" + s
 	}
 	return long

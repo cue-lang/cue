@@ -414,7 +414,7 @@ func (r *renderer) renderTableInMode(f renderFrame, d *docTable) {
 		}
 		r.infoScratch = r.infoScratch[:required]
 		info := r.infoScratch[base:required]
-		n := r.longestAlignedPrefix(rows, avail, f.infWidth, info)
+		n := r.longestAlignedPrefix(rows, avail, f.infWidth, first, info)
 		r.renderTableSegment(f.indent, f.basePrefix, f.infWidth, rows[:n], info, !first)
 		first = false
 		rows = rows[n:]
@@ -773,6 +773,12 @@ func countsTowardRowWidth(c int, ci cellInfo) bool {
 // every row scanned. We always return at least 1: a "boundary" row
 // forms a one-row segment on its own.
 //
+// Columns only align across lines, so a row which shares a line with
+// the previous one, as its separator cannot break, forms a one-row
+// segment. The first row of the table is exempt, as its position is up
+// to the content preceding the table; first reports whether rows starts
+// with it.
+//
 // A row is a "boundary" when either:
 //
 //   - a cell (or a row's Raw Doc) is unflattenable: it contains
@@ -788,13 +794,22 @@ func countsTowardRowWidth(c int, ci cellInfo) bool {
 // newlines even when they extend past the line width - a lone trailing
 // // comment is the canonical example - so they do not trigger a
 // boundary on their own.
-func (r *renderer) longestAlignedPrefix(rows []row, avail int, infiniteWidth bool, info []rowInfo) int {
+func (r *renderer) longestAlignedPrefix(rows []row, avail int, infiniteWidth, first bool, info []rowInfo) int {
 	if len(rows) == 0 {
 		return 0
 	}
+	// sharesLine reports whether rows[i] shares a line with the row
+	// before it.
+	sharesLine := func(i int) bool {
+		return (i > 0 || !first) && !docCanBreak(rows[i].sep)
+	}
 
-	// Precompute per-cell width and break-ability once.
-	for i, row := range rows {
+	// measure computes row i's per-cell width and break-ability. We
+	// measure rows as we admit them, rather than all rows up front, as
+	// the caller calls us again for the rest of the rows after each
+	// segment.
+	measure := func(i int) {
+		row := rows[i]
 		// cells may already be non-nil, so we truncate to permit memory
 		// reuse.
 		cs := info[i].cells[:0]
@@ -806,7 +821,7 @@ func (r *renderer) longestAlignedPrefix(rows []row, avail int, infiniteWidth boo
 				rawCanBreak: canBreak,
 				cells:       cs,
 			}
-			continue
+			return
 		}
 		broken := false
 		for _, d := range row.cells {
@@ -853,7 +868,13 @@ func (r *renderer) longestAlignedPrefix(rows []row, avail int, infiniteWidth boo
 
 	var colMaxW []int
 	for i, row := range rows {
-		if info[i].broken {
+		// A row sharing a line starts the next segment, which measures
+		// it, so we do not measure it here.
+		if i > 0 && sharesLine(i) {
+			return i
+		}
+		measure(i)
+		if info[i].broken || sharesLine(i) {
 			return max(i, 1) // the prefix is always at least 1 row long.
 		}
 		// Predict new column maxes if this row is admitted, using the

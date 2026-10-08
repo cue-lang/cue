@@ -74,10 +74,13 @@ func CacheDir(getenv func(string) string) (string, error) {
 	return filepath.Join(dir, "cue"), nil
 }
 
+// readFile is a variable so that tests can intercept reads.
+var readFile = robustio.ReadFile
+
 func ReadLogins(path string) (*Logins, error) {
 	// Note that we read logins.json without holding a file lock,
 	// as the file lock is only held for writes. Prevent ephemeral errors on Windows.
-	body, err := robustio.ReadFile(path)
+	body, err := readFile(path)
 	if err != nil {
 		return nil, err
 	}

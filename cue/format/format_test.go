@@ -222,55 +222,45 @@ func TestCommentPlacement(t *testing.T) {
 		// swallow the next element or the closer. Such a comment may have
 		// moved there from inside the element, which then ends on another
 		// line than in the source.
-		// The comment swallows the next element.
 		name: "comprehension",
 		in:   head + "x: [\n\tif a // c\n\t{\n\t\t\"a\"\n\t}, \"b\",\n]\n",
-		want: head + "x: [\n\tif a {\n\t\t\"a\"\n\t}, // c \"b\",\n]\n",
+		want: head + "x: [\n\tif a {\n\t\t\"a\"\n\t}, // c\n\t\"b\",\n]\n",
 	}, {
-		// The comment swallows the closer.
 		name: "last comprehension",
 		in:   head + "x: [if a // c\n\t{b}]\n",
-		want: head + "x: [if a {b} // c]\n",
+		want: head + "x: [if a {b} // c\n]\n",
 	}, {
-		// The comment swallows the next element.
 		name: "unary",
 		in:   head + "x: [- // c\n\ty, z]\n",
-		want: head + "x: [-y, // c z]\n",
+		want: head + "x: [-y, // c\n\tz]\n",
 	}, {
-		// The comment swallows the next element.
 		name: "index",
 		in:   head + "x: [y[0 // c\n], z]\n",
-		want: head + "x: [y[0], // c z]\n",
+		want: head + "x: [y[0], // c\n\tz]\n",
 	}, {
-		// The comment swallows the ellipsis, closing the list.
 		name: "before ellipsis",
 		in:   head + "x: [1, ... // c\n]\n",
-		want: head + "x: [1, // c ...,\n]\n",
+		want: head + "x: [1, // c\n\t...,\n]\n",
 	}, {
-		// The comment swallows the closer.
 		name: "ellipsis type",
 		in:   head + "x: [1, ...- // c\n\tint]\n",
-		want: head + "x: [1, ...-int // c]\n",
+		want: head + "x: [1, ...-int, // c\n]\n",
 	}, {
-		// The comment swallows the closer.
 		name: "operand",
 		in:   head + "x: [a & - // c\n\tb]\n",
-		want: head + "x: [a & -b // c]\n",
+		want: head + "x: [a & -b // c\n]\n",
 	}, {
-		// The comment swallows the closer.
 		name: "call unary",
 		in:   head + "x: f(a, - // c\n\ty)\n",
-		want: head + "x: f(a, -y // c)\n",
+		want: head + "x: f(a, -y, // c\n)\n",
 	}, {
-		// The comment swallows the closer.
 		name: "call index",
 		in:   head + "x: f(a, y[0 // c\n])\n",
-		want: head + "x: f(a, y[0] // c)\n",
+		want: head + "x: f(a, y[0], // c\n)\n",
 	}, {
-		// The comment swallows the closer.
 		name: "named call unary",
 		in:   head + "x: f(a: - // c\n\ty)\n",
-		want: head + "x: f(a: -y // c)\n",
+		want: head + "x: f(a: -y, // c\n)\n",
 	}}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

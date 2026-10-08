@@ -109,7 +109,7 @@ m: [
 	{
 		x: "   sdfff2  тест "
 		y: "q\tqq<>q2&\u0001�"
-	} // after list line
+	}, // after list line
 ]
 
 // after list

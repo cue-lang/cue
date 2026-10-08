@@ -670,12 +670,14 @@ func (c *converter) authored(n ast.Node) bool {
 //   - the child has no comments attached to itself: a doc comment
 //     would land right after the parent's opener (no space), and a
 //     trailing line comment would swallow the parent's closer.
-//     Comments deep in descendants are safe - they live inside their
-//     own brackets and never reach the outer parent's boundary.
+//     Comments deep in descendants are safe as long as they live
+//     inside their own brackets, never reaching the outer parent's
+//     boundary, which [endsWithLineComment] tells.
 func (c *converter) shouldHug(child ast.Node) bool {
 	return child != nil &&
 		!child.Pos().IsNewline() &&
 		len(ast.Comments(child)) == 0 &&
+		c.nodeFlags[child]&endsWithLineComment == 0 &&
 		c.hasNewlineInSubtree(child)
 }
 
@@ -1402,6 +1404,12 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 	// between same-line elements.
 	omitCommas := listOmitsCommas(elems, x.Lbrack, x.Rbrack)
 
+	// A comment ending the last row would swallow the closer.
+	closerRel := x.Rbrack.RelPos()
+	if lastElem != nil && closerRel < token.Newline && c.rowEndsWithComment(lastElem) {
+		closerRel = token.Newline
+	}
+
 	// Compute policy first so we can thread WantTrailingComma into
 	// listElemRow before building inner.
 	layout := bracketedLayout{
@@ -1409,7 +1417,7 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 		open:                listOpener(x),
 		close:               rBracketLit,
 		openerRel:           x.Lbrack.RelPos(),
-		closerRel:           x.Rbrack.RelPos(),
+		closerRel:           closerRel,
 		firstElem:           firstElem,
 		lastElem:            lastElem,
 		numElems:            len(elems),
@@ -1677,6 +1685,11 @@ func (c *converter) elementRows(elems []ast.Expr, trailingComma, wrapLinked, omi
 				} else {
 					row.sep = spaceLit
 				}
+			case prevHasComment:
+				// The previous row ends in a comment, which may have
+				// moved there from inside the element, so e's own RelPos
+				// does not tell whether a line break follows it.
+				row.sep = relBreakOr(LeadingRelPos(e), lineBreakHard)
 			case omitCommas:
 				// lineBreakOrComma is ", " when flat (same line) and a
 				// newline (no comma) when broken.
@@ -1686,7 +1699,7 @@ func (c *converter) elementRows(elems []ast.Expr, trailingComma, wrapLinked, omi
 			}
 		}
 		prevLackRelPos = curLackRelPos
-		prevHasComment = row.hasComment || len(postCgs) > 0
+		prevHasComment = row.hasComment || len(postCgs) > 0 || c.rowEndsWithComment(e)
 		rows = append(rows, row)
 		rows = append(rows, c.postCommentRows(postCgs)...)
 	}
@@ -2529,6 +2542,8 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 	anyPost := anyHasPostComment(x.Args)
 	closerRel := x.Rparen.RelPos()
 	var sameLineOpen, noElemNewline bool
+	// A comment ending the last argument's row would swallow the closer.
+	lastEndsWithComment := c.rowEndsWithComment(x.Args[len(x.Args)-1])
 	if len(x.ArgLabels) == 0 {
 		sameLineOpen = hasSameLineOpener(c, x.Args, x.Args)
 		noElemNewline = noElemHasNewline(x.Args)
@@ -2547,9 +2562,10 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		anyPost = anyPost || anyHasPostComment(leads)
 		sameLineOpen = hasSameLineOpener(c, leads, x.Args)
 		noElemNewline = !movesComment && noElemHasNewline(leads)
-		if lastMovesComment && x.Ellipsis == token.NoPos && closerRel < token.Newline {
-			closerRel = token.Newline
-		}
+		lastEndsWithComment = lastEndsWithComment || lastMovesComment
+	}
+	if lastEndsWithComment && x.Ellipsis == token.NoPos && closerRel < token.Newline {
+		closerRel = token.Newline
 	}
 	first := callArgLead(x, 0)
 
@@ -2663,7 +2679,7 @@ func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool)
 			}
 		}
 		prevLackRelPos = curLackRelPos
-		prevHasComment = row.hasComment || len(postCgs) > 0
+		prevHasComment = row.hasComment || len(postCgs) > 0 || c.rowEndsWithComment(e)
 		soft = lineBreakOrSpace
 		if prevHasComment {
 			soft = lineBreakHard
@@ -4087,6 +4103,13 @@ func nodeEndsWithLineComment(n ast.Node) bool {
 		return true
 	}
 	return false
+}
+
+// rowEndsWithComment reports whether the row [converter.listElemRow]
+// builds for e ends in a `//` comment, including one which moves there
+// from inside e, such as from after a unary operator or an operand.
+func (c *converter) rowEndsWithComment(e ast.Node) bool {
+	return c.nodeFlags[e]&endsWithLineComment != 0 || len(trailingPrefixComments(e)) > 0
 }
 
 // isBracketed reports whether n's rendered output ends with a

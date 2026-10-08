@@ -604,6 +604,32 @@ l:
 a: {'?0': x, b: '?y', c: ['a?b']}
 		`,
 	}, {
+		// Number literals are kept only in forms which YAML's core
+		// schema resolves as numbers.
+		// TODO: binary literals, underscores, and signs before a base
+		// prefix are kept, which the core schema resolves as strings.
+		name: "number_literals",
+		in: `
+		a: 0b101
+		b: 1_000
+		c: 0x1_F
+		d: -0x1F
+		e: -0o17
+		f: 0o17
+		g: 1.5e3
+		h: 1Ki
+		`,
+		out: `
+a: 0b101
+b: 1_000
+c: 0x1_F
+d: -0x1F
+e: -0o17
+"f": 0o17
+g: 1.5e3
+h: 1024
+		`,
+	}, {
 		// A literal block with keep chomping takes in the blank lines
 		// which follow it, so none separates it from a following comment.
 		name: "keep_block_foot_comment",

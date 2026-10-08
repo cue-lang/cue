@@ -1,0 +1,27 @@
+# A braceless chain split across lines after its second field keeps
+# the fields before the split as a chain, and the rest on its own
+# indented line, as written.
+#
+# The output wraps the chain in braces after its first field instead.
+-- in --
+a: b:
+	c: 1
+x: {
+	a: b:
+		c: 1
+	dd: 2
+}
+-- out/relpos --
+a: {
+	b:
+		c: 1
+}
+x: {
+	a: {
+		b:
+			c: 1
+	}
+	dd: 2
+}
+-- out/norelpos --
+a: b: c: 1, x: {a: b: c: 1, dd: 2}

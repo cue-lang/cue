@@ -261,6 +261,39 @@ func TestCommentPlacement(t *testing.T) {
 		name: "named call unary",
 		in:   head + "x: f(a: - // c\n\ty)\n",
 		want: head + "x: f(a: -y, // c\n)\n",
+	}, {
+		// The parser attaches a doc comment before the inner label of a
+		// braceless chain to the label, which has no comment slot of its
+		// own, so the chain gains braces to hold the comment.
+		// The comment is dropped.
+		name: "chain label doc",
+		in:   "a:\n\t// comment\n\tc: 1\n",
+		want: "a:\n\tc: 1\n",
+	}, {
+		// The comment is dropped.
+		name: "chain label doc nested",
+		in:   "a: b:\n\t// comment\n\tc: 1\n",
+		want: "a: {\n\tb:\n\t\tc: 1\n}\n",
+	}, {
+		// The comment is dropped.
+		name: "chain string label doc",
+		in:   "a:\n\t// comment\n\t\"b\": 1\n",
+		want: "a:\n\t\"b\": 1\n",
+	}, {
+		// The comment is dropped.
+		name: "chain pattern label doc",
+		in:   "a:\n\t// comment\n\t[string]: 1\n",
+		want: "a:\n\t[string]: 1\n",
+	}, {
+		// The comment is dropped.
+		name: "chain paren label doc",
+		in:   "a:\n\t// comment\n\t(k): 1\n",
+		want: "a:\n\t(k): 1\n",
+	}, {
+		// The comment is dropped.
+		name: "chain interpolation label doc",
+		in:   "a:\n\t// comment\n\t\"\\(k)\": 1\n",
+		want: "a:\n\t\"\\(k)\": 1\n",
 	}}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

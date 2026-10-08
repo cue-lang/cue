@@ -633,9 +633,10 @@ func encode(n ast.Node) (v any, info *encInfo, err error) {
 		info.literal = string(ls)
 	}
 	addDocs(n, info)
-	// Head comments on a collection render above its first entry, and
-	// foot comments after its last entry.
-	if len(info.entries) > 0 {
+	// Head comments on a block collection render above its first entry,
+	// and foot comments after its last entry. Those on a flow collection
+	// stay outside of it, as its entries share its line.
+	if len(info.entries) > 0 && !info.flow {
 		if len(info.head) > 0 {
 			info.entries[0].prependHead(info.head)
 			info.head = nil

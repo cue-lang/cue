@@ -666,9 +666,6 @@ e: 1
 	}, {
 		// Comments around a flow collection stay outside of it, as
 		// YAML has no comments within a single line.
-		// TODO: a head comment on a flow mapping is emitted after its
-		// brace, which YAML does not allow, and one on a flow sequence
-		// is dropped.
 		name: "flow_collection_comments",
 		in: `
 		x: [
@@ -683,8 +680,9 @@ e: 1
 		`,
 		out: `
 x:
-  - {# c1
-      a: 1}
+  # c1
+  - {a: 1}
+  # c2
   - [2]
   - {b: 3} # c3
 "y": {c: 4}

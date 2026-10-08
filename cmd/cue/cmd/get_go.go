@@ -45,6 +45,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // TODO:
@@ -111,7 +112,7 @@ Go structs are converted to cue structs adhering to the following conventions:
 	  translates to the CUE struct
 
 		#MyStruct: {
-			#Common
+			#Common...
 			Field: string
 		}
 
@@ -369,6 +370,10 @@ type extractor struct {
 
 	codecs []*codec
 
+	// explicitOpen reports whether the module's language version
+	// enables explicitopen, where embedding a definition closes the struct.
+	explicitOpen bool
+
 	// jsonV2Errors records why encoding/json/v2 rejects a struct type,
 	// or the empty string if it does not.
 	jsonV2Errors map[*types.Struct]string
@@ -555,6 +560,7 @@ func extract(cmd *Command, args []string) error {
 
 	e := extractor{
 		cmd:            cmd,
+		explicitOpen:   cueexperiment.IsStable("explicitopen", binst.LanguageVersion()),
 		allPkgs:        map[string]*packages.Package{},
 		orig:           map[types.Type]*ast.StructType{},
 		omitted:        map[types.Object]bool{},
@@ -1741,7 +1747,11 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 				// encodes itself too. Otherwise, its fields are encoded.
 				(enc.encodesItself || e.ownEncoding(named) == noOwnEncoding) &&
 				e.embedsAsIs(fields, index+".", enc):
-				embed := &cueast.EmbedDecl{Expr: e.makeType(named, regular, required)}
+				expr := e.makeType(named, regular, required)
+				if e.explicitOpen {
+					expr = &cueast.PostfixExpr{X: expr, Op: cuetoken.ELLIPSIS}
+				}
+				embed := &cueast.EmbedDecl{Expr: expr}
 				if len(st.Elts) > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
 				}

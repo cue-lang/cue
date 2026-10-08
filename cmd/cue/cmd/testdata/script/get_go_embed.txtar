@@ -14,10 +14,7 @@ exec cue vet -c schema.cue go_marshal.json
 # The generated definitions must still reject unknown fields.
 cp module_v0.18.0.cue cue.mod/module.cue
 exec cue get go --local ./...
-# TODO: embedded definitions are not opened, so the generated definitions
-# reject their own fields.
-! exec cue vet -c schema.cue go_marshal.json
-stderr '^Untagged.x: field not allowed'
+exec cue vet -c schema.cue go_marshal.json
 ! exec cue vet -d '#Untagged' ./decls extra.json
 cmp stderr extra.stderr
 
@@ -27,8 +24,8 @@ language: version: "v0.18.0"
 -- extra.json --
 {"kind": "k", "x": 1, "extra": 1}
 -- extra.stderr --
-#Untagged.x: field not allowed:
-    ./decls/p_go_gen.cue:19:2
+extra: field not allowed:
+    ./extra.json:1:24
 -- schema.cue --
 package schema
 

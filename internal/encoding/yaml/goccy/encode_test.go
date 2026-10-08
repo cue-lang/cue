@@ -389,6 +389,7 @@ nested:
   field: !Nested value
 		`,
 	}, {
+		// TODO: the verbatim tag is escaped into a local tag.
 		name: "yaml_tag_verbatim",
 		in: `
 		custom: "value" @yaml(,tag="!<tag:example.com,2000:app/foo>")
@@ -397,6 +398,7 @@ nested:
 custom: !%3Ctag:example.com,2000:app/foo%3E value
 		`,
 	}, {
+		// TODO: the verbatim tag is escaped into a local tag.
 		name: "yaml_tag_url",
 		in: `
 		item: "value" @yaml(,tag="!<https://example.com/schema/v1>")
@@ -495,14 +497,66 @@ a: 1
 		`,
 		out: `yaml: conflicting tags "!A" and "!B"`,
 	}, {
-		// TODO: a tag without a leading "!" is emitted as is, becoming
-		// part of the value; want a verbatim tag, "a: !<Env> v".
+		// A tag is either local, starting with "!", or global, a URI.
+		// TODO: "Env" is neither, yet it is emitted as part of the value.
 		name: "yaml_tag_without_bang",
 		in: `
 		a: "v" @yaml(,tag="Env")
 		`,
 		out: `
 a: Env v
+		`,
+	}, {
+		// A URI is written as a verbatim tag.
+		// TODO: it is emitted as part of the value.
+		name: "yaml_tag_uri",
+		in: `
+		b: "v" @yaml(,tag="tag:example.com,2000:app/B")
+		`,
+		out: `
+b: tag:example.com,2000:app/B v
+		`,
+	}, {
+		// Characters a tag cannot carry are percent-escaped: "!" would
+		// end a tag handle and "," a tag in a flow collection.
+		// TODO: "!" and "," are kept, a verbatim tag is turned into a
+		// local one, and an existing escape is escaped again.
+		name: "yaml_tag_escape",
+		in: `
+		a: "x" @yaml(,tag="!a!b,c")
+		b: ["y"] @yaml(,tag="!!my type")
+		c: "z" @yaml(,tag="!<!a b>")
+		d: "w" @yaml(,tag="!a%21b")
+		`,
+		out: `
+a: !a!b,c x
+b: !!my%20type ["y"]
+c: !%3C!a%20b%3E z
+d: !a%2521b w
+		`,
+	}, {
+		// A tag shorthand needs a suffix.
+		// TODO: "!!" is emitted, which decoders such as yaml.v3 reject.
+		name: "yaml_tag_empty_suffix",
+		in: `
+		a: "v" @yaml(,tag="!!")
+		`,
+		out: `
+a: !! v
+		`,
+	}, {
+		// The core tags are abbreviated with "!!", as given by YAML
+		// directly, so that decoders which support them recognize them.
+		// TODO: they are emitted as part of the value, or escaped into
+		// a local tag.
+		name: "yaml_tag_core_uri",
+		in: `
+		a: "v" @yaml(,tag="tag:yaml.org,2002:str")
+		b: "w" @yaml(,tag="!<tag:yaml.org,2002:str>")
+		`,
+		out: `
+a: tag:yaml.org,2002:str v
+b: !%3Ctag:yaml.org,2002:str%3E w
 		`,
 	}, {
 		// TODO: comments on a tagged value, and on a @yaml declaration

@@ -579,6 +579,58 @@ func TestNodes(t *testing.T) {
 		),
 		out: "[\n\t{\n\t\ta: 1\n\t\tb: 2\n\t},\n\t3,\n]",
 	}, {
+		// As cue def prints an erroneous comparison.
+		// The comma follows the comment.
+		name: "list operand ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return ast.NewList(ast.NewBinExpr(token.NEQ, ast.NewIdent("a"), v), ast.NewIdent("b"))
+		}(),
+		out: "[\n\ta != _|_ // c,\n\tb,\n]",
+	}, {
+		// As above, for a call argument.
+		// The comma follows the comment.
+		name: "call operand ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return ast.NewCall(ast.NewIdent("f"), ast.NewBinExpr(token.NEQ, ast.NewIdent("a"), v), ast.NewIdent("b"))
+		}(),
+		out: "f(\n\ta != _|_ // c,\n\tb,\n)",
+	}, {
+		// As above, for the type of an ellipsis.
+		// The comma follows the comment.
+		name: "ellipsis operand ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return ast.NewList(ast.NewIdent("b"), &ast.Ellipsis{Type: ast.NewBinExpr(token.NEQ, ast.NewIdent("a"), v)})
+		}(),
+		out: "[\n\tb,\n\t...a != _|_ // c,\n]",
+	}, {
+		// As above, for an operand which a bracket follows, whose comment
+		// goes after the bracket.
+		name: "parenthesized list element ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return ast.NewList(&ast.ParenExpr{X: v}, ast.NewIdent("b"))
+		}(),
+		out: "[\n\t(_|_ // c),\n\tb,\n]",
+	}, {
+		// As above, for the type of an ellipsis, which has a comment of
+		// its own too.
+		name: "parenthesized ellipsis type ending in a comment",
+		in: func() ast.Node {
+			x := ast.NewIdent("x")
+			ast.AddComment(x, internal.NewComment(false, "c"))
+			p := &ast.ParenExpr{X: x}
+			ast.AddComment(p, internal.NewComment(false, "d"))
+			return ast.NewList(ast.NewIdent("a"), &ast.Ellipsis{Type: p})
+		}(),
+		out: "[\n\ta,\n\t...(x // c), // d\n]",
+	}, {
 		// A chain which breaks across lines indents the arms after the
 		// first, including when only an arm carries relative
 		// positions, as the braces of [ast.NewStruct] do.
@@ -679,6 +731,68 @@ func TestNodes(t *testing.T) {
 			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewStruct(f, ast.NewIdent("b"), ast.NewIdent("z"))}
 		}(),
 		out: "o: {\n\ta: 1 @x() // c\n\tb: z\n}",
+	}, {
+		// A comment ending an operand which a bracket follows on the
+		// same line goes after the bracket, as a line break cannot
+		// separate them.
+		//
+		// The comment swallows the closing parenthesis.
+		name: "parenthesized operand ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return ast.NewBinExpr(token.MUL, &ast.ParenExpr{X: ast.NewBinExpr(token.ADD, ast.NewIdent("x"), v)}, ast.NewIdent("z"))
+		}(),
+		out: "(x + _|_ // c) * z",
+	}, {
+		// The comment swallows the index.
+		name: "index receiver ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return &ast.IndexExpr{X: v, Index: ast.NewIdent("i")}
+		}(),
+		out: "_|_ // c[i]",
+	}, {
+		// The comment swallows the arguments.
+		name: "callee ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return ast.NewCall(v, ast.NewIdent("i"))
+		}(),
+		out: "_|_ // c(i)",
+	}, {
+		// The comment swallows the rest of the slice.
+		name: "slice bound ending in a comment",
+		in: func() ast.Node {
+			v := &ast.BottomLit{}
+			ast.AddComment(v, internal.NewComment(false, "c"))
+			return &ast.SliceExpr{X: ast.NewIdent("s"), Low: v, High: ast.NewIdent("h")}
+		}(),
+		out: "s[_|_ // c:h]",
+	}, {
+		// A same-line comment at the prefix position of a list or a
+		// binary expression trails it, so the closer of the struct
+		// holding it goes on the next line.
+		//
+		// The comment swallows the closer.
+		name: "list value with a trailing prefix comment",
+		in: func() ast.Node {
+			l := ast.NewList(ast.NewIdent("x"))
+			ast.AddComment(l, &ast.CommentGroup{Line: true, Position: 1, List: []*ast.Comment{{Text: "// c"}}})
+			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewList(ast.NewStruct(&ast.Field{Label: ast.NewIdent("f"), Value: l}))}
+		}(),
+		out: "o: [{f: [x] // c}]",
+	}, {
+		// The comment swallows the closer.
+		name: "binary value with a trailing prefix comment",
+		in: func() ast.Node {
+			x := ast.NewBinExpr(token.AND, ast.NewIdent("a"), ast.NewIdent("b"))
+			ast.AddComment(x, &ast.CommentGroup{Line: true, Position: 1, List: []*ast.Comment{{Text: "// c"}}})
+			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewList(ast.NewStruct(&ast.Field{Label: ast.NewIdent("f"), Value: x}))}
+		}(),
+		out: "o: [{f: a & b // c}]",
 	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the

@@ -78,8 +78,21 @@ func CacheDir(getenv func(string) string) (string, error) {
 var readFile = robustio.ReadFile
 
 func ReadLogins(path string) (*Logins, error) {
-	// Note that we read logins.json without holding a file lock,
-	// as the file lock is only held for writes. Prevent ephemeral errors on Windows.
+	// Hold a shared lock while reading, as writers replace the file
+	// while holding the lock exclusively. On Windows, a read racing with
+	// a rename can spuriously fail, and so can a rename over an open file.
+	// Opening the lock file read-only creates nothing. If that fails for any
+	// reason, such as no writer having run yet, fall back to reading lock-free.
+	if lock, err := lockedfile.Open(path + ".lock"); err == nil {
+		defer lock.Close()
+	}
+	return readLogins(path)
+}
+
+// readLogins reads logins.json without taking the lock file.
+func readLogins(path string) (*Logins, error) {
+	// Prevent ephemeral errors on Windows from other processes
+	// such as antivirus software, which do not take the lock file.
 	body, err := readFile(path)
 	if err != nil {
 		return nil, err
@@ -124,13 +137,12 @@ func writeLoginsUnlocked(path string, logins *Logins) error {
 	}
 	body = append(body, '\n')
 
-	// Write to a temp file and then try to atomically rename to avoid races
-	// with parallel reading since we don't lock at FS level in ReadLogins.
+	// Write to a temp file and rename it over the original, so that a crash
+	// cannot leave a partial file. The rename is atomic for concurrent readers
+	// on POSIX, but not on Windows, which is why ReadLogins takes the lock.
 	if err := os.WriteFile(path+".tmp", body, 0o600); err != nil {
 		return err
 	}
-	// TODO: on non-POSIX platforms os.Rename might not be atomic. Might need to
-	// find another solution. Note that Windows NTFS is also atomic.
 	if err := robustio.Rename(path+".tmp", path); err != nil {
 		return err
 	}
@@ -150,7 +162,8 @@ func UpdateRegistryLogin(path string, key string, new *oauth2.Token) (*Logins, e
 	}
 	defer unlock()
 
-	logins, err := ReadLogins(path)
+	// We already hold the lock, so ReadLogins would deadlock taking it again.
+	logins, err := readLogins(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		// No config file yet; create an empty one.
 		logins = &Logins{Registries: make(map[string]RegistryLogin)}

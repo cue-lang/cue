@@ -64,10 +64,8 @@ func TestReadLoginsDuringWrite(t *testing.T) {
 	unlock()
 
 	<-done
-	// TODO: ReadLogins should wait for the writer
-	// rather than report the file as missing.
-	qt.Assert(t, qt.ErrorIs(gotErr, fs.ErrNotExist))
-	qt.Assert(t, qt.IsNil(got))
+	qt.Assert(t, qt.IsNil(gotErr))
+	qt.Assert(t, qt.DeepEquals(got, logins))
 }
 
 // TestWriteLoginsDuringRead checks that a writer does not replace logins.json
@@ -106,8 +104,7 @@ func TestWriteLoginsDuringRead(t *testing.T) {
 
 	<-done
 	qt.Assert(t, qt.IsNil(gotErr))
-	// TODO: the writer should wait for ReadLogins to finish.
-	qt.Assert(t, qt.DeepEquals(got, newLogins))
+	qt.Assert(t, qt.DeepEquals(got, oldLogins))
 
 	got, err = ReadLogins(path)
 	qt.Assert(t, qt.IsNil(err))

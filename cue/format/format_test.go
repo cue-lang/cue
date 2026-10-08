@@ -209,6 +209,78 @@ func TestClosingBracketComma(t *testing.T) {
 	}
 }
 
+// TestCommentPlacement checks where the formatter places comments which
+// the parser attaches to nodes in unusual positions, such as inside a list
+// element, a label, or an operand. Each comment must stay where it parses
+// back to the same node, without swallowing the tokens which follow it on
+// its line.
+func TestCommentPlacement(t *testing.T) {
+	const head = "@experiment(functions)\n\n"
+	tests := []struct{ name, in, want string }{{
+		// A `//` comment ending the row of a list element or a call
+		// argument is followed by a line break, so that it does not
+		// swallow the next element or the closer. Such a comment may have
+		// moved there from inside the element, which then ends on another
+		// line than in the source.
+		// The comment swallows the next element.
+		name: "comprehension",
+		in:   head + "x: [\n\tif a // c\n\t{\n\t\t\"a\"\n\t}, \"b\",\n]\n",
+		want: head + "x: [\n\tif a {\n\t\t\"a\"\n\t}, // c \"b\",\n]\n",
+	}, {
+		// The comment swallows the closer.
+		name: "last comprehension",
+		in:   head + "x: [if a // c\n\t{b}]\n",
+		want: head + "x: [if a {b} // c]\n",
+	}, {
+		// The comment swallows the next element.
+		name: "unary",
+		in:   head + "x: [- // c\n\ty, z]\n",
+		want: head + "x: [-y, // c z]\n",
+	}, {
+		// The comment swallows the next element.
+		name: "index",
+		in:   head + "x: [y[0 // c\n], z]\n",
+		want: head + "x: [y[0], // c z]\n",
+	}, {
+		// The comment swallows the ellipsis, closing the list.
+		name: "before ellipsis",
+		in:   head + "x: [1, ... // c\n]\n",
+		want: head + "x: [1, // c ...,\n]\n",
+	}, {
+		// The comment swallows the closer.
+		name: "ellipsis type",
+		in:   head + "x: [1, ...- // c\n\tint]\n",
+		want: head + "x: [1, ...-int // c]\n",
+	}, {
+		// The comment swallows the closer.
+		name: "operand",
+		in:   head + "x: [a & - // c\n\tb]\n",
+		want: head + "x: [a & -b // c]\n",
+	}, {
+		// The comment swallows the closer.
+		name: "call unary",
+		in:   head + "x: f(a, - // c\n\ty)\n",
+		want: head + "x: f(a, -y // c)\n",
+	}, {
+		// The comment swallows the closer.
+		name: "call index",
+		in:   head + "x: f(a, y[0 // c\n])\n",
+		want: head + "x: f(a, y[0] // c)\n",
+	}, {
+		// The comment swallows the closer.
+		name: "named call unary",
+		in:   head + "x: f(a: - // c\n\ty)\n",
+		want: head + "x: f(a: -y // c)\n",
+	}}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := format.Source([]byte(tc.in))
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(got), tc.want))
+		})
+	}
+}
+
 // TestClosedLiterals checks that both formatters keep the "#" of closed
 // literals, which the openlists experiment enables, for parsed and for
 // constructed nodes.

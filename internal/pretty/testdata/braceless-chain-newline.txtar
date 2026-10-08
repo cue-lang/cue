@@ -1,9 +1,9 @@
 # Braceless chained fields that the user deliberately split across
 # lines (Newline RelPos on intermediate fields) must not be collapsed
-# into a single row. unchainField returns collapsible=false, so the
-# chain falls through to field() which now honours a leading break on
-# a braceless-struct value: the value starts on its own indented
-# line, preserving the user's line structure.
+# into a single row. unchainField cuts the chain before y, so the
+# chain falls through to field() which honours a leading break on a
+# braceless-struct value: the value starts on its own indented line,
+# preserving the user's line structure.
 -- in --
 x:
 	y:

@@ -537,17 +537,13 @@ func (c *converter) declSlice(decls []ast.Decl) doc {
 // without newlines is decided at render time by the table's row
 // partitioning.
 func (c *converter) simpleFieldChain(f *ast.Field) []*ast.Field {
-	chain, collapsible := unchainField(f)
-	if len(chain) > 1 && !collapsible {
-		// A non-collapsible chain renders as `f: {braced value}` - the
-		// inner field stays inside the braces rather than chaining onto
-		// f's line. So for alignment purposes it is a single field f
-		// whose value is that struct; we use the single-element chain
-		// instead of returning nil, so a single-line struct value still
-		// aligns in the table (a multi-line value breaks the segment via
-		// the leaf checks / table machinery below).
-		chain = chain[:1]
-	}
+	// A non-collapsible chain renders its collapsible prefix as keys,
+	// and the rest as the braced value of the prefix's last field. So
+	// for alignment purposes it is that prefix, whose leaf value is
+	// that struct; a single-line struct value still aligns in the
+	// table, and a multi-line one breaks the segment via the leaf
+	// checks / table machinery below.
+	chain := unchainField(f)
 	leaf := chain[len(chain)-1]
 	if leaf.Value == nil ||
 		leaf.Value.Pos().IsNewline() ||
@@ -559,17 +555,17 @@ func (c *converter) simpleFieldChain(f *ast.Field) []*ast.Field {
 }
 
 // unchainField walks a braceless field chain (x: y: z: val is a
-// chain of three Fields) and returns the sequence of Fields from the
-// head to the leaf. collapsible reports whether the chain can be
-// safely rendered as a single composite key + leaf value, which holds
-// only when:
+// chain of three Fields) and returns the longest prefix of Fields,
+// from the head, which can be safely rendered as a single composite
+// key. The rest of the chain is the value of the prefix's last Field.
+// The whole chain qualifies, up to its leaf, only when:
 //   - every intermediate StructLit and every Field after the head is
 //     comment-free, and
 //   - no Field after the head carries Newline/NewSection RelPos, and
 //   - the head has no Position=1/2 comments, and
 //   - no non-leaf Field carries attributes.
-func unchainField(f *ast.Field) (chain []*ast.Field, collapsible bool) {
-	chain = []*ast.Field{f}
+func unchainField(f *ast.Field) []*ast.Field {
+	chain := []*ast.Field{f}
 	cur := f
 	for {
 		sl, ok := cur.Value.(*ast.StructLit)
@@ -583,22 +579,19 @@ func unchainField(f *ast.Field) (chain []*ast.Field, collapsible bool) {
 		chain = append(chain, inner)
 		cur = inner
 	}
-	if len(chain) < 2 {
-		return chain, false
-	}
 	if hasCommentAt(f, PosPrefix) || hasCommentAt(f, PosSuffix) {
-		return chain, false
+		return chain[:1]
 	}
 	lastIdx := len(chain) - 1
 	for i, cf := range chain {
-		if i > 0 && (len(ast.Comments(cf)) > 0 || cf.Pos().IsNewline()) {
-			return chain, false
+		if i > 0 && (len(fieldComments(cf)) > 0 || cf.Pos().IsNewline()) {
+			return chain[:i]
 		}
 		if i < lastIdx && len(cf.Attrs) > 0 {
-			return chain, false
+			return chain[:i+1]
 		}
 	}
-	return chain, true
+	return chain
 }
 
 // declSep computes the separator before a declaration based on its
@@ -4295,7 +4288,11 @@ func joinLines(acc, cd doc) doc {
 // See commentSlots for the slot semantics.
 func classifyComments(n ast.Node) commentSlots {
 	var s commentSlots
-	for _, cg := range ast.Comments(n) {
+	cgs := ast.Comments(n)
+	if f, ok := n.(*ast.Field); ok {
+		cgs = fieldComments(f)
+	}
+	for _, cg := range cgs {
 		switch cg.Position {
 		case PosDoc:
 			s.doc = append(s.doc, cg)
@@ -5007,7 +5004,24 @@ func bracelessChainCollapsible(v ast.Expr) bool {
 	if !ok {
 		return false
 	}
-	return len(inner.Attrs) == 0 && len(ast.Comments(inner)) == 0 && len(ast.Comments(sl)) == 0
+	return len(inner.Attrs) == 0 && len(fieldComments(inner)) == 0 && len(ast.Comments(sl)) == 0
+}
+
+// fieldComments returns the comments attached to f, plus the doc
+// comments attached to its label, which [converter.label] does not
+// render. The parser attaches a doc comment to the label for the inner
+// fields of a braceless chain, such as y in `x:\n\t// doc\n\ty: 1`, as
+// they have no comment scope of their own.
+func fieldComments(f *ast.Field) []*ast.CommentGroup {
+	cgs := ast.Comments(f)
+	if f.Label == nil {
+		return cgs
+	}
+	docs := classifyComments(f.Label).doc
+	if len(docs) == 0 {
+		return cgs
+	}
+	return slices.Concat(docs, cgs)
 }
 
 // valNeedsLeadingBreak reports whether a field's value must be

@@ -9,6 +9,26 @@ exec go run ./marshal
 cmp stdout go_marshal.json
 exec cue vet -c schema.cue go_marshal.json
 
+# Since v0.18.0, embedding a definition closes the struct to its fields,
+# so embedded definitions are opened to keep the struct's own fields.
+# The generated definitions must still reject unknown fields.
+cp module_v0.18.0.cue cue.mod/module.cue
+exec cue get go --local ./...
+# TODO: embedded definitions are not opened, so the generated definitions
+# reject their own fields.
+! exec cue vet -c schema.cue go_marshal.json
+stderr '^Untagged.x: field not allowed'
+! exec cue vet -d '#Untagged' ./decls extra.json
+cmp stderr extra.stderr
+
+-- module_v0.18.0.cue --
+module: "mod.test"
+language: version: "v0.18.0"
+-- extra.json --
+{"kind": "k", "x": 1, "extra": 1}
+-- extra.stderr --
+#Untagged.x: field not allowed:
+    ./decls/p_go_gen.cue:19:2
 -- schema.cue --
 package schema
 

@@ -718,7 +718,10 @@ outer:
 			e.pkgNames[pkgPath] = info
 		}
 
-		addDoc(f.Doc, cuePkg)
+		pkgDoc := makeDoc(f.Doc, true)
+		if pkgDoc != nil {
+			cueast.AddComment(cuePkg, pkgDoc)
+		}
 		lenPreamble := len(cueFile.Decls)
 
 		for _, d := range f.Decls {
@@ -728,7 +731,7 @@ outer:
 			}
 		}
 
-		if outFile == "" && len(cueFile.Decls) == lenPreamble && f.Doc == nil {
+		if outFile == "" && len(cueFile.Decls) == lenPreamble && pkgDoc == nil {
 			// By default, empty files are not generated.
 			// Note that cueFile.Decls is never empty, as we add top-level docs and a package clause.
 			continue
@@ -1197,8 +1200,7 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 		return nil
 	}
 
-	a := []*cueast.Comment{}
-
+	var a []*cueast.Comment
 	for _, comment := range g.List {
 		c := comment.Text
 
@@ -1207,6 +1209,10 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 		switch c[1] {
 		case '/':
 			// //-style comment (no newline at the end)
+			// Directives such as //go:generate are not documentation.
+			if _, ok := ast.ParseDirective(comment.Slash, c); ok {
+				continue
+			}
 			a = append(a, &cueast.Comment{Text: c})
 
 		case '*':
@@ -1250,6 +1256,16 @@ func makeDoc(g *ast.CommentGroup, isDoc bool) *cueast.CommentGroup {
 				a = append(a, &cueast.Comment{Text: "// " + l[i:]})
 			}
 		}
+	}
+	// Drop leading and trailing blank lines, such as those separating directives.
+	for len(a) > 0 && a[0].Text == "//" {
+		a = a[1:]
+	}
+	for len(a) > 0 && a[len(a)-1].Text == "//" {
+		a = a[:len(a)-1]
+	}
+	if len(a) == 0 {
+		return nil
 	}
 	return &cueast.CommentGroup{Doc: isDoc, List: a}
 }

@@ -2,6 +2,8 @@
 # of evalv2, where inline structs cause some closedness errors
 # to be ignored. evalv3 mimics this behavior for the sake of
 # backwards compatibility and not breaking existing users.
+# The spec closes a selection from a referenced definition regardless;
+# https://cuelang.org/issue/4502 proposes to retire the opening.
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"

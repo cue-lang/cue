@@ -457,8 +457,9 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// The conjuncts of #D.s carry no FromDef either, so the reference must
 	// supply it, as it does for #D.s. A reference from within the definition
 	// itself, such as a sibling field referring to _a, does not close.
-	switch isDef, _ := IsDef(c.Expr()); {
-	case isDef || arc.Label.IsDef() || closeInfo.TopDef || crossesDefinition(c.Env, arc):
+	x := c.Expr()
+	switch isDef, _ := IsDef(x); {
+	case isDef || arc.Label.IsDef() || closeInfo.TopDef || crossesDefinition(n.ctx, c.Env, x, arc):
 		if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
 			// Definitions are always recursively closed, even if arc
 			// doesn't have ClosedRecursive set yet at this point.
@@ -942,35 +943,71 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 }
 
 // crossesDefinition reports whether arc lies within a definition that does
-// not enclose the environment in which the reference to it was written: the
-// reference then reaches the definition's value from outside, and must close
-// like a reference to the definition. A reference written inside the
-// definition, such as b in #D: {a: {}, b: a}, does not close, even if it is
-// evaluated elsewhere because the definition's field was inlined.
+// not enclose the vertex against which the reference x to it is resolved:
+// the reference then reaches the definition's value from outside, and must
+// close like a reference to the definition. A reference resolved within the
+// definition does not close, such as b in #D: {a: {}, b: a}, wherever it is
+// evaluated: the environment chain of x says where the enclosing structs are
+// evaluated, not where x is looked up. Only a definition vertex bounds the
+// definition; https://cuelang.org/issue/4501 is about a regular field
+// holding one without sharing its vertex.
 //
-// A reference evaluated through an inline struct, such as in.foo in
+// A reference resolved against an inline struct, such as in.foo in
 // (f & {in: #D}).out with f: {in: _, out: in.foo}, does not close either:
 // selecting from an inline struct opens definition closedness, as it did in
 // the previous evaluator. Only a value with no path from the root opens in
 // this way: a comprehension body is written at a path and closes like the
 // struct around it. See cue/testdata/eval/openinline.txtar,
-// cue/testdata/eval/issue3672.txtar and cue/testdata/cycle/issue4228.txtar.
-func crossesDefinition(env *Environment, arc *Vertex) bool {
+// cue/testdata/eval/issue3672.txtar and cue/testdata/cycle/issue4228.txtar;
+// https://cuelang.org/issue/4502 proposes to retire this opening.
+func crossesDefinition(ctx *OpContext, env *Environment, x Expr, arc *Vertex) bool {
 	def := enclosingDef(arc.Parent)
 	if def == nil {
 		return false
 	}
-	for e := env; e != nil; e = e.Up {
-		if e.Vertex == def {
-			return false
-		}
-		// TODO(perf): IsDetached walks the parent chain of each vertex in
-		// the environment chain, so this loop can go quadratic in deeply
-		// nested values. Cache the result or bound the walk if this shows
-		// up in profiles.
-		if e.Vertex != nil && e.Vertex.IsDetached() {
+	scope := refScope(ctx, env, x)
+	if scope == nil {
+		// An import reference: the package root is outside every
+		// definition of this package.
+		return true
+	}
+	for s := scope; s != nil; s = s.Parent {
+		if s == def {
 			return false
 		}
 	}
-	return true
+	return !scope.IsDetached()
+}
+
+// refScope returns the vertex against which the reference x is resolved, as
+// the resolve methods choose it. A let bound to a reference takes the scope
+// of that reference, as [Vertex.DerefNonRooted] sees through such a let on
+// the arc side; any other let is a value of the struct declaring it. A
+// non-reference is scoped to the environment vertex, and an import
+// reference to nil.
+//
+// TODO: merge with [IsDef], which walks the same selector spine right before
+// this is called, and ultimately with resolve, as the TODO on IsDef says.
+func refScope(ctx *OpContext, env *Environment, x Expr) *Vertex {
+	for {
+		switch r := x.(type) {
+		case *SelectorExpr:
+			x = r.X
+		case *IndexExpr:
+			x = r.X
+		case *LetReference:
+			env = env.up(ctx, r.UpCount)
+			x = r.X
+		case *FieldReference:
+			return env.up(ctx, r.UpCount).DerefVertex(ctx)
+		case *DynamicReference:
+			return env.up(ctx, r.UpCount).DerefVertex(ctx)
+		case *ValueReference:
+			return env.up(ctx, max(r.UpCount-1, 0)).DerefVertex(ctx)
+		case *ImportReference:
+			return nil
+		default:
+			return env.DerefVertex(ctx)
+		}
+	}
 }

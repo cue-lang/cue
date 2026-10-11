@@ -26,6 +26,16 @@ whole: m & {meta: extra: 1} @test(err, at=meta.extra, contains="field not allowe
 // Selecting from the regular field must be closed too.
 viaField: m.meta & {extra: 1} @test(err, at=extra, contains="field not allowed")
 
+// The regular field holds the same closed value however it is built, but a
+// selection from it is closed only through a bare reference, which shares
+// the definition's vertex. https://cuelang.org/issue/4501
+mu: #Meta & {}
+viaUnified: mu.meta & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+mi: {#Meta}
+viaEmbedded: mi.meta & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+#Fn: {in!: int, out: {v: in}}
+viaOut: (#Fn & {in: 1}).out & {extra: 1} @test(eq, {v: 1, extra: 1}, incorrect) @test(err:todo, p=1, at=extra, contains="field not allowed")
+
 // Deeper selections, and a selection inside a definition.
 #Deep: a: b: {c: 1}
 d: #Deep
@@ -74,7 +84,7 @@ viaOpen: open.meta & {extra: 1} @test(eq, {name: "x", extra: 1})
 #Opt: {a?: int}
 plain: {q: {}, s: #Opt & q & {a: 3}}
 #Via: {v: plain}
-viaSibling: #Via.v.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+viaSibling: #Via.v.s @test(eq, {a: 3})
 
 // The same holds however the sibling is reached: through a let, in a
 // comprehension body, by selecting a field of it, or from a nested field.
@@ -83,10 +93,16 @@ plainFor:    {q: {}, for _, _ in [1] {s: #Opt & q & {a: 3}}}
 plainSel:    {q: {t: {}}, s: #Opt & q.t & {a: 3}}
 plainNested: {q: {}, s: t: #Opt & q & {a: 3}}
 #ViaAll: {l: plainLet, f: plainFor, s: plainSel, n: plainNested}
-viaSiblingLet:    #ViaAll.l.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
-viaSiblingFor:    #ViaAll.f.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
-viaSiblingSel:    #ViaAll.s.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
-viaSiblingNested: #ViaAll.n.s.t @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+viaSiblingLet:    #ViaAll.l.s @test(eq, {a: 3})
+viaSiblingFor:    #ViaAll.f.s @test(eq, {a: 3})
+viaSiblingSel:    #ViaAll.s.s @test(eq, {a: 3})
+viaSiblingNested: #ViaAll.n.s.t @test(eq, {a: 3})
+
+// A reference written inside a definition to a sibling outside it does not
+// close that sibling, while the definition's own field stays closed.
+sib: {x: {}, #D: b: x}
+viaOutsideSibling:     sib.#D.b & {c: 1} @test(err, at=c, contains="field not allowed")
+viaOutsideSiblingOpen: sib.x & {c: 1} @test(eq, {c: 1})
 
 // A reference resolved from outside the definition crosses into it even
 // when it is evaluated at a path within the definition, because the struct
@@ -94,21 +110,23 @@ viaSiblingNested: #ViaAll.n.s.t @test(err, contains="field not allowed", incorre
 outside: #Out
 let Out = {s: {a: 1}, u: outside.s & {b: 2}}
 #Out: Out
-viaOutside: #Out.u @test(eq, {a: 1, b: 2}, incorrect) @test(err:todo, contains="field not allowed")
+viaOutside: #Out.u @test(err, contains="field not allowed")
 
 // A let bound to such a reference denotes the same value.
 outsideLet: #OutLet
 let OutLet = {s: {a: 1}, let S = outsideLet.s, u: S & {b: 2}}
 #OutLet: OutLet
-viaOutsideLet: #OutLet.u @test(eq, {a: 1, b: 2}, incorrect) @test(err:todo, contains="field not allowed")
+viaOutsideLet: #OutLet.u @test(err, contains="field not allowed")
 
 // Selecting from an inline struct opens definition closedness, see
 // eval/openinline.txtar, but only for a reference resolved against the
 // inline struct itself. A reference written inside it and resolved outside
 // it closes as viaField does.
+// TODO: the spec closes the first case too; https://cuelang.org/issue/4502
+// proposes to retire the opening.
 inlineField: ({in: m, out: in.meta}).out & {extra: 1} @test(eq, {name: "x", extra: 1})
-inlineLet:   ({let M = m, out: M.meta}).out & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, at=extra, contains="field not allowed")
-inlineRoot:  ({out: m.meta}).out & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, at=extra, contains="field not allowed")
+inlineLet:   ({let M = m, out: M.meta}).out & {extra: 1} @test(err, at=extra, contains="field not allowed")
+inlineRoot:  ({out: m.meta}).out & {extra: 1} @test(err, at=extra, contains="field not allowed")
 -- old.cue --
 // A definition is closed either way, so the same selections close without
 // the experiment, in a comprehension body as anywhere else.
@@ -132,7 +150,7 @@ oldViaFor: {
 #OldOpt: {a?: int}
 oldPlain: {q: {}, s: #OldOpt & q & {a: 3}}
 #OldVia: {v: oldPlain}
-oldViaSibling: #OldVia.v.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+oldViaSibling: #OldVia.v.s @test(eq, {a: 3})
 
 // Embedding is where the two differ: without the experiment an embedded
 // closed value leaves the struct it lands in open. That holds for a value
@@ -159,52 +177,38 @@ oldEmbedFor: {
     ./in.cue:10:19
 [eval] viaField.extra: field not allowed:
     ./in.cue:13:21
+[incomplete] #Fn.out.v: required field missing: in:
+    ./in.cue:22:26
 [eval] viaDeep.extra: field not allowed:
-    ./in.cue:18:19
+    ./in.cue:28:19
 [eval] viaDef.x.b.extra: field not allowed:
-    ./in.cue:20:25
+    ./in.cue:30:25
 [eval] inter.y.extra: field not allowed:
-    ./in.cue:23:28
+    ./in.cue:33:28
 [eval] inter.y.extra: field not allowed:
-    ./in.cue:23:28
+    ./in.cue:33:28
 [eval] viaIf.x.extra: field not allowed:
-    ./in.cue:30:16
+    ./in.cue:40:16
 [eval] viaFor.one.extra: field not allowed:
-    ./in.cue:35:21
+    ./in.cue:45:21
 [eval] viaEmbed.extra: field not allowed:
-    ./in.cue:43:2
+    ./in.cue:53:2
 [eval] viaEmbedFor.extra: field not allowed:
-    ./in.cue:49:2
-[eval] #Via.v.s.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:61:31
-[eval] #Via.v.s.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:61:31
-[eval] #ViaAll.l.s.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:67:48
-[eval] #ViaAll.f.s.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:68:54
-[eval] #ViaAll.s.s.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:69:44
-[eval] #ViaAll.n.s.t.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:70:40
-[eval] #ViaAll.n.s.t.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:70:40
-[eval] #ViaAll.n.s.t.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:70:40
-[eval] #ViaAll.n.s.t.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:70:40
-[eval] #ViaAll.n.s.t.a: field not allowed:
-    ./in.cue:60:8
-    ./in.cue:70:40
+    ./in.cue:59:2
+[eval] viaOutsideSibling.c: field not allowed:
+    ./in.cue:90:36
+[eval] #Out.u.b: field not allowed:
+    ./in.cue:97:39
+[eval] #Out.u.b: field not allowed:
+    ./in.cue:97:39
+[eval] #OutLet.u.b: field not allowed:
+    ./in.cue:103:56
+[eval] #OutLet.u.b: field not allowed:
+    ./in.cue:103:56
+[eval] inlineLet.extra: field not allowed:
+    ./in.cue:114:48
+[eval] inlineRoot.extra: field not allowed:
+    ./in.cue:115:37
 [eval] oldDirect.extra: field not allowed:
     ./old.cue:5:25
 [eval] oldField.extra: field not allowed:
@@ -213,12 +217,6 @@ oldEmbedFor: {
     ./old.cue:9:16
 [eval] oldViaFor.one.extra: field not allowed:
     ./old.cue:14:21
-[eval] #OldVia.v.s.a: field not allowed:
-    ./old.cue:20:11
-    ./old.cue:21:37
-[eval] #OldVia.v.s.a: field not allowed:
-    ./old.cue:20:11
-    ./old.cue:21:37
 -- out/eval/stats --
 Leaks:  0
 Freed:  111

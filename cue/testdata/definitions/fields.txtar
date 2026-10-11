@@ -328,6 +328,8 @@ validator: keepClosed: {
 // Closedness was not applied when accessing optional fields through a selector;
 // extra fields should still be rejected by the definition.
 // https://cuelang.org/issue/1830
+// A selection from the inline unification is open; the question of closing
+// it is https://cuelang.org/issue/4501.
 issue1830: {
 	#x: {
 		y: {

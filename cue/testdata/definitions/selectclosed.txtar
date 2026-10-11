@@ -66,6 +66,49 @@ viaEmbedFor: {
 // A regular field with a struct literal stays open.
 open: {meta: {name: "x"}}
 viaOpen: open.meta & {extra: 1} @test(eq, {name: "x", extra: 1})
+
+// A regular struct referenced from a definition is evaluated at a path
+// within it. A sibling reference in that struct then resolves to an arc
+// under the definition without crossing into it, so a plain struct it
+// refers to stays open.
+#Opt: {a?: int}
+plain: {q: {}, s: #Opt & q & {a: 3}}
+#Via: {v: plain}
+viaSibling: #Via.v.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+
+// The same holds however the sibling is reached: through a let, in a
+// comprehension body, by selecting a field of it, or from a nested field.
+plainLet:    {q: {}, let Q = q, s: #Opt & Q & {a: 3}}
+plainFor:    {q: {}, for _, _ in [1] {s: #Opt & q & {a: 3}}}
+plainSel:    {q: {t: {}}, s: #Opt & q.t & {a: 3}}
+plainNested: {q: {}, s: t: #Opt & q & {a: 3}}
+#ViaAll: {l: plainLet, f: plainFor, s: plainSel, n: plainNested}
+viaSiblingLet:    #ViaAll.l.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+viaSiblingFor:    #ViaAll.f.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+viaSiblingSel:    #ViaAll.s.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+viaSiblingNested: #ViaAll.n.s.t @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
+
+// A reference resolved from outside the definition crosses into it even
+// when it is evaluated at a path within the definition, because the struct
+// holding the reference is what the definition refers to.
+outside: #Out
+let Out = {s: {a: 1}, u: outside.s & {b: 2}}
+#Out: Out
+viaOutside: #Out.u @test(eq, {a: 1, b: 2}, incorrect) @test(err:todo, contains="field not allowed")
+
+// A let bound to such a reference denotes the same value.
+outsideLet: #OutLet
+let OutLet = {s: {a: 1}, let S = outsideLet.s, u: S & {b: 2}}
+#OutLet: OutLet
+viaOutsideLet: #OutLet.u @test(eq, {a: 1, b: 2}, incorrect) @test(err:todo, contains="field not allowed")
+
+// Selecting from an inline struct opens definition closedness, see
+// eval/openinline.txtar, but only for a reference resolved against the
+// inline struct itself. A reference written inside it and resolved outside
+// it closes as viaField does.
+inlineField: ({in: m, out: in.meta}).out & {extra: 1} @test(eq, {name: "x", extra: 1})
+inlineLet:   ({let M = m, out: M.meta}).out & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, at=extra, contains="field not allowed")
+inlineRoot:  ({out: m.meta}).out & {extra: 1} @test(eq, {name: "x", extra: 1}, incorrect) @test(err:todo, at=extra, contains="field not allowed")
 -- old.cue --
 // A definition is closed either way, so the same selections close without
 // the experiment, in a comprehension body as anywhere else.
@@ -83,6 +126,13 @@ oldViaFor: {
 		"\(k)": o.meta & {extra: 1}
 	}
 } @test(err, at=one.extra, contains="field not allowed")
+
+// A sibling reference in a regular struct that a definition refers to stays
+// open without the experiment as well.
+#OldOpt: {a?: int}
+oldPlain: {q: {}, s: #OldOpt & q & {a: 3}}
+#OldVia: {v: oldPlain}
+oldViaSibling: #OldVia.v.s @test(err, contains="field not allowed", incorrect) @test(eq:todo, {a: 3})
 
 // Embedding is where the two differ: without the experiment an embedded
 // closed value leaves the struct it lands in open. That holds for a value
@@ -125,6 +175,36 @@ oldEmbedFor: {
     ./in.cue:43:2
 [eval] viaEmbedFor.extra: field not allowed:
     ./in.cue:49:2
+[eval] #Via.v.s.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:61:31
+[eval] #Via.v.s.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:61:31
+[eval] #ViaAll.l.s.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:67:48
+[eval] #ViaAll.f.s.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:68:54
+[eval] #ViaAll.s.s.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:69:44
+[eval] #ViaAll.n.s.t.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:70:40
+[eval] #ViaAll.n.s.t.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:70:40
+[eval] #ViaAll.n.s.t.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:70:40
+[eval] #ViaAll.n.s.t.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:70:40
+[eval] #ViaAll.n.s.t.a: field not allowed:
+    ./in.cue:60:8
+    ./in.cue:70:40
 [eval] oldDirect.extra: field not allowed:
     ./old.cue:5:25
 [eval] oldField.extra: field not allowed:
@@ -133,15 +213,21 @@ oldEmbedFor: {
     ./old.cue:9:16
 [eval] oldViaFor.one.extra: field not allowed:
     ./old.cue:14:21
+[eval] #OldVia.v.s.a: field not allowed:
+    ./old.cue:20:11
+    ./old.cue:21:37
+[eval] #OldVia.v.s.a: field not allowed:
+    ./old.cue:20:11
+    ./old.cue:21:37
 -- out/eval/stats --
 Leaks:  0
-Freed:  99
-Reused: 58
-Allocs: 41
+Freed:  111
+Reused: 66
+Allocs: 45
 Retain: 0
 
-Unifications: 99
-Conjuncts:    146
+Unifications: 111
+Conjuncts:    169
 Disjuncts:    0
 
-NumCloseIDs: 30
+NumCloseIDs: 35

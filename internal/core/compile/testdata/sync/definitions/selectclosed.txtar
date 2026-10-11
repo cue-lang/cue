@@ -66,6 +66,49 @@ viaEmbedFor: {
 // A regular field with a struct literal stays open.
 open: {meta: {name: "x"}}
 viaOpen: open.meta & {extra: 1}
+
+// A regular struct referenced from a definition is evaluated at a path
+// within it. A sibling reference in that struct then resolves to an arc
+// under the definition without crossing into it, so a plain struct it
+// refers to stays open.
+#Opt: {a?: int}
+plain: {q: {}, s: #Opt & q & {a: 3}}
+#Via: {v: plain}
+viaSibling: #Via.v.s
+
+// The same holds however the sibling is reached: through a let, in a
+// comprehension body, by selecting a field of it, or from a nested field.
+plainLet:    {q: {}, let Q = q, s: #Opt & Q & {a: 3}}
+plainFor:    {q: {}, for _, _ in [1] {s: #Opt & q & {a: 3}}}
+plainSel:    {q: {t: {}}, s: #Opt & q.t & {a: 3}}
+plainNested: {q: {}, s: t: #Opt & q & {a: 3}}
+#ViaAll: {l: plainLet, f: plainFor, s: plainSel, n: plainNested}
+viaSiblingLet:    #ViaAll.l.s
+viaSiblingFor:    #ViaAll.f.s
+viaSiblingSel:    #ViaAll.s.s
+viaSiblingNested: #ViaAll.n.s.t
+
+// A reference resolved from outside the definition crosses into it even
+// when it is evaluated at a path within the definition, because the struct
+// holding the reference is what the definition refers to.
+outside: #Out
+let Out = {s: {a: 1}, u: outside.s & {b: 2}}
+#Out: Out
+viaOutside: #Out.u
+
+// A let bound to such a reference denotes the same value.
+outsideLet: #OutLet
+let OutLet = {s: {a: 1}, let S = outsideLet.s, u: S & {b: 2}}
+#OutLet: OutLet
+viaOutsideLet: #OutLet.u
+
+// Selecting from an inline struct opens definition closedness, see
+// eval/openinline.txtar, but only for a reference resolved against the
+// inline struct itself. A reference written inside it and resolved outside
+// it closes as viaField does.
+inlineField: ({in: m, out: in.meta}).out & {extra: 1}
+inlineLet:   ({let M = m, out: M.meta}).out & {extra: 1}
+inlineRoot:  ({out: m.meta}).out & {extra: 1}
 -- old.cue --
 // A definition is closed either way, so the same selections close without
 // the experiment, in a comprehension body as anywhere else.
@@ -83,6 +126,13 @@ oldViaFor: {
 		"\(k)": o.meta & {extra: 1}
 	}
 }
+
+// A sibling reference in a regular struct that a definition refers to stays
+// open without the experiment as well.
+#OldOpt: {a?: int}
+oldPlain: {q: {}, s: #OldOpt & q & {a: 3}}
+#OldVia: {v: oldPlain}
+oldViaSibling: #OldVia.v.s
 
 // Embedding is where the two differ: without the experiment an embedded
 // closed value leaves the struct it lands in open. That holds for a value
@@ -186,6 +236,102 @@ oldEmbedFor: {
   viaOpen: (〈0;open〉.meta & {
     extra: 1
   })
+  #Opt: {
+    a?: int
+  }
+  plain: {
+    q: {}
+    s: ((〈1;#Opt〉 & 〈0;q〉) & {
+      a: 3
+    })
+  }
+  #Via: {
+    v: 〈1;plain〉
+  }
+  viaSibling: 〈0;#Via〉.v.s
+  plainLet: {
+    q: {}
+    let Q#3 = 〈0;q〉
+    s: ((〈1;#Opt〉 & 〈0;let Q#3〉) & {
+      a: 3
+    })
+  }
+  plainFor: {
+    q: {}
+    for _, _ in [
+      1,
+    ] {
+      s: ((〈3;#Opt〉 & 〈2;q〉) & {
+        a: 3
+      })
+    }
+  }
+  plainSel: {
+    q: {
+      t: {}
+    }
+    s: ((〈1;#Opt〉 & 〈0;q〉.t) & {
+      a: 3
+    })
+  }
+  plainNested: {
+    q: {}
+    s: {
+      t: ((〈2;#Opt〉 & 〈1;q〉) & {
+        a: 3
+      })
+    }
+  }
+  #ViaAll: {
+    l: 〈1;plainLet〉
+    f: 〈1;plainFor〉
+    s: 〈1;plainSel〉
+    n: 〈1;plainNested〉
+  }
+  viaSiblingLet: 〈0;#ViaAll〉.l.s
+  viaSiblingFor: 〈0;#ViaAll〉.f.s
+  viaSiblingSel: 〈0;#ViaAll〉.s.s
+  viaSiblingNested: 〈0;#ViaAll〉.n.s.t
+  outside: 〈0;#Out〉
+  let Out#1 = {
+    s: {
+      a: 1
+    }
+    u: (〈1;outside〉.s & {
+      b: 2
+    })
+  }
+  #Out: 〈0;let Out#1〉
+  viaOutside: 〈0;#Out〉.u
+  outsideLet: 〈0;#OutLet〉
+  let OutLet#2 = {
+    s: {
+      a: 1
+    }
+    let S#4 = 〈1;outsideLet〉.s
+    u: (〈0;let S#4〉 & {
+      b: 2
+    })
+  }
+  #OutLet: 〈0;let OutLet#2〉
+  viaOutsideLet: 〈0;#OutLet〉.u
+  inlineField: ({
+    in: 〈1;m〉
+    out: 〈0;in〉.meta
+  }.out & {
+    extra: 1
+  })
+  inlineLet: ({
+    let M#6 = 〈1;m〉
+    out: 〈0;let M#6〉.meta
+  }.out & {
+    extra: 1
+  })
+  inlineRoot: ({
+    out: 〈1;m〉.meta
+  }.out & {
+    extra: 1
+  })
 }
 --- old.cue
 {
@@ -217,6 +363,19 @@ oldEmbedFor: {
       })
     }
   }
+  #OldOpt: {
+    a?: int
+  }
+  oldPlain: {
+    q: {}
+    s: ((〈1;#OldOpt〉 & 〈0;q〉) & {
+      a: 3
+    })
+  }
+  #OldVia: {
+    v: 〈1;oldPlain〉
+  }
+  oldViaSibling: 〈0;#OldVia〉.v.s
   oldEmbedDef: {
     〈1;#Old〉.meta
     extra: 1

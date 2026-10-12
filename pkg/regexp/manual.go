@@ -102,9 +102,6 @@ func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error)
 		return nil, err
 	}
 	names := re.SubexpNames()
-	if len(names) == 0 {
-		return nil, errNoNamedGroup
-	}
 	m := re.FindAllStringSubmatch(s, n)
 	if m == nil {
 		return nil, errNoMatch
@@ -121,8 +118,6 @@ func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error)
 	}
 	return result, nil
 }
-
-var errNoNamedGroup = errors.New("no named groups")
 
 // FindAllSubmatch is the 'All' version of [FindSubmatch]; it returns a list
 // of all successive matches of the expression, as defined by the 'All'
@@ -141,7 +136,8 @@ func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 }
 
 // FindNamedSubmatch is like [FindSubmatch], but returns a map with the names used
-// in capturing groups.
+// in capturing groups. Unnamed groups are omitted, so a pattern without
+// named groups results in an empty map.
 //
 // Example:
 //
@@ -156,9 +152,6 @@ func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
 		return nil, err
 	}
 	names := re.SubexpNames()
-	if len(names) == 0 {
-		return nil, errNoNamedGroup
-	}
 	m := re.FindStringSubmatch(s)
 	if m == nil {
 		return nil, errNoMatch

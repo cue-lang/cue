@@ -84,7 +84,8 @@ FindAllNamedSubmatch: func(pattern: string, s: string, n: int) -> [...]
 FindAllSubmatch: func(pattern: string, s: string, n: int) -> [...]
 
 // FindNamedSubmatch is like [FindSubmatch], but returns a map with the names used
-// in capturing groups.
+// in capturing groups. Unnamed groups are omitted, so a pattern without
+// named groups results in an empty map.
 //
 // Example:
 //

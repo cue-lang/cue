@@ -20,6 +20,7 @@ package cuetxtar
 // regressions in structure sharing.
 
 import (
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -163,7 +164,11 @@ func (r *inlineRunner) collectShareIDsForRoot(records []attrRecord, rootPath cue
 				continue
 			}
 			seenEq[key] = true
-			eqExpr, err := parser.ParseExpr("shareID", pa.raw.Fields[1].Text())
+			body := pa.raw.Fields[1].Text()
+			if !strings.Contains(body, "shareID") {
+				continue // no @test(shareID) attributes to parse
+			}
+			eqExpr, err := parser.ParseExpr("shareID", body)
 			if err != nil {
 				continue
 			}
@@ -221,7 +226,11 @@ func (r *inlineRunner) collectDirectShareIDs(records []attrRecord, version strin
 				continue
 			}
 			seenEq[key] = true
-			eqExpr, err := parser.ParseExpr("shareID", pa.raw.Fields[1].Text())
+			body := pa.raw.Fields[1].Text()
+			if !strings.Contains(body, "shareID") {
+				continue // no @test(shareID) attributes to parse
+			}
+			eqExpr, err := parser.ParseExpr("shareID", body)
 			if err != nil {
 				continue
 			}

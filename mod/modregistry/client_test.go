@@ -75,6 +75,12 @@ x: 42
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(data, zipData))
 
+	// The module was published without metadata.
+	meta, err := m.Metadata()
+	qt.Assert(t, qt.IsNil(err))
+	// TODO: Metadata should return nil, as documented.
+	qt.Assert(t, qt.DeepEquals(meta, &Metadata{}))
+
 	tags, err := c.ModuleVersions(ctx, mv.Path())
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v1.2.3"}))
@@ -318,6 +324,22 @@ x: a.foo + something.bar
 	data, err := io.ReadAll(r)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(data, zipData))
+
+	// Annotations which do not belong to [Metadata] are not metadata.
+	var manifest ocispec.Manifest
+	err = json.Unmarshal(mdata, &manifest)
+	qt.Assert(t, qt.IsNil(err))
+	manifest.Annotations = map[string]string{
+		ocispec.AnnotationCreated: "2024-04-23T15:16:17Z",
+	}
+	mdata, err = json.Marshal(manifest)
+	qt.Assert(t, qt.IsNil(err))
+	m, err = c.GetModuleWithManifest(mv, mdata, "application/json")
+	qt.Assert(t, qt.IsNil(err))
+	meta, err := m.Metadata()
+	qt.Assert(t, qt.IsNil(err))
+	// TODO: Metadata should return nil, as documented.
+	qt.Assert(t, qt.DeepEquals(meta, &Metadata{}))
 }
 
 func TestPutWithInvalidDependencyVersion(t *testing.T) {

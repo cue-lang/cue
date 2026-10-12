@@ -278,6 +278,8 @@ func (w *eqWriter) writeConjunction(b *strings.Builder, conj *adt.Conjunction) {
 // eqWriteList emits a list value, routing each integer-indexed arc through
 // eqWriteValue so that struct elements include their definition fields (#X).
 // nestedIndent follows the same compact/multi-line convention as eqWriteStruct.
+// An open list ends in an ellipsis with its element constraint, as in
+// [1, ...int].
 //
 // In multi-line mode the first element starts immediately after '[' (no extra
 // newline), saving one level of indentation. Struct elements that contain their
@@ -291,10 +293,7 @@ func (w *eqWriter) writeConjunction(b *strings.Builder, conj *adt.Conjunction) {
 func (w *eqWriter) writeList(b *strings.Builder, vx *adt.Vertex, nestedIndent string) {
 	b.WriteByte('[')
 	first := true
-	for _, arc := range vx.Arcs {
-		if !arc.Label.IsInt() || arc.ArcType == adt.ArcNotPresent {
-			continue
-		}
+	sep := func() {
 		if !first && nestedIndent != "" {
 			// Subsequent elements: new line at the outer indent level so the
 			// element's opening { aligns with the closing } of the previous one.
@@ -304,18 +303,42 @@ func (w *eqWriter) writeList(b *strings.Builder, vx *adt.Vertex, nestedIndent st
 			b.WriteString(", ")
 		}
 		first = false
+	}
+	for _, arc := range vx.Arcs {
+		if !arc.Label.IsInt() || arc.ArcType == adt.ArcNotPresent {
+			continue
+		}
+		sep()
 		// Pass nestedIndent (not nestedIndent+"\t") so that struct fields land
 		// at nestedIndent and the closing } lands at nestedIndent[:-1], i.e.
 		// immediately before ']'.
 		w.writeValue(b, w.makeSafeVal(arc), nestedIndent)
 	}
-	// TODO: emit "..." for open lists so that the generated expression captures
-	// the open-list constraint. Currently omitted because astCmp accepts the
-	// omission and the ellipsis syntax inside @test(eq) is not yet supported.
+	if !vx.IsClosedList() {
+		sep()
+		b.WriteString("...")
+		elem := w.makeSafeVal(vx).LookupPath(cue.MakePath(cue.AnyIndex))
+		// Write [...] rather than [..._]. Check the value rather than its kind,
+		// which is also top for a disjunction such as *1 | _.
+		if elem.Exists() && !isTop(elem.Core().V.DerefValue().BaseValue) {
+			w.writeValue(b, elem, nestedIndent)
+		}
+	}
 
 	// In multi-line mode the last element's struct already wrote "\n"+indent[:-1]
 	// before its closing '}', so ']' can follow directly without an extra newline.
 	b.WriteByte(']')
+}
+
+// isTop mirrors the helper of the same name in internal/core/export.
+func isTop(v adt.BaseValue) bool {
+	switch v := v.(type) {
+	case *adt.Top:
+		return true
+	case *adt.BasicType:
+		return v.K == adt.TopKind
+	}
+	return false
 }
 
 // isLeafError reports whether eqWriteValue would render v as bare _|_

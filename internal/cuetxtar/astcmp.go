@@ -58,6 +58,7 @@ type cmpCtx struct {
 //   - Disjunctions are compared structurally, order-independently, preserving
 //     default markers.
 //   - Pattern constraints ([T]: V) are checked for existence and value.
+//   - A trailing list ellipsis (...T) checks the list's element constraint.
 //   - Definitions (#D) and hidden definitions (_#D) are compared.
 func CompareExpr(expr ast.Expr, val cue.Value) error {
 	return (&cmpCtx{}).astCmp(cue.Path{}, expr, val)
@@ -793,31 +794,72 @@ func (c *cmpCtx) cmpErr(path cue.Path, val cue.Value, ea *errArgs) error {
 
 // ── lists ───────────────────────────────────────────────────────────────────
 
+// cmpList compares a list literal against a list value. A trailing ellipsis
+// ...T in the expected list requires the value to be an open list whose
+// element constraint compares equal to T. Without one, the value's openness
+// and element constraints are not checked.
 func (c *cmpCtx) cmpList(path cue.Path, l *ast.ListLit, val cue.Value) error {
 	if val.IncompleteKind() != cue.ListKind {
 		return pathErr(path, "expected list, got %v", val.IncompleteKind())
+	}
+	elts := l.Elts
+	var ellipsis *ast.Ellipsis
+	if n := len(elts); n > 0 {
+		if e, ok := elts[n-1].(*ast.Ellipsis); ok {
+			ellipsis = e
+			elts = elts[:n-1]
+		}
 	}
 	iter, err := val.List()
 	if err != nil {
 		return pathErr(path, "cannot iterate value list: %v", err)
 	}
 	i := 0
-	for ; i < len(l.Elts) && iter.Next(); i++ {
+	for ; i < len(elts) && iter.Next(); i++ {
 		elemPath := path.Append(cue.Index(i))
-		if err := c.astCmp(elemPath, l.Elts[i], iter.Value()); err != nil {
+		if err := c.astCmp(elemPath, elts[i], iter.Value()); err != nil {
 			return err
 		}
 	}
-	if i < len(l.Elts) {
-		return pathErr(path, "list: expected %d elements, value has %d", len(l.Elts), i)
-	}
 	// Count remaining value elements.
-	extra := 0
+	count := i
 	for iter.Next() {
-		extra++
+		count++
 	}
-	if extra > 0 {
-		return pathErr(path, "list: expected %d elements, value has %d", len(l.Elts), i+extra)
+	if count != len(elts) {
+		what := "elements"
+		if ellipsis != nil {
+			what = "elements before the ellipsis"
+		}
+		return pathErr(path, "list: expected %d %s, value has %d", len(elts), what, count)
+	}
+	if ellipsis != nil {
+		return c.cmpListEllipsis(path, ellipsis, val)
+	}
+	return nil
+}
+
+// cmpListEllipsis checks that val is an open list whose element constraint
+// compares equal to the type of the ellipsis e.
+func (c *cmpCtx) cmpListEllipsis(path cue.Path, e *ast.Ellipsis, val cue.Value) error {
+	// Do not use the default value, which closes an open list.
+	if val.Core().V.DerefValue().IsClosedList() {
+		return pathErr(path, "list: expected an open list, value is closed")
+	}
+	// The value's element constraints may be split across several patterns,
+	// such as with [...int] & [1, ...]. Compare what applies to an index past
+	// the elements, which all of them match.
+	elemPath := path.Append(cue.AnyIndex)
+	elem := val.LookupPath(cue.MakePath(cue.AnyIndex))
+	if !elem.Exists() {
+		return pathErr(elemPath, "cannot look up element constraint: %v", elem.Err())
+	}
+	var typ ast.Expr = ast.NewIdent("_")
+	if e.Type != nil {
+		typ = e.Type
+	}
+	if err := c.astCmp(elemPath, typ, elem); err != nil {
+		return pathErr(elemPath, "incompatible element constraint: %w", err)
 	}
 	return nil
 }

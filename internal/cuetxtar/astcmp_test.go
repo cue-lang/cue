@@ -494,6 +494,23 @@ func TestAstCompare_Lists(t *testing.T) {
 
 		// Mixed types.
 		{name: "mixed types", expr: `[1, "two", true]`, val: `[1, "two", true]`},
+
+		// A trailing ellipsis requires an open list with an equal element
+		// constraint. Without one, openness is not checked.
+		{name: "ellipsis", expr: `[...int]`, val: `[...int]`},
+		{name: "ellipsis top", expr: `[...]`, val: `[...]`},
+		{name: "ellipsis after elements", expr: `[1, ...int]`, val: `[1, ...int]`},
+		{name: "ellipsis with two element constraints", expr: `[1, ...int]`, val: `[...int] & [1, ...]`},
+		{name: "ellipsis with conflicting element types", expr: `[..._|_]`, val: `[...int] & [...string]`},
+		{name: "ellipsis in definition", expr: `{#a: [...int]}`, val: `#a: [...int]`},
+		{name: "ellipsis conjunction", expr: `[...int & >0]`, val: `[...int] & [...>0]`},
+		{name: "ellipsis disjunction", expr: `[...string] | [1, ...int]`, val: `[1, ...int] | [...string]`},
+		{name: "no ellipsis open value", expr: `[]`, val: `[...int]`},
+		{name: "ellipsis wrong type", expr: `[...int]`, val: `[...string]`, wantErr: "[_]: incompatible element constraint: [_]: expected int, got string"},
+		{name: "ellipsis closed value", expr: `[...int]`, val: `[]`, wantErr: "expected an open list, value is closed"},
+		{name: "ellipsis closed by unification", expr: `[...int]`, val: `[...int] & []`, wantErr: "expected an open list, value is closed"},
+		{name: "ellipsis too many elements", expr: `[1, ...int]`, val: `[1, 2, ...int]`, wantErr: "expected 1 elements before the ellipsis, value has 2"},
+		{name: "ellipsis too few elements", expr: `[1, 2, ...int]`, val: `[1, ...int]`, wantErr: "expected 2 elements before the ellipsis, value has 1"},
 	}
 
 	for _, tt := range tests {

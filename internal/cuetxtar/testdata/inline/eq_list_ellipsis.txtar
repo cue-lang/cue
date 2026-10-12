@@ -1,0 +1,25 @@
+# Tests that @test(eq) fills an open list with a trailing ellipsis carrying
+# its element constraint, so that a filled or rewritten assertion checks it.
+-- in/test.cue --
+// Already filled with the right element constraint: must pass.
+filled: [1, ...int] @test(eq, [1, ...int])
+
+// Bare @test(eq) on open and closed lists.
+top:    [...] @test(eq)
+split:  [...int] & [1, ...] @test(eq)
+closed: [1, ...int] & [1] @test(eq)
+nested: [[...string], ...[...int]] @test(eq)
+dflt:   [...(*1 | _)] @test(eq)
+-- out/update/test.cue --
+// Already filled with the right element constraint: must pass.
+filled: [1, ...int] @test(eq, [1, ...int])
+
+// Bare @test(eq) on open and closed lists.
+top:    [...] @test(eq, [...])
+split:  [...int] & [1, ...] @test(eq, [1, ...int])
+closed: [1, ...int] & [1] @test(eq, [1])
+nested: [[...string], ...[...int]] @test(eq, [[...string], ...[...int]])
+dflt:   [...(*1 | _)] @test(eq, [...*1 | _])
+-- out/status.txt --
+update: output passes run
+force:  identical to update

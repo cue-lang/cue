@@ -90,6 +90,17 @@ Comparison uses `internal/core/diff`.  Insignificant differences (field
 ordering, let-binding substitution, comment presence) are ignored.  Error
 *message text* is ignored; error *kind* and *code* are compared.
 
+#### Pattern and element constraints
+
+A struct literal listing pattern constraints, such as `{[string]: int}`,
+requires the value to have exactly those patterns. One listing none does
+not check the value's patterns.
+
+A list literal ending in an ellipsis, such as `[...int]` or `[1, ...int]`,
+requires the value to be an open list with a single element constraint equal
+to the ellipsis type. One without an ellipsis does not check the value's
+openness or element constraints.
+
 #### Hidden fields in `eq` struct literals
 
 When the expected value of an `@test(eq, {...})` contains a hidden field that

@@ -2215,6 +2215,9 @@ func All() Option {
 //
 // It applies only to [Value.Syntax].
 func Docs(include bool) Option {
+	// TODO: the include argument is ignored, so Docs(false) still includes docs.
+	// Respecting it would drop comments from cue export --out cue,
+	// which passes Docs(false) by default; see https://cuelang.org/issue/1180.
 	return func(p *options) { p.docs = true }
 }
 

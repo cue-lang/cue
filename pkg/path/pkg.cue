@@ -165,4 +165,4 @@ IsAbs: func(path: string, os: string = "unix") -> bool
 // Given "\\host\share\foo" it returns "\\host\share".
 // On other platforms it returns "".
 // The default value for os is Windows.
-VolumeName: func(path: string, os: string = "unix") -> string
+VolumeName: func(path: string, os: string = "windows") -> string

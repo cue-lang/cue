@@ -233,9 +233,7 @@ func TestDefsMatchRegisteredPackages(t *testing.T) {
 					qt.Assert(t, qt.IsNil(err))
 					want := ctx.BuildExpr(wantExpr)
 					got := ctx.BuildExpr(p.Default)
-					// path.VolumeName declares "unix" as its os default,
-					// while the builtin defaults to "windows".
-					qt.Check(t, qt.Equals(got.Equals(want), ip != "path" || name != "VolumeName"),
+					qt.Check(t, qt.IsTrue(got.Equals(want)),
 						qt.Commentf("%s: parameter %d declared default %v vs builtin default %v", name, i+1, got, want))
 				}
 			}

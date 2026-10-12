@@ -2289,9 +2289,8 @@ func (o *options) updateOptions(opts []Option) {
 // represent more than one error, retrievable with [errors.Errors].
 //
 // By default, incomplete values such as non-concrete fields are not
-// reported; use [Concrete] for that. Use [Final] to report missing
-// required fields. Cycles are only reported with [Concrete], [Final],
-// or [DisallowCycles]. Values in definitions and hidden fields never
+// reported; use [Concrete] for that. Use [Concrete] or [Final] to report
+// missing required fields. Definitions and hidden fields within v never
 // need to be concrete.
 func (v Value) Validate(opts ...Option) error {
 	o := options{}

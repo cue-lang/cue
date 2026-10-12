@@ -608,7 +608,7 @@ type lineInfo struct {
 func (f *File) AddLineInfo(offset int, filename string, line int) {
 	x := index(offset)
 	f.mutex.Lock()
-	if i := len(f.infos); i == 0 || index(f.infos[i-1].Offset) < x && x < f.size {
+	if i := len(f.infos); (i == 0 || index(f.infos[i-1].Offset) < x) && x < f.size {
 		f.infos = append(f.infos, lineInfo{offset, filename, line})
 	}
 	f.mutex.Unlock()

@@ -100,7 +100,6 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		t.Fatalf("unknown JSON schema version for file %q", filename)
 	}
 	maybeSkip(t, vers, versStr, s)
-	t.Logf("location: %v", testdataPos(s))
 
 	// Extract the schema from the test data JSON schema.
 	schemaAST, extractErr := jsonschema.Extract(jsonValue, &jsonschema.Config{
@@ -108,20 +107,28 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		DefaultVersion: vers,
 	})
 	var schemaValue cue.Value
+	var extracted []byte
+	logOnFailure(t, func() {
+		t.Logf("location: %v", testdataPos(s))
+		if extracted != nil {
+			t.Logf("extracted schema: %q", extracted)
+		}
+	})
 	if extractErr == nil {
 		// Round-trip via bytes because that's what will usually happen
 		// to the generated schema.
-		b, err := format.Node(schemaAST, format.Simplify())
+		extracted, err = format.Node(schemaAST, format.Simplify())
 		qt.Assert(t, qt.IsNil(err))
-		t.Logf("extracted schema: %q", b)
-		schemaValue = ctx.CompileBytes(b, cue.Filename("generated.cue"))
+		schemaValue = ctx.CompileBytes(extracted, cue.Filename("generated.cue"))
 		if err := schemaValue.Err(); err != nil {
 			extractErr = fmt.Errorf("cannot compile resulting schema: %v", errors.Details(err, nil))
 		}
 	}
 	t.Run("Extract", func(t *testing.T) {
 		if extractErr != nil {
-			t.Logf("txtar:\n%s", schemaFailureTxtar(s))
+			logOnFailure(t, func() {
+				t.Logf("txtar:\n%s", schemaFailureTxtar(s))
+			})
 			schemaExtractFailed(t, m, "", s, fmt.Sprintf("extract error: %v", extractErr))
 			return
 		}
@@ -183,12 +190,10 @@ func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externa
 // runExternalSchemaTest runs a single test case against a given schema value.
 func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *externaltest.Schema, test *externaltest.Test, schemaValue cue.Value) {
 	ctx := schemaValue.Context()
-	defer func() {
-		if t.Failed() || testing.Verbose() {
-			t.Logf("txtar:\n%s", testCaseTxtar(s, test))
-		}
-	}()
-	t.Logf("location: %v", testdataPos(test))
+	logOnFailure(t, func() {
+		t.Logf("location: %v", testdataPos(test))
+		t.Logf("txtar:\n%s", testCaseTxtar(s, test))
+	})
 	instAST, err := json.Extract("instance.json", test.Data)
 	if err != nil {
 		t.Fatal(err)
@@ -219,25 +224,36 @@ func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *exte
 // the result of that.
 func roundTripViaGenerate(t *testing.T, schemaValue cue.Value) (cue.Value, error) {
 	ctx := schemaValue.Context()
+	var data []byte
+	var jsonValue, schemaValue1 cue.Value
+	logOnFailure(t, func() {
+		if data != nil {
+			t.Logf("extracted schema: %q", data)
+		}
+		if jsonValue.Exists() {
+			t.Logf("generated JSON schema: %v", jsonValue)
+		}
+		if schemaValue1.Exists() {
+			t.Logf("round-tripped CUE schema: %#v", schemaValue1)
+		}
+	})
 	// Generate JSON Schema from the extracted CUE.
 	// Note: 2020_12 is the only version that we currently support.
 	syn := schemaValue.Syntax()
 	data, err := format.Node(syn)
 	qt.Assert(t, qt.IsNil(err))
 	schemaValue = ctx.CompileBytes(data)
-	t.Logf("extracted schema: %q", data)
 	jsonAST, err := jsonschema.Generate(schemaValue, &jsonschema.GenerateConfig{
 		Version: jsonschema.VersionDraft2020_12,
 	})
 	if err != nil {
 		return cue.Value{}, fmt.Errorf("generate error: %v", err)
 	}
-	jsonValue := ctx.BuildExpr(jsonAST)
+	jsonValue = ctx.BuildExpr(jsonAST)
 	if err := jsonValue.Err(); err != nil {
 		// This really shouldn't happen.
 		return cue.Value{}, fmt.Errorf("cannot build value from JSON: %v", err)
 	}
-	t.Logf("generated JSON schema: %v", jsonValue)
 
 	generatedSchemaAST, err := jsonschema.Extract(jsonValue, &jsonschema.Config{
 		StrictFeatures: true,
@@ -245,12 +261,23 @@ func roundTripViaGenerate(t *testing.T, schemaValue cue.Value) (cue.Value, error
 	if err != nil {
 		return cue.Value{}, fmt.Errorf("cannot extract generated schema: %v", err)
 	}
-	schemaValue1 := ctx.BuildFile(generatedSchemaAST)
+	schemaValue1 = ctx.BuildFile(generatedSchemaAST)
 	if err := schemaValue1.Err(); err != nil {
 		return cue.Value{}, fmt.Errorf("cannot build extracted schema: %v", err)
 	}
-	t.Logf("round-tripped CUE schema: %#v", schemaValue1)
 	return schemaValue1, nil
+}
+
+// logOnFailure calls logf once t and its subtests have finished,
+// if t failed or the test is verbose.
+// Positions and values are costly to format,
+// so we avoid doing so for the many tests which pass.
+func logOnFailure(t *testing.T, logf func()) {
+	t.Cleanup(func() {
+		if t.Failed() || testing.Verbose() {
+			logf()
+		}
+	})
 }
 
 // testCaseTxtar returns a testscript that runs the given test.

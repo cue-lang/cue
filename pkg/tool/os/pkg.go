@@ -4,18 +4,16 @@
 //
 // CUE definitions:
 //
-//	// A Value are all possible values allowed in flags.
-//	// A null value unsets an environment variable.
+//	// A Value is a value allowed for an environment variable.
+//	// A null value indicates an unset environment variable.
 //	Value: bool | number | *string | null
 //
-//	// Name indicates a valid flag name.
+//	// Name indicates a valid environment variable name.
 //	Name: !="" & !~"^[$]"
 //
-//	// Setenv defines a set of command line flags, the values of which will be set
-//	// at run time. The doc comment of the flag is presented to the user in help.
-//	//
-//	// To define a shorthand, define the shorthand as a new flag referring to
-//	// the flag of which it is a shorthand.
+//	// Setenv is meant to set environment variables, but it is not implemented:
+//	// running it in a command fails. To set environment variables for a
+//	// command run by tool/exec.Run, use its env field.
 //	Setenv: {
 //		$id: _id
 //		_id: "tool/os.Setenv"
@@ -23,7 +21,7 @@
 //		{[Name]: Value}
 //	}
 //
-//	// Getenv gets and parses the specific command line variables.
+//	// Getenv gets and parses the specified environment variables.
 //	Getenv: {
 //		$id: _id
 //		_id: "tool/os.Getenv"
@@ -43,7 +41,8 @@
 //		{[Name]: Value}
 //	}
 //
-//	// Clearenv clears all environment variables.
+//	// Clearenv is meant to clear all environment variables, but it is not
+//	// implemented: running it in a command fails.
 //	Clearenv: {
 //		$id: _id
 //		_id: "tool/os.Clearenv"

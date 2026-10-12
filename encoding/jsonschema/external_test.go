@@ -63,9 +63,11 @@ func TestExternal(t *testing.T) {
 			schemas := tests[filename]
 			t.Run(testName(filename), func(t *testing.T) {
 				t.Parallel()
+				// The schemas in a file run sequentially, so they can share a context.
+				ctx := m.CueContext()
 				for _, s := range schemas {
 					t.Run(testName(s.Description), func(t *testing.T) {
-						runExternalSchemaTests(t, m, filename, s)
+						runExternalSchemaTests(t, m, ctx, filename, s)
 					})
 				}
 			})
@@ -88,9 +90,8 @@ func TestExternal(t *testing.T) {
 	cuetest.WriteGoldenFile(t, "external_teststats.txt", externalTestStats(tests))
 }
 
-func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *externaltest.Schema) {
+func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, filename string, s *externaltest.Schema) {
 	t.Logf("file %v", path.Join("testdata/external", filename))
-	ctx := m.CueContext()
 	jsonAST, err := json.Extract("schema.json", s.Schema)
 	qt.Assert(t, qt.IsNil(err))
 	jsonValue := ctx.BuildExpr(jsonAST)

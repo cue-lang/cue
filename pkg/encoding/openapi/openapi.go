@@ -28,7 +28,6 @@ import (
 )
 
 var (
-	selfContainedPath    = cue.ParsePath("selfContained")
 	expandReferencesPath = cue.ParsePath("expandReferences")
 	infoPath             = cue.ParsePath("info")
 )
@@ -45,8 +44,8 @@ var (
 //	  // Currently only "3.0.0" is supported.
 //	  version!: "3.0.0" // currently "3.0.0" only
 //
-//	  // selfContained causes all non-expanded external references
-//	  // to be included//
+//	  // selfContained has no effect; all non-expanded external
+//	  // references are always included.
 //	  selfContained?: bool
 //
 //	  // expandReferences replaces references with actual objects when generating
@@ -70,7 +69,6 @@ func MarshalSchema(config cue.Value, schema pkg.Schema) (string, error) {
 }
 
 func marshalSchema(_ *adt.OpContext, config cue.Value, schema pkg.Schema) (string, error) {
-	selfContained, _ := config.LookupPath(selfContainedPath).Bool()
 	expandReferences, _ := config.LookupPath(expandReferencesPath).Bool()
 
 	version, err := config.LookupPath(cue.ParsePath("version")).String()
@@ -80,7 +78,6 @@ func marshalSchema(_ *adt.OpContext, config cue.Value, schema pkg.Schema) (strin
 
 	c := &openapi.Config{
 		Version:          version,
-		SelfContained:    selfContained,
 		ExpandReferences: expandReferences,
 	}
 

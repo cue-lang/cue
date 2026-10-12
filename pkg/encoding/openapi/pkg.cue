@@ -37,8 +37,8 @@ package openapi
 // 	  // Currently only "3.0.0" is supported.
 // 	  version!: "3.0.0" // currently "3.0.0" only
 //
-// 	  // selfContained causes all non-expanded external references
-// 	  // to be included//
+// 	  // selfContained has no effect; all non-expanded external
+// 	  // references are always included.
 // 	  selfContained?: bool
 //
 // 	  // expandReferences replaces references with actual objects when generating
@@ -63,8 +63,8 @@ MarshalSchema: func(config: _, schema: _ @schema()) -> string
 
 	info?: #Info
 
-	// selfContained causes all non-expanded external references to be included
-	// in this document.
+	// selfContained has no effect; all non-expanded external references are
+	// always included in the generated document.
 	selfContained: bool | *false
 
 	// expandReferences replaces references with actual objects when generating

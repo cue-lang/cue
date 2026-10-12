@@ -133,9 +133,6 @@ var (
 
 // GenerateConfig defines the configuration for [GenerateV2].
 type GenerateConfig struct {
-	// PkgName defines the package name for a generated CUE package.
-	PkgName string
-
 	// NamesFunc determines how to name the shared schemas generated within
 	// components.schemas. It is passed all the distinct references made by the
 	// schemas in the document and, when AllSchemas is set, a reference to each

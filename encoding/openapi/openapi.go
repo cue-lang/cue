@@ -52,8 +52,8 @@ type Config struct {
 	// the empty string is returned.
 	DescriptionFunc func(v cue.Value) string
 
-	// SelfContained causes all non-expanded external references to be included
-	// in this document.
+	// Deprecated: SelfContained has no effect; all non-expanded external
+	// references are always included in the generated document.
 	SelfContained bool
 
 	// OpenAPI version to use. Supported as of v3.0.0.

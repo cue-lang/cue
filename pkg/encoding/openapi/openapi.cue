@@ -21,8 +21,8 @@ package openapi
 
 	info?: #Info
 
-	// selfContained causes all non-expanded external references to be included
-	// in this document.
+	// selfContained has no effect; all non-expanded external references are
+	// always included in the generated document.
 	selfContained: bool | *false
 
 	// expandReferences replaces references with actual objects when generating

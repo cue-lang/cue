@@ -4,9 +4,18 @@ stdout 'Hello World!'
 exec cue cmd echohidden
 stdout 'Hello World!'
 
+# Captured output is bytes when stdout or stderr is constrained to bytes.
+# TODO: the output is always captured as a string, which conflicts with bytes.
+! exec cue cmd echobytes
+stderr 'command\.echobytes\.(out\.stdout|err\.stderr): conflicting values bytes and "'
+
 -- cue.mod/module.cue --
 module: "mod.test/foo"
 language: version: "v0.9.0"
+
+-- echobytes.stdout --
+stdout: Hello World!
+stderr: oops
 
 -- data.cue --
 package hello
@@ -44,5 +53,21 @@ command: echohidden: {
 
     task: display: cli.Print & {
         text: echo.stdout
+    }
+}
+
+command: echobytes: {
+    out: exec.Run & {
+        cmd:    "echo Hello \(_who)!"
+        stdout: bytes
+    }
+    err: exec.Run & {
+        cmd:         ["sh", "-c", "echo oops >&2; exit 1"]
+        stderr:      bytes
+        mustSucceed: false
+    }
+
+    task: display: cli.Print & {
+        text: "stdout: \(out.stdout)stderr: \(err.stderr)"
     }
 }

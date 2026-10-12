@@ -353,6 +353,8 @@ func TestServeResponse(t *testing.T) {
 		wantBody string
 		// wantHeader holds the values expected for some response header keys.
 		wantHeader http.Header
+		// wantTrailer holds the values expected for some response trailer keys.
+		wantTrailer http.Header
 	}{{
 		name:     "default status code",
 		expr:     `{response: body: "ok"}`,
@@ -383,6 +385,79 @@ func TestServeResponse(t *testing.T) {
 			"X-Single":   {"one"},
 		},
 	}, {
+		// Trailers are declared in the header and sent after the body.
+		name: "trailers",
+		expr: `{response: {
+			trailer: "X-Checksum": "abc"
+			trailer: "X-Multi":    ["one", "two"]
+			body: "ok"
+		}}`,
+		wantCode: 200,
+		wantBody: "ok",
+		// TODO: the trailers are sent as headers.
+		wantHeader: http.Header{
+			"X-Checksum": {"abc"},
+			"X-Multi":    {"one", "two"},
+		},
+		wantTrailer: http.Header{
+			"X-Checksum": nil,
+			"X-Multi":    nil,
+		},
+	}, {
+		// A header and a trailer of the same name keep their own values.
+		name: "header and trailer of the same name",
+		expr: `{response: {
+			header:  "X-Checksum": "pending"
+			trailer: "X-Checksum": "abc"
+			body: "ok"
+		}}`,
+		wantCode: 200,
+		wantBody: "ok",
+		// TODO: the trailer is sent as a header.
+		wantHeader: http.Header{
+			"X-Checksum": {"pending", "abc"},
+		},
+		wantTrailer: http.Header{
+			"X-Checksum": nil,
+		},
+	}, {
+		// Trailers need a chunked body, which these headers prevent.
+		name: "trailer with content length",
+		expr: `{response: {
+			header:  "Content-Length": "2"
+			trailer: "X-Checksum":     "abc"
+			body: "ok"
+		}}`,
+		wantCode: 200,
+		wantBody: "ok",
+		// TODO: the trailer is sent as a header.
+		wantHeader: http.Header{
+			"X-Checksum": {"abc"},
+		},
+	}, {
+		name: "trailer with identity transfer encoding",
+		expr: `{response: {
+			header:  "Transfer-Encoding": "identity"
+			trailer: "X-Checksum":        "abc"
+			body: "ok"
+		}}`,
+		wantCode: 200,
+		wantBody: "ok",
+		// TODO: the trailer is sent as a header.
+		wantHeader: http.Header{
+			"X-Checksum": {"abc"},
+		},
+	}, {
+		// net/http silently drops the trailers it does not allow.
+		name:     "disallowed trailer",
+		expr:     `{response: {trailer: "Cache-Control": "no-cache", body: "ok"}}`,
+		wantCode: 200,
+		wantBody: "ok",
+		// TODO: the trailer is sent as a header.
+		wantHeader: http.Header{
+			"Cache-Control": {"no-cache"},
+		},
+	}, {
 		// net/http panics when given a status code outside [100, 999].
 		name:    "status code too low",
 		expr:    `{response: {statusCode: 0, body: "ok"}}`,
@@ -402,10 +477,11 @@ func TestServeResponse(t *testing.T) {
 	}}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			w := httptest.NewRecorder()
-			c := &serveCmd{w: w}
-			_, err := c.Run(&task.Context{Obj: build(t, tc.expr)})
+			v := build(t, tc.expr)
 			if tc.wantErr != "" {
+				w := httptest.NewRecorder()
+				c := &serveCmd{w: w}
+				_, err := c.Run(&task.Context{Obj: v})
 				if err == nil {
 					t.Fatalf("got no error, want %q", tc.wantErr)
 				}
@@ -419,18 +495,39 @@ func TestServeResponse(t *testing.T) {
 				}
 				return
 			}
+			// Serve the response over a real connection, so that the client
+			// sees how it is framed, such as whether trailers are sent at all.
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				c := &serveCmd{w: w}
+				if _, err := c.Run(&task.Context{Obj: v}); err != nil {
+					t.Error(err)
+				}
+			}))
+			defer srv.Close()
+			res, err := http.Get(srv.URL)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if w.Code != tc.wantCode {
-				t.Errorf("got status code %d, want %d", w.Code, tc.wantCode)
+			defer res.Body.Close()
+			// Trailers are only available once the body has been read.
+			body, err := io.ReadAll(res.Body)
+			if err != nil {
+				t.Fatal(err)
 			}
-			if got := w.Body.String(); got != tc.wantBody {
+			if res.StatusCode != tc.wantCode {
+				t.Errorf("got status code %d, want %d", res.StatusCode, tc.wantCode)
+			}
+			if got := string(body); got != tc.wantBody {
 				t.Errorf("got body %q, want %q", got, tc.wantBody)
 			}
 			for key, want := range tc.wantHeader {
-				if got := w.Header().Values(key); !slices.Equal(got, want) {
+				if got := res.Header.Values(key); !slices.Equal(got, want) {
 					t.Errorf("header %s: got %q, want %q", key, got, want)
+				}
+			}
+			for key, want := range tc.wantTrailer {
+				if got := res.Trailer.Values(key); !slices.Equal(got, want) {
+					t.Errorf("trailer %s: got %q, want %q", key, got, want)
 				}
 			}
 		})

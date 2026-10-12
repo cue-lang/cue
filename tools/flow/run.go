@@ -124,13 +124,13 @@ func (c *Controller) runLoop() {
 
 			start := *c.opCtx.Stats()
 
-			switch t.err {
-			case nil:
+			switch {
+			case t.err == nil:
 				c.updateTaskResults(t)
 
-			case ErrAbort:
-				// TODO: do something cleverer.
-				fallthrough
+			case errors.Is(t.err, ErrAbort):
+				// The task's results are dropped,
+				// and markReady terminates its dependants.
 
 			default:
 				c.addErr(t.err, "task failure")
@@ -154,9 +154,21 @@ func (c *Controller) runLoop() {
 }
 
 func (c *Controller) markReady(t *Task) {
-	for _, x := range c.tasks {
-		if x.state == Waiting && x.isReady() {
-			x.state = Ready
+	// Tasks which depend on an aborted task, transitively,
+	// are terminated without being run.
+	for changed := true; changed; {
+		changed = false
+		for _, x := range c.tasks {
+			if x.state != Waiting {
+				continue
+			}
+			if ready, aborted := x.isReady(); aborted != nil {
+				x.state = Terminated
+				x.err = aborted
+				changed = true
+			} else if ready {
+				x.state = Ready
+			}
 		}
 	}
 

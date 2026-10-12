@@ -109,6 +109,7 @@ type Runner interface {
 	//
 	// If for a returned error x errors.Is(x, ErrAbort), all dependant tasks
 	// will not be run, without this being an error.
+	// Any results set via [Task.Fill] by an aborting task are discarded.
 	Run(t *Task, err error) error
 }
 
@@ -333,8 +334,8 @@ func mermaidGraph(c *Controller) string {
 //	    ↘︎        ↙︎
 //	    Terminated
 //
-// A Task may move from Waiting to Terminating if one of
-// the tasks on which it depends fails.
+// A Task may move from Waiting to Terminated if one of
+// the tasks on which it depends aborts with [ErrAbort].
 //
 // NOTE: transitions from Running to Waiting are currently not supported. In
 // the future this may be possible if a task depends on continuously running
@@ -431,13 +432,18 @@ func (t *Task) done() bool {
 	return t.state > Running
 }
 
-func (t *Task) isReady() bool {
+// isReady reports whether all the tasks on which t depends are done.
+// If any of them aborted with [ErrAbort], it returns that task's error.
+func (t *Task) isReady() (ready bool, aborted errors.Error) {
+	ready = true
 	for _, d := range t.depTasks {
 		if !d.done() {
-			return false
+			ready = false
+		} else if errors.Is(d.err, ErrAbort) {
+			return false, d.err
 		}
 	}
-	return true
+	return ready, nil
 }
 
 func (t *Task) vertex() *adt.Vertex {

@@ -556,17 +556,13 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 
 			update := false
 
-			for i, f := range a.Files {
-
-				// Format CUE files as required
-				if tc.HasTag("noformat") || !strings.HasSuffix(f.Name, ".cue") {
-					continue
-				}
-				if ff, err := format.Source(f.Data); err == nil {
-					if bytes.Equal(f.Data, ff) {
+			// Format CUE files as required
+			if cuetest.FormatTxtar() && !tc.HasTag("noformat") {
+				for i, f := range a.Files {
+					if !strings.HasSuffix(f.Name, ".cue") {
 						continue
 					}
-					if cuetest.FormatTxtar() {
+					if ff, err := format.Source(f.Data); err == nil && !bytes.Equal(f.Data, ff) {
 						update = true
 						a.Files[i].Data = ff
 					}

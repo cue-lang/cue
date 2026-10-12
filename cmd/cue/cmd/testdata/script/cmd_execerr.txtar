@@ -7,6 +7,14 @@ cmp stdout canFail-stdout.golden
 ! exec cue cmd withSpaces
 cmp stderr withSpaces-stderr.golden
 
+# Captured stderr is filled whether or not the command succeeds,
+# even when stdout is not captured.
+# TODO: stderr is only filled when the command fails and stdout is captured.
+exec cue cmd stderrFail
+stdout '^""$'
+! exec cue cmd stderrSucceed
+stderr 'non-concrete value string'
+
 -- cue.mod/module.cue --
 module: "example.com"
 language: version: "v0.9.0"
@@ -27,6 +35,7 @@ command.withSpaces: task failed: command ["false" "with an ignored argument"] fa
 package foo
 
 import (
+	"strconv"
 	"tool/cli"
 	"tool/exec"
 )
@@ -59,6 +68,23 @@ command: canFail: {
 			hasStderr=\(errNotFound.stderr != "")
 			"""
 	}
+}
+
+command: stderrFail: {
+	run: exec.Run & {
+		cmd: ["sh", "-c", "echo fail >&2; exit 1"]
+		stderr: string
+		mustSucceed: false
+	}
+	print: cli.Print & {text: strconv.Quote(run.stderr)}
+}
+
+command: stderrSucceed: {
+	run: exec.Run & {
+		cmd: ["sh", "-c", "echo succeed >&2"]
+		stderr: string
+	}
+	print: cli.Print & {text: strconv.Quote(run.stderr)}
 }
 
 command: withSpaces: exec.Run & {

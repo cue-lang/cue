@@ -161,13 +161,14 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 	})
 }
 
-// schemaExtractFailed marks a schema extraction as failed and also
-// runs all the subtests, marking them as failed too.
+// schemaExtractFailed marks a schema extraction as failed,
+// marking all its tests as failed too.
+// The tests are not run as subtests, as each would only be skipped.
 func schemaExtractFailed(t *testing.T, m *cuetdtest.M, variant string, s *externaltest.Schema, reason string) {
 	for _, test := range s.Tests {
-		t.Run("", func(t *testing.T) {
-			testFailed(t, m, variant, &test.Skip, test, "could not extract schema")
-		})
+		if problem := recordFailure(m, variant, &test.Skip, "could not extract schema"); problem != "" {
+			t.Errorf("test %q: %s", test.Description, problem)
+		}
 	}
 	testFailed(t, m, variant, &s.Skip, s, reason)
 }
@@ -299,22 +300,38 @@ func testName(s string) string {
 // given error message, and updates the
 // skip field pointed to by skipField if necessary.
 func testFailed(t *testing.T, m *cuetdtest.M, variant string, skipField *externaltest.Skip, p positioner, errStr string) {
+	if problem := recordFailure(m, variant, skipField, errStr); problem != "" {
+		t.Fatal(problem)
+	}
+	if !cuetest.UpdateGoldenFiles() {
+		t.Skipf("skipping due to known error: %v", errStr)
+	}
+}
+
+// recordFailure updates the skip field pointed to by skipField
+// for a failure with the given error message if necessary.
+// It returns a non-empty problem if the failure was not expected.
+func recordFailure(m *cuetdtest.M, variant string, skipField *externaltest.Skip, errStr string) (problem string) {
 	name := skipName(m, variant)
+	reason := (*skipField)[name]
 	if cuetest.UpdateGoldenFiles() {
-		if (*skipField)[name] == "" && !cuetest.ForceUpdateGoldenFiles() {
-			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
+		if reason == "" && !cuetest.ForceUpdateGoldenFiles() {
+			return fmt.Sprintf("test regression; was succeeding, now failing: %v", errStr)
 		}
 		if *skipField == nil {
 			*skipField = make(externaltest.Skip)
 		}
 		(*skipField)[name] = errStr
-		return
+		return ""
 	}
-	if reason := (*skipField)[name]; reason != "" {
-		qt.Assert(t, qt.Equals(reason, errStr), qt.Commentf("error message mismatch"))
-		t.Skipf("skipping due to known error: %v", reason)
+	switch reason {
+	case "":
+		return errStr
+	case errStr:
+		return ""
+	default:
+		return fmt.Sprintf("error message mismatch: got %q, want %q", errStr, reason)
 	}
-	t.Fatal(errStr)
 }
 
 // testFails marks the current test as succeeded and updates the

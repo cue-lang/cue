@@ -78,8 +78,7 @@ x: 42
 	// The module was published without metadata.
 	meta, err := m.Metadata()
 	qt.Assert(t, qt.IsNil(err))
-	// TODO: Metadata should return nil, as documented.
-	qt.Assert(t, qt.DeepEquals(meta, &Metadata{}))
+	qt.Assert(t, qt.DeepEquals(meta, (*Metadata)(nil)))
 
 	tags, err := c.ModuleVersions(ctx, mv.Path())
 	qt.Assert(t, qt.IsNil(err))
@@ -338,8 +337,7 @@ x: a.foo + something.bar
 	qt.Assert(t, qt.IsNil(err))
 	meta, err := m.Metadata()
 	qt.Assert(t, qt.IsNil(err))
-	// TODO: Metadata should return nil, as documented.
-	qt.Assert(t, qt.DeepEquals(meta, &Metadata{}))
+	qt.Assert(t, qt.DeepEquals(meta, (*Metadata)(nil)))
 }
 
 func TestPutWithInvalidDependencyVersion(t *testing.T) {

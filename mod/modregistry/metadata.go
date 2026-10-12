@@ -28,6 +28,10 @@ func newMetadataFromAnnotations(annotations map[string]string) (*Metadata, error
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return nil, err
 	}
+	if m == (Metadata{}) {
+		// No metadata annotations; other annotations are ignored.
+		return nil, nil
+	}
 	return &m, nil
 }
 

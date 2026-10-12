@@ -226,12 +226,8 @@ func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *exte
 // the result of that.
 func roundTripViaGenerate(t *testing.T, schemaValue cue.Value) (cue.Value, error) {
 	ctx := schemaValue.Context()
-	var data []byte
 	var jsonValue, schemaValue1 cue.Value
 	logOnFailure(t, func() {
-		if data != nil {
-			t.Logf("extracted schema: %q", data)
-		}
 		if jsonValue.Exists() {
 			t.Logf("generated JSON schema: %v", jsonValue)
 		}
@@ -241,10 +237,6 @@ func roundTripViaGenerate(t *testing.T, schemaValue cue.Value) (cue.Value, error
 	})
 	// Generate JSON Schema from the extracted CUE.
 	// Note: 2020_12 is the only version that we currently support.
-	syn := schemaValue.Syntax()
-	data, err := format.Node(syn)
-	qt.Assert(t, qt.IsNil(err))
-	schemaValue = ctx.CompileBytes(data)
 	jsonAST, err := jsonschema.Generate(schemaValue, &jsonschema.GenerateConfig{
 		Version: jsonschema.VersionDraft2020_12,
 	})

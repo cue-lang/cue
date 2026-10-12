@@ -150,13 +150,14 @@ hashIndex: {
 	y: (#)[0:1] @test(eq, [1])
 }
 
-// Alternatives that differ only in openness are not merged as duplicates.
+// Alternatives that differ only in closedness are duplicates, of which the
+// open one is kept.
 closeDedup: {
-	x: [1] | close([1]) @test(eq, [1] | close([1]))
+	x: [1] | close([1]) @test(eq, [1])
 }
 
 closeDedupStruct: {
-	x: {a: 1} | close({a: 1}) @test(eq, {a: 1} | close({a: 1}))
+	x: {a: 1} | close({a: 1}) @test(eq, {a: 1}) @test(closed=false)
 }
 
 // Definitions close recursively: the elements of a list in a definition are
@@ -269,23 +270,23 @@ closeSlice: {
 [eval] closedLiteralsInDef.errL.0.b: field not allowed:
     ./in.cue:137:21
 [eval] defStructElems.err.0.b: field not allowed:
-    ./in.cue:160:20
+    ./in.cue:161:20
 [eval] defEmpty.err.0: field not allowed:
-    ./in.cue:166:13
+    ./in.cue:167:13
 [eval] defListRef.y.1: field not allowed:
-    ./in.cue:176:9
+    ./in.cue:177:9
 [eval] defListRef.z.b: field not allowed:
-    ./in.cue:178:12
+    ./in.cue:179:12
 [eval] defListRef.listVia.1: field not allowed:
-    ./in.cue:182:22
+    ./in.cue:183:22
 [eval] defListRef.structVia.b: field not allowed:
-    ./in.cue:183:25
+    ./in.cue:184:25
 [eval] defBuiltin.err.2: field not allowed:
-    ./in.cue:189:19
+    ./in.cue:190:19
 [eval] bottomEllipsis.x: incompatible list lengths (1 and 2):
-    ./in.cue:224:5
+    ./in.cue:225:5
 [eval] closeSlice.err.1: field not allowed:
-    ./in.cue:237:15
+    ./in.cue:238:15
 -- out/eval/stats --
 Leaks:  9
 Freed:  378

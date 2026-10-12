@@ -66,8 +66,8 @@ preseveBottomSemantics: ok: {
 }
 
 eliminateOpenVariant: ok: {
-	// We have two structs in the disjunction that are identical in every way
-	// except openness. TODO: should we disambiguate those?
+	// The two structs in the disjunction are identical in every way except
+	// openness, so they are duplicates, of which the open one is kept.
 	c:  {a: 1} | #b
 	#b: {a: 1}
 }

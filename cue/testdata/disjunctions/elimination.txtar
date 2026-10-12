@@ -343,15 +343,15 @@ issue1940: {
 // whose value is bottom where the other disjunct does not allow the field
 // at all. Either way the field can never be present.
 vacuousDuplicates: {
-	list: ([...int] | [...string]) & [] @test(eq, [] | [], incorrect) @test(eq:todo, [])
-	nested: ({x: [...int]} | {x: [...string]}) & {x: []} @test(eq, {x: []} | {x: []}, incorrect) @test(eq:todo, {x: []})
-	three: ([...int] | [...string] | [...]) & [] @test(eq, [] | [] | [], incorrect) @test(eq:todo, [])
-	optional: {a: 1, b?: _|_} | close({a: 1}) @test(eq, {a: 1, b?: _|_ @test(err, code=user)} | {a: 1}, incorrect) @test(eq:todo, {a: 1, b?: _|_ @test(err, code=user)}) @test(closed=false)
-	optionalSwapped: close({a: 1}) | {a: 1, b?: _|_} @test(eq, {a: 1} | {a: 1, b?: _|_ @test(err, code=user)}, incorrect) @test(eq:todo, {a: 1, b?: _|_ @test(err, code=user)}) @test(closed=false)
-	conflict: {a: 1, b?: int & string} | close({a: 1}) @test(eq, {a: 1, b?: _|_ @test(err, code=eval)} | {a: 1}, incorrect) @test(eq:todo, {a: 1, b?: _|_ @test(err, code=eval)})
-	#closed: {a: 1, b?: _|_} | {a: 1} @test(eq, {a: 1, b?: _|_ @test(err, code=user)} | {a: 1}, incorrect) @test(eq:todo, {a: 1, b?: _|_ @test(err, code=user)})
-	#closedSwapped: {a: 1} | {a: 1, b?: _|_} @test(eq, {a: 1} | {a: 1, b?: _|_ @test(err, code=user)}, incorrect) @test(eq:todo, {a: 1})
-	sel: optional.a @test(err, code=incomplete, incorrect) @test(eq:todo, 1)
+	list: ([...int] | [...string]) & [] @test(eq, [])
+	nested: ({x: [...int]} | {x: [...string]}) & {x: []} @test(eq, {x: []})
+	three: ([...int] | [...string] | [...]) & [] @test(eq, [])
+	optional: {a: 1, b?: _|_} | close({a: 1}) @test(eq, {a: 1, b?: _|_ @test(err, code=user)}) @test(closed=false)
+	optionalSwapped: close({a: 1}) | {a: 1, b?: _|_} @test(eq, {a: 1, b?: _|_ @test(err, code=user)}) @test(closed=false)
+	conflict: {a: 1, b?: int & string} | close({a: 1}) @test(eq, {a: 1, b?: _|_ @test(err, code=eval)})
+	#closed: {a: 1, b?: _|_} | {a: 1} @test(eq, {a: 1, b?: _|_ @test(err, code=user)})
+	#closedSwapped: {a: 1} | {a: 1, b?: _|_} @test(eq, {a: 1})
+	sel: optional.a @test(eq, 1)
 
 	// A list that can still grow, or a struct that can still gain fields,
 	// may yet have its constraints satisfied, so they count. In particular,
@@ -368,10 +368,10 @@ vacuousDuplicates: {
 // is kept, whatever its position, as the disjunction allows what either
 // disjunct allows.
 closedDuplicates: {
-	open: {a: 1} | close({a: 1}) @test(eq, {a: 1} | {a: 1}, incorrect) @test(eq:todo, {a: 1}) @test(closed=false)
-	openSwapped: close({a: 1}) | {a: 1} @test(eq, {a: 1} | {a: 1}, incorrect) @test(eq:todo, {a: 1}) @test(closed=false)
-	withDefault: *{a: 1} | close({a: 1}) @test(eq, *{a: 1} | {a: 1}, incorrect) @test(eq:todo, {a: 1}) @test(closed=false)
-	withDefaultSwapped: *close({a: 1}) | {a: 1} @test(eq, *{a: 1} | {a: 1}, incorrect) @test(eq:todo, {a: 1}) @test(closed=false)
+	open: {a: 1} | close({a: 1}) @test(eq, {a: 1}) @test(closed=false)
+	openSwapped: close({a: 1}) | {a: 1} @test(eq, {a: 1}) @test(closed=false)
+	withDefault: *{a: 1} | close({a: 1}) @test(eq, {a: 1}) @test(closed=false)
+	withDefaultSwapped: *close({a: 1}) | {a: 1} @test(eq, {a: 1}) @test(closed=false)
 
 	// A list that cannot grow for lack of an ellipsis is distinct from one
 	// that can.
@@ -1271,8 +1271,6 @@ issue2685: {
 	})
 }
 -- out/errors.txt --
-[incomplete] vacuousDuplicates.sel: unresolved disjunction {a:1,b?:_|_(explicit error (_|_ literal) in source)} | {a:1} (type struct):
-    ./in.cue:350:7
 [incomplete] patternDistinct.sel: unresolved disjunction {a:1} | {a:1} (type struct):
     ./in.cue:391:7
 [incomplete] patternDistinct.selOptional: unresolved disjunction {a:1,b?:int} | {a:1} (type struct):
@@ -1282,14 +1280,14 @@ issue2685: {
 [incomplete] patternDistinct.nestedDefaultSel: unresolved disjunction {a:1} | {a:*1 | 2} (type struct):
     ./in.cue:434:20
 -- out/eval/stats --
-Leaks:  230
-Freed:  2875
-Reused: 2832
-Allocs: 273
+Leaks:  256
+Freed:  2842
+Reused: 2799
+Allocs: 299
 Retain: 0
 
-Unifications: 846
-Conjuncts:    3107
+Unifications: 839
+Conjuncts:    3100
 Disjuncts:    1423
 Notifications: 8
 

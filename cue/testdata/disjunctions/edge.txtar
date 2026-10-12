@@ -88,11 +88,11 @@ preseveBottomSemantics: ok: {
 }
 
 eliminateOpenVariant: ok: {
-	// We have two structs in the disjunction that are identical in every way
-	// except openness. TODO: should we disambiguate those?
-	c:  {a: 1} | #b
+	// The two structs in the disjunction are identical in every way except
+	// openness, so they are duplicates, of which the open one is kept.
+	c:  {a: 1} | #b @test(closed=false)
 	#b: {a: 1}
-	@test(eq, {c: {a: 1} | {a: 1}, #b: {a: 1}})
+	@test(eq, {c: {a: 1}, #b: {a: 1}})
 }
 
 cyclicSelfElimination: ok: {

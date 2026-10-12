@@ -816,7 +816,7 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 	// check uniqueness
 	// TODO: if a node is not finalized, we could check that the parent
 	// (overlayed) closeContexts are identical.
-	for _, xn := range a {
+	for i, xn := range a {
 		// TODO: for some reason, r may already have been added to dst in some
 		// cases, so we need to check for this.
 		if xn == x {
@@ -841,9 +841,23 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 
 			}
 		} else {
-			// Complete nodes.
-			if !Equal(ctx, xn.node.DerefValue(), x.node.DerefValue(), CheckStructural) {
+			// Complete nodes. Disjuncts that are equal apart from their
+			// closedness, or from constraints that nothing can satisfy,
+			// are duplicates too.
+			if !Equal(ctx, xv, nv, CheckStructural|IgnoreClosedness|IgnoreVacuous) {
 				continue
+			}
+			if isClosed(xv) && !isClosed(nv) {
+				// The disjunction allows what either disjunct allows, so
+				// of two disjuncts differing in closedness, the open one
+				// is kept.
+				if xn.defaultMode == isDefault {
+					x.defaultMode = isDefault
+				}
+				mergeCloseInfo(x, xn)
+				xn.freeDisjunct()
+				a[i] = x
+				return a
 			}
 		}
 

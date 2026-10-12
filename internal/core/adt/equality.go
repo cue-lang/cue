@@ -31,6 +31,19 @@ const (
 	// thus excluding hidden and definition fields.
 	RegularOnly
 
+	// IgnoreClosedness disregards whether structs and lists were closed by
+	// close or by a definition. A list that cannot grow for lack of an
+	// ellipsis remains distinct from one that can. This only applies when
+	// CheckStructural is given.
+	IgnoreClosedness
+
+	// IgnoreVacuous disregards constraints that no field or element can
+	// ever satisfy: the element constraints of a list that cannot grow,
+	// and an optional field whose value is bottom where the other value
+	// does not allow the field at all. This only applies when
+	// CheckStructural is given.
+	IgnoreVacuous
+
 	// sharedByIdentity is set by [equalPatterns] to require that vertices
 	// reached via structure sharing are the same vertex.
 	sharedByIdentity
@@ -99,15 +112,21 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 
 	// TODO: this really should be subsumption.
 	if flags&CheckStructural != 0 {
-		if x.IsClosedStruct() != y.IsClosedStruct() {
-			return false
-		}
-		if x.IsClosedList() != y.IsClosedList() {
+		switch {
+		case flags&IgnoreClosedness == 0:
+			if x.IsClosedStruct() != y.IsClosedStruct() {
+				return false
+			}
+			if x.IsClosedList() != y.IsClosedList() {
+				return false
+			}
+		case isFixedLengthList(x) != isFixedLengthList(y):
 			return false
 		}
 	}
 
 	skipRegular := flags&RegularOnly != 0
+	ignoreVacuous := flags&CheckStructural != 0 && flags&IgnoreVacuous != 0
 
 loop1:
 	for _, a := range x.Arcs {
@@ -121,6 +140,9 @@ loop1:
 				}
 				continue loop1
 			}
+		}
+		if ignoreVacuous && isVacuousArc(ctx, a, y) {
+			continue
 		}
 		return false
 	}
@@ -141,6 +163,9 @@ loop2:
 			}
 		}
 		// Arc with same label not found.
+		if ignoreVacuous && isVacuousArc(ctx, b, x) {
+			continue
+		}
 		return false
 	}
 
@@ -172,6 +197,11 @@ func equalPatterns(ctx *OpContext, x, y *Vertex, flags Flag) bool {
 	if y.PatternConstraints != nil {
 		py = y.PatternConstraints.Pairs
 	}
+	if flags&IgnoreVacuous != 0 && isFixedLengthList(x) && isFixedLengthList(y) {
+		// Neither list can gain an element, so their element constraints
+		// are vacuous.
+		return true
+	}
 	if len(px) != len(py) {
 		return false
 	}
@@ -188,6 +218,30 @@ func equalPatterns(ctx *OpContext, x, y *Vertex, flags Flag) bool {
 		}
 	}
 	return true
+}
+
+// isVacuousArc reports whether optional arc a, which has no counterpart in
+// other, forbids its field just as other does: its value is bottom, so the
+// field can never be present, and other does not allow the field at all.
+// An incomplete error does not count, as it may yet resolve, nor does a
+// structural cycle, as unifying a field with another value may yet give a
+// useful result.
+func isVacuousArc(ctx *OpContext, a, other *Vertex) bool {
+	if a.ArcType != ArcOptional {
+		return false
+	}
+	b := a.Bottom()
+	if b == nil || b.IsIncomplete() || b.Code == StructuralCycleError {
+		return false
+	}
+	return !other.Accept(ctx, a.Label)
+}
+
+// isFixedLengthList reports whether v is a list that cannot gain an element:
+// a closed list, or one whose literals had no ellipsis.
+func isFixedLengthList(v *Vertex) bool {
+	m, ok := v.BaseValue.(*ListMarker)
+	return ok && (!m.IsOpen || m.NoEllipsis)
 }
 
 func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {

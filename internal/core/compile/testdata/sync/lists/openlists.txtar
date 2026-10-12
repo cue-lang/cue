@@ -143,7 +143,8 @@ hashIndex: {
 	y: (#)[0:1]
 }
 
-// Alternatives that differ only in openness are not merged as duplicates.
+// Alternatives that differ only in closedness are duplicates, of which the
+// open one is kept.
 closeDedup: {
 	x: [1] | close([1])
 }

@@ -53,9 +53,7 @@ func TestFlow(t *testing.T) {
 			t.Fatal(errors.Details(err, nil))
 		}
 
-		seqNum = 0
-
-		var tasksTotal stats.Counts
+		setSeqNum(0)
 
 		updateFunc := func(c *flow.Controller, task *flow.Task) error {
 			str := flow.MermaidGraph(c)
@@ -72,7 +70,6 @@ func TestFlow(t *testing.T) {
 
 				if t.M.IsDefault() {
 					stats := task.Stats()
-					tasksTotal.Add(stats)
 					fmt.Fprintln(t.Writer(path.Join(step, "stats")), &stats)
 				}
 			}
@@ -106,6 +103,12 @@ func TestFlow(t *testing.T) {
 			return
 		}
 
+		// Sum the stats of all tasks, including those which never completed,
+		// such as tasks terminated by an aborted dependency.
+		var tasksTotal stats.Counts
+		for _, task := range c.Tasks() {
+			tasksTotal.Add(task.Stats())
+		}
 		totals := c.Stats()
 		if tasksTotal != zeroStats && totals != tasksTotal {
 			t.Errorf(diffMsg, tasksTotal, totals, tasksTotal.Since(totals))
@@ -404,6 +407,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 
 	case "abort":
 		return flow.RunnerFunc(func(t *flow.Task) error {
+			t.Fill(map[string]string{"out": "aborted"})
 			return flow.ErrAbort
 		}), nil
 
@@ -429,7 +433,9 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 				return err
 			}
 
-			waitSeqNum(seq)
+			if err := waitSeqNum(t.Context(), seq); err != nil {
+				return err
+			}
 
 			if str, err := t.Value().LookupPath(valPath).String(); err == nil {
 				t.Fill(map[string]string{"out": str})
@@ -444,24 +450,51 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 // These vars are used to serialize tasks that are run in parallel. This allows
 // for testing running tasks in parallel, while obtaining deterministic output.
 var (
-	seqNum  int64
-	seqLock sync.Mutex
-	seqCond = sync.NewCond(&seqLock)
+	seqLock    sync.Mutex
+	seqNum     int64
+	seqChanged = make(chan struct{}) // closed and replaced when seqNum changes
 )
 
-func incSeqNum() {
-	seqCond.L.Lock()
-	seqNum++
-	seqCond.Broadcast()
-	seqCond.L.Unlock()
+func setSeqNum(n int64) {
+	seqLock.Lock()
+	defer seqLock.Unlock()
+	seqNum = n
+	close(seqChanged)
+	seqChanged = make(chan struct{})
 }
 
-func waitSeqNum(seq int64) {
-	seqCond.L.Lock()
-	for seq != seqNum {
-		seqCond.Wait()
+func incSeqNum() {
+	seqLock.Lock()
+	defer seqLock.Unlock()
+	seqNum++
+	close(seqChanged)
+	seqChanged = make(chan struct{})
+}
+
+func loadSeqNum() (int64, <-chan struct{}) {
+	seqLock.Lock()
+	defer seqLock.Unlock()
+	return seqNum, seqChanged
+}
+
+// waitSeqNum waits until seqNum reaches seq, or until ctx is canceled.
+// A flow which stops early leaves its running tasks behind,
+// and they must not act on the seqNum of a later test.
+func waitSeqNum(ctx context.Context, seq int64) error {
+	for {
+		n, changed := loadSeqNum()
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if n == seq {
+			return nil
+		}
+		select {
+		case <-changed:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
 	}
-	seqCond.L.Unlock()
 }
 
 // DO NOT REMOVE: for testing purposes.

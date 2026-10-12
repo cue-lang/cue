@@ -1,0 +1,49 @@
+# A task returning ErrAbort terminates the tasks depending on it,
+# transitively, without running them and without failing the flow.
+# Independent tasks still run.
+# TODO: the abort currently fails the entire flow instead.
+-- in.cue --
+root: {
+	a: {
+		$id: "abort"
+		out: string
+	}
+	b: {
+		$id: "valToOut"
+		val: a.out
+		out: string
+	}
+	c: {
+		$id: "valToOut"
+		val: b.out
+		out: string
+	}
+	d: {
+		$id: "sequenced"
+		seq: 2
+		val: "foo"
+		out: string
+	}
+}
+-- out/run-v3/errors --
+error: root.a: task failed: abort dependant tasks without failure
+-- out/run-v3/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.b [Waiting]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t1
+  t3("root.d [Ready]")
+
+-- out/run-v3/stats/totals --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+ResolveDep:   2

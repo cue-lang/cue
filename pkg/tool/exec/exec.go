@@ -66,7 +66,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, errors.Wrapf(err, v.Pos(), "invalid input")
 	}
 	var stdout, stderr bytes.Buffer
-	_, captureOut, err := stream("stdout")
+	stdoutVal, captureOut, err := stream("stdout")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	} else {
 		cmd.Stdout = ctx.Stdout
 	}
-	_, captureErr, err := stream("stderr")
+	stderrVal, captureErr, err := stream("stderr")
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 
 	update := map[string]interface{}{}
 	if captureOut {
-		update["stdout"] = stdout.String()
+		update["stdout"] = output(stdoutVal, stdout.Bytes())
 	}
 	if captureErr {
 		// An error other than a non-zero exit status, such as a missing
@@ -103,7 +103,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		if exit := (*exec.ExitError)(nil); err != nil && !errors.As(err, &exit) {
 			stderr.WriteString(err.Error())
 		}
-		update["stderr"] = stderr.String()
+		update["stderr"] = output(stderrVal, stderr.Bytes())
 	}
 	update["success"] = err == nil
 
@@ -112,6 +112,15 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	return nil, fmt.Errorf("command %q failed: %v", doc, err)
+}
+
+// output returns captured output as bytes if v is constrained to bytes,
+// and as a string otherwise.
+func output(v cue.Value, b []byte) any {
+	if v.IncompleteKind() == cue.BytesKind {
+		return b
+	}
+	return string(b)
 }
 
 // mkCommand builds an [exec.Cmd] from a CUE task value,

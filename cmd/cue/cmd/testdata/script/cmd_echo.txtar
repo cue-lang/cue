@@ -5,9 +5,8 @@ exec cue cmd echohidden
 stdout 'Hello World!'
 
 # Captured output is bytes when stdout or stderr is constrained to bytes.
-# TODO: the output is always captured as a string, which conflicts with bytes.
-! exec cue cmd echobytes
-stderr 'command\.echobytes\.(out\.stdout|err\.stderr): conflicting values bytes and "'
+exec cue cmd echobytes
+cmp stdout echobytes.stdout
 
 -- cue.mod/module.cue --
 module: "mod.test/foo"

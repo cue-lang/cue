@@ -33,6 +33,11 @@ stdout 'hello from sibling task'
 curl http://${SERVE_ADDR}/form?q=query -H 'Content-Type: application/x-www-form-urlencoded' -d 'a=1&b=two'
 stdout '^body="a=1&b=two" a=1 b=two q=query$'
 
+# Request trailers are available once the body has been read
+curl --trailer 'X-Checksum: abc' --trailer 'X-Multi: one' --trailer 'X-Multi: two' http://${SERVE_ADDR}/trailer -d 'data'
+# TODO: the trailers are missing.
+stdout '^body="data" trailer={}$'
+
 # Custom status code examples
 
 # Valid request returns 201 Created
@@ -317,6 +322,13 @@ command: serve: "/form": http.Serve & {
 	routing: method: "POST"
 	request: _
 	response: body: "body=\(json.Marshal("\(request.body)")) a=\(request.form.a[0]) b=\(request.form.b[0]) q=\(request.form.q[0])"
+}
+
+// This endpoint echoes the request trailers, which follow a chunked body.
+command: serve: "/trailer": http.Serve & {
+	routing: method: "POST"
+	request: _
+	response: body: "body=\(json.Marshal("\(request.body)")) trailer=\(json.Marshal(request.trailer))"
 }
 
 // ServeJSON is a helper for endpoints that serve JSON.

@@ -210,9 +210,11 @@ func TestScript(t *testing.T) {
 			// curl is a simple HTTP client for testscripts.
 			// Supports: -X METHOD, -H header, -d data, -L (follow redirects), -w format, -f (fail on error).
 			// The -w format supports \n as well as curl's %{http_code}.
+			// Unlike curl, it supports --trailer to send a request trailer,
+			// sending the body with chunked encoding.
 			"curl": func(ts *testscript.TestScript, neg bool, args []string) {
 				method := "GET"
-				var headers []string
+				var headers, trailers []string
 				var data string
 				followRedirects := false
 				writeFormat := ""
@@ -228,6 +230,9 @@ func TestScript(t *testing.T) {
 					case arg == "-H" && i+1 < len(args):
 						i++
 						headers = append(headers, args[i])
+					case arg == "--trailer" && i+1 < len(args):
+						i++
+						trailers = append(trailers, args[i])
 					case arg == "-d" && i+1 < len(args):
 						i++
 						data = args[i]
@@ -261,6 +266,16 @@ func TestScript(t *testing.T) {
 				for _, h := range headers {
 					key, val, _ := strings.Cut(h, ":")
 					req.Header.Add(strings.TrimSpace(key), strings.TrimSpace(val))
+				}
+				if len(trailers) > 0 {
+					req.Trailer = http.Header{}
+					for _, h := range trailers {
+						key, val, _ := strings.Cut(h, ":")
+						req.Trailer.Add(strings.TrimSpace(key), strings.TrimSpace(val))
+					}
+					// Trailers are only sent with a chunked body,
+					// which needs an unknown content length.
+					req.ContentLength = -1
 				}
 
 				client := &http.Client{}

@@ -749,6 +749,33 @@ func TestAstCompare_PatternConstraints(t *testing.T) {
 			val:  `{[string]: int, [=~"foo"]: string}`,
 		},
 
+		{
+			// Each pattern in the value should be matched at most once.
+			// TODO: the second expected [string] matches the value's first
+			// pattern again, so [=~"b"] is never checked.
+			name:    "two expected patterns match one value pattern",
+			expr:    `{[string]: int, [string]: int}`,
+			val:     `{[string]: int, [=~"b"]: string}`,
+			wantErr: ``,
+		},
+		{
+			// Both patterns of the value are =~"a". Each expected one should
+			// be matched with the one whose value compares equal.
+			// TODO: the first pattern with an equal label is taken.
+			name:    "pattern matches by label and value",
+			expr:    `{[=~"a"]: string, [=~"a"]: int}`,
+			val:     `{[=~"a" & string]: int, [=~"a"]: string}`,
+			wantErr: "expected string, got int",
+		},
+		{
+			// Every value mismatch should be reported.
+			// TODO: only the first one is.
+			name:    "pattern value matches none of the patterns with its label",
+			expr:    `{[=~"a"]: bool, [=~"a"]: bool}`,
+			val:     `{[=~"a" & string]: int, [=~"a"]: string}`,
+			wantErr: "incompatible pattern value: " + `"[=~\"a\"]": expected bool, got int`,
+		},
+
 		// ── positive: duplicate pattern labels unify in the evaluated value ──
 		//
 		// In CUE, two pattern constraints with the same label (e.g. [string]:

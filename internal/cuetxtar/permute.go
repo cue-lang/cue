@@ -327,10 +327,12 @@ func (r *inlineRunner) buildPermuted(fileIdx int, structPath cue.Path, fieldName
 	lit.Elts = elts
 
 	// r.cueFiles holds the files of r.inst in the same order.
+	// Reuse the archive's context, which is safe for concurrent use,
+	// rather than loading the builtin packages again for each ordering.
 	inst := *r.inst
 	inst.Files = slices.Clone(inst.Files)
 	inst.Files[fileIdx] = file
-	val, _, err := buildInstance(r.cueContext(), &inst)
+	val, _, err := buildInstance(r.ctx, &inst)
 	return val, err
 }
 

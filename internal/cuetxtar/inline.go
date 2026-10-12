@@ -179,6 +179,7 @@ type inlineRunner struct {
 	cueFiles []*cueFileResult // set by runArchive; used by runPermuteAssertion
 	byPath   recordsByPath    // set by runArchive; all @test records by path
 	inst     *build.Instance  // set by runArchive; the instance cueFiles belong to
+	ctx      *cue.Context     // set by runArchive; the context inst was built with
 
 	// pendingPosWrites accumulates pos= attribute updates to write back to the
 	// archive file after all subtests have run (CUE_UPDATE mode only).
@@ -345,8 +346,8 @@ func (r *inlineRunner) runArchive() {
 	// Build and evaluate the stripped CUE.
 	// Note: val.Err() may be non-nil if sub-fields are erroneous; this is
 	// intentional for tests that assert errors. We only fatal on compile errors.
-	ctx := r.cueContext()
-	val, evalStats, allRecords, compileErr := r.buildFromArchive(ctx)
+	r.ctx = r.cueContext()
+	val, evalStats, allRecords, compileErr := r.buildFromArchive(r.ctx)
 	if compileErr != nil {
 		r.t.Fatalf("inline: CUE compile error:\n%s", cueerrors.Details(compileErr, nil))
 		return

@@ -31,28 +31,26 @@ issue3779: {
 	})
 }
 -- collapse.cue --
-// A nested disjunction which collapses to a single disjunct should keep its
-// default, just like a nested disjunction with several disjuncts. The incorrect
-// cases lose that default, or for u2, apply it even though 2 is not a default
-// on the left-hand side.
+// A nested disjunction which collapses to a single disjunct keeps its default,
+// just like a nested disjunction with several disjuncts.
 collapse: {
 	// *1|1 is ⟨1, 1⟩ by rule M1, so rule D2 gives the default 1|2.
-	d2:        (*1 | 1) | (1 | *2)         @test(eq, *2 | 1, incorrect) @test(eq:todo, *1 | *2)
-	d2Strings: (*"a" | "a") | (*"b" | "a") @test(eq, *"b" | "a", incorrect) @test(eq:todo, *"a" | *"b")
+	d2:        (*1 | 1) | (1 | *2)         @test(eq, *1 | *2)
+	d2Strings: (*"a" | "a") | (*"b" | "a") @test(eq, *"a" | *"b")
 	// An example from the spec: (1|*2|3)&2 is ⟨2, 2⟩ by rule U1.
-	d2Spec:    (*1 | 2 | 3) | (1 | *2 | 3) & 2 @test(eq, *1 | 2 | 3, incorrect) @test(eq:todo, *1 | *2 | 3)
-	d2Unified: (*1 | 2) | ((*3 | 4) & 3)       @test(eq, *1 | 3 | 2, incorrect) @test(eq:todo, *1 | *3 | 2)
+	d2Spec:    (*1 | 2 | 3) | (1 | *2 | 3) & 2 @test(eq, *1 | *2 | 3)
+	d2Unified: (*1 | 2) | ((*3 | 4) & 3)       @test(eq, *1 | *3 | 2)
 
-	d1:        (*1 | 1) | 2       @test(eq, 1 | 2, incorrect) @test(eq:todo, *1 | 2)
-	d1Unified: ((*1 | 2) & 1) | 2 @test(eq, 1 | 2, incorrect) @test(eq:todo, *1 | 2)
+	d1:        (*1 | 1) | 2       @test(eq, *1 | 2)
+	d1Unified: ((*1 | 2) & 1) | 2 @test(eq, *1 | 2)
 	d1Pattern: {
 		env: [string]: bool | number | *string | null
 		env: a:        "x"
 		// env.a is ⟨"x", "x"⟩ by rule U1.
-		b: env.a | "fallback" @test(eq, "x" | "fallback", incorrect) @test(eq:todo, *"x" | "fallback")
+		b: env.a | "fallback" @test(eq, *"x" | "fallback")
 	}
 
-	u2: (*1 | 2) & ((*1 | 1) | (1 | *2)) @test(eq, *1 | *2, incorrect) @test(eq:todo, *1 | 2)
+	u2: (*1 | 2) & ((*1 | 1) | (1 | *2)) @test(eq, *1 | 2)
 
 	m1:     *(1 | 1) | 2          @test(eq, *1 | 2)
 	m2:     *(*1 | 1) | 2         @test(eq, *1 | 2)
@@ -72,10 +70,9 @@ nested: {
 	// neither nested disjunction collapses.
 	d2Patterns: ({[string]: int} | *{}) | ({} | *{[string]: int}) @test(eq, *{[string]: int} | *{})
 
-	// The marked "a" is eliminated, so the remaining int should be treated as
-	// unmarked and the default should come from the nested disjunction alone.
-	// The default is lost as int is not a default on the left-hand side.
-	eliminated: (*"a" | int) & (*(*1 | 2) | "b") @test(eq, 1 | 2, incorrect) @test(eq:todo, *1 | 2)
+	// The marked "a" is eliminated, so the remaining int is treated as
+	// unmarked and the default comes from the nested disjunction alone.
+	eliminated: (*"a" | int) & (*(*1 | 2) | "b") @test(eq, *1 | 2)
 
 	// The marked "x" is eliminated, so the nested disjunctions keep their
 	// defaults by rule D2. They lose them as they are unmarked in the

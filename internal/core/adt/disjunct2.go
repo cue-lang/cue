@@ -420,6 +420,8 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		// field reading n does not evaluate the disjunction again; blocked on
 		// checking that sharing does not change results, see TestEvalV3.
 		n.setBaseValue(d)
+		// For a nested n, doDisjunct replaces this with the left-hand mode
+		// once evaluated, so crossProduct reads a collapsed mode from cross[0].
 		if n.defaultMode == maybeDefault {
 			n.defaultMode = cross[0].defaultMode
 		}
@@ -516,8 +518,13 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 
 	hasNonMaybe := false
 	for _, r := range tmp {
-		// Unroll nested disjunctions.
-		switch len(r.disjuncts) {
+		// Unroll nested disjunctions. One which collapsed to a single
+		// disjunct x keeps its default like any other.
+		disjuncts := r.disjuncts
+		if x := r.node.DerefDisjunct().state; x != r {
+			disjuncts = []*nodeContext{x}
+		}
+		switch len(disjuncts) {
 		case 0:
 			// If a default is not dropped in a higher priority, allow still to
 			// become a default, even if other other side has dropped defaults.
@@ -534,11 +541,8 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 			// r did not have a nested disjunction.
 			dst = appendDisjunct(n.ctx, dst, r)
 
-		case 1:
-			panic("unexpected number of disjuncts")
-
 		default:
-			for _, x := range r.disjuncts {
+			for _, x := range disjuncts {
 				m := combineDefault(r.origDefaultMode, x.defaultMode)
 
 				// TODO(defaults): using rightHasDefault instead of false here
@@ -657,7 +661,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 
 	oc.unlinkOverlay()
 
-	d.defaultMode = n.defaultMode
+	// Disjunctions nested in d must not inherit the default mode of n, which
+	// crossProduct combines with theirs once d is evaluated.
+	d.defaultMode = maybeDefault
 	d.origDefaultMode = m
 
 	v.unify(n.ctx, Flags{condition: allKnown, mode: mode, checkTypos: true})
@@ -667,8 +673,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, orig *
 		return nil, err
 	}
 
-	d.node.DerefDisjunct().state.origDefaultMode = d.origDefaultMode
-	d = d.node.DerefDisjunct().state // TODO: maybe do not unroll at all.
+	d.defaultMode = n.defaultMode
 
 	return d, nil
 }

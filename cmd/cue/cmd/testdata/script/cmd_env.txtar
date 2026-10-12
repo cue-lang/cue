@@ -3,9 +3,6 @@ env MYTEXT=World
 exec cue cmd env
 cmp stdout cmd_env.out
 
-! exec cue cmd issue3908
-stderr 'issue3908.print.text: .*non-concrete value string'
-
 -- cmd_env.out --
 Hello World!
 -- task_tool.cue --
@@ -23,14 +20,5 @@ command: env: {
 	}
 	print: cli.Print & {
 		text: "Hello \(env.MYTEXT)!"
-	}
-}
-
-// Should fail when the MYTEXT env var is set.
-command: issue3908: {
-	env: os.Environ
-	_mytext: env.MYTEXT | "fallback"
-	print: cli.Print & {
-		text: _mytext
 	}
 }

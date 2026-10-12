@@ -40,6 +40,9 @@ import (
 	"golang.org/x/mod/sumdb/dirhash"
 	"golang.org/x/sync/errgroup"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
 )
 
@@ -88,7 +91,7 @@ func doVendor(commit string) error {
 		if err != nil && !errors.Is(err, externaltest.ErrNotFound) {
 			return err
 		}
-		return nil
+		return normalizeTests(oldTests)
 	})
 	var fsys fs.FS
 	g.Go(func() error {
@@ -178,6 +181,9 @@ func doVendor(commit string) error {
 	if err != nil {
 		return err
 	}
+	if err := normalizeTests(newTests); err != nil {
+		return err
+	}
 
 	for filename, schemas := range newTests {
 		for _, schema := range schemas {
@@ -207,6 +213,40 @@ func doVendor(commit string) error {
 	}
 	log.Printf("finished")
 	return nil
+}
+
+// normalizeTests rewrites the JSON in the canonical form in which CUE encodes it,
+// so that the old and new tests can be matched by their JSON,
+// and re-vendoring the same tests leaves them unchanged.
+func normalizeTests(tests map[string][]*externaltest.Schema) error {
+	ctx := cuecontext.New()
+	var err error
+	for filename, schemas := range tests {
+		for _, schema := range schemas {
+			if schema.Schema, err = normalizeJSON(ctx, schema.Schema); err != nil {
+				return fmt.Errorf("%s: %v", filename, err)
+			}
+			for _, test := range schema.Tests {
+				if test.Data, err = normalizeJSON(ctx, test.Data); err != nil {
+					return fmt.Errorf("%s: %v", filename, err)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func normalizeJSON(ctx *cue.Context, data stdjson.RawMessage) (stdjson.RawMessage, error) {
+	expr, err := json.Extract("", data)
+	if err != nil {
+		return nil, err
+	}
+	data, err = ctx.BuildExpr(expr).MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	// See https://github.com/cue-lang/cue/issues/3398
+	return bytes.ReplaceAll(data, []byte("\ufeff"), []byte(`\ufeff`)), nil
 }
 
 // upToDate reports whether [stampFile] already describes the vendored test

@@ -51,6 +51,7 @@ func TestExternal(t *testing.T) {
 	t.Parallel()
 	tests, err := externaltest.ReadTestDir(testDir)
 	qt.Assert(t, qt.IsNil(err))
+	checkSkipNames(t, tests)
 
 	// Group the tests under a single subtest so that we can use
 	// t.Parallel and still guarantee that all tests have completed
@@ -143,7 +144,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 	t.Run("RoundTrip", func(t *testing.T) {
 		// Run Generate round-trip tests for draft2020-12 only
 		const supportedVersion = jsonschema.VersionDraft2020_12
-		const variant = "roundtrip"
+		const variant = roundTripVariant
 		var roundTripSchemaValue cue.Value
 		var roundTripErr error
 		switch {
@@ -374,6 +375,36 @@ func testSucceeded(t *testing.T, m *cuetdtest.M, variant string, skipField *exte
 	}
 	if reason := (*skipField)[name]; reason != "" {
 		t.Fatalf("unexpectedly more correct behavior (test success) on skipped test")
+	}
+}
+
+// roundTripVariant is the test variant which round-trips schemas via [jsonschema.Generate].
+const roundTripVariant = "roundtrip"
+
+// checkSkipNames checks that the skip fields only use names from [skipName],
+// as entries for matrix names or variants which no longer exist
+// would otherwise be kept forever.
+func checkSkipNames(t *testing.T, tests map[string][]*externaltest.Schema) {
+	known := make(map[string]bool)
+	for i := range cuetdtest.SmallMatrix {
+		for _, variant := range []string{"", roundTripVariant} {
+			known[skipName(&cuetdtest.SmallMatrix[i], variant)] = true
+		}
+	}
+	check := func(skip externaltest.Skip, p positioner) {
+		for name := range skip {
+			if !known[name] {
+				t.Errorf("%v: unknown skip name %q", testdataPos(p), name)
+			}
+		}
+	}
+	for _, schemas := range tests {
+		for _, s := range schemas {
+			check(s.Skip, s)
+			for _, test := range s.Tests {
+				check(test.Skip, test)
+			}
+		}
 	}
 }
 

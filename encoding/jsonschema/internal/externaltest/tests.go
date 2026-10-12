@@ -4,15 +4,15 @@ import (
 	"bytes"
 	stdjson "encoding/json"
 	"fmt"
-	"iter"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/json"
 )
 
 type Schema struct {
@@ -44,38 +44,31 @@ type Test struct {
 type Skip map[string]string
 
 type location struct {
-	root cue.Value
-	path cue.Path
+	// syntax returns the syntax of the whole file,
+	// which is only parsed when a position is needed.
+	syntax func() ast.Expr
+	schema int
+	test   int // -1 for the schema itself
 }
 
 func (loc location) Pos() token.Pos {
-	var v cue.Value
-	for v = range conjuncts(loc.root.LookupPath(loc.path)) {
-		p := v.Pos()
-		if strings.HasSuffix(p.Filename(), ".json") {
-			return p
+	// The syntax was parsed from JSON which decoded into [Schema] values,
+	// so it is a list of structs, and the indices are in range.
+	schemas, ok := loc.syntax().(*ast.ListLit)
+	if !ok {
+		return token.NoPos
+	}
+	schema := schemas.Elts[loc.schema]
+	if loc.test < 0 {
+		return schema.Pos()
+	}
+	for _, decl := range schema.(*ast.StructLit).Elts {
+		field := decl.(*ast.Field)
+		if name, _, _ := ast.LabelName(field.Label); name == "tests" {
+			return field.Value.(*ast.ListLit).Elts[loc.test].Pos()
 		}
 	}
-	return v.Pos()
-}
-
-func conjuncts(v cue.Value) iter.Seq[cue.Value] {
-	return func(yield func(cue.Value) bool) {
-		yieldConjuncts(v, yield)
-	}
-}
-
-func yieldConjuncts(v cue.Value, yield func(cue.Value) bool) bool {
-	op, args := v.Expr()
-	if op != cue.AndOp {
-		return yield(v)
-	}
-	for _, v := range args {
-		if !yieldConjuncts(v, yield) {
-			return false
-		}
-	}
-	return true
+	return token.NoPos
 }
 
 // FormatTestDir returns the test data files that [WriteTestDir] would write,
@@ -120,54 +113,63 @@ var ErrNotFound = fmt.Errorf("no external JSON schema tests found")
 
 // ReadTestDir reads all the external tests from the given directory.
 func ReadTestDir(dir string) (tests map[string][]*Schema, err error) {
-	if _, err := os.Stat(dir); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, "tests")); err != nil {
 		if os.IsNotExist(err) {
 			return nil, ErrNotFound
 		}
 		return nil, err
 	}
-	inst := load.Instances([]string{"."}, &load.Config{
-		Dir: dir,
-		// Just like in the cue/load tests, prevent Go tests from walking up to the root
-		// directory of the git repository, as that almost always causes test cache misses.
-		ModuleRoot: ".",
-	})[0]
-	if err := inst.Err; err != nil {
-		return nil, err
-	}
-	ctx := cuecontext.New()
-	instVal := ctx.BuildInstance(inst)
-	if err := instVal.Err(); err != nil {
-		return nil, err
-	}
-	val := instVal.LookupPath(cue.MakePath(cue.Str("allTests")))
-	if err := val.Err(); err != nil {
-		return nil, err
-	}
-	if err := val.Decode(&tests); err != nil {
-		return nil, err
-	}
-	// Fix up the raw JSON data to avoid running into some decode issues.
-	for filename, schemas := range tests {
+	tests = make(map[string][]*Schema)
+	fsys := os.DirFS(dir)
+	err = fs.WalkDir(fsys, "tests", func(filename string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.Type().IsRegular() || !strings.HasSuffix(filename, ".json") {
+			return nil
+		}
+		data, err := fs.ReadFile(fsys, filename)
+		if err != nil {
+			return err
+		}
+		var schemas []*Schema
+		if err := stdjson.Unmarshal(data, &schemas); err != nil {
+			return fmt.Errorf("%s: %v", filename, err)
+		}
+		syntax := sync.OnceValue(func() ast.Expr {
+			expr, _ := json.Extract(filename, data)
+			return expr
+		})
 		for i, schema := range schemas {
-			schema.location = location{
-				root: val,
-				path: cue.MakePath(cue.Str(filename), cue.Index(i)),
+			if schema.Schema == nil {
+				return fmt.Errorf("%s: schema %d lacks schema", filename, i)
 			}
+			schema.location = location{syntax: syntax, schema: i, test: -1}
+			schema.Schema = compact(schema.Schema)
 			for j, test := range schema.Tests {
-				test.location = location{
-					root: val,
-					path: cue.MakePath(cue.Str(filename), cue.Index(i), cue.Str("tests"), cue.Index(j)),
+				if test.Data == nil {
+					return fmt.Errorf("%s: schema %d test %d lacks data", filename, i, j)
 				}
-				if len(test.Data) == 0 {
-					// See https://github.com/cue-lang/cue/issues/3397
-					test.Data = []byte("null")
-					continue
-				}
-				// See https://github.com/cue-lang/cue/issues/3398
-				test.Data = bytes.ReplaceAll(test.Data, []byte("\ufeff"), []byte(`\ufeff`))
+				test.location = location{syntax: syntax, schema: i, test: j}
+				test.Data = compact(test.Data)
 			}
 		}
+		tests[filename] = schemas
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return tests, nil
+}
+
+// compact removes insignificant space from the JSON data,
+// so that the test data's layout does not affect positions or formatting.
+// The data must be valid JSON, as validated by [stdjson.Unmarshal].
+func compact(data stdjson.RawMessage) stdjson.RawMessage {
+	var buf bytes.Buffer
+	if err := stdjson.Compact(&buf, data); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
 }

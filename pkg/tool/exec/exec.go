@@ -15,6 +15,7 @@
 package exec
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -64,18 +65,23 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	} else if cmd.Stdin, err = v.Reader(); err != nil {
 		return nil, errors.Wrapf(err, v.Pos(), "invalid input")
 	}
+	var stdout, stderr bytes.Buffer
 	_, captureOut, err := stream("stdout")
 	if err != nil {
 		return nil, err
 	}
-	if !captureOut {
+	if captureOut {
+		cmd.Stdout = &stdout
+	} else {
 		cmd.Stdout = ctx.Stdout
 	}
 	_, captureErr, err := stream("stderr")
 	if err != nil {
 		return nil, err
 	}
-	if !captureErr {
+	if captureErr {
+		cmd.Stderr = &stderr
+	} else {
 		cmd.Stderr = ctx.Stderr
 	}
 
@@ -85,29 +91,23 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, errors.Wrapf(err, v.Pos(), "invalid bool value")
 	}
 
+	err = cmd.Run()
+
 	update := map[string]interface{}{}
 	if captureOut {
-		var stdout []byte
-		stdout, err = cmd.Output()
-		update["stdout"] = string(stdout)
-	} else {
-		err = cmd.Run()
+		update["stdout"] = stdout.String()
+	}
+	if captureErr {
+		// An error other than a non-zero exit status, such as a missing
+		// program, is reported via stderr too.
+		if exit := (*exec.ExitError)(nil); err != nil && !errors.As(err, &exit) {
+			stderr.WriteString(err.Error())
+		}
+		update["stderr"] = stderr.String()
 	}
 	update["success"] = err == nil
 
-	if err == nil {
-		return update, nil
-	}
-
-	if captureErr {
-		if exit := (*exec.ExitError)(nil); errors.As(err, &exit) {
-			update["stderr"] = string(exit.Stderr)
-		} else {
-			update["stderr"] = err.Error()
-		}
-	}
-
-	if !mustSucceed {
+	if err == nil || !mustSucceed {
 		return update, nil
 	}
 

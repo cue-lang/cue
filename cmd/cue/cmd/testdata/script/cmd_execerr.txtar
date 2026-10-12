@@ -9,11 +9,10 @@ cmp stderr withSpaces-stderr.golden
 
 # Captured stderr is filled whether or not the command succeeds,
 # even when stdout is not captured.
-# TODO: stderr is only filled when the command fails and stdout is captured.
 exec cue cmd stderrFail
-stdout '^""$'
-! exec cue cmd stderrSucceed
-stderr 'non-concrete value string'
+stdout '^"fail\\n"$'
+exec cue cmd stderrSucceed
+stdout '^"succeed\\n"$'
 
 -- cue.mod/module.cue --
 module: "example.com"

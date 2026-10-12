@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,7 +19,6 @@ import (
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
@@ -240,54 +237,6 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 			test(t, env)
 		})
 	}
-}
-
-type loggingFramer struct {
-	mu  sync.Mutex
-	buf *safeBuffer
-}
-
-// safeBuffer is a threadsafe buffer for logs.
-type safeBuffer struct {
-	mu  sync.Mutex
-	buf bytes.Buffer
-}
-
-func (b *safeBuffer) Write(p []byte) (int, error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.buf.Write(p)
-}
-
-func (s *loggingFramer) framer(f jsonrpc2.Framer) jsonrpc2.Framer {
-	return func(nc net.Conn) jsonrpc2.Stream {
-		s.mu.Lock()
-		framed := false
-		if s.buf == nil {
-			s.buf = &safeBuffer{buf: bytes.Buffer{}}
-			framed = true
-		}
-		s.mu.Unlock()
-		stream := f(nc)
-		if framed {
-			return protocol.LoggingStream(stream, s.buf)
-		}
-		return stream
-	}
-}
-
-func (s *loggingFramer) printBuffers(testname string, w io.Writer) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if s.buf == nil {
-		return
-	}
-	fmt.Fprintf(os.Stderr, "#### Start Gopls Test Logs for %q\n", testname)
-	s.buf.mu.Lock()
-	io.Copy(w, &s.buf.buf)
-	s.buf.mu.Unlock()
-	fmt.Fprintf(os.Stderr, "#### End Gopls Test Logs for %q\n", testname)
 }
 
 // defaultServer handles the Default execution mode.

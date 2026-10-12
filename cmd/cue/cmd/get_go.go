@@ -321,9 +321,8 @@ const (
 	defaultCodec = "json,yaml"
 )
 
-// initExclusions records the declarations whose names match any of
-// the comma-separated regular expressions in str as omitted.
-func (e *extractor) initExclusions(str string) error {
+// parseExclusions parses the comma-separated regular expressions in str.
+func parseExclusions(str string) ([]*regexp.Regexp, error) {
 	var exclusions []*regexp.Regexp
 	for expr := range strings.SplitSeq(str, ",") {
 		if expr == "" {
@@ -331,12 +330,18 @@ func (e *extractor) initExclusions(str string) error {
 		}
 		re, err := regexp.Compile(expr)
 		if err != nil {
-			return fmt.Errorf("invalid --%s regexp %q: %v", flagExclude, expr, err)
+			return nil, fmt.Errorf("invalid --%s regexp %q: %v", flagExclude, expr, err)
 		}
 		exclusions = append(exclusions, re)
 	}
+	return exclusions, nil
+}
+
+// initExclusions records the declarations whose names match any of
+// exclusions as omitted.
+func (e *extractor) initExclusions(exclusions []*regexp.Regexp) {
 	if len(exclusions) == 0 {
-		return nil
+		return
 	}
 	for obj := range e.genDecls() {
 		for _, re := range exclusions {
@@ -345,7 +350,6 @@ func (e *extractor) initExclusions(str string) error {
 			}
 		}
 	}
-	return nil
 }
 
 type extractor struct {
@@ -421,6 +425,21 @@ var knownCodecs = []*codec{
 	{name: "yaml", tagKey: "yaml", inlineOption: true},
 	// TOML libraries such as github.com/BurntSushi/toml.
 	{name: "toml", tagKey: "toml", noNull: true},
+}
+
+// parseCodecs parses the comma-separated codec names in str.
+func parseCodecs(str string) ([]*codec, error) {
+	var codecs []*codec
+	for name := range strings.SplitSeq(str, ",") {
+		c := lookupCodec(name)
+		for _, c2 := range codecs {
+			if c.tagKey == c2.tagKey {
+				return nil, fmt.Errorf("codecs %s and %s both read %q tags", c2.name, c.name, c.tagKey)
+			}
+		}
+		codecs = append(codecs, c)
+	}
+	return codecs, nil
 }
 
 func lookupCodec(name string) *codec {
@@ -529,6 +548,20 @@ func extract(cmd *Command, args []string) error {
 		return errors.New("--local and --outfile are mutually exclusive")
 	}
 
+	// Validate the flags before loading packages, which is slow.
+	codecs, err := parseCodecs(flagCodec.String(cmd))
+	if err != nil {
+		return err
+	}
+	exclusions, err := parseExclusions(flagExclude.String(cmd))
+	if err != nil {
+		return err
+	}
+	omits, err := parseOmitSelectors(flagOmit.StringArray(cmd))
+	if err != nil {
+		return err
+	}
+
 	// TODO the CUE load using "." (below) assumes that a CUE module and a Go
 	// module will exist within the same directory (more precisely a Go module
 	// could be nested within a CUE module), such that the module path in any
@@ -573,16 +606,7 @@ func extract(cmd *Command, args []string) error {
 		orig:           map[types.Type]*ast.StructType{},
 		omitted:        map[types.Object]bool{},
 		omittedMethods: map[omittedMethod]bool{},
-	}
-
-	for name := range strings.SplitSeq(flagCodec.String(cmd), ",") {
-		c := lookupCodec(name)
-		for _, c2 := range e.codecs {
-			if c.tagKey == c2.tagKey {
-				return fmt.Errorf("codecs %s and %s both read %q tags", c2.name, c.name, c.tagKey)
-			}
-		}
-		e.codecs = append(e.codecs, c)
+		codecs:         codecs,
 	}
 	e.jsonV2Errors = make(map[*types.Struct]string)
 	e.ownEncodings = make(map[types.Type]ownEncoding)
@@ -594,10 +618,8 @@ func extract(cmd *Command, args []string) error {
 		e.done[p.PkgPath] = true
 		e.addPackage(p)
 	}
-	if err := e.initExclusions(flagExclude.String(cmd)); err != nil {
-		return err
-	}
-	if err := e.initOmissions(flagOmit.StringArray(cmd)); err != nil {
+	e.initExclusions(exclusions)
+	if err := e.initOmissions(omits); err != nil {
 		return err
 	}
 

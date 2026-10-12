@@ -51,6 +51,14 @@ type omitSelector struct {
 	pkgs map[string]bool
 }
 
+// parsedOmitSelector is a selector given to the --omit flag of get go
+// before matching any declarations, with the results of [parseOmitSelector].
+type parsedOmitSelector struct {
+	text     string
+	readings []omitReading
+	err      error
+}
+
 // omitReading is a way to read a selector given to the --omit flag of get go,
 // written as pkg.Name or pkg.Name.Method, where each element is a glob
 // as understood by [path.Match].
@@ -193,30 +201,43 @@ func (r *omitReading) matches(obj types.Object) bool {
 	return okPkg && okName
 }
 
-// initOmissions parses the --omit selectors given as values, each of them
-// comma-separated, and records the declarations and methods they match
-// as omitted. A selector which matches nothing is an error,
-// as it is likely a mistake.
-func (e *extractor) initOmissions(values []string) error {
+// parseOmitSelectors parses the --omit selectors given as values,
+// each of them comma-separated. A selector which cannot be read
+// in any valid way is an error.
+func parseOmitSelectors(values []string) ([]parsedOmitSelector, error) {
+	var sels []parsedOmitSelector
 	for _, value := range values {
 		for text := range strings.SplitSeq(value, ",") {
 			if text == "" {
 				continue
 			}
 			readings, err := parseOmitSelector(text)
-			pkgs, hint := e.omitMatching(readings)
-			switch {
-			case len(pkgs) > 0:
-				e.omits = append(e.omits, omitSelector{text, pkgs})
-			case err != nil:
-				// When no valid reading matches, the invalid one is likely
-				// what was meant, such as with a misspelled method.
-				return fmt.Errorf("invalid --%s selector %q: %v", flagOmit, text, err)
-			case hint != "":
-				return fmt.Errorf("--%s selector %q matches nothing; %s", flagOmit, text, hint)
-			default:
-				return fmt.Errorf("--%s selector %q matches nothing", flagOmit, text)
+			if len(readings) == 0 {
+				return nil, fmt.Errorf("invalid --%s selector %q: %v", flagOmit, text, err)
 			}
+			sels = append(sels, parsedOmitSelector{text, readings, err})
+		}
+	}
+	return sels, nil
+}
+
+// initOmissions records the declarations and methods matched by sels
+// as omitted. A selector which matches nothing is an error,
+// as it is likely a mistake.
+func (e *extractor) initOmissions(sels []parsedOmitSelector) error {
+	for _, sel := range sels {
+		pkgs, hint := e.omitMatching(sel.readings)
+		switch {
+		case len(pkgs) > 0:
+			e.omits = append(e.omits, omitSelector{sel.text, pkgs})
+		case sel.err != nil:
+			// When no valid reading matches, the invalid one is likely
+			// what was meant, such as with a misspelled method.
+			return fmt.Errorf("invalid --%s selector %q: %v", flagOmit, sel.text, sel.err)
+		case hint != "":
+			return fmt.Errorf("--%s selector %q matches nothing; %s", flagOmit, sel.text, hint)
+		default:
+			return fmt.Errorf("--%s selector %q matches nothing", flagOmit, sel.text)
 		}
 	}
 	return nil

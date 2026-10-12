@@ -1,7 +1,7 @@
 # Check that 'cue get go' translates embedded Go struct fields
 # like Go's encoding/json encodes them.
 
-exec cue get go --local ./...
+exec cue get go --local ./decls
 cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 
 # Marshal via Go's encoding/json and validate with the generated CUE schema.
@@ -13,7 +13,7 @@ exec cue vet -c schema.cue go_marshal.json
 # so embedded definitions are opened to keep the struct's own fields.
 # The generated definitions must still reject unknown fields.
 cp module_v0.18.0.cue cue.mod/module.cue
-exec cue get go --local ./...
+exec cue get go --local ./decls
 exec cue vet -c schema.cue go_marshal.json
 ! exec cue vet -d '#Untagged' ./decls extra.json
 cmp stderr extra.stderr

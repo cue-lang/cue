@@ -50,12 +50,7 @@ language: version: "v0.15.0"
 -- blah.go --
 package main
 
-import (
-	"encoding/json"
-	"errors"
-
-	"mod.test/blah/sub.v2"
-)
+import "mod.test/blah/sub.v2"
 
 // Validated decodes like a plain struct, recording any error.
 type Validated struct {
@@ -63,13 +58,7 @@ type Validated struct {
 	Error string `json:"-"`
 }
 
-func (v *Validated) UnmarshalJSON(data []byte) error {
-	type plain Validated
-	if err := json.Unmarshal(data, (*plain)(v)); err != nil {
-		v.Error = err.Error()
-	}
-	return nil
-}
+func (v *Validated) UnmarshalJSON(data []byte) error { return nil }
 
 // Lenient is a string which also decodes from a JSON number.
 type Lenient string
@@ -84,7 +73,7 @@ type Inner struct {
 	Field string `json:"field"`
 }
 
-func (Inner) MarshalJSON() ([]byte, error) { return nil, errors.New("unused") }
+func (Inner) MarshalJSON() ([]byte, error) { return nil, nil }
 
 // Outer has the promoted method Inner.MarshalJSON.
 type Outer struct {

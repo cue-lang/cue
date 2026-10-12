@@ -175,6 +175,7 @@ type inlineRunner struct {
 	dir      string
 	filePath string           // path to the archive file on disk; empty for in-memory tests
 	cueFiles []*cueFileResult // set by runArchive; used by runPermuteAssertion
+	byPath   recordsByPath    // set by runArchive; all @test records by path
 
 	// pendingPosWrites accumulates pos= attribute updates to write back to the
 	// archive file after all subtests have run (CUE_UPDATE mode only).
@@ -349,6 +350,7 @@ func (r *inlineRunner) runArchive() {
 		r.t.Fatalf("inline: CUE compile error:\n%s", cueerrors.Details(compileErr, nil))
 		return
 	}
+	r.byPath = indexRecords(allRecords)
 
 	// Report any parse errors collected during attribute extraction.
 	// An invalid @test attribute is always a test failure.
@@ -398,7 +400,7 @@ func (r *inlineRunner) runArchive() {
 				continue
 			}
 			seenFilePaths[rec.path.String()] = true
-			directives := selectActiveDirectives(allRecords, rec.path, version)
+			directives := selectActiveDirectives(r.byPath, rec.path, version)
 			r.runDirectivesForPath(r.sinkOrT(), cue.Path{}, val, directives)
 		}
 	}
@@ -753,10 +755,22 @@ func (r *inlineRunner) versionName() string {
 	return ""
 }
 
+// recordsByPath indexes records by the string form of their path.
+type recordsByPath map[string][]attrRecord
+
+func indexRecords(records []attrRecord) recordsByPath {
+	m := make(recordsByPath)
+	for _, rec := range records {
+		key := rec.path.String()
+		m[key] = append(m[key], rec)
+	}
+	return m
+}
+
 // selectActiveDirectives filters records for a given CUE path and returns the
 // effective set of directives to evaluate. Versioned directives take precedence
 // over unversioned for the same directive name.
-func selectActiveDirectives(records []attrRecord, path cue.Path, version string) []parsedTestAttr {
+func selectActiveDirectives(records recordsByPath, path cue.Path, version string) []parsedTestAttr {
 	// Collect all records matching this path.
 	type entry struct {
 		pa        parsedTestAttr
@@ -766,8 +780,8 @@ func selectActiveDirectives(records []attrRecord, path cue.Path, version string)
 	// todoDirectives are @test(directive:todo, ...) forms — always active and
 	// additive (they do not replace unversioned directives of the same name).
 	var todoDirectives []parsedTestAttr
-	for _, rec := range records {
-		if rec.parseErr != nil || rec.path.String() != path.String() {
+	for _, rec := range records[path.String()] {
+		if rec.parseErr != nil {
 			continue
 		}
 		pa := rec.parsed
@@ -827,7 +841,7 @@ func (r *inlineRunner) runInline(t testing.TB, root testCaseRoot, fileVal cue.Va
 			continue
 		}
 		seenPaths[rec.path.String()] = true
-		directives := selectActiveDirectives(records, rec.path, version)
+		directives := selectActiveDirectives(r.byPath, rec.path, version)
 		fieldVal := fileVal.LookupPath(rec.path)
 		r.runDirectivesForPath(t, rec.path, fieldVal, directives)
 	}

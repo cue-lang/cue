@@ -55,7 +55,7 @@ func (r *inlineRunner) runInlinePermutes(t testing.TB, rootPath cue.Path, record
 		if !pathHasPrefix(rec.path, rootPath) {
 			continue
 		}
-		for _, pa := range selectActiveDirectives(records, rec.path, version) {
+		for _, pa := range selectActiveDirectives(r.byPath, rec.path, version) {
 			if pa.directive != "permute" {
 				continue
 			}
@@ -263,6 +263,25 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	}
 	baseline := orderings[0].val.LookupPath(structPath)
 
+	// Select the directives to replay on each ordering once.
+	type pathDirectives struct {
+		path       cue.Path
+		directives []parsedTestAttr
+	}
+	var checks []pathDirectives
+	seenPaths := make(map[string]bool)
+	for _, rec := range records {
+		key := rec.path.String()
+		if seenPaths[key] || !pathHasPrefix(rec.path, structPath) {
+			continue
+		}
+		seenPaths[key] = true
+		directives := slices.DeleteFunc(selectActiveDirectives(r.byPath, rec.path, version), func(pa parsedTestAttr) bool {
+			return pa.directive == "permute" // avoid recursion
+		})
+		checks = append(checks, pathDirectives{rec.path, directives})
+	}
+
 	for _, o := range orderings[1:] {
 		if o.err != nil {
 			continue
@@ -270,15 +289,9 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 		cap := &failCapture{TB: t}
 		prevSuppress := r.suppressWritebacks
 		r.suppressWritebacks = true
-		for _, rec := range records {
-			if !pathHasPrefix(rec.path, structPath) {
-				continue
-			}
-			for _, pa := range selectActiveDirectives(records, rec.path, version) {
-				if pa.directive == "permute" {
-					continue // avoid recursion
-				}
-				r.runDirective(cap, rec.path, o.val.LookupPath(rec.path), pa)
+		for _, c := range checks {
+			for _, pa := range c.directives {
+				r.runDirective(cap, c.path, o.val.LookupPath(c.path), pa)
 			}
 		}
 		r.suppressWritebacks = prevSuppress

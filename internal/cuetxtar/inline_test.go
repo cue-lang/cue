@@ -414,7 +414,7 @@ func TestSelectActiveDirectives(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := selectActiveDirectives(tt.records, testMakePath(tt.path), tt.version)
+			got := selectActiveDirectives(indexRecords(tt.records), testMakePath(tt.path), tt.version)
 			if tt.wantCount != 0 && len(got) != tt.wantCount {
 				t.Errorf("got %d results, want %d", len(got), tt.wantCount)
 			}

@@ -243,9 +243,9 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	}
 	generate(n)
 
-	// Formatting and evaluating the orderings dominates the cost, so do
-	// both in parallel. They do not count towards the archive's stats,
-	// which are recorded before any permutation runs.
+	// Evaluating the orderings dominates the cost, so do it in parallel.
+	// They do not count towards the archive's stats, which are recorded
+	// before any permutation runs.
 	var g errgroup.Group
 	g.SetLimit(runtime.GOMAXPROCS(0))
 	for _, o := range orderings {
@@ -295,11 +295,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 			}
 		}
 		r.suppressWritebacks = prevSuppress
-		// Filter out pos= related failures: pos= specs use absolute
-		// source line numbers that necessarily shift when fields are
-		// reordered. The remaining failures are order-independent
-		// directive checks (code=, contains=, eq, etc.).
-		msgs := stripPosFailureLines(cap.msgs.String())
+		msgs := strings.TrimSpace(cap.msgs.String())
 		if msgs != "" {
 			permNames := make([]string, n)
 			for i, p := range o.perm {
@@ -320,40 +316,27 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 // struct at structPath in r.cueFiles[fileIdx] reordered so that position i
 // holds the field originally at position perm[i]. It reorders a clone of
 // the file, so it may be called concurrently.
+//
+// The fields keep their source positions, so only the evaluation order
+// changes, and errors still point at the archive's source lines.
 func (r *inlineRunner) buildPermuted(fileIdx int, structPath cue.Path, fieldNames []string, perm []int) (cue.Value, error) {
-	cf := *r.cueFiles[fileIdx]
-	cf.strippedAST = ast.Clone(cf.strippedAST)
-	lit, indices := findPermFieldsAtPath(cf.strippedAST, structPath, fieldNames)
+	file := ast.Clone(r.cueFiles[fileIdx].strippedAST)
+	lit, indices := findPermFieldsAtPath(file, structPath, fieldNames)
 	elts := slices.Clone(lit.Elts)
 	for i, p := range perm {
 		elts[indices[i]] = lit.Elts[indices[p]]
 	}
 	lit.Elts = elts
-	files := slices.Clone(r.cueFiles)
-	files[fileIdx] = &cf
-	archive, err := r.strippedArchive(files)
-	if err != nil {
-		return cue.Value{}, err
-	}
-	return r.buildStripped(r.cueContext(), archive)
-}
 
-// stripPosFailureLines drops failure lines that report position mismatches
-// (any line mentioning "pos=" or "position"). Permutation reorders
-// declarations and therefore shifts absolute source positions, so position
-// checks are intentionally order-sensitive and not meaningful here.
-func stripPosFailureLines(s string) string {
-	var keep []string
-	for _, line := range strings.Split(s, "\n") {
-		if strings.Contains(line, "pos=") || strings.Contains(line, "position") {
-			continue
-		}
-		if strings.TrimSpace(line) == "" {
-			continue
-		}
-		keep = append(keep, line)
+	// r.cueFiles holds the files of r.inst in the same order.
+	inst := *r.inst
+	inst.Files = slices.Clone(inst.Files)
+	inst.Files[fileIdx] = file
+	val := r.cueContext().BuildInstance(&inst)
+	if val.BuildInstance() == nil && val.Err() != nil {
+		return cue.Value{}, val.Err()
 	}
-	return strings.Join(keep, "\n")
+	return val, nil
 }
 
 // findPermFieldsAtPath walks file following structPath and returns the

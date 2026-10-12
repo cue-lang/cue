@@ -48,9 +48,9 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	cueerrors "cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/stats"
@@ -176,6 +176,7 @@ type inlineRunner struct {
 	filePath string           // path to the archive file on disk; empty for in-memory tests
 	cueFiles []*cueFileResult // set by runArchive; used by runPermuteAssertion
 	byPath   recordsByPath    // set by runArchive; all @test records by path
+	inst     *build.Instance  // set by runArchive; the instance cueFiles belong to
 
 	// pendingPosWrites accumulates pos= attribute updates to write back to the
 	// archive file after all subtests have run (CUE_UPDATE mode only).
@@ -661,6 +662,7 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrReco
 	if inst.Err != nil {
 		return cue.Value{}, nil, inst.Err
 	}
+	r.inst = inst
 
 	var allRecords []attrRecord
 	for _, f := range inst.Files {
@@ -681,46 +683,6 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrReco
 		return cue.Value{}, nil, val.Err()
 	}
 	return val, allRecords, nil
-}
-
-// strippedArchive returns a copy of the archive with each of cueFiles
-// formatted from its current AST.
-func (r *inlineRunner) strippedArchive(cueFiles []*cueFileResult) (*txtar.Archive, error) {
-	strippedByName := make(map[string][]byte, len(cueFiles))
-	for _, cf := range cueFiles {
-		b, err := format.Node(cf.strippedAST)
-		if err != nil {
-			return nil, fmt.Errorf("format %s: %w", cf.name, err)
-		}
-		strippedByName[cf.name] = b
-	}
-
-	stripped := *r.archive
-	stripped.Files = slices.Clone(r.archive.Files)
-	for i, f := range stripped.Files {
-		if b, ok := strippedByName[f.Name]; ok {
-			stripped.Files[i].Data = b
-		}
-	}
-	return &stripped, nil
-}
-
-// buildStripped loads and builds an archive from [inlineRunner.strippedArchive].
-// It does not modify r, so it may be called concurrently.
-func (r *inlineRunner) buildStripped(ctx *cue.Context, stripped *txtar.Archive) (cue.Value, error) {
-	insts := loadWithConfig(stripped, r.dir, load.Config{Env: []string{}})
-	if len(insts) == 0 {
-		return cue.Value{}, fmt.Errorf("no instances found")
-	}
-	inst := insts[0]
-	if inst.Err != nil {
-		return cue.Value{}, inst.Err
-	}
-	val := ctx.BuildInstance(inst)
-	if val.BuildInstance() == nil && val.Err() != nil {
-		return cue.Value{}, val.Err()
-	}
-	return val, nil
 }
 
 // cueContext returns the appropriate cue.Context for the current matrix entry.

@@ -21,6 +21,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
@@ -140,9 +141,13 @@ func (f *File) Experiments() []string {
 // the given version and returns a PerFile struct with the experiments enabled.
 // A empty version indicates the default version.
 func NewFile(version string, experiments ...string) (*File, error) {
-	// TODO: cash versions for a given version where there is no experiment
-	// string.
 	m := parseExperiments(experiments...)
+	if m == nil {
+		if f, ok := filesByVersion.Load(version); ok {
+			f := f.(File)
+			return &f, nil
+		}
+	}
 	f := &File{
 		version:     version,
 		experiments: strings.Join(slices.Sorted(maps.Keys(m)), ","),
@@ -151,8 +156,22 @@ func NewFile(version string, experiments ...string) (*File, error) {
 	if err := parseConfig(f, version, m); err != nil {
 		return nil, err
 	}
+	if m == nil && numFilesByVersion.Add(1) <= maxFilesByVersion {
+		filesByVersion.Store(version, *f)
+	}
 	return f, nil
 }
+
+// filesByVersion caches the results of [NewFile] naming no experiments,
+// as nearly every file is parsed that way, by language version.
+// Since versions come from user input, the number of entries is capped
+// by [maxFilesByVersion]; a program sees only a handful in practice.
+var (
+	filesByVersion    sync.Map // map[string]File
+	numFilesByVersion atomic.Int64
+)
+
+const maxFilesByVersion = 64
 
 // Default returns the experiment configuration of the current language
 // version with no experiments named: what applies to source that carries no

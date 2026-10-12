@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/pkg"
 	"github.com/go-quicktest/qt"
@@ -94,13 +95,13 @@ func TestDefsCoverEveryPackage(t *testing.T) {
 // the builtin package it describes. They must declare the same
 // members, and the declared signatures must agree with the registered
 // builtin functions on which members are functions, their number of
-// parameters, their contract labels, and which parameters carry defaults; a
-// declaration may be tighter than the registration, never looser in these
-// derivable facts. A member may declare a validator form only when the
-// evaluator treats the builtin as a validator; the reverse is not
-// enforced — the evaluator promotes any builtin with a bool result,
-// while the validator form follows intent, which the Go source
-// declares with a pkg.Validator result.
+// parameters, their contract labels, and which parameters carry defaults
+// and with what values; a declaration may be tighter than the
+// registration, never looser in these derivable facts. A member may
+// declare a validator form only when the evaluator treats the builtin
+// as a validator; the reverse is not enforced — the evaluator promotes
+// any builtin with a bool result, while the validator form follows
+// intent, which the Go source declares with a pkg.Validator result.
 func TestDefsMatchRegisteredPackages(t *testing.T) {
 	r := runtime.New()
 	ctx := cuecontext.New()
@@ -221,10 +222,21 @@ func TestDefsMatchRegisteredPackages(t *testing.T) {
 				for i, p := range params {
 					// A declared default is written with "=" on the parameter;
 					// it must agree with whether the registered builtin
-					// carries a default for the same parameter.
-					hasDefault := builtin.Params[i].Default() != nil
-					qt.Check(t, qt.Equals(p.Default != nil, hasDefault),
+					// carries a default for the same parameter, and on its value.
+					builtinDefault := builtin.Params[i].Default()
+					qt.Check(t, qt.Equals(p.Default != nil, builtinDefault != nil),
 						qt.Commentf("%s: parameter %d declared default vs builtin parameter having one", name, i+1))
+					if p.Default == nil || builtinDefault == nil {
+						continue
+					}
+					wantExpr, err := export.Value(r, "", builtinDefault)
+					qt.Assert(t, qt.IsNil(err))
+					want := ctx.BuildExpr(wantExpr)
+					got := ctx.BuildExpr(p.Default)
+					// path.VolumeName declares "unix" as its os default,
+					// while the builtin defaults to "windows".
+					qt.Check(t, qt.Equals(got.Equals(want), ip != "path" || name != "VolumeName"),
+						qt.Commentf("%s: parameter %d declared default %v vs builtin default %v", name, i+1, got, want))
 				}
 			}
 		})

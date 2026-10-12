@@ -16,7 +16,9 @@ package filetypes_test
 
 import (
 	"fmt"
+	"maps"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -267,10 +269,19 @@ type oracle struct {
 
 	// tagValues caches [oracle.tagValue] by its tags joined with "+".
 	tagValues map[string]cue.Value
+
+	// toFiles caches [oracle.toFile] results without subsidiary tags,
+	// keyed by the sorted tags and the extension when it participates.
+	toFiles map[string]*build.File
 }
 
 func newOracle(root cue.Value, mode filetypes.Mode) *oracle {
-	return &oracle{root: root, mode: mode, tagValues: make(map[string]cue.Value)}
+	return &oracle{
+		root:      root,
+		mode:      mode,
+		tagValues: make(map[string]cue.Value),
+		toFiles:   make(map[string]*build.File),
+	}
 }
 
 // tagValue returns the mode's FileInfo unified with the tagInfo entries
@@ -352,6 +363,33 @@ func (o *oracle) fromFile(enc, interp, form string) (bool, *filetypes.FileInfo) 
 // discharged only afterwards, so a conflicting extension can force a
 // disjunction onto a non-default branch.
 func (o *oracle) toFile(tags []string, stringTags map[string]string, boolTags map[string]bool, filename string) (bool, *build.File) {
+	if len(stringTags) > 0 || len(boolTags) > 0 {
+		return o.toFileUncached(tags, stringTags, boolTags, filename)
+	}
+	// Unification is commutative, so the order of the tags does not
+	// matter, and the filename only matters when its extension does.
+	tags = slices.Sorted(slices.Values(tags))
+	key := strings.Join(tags, "+")
+	if v := o.tagValue(tags); v.Exists() && !v.LookupPath(cue.MakePath(cue.Str("encoding"))).Exists() {
+		key += " " + testFileExt(filename)
+	}
+	f, ok := o.toFiles[key]
+	if !ok {
+		_, f = o.toFileUncached(tags, nil, nil, filename)
+		o.toFiles[key] = f
+	}
+	if f == nil {
+		return false, nil
+	}
+	f2 := *f
+	f2.Filename = filename
+	f2.Tags = maps.Clone(f.Tags)
+	f2.BoolTags = maps.Clone(f.BoolTags)
+	return true, &f2
+}
+
+// toFileUncached is [oracle.toFile] without the cache.
+func (o *oracle) toFileUncached(tags []string, stringTags map[string]string, boolTags map[string]bool, filename string) (bool, *build.File) {
 	root, mode := o.root, o.mode
 	v := o.tagValue(tags)
 	if !v.Exists() {

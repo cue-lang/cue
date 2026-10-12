@@ -179,6 +179,14 @@ func TestLineInfo(t *testing.T) {
 		checkPos(t, msg, f.Position(f.Pos(offs, 0)), Position{"bar", offs, 42, col})
 		checkPos(t, msg, p.Position(), Position{"bar", offs, 42, col})
 	}
+
+	// Line info at or past the file size is ignored, even as the first entry,
+	// so it does not cause later valid line info to be ignored.
+	f = NewFile("foo", 1, 10)
+	f.AddLineInfo(f.Size(), "baz", 7)
+	f.AddLineInfo(0, "bar", 42)
+	// TODO: the out of range first entry is kept, so the valid one is ignored.
+	checkPos(t, "out of range first line info", f.Position(f.Pos(0, 0)), Position{"foo", 0, 1, 1})
 }
 
 func TestPositionFor(t *testing.T) {

@@ -154,6 +154,24 @@ func TestLookupPath(t *testing.T) {
 		out:    `_`,
 		exists: true,
 	}, {
+		// Disjuncts which differ in their pattern constraints are distinct
+		// values, so the disjunction stays ambiguous and no pattern is
+		// found in it.
+		in:     `x: {[string]: int} | {}`,
+		path:   cue.MakePath(cue.Str("x"), cue.AnyString),
+		err:    `x: field not found: [_]`,
+		exists: false,
+	}, {
+		in:     `x: ({[string]: int} | {}) & {a: 1}`,
+		path:   cue.MakePath(cue.Str("x"), cue.AnyString),
+		err:    `x: field not found: [_]`,
+		exists: false,
+	}, {
+		in:     `#x: ({[string]: int, ...} | {...}) & {}`,
+		path:   cue.MakePath(cue.Def("#x"), cue.AnyString),
+		err:    `#x: field not found: [_]`,
+		exists: false,
+	}, {
 		// A required field holds no value of its own, so looking it up is
 		// indistinguishable from looking up an undeclared field.
 		in:     `x!: int`,

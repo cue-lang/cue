@@ -263,6 +263,117 @@ issue1940: {
 	}
 }
 
+// Disjuncts that are equal apart from constraints nothing can ever satisfy
+// are the same value, so the disjunction resolves to one of them: the
+// element constraints of a list that cannot grow, or an optional field
+// whose value is bottom where the other disjunct does not allow the field
+// at all. Either way the field can never be present.
+vacuousDuplicates: {
+	list: ([...int] | [...string]) & []
+	nested: ({x: [...int]} | {x: [...string]}) & {x: []}
+	three: ([...int] | [...string] | [...]) & []
+	optional: {a: 1, b?: _|_} | close({a: 1})
+	optionalSwapped: close({a: 1}) | {a: 1, b?: _|_}
+	conflict: {a: 1, b?: int & string} | close({a: 1})
+	#closed: {a: 1, b?: _|_} | {a: 1}
+	#closedSwapped: {a: 1} | {a: 1, b?: _|_}
+	sel: optional.a
+
+	// A list that can still grow, or a struct that can still gain fields,
+	// may yet have its constraints satisfied, so they count. In particular,
+	// an open struct allows a field that the other disjunct forbids.
+	open: {a: 1} | {a: 1, b?: _|_}
+	openDistinct: {a?: _|_} | {b?: _|_}
+	openPattern: {a: 1} | {a: 1, [=~"^b"]: _|_}
+	openList: [...int] | [...string]
+	openTop: [...int] | [...]
+	patternLive: {a: 1} | {a: 1, [string]: int}
+}
+
+// Disjuncts that differ only in closedness are duplicates too. The open one
+// is kept, whatever its position, as the disjunction allows what either
+// disjunct allows.
+closedDuplicates: {
+	open: {a: 1} | close({a: 1})
+	openSwapped: close({a: 1}) | {a: 1}
+	withDefault: *{a: 1} | close({a: 1})
+	withDefaultSwapped: *close({a: 1}) | {a: 1}
+
+	// A list that cannot grow for lack of an ellipsis is distinct from one
+	// that can.
+	ellipsis: [] | [...]
+	ellipsisSwapped: [...] | []
+	grow: [1] | [1, ...]
+}
+
+// Disjuncts compared before their evaluation is complete may yet gain fields
+// matched by their pattern constraints, so they are not duplicates.
+patternPending: {
+	nested: ({[string]: [...int]} | {[string]: [...string]}) & ({p: ["hi"]} | null)
+	nestedSwapped: ({[string]: [...string]} | {[string]: [...int]}) & ({p: ["hi"]} | null)
+}
+
+// Disjuncts whose constraints could still be satisfied are distinct values,
+// even when their data is the same, so such a disjunction stays ambiguous:
+// its data cannot be exported and selectors into it are incomplete.
+patternDistinct: {
+	struct: ({[string]: int} | {}) & {a: 1}
+	sel: struct.a
+	optional: {a: 1, b?: int} | {a: 1}
+	selOptional: optional.a
+	closed: (#A | #B) & {a: 1}
+	#A: {a: int}
+	#B: {a: int, b?: int}
+
+	// Hidden fields are part of the value as well.
+	hidden: {a: 1, _h: 1} | {a: 1, _h: 2}
+	selHidden: hidden.a
+
+	// Inline eq cannot express pattern constraints or list element
+	// constraints, so the disjuncts below print alike.
+	pattern: {[string]: int} | {}
+	#patternClosed: ({[string]: int} | {}) & {}
+	#patternClosedSwapped: ({} | {[string]: int}) & {}
+
+	// Within a definition, an ellipsis opens a struct, which should then be
+	// kept over the closed one. It is not, as the evaluator does not yet
+	// take the ellipsis into account when deciding whether a struct is
+	// closed.
+	#ellipsis: ({} | {...}) & {}
+	#ellipsisPatterns: ({[=~"a"]: int} | {...}) & {}
+
+	// A pattern constraint to top constrains nothing, but the values it
+	// admits differ from those the other disjunct admits.
+	structTop: {[string]: _} | {[string]: int}
+	listTop: [...int] | [...]
+
+	structs: {[string]: int} | {[string]: string}
+	structsSwapped: {[string]: string} | {[string]: int}
+	regexps: {[=~"a"]: int} | {[=~"b"]: int}
+	defaultLast: {[string]: bool} | *{[string]: int}
+	lists: [...int] | [...string]
+
+	three:        {[string]: int} | {[string]: string} | {}
+	threeSwapped: {} | {[string]: int} | {[string]: string}
+	threeList:    [...int] | [...string] | [...]
+
+	// A disjunct holding one of the values of a nested disjunction is
+	// distinct from one holding the nested disjunction itself.
+	nestedDefault: {a: 1} | {a: *1 | 2}
+	nestedDefaultSwapped: {a: *1 | 2} | {a: 1}
+	nestedDefaultSel: nestedDefault.a & 2
+
+	#closedOverlap: ({[string]: int} | {[string]: int, [=~"a"]: >0}) & {}
+	#closedOverlapSwapped: ({[string]: int, [=~"a"]: >0} | {[string]: int}) & {}
+	#closedOptional: ({b?: int} | {b?: int, [string]: >0}) & {}
+
+	// A pattern constraint referring to its own definition cycles when
+	// evaluated on its own. That does not make it vacuous: nested fields
+	// matching it remain allowed.
+	#recursive: {id: {}} | {id: {} | {[string]: #recursive}} | {}
+	recursiveNested: #recursive & {id: id: {}}
+}
+
 -- issue2209full.cue --
 // Evaluator 0.5 regression where disjunctions combined with comprehensions
 // produced incorrect results or spurious errors.
@@ -1512,6 +1623,300 @@ issue2685: {
     }
     #C: (〈0;#B〉 & {
       x: 〈1;#A〉
+    })
+  }
+  vacuousDuplicates: {
+    list: (([
+      ...int,
+    ]|[
+      ...string,
+    ]) & [])
+    nested: (({
+      x: [
+        ...int,
+      ]
+    }|{
+      x: [
+        ...string,
+      ]
+    }) & {
+      x: []
+    })
+    three: (([
+      ...int,
+    ]|[
+      ...string,
+    ]|[
+      ...,
+    ]) & [])
+    optional: ({
+      a: 1
+      b?: _|_(explicit error (_|_ literal) in source)
+    }|close({
+      a: 1
+    }))
+    optionalSwapped: (close({
+      a: 1
+    })|{
+      a: 1
+      b?: _|_(explicit error (_|_ literal) in source)
+    })
+    conflict: ({
+      a: 1
+      b?: (int & string)
+    }|close({
+      a: 1
+    }))
+    #closed: ({
+      a: 1
+      b?: _|_(explicit error (_|_ literal) in source)
+    }|{
+      a: 1
+    })
+    #closedSwapped: ({
+      a: 1
+    }|{
+      a: 1
+      b?: _|_(explicit error (_|_ literal) in source)
+    })
+    sel: 〈0;optional〉.a
+    open: ({
+      a: 1
+    }|{
+      a: 1
+      b?: _|_(explicit error (_|_ literal) in source)
+    })
+    openDistinct: ({
+      a?: _|_(explicit error (_|_ literal) in source)
+    }|{
+      b?: _|_(explicit error (_|_ literal) in source)
+    })
+    openPattern: ({
+      a: 1
+    }|{
+      a: 1
+      [=~"^b"]: _|_(explicit error (_|_ literal) in source)
+    })
+    openList: ([
+      ...int,
+    ]|[
+      ...string,
+    ])
+    openTop: ([
+      ...int,
+    ]|[
+      ...,
+    ])
+    patternLive: ({
+      a: 1
+    }|{
+      a: 1
+      [string]: int
+    })
+  }
+  closedDuplicates: {
+    open: ({
+      a: 1
+    }|close({
+      a: 1
+    }))
+    openSwapped: (close({
+      a: 1
+    })|{
+      a: 1
+    })
+    withDefault: (*{
+      a: 1
+    }|close({
+      a: 1
+    }))
+    withDefaultSwapped: (*close({
+      a: 1
+    })|{
+      a: 1
+    })
+    ellipsis: ([]|[
+      ...,
+    ])
+    ellipsisSwapped: ([
+      ...,
+    ]|[])
+    grow: ([
+      1,
+    ]|[
+      1,
+      ...,
+    ])
+  }
+  patternPending: {
+    nested: (({
+      [string]: [
+        ...int,
+      ]
+    }|{
+      [string]: [
+        ...string,
+      ]
+    }) & ({
+      p: [
+        "hi",
+      ]
+    }|null))
+    nestedSwapped: (({
+      [string]: [
+        ...string,
+      ]
+    }|{
+      [string]: [
+        ...int,
+      ]
+    }) & ({
+      p: [
+        "hi",
+      ]
+    }|null))
+  }
+  patternDistinct: {
+    struct: (({
+      [string]: int
+    }|{}) & {
+      a: 1
+    })
+    sel: 〈0;struct〉.a
+    optional: ({
+      a: 1
+      b?: int
+    }|{
+      a: 1
+    })
+    selOptional: 〈0;optional〉.a
+    closed: ((〈0;#A〉|〈0;#B〉) & {
+      a: 1
+    })
+    #A: {
+      a: int
+    }
+    #B: {
+      a: int
+      b?: int
+    }
+    hidden: ({
+      a: 1
+      _h: 1
+    }|{
+      a: 1
+      _h: 2
+    })
+    selHidden: 〈0;hidden〉.a
+    pattern: ({
+      [string]: int
+    }|{})
+    #patternClosed: (({
+      [string]: int
+    }|{}) & {})
+    #patternClosedSwapped: (({}|{
+      [string]: int
+    }) & {})
+    #ellipsis: (({}|{
+      ...
+    }) & {})
+    #ellipsisPatterns: (({
+      [=~"a"]: int
+    }|{
+      ...
+    }) & {})
+    structTop: ({
+      [string]: _
+    }|{
+      [string]: int
+    })
+    listTop: ([
+      ...int,
+    ]|[
+      ...,
+    ])
+    structs: ({
+      [string]: int
+    }|{
+      [string]: string
+    })
+    structsSwapped: ({
+      [string]: string
+    }|{
+      [string]: int
+    })
+    regexps: ({
+      [=~"a"]: int
+    }|{
+      [=~"b"]: int
+    })
+    defaultLast: ({
+      [string]: bool
+    }|*{
+      [string]: int
+    })
+    lists: ([
+      ...int,
+    ]|[
+      ...string,
+    ])
+    three: ({
+      [string]: int
+    }|{
+      [string]: string
+    }|{})
+    threeSwapped: ({}|{
+      [string]: int
+    }|{
+      [string]: string
+    })
+    threeList: ([
+      ...int,
+    ]|[
+      ...string,
+    ]|[
+      ...,
+    ])
+    nestedDefault: ({
+      a: 1
+    }|{
+      a: (*1|2)
+    })
+    nestedDefaultSwapped: ({
+      a: (*1|2)
+    }|{
+      a: 1
+    })
+    nestedDefaultSel: (〈0;nestedDefault〉.a & 2)
+    #closedOverlap: (({
+      [string]: int
+    }|{
+      [string]: int
+      [=~"a"]: >0
+    }) & {})
+    #closedOverlapSwapped: (({
+      [string]: int
+      [=~"a"]: >0
+    }|{
+      [string]: int
+    }) & {})
+    #closedOptional: (({
+      b?: int
+    }|{
+      b?: int
+      [string]: >0
+    }) & {})
+    #recursive: ({
+      id: {}
+    }|{
+      id: ({}|{
+        [string]: 〈2;#recursive〉
+      })
+    }|{})
+    recursiveNested: (〈0;#recursive〉 & {
+      id: {
+        id: {}
+      }
     })
   }
 }

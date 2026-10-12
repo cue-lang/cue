@@ -51,7 +51,18 @@ fromIntLarge: {
 variant: a: uuid.Variant(sha1.a)
 version: a: uuid.Version(sha1.a)
 urn: a:     uuid.URN(sha1.a)
-toInt: a:   uuid.ToInt(sha1.a)
+
+// ToInt decodes the 128-bit value of a UUID in any form accepted by Parse,
+// and is the inverse of FromInt.
+// TODO: ToInt currently returns the bytes of the string itself as an integer,
+// so it does not round-trip and does not reject invalid UUIDs.
+toInt: {
+	a:         uuid.ToInt(sha1.a)
+	dns:       uuid.ToInt(uuid.ns.DNS)
+	urn:       uuid.ToInt(validTable.c)
+	roundTrip: uuid.FromInt(a)
+	invalid:   uuid.ToInt(invalidTable.a)
+}
 -- out/uuid-v3 --
 Errors:
 valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID format:
@@ -69,6 +80,8 @@ parse.err.b: error in call to uuid.Parse: invalid UUID length: 30:
     ./in.cue:35:13
 parse.err.c: error in call to uuid.Parse: invalid UUID length: 37:
     ./in.cue:35:13
+toInt.roundTrip: error in call to uuid.FromInt: invalid UUID (got 36 bytes):
+    ./in.cue:62:13
 
 Result:
 sha1: a: "052ef62d-7223-58b6-a551-c1deee46d401"
@@ -126,13 +139,28 @@ fromIntLarge: {
 variant: a: 1
 version: a: 5
 urn: a:     "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"
-toInt: a:   93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
+
+// ToInt decodes the 128-bit value of a UUID in any form accepted by Parse,
+// and is the inverse of FromInt.
+// TODO: ToInt currently returns the bytes of the string itself as an integer,
+// so it does not round-trip and does not reject invalid UUIDs.
+toInt: {
+	a:         93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
+	dns:       105650679877645322908966597104845053545234508911669713823561288000003997571566663656248
+	urn:       1077458076904213895080154061080074672656303875852468910137731530200742365514657279126070731818279308125810736
+	roundTrip: _|_ // toInt.roundTrip: error in call to uuid.FromInt: invalid UUID (got 36 bytes)
+	invalid:   93651793875903522082415710534026509363018498450217964911440342253418420761506880958513
+}
 -- diff/-out/uuid-v3<==>+out/uuid --
 diff old new
 --- old
 +++ new
-@@ -16,12 +16,8 @@
+@@ -14,14 +14,12 @@
      ./in.cue:35:13
+ parse.err.c: error in call to uuid.Parse: invalid UUID length: 37:
+     ./in.cue:35:13
++toInt.roundTrip: error in call to uuid.FromInt: invalid UUID (got 36 bytes):
++    ./in.cue:62:13
  
  Result:
 -sha1: {
@@ -146,7 +174,7 @@ diff old new
  validTable: {
  	a: "052ef62d-7223-58b6-a551-c1deee46d401"
  	b: "052EF62D-7223-58B6-A551-C1DEEE46D401"
-@@ -35,6 +31,11 @@
+@@ -35,6 +33,11 @@
  	c: "{123e4567-e89b-12d3-a456-426655440000"
  }
  valid: {
@@ -158,7 +186,7 @@ diff old new
  	ok: {
  		a: "052ef62d-7223-58b6-a551-c1deee46d401"
  		b: "052EF62D-7223-58B6-A551-C1DEEE46D401"
-@@ -42,13 +43,13 @@
+@@ -42,13 +45,13 @@
  		d: "{123e4567-e89b-12d3-a456-426655440000}"
  		e: "123e4567e89b12d3a456426655440000"
  	}
@@ -177,7 +205,7 @@ diff old new
  	ok: {
  		a: "052ef62d-7223-58b6-a551-c1deee46d401"
  		b: "052ef62d-7223-58b6-a551-c1deee46d401"
-@@ -56,24 +57,18 @@
+@@ -56,24 +59,29 @@
  		d: "123e4567-e89b-12d3-a456-426655440000"
  		e: "123e4567-e89b-12d3-a456-426655440000"
  	}
@@ -199,9 +227,6 @@ diff old new
 -urn: {
 -	a: "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"
 -}
--toInt: {
--	a: 93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
--}
 +}
 +fromInt: a: "052ef62d-7223-58b6-a551-c1deee46d401"
 +
@@ -216,7 +241,19 @@ diff old new
 +variant: a: 1
 +version: a: 5
 +urn: a:     "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"
-+toInt: a:   93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
++
++// ToInt decodes the 128-bit value of a UUID in any form accepted by Parse,
++// and is the inverse of FromInt.
++// TODO: ToInt currently returns the bytes of the string itself as an integer,
++// so it does not round-trip and does not reject invalid UUIDs.
+ toInt: {
+-	a: 93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
++	a:         93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
++	dns:       105650679877645322908966597104845053545234508911669713823561288000003997571566663656248
++	urn:       1077458076904213895080154061080074672656303875852468910137731530200742365514657279126070731818279308125810736
++	roundTrip: _|_ // toInt.roundTrip: error in call to uuid.FromInt: invalid UUID (got 36 bytes)
++	invalid:   93651793875903522082415710534026509363018498450217964911440342253418420761506880958513
+ }
 -- out/uuid --
 Errors:
 valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID format:

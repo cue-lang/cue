@@ -28,12 +28,10 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -53,16 +51,6 @@ import (
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetestscript"
 )
-
-// hostGoModCache returns the host's GOMODCACHE, letting testscripts reuse
-// already downloaded modules; gotooltest gives each script an empty GOPATH.
-var hostGoModCache = sync.OnceValues(func() (string, error) {
-	out, err := exec.Command("go", "env", "GOMODCACHE").Output()
-	if err != nil {
-		return "", fmt.Errorf("go env GOMODCACHE: %v", err)
-	}
-	return strings.TrimSpace(string(out)), nil
-})
 
 // TestLatest checks that the examples match the latest language standard,
 // even if still valid in backwards compatibility mode. An archive which
@@ -310,24 +298,7 @@ func TestScript(t *testing.T) {
 			// Set up the environment that the cue command expects: the
 			// registries described by the script's _registry* directories,
 			// the cache directory, and the language version variables.
-			if err := cuetestscript.Setup(setupEnv{e}); err != nil {
-				return err
-			}
-			// Let testscripts build Go code against this cuelang.org/go
-			// checkout via a replace directive without network access.
-			checkoutRoot, err := filepath.Abs(filepath.Join("..", "..", ".."))
-			if err != nil {
-				return err
-			}
-			goModCache, err := hostGoModCache()
-			if err != nil {
-				return err
-			}
-			e.Vars = append(e.Vars,
-				"CUE_CHECKOUT_ROOT="+checkoutRoot,
-				"HOST_GOMODCACHE="+goModCache,
-			)
-			return nil
+			return cuetestscript.Setup(setupEnv{e})
 		},
 		Condition: cuetest.Condition,
 	}

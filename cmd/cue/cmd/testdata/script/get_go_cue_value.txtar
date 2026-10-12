@@ -3,12 +3,8 @@
 # Marshaler types from other packages, like dep.Value, are still
 # generated and referenced as usual.
 
-# Replace cuelang.org/go with the local checkout, reusing the host's
-# module cache and go.sum to avoid network access.
-env GOMODCACHE=$HOST_GOMODCACHE
-go mod edit -replace=cuelang.org/go=$CUE_CHECKOUT_ROOT
-cp $CUE_CHECKOUT_ROOT/go.sum go.sum
-go mod tidy
+# A stub stands in for cuelang.org/go, as get go only looks at the type's
+# package path and name, and loading the real module is slow.
 
 exec cue get go --local ./x
 cmp x/x_go_gen.cue x/x_go_gen.cue.golden
@@ -24,6 +20,22 @@ module mod.test
 go 1.25
 
 require cuelang.org/go v0.0.0
+
+replace cuelang.org/go => ./cuestub
+-- cuestub/go.mod --
+module cuelang.org/go
+
+go 1.25
+-- cuestub/cue/cue.go --
+package cue
+
+type Value struct {
+	v int
+}
+
+func (v Value) MarshalJSON() ([]byte, error) {
+	return nil, nil
+}
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.15.0"

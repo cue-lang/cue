@@ -611,8 +611,13 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			return
 
 		case *StructMarker:
+			// A vertex converted to data stands for its regular fields alone.
+			// Any other vertex without conjuncts, such as a disjunct of a
+			// finalized disjunction (see the TODO in finalizeDisjunctions),
+			// stands for its evaluated value as a whole, declarations
+			// included.
 			for _, a := range x.Arcs {
-				if a.ArcType != ArcMember {
+				if a.ArcType > ArcOptional || (x.isData && a.ArcType != ArcMember) {
 					continue
 				}
 				// TODO(errors): report error when this is a regular field.
@@ -620,6 +625,21 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				n.insertArc(a.Label, a.ArcType, c, id, true)
 			}
 			n.node.Structs = append(n.node.Structs, x.Structs...)
+			if x.isData {
+				return
+			}
+			if pcs := x.PatternConstraints; pcs != nil {
+				for _, pc := range pcs.Pairs {
+					for c := range pc.Constraint.LeafConjuncts() {
+						c.CloseInfo = id
+						n.insertPattern(pc.Pattern, c)
+					}
+				}
+			}
+			if x.HasEllipsis {
+				n.node.HasEllipsis = true
+				n.updateConjunctInfo(TopKind, id, cHasEllipsis)
+			}
 
 		case Value:
 			n.insertValueConjunct(env, v, id)

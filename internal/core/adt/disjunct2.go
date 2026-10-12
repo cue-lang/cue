@@ -677,7 +677,11 @@ func (n *nodeContext) finalizeDisjunctions() {
 	// TODO: we clear the Conjuncts to be compatible with the old evaluator.
 	// This is especially relevant for the API. Ideally, though, we should
 	// update Conjuncts to reflect the actual conjunct that went into the
-	// disjuncts.
+	// disjuncts. Until then, insertValueConjunct inserts a disjunct used as
+	// a value from its arcs, declarations included. Note that restoring the
+	// conjuncts would make close over a disjunction close the re-evaluated
+	// expression rather than the evaluated value; see embeddedDisjunction in
+	// cue/testdata/builtins/closed.txtar.
 	numErrs := 0
 	for _, x := range n.disjuncts {
 		x.node.Conjuncts = nil

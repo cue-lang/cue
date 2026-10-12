@@ -144,6 +144,20 @@ issue3963: {
 	#D: #A | #B
 	definition: #D & {a: "x"} @test(eq, {a: "x"})
 }
+
+// close over a disjunction closes each disjunct as the value it evaluated
+// to: its optional and required fields, pattern constraints, and ellipsis
+// carry over along with its regular fields.
+disjunctValue: {
+	v: close({a?: int} | *{b?: int}) @test(eq, {}, incorrect) @test(eq:todo, *{b?: int} | {a?: int})
+	t1: v & {b: 1} @test(err, code=eval, contains="field not allowed", incorrect)
+	t2: v & {a: 1} @test(err, code=eval, contains="field not allowed", incorrect)
+	t3: v & {c: 1} @test(err, code=eval, contains="field not allowed", pos=[0:11])
+
+	required: close({a!: int} | {b!: int}) & {b: 1} @test(err, code=eval, contains="field not allowed", incorrect)
+	pattern:  close({[string]: int} | *{b: int, [=~"^c"]: string}) & {b: 1, c: "x"} @test(err, code=eval, contains="empty disjunction", incorrect)
+	ellipsis: close({a: 1, ...} | {b: 1}) & {c: 2} @test(err, code=eval, contains="field not allowed", incorrect) @test(eq:todo, {a: 1, c: 2})
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -239,17 +253,17 @@ issue1206: elimination: {
 }
 
 -- out/eval/stats --
-Leaks:  14
-Freed:  452
-Reused: 419
-Allocs: 47
+Leaks:  15
+Freed:  544
+Reused: 511
+Allocs: 48
 Retain: 0
 
-Unifications: 294
-Conjuncts:    538
-Disjuncts:    48
+Unifications: 345
+Conjuncts:    616
+Disjuncts:    76
 
-NumCloseIDs: 110
+NumCloseIDs: 130
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7
@@ -271,6 +285,21 @@ NumCloseIDs: 110
     ./in.cue:129:11
 [eval] issue3963.denied.c: field not allowed:
     ./in.cue:141:33
+[eval] disjunctValue.t1.b: field not allowed:
+    ./in.cue:152:11
+[eval] disjunctValue.t2.a: field not allowed:
+    ./in.cue:153:11
+[eval] disjunctValue.t3.c: field not allowed:
+    ./in.cue:154:11
+[eval] disjunctValue.required.b: field not allowed:
+    ./in.cue:156:44
+[eval] disjunctValue.pattern: 2 errors in empty disjunction:
+disjunctValue.pattern.b: field not allowed:
+    ./in.cue:157:68
+disjunctValue.pattern.c: field not allowed:
+    ./in.cue:157:74
+[eval] disjunctValue.ellipsis.c: field not allowed:
+    ./in.cue:158:43
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

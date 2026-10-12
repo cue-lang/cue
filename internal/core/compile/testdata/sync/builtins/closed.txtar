@@ -90,6 +90,20 @@ issue3963: {
 	#D: #A | #B
 	definition: #D & {a: "x"}
 }
+
+// close over a disjunction closes each disjunct as the value it evaluated
+// to: its optional and required fields, pattern constraints, and ellipsis
+// carry over along with its regular fields.
+disjunctValue: {
+	v: close({a?: int} | *{b?: int})
+	t1: v & {b: 1}
+	t2: v & {a: 1}
+	t3: v & {c: 1}
+
+	required: close({a!: int} | {b!: int}) & {b: 1}
+	pattern:  close({[string]: int} | *{b: int, [=~"^c"]: string}) & {b: 1, c: "x"}
+	ellipsis: close({a: 1, ...} | {b: 1}) & {c: 2}
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -507,6 +521,46 @@ issue1206: elimination: {
     #D: (〈0;#A〉|〈0;#B〉)
     definition: (〈0;#D〉 & {
       a: "x"
+    })
+  }
+  disjunctValue: {
+    v: close(({
+      a?: int
+    }|*{
+      b?: int
+    }))
+    t1: (〈0;v〉 & {
+      b: 1
+    })
+    t2: (〈0;v〉 & {
+      a: 1
+    })
+    t3: (〈0;v〉 & {
+      c: 1
+    })
+    required: (close(({
+      a!: int
+    }|{
+      b!: int
+    })) & {
+      b: 1
+    })
+    pattern: (close(({
+      [string]: int
+    }|*{
+      b: int
+      [=~"^c"]: string
+    })) & {
+      b: 1
+      c: "x"
+    })
+    ellipsis: (close(({
+      a: 1
+      ...
+    }|{
+      b: 1
+    })) & {
+      c: 2
     })
   }
 }

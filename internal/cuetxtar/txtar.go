@@ -497,6 +497,9 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// that express golden-file expectations in CUE form rather than as
 			// raw text sections).
 			if x.Inline && isInlineMode(a) {
+				// Each archive records stats from its own OpContext,
+				// so archives can run in parallel.
+				t.Parallel()
 				runner := &inlineRunner{
 					t:            t,
 					m:            m,

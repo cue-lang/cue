@@ -20,11 +20,11 @@ package imported
 #Bar: foo?: #Foo
 -- out/eval/stats --
 Leaks:  0
-Freed:  18
+Freed:  2
 Reused: 0
-Allocs: 18
+Allocs: 2
 Retain: 0
 
-Unifications: 18
-Conjuncts:    18
+Unifications: 2
+Conjuncts:    2
 Disjuncts:    0

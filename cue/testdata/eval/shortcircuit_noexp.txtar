@@ -15,11 +15,11 @@ noExpOr:  true  || _|_  @test(err, code=user, contains="explicit error (_|_ lite
     ./in.cue:4:20
 -- out/eval/stats --
 Leaks:  0
-Freed:  11
+Freed:  3
 Reused: 0
-Allocs: 11
+Allocs: 3
 Retain: 0
 
-Unifications: 11
-Conjuncts:    11
+Unifications: 3
+Conjuncts:    3
 Disjuncts:    0

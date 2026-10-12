@@ -106,13 +106,13 @@ objects: plain: a: spec: ref:        objects.hashed.b.metadata.name
 objects: hashed: b: data: foo:       "bar"
 -- out/eval/stats --
 Leaks:  44
-Freed:  239
+Freed:  223
 Reused: 177
-Allocs: 106
+Allocs: 90
 Retain: 0
 
-Unifications: 224
-Conjuncts:    476
+Unifications: 208
+Conjuncts:    460
 Disjuncts:    4
 Notifications: 10
 

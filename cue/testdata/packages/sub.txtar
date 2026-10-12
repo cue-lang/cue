@@ -18,13 +18,13 @@ package pkg1
 Object: "World"
 -- out/eval/stats --
 Leaks:  2
-Freed:  18
+Freed:  2
 Reused: 0
-Allocs: 20
+Allocs: 4
 Retain: 0
 
-Unifications: 19
-Conjuncts:    21
+Unifications: 3
+Conjuncts:    5
 Disjuncts:    0
 
 NumCloseIDs: 2

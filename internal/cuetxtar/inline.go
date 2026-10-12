@@ -56,9 +56,11 @@ import (
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/value"
 )
 
 // RunInlineTests iterates over txtar archives in dir, detects inline-assertion
@@ -343,10 +345,8 @@ func (r *inlineRunner) runArchive() {
 	// Build and evaluate the stripped CUE.
 	// Note: val.Err() may be non-nil if sub-fields are erroneous; this is
 	// intentional for tests that assert errors. We only fatal on compile errors.
-	adt.ResetStats()
 	ctx := r.cueContext()
-	val, allRecords, compileErr := r.buildFromArchive(ctx)
-	evalStats := adt.TotalStats()
+	val, evalStats, allRecords, compileErr := r.buildFromArchive(ctx)
 	if compileErr != nil {
 		r.t.Fatalf("inline: CUE compile error:\n%s", cueerrors.Details(compileErr, nil))
 		return
@@ -653,14 +653,16 @@ func (r *inlineRunner) relFilename(absPath string) string {
 // during evaluation, so the result is identical to stripping them, but error
 // positions reference the original source lines — what the user sees in their
 // editor — rather than a reformatted stripped copy.
-func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrRecord, error) {
+//
+// It also returns the stats of evaluating the value.
+func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, stats.Counts, []attrRecord, error) {
 	insts := loadWithConfig(r.archive, r.dir, load.Config{Env: []string{}})
 	if len(insts) == 0 {
-		return cue.Value{}, nil, fmt.Errorf("no instances found")
+		return cue.Value{}, stats.Counts{}, nil, fmt.Errorf("no instances found")
 	}
 	inst := insts[0]
 	if inst.Err != nil {
-		return cue.Value{}, nil, inst.Err
+		return cue.Value{}, stats.Counts{}, nil, inst.Err
 	}
 	r.inst = inst
 
@@ -678,11 +680,25 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, []attrReco
 
 	// Build from the original instance so that error positions match the
 	// original source, not a reformatted stripped copy.
-	val := ctx.BuildInstance(inst)
-	if val.BuildInstance() == nil && val.Err() != nil {
-		return cue.Value{}, nil, val.Err()
+	val, counts, err := buildInstance(ctx, inst)
+	if err != nil {
+		return cue.Value{}, stats.Counts{}, nil, err
 	}
-	return val, allRecords, nil
+	return val, counts, allRecords, nil
+}
+
+// buildInstance is like [cue.Context.BuildInstance], but it evaluates with an
+// OpContext of its own and returns its stats, which only count this build even
+// when others run in parallel.
+func buildInstance(ctx *cue.Context, inst *build.Instance) (cue.Value, stats.Counts, error) {
+	rt := (*runtime.Runtime)(ctx)
+	v, err := rt.Build(nil, inst)
+	if err != nil {
+		return cue.Value{}, stats.Counts{}, err
+	}
+	opCtx := eval.NewContext(rt, nil)
+	v.Finalize(opCtx)
+	return value.Make(opCtx, v), *opCtx.Stats(), nil
 }
 
 // cueContext returns the appropriate cue.Context for the current matrix entry.

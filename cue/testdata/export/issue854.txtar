@@ -25,13 +25,13 @@ package c
     ./c/c.cue:1:1
 -- out/eval/stats --
 Leaks:  5
-Freed:  18
+Freed:  2
 Reused: 0
-Allocs: 23
+Allocs: 7
 Retain: 0
 
-Unifications: 22
-Conjuncts:    24
+Unifications: 6
+Conjuncts:    8
 Disjuncts:    0
 
 NumCloseIDs: 1

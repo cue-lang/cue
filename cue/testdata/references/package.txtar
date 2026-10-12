@@ -26,11 +26,11 @@ blah: Settings.anyKey
 Settings: {}
 -- out/eval/stats --
 Leaks:  3
-Freed:  19
+Freed:  3
 Reused: 0
-Allocs: 22
+Allocs: 6
 Retain: 0
 
-Unifications: 21
-Conjuncts:    21
+Unifications: 5
+Conjuncts:    5
 Disjuncts:    0

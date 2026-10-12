@@ -244,8 +244,6 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	generate(n)
 
 	// Evaluating the orderings dominates the cost, so do it in parallel.
-	// They do not count towards the archive's stats, which are recorded
-	// before any permutation runs.
 	var g errgroup.Group
 	g.SetLimit(runtime.GOMAXPROCS(0))
 	for _, o := range orderings {
@@ -332,11 +330,8 @@ func (r *inlineRunner) buildPermuted(fileIdx int, structPath cue.Path, fieldName
 	inst := *r.inst
 	inst.Files = slices.Clone(inst.Files)
 	inst.Files[fileIdx] = file
-	val := r.cueContext().BuildInstance(&inst)
-	if val.BuildInstance() == nil && val.Err() != nil {
-		return cue.Value{}, val.Err()
-	}
-	return val, nil
+	val, _, err := buildInstance(r.cueContext(), &inst)
+	return val, err
 }
 
 // findPermFieldsAtPath walks file following structPath and returns the

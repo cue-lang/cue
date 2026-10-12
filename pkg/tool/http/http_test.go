@@ -394,14 +394,13 @@ func TestServeResponse(t *testing.T) {
 		}}`,
 		wantCode: 200,
 		wantBody: "ok",
-		// TODO: the trailers are sent as headers.
 		wantHeader: http.Header{
-			"X-Checksum": {"abc"},
-			"X-Multi":    {"one", "two"},
-		},
-		wantTrailer: http.Header{
 			"X-Checksum": nil,
 			"X-Multi":    nil,
+		},
+		wantTrailer: http.Header{
+			"X-Checksum": {"abc"},
+			"X-Multi":    {"one", "two"},
 		},
 	}, {
 		// A header and a trailer of the same name keep their own values.
@@ -413,12 +412,11 @@ func TestServeResponse(t *testing.T) {
 		}}`,
 		wantCode: 200,
 		wantBody: "ok",
-		// TODO: the trailer is sent as a header.
 		wantHeader: http.Header{
-			"X-Checksum": {"pending", "abc"},
+			"X-Checksum": {"pending"},
 		},
 		wantTrailer: http.Header{
-			"X-Checksum": nil,
+			"X-Checksum": {"abc"},
 		},
 	}, {
 		// Trailers need a chunked body, which these headers prevent.
@@ -428,12 +426,7 @@ func TestServeResponse(t *testing.T) {
 			trailer: "X-Checksum":     "abc"
 			body: "ok"
 		}}`,
-		wantCode: 200,
-		wantBody: "ok",
-		// TODO: the trailer is sent as a header.
-		wantHeader: http.Header{
-			"X-Checksum": {"abc"},
-		},
+		wantErr: "trailers cannot be sent with a Content-Length header",
 	}, {
 		name: "trailer with identity transfer encoding",
 		expr: `{response: {
@@ -441,22 +434,12 @@ func TestServeResponse(t *testing.T) {
 			trailer: "X-Checksum":        "abc"
 			body: "ok"
 		}}`,
-		wantCode: 200,
-		wantBody: "ok",
-		// TODO: the trailer is sent as a header.
-		wantHeader: http.Header{
-			"X-Checksum": {"abc"},
-		},
+		wantErr: "trailers cannot be sent with an identity Transfer-Encoding",
 	}, {
 		// net/http silently drops the trailers it does not allow.
-		name:     "disallowed trailer",
-		expr:     `{response: {trailer: "Cache-Control": "no-cache", body: "ok"}}`,
-		wantCode: 200,
-		wantBody: "ok",
-		// TODO: the trailer is sent as a header.
-		wantHeader: http.Header{
-			"Cache-Control": {"no-cache"},
-		},
+		name:    "disallowed trailer",
+		expr:    `{response: {trailer: "Cache-Control": "no-cache", body: "ok"}}`,
+		wantErr: "Cache-Control is not allowed as a trailer",
 	}, {
 		// net/http panics when given a status code outside [100, 999].
 		name:    "status code too low",

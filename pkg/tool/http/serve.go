@@ -19,11 +19,15 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"sync"
+
+	"golang.org/x/net/http/httpguts"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -239,6 +243,23 @@ func (c *serveCmd) Run(ctx *task.Context) (res any, err error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, response.Pos(), "cannot parse trailers")
 	}
+	trailerKeys := slices.Sorted(maps.Keys(trailers))
+	for _, k := range trailerKeys {
+		// net/http silently drops the trailers it does not allow.
+		if !httpguts.ValidTrailerHeader(k) {
+			return nil, errors.Newf(response.Pos(), "%s is not allowed as a trailer", k)
+		}
+	}
+	// Trailers follow a chunked body, which net/http does not use
+	// when given either of these headers, silently dropping the trailers.
+	if len(trailers) > 0 {
+		if headers.Get("Content-Length") != "" {
+			return nil, errors.Newf(response.Pos(), "trailers cannot be sent with a Content-Length header")
+		}
+		if headers.Get("Transfer-Encoding") == "identity" {
+			return nil, errors.Newf(response.Pos(), "trailers cannot be sent with an identity Transfer-Encoding")
+		}
+	}
 
 	// net/http panics when writing a status code outside the range of the
 	// three-digit HTTP codes. [task.Context.TaskFunc] unifies every task value
@@ -271,14 +292,20 @@ func (c *serveCmd) Run(ctx *task.Context) (res any, err error) {
 		}
 	}
 
-	for k, vs := range trailers {
-		for _, v := range vs {
-			c.w.Header().Add(k, v)
-		}
+	// Trailers must be declared before writing the header,
+	// and their values set once the body has been written.
+	for _, k := range trailerKeys {
+		c.w.Header().Add("Trailer", k)
 	}
 
 	c.w.WriteHeader(int(statusCode))
 	c.w.Write(b)
+
+	// The header has already been written, so replace any header values
+	// of the same name, which net/http would also send as trailer values.
+	for k, vs := range trailers {
+		c.w.Header()[k] = vs
+	}
 
 	return nil, nil
 }

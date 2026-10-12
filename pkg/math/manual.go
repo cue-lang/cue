@@ -15,6 +15,7 @@
 package math
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/cockroachdb/apd/v3"
@@ -47,78 +48,60 @@ func toInt(d *internal.Decimal) *big.Int {
 	return b
 }
 
+// roundToInt rounds x to an integral value with round, and converts the
+// result to a big.Int. It is an error if x is an infinity or NaN, neither
+// of which has an integer value.
+func roundToInt(x *internal.Decimal, round func(d, x *internal.Decimal) (apd.Condition, error)) (*big.Int, error) {
+	if x.Form != apd.Finite {
+		return nil, fmt.Errorf("cannot convert %s to an integer", x)
+	}
+	var d internal.Decimal
+	_, err := round(&d, x)
+	return toInt(&d), err
+}
+
 // Floor returns the greatest integer value less than or equal to x.
 //
-// Special cases are:
-//
-//	Floor(±0) = ±0
-//	Floor(±Inf) = ±Inf
-//	Floor(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 func Floor(x *internal.Decimal) (*big.Int, error) {
-	var d internal.Decimal
 	// apd truncates towards zero and then subtracts one, so an argument with
 	// a fraction needs a context which will not round that step away.
-	_, err := internal.ExactContext.Floor(&d, x)
-	return toInt(&d), err
+	return roundToInt(x, internal.ExactContext.Floor)
 }
 
 // Ceil returns the least integer value greater than or equal to x.
 //
-// Special cases are:
-//
-//	Ceil(±0) = ±0
-//	Ceil(±Inf) = ±Inf
-//	Ceil(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 func Ceil(x *internal.Decimal) (*big.Int, error) {
-	var d internal.Decimal
 	// See the comment in [Floor]; Ceil adds one rather than subtracting it.
-	_, err := internal.ExactContext.Ceil(&d, x)
-	return toInt(&d), err
+	return roundToInt(x, internal.ExactContext.Ceil)
 }
 
 var roundTruncContext = roundContext(apd.RoundDown)
 
 // Trunc returns the integer value of x.
 //
-// Special cases are:
-//
-//	Trunc(±0) = ±0
-//	Trunc(±Inf) = ±Inf
-//	Trunc(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 func Trunc(x *internal.Decimal) (*big.Int, error) {
-	var d internal.Decimal
-	_, err := roundTruncContext.RoundToIntegralExact(&d, x)
-	return toInt(&d), err
+	return roundToInt(x, roundTruncContext.RoundToIntegralExact)
 }
 
 var roundUpContext = roundContext(apd.RoundHalfUp)
 
 // Round returns the nearest integer, rounding half away from zero.
 //
-// Special cases are:
-//
-//	Round(±0) = ±0
-//	Round(±Inf) = ±Inf
-//	Round(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 func Round(x *internal.Decimal) (*big.Int, error) {
-	var d internal.Decimal
-	_, err := roundUpContext.RoundToIntegralExact(&d, x)
-	return toInt(&d), err
+	return roundToInt(x, roundUpContext.RoundToIntegralExact)
 }
 
 var roundEvenContext = roundContext(apd.RoundHalfEven)
 
 // RoundToEven returns the nearest integer, rounding ties to even.
 //
-// Special cases are:
-//
-//	RoundToEven(±0) = ±0
-//	RoundToEven(±Inf) = ±Inf
-//	RoundToEven(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 func RoundToEven(x *internal.Decimal) (*big.Int, error) {
-	var d internal.Decimal
-	_, err := roundEvenContext.RoundToIntegralExact(&d, x)
-	return toInt(&d), err
+	return roundToInt(x, roundEvenContext.RoundToIntegralExact)
 }
 
 // remContext takes a remainder exactly: apd reports "division impossible"

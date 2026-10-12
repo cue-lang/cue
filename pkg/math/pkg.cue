@@ -64,47 +64,27 @@ MaxBase: 62
 
 // Floor returns the greatest integer value less than or equal to x.
 //
-// Special cases are:
-//
-// 	Floor(±0) = ±0
-// 	Floor(±Inf) = ±Inf
-// 	Floor(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 Floor: func(x: number) -> int
 
 // Ceil returns the least integer value greater than or equal to x.
 //
-// Special cases are:
-//
-// 	Ceil(±0) = ±0
-// 	Ceil(±Inf) = ±Inf
-// 	Ceil(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 Ceil: func(x: number) -> int
 
 // Trunc returns the integer value of x.
 //
-// Special cases are:
-//
-// 	Trunc(±0) = ±0
-// 	Trunc(±Inf) = ±Inf
-// 	Trunc(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 Trunc: func(x: number) -> int
 
 // Round returns the nearest integer, rounding half away from zero.
 //
-// Special cases are:
-//
-// 	Round(±0) = ±0
-// 	Round(±Inf) = ±Inf
-// 	Round(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 Round: func(x: number) -> int
 
 // RoundToEven returns the nearest integer, rounding ties to even.
 //
-// Special cases are:
-//
-// 	RoundToEven(±0) = ±0
-// 	RoundToEven(±Inf) = ±Inf
-// 	RoundToEven(NaN) = NaN
+// It is an error if x is an infinity or NaN.
 RoundToEven: func(x: number) -> int
 
 // MultipleOf reports whether x is a multiple of y.

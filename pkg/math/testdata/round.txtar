@@ -44,7 +44,6 @@ trunc1: math.Trunc(-2.9)
 
 // Infinities and NaN have no integer value.
 // math.Log(0) is -Infinity, and math.Sqrt(-1) is NaN.
-// TODO: these should fail rather than evaluate to 0.
 floorNegInf:  math.Floor(math.Log(0))
 ceilPosInf:   math.Ceil(-math.Log(0))
 truncNegInf:  math.Trunc(math.Log(0))
@@ -59,6 +58,18 @@ floorE1: too many arguments in call to math.Floor (have 2, want 1):
     ./in.cue:27:10
 floorE2: cannot use "foo" (type string) as number in argument 1 to math.Floor:
     ./in.cue:28:21
+floorNegInf: error in call to math.Floor: cannot convert -Infinity to an integer:
+    ./in.cue:44:15
+ceilPosInf: error in call to math.Ceil: cannot convert Infinity to an integer:
+    ./in.cue:45:15
+truncNegInf: error in call to math.Trunc: cannot convert -Infinity to an integer:
+    ./in.cue:46:15
+roundPosInf: error in call to math.Round: cannot convert Infinity to an integer:
+    ./in.cue:47:15
+roundEvenNaN: error in call to math.RoundToEven: cannot convert NaN to an integer:
+    ./in.cue:48:15
+floorNaN: error in call to math.Floor: cannot convert NaN to an integer:
+    ./in.cue:49:15
 
 Result:
 mul0: true
@@ -96,10 +107,9 @@ trunc1:  -2
 
 // Infinities and NaN have no integer value.
 // math.Log(0) is -Infinity, and math.Sqrt(-1) is NaN.
-// TODO: these should fail rather than evaluate to 0.
-floorNegInf:  0
-ceilPosInf:   0
-truncNegInf:  0
-roundPosInf:  0
-roundEvenNaN: 0
-floorNaN:     0
+floorNegInf:  _|_ // floorNegInf: error in call to math.Floor: cannot convert -Infinity to an integer
+ceilPosInf:   _|_ // ceilPosInf: error in call to math.Ceil: cannot convert Infinity to an integer
+truncNegInf:  _|_ // truncNegInf: error in call to math.Trunc: cannot convert -Infinity to an integer
+roundPosInf:  _|_ // roundPosInf: error in call to math.Round: cannot convert Infinity to an integer
+roundEvenNaN: _|_ // roundEvenNaN: error in call to math.RoundToEven: cannot convert NaN to an integer
+floorNaN:     _|_ // floorNaN: error in call to math.Floor: cannot convert NaN to an integer

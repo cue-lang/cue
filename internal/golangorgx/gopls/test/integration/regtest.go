@@ -94,7 +94,7 @@ func (r RunMultiple) Run(t *testing.T, files string, f TestFunc) {
 func DefaultModes() Mode {
 	modes := Default
 	if !testing.Short() {
-		modes |= Experimental | Forwarded
+		modes |= Forwarded
 	}
 	if *runSubprocessTests {
 		modes |= SeparateProcess

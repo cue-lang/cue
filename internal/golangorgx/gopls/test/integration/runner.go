@@ -33,7 +33,6 @@ import (
 // Mode is a bitmask that defines for which execution modes a test should run.
 //
 // Each mode controls several aspects of gopls' configuration:
-//   - Which server options to use for gopls sessions
 //   - Whether to use a shared cache
 //   - Whether to use a shared server
 //   - Whether to run the server in-process or in a separate process
@@ -47,12 +46,11 @@ import (
 // with 'Options', and use RunMultiple rather than a hard-coded loop through
 // modes.
 //
-// Mode            | Options      | Shared Cache? | Shared Server? | In-process?
-// ---------------------------------------------------------------------------
-// Default         | Default      | Y             | N              | Y
-// Forwarded       | Default      | Y             | Y              | Y
-// SeparateProcess | Default      | Y             | Y              | N
-// Experimental    | Experimental | N             | N              | Y
+// Mode            | Shared Cache? | Shared Server? | In-process?
+// ------------------------------------------------------------
+// Default         | Y             | N              | Y
+// Forwarded       | Y             | Y              | Y
+// SeparateProcess | Y             | Y              | N
 type Mode int
 
 const (
@@ -73,13 +71,6 @@ const (
 	//
 	// Only supported on GOOS=linux.
 	SeparateProcess
-
-	// Experimental enables all of the experimental configurations that are
-	// being developed, and runs gopls in sidecar mode.
-	//
-	// It uses a separate cache for each test, to exercise races that may only
-	// appear with cache misses.
-	Experimental
 )
 
 func (m Mode) String() string {
@@ -90,8 +81,6 @@ func (m Mode) String() string {
 		return "forwarded"
 	case SeparateProcess:
 		return "separate process"
-	case Experimental:
-		return "experimental"
 	default:
 		return "unknown mode"
 	}
@@ -141,7 +130,6 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 		{"default", Default, r.defaultServer},
 		{"forwarded", Forwarded, r.forwardedServer},
 		{"separate_process", SeparateProcess, r.separateProcessServer},
-		{"experimental", Experimental, r.experimentalServer},
 	}
 
 	for _, tc := range tests {
@@ -309,19 +297,6 @@ func (r *Runner) defaultServer(config runConfig, optsHook func(*settings.Options
 		panic(err)
 	}
 	return lsprpc.NewStreamServer(c, false, optsHook)
-}
-
-// experimentalServer handles the Experimental execution mode.
-func (r *Runner) experimentalServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
-	c, err := newCache(config)
-	if err != nil {
-		panic(err)
-	}
-	options := func(o *settings.Options) {
-		optsHook(o)
-		o.EnableAllExperiments()
-	}
-	return lsprpc.NewStreamServer(c, false, options)
 }
 
 // forwardedServer handles the Forwarded execution mode.

@@ -17,6 +17,7 @@ package filetypes_test
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -70,25 +71,26 @@ func TestDriverMatchesCUE(t *testing.T) {
 
 	// run runs body for every mode as parallel subtests of name, each
 	// with its own compiled types.cue to keep the subtests independent.
-	run := func(name string, body func(t *testing.T, root cue.Value, mode filetypes.Mode)) {
+	run := func(name string, body func(t *testing.T, o *oracle)) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			for _, mode := range modes {
 				t.Run(mode.String(), func(t *testing.T) {
 					t.Parallel()
-					body(t, compileTypes(t), mode)
+					body(t, newOracle(compileTypes(t), mode))
 				})
 			}
 		})
 	}
 
-	run("fromfile", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+	run("fromfile", func(t *testing.T, o *oracle) {
+		mode := o.mode
 		for _, enc := range encodings {
 			for _, interp := range interps {
 				for _, form := range forms {
 					b := &build.File{Filename: "x", Encoding: build.Encoding(enc), Interpretation: build.Interpretation(interp), Form: build.Form(form)}
 					fi, derr := filetypes.FromFile(b, mode)
-					ok, want := cueFromFile(root, mode, enc, interp, form)
+					ok, want := o.fromFile(enc, interp, form)
 					if (derr == nil) != ok {
 						t.Errorf("[%s enc=%s interp=%q form=%q] driver ok=%v, CUE ok=%v", mode, enc, interp, form, derr == nil, ok)
 						continue
@@ -103,7 +105,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 		}
 	})
 
-	run("qualifier-pairs", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+	run("qualifier-pairs", func(t *testing.T, o *oracle) {
 		for _, a := range tags {
 			for _, b := range tags {
 				scope := a
@@ -112,7 +114,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 					scope = a + "+" + b
 					want = []string{a, b}
 				}
-				compare(t, root, mode, scope, want, "x")
+				compare(t, o, scope, want, "x")
 			}
 		}
 	})
@@ -123,7 +125,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 	// that does not pin the encoding (a form tag, or pb with its
 	// struct-level disjunction) must let the extension participate in
 	// disjunct selection.
-	run("extension-axis", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+	run("extension-axis", func(t *testing.T, o *oracle) {
 		scopes := append([]string{""}, tags...)
 		for _, scope := range scopes {
 			var tagList []string
@@ -131,7 +133,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 				tagList = []string{scope}
 			}
 			for _, filename := range filenames {
-				compare(t, root, mode, scope, tagList, filename)
+				compare(t, o, scope, tagList, filename)
 			}
 		}
 	})
@@ -139,7 +141,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 	// tag-pairs-with-extensions: all tag pairs against a representative
 	// set of filenames. The pb pairs with .json/.proto/.textproto are
 	// the regression surface for extension-driven disjunct selection.
-	run("tag-pairs-with-extensions", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+	run("tag-pairs-with-extensions", func(t *testing.T, o *oracle) {
 		representative := []string{"x.json", "x.proto", "x.textproto", "-"}
 		for _, a := range tags {
 			for _, b := range tags {
@@ -148,13 +150,14 @@ func TestDriverMatchesCUE(t *testing.T) {
 				}
 				scope := a + "+" + b
 				for _, filename := range representative {
-					compare(t, root, mode, scope, []string{a, b}, filename)
+					compare(t, o, scope, []string{a, b}, filename)
 				}
 			}
 		}
 	})
 
-	run("subsidiary-tags", func(t *testing.T, root cue.Value, mode filetypes.Mode) {
+	run("subsidiary-tags", func(t *testing.T, o *oracle) {
+		mode := o.mode
 		cases := []struct {
 			scope    string
 			top      []string
@@ -175,7 +178,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 		}
 		for _, tc := range cases {
 			got, derr := filetypes.ParseFileAndType("x", tc.scope, mode)
-			ok, want := cueToFile(root, mode, tc.top, tc.stringly, tc.boolean, "x")
+			ok, want := o.toFile(tc.top, tc.stringly, tc.boolean, "x")
 			if (derr == nil) != ok {
 				t.Errorf("[%s %s] driver ok=%v (%v), CUE ok=%v", mode, tc.scope, derr == nil, derr, ok)
 				continue
@@ -190,17 +193,17 @@ func TestDriverMatchesCUE(t *testing.T) {
 
 // compare resolves one (scope, filename, mode) with the driver and
 // with the oracle and asserts they agree.
-func compare(t *testing.T, root cue.Value, mode filetypes.Mode, scope string, tagList []string, filename string) {
+func compare(t *testing.T, o *oracle, scope string, tagList []string, filename string) {
 	t.Helper()
-	f, derr := filetypes.ParseFileAndType(filename, scope, mode)
-	ok, oracle := cueToFile(root, mode, tagList, nil, nil, filename)
+	f, derr := filetypes.ParseFileAndType(filename, scope, o.mode)
+	ok, want := o.toFile(tagList, nil, nil, filename)
 	if (derr == nil) != ok {
-		t.Errorf("[%s %q %s] driver ok=%v (%v), CUE ok=%v", mode, scope, filename, derr == nil, derr, ok)
+		t.Errorf("[%s %q %s] driver ok=%v (%v), CUE ok=%v", o.mode, scope, filename, derr == nil, derr, ok)
 		return
 	}
 	if derr == nil {
-		qt.Check(t, qt.CmpEquals(f, oracle, cmpopts.EquateEmpty()),
-			qt.Commentf("[%s %q %s] build.File mismatch", mode, scope, filename))
+		qt.Check(t, qt.CmpEquals(f, want, cmpopts.EquateEmpty()),
+			qt.Commentf("[%s %q %s] build.File mismatch", o.mode, scope, filename))
 	}
 }
 
@@ -249,8 +252,42 @@ func hasEncoding(v cue.Value) bool {
 	return resolveStr(v, "encoding") != ""
 }
 
-// cueFromFile is the evaluator oracle for the FromFile resolution.
-func cueFromFile(root cue.Value, mode filetypes.Mode, enc, interp, form string) (bool, *filetypes.FileInfo) {
+// oracle evaluates types.cue for one mode. The evaluator is far slower
+// than the driver under test, so it caches the values shared by many cases.
+type oracle struct {
+	root cue.Value
+	mode filetypes.Mode
+
+	// tagValues caches [oracle.tagValue] by its tags joined with "+".
+	tagValues map[string]cue.Value
+}
+
+func newOracle(root cue.Value, mode filetypes.Mode) *oracle {
+	return &oracle{root: root, mode: mode, tagValues: make(map[string]cue.Value)}
+}
+
+// tagValue returns the mode's FileInfo unified with the tagInfo entries
+// of tags, or a value which does not exist if any tag is unknown.
+func (o *oracle) tagValue(tags []string) cue.Value {
+	key := strings.Join(tags, "+")
+	if v, ok := o.tagValues[key]; ok {
+		return v
+	}
+	var v cue.Value
+	if len(tags) == 0 {
+		v = o.root.LookupPath(cue.ParsePath(fmt.Sprintf("modes.%s.FileInfo", o.mode)))
+	} else if prev := o.tagValue(tags[:len(tags)-1]); prev.Exists() {
+		if ti := o.root.LookupPath(cue.ParsePath("tagInfo." + tags[len(tags)-1])); ti.Exists() {
+			v = prev.Unify(ti)
+		}
+	}
+	o.tagValues[key] = v
+	return v
+}
+
+// fromFile is the evaluator oracle for the FromFile resolution.
+func (o *oracle) fromFile(enc, interp, form string) (bool, *filetypes.FileInfo) {
+	root, mode := o.root, o.mode
 	ctx := root.Context()
 	if enc == "" {
 		return false, nil
@@ -295,7 +332,7 @@ func cueFromFile(root cue.Value, mode filetypes.Mode, enc, interp, form string) 
 	return true, &fi
 }
 
-// cueToFile is the evaluator oracle for the qualifier-and-filename
+// toFile is the evaluator oracle for the qualifier-and-filename
 // resolution. It replicates the reference algorithm the earlier
 // lookup tables were generated from (toFile1 in the pre-driver
 // generate.go): the file extension participates exactly when the
@@ -305,14 +342,11 @@ func cueFromFile(root cue.Value, mode filetypes.Mode, enc, interp, form string) 
 // disjunction such as tagInfo.pb — and disjunction defaults are
 // discharged only afterwards, so a conflicting extension can force a
 // disjunction onto a non-default branch.
-func cueToFile(root cue.Value, mode filetypes.Mode, tags []string, stringTags map[string]string, boolTags map[string]bool, filename string) (bool, *build.File) {
-	v := root.LookupPath(cue.ParsePath(fmt.Sprintf("modes.%s.FileInfo", mode)))
-	for _, tag := range tags {
-		ti := root.LookupPath(cue.ParsePath("tagInfo." + tag))
-		if !ti.Exists() {
-			return false, nil
-		}
-		v = v.Unify(ti)
+func (o *oracle) toFile(tags []string, stringTags map[string]string, boolTags map[string]bool, filename string) (bool, *build.File) {
+	root, mode := o.root, o.mode
+	v := o.tagValue(tags)
+	if !v.Exists() {
+		return false, nil
 	}
 	if len(stringTags) > 0 {
 		v = v.Unify(root.Context().Encode(map[string]any{"tags": stringTags}))

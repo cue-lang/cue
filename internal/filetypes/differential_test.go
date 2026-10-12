@@ -69,15 +69,22 @@ func TestDriverMatchesCUE(t *testing.T) {
 	}
 	filenames = append(filenames, "x.unknown", "withoutextension")
 
-	// run runs body for every mode as parallel subtests of name, each
-	// with its own compiled types.cue to keep the subtests independent.
+	// Each mode has one oracle, shared by all subtests of that mode
+	// so that they reuse each other's cached values.
+	oracles := make(map[filetypes.Mode]*oracle)
+	for _, mode := range modes {
+		oracles[mode] = newOracle(compileTypes(t), mode)
+	}
+
+	// run runs body for every mode as parallel subtests of name.
+	// The subtests of each name run one after another,
+	// as a mode's oracle is not safe for concurrent use.
 	run := func(name string, body func(t *testing.T, o *oracle)) {
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
 			for _, mode := range modes {
 				t.Run(mode.String(), func(t *testing.T) {
 					t.Parallel()
-					body(t, newOracle(compileTypes(t), mode))
+					body(t, oracles[mode])
 				})
 			}
 		})

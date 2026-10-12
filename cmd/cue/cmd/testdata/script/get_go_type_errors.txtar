@@ -1,5 +1,7 @@
 # Test that we properly print errors when there are fatal errors
 # in loading Go packages, such as a typechecking error.
+# Function bodies are not type-checked, as only declarations are extracted,
+# so neither the error in F nor its use of the fmt import is reported.
 
 ! exec cue get go --local
 ! stdout .
@@ -12,10 +14,17 @@ go 1.14
 -- blah.go --
 package main
 
+import "fmt"
+
 var someInt int = "not an int"
 
 type T struct {
 	Age int
 }
+
+func F() int {
+	var s string = 3
+	fmt.Println(s)
+}
 -- stderr.golden --
-${WORK}${/}blah.go:3:19: cannot use "not an int" (untyped string constant) as int value in variable declaration
+${WORK}${/}blah.go:5:19: cannot use "not an int" (untyped string constant) as int value in variable declaration

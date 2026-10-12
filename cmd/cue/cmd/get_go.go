@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/constant"
+	goparser "go/parser"
 	"go/token"
 	"go/types"
 	"maps"
@@ -548,11 +549,15 @@ func extract(cmd *Command, args []string) error {
 		Mode: packages.NeedName | packages.NeedCompiledGoFiles |
 			packages.NeedImports | packages.NeedDeps | packages.NeedTypes |
 			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedModule,
+		ParseFile: parseFileWithoutBodies,
 	}
 	pkgs, err := packages.Load(cfg, args...)
 	if err != nil {
 		return err
 	}
+	packages.Visit(pkgs, nil, func(p *packages.Package) {
+		p.Errors = slices.DeleteFunc(p.Errors, isUnusedImportError)
+	})
 	if packages.PrintErrors(pkgs) > 0 {
 		return ErrPrintedError
 	}
@@ -602,6 +607,39 @@ func extract(cmd *Command, args []string) error {
 		}
 	}
 	return nil
+}
+
+// parseFileWithoutBodies implements [packages.Config.ParseFile].
+// Only declarations are extracted, yet loading dependencies from source
+// type-checks every function body, which is most of the work.
+// Each body is replaced with an empty endless loop,
+// which still terminates functions with results.
+func parseFileWithoutBodies(fset *token.FileSet, filename string, src []byte) (*ast.File, error) {
+	const mode = goparser.AllErrors | goparser.ParseComments | goparser.SkipObjectResolution
+	f, err := goparser.ParseFile(fset, filename, src, mode)
+	if f == nil {
+		return nil, err
+	}
+	for _, decl := range f.Decls {
+		if fd, ok := decl.(*ast.FuncDecl); ok && fd.Body != nil {
+			pos := fd.Body.Lbrace
+			fd.Body.List = []ast.Stmt{&ast.ForStmt{
+				For:  pos,
+				Body: &ast.BlockStmt{Lbrace: pos, Rbrace: pos},
+			}}
+		}
+	}
+	return f, err
+}
+
+// isUnusedImportError reports whether err is a type-checking error about an
+// unused import, which [parseFileWithoutBodies] causes for any import used
+// only by function bodies. go/types skips this check entirely when ignoring
+// function bodies, but go/packages does not let us ask for that.
+func isUnusedImportError(err packages.Error) bool {
+	return err.Kind == packages.TypeError &&
+		strings.Contains(err.Msg, " imported ") &&
+		strings.HasSuffix(err.Msg, " and not used")
 }
 
 func (e *extractor) addPackage(p *packages.Package) {

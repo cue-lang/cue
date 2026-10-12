@@ -967,9 +967,20 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 		return s.errf(n, "schema expects mapping node, found %s", n.Kind()), s.schemaInfo
 	}
 
+	// Collect the fields once, as iterating over n is not cheap.
+	type field struct {
+		key   string
+		value cue.Value
+	}
+	var fields []field
+	s.processMap(n, func(key string, value cue.Value) {
+		fields = append(fields, field{key, value})
+	})
+
 	// do multiple passes over the constraints to ensure they are done in order.
 	for pass := range numPhases {
-		s.processMap(n, func(key string, value cue.Value) {
+		for _, f := range fields {
+			key, value := f.key, f.value
 			if pass == 0 && key == "$ref" {
 				// Before 2019-19, keywords alongside $ref are ignored so keep
 				// track of whether we've seen any non-$ref keywords so we can
@@ -985,20 +996,20 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 					// not intended to be a valid keyword, and is explicitly
 					// allowed by OpenAPI. It seems reasonable that
 					// this is not an error even with StrictKeywords enabled.
-					return
+					continue
 				}
 				if pass == 0 && s.cfg.StrictKeywords {
 					// TODO: value is not the correct position, albeit close. Fix this.
 					s.warnUnrecognizedKeyword(key, value, "unknown keyword %q", key)
 				}
-				return
+				continue
 			}
 			if c.phase != pass {
-				return
+				continue
 			}
 			if !s.schemaVersion.is(c.versions) {
 				s.warnUnrecognizedKeyword(key, value, "keyword %q is not supported in JSON schema version %v", key, s.schemaVersion)
-				return
+				continue
 			}
 			if pass > 0 && !s.schemaVersion.is(vfrom(VersionDraft2019_09)) && s.hasRefKeyword && key != "$ref" {
 				// We're using a schema version that ignores keywords alongside $ref.
@@ -1010,10 +1021,10 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 				// keyword itself). We could make that situation an explicit error, but other
 				// implementations don't, and it would require an entire extra pass just to do so.
 				s.warnUnrecognizedKeyword(key, value, "ignoring keyword %q alongside $ref", key)
-				return
+				continue
 			}
 			c.fn(key, value, s)
-		})
+		}
 		if s.schemaVersion == VersionKubernetesCRD && s.isRoot {
 			// The root of a CRD is always a resource, so treat it as if it contained
 			// the x-kubernetes-embedded-resource keyword

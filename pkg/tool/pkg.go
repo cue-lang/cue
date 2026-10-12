@@ -64,7 +64,7 @@
 //		[Name]: Tasks
 //	}
 //
-//	// #Name defines a valid task or command name.
+//	// Name defines a valid task or command name.
 //	Name: =~#"^\PL([-](\PL|\PN))*$"#
 //
 //	// A Task defines a step in the execution of a command.

@@ -164,12 +164,22 @@ func checkNoExtraFields(path cue.Path, val cue.Value) error {
 // AST comparison in favor of compile-and-compare. Defaults are resolved
 // on val before the check.
 func cmpFinal(path cue.Path, expr ast.Expr, val cue.Value) error {
-	b, err := format.Node(expr)
-	if err != nil {
-		return pathErr(path, "cannot format expression: %v", err)
-	}
 	ctx := val.Context()
-	expected := ctx.CompileString(string(b))
+	var b []byte
+	var expected cue.Value
+	if lit, ok := expr.(*ast.BasicLit); ok {
+		// Literals are the common case; build them without formatting and
+		// parsing them again.
+		b = []byte(lit.Value)
+		expected = ctx.BuildExpr(lit)
+	} else {
+		var err error
+		b, err = format.Node(expr)
+		if err != nil {
+			return pathErr(path, "cannot format expression: %v", err)
+		}
+		expected = ctx.CompileString(string(b))
+	}
 	if err := expected.Err(); err != nil {
 		return pathErr(path, "cannot compile expression %q: %v", b, err)
 	}

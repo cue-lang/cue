@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/filetypes"
 	"github.com/go-quicktest/qt"
-	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 // TestDriverMatchesCUE is the differential guard that the earlier
@@ -106,7 +105,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 					}
 					if derr == nil {
 						want.Filename = b.Filename
-						qt.Check(t, qt.CmpEquals(fi, want, cmpopts.EquateEmpty()),
+						qt.Check(t, qt.DeepEquals(fi, want),
 							qt.Commentf("[%s enc=%s interp=%q form=%q] FileInfo mismatch", mode, enc, interp, form))
 					}
 				}
@@ -193,7 +192,7 @@ func TestDriverMatchesCUE(t *testing.T) {
 				continue
 			}
 			if derr == nil {
-				qt.Check(t, qt.CmpEquals(got, want, cmpopts.EquateEmpty()),
+				qt.Check(t, qt.DeepEquals(emptyAsNil(got), emptyAsNil(want)),
 					qt.Commentf("[%s %s] build.File mismatch", mode, tc.scope))
 			}
 		}
@@ -211,7 +210,7 @@ func compare(t *testing.T, o *oracle, scope string, tagList []string, filename s
 		return
 	}
 	if derr == nil {
-		qt.Check(t, qt.CmpEquals(f, want, cmpopts.EquateEmpty()),
+		qt.Check(t, qt.DeepEquals(emptyAsNil(f), emptyAsNil(want)),
 			qt.Commentf("[%s %q %s] build.File mismatch", o.mode, scope, filename))
 	}
 }
@@ -442,4 +441,17 @@ func testFileExt(f string) string {
 		return ""
 	}
 	return e
+}
+
+// emptyAsNil returns a copy of f with empty maps replaced by nil,
+// so that go-cmp can compare files without any options.
+func emptyAsNil(f *build.File) *build.File {
+	f2 := *f
+	if len(f2.Tags) == 0 {
+		f2.Tags = nil
+	}
+	if len(f2.BoolTags) == 0 {
+		f2.BoolTags = nil
+	}
+	return &f2
 }

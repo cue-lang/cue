@@ -71,7 +71,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			x := c.String(0)
 			if c.Do() {
-				c.Ret = ToInt(x)
+				c.Ret, c.Err = ToInt(x)
 			}
 		},
 	}, {

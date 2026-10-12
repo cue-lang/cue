@@ -72,6 +72,7 @@ type httpRequest struct {
 	Body       []byte              `json:"body"`
 	Form       map[string][]string `json:"form"`
 	Header     map[string][]string `json:"header"`
+	Trailer    map[string][]string `json:"trailer"`
 	PathValues map[string]string   `json:"pathValues"`
 }
 
@@ -144,6 +145,16 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 			return
 		}
 
+		// The trailers are only known once the body has been read in full.
+		// A trailer declared via the Trailer header but never sent has no
+		// values, so it is left out.
+		trailer := make(map[string][]string)
+		for k, vs := range req.Trailer {
+			if len(vs) > 0 {
+				trailer[k] = vs
+			}
+		}
+
 		pathValues := make(map[string]string)
 		for _, variable := range vars {
 			if s := req.PathValue(variable); s != "" {
@@ -157,6 +168,7 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 			Body:       data,
 			Form:       req.Form,
 			Header:     req.Header,
+			Trailer:    trailer,
 			PathValues: pathValues,
 		})
 

@@ -35,8 +35,7 @@ stdout '^body="a=1&b=two" a=1 b=two q=query$'
 
 # Request trailers are available once the body has been read
 curl --trailer 'X-Checksum: abc' --trailer 'X-Multi: one' --trailer 'X-Multi: two' http://${SERVE_ADDR}/trailer -d 'data'
-# TODO: the trailers are missing.
-stdout '^body="data" trailer={}$'
+stdout '^body="data" trailer={"X-Checksum":\["abc"\],"X-Multi":\["one","two"\]}$'
 
 # Custom status code examples
 

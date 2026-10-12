@@ -287,37 +287,39 @@ func (o *oracle) tagValue(tags []string) cue.Value {
 
 // fromFile is the evaluator oracle for the FromFile resolution.
 func (o *oracle) fromFile(enc, interp, form string) (bool, *filetypes.FileInfo) {
-	root, mode := o.root, o.mode
-	ctx := root.Context()
 	if enc == "" {
 		return false, nil
 	}
-	v := root.LookupPath(cue.ParsePath(fmt.Sprintf("modes.%s.FileInfo", mode)))
-	v = v.Unify(ctx.CompileString(fmt.Sprintf("{encoding: %q}", enc)))
+	// Build a single conjunction rather than unifying each part in turn,
+	// which evaluates every intermediate value.
+	conjuncts := []string{
+		fmt.Sprintf("modes.%s.FileInfo", o.mode),
+		fmt.Sprintf("{encoding: %q}", enc),
+	}
+	// add adds the value at path, reporting whether it exists.
+	add := func(path string) bool {
+		conjuncts = append(conjuncts, path)
+		return o.root.LookupPath(cue.ParsePath(path)).Exists()
+	}
 	if interp != "" {
-		v = v.Unify(ctx.CompileString(fmt.Sprintf("{interpretation: %q}", interp)))
+		conjuncts = append(conjuncts, fmt.Sprintf("{interpretation: %q}", interp))
 	}
 	if form != "" {
-		v = v.Unify(ctx.CompileString(fmt.Sprintf("{form: %q}", form)))
-		fe := root.LookupPath(cue.ParsePath("forms." + form))
-		if !fe.Exists() {
+		conjuncts = append(conjuncts, fmt.Sprintf("{form: %q}", form))
+		if !add("forms." + form) {
 			return false, nil
 		}
-		v = v.Unify(fe)
 	} else if interp != "" {
-		ie := root.LookupPath(cue.ParsePath("interpretations." + interp))
-		if !ie.Exists() {
+		if !add("interpretations." + interp) {
 			return false, nil
 		}
-		v = v.Unify(ie)
 	}
 	if interp == "" {
-		ee := root.LookupPath(cue.ParsePath(fmt.Sprintf("modes.%s.encodings.%s", mode, enc)))
-		if !ee.Exists() {
+		if !add(fmt.Sprintf("modes.%s.encodings.%s", o.mode, enc)) {
 			return false, nil
 		}
-		v = v.Unify(ee)
 	}
+	v := o.root.Context().CompileString(strings.Join(conjuncts, " & "), cue.Scope(o.root))
 	// Collapse struct-level disjunctions (tagInfo.pb, encodings.cue) to
 	// the CUE default — the branch the driver's alts backtracking
 	// selects — then reject a bottom result.

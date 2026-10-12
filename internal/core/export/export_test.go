@@ -52,6 +52,7 @@ func TestDefinition(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		t.Parallel()
 		r := t.Runtime()
 		a := t.Instance()
 

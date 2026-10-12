@@ -41,6 +41,16 @@ ceil1: math.Ceil(-2.2)
 
 trunc0: math.Trunc(2.5)
 trunc1: math.Trunc(-2.9)
+
+// Infinities and NaN have no integer value.
+// math.Log(0) is -Infinity, and math.Sqrt(-1) is NaN.
+// TODO: these should fail rather than evaluate to 0.
+floorNegInf:  math.Floor(math.Log(0))
+ceilPosInf:   math.Ceil(-math.Log(0))
+truncNegInf:  math.Trunc(math.Log(0))
+roundPosInf:  math.Round(-math.Log(0))
+roundEvenNaN: math.RoundToEven(math.Sqrt(-1))
+floorNaN:     math.Floor(math.Sqrt(-1))
 -- out/math --
 Errors:
 mul2: error in call to math.MultipleOf: division by zero:
@@ -83,3 +93,13 @@ ceil0:   3
 ceil1:   -2
 trunc0:  2
 trunc1:  -2
+
+// Infinities and NaN have no integer value.
+// math.Log(0) is -Infinity, and math.Sqrt(-1) is NaN.
+// TODO: these should fail rather than evaluate to 0.
+floorNegInf:  0
+ceilPosInf:   0
+truncNegInf:  0
+roundPosInf:  0
+roundEvenNaN: 0
+floorNaN:     0

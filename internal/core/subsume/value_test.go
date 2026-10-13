@@ -870,6 +870,56 @@ func TestValues(t *testing.T) {
 			in:  `a: {[string]: int}, b: {[string]: int}`,
 			err: "",
 		},
+		{
+			// The patterns of b admit labels that the closed a does not, so
+			// a should not subsume b. It does, as a has no patterns.
+			in:  `a: close({}), b: close({[string]: int})`,
+			err: "",
+		},
+		{
+			in:  `a: close({a: 1}), b: close({a: 1, [string]: int})`,
+			err: "",
+		},
+		{
+			// A pattern of b without an equal one in the closed a may admit
+			// labels that a does not, so a should not subsume b. It does.
+			in:  `a: close({[=~"a"]: int}), b: close({[=~"a"]: int, [=~"b"]: int})`,
+			err: "",
+		},
+		{
+			// A struct opened by an ellipsis admits labels that a closed one
+			// does not, so a should not subsume b. It does, as the ellipsis
+			// is not taken into account.
+			in:  `a: close({}), b: #B & {}, #B: {...}`,
+			err: "",
+		},
+		{
+			in:  `a: #A, b: close({}), #A: {...}`,
+			err: "",
+		},
+		{
+			// The element constraints of open lists should be compared. They
+			// are not, so lists with the same elements subsume each other.
+			in:  `a: [...int], b: [...string]`,
+			err: "",
+		},
+		{
+			in:  `a: [1, ...int], b: [1, ...string]`,
+			err: "",
+		},
+		{
+			in:  `a: [1, ...], b: [1, ...int]`,
+			err: "",
+		},
+		{
+			in:  `a: [1, ...int], b: [1, ...]`,
+			err: "",
+		},
+		{
+			// A closed list admits no elements beyond those compared.
+			in:  `a: [...int], b: close([1])`,
+			err: "",
+		},
 
 		// TODO: the subNoOptional mode used to be used by the equality check.
 		// Now this has its own implementation it is no longer necessary. Keep

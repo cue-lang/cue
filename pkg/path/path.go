@@ -284,7 +284,15 @@ func Rel(basepath, targpath string, os OS) (string, error) {
 	targ = targ[len(targVol):]
 	if base == "." {
 		base = ""
+	} else if base == "" && x.volumeNameLen(baseVol) > 2 /* isUNC */ {
+		// Treat a bare UNC volume like `\\host\share` as its root directory.
+		base = string(x.Separator)
 	}
+	if targ == "" && x.volumeNameLen(targVol) > 2 /* isUNC */ {
+		// Treat a bare UNC volume like `\\host\share` as its root directory.
+		targ = string(x.Separator)
+	}
+
 	// Can't use IsAbs - `\a` and `a` are both relative in Windows.
 	baseSlashed := len(base) > 0 && base[0] == x.Separator
 	targSlashed := len(targ) > 0 && targ[0] == x.Separator
@@ -310,6 +318,11 @@ func Rel(basepath, targpath string, os OS) (string, error) {
 		}
 		if ti < tl {
 			ti++
+		}
+		// If the last elements matched and both paths are now exhausted,
+		// the paths are equivalent. Without this check, Rel can loop forever.
+		if bi == bl && ti == tl {
+			return ".", nil
 		}
 		b0 = bi
 		t0 = ti

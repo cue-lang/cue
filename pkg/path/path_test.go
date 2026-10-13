@@ -644,16 +644,16 @@ var winreltests = []RelTests{
 	{`C:\Projects`, `c:\projects`, `.`},
 	{`C:\Projects\a\..`, `c:\projects`, `.`},
 	{`\\host\share`, `\\host\share`, `.`},
-	{`\\host\share`, `\\host\share\`, `err`},         // want `.`
-	{`\\host\share`, `\\host\share\file.txt`, `err`}, // want `file.txt`
+	{`\\host\share`, `\\host\share\`, `.`},
+	{`\\host\share`, `\\host\share\file.txt`, `file.txt`},
 	{`\\host\share\`, `\\host\share\file.txt`, `file.txt`},
-	{`\\HOST\SHARE`, `\\host\share\file.txt`, `err`}, // want `file.txt`
-	{`//host/share`, `\\host\share\file.txt`, `err`}, // want `file.txt`
+	{`\\HOST\SHARE`, `\\host\share\file.txt`, `file.txt`},
+	{`//host/share`, `\\host\share\file.txt`, `file.txt`},
 	{`\\host\share\dir`, `\\host\share\dir\file.txt`, `file.txt`},
 	{`\\host\share\dir`, `\\host\share\file.txt`, `..\file.txt`},
 	{`\\host\share\dir\file.txt`, `\\host\share\dir`, `..`},
-	{`\\host\share\`, `\\host\share`, `err`},    // want `.`
-	{`\\host\share\dir`, `\\host\share`, `err`}, // want `..`
+	{`\\host\share\`, `\\host\share`, `.`},
+	{`\\host\share\dir`, `\\host\share`, `..`},
 	{`\\host\share`, `\\host\other\file.txt`, `err`},
 	{`\\host\share`, `\\host\other\`, `err`},
 	{`\\host\share`, `\\other\share\`, `err`},

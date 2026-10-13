@@ -23,6 +23,7 @@ import (
 	"go/token"
 	"go/types"
 	"maps"
+	"math/big"
 	"os"
 	"path"
 	"path/filepath"
@@ -1091,6 +1092,11 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				default:
 					// TODO(mvdan): replace this with switch cases for Bool/Int/Float
 					sv := v.ExactString()
+					if f, ok := constant.Val(v).(*big.Float); ok {
+						// Unlike fractions, these use hexadecimal, which CUE lacks.
+						r, _ := f.Rat(nil)
+						sv = r.RatString()
+					}
 					var err error
 					cv, err = parser.ParseExpr("", sv)
 					if err != nil {

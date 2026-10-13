@@ -21,10 +21,9 @@ cmp ./pkg_generics/pkg_generics_go_gen.cue ./pkg_generics/pkg_generics_go_gen.cu
 # Float constants keep their exact values, including those which
 # go/constant holds as binary floats as they are too large for fractions.
 # They are in a nested Go module, which ./... above does not cover.
-# TODO: Huge causes a panic instead.
 cd floats
-! exec cue get go --local
-stderr 'panic: failed to parse 0x'
+exec cue get go --local
+cmp floats_go_gen.cue floats_go_gen.cue.golden
 cd ..
 
 # Verify dependencies did not change

@@ -348,9 +348,14 @@ func Rel(basepath, targpath string, os OS) (string, error) {
 			buf[n] = x.Separator
 			copy(buf[n+1:], targ[t0:])
 		}
-		return string(buf), nil
+		return clean(string(buf), x), nil
 	}
-	return targ[t0:], nil
+	rel := targ[t0:]
+	if x.volumeNameLen(rel) > 0 {
+		// Avoid a result like c:x, which would be read as a path on drive c:.
+		rel = "." + string(x.Separator) + rel
+	}
+	return rel, nil
 }
 
 // Base returns the last element of path.

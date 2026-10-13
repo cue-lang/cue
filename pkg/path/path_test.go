@@ -628,8 +628,8 @@ var reltests = []RelTests{
 	{".", "a/b", "a/b"},
 	{".", "..", ".."},
 	{"", "../../.", "../.."},
-	{"a", ".", "../."},      // want ".."
-	{"a/b", ".", "../../."}, // want "../.."
+	{"a", ".", ".."},
+	{"a/b", ".", "../.."},
 
 	// can't do purely lexically
 	{"..", ".", "err"},
@@ -660,7 +660,7 @@ var winreltests = []RelTests{
 	{`\\host\share`, `\\host\other\file.txt`, `err`},
 	{`\\host\share`, `\\host\other\`, `err`},
 	{`\\host\share`, `\\other\share\`, `err`},
-	{`a`, `a/c:x`, `c:x`}, // want `.\c:x`
+	{`a`, `a/c:x`, `.\c:x`},
 }
 
 func TestRel(t *testing.T) {

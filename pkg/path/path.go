@@ -98,8 +98,8 @@ func clean(path string, os os) string {
 	volLen := os.volumeNameLen(path)
 	path = path[volLen:]
 	if path == "" {
-		if volLen > 1 && originalPath[1] != ':' {
-			// should be UNC
+		if volLen > 1 && os.IsPathSeparator(originalPath[0]) {
+			// should be UNC or a device path
 			return fromSlash(originalPath, os)
 		}
 		return originalPath + "."
@@ -224,7 +224,7 @@ func Split(path string, os OS) []string {
 // list is empty or all its elements are empty, Join returns
 // an empty string.
 // On Windows, the result will only be a UNC path if the first
-// non-empty element is a UNC path.
+// non-empty element starts with two separators, as UNC paths do.
 // The default value for os is Unix.
 func Join(elem []string, os OS) string {
 	return getOS(os).join(elem)
@@ -403,5 +403,5 @@ func VolumeName(path string, os OS) string {
 }
 
 func volumeName(path string, os os) string {
-	return path[:os.volumeNameLen(path)]
+	return fromSlash(path[:os.volumeNameLen(path)], os)
 }

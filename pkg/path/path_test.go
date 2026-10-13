@@ -118,30 +118,30 @@ var wincleantests = []PathTest{
 	{`\\host\share\foo\..\bar`, `\\host\share\bar`},
 	{`//host/share/foo/../baz`, `\\host\share\baz`},
 	{`\\host\share\foo\..\..\..\..\bar`, `\\host\share\bar`},
-	{`\\?\UNC\host\share\foo\..\..\..\..\bar`, `\\?\UNC\bar`}, // want `\\?\UNC\host\share\bar`
-	{`\??\UNC\host\share\foo\..\..\..\..\bar`, `\??\bar`},     // want `\??\UNC\host\share\bar`
-	{`\\.\C:\a\..\..\..\..\bar`, `\bar`},                      // want `\\.\C:\bar`
-	{`\\.\C:\\\\a`, `\C:\a`},                                  // want `\\.\C:\a`
+	{`\\?\UNC\host\share\foo\..\..\..\..\bar`, `\\?\UNC\host\share\bar`},
+	{`\??\UNC\host\share\foo\..\..\..\..\bar`, `\??\UNC\host\share\bar`},
+	{`\\.\C:\a\..\..\..\..\bar`, `\\.\C:\bar`},
+	{`\\.\C:\\\\a`, `\\.\C:\a`},
 	{`\\a\b\..\c`, `\\a\b\c`},
 	{`\\a\b`, `\\a\b`},
-	{`//abc`, `\abc`},   // want `\\abc`
-	{`///abc`, `\abc`},  // want `\\\abc`
-	{`//abc//`, `\abc`}, // want `\\abc\\`
+	{`//abc`, `\\abc`},
+	{`///abc`, `\\\abc`},
+	{`//abc//`, `\\abc\\`},
 	{`\\?\C:\`, `\\?\C:\`},
 	{`\\?\C:\a`, `\\?\C:\a`},
 
 	// A GLOBALROOT path is a link into the NT object namespace, where the
 	// volume is named by the two components that follow it, so a trailing
 	// separator there is the volume root and is kept.
-	{`\\?\GLOBALROOT\Device\HarddiskVolume1\`, `\\?\GLOBALROOT\Device\HarddiskVolume1`}, // want `\\?\GLOBALROOT\Device\HarddiskVolume1\`
+	{`\\?\GLOBALROOT\Device\HarddiskVolume1\`, `\\?\GLOBALROOT\Device\HarddiskVolume1\`},
 	{`\\?\GLOBALROOT\Device\HarddiskVolume1`, `\\?\GLOBALROOT\Device\HarddiskVolume1`},
 	{`\\?\GLOBALROOT\Device\HarddiskVolume1\a\..\b`, `\\?\GLOBALROOT\Device\HarddiskVolume1\b`},
-	{`\\?\GLOBALROOT\Device\HarddiskVolume1\a\..\..\..\b`, `\\?\GLOBALROOT\b`},          // want `\\?\GLOBALROOT\Device\HarddiskVolume1\b`
-	{`\\?\GLOBALROOT\GLOBAL??\C:\`, `\\?\GLOBALROOT\GLOBAL??\C:`},                       // want `\\?\GLOBALROOT\GLOBAL??\C:\`
-	{`\\.\GLOBALROOT\Device\HarddiskVolume1\`, `\GLOBALROOT\Device\HarddiskVolume1`},    // want `\\.\GLOBALROOT\Device\HarddiskVolume1\`
-	{`\??\GLOBALROOT\Device\HarddiskVolume1\`, `\??\GLOBALROOT\Device\HarddiskVolume1`}, // want `\??\GLOBALROOT\Device\HarddiskVolume1\`
+	{`\\?\GLOBALROOT\Device\HarddiskVolume1\a\..\..\..\b`, `\\?\GLOBALROOT\Device\HarddiskVolume1\b`},
+	{`\\?\GLOBALROOT\GLOBAL??\C:\`, `\\?\GLOBALROOT\GLOBAL??\C:\`},
+	{`\\.\GLOBALROOT\Device\HarddiskVolume1\`, `\\.\GLOBALROOT\Device\HarddiskVolume1\`},
+	{`\??\GLOBALROOT\Device\HarddiskVolume1\`, `\??\GLOBALROOT\Device\HarddiskVolume1\`},
 	// A .. in the volume position is rejected, as it is for UNC paths.
-	{`\\?\GLOBALROOT\..\x`, `\\?\GLOBALROOT\x`}, // want `\?\x`
+	{`\\?\GLOBALROOT\..\x`, `\?\x`},
 }
 
 func TestClean(t *testing.T) {
@@ -352,13 +352,13 @@ var winjointests = []JoinTest{
 	{[]string{`\`}, `\`},
 	{[]string{`\`, ``}, `\`},
 	{[]string{`\`, `a`}, `\a`},
-	{[]string{`\\`, `a`}, `\a`}, // want `\\a`
+	{[]string{`\\`, `a`}, `\\a`},
 	{[]string{`\`, `a`, `b`}, `\a\b`},
-	{[]string{`\\`, `a`, `b`}, `\a\b`}, // want `\\a\b`
+	{[]string{`\\`, `a`, `b`}, `\\a\b`},
 	{[]string{`\`, `\\a\b`, `c`}, `\a\b\c`},
-	{[]string{`\\a`, `b`, `c`}, `\a\b\c`},  // want `\\a\b\c`
-	{[]string{`\\a\`, `b`, `c`}, `\a\b\c`}, // want `\\a\b\c`
-	{[]string{`//`, `a`}, `\a`},            // want `\\a`
+	{[]string{`\\a`, `b`, `c`}, `\\a\b\c`},
+	{[]string{`\\a\`, `b`, `c`}, `\\a\b\c`},
+	{[]string{`//`, `a`}, `\\a`},
 	{[]string{`a:\b\c`, `x\..\y:\..\..\z`}, `a:\b\z`},
 }
 
@@ -473,7 +473,7 @@ var windirtests = []PathTest{
 	{`\\host\share\`, `\\host\share\`},
 	{`\\host\share\a`, `\\host\share\`},
 	{`\\host\share\a\b`, `\\host\share\a`},
-	{`\\\\`, `\`}, // want `\\\\`
+	{`\\\\`, `\\\\`},
 }
 
 func TestDir(t *testing.T) {
@@ -651,68 +651,68 @@ var volumenametests = []VolumeNameTest{
 	{`c:/foo/bar`, `c:`},
 	{`c:`, `c:`},
 	{`c:\`, `c:`},
-	{`2:`, ``}, // want `2:`
+	{`2:`, `2:`},
 	{``, ``},
-	{`\\\host`, ``},        // want `\\\host`
-	{`\\\host\`, ``},       // want `\\\host`
-	{`\\\host\share`, ``},  // want `\\\host`
-	{`\\\host\\share`, ``}, // want `\\\host`
-	{`\\host`, ``},         // want `\\host`
-	{`//host`, ``},         // want `\\host`
-	{`\\host\`, ``},        // want `\\host\`
-	{`//host/`, ``},        // want `\\host\`
+	{`\\\host`, `\\\host`},
+	{`\\\host\`, `\\\host`},
+	{`\\\host\share`, `\\\host`},
+	{`\\\host\\share`, `\\\host`},
+	{`\\host`, `\\host`},
+	{`//host`, `\\host`},
+	{`\\host\`, `\\host\`},
+	{`//host/`, `\\host\`},
 	{`\\host\share`, `\\host\share`},
-	{`//host/share`, `//host/share`}, // want `\\host\share`
+	{`//host/share`, `\\host\share`},
 	{`\\host\share\`, `\\host\share`},
-	{`//host/share/`, `//host/share`}, // want `\\host\share`
+	{`//host/share/`, `\\host\share`},
 	{`\\host\share\foo`, `\\host\share`},
-	{`//host/share/foo`, `//host/share`}, // want `\\host\share`
+	{`//host/share/foo`, `\\host\share`},
 	{`\\host\share\\foo\\\bar\\\\baz`, `\\host\share`},
-	{`//host/share//foo///bar////baz`, `//host/share`}, // want `\\host\share`
+	{`//host/share//foo///bar////baz`, `\\host\share`},
 	{`\\host\share\foo\..\bar`, `\\host\share`},
-	{`//host/share/foo/../bar`, `//host/share`}, // want `\\host\share`
+	{`//host/share/foo/../bar`, `\\host\share`},
 	{`\\..\..\a`, ``},
 	{`//../../a`, ``},
 	{`\\i\..\c$`, ``},
 	{`//./UNC/../share`, ``},
 	{`//?/../x`, ``},
 	{`//./../x`, ``},
-	{`//.../share`, ``},                     // want `\\...\share`
-	{`//host/...`, ``},                      // want `\\host\...`
-	{`//?/..x`, ``},                         // want `\\?\..x`
-	{`//.`, ``},                             // want `\\.`
-	{`//./`, ``},                            // want `\\.\`
-	{`//./NUL`, ``},                         // want `\\.\NUL`
-	{`//?`, ``},                             // want `\\?`
-	{`//?/`, ``},                            // want `\\?\`
-	{`//?/NUL`, `//?/NUL`},                  // want `\\?\NUL`
-	{`/??`, ``},                             // want `\??`
-	{`/??/`, ``},                            // want `\??\`
-	{`/??/NUL`, ``},                         // want `\??\NUL`
-	{`//./a/b`, ``},                         // want `\\.\a`
-	{`//./C:`, ``},                          // want `\\.\C:`
-	{`//./C:/`, ``},                         // want `\\.\C:`
-	{`//./C:/a/b/c`, ``},                    // want `\\.\C:`
-	{`//./UNC/host/share/a/b/c`, ``},        // want `\\.\UNC\host\share`
-	{`//?/UNC/host/share/a/b/c`, `//?/UNC`}, // want `\\?\UNC\host\share`
-	{`/??/UNC/host/share/a/b/c`, ``},        // want `\??\UNC\host\share`
-	{`//./UNC/host`, ``},                    // want `\\.\UNC\host`
-	{`//./UNC/host\`, ``},                   // want `\\.\UNC\host\`
-	{`//./UNC`, ``},                         // want `\\.\UNC`
-	{`//./UNC/`, ``},                        // want `\\.\UNC\`
+	{`//.../share`, `\\...\share`},
+	{`//host/...`, `\\host\...`},
+	{`//?/..x`, `\\?\..x`},
+	{`//.`, `\\.`},
+	{`//./`, `\\.\`},
+	{`//./NUL`, `\\.\NUL`},
+	{`//?`, `\\?`},
+	{`//?/`, `\\?\`},
+	{`//?/NUL`, `\\?\NUL`},
+	{`/??`, `\??`},
+	{`/??/`, `\??\`},
+	{`/??/NUL`, `\??\NUL`},
+	{`//./a/b`, `\\.\a`},
+	{`//./C:`, `\\.\C:`},
+	{`//./C:/`, `\\.\C:`},
+	{`//./C:/a/b/c`, `\\.\C:`},
+	{`//./UNC/host/share/a/b/c`, `\\.\UNC\host\share`},
+	{`//?/UNC/host/share/a/b/c`, `\\?\UNC\host\share`},
+	{`/??/UNC/host/share/a/b/c`, `\??\UNC\host\share`},
+	{`//./UNC/host`, `\\.\UNC\host`},
+	{`//./UNC/host\`, `\\.\UNC\host\`},
+	{`//./UNC`, `\\.\UNC`},
+	{`//./UNC/`, `\\.\UNC\`},
 	{`\\?\x`, `\\?\x`},
-	{`\??\x`, ``}, // want `\??\x`
+	{`\??\x`, `\??\x`},
 
-	{`\\?\GLOBALROOT\Device\HarddiskVolume1`, `\\?\GLOBALROOT`},     // want `\\?\GLOBALROOT\Device\HarddiskVolume1`
-	{`\\?\GLOBALROOT\Device\HarddiskVolume1\`, `\\?\GLOBALROOT`},    // want `\\?\GLOBALROOT\Device\HarddiskVolume1`
-	{`\\?\GLOBALROOT\Device\HarddiskVolume1\a\b`, `\\?\GLOBALROOT`}, // want `\\?\GLOBALROOT\Device\HarddiskVolume1`
-	{`\\?\GLOBALROOT\GLOBAL??\C:\`, `\\?\GLOBALROOT`},               // want `\\?\GLOBALROOT\GLOBAL??\C:`
-	{`\\.\GLOBALROOT\Device\HarddiskVolume1\a`, ``},                 // want `\\.\GLOBALROOT\Device\HarddiskVolume1`
-	{`\??\GLOBALROOT\Device\HarddiskVolume1\a`, ``},                 // want `\??\GLOBALROOT\Device\HarddiskVolume1`
+	{`\\?\GLOBALROOT\Device\HarddiskVolume1`, `\\?\GLOBALROOT\Device\HarddiskVolume1`},
+	{`\\?\GLOBALROOT\Device\HarddiskVolume1\`, `\\?\GLOBALROOT\Device\HarddiskVolume1`},
+	{`\\?\GLOBALROOT\Device\HarddiskVolume1\a\b`, `\\?\GLOBALROOT\Device\HarddiskVolume1`},
+	{`\\?\GLOBALROOT\GLOBAL??\C:\`, `\\?\GLOBALROOT\GLOBAL??\C:`},
+	{`\\.\GLOBALROOT\Device\HarddiskVolume1\a`, `\\.\GLOBALROOT\Device\HarddiskVolume1`},
+	{`\??\GLOBALROOT\Device\HarddiskVolume1\a`, `\??\GLOBALROOT\Device\HarddiskVolume1`},
 	{`\\?\GLOBALROOT`, `\\?\GLOBALROOT`},
-	{`\\?\GLOBALROOT\`, `\\?\GLOBALROOT`},       // want `\\?\GLOBALROOT\`
-	{`\\?\GLOBALROOT\Device`, `\\?\GLOBALROOT`}, // want `\\?\GLOBALROOT\Device`
-	{`\\?\GLOBALROOT\..\x`, `\\?\GLOBALROOT`},   // want ``
+	{`\\?\GLOBALROOT\`, `\\?\GLOBALROOT\`},
+	{`\\?\GLOBALROOT\Device`, `\\?\GLOBALROOT\Device`},
+	{`\\?\GLOBALROOT\..\x`, ``},
 }
 
 func TestVolumeName(t *testing.T) {

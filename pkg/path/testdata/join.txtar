@@ -162,7 +162,7 @@ Join: {
 		out: "\\"
 	}, {
 		arg: ["//", "a"]
-		out: "\\a"
+		out: "\\\\a"
 	}, {
 		arg: ["directory", "file"]
 		out: "directory\\file"

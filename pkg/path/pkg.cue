@@ -114,7 +114,7 @@ Split: func(path: string, os: string = "unix") -> [...string]
 // list is empty or all its elements are empty, Join returns
 // an empty string.
 // On Windows, the result will only be a UNC path if the first
-// non-empty element is a UNC path.
+// non-empty element starts with two separators, as UNC paths do.
 // The default value for os is Unix.
 Join: func(elem: [...string], os: string = "unix") -> string
 

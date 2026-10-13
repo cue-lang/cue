@@ -80,40 +80,130 @@ func (os windowsInfo) IsAbs(path string) (b bool) {
 
 // volumeNameLen returns length of the leading volume name on Windows.
 // It returns 0 elsewhere.
+//
+// See:
+// https://learn.microsoft.com/en-us/dotnet/standard/io/file-path-formats
+// https://googleprojectzero.blogspot.com/2016/02/the-definitive-guide-on-win32-to-nt.html
 func (os windowsInfo) volumeNameLen(path string) int {
-	if len(path) < 2 {
-		return 0
-	}
-	// with drive letter
-	c := path[0]
-	if path[1] == ':' && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z') {
+	switch {
+	case len(path) >= 2 && path[1] == ':':
+		// Path starts with a drive letter.
+		//
+		// Not all Windows functions necessarily enforce the requirement that
+		// drive letters be in the set A-Z, and we don't try to here.
+		//
+		// We don't handle the case of a path starting with a non-ASCII character,
+		// in which case the "drive letter" might be multiple bytes long.
 		return 2
+
+	case len(path) == 0 || !isSlash(path[0]):
+		// Path does not have a volume component.
+		return 0
+
+	case pathHasPrefixFold(path, `\\.`) ||
+		pathHasPrefixFold(path, `\\?`) || pathHasPrefixFold(path, `\??`):
+		// Path starts with a device prefix: \\.\ for Local Device paths,
+		// or \\?\ or \??\ for Root Local Device paths.
+		switch {
+		case len(path) == 3:
+			return 3 // exactly \\., \\?, or \??
+		case pathHasPrefixFold(path[4:], `UNC`):
+			// We're going to treat the UNC host and share as part of the volume
+			// prefix for historical reasons, but this isn't really principled;
+			// Windows's own GetFullPathName will happily remove the first
+			// component of the path in this space, converting
+			// \\.\unc\a\b\..\c into \\.\unc\a\c.
+			return validVolumeNameLen(path, uncLen(path, len(`\\.\UNC\`)))
+		case pathHasPrefixFold(path[4:], `GLOBALROOT`):
+			// GLOBALROOT links to the root of the NT object namespace. A volume
+			// device path such as \\?\GLOBALROOT\Device\HarddiskVolume1\ has two
+			// components after GLOBALROOT. Treat them as the volume name so Clean
+			// preserves the separator denoting the volume root. This is a lexical
+			// approximation; other object namespace paths can have different layouts.
+			return validVolumeNameLen(path, uncLen(path, len(`\\?\GLOBALROOT\`)))
+		}
+		// We treat the next component after the device prefix as
+		// part of the volume name, which means Clean(`\\?\c:\`)
+		// won't remove the trailing \.
+		_, rest, ok := cutPath(path[4:])
+		if !ok {
+			return validVolumeNameLen(path, len(path))
+		}
+		return validVolumeNameLen(path, len(path)-len(rest)-1)
+
+	case len(path) >= 2 && isSlash(path[1]):
+		// Path starts with \\, and is a UNC path.
+		return validVolumeNameLen(path, uncLen(path, 2))
 	}
-	// is it UNC? https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
-	if l := len(path); l >= 5 && isSlash(path[0]) && isSlash(path[1]) &&
-		!isSlash(path[2]) && path[2] != '.' {
-		// first, leading `\\` and next shouldn't be `\`. its server name.
-		for n := 3; n < l-1; n++ {
-			// second, next '\' shouldn't be repeated.
-			if isSlash(path[n]) {
-				n++
-				// third, following something characters. its share name.
-				if !isSlash(path[n]) {
-					if path[n] == '.' {
-						break
-					}
-					for ; n < l; n++ {
-						if isSlash(path[n]) {
-							break
-						}
-					}
-					return n
-				}
-				break
+	return 0
+}
+
+// validVolumeNameLen returns n if path[:n] is a valid Windows volume name.
+// If the volume name contains a ".." path component, it returns 0.
+func validVolumeNameLen(path string, n int) int {
+	for p := path[:n]; p != ""; {
+		var part string
+		part, p, _ = cutPath(p)
+		if part == ".." {
+			return 0
+		}
+	}
+	return n
+}
+
+// pathHasPrefixFold tests whether the path s begins with prefix,
+// ignoring case and treating all path separators as equivalent.
+// If s is longer than prefix, then s[len(prefix)] must be a path separator.
+func pathHasPrefixFold(s, prefix string) bool {
+	if len(s) < len(prefix) {
+		return false
+	}
+	for i := 0; i < len(prefix); i++ {
+		if isSlash(prefix[i]) {
+			if !isSlash(s[i]) {
+				return false
+			}
+		} else if toUpper(prefix[i]) != toUpper(s[i]) {
+			return false
+		}
+	}
+	if len(s) > len(prefix) && !isSlash(s[len(prefix)]) {
+		return false
+	}
+	return true
+}
+
+// uncLen returns the length of the volume prefix of a UNC path.
+// prefixLen is the prefix prior to the start of the UNC host;
+// for example, for "//host/share", the prefixLen is len("//")==2.
+func uncLen(path string, prefixLen int) int {
+	count := 0
+	for i := prefixLen; i < len(path); i++ {
+		if isSlash(path[i]) {
+			count++
+			if count == 2 {
+				return i
 			}
 		}
 	}
-	return 0
+	return len(path)
+}
+
+// cutPath slices path around the first path separator.
+func cutPath(path string) (before, after string, found bool) {
+	for i := range path {
+		if isSlash(path[i]) {
+			return path[:i], path[i+1:], true
+		}
+	}
+	return path, "", false
+}
+
+func toUpper(c byte) byte {
+	if 'a' <= c && c <= 'z' {
+		return c - ('a' - 'A')
+	}
+	return c
 }
 
 func (os windowsInfo) splitList(path string) []string {
@@ -148,52 +238,44 @@ func (os windowsInfo) splitList(path string) []string {
 }
 
 func (os windowsInfo) join(elem []string) string {
-	for i, e := range elem {
-		if e != "" {
-			return os.joinNonEmpty(elem[i:])
-		}
-	}
-	return ""
-}
-
-// joinNonEmpty is like join, but it assumes that the first element is non-empty.
-func (o windowsInfo) joinNonEmpty(elem []string) string {
-	if len(elem[0]) == 2 && elem[0][1] == ':' {
-		// First element is drive letter without terminating slash.
-		// Keep path relative to current directory on that drive.
-		// Skip empty elements.
-		i := 1
-		for ; i < len(elem); i++ {
-			if elem[i] != "" {
-				break
+	var b strings.Builder
+	var lastChar byte
+	for _, e := range elem {
+		switch {
+		case b.Len() == 0:
+			// Add the first non-empty path element unchanged.
+		case isSlash(lastChar):
+			// If the path ends in a slash, strip any leading slashes from the next
+			// path element to avoid creating a UNC path (any path starting with "\\")
+			// from non-UNC elements.
+			//
+			// The correct behavior for Join when the first element is an incomplete UNC
+			// path (for example, "\\") is underspecified. We currently join subsequent
+			// elements so Join("\\", "host", "share") produces "\\host\share".
+			for len(e) > 0 && isSlash(e[0]) {
+				e = e[1:]
 			}
+		case lastChar == ':':
+			// If the path ends in a colon, keep the path relative to the current directory
+			// on a drive and don't add a separator. Preserve leading slashes in the next
+			// path element, which may make the path absolute.
+			//
+			// 	Join(`C:`, `f`) = `C:f`
+			//	Join(`C:`, `\f`) = `C:\f`
+		default:
+			// In all other cases, add a separator between elements.
+			b.WriteByte(windowsSeparator)
+			lastChar = windowsSeparator
 		}
-		return clean(elem[0]+strings.Join(elem[i:], string(windowsSeparator)), windows)
+		if len(e) > 0 {
+			b.WriteString(e)
+			lastChar = e[len(e)-1]
+		}
 	}
-	// The following logic prevents Join from inadvertently creating a
-	// UNC path on Windows. Unless the first element is a UNC path, Join
-	// shouldn't create a UNC path. See golang.org/issue/9167.
-	p := clean(strings.Join(elem, string(windowsSeparator)), windows)
-	if !isUNC(p) {
-		return p
+	if b.Len() == 0 {
+		return ""
 	}
-	// p == UNC only allowed when the first element is a UNC path.
-	head := clean(elem[0], windows)
-	if isUNC(head) {
-		return p
-	}
-	// head + tail == UNC, but joining two non-UNC paths should not result
-	// in a UNC path. Undo creation of UNC path.
-	tail := clean(strings.Join(elem[1:], string(windowsSeparator)), windows)
-	if head[len(head)-1] == windowsSeparator {
-		return head + tail
-	}
-	return head + string(windowsSeparator) + tail
-}
-
-// isUNC reports whether path is a UNC path.
-func isUNC(path string) bool {
-	return windows.volumeNameLen(path) > 2
+	return clean(b.String(), windows)
 }
 
 func (o windowsInfo) sameWord(a, b string) bool {

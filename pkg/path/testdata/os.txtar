@@ -118,8 +118,10 @@ IsAbs: [_]: {
 	"c:":   _
 	"c:/":  _
 	"c:\\": _
+	"NUL":  _
 
 	"//home/user/foo": _
+	"//host/share":    _
 }
 
 Volume: [string]~(OS,_): [string]~(ARG,_): path.VolumeName(ARG, OS)
@@ -421,7 +423,9 @@ IsAbs: {
 		"c:":              false
 		"c:/":             false
 		"c:\\":            false
+		NUL:               false
 		"//home/user/foo": true
+		"//host/share":    true
 	}
 	plan9: {
 		"":                false
@@ -430,7 +434,9 @@ IsAbs: {
 		"c:":              false
 		"c:/":             false
 		"c:\\":            false
+		NUL:               false
 		"//home/user/foo": true
+		"//host/share":    true
 	}
 	windows: {
 		"":                false
@@ -439,7 +445,9 @@ IsAbs: {
 		"c:":              false
 		"c:/":             true
 		"c:\\":            true
+		NUL:               true
 		"//home/user/foo": true
+		"//host/share":    false
 	}
 	default: {
 		"":                false
@@ -448,7 +456,9 @@ IsAbs: {
 		"c:":              false
 		"c:/":             false
 		"c:\\":            false
+		NUL:               false
 		"//home/user/foo": true
+		"//host/share":    true
 	}
 }
 Volume: {

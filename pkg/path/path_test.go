@@ -545,8 +545,22 @@ var winisabstests = []IsAbsTest{
 	{`c:a\b`, false},
 	{`c:\a\b`, true},
 	{`c:/a/b`, true},
+	{`\\host\share`, false}, // want true
+	{`\\host\share\`, true},
 	{`\\host\share\foo`, true},
 	{`//host/share/foo/bar`, true},
+	{`\\..\..\a`, false},
+	{`//../../a`, false},
+	{`\\i\..\c$`, false},
+	{`//?/../x`, false},
+	{`//./../x`, false},
+	{`\\?\a\b\c`, true},
+	{`\??\a\b\c`, true},
+
+	// Reserved names are not absolute paths.
+	{`NUL`, true}, // want false
+	{`nul`, true}, // want false
+	{`CON`, true}, // want false
 }
 
 func TestIsAbs(t *testing.T) {
@@ -562,11 +576,6 @@ func TestIsAbs(t *testing.T) {
 			for _, test := range isabstests {
 				tests = append(tests, IsAbsTest{"c:" + test.path, test.isAbs})
 			}
-			// Test reserved names.
-			// tests = append(tests, IsAbsTest{"/dev/null", true})
-			tests = append(tests, IsAbsTest{"NUL", true})
-			tests = append(tests, IsAbsTest{"nul", true})
-			tests = append(tests, IsAbsTest{"CON", true})
 		} else {
 			tests = isabstests
 		}

@@ -2080,24 +2080,37 @@ func TestParseExpr(t *testing.T) {
 // realistic document is rejected with an error rather than recursing until
 // the Go runtime aborts the program.
 func TestNestingDepthLimit(t *testing.T) {
-	// Comfortably past maxNestLevel in each recursive syntactic form.
-	const depth = maxNestLevel + 1000
 	for _, tc := range []struct {
 		name        string
 		open, close string
+		depth       int
+		wantErr     bool
 	}{
-		{"lists", "[", "]"},
-		{"structs", "{a:", "}"},
-		{"parens", "(", ")"},
-		{"unary", "!", ""},
+		// Comfortably past maxNestLevel in each recursive syntactic form.
+		{"lists", "[", "]", maxNestLevel + 1000, true},
+		{"structs", "{a:", "}", maxNestLevel + 1000, true},
+		{"parens", "(", ")", maxNestLevel + 1000, true},
+		{"unary", "!", "", maxNestLevel + 1000, true},
+		{"calls", "len(", ")", maxNestLevel + 1000, true},
+		{"calls_within", "len(", ")", maxNestLevel - 100, false},
+
+		// Syntax built iteratively may nest further, up to maxChainLevel.
+		{"fields_within", "a: ", "", 2 * maxNestLevel, false},
+		{"binary_within", "1+", "", 2 * maxNestLevel, false},
+		{"indexes_within", "", "[0]", 2 * maxNestLevel, false},
+		// Iterative syntax is not counted towards any nesting depth,
+		// so deep enough input overflows the stack after parsing.
+		{"fields_past", "a: ", "", 101_000, false},
+		{"binary_past", "1+", "", 101_000, false},
+		{"indexes_past", "", "[0]", 101_000, false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			src := strings.Repeat(tc.open, depth) + "1" + strings.Repeat(tc.close, depth)
-			_, err := parseExprString(src)
-			if err == nil {
-				t.Fatal("got no error")
+			src := strings.Repeat(tc.open, tc.depth) + "1" + strings.Repeat(tc.close, tc.depth)
+			_, err := ParseFile("", src)
+			if gotErr := err != nil; gotErr != tc.wantErr {
+				t.Fatalf("got error %v, want error: %v", err, tc.wantErr)
 			}
-			if !strings.Contains(err.Error(), "nesting depth") {
+			if err != nil && !strings.Contains(err.Error(), "nesting depth") {
 				t.Fatalf("got %v, want a nesting depth error", err)
 			}
 		})

@@ -114,7 +114,7 @@ type printer struct {
 	// - auto
 }
 
-// ReplaceArg implements the format.Printer interface. It wraps Vertex arguments
+// ReplaceArg implements [errors.Config.Printer]. It wraps Vertex arguments
 // with a formatter value, that holds a pointer to w. This allows the stack
 // of processed vertices to be passed down, which in turn is used for cycle
 // detection.

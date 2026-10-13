@@ -29,7 +29,6 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/core/format"
 )
 
 // New is a convenience wrapper for [errors.New] in the core library.
@@ -535,7 +534,10 @@ type Config struct {
 	OmitPath bool
 
 	// Printer is used internally to detect printing cycles.
-	Printer format.Printer
+	// ReplaceArg may replace an argument to an error message.
+	Printer interface {
+		ReplaceArg(x any) (r any, wasReplaced bool)
+	}
 }
 
 var zeroConfig = &Config{}

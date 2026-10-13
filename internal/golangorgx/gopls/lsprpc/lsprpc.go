@@ -32,21 +32,18 @@ type streamServer struct {
 	cache *cache.Cache
 	// daemon controls whether or not to log new connections.
 	daemon bool
-
-	// optionsOverrides is passed to newly created workspaces.
-	optionsOverrides func(*settings.Options)
 }
 
 // NewStreamServer creates a StreamServer using the shared cache.
-func NewStreamServer(cache *cache.Cache, daemon bool, optionsFunc func(*settings.Options)) jsonrpc2.StreamServer {
-	return &streamServer{cache: cache, daemon: daemon, optionsOverrides: optionsFunc}
+func NewStreamServer(cache *cache.Cache, daemon bool) jsonrpc2.StreamServer {
+	return &streamServer{cache: cache, daemon: daemon}
 }
 
 // ServeStream implements the jsonrpc2.StreamServer interface, by handling
 // incoming streams using a new lsp server.
 func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) error {
 	client := protocol.ClientDispatcher(conn)
-	options := settings.DefaultOptions(s.optionsOverrides)
+	options := settings.DefaultOptions()
 	svr := server.New(s.cache, client, options)
 	svrID := svr.ID()
 

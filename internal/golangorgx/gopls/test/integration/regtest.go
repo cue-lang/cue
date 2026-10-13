@@ -14,7 +14,6 @@ import (
 	"time"
 
 	cuecmd "cuelang.org/go/cmd/cue/cmd"
-	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/lsp/cache"
 )
 
@@ -103,14 +102,12 @@ func DefaultModes() Mode {
 }
 
 // Main sets up and tears down the shared integration test state.
-func Main(m *testing.M, hook func(*settings.Options)) {
+func Main(m *testing.M) {
 	// If this magic environment variable is set, run cue lsp instead of the test
 	// suite. See the documentation for runTestAsCueLspEnvvar for more details.
 	if os.Getenv(runTestAsCueLspEnvvar) == "true" {
 		// Run the real cue CLI: the arguments are of the form
-		// "lsp serve ..." (see Runner.separateProcessServer). Note
-		// that the hook parameter is not honored in this mode; it is
-		// a no-op for all current callers.
+		// "lsp serve ..." (see Runner.separateProcessServer).
 		c, err := cuecmd.New(os.Args[1:])
 		if err == nil {
 			err = c.Run(context.Background())
@@ -129,7 +126,6 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 		Timeout:                  *timeout,
 		PrintGoroutinesOnFailure: *printGoroutinesOnFailure,
 		SkipCleanup:              *skipCleanup,
-		OptionsHook:              hook,
 	}
 
 	runner.cuePath = *cueBinaryPath

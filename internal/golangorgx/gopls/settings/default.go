@@ -22,7 +22,7 @@ const ExternalValidateCommand = "cuelsp.externalvalidate"
 // DefaultOptions is the options that are used for Gopls execution independent
 // of any externally provided configuration (LSP initialization, command
 // invocation, etc.).
-func DefaultOptions(overrides ...func(*Options)) *Options {
+func DefaultOptions() *Options {
 	optionsOnce.Do(func() {
 		defaultOptions = &Options{
 			ClientOptions: ClientOptions{
@@ -106,11 +106,5 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 			},
 		}
 	})
-	options := defaultOptions.Clone()
-	for _, override := range overrides {
-		if override != nil {
-			override(options)
-		}
-	}
-	return options
+	return defaultOptions.Clone()
 }

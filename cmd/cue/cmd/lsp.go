@@ -25,7 +25,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/golangorgx/gopls/hooks"
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
 	"cuelang.org/go/internal/golangorgx/tools/fakenet"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
@@ -120,7 +119,7 @@ func runLSPServe(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		ss = lsprpc.NewStreamServer(cache, isDaemon, hooks.Options)
+		ss = lsprpc.NewStreamServer(cache, isDaemon)
 	}
 
 	ctx := cmd.Context()

@@ -28,12 +28,11 @@
 //		"fmt"
 //		"testing"
 //
-//		"cuelang.org/go/internal/golangorgx/gopls/hooks"
 //		. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 //	)
 //
 //	func TestMain(m *testing.M) {
-//		Main(m, hooks.Options)
+//		Main(m)
 //	}
 //
 // # Writing a simple integration test

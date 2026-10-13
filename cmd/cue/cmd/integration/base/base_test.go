@@ -3,14 +3,13 @@ package feature
 import (
 	"testing"
 
-	"cuelang.org/go/internal/golangorgx/gopls/hooks"
 	I "cuelang.org/go/internal/golangorgx/gopls/test/integration"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"github.com/go-quicktest/qt"
 )
 
 func TestMain(m *testing.M) {
-	I.Main(m, hooks.Options)
+	I.Main(m)
 }
 
 func TestFormatFile(t *testing.T) {

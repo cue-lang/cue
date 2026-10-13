@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/lsprpc"
-	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
@@ -89,11 +88,10 @@ func (m Mode) String() string {
 // state.
 type Runner struct {
 	// Configuration
-	DefaultModes             Mode                    // modes to run for each test
-	Timeout                  time.Duration           // per-test timeout, if set
-	PrintGoroutinesOnFailure bool                    // whether to dump goroutines on test failure
-	SkipCleanup              bool                    // if set, don't delete test data directories when the test exits
-	OptionsHook              func(*settings.Options) // if set, use these options when creating gopls sessions
+	DefaultModes             Mode          // modes to run for each test
+	Timeout                  time.Duration // per-test timeout, if set
+	PrintGoroutinesOnFailure bool          // whether to dump goroutines on test failure
+	SkipCleanup              bool          // if set, don't delete test data directories when the test exits
 
 	// Immutable state shared across test invocations
 	cuePath string // path to the cue executable (for SeparateProcess mode)
@@ -122,7 +120,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 	tests := []struct {
 		name      string
 		mode      Mode
-		getServer func(runConfig, func(*settings.Options)) jsonrpc2.StreamServer
+		getServer func(runConfig) jsonrpc2.StreamServer
 	}{
 		{"default", Default, r.defaultServer},
 		{"forwarded", Forwarded, r.forwardedServer},
@@ -185,7 +183,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 				}
 			}()
 
-			ss := tc.getServer(config, r.OptionsHook)
+			ss := tc.getServer(config)
 
 			framer := jsonrpc2.NewRawStream
 			ls := &loggingFramer{}
@@ -240,16 +238,16 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 }
 
 // defaultServer handles the Default execution mode.
-func (r *Runner) defaultServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+func (r *Runner) defaultServer(config runConfig) jsonrpc2.StreamServer {
 	c, err := newCache(config)
 	if err != nil {
 		panic(err)
 	}
-	return lsprpc.NewStreamServer(c, false, optsHook)
+	return lsprpc.NewStreamServer(c, false)
 }
 
 // forwardedServer handles the Forwarded execution mode.
-func (r *Runner) forwardedServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+func (r *Runner) forwardedServer(config runConfig) jsonrpc2.StreamServer {
 	if config.reg != nil {
 		// This is because the server may be long-lived and used for
 		// several tests, possibly even in parallel. So we cannot allow
@@ -262,7 +260,7 @@ func (r *Runner) forwardedServer(config runConfig, optsHook func(*settings.Optio
 			panic(err)
 		}
 		ctx := context.Background()
-		ss := lsprpc.NewStreamServer(c, false, optsHook)
+		ss := lsprpc.NewStreamServer(c, false)
 		r.ts = servertest.NewTCPServer(ctx, ss, nil)
 	})
 	return newForwarder("tcp", r.ts.Addr)
@@ -282,7 +280,7 @@ func newCache(config runConfig) (*cache.Cache, error) {
 const runTestAsCueLspEnvvar = "_CUELSP_TEST_BINARY_RUN_AS_CUELSP"
 
 // separateProcessServer handles the SeparateProcess execution mode.
-func (r *Runner) separateProcessServer(config runConfig, optsHook func(*settings.Options)) jsonrpc2.StreamServer {
+func (r *Runner) separateProcessServer(config runConfig) jsonrpc2.StreamServer {
 	if runtime.GOOS != "linux" {
 		panic("separate process execution mode is only supported on linux")
 	}

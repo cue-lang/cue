@@ -81,6 +81,7 @@ var cleantests = []PathTest{
 	{"/abc/def/../../..", "/"},
 	{"abc/def/../../../ghi/jkl/../../../mno", "../../mno"},
 	{"/../abc", "/abc"},
+	{"a/../b:/../../c", `../c`},
 
 	// Combinations
 	{"abc/./../def", "def"},
@@ -103,6 +104,7 @@ var wincleantests = []PathTest{
 	{`c:\abc\def\..\..`, `c:\`},
 	{`c:\..\abc`, `c:\abc`},
 	{`c:..\abc`, `c:..\abc`},
+	{`c:\b:\..\..\..\d`, `c:\d`},
 	// A bare device volume is kept as it is, as it names a root.
 	{`\??\UNC\host\share`, `\??\UNC\host\share`},
 	{`\??\GLOBALROOT\Device\HarddiskVolume1`, `\??\GLOBALROOT\Device\HarddiskVolume1`},
@@ -124,6 +126,8 @@ var wincleantests = []PathTest{
 	{`\\.\C:\\\\a`, `\\.\C:\a`},
 	{`\\a\b\..\c`, `\\a\b\c`},
 	{`\\a\b`, `\\a\b`},
+	{`.\c:\foo`, `c:\foo`}, // want `.\c:\foo`
+	{`.\c:foo`, `c:foo`},   // want `.\c:foo`
 	{`//abc`, `\\abc`},
 	{`///abc`, `\\\abc`},
 	{`//abc//`, `\\abc\\`},
@@ -142,6 +146,18 @@ var wincleantests = []PathTest{
 	{`\??\GLOBALROOT\Device\HarddiskVolume1\`, `\??\GLOBALROOT\Device\HarddiskVolume1\`},
 	// A .. in the volume position is rejected, as it is for UNC paths.
 	{`\\?\GLOBALROOT\..\x`, `\?\x`},
+
+	// Don't allow cleaning to move an element with a colon to the start of the path.
+	{`a/../c:/a`, `c:\a`}, // want `.\c:\a`
+	{`a/../../c:`, `..\c:`},
+	{`foo:bar`, `foo:bar`},
+	{`xy:z//q/../..`, `.`},
+	{`xy:z//q/../../w`, `w`},
+
+	// Don't allow cleaning to create a Root Local Device path like \??\a.
+	{`\a\..\??\c:\x`, `\??\c:\x`}, // want `\.\??\c:\x`
+	{`/a/../??/..`, `\`},
+	{`/a/../??x/..`, `\`},
 }
 
 func TestClean(t *testing.T) {
@@ -360,6 +376,7 @@ var winjointests = []JoinTest{
 	{[]string{`\\a\`, `b`, `c`}, `\\a\b\c`},
 	{[]string{`//`, `a`}, `\\a`},
 	{[]string{`a:\b\c`, `x\..\y:\..\..\z`}, `a:\b\z`},
+	{[]string{`\`, `??\a`}, `\??\a`}, // want `\.\??\a`
 }
 
 func TestJoin(t *testing.T) {

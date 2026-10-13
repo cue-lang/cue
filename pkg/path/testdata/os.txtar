@@ -54,6 +54,7 @@ Clean: default: Clean.unix
 Clean: [_]: {
 	"abc//def//ghi":        _
 	"c:\\abc\\def\\..\\..": _
+	"a/../c:/b":            _
 }
 
 Match: [#AnyOS]~(OS,_): [string]~(Pattern,_): [string]~(Name,_): path.Match(Pattern, Name, OS)
@@ -208,18 +209,22 @@ Clean: {
 	unix: {
 		"abc//def//ghi":        "abc/def/ghi"
 		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+		"a/../c:/b":            "c:/b"
 	}
 	plan9: {
 		"abc//def//ghi":        "abc/def/ghi"
 		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+		"a/../c:/b":            "c:/b"
 	}
 	windows: {
 		"abc//def//ghi":        "abc\\def\\ghi"
 		"c:\\abc\\def\\..\\..": "c:\\"
+		"a/../c:/b":            "c:\\b"
 	}
 	default: {
 		"abc//def//ghi":        "abc/def/ghi"
 		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+		"a/../c:/b":            "c:/b"
 	}
 }
 Match: {

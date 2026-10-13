@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20261008151123-94f4aa6e0087
-	github.com/bufbuild/protocompile v0.14.1
+	github.com/bufbuild/protocompile v0.14.2-0.20260824170637-a01cc8856977
 	github.com/cockroachdb/apd/v3 v3.2.3
 	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3
@@ -36,6 +36,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
+	github.com/petermattis/goid v0.0.0-20260716134002-a9b348f0a2b9 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 )
 

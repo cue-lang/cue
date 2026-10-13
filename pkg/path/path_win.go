@@ -39,37 +39,15 @@ func (os windowsInfo) IsPathSeparator(b byte) bool {
 	return isSlash(b)
 }
 
-// reservedNames lists reserved Windows names. Search for PRN in
-// https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file
-// for details.
-var reservedNames = []string{
-	"CON", "PRN", "AUX", "NUL",
-	"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-	"LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
-}
-
-// isReservedName returns true, if path is Windows reserved name.
-// See reservedNames for the full list.
-func (os windowsInfo) isReservedName(path string) bool {
-	if len(path) == 0 {
-		return false
-	}
-	for _, reserved := range reservedNames {
-		if strings.EqualFold(path, reserved) {
-			return true
-		}
-	}
-	return false
-}
-
 // IsAbs reports whether the path is absolute.
 func (os windowsInfo) IsAbs(path string) (b bool) {
-	if os.isReservedName(path) {
-		return true
-	}
 	l := os.volumeNameLen(path)
 	if l == 0 {
 		return false
+	}
+	// If the volume name starts with a double slash, this is an absolute path.
+	if isSlash(path[0]) && isSlash(path[1]) {
+		return true
 	}
 	path = path[l:]
 	if path == "" {

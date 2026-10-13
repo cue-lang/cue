@@ -545,7 +545,7 @@ var winisabstests = []IsAbsTest{
 	{`c:a\b`, false},
 	{`c:\a\b`, true},
 	{`c:/a/b`, true},
-	{`\\host\share`, false}, // want true
+	{`\\host\share`, true},
 	{`\\host\share\`, true},
 	{`\\host\share\foo`, true},
 	{`//host/share/foo/bar`, true},
@@ -558,9 +558,9 @@ var winisabstests = []IsAbsTest{
 	{`\??\a\b\c`, true},
 
 	// Reserved names are not absolute paths.
-	{`NUL`, true}, // want false
-	{`nul`, true}, // want false
-	{`CON`, true}, // want false
+	{`NUL`, false},
+	{`nul`, false},
+	{`CON`, false},
 }
 
 func TestIsAbs(t *testing.T) {

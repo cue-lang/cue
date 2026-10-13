@@ -445,9 +445,9 @@ IsAbs: {
 		"c:":              false
 		"c:/":             true
 		"c:\\":            true
-		NUL:               true
+		NUL:               false
 		"//home/user/foo": true
-		"//host/share":    false
+		"//host/share":    true
 	}
 	default: {
 		"":                false

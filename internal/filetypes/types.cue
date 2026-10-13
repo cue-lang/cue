@@ -40,14 +40,14 @@ package build
 	// for encoding/decoding.
 
 	data:          *true | false // include/allow regular fields
-	references:    *true | false // don't resolve/allow references
+	references:    *true | false // include/allow references
 	cycles:        *true | false // cycles are permitted
 	definitions?:  bool          // include/allow definition fields
-	optional?:     bool          // include/allow definition fields
+	optional?:     bool          // include/allow optional fields
 	constraints?:  bool          // include/allow constraints
 	keepDefaults?: bool          // select/allow default values
 	incomplete?:   bool          // permit incomplete values
-	imports?:      bool          // don't expand/allow imports
+	imports?:      bool          // include/allow imports
 	stream?:       bool          // permit streaming
 	docs?:         bool          // show/allow docs
 	attributes?:   bool          // include/allow attributes

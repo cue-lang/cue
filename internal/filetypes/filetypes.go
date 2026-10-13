@@ -73,13 +73,13 @@ type FileInfo struct {
 
 	Definitions  bool `json:"definitions"`  // include/allow definition fields
 	Data         bool `json:"data"`         // include/allow regular fields
-	Optional     bool `json:"optional"`     // include/allow definition fields
+	Optional     bool `json:"optional"`     // include/allow optional fields
 	Constraints  bool `json:"constraints"`  // include/allow constraints
-	References   bool `json:"references"`   // don't resolve/allow references
+	References   bool `json:"references"`   // include/allow references
 	Cycles       bool `json:"cycles"`       // cycles are permitted
 	KeepDefaults bool `json:"keepDefaults"` // select/allow default values
 	Incomplete   bool `json:"incomplete"`   // permit incomplete values
-	Imports      bool `json:"imports"`      // don't expand/allow imports
+	Imports      bool `json:"imports"`      // include/allow imports
 	Stream       bool `json:"stream"`       // permit streaming
 	Docs         bool `json:"docs"`         // show/allow docs
 	Attributes   bool `json:"attributes"`   // include/allow attributes

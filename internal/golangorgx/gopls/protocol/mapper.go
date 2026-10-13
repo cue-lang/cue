@@ -19,16 +19,6 @@ package protocol
 // 	token.FileSet
 // 	token.File
 //
-//    Because File.Offset and File.Pos panic on invalid inputs,
-//    we do not call them directly and instead use the safetoken package
-//    for these conversions. This is enforced by a static check.
-//
-//    Beware also that the methods of token.File have two bugs for which
-//    safetoken contains workarounds:
-//    - #57490, whereby the parser may create ast.Nodes during error
-//      recovery whose computed positions are out of bounds (EOF+1).
-//    - #41029, whereby the wrong line number is returned for the EOF position.
-//
 // 3. the cmd package.
 //
 //    cmd.point = (line, col8, offset).
@@ -64,14 +54,10 @@ package protocol
 import (
 	"bytes"
 	"fmt"
-	"go/ast"
-	"go/token"
 	"sort"
 	"strings"
 	"sync"
 	"unicode/utf8"
-
-	"cuelang.org/go/internal/golangorgx/gopls/util/safetoken"
 )
 
 // A Mapper wraps the content of a file and provides mapping
@@ -85,11 +71,6 @@ import (
 //
 // All conversion methods are named "FromTo", where From and To are the two types.
 // For example, the PointPosition method converts from a Point to a Position.
-//
-// Mapper does not intrinsically depend on go/token-based
-// representations.  Use safetoken to map between token.Pos <=> byte
-// offsets, or the convenience methods such as PosPosition,
-// NodePosition, or NodeRange.
 //
 // See overview comments at top of this file.
 type Mapper struct {
@@ -310,61 +291,9 @@ func (m *Mapper) PositionOffset(p Position) (int, error) {
 	return offset + col8, nil
 }
 
-// -- go/token domain convenience methods --
-
-// PosPosition converts a token pos to a protocol (UTF-16) position.
-func (m *Mapper) PosPosition(tf *token.File, pos token.Pos) (Position, error) {
-	offset, err := safetoken.Offset(tf, pos)
-	if err != nil {
-		return Position{}, err
-	}
-	return m.OffsetPosition(offset)
-}
-
-// PosLocation converts a token range to a protocol (UTF-16) location.
-func (m *Mapper) PosLocation(tf *token.File, start, end token.Pos) (Location, error) {
-	startOffset, endOffset, err := safetoken.Offsets(tf, start, end)
-	if err != nil {
-		return Location{}, err
-	}
-	rng, err := m.OffsetRange(startOffset, endOffset)
-	if err != nil {
-		return Location{}, err
-	}
-	return m.RangeLocation(rng), nil
-}
-
-// PosRange converts a token range to a protocol (UTF-16) range.
-func (m *Mapper) PosRange(tf *token.File, start, end token.Pos) (Range, error) {
-	startOffset, endOffset, err := safetoken.Offsets(tf, start, end)
-	if err != nil {
-		return Range{}, err
-	}
-	return m.OffsetRange(startOffset, endOffset)
-}
-
-// NodeRange converts a syntax node range to a protocol (UTF-16) range.
-func (m *Mapper) NodeRange(tf *token.File, node ast.Node) (Range, error) {
-	return m.PosRange(tf, node.Pos(), node.End())
-}
-
 // RangeLocation pairs a protocol Range with its URI, in a Location.
 func (m *Mapper) RangeLocation(rng Range) Location {
 	return Location{URI: m.URI, Range: rng}
-}
-
-// PosMappedRange returns a MappedRange for the given token.Pos range.
-func (m *Mapper) PosMappedRange(tf *token.File, start, end token.Pos) (MappedRange, error) {
-	startOffset, endOffset, err := safetoken.Offsets(tf, start, end)
-	if err != nil {
-		return MappedRange{}, nil
-	}
-	return m.OffsetMappedRange(startOffset, endOffset)
-}
-
-// NodeMappedRange returns a MappedRange for the given node range.
-func (m *Mapper) NodeMappedRange(tf *token.File, node ast.Node) (MappedRange, error) {
-	return m.PosMappedRange(tf, node.Pos(), node.End())
 }
 
 // -- MappedRange --
@@ -374,8 +303,6 @@ func (m *Mapper) NodeMappedRange(tf *token.File, node ast.Node) (MappedRange, er
 // as protocol.Range or UTF-8.
 //
 // Construct one by calling Mapper.OffsetMappedRange with start/end offsets.
-// From the go/token domain, call safetoken.Offsets first,
-// or use a helper such as ParsedGoFile.MappedPosRange.
 //
 // Two MappedRanges produced the same Mapper are equal if and only if they
 // denote the same range.  Two MappedRanges produced by different Mappers

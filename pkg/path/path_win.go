@@ -206,6 +206,32 @@ func toUpper(c byte) byte {
 	return c
 }
 
+// postClean adjusts the results of Clean to avoid turning a relative path
+// into an absolute or rooted one.
+func (os windowsInfo) postClean(out *lazybuf) {
+	if out.volLen != 0 || out.buf == nil {
+		return
+	}
+	// If a ':' appears in the path element at the start of a path,
+	// insert a .\ at the beginning to avoid converting relative paths
+	// like a/../c: into c:.
+	for _, c := range out.buf[:out.w] {
+		if isSlash(c) {
+			break
+		}
+		if c == ':' {
+			out.prepend('.', windowsSeparator)
+			return
+		}
+	}
+	// If a path begins with \??\, insert a \. at the beginning
+	// to avoid converting paths like \a\..\??\c:\x into \??\c:\x
+	// (equivalent to c:\x).
+	if out.w >= 3 && isSlash(out.buf[0]) && out.buf[1] == '?' && out.buf[2] == '?' {
+		out.prepend(windowsSeparator, '.')
+	}
+}
+
 func (os windowsInfo) splitList(path string) []string {
 	// The same implementation is used in LookPath in os/exec;
 	// consider changing os/exec when changing this.
@@ -254,6 +280,12 @@ func (os windowsInfo) join(elem []string) string {
 			// elements so Join("\\", "host", "share") produces "\\host\share".
 			for len(e) > 0 && isSlash(e[0]) {
 				e = e[1:]
+			}
+			// If the path is \ and the next path element is ??,
+			// add an extra .\ to create \.\?? rather than \??\
+			// (a Root Local Device path).
+			if b.Len() == 1 && strings.HasPrefix(e, "??") && (len(e) == len("??") || isSlash(e[2])) {
+				b.WriteString(`.\`)
 			}
 		case lastChar == ':':
 			// If the path ends in a colon, keep the path relative to the current directory

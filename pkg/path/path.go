@@ -23,6 +23,7 @@ package path
 
 import (
 	"errors"
+	"slices"
 	"strings"
 )
 
@@ -56,6 +57,11 @@ func (b *lazybuf) append(c byte) {
 	}
 	b.buf[b.w] = c
 	b.w++
+}
+
+func (b *lazybuf) prepend(prefix ...byte) {
+	b.buf = slices.Insert(b.buf, 0, prefix...)
+	b.w += len(prefix)
 }
 
 func (b *lazybuf) string() string {
@@ -164,6 +170,7 @@ func clean(path string, os os) string {
 		out.append('.')
 	}
 
+	os.postClean(&out) // avoid creating absolute paths on Windows
 	return fromSlash(out.string(), os)
 }
 

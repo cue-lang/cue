@@ -126,8 +126,9 @@ var wincleantests = []PathTest{
 	{`\\.\C:\\\\a`, `\\.\C:\a`},
 	{`\\a\b\..\c`, `\\a\b\c`},
 	{`\\a\b`, `\\a\b`},
-	{`.\c:\foo`, `c:\foo`}, // want `.\c:\foo`
-	{`.\c:foo`, `c:foo`},   // want `.\c:foo`
+	{`.\c:`, `.\c:`},
+	{`.\c:\foo`, `.\c:\foo`},
+	{`.\c:foo`, `.\c:foo`},
 	{`//abc`, `\\abc`},
 	{`///abc`, `\\\abc`},
 	{`//abc//`, `\\abc\\`},
@@ -148,14 +149,17 @@ var wincleantests = []PathTest{
 	{`\\?\GLOBALROOT\..\x`, `\?\x`},
 
 	// Don't allow cleaning to move an element with a colon to the start of the path.
-	{`a/../c:/a`, `c:\a`}, // want `.\c:\a`
+	{`a/../c:`, `.\c:`},
+	{`a\..\c:`, `.\c:`},
+	{`a/../c:/a`, `.\c:\a`},
 	{`a/../../c:`, `..\c:`},
 	{`foo:bar`, `foo:bar`},
 	{`xy:z//q/../..`, `.`},
 	{`xy:z//q/../../w`, `w`},
 
 	// Don't allow cleaning to create a Root Local Device path like \??\a.
-	{`\a\..\??\c:\x`, `\??\c:\x`}, // want `\.\??\c:\x`
+	{`/a/../??/a`, `\.\??\a`},
+	{`\a\..\??\c:\x`, `\.\??\c:\x`},
 	{`/a/../??/..`, `\`},
 	{`/a/../??x/..`, `\`},
 }
@@ -376,7 +380,7 @@ var winjointests = []JoinTest{
 	{[]string{`\\a\`, `b`, `c`}, `\\a\b\c`},
 	{[]string{`//`, `a`}, `\\a`},
 	{[]string{`a:\b\c`, `x\..\y:\..\..\z`}, `a:\b\z`},
-	{[]string{`\`, `??\a`}, `\??\a`}, // want `\.\??\a`
+	{[]string{`\`, `??\a`}, `\.\??\a`},
 }
 
 func TestJoin(t *testing.T) {

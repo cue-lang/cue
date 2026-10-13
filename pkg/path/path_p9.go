@@ -62,3 +62,5 @@ func (o plan9Info) join(elem []string) string {
 func (o plan9Info) sameWord(a, b string) bool {
 	return a == b
 }
+
+func (o plan9Info) postClean(out *lazybuf) {}

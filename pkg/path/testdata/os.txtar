@@ -219,7 +219,7 @@ Clean: {
 	windows: {
 		"abc//def//ghi":        "abc\\def\\ghi"
 		"c:\\abc\\def\\..\\..": "c:\\"
-		"a/../c:/b":            "c:\\b"
+		"a/../c:/b":            ".\\c:\\b"
 	}
 	default: {
 		"abc//def//ghi":        "abc/def/ghi"

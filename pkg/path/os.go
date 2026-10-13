@@ -43,6 +43,7 @@ type osInfo interface {
 	IsAbs(path string) (b bool)
 	join(elem []string) string
 	sameWord(a, b string) bool
+	postClean(out *lazybuf)
 }
 
 func getOS(o OS) os {

@@ -64,3 +64,5 @@ func (o unixInfo) join(elem []string) string {
 func (o unixInfo) sameWord(a, b string) bool {
 	return a == b
 }
+
+func (o unixInfo) postClean(out *lazybuf) {}

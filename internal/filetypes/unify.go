@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/filetypes/internal"
 )
 
 // kind describes how much is known about a scalar property value,
@@ -249,6 +248,10 @@ func (a bval) unify(b bval) (bval, bool) {
 	}
 }
 
+func (a bval) resolve() bool {
+	return a.kind != unset && a.value
+}
+
 func (a sval) resolve() string {
 	if a.kind == unset || a.kind == constraint {
 		return ""
@@ -287,23 +290,6 @@ var aspectNames = [numAspects]string{
 	aOptional:     "optional",
 	aReferences:   "references",
 	aStream:       "stream",
-}
-
-// aspectBits maps the driver's aspect indices to the internal.Aspects
-// bit flags used by FileInfo.SetAspects.
-var aspectBits = [numAspects]internal.Aspects{
-	aData:         internal.Data,
-	aReferences:   internal.References,
-	aCycles:       internal.Cycles,
-	aDefinitions:  internal.Definitions,
-	aOptional:     internal.Optional,
-	aConstraints:  internal.Constraints,
-	aKeepDefaults: internal.KeepDefaults,
-	aIncomplete:   internal.Incomplete,
-	aImports:      internal.Imports,
-	aStream:       internal.Stream,
-	aDocs:         internal.Docs,
-	aAttributes:   internal.Attributes,
 }
 
 // entry is the open representation of one types.cue #FileInfo value: a
@@ -821,14 +807,20 @@ func fromFileUncached(b *build.File, mode Mode) (*FileInfo, error) {
 		Encoding:       build.Encoding(e.encoding.resolve()),
 		Interpretation: build.Interpretation(e.interpretation.resolve()),
 		Form:           build.Form(e.form.resolve()),
+
+		Definitions:  e.aspects[aDefinitions].resolve(),
+		Data:         e.aspects[aData].resolve(),
+		Optional:     e.aspects[aOptional].resolve(),
+		Constraints:  e.aspects[aConstraints].resolve(),
+		References:   e.aspects[aReferences].resolve(),
+		Cycles:       e.aspects[aCycles].resolve(),
+		KeepDefaults: e.aspects[aKeepDefaults].resolve(),
+		Incomplete:   e.aspects[aIncomplete].resolve(),
+		Imports:      e.aspects[aImports].resolve(),
+		Stream:       e.aspects[aStream].resolve(),
+		Docs:         e.aspects[aDocs].resolve(),
+		Attributes:   e.aspects[aAttributes].resolve(),
 	}
-	var aspects internal.Aspects
-	for i := range e.aspects {
-		if e.aspects[i].kind != unset && e.aspects[i].value {
-			aspects |= aspectBits[i]
-		}
-	}
-	fi.SetAspects(aspects)
 	return fi, nil
 }
 

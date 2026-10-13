@@ -13,7 +13,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/internal/cueimports"
 	"cuelang.org/go/mod/module"
 )
 
@@ -264,12 +263,12 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 		}
 		defer f.Close()
 
-		// Note that we use cueimports.Read before parser.ParseFile as cue/parser
+		// Note that we use readImports before parser.ParseFile as cue/parser
 		// will always consume the whole input reader, which is often wasteful.
 		//
-		// TODO(mvdan): the need for cueimports.Read can go once cue/parser can work
+		// TODO(mvdan): the need for readImports can go once cue/parser can work
 		// on a reader in a streaming manner.
-		data, err := cueimports.Read(f)
+		data, err := readImports(f)
 		if err != nil {
 			return "", yield(pf, err)
 		}

@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package cueimports provides support for reading the import
-// section of a CUE file without needing to read the rest of it.
-package cueimports
+package modimports
 
 import (
 	"bufio"
@@ -186,9 +184,9 @@ func (r *importReader) readImport() {
 	r.readString()
 }
 
-// Read is like io.ReadAll, except that it expects a CUE file as
+// readImports is like io.ReadAll, except that it expects a CUE file as
 // input and stops reading the input once the imports have completed.
-func Read(f io.Reader) ([]byte, errors.Error) {
+func readImports(f io.Reader) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}
 
 	r.readKeyword("package")

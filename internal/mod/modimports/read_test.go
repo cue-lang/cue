@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cueimports
+package modimports
 
 import (
 	"io"
@@ -109,7 +109,7 @@ func testRead(t *testing.T, tests []readTest, read func(io.Reader) ([]byte, erro
 
 func TestReadImports(t *testing.T) {
 	testRead(t, readImportsTests, func(r io.Reader) ([]byte, errors.Error) {
-		return Read(r)
+		return readImports(r)
 	})
 }
 
@@ -183,6 +183,6 @@ var readFailuresTests = []readTest{
 func TestReadFailures(t *testing.T) {
 	// Errors should be reported (true arg to readImports).
 	testRead(t, readFailuresTests, func(r io.Reader) ([]byte, errors.Error) {
-		return Read(r)
+		return readImports(r)
 	})
 }

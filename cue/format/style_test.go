@@ -262,6 +262,23 @@ func TestASTStyleRelPos(t *testing.T) {
 		}
 	})
 
+	t.Run("A2_NewlineBetweenAdjacentImports", func(t *testing.T) {
+		f := &ast.File{Decls: []ast.Decl{
+			importDecl(importSpec(`"strings"`)),
+			importDecl(importSpec(`"list"`)),
+			field("x", "int"),
+		}}
+		if !annotate(t, cfg, f) {
+			t.Fatal("expected Apply to report a change")
+		}
+		if got, want := leadingRel(f.Decls[1]), token.Newline; got != want {
+			t.Errorf("decl[1] (adjacent import) leading RelPos = %v, want %v", got, want)
+		}
+		if got, want := leadingRel(f.Decls[2]), token.NewSection; got != want {
+			t.Errorf("decl[2] (field after imports) leading RelPos = %v, want %v", got, want)
+		}
+	})
+
 	t.Run("A3_BlankAfterCommentGroup", func(t *testing.T) {
 		// A standalone CommentGroup decl gets a blank line after it,
 		// matching what the old formatter did.

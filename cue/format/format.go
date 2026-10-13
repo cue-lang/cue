@@ -362,6 +362,7 @@ type formatter struct {
 	stack    []frame
 	current  frame
 	nestExpr int
+	nextDecl ast.Decl
 }
 
 func newFormatter(p *printer) *formatter {

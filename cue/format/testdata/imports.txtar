@@ -117,3 +117,17 @@ import ( // a
 ) // b
 
 x: time.time
+-- issue1545.input --
+package x
+
+import "strings"
+import "list"
+
+x: strings.Join(list.Concat([["1"], ["2"]]), "+")
+-- out/format/issue1545.golden --
+package x
+
+import "strings"
+import "list"
+
+x: strings.Join(list.Concat([["1"], ["2"]]), "+")

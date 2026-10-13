@@ -71,7 +71,7 @@ import (
 //
 // Group A - blank lines (target: [token.NewSection]):
 //   - A1: curr follows a [*ast.Package] decl.
-//   - A2: curr follows an [*ast.ImportDecl].
+//   - A2: curr follows an [*ast.ImportDecl] and is not an [*ast.ImportDecl].
 //   - A3: curr follows a standalone [*ast.CommentGroup] decl.
 //   - A4: curr has doc comments AND prev is either a Definition
 //     [*ast.Field] (label starts with `#`) or any non-Field decl
@@ -618,8 +618,12 @@ func bodyTarget(prev, curr ast.Decl) token.RelPos {
 	// A1 / A2 / A3: NewSection after Package, ImportDecl, or a
 	// standalone CommentGroup. These dominate B1/B2.
 	switch prev.(type) {
-	case *ast.Package, *ast.ImportDecl, *ast.CommentGroup:
+	case *ast.Package, *ast.CommentGroup:
 		target = max(target, token.NewSection)
+	case *ast.ImportDecl:
+		if _, ok := curr.(*ast.ImportDecl); !ok {
+			target = max(target, token.NewSection)
+		}
 	}
 
 	return target

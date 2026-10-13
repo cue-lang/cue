@@ -1,0 +1,17 @@
+exec cue fmt x.cue
+cmp x.cue x.cue.golden
+
+-- x.cue --
+package x
+
+import "strings"
+import "list"
+
+x: strings.Join(list.Concat([["1"], ["2"]]), "+")
+-- x.cue.golden --
+package x
+
+import "strings"
+import "list"
+
+x: strings.Join(list.Concat([["1"], ["2"]]), "+")

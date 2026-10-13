@@ -144,6 +144,11 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 			ellipsis = x
 			continue
 		}
+		if i+1 < len(list) {
+			f.nextDecl = list[i+1]
+		} else {
+			f.nextDecl = nil
+		}
 		f.decl(x)
 		d = 0
 		if f, ok := x.(*ast.Field); ok {
@@ -554,7 +559,11 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.walkSpecList(n.Specs)
 			f.print(unindent, newline, n.Rparen, token.RPAREN, newline)
 		}
-		f.print(newsection, nooverride)
+		if _, ok := f.nextDecl.(*ast.ImportDecl); ok {
+			f.print(newline)
+		} else {
+			f.print(newsection, nooverride)
+		}
 
 	case *ast.LetClause:
 		if !decl.Pos().HasRelPos() || decl.Pos().RelPos() >= token.Newline {

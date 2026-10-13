@@ -82,6 +82,10 @@ type parser struct {
 	// nestLevel tracks and limits the expression nesting depth during
 	// parsing. See [maxNestLevel].
 	nestLevel int
+
+	// chainLevel tracks and limits the nesting depth of syntax built
+	// iteratively during parsing. See [maxChainLevel].
+	chainLevel int
 }
 
 func (p *parser) init(filename string, src []byte, opts []Option) {
@@ -316,6 +320,25 @@ func incNestLevel(p *parser) *parser {
 // decNestLevel decrements the parser's nesting depth. See [incNestLevel].
 func decNestLevel(p *parser) {
 	p.nestLevel--
+}
+
+// maxChainLevel is the deepest nesting the parser accepts from syntax which
+// it builds iteratively, such as chained fields like a: b: c: 1 or binary
+// expressions like 1+2+3. As these do not grow the parser's stack, they may
+// nest further than [maxNestLevel], but must still be bounded so that
+// recursive walks of the resulting syntax tree do not overflow the stack.
+const maxChainLevel = 100_000
+
+// incChainLevel increments the parser's chain depth, bailing out with an
+// error once it grows past [maxChainLevel]. Callers subtract the levels
+// they added from p.chainLevel once they are done.
+func incChainLevel(p *parser) {
+	p.chainLevel++
+	if p.chainLevel > maxChainLevel {
+		p.panicking = true
+		p.errf(p.pos, "expression exceeds maximum nesting depth of %d", maxChainLevel)
+		panic("expression too deeply nested")
+	}
 }
 
 // Advance to the next
@@ -1076,6 +1099,8 @@ func (p *parser) parseField() (decl ast.Decl) {
 	m.TokenPos = p.pos
 	p.expect(token.COLON)
 
+	// Each chained label nests its value in another struct.
+	var n int
 	for {
 		if l, ok := m.Label.(*ast.ListLit); ok {
 			switch {
@@ -1094,6 +1119,8 @@ func (p *parser) parseField() (decl ast.Decl) {
 			m.Value = expr
 			break
 		}
+		n++
+		incChainLevel(p)
 		field := &ast.Field{Label: label}
 		m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 		m = field
@@ -1111,6 +1138,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		m.TokenPos = p.pos
 		p.expect(token.COLON)
 	}
+	p.chainLevel -= n
 
 	if attrs := p.parseAttributes(); attrs != nil {
 		m.Attrs = attrs
@@ -2173,8 +2201,11 @@ func (p *parser) parsePrimaryExpr() ast.Expr {
 
 func (p *parser) parsePrimaryExprTail(operand ast.Expr) ast.Expr {
 	x := operand
+	// Each iteration nests x one level deeper.
+	var n int
 L:
-	for {
+	for n = 1; ; n++ {
+		incChainLevel(p)
 		switch p.tok {
 		case token.PERIOD:
 			period := p.pos
@@ -2254,6 +2285,7 @@ L:
 			break L
 		}
 	}
+	p.chainLevel -= n
 
 	return x
 }
@@ -2301,9 +2333,12 @@ func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
 }
 
 func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
-	for {
+	// Each iteration nests x one level deeper.
+	for n := 1; ; n++ {
+		incChainLevel(p)
 		op, prec := p.tok, p.tok.Precedence()
 		if prec < prec1 {
+			p.chainLevel -= n
 			return x
 		}
 		c := p.openComments()

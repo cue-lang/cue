@@ -2098,11 +2098,9 @@ func TestNestingDepthLimit(t *testing.T) {
 		{"fields_within", "a: ", "", 2 * maxNestLevel, false},
 		{"binary_within", "1+", "", 2 * maxNestLevel, false},
 		{"indexes_within", "", "[0]", 2 * maxNestLevel, false},
-		// Iterative syntax is not counted towards any nesting depth,
-		// so deep enough input overflows the stack after parsing.
-		{"fields_past", "a: ", "", 101_000, false},
-		{"binary_past", "1+", "", 101_000, false},
-		{"indexes_past", "", "[0]", 101_000, false},
+		{"fields_past", "a: ", "", maxChainLevel + 1000, true},
+		{"binary_past", "1+", "", maxChainLevel + 1000, true},
+		{"indexes_past", "", "[0]", maxChainLevel + 1000, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			src := strings.Repeat(tc.open, tc.depth) + "1" + strings.Repeat(tc.close, tc.depth)

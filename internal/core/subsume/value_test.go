@@ -871,41 +871,38 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			// The patterns of b admit labels that the closed a does not, so
-			// a should not subsume b. It does, as a has no patterns.
+			// The patterns of b admit labels that the closed a does not.
 			in:  `a: close({}), b: close({[string]: int})`,
-			err: "",
+			err: "value not an instance: inexact subsumption",
 		},
 		{
 			in:  `a: close({a: 1}), b: close({a: 1, [string]: int})`,
-			err: "",
+			err: "value not an instance: inexact subsumption",
 		},
 		{
 			// A pattern of b without an equal one in the closed a may admit
-			// labels that a does not, so a should not subsume b. It does.
+			// labels that a does not.
 			in:  `a: close({[=~"a"]: int}), b: close({[=~"a"]: int, [=~"b"]: int})`,
-			err: "",
+			err: "value not an instance: inexact subsumption",
 		},
 		{
 			// A struct opened by an ellipsis admits labels that a closed one
-			// does not, so a should not subsume b. It does, as the ellipsis
-			// is not taken into account.
+			// does not.
 			in:  `a: close({}), b: #B & {}, #B: {...}`,
-			err: "",
+			err: "value not an instance",
 		},
 		{
 			in:  `a: #A, b: close({}), #A: {...}`,
 			err: "",
 		},
 		{
-			// The element constraints of open lists should be compared. They
-			// are not, so lists with the same elements subsume each other.
+			// The element constraints of open lists are compared.
 			in:  `a: [...int], b: [...string]`,
-			err: "",
+			err: "value not an instance",
 		},
 		{
 			in:  `a: [1, ...int], b: [1, ...string]`,
-			err: "",
+			err: "value not an instance",
 		},
 		{
 			in:  `a: [1, ...], b: [1, ...int]`,
@@ -913,7 +910,7 @@ func TestValues(t *testing.T) {
 		},
 		{
 			in:  `a: [1, ...int], b: [1, ...]`,
-			err: "",
+			err: "value not an instance",
 		},
 		{
 			// A closed list admits no elements beyond those compared.

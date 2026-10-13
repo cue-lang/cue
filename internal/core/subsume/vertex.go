@@ -87,11 +87,11 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		panic(fmt.Sprintf("unexpected type %T", v))
 	}
 
-	xClosed := x.IsClosedStruct() && !s.IgnoreClosedness
+	xClosed := !x.IsOpenStruct() && !s.IgnoreClosedness
 	// TODO: this should not close for taking defaults. Do a more principled
 	// makeover of this package before making it public, though.
 	yClosed := s.Final || s.Defaults ||
-		(y.IsClosedStruct() && !s.IgnoreClosedness)
+		(!y.IsOpenStruct() && !s.IgnoreClosedness)
 
 	if xClosed && !yClosed && !final {
 		return false
@@ -217,33 +217,45 @@ outer:
 		}
 	}
 
-	// Now compare pattern constraints.
+	return s.patterns(x, y, xClosed, final)
+}
+
+// patterns compares the pattern constraints of x and y, given whether x is
+// closed, meaning it allows no labels beyond its fields and patterns.
+func (s *subsumer) patterns(x, y *adt.Vertex, xClosed, final bool) bool {
 	apc := x.PatternConstraints
 	bpc := y.PatternConstraints
 	if bpc == nil {
 		if apc == nil {
 			return true
 		}
-		if y.IsClosedStruct() || y.IsClosedList() || final {
+		if !y.IsOpenStruct() || final {
 			// This is a special case where know that any allowed optional field
 			// in a must be bottom in y, which is strictly more specific.
 			return true
 		}
 		return false
 	}
-	if apc == nil {
-		return true
+	var apairs []adt.PatternConstraint
+	if apc != nil {
+		apairs = apc.Pairs
 	}
-	if len(apc.Pairs) > len(bpc.Pairs) {
+	switch {
+	case len(apairs) > len(bpc.Pairs):
 		// Theoretically it is still possible for a to subsume b, but it will
 		// somewhat tricky and expensive to compute and it is probably not worth
 		// it.
 		s.inexact = true
 		return false
+	case len(apairs) < len(bpc.Pairs) && xClosed && !final:
+		// A pattern of y without an equal one in x may admit labels that a
+		// closed x does not.
+		s.inexact = true
+		return false
 	}
 
 outerConstraint:
-	for _, p := range apc.Pairs {
+	for _, p := range apairs {
 		for _, q := range bpc.Pairs {
 			if adt.Equal(s.ctx, p.Pattern, q.Pattern, 0) {
 				p.Constraint.Finalize(s.ctx)
@@ -261,7 +273,6 @@ outerConstraint:
 		s.inexact = true
 		return false
 	}
-
 	return true
 }
 
@@ -292,12 +303,6 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 				return false
 			}
 		}
-
-		if !y.IsClosedList() {
-			b := &adt.Vertex{Label: adt.AnyIndex}
-			y.MatchAndInsert(ctx, b)
-			b.Finalize(ctx)
-		}
 	}
 
 	for i, a := range xElems {
@@ -306,5 +311,10 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 		}
 	}
 
-	return true
+	if y.IsClosedList() {
+		// y admits no elements beyond those compared.
+		return true
+	}
+	// x is open here, as a closed x against an open y was rejected above.
+	return s.patterns(x, y, false, false)
 }

@@ -17,8 +17,6 @@ import (
 	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 )
 
 // NewTracker returns a new Tracker that reports progress to the
@@ -87,12 +85,10 @@ func (t *Tracker) Start(ctx context.Context, title, message string, token protoc
 		//
 		// Just show a simple message. Clients can implement workDone progress
 		// reporting to get cancellation support.
-		if err := wd.client.ShowMessage(ctx, &protocol.ShowMessageParams{
+		wd.client.ShowMessage(ctx, &protocol.ShowMessageParams{
 			Type:    protocol.Log,
 			Message: message,
-		}); err != nil {
-			event.Error(ctx, "showing start message for "+title, err)
-		}
+		})
 		return wd
 	}
 	if wd.token == nil {
@@ -102,7 +98,6 @@ func (t *Tracker) Start(ctx context.Context, title, message string, token protoc
 		})
 		if err != nil {
 			wd.err = err
-			event.Error(ctx, "starting work for "+title, err)
 			return wd
 		}
 		wd.token = token
@@ -117,7 +112,7 @@ func (t *Tracker) Start(ctx context.Context, title, message string, token protoc
 		delete(t.inProgress, token)
 		t.mu.Unlock()
 	}
-	err := wd.client.Progress(ctx, &protocol.ProgressParams{
+	wd.client.Progress(ctx, &protocol.ProgressParams{
 		Token: wd.token,
 		Value: &protocol.WorkDoneProgressBegin{
 			Kind:        "begin",
@@ -126,9 +121,6 @@ func (t *Tracker) Start(ctx context.Context, title, message string, token protoc
 			Title:       title,
 		},
 	})
-	if err != nil {
-		event.Error(ctx, "progress begin", err)
-	}
 	return wd
 }
 
@@ -194,7 +186,7 @@ func (wd *WorkDone) Report(ctx context.Context, message string, percentage float
 		return
 	}
 	message = strings.TrimSuffix(message, "\n")
-	err := wd.client.Progress(ctx, &protocol.ProgressParams{
+	wd.client.Progress(ctx, &protocol.ProgressParams{
 		Token: wd.token,
 		Value: &protocol.WorkDoneProgressReport{
 			Kind: "report",
@@ -206,9 +198,6 @@ func (wd *WorkDone) Report(ctx context.Context, message string, percentage float
 			Percentage:  uint32(percentage),
 		},
 	})
-	if err != nil {
-		event.Error(ctx, "reporting progress", err)
-	}
 }
 
 // EndAsync reports a workdone completion back to the client,
@@ -223,18 +212,17 @@ func (wd *WorkDone) End(ctx context.Context, message string) {
 	if wd == nil {
 		return
 	}
-	var err error
 	switch {
 	case wd.err != nil:
 		// There is a prior error.
 	case wd.token == nil:
 		// We're falling back to message-based reporting.
-		err = wd.client.ShowMessage(ctx, &protocol.ShowMessageParams{
+		wd.client.ShowMessage(ctx, &protocol.ShowMessageParams{
 			Type:    protocol.Info,
 			Message: message,
 		})
 	default:
-		err = wd.client.Progress(ctx, &protocol.ProgressParams{
+		wd.client.Progress(ctx, &protocol.ProgressParams{
 			Token: wd.token,
 			Value: &protocol.WorkDoneProgressEnd{
 				Kind:    "end",
@@ -242,29 +230,9 @@ func (wd *WorkDone) End(ctx context.Context, message string) {
 			},
 		})
 	}
-	if err != nil {
-		event.Error(ctx, "ending work", err)
-	}
 	if wd.cleanup != nil {
 		wd.cleanup()
 	}
-}
-
-// NewEventWriter returns an [io.Writer] that calls the context's
-// event printer for each data payload, wrapping it with the
-// operation=generate tag to distinguish its logs from others.
-func NewEventWriter(ctx context.Context, operation string) io.Writer {
-	return &eventWriter{ctx: ctx, operation: operation}
-}
-
-type eventWriter struct {
-	ctx       context.Context
-	operation string
-}
-
-func (ew *eventWriter) Write(p []byte) (n int, err error) {
-	event.Log(ew.ctx, string(p), tag.Operation.Of(ew.operation))
-	return len(p), nil
 }
 
 // NewWorkDoneWriter wraps a WorkDone handle to provide a Writer interface,

@@ -11,8 +11,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 )
 
 // ModificationSource identifies the origin of a change.
@@ -83,9 +81,6 @@ var openRange = &protocol.Range{
 }
 
 func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocumentParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didOpen", tag.URI.Of(params.TextDocument.URI))
-	defer done()
-
 	// TODO(myitcv): we need to report an error/problem/something in case the user opens a file
 	// that is not part of the CUE module. For now we will not support that, because it massively
 	// opens up a can of worms in terms of single-file support, ad hoc workspaces etc.
@@ -104,9 +99,6 @@ func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocume
 }
 
 func (s *server) DidChange(ctx context.Context, params *protocol.DidChangeTextDocumentParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didChange", tag.URI.Of(params.TextDocument.URI))
-	defer done()
-
 	mods := []file.Modification{{
 		URI:            params.TextDocument.URI,
 		Action:         file.Change,
@@ -117,9 +109,6 @@ func (s *server) DidChange(ctx context.Context, params *protocol.DidChangeTextDo
 }
 
 func (s *server) DidChangeWatchedFiles(ctx context.Context, params *protocol.DidChangeWatchedFilesParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didChangeWatchedFiles")
-	defer done()
-
 	modifications := make([]file.Modification, len(params.Changes))
 	for i, change := range params.Changes {
 		modifications[i] = file.Modification{
@@ -132,9 +121,6 @@ func (s *server) DidChangeWatchedFiles(ctx context.Context, params *protocol.Did
 }
 
 func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocumentParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didClose", tag.URI.Of(params.TextDocument.URI))
-	defer done()
-
 	mods := []file.Modification{{
 		URI:    params.TextDocument.URI,
 		Action: file.Close,
@@ -143,9 +129,6 @@ func (s *server) DidClose(ctx context.Context, params *protocol.DidCloseTextDocu
 }
 
 func (s *server) DidSave(ctx context.Context, params *protocol.DidSaveTextDocumentParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didSave", tag.URI.Of(params.TextDocument.URI))
-	defer done()
-
 	// In [server.Initialize], we explicitly tell the client to not
 	// sent us the file text on save. So here we completely ignore
 	// params.Text.

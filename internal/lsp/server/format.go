@@ -15,8 +15,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
-	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 	"cuelang.org/go/internal/lsp/fscache"
 )
 
@@ -26,9 +24,6 @@ import (
 //
 // Formatting implements [protocol.Server]
 func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormattingParams) ([]protocol.TextEdit, error) {
-	_, done := event.Start(ctx, "lsp.Server.formatting", tag.URI.Of(params.TextDocument.URI))
-	defer done()
-
 	uri := params.TextDocument.URI
 	parsedFile, bf, config, fh, err := s.workspace.ReadCUEFile(uri)
 	if err != nil {

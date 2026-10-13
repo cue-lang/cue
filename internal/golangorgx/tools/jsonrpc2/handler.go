@@ -8,8 +8,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-
-	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
 // Handler is invoked to handle incoming requests.
@@ -96,13 +94,9 @@ func AsyncHandler(handler Handler) Handler {
 			close(unlockNext)
 			return innerReply(ctx, result, err)
 		}
-		_, queueDone := event.Start(ctx, "queued")
 		go func() {
 			<-waitForPrevious
-			queueDone()
-			if err := handler(ctx, reply, req); err != nil {
-				event.Error(ctx, "jsonrpc2 async message delivery failed", err)
-			}
+			handler(ctx, reply, req)
 		}()
 		return nil
 	}
@@ -142,13 +136,9 @@ func (h *EnqueueHandler) Handle(ctx context.Context, reply Replier, req Request)
 		close(unlockNext)
 		return innerReply(ctx, result, err)
 	}
-	_, queueDone := event.Start(ctx, "queued")
 	go func() {
 		<-waitForPrevious
-		queueDone()
-		if err := h.handler(ctx, reply, req); err != nil {
-			event.Error(ctx, "jsonrpc2 async message delivery failed", err)
-		}
+		h.handler(ctx, reply, req)
 	}()
 	return nil
 }

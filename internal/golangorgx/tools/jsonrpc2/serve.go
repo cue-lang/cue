@@ -6,14 +6,10 @@ package jsonrpc2
 
 import (
 	"context"
-	"errors"
-	"io"
 	"math"
 	"net"
 	"os"
 	"time"
-
-	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
 // NOTE: This file provides an experimental API for serving multiple remote
@@ -92,10 +88,7 @@ func Serve(ctx context.Context, ln net.Listener, server StreamServer, idleTimeou
 		// Cancel pending ServeStream callbacks and wait for them to finish.
 		cancel()
 		for activeConns > 0 {
-			err := <-closedConns
-			if !isClosingError(err) {
-				event.Error(ctx, "closed a connection", err)
-			}
+			<-closedConns
 			activeConns--
 		}
 	}()
@@ -128,10 +121,7 @@ func Serve(ctx context.Context, ln net.Listener, server StreamServer, idleTimeou
 				closedConns <- err
 			}()
 
-		case err := <-closedConns:
-			if !isClosingError(err) {
-				event.Error(ctx, "closed a connection", err)
-			}
+		case <-closedConns:
 			activeConns--
 			if activeConns == 0 {
 				connTimer.Reset(idleTimeout)
@@ -144,20 +134,4 @@ func Serve(ctx context.Context, ln net.Listener, server StreamServer, idleTimeou
 			return nil
 		}
 	}
-}
-
-// isClosingError reports if the error occurs normally during the process of
-// closing a network connection. It uses imperfect heuristics that err on the
-// side of false negatives, and should not be used for anything critical.
-func isClosingError(err error) bool {
-	if errors.Is(err, io.EOF) {
-		return true
-	}
-	// Per https://github.com/golang/go/issues/4373, this error string should not
-	// change. This is not ideal, but since the worst that could happen here is
-	// some superfluous logging, it is acceptable.
-	if err.Error() == "use of closed network connection" {
-		return true
-	}
-	return false
 }

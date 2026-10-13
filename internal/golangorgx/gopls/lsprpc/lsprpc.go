@@ -18,8 +18,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/lsp/cache"
 	"cuelang.org/go/internal/lsp/server"
@@ -61,7 +59,6 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 	// server is shut down.
 	defer enqueue.Enqueue(func() { svr.Shutdown(ctx) })
 
-	ctx = protocol.WithClient(ctx, client)
 	conn.Go(ctx, handlers)
 	if s.daemon {
 		log.Printf("Server %s: connected", svrID)
@@ -148,7 +145,6 @@ func (f *forwarder) ServeStream(ctx context.Context, clientConn jsonrpc2.Conn) e
 	} else if clientConn.Err() != nil {
 		err = fmt.Errorf("client disconnected: %v", clientConn.Err())
 	}
-	event.Log(ctx, fmt.Sprintf("forwarder: exited with error: %v", err))
 	return err
 }
 
@@ -158,15 +154,9 @@ func (f *forwarder) handshake(ctx context.Context) {
 	// transition to the V2 API.
 	hreq := handshakeRequest{ServerID: f.serverID}
 	var hresp handshakeResponse
-	if err := protocol.Call(ctx, f.serverConn, handshakeMethod, hreq, &hresp); err != nil {
-		// TODO(rfindley): at some point in the future we should return an error
-		// here.  Handshakes have become functional in nature.
-		event.Error(ctx, "forwarder: cuelsp handshake failed", err)
-	}
-	event.Log(ctx, "New server",
-		tag.NewServer.Of(f.serverID),
-		tag.ServerID.Of(hresp.ServerID),
-	)
+	// TODO(rfindley): at some point in the future we should return an error
+	// here.  Handshakes have become functional in nature.
+	protocol.Call(ctx, f.serverConn, handshakeMethod, hreq, &hresp)
 }
 
 // A handshakeRequest identifies a client to the LSP server.
@@ -203,9 +193,6 @@ func handshaker(svrID string, logHandshakes bool, handler jsonrpc2.Handler) json
 	return func(ctx context.Context, reply jsonrpc2.Replier, r jsonrpc2.Request) error {
 		switch r.Method() {
 		case handshakeMethod:
-			// We log.Printf in this handler, rather than event.Log when we want logs
-			// to go to the daemon log rather than being reflected back to the
-			// client.
 			var req handshakeRequest
 			if err := json.Unmarshal(r.Params(), &req); err != nil {
 				if logHandshakes {
@@ -217,9 +204,6 @@ func handshaker(svrID string, logHandshakes bool, handler jsonrpc2.Handler) json
 			if logHandshakes {
 				log.Printf("Server %s: got handshake.", svrID)
 			}
-			event.Log(ctx, "Handshake server update",
-				tag.ServerID.Of(req.ServerID),
-			)
 			resp := handshakeResponse{
 				ServerID: svrID,
 			}
@@ -237,9 +221,7 @@ func handshaker(svrID string, logHandshakes bool, handler jsonrpc2.Handler) json
 
 func sendError(ctx context.Context, reply jsonrpc2.Replier, err error) {
 	err = fmt.Errorf("%v: %w", err, jsonrpc2.ErrParse)
-	if err := reply(ctx, nil, err); err != nil {
-		event.Error(ctx, "", err)
-	}
+	reply(ctx, nil, err)
 }
 
 // ParseAddr parses the address of a cuelsp remote.

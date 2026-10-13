@@ -16,7 +16,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/lsp/cache"
 )
 
@@ -127,23 +126,12 @@ func (s *server) SetEnqueuer(enqueue func(func())) {
 // sent, instead it should wait for an exit message, which is
 // asynchronous.
 func (s *server) Shutdown(ctx context.Context) error {
-	ctx, done := event.Start(ctx, "lsp.Server.shutdown")
-	defer done()
-
-	switch s.state {
-	case serverInitialized:
+	if s.state == serverInitialized {
 		s.state = serverShutDown
 		// It's very likely that eventually we'll need to tell the
 		// workspace we're shutting down, and maybe wait for it to
 		// finish making changes.
-
-	case serverShutDown:
-		return nil
-
-	default:
-		event.Log(ctx, "server shutdown without initialization")
 	}
-
 	return nil
 }
 
@@ -153,9 +141,6 @@ func (s *server) Shutdown(ctx context.Context) error {
 //
 // This is asynchronous - it does not get a response.
 func (s *server) Exit(ctx context.Context) error {
-	_, done := event.Start(ctx, "lsp.Server.exit")
-	defer done()
-
 	s.client.Close()
 
 	if s.state != serverShutDown {
@@ -170,9 +155,6 @@ func (s *server) Exit(ctx context.Context) error {
 // WorkDoneProgressCancel is a message from the editor/client
 // requesting the cancellation of a long-running process.
 func (s *server) WorkDoneProgressCancel(ctx context.Context, params *protocol.WorkDoneProgressCancelParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.workDoneProgressCancel")
-	defer done()
-
 	err := s.progress.Cancel(params.Token)
 	// WorkDoneProgressCancel is a notification, so if there's an
 	// error, we show it rather than return it.

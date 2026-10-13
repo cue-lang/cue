@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io"
 
-	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 )
 
@@ -160,8 +159,6 @@ func Call(ctx context.Context, conn jsonrpc2.Conn, method string, params interfa
 
 func cancelCall(ctx context.Context, sender connSender, id jsonrpc2.ID) {
 	ctx = context.WithoutCancel(ctx)
-	ctx, done := event.Start(ctx, "protocol.canceller")
-	defer done()
 	// Note that only *jsonrpc2.ID implements json.Marshaler.
 	sender.Notify(ctx, "$/cancelRequest", &CancelParams{ID: &id})
 }

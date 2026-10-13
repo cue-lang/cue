@@ -12,8 +12,6 @@ import (
 	"os"
 	"os/exec"
 	"time"
-
-	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
 // autoNetwork is the pseudo network type used to signal that cuelsp should use
@@ -57,12 +55,8 @@ func (d *autoDialer) Dial(ctx context.Context) (io.ReadWriteCloser, error) {
 func (d *autoDialer) dialNet(ctx context.Context) (net.Conn, error) {
 	// Attempt to verify that we own the remote. This is imperfect, but if we can
 	// determine that the remote is owned by a different user, we should fail.
-	ok, err := verifyRemoteOwnership(d.network, d.addr)
-	if err != nil {
-		// If the ownership check itself failed, we fail open but log an error to
-		// the user.
-		event.Error(ctx, "unable to check daemon socket owner, failing open", err)
-	} else if !ok {
+	// If the ownership check itself failed, we fail open.
+	if ok, err := verifyRemoteOwnership(d.network, d.addr); err == nil && !ok {
 		// We successfully checked that the socket is not owned by us, we fail
 		// closed.
 		return nil, fmt.Errorf("socket %q is owned by a different user", d.addr)
@@ -103,7 +97,6 @@ func (d *autoDialer) dialNet(ctx context.Context) (net.Conn, error) {
 		if err == nil {
 			return netConn, nil
 		}
-		event.Log(ctx, fmt.Sprintf("failed attempt #%d to connect to remote: %v\n", retry+2, err))
 		// In case our failure was a fast-failure, ensure we wait at least
 		// f.dialTimeout before trying again.
 		if retry != retries-1 {

@@ -10,10 +10,6 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
-
-	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/event/label"
-	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 )
 
 // Conn is the common interface to jsonrpc clients and servers.
@@ -82,18 +78,7 @@ func (c *conn) Notify(ctx context.Context, method string, params any) (err error
 	if err != nil {
 		return fmt.Errorf("marshaling notify parameters: %v", err)
 	}
-	ctx, done := event.Start(ctx, method,
-		tag.Method.Of(method),
-		tag.RPCDirection.Of(tag.Outbound),
-	)
-	defer func() {
-		recordStatus(ctx, err)
-		done()
-	}()
-
-	event.Metric(ctx, tag.Started.Of(1))
-	n, err := c.write(ctx, notify)
-	event.Metric(ctx, tag.SentBytes.Of(n))
+	_, err = c.write(ctx, notify)
 	return err
 }
 
@@ -104,16 +89,6 @@ func (c *conn) Call(ctx context.Context, method string, params, result any) (_ I
 	if err != nil {
 		return id, fmt.Errorf("marshaling call parameters: %v", err)
 	}
-	ctx, done := event.Start(ctx, method,
-		tag.Method.Of(method),
-		tag.RPCDirection.Of(tag.Outbound),
-		tag.RPCID.Of(fmt.Sprintf("%q", id)),
-	)
-	defer func() {
-		recordStatus(ctx, err)
-		done()
-	}()
-	event.Metric(ctx, tag.Started.Of(1))
 	// We have to add ourselves to the pending map before we send, otherwise we
 	// are racing the response. Also add a buffer to rchan, so that if we get a
 	// wire response between the time this call is cancelled and id is deleted
@@ -128,9 +103,7 @@ func (c *conn) Call(ctx context.Context, method string, params, result any) (_ I
 		c.pendingMu.Unlock()
 	}()
 	// now we are ready to send
-	n, err := c.write(ctx, call)
-	event.Metric(ctx, tag.SentBytes.Of(n))
-	if err != nil {
+	if _, err := c.write(ctx, call); err != nil {
 		// sending failed, we will never get a response, so don't leave it pending
 		return id, err
 	}
@@ -153,12 +126,8 @@ func (c *conn) Call(ctx context.Context, method string, params, result any) (_ I
 	}
 }
 
-func (c *conn) replier(req Request, spanDone func()) Replier {
+func (c *conn) replier(req Request) Replier {
 	return func(ctx context.Context, result any, err error) error {
-		defer func() {
-			recordStatus(ctx, err)
-			spanDone()
-		}()
 		call, ok := req.(*Call)
 		if !ok {
 			// request was a notify, no need to respond
@@ -168,9 +137,7 @@ func (c *conn) replier(req Request, spanDone func()) Replier {
 		if err != nil {
 			return err
 		}
-		n, err := c.write(ctx, response)
-		event.Metric(ctx, tag.SentBytes.Of(n))
-		if err != nil {
+		if _, err := c.write(ctx, response); err != nil {
 			// TODO(iancottrell): if a stream write fails, we really need to shut down
 			// the whole stream
 			return err
@@ -193,7 +160,7 @@ func (c *conn) run(ctx context.Context, handler Handler) {
 	defer close(c.done)
 	for {
 		// get the next message
-		msg, n, err := c.stream.Read(ctx)
+		msg, _, err := c.stream.Read(ctx)
 		if err != nil {
 			// The stream failed, we cannot continue.
 			c.fail(err)
@@ -201,24 +168,8 @@ func (c *conn) run(ctx context.Context, handler Handler) {
 		}
 		switch msg := msg.(type) {
 		case Request:
-			labels := []label.Label{
-				tag.Method.Of(msg.Method()),
-				tag.RPCDirection.Of(tag.Inbound),
-				{}, // reserved for ID if present
-			}
-			if call, ok := msg.(*Call); ok {
-				labels[len(labels)-1] = tag.RPCID.Of(fmt.Sprintf("%q", call.ID()))
-			} else {
-				labels = labels[:len(labels)-1]
-			}
-			reqCtx, spanDone := event.Start(ctx, msg.Method(), labels...)
-			event.Metric(reqCtx,
-				tag.Started.Of(1),
-				tag.ReceivedBytes.Of(n))
-			if err := handler(reqCtx, c.replier(msg, spanDone), msg); err != nil {
-				// delivery failed, not much we can do
-				event.Error(reqCtx, "jsonrpc2 message delivery failed", err)
-			}
+			// If delivery fails, there is not much we can do.
+			handler(ctx, c.replier(msg), msg)
 		case *Response:
 			// If method is not set, this should be a response, in which case we must
 			// have an id to send the response back to the caller.
@@ -251,12 +202,4 @@ func (c *conn) Err() error {
 func (c *conn) fail(err error) {
 	c.err.Store(err)
 	c.stream.Close()
-}
-
-func recordStatus(ctx context.Context, err error) {
-	if err != nil {
-		event.Label(ctx, tag.StatusCode.Of("ERROR"))
-	} else {
-		event.Label(ctx, tag.StatusCode.Of("OK"))
-	}
 }

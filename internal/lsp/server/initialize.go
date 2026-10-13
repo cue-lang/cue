@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/lsp/cache"
 )
@@ -50,9 +49,6 @@ func validateWorkspaceFolders(folders []protocol.WorkspaceFolder) (map[protocol.
 //
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize
 func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitialize) (*protocol.InitializeResult, error) {
-	ctx, done := event.Start(ctx, "lsp.Server.initialize")
-	defer done()
-
 	if s.state != serverCreated {
 		return nil, fmt.Errorf("%w: initialize called while server in %v state", jsonrpc2.ErrInvalidRequest, s.state)
 	}
@@ -151,9 +147,6 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 //
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialized
 func (s *server) Initialized(ctx context.Context, params *protocol.InitializedParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.initialized")
-	defer done()
-
 	if s.state != serverInitializing {
 		return fmt.Errorf("%w: initialized called while server in %v state", jsonrpc2.ErrInvalidRequest, s.state)
 	}

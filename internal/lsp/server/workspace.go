@@ -12,7 +12,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/tools/event"
 )
 
 // AddFolders gets called from Initialized, and from
@@ -74,9 +73,6 @@ func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol
 }
 
 func (s *server) DidChangeConfiguration(ctx context.Context, _ *protocol.DidChangeConfigurationParams) error {
-	ctx, done := event.Start(ctx, "lsp.Server.didChangeConfiguration")
-	defer done()
-
 	if s.Options().VerboseWorkDoneProgress {
 		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromDidChangeConfiguration), "Calculating diagnostics...", nil, nil)
 		defer work.EndAsync(ctx, "Done.")

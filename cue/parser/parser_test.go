@@ -2124,8 +2124,8 @@ func TestParseExpr(t *testing.T) {
 	if err == nil {
 		t.Errorf("ParseExpr(%q): got no error", src)
 	}
-	// No partial result is returned along with the error.
-	if got, want := fmt.Sprintf("%T", x), "<nil>"; got != want {
+	// The partial result is returned along with the error.
+	if got, want := fmt.Sprintf("%T", x), "*ast.BinaryExpr"; got != want {
 		t.Errorf("ParseExpr(%q): got %s, want %s", src, got, want)
 	}
 

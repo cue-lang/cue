@@ -230,10 +230,15 @@ func ParseFile(filename string, src any, mode ...Option) (f *ast.File, err error
 }
 
 // ParseExpr is a convenience function for parsing an expression.
-// The arguments have the same meaning as for Parse, but the source must
-// be a valid CUE (type or value) expression. Specifically, fset must not
-// be nil.
-func ParseExpr(filename string, src any, mode ...Option) (_ ast.Expr, err error) {
+// The arguments have the same meaning as for [ParseFile], but the source
+// must be a valid CUE (type or value) expression.
+//
+// If the source couldn't be read, the returned AST is nil and the error
+// indicates the specific failure. If the source was read but syntax
+// errors were found, the result is a partial AST (with Bad* nodes
+// representing the fragments of erroneous source code), which may be nil
+// if parsing was abandoned.
+func ParseExpr(filename string, src any, mode ...Option) (expr ast.Expr, err error) {
 	// get source
 	text, err := source.ReadAll(filename, src)
 	if err != nil {
@@ -263,7 +268,7 @@ func ParseExpr(filename string, src any, mode ...Option) (_ ast.Expr, err error)
 	// This is not needed for a correct expression x as the
 	// parser will be ok with a nil topScope, but be cautious
 	// in case of an erroneous x.
-	e := p.parseRHS()
+	expr = p.parseRHS()
 
 	// If a comma was inserted, consume it;
 	// report an error if there's more tokens.
@@ -274,13 +279,10 @@ func ParseExpr(filename string, src any, mode ...Option) (_ ast.Expr, err error)
 		p.expect(token.EOF)
 	}
 
-	if p.errors != nil {
-		return nil, p.errors
-	}
-	astutil.ResolveExpr(e, p.errf)
+	astutil.ResolveExpr(expr, p.errf)
 	if p.cfg.Mode&ParseComments != 0 {
-		ast.ResolveComments(e)
+		ast.ResolveComments(expr)
 	}
 
-	return e, p.errors
+	return expr, p.errors
 }

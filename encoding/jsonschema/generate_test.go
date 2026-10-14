@@ -94,10 +94,6 @@ func TestGenerate(t *testing.T) {
 			extractCfg.StrictKeywords = false
 		}
 		extractedSchemaFile, err := jsonschema.Extract(schemaValue, extractCfg)
-		if t.HasTag("brokenRoundTrip") {
-			qt.Assert(t, qt.IsNotNil(err), qt.Commentf("round-trip extraction succeeds; remove the brokenRoundTrip tag"))
-			return
-		}
 		qt.Assert(t, qt.IsNil(err), qt.Commentf("generated JSON Schema should round-trip cleanly via Extract"))
 		extractedSchemaValue := ctx.BuildFile(extractedSchemaFile)
 		t.Logf("extracted schema: %#v", extractedSchemaValue)

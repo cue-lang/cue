@@ -374,26 +374,26 @@ single postfix alias "_" field cannot be the blank identifier`,
 			desc: "empty index",
 			in: `a: b[]
 			c: 1`,
-			// The error recovery skips the rest of the input.
-			out: "a: b[<*ast.BadExpr>]\nexpected operand, found ']' (and 1 more errors)",
+			// The error recovery resumes after the brackets.
+			out: "a: b[<*ast.BadExpr>], c: 1\nexpected operand, found ']'",
 		},
 		{
 			desc: "empty index in a binary expression",
 			in:   `a: b[] + 1, c: 1`,
-			// The error recovery skips the rest of the input.
-			out: "a: b[<*ast.BadExpr>]\nexpected operand, found ']' (and 1 more errors)",
+			// The error recovery resumes after the brackets.
+			out: "a: b[<*ast.BadExpr>]+1, c: 1\nexpected operand, found ']'",
 		},
 		{
 			desc: "empty index in a list",
 			in:   `a: [b[]], c: 1`,
-			// The error recovery skips the rest of the input.
-			out: "a: [b[<*ast.BadExpr>]]\nexpected operand, found ']' (and 2 more errors)",
+			// The error recovery resumes after the brackets.
+			out: "a: [b[<*ast.BadExpr>]], c: 1\nexpected operand, found ']'",
 		},
 		{
 			desc: "empty optional index",
 			in:   `a: b[]?, c: 1`,
-			// The error recovery skips the rest of the input.
-			out: "a: b[<*ast.BadExpr>]\nexpected operand, found ']' (and 1 more errors)",
+			// The error recovery resumes after the brackets.
+			out: "a: b[<*ast.BadExpr>]?, c: 1\nexpected operand, found ']'",
 		},
 		{
 			desc: "expression embedding",

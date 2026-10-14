@@ -789,7 +789,12 @@ func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 	p.exprLev++
 	var index [N]ast.Expr
 	var colons [N - 1]token.Pos
-	if p.tok != token.COLON {
+	if p.tok == token.RBRACK {
+		// An empty index is not permitted; accept it for parsing
+		// tolerance, but complain.
+		p.errorExpected(p.pos, "operand")
+		index[0] = &ast.BadExpr{From: p.pos, To: p.pos}
+	} else if p.tok != token.COLON {
 		index[0] = p.parseRHS()
 	}
 	nColons := 0

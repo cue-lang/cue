@@ -522,7 +522,7 @@ func TestInit(t *testing.T) {
 	var s Scanner
 
 	// 1st init
-	src1 := "false true { }"
+	src1 := "false true { ,"
 	f1 := token.NewFile("src1", -1, len(src1))
 	s.Init(f1, []byte(src1), nil, DontInsertCommas)
 	if f1.Size() != len(src1) {
@@ -534,6 +534,11 @@ func TestInit(t *testing.T) {
 	if tok != token.LBRACE {
 		t.Errorf("bad token: got %s, expected %s", tok, token.LBRACE)
 	}
+	// Stop right after an explicit comma, which applies to the next token.
+	_, tok, _ = s.Scan() // ,
+	if tok != token.COMMA {
+		t.Errorf("bad token: got %s, expected %s", tok, token.COMMA)
+	}
 
 	// 2nd init
 	src2 := "null true { ]"
@@ -542,9 +547,14 @@ func TestInit(t *testing.T) {
 	if f2.Size() != len(src2) {
 		t.Errorf("bad file size: got %d, expected %d", f2.Size(), len(src2))
 	}
-	_, tok, _ = s.Scan() // go
+	pos, tok, _ := s.Scan() // null
 	if tok != token.NULL {
 		t.Errorf("bad token: got %s, expected %s", tok, token.NULL)
+	}
+	// The comma from the first source should not carry over,
+	// but Init does not reset the comma state.
+	if !pos.HasComma() {
+		t.Errorf("first token after Init does not have the comma bit set")
 	}
 
 	if s.ErrorCount != 0 {

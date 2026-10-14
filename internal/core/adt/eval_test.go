@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
@@ -111,8 +110,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 		return
 	}
 
-	e := eval.New(r)
-	ctx := e.NewContext(v)
+	ctx := adt.NewContext(r, v)
 	v.Finalize(ctx)
 
 	switch counts := ctx.Stats(); {
@@ -221,8 +219,7 @@ language: version: "v0.15.0"
 		t.Fatal(err)
 	}
 
-	e := eval.New(r)
-	ctx := e.NewContext(v)
+	ctx := adt.NewContext(r, v)
 	ctx.Config = flags
 	v.Finalize(ctx)
 

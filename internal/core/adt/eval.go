@@ -41,14 +41,6 @@ func (c *OpContext) Stats() *stats.Counts {
 	return &c.stats
 }
 
-// TODO: Note: NewContext takes essentially a cue.Value. By making this
-// type more central, we can perhaps avoid context creation.
-
-// func NewContext(r Runtime, v *Vertex) *OpContext {
-// 	e := NewUnifier(r)
-// 	return e.NewContext(v)
-// }
-
 // evaluate returns the evaluated value associated with v. It may return a
 // partial result. That is, if v was not yet unified, it may return a
 // concrete value that must be the result assuming the configuration has no
@@ -587,7 +579,6 @@ func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 	err := &ConflictError{
 		baseError: baseError{
 			r:       ctx.Runtime,
-			format:  ctx.format,
 			v:       ctx.errNode(),
 			pos:     token.NoPos,
 			altPath: ctx.makeAltPath(),

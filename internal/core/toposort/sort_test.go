@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/toposort"
 	"cuelang.org/go/internal/cuetdtest"
@@ -51,7 +50,7 @@ func TestTopologicalSort(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				v.Finalize(eval.NewContext(run, v))
+				v.Finalize(adt.NewContext(run, v))
 
 				evalWithOptions := export.Profile{
 					TakeDefaults:    true,

@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/cuetdtest"
 )
@@ -470,7 +469,7 @@ func TestStructural(t *testing.T) {
 				t.Fatal(errs)
 			}
 
-			ctx := eval.NewContext(r, root)
+			ctx := adt.NewContext(r, root)
 			root.Finalize(ctx)
 
 			// Use low-level lookup to avoid evaluation.

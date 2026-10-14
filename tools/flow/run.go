@@ -33,7 +33,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/value"
 )
@@ -80,7 +79,7 @@ func (c *Controller) runLoop() {
 				}
 
 				running = true
-				t.ctxt = eval.NewContext(value.ToInternal(t.v))
+				t.ctxt = value.OpContext(t.v)
 
 				go func(t *Task) {
 					if err := t.r.Run(t, nil); err != nil {

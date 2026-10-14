@@ -24,7 +24,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
@@ -62,8 +62,7 @@ func Benchmark(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
-		e := eval.New(r)
-		ctx := e.NewContext(v)
+		ctx := adt.NewContext(r, v)
 		v.Finalize(ctx)
 
 		if cuetest.UpdateGoldenFiles() {

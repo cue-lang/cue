@@ -21,7 +21,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
@@ -43,8 +42,7 @@ func Run(name string, t *testing.T) {
 			t.Fatal(errs)
 		}
 
-		e := eval.New(r)
-		ctx := e.NewContext(v)
+		ctx := adt.NewContext(r, v)
 		v.Finalize(ctx)
 
 		var verr errors.Error

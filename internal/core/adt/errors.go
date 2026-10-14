@@ -378,7 +378,6 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 // baseError contains common fields and methods for error types.
 type baseError struct {
 	r      Runtime
-	format func(Runtime, Node) string
 	v      *Vertex
 	pos    token.Pos
 	auxpos []token.Pos
@@ -477,7 +476,6 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 	err := &ValueError{
 		baseError: baseError{
 			r:       c.Runtime,
-			format:  c.format,
 			v:       c.errNode(),
 			pos:     p,
 			altPath: c.makeAltPath(),
@@ -547,7 +545,7 @@ func (e *ValueError) Msg() (format string, args []interface{}) {
 	format, args = e.Message.Msg()
 	for i, a := range args {
 		if x, ok := a.(Node); ok {
-			args[i] = Formatter{X: x, F: e.format, R: e.r}
+			args[i] = Formatter{X: x, R: e.r}
 		}
 	}
 	return format, args
@@ -570,8 +568,8 @@ func (e *ConflictError) Error() string {
 }
 
 func (e *ConflictError) Msg() (format string, args []interface{}) {
-	v1Str := Formatter{X: e.v1, F: e.format, R: e.r}
-	v2Str := Formatter{X: e.v2, F: e.format, R: e.r}
+	v1Str := Formatter{X: e.v1, R: e.r}
+	v2Str := Formatter{X: e.v2, R: e.r}
 	if e.k1 == e.k2 {
 		return "conflicting values %s and %s", []interface{}{v1Str, v2Str}
 	}

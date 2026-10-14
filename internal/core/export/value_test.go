@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
@@ -69,7 +68,7 @@ if false {
 			t.Fatal(err)
 		}
 
-		ctx := eval.NewContext(r, v)
+		ctx := adt.NewContext(r, v)
 		v.Finalize(ctx)
 
 		// Archives pinning an older language version, such as those covering
@@ -131,7 +130,7 @@ func TestValueX(t *testing.T) {
 		t.Fatal(errs)
 	}
 
-	ctx := eval.NewContext(r, v)
+	ctx := adt.NewContext(r, v)
 	ctx.LogEval = 1
 	v.Finalize(ctx)
 

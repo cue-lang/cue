@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -462,7 +461,7 @@ func newContext(idx *runtime.Runtime) *adt.OpContext {
 	if idx == nil {
 		return nil
 	}
-	return eval.NewContext(idx, nil)
+	return adt.NewContext(idx, nil)
 }
 
 func debugStr(ctx *adt.OpContext, v adt.Node) string {

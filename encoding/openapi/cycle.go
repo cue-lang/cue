@@ -21,7 +21,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/dep"
-	"cuelang.org/go/internal/core/eval"
 	internalvalue "cuelang.org/go/internal/value"
 )
 
@@ -39,7 +38,7 @@ func (b *builder) checkCycle(v cue.Value) bool {
 		return true
 	}
 	r, n := internalvalue.ToInternal(v)
-	ctx := eval.NewContext(r, n)
+	ctx := adt.NewContext(r, n)
 
 	err := dep.Visit(nil, ctx, n, func(d dep.Dependency) error {
 		if slices.Contains(b.ctx.cycleNodes, d.Node) {

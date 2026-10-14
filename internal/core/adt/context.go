@@ -59,29 +59,26 @@ type Runtime interface {
 	// ConfigureOpCtx configures the [*OpContext] with details such as
 	// evaluator version, debug options etc.
 	ConfigureOpCtx(ctx *OpContext)
-}
 
-type Config struct {
-	Runtime
-	Format func(Runtime, Node) string
+	// FormatNode prints n for use in errors or debugging.
+	FormatNode(n Node) string
 }
 
 var contextGeneration atomic.Uint64
 
-// New creates an operation context.
-func New(v *Vertex, cfg *Config) *OpContext {
-	if cfg.Runtime == nil {
+// NewContext creates an operation context.
+func NewContext(r Runtime, v *Vertex) *OpContext {
+	if r == nil {
 		panic("nil Runtime")
 	}
 
 	ctx := &OpContext{
 		opID:        contextGeneration.Add(1),
-		Runtime:     cfg.Runtime,
-		format:      cfg.Format,
+		Runtime:     r,
 		vertex:      v,
 		taskContext: schedConfig,
 	}
-	cfg.Runtime.ConfigureOpCtx(ctx)
+	r.ConfigureOpCtx(ctx)
 	ctx.stats.EvalVersion = ctx.Version
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
@@ -134,7 +131,6 @@ func (c *OpContext) IsValidator() bool {
 // errors and vertex to be restored.
 type OpContext struct {
 	Runtime
-	format func(Runtime, Node) string
 
 	cuedebug.Config
 	Version internal.EvaluatorVersion // Copied from Runtime
@@ -345,11 +341,6 @@ func (c *OpContext) Pos() token.Pos {
 
 func (c *OpContext) Source() ast.Node {
 	return c.src
-}
-
-// NewContext creates an operation context.
-func NewContext(r Runtime, v *Vertex) *OpContext {
-	return New(v, &Config{Runtime: r})
 }
 
 func (c *OpContext) pos() token.Pos {
@@ -1491,15 +1482,12 @@ func (c *OpContext) newList(src ast.Node, parent *Vertex) *Vertex {
 // String reports a string of x, for use in errors or debugging.
 // Use [OpContext.Str] instead for %s format arguments, as it delays the work.
 func (c *OpContext) String(x Node) string {
-	if c.format == nil {
-		return fmt.Sprintf("%T", x)
-	}
-	return c.format(c.Runtime, x)
+	return c.FormatNode(x)
 }
 
 // Str reports a string of x via a [fmt.Stringer], for use in errors or debugging.
 func (c *OpContext) Str(x Node) fmt.Stringer {
-	return Formatter{X: x, F: c.format, R: c.Runtime}
+	return Formatter{X: x, R: c.Runtime}
 }
 
 // Formatter wraps an adt.Node with the necessary information to print it.
@@ -1513,16 +1501,11 @@ func (c *OpContext) Str(x Node) fmt.Stringer {
 type Formatter struct {
 	X Node
 
-	// F formats Node, resolving references as needed.using Runtime.
-	// TODO: only used for cases where the debug printer is somehow
-	// circumvented. Verify this no longer happens.
-	F func(Runtime, Node) string
-
 	// TODO: is runtime needed? Probably not if we have a global string index.
 	R Runtime
 }
 
-func (f Formatter) String() string { return f.F(f.R, f.X) }
+func (f Formatter) String() string { return f.R.FormatNode(f.X) }
 
 // NewList returns a new list for the given values.
 func (c *OpContext) NewList(values ...Value) *Vertex {

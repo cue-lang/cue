@@ -35,7 +35,6 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
@@ -60,7 +59,7 @@ func TestDefinition(t *testing.T) {
 		if errs != nil {
 			t.Fatal(errs)
 		}
-		v.Finalize(eval.NewContext(r, v))
+		v.Finalize(adt.NewContext(r, v))
 
 		// Archives pinning an older language version, such as those covering
 		// the prefix alias syntax, must be exported in syntax valid there.
@@ -369,7 +368,7 @@ func TestX(t *testing.T) {
 	if errs != nil {
 		t.Fatal(errs)
 	}
-	v.Finalize(eval.NewContext(r, v))
+	v.Finalize(adt.NewContext(r, v))
 
 	file, errs := export.Def(r, "main", v)
 	if errs != nil {

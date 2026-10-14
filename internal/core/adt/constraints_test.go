@@ -20,7 +20,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 )
@@ -35,7 +34,7 @@ func TestMatchPatternValue(t *testing.T) {
 	}
 
 	r := runtime.New()
-	ctx := eval.NewContext(r, nil)
+	ctx := adt.NewContext(r, nil)
 
 	pv := func(t *testing.T, s string) adt.Value {
 		switch s {

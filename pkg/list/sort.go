@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/value"
 )
 
@@ -108,7 +107,7 @@ func (s *valueSorter) lessNew(i, j int) bool {
 
 func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 	v := cmp.Core()
-	ctx := eval.NewContext(v.R, v.V)
+	ctx := adt.NewContext(v.R, v.V)
 
 	n := &adt.Vertex{
 		Label:     v.V.Label,

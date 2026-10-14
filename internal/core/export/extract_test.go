@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
@@ -44,7 +43,7 @@ func TestExtract(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		ctx := eval.NewContext(r, v)
+		ctx := adt.NewContext(r, v)
 		v.Finalize(ctx)
 
 		writeDocs(t, r, v, nil)

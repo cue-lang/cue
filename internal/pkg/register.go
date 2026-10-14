@@ -20,7 +20,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -30,7 +29,7 @@ func Register(importPath string, p *Package) {
 		PkgName:    path.Base(importPath),
 	}
 	f := func(r adt.Runtime) (*adt.Vertex, errors.Error) {
-		ctx := eval.NewContext(r, nil)
+		ctx := adt.NewContext(r, nil)
 
 		return p.MustCompile(ctx, importPath), nil
 	}

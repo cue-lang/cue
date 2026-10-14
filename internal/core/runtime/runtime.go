@@ -18,6 +18,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 )
@@ -44,6 +45,12 @@ func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Version = r.version
 	ctx.Config = r.flags
+}
+
+var printConfig = &debug.Config{Compact: true, CompactBuiltins: true}
+
+func (r *Runtime) FormatNode(n adt.Node) string {
+	return debug.NodeString(r, n, printConfig)
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {

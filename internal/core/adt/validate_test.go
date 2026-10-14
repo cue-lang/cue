@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 )
@@ -429,7 +428,7 @@ func TestValidate(t *testing.T) {
 			t.M.TODO_NoSharing(t)
 		}
 		r := t.M.Runtime()
-		ctx := eval.NewContext(r, nil)
+		ctx := adt.NewContext(r, nil)
 
 		f, err := parser.ParseFile("test", tc.in)
 		if err != nil {

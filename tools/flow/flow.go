@@ -78,7 +78,6 @@ import (
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/value"
 )
 
@@ -251,7 +250,7 @@ func (c *Controller) addErr(err error, msg string) {
 // The instance value can either be a *cue.Instance or a cue.Value.
 func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 	v := inst.Value()
-	ctx := eval.NewContext(value.ToInternal(v))
+	ctx := value.OpContext(v)
 
 	c := &Controller{
 		isTask: f,

@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/walk"
 	"cuelang.org/go/internal/cueexperiment"
 )
@@ -453,7 +452,7 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion, carried...)
 	e := &exporter{
 		cfg:   p,
-		ctx:   eval.NewContext(r, n),
+		ctx:   adt.NewContext(r, n),
 		index: r,
 		pkgID: pkgID,
 

@@ -56,7 +56,7 @@ import (
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
@@ -697,7 +697,7 @@ func buildInstance(ctx *cue.Context, inst *build.Instance) (cue.Value, stats.Cou
 	if err != nil {
 		return cue.Value{}, stats.Counts{}, err
 	}
-	opCtx := eval.NewContext(rt, nil)
+	opCtx := adt.NewContext(rt, nil)
 	v.Finalize(opCtx)
 	return value.Make(opCtx, v), *opCtx.Stats(), nil
 }

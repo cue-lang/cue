@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -44,7 +43,7 @@ func Context[Ctx *cue.Runtime | *cue.Context | cue.Value | *adt.OpContext](ctx C
 	panic("unreachable")
 }
 
-// OpContext returns an OpContext with proper node formatting initialized.
+// OpContext returns an OpContext for the runtime and vertex underlying c.
 func OpContext[Ctx *cue.Runtime | *cue.Context | cue.Value](c Ctx) *adt.OpContext {
 	var r *runtime.Runtime
 	var v *adt.Vertex
@@ -59,7 +58,7 @@ func OpContext[Ctx *cue.Runtime | *cue.Context | cue.Value](c Ctx) *adt.OpContex
 	default:
 		panic("unreachable")
 	}
-	return eval.NewContext(r, v)
+	return adt.NewContext(r, v)
 }
 
 func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
@@ -98,7 +97,7 @@ func UnifyBuiltin(v cue.Value, kind string) cue.Value {
 func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
-	ctx := eval.NewContext(rt, nil)
+	ctx := adt.NewContext(rt, nil)
 	v := convert.FromGoValue(ctx, x, nilIsTop)
 	n := adt.ToVertex(v)
 	return r.Encode(n)
@@ -107,7 +106,7 @@ func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
 func FromGoType(r *cue.Context, x interface{}) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
-	ctx := eval.NewContext(rt, nil)
+	ctx := adt.NewContext(rt, nil)
 	v, err := convert.FromGoType(ctx, x)
 	if err != nil {
 		return r.Encode(&adt.Bottom{Err: err})

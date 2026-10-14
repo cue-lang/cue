@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetdtest"
@@ -60,7 +59,7 @@ func TestVisit(t *testing.T) {
 			t.Fatal(val.Err())
 		}
 
-		ctxt := eval.NewContext(value.ToInternal(val))
+		ctxt := value.OpContext(val)
 
 		testCases := []struct {
 			name string
@@ -164,7 +163,7 @@ func TestX(t *testing.T) {
 	out := debug.NodeString(r, n, nil)
 	t.Error(out)
 
-	ctxt := eval.NewContext(r, n)
+	ctxt := adt.NewContext(r, n)
 
 	for c := range n.LeafConjuncts() {
 		str := debug.NodeString(ctxt, c.Elem(), nil)

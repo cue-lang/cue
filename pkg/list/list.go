@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/iterutil"
 	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/value"
@@ -275,8 +274,7 @@ func UniqueItems(a []cue.Value) (pkg.Validator, error) {
 	// - Sort the elements based on the hash value.
 	// - Compare subsequent elements to see if they are equal.
 
-	tv := a[0].Core()
-	ctx := eval.NewContext(tv.R, tv.V)
+	ctx := value.OpContext(a[0])
 
 	posX, posY := 0, 0
 	code := adt.IncompleteError

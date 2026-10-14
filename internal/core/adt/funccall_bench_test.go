@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -166,7 +165,7 @@ out: [for i in list.Range(0, %d, 1) {%s}]
 	}
 	evaluate := func() (*adt.Vertex, *adt.OpContext) {
 		v := &adt.Vertex{Conjuncts: root.Conjuncts}
-		ctx := eval.NewContext(r, v)
+		ctx := adt.NewContext(r, v)
 		v.Finalize(ctx)
 		return v, ctx
 	}

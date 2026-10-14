@@ -501,15 +501,13 @@ cannot import package as definition identifier`,
 			desc: "import path as a bytes literal",
 			in: `import 'foo'
 			a: 1`,
-			// The import path is not a double-quoted string, yet is accepted.
-			out: "import 'foo', a: 1",
+			out: "import 'foo', a: 1\nimport path must be a double-quoted string",
 		},
 		{
 			desc: "import path as a raw string",
 			in: `import #"foo"#
 			a: 1`,
-			// The import path is not a double-quoted string, yet is accepted.
-			out: "import #\"foo\"#, a: 1",
+			out: "import #\"foo\"#, a: 1\nimport path must be a double-quoted string",
 		},
 		{
 			desc: "import path as a multiline string",
@@ -517,8 +515,7 @@ cannot import package as definition identifier`,
 				foo
 				"""
 			a: 1`,
-			// The import path is not a double-quoted string, yet is accepted.
-			out: "import \"\"\"\n\t\t\t\tfoo\n\t\t\t\t\"\"\", a: 1",
+			out: "import \"\"\"\n\t\t\t\tfoo\n\t\t\t\t\"\"\", a: 1\nimport path must be a double-quoted string",
 		},
 		{
 			desc: "missing import path in a group",
@@ -2318,8 +2315,8 @@ func TestImports(t *testing.T) {
 		`"a"`:        true,
 		`"a/b"`:      true,
 		`"a.b"`:      true,
-		`'m\x61th'`:  true, // not a double-quoted string, yet accepted
-		`#"a"#`:      true, // not a double-quoted string, yet accepted
+		`'m\x61th'`:  false,
+		`#"a"#`:      false,
 		`"greek/αβ"`: true,
 		`""`:         false,
 

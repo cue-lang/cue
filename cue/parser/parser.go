@@ -2592,7 +2592,10 @@ func (p *parser) parseImportSpec() *ast.ImportSpec {
 	switch {
 	case p.tok == token.STRING:
 		path, n = p.lit, p.litLen()
-		if !isValidImport(path) {
+		// The spec only allows single-line double-quoted strings.
+		if !strings.HasPrefix(path, `"`) || strings.HasPrefix(path, `"""`) {
+			p.errf(pos, "import path must be a double-quoted string")
+		} else if !isValidImport(path) {
 			p.errf(pos, "invalid import path: %s", path)
 		}
 		p.next()

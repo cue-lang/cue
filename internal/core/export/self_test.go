@@ -46,14 +46,13 @@ func TestSelfContained(t *testing.T) {
 		ToDo: map[string]string{
 			"self-v3/selfcontained/import": `wa: reference "_hidden_567475F3" not found:`,
 
-			"self/selfcontained/cyclic":            `reference not properly substituted`,
 			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
 			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,
 
-			// A reference into a comprehension scope is left dangling in a
-			// hoisted let binding.
-			"self-v3/selfcontained/issue2944":         `let[].#x: reference "test" not found`,
-			"self-v3-noshare/selfcontained/issue2944": `let[].#x: reference "test" not found`,
+			// The hoisted let bindings leave self references dangling and
+			// replace the comprehension body with an unrelated reference.
+			"self-v3/selfcontained/issue2944":         `result.tests.0: field not allowed`,
+			"self-v3-noshare/selfcontained/issue2944": `result.tests.0: field not allowed`,
 		},
 	}
 

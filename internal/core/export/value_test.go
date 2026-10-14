@@ -31,10 +31,6 @@ import (
 	"golang.org/x/tools/txtar"
 )
 
-var exclude = map[string]string{
-	"scalardef": "incomplete",
-}
-
 func TestValue(t *testing.T) {
 	t.Parallel()
 	const debugValue = `
@@ -49,7 +45,6 @@ if false {
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/main",
 		Name:   "value",
-		Skip:   exclude,
 		Matrix: cuetdtest.SmallMatrix,
 
 		// Uncomment to debug an isolated test case.

@@ -65,10 +65,6 @@ type TxTarTest struct {
 	// functionality share the same test sets.
 	Fallback string
 
-	// Skip is a map of tests to skip; the key is the test name; the value is the
-	// skip message.
-	Skip map[string]string
-
 	// ToDo is a map of tests that should be skipped now, but should be fixed.
 	ToDo map[string]string
 
@@ -549,9 +545,6 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				if tc.HasTag("skip-" + tc.Name()) {
 					t.Skip()
 				}
-			}
-			if msg, ok := x.Skip[testName]; ok {
-				t.Skip(msg)
 			}
 			if msg, ok := x.ToDo[testName]; ok {
 				t.Skip(msg)

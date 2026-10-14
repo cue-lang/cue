@@ -103,15 +103,3 @@ func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 		})
 	}
 }
-
-func (m *M) TODO_Sharing(t testing.TB) {
-	if m.Flags.Sharing {
-		t.Skip("Skipping v3 with sharing")
-	}
-}
-
-func (m *M) TODO_NoSharing(t testing.TB) {
-	if m.version == internal.EvalV3 && !m.Flags.Sharing {
-		t.Skip("Skipping v3 without sharing")
-	}
-}

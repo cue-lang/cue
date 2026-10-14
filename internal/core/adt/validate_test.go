@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/cuetdtest"
-	"cuelang.org/go/internal/cuetest"
 )
 
 func TestValidate(t *testing.T) {
@@ -36,7 +35,8 @@ func TestValidate(t *testing.T) {
 		cfg    *adt.ValidateConfig
 		all    bool // use ValidateAll
 
-		skipNoShare bool
+		// outNoShare, if set, is the expected output without sharing.
+		outNoShare string
 	}
 	testCases := []testCase{{
 		name: "no error, but not concrete, even with definition label",
@@ -400,7 +400,11 @@ func TestValidate(t *testing.T) {
 				config.v.x.y: incomplete value string:
 				    test:2:11
 				    test:3:11`,
-		skipNoShare: true,
+		// The path is what matters here. With sharing, the error also
+		// carries the position of the shared #A reference in #B.
+		outNoShare: `incomplete
+				config.v.x.y: incomplete value string:
+				    test:2:11`,
 	}, {
 		// A let is not validated by itself, so the shared value is only
 		// reachable through the hidden field. Without sharing, _h holds
@@ -419,14 +423,19 @@ func TestValidate(t *testing.T) {
 				x.y.b: conflicting values 4 and 3:
 				    test:2:30
 				    test:2:34`,
-		skipNoShare: true,
+		outNoShare: `eval
+				_h.a: conflicting values 2 and 1:
+				    test:2:20
+				    test:2:24
+				    test:3:8
+				eval
+				_h.b: conflicting values 4 and 3:
+				    test:2:30
+				    test:2:34
+				    test:3:8`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
-		t.Update(cuetest.UpdateGoldenFiles())
-		if tc.skipNoShare {
-			t.M.TODO_NoSharing(t)
-		}
 		r := t.M.Runtime()
 		ctx := adt.NewContext(r, nil)
 
@@ -458,6 +467,10 @@ func TestValidate(t *testing.T) {
 
 		got := strings.TrimSpace(w.String())
 		got = strings.ReplaceAll(got, "\n", "\n\t\t\t\t")
-		t.Equal(got, tc.out)
+		if !t.M.Flags.Sharing && tc.outNoShare != "" {
+			t.Equal(got, tc.outNoShare)
+		} else {
+			t.Equal(got, tc.out)
+		}
 	})
 }

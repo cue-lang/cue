@@ -53,10 +53,12 @@ a: {
 c: 2
 -- standalone/syntaxerr.cue.golden --
 a: range:0:0-2:1 selectionRange:0:0-0:1
+a.b: range:1:2-1:7 selectionRange:1:2-1:3
 c: range:3:0-3:4 selectionRange:3:0-3:1
 -- standalone/syntaxerrstart.cue --
 b: (1
 -- standalone/syntaxerrstart.cue.golden --
+b: range:0:0-0:5 selectionRange:0:0-0:1
 `
 
 	archive := make(map[string][]byte)

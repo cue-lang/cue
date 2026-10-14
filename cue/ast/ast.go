@@ -1101,13 +1101,35 @@ func (x *Func) End() token.Pos {
 	}
 	return token.NoPos
 }
-func (x *StructLit) End() token.Pos {
-	if x.Rbrace == token.NoPos && len(x.Elts) > 0 {
-		return x.Elts[len(x.Elts)-1].End()
+
+// bracketEnd returns the end of a node delimited by brackets. When the
+// closing bracket has no position, such as when it is missing due to a
+// syntax error, it falls back to the end of the last element, or to
+// that of the opening bracket.
+func bracketEnd(open, close token.Pos, last Node) token.Pos {
+	if close.IsValid() {
+		return close.Add(1)
 	}
-	return x.Rbrace.Add(1)
+	if last != nil {
+		return last.End()
+	}
+	return open.Add(1)
 }
-func (x *ListLit) End() token.Pos { return x.Rbrack.Add(1) }
+
+// lastNode returns the last of nodes, or nil if there are none.
+func lastNode[T Node](nodes []T) Node {
+	if n := len(nodes); n > 0 {
+		return nodes[n-1]
+	}
+	return nil
+}
+
+func (x *StructLit) End() token.Pos {
+	return bracketEnd(x.Lbrace, x.Rbrace, lastNode(x.Elts))
+}
+func (x *ListLit) End() token.Pos {
+	return bracketEnd(x.Lbrack, x.Rbrack, lastNode(x.Elts))
+}
 func (x *Ellipsis) End() token.Pos {
 	if x.Type != nil {
 		return x.Type.End()
@@ -1124,13 +1146,30 @@ func (x *TryClause) End() token.Pos {
 func (x *ForClause) End() token.Pos      { return x.Source.End() }
 func (x *IfClause) End() token.Pos       { return x.Condition.End() }
 func (x *FallbackClause) End() token.Pos { return x.Body.End() }
-func (x *ParenExpr) End() token.Pos      { return x.Rparen.Add(1) }
-func (x *SelectorExpr) End() token.Pos   { return x.Sel.End() }
-func (x *IndexExpr) End() token.Pos      { return x.Rbrack.Add(1) }
-func (x *SliceExpr) End() token.Pos      { return x.Rbrack.Add(1) }
-func (x *CallExpr) End() token.Pos       { return x.Rparen.Add(1) }
-func (x *UnaryExpr) End() token.Pos      { return x.X.End() }
-func (x *BinaryExpr) End() token.Pos     { return x.Y.End() }
+func (x *ParenExpr) End() token.Pos {
+	return bracketEnd(x.Lparen, x.Rparen, x.X)
+}
+func (x *SelectorExpr) End() token.Pos { return x.Sel.End() }
+func (x *IndexExpr) End() token.Pos {
+	return bracketEnd(x.Lbrack, x.Rbrack, x.Index)
+}
+func (x *SliceExpr) End() token.Pos {
+	// The position of ":" is not recorded, so without a closing
+	// bracket this falls short of it.
+	last := x.High
+	if last == nil {
+		last = x.Low
+	}
+	return bracketEnd(x.Lbrack, x.Rbrack, last)
+}
+func (x *CallExpr) End() token.Pos {
+	if !x.Rparen.IsValid() && x.Ellipsis.IsValid() {
+		return x.Ellipsis.Add(3) // len("...")
+	}
+	return bracketEnd(x.Lparen, x.Rparen, lastNode(x.Args))
+}
+func (x *UnaryExpr) End() token.Pos  { return x.X.End() }
+func (x *BinaryExpr) End() token.Pos { return x.Y.End() }
 func (x *PostfixExpr) End() token.Pos {
 	switch x.Op {
 	case token.ELLIPSIS:
@@ -1244,13 +1283,7 @@ func (d *EmbedDecl) pos() *token.Pos  { return d.Expr.pos() }
 
 func (d *BadDecl) End() token.Pos { return d.To }
 func (d *ImportDecl) End() token.Pos {
-	if d.Rparen.IsValid() {
-		return d.Rparen.Add(1)
-	}
-	if len(d.Specs) == 0 {
-		return token.NoPos
-	}
-	return d.Specs[0].End()
+	return bracketEnd(d.Lparen, d.Rparen, lastNode(d.Specs))
 }
 func (d *EmbedDecl) End() token.Pos { return d.Expr.End() }
 

@@ -2467,15 +2467,15 @@ func TestIssue57490(t *testing.T) {
 		end string
 	}{
 		{"x: {a: int, b: int}\ny: x.", "2:6"},
-		{"a: {", "-"},                    // End is invalid.
-		{"a: [1, 2", "-"},                // End is invalid.
-		{"a: [", "-"},                    // End is invalid.
-		{"a: (1", "-"},                   // End is invalid.
-		{"a: b[1", "-"},                  // End is invalid.
-		{"a: b[1:2", "-"},                // End is invalid.
-		{"a: f(1", "-"},                  // End is invalid.
-		{"a: f(", "-"},                   // End is invalid.
-		{"import (\"a\"\n\"b\"", "1:12"}, // End is that of the first spec.
+		{"a: {", "1:5"},
+		{"a: [1, 2", "1:9"},
+		{"a: [", "1:5"},
+		{"a: (1", "1:6"},
+		{"a: b[1", "1:7"},
+		{"a: b[1:2", "1:9"},
+		{"a: f(1", "1:7"},
+		{"a: f(", "1:6"},
+		{"import (\"a\"\n\"b\"", "2:4"},
 	} {
 		file, err := parser.ParseFile("", tc.in)
 		if err == nil {

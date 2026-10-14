@@ -15,7 +15,6 @@
 package adt_test
 
 import (
-	"flag"
 	"fmt"
 	"path/filepath"
 	"slices"
@@ -37,35 +36,6 @@ import (
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
-
-var (
-	todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
-)
-
-// TestEvalV2 tests the old implementation of the evaluator.
-// Note that [TestEvalV3] with CUE_UPDATE=1 assumes it runs after this test
-// for the sake of comparing results between the two evaluator versions.
-// As such, these two tests are not parallel at the top level.
-//
-// Note that this also means that CUE_UPDATE=1 is broken under `go test -shuffle`.
-func TestEvalV2(t *testing.T) {
-	t.Skip("TODO: this will become the main test after EvalV3 promotes")
-	test := cuetxtar.TxTarTest{
-		Root: "../../../cue/testdata",
-		Name: "eval",
-	}
-	cuedebug.Init()
-	dbg := cuedebug.Flags
-	cueexperiment.Init()
-	exp := cueexperiment.Flags
-	if *todo {
-		test.ToDo = nil
-	}
-	test.Run(t, func(t *cuetxtar.Test) {
-		t.Parallel()
-		runEvalTest(t, internal.EvalV3, dbg, exp)
-	})
-}
 
 func TestEvalV3(t *testing.T) {
 	adt.DebugDeps = true // check unmatched dependencies.
@@ -89,19 +59,15 @@ func TestEvalV3(t *testing.T) {
 	cueexperiment.Init()
 	exp := cueexperiment.Flags
 
-	if *todo {
-		test.ToDo = nil
-	}
-
 	test.Run(t, func(t *cuetxtar.Test) {
 		t.Parallel()
-		runEvalTest(t, internal.EvalV3, dbg, exp)
+		runEvalTest(t, dbg, exp)
 	})
 }
 
-func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedebug.Config, exp cueexperiment.Config) (errorCount int64) {
+func runEvalTest(t *cuetxtar.Test, dbg cuedebug.Config, exp cueexperiment.Config) {
 	a := t.Instance()
-	r := runtime.NewWithSettings(version, dbg)
+	r := runtime.NewWithSettings(internal.EvalV3, dbg)
 	r.SetGlobalExperiments(&exp)
 
 	v, err := r.Build(nil, a)
@@ -113,27 +79,9 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 	ctx := adt.NewContext(r, v)
 	v.Finalize(ctx)
 
-	switch counts := ctx.Stats(); {
-	case version == internal.DevVersion:
-		// V2 is no longer supported. Write stats to out/eval/stats (the
-		// fallback name) directly — no evalalpha diff section is generated.
-		// If out/evalalpha/stats or its diff section exist in the archive,
-		// remove them so that CUE_UPDATE=1 cleans them up.
-		hasStats := slices.ContainsFunc(t.Archive.Files, func(f txtar.File) bool {
-			return f.Name == "out/eval/stats" || f.Name == "out/evalalpha/stats"
-		})
-		if hasStats {
-			t.Archive.Files = slices.DeleteFunc(t.Archive.Files, func(f txtar.File) bool {
-				return f.Name == "out/evalalpha/stats" ||
-					f.Name == "diff/-out/evalalpha/stats<==>+out/eval/stats"
-			})
-			w := t.WriterFallback("stats")
-			fmt.Fprintln(w, counts)
-		}
-
-	default:
-		w := t.Writer("stats")
-		fmt.Fprintln(w, counts)
+	// Write stats to out/eval/stats, the fallback name, when present.
+	if slices.ContainsFunc(t.Archive.Files, func(f txtar.File) bool { return f.Name == "out/eval/stats" }) {
+		fmt.Fprintln(t.WriterFallback("stats"), ctx.Stats())
 	}
 
 	// if n := stats.Leaks(); n > 0 {
@@ -163,7 +111,6 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, dbg cuedeb
 	}
 
 	t.Write(debug.AppendNode(nil, r, v, &debug.Config{Cwd: t.Dir}))
-	return
 }
 
 func TestIssue3985(t *testing.T) {

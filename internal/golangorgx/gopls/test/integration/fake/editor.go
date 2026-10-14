@@ -81,8 +81,9 @@ type EditorConfig struct {
 	// Editor.ChangeConfiguration has no effect.
 	ClientName string
 
-	// WorkspaceFolders is the workspace folders to configure on the LSP server,
-	// relative to the sandbox workdir.
+	// WorkspaceFolders is the workspace folders to configure on the LSP server.
+	// Each workspace folder is a file path relative to the sandbox workdir, or
+	// a URI, used to test virtual folders with non-file URI schemes.
 	//
 	// As a special case, if WorkspaceFolders is nil the editor defaults to
 	// configuring a single workspace folder corresponding to the workdir root.
@@ -90,7 +91,8 @@ type EditorConfig struct {
 	WorkspaceFolders []string
 
 	// RootURIAsDefaultFolder configures the RootURI initialization
-	// parameter to be set to the default workdir root.
+	// parameter to be set to the first workspace folder, as VS Code does,
+	// or to the default workdir root if there are no workspace folders.
 	RootURIAsDefaultFolder bool
 
 	// Whether to edit files with windows line endings.
@@ -251,7 +253,11 @@ func (e *Editor) initialize(ctx context.Context) error {
 	params.InitializationOptions = makeSettings(e.sandbox, config, nil)
 	params.WorkspaceFolders = makeWorkspaceFolders(e.sandbox, config.WorkspaceFolders)
 	if config.RootURIAsDefaultFolder {
-		params.RootURI = e.sandbox.Workdir.URI(string(e.sandbox.Workdir.RelativeTo))
+		if len(params.WorkspaceFolders) > 0 {
+			params.RootURI = protocol.DocumentURI(params.WorkspaceFolders[0].URI)
+		} else {
+			params.RootURI = e.sandbox.Workdir.URI(string(e.sandbox.Workdir.RelativeTo))
+		}
 	}
 
 	capabilities, err := clientCapabilities(config)
@@ -353,7 +359,10 @@ func makeWorkspaceFolders(sandbox *Sandbox, paths []string) (folders []protocol.
 	}
 
 	for _, path := range paths {
-		uri := string(sandbox.Workdir.URI(path))
+		uri := path
+		if !strings.Contains(path, "://") { // relative file path
+			uri = string(sandbox.Workdir.URI(path))
+		}
 		folders = append(folders, protocol.WorkspaceFolder{
 			URI:  uri,
 			Name: filepath.Base(uri),

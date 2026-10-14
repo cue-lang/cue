@@ -94,10 +94,11 @@ func (s Settings) set(opts *runConfig) {
 	maps.Copy(opts.editor.Settings, s)
 }
 
-// WorkspaceFolders configures the workdir-relative workspace folders to send
-// to the LSP server. By default the editor sends a single workspace folder
-// corresponding to the workdir root. To explicitly configure no workspace
-// folders, use WorkspaceFolders with no arguments.
+// WorkspaceFolders configures the workspace folders to send to the LSP
+// server, as workdir-relative paths or as URIs such as virtual:///path.
+// By default the editor sends a single workspace folder corresponding to
+// the workdir root. To explicitly configure no workspace folders, use
+// WorkspaceFolders with no arguments.
 func WorkspaceFolders(relFolders ...string) RunOption {
 	if len(relFolders) == 0 {
 		// Use an empty non-nil slice to signal explicitly no folders.
@@ -110,8 +111,9 @@ func WorkspaceFolders(relFolders ...string) RunOption {
 }
 
 // RootURIAsDefaultFolder configures the RootURI initialization
-// parameter to be set to the default workdir root. This is sent to the
-// LSP server as part of initialization.
+// parameter to be set to the first workspace folder, as VS Code does,
+// or to the default workdir root if there are no workspace folders.
+// This is sent to the LSP server as part of initialization.
 func RootURIAsDefaultFolder() RunOption {
 	return optionSetter(func(opts *runConfig) {
 		opts.editor.RootURIAsDefaultFolder = true

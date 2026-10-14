@@ -54,6 +54,9 @@ package a
 		name  string
 		opts  []I.RunOption
 		files string
+		// skippedFolders is the number of virtual folders, with non-file
+		// URIs, which the server is expected to skip.
+		skippedFolders int
 	}
 	tests := []tc{
 		{
@@ -100,6 +103,50 @@ package a
 			},
 			files: filesOneModule,
 		},
+		{
+			// Virtual folders, such as those registered by VS Code
+			// extensions like GitLens, are skipped.
+			name: "virtual folder",
+			opts: []I.RunOption{
+				I.WorkspaceFolders("virtual:///virtualpath"),
+				// TODO: initialize fails instead.
+				I.InitializeError(`.*invalid WorkspaceFolder.URI.*`),
+			},
+			files:          filesOneModule,
+			skippedFolders: 1,
+		},
+		{
+			name: "real and virtual folders",
+			opts: []I.RunOption{
+				I.WorkspaceFolders("a", "decompileFs:///virtualpath", "b"),
+				// TODO: initialize fails instead.
+				I.InitializeError(`.*invalid WorkspaceFolder.URI.*`),
+			},
+			files:          filesOneModule,
+			skippedFolders: 1,
+		},
+		{
+			// The rooturi is the first workspace folder in VS Code,
+			// so it may be a virtual folder as well.
+			name: "virtual first folder, rooturi set",
+			opts: []I.RunOption{
+				I.WorkspaceFolders("virtual:///virtualpath", "a"),
+				I.RootURIAsDefaultFolder(),
+				// TODO: initialize fails instead.
+				I.InitializeError(`.*DocumentURI scheme is not 'file'.*`),
+			},
+			files:          filesOneModule,
+			skippedFolders: 1,
+		},
+		{
+			// A malformed file URI is not a virtual folder, so it is an error.
+			name: "malformed file folder",
+			opts: []I.RunOption{
+				I.WorkspaceFolders("file:///bad%zz"),
+				I.InitializeError(`.*invalid WorkspaceFolder.URI.*`),
+			},
+			files: filesOneModule,
+		},
 	}
 
 	for _, tc := range tests {
@@ -113,7 +160,10 @@ package a
 				got := env.BufferText("a/a.cue")
 				want := "package a\n\nx: 5\n"
 				qt.Assert(t, qt.Equals(got, want))
-				env.Await(env.DoneWithChange())
+				env.Await(
+					env.DoneWithChange(),
+					I.LogExactf(protocol.Warning, tc.skippedFolders, false, "skip adding virtual folder"),
+				)
 			})
 		})
 	}
@@ -135,9 +185,13 @@ package a
 			env.DoneDiagnosingChanges(),
 			I.NoLogExactf(protocol.Debug, "Module dir=%v module=unknown Created", rootURI),
 		)
-		env.ChangeWorkspaceFolders(rootURI.FilePath())
+		// The virtual folder is skipped, and the real one is added.
+		env.ChangeWorkspaceFolders(rootURI.FilePath(), "virtual:///virtualpath")
 		env.Await(
 			env.DoneDiagnosingChanges(),
+			// TODO: all added folders are rejected instead.
+			I.LogExactf(protocol.Warning, 0, false, "skip adding virtual folder"),
+			I.LogExactf(protocol.Debug, 0, false, "Workspace folder added: %v", rootURI),
 			I.NoLogExactf(protocol.Debug, "Module dir=%v module=unknown Created", rootURI),
 		)
 		env.OpenFile("a/a.cue")

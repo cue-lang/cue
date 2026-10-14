@@ -328,6 +328,54 @@ single postfix alias "_" field cannot be the blank identifier`,
 			out: "a.b._\nexpected selector, found 'STRING' \"\"\"\n\t\t\t\"\"\"",
 		},
 		{
+			desc: "missing selector before a closing brace",
+			in: `a: {b.}
+			c: 1`,
+			// The closing brace is consumed, so the error cascades.
+			out: "a: {b._, c: 1}\nexpected selector, found '}' (and 1 more errors)",
+		},
+		{
+			desc: "missing selector before a closing bracket",
+			in:   `a: [b.], c: 1`,
+			// The closing bracket is consumed, so the error cascades.
+			out: "a: [b._, c, 1]\nexpected selector, found ']' (and 2 more errors)",
+		},
+		{
+			desc: "missing selector before a closing parenthesis",
+			in:   `a: f(b.), c: 1`,
+			// The closing parenthesis is consumed, so the error cascades.
+			out: "a: f(b._, c: 1)\nexpected selector, found ')' (and 2 more errors)",
+		},
+		{
+			desc: "missing selector before a closing function parameter list",
+			in:   `a: func(b.): int, c: 1`,
+			// The closing parenthesis is consumed, so the error cascades.
+			out: "a: func(b._, c: 1)\nexpected selector, found ')' (and 2 more errors)",
+		},
+		{
+			desc: "missing selector before a comma",
+			in:   `a: b., c: 1`,
+			// The comma is consumed, so the error cascades.
+			out: "a: b._, <*ast.BadExpr>\nexpected selector, found ',' (and 2 more errors)",
+		},
+		{
+			desc: "missing selector before a stray closing brace",
+			in: `a: b.}
+			c: 1`,
+			out: "a: b._, c: 1\nexpected selector, found '}'",
+		},
+		{
+			desc: "missing selector before a stray closing parenthesis",
+			in:   `a: {for x in b.) {}}`,
+			out:  "a: {for x in b._ {}}\nexpected selector, found ')'",
+		},
+		{
+			desc: "missing selector in an interpolation",
+			in:   `a: "\(b.)", c: 1`,
+			// The closing parenthesis is consumed, so the error cascades.
+			out: "a: \"\\(b._1\nexpected selector, found ')' (and 3 more errors)",
+		},
+		{
 			desc: "expression embedding",
 			in: `#Def: {
 			a.b.c

@@ -16,6 +16,7 @@ package lsprpc
 
 import (
 	"context"
+	"errors"
 	"net"
 	"os"
 	"path/filepath"
@@ -24,7 +25,7 @@ import (
 )
 
 func TestDialNetCanceled(t *testing.T) {
-	// A context which is done during the retries should stop them
+	// A context which is done during the retries stops them
 	// rather than waiting for all of them.
 	addr := filepath.Join(t.TempDir(), "missing.sock")
 	d, err := newAutoDialer("unix;"+addr, nil)
@@ -33,16 +34,13 @@ func TestDialNetCanceled(t *testing.T) {
 	}
 	ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 	defer cancel()
-	done := make(chan error, 1)
-	go func() {
-		_, err := d.dialNet(ctx)
-		done <- err
-	}()
-	// The retries ignore the deadline and take about 13s.
-	select {
-	case err := <-done:
-		t.Fatalf("dialing stopped at the deadline with error %v", err)
-	case <-time.After(time.Second):
+	start := time.Now()
+	if _, err := d.dialNet(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("got error %v, want %v", err, context.DeadlineExceeded)
+	}
+	// All the retries take about 13s.
+	if elapsed := time.Since(start); elapsed > 5*time.Second {
+		t.Fatalf("dialing took %v, want it to stop at the deadline", elapsed)
 	}
 
 	// A canceled context does not make a running daemon look absent,
@@ -64,9 +62,8 @@ func TestDialNetCanceled(t *testing.T) {
 	}
 	ctx, cancel = context.WithCancel(t.Context())
 	cancel()
-	// The canceled context is ignored, so the dial succeeds.
-	if _, err := d.dialNet(ctx); err != nil {
-		t.Fatalf("got error %v, want none", err)
+	if _, err := d.dialNet(ctx); !errors.Is(err, context.Canceled) {
+		t.Fatalf("got error %v, want %v", err, context.Canceled)
 	}
 	if _, err := os.Stat(addr); err != nil {
 		t.Fatal(err)

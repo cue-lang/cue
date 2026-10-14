@@ -61,11 +61,16 @@ func (d *autoDialer) dialNet(ctx context.Context) (net.Conn, error) {
 		// closed.
 		return nil, fmt.Errorf("socket %q is owned by a different user", d.addr)
 	}
-	const dialTimeout = 1 * time.Second
+	dialer := net.Dialer{Timeout: 1 * time.Second}
 	// Try dialing our remote once, in case it is already running.
-	netConn, err := net.DialTimeout(d.network, d.addr, dialTimeout)
+	netConn, err := dialer.DialContext(ctx, d.network, d.addr)
 	if err == nil {
 		return netConn, nil
+	}
+	// A dial cut short by the context says nothing about whether the remote
+	// is running, so do not remove its socket or start another one.
+	if ctx.Err() != nil {
+		return nil, fmt.Errorf("dialing remote: %w", ctx.Err())
 	}
 	if d.isAuto && d.argFunc != nil {
 		if d.network == "unix" {
@@ -92,11 +97,18 @@ func (d *autoDialer) dialNet(ctx context.Context) (net.Conn, error) {
 	// so we retry with exponential backoff.
 	const retries = 8
 	for retry := range retries {
-		time.Sleep(50 * time.Millisecond << retry) // 50ms, 100ms, ..., 6.4s (total ~12.8s)
-		netConn, err = net.DialTimeout(d.network, d.addr, dialTimeout)
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("dialing remote: %w", ctx.Err())
+		case <-time.After(50 * time.Millisecond << retry): // 50ms, 100ms, ..., 6.4s (total ~12.8s)
+		}
+		netConn, err = dialer.DialContext(ctx, d.network, d.addr)
 		if err == nil {
 			return netConn, nil
 		}
+	}
+	if ctx.Err() != nil {
+		err = ctx.Err() // the last dial was cut short
 	}
 	return nil, fmt.Errorf("dialing remote: %w", err)
 }

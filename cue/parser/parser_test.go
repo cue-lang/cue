@@ -498,6 +498,29 @@ cannot import package as definition identifier`,
 			out: "import , a: 1, b: 2\nimport path must be a string",
 		},
 		{
+			desc: "import path as a bytes literal",
+			in: `import 'foo'
+			a: 1`,
+			// The import path is not a double-quoted string, yet is accepted.
+			out: "import 'foo', a: 1",
+		},
+		{
+			desc: "import path as a raw string",
+			in: `import #"foo"#
+			a: 1`,
+			// The import path is not a double-quoted string, yet is accepted.
+			out: "import #\"foo\"#, a: 1",
+		},
+		{
+			desc: "import path as a multiline string",
+			in: `import """
+				foo
+				"""
+			a: 1`,
+			// The import path is not a double-quoted string, yet is accepted.
+			out: "import \"\"\"\n\t\t\t\tfoo\n\t\t\t\t\"\"\", a: 1",
+		},
+		{
 			desc: "missing import path in a group",
 			in: `import (
 				foo
@@ -2295,32 +2318,26 @@ func TestImports(t *testing.T) {
 		`"a"`:        true,
 		`"a/b"`:      true,
 		`"a.b"`:      true,
-		`'m\x61th'`:  true,
+		`'m\x61th'`:  true, // not a double-quoted string, yet accepted
+		`#"a"#`:      true, // not a double-quoted string, yet accepted
 		`"greek/αβ"`: true,
 		`""`:         false,
 
-		// Each of these pairs tests both #""# vs "" strings
-		// and also use of invalid characters spelled out as
-		// escape sequences and written directly.
-		// For example `"\x00"` tests import "\x00"
-		// while "`\x00`" tests import `<actual-NUL-byte>`.
-		`#"a"#`:        true,
+		// Invalid characters, spelled out as escape sequences
+		// and written directly. For example, `"\x00"` tests
+		// an escaped NUL, while "\"\x00\"" tests an actual NUL byte.
 		`"\x00"`:       false,
-		"'\x00'":       false,
+		"\"\x00\"":     false,
 		`"\x7f"`:       false,
-		"`\x7f`":       false,
+		"\"\x7f\"":     false,
 		`"a!"`:         false,
-		"#'a!'#":       false,
 		`"a b"`:        false,
-		`#"a b"#`:      false,
 		`"a\\b"`:       false,
-		"#\"a\\b\"#":   false,
 		"\"`a`\"":      false,
-		"#'\"a\"'#":    false,
 		`"\x80\x80"`:   false,
-		"#'\x80\x80'#": false,
+		"\"\x80\x80\"": false,
 		`"\xFFFD"`:     false,
-		"#'\xFFFD'#":   false,
+		"\"\uFFFD\"":   false,
 	}
 	for path, isValid := range imports {
 		t.Run(path, func(t *testing.T) {

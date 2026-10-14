@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
@@ -27,11 +28,27 @@ import (
 	"cuelang.org/go/internal/lsp/cache"
 )
 
-func validateWorkspaceFolders(folders []protocol.WorkspaceFolder) (map[protocol.WorkspaceFolder]protocol.DocumentURI, error) {
+// isVirtualFolder reports whether a workspace folder URI is not a file URI.
+// Clients such as VS Code support extensions which register virtual file
+// systems with custom schemes like gitlens:// or decompileFs://.
+func isVirtualFolder(uri string) bool {
+	return !strings.HasPrefix(uri, "file://")
+}
+
+// validateWorkspaceFolders parses the URIs of the given workspace folders.
+// Virtual folders are skipped with a warning; see [isVirtualFolder].
+func (s *server) validateWorkspaceFolders(ctx context.Context, folders []protocol.WorkspaceFolder) (map[protocol.WorkspaceFolder]protocol.DocumentURI, error) {
 	withParsedUri := make(map[protocol.WorkspaceFolder]protocol.DocumentURI)
 	for _, folder := range folders {
 		if folder.URI == "" {
 			return nil, fmt.Errorf("empty WorkspaceFolder.URI")
+		}
+		if isVirtualFolder(folder.URI) {
+			s.client.LogMessage(ctx, &protocol.LogMessageParams{
+				Type:    protocol.Warning,
+				Message: fmt.Sprintf("skip adding virtual folder %q", folder.URI),
+			})
+			continue
 		}
 		uri, err := protocol.ParseDocumentURI(folder.URI)
 		if err != nil {
@@ -71,13 +88,15 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 
 	folders := params.WorkspaceFolders
 	if len(folders) == 0 && params.RootURI != "" {
-		folders = []protocol.WorkspaceFolder{{
-			URI:  string(params.RootURI),
-			Name: path.Base(params.RootURI.FilePath()),
-		}}
+		folder := protocol.WorkspaceFolder{URI: params.RootURI}
+		// A virtual or malformed rootUri needs no name; it is skipped or rejected below.
+		if uri, err := protocol.ParseDocumentURI(params.RootURI); err == nil {
+			folder.Name = path.Base(uri.FilePath())
+		}
+		folders = []protocol.WorkspaceFolder{folder}
 	}
 
-	validFolders, err := validateWorkspaceFolders(folders)
+	validFolders, err := s.validateWorkspaceFolders(ctx, folders)
 	if err != nil {
 		return nil, err
 	}

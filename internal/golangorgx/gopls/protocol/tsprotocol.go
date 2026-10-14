@@ -5255,7 +5255,10 @@ type XInitializeParams struct {
 	// `rootUri` wins.
 	//
 	// @deprecated in favour of workspaceFolders.
-	RootURI DocumentURI `json:"rootUri"`
+	//
+	// CUE: a URI rather than a DocumentURI, which may only be a file URI,
+	// so that a virtual workspace folder does not fail decoding.
+	RootURI URI `json:"rootUri"`
 	// The capabilities provided by the client (editor or tool)
 	Capabilities ClientCapabilities `json:"capabilities"`
 	// User provided initialization options.
@@ -5296,7 +5299,10 @@ type _InitializeParams struct {
 	// `rootUri` wins.
 	//
 	// @deprecated in favour of workspaceFolders.
-	RootURI DocumentURI `json:"rootUri"`
+	//
+	// CUE: a URI rather than a DocumentURI, which may only be a file URI,
+	// so that a virtual workspace folder does not fail decoding.
+	RootURI URI `json:"rootUri"`
 	// The capabilities provided by the client (editor or tool)
 	Capabilities ClientCapabilities `json:"capabilities"`
 	// User provided initialization options.

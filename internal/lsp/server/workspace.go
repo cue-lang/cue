@@ -55,13 +55,16 @@ func (s *server) AddFolders(ctx context.Context, folders map[protocol.WorkspaceF
 
 func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol.DidChangeWorkspaceFoldersParams) error {
 	for _, folder := range params.Event.Removed {
+		if isVirtualFolder(folder.URI) {
+			continue // never added, so there is nothing to remove
+		}
 		dir, err := protocol.ParseDocumentURI(folder.URI)
 		if err != nil {
 			return fmt.Errorf("invalid folder %q: %v", folder.URI, err)
 		}
 		s.workspace.RemoveFolder(dir)
 	}
-	validFolders, err := validateWorkspaceFolders(params.Event.Added)
+	validFolders, err := s.validateWorkspaceFolders(ctx, params.Event.Added)
 	if err == nil {
 		err = s.AddFolders(ctx, validFolders)
 	}

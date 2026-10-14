@@ -254,9 +254,9 @@ func (e *Editor) initialize(ctx context.Context) error {
 	params.WorkspaceFolders = makeWorkspaceFolders(e.sandbox, config.WorkspaceFolders)
 	if config.RootURIAsDefaultFolder {
 		if len(params.WorkspaceFolders) > 0 {
-			params.RootURI = protocol.DocumentURI(params.WorkspaceFolders[0].URI)
+			params.RootURI = params.WorkspaceFolders[0].URI
 		} else {
-			params.RootURI = e.sandbox.Workdir.URI(string(e.sandbox.Workdir.RelativeTo))
+			params.RootURI = string(e.sandbox.Workdir.URI(string(e.sandbox.Workdir.RelativeTo)))
 		}
 	}
 

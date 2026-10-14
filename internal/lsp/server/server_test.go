@@ -106,7 +106,7 @@ func TestLifecycle(t *testing.T) {
 	fileURI := root + "/a.cue"
 
 	var initParams protocol.ParamInitialize
-	initParams.RootURI = root
+	initParams.RootURI = protocol.URI(root)
 	initParams.Capabilities.Workspace.Configuration = true
 	initParams.Capabilities.Workspace.DidChangeConfiguration.DynamicRegistration = true
 

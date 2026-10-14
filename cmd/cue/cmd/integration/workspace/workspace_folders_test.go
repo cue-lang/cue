@@ -109,8 +109,6 @@ package a
 			name: "virtual folder",
 			opts: []I.RunOption{
 				I.WorkspaceFolders("virtual:///virtualpath"),
-				// TODO: initialize fails instead.
-				I.InitializeError(`.*invalid WorkspaceFolder.URI.*`),
 			},
 			files:          filesOneModule,
 			skippedFolders: 1,
@@ -119,8 +117,6 @@ package a
 			name: "real and virtual folders",
 			opts: []I.RunOption{
 				I.WorkspaceFolders("a", "decompileFs:///virtualpath", "b"),
-				// TODO: initialize fails instead.
-				I.InitializeError(`.*invalid WorkspaceFolder.URI.*`),
 			},
 			files:          filesOneModule,
 			skippedFolders: 1,
@@ -132,8 +128,6 @@ package a
 			opts: []I.RunOption{
 				I.WorkspaceFolders("virtual:///virtualpath", "a"),
 				I.RootURIAsDefaultFolder(),
-				// TODO: initialize fails instead.
-				I.InitializeError(`.*DocumentURI scheme is not 'file'.*`),
 			},
 			files:          filesOneModule,
 			skippedFolders: 1,
@@ -189,9 +183,8 @@ package a
 		env.ChangeWorkspaceFolders(rootURI.FilePath(), "virtual:///virtualpath")
 		env.Await(
 			env.DoneDiagnosingChanges(),
-			// TODO: all added folders are rejected instead.
-			I.LogExactf(protocol.Warning, 0, false, "skip adding virtual folder"),
-			I.LogExactf(protocol.Debug, 0, false, "Workspace folder added: %v", rootURI),
+			I.LogExactf(protocol.Warning, 1, false, "skip adding virtual folder"),
+			I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			I.NoLogExactf(protocol.Debug, "Module dir=%v module=unknown Created", rootURI),
 		)
 		env.OpenFile("a/a.cue")

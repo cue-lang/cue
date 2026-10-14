@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package runtime
 
-import (
-	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
-)
+import "cuelang.org/go/internal/core/adt"
 
+// Value is the internal representation of a cue.Value,
+// as returned by its Core method.
 type Value struct {
-	R *runtime.Runtime
+	R *Runtime
 	V *adt.Vertex
-}
-
-type Interface interface {
-	Core() Value
 }

@@ -37,8 +37,8 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/runtime"
 	cuejson "cuelang.org/go/internal/encoding/json"
-	"cuelang.org/go/internal/types"
 )
 
 // This file contains functionality for converting Go to CUE.
@@ -359,7 +359,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		return n
 	}
 
-	if v, ok := typeAssert[types.Interface](val); ok {
+	if v, ok := typeAssert[interface{ Core() runtime.Value }](val); ok {
 		// TODO: the zero cue.Value holds no vertex, and nil panics later on.
 		// See https://cuelang.org/issue/3175.
 		t := v.Core()

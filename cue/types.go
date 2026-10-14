@@ -40,7 +40,6 @@ import (
 	"cuelang.org/go/internal/core/subsume"
 	internaljson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/iterutil"
-	"cuelang.org/go/internal/types"
 )
 
 // Kind determines the underlying type of a Value.
@@ -627,8 +626,8 @@ func (v valueScope) Parent() compile.Scope {
 type hiddenValue = Value
 
 // Core is for internal use only.
-func (v hiddenValue) Core() types.Value {
-	return types.Value{V: v.v, R: v.idx}
+func (v hiddenValue) Core() runtime.Value {
+	return runtime.Value{V: v.v, R: v.idx}
 }
 
 func newErrValue(v Value, b *adt.Bottom) Value {

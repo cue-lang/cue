@@ -619,7 +619,8 @@ func unchainField(f *ast.Field) []*ast.Field {
 //
 // First, if prev's rendered output ends with an own-line `//` comment,
 // we promote the separator to NewSection when prev is a Definition
-// (#Foo) or any non-field, non-comment decl. Inside an [infiniteWidth]
+// (#Foo) or any non-field, non-comment decl, except between two
+// ImportDecls, which keep their source layout. Inside an [infiniteWidth]
 // wrap a lineBreakComma would otherwise be rewritten to stringLit(", ")
 // and the `//` would absorb the next decl. Promoting also keeps the
 // parse/format cycle idempotent when the comment migrates from prev's
@@ -646,6 +647,10 @@ func (c *converter) declSep(d ast.Decl, prev ast.Decl) doc {
 				rel = token.NewSection
 			}
 		case *ast.CommentGroup: // noop
+		case *ast.ImportDecl:
+			if _, ok := d.(*ast.ImportDecl); !ok {
+				rel = token.NewSection
+			}
 		default:
 			rel = token.NewSection
 		}

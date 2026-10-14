@@ -16,7 +16,6 @@ package p
 import (
 	"math"
 ) // c1
-
 import (
 	"strconv"
 ) // c2

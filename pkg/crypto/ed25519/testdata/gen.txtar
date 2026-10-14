@@ -1,6 +1,5 @@
 -- in.cue --
 import "encoding/hex"
-
 import "crypto/ed25519"
 
 t0: ed25519.Valid(hex.Decode("3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"), hex.Decode("76616c6964"), hex.Decode("f796ce9e6e23cbc15f6d308e886b1996335a6b1c40f7d618b1a6646be262974fdcf811214ce2705e04252edc63b068c84f61e8cace7814b3aac9c93565e3d904"))
@@ -10,7 +9,7 @@ t3: ed25519.Valid(hex.Decode(""), hex.Decode("77726f6e67206b65792073697a65"), he
 -- out/ed25519-v3 --
 Errors:
 t3: error in call to crypto/ed25519.Valid: ed25519: publicKey must be 32 bytes:
-    ./in.cue:8:5
+    ./in.cue:7:5
 
 Result:
 t0: true

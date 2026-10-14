@@ -275,8 +275,7 @@ func TestASTStyleRelPos(t *testing.T) {
 		if !annotate(t, cfg, f) {
 			t.Fatal("expected Apply to report a change")
 		}
-		// TODO: the first two should be Newline; see https://cuelang.org/issue/1545.
-		wants := []token.RelPos{token.NewSection, token.NewSection, token.NewSection}
+		wants := []token.RelPos{token.Newline, token.Newline, token.NewSection}
 		for i, want := range wants {
 			if got := leadingRel(f.Decls[i+1]); got != want {
 				t.Errorf("decl[%d] leading RelPos = %v, want %v", i+1, got, want)

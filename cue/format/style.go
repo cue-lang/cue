@@ -71,7 +71,9 @@ import (
 //
 // Group A - blank lines (target: [token.NewSection]):
 //   - A1: curr follows a [*ast.Package] decl.
-//   - A2: curr follows an [*ast.ImportDecl].
+//   - A2: curr follows an [*ast.ImportDecl] and is not one itself.
+//     Consecutive ImportDecls keep their source layout, and A4 does
+//     not apply between them either.
 //   - A3: curr follows a standalone [*ast.CommentGroup] decl.
 //   - A4: curr has doc comments AND prev is either a Definition
 //     [*ast.Field] (label starts with `#`) or any non-Field decl
@@ -597,6 +599,13 @@ func bodyTarget(prev, curr ast.Decl) token.RelPos {
 	switch curr.(type) {
 	case *ast.LetClause, *ast.EmbedDecl, *ast.Comprehension, *ast.Alias:
 		// B2: explicit floor of Newline.
+	}
+
+	// Consecutive ImportDecls keep their source layout, like in Go.
+	_, prevImport := prev.(*ast.ImportDecl)
+	_, currImport := curr.(*ast.ImportDecl)
+	if prevImport && currImport {
+		return target
 	}
 
 	// A4: doc comments on curr promote to NewSection when prev is a

@@ -9,7 +9,7 @@ cmp stderr issue1744/stderr-golden
 cmp issue1744/invalid.cue issue1744/invalid.cue.orig
 
 -- expect-stderr --
-expected 'STRING', found '.':
+expected import path, found '.':
     ./fmt/invalid.cue:1:9
 -- fmt/invalid.cue --
 import a.b "foo"

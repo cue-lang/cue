@@ -2478,7 +2478,7 @@ func isValidImport(lit string) bool {
 	return s != ""
 }
 
-func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
+func (p *parser) parseImportSpec() *ast.ImportSpec {
 	if p.trace {
 		defer un(trace(p, "ImportSpec"))
 	}
@@ -2493,10 +2493,24 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 		}
 	}
 
-	path := p.lit
-	pos := p.expect(token.STRING)
-	if pos.IsValid() && !isValidImport(path) {
-		p.errf(pos, "invalid import path: %s", path)
+	pos := p.pos
+	var path string
+	switch {
+	case p.tok == token.STRING:
+		path = p.lit
+		if !isValidImport(path) {
+			p.errf(pos, "invalid import path: %s", path)
+		}
+		p.next()
+	case p.tok == token.INTERPOLATION:
+		p.errf(pos, "import path must not be interpolated")
+		p.parseInterpolation()
+	case p.tok.IsLiteral():
+		p.errf(pos, "import path must be a string")
+		p.next()
+	default:
+		p.errorExpected(pos, "import path")
+		p.skipImportSpec()
 	}
 	p.expectComma() // skip over a comma or newline
 	// collect imports
@@ -2507,6 +2521,33 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 	c.closeNode(p, spec)
 
 	return spec
+}
+
+// skipImportSpec skips to the end of a malformed import spec, without
+// consuming the comma or the closing parenthesis of the import group,
+// so that what follows is still parsed.
+func (p *parser) skipImportSpec() {
+	depth := 0 // of nested brackets within the import spec
+	for p.tok != token.EOF {
+		switch p.tok {
+		case token.COMMA:
+			if depth == 0 {
+				return
+			}
+		case token.LPAREN, token.LBRACK, token.LBRACE:
+			depth++
+		case token.RPAREN, token.RBRACK, token.RBRACE:
+			if depth > 0 {
+				depth--
+			} else if p.atCloser() {
+				return
+			}
+		case token.INTERPOLATION:
+			p.parseInterpolation()
+			continue
+		}
+		p.next()
+	}
 }
 
 func (p *parser) parseImports() *ast.ImportDecl {
@@ -2522,14 +2563,16 @@ func (p *parser) parseImports() *ast.ImportDecl {
 		lparen = p.pos
 		p.next()
 		p.openList()
-		for iota := 0; p.tok != token.RPAREN && p.tok != token.EOF; iota++ {
-			list = append(list, p.parseImportSpec(iota))
+		p.pushCloser(token.RPAREN)
+		defer p.popCloser()
+		for p.tok != token.RPAREN && p.tok != token.EOF {
+			list = append(list, p.parseImportSpec())
 		}
 		p.closeList()
 		rparen = p.expect(token.RPAREN)
 		p.expectComma() // skip over a comma or newline
 	} else {
-		list = append(list, p.parseImportSpec(0))
+		list = append(list, p.parseImportSpec())
 	}
 
 	d := &ast.ImportDecl{

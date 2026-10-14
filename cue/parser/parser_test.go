@@ -462,16 +462,14 @@ cannot import package as definition identifier`,
 			in: `import
 			a: 1
 			b: 2`,
-			// The rest of the file is lost.
-			out: "import \n\nexpected 'STRING', found newline (and 1 more errors)",
+			out: "import , a: 1, b: 2\nexpected import path, found newline",
 		},
 		{
 			desc: "import path not a string",
 			in: `import 1
 			a: 1
 			b: 2`,
-			// The error does not say what is wrong with the path.
-			out: "import 1, a: 1, b: 2\nexpected 'STRING', found 'INT' 1",
+			out: "import , a: 1, b: 2\nimport path must be a string",
 		},
 		{
 			desc: "missing import path in a group",
@@ -481,15 +479,13 @@ cannot import package as definition identifier`,
 			)
 			a: 1
 			b: 2`,
-			// The rest of the file is lost.
-			out: "import ( foo \n )\nexpected 'STRING', found newline (and 2 more errors)",
+			out: "import ( foo , \"bar\" ), a: 1, b: 2\nexpected import path, found newline",
 		},
 		{
 			desc: "interpolated import path",
 			in: `import "\(x)"
 			a: 1`,
-			// The rest of the file is lost.
-			out: "import \"\\(\nexpected 'STRING', found 'INTERPOLATION' \"\\( (and 2 more errors)",
+			out: "import , a: 1\nimport path must not be interpolated",
 		},
 		{
 			desc: "interpolated import path in a group",
@@ -497,8 +493,7 @@ cannot import package as definition identifier`,
 				"\(x)"
 			)
 			a: 1`,
-			// The rest of the file is lost.
-			out: "import ( \"\\( )\nexpected 'STRING', found 'INTERPOLATION' \"\\( (and 3 more errors)",
+			out: "import (  ), a: 1\nimport path must not be interpolated",
 		},
 		{
 			desc: "parentheses within a malformed import spec in a group",
@@ -506,8 +501,7 @@ cannot import package as definition identifier`,
 				foo (b)
 			)
 			a: 1`,
-			// The rest of the file is lost.
-			out: "import ( foo  )\nexpected 'STRING', found '(' (and 2 more errors)",
+			out: "import ( foo  ), a: 1\nexpected import path, found '('",
 		},
 		{
 			desc:    "collapsed fields",
@@ -1354,8 +1348,7 @@ bar: 2
 			in: `
 		import . "foo"
 		`,
-			// The error cascades.
-			out: "import \nexpected 'STRING', found '.' (and 1 more errors)",
+			out: "import \nexpected import path, found '.'",
 		},
 		{
 			desc: "attributes (2)",

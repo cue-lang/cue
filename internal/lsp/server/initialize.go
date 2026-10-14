@@ -90,7 +90,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 		//
 		// Using CodeActionOptions is only valid if codeActionLiteralSupport is set.
 		codeActionProvider = &protocol.CodeActionOptions{
-			CodeActionKinds: s.getSupportedCodeActions(),
+			CodeActionKinds: supportedCodeActions,
 			ResolveProvider: true,
 		}
 	}
@@ -118,7 +118,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
 			DocumentSymbolProvider:     &protocol.Or_ServerCapabilities_documentSymbolProvider{Value: true},
 			ExecuteCommandProvider: &protocol.ExecuteCommandOptions{
-				Commands: protocol.NonNilSlice(options.SupportedCommands),
+				Commands: []string{settings.ExternalValidateCommand},
 			},
 			HoverProvider:      &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
 			ReferencesProvider: &protocol.Or_ServerCapabilities_referencesProvider{Value: true},

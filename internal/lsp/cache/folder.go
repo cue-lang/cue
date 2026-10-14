@@ -74,7 +74,7 @@ func (s *WorkspaceFolder) watchSubdirs() bool {
 		return false
 	case settings.SubdirWatchPatternsAuto:
 		// See the documentation of
-		// [settings.InternalOptions.SubdirWatchPatterns] for an
+		// [settings.Options.SubdirWatchPatterns] for an
 		// explanation of why VS Code gets a different default value
 		// here.
 		//

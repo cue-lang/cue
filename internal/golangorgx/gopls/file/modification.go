@@ -22,10 +22,6 @@ type Modification struct {
 	// ContentChanges will be nil when they are not supplied,
 	// specifically on textDocument/didClose and for on-disk changes.
 	ContentChanges []protocol.TextDocumentContentChangeEvent
-
-	// LanguageID is only sent from the language client on
-	// textDocument/didOpen.
-	LanguageID string
 }
 
 // An Action is a type of file state change.

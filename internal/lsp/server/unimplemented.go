@@ -4,7 +4,7 @@
 
 package server
 
-// This file defines the LSP server methods that gopls does not currently implement.
+// This file defines the LSP server methods that are not currently implemented.
 
 import (
 	"context"

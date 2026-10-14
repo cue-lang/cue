@@ -37,18 +37,6 @@ const (
 	// FromInitialWorkspaceLoad refers to the loading of all packages in the
 	// workspace when the view is first created.
 	FromInitialWorkspaceLoad
-
-	// FromCheckUpgrades refers to state changes resulting from the CheckUpgrades
-	// command, which queries module upgrades.
-	FromCheckUpgrades
-
-	// FromResetGoModDiagnostics refers to state changes resulting from the
-	// ResetGoModDiagnostics command.
-	FromResetGoModDiagnostics
-
-	// FromToggleGCDetails refers to state changes resulting from toggling
-	// gc_details on or off for a package.
-	FromToggleGCDetails
 )
 
 func (m ModificationSource) String() string {
@@ -65,10 +53,6 @@ func (m ModificationSource) String() string {
 		return "close files"
 	case FromInitialWorkspaceLoad:
 		return "initial workspace load"
-	case FromCheckUpgrades:
-		return "from check upgrades"
-	case FromResetGoModDiagnostics:
-		return "from resetting go.mod diagnostics"
 	default:
 		return "unknown file modification"
 	}
@@ -92,7 +76,6 @@ func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocume
 		Action:         file.Open,
 		Version:        params.TextDocument.Version,
 		ContentChanges: []protocol.TextDocumentContentChangeEvent{{Range: openRange, Text: params.TextDocument.Text}},
-		LanguageID:     params.TextDocument.LanguageID,
 	}}
 	return s.didModifyFiles(ctx, mods, FromDidOpen)
 }

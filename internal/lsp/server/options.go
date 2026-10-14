@@ -38,45 +38,25 @@ func (s *server) SetOptions(opts *settings.Options) {
 	s.options = opts
 }
 
-// handleOptionResults processes the results of combining existing
-// options with options newly received from the editor/client. It is
-// validation of options.
+// handleOptionResults reports any errors from combining existing
+// options with options newly received from the editor/client.
 func (s *server) handleOptionResults(ctx context.Context, results settings.OptionResults) error {
-	var warnings, errors []string
+	var errors []string
 	for _, result := range results {
-		switch result.Error.(type) {
-		case nil:
-			// nothing to do
-		case *settings.SoftError:
-			warnings = append(warnings, result.Error.Error())
-		default:
+		if result.Error != nil {
 			errors = append(errors, result.Error.Error())
 		}
 	}
 
-	// Sort messages, but put errors first.
-	//
-	// Having stable content for the message allows clients to de-duplicate. This
-	// matters because we may send duplicate warnings for clients that support
-	// dynamic configuration: one for the initial settings, and then more for the
-	// individual viewsettings.
-	var msgs []string
-	msgType := protocol.Warning
+	// Sort messages so that their content is stable, allowing clients to
+	// de-duplicate. This matters because we may send duplicate errors for
+	// clients that support dynamic configuration: one for the initial
+	// settings, and then more for each workspace folder.
 	if len(errors) > 0 {
-		msgType = protocol.Error
 		slices.Sort(errors)
-		msgs = append(msgs, errors...)
-	}
-	if len(warnings) > 0 {
-		slices.Sort(warnings)
-		msgs = append(msgs, warnings...)
-	}
-
-	if len(msgs) > 0 {
-		combined := "Invalid settings: " + strings.Join(msgs, "; ")
 		params := &protocol.ShowMessageParams{
-			Type:    msgType,
-			Message: combined,
+			Type:    protocol.Error,
+			Message: "Invalid settings: " + strings.Join(errors, "; "),
 		}
 		return s.eventuallyShowMessage(ctx, params)
 	}

@@ -23,15 +23,12 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
 
-func (s *server) getSupportedCodeActions() []protocol.CodeActionKind {
-	var result []protocol.CodeActionKind
-	for _, kinds := range s.Options().SupportedCodeActions {
-		for kind := range kinds {
-			result = append(result, kind)
-		}
-	}
-	slices.Sort(result)
-	return slices.Compact(result)
+// supportedCodeActions lists the code action kinds which the server
+// provides, in sorted order.
+var supportedCodeActions = []protocol.CodeActionKind{
+	protocol.RefactorRewriteConvertFromStruct,
+	protocol.RefactorRewriteConvertToFromStruct,
+	protocol.RefactorRewriteConvertToStruct,
 }
 
 func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionParams) ([]protocol.CodeAction, error) {
@@ -40,7 +37,7 @@ func (s *server) CodeAction(ctx context.Context, params *protocol.CodeActionPara
 	// code action. This allows us to avoid potentially expensive
 	// calculations of edits (diffs) before the user has chosen any
 	// code action.
-	delayEdit := slices.Contains(s.options.ClientOptions.CodeActionResolveOptions, "edit")
+	delayEdit := slices.Contains(s.options.CodeActionResolveOptions, "edit")
 	var raw json.RawMessage
 	if delayEdit {
 		// The client will send this raw data back to us in any

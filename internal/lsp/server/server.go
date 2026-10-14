@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package server defines gopls' implementation of the LSP server
+// Package server defines the CUE implementation of the LSP server
 // interface, [protocol.Server]. Call [New] to create an instance.
 package server
 

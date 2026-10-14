@@ -56,6 +56,9 @@ type Config struct {
 // called when running "cue help"), and also because we want the failure
 // mode to be one of error not panic, which would be the only option if
 // it was a top level init function.
+//
+// TODO: only the cue command reports the error; Go API users such as
+// [cuelang.org/go/cue/cuecontext.New] and [cuelang.org/go/cue/format] ignore it.
 func Init() error {
 	// Read CUE_DEBUG on every call so go test records it as a cache input;
 	// see the matching note in internal/cueexperiment.

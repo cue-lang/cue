@@ -35,6 +35,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -178,6 +179,9 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			return err
 		}
 		if err := cueexperiment.Init(); err != nil {
+			return err
+		}
+		if err := cuedebug.Init(); err != nil {
 			return err
 		}
 		var opts []cuecontext.Option

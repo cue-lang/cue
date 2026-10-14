@@ -18,9 +18,8 @@ cmp stderr deprecated.stderr
 
 # CUE_DEBUG flags are validated too.
 env CUE_EXPERIMENT=
-# TODO: the cue command ignores errors in CUE_DEBUG.
 env CUE_DEBUG=unknown
-exec cue export in.cue
+! exec cue export in.cue
 cmp stderr debug.stderr
 
 -- in.cue --
@@ -34,3 +33,4 @@ error in CUE_EXPERIMENT: unknown experiment "unknown"
 -- deprecated.stderr --
 error in CUE_EXPERIMENT: cannot disable stable experiment "evalv3"
 -- debug.stderr --
+error in CUE_DEBUG: unknown flag "unknown"

@@ -1906,9 +1906,10 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
 			expr, err := parser.ParseExpr("get go", s, parser.Version(e.langVersion))
 			if err != nil {
-				e.logf("error parsing struct tag %q:", s, err)
+				e.logf("error parsing struct tag %q of field %q: %v", s, f.Name(), err)
+			} else {
+				field.Value = cueast.NewBinExpr(cuetoken.AND, field.Value, expr)
 			}
-			field.Value = cueast.NewBinExpr(cuetoken.AND, field.Value, expr)
 		}
 
 		// Add field tag to convert back to Go.

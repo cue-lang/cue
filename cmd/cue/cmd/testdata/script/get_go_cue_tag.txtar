@@ -1,6 +1,5 @@
 # Test that cue struct tags add constraints to the generated fields.
-# A tag which is not a valid CUE expression should add no constraint,
-# but its partial expression is added, making the field bottom.
+# A tag which is not a valid CUE expression adds no constraint.
 
 exec cue get go --local
 cmp x_go_gen.cue x_go_gen.cue.golden
@@ -25,5 +24,5 @@ package x
 
 #T: {
 	Good: int & >5
-	Bad:  int & >5 & _|_
+	Bad:  int
 }

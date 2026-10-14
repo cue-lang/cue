@@ -88,7 +88,17 @@ func (s *Scanner) next() {
 			// not ASCII
 			r, w = utf8.DecodeRune(s.src[s.rdOffset:])
 			if r == utf8.RuneError && w == 1 {
-				s.errf(s.offset, "illegal UTF-8 encoding")
+				in := s.src[s.rdOffset:]
+				if s.offset == 0 &&
+					len(in) >= 2 &&
+					(in[0] == 0xFF && in[1] == 0xFE || in[0] == 0xFE && in[1] == 0xFF) {
+					// U+FEFF BOM at start of file, encoded as big- or little-endian
+					// UTF-16. Consume all input to avoid an error cascade.
+					s.errf(s.offset, "illegal UTF-8 encoding (got UTF-16)")
+					s.rdOffset += len(in)
+				} else {
+					s.errf(s.offset, "illegal UTF-8 encoding")
+				}
 			} else if r == bom && s.offset > 0 {
 				s.errf(s.offset, "illegal byte order mark")
 			}

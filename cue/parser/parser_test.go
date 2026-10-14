@@ -458,6 +458,58 @@ cannot import package as definition identifier`,
 			out: `package k8s, import a "foo", import "bar/baz"`,
 		},
 		{
+			desc: "missing import path",
+			in: `import
+			a: 1
+			b: 2`,
+			// The rest of the file is lost.
+			out: "import \n\nexpected 'STRING', found newline (and 1 more errors)",
+		},
+		{
+			desc: "import path not a string",
+			in: `import 1
+			a: 1
+			b: 2`,
+			// The error does not say what is wrong with the path.
+			out: "import 1, a: 1, b: 2\nexpected 'STRING', found 'INT' 1",
+		},
+		{
+			desc: "missing import path in a group",
+			in: `import (
+				foo
+				"bar"
+			)
+			a: 1
+			b: 2`,
+			// The rest of the file is lost.
+			out: "import ( foo \n )\nexpected 'STRING', found newline (and 2 more errors)",
+		},
+		{
+			desc: "interpolated import path",
+			in: `import "\(x)"
+			a: 1`,
+			// The rest of the file is lost.
+			out: "import \"\\(\nexpected 'STRING', found 'INTERPOLATION' \"\\( (and 2 more errors)",
+		},
+		{
+			desc: "interpolated import path in a group",
+			in: `import (
+				"\(x)"
+			)
+			a: 1`,
+			// The rest of the file is lost.
+			out: "import ( \"\\( )\nexpected 'STRING', found 'INTERPOLATION' \"\\( (and 3 more errors)",
+		},
+		{
+			desc: "parentheses within a malformed import spec in a group",
+			in: `import (
+				foo (b)
+			)
+			a: 1`,
+			// The rest of the file is lost.
+			out: "import ( foo  )\nexpected 'STRING', found '(' (and 2 more errors)",
+		},
+		{
 			desc:    "collapsed fields",
 			version: oldAliasVersion,
 			in: `a: #b: c?: [Name=_]: d: 1
@@ -1302,6 +1354,7 @@ bar: 2
 			in: `
 		import . "foo"
 		`,
+			// The error cascades.
 			out: "import \nexpected 'STRING', found '.' (and 1 more errors)",
 		},
 		{

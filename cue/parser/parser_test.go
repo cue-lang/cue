@@ -1285,14 +1285,14 @@ expected ')' for string interpolation, found ','`,
 		{
 			desc: "let comments",
 			in:   `let X = foo // Comment 1`,
-			// The comment is not marked as a line comment at EOF.
-			out: `<[5// Comment 1] let X=foo>`,
+			// The comment is a line comment even at EOF.
+			out: `<[l5// Comment 1] let X=foo>`,
 		},
 		{
 			desc: "line comments at the end of the file",
 			in:   "a: 1 // Comment 1\n",
-			// The comment is not marked as a line comment at EOF.
-			out: `<[5// Comment 1] a: 1>`,
+			// The comment is a line comment even at EOF.
+			out: `<[l5// Comment 1] a: 1>`,
 		},
 		{
 			desc: "emit comments",

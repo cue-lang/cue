@@ -480,9 +480,9 @@ func (p *parser) next() {
 			// The comment is on same line as the previous token; it
 			// cannot be a lead comment but may be a line comment.
 			comment, endline = p.consumeCommentGroup(prevLine, 0)
-			if p.file.Line(p.pos) != endline {
-				// The next token is on a different line, thus
-				// the last comment group is a line comment.
+			if p.file.Line(p.pos) != endline || p.tok == token.EOF {
+				// The next token is on a different line, or there is
+				// none, thus the last comment group is a line comment.
 				comment.Line = true
 			}
 		}

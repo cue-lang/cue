@@ -1,10 +1,9 @@
 package cuedebug
 
 import (
+	"fmt"
 	"os"
 	"sync"
-
-	"cuelang.org/go/internal/envflag"
 )
 
 // Flags holds the set of global CUE_DEBUG flags. It is initialized by Init.
@@ -38,7 +37,7 @@ type Config struct {
 	LogEval int
 
 	// Sharing enables structure sharing.
-	Sharing bool `envflag:"default:true"`
+	Sharing bool `cuedebug:"default:true"`
 
 	// SortFields forces fields in a struct to be sorted
 	// lexicographically.
@@ -67,5 +66,10 @@ func Init() error {
 }
 
 var initOnce = sync.OnceValue(func() error {
-	return envflag.Init(&Flags, "CUE_DEBUG")
+	var err error
+	Flags, err = Parse(os.Getenv("CUE_DEBUG"))
+	if err != nil {
+		return fmt.Errorf("cannot parse CUE_DEBUG: %w", err)
+	}
+	return nil
 })

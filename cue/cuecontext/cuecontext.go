@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
-	"cuelang.org/go/internal/envflag"
 
 	_ "cuelang.org/go/pkg"
 )
@@ -107,8 +106,8 @@ func EvaluatorVersion(v EvalVersion) Option {
 // the context with the relevant debug options. It panics for unknown or
 // malformed options.
 func CUE_DEBUG(s string) Option {
-	var c cuedebug.Config
-	if err := envflag.Parse(&c, s); err != nil {
+	c, err := cuedebug.Parse(s)
+	if err != nil {
 		panic(fmt.Errorf("cuecontext.CUE_DEBUG: %v", err))
 	}
 

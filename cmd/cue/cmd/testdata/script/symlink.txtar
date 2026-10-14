@@ -4,6 +4,7 @@
 # - symbolic links are followed for files that are directly part of the build.
 # - symbolic links are disallowed for embedded files.
 # - symbolic links are silently dropped when publishing modules.
+# - symbolic links are followed only at the root of a ./... pattern.
 
 # TODO this does not test behavior when a zip file contains
 # a symbolic link, but simple inspection of the modzip.Unzip
@@ -38,6 +39,15 @@ exec cue mod tidy
 cmp cue.mod/module.cue $WORK/want-module-2
 exec cue eval
 cmp stdout $WORK/want-stdout-3
+
+# Symbolic link is followed when it is the directory where a ./... pattern
+# starts, such as the current directory, but not below it.
+symlink $WORK/symroot -> $WORK/_symroot
+symlink $WORK/_symroot/squirrel -> $WORK/_symroot/_squirrel
+cd $WORK/symroot
+# TODO: the symbolic link at the root is not followed either.
+! exec cue eval ./...
+stderr '^cue: "./..." matched no packages$'
 
 -- want-stdout-1 --
 x: true
@@ -95,3 +105,16 @@ language: version: "v0.9.2"
 -- _registry/deps.example_d1_v0.0.1/x.cue --
 package d1
 self: "deps.example/d1"
+-- _symroot/cue.mod/module.cue --
+module: "test.example/symroot"
+language: version: "v0.9.2"
+
+-- _symroot/root.cue --
+package root
+self: "root"
+-- _symroot/branch/branch.cue --
+package branch
+self: "branch"
+-- _symroot/_squirrel/squirrel.cue --
+package squirrel
+self: "squirrel"

@@ -2457,22 +2457,34 @@ func TestVersionOption(t *testing.T) {
 }
 
 // Adapted from https://go-review.googlesource.com/c/go/+/559436
+// and https://go.dev/cl/202581.
+//
+// Each input is not correctly terminated, so the last declaration's
+// End must be the end of the file, without going past it.
 func TestIssue57490(t *testing.T) {
-	src := `x: {a: int, b: int}
-y: x.` // program not correctly terminated
-	file, err := parser.ParseFile("", src)
-	if err == nil {
-		t.Fatalf("syntax error expected, but no error reported")
-	}
-
-	// Because of the syntax error, the end position of the field decl
-	// is past the end of the file's position range.
-	funcEnd := file.Decls[1].End()
-
-	tokFile := file.Pos().File()
-	offset := tokFile.Offset(funcEnd)
-	if offset != tokFile.Size() {
-		t.Fatalf("offset = %d, want %d", offset, tokFile.Size())
+	for _, tc := range []struct {
+		in  string
+		end string
+	}{
+		{"x: {a: int, b: int}\ny: x.", "2:6"},
+		{"a: {", "-"},                    // End is invalid.
+		{"a: [1, 2", "-"},                // End is invalid.
+		{"a: [", "-"},                    // End is invalid.
+		{"a: (1", "-"},                   // End is invalid.
+		{"a: b[1", "-"},                  // End is invalid.
+		{"a: b[1:2", "-"},                // End is invalid.
+		{"a: f(1", "-"},                  // End is invalid.
+		{"a: f(", "-"},                   // End is invalid.
+		{"import (\"a\"\n\"b\"", "1:12"}, // End is that of the first spec.
+	} {
+		file, err := parser.ParseFile("", tc.in)
+		if err == nil {
+			t.Fatalf("%q: syntax error expected, but no error reported", tc.in)
+		}
+		end := file.Decls[len(file.Decls)-1].End()
+		if got := end.String(); got != tc.end {
+			t.Errorf("%q: end = %s, want %s", tc.in, got, tc.end)
+		}
 	}
 }
 

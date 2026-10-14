@@ -252,7 +252,7 @@ func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 		buf = append(buf, 'v')
 	default:
 		switch {
-		case r < ' ' && f.exact:
+		case (r < ' ' || r == 0x7f) && f.exact:
 			buf = append(buf, 'x')
 			buf = append(buf, lowerhex[byte(r)>>4])
 			buf = append(buf, lowerhex[byte(r)&0xF])

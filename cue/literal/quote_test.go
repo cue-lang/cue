@@ -41,6 +41,9 @@ func TestQuote(t *testing.T) {
 		{form: String, in: "\U0010ffff", out: `"\U0010ffff"`},
 		{form: String, in: "\x04", out: `"\u0004"`},
 		{form: Bytes, in: "\x04", out: `'\x04'`},
+		// Strings do not allow \x escapes.
+		{form: String, in: "\x7f", out: `"\u007f"`},
+		{form: Bytes, in: "\x7f", out: `'\x7f'`},
 		{form: String.WithASCIIOnly(), in: "\u263a", out: `"\u263a"`},
 		{form: String.WithGraphicOnly(), in: "\u263a", out: `"☺"`},
 		{

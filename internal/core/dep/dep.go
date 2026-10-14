@@ -111,7 +111,8 @@ type Config struct {
 
 // A Dependency is a reference and the node that reference resolves to.
 type Dependency struct {
-	// Node is the referenced node.
+	// Node is the referenced node. It may be a structure-shared arc, whose
+	// value is reached through [adt.Vertex.DerefValue].
 	Node *adt.Vertex
 
 	// Reference is the expression that referenced the node.
@@ -522,7 +523,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		// to record a path that still needs to be selected into the recorded
 		// dependency. See the Target Path definition at the top of the file.
 		if f := c.feature(x.env, x.ref); f != 0 {
-			w = v.Lookup(f)
+			w = v.DerefValue().LookupRaw(f)
 		}
 		if w == nil {
 			break

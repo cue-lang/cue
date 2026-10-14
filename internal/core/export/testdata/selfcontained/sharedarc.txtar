@@ -9,9 +9,6 @@ extIf: {
 }
 msg: string
 -- out/self-v3/default --
-MSG
-
-//cue:path: msg
-let MSG = string
+string
 -- out/self-v3-noshare/default --
 string

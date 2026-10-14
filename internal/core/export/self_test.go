@@ -49,11 +49,6 @@ func TestSelfContained(t *testing.T) {
 			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
 			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,
 
-			// A selection into a structure-shared arc is hoisted as its
-			// sharing target, and the result does not round-trip.
-			"self-v3/selfcontained/sharedarc":    `- string, + string,`,
-			"self-v3/selfcontained/sharedvertex": `- string, + string,`,
-
 			// The hoisted let bindings leave self references dangling and
 			// replace the comprehension body with an unrelated reference.
 			"self-v3/selfcontained/issue2944":         `result.tests.0: field not allowed`,

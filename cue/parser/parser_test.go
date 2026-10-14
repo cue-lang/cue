@@ -2456,34 +2456,62 @@ func TestVersionOption(t *testing.T) {
 	parser.Version("nope")
 }
 
-// Adapted from https://go-review.googlesource.com/c/go/+/559436
-// and https://go.dev/cl/202581.
+// TestEnd checks the End of the last declaration in each input, and that
+// of every literal.
 //
-// Each input is not correctly terminated, so the last declaration's
-// End must be the end of the file, without going past it.
-func TestIssue57490(t *testing.T) {
+// Inputs which are not correctly terminated are adapted from
+// https://go-review.googlesource.com/c/go/+/559436 and
+// https://go.dev/cl/202581: the last declaration's End must be the end
+// of the file, without going past it.
+//
+// Multiline strings with CRLF line endings are adapted from
+// https://go.dev/issue/76031: the scanner strips their carriage returns
+// from [ast.BasicLit.Value].
+func TestEnd(t *testing.T) {
 	for _, tc := range []struct {
-		in  string
-		end string
+		in      string
+		wantErr bool
+		end     string
+		lits    string
 	}{
-		{"x: {a: int, b: int}\ny: x.", "2:6"},
-		{"a: {", "1:5"},
-		{"a: [1, 2", "1:9"},
-		{"a: [", "1:5"},
-		{"a: (1", "1:6"},
-		{"a: b[1", "1:7"},
-		{"a: b[1:2", "1:9"},
-		{"a: f(1", "1:7"},
-		{"a: f(", "1:6"},
-		{"import (\"a\"\n\"b\"", "2:4"},
+		{"x: {a: int, b: int}\ny: x.", true, "2:6", ""},
+		{"a: {", true, "1:5", ""},
+		{"a: [1, 2", true, "1:9", "1:6 1:9"},
+		{"a: [", true, "1:5", ""},
+		{"a: (1", true, "1:6", "1:6"},
+		{"a: b[1", true, "1:7", "1:7"},
+		{"a: b[1:2", true, "1:9", "1:7 1:9"},
+		{"a: f(1", true, "1:7", "1:7"},
+		{"a: f(", true, "1:6", ""},
+		{"import (\"a\"\n\"b\"", true, "2:4", "1:12 2:4"},
+
+		{"x: \"a\"\ny: 12\nz: null", false, "3:8", "1:7 2:6 3:8"},
+		{"x: \"\"\"\n\ta\n\tb\n\t\"\"\"\n", false, "4:5", "4:5"},
+		{"x: \"\"\"\r\n\ta\r\n\tb\r\n\t\"\"\"\r\n", false, "4:2", "4:2"},                           // End is too early.
+		{"x: '''\r\n\ta\r\n\t'''\r\n", false, "3:3", "3:3"},                                        // End is too early.
+		{"x: \"\"\"\r\n\ta\\(1)\r\n\tb\\(2)\r\n\t\"\"\"\r\n", false, "4:4", "2:5 2:6 3:4 3:6 4:4"}, // Ends are too early.
 	} {
-		file, err := parser.ParseFile("", tc.in)
-		if err == nil {
-			t.Fatalf("%q: syntax error expected, but no error reported", tc.in)
+		f, err := parser.ParseFile("", tc.in)
+		if gotErr := err != nil; gotErr != tc.wantErr {
+			t.Errorf("%q: error = %v, want error: %v", tc.in, err, tc.wantErr)
 		}
-		end := file.Decls[len(file.Decls)-1].End()
+		if len(f.Decls) == 0 {
+			t.Errorf("%q: no declarations", tc.in)
+			continue
+		}
+		end := f.Decls[len(f.Decls)-1].End()
 		if got := end.String(); got != tc.end {
 			t.Errorf("%q: end = %s, want %s", tc.in, got, tc.end)
+		}
+		var lits []string
+		ast.Walk(f, func(n ast.Node) bool {
+			if x, ok := n.(*ast.BasicLit); ok {
+				lits = append(lits, x.End().String())
+			}
+			return true
+		}, nil)
+		if got := strings.Join(lits, " "); got != tc.lits {
+			t.Errorf("%q: literal ends = %s, want %s", tc.in, got, tc.lits)
 		}
 	}
 }

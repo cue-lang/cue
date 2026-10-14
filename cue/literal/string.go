@@ -342,6 +342,10 @@ const (
 // is not permitted in the output.
 func unquoteChar(s string, info QuoteInfo) (value rune, multibyte bool, tail string, err error) {
 	// easy cases
+	if len(s) == 0 {
+		err = errSyntax
+		return
+	}
 	switch c := s[0]; {
 	case c == info.char && info.char != 0:
 		for i := 1; byte(i) < info.numChar; i++ {

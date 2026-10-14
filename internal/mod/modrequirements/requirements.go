@@ -398,13 +398,6 @@ func (mg *ModuleGraph) Selected(path string) (version string) {
 	return mg.g.Selected(path)
 }
 
-// WalkBreadthFirst invokes f once, in breadth-first order, for each module
-// version other than "none" that appears in the graph, regardless of whether
-// that version is selected.
-func (mg *ModuleGraph) WalkBreadthFirst(f func(m module.Version)) {
-	mg.g.WalkBreadthFirst(f)
-}
-
 // BuildList returns the selected versions of all modules present in the graph,
 // beginning with the main modules.
 //
@@ -431,8 +424,7 @@ func (mg *ModuleGraph) findError(loadCache *par.ErrCache[module.Version, *modFil
 		if len(errStack) > 1 && errors.As(err, new(*modregistry.ModuleError)) {
 			errStack = errStack[:len(errStack)-1]
 		}
-		var noUpgrade func(from, to module.Version) bool
-		return mvs.NewBuildListError(err, errStack, module.Versions{}, noUpgrade)
+		return mvs.NewBuildListError(err, errStack, module.Versions{})
 	}
 
 	return nil

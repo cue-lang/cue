@@ -2,6 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Package mvs implements Minimal Version Selection.
+// See https://research.swtch.com/vgo-mvs.
+//
+// TODO: internal/mod/modrequirements is the only user, always with
+// [cuelang.org/go/mod/module.Version]. Consider folding this package
+// into it, dropping the type parameters and the [Versions] interface;
+// note that the public [cuelang.org/go/mod/module.Versions] type
+// would then be unused.
 package mvs
 
 import (
@@ -176,35 +184,6 @@ func (g *Graph[V]) newVersion(path string, vers string) V {
 	return v
 }
 
-// WalkBreadthFirst invokes f once, in breadth-first order, for each module
-// version other than "none" that appears in the graph, regardless of whether
-// that version is selected.
-func (g *Graph[V]) WalkBreadthFirst(f func(m V)) {
-	var queue []V
-	enqueued := make(map[V]bool)
-	for _, m := range g.roots {
-		if g.v.Version(m) != "none" {
-			queue = append(queue, m)
-			enqueued[m] = true
-		}
-	}
-
-	for len(queue) > 0 {
-		m := queue[0]
-		queue = queue[1:]
-
-		f(m)
-
-		reqs, _ := g.RequiredBy(m)
-		for _, r := range reqs {
-			if !enqueued[r] && g.v.Version(r) != "none" {
-				queue = append(queue, r)
-				enqueued[r] = true
-			}
-		}
-	}
-}
-
 // FindPath reports a shortest requirement path starting at one of the roots of
 // the graph and ending at a module version m for which f(m) returns true, or
 // nil if no such path exists.
@@ -233,14 +212,7 @@ func (g *Graph[V]) FindPath(f func(V) bool) []V {
 				}
 				path = append(path, m)
 			}
-
-			i, j := 0, len(path)-1
-			for i < j {
-				path[i], path[j] = path[j], path[i]
-				i++
-				j--
-			}
-
+			slices.Reverse(path)
 			return path
 		}
 

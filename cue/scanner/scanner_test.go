@@ -551,10 +551,9 @@ func TestInit(t *testing.T) {
 	if tok != token.NULL {
 		t.Errorf("bad token: got %s, expected %s", tok, token.NULL)
 	}
-	// The comma from the first source should not carry over,
-	// but Init does not reset the comma state.
-	if !pos.HasComma() {
-		t.Errorf("first token after Init does not have the comma bit set")
+	// The comma from the first source must not carry over.
+	if pos.HasComma() {
+		t.Errorf("first token after Init has the comma bit set")
 	}
 
 	if s.ErrorCount != 0 {

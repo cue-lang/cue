@@ -133,18 +133,17 @@ func (s *Scanner) Init(file *token.File, src []byte, eh ErrorHandler, mode Mode)
 	if file.Size() != len(src) {
 		panic(fmt.Sprintf("file size (%d) does not match src len (%d)", file.Size(), len(src)))
 	}
-	s.file = file
-	s.dir, _ = filepath.Split(file.Name())
-	s.src = src
-	s.errh = eh
-	s.mode = mode
+	dir, _ := filepath.Split(file.Name())
 
-	s.ch = ' '
-	s.offset = 0
-	s.rdOffset = 0
-	s.insertEOL = false
-	s.experiments = nil
-	s.ErrorCount = 0
+	*s = Scanner{
+		file: file,
+		dir:  dir,
+		src:  src,
+		errh: eh,
+		mode: mode,
+
+		ch: ' ',
+	}
 
 	s.next()
 	if s.ch == bom {

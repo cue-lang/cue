@@ -216,38 +216,47 @@ imports:
     mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		// A trailing slash may come before a package qualifier or version.
-		// TODO: the trailing slash is not cleaned away, so loading fails.
 		name: "RelativePathTrailingSlashQualifier",
 		cfg:  dirCfg,
 		args: []string{"./hello/:test"},
-		want: `err:    non-canonical import path: "./hello/" should be "hello"
-path:   mod.test/test/hello@v0
+		want: `path:   mod.test/test/hello@v0:test
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
-display:./hello/`,
+display:./hello
+files:
+    $CWD/testdata/testmod/test.cue
+    $CWD/testdata/testmod/hello/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
-		// TODO: as above.
 		name: "ExplicitPackageIdentifierTrailingSlash",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello/:test"},
-		want: `err:    no dependency found for package "mod.test/test/hello/"
-path:   mod.test/test/hello/:test
-module: ""
-root:   ""
-dir:    ""
-display:mod.test/test/hello/:test`,
+		want: `path:   mod.test/test/hello:test
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/hello
+display:mod.test/test/hello:test
+files:
+    $CWD/testdata/testmod/test.cue
+    $CWD/testdata/testmod/hello/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
-		// TODO: as above.
 		name: "ExplicitPackageIdentifierTrailingSlashVersion",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello/@v0:test"},
-		want: `err:    no dependency found for package "mod.test/test/hello/@v0"
-path:   mod.test/test/hello/@v0:test
-module: ""
-root:   ""
-dir:    ""
-display:mod.test/test/hello/@v0:test`,
+		want: `path:   mod.test/test/hello@v0:test
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/hello
+display:mod.test/test/hello@v0:test
+files:
+    $CWD/testdata/testmod/test.cue
+    $CWD/testdata/testmod/hello/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "NoPackageName",
 		cfg:  dirCfg,

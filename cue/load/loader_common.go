@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -488,7 +489,8 @@ func warnUnmatched(matches []*match) {
 
 // cleanPatterns returns the patterns to use for the given
 // command line. It canonicalizes the patterns but does not
-// evaluate any matches.
+// evaluate any matches. It preserves any package qualifier,
+// as well as any version for patterns which are not local paths.
 func cleanPatterns(patterns []string, os pkgpath.OS) []string {
 	if len(patterns) == 0 {
 		return []string{"."}
@@ -502,16 +504,28 @@ func cleanPatterns(patterns []string, os pkgpath.OS) []string {
 			a = strings.Replace(a, `\`, `/`, -1)
 		}
 
-		// Put argument in canonical form, but preserve leading "./".
-		if strings.HasPrefix(a, "./") {
-			a = "./" + pathpkg.Clean(a)
-			if a == "./." {
-				a = "."
-			}
-		} else if a != "" {
-			a = pathpkg.Clean(a)
+		// Only clean the path, so that "./foo/:pkg" becomes "./foo:pkg".
+		// Local paths may contain '@', so only the qualifier is split off.
+		p, suffix := a, ""
+		if i := strings.LastIndexAny(p, "/:"); i >= 0 && p[i] == ':' {
+			p, suffix = p[:i], p[i:]
 		}
-		out = append(out, a)
+		if !isLocalImport(p) {
+			if prefix, vers, ok := ast.SplitPackageVersion(p); ok {
+				p, suffix = prefix, "@"+vers+suffix
+			}
+		}
+
+		// Put argument in canonical form, but preserve leading "./".
+		if strings.HasPrefix(p, "./") {
+			p = "./" + pathpkg.Clean(p)
+			if p == "./." {
+				p = "."
+			}
+		} else if p != "" {
+			p = pathpkg.Clean(p)
+		}
+		out = append(out, p+suffix)
 	}
 	return out
 }

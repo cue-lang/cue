@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/source"
@@ -257,13 +256,9 @@ func ParseExpr(filename string, src any, mode ...Option) (expr ast.Expr, err err
 	p.init(filename, text, mode)
 	// We don't have a file with experiment attributes, but we still want to apply
 	// the default experiment values given the configured language version.
-	exp, expErr := cueexperiment.NewFile(p.cfg.Version)
-	if expErr != nil {
-		return nil, errors.Newf(token.NoPos, "parsing experiments: %v", expErr)
+	if !p.setExperiments(p.cfg.Version) {
+		return nil, p.errors
 	}
-	p.experiments = exp
-	p.file.SetExperiments(exp)
-	p.scanner.SetExperiments(p.scannerExperiments(false))
 	// Set up pkg-level scopes to avoid nil-pointer errors.
 	// This is not needed for a correct expression x as the
 	// parser will be ok with a nil topScope, but be cautious

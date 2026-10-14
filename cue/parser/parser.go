@@ -1598,6 +1598,22 @@ func (p *parser) functionsExperimentEnabled() bool {
 	return p.experiments != nil && p.experiments.Functions
 }
 
+// setExperiments sets up the experiments for the given language version and
+// experiment names, reporting whether it succeeded. On failure, the error is
+// recorded and the parser must not proceed, as p.experiments is unset.
+func (p *parser) setExperiments(version string, names ...string) bool {
+	exp, err := cueexperiment.NewFile(version, names...)
+	if err != nil {
+		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", version)
+		p.errors = errors.Append(p.errors, e)
+		return false
+	}
+	p.experiments = exp
+	p.file.SetExperiments(exp)
+	p.scanner.SetExperiments(p.scannerExperiments(false))
+	return true
+}
+
 // scannerExperiments returns the experiment state used for scanning. The
 // ParseFuncs compatibility mode and error recovery can force function tokens
 // on without changing the experiment state recorded on the parsed file.
@@ -2696,17 +2712,9 @@ func (p *parser) parseFile() *ast.File {
 
 	// A file's own @version attribute takes precedence over the configured
 	// version, which is the default for files without one.
-	v := cmp.Or(p.fileVersion, p.cfg.Version)
-	exp, err := cueexperiment.NewFile(v, p.expList...)
-	if err != nil {
-		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", v)
-		p.errors = errors.Append(p.errors, e)
-		// Do not proceed without setting p.experiments.
+	if !p.setExperiments(cmp.Or(p.fileVersion, p.cfg.Version), p.expList...) {
 		return nil
 	}
-	p.experiments = exp
-	p.file.SetExperiments(exp)
-	p.scanner.SetExperiments(p.scannerExperiments(false))
 
 	if p.cfg.Mode&PackageClauseOnly == 0 {
 		// import decls

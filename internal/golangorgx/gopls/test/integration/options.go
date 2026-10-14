@@ -85,9 +85,6 @@ func CapabilitiesJSON(capabilities []byte) RunOption {
 }
 
 // Settings sets user-provided configuration for the LSP server.
-//
-// As a special case, the env setting must not be provided via Settings: use
-// EnvVars instead.
 type Settings map[string]interface{}
 
 func (s Settings) set(opts *runConfig) {
@@ -145,18 +142,6 @@ func (fs FolderSettings) set(opts *runConfig) {
 		folders[k] = v
 	}
 	opts.editor.FolderSettings = folders
-}
-
-// EnvVars sets environment variables for the LSP session. When applying these
-// variables to the session, the special string $SANDBOX_WORKDIR is replaced by
-// the absolute path to the sandbox working directory.
-type EnvVars map[string]string
-
-func (e EnvVars) set(opts *runConfig) {
-	if opts.editor.Env == nil {
-		opts.editor.Env = make(map[string]string)
-	}
-	maps.Copy(opts.editor.Env, e)
 }
 
 // MessageResponder configures the editor to respond to

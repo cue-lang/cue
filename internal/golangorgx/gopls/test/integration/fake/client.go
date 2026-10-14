@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake/glob"
 )
 
@@ -102,7 +103,7 @@ func (c *Client) Configuration(_ context.Context, p *protocol.ParamConfiguration
 		if item.ScopeURI != nil && *item.ScopeURI == "" {
 			return nil, fmt.Errorf(`malformed ScopeURI ""`)
 		}
-		if item.Section == "gopls" {
+		if item.Section == settings.ConfigSection {
 			config := c.editor.Config()
 			results[i] = makeSettings(c.editor.sandbox, config, item.ScopeURI)
 		}

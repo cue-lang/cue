@@ -19,6 +19,10 @@ var (
 
 const ExternalValidateCommand = "cuelsp.externalvalidate"
 
+// ConfigSection is the section which the server requests via
+// workspace/configuration.
+const ConfigSection = "cuelsp"
+
 // DefaultOptions is the options that are used for Gopls execution independent
 // of any externally provided configuration (LSP initialization, command
 // invocation, etc.).

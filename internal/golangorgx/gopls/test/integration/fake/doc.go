@@ -16,5 +16,5 @@
 // their primary use.
 //
 // The Sandbox type provides a facility for executing tests with a temporary
-// directory, module proxy, and GOPATH.
+// directory.
 package fake

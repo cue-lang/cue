@@ -102,7 +102,7 @@ func (s *server) fetchFolderOptions(ctx context.Context, dir protocol.DocumentUR
 	configs, err := s.client.Configuration(ctx, &protocol.ParamConfiguration{
 		Items: []protocol.ConfigurationItem{{
 			ScopeURI: scopeURI,
-			Section:  "cuelsp",
+			Section:  settings.ConfigSection,
 		}},
 	})
 	if err != nil {

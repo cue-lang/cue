@@ -328,7 +328,7 @@ func checkExpectations(s State, expectations []Expectation) (Verdict, string) {
 // Await blocks until the given expectations are all simultaneously met.
 //
 // Generally speaking Await should be avoided because it blocks indefinitely if
-// gopls ends up in a state where the expectations are never going to be met.
+// the server ends up in a state where the expectations are never going to be met.
 // Use AfterChange or OnceMet instead, so that the runner knows when to stop
 // waiting.
 func (e *Env) Await(expectations ...Expectation) {

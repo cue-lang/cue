@@ -28,7 +28,7 @@ import (
 
 // Mode is a bitmask that defines for which execution modes a test should run.
 //
-// Each mode controls several aspects of gopls' configuration:
+// Each mode controls several aspects of the server's configuration:
 //   - Whether to use a shared cache
 //   - Whether to use a shared server
 //   - Whether to run the server in-process or in a separate process
@@ -50,20 +50,19 @@ import (
 type Mode int
 
 const (
-	// Default mode runs gopls with the default options, communicating over pipes
+	// Default mode runs the server with the default options, communicating over pipes
 	// to emulate the lsp sidecar execution mode, which communicates over
 	// stdin/stdout.
 	//
-	// It uses separate servers for each test, but a shared cache, to avoid
-	// duplicating work when processing GOROOT.
+	// It uses separate servers for each test, but a shared cache.
 	Default Mode = 1 << iota
 
 	// Forwarded uses the default options, but forwards connections to a shared
-	// in-process gopls server.
+	// in-process server.
 	Forwarded
 
 	// SeparateProcess uses the default options, but forwards connection to an
-	// external gopls daemon.
+	// external cue lsp daemon.
 	//
 	// Only supported on GOOS=linux.
 	SeparateProcess
@@ -82,7 +81,7 @@ func (m Mode) String() string {
 	}
 }
 
-// A Runner runs tests in gopls execution environments, as specified by its
+// A Runner runs tests in server execution environments, as specified by its
 // modes. For modes that share state (for example, a shared cache or common
 // remote), any tests that execute on the same Runner will share the same
 // state.
@@ -109,7 +108,7 @@ type Runner struct {
 
 type TestFunc func(t *testing.T, env *Env)
 
-// Run executes the test function in the default configured gopls execution
+// Run executes the test function in the default configured execution
 // modes. For each a test run, a new workspace is created containing the
 // un-txtared files specified by filedata.
 func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOption) {

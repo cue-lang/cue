@@ -71,9 +71,7 @@ func (b buffer) text() string {
 	return string(b.mapper.Content)
 }
 
-// EditorConfig configures the editor's LSP session. This is similar to
-// golang.UserOptions, but we use a separate type here so that we expose only
-// that configuration which we support.
+// EditorConfig configures the editor's LSP session.
 //
 // The zero value for EditorConfig is the default configuration.
 type EditorConfig struct {
@@ -82,12 +80,6 @@ type EditorConfig struct {
 	// Since this can only be set during initialization, changing this field via
 	// Editor.ChangeConfiguration has no effect.
 	ClientName string
-
-	// Env holds environment variables to apply on top of the default editor
-	// environment. When applying these variables, the special string
-	// $SANDBOX_WORKDIR is replaced by the absolute path to the sandbox working
-	// directory.
-	Env map[string]string
 
 	// WorkspaceFolders is the workspace folders to configure on the LSP server,
 	// relative to the sandbox workdir.
@@ -103,14 +95,6 @@ type EditorConfig struct {
 
 	// Whether to edit files with windows line endings.
 	WindowsLineEndings bool
-
-	// Map of language ID -> regexp to match, used to set the file type of new
-	// buffers. Applied as an overlay on top of the following defaults:
-	//  "go" -> ".*\.go"
-	//  "go.mod" -> "go\.mod"
-	//  "go.sum" -> "go\.sum"
-	//  "gotmpl" -> ".*tmpl"
-	FileAssociations map[string]string
 
 	// Settings holds user-provided configuration for the LSP server.
 	Settings map[string]any
@@ -226,31 +210,12 @@ func (e *Editor) Client() *Client {
 
 // makeSettings builds the settings map for use in LSP settings RPCs.
 func makeSettings(sandbox *Sandbox, config EditorConfig, scopeURI *protocol.URI) map[string]any {
-	env := make(map[string]string)
-	maps.Copy(env, config.Env)
-	for k, v := range env {
-		v = strings.ReplaceAll(v, "$SANDBOX_WORKDIR", sandbox.Workdir.RootURI().FilePath())
-		env[k] = v
-	}
-
 	settings := map[string]any{
-		"env": env,
-
 		// Use verbose progress reporting so that integration tests can assert on
 		// asynchronous operations being completed (such as diagnosing a snapshot).
 		"verboseWorkDoneProgress": true,
-
-		// Set an unlimited completion budget, so that tests don't flake because
-		// completions are too slow.
-		"completionBudget": "0s",
 	}
-
-	for k, v := range config.Settings {
-		if k == "env" {
-			panic("must not provide env via the EditorConfig.Settings field: use the EditorConfig.Env field instead")
-		}
-		settings[k] = v
-	}
+	maps.Copy(settings, config.Settings)
 
 	// If the server is requesting configuration for a specific scope, apply
 	// settings for the nearest folder that has customized settings, if any.
@@ -316,13 +281,13 @@ func (e *Editor) initialize(ctx context.Context) error {
 			return fmt.Errorf("initialized: %w", err)
 		}
 	}
-	// TODO: await initial configuration here, or expect gopls to manage that?
+	// TODO: await initial configuration here, or expect the server to manage that?
 	return nil
 }
 
 func clientCapabilities(cfg EditorConfig) (protocol.ClientCapabilities, error) {
 	var capabilities protocol.ClientCapabilities
-	// Set various client capabilities that are sought by gopls.
+	// Set various client capabilities that are sought by the server.
 	capabilities.Workspace.Configuration = true // support workspace/configuration
 	capabilities.TextDocument.Completion.CompletionItem.TagSupport = &protocol.CompletionItemTagOptions{}
 	capabilities.TextDocument.Completion.CompletionItem.TagSupport.ValueSet = []protocol.CompletionItemTag{protocol.ComplDeprecated}
@@ -532,7 +497,7 @@ func (e *Editor) createBuffer(ctx context.Context, path string, dirty bool, cont
 func (e *Editor) textDocumentItem(buf buffer) protocol.TextDocumentItem {
 	return protocol.TextDocumentItem{
 		URI:        e.sandbox.Workdir.URI(buf.path),
-		LanguageID: languageID(buf.path, e.config.FileAssociations),
+		LanguageID: languageID(buf.path),
 		Version:    int32(buf.version),
 		Text:       buf.text(),
 	}
@@ -552,28 +517,10 @@ func (e *Editor) sendDidOpen(ctx context.Context, item protocol.TextDocumentItem
 	return nil
 }
 
-var defaultFileAssociations = map[string]*regexp.Regexp{
-	"go":      regexp.MustCompile(`^.*\.go$`), // '$' is important: don't match .gotmpl!
-	"go.mod":  regexp.MustCompile(`^go\.mod$`),
-	"go.sum":  regexp.MustCompile(`^go(\.work)?\.sum$`),
-	"go.work": regexp.MustCompile(`^go\.work$`),
-	"gotmpl":  regexp.MustCompile(`^.*tmpl$`),
-}
-
-// languageID returns the language identifier for the path p given the user
-// configured fileAssociations.
-func languageID(p string, fileAssociations map[string]string) string {
-	base := path.Base(p)
-	for lang, re := range fileAssociations {
-		re := regexp.MustCompile(re)
-		if re.MatchString(base) {
-			return lang
-		}
-	}
-	for lang, re := range defaultFileAssociations {
-		if re.MatchString(base) {
-			return lang
-		}
+// languageID returns the language identifier for the path p.
+func languageID(p string) string {
+	if path.Ext(p) == ".cue" {
+		return "cue"
 	}
 	return ""
 }
@@ -1035,7 +982,7 @@ func (e *Editor) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCom
 	if err != nil {
 		return nil, err
 	}
-	// Some commands use the go command, which writes directly to disk.
+	// Some commands may write directly to disk.
 	// For convenience, check for those changes.
 	if err := e.sandbox.Workdir.CheckForFileChanges(ctx); err != nil {
 		return nil, fmt.Errorf("checking for file changes: %v", err)
@@ -1043,7 +990,7 @@ func (e *Editor) ExecuteCommand(ctx context.Context, params *protocol.ExecuteCom
 	return result, nil
 }
 
-// FormatBuffer gofmts a Go file.
+// FormatBuffer formats a file via textDocument/formatting.
 func (e *Editor) FormatBuffer(ctx context.Context, path string) error {
 	if e.Server == nil {
 		return nil
@@ -1390,7 +1337,7 @@ func (e *Editor) SetConfig(cfg EditorConfig) {
 func (e *Editor) ChangeConfiguration(ctx context.Context, newConfig EditorConfig) error {
 	e.SetConfig(newConfig)
 	if e.Server != nil {
-		var params protocol.DidChangeConfigurationParams // empty: gopls ignores the Settings field
+		var params protocol.DidChangeConfigurationParams // empty: the server ignores the Settings field
 		if err := e.Server.DidChangeConfiguration(ctx, &params); err != nil {
 			return err
 		}

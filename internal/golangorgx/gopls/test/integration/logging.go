@@ -75,7 +75,7 @@ func (s *loggingFramer) printBuffers(testname string, w io.Writer) {
 	}
 	calls := make(map[callKey]call)
 
-	fmt.Fprintf(os.Stderr, "#### Start Gopls Test Logs for %q\n", testname)
+	fmt.Fprintf(os.Stderr, "#### Start CUE LSP Test Logs for %q\n", testname)
 	bw := bufio.NewWriter(w)
 	for _, m := range msgs {
 		direction, pastTense := "Received", "Received"
@@ -108,7 +108,7 @@ func (s *loggingFramer) printBuffers(testname string, w io.Writer) {
 		}
 	}
 	bw.Flush()
-	fmt.Fprintf(os.Stderr, "#### End Gopls Test Logs for %q\n", testname)
+	fmt.Fprintf(os.Stderr, "#### End CUE LSP Test Logs for %q\n", testname)
 }
 
 type loggingStream struct {

@@ -5,18 +5,18 @@
 package fake
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"cuelang.org/go/internal/robustio"
 	"golang.org/x/tools/txtar"
 )
 
-// Sandbox holds a collection of temporary resources to use for working with Go
-// code in tests.
+// Sandbox holds a collection of temporary resources to use for working with
+// files in tests.
 type Sandbox struct {
 	rootdir string
 	Workdir *Workdir
@@ -44,9 +44,7 @@ type SandboxConfig struct {
 }
 
 // NewSandbox creates a collection of named temporary resources, with a
-// working directory populated by the txtar-encoded content in srctxt, and a
-// file-based module proxy populated with the txtar-encoded content in
-// proxytxt.
+// working directory populated by config.Files.
 //
 // If rootDir is non-empty, it will be used as the root of temporary
 // directories created for the sandbox. Otherwise, a new temporary directory
@@ -89,15 +87,7 @@ func NewSandbox(config *SandboxConfig) (_ *Sandbox, err error) {
 		}
 		return sb, nil
 	}
-	var workdir string
-	if config.Workdir == "" {
-		if workdir == "" {
-			workdir = filepath.Join(sb.rootdir, "work")
-		}
-	} else {
-		// relative path
-		workdir = filepath.Join(sb.rootdir, config.Workdir)
-	}
+	workdir := filepath.Join(sb.rootdir, cmp.Or(config.Workdir, "work"))
 	if err := os.MkdirAll(workdir, 0755); err != nil {
 		return nil, err
 	}
@@ -141,26 +131,6 @@ func validateConfig(config SandboxConfig) error {
 		return errors.New("absolute Workdir cannot be set in conjunction with Files")
 	}
 	return nil
-}
-
-// splitModuleVersionPath extracts module information from files stored in the
-// directory structure modulePath@version/suffix.
-// For example:
-//
-//	splitModuleVersionPath("mod.com@v1.2.3/package") = ("mod.com", "v1.2.3", "package")
-func splitModuleVersionPath(path string) (modulePath, version, suffix string) {
-	parts := strings.Split(path, "/")
-	var modulePathParts []string
-	for i, p := range parts {
-		if strings.Contains(p, "@") {
-			mv := strings.SplitN(p, "@", 2)
-			modulePathParts = append(modulePathParts, mv[0])
-			return strings.Join(modulePathParts, "/"), mv[1], strings.Join(parts[i+1:], "/")
-		}
-		modulePathParts = append(modulePathParts, p)
-	}
-	// Default behavior: this is just a module path.
-	return path, "", ""
 }
 
 func (sb *Sandbox) RootDir() string {

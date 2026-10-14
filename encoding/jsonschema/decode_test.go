@@ -61,8 +61,9 @@ import (
 // it should start with `#schema` followed by a CUE path
 // of the schema to test within the extracted schema.
 //
-// The #noverify tag in the txtar header causes verification and
-// instance tests to be skipped.
+// The #noverify tag in the txtar header marks an extracted schema which
+// imports external packages: building it must fail with only unresolved
+// imports, and instance tests are skipped.
 //
 // The #version: <version> tag selects the default schema version URI to use.
 // As a special case, when this is "openapi", OpenAPI extraction
@@ -169,9 +170,6 @@ func TestDecode(t *testing.T) {
 		}
 		b = append(bytes.TrimSpace(b), '\n')
 		w.Write(b)
-		if t.HasTag("noverify") {
-			return
-		}
 		// Verify that the generated CUE compiles, at the language version it
 		// was generated for; syntax the target cannot parse is of no use to it.
 		genFile, err := parser.ParseFile("generated.cue", b,
@@ -180,7 +178,21 @@ func TestDecode(t *testing.T) {
 			t.Fatal(errors.Details(err, nil), qt.Commentf("generated code: %q", b))
 		}
 		schemav := ctx.BuildFile(genFile)
-		if err := schemav.Err(); err != nil {
+		err = schemav.Err()
+		if t.HasTag("noverify") {
+			if err == nil {
+				t.Fatal("generated code verifies; remove #noverify")
+			}
+			for _, e := range errors.Errors(err) {
+				switch format, _ := e.Msg(); format {
+				case "package %q imported but not defined in %s", "import %q not found":
+				default:
+					t.Fatal(errors.Details(e, nil), qt.Commentf("generated code: %q", b))
+				}
+			}
+			return
+		}
+		if err != nil {
 			t.Fatal(errors.Details(err, nil), qt.Commentf("generated code: %q", b))
 		}
 		testEntries, err := fs.ReadDir(fsys, "test")

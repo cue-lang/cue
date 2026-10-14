@@ -220,18 +220,6 @@ func (fs *overlayFileSystem) stat(path string) (iofs.FileInfo, errors.Error) {
 	return fi, nil
 }
 
-func (fs *overlayFileSystem) lstat(path string) (iofs.FileInfo, errors.Error) {
-	path = fs.makeAbs(path)
-	if fi := fs.getOverlay(path); fi != nil {
-		return fi, nil
-	}
-	fi, err := os.Lstat(path)
-	if err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "stat")
-	}
-	return fi, nil
-}
-
 func (fs *overlayFileSystem) openFile(path string) (io.ReadCloser, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
@@ -250,7 +238,9 @@ var skipDir = errors.Newf(token.NoPos, "skip directory")
 type walkFunc func(path string, entry iofs.DirEntry, err errors.Error) errors.Error
 
 func (fs *overlayFileSystem) walk(root string, f walkFunc) error {
-	info, err := fs.lstat(root)
+	// Symlinks below the root are not followed, but the root itself is,
+	// as it may be the current directory reached through a symlink.
+	info, err := fs.stat(root)
 	entry := iofs.FileInfoToDirEntry(info)
 	if err != nil {
 		err = f(root, entry, err)

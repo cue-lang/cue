@@ -45,9 +45,8 @@ cmp stdout $WORK/want-stdout-3
 symlink $WORK/symroot -> $WORK/_symroot
 symlink $WORK/_symroot/squirrel -> $WORK/_symroot/_squirrel
 cd $WORK/symroot
-# TODO: the symbolic link at the root is not followed either.
-! exec cue eval ./...
-stderr '^cue: "./..." matched no packages$'
+exec cue eval ./...
+cmp stdout $WORK/want-stdout-4
 
 -- want-stdout-1 --
 x: true
@@ -72,6 +71,10 @@ z: true
 dep: self: "deps.example/d1"
 -- want-stdout-3 --
 x: true
+-- want-stdout-4 --
+self: "root"
+// ---
+self: "branch"
 -- cue.mod/module.cue --
 module: "test.example/main"
 language: version: "v0.9.2"

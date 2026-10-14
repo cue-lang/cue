@@ -3,6 +3,7 @@
 
 # On Windows, chmod 000 does not deny reading a file.
 [windows] skip 'file permissions cannot deny reads on Windows'
+[root] skip 'root typically ignores file permissions'
 
 exec cue export .
 cmp stdout want-export.txt
@@ -17,6 +18,45 @@ chmod 644 $CUE_CACHE_DIR/mod/extract/example.com/e@v0.0.1/top.cue
 chmod 000 sub/bad.cue
 ! exec cue mod tidy
 stderr '^open sub/bad.cue: permission denied$'
+chmod 644 sub/bad.cue
+
+# An unreadable directory in the main module is reported by patterns
+# which could match it, rather than treated as if it were empty.
+exec cue eval ./...
+stdout '^self: "noread"$'
+chmod 000 noread
+# TODO: the unreadable directory is silently skipped.
+exec cue eval ./...
+! stdout noread
+exec cue fmt --check ./...
+! exec cue eval ./...:noread
+stderr '^cue: "./..." matched no packages$'
+! exec cue fmt --check ./...:noread
+stderr '^cue: "./..." matched no packages$'
+chmod 755 noread
+
+# An unreadable directory which the pattern leaves out, such as testdata
+# below its root, does not fail it.
+chmod 000 testdata
+exec cue eval ./...
+stdout '^self: "noread"$'
+exec cue fmt --check ./...
+chmod 755 testdata
+
+# A pattern rooted at a file matches no packages.
+! exec cue eval ./main.cue/...
+stderr '^cue: "./main.cue/..." matched no packages$'
+! exec cue fmt --check ./main.cue/...
+stderr '^cue: "./main.cue/..." matched no packages$'
+
+# An entry which no longer exists, such as a file removed while walking,
+# does not fail the pattern; loading its package reports it if needed.
+# A dangling symlink stands in for such a file.
+mkdir gone
+symlink gone/gone.cue -> missing.cue
+! exec cue eval ./...
+stderr '^stat .*gone.cue: no such file or directory$'
+rm gone
 
 -- want-export.txt --
 {
@@ -28,11 +68,20 @@ language: version: "v0.9.0"
 deps: "example.com/e": v: "v0.0.1"
 -- main.cue --
 package main
+
 import "example.com/e"
 
 x: e.foo
 -- sub/bad.cue --
 package sub
+-- noread/noread.cue --
+package noread
+
+self: "noread"
+-- testdata/t.cue --
+package t
+
+self: "testdata"
 -- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
 module: "example.com/e@v0"
 language: version: "v0.9.0"

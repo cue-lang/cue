@@ -311,6 +311,14 @@ func TestScript(t *testing.T) {
 			e.Setenv("GOFLAGS", "-trimpath")
 			return cuetestscript.Setup(setupEnv{e})
 		},
+		Condition: func(cond string) (bool, error) {
+			// [root] is true when running as root, which typically
+			// ignores file permissions.
+			if cond == "root" {
+				return os.Geteuid() == 0, nil
+			}
+			return false, fmt.Errorf("unknown condition %q", cond)
+		},
 	}
 	// Add the commands that come with the cue testscript environment,
 	// such as memregistry; see [cuetestscript.Cmds].

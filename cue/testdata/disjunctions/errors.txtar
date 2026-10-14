@@ -206,16 +206,15 @@ issue3599: full: {
 			if !doWrite { read: "somefile.txt" }
 		}
 	}
-	@test(skip, hint="somehow this test doesn't work. Fix it.")
-	@test(eq:todo, {
+	@test(eq, {
 		#Action: {
-			action: {read!: string, write?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])} | {write!: string, read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[])}
+			action: {read!: string, write?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[4:12])} | {write!: string, read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source", pos=[7:12])}
 		}
 		#Minio: {
 			container: {
 				action: {
 					write: "somefile.txt"
-					read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source (and 1 more errors)", pos=[23:13])
+					read?: _|_ @test(err, code=user, contains="explicit error (_|_ literal) in source (and 1 more errors)", pos=[18:13])
 				}
 			}
 			doWrite: *true | bool
@@ -226,12 +225,12 @@ issue3599: full: {
 issue3599: reduced: p1: {
 	{ a?:  1&2 } | { a:  string, b?: 1&2 }
 	{  } | {  }
-	@test(eq, {a?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[49:25, 50:2, 50:9, 50:11])} | {a: string, b?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[49:25, 50:2, 50:35, 50:37])})
+	@test(eq, {a?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[1:9, 1:11])} | {a: string, b?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[1:35, 1:37])})
 }
 issue3599: reduced: p2: {
 	{  } | {  }
 	{ a?:  1&2 } | { a:  string, b?: 1&2 }
-	@test(eq, {a?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[54:25, 56:2, 56:9, 56:11])} | {a: string, b?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[54:25, 56:2, 56:35, 56:37])})
+	@test(eq, {a?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[2:9, 2:11])} | {a: string, b?: _|_ @test(err, code=eval, contains="conflicting values", args=[2, 1], pos=[2:35, 2:37])})
 }
 issue3599: let: {
 	{ } | { a:  B | 1, let B = 1&2 }

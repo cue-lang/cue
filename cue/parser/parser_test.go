@@ -2120,8 +2120,13 @@ func TestParseExpr(t *testing.T) {
 
 	// an invalid expression
 	src = "a + *"
-	if _, err := parseExprString(src); err == nil {
+	x, err = parseExprString(src)
+	if err == nil {
 		t.Errorf("ParseExpr(%q): got no error", src)
+	}
+	// No partial result is returned along with the error.
+	if got, want := fmt.Sprintf("%T", x), "<nil>"; got != want {
+		t.Errorf("ParseExpr(%q): got %s, want %s", src, got, want)
 	}
 
 	// a bare operator must not crash (issue found via fuzzing)

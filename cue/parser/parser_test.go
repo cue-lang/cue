@@ -371,6 +371,31 @@ single postfix alias "_" field cannot be the blank identifier`,
 			out:  "a: \"\\(b._)\", c: 1\nexpected selector, found ')'",
 		},
 		{
+			desc: "empty index",
+			in: `a: b[]
+			c: 1`,
+			// The error recovery skips the rest of the input.
+			out: "a: b[<*ast.BadExpr>]\nexpected operand, found ']' (and 1 more errors)",
+		},
+		{
+			desc: "empty index in a binary expression",
+			in:   `a: b[] + 1, c: 1`,
+			// The error recovery skips the rest of the input.
+			out: "a: b[<*ast.BadExpr>]\nexpected operand, found ']' (and 1 more errors)",
+		},
+		{
+			desc: "empty index in a list",
+			in:   `a: [b[]], c: 1`,
+			// The error recovery skips the rest of the input.
+			out: "a: [b[<*ast.BadExpr>]]\nexpected operand, found ']' (and 2 more errors)",
+		},
+		{
+			desc: "empty optional index",
+			in:   `a: b[]?, c: 1`,
+			// The error recovery skips the rest of the input.
+			out: "a: b[<*ast.BadExpr>]\nexpected operand, found ']' (and 1 more errors)",
+		},
+		{
 			desc: "expression embedding",
 			in: `#Def: {
 			a.b.c

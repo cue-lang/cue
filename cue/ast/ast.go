@@ -17,6 +17,7 @@
 package ast
 
 import (
+	"cmp"
 	"fmt"
 	"iter"
 	"slices"
@@ -504,8 +505,12 @@ func (n *predeclaredNode) pos() *token.Pos { return nil }
 func (n *predeclaredNode) End() token.Pos  { return token.NoPos }
 
 // A BasicLit node represents a literal of basic type.
+//
+// The parser sets ValueLen, as Value is not verbatim for multiline
+// strings: the scanner strips their carriage returns.
 type BasicLit struct {
 	ValuePos token.Pos   // literal position
+	ValueLen int         // length of the literal in the source; zero means len(Value)
 	Kind     token.Token // INT, FLOAT, STRING, NULL, TRUE, FALSE
 	Value    string      // literal string; e.g. 42, 0x7f, 3.14, 1_234_567, 1e-9, 2.4i, 'a', '\x7f', "foo", or '\m\n\o'
 
@@ -1071,7 +1076,9 @@ func (x *BadExpr) End() token.Pos { return x.To }
 func (x *Ident) End() token.Pos {
 	return x.NamePos.Add(len(x.Name))
 }
-func (x *BasicLit) End() token.Pos { return x.ValuePos.Add(len(x.Value)) }
+func (x *BasicLit) End() token.Pos {
+	return x.ValuePos.Add(cmp.Or(x.ValueLen, len(x.Value)))
+}
 
 func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].End() }
 func (x *Func) End() token.Pos {

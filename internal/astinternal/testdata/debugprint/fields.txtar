@@ -22,6 +22,7 @@ embed: {
 			TokenPos: token.Pos("fields.cue:1:2", nospace)
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("fields.cue:1:4", blank)
+				ValueLen: 1
 				Kind: token.Token("INT")
 				Value: "1"
 			}
@@ -40,6 +41,7 @@ embed: {
 			TokenPos: token.Pos("fields.cue:2:2", nospace)
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("fields.cue:2:4", blank)
+				ValueLen: 1
 				Kind: token.Token("INT")
 				Value: "2"
 			}

@@ -30,6 +30,7 @@ for k, v in input if v > 2 {
 						TokenPos: token.Pos("comprehensions.cue:2:3", nospace)
 						Value: *ast.BasicLit{
 							ValuePos: token.Pos("comprehensions.cue:2:5", blank)
+							ValueLen: 4
 							Kind: token.Token("true")
 							Value: "true"
 						}
@@ -69,6 +70,7 @@ for k, v in input if v > 2 {
 						Op: token.Token(">")
 						Y: *ast.BasicLit{
 							ValuePos: token.Pos("comprehensions.cue:4:26", blank)
+							ValueLen: 1
 							Kind: token.Token("INT")
 							Value: "2"
 						}

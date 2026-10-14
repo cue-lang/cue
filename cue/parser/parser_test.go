@@ -2487,9 +2487,9 @@ func TestEnd(t *testing.T) {
 
 		{"x: \"a\"\ny: 12\nz: null", false, "3:8", "1:7 2:6 3:8"},
 		{"x: \"\"\"\n\ta\n\tb\n\t\"\"\"\n", false, "4:5", "4:5"},
-		{"x: \"\"\"\r\n\ta\r\n\tb\r\n\t\"\"\"\r\n", false, "4:2", "4:2"},                           // End is too early.
-		{"x: '''\r\n\ta\r\n\t'''\r\n", false, "3:3", "3:3"},                                        // End is too early.
-		{"x: \"\"\"\r\n\ta\\(1)\r\n\tb\\(2)\r\n\t\"\"\"\r\n", false, "4:4", "2:5 2:6 3:4 3:6 4:4"}, // Ends are too early.
+		{"x: \"\"\"\r\n\ta\r\n\tb\r\n\t\"\"\"\r\n", false, "4:5", "4:5"},
+		{"x: '''\r\n\ta\r\n\t'''\r\n", false, "3:5", "3:5"},
+		{"x: \"\"\"\r\n\ta\\(1)\r\n\tb\\(2)\r\n\t\"\"\"\r\n", false, "4:5", "2:5 2:6 3:5 3:6 4:5"},
 	} {
 		f, err := parser.ParseFile("", tc.in)
 		if gotErr := err != nil; gotErr != tc.wantErr {

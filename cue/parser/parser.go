@@ -62,6 +62,7 @@ type parser struct {
 	pos token.Pos   // token position
 	tok token.Token // one token look-ahead
 	lit string      // token literal
+	end int         // offset immediately after the token
 
 	// Token after next, filled by [parser.peek].
 	peekToken struct {
@@ -70,6 +71,7 @@ type parser struct {
 		pos token.Pos
 		tok token.Token
 		lit string
+		end int
 	}
 
 	// Error recovery
@@ -397,12 +399,13 @@ func (p *parser) next0() {
 
 	// We had peeked one token, effectively scanning it early; use it now.
 	if p.peekToken.scanned {
-		p.pos, p.tok, p.lit = p.peekToken.pos, p.peekToken.tok, p.peekToken.lit
+		p.pos, p.tok, p.lit, p.end = p.peekToken.pos, p.peekToken.tok, p.peekToken.lit, p.peekToken.end
 		p.peekToken.scanned = false
 		return
 	}
 
 	p.pos, p.tok, p.lit = p.scanner.Scan()
+	p.end = p.scanner.Offset()
 }
 
 // peek scans one more token as a look-ahead and stores it in [parser.peekToken].
@@ -412,7 +415,13 @@ func (p *parser) peek() {
 		panic("can only peek one token at a time")
 	}
 	p.peekToken.pos, p.peekToken.tok, p.peekToken.lit = p.scanner.Scan()
+	p.peekToken.end = p.scanner.Offset()
 	p.peekToken.scanned = true
+}
+
+// litLen returns the length of the current token in the source.
+func (p *parser) litLen() int {
+	return p.end - p.pos.Offset()
 }
 
 // Consume a comment and return it and the line on which it ends.
@@ -739,7 +748,7 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 
 	case token.NULL, token.TRUE, token.FALSE, token.INT, token.FLOAT, token.STRING:
 		c := p.openComments()
-		x := &ast.BasicLit{ValuePos: p.pos, Kind: p.tok, Value: p.lit}
+		x := &ast.BasicLit{ValuePos: p.pos, ValueLen: p.litLen(), Kind: p.tok, Value: p.lit}
 		p.next()
 		return c.closeExpr(p, x)
 
@@ -2338,6 +2347,7 @@ L:
 				if strings.HasPrefix(p.lit, `"`) && !strings.HasPrefix(p.lit, `""`) {
 					str := &ast.BasicLit{
 						ValuePos: p.pos,
+						ValueLen: p.litLen(),
 						Kind:     token.STRING,
 						Value:    p.lit,
 					}
@@ -2494,6 +2504,9 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	// Note: we can only tell if the string returned by ResumeInterpolation
 	// starts a new interpolated expression by whether it ends in a parenthesis.
 	for strings.HasSuffix(last.Value, "(") {
+		// The scanner also returns that parenthesis as the current token,
+		// so the fragment ends where it does.
+		last.ValueLen = p.end - last.ValuePos.Offset()
 		c.pos = 1
 		p.expect(token.LPAREN)
 		cc.closeExpr(p, last)
@@ -2511,13 +2524,13 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 			p.errorExpected(p.pos, "')' for string interpolation")
 		}
 		lit = p.scanner.ResumeInterpolation()
-		pos = p.pos
-		p.next()
-		last = &ast.BasicLit{
-			ValuePos: pos,
-			Kind:     token.STRING,
-			Value:    lit,
+		last = &ast.BasicLit{ValuePos: p.pos, Kind: token.STRING, Value: lit}
+		if !strings.HasSuffix(lit, "(") {
+			// The last fragment ends where the scanner stopped;
+			// the others end at the parenthesis scanned next.
+			last.ValueLen = p.scanner.Offset() - last.ValuePos.Offset()
 		}
+		p.next()
 		exprs = append(exprs, last)
 	}
 	cc.closeExpr(p, last)
@@ -2575,9 +2588,10 @@ func (p *parser) parseImportSpec() *ast.ImportSpec {
 
 	pos := p.pos
 	var path string
+	var n int
 	switch {
 	case p.tok == token.STRING:
-		path = p.lit
+		path, n = p.lit, p.litLen()
 		if !isValidImport(path) {
 			p.errf(pos, "invalid import path: %s", path)
 		}
@@ -2596,7 +2610,7 @@ func (p *parser) parseImportSpec() *ast.ImportSpec {
 	// collect imports
 	spec := &ast.ImportSpec{
 		Name: ident,
-		Path: &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: path},
+		Path: &ast.BasicLit{ValuePos: pos, ValueLen: n, Kind: token.STRING, Value: path},
 	}
 	c.closeNode(p, spec)
 

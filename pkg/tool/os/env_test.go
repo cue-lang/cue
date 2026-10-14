@@ -94,7 +94,7 @@ func TestGetenv(t *testing.T) {
 
 		qt.Assert(t, qt.CmpEquals[any](got, want,
 			cmpopts.IgnoreFields(ast.BinaryExpr{}, "OpPos"),
-			cmpopts.IgnoreFields(ast.BasicLit{}, "ValuePos"),
+			cmpopts.IgnoreFields(ast.BasicLit{}, "ValuePos", "ValueLen"),
 			cmpopts.IgnoreUnexported(ast.BasicLit{}, ast.BinaryExpr{}),
 			// For ignoring addinonal entries from os.Environ:
 			cmpopts.IgnoreMapEntries(func(s string, x interface{}) bool {

@@ -628,7 +628,7 @@ func cloneImportSpec(s *ast.ImportSpec) *ast.ImportSpec {
 		out.Name = &ast.Ident{NamePos: s.Name.NamePos, Name: s.Name.Name}
 	}
 	if s.Path != nil {
-		out.Path = &ast.BasicLit{ValuePos: s.Path.ValuePos, Kind: s.Path.Kind, Value: s.Path.Value}
+		out.Path = &ast.BasicLit{ValuePos: s.Path.ValuePos, ValueLen: s.Path.ValueLen, Kind: s.Path.Kind, Value: s.Path.Value}
 	}
 	return out
 }
@@ -641,10 +641,5 @@ func setSpecRelPos(s *ast.ImportSpec, r token.RelPos) {
 		ast.SetRelPos(cg, r)
 		return
 	}
-	pos := s.Pos().WithRel(r)
-	if s.Name != nil {
-		s.Name.NamePos = pos
-	} else {
-		s.Path.ValuePos = pos
-	}
+	ast.SetRelPos(s, r)
 }

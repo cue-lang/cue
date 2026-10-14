@@ -35,6 +35,7 @@ b: 3
 			TokenPos: token.Pos("file.cue:4:2", nospace)
 			Value: *ast.BasicLit@TESTPTR{
 				ValuePos: token.Pos("file.cue:4:4", blank)
+				ValueLen: 1
 				Kind: token.Token("INT")
 				Value: "3"
 			}

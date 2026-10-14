@@ -65,6 +65,7 @@ import (
 				{
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("imports.cue:3:8", blank)
+						ValueLen: 5
 						Kind: token.Token("STRING")
 						Value: "\"foo\""
 					}
@@ -78,6 +79,7 @@ import (
 				{
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("imports.cue:6:2", newline)
+						ValueLen: 5
 						Kind: token.Token("STRING")
 						Value: "\"bar\""
 					}
@@ -89,6 +91,7 @@ import (
 					}
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("imports.cue:7:7", blank)
+						ValueLen: 5
 						Kind: token.Token("STRING")
 						Value: "\"baz\""
 					}

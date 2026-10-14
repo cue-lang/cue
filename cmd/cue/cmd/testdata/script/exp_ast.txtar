@@ -59,6 +59,7 @@ b: +
 				{
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("a/one.cue:3:8", blank)
+						ValueLen: 9
 						Kind: token.Token("STRING")
 						Value: "\"strings\""
 					}
@@ -87,6 +88,7 @@ b: +
 				Args: []ast.Expr{
 					*ast.BasicLit{
 						ValuePos: token.Pos("a/one.cue:5:20", nospace)
+						ValueLen: 5
 						Kind: token.Token("STRING")
 						Value: "\"foo\""
 					}
@@ -112,6 +114,7 @@ b: +
 				{
 					Path: *ast.BasicLit{
 						ValuePos: token.Pos("a/two.cue:3:8", blank)
+						ValueLen: 27
 						Kind: token.Token("STRING")
 						Value: "\"example.com/other/strings\""
 					}
@@ -161,6 +164,7 @@ b: +
 			TokenPos: token.Pos("ref/ref.cue:1:2", nospace)
 			Value: *ast.BasicLit@ref001[ref/ref.cue:1:4,1:5]{
 				ValuePos: token.Pos("ref/ref.cue:1:4", blank)
+				ValueLen: 1
 				Kind: token.Token("INT")
 				Value: "1"
 			}
@@ -193,6 +197,7 @@ b: +
 			TokenPos: token.Pos("-:1:2", nospace)
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("-:1:4", blank)
+				ValueLen: 1
 				Kind: token.Token("INT")
 				Value: "1"
 			}

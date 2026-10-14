@@ -44,9 +44,8 @@ type File struct {
 	// version is the module version of the file that was compiled.
 	version string
 
-	// experiments is a comma-separated list of experiments that are enabled
-	// for this file. This is for documentation purposes only, as the
-	// experiments are already set in the struct fields.
+	// experiments is the sorted, comma-separated list of experiments
+	// explicitly enabled for this file, as returned by [File.Experiments].
 	experiments string
 
 	// Testing is used to enable experiments for testing.
@@ -189,20 +188,6 @@ var defaultFile = sync.OnceValue(func() File {
 	return *f
 })
 
-// IsPreview returns true if the experiment exists and can be used
-// for the given version.
-func IsPreview(experiment, version string) bool {
-	return isPreview(experiment, version, File{})
-}
-
-func isPreview(experiment, version string, t any) bool {
-	expInfo := getExperimentInfoT(experiment, t)
-	if expInfo == nil {
-		return false
-	}
-	return expInfo.isValidForVersion(version)
-}
-
 func (e *experimentInfo) isValidForVersion(version string) bool {
 	// Check if experiment is available for this version
 	if version != "" {
@@ -224,7 +209,7 @@ func (e *experimentInfo) isValidForVersion(version string) bool {
 // IsStable returns true if the experiment is stable (no longer
 // experimental) for the given version.
 func IsStable(experiment, version string) bool {
-	expInfo := getExperimentInfo(experiment)
+	expInfo := getExperimentInfo(experiment, File{})
 	if expInfo == nil {
 		return false
 	}
@@ -245,7 +230,7 @@ func CanApplyFix(experiment, version, target string) error {
 }
 
 func canApplyExperimentFix(experiment, version, target string, t any) error {
-	expInfo := getExperimentInfoT(experiment, t)
+	expInfo := getExperimentInfo(experiment, t)
 	if expInfo == nil {
 		return fmt.Errorf("unknown experiment %q", experiment)
 	}
@@ -347,12 +332,6 @@ func getUpgradeExperiments(origVersion, targetVersion string, t any) []string {
 	return accepted
 }
 
-// ShouldRemoveAttribute returns true if the experiment attribute
-// should be removed because the experiment is stable for the given version.
-func ShouldRemoveAttribute(experiment, version string) bool {
-	return IsStable(experiment, version)
-}
-
 // experimentInfo holds parsed experiment lifecycle information
 type experimentInfo struct {
 	Preview   string
@@ -360,12 +339,9 @@ type experimentInfo struct {
 	Withdrawn string
 }
 
-// getExperimentInfo returns experiment lifecycle info for the given experiment name
-func getExperimentInfo(experiment string) *experimentInfo {
-	return getExperimentInfoT(experiment, File{})
-}
-
-func getExperimentInfoT(experiment string, t any) *experimentInfo {
+// getExperimentInfo returns experiment lifecycle info for the given experiment name,
+// looked up in the fields of t.
+func getExperimentInfo(experiment string, t any) *experimentInfo {
 	ft := reflect.TypeOf(t)
 	for field := range ft.Fields() {
 		if strings.EqualFold(field.Name, experiment) {

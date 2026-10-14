@@ -32,55 +32,6 @@ type testFile struct {
 	Exp15 bool `experiment:"preview:v0.15.0"`
 }
 
-func TestIsAvailable(t *testing.T) {
-	tests := []struct {
-		name       string
-		experiment string
-		version    string
-		want       bool
-	}{
-		{
-			name:       "valid experiment for current version",
-			experiment: "explicitopen",
-			version:    "v0.15.0",
-			want:       true,
-		},
-		{
-			name:       "experiment not available yet",
-			experiment: "explicitopen",
-			version:    "v0.14.0",
-			want:       false,
-		},
-		{
-			name:       "unknown experiment",
-			experiment: "nonexistent",
-			version:    "v0.15.0",
-			want:       false,
-		},
-		{
-			name:       "empty version (latest)",
-			experiment: "explicitopen",
-			version:    "",
-			want:       true,
-		},
-		{
-			name:       "case insensitive",
-			experiment: "ExplicitOpen",
-			version:    "v0.15.0",
-			want:       true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := IsPreview(tt.experiment, tt.version)
-			if got != tt.want {
-				t.Errorf("IsAvailable(%q, %q) = %v, want %v", tt.experiment, tt.version, got, tt.want)
-			}
-		})
-	}
-}
-
 func TestIsStable(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -93,6 +44,18 @@ func TestIsStable(t *testing.T) {
 			experiment: "explicitopen",
 			version:    "v0.15.0",
 			want:       false,
+		},
+		{
+			name:       "experiment accepted",
+			experiment: "accepted_",
+			version:    "v0.16.0",
+			want:       true,
+		},
+		{
+			name:       "case insensitive",
+			experiment: "Accepted_",
+			version:    "v0.16.0",
+			want:       true,
 		},
 		{
 			name:       "unknown experiment",
@@ -310,43 +273,6 @@ func TestGetUpgradeExperiments(t *testing.T) {
 			got := getUpgradeExperiments(tt.version, tt.target, testFile{})
 			if !slices.Equal(got, tt.want) {
 				t.Errorf("GetUpgradeExperiments(%q, %q) = %v, want %v", tt.version, tt.target, got, tt.want)
-			}
-		})
-	}
-}
-
-func TestShouldRemoveExperimentAttribute(t *testing.T) {
-	tests := []struct {
-		name       string
-		experiment string
-		version    string
-		want       bool
-	}{
-		{
-			name:       "experiment not accepted yet",
-			experiment: "explicitopen",
-			version:    "v0.15.0",
-			want:       false,
-		},
-		{
-			name:       "experiment accepted",
-			experiment: "accepted_",
-			version:    "v0.16.0",
-			want:       true,
-		},
-		{
-			name:       "unknown experiment",
-			experiment: "nonexistent",
-			version:    "v0.15.0",
-			want:       false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := ShouldRemoveAttribute(tt.experiment, tt.version)
-			if got != tt.want {
-				t.Errorf("ShouldRemoveExperimentAttribute(%q, %q) = %v, want %v", tt.experiment, tt.version, got, tt.want)
 			}
 		})
 	}

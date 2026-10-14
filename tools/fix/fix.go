@@ -317,7 +317,7 @@ func removeStableExperiments(f *ast.File, version string) {
 		n := 0
 		for exp := range strings.SplitSeq(body, ",") {
 			n++
-			if exp = strings.TrimSpace(exp); !cueexperiment.ShouldRemoveAttribute(exp, version) {
+			if exp = strings.TrimSpace(exp); !cueexperiment.IsStable(exp, version) {
 				keep = append(keep, exp)
 			}
 		}

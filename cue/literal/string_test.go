@@ -15,6 +15,7 @@
 package literal
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -154,6 +155,8 @@ func TestUnquote(t *testing.T) {
 	}
 }
 
+var errPanic = errors.New("panic")
+
 func TestInterpolation(t *testing.T) {
 	testCases := []struct {
 		quotes string
@@ -170,11 +173,24 @@ func TestInterpolation(t *testing.T) {
 		{`#""#`, `"`, "", errUnmatchedQuote},
 		{`#""#`, `\`, "", errUnmatchedQuote},
 		{`##""##`, `\'`, "", errUnmatchedQuote},
+		// A high surrogate escape with no low surrogate after it.
+		// This panics; it should fail with errSurrogate.
+		{`""`, `\uD800`, "", errPanic},
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%s/%s", i, tc.quotes, tc.in), func(t *testing.T) {
 			info, _, _, _ := ParseQuotes(tc.quotes, tc.quotes)
-			if got, err := info.Unquote(tc.in); err != tc.err {
+			var got string
+			var err error
+			func() {
+				defer func() {
+					if recover() != nil {
+						err = errPanic
+					}
+				}()
+				got, err = info.Unquote(tc.in)
+			}()
+			if err != tc.err {
 				t.Errorf("error: got %q; want %q", err, tc.err)
 			} else if got != tc.out {
 				t.Errorf("value: got %q; want %q", got, tc.out)

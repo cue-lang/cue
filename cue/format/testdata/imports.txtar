@@ -117,3 +117,47 @@ import ( // a
 ) // b
 
 x: time.time
+-- issue1545.input --
+package foo
+
+import "strings"
+import "list"
+
+import "time"
+import (
+	"a"
+	"b"
+)
+// doc for c
+import "c"
+import (
+	"d"
+	// trailing d
+)
+import "e"
+x: 1
+-- out/format/issue1545.golden --
+package foo
+
+import "strings"
+
+import "list"
+
+import "time"
+
+import (
+	"a"
+	"b"
+)
+
+// doc for c
+import "c"
+
+import (
+	"d"
+	// trailing d
+)
+
+import "e"
+
+x: 1

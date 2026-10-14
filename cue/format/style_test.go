@@ -262,6 +262,28 @@ func TestASTStyleRelPos(t *testing.T) {
 		}
 	})
 
+	t.Run("A2_NewlineBetweenImports", func(t *testing.T) {
+		// Consecutive ImportDecls are only split onto their own lines,
+		// even when one carries a doc comment; the blank line comes
+		// after the last one.
+		f := &ast.File{Decls: []ast.Decl{
+			importDecl(importSpec(`"a"`)),
+			importDecl(importSpec(`"b"`)),
+			withDoc(importDecl(importSpec(`"c"`)), "c doc"),
+			field("x", "int"),
+		}}
+		if !annotate(t, cfg, f) {
+			t.Fatal("expected Apply to report a change")
+		}
+		// TODO: the first two should be Newline; see https://cuelang.org/issue/1545.
+		wants := []token.RelPos{token.NewSection, token.NewSection, token.NewSection}
+		for i, want := range wants {
+			if got := leadingRel(f.Decls[i+1]); got != want {
+				t.Errorf("decl[%d] leading RelPos = %v, want %v", i+1, got, want)
+			}
+		}
+	})
+
 	t.Run("A3_BlankAfterCommentGroup", func(t *testing.T) {
 		// A standalone CommentGroup decl gets a blank line after it,
 		// matching what the old formatter did.

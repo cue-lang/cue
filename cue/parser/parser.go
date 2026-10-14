@@ -86,6 +86,10 @@ type parser struct {
 	// chainLevel tracks and limits the nesting depth of syntax built
 	// iteratively during parsing. See [maxChainLevel].
 	chainLevel int
+
+	// closers holds the closing tokens of the enclosing constructs being
+	// parsed, innermost last, for error recovery. See [parser.pushCloser].
+	closers []token.Token
 }
 
 func (p *parser) init(filename string, src []byte, opts []Option) {
@@ -303,6 +307,23 @@ func un(p *parser) {
 // maxNestLevel is the deepest expression nesting the parser accepts. Input
 // nested more deeply is rejected rather than recursed into any further.
 const maxNestLevel = 10_000
+
+// pushCloser records that the construct being parsed ends with tok,
+// until the matching call to [parser.popCloser].
+func (p *parser) pushCloser(tok token.Token) {
+	p.closers = append(p.closers, tok)
+}
+
+func (p *parser) popCloser() {
+	p.closers = p.closers[:len(p.closers)-1]
+}
+
+// atCloser reports whether the current token closes the innermost
+// enclosing construct.
+func (p *parser) atCloser() bool {
+	n := len(p.closers)
+	return n > 0 && p.tok == p.closers[n-1]
+}
 
 // incNestLevel increments the parser's nesting depth, bailing out with an
 // error once it grows past [maxNestLevel]. It pairs with [decNestLevel] in the
@@ -734,6 +755,8 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 		defer func() { c.closeNode(p, expr) }()
 		lparen := p.pos
 		p.next()
+		p.pushCloser(token.RPAREN)
+		defer p.popCloser()
 		p.exprLev++
 		p.openList()
 		x := p.parseRHS() // types may be parenthesized: (some type)
@@ -771,6 +794,8 @@ func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 
 	const N = 2
 	lbrack := p.expect(token.LBRACK)
+	p.pushCloser(token.RBRACK)
+	defer p.popCloser()
 
 	p.exprLev++
 	var index [N]ast.Expr
@@ -832,6 +857,8 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
 	defer p.closeList()
 
 	lparen := p.expect(token.LPAREN)
+	p.pushCloser(token.RPAREN)
+	defer p.popCloser()
 
 	p.exprLev++
 	var list []ast.Expr
@@ -1269,6 +1296,8 @@ func (p *parser) parseStruct() (expr ast.Expr) {
 		defer un(trace(p, "StructLit"))
 	}
 
+	p.pushCloser(token.RBRACE)
+	defer p.popCloser()
 	elts := p.parseStructBody()
 	rbrace := p.expectClosing(token.RBRACE, "struct literal")
 	return &ast.StructLit{
@@ -1638,6 +1667,8 @@ func (p *parser) parseFunc() (expr ast.Expr) {
 	}
 
 	lparen := p.expect(token.LPAREN)
+	p.pushCloser(token.RPAREN)
+	defer p.popCloser()
 	params, ellipsis := p.parseFuncParams()
 	rparen := p.expectClosing(token.RPAREN, "function parameter list")
 
@@ -1913,6 +1944,8 @@ func (p *parser) parseList() (expr ast.Expr) {
 		defer un(trace(p, "ListLiteral"))
 	}
 
+	p.pushCloser(token.RBRACK)
+	defer p.popCloser()
 	elts := p.parseListElements()
 
 	if p.tok == token.ELLIPSIS {
@@ -2250,7 +2283,12 @@ L:
 
 				pos := p.pos
 				p.errorExpected(pos, "selector")
-				p.next() // make progress
+				// Leave a comma or the closing token of the enclosing
+				// construct for it to consume, so that the error does not
+				// cascade.
+				if p.tok != token.COMMA && !p.atCloser() {
+					p.next() // make progress
+				}
 				x = &ast.SelectorExpr{
 					X:      x,
 					Period: period,
@@ -2368,6 +2406,10 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	p.next()
 	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
+
+	// Each interpolated expression ends with a closing parenthesis.
+	p.pushCloser(token.RPAREN)
+	defer p.popCloser()
 
 	// Note: we can only tell if the string returned by ResumeInterpolation
 	// starts a new interpolated expression by whether it ends in a parenthesis.

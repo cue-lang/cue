@@ -74,7 +74,7 @@ type Codec struct {
 	Binary bool
 
 	// Value optionally holds a value-plane codec (a
-	// *cuelang.org/go/internal/valuecodec.Codec) as an opaque payload.
+	// *cuelang.org/go/internal/encoding.ValueCodec) as an opaque payload.
 	// It is stored as any so this package keeps no typed dependency on
 	// the CUE evaluator; the internal/encoding dispatch site type-asserts
 	// it. When non-nil it supersedes NewDecoder/NewEncoder for that

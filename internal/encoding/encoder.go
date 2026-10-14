@@ -40,7 +40,6 @@ import (
 	"cuelang.org/go/internal/cueexperiment"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/valuecodec"
 )
 
 // An Encoder converts CUE to various file formats, including CUE itself.
@@ -325,7 +324,7 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 		}
 		e.concrete = !fi.Incomplete
 		var closeCodec func() error
-		if vc, ok := codec.Value.(*valuecodec.Codec); ok && vc.NewValueEncoder != nil {
+		if vc, ok := codec.Value.(*ValueCodec); ok && vc.NewValueEncoder != nil {
 			// Value-plane encoder: pass the raw cue.Value, preserving the
 			// lattice, and enforce concreteness only when the mode
 			// requires it (the resolved form's Incomplete aspect),

@@ -12,19 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package valuecodec defines the value-plane codec type for the dynamic
-// encoding registry: constructors that decode/encode directly through
-// cue.Value. Syntax can express constraints, defaults, definitions, and
-// conjunctions, but rebuilding through syntax cannot preserve evaluated graph
-// identity, structure sharing, or original conjunct provenance; the direct
-// value path can.
-//
-// It is a leaf package so that both the public registration API
-// (cuelang.org/go/unstable/encodingregistry) and the encoding dispatch
-// (cuelang.org/go/internal/encoding) can name the value-plane types
-// without either importing the other, and without internal/filetypes —
-// which stores a *Codec opaquely — needing a typed cue dependency.
-package valuecodec
+package encoding
 
 import (
 	"io"
@@ -50,10 +38,15 @@ type ValueEncoder interface {
 	Close() error
 }
 
-// A Codec holds the value-plane constructors of a registered encoding.
+// A ValueCodec holds the value-plane constructors of a registered
+// encoding, which decode and encode directly through cue.Value.
+// Rebuilding through syntax cannot preserve evaluated graph identity,
+// structure sharing, or original conjunct provenance; the direct value
+// path can.
+//
 // Either constructor may be nil (decode-only or encode-only). The
 // decoder receives the *cue.Context to build values into.
-type Codec struct {
+type ValueCodec struct {
 	NewValueDecoder func(*cue.Context, *build.File, io.Reader) (ValueDecoder, error)
 	NewValueEncoder func(*build.File, io.Writer) (ValueEncoder, error)
 }

@@ -44,7 +44,6 @@ import (
 	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/source"
-	"cuelang.org/go/internal/valuecodec"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -488,7 +487,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		// the built-in cases and before the error, so built-in behavior
 		// is never rerouted.
 		if codec, ok := filetypes.LookupCodec(string(f.Encoding)); ok {
-			if vc, ok := codec.Value.(*valuecodec.Codec); ok && vc.NewValueDecoder != nil {
+			if vc, ok := codec.Value.(*ValueCodec); ok && vc.NewValueDecoder != nil {
 				// Retain each decoded cue.Value directly. File provides a
 				// compatibility syntax projection, but value-aware callers use
 				// DecodedValue so no lattice information is lost.

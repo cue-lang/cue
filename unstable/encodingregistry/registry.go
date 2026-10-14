@@ -67,8 +67,8 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/valuecodec"
 )
 
 // A Decoder decodes documents of a registered encoding into CUE
@@ -85,12 +85,12 @@ type Encoder = filetypes.Encoder
 // A ValueDecoder decodes documents of a registered encoding directly
 // into cue.Value, preserving the full value lattice. Decode returns one
 // value per document and io.EOF when no documents remain.
-type ValueDecoder = valuecodec.ValueDecoder
+type ValueDecoder = encoding.ValueDecoder
 
 // A ValueEncoder encodes cue.Value into a registered encoding,
 // preserving the value lattice. Close flushes buffered output but does
 // not close the underlying writer.
-type ValueEncoder = valuecodec.ValueEncoder
+type ValueEncoder = encoding.ValueEncoder
 
 // Mode identifies an overall mode CUE is being run in, for per-mode
 // property overlays. The zero value is not a valid mode.

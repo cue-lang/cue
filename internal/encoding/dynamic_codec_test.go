@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/valuecodec"
 )
 
 // The tests in this file register synthetic encodings in the
@@ -72,8 +71,8 @@ func TestValueDecoderNonExistentValue(t *testing.T) {
 		Extensions: []string{".vpzero"},
 		Info:       filetypes.DynamicFileInfo{Form: "schema"},
 		Codec: filetypes.Codec{
-			Value: &valuecodec.Codec{
-				NewValueDecoder: func(ctx *cue.Context, f *build.File, r io.Reader) (valuecodec.ValueDecoder, error) {
+			Value: &encoding.ValueCodec{
+				NewValueDecoder: func(ctx *cue.Context, f *build.File, r io.Reader) (encoding.ValueDecoder, error) {
 					return &zeroValueDecoder{}, nil
 				},
 			},

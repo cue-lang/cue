@@ -117,6 +117,56 @@ extIf: {
 
 -- out/dependencies/field --
 line  reference    path of resulting vertex
+-- out/dependencies-v3/all --
+line  reference                                               path of resulting vertex
+10:   s.k                                                  => s.k
+13:   q                                                    => q
+14:   q                                                    => q
+15:   {out: q}.out.x                                       => q.x
+18:   q                                                    => q
+18:   {out: r: q}.out                                      => **non-rooted**
+19:   {out: r: c}.out                                      => **non-rooted**
+20:   {out: r: q}.out.r.x                                  => q.x
+21:   {out: {out: r: q}.out}.out.r.x                       => q.x
+22:   {out: {out: r: q}.out.r}.out.x                       => q.x
+28:   r.k                                                  => r.k
+29:   r.k.l                                                => r.k.l
+34:   q                                                    => q
+40:   s                                                    => s
+45:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+45:   msg                                                  => msg
+51:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+51:   msg                                                  => msg
+57:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+57:   msg                                                  => msg
+106:  strings.Join                                         => "strings".Join
+106:  strings.Split                                        => "strings".Split
+106:  arg                                                  => **non-rooted**
+78:   (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result => #f.result
+108:  strings.Join                                         => "strings".Join
+108:  strings.Split                                        => "strings".Split
+93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
+113:  msg                                                  => msg
+110:  (extIf & {}).env                                     => msg
+-- diff/-out/dependencies-v3/all<==>+out/dependencies/all --
+diff old new
+--- old
++++ new
+@@ -4,6 +4,8 @@
+ 14:   q                                                    => q
+ 15:   {out: q}.out.x                                       => q.x
+ 18:   q                                                    => q
++18:   {out: r: q}.out                                      => **non-rooted**
++19:   {out: r: c}.out                                      => **non-rooted**
+ 20:   {out: r: q}.out.r.x                                  => q.x
+ 21:   {out: {out: r: q}.out}.out.r.x                       => q.x
+ 22:   {out: {out: r: q}.out.r}.out.x                       => q.x
+@@ -25,4 +27,4 @@
+ 108:  strings.Split                                        => "strings".Split
+ 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
+ 113:  msg                                                  => msg
+-110:  (extIf & {}).env                                     => extIf.env
++110:  (extIf & {}).env                                     => msg
 -- out/dependencies/all --
 line  reference                                               path of resulting vertex
 10:   s.k                                                  => s.k
@@ -146,6 +196,110 @@ line  reference                                               path of resulting 
 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
 113:  msg                                                  => msg
 110:  (extIf & {}).env                                     => extIf.env
+-- diff/dependencies-v3/todo/p3 --
+With structure sharing, (extIf & {}).env is reported as msg rather than
+extIf.env, as expanding the selected path follows the shared arc; in dynamic
+mode this duplicates the msg entry found by inspecting the inline value.
+Values selected from inline structs are reported as extra **non-rooted**
+dependencies when inspecting them finds no other dependency, even though
+Rootless is unset: for selections nested in another inline expression, and
+in dynamic mode also at the top level. Dynamic clients such as tools/flow
+recurse into these reports to find references inside the inline struct, so
+they cannot simply be dropped. Dynamic mode attributes the msg dependency of
+(extIf & {}).env to that reference, as it does for other references reached
+through a selected inline value, rather than to msg on line 113.
+-- out/dependencies-v3/dynamic --
+line  reference                          path of resulting vertex
+8:    [c][0]                          => a.b.c
+10:   s.k                             => s.k
+12:   {out: c}.out                    => a.b.c
+13:   {out: q}.out                    => q
+14:   {out: q}.out                    => q
+15:   {out: q}.out.x                  => q.x
+17:   {out: r: s: string}.out         => **non-rooted**
+18:   {out: {out: r: q}.out}.out.r    => q
+18:   {out: r: q}.out                 => **non-rooted**
+19:   {out: {out: r: c}.out}.out.r[0] => a.b.c[0]
+20:   {out: r: q}.out.r.x             => q.x
+21:   {out: {out: r: q}.out}.out.r.x  => q.x
+22:   {out: {out: r: q}.out.r}.out.x  => q.x
+25:   h1.r                            => a.b.h1.r
+26:   h1.r.s                          => a.b.h1.r.s
+28:   r.k                             => r.k
+29:   r.k.l                           => r.k.l
+33:   {
+      out:   q
+      other: s // should not appear in output
+}.out => q
+38:   {
+      out:   other
+      other: s // should appear in output
+}.out => s
+45:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
+45:   msg                      => msg
+51:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
+51:   msg                      => msg
+57:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
+57:   msg                      => msg
+62:   {
+      person: strings.ToUpper(msg) // do not report msg
+      out:    "foo"
+}.out => **non-rooted**
+106:  strings.Join                                         => "strings".Join
+106:  strings.Split                                        => "strings".Split
+78:   runs.t1.stdout                                       => a.b.t1.runs.t1.stdout
+78:   runs.t2.stdout                                       => a.b.t1.runs.t2.stdout
+78:   (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result => #f.result
+108:  strings.Join                                         => "strings".Join
+108:  strings.Split                                        => "strings".Split
+93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
+110:  (extIf & {}).env                                     => msg
+110:  (extIf & {}).env                                     => msg
+-- diff/-out/dependencies-v3/dynamic<==>+out/dependencies/dynamic --
+diff old new
+--- old
++++ new
+@@ -5,7 +5,9 @@
+ 13:   {out: q}.out                    => q
+ 14:   {out: q}.out                    => q
+ 15:   {out: q}.out.x                  => q.x
++17:   {out: r: s: string}.out         => **non-rooted**
+ 18:   {out: {out: r: q}.out}.out.r    => q
++18:   {out: r: q}.out                 => **non-rooted**
+ 19:   {out: {out: r: c}.out}.out.r[0] => a.b.c[0]
+ 20:   {out: r: q}.out.r.x             => q.x
+ 21:   {out: {out: r: q}.out}.out.r.x  => q.x
+@@ -22,12 +24,16 @@
+       out:   other
+       other: s // should appear in output
+ }.out => s
+-45:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+-45:   msg                                                  => msg
+-51:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+-51:   msg                                                  => msg
+-57:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+-57:   msg                                                  => msg
++45:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
++45:   msg                      => msg
++51:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
++51:   msg                      => msg
++57:   regexp.FindNamedSubmatch => "regexp".FindNamedSubmatch
++57:   msg                      => msg
++62:   {
++      person: strings.ToUpper(msg) // do not report msg
++      out:    "foo"
++}.out => **non-rooted**
+ 106:  strings.Join                                         => "strings".Join
+ 106:  strings.Split                                        => "strings".Split
+ 78:   runs.t1.stdout                                       => a.b.t1.runs.t1.stdout
+@@ -36,5 +42,5 @@
+ 108:  strings.Join                                         => "strings".Join
+ 108:  strings.Split                                        => "strings".Split
+ 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
+-113:  msg                                                  => msg
+-110:  (extIf & {}).env                                     => extIf.env
++110:  (extIf & {}).env                                     => msg
++110:  (extIf & {}).env                                     => msg
 -- out/dependencies/dynamic --
 line  reference                          path of resulting vertex
 8:    [c][0]                          => a.b.c
@@ -187,3 +341,9 @@ line  reference                          path of resulting vertex
 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
 113:  msg                                                  => msg
 110:  (extIf & {}).env                                     => extIf.env
+-- out/dependencies-v3/stats/field --
+// COUNT: 0
+-- out/dependencies-v3/stats/all --
+// COUNT: 62
+-- out/dependencies-v3/stats/dynamic --
+// COUNT: 113

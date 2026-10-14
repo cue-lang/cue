@@ -39,10 +39,6 @@ func TestVisit(t *testing.T) {
 		Root:   "./testdata",
 		Name:   "dependencies",
 		Matrix: cuetdtest.SmallMatrix,
-
-		ToDo: map[string]string{
-			"dependencies-v3/inline": "error",
-		},
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

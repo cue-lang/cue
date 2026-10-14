@@ -37,8 +37,6 @@ const (
 )
 
 func TestValues(t *testing.T) {
-	// Do not inline: the named struct is used as a marker in
-	// testdata/gen.go.
 	type subsumeTest struct {
 		// the result of b ⊑ a, where a and b are defined in "in"
 		err  string
@@ -1323,6 +1321,187 @@ func TestValues(t *testing.T) {
 			in:   `a: [2], b: [2, ...int]`,
 			mode: subFinal,
 			err:  "",
+		},
+
+		// Structural
+		{
+			in:  `a: !int, b: !int`,
+			err: "",
+		},
+		{
+			in:  `a: !number, b: !int`,
+			err: "",
+		},
+		{
+			in:  `a: !int, b: !number`,
+			err: "",
+		},
+
+		{
+			in:  `a: !bool, b: bool`,
+			err: `value not an instance`,
+		},
+		{
+			in:  `a: !bool, b: !bool`,
+			err: "",
+		},
+
+		// Call
+		// TODO: should subsume; incomplete values are not compared structurally.
+		{
+			in: `
+			a: fn()
+			b: fn()
+			fn: _`,
+			err: `value not an instance`,
+		},
+		{
+			in: `
+			a: fn(),
+			b: fn(1)
+			fn: _`,
+			err: `value not an instance`,
+		},
+		// TODO: should subsume; incomplete values are not compared structurally.
+		{
+			in: `
+			a: fn(2)
+			b: fn(2)
+			fn: _`,
+			err: `value not an instance`,
+		},
+		// TODO: should subsume; incomplete values are not compared structurally.
+		{
+			in: `
+			a: fn(number)
+			b: fn(2)
+			fn: _`,
+			err: `value not an instance`,
+		},
+		{
+			in: `
+			a: fn(2)
+			b: fn(number)
+			fn: _`,
+			err: `value not an instance`,
+		},
+
+		{
+			in:  `a: c + d, b: int, c: int, d: int`,
+			err: `value not an instance`,
+		},
+		{
+			in:  `a: {}, b: c & {}, c: {}`,
+			err: "",
+		},
+
+		// references
+		{
+			in:  `a: c, b: c, c: {}`,
+			err: "",
+		},
+		{
+			in:  `a: c, b: d, c: {}, d: {}`,
+			err: "",
+		},
+		{
+			in: `a: c, b: d, c: {a:1}, d: {}`,
+			err: `
+				regular field is constraint in subsumed value: a
+				value not an instance`},
+		{
+			in:  `a: c, b: d, c: {a:1}, d: c & {b:1}`,
+			err: "",
+		},
+		{
+			in: `a: d, b: c, c: {a:1}, d: c & {b:1}`,
+			err: `
+				regular field is constraint in subsumed value: b
+				value not an instance`},
+		{
+			in:  `a: c.c, b: c, c: { d: number}`,
+			err: `value not an instance`,
+		},
+
+		// type unification catches a reference error.
+		{
+			in:  `a: c, b: d, c: 1, d: 2`,
+			err: `value not an instance`,
+		},
+
+		{
+			in:  ` a: [1][1], b: [1][1]`,
+			err: "",
+		},
+		{
+			in:  ` a: [1][number], b: [1][1]`,
+			err: "",
+		},
+		{
+			in:  ` a: [number][1], b: [1][1]`,
+			err: "",
+		},
+		{
+			in:  ` a: [number][number], b: [1][1]`,
+			err: "",
+		},
+		{
+			in:  ` a: [1][0], b: [1][number]`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: [1][0], b: [number][0]`,
+			err: `value not an instance`,
+		},
+		// TODO: should subsume; incomplete values are not compared structurally.
+		{
+			in:  ` a: [number][number], b: [1][number]`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: [number][number], b: [number][1]`,
+			err: "",
+		},
+		// purely structural:
+		{
+			in:  ` a: [number][number], b: number`,
+			err: `value not an instance`,
+		},
+
+		// interpolations
+		// TODO: should subsume; incomplete values are not compared structurally.
+		{
+			in:  ` a: "\(d)", b: "\(d)", d: _`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: "\(d)", b: "\(e)", d: _, e: _`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: "\(string)", b: "\("foo")"`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: "\(string)", b: "\(d)", d: "foo"`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: "\("foo")", b: "\("foo")"`,
+			err: "",
+		},
+		{
+			in:  ` a: "\("foo")", b: "\(1) \(2)"`,
+			err: `value not an instance`,
+		},
+
+		{
+			in:  ` a: "s \(d) e", b: "s a e", d: _`,
+			err: `value not an instance`,
+		},
+		{
+			in:  ` a: "s \(d)m\(d) e", b: "s a e", d: _`,
+			err: `value not an instance`,
 		},
 	}
 

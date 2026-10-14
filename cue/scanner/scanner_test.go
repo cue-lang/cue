@@ -880,6 +880,63 @@ func TestScanErrors(t *testing.T) {
 	}
 }
 
+// TestUTF16 is separate from TestScanErrors as it expects multiple errors.
+func TestUTF16(t *testing.T) {
+	// UTF-16 input is not supported, and it should give one error from
+	// decoding it and one from scanning it. Instead, the scanner reports
+	// a cascade of errors, including two per NUL byte.
+	testCases := []struct {
+		src  string
+		want []string
+	}{{
+		src: "\xfe\xff\x00a\x00:\x00 \x001", // BOM + "a: 1" encoded as UTF-16 BE
+		want: []string{
+			"#0: illegal UTF-8 encoding",
+			"#1: illegal UTF-8 encoding",
+			"#0: illegal character U+FFFD '�'",
+			"#2: illegal character NUL",
+			"#1: illegal character U+FFFD '�'",
+			"#2: illegal character U+0000",
+			"#4: illegal character NUL",
+			"#4: illegal character U+0000",
+			"#6: illegal character NUL",
+			"#6: illegal character U+0000",
+			"#8: illegal character NUL",
+			"#8: illegal character U+0000",
+		},
+	}, {
+		src: "\xff\xfea\x00:\x00 \x001\x00", // BOM + "a: 1" encoded as UTF-16 LE
+		want: []string{
+			"#0: illegal UTF-8 encoding",
+			"#1: illegal UTF-8 encoding",
+			"#0: illegal character U+FFFD '�'",
+			"#1: illegal character U+FFFD '�'",
+			"#3: illegal character NUL",
+			"#3: illegal character U+0000",
+			"#5: illegal character NUL",
+			"#5: illegal character U+0000",
+			"#7: illegal character NUL",
+			"#7: illegal character U+0000",
+			"#9: illegal character NUL",
+			"#9: illegal character U+0000",
+		},
+	}}
+	for _, tc := range testCases {
+		var got []string
+		eh := func(pos token.Pos, msg string, args []interface{}) {
+			got = append(got, fmt.Sprintf("#%d: %s", pos.Offset(), fmt.Sprintf(msg, args...)))
+		}
+		var s Scanner
+		s.Init(token.NewFile("", -1, len(tc.src)), []byte(tc.src), eh, 0)
+		for {
+			if _, tok, _ := s.Scan(); tok == token.EOF {
+				break
+			}
+		}
+		qt.Check(t, qt.DeepEquals(got, tc.want), qt.Commentf("src: %q", tc.src))
+	}
+}
+
 // Verify that no comments show up as literal values when skipping comments.
 func TestNoLiteralComments(t *testing.T) {
 	var src = `

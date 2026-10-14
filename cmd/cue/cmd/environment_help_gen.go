@@ -23,8 +23,6 @@ var cueDebugHelp = `
 			when interacting with module registries.
 		strict
 			strict sets whether extra aggressive checking should be done.
-			This should typically default to true for pre-releases and default to
-			false otherwise.
 		logeval
 			logeval sets the log level for the evaluator.
 			There are currently only two levels:

@@ -80,10 +80,8 @@ func initExperimentFlags() error {
 	a := strings.Split(os.Getenv("CUE_EXPERIMENT"), ",")
 	experiments, err := parseEnvExperiments(a...)
 	if err != nil {
-		return err
+		return fmt.Errorf("error in CUE_EXPERIMENT: %w", err)
 	}
-
-	// First, set defaults based on experiment lifecycle
 	if err := parseConfig(&Flags, "", experiments); err != nil {
 		return fmt.Errorf("error in CUE_EXPERIMENT: %w", err)
 	}

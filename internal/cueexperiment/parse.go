@@ -57,7 +57,7 @@ func parseEnvExperiments(x ...string) (m map[string]bool, err error) {
 		} else if val, err := strconv.ParseBool(valueStr); err == nil {
 			m[name] = val
 		} else {
-			return nil, fmt.Errorf("cannot parse CUE_EXPERIMENT: invalid value %q for experiment %q", valueStr, name)
+			return nil, fmt.Errorf("invalid value %q for experiment %q", valueStr, name)
 		}
 	}
 	return m, nil
@@ -84,7 +84,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 
 	var errs []error
 
-	// Collect the field indices and set the default values.
+	// Set each field from its experiment's lifecycle and the given experiments.
 	fv := reflect.ValueOf(flags).Elem()
 	ft := fv.Type()
 	for i := range ft.NumField() {
@@ -120,11 +120,7 @@ func parseConfig[T any](flags *T, version string, experiments map[string]bool) e
 						fv.Field(i).Set(reflect.ValueOf(true))
 					}
 					if explicitlyDisabled {
-						// We allow setting deprecated flags to their default
-						// value so that bold explorers will not be penalized
-						// for their experimentation.
 						errs = append(errs, fmt.Errorf("cannot disable stable experiment %q", name))
-						continue
 					}
 
 				case "withdrawn":

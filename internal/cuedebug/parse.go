@@ -24,8 +24,7 @@ func Parse(s string) (Config, error) {
 // The string may contain a comma-separated list of name=value pairs
 // for the fields of T. For a boolean field, a bare name means name=true.
 //
-// Names are treated case insensitively. Boolean values are parsed via [strconv.ParseBool],
-// and integers via [strconv.Atoi].
+// Boolean values are parsed via [strconv.ParseBool], and integers via [strconv.Atoi].
 func parse[T any](flags *T, env string) error {
 	// Collect the field indices and set the default values.
 	indexByName := make(map[string]int)

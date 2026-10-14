@@ -25,8 +25,6 @@ type Config struct {
 	// allowed environment variables to be known.
 
 	// Strict sets whether extra aggressive checking should be done.
-	// This should typically default to true for pre-releases and default to
-	// false otherwise.
 	Strict bool
 
 	// LogEval sets the log level for the evaluator.
@@ -69,7 +67,7 @@ var initOnce = sync.OnceValue(func() error {
 	var err error
 	Flags, err = Parse(os.Getenv("CUE_DEBUG"))
 	if err != nil {
-		return fmt.Errorf("cannot parse CUE_DEBUG: %w", err)
+		return fmt.Errorf("error in CUE_DEBUG: %w", err)
 	}
 	return nil
 })

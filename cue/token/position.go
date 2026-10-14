@@ -655,6 +655,8 @@ func searchLineInfos(a []lineInfo, x int) int {
 // If adjusted is set, unpack will return the filename and line information
 // possibly adjusted by //line comments; otherwise those comments are ignored.
 func (f *File) unpack(offset index, adjusted bool) (filename string, line, column int) {
+	f.mutex.RLock()
+	defer f.mutex.RUnlock()
 	filename = f.name
 	if i := searchInts(f.lines, offset); i >= 0 {
 		line, column = i+1, int(offset-f.lines[i]+1)

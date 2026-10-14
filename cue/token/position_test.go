@@ -17,6 +17,7 @@ package token
 import (
 	"fmt"
 	"slices"
+	"sync"
 	"testing"
 )
 
@@ -244,6 +245,28 @@ done
 		checkPos(t, "3. PositionFor adjusted", got2, want)
 		checkPos(t, "3. Position", got3, want)
 	}
+}
+
+// Test that concurrent use of File.AddLine and File.PositionFor is race-free.
+// Adapted from https://go.dev/cl/34591.
+func TestPositionForRace(t *testing.T) {
+	const n = 1000
+	f := NewFile("f", 1, n)
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		for i := range n {
+			f.AddLine(i)
+			f.AddLineInfo(i, "g", i)
+		}
+	})
+	wg.Go(func() {
+		pos := f.Pos(n/2, 0)
+		for range n {
+			f.PositionFor(pos, false)
+			f.PositionFor(pos, true)
+		}
+	})
+	wg.Wait()
 }
 
 // Adapted from https://go-review.googlesource.com/c/go/+/559436

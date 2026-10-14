@@ -1063,8 +1063,16 @@ scanAgain:
 				tok = token.OR
 			}
 		default:
-			// next reports unexpected BOMs - don't repeat
-			if ch != bom {
+			switch ch {
+			case bom:
+				// next reports unexpected BOMs - don't repeat
+			case '“', '”':
+				// Report an informative error for curly quotation marks,
+				// which are easily introduced via copy and paste.
+				s.errf(s.file.Offset(pos), "curly quotation mark %q (use neutral %q)", ch, '"')
+			case '‘', '’':
+				s.errf(s.file.Offset(pos), "curly quotation mark %q (use neutral %q)", ch, '\'')
+			default:
 				s.errf(s.file.Offset(pos), "illegal character %#U", ch)
 			}
 			insertEOL = s.insertEOL // preserve insertSemi info

@@ -1,0 +1,14 @@
+Pow returns 1 for zero exponents, including signed and scaled zeros.
+
+-- in.cue --
+import "math"
+
+zero:         math.Pow(0, 0)
+negativeZero: math.Pow(-0.0, -0.0)
+scaledZero:   math.Pow(0, 0e10)
+nonzero:      math.Pow(-2, 0)
+-- out/math --
+zero:         1
+negativeZero: 1
+scaledZero:   1
+nonzero:      1

@@ -88,11 +88,11 @@ type parsedTestAttr struct {
 	// e.g. "in.cue" (needed to locate the file for CUE_UPDATE write-back).
 	srcFileName string
 
-	// baseLine is the effective 1-indexed line of the field carrying this
-	// attribute in the stripped-and-formatted output.  It may differ from
-	// srcAttr.Pos().Line() when earlier @test attributes on preceding fields
-	// contain embedded newlines in their bodies (which are stripped before
-	// formatting, collapsing those extra lines).
+	// baseLine is the 1-indexed source line that relative pos= specs in this
+	// attribute, including those nested in an eq body, are resolved against:
+	// the start of the field for a field attribute, the opening brace of the
+	// enclosing struct for a decl attribute, and the attribute itself at file
+	// level.
 	baseLine int
 }
 

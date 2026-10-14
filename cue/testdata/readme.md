@@ -181,13 +181,31 @@ x: ({a: int & string} | {b: int & bool}) @test(err,
 #### `pos=[...]` — error positions
 
 Specifies expected error positions. Each position is written as `deltaLine:col`
-relative to the `@test` attribute line, or `file:line:col` for positions in
-other files. Positions are matched **order-independently** — the order of specs
-does not need to match the order of actual positions. Commas between specs are
+relative to a base line, or `file:line:col` for positions in other files.
+Positions are matched **order-independently** — the order of specs does not
+need to match the order of actual positions. Commas between specs are
 optional:
 
 ```cue
 bad: x & y @test(err, code=eval, pos=[0:5, 0:9])
+```
+
+The base line depends on where the `@test` attribute sits:
+
+| Attribute | Base line |
+|-----------|-----------|
+| field attribute | the line where the field starts |
+| decl attribute inside a struct | the line of the struct's opening `{` |
+| file-level decl attribute | the line where the attribute starts |
+
+A `@test(err, pos=...)` nested in a `@test(eq, {...})` body uses the base line
+of the enclosing `eq` attribute; below, `b`'s positions are relative to `s: {`:
+
+```cue
+s: {
+	b: 1 & 2
+	@test(eq, {b: _|_ @test(err, code=eval, pos=[1:5, 1:9])})
+}
 ```
 
 `pos=[]` is a fill-in placeholder. Running with `CUE_UPDATE=1` writes the

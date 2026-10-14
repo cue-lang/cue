@@ -862,7 +862,7 @@ func positionsFromSingleError(e cueerrors.Error) []token.Pos {
 // not manually inspect token.Pos values.
 
 // posSpecsMatch reports whether positions match specs in any order.
-// baseLine is the line number of the @test attribute; used to resolve relative specs.
+// baseLine resolves relative specs; see [parsedTestAttr.baseLine].
 // The runner's relFilename method is needed for absolute specs — pass it as a func.
 func posSpecsMatch(positions []token.Pos, specs []posSpec, baseLine int, relFilename func(string) string) bool {
 	if len(positions) != len(specs) {

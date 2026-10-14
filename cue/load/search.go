@@ -19,6 +19,7 @@ import (
 	"io/fs"
 	"path"
 	"strings"
+	"syscall"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -178,10 +179,12 @@ func (l *loader) matchPackages(pattern, pkgName string) *match {
 // beginning ./ or ../, meaning it should scan the tree rooted
 // at the given directory. There are ... in the pattern too.
 // (See cue help inputs for pattern syntax.)
-func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
+//
+// orig is the pattern as given, for errors; pattern has no qualifier.
+func (l *loader) matchPackagesInFS(orig, pattern, pkgName string) *match {
 	c := l.cfg
 	m := &match{
-		Pattern: pattern,
+		Pattern: orig,
 		Literal: false,
 	}
 
@@ -202,14 +205,14 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 	if !hasFilepathPrefix(root, c.ModuleRoot, c.pathOS) {
 		m.Err = errors.Newf(token.NoPos,
 			"cue: pattern %s refers to dir %s, outside module root %s",
-			pattern, root, c.ModuleRoot)
+			m.Pattern, root, c.ModuleRoot)
 		return m
 	}
 
 	pkgDir := pkgpath.Join([]string{root, modDir}, c.pathOS)
 
-	_ = c.fileSystem.walk(root, func(path string, entry fs.DirEntry, err errors.Error) errors.Error {
-		if err != nil || !entry.IsDir() {
+	walkErr := c.fileSystem.walk(root, func(path string, entry fs.DirEntry, err errors.Error) errors.Error {
+		if entry != nil && !entry.IsDir() {
 			return nil
 		}
 		if path == pkgDir {
@@ -217,12 +220,14 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		}
 
 		top := path == root
-
-		// Avoid .foo, _foo, and testdata directory trees, but do not avoid "." or "..".
-		elem := pkgpath.Base(path, c.pathOS)
-		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
-		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
+		if skipPatternDir(pkgpath.Base(path, c.pathOS), top) {
 			return skipDir
+		}
+		if err != nil {
+			if noPackagesErr(err) {
+				return skipDir
+			}
+			return err
 		}
 
 		if !top {
@@ -264,7 +269,26 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		m.Pkgs = append(m.Pkgs, pkgs...)
 		return nil
 	})
+	if walkErr != nil {
+		m.Err = errors.Wrapf(walkErr, token.NoPos, "pattern %s", m.Pattern)
+	}
 	return m
+}
+
+// skipPatternDir reports whether a ./... pattern leaves out the directory
+// tree with the given base name: .foo, _foo, and testdata below the root.
+func skipPatternDir(name string, root bool) bool {
+	if name == "." || name == ".." {
+		return false
+	}
+	return strings.HasPrefix(name, ".") || strings.HasPrefix(name, "_") || (name == "testdata" && !root)
+}
+
+// noPackagesErr reports whether an error reading an entry means it holds
+// no packages, such as a missing root or a file removed while walking.
+// Any other error, such as a permission error, may hide packages.
+func noPackagesErr(err error) bool {
+	return errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR)
 }
 
 // importPaths returns the matching paths to use for the given command line.
@@ -299,7 +323,7 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 
 		if strings.Contains(a, "...") {
 			if isLocalImport(a) {
-				out = append(out, l.matchPackagesInFS(a, pkgName))
+				out = append(out, l.matchPackagesInFS(orig, a, pkgName))
 			} else {
 				// TODO: patterns with a non-relative prefix, such as a
 				// package path inside the main module, match no packages
@@ -428,7 +452,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 	if !ok {
 		return nil, fmt.Errorf("pattern not allowed in external package path %q", origp)
 	}
-	return appendExpandedWildcardPackagePath(pkgPaths, ip, pkgQual, module.SourceLoc{
+	return appendExpandedWildcardPackagePath(pkgPaths, origp, ip, pkgQual, module.SourceLoc{
 		FS:  c.fileSystem.ioFS(moduleRoot, c.languageVersion()),
 		Dir: ".",
 	}, c.Module, tg)
@@ -547,7 +571,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 //
 // Note: this logic matches the logic in [loader.importPathsQuiet].
 // TODO de-duplicate the logic so wildcards are expanded exactly once using a single piece of logic.
-func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) ([]resolvedPackageArg, error) {
+func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, origp string, pattern ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) ([]resolvedPackageArg, error) {
 	modIpath := ast.ParseImportPath(mainModPath)
 	// Find directory to begin the scan.
 	// Could be smarter but this one optimization is enough for now,
@@ -581,13 +605,19 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 		}
 	}
 
+	// Leave out the same directories as matchPackagesInFS, so that both
+	// expansions fail on the same ones. SkipDir is not called for the root.
+	opts := modimports.WalkOptions{
+		SkipDir: func(p string) bool { return skipPatternDir(path.Base(p), false) },
+	}
 	var prevFile modimports.ModuleFile
 	var prevImportPath ast.ImportPath
-	for f, err := range modimports.AllModuleFiles(mainModRoot.FS, dir, modimports.WalkOptions{}) {
+	for f, err := range modimports.AllModuleFiles(mainModRoot.FS, dir, opts) {
 		if err != nil {
-			// Skip just this entry; stopping would leave every package
-			// after it unloaded, and their imports unresolved.
-			continue
+			if noPackagesErr(err) {
+				continue
+			}
+			return nil, fmt.Errorf("pattern %s: %w", origp, err)
 		}
 		fileDir := path.Dir(f.FilePath)
 		if !match(fileDir) {

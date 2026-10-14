@@ -1022,9 +1022,8 @@ func TestWildcardUnreadableEntries(t *testing.T) {
 			}
 			got = append(got, s)
 		}
-		// TODO: the unreadable directory is silently skipped.
 		qt.Assert(t, qt.DeepEquals(got, []string{
-			"mod.test/m/zz@v0",
+			" (error)",
 		}), qt.Commentf("SkipImports: %v", skipImports))
 	}
 }

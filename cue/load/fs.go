@@ -237,6 +237,8 @@ func (fs *overlayFileSystem) openFile(path string) (io.ReadCloser, errors.Error)
 
 var skipDir = errors.Newf(token.NoPos, "skip directory")
 
+// A walkFunc is called for each entry with any error reading it;
+// entry is nil when the root cannot be stat'ed.
 type walkFunc func(path string, entry iofs.DirEntry, err errors.Error) errors.Error
 
 func (fs *overlayFileSystem) walk(root string, f walkFunc) error {
@@ -246,8 +248,6 @@ func (fs *overlayFileSystem) walk(root string, f walkFunc) error {
 	entry := iofs.FileInfoToDirEntry(info)
 	if err != nil {
 		err = f(root, entry, err)
-	} else if !info.IsDir() {
-		return errors.Newf(token.NoPos, "path %q is not a directory", root)
 	} else {
 		err = fs.walkRec(root, entry, f)
 	}
@@ -255,7 +255,6 @@ func (fs *overlayFileSystem) walk(root string, f walkFunc) error {
 		return nil
 	}
 	return err
-
 }
 
 func (fs *overlayFileSystem) walkRec(path string, entry iofs.DirEntry, f walkFunc) errors.Error {

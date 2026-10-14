@@ -25,14 +25,14 @@ chmod 644 sub/bad.cue
 exec cue eval ./...
 stdout '^self: "noread"$'
 chmod 000 noread
-# TODO: the unreadable directory is silently skipped.
-exec cue eval ./...
-! stdout noread
-exec cue fmt --check ./...
+! exec cue eval ./...
+stderr '^pattern ./...: readDir: open .*noread: permission denied$'
+! exec cue fmt --check ./...
+stderr '^pattern ./...: readDir: open .*noread: permission denied$'
 ! exec cue eval ./...:noread
-stderr '^cue: "./..." matched no packages$'
+stderr '^pattern ./...:noread: readDir: open .*noread: permission denied$'
 ! exec cue fmt --check ./...:noread
-stderr '^cue: "./..." matched no packages$'
+stderr '^pattern ./...:noread: readDir: open .*noread: permission denied$'
 chmod 755 noread
 
 # An unreadable directory which the pattern leaves out, such as testdata

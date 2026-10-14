@@ -74,9 +74,6 @@ func (fsys *iofsFileSystem) openFile(p string) (io.ReadCloser, errors.Error) {
 func (fsys *iofsFileSystem) walk(root string, f walkFunc) error {
 	fsRoot := fsys.fsPath(root)
 	return fs.WalkDir(fsys.fsys, fsRoot, func(p string, d fs.DirEntry, err error) error {
-		if p == fsRoot && err == nil && !d.IsDir() {
-			return errors.Newf(token.NoPos, "path %q is not a directory", root)
-		}
 		var cueErr errors.Error
 		if err != nil {
 			cueErr = errors.Wrapf(err, token.NoPos, "walk")

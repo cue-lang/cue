@@ -21,8 +21,8 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/task"
-	"cuelang.org/go/pkg/internal"
 )
 
 func TestEmptyCmd(t *testing.T) {
@@ -31,7 +31,7 @@ func TestEmptyCmd(t *testing.T) {
 		`cmd: "   "`,
 		`cmd: []`,
 	} {
-		ctx := internal.NewContext()
+		ctx := (*cue.Context)(runtime.New())
 		v := ctx.CompileString(val)
 		if err := v.Err(); err != nil {
 			t.Fatal(err)
@@ -94,7 +94,7 @@ func TestEnv(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			ctx := internal.NewContext()
+			ctx := (*cue.Context)(runtime.New())
 			v := ctx.CompileString(tc.val, cue.Filename(tc.desc))
 			if err := v.Err(); err != nil {
 				t.Fatal(err)

@@ -30,9 +30,9 @@ import (
 	"cuelang.org/go/cue"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
-	"cuelang.org/go/pkg/internal"
 )
 
 func newTLSServer() *httptest.Server {
@@ -61,7 +61,7 @@ func build(t *testing.T, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	v := internal.NewContext().BuildExpr(x)
+	v := (*cue.Context)(runtime.New()).BuildExpr(x)
 	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
@@ -188,7 +188,7 @@ func TestParseHeaders(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			ctx := internal.NewContext()
+			ctx := (*cue.Context)(runtime.New())
 			v := ctx.CompileString(tc.req, cue.Filename("http headers"))
 			if err := v.Err(); err != nil {
 				t.Fatal(err)

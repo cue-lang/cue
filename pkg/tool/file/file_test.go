@@ -25,9 +25,9 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
+	coreruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
-	"cuelang.org/go/pkg/internal"
 	"github.com/go-quicktest/qt"
 )
 
@@ -38,7 +38,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	v := internal.NewContext().BuildExpr(x)
+	v := (*cue.Context)(coreruntime.New()).BuildExpr(x)
 	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}

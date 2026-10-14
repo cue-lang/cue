@@ -26,9 +26,9 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
-	"cuelang.org/go/pkg/internal"
 )
 
 func TestGetenv(t *testing.T) {
@@ -132,7 +132,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 		errors.Print(os.Stderr, err, nil)
 		t.Fatal(err)
 	}
-	ctx := internal.NewContext()
+	ctx := (*cue.Context)(runtime.New())
 	v := ctx.BuildExpr(x)
 	if err := v.Err(); err != nil {
 		t.Fatal(err)

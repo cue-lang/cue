@@ -88,19 +88,14 @@ func (d *autoDialer) dialNet(ctx context.Context) (net.Conn, error) {
 		}
 	}
 
-	const retries = 5
 	// It can take some time for the newly started server to bind to our address,
-	// so we retry for a bit.
+	// so we retry with exponential backoff.
+	const retries = 8
 	for retry := range retries {
-		startDial := time.Now()
+		time.Sleep(50 * time.Millisecond << retry) // 50ms, 100ms, ..., 6.4s (total ~12.8s)
 		netConn, err = net.DialTimeout(d.network, d.addr, dialTimeout)
 		if err == nil {
 			return netConn, nil
-		}
-		// In case our failure was a fast-failure, ensure we wait at least
-		// f.dialTimeout before trying again.
-		if retry != retries-1 {
-			time.Sleep(dialTimeout - time.Since(startDial))
 		}
 	}
 	return nil, fmt.Errorf("dialing remote: %w", err)

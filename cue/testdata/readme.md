@@ -304,7 +304,11 @@ internal representation a value produces without locking the test to it.
 wip: someExpr @test(skip, why="not yet implemented")
 ```
 
-A versioned form `skip:v3` skips only under evaluator version `v3`.
+A skip covers the subtree of the path it annotates: a top-level field's whole
+sub-test, or only the assertions at and below a nested path. A top-level field
+whose assertions are all skipped is reported as skipped too. The reason is
+taken from `why=`, else `hint=`. A versioned form `skip:v3` skips only under
+evaluator version `v3`.
 
 ### `permute` — field-order independence
 

@@ -78,6 +78,9 @@ type parsedTestAttr struct {
 	// such as AI assistants reviewing test failures.
 	hint string
 
+	// why is the reason given by skip and todo (from why="...").
+	why string
+
 	// srcAttr is the original AST attribute node (needed for CUE_UPDATE write-back).
 	srcAttr *ast.Attribute
 
@@ -155,7 +158,7 @@ func parseTestAttr(astAttr *ast.Attribute) (parsedTestAttr, error) {
 
 	// Extract universal flags and reject unknown key= flags.
 	// Positional args (kv.Key() == "") are accepted by directives as needed.
-	// Directives with their own flag parsers (err, todo, skip, shareID) are
+	// Directives with their own flag parsers (err, shareID, permute) are
 	// responsible for validating their own flags.
 	for _, kv := range attr.Fields[1:] {
 		switch kv.Key() {
@@ -178,9 +181,16 @@ func parseTestAttr(astAttr *ast.Attribute) (parsedTestAttr, error) {
 			default:
 				return result, fmt.Errorf("@test(%s): unknown flag %q", result.directive, kv.Key())
 			}
+		case "why":
+			switch result.directive {
+			case "skip", "todo":
+				result.why = kv.Value()
+			default:
+				return result, fmt.Errorf("@test(%s): unknown flag %q", result.directive, kv.Key())
+			}
 		default:
 			switch result.directive {
-			case "err", "todo", "skip", "shareID", "permute":
+			case "err", "shareID", "permute":
 				// These directives parse their own flags elsewhere.
 			default:
 				return result, fmt.Errorf("@test(%s): unknown flag %q", result.directive, kv.Key())

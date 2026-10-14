@@ -1,0 +1,40 @@
+# A @test(skip) on a nested path skips only that path's subtree; the other
+# assertions under the same root still run, so the failing one on a.sibling
+# is reported while the failing ones under a.skipped are not. The sub-test
+# for b, whose assertions are all skipped, is skipped as a whole.
+-- in/test.cue --
+a: {
+	skipped: {
+		x: 1 @test(eq, 2)
+		@test(eq, {x: 3})
+		@test(skip, why="demonstrating a nested skip")
+	}
+	sibling: 1 @test(eq, 2)
+	other:   1 @test(eq, 1)
+}
+b: {
+	skipped: {
+		x: 1 @test(eq, 2)
+		@test(skip, why="demonstrating a fully skipped root")
+	}
+}
+-- out/run/errors.txt --
+path a.sibling: expected 2, got 1
+-- out/force/test.cue --
+a: {
+	skipped: {
+		x: 1 @test(eq, 2)
+		@test(eq, {x: 3})
+		@test(skip, why="demonstrating a nested skip")
+	}
+	sibling: 1 @test(eq, 1)
+	other:   1 @test(eq, 1)
+}
+b: {
+	skipped: {
+		x: 1 @test(eq, 2)
+		@test(skip, why="demonstrating a fully skipped root")
+	}
+}
+-- out/status.txt --
+update: identical to input

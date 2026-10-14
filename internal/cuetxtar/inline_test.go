@@ -732,6 +732,33 @@ func TestHintFlag(t *testing.T) {
 		}
 	})
 
+	t.Run("unknown flag rejected for skip and todo", func(t *testing.T) {
+		for _, src := range []string{
+			`x: 1 @test(skip, reason="x")`,
+			`x: 1 @test(todo, reason="x")`,
+		} {
+			_, err := parseAttr(src)
+			if err == nil || !strings.Contains(err.Error(), "unknown flag") {
+				t.Errorf("%s: expected unknown flag error, got: %v", src, err)
+			}
+		}
+	})
+
+	t.Run("why and hint accepted for skip", func(t *testing.T) {
+		for _, src := range []string{
+			`x: 1 @test(skip, why="x")`,
+			`x: 1 @test(skip, hint="x")`,
+		} {
+			pa, err := parseAttr(src)
+			if err != nil {
+				t.Fatalf("%s: unexpected error: %v", src, err)
+			}
+			if got := skipReason(pa); got != "x" {
+				t.Errorf("%s: got skip reason %q, want %q", src, got, "x")
+			}
+		}
+	})
+
 	t.Run("suberr without = is rejected", func(t *testing.T) {
 		_, err := parseAttr(`x: 1 @test(err, suberr(code=eval, contains="foo"))`)
 		if err == nil || !strings.Contains(err.Error(), "missing '='") {

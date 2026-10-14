@@ -273,67 +273,44 @@ func (c *FailCapture) Failed() bool { return c.msgs.Len() > 0 }
 // Messages returns the accumulated error text.
 func (c *FailCapture) Messages() string { return c.msgs.String() }
 
-// runDirectivesForPath runs all directives for a single path, handling
-// @test(skip) and @test(todo) according to their semantics:
-//   - skip directives fire first so t.Skip() is called before other assertions
-//   - todo wraps all other directives in a todoCapture to suppress failures
+// runDirectivesForPath runs all directives for a single path; @test(todo)
+// wraps all other directives in a todoCapture to suppress failures.
+// Paths under a @test(skip) never reach here, as runArchive drops them.
 //
 // path is used both as the argument to runDirective and in log messages;
 // an empty path is displayed as "(file level)".
 func (r *inlineRunner) runDirectivesForPath(t testing.TB, path cue.Path, val cue.Value, directives []parsedTestAttr) {
-	for _, pa := range directives {
-		if pa.directive == "skip" {
+	i := slices.IndexFunc(directives, func(pa parsedTestAttr) bool { return pa.directive == "todo" })
+	if i < 0 {
+		for _, pa := range directives {
 			r.runDirective(t, path, val, pa)
 		}
+		return
 	}
-	hasTodo := false
-	var todoWhy, todoPriority string
-	for _, pa := range directives {
-		if pa.directive == "todo" {
-			hasTodo = true
-			for _, kv := range pa.raw.Fields[1:] {
-				switch kv.Key() {
-				case "why":
-					todoWhy = kv.Value()
-				case "p":
-					todoPriority = kv.Value()
-				}
-			}
-			break
-		}
-	}
+	todo := directives[i]
 	label := path.String()
 	if label == "" {
 		label = "(file level)"
 	}
+	cap := &failCapture{TB: t}
+	for _, pa := range directives {
+		if pa.directive == "todo" {
+			continue
+		}
+		r.runDirective(cap, path, val, pa)
+	}
+	if !cap.failed {
+		t.Logf("WARNING: TODO now passes for %s — consider removing @test(todo)", label)
+		return
+	}
 	suffix := ""
-	if todoPriority != "" {
-		suffix += fmt.Sprintf(" p=%s", todoPriority)
+	if todo.todoPriority != "" {
+		suffix += fmt.Sprintf(" p=%s", todo.todoPriority)
 	}
-	if todoWhy != "" {
-		suffix += fmt.Sprintf(" why=%q", todoWhy)
+	if todo.why != "" {
+		suffix += fmt.Sprintf(" why=%q", todo.why)
 	}
-	if hasTodo {
-		cap := &failCapture{TB: t}
-		for _, pa := range directives {
-			if pa.directive == "skip" || pa.directive == "todo" {
-				continue
-			}
-			r.runDirective(cap, path, val, pa)
-		}
-		if cap.failed {
-			t.Logf("TODO (still failing): %s%s\n%s", label, suffix, cap.msgs.String())
-		} else {
-			t.Logf("WARNING: TODO now passes for %s — consider removing @test(todo)", label)
-		}
-	} else {
-		for _, pa := range directives {
-			if pa.directive == "skip" {
-				continue
-			}
-			r.runDirective(t, path, val, pa)
-		}
-	}
+	t.Logf("TODO (still failing): %s%s\n%s", label, suffix, cap.msgs.String())
 }
 
 // runArchive runs all test cases in the archive.
@@ -360,6 +337,43 @@ func (r *inlineRunner) runArchive() {
 		if rec.parseErr != nil {
 			r.t.Errorf("@test parse error at %s (%s): %v", rec.parsed.srcAttr.Pos(), rec.parsed.srcAttr.Text, rec.parseErr)
 		}
+	}
+
+	// @test(skip) skips the subtree of the path it annotates: the whole
+	// archive at file level, a root's whole sub-test, or the assertions at
+	// and below a nested path. runRecords omits all skipped records.
+	version := r.versionName()
+	type skipEntry struct {
+		path   cue.Path
+		reason string
+	}
+	var skips []skipEntry
+	for _, rec := range allRecords {
+		if rec.parseErr != nil || rec.parsed.directive != "skip" {
+			continue
+		}
+		if slices.ContainsFunc(skips, func(s skipEntry) bool { return s.path.String() == rec.path.String() }) {
+			continue
+		}
+		active := selectActiveDirectives(r.byPath, rec.path, version)
+		i := slices.IndexFunc(active, func(pa parsedTestAttr) bool { return pa.directive == "skip" })
+		if i < 0 {
+			continue
+		}
+		reason := skipReason(active[i])
+		skips = append(skips, skipEntry{rec.path, reason})
+		if rec.fileLevel {
+			r.sinkOrT().Skip(reason)
+		}
+		if len(rec.path.Selectors()) > 1 {
+			r.t.Logf("SKIP %s: %s", rec.path, reason)
+		}
+	}
+	runRecords := allRecords
+	if len(skips) > 0 {
+		runRecords = slices.DeleteFunc(slices.Clone(allRecords), func(rec attrRecord) bool {
+			return slices.ContainsFunc(skips, func(s skipEntry) bool { return pathHasPrefix(rec.path, s.path) })
+		})
 	}
 
 	// Collect file-level records (decl @test attrs at file scope).
@@ -395,7 +409,6 @@ func (r *inlineRunner) runArchive() {
 
 	// Run file-level @test assertions against the entire file value.
 	if len(fileLevelRecords) > 0 {
-		version := r.versionName()
 		seenFilePaths := make(map[string]bool)
 		for _, rec := range fileLevelRecords {
 			if seenFilePaths[rec.path.String()] {
@@ -433,7 +446,18 @@ func (r *inlineRunner) runArchive() {
 		root := root
 		name := r.subTestName(root, allRecords)
 		r.t.Run(name, func(t *testing.T) {
-			r.runInline(r.sinkOrSub(t), root, val, allRecords)
+			// Skip the sub-test itself rather than the error sink: a
+			// skip is not a failure, and in capture mode the sink is
+			// the parent test, which a sub-test must not skip.
+			rootPath := cue.MakePath(root.sel)
+			if len(skips) > 0 && !slices.ContainsFunc(runRecords, func(rec attrRecord) bool { return pathHasPrefix(rec.path, rootPath) }) {
+				reason := "all assertions skipped"
+				if i := slices.IndexFunc(skips, func(s skipEntry) bool { return s.path.String() == rootPath.String() }); i >= 0 {
+					reason = skips[i].reason
+				}
+				t.Skip(reason)
+			}
+			r.runInline(r.sinkOrSub(t), root, val, runRecords)
 		})
 	}
 
@@ -441,8 +465,7 @@ func (r *inlineRunner) runArchive() {
 	// nesting depth may form groups spanning different roots. These cross-root
 	// sharing assertions cannot be detected per-root, so we collect them once
 	// over all records and check after all subtests run.
-	version := r.versionName()
-	if fileShareGroups := r.collectDirectShareIDs(allRecords, version); len(fileShareGroups) > 0 {
+	if fileShareGroups := r.collectDirectShareIDs(runRecords, version); len(fileShareGroups) > 0 {
 		r.runShareIDChecks(r.sinkOrT(), val, fileShareGroups)
 	}
 
@@ -835,6 +858,18 @@ func (r *inlineRunner) runInline(t testing.TB, root testCaseRoot, fileVal cue.Va
 	r.runInlinePermutes(t, rootPath, records, version)
 }
 
+// skipReason returns the reason given by a @test(skip) directive:
+// its why= value, else its hint= value, else "skipped".
+func skipReason(pa parsedTestAttr) string {
+	switch {
+	case pa.why != "":
+		return pa.why
+	case pa.hint != "":
+		return pa.hint
+	}
+	return "skipped"
+}
+
 // pathHasPrefix reports whether path starts with prefix, treating each
 // selector as an atomic component (not a substring of a selector).
 func pathHasPrefix(path, prefix cue.Path) bool {
@@ -884,16 +919,7 @@ func (r *inlineRunner) runDirective(t testing.TB, path cue.Path, val cue.Value, 
 	case "allows":
 		r.runAllowsAssertion(t, path, val, pa)
 	case "skip":
-		// @test(skip) or @test(skip, why="reason") — skip this test.
-		reason := "skipped"
-		if len(pa.raw.Fields) > 1 {
-			for _, kv := range pa.raw.Fields[1:] {
-				if kv.Key() == "why" {
-					reason = kv.Value()
-				}
-			}
-		}
-		t.Skip(reason) // t.Skip calls runtime.Goexit, stopping the goroutine.
+		// Handled by runArchive, which drops skipped paths.
 	case "debugCheck":
 		r.runDebugCheckInline(t, path, val, pa)
 	case "debug":

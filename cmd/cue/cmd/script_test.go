@@ -372,7 +372,8 @@ func TestX(t *testing.T) {
 
 		c, _ := cuecmd.New(args[1:])
 		b := &bytes.Buffer{}
-		c.SetOutput(b)
+		c.SetOut(b)
+		c.SetErr(b)
 		err = c.Run(context.Background())
 		// Always create an error to show
 		t.Error(err, "\n", b.String())

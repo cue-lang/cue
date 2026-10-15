@@ -42,14 +42,16 @@ func TestCommand(t *testing.T) {
 	// Create one command and run it, only checking that it succeeds.
 	c, err := cmd.New([]string{"help", "export"})
 	qt.Assert(t, qt.IsNil(err))
-	c.SetOutput(io.Discard)
+	c.SetOut(io.Discard)
+	c.SetErr(io.Discard)
 	err = c.Run(ctx)
 	qt.Assert(t, qt.IsNil(err))
 
 	// Create another command and run it, expecting it to fail.
 	c, err = cmd.New([]string{"help", "nosuchcommand"})
 	qt.Assert(t, qt.IsNil(err))
-	c.SetOutput(io.Discard)
+	c.SetOut(io.Discard)
+	c.SetErr(io.Discard)
 	err = c.Run(ctx)
 	qt.Assert(t, qt.IsNotNil(err))
 
@@ -58,6 +60,7 @@ func TestCommand(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	c.SetInput(strings.NewReader("foo: 123\n"))
 	var buf bytes.Buffer
+	//lint:ignore SA1019 keep covering the cobra method which users call
 	c.SetOutput(&buf)
 	err = c.Run(ctx)
 	qt.Assert(t, qt.IsNil(err))
@@ -76,7 +79,8 @@ func TestCommand(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		c.SetInput(strings.NewReader("a: [string]: b: 1\na: x: b: 1\n"))
 		var buf bytes.Buffer
-		c.SetOutput(&buf)
+		c.SetOut(&buf)
+		c.SetErr(&buf)
 		err = c.Run(ctx)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(buf.String(), "a: [string]: b: 1\na: x: _\n"))
@@ -127,7 +131,8 @@ func TestCommand(t *testing.T) {
 
 		c, err = cmd.New([]string{"fix"})
 		qt.Assert(t, qt.IsNil(err))
-		c.SetOutput(io.Discard)
+		c.SetOut(io.Discard)
+		c.SetErr(io.Discard)
 		err = c.Run(ctx)
 		qt.Assert(t, qt.ErrorMatches(err, `.*permission denied`))
 	})
@@ -148,7 +153,8 @@ func TestCommand(t *testing.T) {
 
 		c, err = cmd.New([]string{"fix"})
 		qt.Assert(t, qt.IsNil(err))
-		c.SetOutput(io.Discard)
+		c.SetOut(io.Discard)
+		c.SetErr(io.Discard)
 		errc := make(chan error, 1)
 		go func() { errc <- c.Run(ctx) }()
 		select {

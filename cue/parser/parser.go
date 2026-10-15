@@ -625,25 +625,6 @@ func syncExpr(p *parser) {
 	}
 }
 
-// safePos returns a valid file position for a given position: If pos
-// is valid to begin with, safePos returns pos. If pos is out-of-range,
-// safePos returns the EOF position.
-//
-// This is hack to work around "artificial" end positions in the AST which
-// are computed by adding 1 to (presumably valid) token positions. If the
-// token positions are invalid due to parse errors, the resulting end position
-// may be past the file's EOF position, which would lead to panics if used
-// later on.
-func (p *parser) safePos(pos token.Pos) (res token.Pos) {
-	defer func() {
-		if recover() != nil {
-			res = p.file.Pos(p.file.Base()+p.file.Size(), pos.RelPos()) // EOF position
-		}
-	}()
-	_ = p.file.Offset(pos) // trigger a panic if position is out-of-range
-	return pos
-}
-
 // ----------------------------------------------------------------------------
 // Identifiers
 
@@ -2210,7 +2191,7 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 		// all other nodes are not proper expressions
 		p.errorExpected(x.Pos(), "expression")
 		x = &ast.BadExpr{
-			From: x.Pos(), To: p.safePos(x.End()),
+			From: x.Pos(), To: x.End(),
 		}
 	}
 	return x

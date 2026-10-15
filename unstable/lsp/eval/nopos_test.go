@@ -74,6 +74,7 @@ func TestFuncArgsWithoutPositions(t *testing.T) {
 		Decls: []ast.Decl{
 			&ast.Field{Label: ast.NewIdent("k"), Value: ast.NewIdent("int")},
 			&ast.Field{Label: ast.NewIdent("f"), Value: &ast.Func{
+				//lint:ignore SA1019 the deprecated field is what this test covers
 				Args: []ast.Expr{kRef},
 				Ret:  ast.NewIdent("int"),
 			}},

@@ -35,12 +35,11 @@ package c
 
 	const filesTwoModules = `
 -- a/cue.mod/module.cue --
-module: "mod.example/b"
+module: "mod.example/a"
 language: version: "v0.11.0"
 
 -- a/a.cue --
 package a
-
 -- b/cue.mod/module.cue --
 module: "mod.example/b"
 language: version: "v0.11.0"
@@ -102,6 +101,13 @@ package a
 				I.WorkspaceFolders("a", "b"),
 			},
 			files: filesOneModule,
+		},
+		{
+			name: "multiple folders, two modules",
+			opts: []I.RunOption{
+				I.WorkspaceFolders("a", "b"),
+			},
+			files: filesTwoModules,
 		},
 		{
 			// Virtual folders, such as those registered by VS Code

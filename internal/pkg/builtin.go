@@ -224,10 +224,10 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	case *callError:
 		ret = err.b
 	case *json.MarshalerError:
-		if err, ok := err.Err.(Bottomer); ok {
-			if b := err.Bottom(); b != nil {
-				ret = b
-			}
+		// A failed marshal is an error even when what it wraps is not,
+		// such as a validation error outside a validator.
+		if ret = processErr(call, err.Err, nil); ret == nil {
+			ret = &adt.Bottom{Err: errors.Promote(err, "")}
 		}
 	case errors.Error:
 		// Convert lists of errors to a combined Bottom error.

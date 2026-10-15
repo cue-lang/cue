@@ -1,0 +1,16 @@
+# json.Marshal reports a marshaling error which carries no CUE error,
+# such as the invalid JSON produced for a non-finite number, as a CUE error.
+-- in.cue --
+import (
+	"encoding/json"
+	"math"
+)
+
+nonFinite: json.Marshal(math.Pow(0, -1))
+-- out/json-v3 --
+Errors:
+nonFinite: error in call to encoding/json.Marshal: invalid character 'I' looking for beginning of value:
+    ./in.cue:6:12
+
+Result:
+nonFinite: _|_ // nonFinite: error in call to encoding/json.Marshal: invalid character 'I' looking for beginning of value

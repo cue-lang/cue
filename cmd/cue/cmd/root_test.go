@@ -163,10 +163,13 @@ func TestCommand(t *testing.T) {
 func TestVersion(t *testing.T) {
 	t.Parallel()
 
-	if info, err := os.Lstat("../../../.git"); err != nil {
-		t.Skip("cue version only includes VCS-derived information when building from a git clone")
-	} else if !info.IsDir() {
-		t.Skip("VCS information is not stamped for git worktrees due to https://go.dev/issue/58218")
+	// Check a file inside .git rather than the directory itself:
+	// the directory's mtime changes whenever git refreshes its index,
+	// which the "go run" below does, so the test would never be cached.
+	// .git is a file in a git worktree, so .git/HEAD does not exist there.
+	if _, err := os.Lstat("../../../.git/HEAD"); err != nil {
+		t.Skip("cue version only includes VCS-derived information when building from a git clone; " +
+			"VCS information is not stamped for git worktrees due to https://go.dev/issue/58218")
 	}
 
 	// Test whether "cue version" reports the version information we expect.

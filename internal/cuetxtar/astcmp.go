@@ -45,16 +45,6 @@ type cmpCtx struct {
 	// innerAttrText is the raw text of the inner @test(err,...) attribute
 	// (used to locate it within the outer @test(eq,...) source text).
 	posWriteback func(innerAttrText string, positions []token.Pos)
-	// formatPos, when non-nil, formats a token.Pos for error messages.
-	// When nil, positions are formatted as line:col.
-	formatPos func(token.Pos) string
-}
-
-func (c *cmpCtx) fmtPos(p token.Pos) string {
-	if c.formatPos != nil {
-		return c.formatPos(p)
-	}
-	return fmt.Sprintf("%d:%d", p.Line(), p.Column())
 }
 
 // astCompare compares a parsed CUE AST expression against an evaluated

@@ -1103,25 +1103,21 @@ func TestCatchInvalidConjuncts(t *testing.T) {
 	#a: "s"
 	#a
 }`
+	val := compileVal(t, srcField).LookupPath(cue.ParsePath("x"))
 	t.Run("conjunction form is invalid", func(t *testing.T) {
 		// "s" & {#a: "s"} is invalid CUE: {#a: "s"} has no embedded _ so a
 		// string literal cannot unify with it. astCompare must return an error
 		// for such a conjunction. This cannot be tested via a txtar test file
 		// because a failing @test would also fail the outer test run.
-		ctx := cuecontext.New()
-		val := ctx.CompileString(`{
-			#a: _
-			_
-		} & {
-			#a: "s"
-			#a
-		}`)
-		expr, err := parser.ParseExpr("test.cue", `"s" & {#a: "s"}`)
-		if err != nil {
-			t.Fatalf("parse: %v", err)
-		}
+		expr := parseExpr(t, `"s" & {#a: "s"}`)
 		if err := astCompare(expr, val); err == nil {
 			t.Error("expected error for invalid conjunction expression, got nil")
+		}
+	})
+	t.Run("struct-embed form is valid", func(t *testing.T) {
+		expr := parseExpr(t, `{"s", #a: "s"}`)
+		if err := astCompare(expr, val); err != nil {
+			t.Errorf("unexpected error for struct-embed expression: %v", err)
 		}
 	})
 }

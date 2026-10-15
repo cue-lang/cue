@@ -7,6 +7,11 @@ d: int & float  @test(err, code=eval, pos=[0:4, 0:10])
 e: "4" & string @test(eq, "4")
 f: true         @test(eq, true)
 f: bool
+
+// A zero may carry a multiplier like any other integer literal.
+g: 0Ki   @test(eq, 0)
+h: 0.0Mi @test(eq, 0)
+i: 1.5Ki @test(eq, 1536)
 -- out/errors.txt --
 [eval] d: conflicting values int and float (mismatched types int and float):
     ./in.cue:5:4

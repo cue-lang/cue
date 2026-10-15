@@ -7,6 +7,11 @@ d: int & float
 e: "4" & string
 f: true
 f: bool
+
+// A zero may carry a multiplier like any other integer literal.
+g: 0Ki
+h: 0.0Mi
+i: 1.5Ki
 -- out/compile --
 --- in.cue
 {
@@ -18,4 +23,7 @@ f: bool
   e: ("4" & string)
   f: true
   f: bool
+  g: 0
+  h: 0
+  i: 1536
 }

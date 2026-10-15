@@ -21,6 +21,7 @@ package math
 
 import (
 	"math"
+	"math/bits"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -252,9 +253,7 @@ var two = apd.New(2, 0)
 //
 // Special cases are the same as Exp.
 func Exp2(x *internal.Decimal) (*internal.Decimal, error) {
-	var d internal.Decimal
-	_, err := internal.BaseContext.Pow(&d, two, x)
-	return &d, err
+	return Pow(two, x)
 }
 
 // Expm1 returns e**x - 1, the base-e exponential of x minus 1.
@@ -493,9 +492,35 @@ func Pow(x, y *internal.Decimal) (*internal.Decimal, error) {
 		// Pow(x, ±0) = 1 for any x, but apd rejects Pow(0, 0).
 		return apd.New(1, 0), nil
 	}
-	var d internal.Decimal
-	_, err := internal.BaseContext.Pow(&d, x, y)
-	return &d, err
+	// apd rounds a power to the context precision even when it is an integer,
+	// so compute a power of a non-zero integer x by an integer y exactly.
+	var b, frac, e internal.Decimal
+	x.Modf(&b, &frac)
+	n, err := e.Abs(y).Int64()
+	if err != nil || x.Form != apd.Finite || x.IsZero() || !frac.IsZero() {
+		var d internal.Decimal
+		_, err := internal.BaseContext.Pow(&d, x, y)
+		return &d, err
+	}
+	// Square and multiply top-down; a product out of range fails promptly.
+	// TODO: use ExactContext.Pow once it honors a precision of zero;
+	// see https://github.com/cockroachdb/apd/issues/161.
+	d := apd.New(1, 0)
+	for i := bits.Len64(uint64(n)) - 1; i >= 0; i-- {
+		if _, err := internal.ExactContext.Mul(d, d, d); err != nil {
+			return d, err
+		}
+		if n&(1<<i) != 0 {
+			if _, err := internal.ExactContext.Mul(d, d, &b); err != nil {
+				return d, err
+			}
+		}
+	}
+	if y.Negative {
+		// Divide like the / operator, which does not pad an exact quotient.
+		_, err = internal.BaseContext.Quo(d, apd.New(1, 0), d)
+	}
+	return d, err
 }
 
 // Pow10 returns 10**n, the base-10 exponential of n.

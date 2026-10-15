@@ -502,7 +502,7 @@ func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.
 
 	e.completePivot(f)
 
-	if err := astutil.Sanitize(f); err != nil {
+	if err := astutil.SanitizeFiles([]*ast.File{f}); err != nil {
 		err := errors.Promote(err, "export")
 		return f, errors.Append(e.errs, err)
 	}

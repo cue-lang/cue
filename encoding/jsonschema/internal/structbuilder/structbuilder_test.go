@@ -285,7 +285,7 @@ func assertStructBuilderSyntax(t *testing.T, b *structbuilder.Builder, want stri
 	t.Helper()
 	f, err := b.Syntax()
 	qt.Assert(t, qt.IsNil(err))
-	err = astutil.Sanitize(f)
+	err = astutil.SanitizeFiles([]*ast.File{f})
 	qt.Assert(t, qt.IsNil(err))
 	data, err := format.Node(f)
 	qt.Assert(t, qt.IsNil(err))

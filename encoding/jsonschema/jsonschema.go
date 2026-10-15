@@ -114,7 +114,7 @@ func extract(data cue.InstanceOrValue, cfg *Config, extra []ast.Decl) (*ast.File
 		return nil, d.errs
 	}
 	f.Decls = append(f.Decls, extra...)
-	if err := astutil.Sanitize(f); err != nil {
+	if err := astutil.SanitizeFiles([]*ast.File{f}); err != nil {
 		return nil, fmt.Errorf("cannot sanitize jsonschema resulting syntax: %v", err)
 	}
 	format.ASTStyle{Labels: true, InlineStructs: true, Ellipsis: true}.Apply(f)

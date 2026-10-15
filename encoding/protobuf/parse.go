@@ -141,7 +141,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		p.topElement(e)
 	}
 
-	err = astutil.Sanitize(p.file)
+	err = astutil.SanitizeFiles([]*ast.File{p.file})
 
 	// Some labels, like enum values, are generated quoted;
 	// the rewrites of format.Simplify unquote those which can be identifiers.

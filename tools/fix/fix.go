@@ -122,7 +122,7 @@ func File(f *ast.File, o ...Option) *ast.File {
 	if err != nil {
 		panic(err)
 	}
-	if err := astutil.Sanitize(f); err != nil {
+	if err := astutil.SanitizeFiles([]*ast.File{f}); err != nil {
 		panic(err)
 	}
 	return f

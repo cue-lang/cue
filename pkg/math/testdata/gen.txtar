@@ -78,10 +78,6 @@ t60: error in call to math.Pow10: int 4294967295 overflows int32 in argument 0:
     ./in.cue:58:6
 t61: error in call to math.Pow10: int -2147483649 overflows int32 in argument 0:
     ./in.cue:59:6
-t62: error in call to math.Pow: invalid operation:
-    ./in.cue:61:6
-t63: error in call to math.Pow: invalid operation:
-    ./in.cue:62:6
 
 Result:
 t2:  3
@@ -142,5 +138,5 @@ t59: _|_ // t59: error in call to math.Pow10: t59: int 2147483648 overflows int3
 t60: _|_ // t60: error in call to math.Pow10: t60: int 4294967295 overflows int32 in argument 0
 t61: _|_ // t61: error in call to math.Pow10: t61: int -2147483649 overflows int32 in argument 0
 // A zero exponent gives one for any base, including zero.
-t62: _|_ // t62: error in call to math.Pow: invalid operation
-t63: _|_ // t63: error in call to math.Pow: invalid operation
+t62: 1
+t63: 1

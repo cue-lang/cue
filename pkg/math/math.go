@@ -489,6 +489,10 @@ func Mod(x, y float64) float64 {
 //	Pow(-Inf, y) = Pow(-0, -y)
 //	Pow(x, y) = NaN for finite x < 0 and finite non-integer y
 func Pow(x, y *internal.Decimal) (*internal.Decimal, error) {
+	if y.IsZero() {
+		// Pow(x, ±0) = 1 for any x, but apd rejects Pow(0, 0).
+		return apd.New(1, 0), nil
+	}
 	var d internal.Decimal
 	_, err := internal.BaseContext.Pow(&d, x, y)
 	return &d, err

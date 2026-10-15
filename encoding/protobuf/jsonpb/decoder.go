@@ -123,14 +123,8 @@ func (r *rewriter) rewriteDecls(schema cue.Value, decls []ast.Decl) {
 			continue
 		}
 
-		v := schema.LookupPath(cue.MakePath(sel))
-		if !v.Exists() {
-			f := schema.Template()
-			if f == nil {
-				continue
-			}
-			v = f(sel.String())
-		}
+		// An optional selector also finds regular fields and pattern constraints.
+		v := schema.LookupPath(cue.MakePath(sel.Optional()))
 		if !v.Exists() {
 			continue
 		}

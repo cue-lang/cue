@@ -1,0 +1,12 @@
+# Pattern constraints should match fields whose names are not
+# identifiers, such as "a-b", by name. They are currently matched
+# against the quoted label, so "a-b" is not decoded as bytes.
+
+-- schema.cue --
+b: [=~"^a-"]: bytes
+-- data.cue --
+b: "a-b": "SGVsbG8="
+b: ab:    "SGVsbG8="
+-- out/jsonpb/data.cue --
+b: "a-b": "SGVsbG8="
+b: ab:    "SGVsbG8="

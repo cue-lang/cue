@@ -26,20 +26,26 @@ import (
 )
 
 // Context returns the cue.Context of the given argument.
+// For a [cue.Value], it is equivalent to the deprecated [cue.Value.Context],
+// and the same caveats apply when combining values from different contexts.
 //
 //lint:ignore SA1019 callers may still pass the deprecated *cue.Runtime
 func Context[Ctx *cue.Runtime | *cue.Context | cue.Value | *adt.OpContext](ctx Ctx) *cue.Context {
-	switch x := any(ctx).(type) {
-	case *cue.Runtime: //lint:ignore SA1019 see above
-		(*runtime.Runtime)(x).Init()
-		return (*cue.Context)(x)
-	case *cue.Context:
-		return x
-	case cue.Value:
-		r, _ := ToInternal(x)
+	// Type-switch on a pointer: converting a cue.Value itself to an
+	// interface would copy it to the heap.
+	// TODO: switch on ctx directly once the compiler folds type switches
+	// in instantiated generic functions; see https://go.dev/issue/59591.
+	switch x := any(&ctx).(type) {
+	case **cue.Runtime: //lint:ignore SA1019 see above
+		(*runtime.Runtime)(*x).Init()
+		return (*cue.Context)(*x)
+	case **cue.Context:
+		return *x
+	case *cue.Value:
+		r, _ := ToInternal(*x)
 		return (*cue.Context)(r)
-	case *adt.OpContext:
-		r := x.Runtime.(*runtime.Runtime)
+	case **adt.OpContext:
+		r := (*x).Runtime.(*runtime.Runtime)
 		return (*cue.Context)(r)
 	}
 	panic("unreachable")

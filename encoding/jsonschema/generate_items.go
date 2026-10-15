@@ -90,10 +90,6 @@ func (it *itemAllOf) hash(h *maphash.Hash, u *uniqueItems) {
 	}
 }
 
-func (i *itemAllOf) add(it internItem) {
-	i.elems = append(i.elems, it)
-}
-
 var _ elementsItem = (*itemAllOf)(nil)
 
 // elements implements [elementsItem].
@@ -877,12 +873,6 @@ func (i *itemContains) apply(f func(internItem, *uniqueItems) internItem, u *uni
 		return i
 	}
 	return &itemContains{elem: elem, min: i.min, max: i.max}
-}
-
-// property represents an object property
-type property struct {
-	name string
-	item item
 }
 
 // itemProperties represents object properties and associated keywords.

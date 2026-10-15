@@ -2021,20 +2021,6 @@ func isTrue(it internItem) bool {
 	return ok
 }
 
-// isConcreteScalar reports whether v should be considered concrete
-// enough to be encoded as a const or enum value.
-//
-// Structs and lists are excluded for now to avoid O(n^2)
-// overhead when checking.
-//
-// TODO handle struct and list kinds.
-func isConcreteScalar(v cue.Value) bool {
-	if !v.IsConcrete() {
-		return false
-	}
-	return (v.Kind() & (cue.StructKind | cue.ListKind)) == 0
-}
-
 // DefaultNameFunc holds the default function used by [Generate]
 // to generate a JSON Schema definition name from a reference path
 // within the value inst, where inst is usually a CUE package value.

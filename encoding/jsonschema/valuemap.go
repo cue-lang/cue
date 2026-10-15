@@ -29,10 +29,6 @@ func newValueMap[T any]() *valueMap[T] {
 	}
 }
 
-func (m *valueMap[T]) len() int {
-	return len(m.byPath)
-}
-
 func (m *valueMap[T]) set(key cue.Value, v T) {
 	m.byPos[key.Pos()] = true
 	m.byPath[key.Path().String()] = v

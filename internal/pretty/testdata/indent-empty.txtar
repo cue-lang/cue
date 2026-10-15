@@ -1,0 +1,17 @@
+#width: 10
+#indent: ""
+
+# An empty indent emits no indentation and counts as zero columns, so
+# the nested list fits flat at width 10.
+-- in --
+a: {
+	b: [1, 2]
+}
+-- out/relpos --
+a: {
+b: [1, 2]
+}
+-- out/norelpos --
+a: {
+b: [1, 2]
+}

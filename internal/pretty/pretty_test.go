@@ -36,11 +36,13 @@ import (
 // the [cuetxtar] golden-file harness. Each file holds an "in" input
 // section and the expected outputs "out/relpos" (RelPos honoured) and
 // "out/norelpos" (RelPos stripped); we check both outputs for
-// idempotency and comment preservation. The width / indent / houseStyle
-// knobs are read from the archive comment as cuetxtar tags:
+// idempotency and comment preservation. The width / indent /
+// indentWidth / houseStyle knobs are read from the archive comment as
+// cuetxtar tags:
 //
 //	#width: 40
 //	#indent: "  "
+//	#indentWidth: 2
 //	#houseStyle: true
 //
 // CUE_UPDATE=1 regenerates the out/* sections in place (and creates
@@ -55,15 +57,19 @@ func TestTxtar(t *testing.T) {
 		Name: "",
 	}
 	test.Run(t, func(tc *cuetxtar.Test) {
-		// width / indent / houseStyle come from the archive comment tags.
-		width := 80
-		if v, ok := tc.Value("width"); ok {
+		intTag := func(name string, def int) int {
+			v, ok := tc.Value(name)
+			if !ok {
+				return def
+			}
 			n, err := strconv.Atoi(v)
 			if err != nil {
-				tc.Fatalf("bad #width: %v", err)
+				tc.Fatalf("bad #%s: %v", name, err)
 			}
-			width = n
+			return n
 		}
+		width := intTag("width", 80)
+		indentWidth := intTag("indentWidth", 0)
 		indent := "\t"
 		if v, ok := tc.Value("indent"); ok {
 			s, err := strconv.Unquote(v)
@@ -93,7 +99,7 @@ func TestTxtar(t *testing.T) {
 			tc.Fatal(err)
 		}
 		input := trimTrailingNewline(string(data))
-		cfg := &pretty.Config{Width: width, Indent: indent}
+		cfg := &pretty.Config{Width: width, Indent: indent, IndentWidth: indentWidth}
 		styleCfg := format.ASTStyle{RelPos: houseStyle}
 
 		// With RelPos from the parser.

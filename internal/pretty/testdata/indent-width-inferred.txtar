@@ -1,0 +1,23 @@
+#width: 13
+
+# Without an explicit indentWidth, a tab indent counts as four columns
+# towards the width, so at width 13 the nested 9-column list fits flat
+# and the 10-column one breaks.
+-- in --
+a: {
+	b: [1, 2]
+	bb: [1, 2]
+}
+-- out/relpos --
+a: {
+	b:  [1, 2]
+	bb: [1, 2]
+}
+-- out/norelpos --
+a: {
+	b: [1, 2]
+	bb: [
+		1,
+		2,
+	]
+}

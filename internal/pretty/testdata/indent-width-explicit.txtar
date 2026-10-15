@@ -1,0 +1,20 @@
+#width: 13
+#indentWidth: 8
+
+# An explicit indentWidth overrides the four columns inferred for a tab
+# indent, so the nested list no longer fits flat at width 13.
+-- in --
+a: {
+	b: [1, 2]
+}
+-- out/relpos --
+a: {
+	b: [1, 2]
+}
+-- out/norelpos --
+a: {
+	b: [
+		1,
+		2,
+	]
+}

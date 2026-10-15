@@ -1401,6 +1401,7 @@ func (t *trimmerV3) trim(files []*ast.File, dir string) error {
 	t.inc()
 	defer t.dec()
 
+	var trimmed []*ast.File
 	for _, f := range files {
 		if !strings.HasPrefix(f.Filename, dir) {
 			continue
@@ -1438,10 +1439,8 @@ func (t *trimmerV3) trim(files []*ast.File, dir string) error {
 
 			return true
 		}, nil)
-		if err := astutil.Sanitize(f); err != nil {
-			return err
-		}
+		trimmed = append(trimmed, f)
 		t.dec()
 	}
-	return nil
+	return astutil.SanitizeFiles(trimmed)
 }

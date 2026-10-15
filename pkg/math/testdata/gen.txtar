@@ -63,6 +63,38 @@ t61: math.Pow10(-2147483649)
 // A zero exponent gives one for any base, including zero.
 t62: math.Pow(0, 0)
 t63: math.Pow(-0.0, 0.0)
+// An integer power of an integer must be exact, however many digits it has.
+t64: math.Pow(2, 200)
+t65: math.Pow(3, 100)
+t66: math.Exp2(200)
+t67: math.Pow(12345678901234567890123456789012345678, 1)
+// A negative integer exponent divides as the / operator does, without
+// padding an exact result to the 34 digits of the decimal context.
+t68: math.Pow(2, -1)
+t69: math.Pow(2, -3)
+t70: math.Exp2(-1)
+// Integer powers of decimal and negative bases.
+t71: math.Pow(1.5, 3)
+t72: math.Pow(0.1, 2)
+t73: math.Pow(-2, 3)
+// A power beyond the exponent range is an error, reported promptly.
+t74: math.Pow(10, 200000)
+t75: math.Pow(2, 1e10)
+t76: math.Pow(2, -1e10)
+// The last digit of the largest power of two in the exponent range, which is
+// 6 when the power is exact, and the next power, which is out of range.
+t77: mod(math.Pow(2, 332196), 10)
+t78: math.Pow(2, 332197)
+// An integral float base must give an exact power too.
+t79: math.Pow(2.0, 200)
+// A negative base with a negative exponent.
+t80: math.Pow(-2, -3)
+// A base of one or minus one has a power at any exponent, and any other base
+// is out of range at the minimum int64.
+t81: math.Pow(1, 9223372036854775807)
+t82: math.Pow(-1, 9223372036854775807)
+t83: math.Pow(-1, -9223372036854775808)
+t84: math.Pow(2, -9223372036854775808)
 -- out/math-v3 --
 Errors:
 t3: cannot call non-function math.Pi (type float):
@@ -78,6 +110,16 @@ t60: error in call to math.Pow10: int 4294967295 overflows int32 in argument 0:
     ./in.cue:58:6
 t61: error in call to math.Pow10: int -2147483649 overflows int32 in argument 0:
     ./in.cue:59:6
+t74: error in call to math.Pow: exponent out of range:
+    ./in.cue:78:6
+t75: error in call to math.Pow: exponent out of range:
+    ./in.cue:79:6
+t76: error in call to math.Pow: exponent out of range:
+    ./in.cue:80:6
+t78: error in call to math.Pow: exponent out of range:
+    ./in.cue:84:6
+t84: error in call to math.Pow: exponent out of range:
+    ./in.cue:94:6
 
 Result:
 t2:  3
@@ -140,3 +182,35 @@ t61: _|_ // t61: error in call to math.Pow10: t61: int -2147483649 overflows int
 // A zero exponent gives one for any base, including zero.
 t62: 1
 t63: 1
+// An integer power of an integer must be exact, however many digits it has.
+t64: 1606938044258990275541962092341163000000000000000000000000000
+t65: 515377520732011331036461129765621300000000000000
+t66: 1606938044258990275541962092341163000000000000000000000000000
+t67: 12345678901234567890123456789012350000
+// A negative integer exponent divides as the / operator does, without
+// padding an exact result to the 34 digits of the decimal context.
+t68: 0.5000000000000000000000000000000000
+t69: 0.1250000000000000000000000000000000
+t70: 0.5000000000000000000000000000000000
+// Integer powers of decimal and negative bases.
+t71: 3.375
+t72: 0.01
+t73: -8
+// A power beyond the exponent range is an error, reported promptly.
+t74: _|_ // t74: error in call to math.Pow: exponent out of range
+t75: _|_ // t75: error in call to math.Pow: exponent out of range
+t76: _|_ // t76: error in call to math.Pow: exponent out of range
+// The last digit of the largest power of two in the exponent range, which is
+// 6 when the power is exact, and the next power, which is out of range.
+t77: 0
+t78: _|_ // t78: error in call to math.Pow: exponent out of range
+// An integral float base must give an exact power too.
+t79: 1606938044258990275541962092341163000000000000000000000000000
+// A negative base with a negative exponent.
+t80: -0.1250000000000000000000000000000000
+// A base of one or minus one has a power at any exponent, and any other base
+// is out of range at the minimum int64.
+t81: 1
+t82: -1
+t83: 1
+t84: _|_ // t84: error in call to math.Pow: exponent out of range

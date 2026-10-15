@@ -390,7 +390,7 @@ objsLoop:
 		}
 	}
 
-	return f, astutil.Sanitize(f)
+	return f, astutil.SanitizeFiles([]*ast.File{f})
 }
 
 func parseFullPath(exprs string, version parser.Option) (p []ast.Label, err error) {

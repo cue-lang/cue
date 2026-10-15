@@ -224,6 +224,7 @@ func runRefactorImports(cmd *Command, args []string) error {
 		if err := inst.Err; err != nil {
 			return err
 		}
+		var changed []*ast.File
 		for _, file := range inst.BuildFiles {
 			if filepath.Dir(file.Filename) != inst.Dir {
 				// Avoid processing files which are inherited from parent directories.
@@ -287,14 +288,17 @@ func runRefactorImports(cmd *Command, args []string) error {
 				// Nothing changed: no need to write the file.
 				continue
 			}
-			if err := astutil.Sanitize(syntax); err != nil {
-				return err
-			}
+			changed = append(changed, syntax)
+		}
+		if err := astutil.SanitizeFiles(changed); err != nil {
+			return err
+		}
+		for _, syntax := range changed {
 			data, err := format.Node(syntax)
 			if err != nil {
 				return err
 			}
-			if err := os.WriteFile(file.Filename, data, 0o666); err != nil {
+			if err := os.WriteFile(syntax.Filename, data, 0o666); err != nil {
 				return err
 			}
 		}

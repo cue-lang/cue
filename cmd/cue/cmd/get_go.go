@@ -853,9 +853,10 @@ outer:
 	}
 
 	cueFile, cuePkg := e.newFile(pName, args)
+	var cueFiles []*cueast.File
 	// By default, we output one CUE file for each Go file as long as there's anything to generate.
 	// When --outfile is used, we want to generate exactly one CUE file for an entire Go package,
-	// so we instead keep joining declarations until we reach the last Go file, where we then write.
+	// so we instead keep joining declarations across all Go files.
 	for i, f := range p.Syntax {
 		e.cmap = ast.NewCommentMap(p.Fset, f, f.Comments)
 
@@ -888,44 +889,45 @@ outer:
 			}
 		}
 
-		if outFile == "" && len(cueFile.Decls) == lenPreamble && pkgDoc == nil {
+		if outFile != "" {
+			continue
+		}
+		if len(cueFile.Decls) == lenPreamble && pkgDoc == nil {
 			// By default, empty files are not generated.
 			// Note that cueFile.Decls is never empty, as we add top-level docs and a package clause.
 			continue
 		}
 
-		if outFile != "" && i != len(p.Syntax)-1 {
-			// By default, we generate one CUE file per Go file.
-			// With --outfile, we keep adding to one output file, and write it at the end.
-			// TODO: using a second loop to write output files may be simpler.
-			continue
-		}
+		file := filepath.Base(p.CompiledGoFiles[i])
+		file = strings.Replace(file, ".go", "_go", 1)
+		file += "_gen.cue"
+		cueFile.Filename = filepath.Join(dir, file)
+		cueFiles = append(cueFiles, cueFile)
+		cueFile, cuePkg = e.newFile(pName, args)
+	}
+	if outFile != "" && len(p.Syntax) > 0 {
+		cueFile.Filename = outFile
+		cueFiles = append(cueFiles, cueFile)
+	}
 
-		if err := astutil.Sanitize(cueFile); err != nil {
-			return err
-		}
-
-		b, err := format.Node(cueFile, format.Simplify())
+	// The generated files belong to the same CUE package,
+	// so they are sanitized together before any is written.
+	if err := astutil.SanitizeFiles(cueFiles); err != nil {
+		return err
+	}
+	for _, f := range cueFiles {
+		b, err := format.Node(f, format.Simplify())
 		if err != nil {
 			return err
 		}
-
-		dst := outFile
-		if dst == "" {
-			file := filepath.Base(p.CompiledGoFiles[i])
-			file = strings.Replace(file, ".go", "_go", 1)
-			file += "_gen.cue"
-			dst = filepath.Join(dir, file)
-		}
-		if dst == "-" {
+		if f.Filename == "-" {
 			_, err = os.Stdout.Write(b)
 		} else {
-			err = os.WriteFile(dst, b, 0666)
+			err = os.WriteFile(f.Filename, b, 0666)
 		}
 		if err != nil {
 			return err
 		}
-		cueFile, cuePkg = e.newFile(pName, args)
 	}
 
 	if !isMain {

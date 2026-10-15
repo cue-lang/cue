@@ -582,7 +582,7 @@ func (h *hoister) hoist(f *ast.File) {
 		}
 		return true
 	})
-	astutil.Sanitize(f)
+	astutil.SanitizeFiles([]*ast.File{f})
 }
 
 func tryParse(str, version string) (s ast.Expr, pkg string) {

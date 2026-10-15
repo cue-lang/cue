@@ -95,6 +95,8 @@ func runCRD(cmd *Command, args []string) error {
 		return fmt.Errorf("input must be individual files not packages")
 	}
 	groups := make(map[string]bool)
+	// versionFiles holds the files to write, keyed by version.
+	versionFiles := make(map[string][]*ast.File)
 	autoGroup := group == ""
 	for _, f := range inst.OrphanedFiles {
 		d := encoding.NewDecoder(cmd.ctx, f, &encoding.Config{TargetLanguageVersion: langVersion})
@@ -124,6 +126,7 @@ func runCRD(cmd *Command, args []string) error {
 					// TODO there's a potential security issue if the version or kind
 					// contain a path separator.
 					newf := &ast.File{
+						Filename: filepath.Join(version, crd.Data.Spec.Names.Singular+".cue"),
 						Decls: []ast.Decl{
 							&ast.Package{
 								Name: ast.NewIdent(version),
@@ -134,21 +137,7 @@ func runCRD(cmd *Command, args []string) error {
 							},
 						},
 					}
-					// Add appropriate imports.
-					if err := astutil.Sanitize(newf); err != nil {
-						return err
-					}
-					data, err := format.Node(newf, format.Simplify())
-					if err != nil {
-						return err
-					}
-					if err := os.MkdirAll(version, 0o777); err != nil {
-						return err
-					}
-					log.Printf("writing %s", filepath.Join(version, crd.Data.Spec.Names.Singular+".cue"))
-					if err := os.WriteFile(filepath.Join(version, crd.Data.Spec.Names.Singular+".cue"), data, 0o666); err != nil {
-						return err
-					}
+					versionFiles[version] = append(versionFiles[version], newf)
 				}
 			}
 		}
@@ -158,6 +147,26 @@ func runCRD(cmd *Command, args []string) error {
 	}
 	if autoGroup && len(groups) > 1 {
 		return fmt.Errorf("multiple CRD groups found: %v", strings.Join(slices.Sorted(maps.Keys(groups)), " "))
+	}
+	for _, version := range slices.Sorted(maps.Keys(versionFiles)) {
+		files := versionFiles[version]
+		// Add appropriate imports. All files for a version form one package.
+		if err := astutil.SanitizeFiles(files); err != nil {
+			return err
+		}
+		if err := os.MkdirAll(version, 0o777); err != nil {
+			return err
+		}
+		for _, f := range files {
+			data, err := format.Node(f, format.Simplify())
+			if err != nil {
+				return err
+			}
+			log.Printf("writing %s", f.Filename)
+			if err := os.WriteFile(f.Filename, data, 0o666); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

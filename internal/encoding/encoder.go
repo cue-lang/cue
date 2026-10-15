@@ -367,9 +367,17 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			}
 			closeCodec = enc.Close
 		}
+		// A codec close error means its output is incomplete and must never
+		// replace the destination file, so only commit after a successful one.
 		wclose := e.close
 		e.close = func() error {
-			return closeAndCommit(closeCodec, wclose)
+			if err := closeCodec(); err != nil {
+				return err
+			}
+			if wclose != nil {
+				return wclose()
+			}
+			return nil
 		}
 	}
 
@@ -417,19 +425,6 @@ func (e *Encoder) Encode(v cue.Value) error {
 		return err
 	}
 	return e.encValue(v)
-}
-
-// closeAndCommit finishes a codec before publishing bytes buffered by writer.
-// A codec close error means its output is incomplete and must never replace the
-// destination file.
-func closeAndCommit(closeCodec, commit func() error) error {
-	if err := closeCodec(); err != nil {
-		return err
-	}
-	if commit != nil {
-		return commit()
-	}
-	return nil
 }
 
 func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error) {

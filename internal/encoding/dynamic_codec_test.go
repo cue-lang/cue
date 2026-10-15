@@ -116,11 +116,14 @@ func TestValueDecoderNonExistentValue(t *testing.T) {
 }
 
 // captureEncoder records the syntax node handed to a registered
-// syntax-plane encoder.
-type captureEncoder struct{ node ast.Node }
+// syntax-plane encoder, and returns closeErr from Close.
+type captureEncoder struct {
+	node     ast.Node
+	closeErr error
+}
 
 func (e *captureEncoder) Encode(n ast.Node) error { e.node = n; return nil }
-func (e *captureEncoder) Close() error            { return nil }
+func (e *captureEncoder) Close() error            { return e.closeErr }
 
 // TestDynamicSyntaxEncoderSchemaAspects verifies that a registered
 // syntax-plane encoding derives its concreteness and syntax projection

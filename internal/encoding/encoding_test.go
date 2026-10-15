@@ -12,50 +12,90 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package encoding
+package encoding_test
 
 import (
 	"errors"
+	"io"
+	"io/fs"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/filetypes"
 )
 
-func TestCloseAndCommit(t *testing.T) {
+// TestEncoderClose checks that a file output is only written once the
+// codec closes successfully.
+func TestEncoderClose(t *testing.T) {
+	encodeToFile := func(t *testing.T, filename string, closeErr error) error {
+		resetRegistry(t)
+		err := filetypes.RegisterEncoding(filetypes.DynamicEncoding{
+			Name:       "closeerr",
+			Extensions: []string{".closeerr"},
+			Info:       filetypes.DynamicFileInfo{Form: "data"},
+			Codec: filetypes.Codec{
+				NewDecoder: newStubDecoder,
+				NewEncoder: func(f *build.File, w io.Writer) (filetypes.Encoder, error) {
+					return &captureEncoder{closeErr: closeErr}, nil
+				},
+			},
+		})
+		if err != nil {
+			t.Fatalf("RegisterEncoding: %v", err)
+		}
+		ctx := cuecontext.New()
+		enc, err := encoding.NewEncoder(ctx, &build.File{
+			Filename: filename,
+			Encoding: "closeerr",
+			Form:     "data",
+		}, &encoding.Config{Mode: filetypes.Export})
+		if err != nil {
+			t.Fatalf("NewEncoder: %v", err)
+		}
+		if err := enc.Encode(ctx.CompileString("a: 1")); err != nil {
+			t.Fatalf("Encode: %v", err)
+		}
+		return enc.Close()
+	}
+
 	t.Run("codec failure aborts commit", func(t *testing.T) {
 		codecErr := errors.New("codec close failed")
-		committed := false
-		err := closeAndCommit(func() error {
-			return codecErr
-		}, func() error {
-			committed = true
-			return nil
-		})
+		filename := filepath.Join(t.TempDir(), "out.closeerr")
+		err := encodeToFile(t, filename, codecErr)
 		if !errors.Is(err, codecErr) {
 			t.Fatalf("got error %v; want %v", err, codecErr)
 		}
-		if committed {
-			t.Fatal("committed output after codec close failed")
+		if _, err := os.Stat(filename); !errors.Is(err, fs.ErrNotExist) {
+			t.Fatalf("committed output after codec close failed: %v", err)
 		}
 	})
 
 	t.Run("successful codec close commits", func(t *testing.T) {
-		commitErr := errors.New("commit failed")
-		committed := false
-		err := closeAndCommit(func() error {
-			return nil
-		}, func() error {
-			committed = true
-			return commitErr
-		})
-		if !committed {
-			t.Fatal("did not commit output after successful codec close")
+		filename := filepath.Join(t.TempDir(), "out.closeerr")
+		if err := encodeToFile(t, filename, nil); err != nil {
+			t.Fatal(err)
 		}
-		if !errors.Is(err, commitErr) {
-			t.Fatalf("got error %v; want %v", err, commitErr)
+		if _, err := os.Stat(filename); err != nil {
+			t.Fatalf("did not commit output after successful codec close: %v", err)
+		}
+	})
+
+	t.Run("commit failure is returned", func(t *testing.T) {
+		// Without Force, committing to an existing file fails.
+		filename := filepath.Join(t.TempDir(), "out.closeerr")
+		if err := os.WriteFile(filename, nil, 0o666); err != nil {
+			t.Fatal(err)
+		}
+		err := encodeToFile(t, filename, nil)
+		if !errors.Is(err, fs.ErrExist) {
+			t.Fatalf("got error %v; want %v", err, fs.ErrExist)
 		}
 	})
 }
@@ -106,17 +146,18 @@ func TestValidate(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			d := Decoder{cfg: &Config{}}
-			d.validate(f, &build.File{
+			d := encoding.NewDecoder(cuecontext.New(), &build.File{
 				Filename: "foo.cue",
 				Encoding: build.CUE,
 				Form:     tc.form,
-			})
-			if (tc.err == "") != (d.err == nil) {
-				t.Errorf("error: got %v; want %v", tc.err == "", d.err == nil)
+				Source:   f,
+			}, nil)
+			err = d.Err()
+			if (tc.err == "") != (err == nil) {
+				t.Errorf("got error %v; want error %v", err, tc.err != "")
 			}
-			if d.err != nil && !strings.Contains(d.err.Error(), tc.err) {
-				t.Errorf("error message did not contain %q: %v", tc.err, d.err)
+			if err != nil && !strings.Contains(err.Error(), tc.err) {
+				t.Errorf("error message did not contain %q: %v", tc.err, err)
 			}
 		})
 	}

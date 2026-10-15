@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/internal/core/adt"
+	internaljson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/value"
 )
@@ -85,9 +86,17 @@ func marshalSchema(_ *adt.OpContext, config cue.Value, schema pkg.Schema) (strin
 		c.Info = info
 	}
 
-	b, err := openapi.Gen(schema, c)
+	f, err := openapi.Generate(schema, c)
 	if err != nil {
 		return "", err
 	}
-	return string(b), err
+	v := value.Context(schema).BuildFile(f)
+	if err := v.Err(); err != nil {
+		return "", err
+	}
+	b, err := internaljson.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

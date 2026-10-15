@@ -56,7 +56,7 @@ func TestFlow(t *testing.T) {
 		setSeqNum(0)
 
 		updateFunc := func(c *flow.Controller, task *flow.Task) error {
-			str := flow.MermaidGraph(c)
+			str := mermaidGraph(c)
 			step := fmt.Sprintf("t%d", seqNum)
 			fmt.Fprintln(t.Writer(step), str)
 
@@ -447,6 +447,23 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 	return nil, nil
 }
 
+var mermaidQuote = strings.NewReplacer("#", "#35;", `"`, "#quot;")
+
+// mermaidGraph renders the tasks of c and their dependencies as a mermaid
+// graph, like flow's debug output.
+func mermaidGraph(c *flow.Controller) string {
+	w := &strings.Builder{}
+	fmt.Fprintln(w, "graph TD")
+	for i, t := range c.Tasks() {
+		path := mermaidQuote.Replace(t.Path().String())
+		fmt.Fprintf(w, "  t%d(\"%s [%s]\")\n", i, path, t.State())
+		for _, t := range t.Dependencies() {
+			fmt.Fprintf(w, "  t%d-->t%d\n", i, t.Index())
+		}
+	}
+	return w.String()
+}
+
 // These vars are used to serialize tasks that are run in parallel. This allows
 // for testing running tasks in parallel, while obtaining deterministic output.
 var (
@@ -522,7 +539,7 @@ func TestX(t *testing.T) {
 		},
 	}, v, taskFunc)
 
-	t.Error(flow.MermaidGraph(c))
+	t.Error(mermaidGraph(c))
 
 	if err := c.Run(context.Background()); err != nil {
 		t.Fatal(errors.Details(err, nil))

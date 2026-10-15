@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package flow
+package flow_test
 
 import (
+	"context"
+	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
-)
 
-// MermaidGraph exports mermaidGraph for external tests
-var MermaidGraph = mermaidGraph
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/tools/flow"
+)
 
 func TestIsCyclic(t *testing.T) {
 	testCases := []struct {
@@ -32,8 +36,8 @@ func TestIsCyclic(t *testing.T) {
 	}{{
 		tasks: "",
 	}, {
+		// flow ignores references from a task to itself.
 		tasks: "0",
-		cycle: true,
 	}, {
 		tasks: "1; 0",
 		cycle: true,
@@ -49,35 +53,56 @@ func TestIsCyclic(t *testing.T) {
 	}, {
 		tasks: ";0;0,1;0,1,2;0,1,2,3;",
 	}, {
-		tasks: "1,2,3,4; 2,3,4; 2; 4;",
+		// A two-task cycle between t1 and t2.
+		tasks: "1,2,3,4; 2,3,4; 1; 4;",
 		cycle: true,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.tasks, func(t *testing.T) {
-			deps := strings.Split(tc.tasks, ";")
-			tasks := make([]*Task, len(deps))
-			for i := range tasks {
-				tasks[i] = &Task{index: i}
-			}
-			for i, d := range deps {
-				if d == "" {
-					continue
-				}
+			var b, wantDeps strings.Builder
+			b.WriteString("root: {\n")
+			for i, d := range strings.Split(tc.tasks, ";") {
+				var after, deps []string
 				for num := range strings.SplitSeq(d, ",") {
-					num = strings.TrimSpace(num)
-					if num == "" {
-						continue
+					if num = strings.TrimSpace(num); num != "" {
+						after = append(after, "t"+num+".$id")
+						if num != strconv.Itoa(i) {
+							deps = append(deps, "root.t"+num)
+						}
 					}
-					x, err := strconv.Atoi(num)
-					if err != nil {
-						t.Fatal(err)
-					}
-					t.Logf("%d -> %d", i, x)
-					tasks[i].depTasks = append(tasks[i].depTasks, tasks[x])
 				}
+				fmt.Fprintf(&b, "\tt%d: {$id: \"valToOut\", $after: [%s]}\n", i, strings.Join(after, ", "))
+				fmt.Fprintf(&wantDeps, "root.t%d: %s\n", i, strings.Join(deps, ", "))
 			}
-			if got := checkCycle(tasks) != nil; got != tc.cycle {
-				t.Errorf("got %v; want %v", got, tc.cycle)
+			b.WriteString("}\n")
+			t.Log(b.String())
+
+			v := cuecontext.New().CompileString(b.String())
+			if err := v.Err(); err != nil {
+				t.Fatal(err)
+			}
+			c := flow.New(&flow.Config{Root: cue.ParsePath("root")}, v, taskFunc)
+
+			var gotDeps strings.Builder
+			for _, task := range c.Tasks() {
+				var deps []string
+				for _, d := range task.Dependencies() {
+					deps = append(deps, d.Path().String())
+				}
+				slices.Sort(deps)
+				fmt.Fprintf(&gotDeps, "%s: %s\n", task.Path(), strings.Join(deps, ", "))
+			}
+			if got, want := gotDeps.String(), wantDeps.String(); got != want {
+				t.Errorf("got dependencies:\n%s\nwant:\n%s", got, want)
+			}
+
+			err := c.Run(context.Background())
+			if tc.cycle {
+				if err == nil || !strings.Contains(err.Error(), "cyclic task dependency") {
+					t.Errorf("got error %v; want a cyclic task dependency", err)
+				}
+			} else if err != nil {
+				t.Errorf("unexpected error: %v", err)
 			}
 		})
 	}

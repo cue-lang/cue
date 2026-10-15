@@ -64,6 +64,10 @@ func TestNumbers(t *testing.T) {
 		{"1", "1", mkInt(1)},
 		{"+1", "1", mkInt(1)},
 		{"-1", "-1", mkInt(-1)},
+		{"+0", "0", mkInt(0)},
+		// A leading zero after a sign is dropped.
+		{"-0", "-", NumInfo{base: 10, neg: true, buf: []byte("-")}},
+		{"-.5", "-.5", mkFloat("-.5")},
 		{"100_000", "100000", NumInfo{UseSep: true, base: 10, buf: []byte("100000")}},
 		{"1.", "1.", mkFloat("1.")},
 		{"0.", "0.", mkFloat("0.")},
@@ -109,7 +113,7 @@ func TestNumbers(t *testing.T) {
 		})
 	}
 
-	// dec is the result of [NumInfo.Decimal], or its error.
+	// dec is the result of [ParseNum] and [NumInfo.Decimal], or the first error.
 	decCases := []struct {
 		lit string
 		dec string
@@ -132,13 +136,22 @@ func TestNumbers(t *testing.T) {
 		{"123e99999", `exponent out of range in number "123e99999"`},
 		{"0.001e100003", `exponent out of range in number "0.001e100003"`},
 		{"1e2147483648", `exponent out of range in number "1e2147483648"`},
+		{"-0x0", "-0"},
+		// A signed zero fails to parse, unlike "-0x0".
+		{"-0", `exponent out of range in number "-0"`},
+		{"-0.", `exponent out of range in number "-0."`},
+		{"-0e1", `exponent out of range in number "-0e1"`},
+		{"-0Ki", `exponent out of range in number "-0Ki"`},
+		// A zero with a multiplier fails to parse.
+		{"0Ki", `exponent out of range in number "0Ki"`},
 	}
 	for _, tc := range decCases {
 		t.Run("Decimal/"+tc.lit, func(t *testing.T) {
-			qt.Assert(t, qt.IsNil(ParseNum(tc.lit, &n)))
 			var d apd.Decimal
 			var got string
-			if err := n.Decimal(&d); err != nil {
+			if err := ParseNum(tc.lit, &n); err != nil {
+				got = err.Error()
+			} else if err := n.Decimal(&d); err != nil {
 				got = err.Error()
 			} else {
 				got = d.String()

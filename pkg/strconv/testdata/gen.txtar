@@ -67,6 +67,7 @@ t50: strconv.ParseNumber("1Ki")
 t51: strconv.ParseNumber("-.5")
 t52: strconv.ParseNumber("1_")
 t53: strconv.ParseNumber("0xG")
+t62: strconv.ParseNumber("-0")
 // An integer computed beyond the 34 digits of the decimal context must still
 // convert exactly; see https://cuelang.org/issue/3787.
 t59: strconv.FormatInt(10000000000000000000000000000000000 + 1, 10)
@@ -121,8 +122,10 @@ t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": il
     ./in.cue:65:6
 t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG":
     ./in.cue:66:6
+t62: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "-0": exponent out of range in number "-0":
+    ./in.cue:67:6
 t61: error in call to strconv.QuoteRune: int 2147483745 overflows rune in argument 0:
-    ./in.cue:72:6
+    ./in.cue:73:6
 
 Result:
 t1:  "40"
@@ -189,6 +192,7 @@ t50: 1024
 t51: -0.5
 t52: _|_ // t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number
 t53: _|_ // t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG"
+t62: _|_ // t62: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "-0": exponent out of range in number "-0"
 // An integer computed beyond the 34 digits of the decimal context must still
 // convert exactly; see https://cuelang.org/issue/3787.
 t59: "10000000000000000000000000000000001"
@@ -199,7 +203,7 @@ t61: _|_ // t61: error in call to strconv.QuoteRune: t61: int 2147483745 overflo
 diff old new
 --- old
 +++ new
-@@ -1,19 +1,58 @@
+@@ -1,19 +1,60 @@
  Errors:
 -t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
 +t2: error in call to strconv.FormatFloat: format value 300 out of range [0, 255]:
@@ -254,8 +258,10 @@ diff old new
 +    ./in.cue:65:6
 +t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG":
 +    ./in.cue:66:6
++t62: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "-0": exponent out of range in number "-0":
++    ./in.cue:67:6
 +t61: error in call to strconv.QuoteRune: int 2147483745 overflows rune in argument 0:
-+    ./in.cue:72:6
++    ./in.cue:73:6
  
  Result:
  t1:  "40"
@@ -268,7 +274,7 @@ diff old new
  t5:  "true"
  t6:  "170141183460469231731687303715884105728"
  t7:  "40"
-@@ -20,12 +59,38 @@
+@@ -20,12 +61,38 @@
  t8:  "170141183460469231731687303715884105728"
  t9:  "Z"
  t10: "0"
@@ -308,7 +314,7 @@ diff old new
  // Test ParseUint with various bit widths
  t34: 255
  t35: _|_ // t35: error in call to strconv.ParseUint: strconv.ParseUint: parsing "256": value out of range
-@@ -41,3 +106,16 @@
+@@ -41,3 +108,17 @@
  t45: _|_ // t45: error in call to strconv.ParseUint: strconv.ParseUint: parsing "invalid": invalid syntax
  t46: _|_ // t46: error in call to strconv.ParseUint: strconv.ParseUint: parsing "123": value out of range
  t47: _|_ // t47: error in call to strconv.ParseUint: strconv.ParseUint: parsing "-1": value out of range
@@ -319,6 +325,7 @@ diff old new
 +t51: -0.5
 +t52: _|_ // t52: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "1_": illegal '_' in number
 +t53: _|_ // t53: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "0xG": illegal hexadecimal number "0xG"
++t62: _|_ // t62: error in call to strconv.ParseNumber: strconv.ParseNumber: parsing "-0": exponent out of range in number "-0"
 +// An integer computed beyond the 34 digits of the decimal context must still
 +// convert exactly; see https://cuelang.org/issue/3787.
 +t59: "10000000000000000000000000000000001"

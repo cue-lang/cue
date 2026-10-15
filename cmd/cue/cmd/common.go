@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/value"
 )
 
 func defaultConfig() (*config, error) {
@@ -319,7 +320,7 @@ func (i *expressionIter) value() cue.Value {
 		return i.iter.value()
 	}
 	v := i.iter.value()
-	return v.Context().BuildExpr(i.expr[i.i],
+	return value.Context(v).BuildExpr(i.expr[i.i],
 		cue.Scope(v),
 		cue.InferBuiltins(true),
 		cue.ImportPath(i.iter.id()),
@@ -881,7 +882,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		inst = cue.Merge(insts...)
 	}
 
-	ctx := inst.Value().Context()
+	ctx := value.Context(inst.Value())
 	for _, b := range binst {
 		for _, i := range b.Imports {
 			val := ctx.BuildInstance(i)

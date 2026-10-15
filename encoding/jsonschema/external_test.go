@@ -137,7 +137,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 		testSucceeded(t, m, "", &s.Skip, s)
 		for _, test := range s.Tests {
 			t.Run(testName(test.Description), func(t *testing.T) {
-				runExternalSchemaTest(t, m, "", s, test, schemaValue)
+				runExternalSchemaTest(t, m, ctx, "", s, test, schemaValue)
 			})
 		}
 	})
@@ -155,7 +155,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 			// Generation only supports 2020-12 currently
 			roundTripErr = fmt.Errorf("generation only supported in version %v", supportedVersion)
 		default:
-			roundTripSchemaValue, roundTripErr = roundTripViaGenerate(t, schemaValue)
+			roundTripSchemaValue, roundTripErr = roundTripViaGenerate(t, ctx, schemaValue)
 		}
 		if roundTripErr != nil {
 			schemaExtractFailed(t, m, variant, s, roundTripErr.Error())
@@ -164,7 +164,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 		testSucceeded(t, m, variant, &s.Skip, s)
 		for _, test := range s.Tests {
 			t.Run(testName(test.Description), func(t *testing.T) {
-				runExternalSchemaTest(t, m, variant, s, test, roundTripSchemaValue)
+				runExternalSchemaTest(t, m, ctx, variant, s, test, roundTripSchemaValue)
 			})
 		}
 	})
@@ -190,8 +190,7 @@ func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externa
 }
 
 // runExternalSchemaTest runs a single test case against a given schema value.
-func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *externaltest.Schema, test *externaltest.Test, schemaValue cue.Value) {
-	ctx := schemaValue.Context()
+func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, ctx *cue.Context, variant string, s *externaltest.Schema, test *externaltest.Test, schemaValue cue.Value) {
 	logOnFailure(t, func() {
 		t.Logf("location: %v", testdataPos(test))
 		t.Logf("txtar:\n%s", testCaseTxtar(s, test))
@@ -224,8 +223,7 @@ func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *exte
 // roundTripViaGenerate takes a CUE schema as produced by Extract,
 // invokes Generate on it, then returns the result of invoking Extract on
 // the result of that.
-func roundTripViaGenerate(t *testing.T, schemaValue cue.Value) (cue.Value, error) {
-	ctx := schemaValue.Context()
+func roundTripViaGenerate(t *testing.T, ctx *cue.Context, schemaValue cue.Value) (cue.Value, error) {
 	var jsonValue, schemaValue1 cue.Value
 	logOnFailure(t, func() {
 		if jsonValue.Exists() {

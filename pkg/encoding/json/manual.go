@@ -142,7 +142,7 @@ func validate(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
 	if !json.Valid(b) {
 		return false, fmt.Errorf("json: invalid JSON")
 	}
-	v2 := v.Context().CompileBytes(b, cue.Filename("json.Validate"))
+	v2 := value.Context(v).CompileBytes(b, cue.Filename("json.Validate"))
 	if err := v2.Err(); err != nil {
 		return false, err
 	}

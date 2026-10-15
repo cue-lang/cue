@@ -35,6 +35,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/value"
 )
 
 const (
@@ -176,7 +177,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			v = root
 		} else {
 			if !root.Exists() {
-				root = v.Context().CompileString("{}")
+				root = value.Context(v).CompileString("{}")
 			}
 			if root.Kind() != cue.StructKind {
 				d.errf(root, "value at path %v must be struct containing definitions but is actually %v", d.cfg.Root, root)

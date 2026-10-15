@@ -50,7 +50,7 @@ import (
 // branch when the extension conflicts with the default one.
 func TestDriverMatchesCUE(t *testing.T) {
 	t.Parallel()
-	root := compileTypes(t)
+	root := compileTypes(t, cuecontext.New())
 
 	modes := []filetypes.Mode{filetypes.Input, filetypes.Export, filetypes.Def, filetypes.Eval}
 	encodings := fieldNames(t, root.LookupPath(cue.ParsePath("modes.input.encodings")))
@@ -74,7 +74,8 @@ func TestDriverMatchesCUE(t *testing.T) {
 	// so that they reuse each other's cached values.
 	oracles := make(map[filetypes.Mode]*oracle)
 	for _, mode := range modes {
-		oracles[mode] = newOracle(compileTypes(t), mode)
+		ctx := cuecontext.New()
+		oracles[mode] = newOracle(ctx, compileTypes(t, ctx), mode)
 	}
 
 	// run runs body for every mode as parallel subtests of name.
@@ -215,10 +216,10 @@ func compare(t *testing.T, o *oracle, scope string, tagList []string, filename s
 	}
 }
 
-// compileTypes compiles types.cue in a new context.
-func compileTypes(t *testing.T) cue.Value {
+// compileTypes compiles types.cue in ctx.
+func compileTypes(t *testing.T, ctx *cue.Context) cue.Value {
 	t.Helper()
-	root := cuecontext.New().CompileBytes(filetypes.TypesCUESource(), cue.Filename("types.cue"))
+	root := ctx.CompileBytes(filetypes.TypesCUESource(), cue.Filename("types.cue"))
 	if err := root.Err(); err != nil {
 		t.Fatalf("compiling types.cue: %v", err)
 	}
@@ -263,6 +264,7 @@ func hasEncoding(v cue.Value) bool {
 // oracle evaluates types.cue for one mode. The evaluator is far slower
 // than the driver under test, so it caches the values shared by many cases.
 type oracle struct {
+	ctx  *cue.Context
 	root cue.Value
 	mode filetypes.Mode
 
@@ -274,8 +276,9 @@ type oracle struct {
 	toFiles map[string]*build.File
 }
 
-func newOracle(root cue.Value, mode filetypes.Mode) *oracle {
+func newOracle(ctx *cue.Context, root cue.Value, mode filetypes.Mode) *oracle {
 	return &oracle{
+		ctx:       ctx,
 		root:      root,
 		mode:      mode,
 		tagValues: make(map[string]cue.Value),
@@ -336,7 +339,7 @@ func (o *oracle) fromFile(enc, interp, form string) (bool, *filetypes.FileInfo) 
 			return false, nil
 		}
 	}
-	v := o.root.Context().CompileString(strings.Join(conjuncts, " & "), cue.Scope(o.root))
+	v := o.ctx.CompileString(strings.Join(conjuncts, " & "), cue.Scope(o.root))
 	// Collapse struct-level disjunctions (tagInfo.pb, encodings.cue) to
 	// the CUE default — the branch the driver's alts backtracking
 	// selects — then reject a bottom result.
@@ -395,10 +398,10 @@ func (o *oracle) toFileUncached(tags []string, stringTags map[string]string, boo
 		return false, nil
 	}
 	if len(stringTags) > 0 {
-		v = v.Unify(root.Context().Encode(map[string]any{"tags": stringTags}))
+		v = v.Unify(o.ctx.Encode(map[string]any{"tags": stringTags}))
 	}
 	if len(boolTags) > 0 {
-		v = v.Unify(root.Context().Encode(map[string]any{"boolTags": boolTags}))
+		v = v.Unify(o.ctx.Encode(map[string]any{"boolTags": boolTags}))
 	}
 	if v.Validate() != nil {
 		return false, nil // invalid tag combination

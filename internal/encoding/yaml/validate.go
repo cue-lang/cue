@@ -33,7 +33,7 @@ import (
 // This can be done by using the Expr method on the BuiltinCallContext.
 func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 	d := NewDecoder("yaml.Validate", b)
-	r := v.Context()
+	r := value.Context(v)
 	for {
 		expr, err := d.Decode()
 		if err != nil {
@@ -86,7 +86,7 @@ func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 // every object must match v.
 func ValidatePartial(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 	d := NewDecoder("yaml.ValidatePartial", b)
-	r := v.Context()
+	r := value.Context(v)
 	for {
 		expr, err := d.Decode()
 		if err != nil {

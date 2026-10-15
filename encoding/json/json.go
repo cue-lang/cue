@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/token"
 	cuejson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/source"
+	"cuelang.org/go/internal/value"
 )
 
 // Valid reports whether data is a valid JSON encoding.
@@ -42,7 +43,7 @@ func Validate(b []byte, v cue.Value) error {
 	if !json.Valid(b) {
 		return fmt.Errorf("json: invalid JSON")
 	}
-	v2 := v.Context().CompileBytes(b, cue.Filename("json.Validate"))
+	v2 := value.Context(v).CompileBytes(b, cue.Filename("json.Validate"))
 	if err := v2.Err(); err != nil {
 		return err
 	}
@@ -95,6 +96,8 @@ func extract(path string, b []byte) (ast.Expr, error) {
 // is only used to extract to CUE ast objects.
 //
 // The runtime argument is a historical remnant and unused.
+//
+//lint:ignore SA1019 the deprecated parameter is part of the public API
 func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 	b, err := source.ReadAll(path, src)
 	tokFile := token.NewFile(path, 0, len(b))

@@ -21,9 +21,9 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 )
 
-func closeAll(v cue.Value) cue.Value {
+func closeAll(ctx *cue.Context, v cue.Value) cue.Value {
 	path := cue.MakePath(cue.Def("#x"))
-	return v.Context().CompileString("#x: _").FillPath(path, v).LookupPath(path)
+	return ctx.CompileString("#x: _").FillPath(path, v).LookupPath(path)
 }
 
 type editConfig struct {
@@ -44,7 +44,7 @@ func TestAPIModifyingValues(t *testing.T) {
 	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
-	closed := closeAll(ctx.EncodeType(editConfig{}))
+	closed := closeAll(ctx, ctx.EncodeType(editConfig{}))
 
 	v = v.Unify(closed)
 	if err := v.Err(); err != nil {

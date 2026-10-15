@@ -27,6 +27,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal/value"
 )
 
 // Config defines options for generation Go code.
@@ -156,7 +157,9 @@ func Generate(pkgPath string, inst cue.InstanceOrValue, c *Config) (b []byte, er
 		g.decl(iter.Selector().Unquoted(), iter.Value())
 	}
 
-	r := (*cue.Runtime)(val.Context())
+	// Marshal and Unmarshal are only available on the deprecated Runtime,
+	// and the generated code relies on Runtime.Unmarshal too.
+	r := (*cue.Runtime)(value.Context(val)) //lint:ignore SA1019 see above
 	b, err = r.Marshal(val)
 	g.addErr(err)
 	// If we can't round-trip it, fail.

@@ -95,7 +95,7 @@ func TestValidate(t *testing.T) {
 			checkErr(t, err, tc.err)
 
 			// Smoke test that it seems to work OK with deprecated *cue.Runtime argument
-			r := &cue.Runtime{}
+			r := &cue.Runtime{} //lint:ignore SA1019 testing the deprecated API
 			codec = New(r, nil)
 			if _, err := codec.ExtractType(tc.value); err != nil {
 				t.Fatal(err)

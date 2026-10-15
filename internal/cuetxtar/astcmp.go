@@ -154,7 +154,7 @@ func checkNoExtraFields(path cue.Path, val cue.Value) error {
 // AST comparison in favor of compile-and-compare. Defaults are resolved
 // on val before the check.
 func cmpFinal(path cue.Path, expr ast.Expr, val cue.Value) error {
-	ctx := val.Context()
+	ctx := value.Context(val)
 	var b []byte
 	var expected cue.Value
 	if lit, ok := expr.(*ast.BasicLit); ok {
@@ -945,7 +945,7 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 	// per-conjunct comparison; if the expression is genuinely wrong the
 	// individual c.astCmp calls below will still catch the mismatch.
 	// TODO(inline): allow setting the experiments in the cue.Context?
-	ctx := val.Context()
+	ctx := value.Context(val)
 	ctx.BuildExpr(e, cue.InferBuiltins(true)) //nolint:errcheck
 
 	astParts := flattenConjunction(e)
@@ -1015,7 +1015,7 @@ func toStr(expr ast.Expr) string {
 // package-qualified references (e.g. struct.MaxFields(2), math.Pi) resolve to
 // CUE builtin packages, then compares the resulting value against val.
 func cmpBuiltinExpr(path cue.Path, expr ast.Expr, val cue.Value) error {
-	ctx := val.Context()
+	ctx := value.Context(val)
 	expected := ctx.BuildExpr(expr, cue.InferBuiltins(true))
 	if err := expected.Err(); err != nil {
 		return pathErr(path, "cannot compile expression %s: %v", toStr(expr), err)

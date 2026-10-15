@@ -46,6 +46,8 @@ type Codec struct {
 // use of Decode, Validate, and Complete is efficient.
 //
 // Note: calling this with a *cue.Runtime value is deprecated.
+//
+//lint:ignore SA1019 the deprecated *cue.Runtime is part of the public API
 func New[Ctx *cue.Runtime | *cue.Context](ctx Ctx, c *Config) *Codec {
 	return &Codec{runtime: value.Context(ctx)}
 }
@@ -183,7 +185,7 @@ func fromGoType(r *cue.Context, x interface{}) (cue.Value, error) {
 }
 
 func checkAndForkContext(r *cue.Context, v cue.Value) *cue.Context {
-	rr := v.Context()
+	rr := value.Context(v)
 	if r != rr {
 		panic("value not from same runtime")
 	}

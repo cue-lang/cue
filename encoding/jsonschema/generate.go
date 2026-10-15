@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal/anyhash"
+	"cuelang.org/go/internal/value"
 )
 
 // GenerateConfig configures JSON Schema generation from CUE values.
@@ -1590,7 +1591,7 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 				}
 			}
 			if !elem.Exists() {
-				elem = v.Context().CompileString("_")
+				elem = value.Context(v).CompileString("_")
 			}
 		}
 		prefix[i] = g.makeItem(elem, mode)
@@ -1763,7 +1764,7 @@ func classifyIndexPattern(p cue.Value) (kind indexPatternKind, index int64) {
 		}
 		return indexPatternExact, i
 	}
-	if p.Subsume(p.Context().CompileString("int")) == nil {
+	if p.Subsume(value.Context(p).CompileString("int")) == nil {
 		// It admits every integer, and hence every index; for example
 		// the int type itself or the _ pattern of an open list.
 		return indexPatternFrom, 0
@@ -2003,7 +2004,7 @@ func regexpForValue1(v cue.Value) (string, bool) {
 func acceptsAllString(v cue.Value) bool {
 	// TODO return v.AcceptsAll(cue.StringKind) if/when that
 	// method is implemented.
-	sv := v.Context().CompileString("string")
+	sv := value.Context(v).CompileString("string")
 	return v.Unify(sv).Subsume(sv, cue.Final()) == nil
 }
 

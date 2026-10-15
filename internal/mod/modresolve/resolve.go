@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/value"
 	"cuelang.org/go/mod/module"
 )
 
@@ -206,7 +207,7 @@ func ParseConfig(configFile []byte, filename string, catchAllDefault string) (Lo
 		}
 		_configSchema = schemav
 	})
-	v := _configSchema.Context().CompileBytes(configFile, cue.Filename(filename))
+	v := value.Context(_configSchema).CompileBytes(configFile, cue.Filename(filename))
 	if err := v.Err(); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "invalid registry configuration file")
 	}

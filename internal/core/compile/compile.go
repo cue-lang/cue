@@ -372,6 +372,8 @@ func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
 
 // requireVersion checks if a feature is available in the current language version.
 // Returns an error if the feature requires a newer version, nil otherwise.
+//
+//lint:ignore U1000 kept for gating future language features
 func (c *compiler) requireVersion(n ast.Node, minVersion, feature string) *adt.Bottom {
 	v := c.experiments.LanguageVersion()
 	if v == "" {

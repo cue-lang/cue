@@ -16,6 +16,8 @@ package subsume
 
 // TODO: structural subsumption has not yet been implemented.
 
+//lint:file-ignore U1000 see the TODO above
+
 import "cuelang.org/go/internal/core/adt"
 
 func (s *subsumer) subsumes(gt, lt adt.Conjunct) bool {

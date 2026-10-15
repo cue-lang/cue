@@ -548,6 +548,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 	return n
 }
 
+//lint:ignore U1000 kept for when freeing is reintroduced; see Vertex.unify
 func (n *nodeContext) free() {
 	if n.refCount--; n.refCount == 0 {
 		n.ctx.freeNodeContext(n)

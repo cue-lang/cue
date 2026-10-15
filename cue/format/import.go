@@ -14,6 +14,8 @@
 
 package format
 
+//lint:file-ignore U1000 import sorting is not wired up yet
+
 import (
 	"sort"
 	"strconv"

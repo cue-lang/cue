@@ -170,8 +170,6 @@ const (
 	schedFAILED
 )
 
-func (s schedState) done() bool { return s >= schedSUCCESS }
-
 func (s taskState) String() string {
 	switch s {
 	case taskREADY:
@@ -370,18 +368,6 @@ func allTasksFinished(x *nodeContext) bool {
 		}
 	}
 	return true
-}
-
-// cloneInto initializes the state of dst to be the same as s.
-//
-// NOTE: this is deliberately not a pointer receiver: this approach allows
-// cloning s into dst while preserving the buffers of dst and not having to
-// explicitly clone any non-buffer fields.
-func (s scheduler) cloneInto(dst *scheduler) {
-	s.tasks = append(dst.tasks, s.tasks...)
-	s.blocking = append(dst.blocking, s.blocking...)
-
-	*dst = s
 }
 
 // incrementCounts adds the counters for each condition.

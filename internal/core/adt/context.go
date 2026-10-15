@@ -89,10 +89,6 @@ func NewContext(r Runtime, v *Vertex) *OpContext {
 	return ctx
 }
 
-func (c *OpContext) isDevVersion() bool {
-	return c.Version == internal.DevVersion
-}
-
 // IsValidator reports whether the context is being evaluated
 // as part of a validator function call.
 func (c *OpContext) IsValidator() bool {
@@ -1468,15 +1464,6 @@ func (c *OpContext) NewBool(b bool) Value {
 		}
 	}
 	return &Bool{Src: c.src, B: b}
-}
-
-func (c *OpContext) newList(src ast.Node, parent *Vertex) *Vertex {
-	var pos token.Pos
-	if src != nil {
-		pos = src.Pos()
-	}
-	m := *ListMarkerAt(pos)
-	return c.newInlineVertex(parent, &m)
 }
 
 // String reports a string of x, for use in errors or debugging.

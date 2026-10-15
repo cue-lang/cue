@@ -485,18 +485,6 @@ func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
 	// TODO: we could still try to accumulate patterns.
 }
 
-// isTotal reports whether pattern value p represents a full domain, that is,
-// whether it is of type BasicType or Top.
-func isTotal(p Value) bool {
-	switch p.(type) {
-	case *BasicType:
-		return true
-	case *Top:
-		return true
-	}
-	return false
-}
-
 func (ctx *OpContext) addPositions(c Conjunct) {
 	if x, ok := c.x.(*ConjunctGroup); ok {
 		for _, c := range *x {
@@ -550,41 +538,4 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 	// TODO: create a special kind of error that gets the positions
 	// of the relevant locations upon request from the arc.
 	return err
-}
-
-// mergeConjunctions combines two values into one. It never modifies an
-// existing conjunction.
-//
-// TODO: this was used in the closeContext code. We can still use it to
-// construct pattern constraint conjunction in the future. This is currently
-// unimplemented.
-func mergeConjunctions(a, b Value) Value {
-	if a == nil {
-		return b
-	}
-	if b == nil {
-		return a
-	}
-	ca, _ := a.(*Conjunction)
-	cb, _ := b.(*Conjunction)
-	n := 2
-	if ca != nil {
-		n += len(ca.Values) - 1
-	}
-	if cb != nil {
-		n += len(cb.Values) - 1
-	}
-	vs := make([]Value, 0, n)
-	if ca != nil {
-		vs = append(vs, ca.Values...)
-	} else {
-		vs = append(vs, a)
-	}
-	if cb != nil {
-		vs = append(vs, cb.Values...)
-	} else {
-		vs = append(vs, b)
-	}
-	// TODO: potentially order conjuncts to make matching more likely.
-	return &Conjunction{Values: vs}
 }

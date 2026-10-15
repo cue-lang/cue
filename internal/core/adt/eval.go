@@ -791,10 +791,6 @@ func (n *nodeContext) addErr(err errors.Error) {
 	}
 }
 
-func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {
-	return n.insertArc(f, mode, x, x.CloseInfo, false)
-}
-
 func (n *nodeContext) invalidListLength(na, nb int, a, b Expr) {
 	n.addErr(n.ctx.Newf("incompatible list lengths (%d and %d)", na, nb))
 }

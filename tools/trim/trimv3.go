@@ -1137,8 +1137,6 @@ func (t *trimmerV3) resolveElemAll(c adt.Conjunct, f func(adt.Resolver, *adt.Ver
 						worklist = append(worklist, item{y.Expr, cenv, true})
 						cenv = push(cenv)
 					}
-				case *adt.ValueClause:
-					cenv = push(cenv)
 				}
 			}
 			worklist = append(worklist, item{adt.ToExpr(elemT.Value), cenv, true})

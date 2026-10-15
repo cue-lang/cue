@@ -88,25 +88,6 @@ func (d *envYield) addEnv(env *Environment) {
 	d.envs = append(d.envs, env)
 }
 
-// ValueClause represents a wrapper Environment in a chained clause list
-// to account for the unwrapped struct. It is never created by the compiler
-// and serves as a dynamic element only.
-//
-// The type is still referenced by walk/dep/export/debug for type-switching
-// over Yielders, but in the dependency-tracking comprehension flow the yield
-// method is not reached: clauses are walked statically and ValueClause never
-// appears in a Comprehension.Clauses chain. The empty body documents that no
-// yield action is needed; if a future change reintroduces dynamic ValueClause
-// chaining, restore `s.yield(s.ctx.spawn(v.arc))`.
-type ValueClause struct {
-	Node
-
-	// The node in which to resolve lookups in the comprehension's value struct.
-	arc *Vertex
-}
-
-func (v *ValueClause) yield(s *compState) {}
-
 // insertComprehension registers a comprehension with a node, possibly pushing
 // down its evaluation to the node's children. It will only evaluate one level
 // of fields at a time.

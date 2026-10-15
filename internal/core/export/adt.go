@@ -791,10 +791,6 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			e.copyMeta(clause, x.Src)
 			c.Clauses = append(c.Clauses, clause)
 
-		case *adt.ValueClause:
-			// Can occur in nested comprehenions.
-			env = &adt.Environment{Up: env, Vertex: empty}
-
 		default:
 			panic(fmt.Sprintf("unknown field %T", x))
 		}

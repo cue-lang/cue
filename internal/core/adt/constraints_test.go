@@ -29,7 +29,6 @@ func TestMatchPatternValue(t *testing.T) {
 		expr   string
 		label  string
 		index  int64
-		value  string // overrides value from label
 		result bool
 	}
 

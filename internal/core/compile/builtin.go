@@ -28,7 +28,6 @@ const supportedByLen = adt.StructKind | adt.BytesKind | adt.StringKind | adt.Lis
 
 var (
 	stringParam = adt.Param{Value: &adt.BasicType{K: adt.StringKind}}
-	structParam = adt.Param{Value: &adt.BasicType{K: adt.StructKind}}
 	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
 	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}
 	topParam    = adt.Param{Value: &adt.BasicType{K: adt.TopKind}}

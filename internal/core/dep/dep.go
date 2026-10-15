@@ -773,9 +773,6 @@ func (c *visitor) markClauses(env *adt.Environment, a []adt.Yielder) *adt.Enviro
 				env = &adt.Environment{Up: env, Vertex: empty}
 			}
 			// Struct form: no expression, body is in Comprehension.Value
-
-		case *adt.ValueClause:
-			env = &adt.Environment{Up: env, Vertex: empty}
 		}
 	}
 	return env

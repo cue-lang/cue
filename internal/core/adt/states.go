@@ -152,9 +152,8 @@ const (
 	// subFieldsProcessed means that all tasks of a Vertex, including those of
 	// its arcs have been completed.
 	//
-	// This is a signal condition that is met if all arcs have reached the
-	// the state finalStateKnown.
-	//
+	// This is a signal condition that is met if all arcs have met all
+	// conditions.
 	subFieldsProcessed
 
 	// disjunctionTask indicates that this task is a disjunction. This is
@@ -162,12 +161,6 @@ const (
 	disjunctionTask
 
 	childConjunctsDone
-
-	leftOfMaxCoreCondition
-
-	finalStateKnown condition = leftOfMaxCoreCondition - 1
-
-	preValidation condition = finalStateKnown //&^ validationCompleted
 
 	conditionsUsingCounters = arcTypeKnown |
 		valueKnown |
@@ -197,13 +190,6 @@ const (
 	// a fieldConjunct is on that only adds a new field to the struct.
 	fieldConjunct = allTasksCompleted |
 		fieldConjunctsKnown | valueKnown
-
-	// a scalarConjunct is one that is guaranteed to result in a scalar or
-	// list value.
-	scalarConjunct = allTasksCompleted |
-		scalarKnown |
-		valueKnown |
-		disjunctionTask
 
 	// a scalarValue is one that is guaranteed to result in a scalar.
 	// TODO: use more widely instead of scalarKnown.

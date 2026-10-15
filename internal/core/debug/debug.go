@@ -873,8 +873,6 @@ func (w *printer) node(n adt.Node) {
 			w.string(" ")
 		}
 
-	case *adt.ValueClause:
-
 	default:
 		panic(fmt.Sprintf("unknown type %T", x))
 	}

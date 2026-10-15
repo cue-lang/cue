@@ -101,22 +101,10 @@ func (c *OpContext) popOverlay() {
 	c.overlays = c.overlays[:i]
 }
 
-func (c *OpContext) deref(v *Vertex) *Vertex {
-	for i := len(c.overlays) - 1; i >= 0; i-- {
-		f := c.overlays[i]
-		if f.root == v {
-			continue
-		}
-		if x, ok := f.vertexMap[v]; ok {
-			return x
-		}
-	}
-	return v
-}
-
-// derefRoot is like deref, but also dereferences the root vertex of each overlay
-// frame. This is needed for environment vertex resolution, where the root
-// vertex must be mapped to its clone during disjunction evaluation.
+// derefRoot returns the most recent overlay clone of v, including the root
+// vertex of each overlay frame. This is needed for environment vertex
+// resolution, where the root vertex must be mapped to its clone during
+// disjunction evaluation.
 func (c *OpContext) derefRoot(v *Vertex) *Vertex {
 	for i := len(c.overlays) - 1; i >= 0; i-- {
 		f := c.overlays[i]

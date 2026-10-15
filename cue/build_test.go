@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -340,7 +341,9 @@ type bimport struct {
 	files []string
 }
 
-func makeInstances(insts []*bimport) (instances []*build.Instance) {
+// makeInstances builds the instances in insts without a path, as well as roots,
+// resolving imports from the instances in insts with a path.
+func makeInstances(insts []*bimport, roots ...*bimport) (instances []*build.Instance) {
 	b := builder{
 		imports: map[string]*bimport{},
 	}
@@ -352,7 +355,7 @@ func makeInstances(insts []*bimport) (instances []*build.Instance) {
 		}
 	}
 	for _, bi := range insts {
-		if bi.path == "" {
+		if bi.path == "" || slices.Contains(roots, bi) {
 			instances = append(instances, b.build(bi))
 		}
 	}
@@ -365,6 +368,7 @@ func (b *builder) build(bi *bimport) *build.Instance {
 		path = "dir"
 	}
 	p := b.ctxt.NewInstance(path, nil)
+	p.ImportPath = bi.path
 	for i, f := range bi.files {
 		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
 	}

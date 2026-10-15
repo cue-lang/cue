@@ -16,11 +16,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package path
+package path_test
 
 import (
+	"errors"
 	"strings"
 	"testing"
+
+	"cuelang.org/go/pkg/path"
 )
 
 type MatchTest struct {
@@ -68,23 +71,23 @@ var matchTests = []MatchTest{
 	{"[\\-x]", "x", true, nil},
 	{"[\\-x]", "-", true, nil},
 	{"[\\-x]", "a", false, nil},
-	{"[]a]", "]", false, ErrBadPattern},
-	{"[-]", "-", false, ErrBadPattern},
-	{"[x-]", "x", false, ErrBadPattern},
-	{"[x-]", "-", false, ErrBadPattern},
-	{"[x-]", "z", false, ErrBadPattern},
-	{"[-x]", "x", false, ErrBadPattern},
-	{"[-x]", "-", false, ErrBadPattern},
-	{"[-x]", "a", false, ErrBadPattern},
-	{"\\", "a", false, ErrBadPattern},
-	{"[a-b-c]", "a", false, ErrBadPattern},
-	{"[", "a", false, ErrBadPattern},
-	{"[^", "a", false, ErrBadPattern},
-	{"[^bc", "a", false, ErrBadPattern},
-	{"a[", "a", false, ErrBadPattern},
-	{"a[", "ab", false, ErrBadPattern},
-	{"a[", "x", false, ErrBadPattern},
-	{"a/b[", "x", false, ErrBadPattern},
+	{"[]a]", "]", false, path.ErrBadPattern},
+	{"[-]", "-", false, path.ErrBadPattern},
+	{"[x-]", "x", false, path.ErrBadPattern},
+	{"[x-]", "-", false, path.ErrBadPattern},
+	{"[x-]", "z", false, path.ErrBadPattern},
+	{"[-x]", "x", false, path.ErrBadPattern},
+	{"[-x]", "-", false, path.ErrBadPattern},
+	{"[-x]", "a", false, path.ErrBadPattern},
+	{"\\", "a", false, path.ErrBadPattern},
+	{"[a-b-c]", "a", false, path.ErrBadPattern},
+	{"[", "a", false, path.ErrBadPattern},
+	{"[^", "a", false, path.ErrBadPattern},
+	{"[^bc", "a", false, path.ErrBadPattern},
+	{"a[", "a", false, path.ErrBadPattern},
+	{"a[", "ab", false, path.ErrBadPattern},
+	{"a[", "x", false, path.ErrBadPattern},
+	{"a/b[", "x", false, path.ErrBadPattern},
 	{"*x", "xxx", true, nil},
 	{"**", "ab/c", false, errStarStarDisallowed},
 	{"**/c", "ab/c", false, errStarStarDisallowed},
@@ -92,6 +95,10 @@ var matchTests = []MatchTest{
 	{"\\**", "*ab", true, nil},
 	{"[x**y]", "*", true, nil},
 }
+
+// errStarStarDisallowed has the message of the unexported error which
+// [path.Match] returns for patterns containing "**".
+var errStarStarDisallowed = errors.New("'**' is not supported in patterns as of yet")
 
 func errp(e error) string {
 	if e == nil {
@@ -101,20 +108,23 @@ func errp(e error) string {
 }
 
 func TestMatch(t *testing.T) {
-	testEachOS(t, []OS{Unix, Windows, Plan9}, func(t *testing.T, os OS) {
+	testEachOS(t, []path.OS{path.Unix, path.Windows, path.Plan9}, func(t *testing.T, os path.OS) {
 		for _, tt := range matchTests {
 			pattern := tt.pattern
 			s := tt.s
-			if os == Windows {
+			if os == path.Windows {
 				if strings.Contains(pattern, "\\") {
 					// no escape allowed on windows.
 					continue
 				}
-				pattern = Clean(pattern, os)
-				s = Clean(s, os)
+				pattern = path.Clean(pattern, os)
+				s = path.Clean(s, os)
 			}
-			ok, err := Match(pattern, s, os)
-			if ok != tt.match || err != tt.err {
+			ok, err := path.Match(pattern, s, os)
+			// The "**" error is unexported, so compare messages,
+			// as well as identity for ErrBadPattern.
+			if ok != tt.match || errp(err) != errp(tt.err) ||
+				(tt.err == path.ErrBadPattern && err != tt.err) {
 				t.Errorf("Match(%#q, %#q, %q) = %v, %q want %v, %q",
 					pattern, s, os, ok, errp(err), tt.match, errp(tt.err))
 			}

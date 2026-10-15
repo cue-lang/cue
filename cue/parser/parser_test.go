@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package parser
+package parser_test
 
 import (
 	"bytes"
@@ -25,6 +25,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	cueerrors "cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cueversion"
@@ -1820,17 +1821,17 @@ bar: 2
 		}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			mode := []Option{AllErrors}
+			mode := []parser.Option{parser.AllErrors}
 			if strings.Contains(tc.desc, "comments") {
-				mode = append(mode, ParseComments)
+				mode = append(mode, parser.ParseComments)
 			}
 			if strings.Contains(tc.desc, "function") {
-				mode = append(mode, ParseFuncs)
+				mode = append(mode, parser.ParseFuncs)
 			}
 			if tc.version != "" {
-				mode = append(mode, Version(tc.version))
+				mode = append(mode, parser.Version(tc.version))
 			}
-			f, err := ParseFile("input", tc.in, mode...)
+			f, err := parser.ParseFile("input", tc.in, mode...)
 			got := astinternal.DebugStr(f)
 			if err != nil {
 				got += "\n" + err.Error()
@@ -1849,7 +1850,7 @@ func TestClosedLiterals(t *testing.T) {
 	const exp = "@experiment(openlists)\n"
 	value := func(t *testing.T, src string) ast.Expr {
 		t.Helper()
-		f, err := ParseFile("input", src)
+		f, err := parser.ParseFile("input", src)
 		if err != nil {
 			t.Fatalf("parse %q: %v", src, err)
 		}
@@ -1895,7 +1896,7 @@ func TestClosedLiterals(t *testing.T) {
 		}
 	})
 	t.Run("label", func(t *testing.T) {
-		if _, err := ParseFile("input", exp+"a: {#[string]: int}"); err == nil {
+		if _, err := parser.ParseFile("input", exp+"a: {#[string]: int}"); err == nil {
 			t.Errorf("a closed list literal as a label parsed without error")
 		}
 	})
@@ -1920,7 +1921,7 @@ func TestStrict(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			_, err := ParseFile("input", tc.in, AllErrors, ParseComments)
+			_, err := parser.ParseFile("input", tc.in, parser.AllErrors, parser.ParseComments)
 			if err == nil {
 				t.Errorf("unexpected success: %v", tc.in)
 			}
@@ -1947,7 +1948,7 @@ func TestFunctionOrderingErrors(t *testing.T) {
 	if src == nil {
 		t.Fatal("missing in.cue")
 	}
-	file, err := ParseFile("in.cue", src, AllErrors, ParseComments)
+	file, err := parser.ParseFile("in.cue", src, parser.AllErrors, parser.ParseComments)
 	if err == nil {
 		t.Fatal("expected ordering errors")
 	}
@@ -1974,7 +1975,7 @@ func TestFunctionOrderingErrors(t *testing.T) {
 // "->" scans as two tokens, so that 3->2 parses as the binary expression
 // 3 - (>2), as it did before the experiment was introduced.
 func TestArrowWithoutExperiment(t *testing.T) {
-	f, err := ParseFile("input", "a: 3->2", AllErrors)
+	f, err := parser.ParseFile("input", "a: 3->2", parser.AllErrors)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -2003,7 +2004,7 @@ func TestArrowWithoutExperiment(t *testing.T) {
 // named "func" does not report errors of its own: a genuine scan error in
 // the argument list must be reported exactly once, by the real parse.
 func TestFuncLookaheadErrors(t *testing.T) {
-	_, err := ParseFile("input", `x: func("a\q")`, AllErrors)
+	_, err := parser.ParseFile("input", `x: func("a\q")`, parser.AllErrors)
 	var msgs []string
 	for _, e := range cueerrors.Errors(err) {
 		msgs = append(msgs, e.Error())
@@ -2080,7 +2081,7 @@ func nodeContainsPos(n ast.Node, pos token.Pos) bool {
 // expression x. The position information recorded in the AST is undefined. The
 // filename used in error messages is the empty string.
 func parseExprString(x string) (ast.Expr, error) {
-	return ParseExpr("", []byte(x))
+	return parser.ParseExpr("", []byte(x))
 }
 
 func TestParseExpr(t *testing.T) {
@@ -2113,7 +2114,7 @@ func TestParseExpr(t *testing.T) {
 	// only accepted below v0.18.0, where aliasv2 is stable;
 	// from v0.18.0 on it must report an error rather than crash.
 	src = "[A=0]"
-	if _, err := ParseExpr("", []byte(src), Version(oldAliasVersion)); err != nil {
+	if _, err := parser.ParseExpr("", []byte(src), parser.Version(oldAliasVersion)); err != nil {
 		t.Errorf("ParseExpr(%q): %v", src, err)
 	}
 	if _, err := parseExprString(src); err == nil {
@@ -2168,6 +2169,12 @@ func TestParseExpr(t *testing.T) {
 // realistic document is rejected with an error rather than recursing until
 // the Go runtime aborts the program.
 func TestNestingDepthLimit(t *testing.T) {
+	// The parser's nesting limits for recursive and iteratively built syntax,
+	// as reported by its errors.
+	const (
+		maxNestLevel  = 10_000
+		maxChainLevel = 100_000
+	)
 	for _, tc := range []struct {
 		name        string
 		open, close string
@@ -2192,12 +2199,18 @@ func TestNestingDepthLimit(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			src := strings.Repeat(tc.open, tc.depth) + "1" + strings.Repeat(tc.close, tc.depth)
-			_, err := ParseFile("", src)
+			_, err := parser.ParseFile("", src)
 			if gotErr := err != nil; gotErr != tc.wantErr {
 				t.Fatalf("got error %v, want error: %v", err, tc.wantErr)
 			}
-			if err != nil && !strings.Contains(err.Error(), "nesting depth") {
-				t.Fatalf("got %v, want a nesting depth error", err)
+			if err != nil {
+				limit := maxNestLevel
+				if tc.depth > maxChainLevel {
+					limit = maxChainLevel
+				}
+				if want := fmt.Sprintf("nesting depth of %d", limit); !strings.Contains(err.Error(), want) {
+					t.Fatalf("got %v, want an error containing %q", err, want)
+				}
 			}
 		})
 	}
@@ -2238,7 +2251,7 @@ func TestImports(t *testing.T) {
 	for path, isValid := range imports {
 		t.Run(path, func(t *testing.T) {
 			src := fmt.Sprintf("package p, import %s", path)
-			_, err := ParseFile("", src)
+			_, err := parser.ParseFile("", src)
 			switch {
 			case err != nil && isValid:
 				t.Errorf("ParseFile(%s): got %v; expected no error", src, err)
@@ -2258,7 +2271,7 @@ func TestIncompleteSelection(t *testing.T) {
 		"{ a: fmt.\n0.0: x }", // not at end of struct
 	} {
 		t.Run("", func(t *testing.T) {
-			f, err := ParseFile("", src)
+			f, err := parser.ParseFile("", src)
 			if err == nil {
 				t.Fatalf("ParseFile(%s) succeeded unexpectedly", src)
 			}
@@ -2303,14 +2316,14 @@ a: b: 1
 
 	// The version is recorded in the token.File, so every position in the
 	// file reports it, not just the file's own.
-	f, err := ParseFile("input", src, Version("v0.17.0"))
+	f, err := parser.ParseFile("input", src, parser.Version("v0.17.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	checkAll(f, "v0.17.0")
 
 	// Parsing without an explicit version resolves to the current one.
-	f, err = ParseFile("input", src)
+	f, err = parser.ParseFile("input", src)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2321,7 +2334,7 @@ func TestParseExprExperiments(t *testing.T) {
 	// ParseExpr records the experiments implied by the configured language
 	// version on the returned positions, as ParseFile does, so that
 	// consumers can resolve which experiments apply to the expression.
-	x, err := ParseExpr("input", "self")
+	x, err := parser.ParseExpr("input", "self")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2333,7 +2346,7 @@ func TestParseExprExperiments(t *testing.T) {
 		t.Errorf("aliasv2 not enabled at the default version, where it is stable")
 	}
 
-	x, err = ParseExpr("input", "self", Version("v0.17.0"))
+	x, err = parser.ParseExpr("input", "self", parser.Version("v0.17.0"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2349,15 +2362,15 @@ func TestParseExprExperiments(t *testing.T) {
 func TestVersionOption(t *testing.T) {
 	// An empty version selects the current one, so that a caller whose
 	// version may be unset can pass it on rather than guarding the call.
-	if got := NewConfig(Version("")).Version; got != cueversion.LanguageVersion() {
+	if got := parser.NewConfig(parser.Version("")).Version; got != cueversion.LanguageVersion() {
 		t.Errorf("empty version = %q; want %q", got, cueversion.LanguageVersion())
 	}
-	if got := NewConfig(Version("v0.17.0")).Version; got != "v0.17.0" {
+	if got := parser.NewConfig(parser.Version("v0.17.0")).Version; got != "v0.17.0" {
 		t.Errorf("pinned version = %q; want %q", got, "v0.17.0")
 	}
 	// It selects it rather than standing aside, so the options compose in
 	// either order, as any other option does.
-	if got := NewConfig(Version("v0.17.0"), Version("")).Version; got != cueversion.LanguageVersion() {
+	if got := parser.NewConfig(parser.Version("v0.17.0"), parser.Version("")).Version; got != cueversion.LanguageVersion() {
 		t.Errorf("empty version after a pinned one = %q; want %q", got, cueversion.LanguageVersion())
 	}
 	// A non-empty version must still be valid semver.
@@ -2366,14 +2379,14 @@ func TestVersionOption(t *testing.T) {
 			t.Error(`Version("nope") did not panic`)
 		}
 	}()
-	Version("nope")
+	parser.Version("nope")
 }
 
 // Adapted from https://go-review.googlesource.com/c/go/+/559436
 func TestIssue57490(t *testing.T) {
 	src := `x: {a: int, b: int}
 y: x.` // program not correctly terminated
-	file, err := ParseFile("", src)
+	file, err := parser.ParseFile("", src)
 	if err == nil {
 		t.Fatalf("syntax error expected, but no error reported")
 	}
@@ -2393,8 +2406,8 @@ y: x.` // program not correctly terminated
 func TestX(t *testing.T) {
 	t.Skip()
 
-	f, err := ParseFile("input", `
-	`, ParseComments)
+	f, err := parser.ParseFile("input", `
+	`, parser.ParseComments)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2440,7 +2453,7 @@ func TestPostfixAlias(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f, err := ParseFile("test.cue", []byte(tt.input), ParseComments)
+			f, err := parser.ParseFile("test.cue", []byte(tt.input), parser.ParseComments)
 			if err != nil {
 				t.Fatalf("ParseFile failed: %v", err)
 			}

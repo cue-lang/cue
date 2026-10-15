@@ -39,6 +39,7 @@ import (
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
+	"cuelang.org/go/internal/value"
 )
 
 func getValue(m *cuetdtest.M, body string) cue.Value {
@@ -1248,7 +1249,7 @@ pkg: x, x: y: "hello"`)
 
 					// Struct gets all fields. Skip tests with optional fields,
 					// as the result will differ.
-					if cue.ValueVertex(v).ArcType != adt.ArcMember {
+					if value.Vertex(v).ArcType != adt.ArcMember {
 						return
 					}
 				}
@@ -1841,13 +1842,6 @@ func TestAllows(t *testing.T) {
 		sel:   cue.AnyIndex,
 		allow: true,
 	}, {
-		desc: "definition in open scalar",
-		in: `
-		x: 1
-		`,
-		sel:   cue.AnyDefinition,
-		allow: true,
-	}, {
 		desc: "field in open scalar",
 		in: `
 			x: 1
@@ -1862,7 +1856,7 @@ func TestAllows(t *testing.T) {
 			x: 1
 			#Def: int
 			`,
-		sel:   cue.AnyDefinition,
+		sel:   cue.Def("#foo"),
 		allow: true,
 	}, {
 		desc: "allow field in any",
@@ -2384,7 +2378,7 @@ func TestElem(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			v := getValue(m, tc.value)
-			cue.ValueVertex(v).Finalize(cue.ValueCtx(v))
+			value.Vertex(v).Finalize(value.OpContext(v))
 			for _, p := range tc.path {
 				if p == "" {
 					var ok bool
@@ -3443,7 +3437,10 @@ func TestPath(t *testing.T) {
 				}
 				return
 			}
-			got := cue.PathToStrings(p)
+			var got []string
+			for _, sel := range p.Selectors() {
+				got = append(got, sel.String())
+			}
 			if !reflect.DeepEqual(got, tc.path) {
 				t.Errorf("got %v; want %v", got, tc.path)
 			}
@@ -3512,7 +3509,7 @@ func TestValueLookup(t *testing.T) {
 				t.Errorf("exists: got %v; want %v", got, tc.notExists)
 			}
 
-			got := cue.ValueCtx(v).String(cue.ValueVertex(v))
+			got := value.OpContext(v).String(value.Vertex(v))
 			if tc.str == "" {
 				t.Fatalf("str empty, got %q", got)
 			}
@@ -3938,7 +3935,7 @@ func TestWalk(t *testing.T) {
 			}
 			val.Walk(func(v cue.Value) bool {
 				v = v.Eval()
-				if !cue.ValueVertex(v).Label.IsInt() {
+				if !value.Vertex(v).Label.IsInt() {
 					if k, ok := v.Label(); ok {
 						buf = append(buf, k+":"...)
 					}
@@ -3949,8 +3946,8 @@ func TestWalk(t *testing.T) {
 				case cue.ListKind:
 					buf = append(buf, '[')
 				default:
-					if b := cue.ValueVertex(v).Bottom(); b != nil {
-						s := cue.DebugStr(cue.ValueCtx(v), b)
+					if b := value.Vertex(v).Bottom(); b != nil {
+						s := debug.NodeString(value.OpContext(v), b, nil)
 						buf = append(buf, fmt.Sprint(s, ",")...)
 						return true
 					}
@@ -4519,7 +4516,7 @@ func TestPathCorrection(t *testing.T) {
 			if gotVal != val {
 				t.Error("reference not in original instance")
 			}
-			gotPath := strings.Join(cue.PathToStrings(ref), ".")
+			gotPath := ref.String()
 			if gotPath != tc.want {
 				t.Errorf("got path %s; want %s", gotPath, tc.want)
 			}
@@ -4883,9 +4880,9 @@ func exprStr(v cue.Value) string {
 }
 
 func compactRawStr(v cue.Value) string {
-	ctx := cue.ValueCtx(v)
+	ctx := value.OpContext(v)
 	cfg := &debug.Config{Compact: true, Raw: true}
-	return debug.NodeString(ctx, cue.ValueVertex(v), cfg)
+	return debug.NodeString(ctx, value.Vertex(v), cfg)
 }
 
 func TestIsClosed(t *testing.T) {

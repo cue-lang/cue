@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package parser
+package parser_test
 
 import (
 	"os"
 	"testing"
+
+	"cuelang.org/go/cue/parser"
 )
 
 var src = readFile("testdata/commas.src")
@@ -32,7 +34,7 @@ func readFile(filename string) []byte {
 func BenchmarkParse(b *testing.B) {
 	b.SetBytes(int64(len(src)))
 	for i := 0; i < b.N; i++ {
-		if _, err := ParseFile("", src, ParseComments); err != nil {
+		if _, err := parser.ParseFile("", src, parser.ParseComments); err != nil {
 			b.Fatalf("benchmark failed due to parse error: %s", err)
 		}
 	}

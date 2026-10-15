@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package time
+package time_test
 
 import (
 	"testing"
+
+	pkgtime "cuelang.org/go/pkg/time"
 )
 
 func TestDuration(t *testing.T) {
@@ -29,7 +31,7 @@ func TestDuration(t *testing.T) {
 
 	for _, tc := range valid {
 		t.Run(tc, func(t *testing.T) {
-			if b, err := Duration(tc); !b || err != nil {
+			if b, err := pkgtime.Duration(tc); !b || err != nil {
 				t.Errorf("CUE eval failed unexpectedly: %v", err)
 			}
 		})
@@ -41,7 +43,7 @@ func TestDuration(t *testing.T) {
 
 	for _, tc := range invalid {
 		t.Run(tc, func(t *testing.T) {
-			if _, err := Duration(tc); err == nil {
+			if _, err := pkgtime.Duration(tc); err == nil {
 				t.Errorf("CUE eval succeeded unexpectedly")
 			}
 		})
@@ -53,14 +55,14 @@ func TestFormatDuration(t *testing.T) {
 		in  int64
 		out string
 	}{
-		{3*Hour + 2*Minute, "3h2m0s"},
-		{5 * Second, "5s"},
-		{600 * Millisecond, "600ms"},
+		{3*pkgtime.Hour + 2*pkgtime.Minute, "3h2m0s"},
+		{5 * pkgtime.Second, "5s"},
+		{600 * pkgtime.Millisecond, "600ms"},
 	}
 
 	for _, tc := range valid {
 		t.Run(tc.out, func(t *testing.T) {
-			s := FormatDuration(tc.in)
+			s := pkgtime.FormatDuration(tc.in)
 			if s != tc.out {
 				t.Fatalf("got %v; want %v", s, tc.out)
 			}
@@ -74,14 +76,14 @@ func TestParseDuration(t *testing.T) {
 		out int64
 		err bool
 	}{
-		{"3h2m", 3*Hour + 2*Minute, false},
-		{"5s", 5 * Second, false},
+		{"3h2m", 3*pkgtime.Hour + 2*pkgtime.Minute, false},
+		{"5s", 5 * pkgtime.Second, false},
 		{"5d", 0, true},
 	}
 
 	for _, tc := range valid {
 		t.Run(tc.in, func(t *testing.T) {
-			i, err := ParseDuration(tc.in)
+			i, err := pkgtime.ParseDuration(tc.in)
 			if got := err != nil; got != tc.err {
 				t.Fatalf("error: got %v; want %v", i, tc.out)
 			}

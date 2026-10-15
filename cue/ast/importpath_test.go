@@ -12,39 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ast
+package ast_test
 
 import (
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"github.com/go-quicktest/qt"
 )
 
 var parseImportPathTests = []struct {
 	testName string
 	path     string
-	want     ImportPath
+	want     ast.ImportPath
 
 	wantString          string // "" to be equal to the path field
 	wantCanonicalString string // "" to be equal to the path field
 }{{
 	testName: "StdlibLikeWithSlash",
 	path:     "stdlib/path",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "stdlib/path",
 		Qualifier: "path",
 	},
 }, {
 	testName: "StdlibLikeNoSlash",
 	path:     "math",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "math",
 		Qualifier: "math",
 	},
 }, {
 	testName: "StdlibLikeExplicitQualifier",
 	path:     "stdlib/path:other",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "stdlib/path",
 		ExplicitQualifier: true,
 		Qualifier:         "other",
@@ -52,14 +53,14 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "ExplicitEmptyQualifier",
 	path:     "stdlib/path:",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "stdlib/path",
 		ExplicitQualifier: true,
 	},
 }, {
 	testName: "StdlibLikeExplicitQualifierNoSlash",
 	path:     "math:other",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "math",
 		ExplicitQualifier: true,
 		Qualifier:         "other",
@@ -67,7 +68,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithMajorVersion",
 	path:     "foo.com/bar@v0",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Version:   "v0",
 		Qualifier: "bar",
@@ -75,7 +76,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithFullVersion",
 	path:     "foo.com/bar@v0.2.3:xxx",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar",
 		Version:           "v0.2.3",
 		Qualifier:         "xxx",
@@ -84,7 +85,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithFullVersionNoQualifier",
 	path:     "foo.com/bar@v0.2.3-foo",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Version:   "v0.2.3-foo",
 		Qualifier: "bar",
@@ -92,7 +93,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithLatest",
 	path:     "foo.com/bar@latest",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Version:   "latest",
 		Qualifier: "bar",
@@ -100,7 +101,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithMajorVersionLatest",
 	path:     "foo.com/bar@v1.latest",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Version:   "v1.latest",
 		Qualifier: "bar",
@@ -108,7 +109,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithMajorVersionNoSlash",
 	path:     "main.test@v0",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "main.test",
 		Version:   "v0",
 		Qualifier: "",
@@ -116,7 +117,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithMajorVersionAndExplicitQualifier",
 	path:     "foo.com/bar@v0:other",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar",
 		Version:           "v0",
 		ExplicitQualifier: true,
@@ -125,7 +126,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithMajorVersionAndNoQualifier",
 	path:     "foo.com/bar@v0",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Version:   "v0",
 		Qualifier: "bar",
@@ -133,7 +134,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithRedundantQualifier",
 	path:     "foo.com/bar@v0:bar",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar",
 		Version:           "v0",
 		ExplicitQualifier: true,
@@ -143,7 +144,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithPattern",
 	path:     "foo.com/bar/.../blah",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar/.../blah",
 		Version:           "",
 		ExplicitQualifier: false,
@@ -152,7 +153,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithPatternAtEnd",
 	path:     "foo.com/bar/...",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar/...",
 		Version:           "",
 		ExplicitQualifier: false,
@@ -161,7 +162,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithUnderscoreLastElement",
 	path:     "foo.com/bar/_foo",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar/_foo",
 		Version:           "",
 		ExplicitQualifier: false,
@@ -170,7 +171,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "WithHashLastElement",
 	path:     "foo.com/bar/#foo",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar/#foo",
 		Version:           "",
 		ExplicitQualifier: false,
@@ -179,7 +180,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "StdlibPathWithQualifier",
 	path:     "strings:strings",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "strings",
 		Version:           "",
 		ExplicitQualifier: true,
@@ -189,7 +190,7 @@ var parseImportPathTests = []struct {
 }, {
 	testName: "DotWithQualifier",
 	path:     ".:foo",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              ".",
 		ExplicitQualifier: true,
 		Qualifier:         "foo",
@@ -198,7 +199,7 @@ var parseImportPathTests = []struct {
 	// Historically, `:pkgname` has been a short-hand for `.:pkgname`.
 	testName: "JustQualifier",
 	path:     ":foo",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              ".",
 		ExplicitQualifier: true,
 		Qualifier:         "foo",
@@ -209,14 +210,14 @@ var parseImportPathTests = []struct {
 	// Likely nonsensical, but keep track of what we return.
 	testName: "Empty",
 	path:     "",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path: "",
 	},
 }, {
 	// Likely nonsensical, but keep track of what we return.
 	testName: "Colon",
 	path:     ":",
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              ".",
 		ExplicitQualifier: true,
 		Qualifier:         "",
@@ -228,7 +229,7 @@ var parseImportPathTests = []struct {
 func TestParseImportPath(t *testing.T) {
 	for _, test := range parseImportPathTests {
 		t.Run(test.testName, func(t *testing.T) {
-			parts := ParseImportPath(test.path)
+			parts := ast.ParseImportPath(test.path)
 			qt.Assert(t, qt.DeepEquals(parts, test.want))
 			if test.wantString == "" {
 				test.wantString = test.path
@@ -240,33 +241,33 @@ func TestParseImportPath(t *testing.T) {
 			gotCanonical := parts.Canonical().String()
 			qt.Assert(t, qt.Equals(gotCanonical, test.wantCanonicalString))
 			// Make sure that the canonical version round-trips OK.
-			qt.Assert(t, qt.Equals(ParseImportPath(gotCanonical).String(), gotCanonical))
+			qt.Assert(t, qt.Equals(ast.ParseImportPath(gotCanonical).String(), gotCanonical))
 		})
 	}
 }
 
 var canonicalWithManuallyConstructedImportPathTests = []struct {
 	testName   string
-	ip         ImportPath
-	want       ImportPath
+	ip         ast.ImportPath
+	want       ast.ImportPath
 	wantString string
 }{{
 	testName: "MissingQualifierIsAdded",
-	ip: ImportPath{
+	ip: ast.ImportPath{
 		Path: "foo.com/bar",
 	},
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Qualifier: "bar",
 	},
 	wantString: "foo.com/bar",
 }, {
 	testName: "ExplicitQualifierIsSet",
-	ip: ImportPath{
+	ip: ast.ImportPath{
 		Path:      "foo.com/bar",
 		Qualifier: "other",
 	},
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com/bar",
 		Qualifier:         "other",
 		ExplicitQualifier: true,
@@ -274,11 +275,11 @@ var canonicalWithManuallyConstructedImportPathTests = []struct {
 	wantString: "foo.com/bar:other",
 }, {
 	testName: "HostOnly",
-	ip: ImportPath{
+	ip: ast.ImportPath{
 		Path:      "foo.com",
 		Qualifier: "bar",
 	},
-	want: ImportPath{
+	want: ast.ImportPath{
 		Path:              "foo.com",
 		Qualifier:         "bar",
 		ExplicitQualifier: true,
@@ -299,7 +300,7 @@ func TestCanonicalWithManuallyConstructedImportPath(t *testing.T) {
 }
 
 func TestImportPathStringAddsQualifier(t *testing.T) {
-	ip := ImportPath{
+	ip := ast.ImportPath{
 		Path:      "foo.com/bar",
 		Version:   "v0",
 		Qualifier: "baz",
@@ -308,7 +309,7 @@ func TestImportPathStringAddsQualifier(t *testing.T) {
 }
 
 func TestImportPathStringAddsQualifierWhenNoVersion(t *testing.T) {
-	ip := ImportPath{
+	ip := ast.ImportPath{
 		Path:      "foo.com/bar",
 		Qualifier: "baz",
 	}

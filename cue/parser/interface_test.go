@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package parser
+package parser_test
 
 import (
 	"reflect"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/source"
 )
 
@@ -51,7 +52,7 @@ func TestParseFile(t *testing.T) {
 	type args struct {
 		filename string
 		src      interface{}
-		options  []Option
+		options  []parser.Option
 	}
 	tests := []struct {
 		name    string
@@ -62,7 +63,7 @@ func TestParseFile(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		gotF, err := ParseFile(tt.args.filename, tt.args.src, tt.args.options...)
+		gotF, err := parser.ParseFile(tt.args.filename, tt.args.src, tt.args.options...)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. ParseFile() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
@@ -77,7 +78,7 @@ func TestParseExprFrom(t *testing.T) {
 	type args struct {
 		filename string
 		src      interface{}
-		mode     Option
+		mode     parser.Option
 	}
 	tests := []struct {
 		name    string
@@ -88,7 +89,7 @@ func TestParseExprFrom(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := ParseExpr(tt.args.filename, tt.args.src, tt.args.mode)
+		got, err := parser.ParseExpr(tt.args.filename, tt.args.src, tt.args.mode)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. ParseExprFrom() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue

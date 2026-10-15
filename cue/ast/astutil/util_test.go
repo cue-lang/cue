@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package astutil
+package astutil_test
 
 import (
 	"path"
@@ -21,33 +21,34 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 )
 
 func TestImportInfo(t *testing.T) {
 	testCases := []struct {
 		name string
 		path string
-		want ImportInfo
+		want astutil.ImportInfo
 	}{
-		{"", "a.b/bar", ImportInfo{
+		{"", "a.b/bar", astutil.ImportInfo{
 			Ident:   "bar",
 			PkgName: "bar",
 			ID:      "a.b/bar",
 			Dir:     "a.b/bar",
 		}},
-		{"foo", "a.b/bar", ImportInfo{
+		{"foo", "a.b/bar", astutil.ImportInfo{
 			Ident:   "foo",
 			PkgName: "bar",
 			ID:      "a.b/bar",
 			Dir:     "a.b/bar",
 		}},
-		{"", "a.b/bar:foo", ImportInfo{
+		{"", "a.b/bar:foo", astutil.ImportInfo{
 			Ident:   "foo",
 			PkgName: "foo",
 			ID:      "a.b/bar:foo",
 			Dir:     "a.b/bar",
 		}},
-		{"", "strings", ImportInfo{
+		{"", "strings", astutil.ImportInfo{
 			Ident:   "strings",
 			PkgName: "strings",
 			ID:      "strings",
@@ -60,7 +61,7 @@ func TestImportInfo(t *testing.T) {
 			if tc.name != "" {
 				ident = ast.NewIdent(tc.name)
 			}
-			got, err := ParseImportSpec(&ast.ImportSpec{
+			got, err := astutil.ParseImportSpec(&ast.ImportSpec{
 				Name: ident,
 				Path: ast.NewString(tc.path),
 			})

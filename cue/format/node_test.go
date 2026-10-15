@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package format
+package format_test
 
 import (
 	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -59,7 +60,7 @@ func TestInvalidAST(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			b, err := Node(tc.node)
+			b, err := format.Node(tc.node)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -84,7 +85,7 @@ func TestErrors(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			b, err := Node(tc.node)
+			b, err := format.Node(tc.node)
 			if err == nil {
 				t.Fatalf("expected error, found %q", b)
 			}

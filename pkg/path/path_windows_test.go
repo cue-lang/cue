@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package path
+package path_test
 
 import (
 	"flag"
@@ -26,6 +26,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"cuelang.org/go/pkg/path"
 )
 
 func TestWinSplitListTestsAreValid(t *testing.T) {
@@ -53,12 +55,12 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 		if d == "" {
 			continue
 		}
-		if cd := Clean(d, Windows); VolumeName(cd, Windows) != "" ||
+		if cd := path.Clean(d, path.Windows); path.VolumeName(cd, path.Windows) != "" ||
 			cd[0] == '\\' || cd == ".." || (len(cd) >= 3 && cd[0:3] == `..\`) {
 			t.Errorf("%d,%d: %#q refers outside working directory", ti, i, d)
 			return
 		}
-		dd := Join([]string{tmp, d}, Windows)
+		dd := path.Join([]string{tmp, d}, path.Windows)
 		if _, err := goos.Stat(dd); err == nil {
 			t.Errorf("%d,%d: %#q already exists", ti, i, d)
 			return
@@ -67,7 +69,7 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 			t.Errorf("%d,%d: MkdirAll(%#q) failed: %v", ti, i, dd, err)
 			return
 		}
-		fn, data := Join([]string{dd, cmdfile}, Windows), []byte("@echo "+d+"\r\n")
+		fn, data := path.Join([]string{dd, cmdfile}, path.Windows), []byte("@echo "+d+"\r\n")
 		if err := goos.WriteFile(fn, data, perm); err != nil {
 			t.Errorf("%d,%d: WriteFile(%#q) failed: %v", ti, i, fn, err)
 			return
@@ -98,7 +100,7 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 			return
 		default:
 			// unshadow cmdfile in next directory
-			err = goos.Remove(Join([]string{tmp, d, cmdfile}, Windows))
+			err = goos.Remove(path.Join([]string{tmp, d, cmdfile}, path.Windows))
 			if err != nil {
 				t.Fatalf("Remove test command failed: %v", err)
 			}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package parser
+package parser_test
 
 import (
 	"fmt"
@@ -25,6 +25,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	cueerrors "cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 )
 
 // TestSyntaxCorpus checks each file in testdata/syntax against the parser at
@@ -68,7 +69,7 @@ func TestSyntaxCorpus(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				f, err := ParseFile(name, src)
+				f, err := parser.ParseFile(name, src)
 				if class == "fail" {
 					checkFailure(t, src, err)
 					return

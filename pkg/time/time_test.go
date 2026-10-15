@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package time
+package time_test
 
 import (
 	"encoding/json"
 	"strconv"
 	"testing"
 	"time"
+
+	pkgtime "cuelang.org/go/pkg/time"
 )
 
 func TestTimestamp(t *testing.T) {
@@ -58,10 +60,10 @@ func TestTimestamp(t *testing.T) {
 			}
 			str, _ := strconv.Unquote(tc)
 
-			if b, err := Time(str); !b || err != nil {
+			if b, err := pkgtime.Time(str); !b || err != nil {
 				t.Errorf("Time failed unexpectedly: %v", err)
 			}
-			if _, err := Parse(RFC3339Nano, str); err != nil {
+			if _, err := pkgtime.Parse(pkgtime.RFC3339Nano, str); err != nil {
 				t.Errorf("Parse failed unexpectedly")
 			}
 		})
@@ -91,11 +93,11 @@ func TestTimestamp(t *testing.T) {
 
 			str, _ := strconv.Unquote(tc)
 
-			if _, err := Time(str); err == nil {
+			if _, err := pkgtime.Time(str); err == nil {
 				t.Errorf("CUE eval succeeded unexpectedly")
 			}
 
-			if _, err := Parse(RFC3339Nano, str); err == nil {
+			if _, err := pkgtime.Parse(pkgtime.RFC3339Nano, str); err == nil {
 				t.Errorf("CUE eval succeeded unexpectedly")
 			}
 		})
@@ -114,7 +116,7 @@ func TestUnix(t *testing.T) {
 
 	for _, tc := range valid {
 		t.Run(tc.want, func(t *testing.T) {
-			got := Unix(tc.sec, tc.nano)
+			got := pkgtime.Unix(tc.sec, tc.nano)
 			if got != tc.want {
 				t.Errorf("got %v; want %s", got, tc.want)
 			}

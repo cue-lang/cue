@@ -265,11 +265,6 @@ func (sel Selector) Index() int {
 }
 
 var (
-	// AnyDefinition is a [Selector] which can be used to ask for any definition.
-	//
-	// In paths it is used to select constraints that apply to all elements.
-	// AnyDefinition = anyDefinition
-	anyDefinition = Selector{sel: anySelector(adt.AnyDefinition)}
 	// AnyIndex is a [Selector] which can be used to ask for any index.
 	//
 	// In paths it is used to select constraints that apply to all elements.

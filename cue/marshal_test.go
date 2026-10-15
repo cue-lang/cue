@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"fmt"
@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	"github.com/go-quicktest/qt"
+
+	"cuelang.org/go/cue"
 )
 
 func TestMarshalling(t *testing.T) {
@@ -58,7 +60,7 @@ func TestMarshalling(t *testing.T) {
 		`}}
 	for _, tc := range testCases {
 		t.Run(tc.filename, func(t *testing.T) {
-			r := &Runtime{}
+			r := &cue.Runtime{}
 			inst, err := r.Compile(tc.filename, tc.input)
 			if err != nil {
 				t.Fatal(err)
@@ -72,7 +74,7 @@ func TestMarshalling(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			r2 := &Runtime{}
+			r2 := &cue.Runtime{}
 			instances, err := r2.Unmarshal(b)
 			if err != nil {
 				t.Fatal(err)
@@ -92,15 +94,9 @@ func TestMarshalling(t *testing.T) {
 }
 
 func TestMarshalMultiPackage(t *testing.T) {
-	files := func(s ...string) (a []fileData) {
-		for i, s := range s {
-			a = append(a, fileData{fmt.Sprintf("file%d.cue", i), []byte(s)})
-		}
-		return a
-	}
-	insts := func(i ...*instanceData) []*instanceData { return i }
-	pkg1 := &instanceData{
-		true,
+	files := func(s ...string) []string { return s }
+	insts := func(i ...*bimport) []*bimport { return i }
+	pkg1 := &bimport{
 		"mod.test/foo/pkg1",
 		files(`
 		package pkg1
@@ -108,19 +104,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 		Object: "World"
 		`),
 	}
-	// pkg1dep is the same as pkg1 but not a root instance;
-	// it's only present as a dependency.
-	pkg1dep := &instanceData{
-		false,
-		"mod.test/foo/pkg1",
-		files(`
-		package pkg1
-
-		Object: "World"
-		`),
-	}
-	pkg2 := &instanceData{
-		true,
+	pkg2 := &bimport{
 		"mod.test/foo/pkg2",
 		files(`
 		package pkg
@@ -130,22 +114,25 @@ func TestMarshalMultiPackage(t *testing.T) {
 	}
 
 	testCases := []struct {
-		instances []*instanceData
+		instances []*bimport
+		roots     []*bimport // root instances with an import path
 		emit      string
 	}{{
-		insts(&instanceData{true, "", files(`test: "ok"`)}),
+		insts(&bimport{"", files(`test: "ok"`)}),
+		nil,
 		`{test: "ok"}`,
 	}, {
-		insts(&instanceData{true, "",
+		insts(&bimport{"",
 			files(
 				`package test
 
 		import math2 "math"
 
 		"Pi: \(math2.Pi)!"`)}),
+		nil,
 		`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
 	}, {
-		insts(pkg1, &instanceData{true, "",
+		insts(pkg1, &bimport{"",
 			files(
 				`package test
 
@@ -153,9 +140,10 @@ func TestMarshalMultiPackage(t *testing.T) {
 
 			"Hello \(pkg1.Object)!"`),
 		}),
+		insts(pkg1),
 		`"Hello World!"`,
 	}, {
-		insts(pkg1, &instanceData{true, "",
+		insts(pkg1, &bimport{"",
 			files(
 				`package test
 
@@ -164,9 +152,10 @@ func TestMarshalMultiPackage(t *testing.T) {
 
 		pkg1: pkg2.Object`),
 		}),
+		insts(pkg1),
 		`"Hello World!"`,
 	}, {
-		insts(pkg2, &instanceData{true, "",
+		insts(pkg2, &bimport{"",
 			files(
 				`package test
 
@@ -174,11 +163,12 @@ func TestMarshalMultiPackage(t *testing.T) {
 
 		"Hello \(pkg.Number)!"`),
 		}),
+		insts(pkg2),
 		`"Hello 12!"`,
 	}, {
 		// Test that a non-root dependency is correctly included
 		// in the marshaled data.
-		insts(pkg1dep, &instanceData{true, "",
+		insts(pkg1, &bimport{"",
 			files(
 				`package test
 
@@ -186,10 +176,11 @@ func TestMarshalMultiPackage(t *testing.T) {
 
 		"Hello \(pkg1.Object)!"`),
 		}),
+		nil,
 		`"Hello World!"`,
 	}}
 
-	strValue := func(a []*Instance) (ret []string) {
+	strValue := func(a []*cue.Instance) (ret []string) {
 		for _, i := range a {
 			ret = append(ret, strings.TrimSpace((fmt.Sprint(i.Value()))))
 		}
@@ -198,15 +189,15 @@ func TestMarshalMultiPackage(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			r := &Runtime{}
+			r := &cue.Runtime{}
 
-			insts, err := compileInstances(r, tc.instances)
+			insts, err := r.BuildInstances(makeInstances(tc.instances, tc.roots...))
 			if err != nil {
 				t.Fatal(err)
 			}
 			want := strValue(insts)
 
-			vals := make([]InstanceOrValue, 0)
+			vals := make([]cue.InstanceOrValue, 0)
 			for _, inst := range insts {
 				val := inst.Value()
 				vals = append(vals, &val)
@@ -217,7 +208,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			r2 := &Runtime{}
+			r2 := &cue.Runtime{}
 			insts, err = r2.Unmarshal(b)
 			if err != nil {
 				t.Fatal(err)

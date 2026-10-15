@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package goccy
+package goccy_test
 
 import (
 	"strings"
@@ -23,6 +23,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/encoding/yaml/goccy"
 )
 
 func TestEncodeFile(t *testing.T) {
@@ -722,7 +723,7 @@ item: !!binary //4=
 			if err != nil {
 				t.Fatal(err)
 			}
-			b, err := Encode(f, EncodeOptions{})
+			b, err := goccy.Encode(f, goccy.EncodeOptions{})
 			var got string
 			if err != nil {
 				got = err.Error()
@@ -796,7 +797,7 @@ true
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := Encode(tc.in, EncodeOptions{})
+			b, err := goccy.Encode(tc.in, goccy.EncodeOptions{})
 			if err != nil {
 				t.Fatal(err)
 			}

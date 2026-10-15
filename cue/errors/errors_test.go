@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package errors
+package errors_test
 
 import (
 	"bytes"
@@ -20,13 +20,25 @@ import (
 	"slices"
 	"testing"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
 // TODO this foundational package could do with a bunch more tests.
 
+// posError is an [errors.Error] with a position and a message,
+// like those created by [errors.Newf].
+type posError struct {
+	pos token.Pos
+	errors.Message
+}
+
+func (e *posError) Path() []string              { return nil }
+func (e *posError) InputPositions() []token.Pos { return nil }
+func (e *posError) Position() token.Pos         { return e.pos }
+
 // countingError is a [posError] that counts how often its message is rendered
-// via Error, so tests can assert that removeMultiples only renders errors it
+// via Error, so tests can assert that [errors.Sanitize] only renders errors it
 // must compare to deduplicate. It overrides Path, which posError leaves nil.
 type countingError struct {
 	posError
@@ -41,7 +53,7 @@ func (e *countingError) Error() string {
 	return e.posError.Error()
 }
 
-// TestRemoveMultiplesRenders records how many times removeMultiples renders
+// TestRemoveMultiplesRenders records how many times [errors.Sanitize] renders
 // each error in a list while sorting and deduplicating it, along with which
 // errors survive and the rendered result. Rendering fully formats an error's
 // message, so the counts are worth pinning: later commits that change how
@@ -53,7 +65,7 @@ func TestRemoveMultiplesRenders(t *testing.T) {
 	f := token.NewFile("test", 0, 100)
 	pos := func(offset int) token.Pos { return f.Pos(offset, token.NoRelPos) }
 	newErr := func(p token.Pos, msg string, path ...string) *countingError {
-		return &countingError{posError: posError{pos: p, Message: Message{format: msg}}, path: path}
+		return &countingError{posError: posError{pos: p, Message: errors.NewMessagef("%s", msg)}, path: path}
 	}
 
 	tests := []struct {
@@ -77,15 +89,16 @@ func TestRemoveMultiplesRenders(t *testing.T) {
 		{newErr(token.NoPos, "invalid position, grouped regardless of path (third)"), true, 1},
 	}
 
-	l := make(list, len(tests))
-	for i, tt := range tests {
-		l[i] = tt.countingError
+	var err errors.Error
+	for _, tt := range tests {
+		err = errors.Append(err, tt.countingError)
 	}
-	l.removeMultiples()
+	err = errors.Sanitize(err)
+	l := errors.Errors(err)
 
 	for i, tt := range tests {
-		msg, _ := tt.Msg()
-		kept := slices.Contains(l, Error(tt.countingError))
+		msg := tt.posError.Error() // not counted as a render
+		kept := slices.Contains(l, errors.Error(tt.countingError))
 		if kept != tt.wantKept {
 			t.Errorf("error %q (#%d): kept = %v, want %v", msg, i, kept, tt.wantKept)
 		}
@@ -120,7 +133,7 @@ d: one of three distinct at position 40 path d (second):
 d: one of three distinct at position 40 path d (third):
     test:1:41
 `
-	if got := Details(l, nil); got != want {
+	if got := errors.Details(err, nil); got != want {
 		t.Errorf("deduplicated errors:\ngot:\n%s\nwant:\n%s", got, want)
 	}
 }
@@ -132,28 +145,28 @@ func TestPrintError(t *testing.T) {
 		wantW string
 	}{{
 		name:  "SimplePromoted",
-		err:   Promote(fmt.Errorf("hello"), "msg"),
+		err:   errors.Promote(fmt.Errorf("hello"), "msg"),
 		wantW: "msg: hello\n",
 	}, {
 		name:  "PromoteWithPercent",
-		err:   Promote(fmt.Errorf("hello"), "msg%s"),
+		err:   errors.Promote(fmt.Errorf("hello"), "msg%s"),
 		wantW: "msg%s: hello\n",
 	}, {
 		name:  "PromoteWithEmptyString",
-		err:   Promote(fmt.Errorf("hello"), ""),
+		err:   errors.Promote(fmt.Errorf("hello"), ""),
 		wantW: "hello\n",
 	}, {
 		name:  "TwoErrors",
-		err:   Append(Promote(fmt.Errorf("hello"), "x"), Promote(fmt.Errorf("goodbye"), "y")),
+		err:   errors.Append(errors.Promote(fmt.Errorf("hello"), "x"), errors.Promote(fmt.Errorf("goodbye"), "y")),
 		wantW: "x: hello\ny: goodbye\n",
 	}, {
 		name:  "WrappedSingle",
-		err:   fmt.Errorf("wrap: %w", Promote(fmt.Errorf("hello"), "x")),
+		err:   fmt.Errorf("wrap: %w", errors.Promote(fmt.Errorf("hello"), "x")),
 		wantW: "x: hello\n",
 	}, {
 		name: "WrappedMultiple",
 		err: fmt.Errorf("wrap: %w",
-			Append(Promote(fmt.Errorf("hello"), "x"), Promote(fmt.Errorf("goodbye"), "y")),
+			errors.Append(errors.Promote(fmt.Errorf("hello"), "x"), errors.Promote(fmt.Errorf("goodbye"), "y")),
 		),
 		wantW: "x: hello\ny: goodbye\n",
 	}}
@@ -161,7 +174,7 @@ func TestPrintError(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &bytes.Buffer{}
-			Print(w, tt.err, nil)
+			errors.Print(w, tt.err, nil)
 			if gotW := w.String(); gotW != tt.wantW {
 				t.Errorf("unexpected PrintError result\ngot %q\nwant %q", gotW, tt.wantW)
 			}
@@ -170,19 +183,19 @@ func TestPrintError(t *testing.T) {
 }
 
 func TestListUnwrap(t *testing.T) {
-	a := Newf(token.NoPos, "a")
-	b := Newf(token.NoPos, "b")
-	err := Append(a, b)
+	a := &posError{Message: errors.NewMessagef("a")}
+	b := &posError{Message: errors.NewMessagef("b")}
+	err := errors.Append(a, b)
 
 	got := err.(interface{ Unwrap() []error }).Unwrap()
 	if want := []error{a, b}; !slices.Equal(got, want) {
 		t.Errorf("Unwrap() = %v, want %v", got, want)
 	}
-	if !Is(err, b) {
+	if !errors.Is(err, b) {
 		t.Errorf("Is(err, b) = false, want true")
 	}
 	var pe *posError
-	if !As(err, &pe) || pe != a {
+	if !errors.As(err, &pe) || pe != a {
 		t.Errorf("As(err, &pe) gave %v, want %v", pe, a)
 	}
 }
@@ -205,9 +218,9 @@ func TestWrappedInputPositionsSharedParent(t *testing.T) {
 	inputs := make([]token.Pos, 1, 4)
 	inputs[0] = pos(1)
 	parent := &inputsError{inputs: inputs}
-	c1 := Newf(pos(10), "c1")
-	c2 := Newf(pos(20), "c2")
-	w := Errors(Wrap(parent, Append(c1, c2)))
+	c1 := errors.Newf(pos(10), "c1")
+	c2 := errors.Newf(pos(20), "c2")
+	w := errors.Errors(errors.Wrap(parent, errors.Append(c1, c2)))
 
 	got1 := w[0].InputPositions()
 	got2 := w[1].InputPositions()

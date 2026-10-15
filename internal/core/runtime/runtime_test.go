@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package runtime
+package runtime_test
 
 import (
 	"sync"
 	"testing"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // TestBuildDataConcurrent tests that concurrent access to BuildData and
@@ -28,7 +29,7 @@ import (
 // The race occurred when one goroutine called SetBuildData (map write) while
 // another called BuildData (map read) on the same runtime's loaded map.
 func TestBuildDataConcurrent(t *testing.T) {
-	r := New()
+	r := runtime.New()
 
 	// Create multiple build instances to operate on.
 	instances := make([]*build.Instance, 10)

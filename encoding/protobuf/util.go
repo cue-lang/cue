@@ -19,6 +19,8 @@ import (
 	"slices"
 	"strings"
 	"text/scanner"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/emicklei/proto"
 
@@ -73,7 +75,10 @@ func comment(c *proto.Comment, doc bool) *ast.CommentGroup {
 func labelName(s string) string {
 	split := strings.Split(s, "_")
 	for i := 1; i < len(split); i++ {
-		split[i] = strings.Title(split[i])
+		if part := split[i]; part != "" {
+			r, size := utf8.DecodeRuneInString(part)
+			split[i] = string(unicode.ToTitle(r)) + part[size:]
+		}
 	}
 	return strings.Join(split, "")
 }

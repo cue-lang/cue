@@ -38,6 +38,7 @@ func TestExtractDefinitions(t *testing.T) {
 		"other/trailcomment.proto",
 		"other/full_references.proto",
 		"other/package_less_import.proto",
+		"other/labels.proto",
 	}
 	for _, file := range testCases {
 		t.Run(file, func(t *testing.T) {

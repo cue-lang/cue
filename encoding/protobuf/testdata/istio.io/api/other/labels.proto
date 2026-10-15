@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package labels;
+
+// Field names are converted from snake_case to camelCase.
+message Names {
+    string foo_bar = 1;
+    string foo_über = 2;
+    string foo_ǆx = 3;
+}

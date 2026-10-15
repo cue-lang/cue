@@ -249,6 +249,7 @@ func runModUpload(cmd *Command, args []string) error {
 			}
 		}
 
+		//lint:ignore SA1019 no replacement API yet
 		if err := modzip.Create(zf, mv, archive, pathAbsPairIO{}); err != nil {
 			return err
 		}

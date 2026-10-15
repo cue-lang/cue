@@ -21,6 +21,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 
+	//lint:ignore SA1019 TestCompatPackage covers the deprecated package
 	"cuelang.org/go/encoding/protobuf/cue"
 	"cuelang.org/go/encoding/protobuf/cueproto"
 )

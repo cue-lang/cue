@@ -530,6 +530,7 @@ func putModule(t *testing.T, c *Client, mv module.Version, txtarData string) []b
 func createZip(t *testing.T, mv module.Version, txtarData string) []byte {
 	ar := txtar.Parse([]byte(txtarData))
 	var zipContent bytes.Buffer
+	//lint:ignore SA1019 no replacement API yet
 	err := modzip.Create(&zipContent, mv, ar.Files, txtarFileIO{})
 	qt.Assert(t, qt.IsNil(err))
 	return zipContent.Bytes()

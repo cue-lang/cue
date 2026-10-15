@@ -763,14 +763,18 @@ func buildInstances(cmd *Command, binst []*build.Instance) ([]*instance, error) 
 	return insts, nil
 }
 
+// buildToolInstances and buildTools still use the deprecated [cue.Instance]
+// API, as [cue.Merge] and [cue.Instance.Build] have no exact replacement:
+// Merge keeps only the regular fields of each package, and Build compiles the
+// tool files in the scope of the package before unifying the two.
 func buildToolInstances(ctx *cue.Context, binst []*build.Instance) ([]*cue.Instance, error) {
 	// Reuse the same context, if there is one, so that the @embed injection can be used.
 	// Note that ctx may be nil when we do `cue help cmd`.
-	r := new(cue.Runtime)
+	r := new(cue.Runtime) //lint:ignore SA1019 see above
 	if ctx != nil {
-		r = (*cue.Runtime)(ctx)
+		r = (*cue.Runtime)(ctx) //lint:ignore SA1019 see above
 	}
-	instances, _ := r.BuildInstances(binst)
+	instances, _ := r.BuildInstances(binst) //lint:ignore SA1019 see above
 	for _, inst := range instances {
 		if inst.Err != nil {
 			return nil, inst.Err
@@ -879,7 +883,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 
 	inst := insts[0]
 	if len(insts) > 1 {
-		inst = cue.Merge(insts...)
+		inst = cue.Merge(insts...) //lint:ignore SA1019 see buildToolInstances
 	}
 
 	ctx := value.Context(inst.Value())
@@ -895,7 +899,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	// Set path equal to the package from which it is loading.
 	ti.ImportPath = binst[0].ImportPath
 
-	inst = inst.Build(ti)
+	inst = inst.Build(ti) //lint:ignore SA1019 see buildToolInstances
 	return inst, inst.Err
 }
 

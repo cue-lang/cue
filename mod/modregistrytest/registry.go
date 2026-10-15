@@ -484,6 +484,7 @@ type moduleContent struct {
 }
 
 func (c *moduleContent) writeZip(w io.Writer) error {
+	//lint:ignore SA1019 no replacement API yet
 	return modzip.Create(w, c.version, c.files, txtarFileIO{})
 }
 

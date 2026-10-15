@@ -430,10 +430,12 @@ func applyCursor(v applyVisitor, c Cursor) {
 		// Rewrite the nodes actually present in the AST rather than the
 		// synthesized view of [ast.Func.Parameters], whose discriminator
 		// between the two signature styles this condition mirrors.
-		if len(n.Params) > 0 || len(n.Args) == 0 {
+		//lint:ignore SA1019 still walk ASTs that only set the legacy Args
+		args := n.Args
+		if len(n.Params) > 0 || len(args) == 0 {
 			applyList(v, c, n.Params)
 		} else {
-			applyList(v, c, n.Args)
+			applyList(v, c, args)
 		}
 		applyIfNotNil(v, c, &n.Ret)
 		applyIfNotNil(v, c, &n.Body)

@@ -68,6 +68,7 @@ func (b *unmarshaller) build(bi *instanceData) *build.Instance {
 	p := b.ctxt.NewInstance(bi.Path, nil)
 	p.ImportPath = bi.Path
 	for _, f := range bi.Files {
+		//lint:ignore SA1019 AddFile is due to be renamed, not removed
 		_ = p.AddFile(f.Name, f.Data)
 	}
 	p.Complete()

@@ -828,7 +828,9 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		// synthesized view of [ast.Func.Parameters] (whose discriminator
 		// between the two signature styles this condition mirrors), so
 		// that f.before/f.after visit the nodes carrying the comments.
-		if len(x.Params) > 0 || len(x.Args) == 0 {
+		//lint:ignore SA1019 still print ASTs that only set the legacy Args
+		args := x.Args
+		if len(x.Params) > 0 || len(args) == 0 {
 			for _, p := range x.Params {
 				if p == nil {
 					continue
@@ -866,7 +868,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 				f.after(p)
 			}
 		} else {
-			for _, arg := range x.Args {
+			for _, arg := range args {
 				f.before(arg)
 				f.exprRaw(arg, token.LowestPrec, depth)
 				f.print(comma, blank)

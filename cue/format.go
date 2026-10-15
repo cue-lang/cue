@@ -188,6 +188,7 @@ func formatExpr(state fmt.State, n ast.Node) {
 		// TODO: 0 means no newlines.
 		opts = append(opts,
 			format.IndentWidth(tabwidth),
+			//lint:ignore SA1019 unlike Indent, it does not force formatv2
 			format.TabIndent(false))
 	}
 	// TODO: consider this.

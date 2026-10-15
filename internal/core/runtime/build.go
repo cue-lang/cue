@@ -94,6 +94,7 @@ func (r *Runtime) Compile(cfg *Config, source interface{}) (*adt.Vertex, *build.
 		filename = cfg.Filename
 	}
 	p := ctx.NewInstance(filename, nil)
+	//lint:ignore SA1019 AddFile is due to be renamed, not removed
 	if err := p.AddFile(filename, source); err != nil {
 		return nil, p
 	}

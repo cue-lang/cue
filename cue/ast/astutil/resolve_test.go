@@ -217,6 +217,7 @@ func TestResolveLegacyFuncArgs(t *testing.T) {
 				TokenPos: token.NoSpace.Pos(),
 				Value: &ast.Func{
 					Func: token.NoSpace.Pos(),
+					//lint:ignore SA1019 tests the legacy Args field
 					Args: []ast.Expr{argRef},
 					Ret:  ast.NewIdent("_"),
 				},

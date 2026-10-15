@@ -370,6 +370,7 @@ func (b *builder) build(bi *bimport) *build.Instance {
 	p := b.ctxt.NewInstance(path, nil)
 	p.ImportPath = bi.path
 	for i, f := range bi.files {
+		//lint:ignore SA1019 AddFile is due to be renamed, not removed
 		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
 	}
 	_ = p.Complete()

@@ -950,6 +950,7 @@ x: {
 					Label:    &ast.Ident{NamePos: token.Newline.Pos(), Name: "f"},
 					TokenPos: token.Blank.Pos(),
 					Value: &ast.Func{
+						//lint:ignore SA1019 tests the legacy Args field
 						Args: []ast.Expr{
 							&ast.Ident{Name: "int"},
 							&ast.Ident{Name: "string"},

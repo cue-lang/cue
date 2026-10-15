@@ -373,6 +373,7 @@ language: version: "v0.14.0"
 	bare := func() cue.Value {
 		inst := build.NewContext().NewInstance("b.cue", nil)
 		inst.ImportPath = "b"
+		//lint:ignore SA1019 AddFile is due to be renamed, not removed
 		qt.Assert(t, qt.IsNil(inst.AddFile("b.cue", src)))
 		return ctx.BuildInstance(inst)
 	}

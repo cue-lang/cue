@@ -82,8 +82,9 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	}
 
 	js, err := jsonschema.Extract(data, &jsonschema.Config{
-		Root:           oapiSchemas,
+		//lint:ignore SA1019 MapRef would need a copy of jsonschema's fragment handling
 		Map:            openAPIMapping,
+		Root:           oapiSchemas,
 		DefaultVersion: schemaVersion,
 		StrictFeatures: c.StrictFeatures,
 		// OpenAPI 3.0 is stricter than JSON Schema about allowed keywords.

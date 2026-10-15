@@ -1709,7 +1709,8 @@ func (p *parser) parseFunc() (expr ast.Expr) {
 		Ret:      ret,
 		Colon:    colon,
 		Body:     body,
-		Args:     funcParamArgs(params),
+		//lint:ignore SA1019 keep populating Args for older consumers
+		Args: funcParamArgs(params),
 	}
 }
 

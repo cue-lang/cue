@@ -175,6 +175,11 @@ func TestConvert(t *testing.T) {
 	}, {
 		&f37, "(float){ 37.0 }",
 	}, {
+		// TODO: these keep only 10 significant digits.
+		big.NewFloat(1.2345678901234567), "(float){ 1.23456789 }",
+	}, {
+		new(big.Float).SetInt(new(big.Int).Lsh(big.NewInt(1), 100)), "(float){ 1.2676506E+30 }",
+	}, {
 		&d35, "(int){ 35 }",
 	}, {
 		&n36, "(int){ -36 }",

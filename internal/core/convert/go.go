@@ -338,7 +338,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		v, _ := reflect.TypeAssert[*big.Float](val)
 		n := &adt.Num{Src: src, K: adt.FloatKind}
 		// NOTE: apd.Decimal has an API to set from a big.Int, but not from a big.Float.
-		if _, _, err := n.X.SetString(v.String()); err != nil {
+		if _, _, err := n.X.SetString(v.Text('g', -1)); err != nil {
 			return ctx.AddErr(errors.Promote(err, "invalid float"))
 		}
 		return n

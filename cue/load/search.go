@@ -584,7 +584,7 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 
 	var prevFile modimports.ModuleFile
 	var prevImportPath ast.ImportPath
-	for f, err := range modimports.AllModuleFiles(mainModRoot.FS, dir) {
+	for f, err := range modimports.AllModuleFiles(mainModRoot.FS, dir, modimports.WalkOptions{}) {
 		if err != nil {
 			// Skip just this entry; stopping would leave every package
 			// after it unloaded, and their imports unresolved.

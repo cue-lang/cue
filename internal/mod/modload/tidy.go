@@ -138,7 +138,7 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *T
 	// Note: we can ignore build tags and the fact that we might
 	// have _tool.cue and _test.cue files, because we want to include
 	// all of those, but we do need to consider @ignore() attributes.
-	rootPkgPaths, err := modimports.AllImports(withoutIgnoredFiles(modimports.AllModuleFiles(fsys, modRoot)))
+	rootPkgPaths, err := modimports.AllImports(withoutIgnoredFiles(modimports.AllModuleFiles(fsys, modRoot, modimports.WalkOptions{})))
 	if err != nil {
 		return nil, err
 	}

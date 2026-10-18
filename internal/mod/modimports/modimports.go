@@ -144,13 +144,93 @@ func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) iter.Seq2[ModuleF
 	}
 }
 
+// WalkOptions adjusts how [AllModuleFiles] walks the module. The zero value
+// walks the packages the module's ./... pattern would, less its testdata
+// rule.
+type WalkOptions struct {
+	// SkipDir decides whether the walk enters the directory at the given
+	// path, slash-separated and relative to the root of the fs: when it
+	// returns true the directory and everything below it are left out. It
+	// is not called for the root itself, nor for a cue.mod directory, which
+	// the walk of the main tree always leaves out. When nil, directories
+	// whose name starts with "." or "_" are left out.
+	SkipDir func(path string) bool
+
+	// IncludeCueModTrees also yields, after the main tree, the files under
+	// cue.mod/gen, cue.mod/pkg and cue.mod/usr, the trees the loader reaches
+	// by import path. SkipDir applies there too, with paths under cue.mod. A
+	// cue.mod directory below those trees is not a module boundary: a
+	// vendored copy of a module may carry one, and the loader reaches the
+	// files beside it all the same.
+	IncludeCueModTrees bool
+
+	// ReportLinkedDirs yields a symbolic link to a directory, which the walk
+	// does not follow, as an error wrapping [ErrLinkedDir] with the link's
+	// path, so that a caller can tell the files it is not seeing. By default
+	// such a link is passed over in silence, as the loader's ./... passes
+	// over it. A link in place of the module's own cue.mod is not reported:
+	// it is read through, as the loader reads it, and the cue.mod trees are
+	// walked behind it.
+	ReportLinkedDirs bool
+}
+
+// ErrLinkedDir is the error [AllModuleFiles] yields for a symbolic link to
+// a directory when [WalkOptions.ReportLinkedDirs] is set.
+var ErrLinkedDir = errors.New("symbolic link to a directory is not followed")
+
 // AllModuleFiles returns an iterator that produces all the CUE files inside the
-// module at the given root.
+// module at the given root, as opts selects them. A directory's files come
+// before its subdirectories, each in name order; a directory below the root
+// that holds its own cue.mod is a separate module and is left out with
+// everything below it. A symbolic link is treated as the entry it resolves
+// to, so a link to a CUE file is read through it; a link to a directory is
+// not followed.
 //
 // The caller may assume that files from the same package are always adjacent.
-func AllModuleFiles(fsys fs.FS, root string) iter.Seq2[ModuleFile, error] {
+func AllModuleFiles(fsys fs.FS, root string, opts WalkOptions) iter.Seq2[ModuleFile, error] {
+	if opts.SkipDir == nil {
+		opts.SkipDir = func(p string) bool { return isHidden(path.Base(p)) }
+	}
 	return func(yield func(ModuleFile, error) bool) {
-		yieldAllModFiles(fsys, root, true, yield)
+		if !yieldAllModFiles(fsys, root, true, false, opts, yield) {
+			return
+		}
+		if !opts.IncludeCueModTrees {
+			return
+		}
+		// The trees are read as entries of cue.mod rather than stat'ed, so
+		// that a symbolic link in place of one is seen as a link and not
+		// followed, like any other link to a directory; and SkipDir has
+		// its say on each tree as on any directory.
+		cueMod := path.Join(root, "cue.mod")
+		entries, err := fs.ReadDir(fsys, cueMod)
+		if err != nil {
+			if !errors.Is(err, fs.ErrNotExist) {
+				yield(ModuleFile{FilePath: cueMod}, err)
+			}
+			return
+		}
+		for _, sub := range []string{"gen", "pkg", "usr"} {
+			dir := path.Join(cueMod, sub)
+			i := slices.IndexFunc(entries, func(e fs.DirEntry) bool { return e.Name() == sub })
+			if i < 0 {
+				continue
+			}
+			if opts.ReportLinkedDirs && entries[i].Type()&fs.ModeSymlink != 0 {
+				if info, err := fs.Stat(fsys, dir); err == nil && info.IsDir() {
+					if !yield(ModuleFile{FilePath: dir}, fmt.Errorf("%s: %w", dir, ErrLinkedDir)) {
+						return
+					}
+					continue
+				}
+			}
+			if !entries[i].IsDir() || opts.SkipDir(dir) {
+				continue
+			}
+			if !yieldAllModFiles(fsys, dir, true, true, opts, yield) {
+				return
+			}
+		}
 	}
 }
 
@@ -161,7 +241,7 @@ func AllModuleFiles(fsys fs.FS, root string) iter.Seq2[ModuleFile, error] {
 // that `foo/` is a nested module that we should be ignoring entirely.
 // That could be avoided via extra `fs.Stat` calls, but those are extra fs calls.
 // Using [fs.ReadDir] avoids this issue entirely, as we can loop twice.
-func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFile, error) bool) bool {
+func yieldAllModFiles(fsys fs.FS, fpath string, topDir, inCueMod bool, opts WalkOptions, yield func(ModuleFile, error) bool) bool {
 	entries, err := fs.ReadDir(fsys, fpath)
 	if err != nil {
 		if !yield(ModuleFile{
@@ -170,8 +250,9 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 			return false
 		}
 	}
-	// Skip nested submodules entirely.
-	if !topDir {
+	// Skip nested submodules entirely, except under the cue.mod trees, where
+	// a cue.mod is not a boundary (see WalkOptions.IncludeCueModTrees).
+	if !topDir && !inCueMod {
 		for _, entry := range entries {
 			if entry.Name() == "cue.mod" {
 				return true
@@ -184,10 +265,29 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 		if entry.IsDir() {
 			continue
 		}
-		if isHidden(entry.Name()) {
+		if entry.Name() == "cue.mod" && !inCueMod {
+			// A link in place of cue.mod is the module's cue.mod all the
+			// same: the loader reads through it, and so do the cue.mod
+			// trees below, so it is no linked directory to report.
 			continue
 		}
 		fpath := path.Join(fpath, entry.Name())
+		if opts.ReportLinkedDirs && entry.Type()&fs.ModeSymlink != 0 {
+			// A link to a directory is judged as the directory it stands
+			// for, by SkipDir, and not by the file-name rules below: an
+			// import reaches a linked _dep as it reaches a _dep directory.
+			if info, err := fs.Stat(fsys, fpath); err == nil && info.IsDir() {
+				if !opts.SkipDir(fpath) {
+					if !yield(ModuleFile{FilePath: fpath}, fmt.Errorf("%s: %w", fpath, ErrLinkedDir)) {
+						return false
+					}
+				}
+				continue
+			}
+		}
+		if isHidden(entry.Name()) {
+			continue
+		}
 		if _, ok := yieldPackageFile(fsys, fpath, func(string) bool { return true }, yield); !ok {
 			return false
 		}
@@ -198,11 +298,14 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 		if !entry.IsDir() {
 			continue
 		}
-		if name == "cue.mod" || isHidden(name) {
+		if name == "cue.mod" {
 			continue
 		}
 		fpath := path.Join(fpath, name)
-		if !yieldAllModFiles(fsys, fpath, false, yield) {
+		if opts.SkipDir(fpath) {
+			continue
+		}
+		if !yieldAllModFiles(fsys, fpath, false, inCueMod, opts, yield) {
 			return false
 		}
 	}

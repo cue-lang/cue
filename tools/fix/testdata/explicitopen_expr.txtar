@@ -874,9 +874,9 @@ nestedOpenLitDeep: {
 		a: foo: allowed: 5
 	}
 
-	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}})
 	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
-	t3: v & {a: sib: 7}          @test(eq, {a: {foo: {allowed: 5, foo?: _}, sib: 7}}) @test(todo, why="rewritten closing stays strict")
+	t3: v & {a: sib: 7}          @test(eq, {a: {foo: {allowed: 5, foo?: _}, sib: 7}})
 }
 
 // A selector path below a definition is closed recursively like the
@@ -888,7 +888,7 @@ nestedOpenRefPath: {
 		foo: allowed: 5
 	}
 
-	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}}) @test(todo, why="rewritten closing stays strict")
+	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}})
 	t2: v & {foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 	t3: v & {sib: 7}          @test(err, code=eval, contains="field not allowed")
 }
@@ -901,7 +901,7 @@ nestedOpenLitPath: {
 		a: foo: allowed: 5
 	}
 
-	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}})
 	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 }
 
@@ -2024,13 +2024,13 @@ nestedOpenRefPlain: {
 nestedOpenLitDeep: {
 	#F: {foo?: _}
 	v: {
-		{a: foo: #F}
+		{a: foo: __closeAll({#F..., allowed?: _})}
 		a: foo: allowed: 5
 	}
 
-	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}})
 	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
-	t3: v & {a: sib: 7}          @test(eq, {a: {foo: {allowed: 5, foo?: _}, sib: 7}}) @test(todo, why="rewritten closing stays strict")
+	t3: v & {a: sib: 7}          @test(eq, {a: {foo: {allowed: 5, foo?: _}, sib: 7}})
 }
 
 // A selector path below a definition is closed recursively like the
@@ -2038,11 +2038,11 @@ nestedOpenLitDeep: {
 nestedOpenRefPath: {
 	#D: a: foo: {foo?: _}
 	v: close({
-		{foo?: #D.a.foo}
+		{foo?: __closeAll({#D.a.foo..., allowed?: _})}
 		foo: allowed: 5
 	})
 
-	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}}) @test(todo, why="rewritten closing stays strict")
+	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}})
 	t2: v & {foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 	t3: v & {sib: 7}          @test(err, code=eval, contains="field not allowed")
 }
@@ -2051,11 +2051,11 @@ nestedOpenRefPath: {
 nestedOpenLitPath: {
 	#D: a: foo: {foo?: _}
 	v: {
-		{a: foo: #D.a.foo}
+		{a: foo: __closeAll({#D.a.foo..., allowed?: _})}
 		a: foo: allowed: 5
 	}
 
-	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}})
 	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 }
 

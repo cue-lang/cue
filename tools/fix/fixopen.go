@@ -1195,6 +1195,11 @@ func widenClosing(expr ast.Expr, decls []ast.Decl, closed bool) (result ast.Expr
 			ast.SetRelPos(lit, token.NoSpace)
 			return ast.NewCall(ast.NewIdent("__closeAll"), lit), true
 		}
+		// An open literal denies nothing itself, but the values it
+		// declares at the extended paths may.
+		if lit, ok := unparen(expr).(*ast.StructLit); ok {
+			return expr, widenFields(lit, decls, false, false)
+		}
 		return expr, false
 	}
 	for _, d := range s.Elts {
@@ -1208,10 +1213,12 @@ func widenClosing(expr ast.Expr, decls []ast.Decl, closed bool) (result ast.Expr
 }
 
 // definitionRef returns the definition which expr provably references: an
-// identifier or a selector naming one, in either case possibly wrapped in
-// struct literals which embed nothing else, as { X } is equivalent to X.
-// A definition is closed, and closed recursively, so spreading it and
-// closing the union again reproduces the old widening of it.
+// identifier or a selector naming one, or a selector path below one, in
+// any case possibly wrapped in struct literals which embed nothing else,
+// as { X } is equivalent to X. A definition is closed, and closed
+// recursively, so spreading it and closing the union again reproduces
+// the old widening of it. A name is taken for a definition by its prefix
+// alone; an alias or let which borrows the prefix is not told apart.
 //
 // Any other reference has a closedness this fix cannot know. Spreading it
 // would open the closedness of its fields for every conjunct, which the
@@ -1229,6 +1236,9 @@ func definitionRef(expr ast.Expr) (ast.Expr, bool) {
 		}
 	case *ast.SelectorExpr:
 		if id, ok := x.Sel.(*ast.Ident); ok && internal.IsDef(id.Name) {
+			return x, true
+		}
+		if _, ok := definitionRef(x.X); ok {
 			return x, true
 		}
 	}

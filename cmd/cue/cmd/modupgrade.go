@@ -77,9 +77,6 @@ cue.mod/module.cue has no language version must run cue mod fix first.
 `,
 		RunE: mkRunE(c, runModUpgrade),
 		Args: cobra.ExactArgs(1),
-
-		// TODO(upgrade): hide until we are happy for users to rely on it.
-		Hidden: true,
 	}
 
 	cmd.Flags().BoolP(string(flagForce), "f", false,

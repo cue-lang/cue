@@ -22,6 +22,18 @@ exec cue mod --help
 stdout -count=1 'groups commands which operate on CUE modules'
 stdout -count=1 'publish *publish the current module to a registry$'
 
+# cue mod upgrade is listed, and its help states what it selects, what it
+# skips, what --force does, and the way to convert without changing the
+# version.
+exec cue help mod
+stdout -count=1 'upgrade *upgrade the module to a new language version$'
+
+exec cue help mod upgrade
+stdout -count=1 'cue\.mod/gen'
+stdout 'skipped'
+stdout '\-\-force'
+stdout 'cue fix -f --exp'
+
 exec cue help mod publish
 stdout -count=1 '^Publish the current module to an OCI registry\.'
 

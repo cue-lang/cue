@@ -1,0 +1,32 @@
+# TestLatest: skip
+# Files without a package clause form the anonymous package of their
+# directory, which the loader combines, so the sanitizer must see them
+# together: the field named self in a.cue makes the alias rewrite in b.cue
+# bind to __self.
+
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp a.cue _expect/a.cue.want
+cmp b.cue _expect/b.cue.want
+exec cue vet a.cue b.cue
+
+-- cue.mod/module.cue --
+module: "test.example"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+self: 42
+-- b.cue --
+foo: X={
+	i: X.a
+	a: 1
+}
+-- _expect/a.cue.want --
+self: 42
+-- _expect/b.cue.want --
+foo: {
+	let X = __self
+	i: X.a
+	a: 1
+}

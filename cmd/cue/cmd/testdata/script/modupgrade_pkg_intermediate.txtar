@@ -1,0 +1,76 @@
+# TestLatest: skip
+# A vendored package under cue.mod/pkg whose path has intermediate
+# directories holding no files, and an unimported package under
+# cue.mod/usr. A compatibility guard: the empty intermediates must cause
+# no error, as they did not before the walk replaced loading, and the
+# unimported package is converted too, so a later import does not fail at
+# the new version.
+
+exec cue export .
+cp stdout export.before
+
+exec cue mod upgrade v0.18.0
+! stderr .
+
+cmp cue.mod/module.cue _expect/module.cue.want
+cmp cue.mod/pkg/github.com/org/repo/sub/sub.cue _expect/sub.cue.want
+cmp cue.mod/usr/example.com/unused/u.cue _expect/u.cue.want
+
+exec cue export .
+cmp stdout export.before
+exec cue vet .
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.14.0"
+
+-- main.cue --
+package main
+
+import "github.com/org/repo/sub"
+
+x: sub.#S & {a: 1}
+-- cue.mod/pkg/github.com/org/repo/sub/sub.cue --
+package sub
+
+#A: a: int
+
+#S: {
+	#A
+	b: int | *2
+}
+
+Y=v: {c: Y.d, d: 1}
+-- cue.mod/usr/example.com/unused/u.cue --
+package unused
+
+#A: a: int
+
+#U: {
+	#A
+	b: int
+}
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/sub.cue.want --
+package sub
+
+#A: a: int
+
+#S: {
+	#A...
+	b: int | *2
+}
+
+v~(Y): {c: Y.d, d: 1}
+-- _expect/u.cue.want --
+package unused
+
+#A: a: int
+
+#U: {
+	#A...
+	b: int
+}

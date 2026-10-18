@@ -1,0 +1,47 @@
+readonly b.cue
+exit 1
+rerun
+
+A rerun after a partial write converges to what one run produces. The
+first run writes a.cue and fails on b.cue, so the version stays. The
+rerun finds a.cue in the target's form: it no longer parses at the old
+version, but it parses at the target, so it joins its package as it is,
+and the sanitizer sees the field named self it declares; b.cue is then
+rewritten with __self, as a one-shot run would write it, and the version
+is bumped.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+package x
+
+self: a: 99
+Y=z: {c: Y.d, d: 1}
+-- b.cue --
+package x
+
+foo: X={i: X.a, a: 1}
+-- expect/stderr --
+b.cue: write: permission denied
+mod upgrade: 1 file(s) could not be written; language version left at v0.15.0
+-- expect/a.cue --
+package x
+
+self: a: 99
+z~(Y): {c: Y.d, d: 1}
+-- expect2/stderr --
+-- expect2/a.cue --
+package x
+
+self: a: 99
+z~(Y): {c: Y.d, d: 1}
+-- expect2/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"
+-- expect2/b.cue --
+package x
+
+foo: {let X = __self, i: X.a, a: 1}

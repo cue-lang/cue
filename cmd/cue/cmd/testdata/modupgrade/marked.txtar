@@ -1,0 +1,40 @@
+exit 0
+
+The explicitopen rewrite marks a place whose meaning changed with a
+TODO(cue-fix) comment. The upgrade still completes, and the summary names
+the file so the author knows to review it.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package p
+
+#A: {a: int}
+
+x: {
+	c: bool
+	if c {
+		#A
+	}
+}
+-- expect/stderr --
+mod upgrade: review the TODO(cue-fix) comments the rewrite added in: a.cue
+-- expect/a.cue --
+package p
+
+#A: {a: int}
+
+x: {
+	c: bool
+	if c {
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the
+		// comprehension fired; this is no longer the case.
+		#A...
+	}
+}
+-- expect/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"

@@ -1,0 +1,43 @@
+readonly b.cue
+exit 1
+rerun
+
+A write that fails partway is reported, and the module file is not
+written: the module never claims a version while a file it evaluates is
+still in the old form. Once the file is writable, a rerun converges: the
+file already converted joins its package in the target's form and is
+reported as nothing, the rest
+converts, and the version is bumped.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package p
+
+X=a: {b: X.c, c: 1}
+-- b.cue --
+package p
+
+Y=b: {c: Y.d, d: 1}
+-- expect/stderr --
+b.cue: write: permission denied
+mod upgrade: 1 file(s) could not be written; language version left at v0.17.0
+-- expect/a.cue --
+package p
+
+a~(X): {b: X.c, c: 1}
+-- expect2/stderr --
+-- expect2/a.cue --
+package p
+
+a~(X): {b: X.c, c: 1}
+-- expect2/b.cue --
+package p
+
+b~(Y): {c: Y.d, d: 1}
+-- expect2/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"

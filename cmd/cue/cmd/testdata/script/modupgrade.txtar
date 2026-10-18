@@ -8,6 +8,7 @@ exec cue export .
 cp stdout export.before
 
 exec cue mod upgrade v0.18.0
+! stderr .
 
 cmp in.cue expect/out
 cmp cue.mod/module.cue expect/outmod

@@ -1,0 +1,53 @@
+# TestLatest: skip
+# Compatibility guard: a sibling file declares a top-level field named
+# self, so the alias rewrite in the other file must bind to __self. This
+# passes through the package-based path too; it is kept so that selecting
+# files without loading packages can never sanitize a file on its own.
+# Replays tools/fix/testdata/crossfile_self.txtar through the upgrade.
+
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp a.cue _expect/a.cue.want
+cmp b.cue _expect/b.cue.want
+exec cue vet .
+
+-- cue.mod/module.cue --
+module: "test.example"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+// This file defines a top-level field named "self" that shadows
+// the predeclared "self" identifier.
+package foo
+
+self: 42
+-- b.cue --
+// This file uses a value alias that converts to "let X = self".
+// Since "self" is shadowed by a top-level field in a.cue, the
+// generated code should use "__self" instead.
+package foo
+
+// Value alias conversion should detect cross-file shadowing
+foo: X={
+	i: X.a
+	a: 1
+}
+-- _expect/a.cue.want --
+// This file defines a top-level field named "self" that shadows
+// the predeclared "self" identifier.
+package foo
+
+self: 42
+-- _expect/b.cue.want --
+// This file uses a value alias that converts to "let X = self".
+// Since "self" is shadowed by a top-level field in a.cue, the
+// generated code should use "__self" instead.
+package foo
+
+// Value alias conversion should detect cross-file shadowing
+foo: {
+	let X = __self
+	i: X.a
+	a: 1
+}

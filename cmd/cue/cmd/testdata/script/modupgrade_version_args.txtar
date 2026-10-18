@@ -1,0 +1,39 @@
+# TestLatest: skip
+# The version argument is checked before anything is read or written: it
+# must be valid, no newer than this cue's language version, and no older
+# than the module's. Upgrading to the module's own version is nothing to
+# do, and says so.
+
+! exec cue mod upgrade bogus
+stderr 'invalid version "bogus"'
+
+! exec cue mod upgrade v9.0.0
+stderr 'too new'
+
+! exec cue mod upgrade v0.13.0
+stderr 'older than'
+
+exec cue mod upgrade v0.14.0
+stderr 'module is already at v0.14.0'
+
+cmp a.cue _expect/a.cue.want
+cmp cue.mod/module.cue _expect/module.cue.want
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.14.0"
+
+-- a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- _expect/a.cue.want --
+package a
+
+X=a: {b: X.c, c: 1}
+-- _expect/module.cue.want --
+module: "mod.test"
+
+language: version: "v0.14.0"
+

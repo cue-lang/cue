@@ -1,0 +1,92 @@
+# TestLatest: skip
+# A directory below the root that holds its own cue.mod is a separate
+# module: cue mod upgrade leaves it alone entirely, its files and its
+# module file, however deep it sits and whatever version it declares. It
+# is upgraded on its own, from inside it, and that upgrade stops at its
+# own root: the enclosing module's files are not touched either.
+
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp cue.mod/module.cue _expect/module.cue.want
+cmp a.cue _expect/a.cue.want
+cmp lib/nested/cue.mod/module.cue _expect/nested_module_before.cue.want
+cmp lib/nested/n.cue _expect/nested_n_before.cue.want
+cmp lib/nested/deep/d.cue _expect/nested_d_before.cue.want
+
+cd lib/nested
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp cue.mod/module.cue ../../_expect/nested_module_after.cue.want
+cmp n.cue ../../_expect/nested_n_after.cue.want
+cmp deep/d.cue ../../_expect/nested_d_after.cue.want
+cd ../..
+cmp a.cue _expect/a.cue.want
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- lib/nested/cue.mod/module.cue --
+module: "nested.test"
+
+language: version: "v0.14.0"
+
+-- lib/nested/n.cue --
+package n
+
+Y=n: {c: Y.d, d: 1}
+-- lib/nested/deep/d.cue --
+package deep
+
+#A: a: int
+
+#D: {
+	#A
+	b: int
+}
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/a.cue.want --
+package a
+
+a~(X): {b: X.c, c: 1}
+-- _expect/nested_module_before.cue.want --
+module: "nested.test"
+
+language: version: "v0.14.0"
+
+-- _expect/nested_n_before.cue.want --
+package n
+
+Y=n: {c: Y.d, d: 1}
+-- _expect/nested_d_before.cue.want --
+package deep
+
+#A: a: int
+
+#D: {
+	#A
+	b: int
+}
+-- _expect/nested_module_after.cue.want --
+module: "nested.test"
+language: version: "v0.18.0"
+-- _expect/nested_n_after.cue.want --
+package n
+
+n~(Y): {c: Y.d, d: 1}
+-- _expect/nested_d_after.cue.want --
+package deep
+
+#A: a: int
+
+#D: {
+	#A...
+	b: int
+}

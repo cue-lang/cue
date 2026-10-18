@@ -1,0 +1,121 @@
+# TestLatest: skip
+# Symbolic links to files are read through, as the loader reads them. A
+# link to a file of the module is converted once, through its own path, so
+# the link sees the converted file; so is a link into a _ directory, whose
+# files are walked too. A link to a file outside the module or into a
+# nested module, and a link to a directory, a _-prefixed one included, are
+# not written through nor followed: the loader still reads them, so leaving
+# them unconverted would break the module at the new version, and they fail
+# the upgrade like any file that cannot be converted. --force writes the rest and bumps the
+# version regardless; the failures are still reported, and the exit status
+# is 1.
+
+[windows] skip 'symbolic links'
+
+symlink m/link.cue -> a.cue
+symlink m/out.cue -> ../outside.cue
+symlink m/linkx.cue -> _dir/x.cue
+symlink m/linkdir -> sub
+symlink m/_linkdir -> sub
+symlink m/linkn.cue -> nested/n.cue
+
+cd m
+! exec cue mod upgrade v0.18.0
+cmp stderr ../_expect/stderr
+cmp a.cue ../_expect/a_before.cue.want
+cmp cue.mod/module.cue ../_expect/module_before.cue.want
+
+! exec cue mod upgrade --force v0.18.0
+cmp stderr ../_expect/stderr_force
+cmp a.cue ../_expect/a.cue.want
+cmp link.cue ../_expect/a.cue.want
+cmp _dir/x.cue ../_expect/x.cue.want
+cmp sub/s.cue ../_expect/s.cue.want
+cmp ../outside.cue ../_expect/outside.cue.want
+cmp nested/n.cue ../_expect/n.cue.want
+cmp nested/cue.mod/module.cue ../_expect/nested_module.cue.want
+cmp cue.mod/module.cue ../_expect/module.cue.want
+
+-- m/cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- m/a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- m/_dir/x.cue --
+package x
+
+Y=x: {c: Y.d, d: 1}
+-- m/sub/s.cue --
+package s
+
+Z=s: {c: Z.d, d: 1}
+-- m/nested/cue.mod/module.cue --
+module: "nested.test"
+
+language: version: "v0.17.0"
+
+-- m/nested/n.cue --
+package n
+
+N=n: {c: N.d, d: 1}
+-- outside.cue --
+package o
+
+W=o: {c: W.d, d: 1}
+-- _expect/stderr --
+_linkdir: symbolic link to a directory is not followed
+linkdir: symbolic link to a directory is not followed
+linkn.cue: symbolic link into a nested module is not written through
+out.cue: symbolic link to a file outside the module is not written through
+mod upgrade: 4 file(s) could not be converted; nothing written, language version left at v0.17.0
+    to convert the other files now and stay at v0.17.0, then fix the files above by hand and run the upgrade again:
+        cue fix -f --exp=aliasv2,explicitopen
+    to upgrade anyway, leaving those files invalid at v0.18.0:
+        cue mod upgrade --force v0.18.0
+-- _expect/stderr_force --
+_linkdir: symbolic link to a directory is not followed
+linkdir: symbolic link to a directory is not followed
+linkn.cue: symbolic link into a nested module is not written through
+out.cue: symbolic link to a file outside the module is not written through
+mod upgrade: 4 file(s) could not be converted; language version set to v0.18.0 (--force)
+-- _expect/a_before.cue.want --
+package a
+
+X=a: {b: X.c, c: 1}
+-- _expect/module_before.cue.want --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- _expect/a.cue.want --
+package a
+
+a~(X): {b: X.c, c: 1}
+-- _expect/x.cue.want --
+package x
+
+x~(Y): {c: Y.d, d: 1}
+-- _expect/s.cue.want --
+package s
+
+s~(Z): {c: Z.d, d: 1}
+-- _expect/outside.cue.want --
+package o
+
+W=o: {c: W.d, d: 1}
+-- _expect/n.cue.want --
+package n
+
+N=n: {c: N.d, d: 1}
+-- _expect/nested_module.cue.want --
+module: "nested.test"
+
+language: version: "v0.17.0"
+
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"

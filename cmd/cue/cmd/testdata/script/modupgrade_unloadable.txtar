@@ -1,0 +1,80 @@
+# TestLatest: skip
+# Packages that do not load — an import nobody provides, a directory with
+# files of two packages — are rewritten all the same: the upgrade parses
+# files, it does not load packages. Before this worked, any load error
+# stopped the whole upgrade and nothing was written.
+
+exec cue export ./good
+cp stdout export.before
+
+exec cue mod upgrade v0.18.0
+! stderr .
+
+cmp cue.mod/module.cue _expect/module.cue.want
+cmp missing/m.cue _expect/m.cue.want
+cmp mixed/a.cue _expect/mixed_a.cue.want
+cmp mixed/b.cue _expect/mixed_b.cue.want
+cmp good/g.cue _expect/g.cue.want
+
+exec cue export ./good
+cmp stdout export.before
+exec cue vet ./good
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.14.0"
+
+-- missing/m.cue --
+package missing
+
+import "example.com/nobody/provides"
+
+X=a: {b: X.c, c: provides.v}
+-- mixed/a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- mixed/b.cue --
+package b
+
+X=a: {b: X.c, c: 2}
+-- good/g.cue --
+package good
+
+#A: a: int
+
+#G: {
+	#A
+	b: int | *2
+}
+
+g: #G & {a: 1}
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/m.cue.want --
+package missing
+
+import "example.com/nobody/provides"
+
+a~(X): {b: X.c, c: provides.v}
+-- _expect/mixed_a.cue.want --
+package a
+
+a~(X): {b: X.c, c: 1}
+-- _expect/mixed_b.cue.want --
+package b
+
+a~(X): {b: X.c, c: 2}
+-- _expect/g.cue.want --
+package good
+
+#A: a: int
+
+#G: {
+	#A...
+	b: int | *2
+}
+
+g: #G & {a: 1}

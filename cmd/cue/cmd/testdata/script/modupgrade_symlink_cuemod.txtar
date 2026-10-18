@@ -1,0 +1,50 @@
+# TestLatest: skip
+# A module whose cue.mod is a symbolic link to a directory elsewhere, as a
+# shared vendoring setup has it. The loader reads through the link, so the
+# upgrade does too: the files under cue.mod/pkg are converted in place, the
+# shared module.cue is bumped, and the link is no linked directory to
+# report.
+
+[windows] skip 'symbolic links'
+
+symlink m/cue.mod -> ../shared
+
+cd m
+exec cue export .
+cp stdout before.json
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp m.cue ../_expect/m.cue.want
+cmp ../shared/pkg/example.com/p/p.cue ../_expect/p.cue.want
+cmp ../shared/module.cue ../_expect/module.cue.want
+exec cue export .
+cmp stdout before.json
+
+-- shared/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- shared/pkg/example.com/p/p.cue --
+package p
+
+X=p: {b: X.c, c: 1}
+-- m/m.cue --
+package m
+
+import "example.com/p"
+
+Y=m: {b: Y.c, c: p.p.c}
+-- _expect/m.cue.want --
+package m
+
+import "example.com/p"
+
+m~(Y): {b: Y.c, c: p.p.c}
+-- _expect/p.cue.want --
+package p
+
+p~(X): {b: X.c, c: 1}
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"

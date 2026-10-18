@@ -1,0 +1,26 @@
+fail b.cue
+exit 1
+
+The module is older than the experiments' preview versions, so there is
+no "stay at this version" conversion to offer: the report says so instead
+of printing a cue fix command that would be refused.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.9.0"
+
+-- a.cue --
+package p
+
+X=a: {b: X.c, c: 1}
+-- b.cue --
+package p
+
+Y=b: {c: Y.d, d: 1}
+-- expect/stderr --
+b.cue:1:1: injected rewrite failure
+mod upgrade: 1 file(s) could not be converted; nothing written, language version left at v0.9.0
+    v0.9.0 cannot carry @experiment attributes for aliasv2,explicitopen: fix the files above by hand, then run the upgrade again
+    to upgrade anyway, leaving those files invalid at v0.18.0:
+        cue mod upgrade --force v0.18.0

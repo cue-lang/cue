@@ -1,0 +1,43 @@
+# An experiment that does not exist is refused whatever the module holds:
+# a parseable file, nothing, or only a file the parser rejects. Nothing is
+# written.
+
+! exec cue fix --exp=nonexistent
+stderr 'nonexistent'
+cmp a.cue a.cue.orig
+
+cd empty
+! exec cue fix --exp=nonexistent
+stderr 'nonexistent'
+cd ..
+
+cd broken
+! exec cue fix --exp=nonexistent
+stderr 'nonexistent'
+cd ..
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- a.cue.orig --
+package a
+
+X=a: {b: X.c, c: 1}
+-- empty/cue.mod/module.cue --
+module: "empty.test"
+
+language: version: "v0.17.0"
+
+-- broken/cue.mod/module.cue --
+module: "broken.test"
+
+language: version: "v0.17.0"
+
+-- broken/site.cue --
+{{ define "main" }}<p>{{ .Title }}</p>{{ end }}

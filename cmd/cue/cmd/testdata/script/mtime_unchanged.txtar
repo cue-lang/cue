@@ -57,6 +57,14 @@ exec cue trim ./trimmed
 mod-time trimmed/x.cue
 cmp stdout mod-time-trim
 
+# cue mod upgrade does not touch a file the upgrade leaves unchanged, even
+# though it writes the module file.
+mod-time nofix.cue
+cp stdout mod-time-modupgrade
+exec cue mod upgrade v0.18.0
+mod-time nofix.cue
+cmp stdout mod-time-modupgrade
+
 -- fmt.cue --
 package fmt
 

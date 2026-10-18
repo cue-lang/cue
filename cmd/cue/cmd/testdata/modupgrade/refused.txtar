@@ -1,0 +1,39 @@
+fail b.cue
+exit 1
+rerun
+
+A rewrite fails without --force: nothing is written, not even the files
+that converted, the version stays, and the report names both ways
+forward. Once the failure is gone, a rerun converts everything.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package p
+
+X=a: {b: X.c, c: 1}
+-- b.cue --
+package p
+
+Y=b: {c: Y.d, d: 1}
+-- expect/stderr --
+b.cue:1:1: injected rewrite failure
+mod upgrade: 1 file(s) could not be converted; nothing written, language version left at v0.17.0
+    to convert the other files now and stay at v0.17.0, then fix the files above by hand and run the upgrade again:
+        cue fix -f --exp=aliasv2,explicitopen
+    to upgrade anyway, leaving those files invalid at v0.18.0:
+        cue mod upgrade --force v0.18.0
+-- expect2/a.cue --
+package p
+
+a~(X): {b: X.c, c: 1}
+-- expect2/b.cue --
+package p
+
+b~(Y): {c: Y.d, d: 1}
+-- expect2/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"

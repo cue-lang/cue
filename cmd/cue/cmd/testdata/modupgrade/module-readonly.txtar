@@ -1,0 +1,72 @@
+readonly cue.mod/module.cue
+exit 1
+rerun
+
+The module file itself cannot be written: the files were converted and
+are on disk, the failure is reported like any other write, and the
+version stays. A rerun, once the module file is writable, finds the
+files already in the target's form, which join their packages as they
+are and are reported as nothing, and bumps the version.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package p
+
+#A: {a: int}
+
+x: {
+	c: bool
+	if c {
+		#A
+	}
+}
+-- b.cue --
+package p
+
+Y=b: {c: Y.d, d: 1}
+-- expect/stderr --
+cue.mod/module.cue: write: permission denied
+mod upgrade: 1 file(s) could not be written; language version left at v0.17.0
+mod upgrade: review the TODO(cue-fix) comments the rewrite added in: a.cue
+-- expect/a.cue --
+package p
+
+#A: {a: int}
+
+x: {
+	c: bool
+	if c {
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the
+		// comprehension fired; this is no longer the case.
+		#A...
+	}
+}
+-- expect/b.cue --
+package p
+
+b~(Y): {c: Y.d, d: 1}
+-- expect2/stderr --
+-- expect2/a.cue --
+package p
+
+#A: {a: int}
+
+x: {
+	c: bool
+	if c {
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the
+		// comprehension fired; this is no longer the case.
+		#A...
+	}
+}
+-- expect2/b.cue --
+package p
+
+b~(Y): {c: Y.d, d: 1}
+-- expect2/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"

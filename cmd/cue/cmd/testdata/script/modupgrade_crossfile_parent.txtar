@@ -1,0 +1,41 @@
+# TestLatest: skip
+# Compatibility guard: the field named self is declared by the parent
+# directory's package, which a package in a subdirectory of the same name
+# inherits from. The alias rewrite in the child must still bind to __self.
+# Grouping files by directory alone would miss the parent; grouping by
+# package name across the module does not.
+
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp a.cue _expect/a.cue.want
+cmp sub/b.cue _expect/b.cue.want
+exec cue vet ./sub
+
+-- cue.mod/module.cue --
+module: "test.example"
+
+language: version: "v0.15.0"
+
+-- a.cue --
+package foo
+
+self: 42
+-- sub/b.cue --
+package foo
+
+foo: X={
+	i: X.a
+	a: 1
+}
+-- _expect/a.cue.want --
+package foo
+
+self: 42
+-- _expect/b.cue.want --
+package foo
+
+foo: {
+	let X = __self
+	i: X.a
+	a: 1
+}

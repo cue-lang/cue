@@ -1,0 +1,70 @@
+# TestLatest: skip
+# A module whose root package imports a generated package under
+# cue.mod/gen, written in syntax that v0.18.0 no longer accepts. The upgrade
+# must convert the generated files with the module: they are evaluated at
+# the module's language version like any other file. Before this worked,
+# the upgrade passed the generated directories to the loader as import
+# paths and failed with "cannot find module providing package k8s.io/api".
+
+exec cue export .
+cp stdout export.before
+
+exec cue mod upgrade v0.18.0
+! stderr .
+
+cmp cue.mod/module.cue _expect/module.cue.want
+cmp main.cue _expect/main.cue.want
+cmp cue.mod/gen/k8s.io/api/core/v1/pod.cue _expect/pod.cue.want
+cmp cue.mod/gen/k8s.io/api/core/v1/list.cue _expect/list.cue.want
+
+# The upgraded module exports the same data and is valid at its new version.
+exec cue export .
+cmp stdout export.before
+exec cue vet .
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.14.0"
+
+-- main.cue --
+package main
+
+import "k8s.io/api/core/v1"
+
+p: v1.#Pod & {name: "x"}
+-- cue.mod/gen/k8s.io/api/core/v1/pod.cue --
+package v1
+
+#ObjectMeta: name: string
+
+#Pod: {
+	#ObjectMeta
+	spec: {}
+}
+-- cue.mod/gen/k8s.io/api/core/v1/list.cue --
+package v1
+
+#List: [Name=string]: n?: Name
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/main.cue.want --
+package main
+
+import "k8s.io/api/core/v1"
+
+p: v1.#Pod & {name: "x"}
+-- _expect/pod.cue.want --
+package v1
+
+#ObjectMeta: name: string
+
+#Pod: {
+	#ObjectMeta...
+	spec: {}
+}
+-- _expect/list.cue.want --
+package v1
+
+#List: [string]~(Name,_): n?: Name

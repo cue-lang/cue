@@ -1,0 +1,38 @@
+# TestLatest: skip
+# The language version is module-wide, so an upgrade started in a
+# subdirectory upgrades the whole module, files above the working
+# directory included.
+
+cd sub
+exec cue mod upgrade v0.18.0
+! stderr .
+cd ..
+
+cmp cue.mod/module.cue _expect/module.cue.want
+cmp a.cue _expect/a.cue.want
+cmp sub/b.cue _expect/b.cue.want
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.14.0"
+
+-- a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- sub/b.cue --
+package b
+
+Y=b: {c: Y.d, d: 1}
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/a.cue.want --
+package a
+
+a~(X): {b: X.c, c: 1}
+-- _expect/b.cue.want --
+package b
+
+b~(Y): {c: Y.d, d: 1}

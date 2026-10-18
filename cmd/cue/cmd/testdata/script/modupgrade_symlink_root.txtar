@@ -1,0 +1,43 @@
+# TestLatest: skip
+# The module is entered through a symbolic link, so the working directory
+# the command sees is a path through that link. The module's files are the
+# same, and all of them are upgraded. Before this worked, the walk took
+# the linked root for a link and skipped the whole main tree, while the
+# version was still bumped.
+
+[!unix] skip 'no symbolic links available for this test'
+
+symlink link -> mod
+cd link
+exec cue mod upgrade v0.18.0
+! stderr .
+cd ..
+
+cmp mod/cue.mod/module.cue _expect/module.cue.want
+cmp mod/a.cue _expect/a.cue.want
+cmp mod/sub/b.cue _expect/b.cue.want
+
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.14.0"
+
+-- mod/a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- mod/sub/b.cue --
+package b
+
+Y=b: {c: Y.d, d: 1}
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/a.cue.want --
+package a
+
+a~(X): {b: X.c, c: 1}
+-- _expect/b.cue.want --
+package b
+
+b~(Y): {c: Y.d, d: 1}

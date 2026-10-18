@@ -1,0 +1,34 @@
+fail b.cue
+f
+exit 1
+
+With -f and both a failed rewrite and a skipped file, the summary
+accounts for both, and the skipped file is reported in walk order with
+the failure.
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package p
+
+X=a: {b: X.c, c: 1}
+-- b.cue --
+package p
+
+Y=b: {c: Y.d, d: 1}
+-- site/layout.cue --
+{{ define "main" }}<p>{{ .Title }}</p>{{ end }}
+-- expect/stderr --
+b.cue:1:1: injected rewrite failure
+site/layout.cue:1:11: skipped: expected label or ':', found 'STRING' "main"
+mod upgrade: 1 file(s) could not be converted, 1 skipped; language version set to v0.18.0 (--force)
+-- expect/a.cue --
+package p
+
+a~(X): {b: X.c, c: 1}
+-- expect/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"

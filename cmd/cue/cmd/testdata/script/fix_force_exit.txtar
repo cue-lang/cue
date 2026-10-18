@@ -1,0 +1,47 @@
+# TestLatest: skip
+# cue fix -f proceeds past errors, but it no longer pretends they did not
+# happen: the errors it passed over are printed and the exit status is 1.
+# Before this change they were discarded and the status was 0.
+
+! exec cue fix -f --exp=aliasv2 ./missing
+stderr 'cannot find package "example.com/nobody/provides"'
+
+# With a pattern, a package whose import fails does not take the other
+# packages down with it: they are still rewritten, the error is printed
+# and the exit status is 1.
+! exec cue fix -f --exp=aliasv2 ./...
+stderr 'cannot find package "example.com/nobody/provides"'
+cmp ok/o.cue _expect/o.cue.want
+
+# Without package arguments, a file the parser rejects at the module's
+# version is skipped and reported; that alone does not fail the command.
+exec cue fix --exp=aliasv2
+stderr 'site/layout.cue:1:11: skipped: '
+cmp ok/o.cue _expect/o.cue.want
+cmp site/layout.cue _expect/layout.cue.want
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- missing/m.cue --
+package missing
+
+import "example.com/nobody/provides"
+
+X=a: {b: X.c, c: provides.v}
+-- ok/o.cue --
+package ok
+
+X=a: {b: X.c, c: 1}
+-- site/layout.cue --
+{{ define "main" }}<p>{{ .Title }}</p>{{ end }}
+-- _expect/o.cue.want --
+@experiment(aliasv2)
+
+package ok
+
+a~(X): {b: X.c, c: 1}
+-- _expect/layout.cue.want --
+{{ define "main" }}<p>{{ .Title }}</p>{{ end }}

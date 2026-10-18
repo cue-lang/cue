@@ -1,0 +1,53 @@
+# TestLatest: skip
+# A file the parser rejects at the module's current version is left as it
+# is and reported as skipped, and does not stop the upgrade: a Hugo template
+# with a .cue name, and a file already written in v0.18.0 syntax. The second
+# parses at the target, so it joins its package as it is and is reported as
+# nothing. Before this worked, the parse error stopped the whole upgrade.
+
+exec cue export .
+cp stdout export.before
+
+exec cue mod upgrade v0.18.0
+cmp stderr _expect/stderr
+
+cmp cue.mod/module.cue _expect/module.cue.want
+cmp a.cue _expect/a.cue.want
+cmp new/x.cue _expect/x.cue.want
+cmp site/layout.cue _expect/layout.cue.want
+
+exec cue export .
+cmp stdout export.before
+exec cue vet ./new
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package a
+
+X=a: {b: X.c, c: 1}
+-- new/x.cue --
+package x
+
+a~(X): {b: X.c, c: 1}
+-- site/layout.cue --
+{{ define "main" }}<p>{{ .Title }}</p>{{ end }}
+-- _expect/stderr --
+site/layout.cue:1:11: skipped: expected label or ':', found 'STRING' "main"
+mod upgrade: language version set to v0.18.0; 1 file(s) skipped
+-- _expect/module.cue.want --
+module: "mod.test"
+language: version: "v0.18.0"
+-- _expect/a.cue.want --
+package a
+
+a~(X): {b: X.c, c: 1}
+-- _expect/x.cue.want --
+package x
+
+a~(X): {b: X.c, c: 1}
+-- _expect/layout.cue.want --
+{{ define "main" }}<p>{{ .Title }}</p>{{ end }}

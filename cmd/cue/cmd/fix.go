@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"io/fs"
-	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -36,7 +34,20 @@ func newFixCmd(c *Command) *cobra.Command {
 After you update to a new CUE release, fix helps make the necessary changes
 to your program.
 
-Without any packages, fix applies to all files within a module.
+Without any packages, fix applies to every file of the module, from
+whichever directory it is run: the files of the module's own tree, the
+packages ./... denotes from the module root and _ and testdata
+directories included, and every CUE file under cue.mod/gen, cue.mod/pkg
+and cue.mod/usr, found by walking the module and rewritten one package at
+a time without loading, so a package whose import cannot be resolved is
+rewritten all the same. Symbolic links are handled as cue mod upgrade
+handles them. A file the parser rejects at the module's language version
+is skipped and reported. With packages named, the loader selects the
+files, and its errors are reported.
+
+A file that cannot be rewritten stops fix from writing anything, unless
+-f is given, in which case the files that converted are written; either
+way the errors are printed and the exit status is non-zero.
 
 
 Experiments
@@ -92,23 +103,44 @@ func runFixAll(cmd *Command, args []string) error {
 		opts = append(opts, fix.RemoveListCommas())
 	}
 
+	if len(args) == 0 {
+		return fixModule(cmd, flagForce.Bool(cmd), opts...)
+	}
 	_, errs := fixInstances(cmd, args, flagForce.Bool(cmd), opts...)
 	return errs
 }
 
-func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) ([]*build.Instance, errors.Error) {
-	if len(args) == 0 {
-		args = []string{"./..."}
-
-		dir, err := findModuleRoot()
-		if err != nil {
-			return nil, errors.Promote(err, "")
-		}
-		for _, sub := range []string{"gen", "pkg", "usr"} {
-			args = appendDirs(args, filepath.Join(dir, "cue.mod", sub))
-		}
+// fixModule rewrites every file of the module, selected and grouped as
+// cue mod upgrade selects and groups them, at the module's own language
+// version. Without force a failed rewrite leaves every file unwritten.
+func fixModule(cmd *Command, force bool, opts ...fix.Option) error {
+	root, err := findModuleRoot()
+	if err != nil {
+		return err
 	}
+	mf, _, version, err := parseModuleFile(root)
+	if err != nil {
+		return err
+	}
+	results, runErr := rewriteModule(root, mf, version, version, opts...)
+	stderr := cmd.ErrOrStderr()
+	_, failed := reportRewrites(stderr, results)
+	if runErr != nil {
+		return runErr
+	}
+	if failed > 0 && !force {
+		return ErrPrintedError
+	}
+	if n := writeRewrites(stderr, results); n > 0 || failed > 0 {
+		return ErrPrintedError
+	}
+	return nil
+}
 
+// fixInstances loads the packages args name and rewrites their files; it
+// is the explicit-argument path of cue fix. Without arguments, fix and mod
+// upgrade select the module's files by walking it instead (fixModule).
+func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) ([]*build.Instance, errors.Error) {
 	instances := load.Instances(args, &load.Config{
 		Tests:   true,
 		Tools:   true,
@@ -158,42 +190,7 @@ func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) (
 		}
 	}
 
-	return instances, nil
-}
-
-// appendDirs appends the directories under base which hold any CUE files not
-// ignored by the loader, such as "github.com/foo/bar" in a cue.mod tree.
-// Intermediate directories such as "github.com/foo" are not packages, and
-// loading them would fail. A directory directly under base is left out too,
-// as its import path lacks a dot and names a standard library package.
-// A directory which cannot be read is kept, so that the loader reports the
-// error.
-func appendDirs(a []string, base string) []string {
-	seen := map[string]bool{}
-	_ = filepath.WalkDir(base, func(path string, entry fs.DirEntry, err error) error {
-		dir := path
-		if err == nil {
-			if entry.IsDir() || !isCUEFile(entry.Name()) {
-				return nil
-			}
-			dir = filepath.Dir(path)
-		}
-		if dir == base || seen[dir] {
-			return nil
-		}
-		seen[dir] = true
-		short := filepath.ToSlash(dir[len(base)+1:])
-		if strings.Contains(short, "/") {
-			a = append(a, short)
-		}
-		return nil
-	})
-	return a
-}
-
-// isCUEFile reports whether name is a CUE file which the loader does not
-// ignore, such as those starting with an underscore.
-func isCUEFile(name string) bool {
-	return strings.HasSuffix(name, ".cue") &&
-		!strings.HasPrefix(name, "_") && !strings.HasPrefix(name, ".")
+	// With force the errors were proceeded past, not resolved: they are
+	// still reported, and still make the command fail.
+	return instances, errs
 }

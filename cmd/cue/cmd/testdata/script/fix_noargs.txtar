@@ -1,0 +1,44 @@
+# TestLatest: skip
+# cue fix without package arguments selects files the way cue mod upgrade
+# does: by walking the module, cue.mod/gen, pkg and usr included, without
+# loading packages. A package whose import nobody provides and a vendored
+# package are both rewritten. With an explicit package argument the loader
+# is still in charge, and its error is still reported.
+
+exec cue fix --exp=aliasv2
+! stderr .
+cmp missing/m.cue _expect/m.cue.want
+cmp cue.mod/pkg/example.com/v/v.cue _expect/v.cue.want
+
+! exec cue fix --exp=aliasv2 ./missing
+stderr 'cannot find package "example.com/nobody/provides"'
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- missing/m.cue --
+package missing
+
+import "example.com/nobody/provides"
+
+X=a: {b: X.c, c: provides.v}
+-- cue.mod/pkg/example.com/v/v.cue --
+package v
+
+X=a: {b: X.c, c: 1}
+-- _expect/m.cue.want --
+@experiment(aliasv2)
+
+package missing
+
+import "example.com/nobody/provides"
+
+a~(X): {b: X.c, c: provides.v}
+-- _expect/v.cue.want --
+@experiment(aliasv2)
+
+package v
+
+a~(X): {b: X.c, c: 1}

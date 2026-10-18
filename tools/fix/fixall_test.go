@@ -70,14 +70,17 @@ func TestInstances(t *testing.T) {
 		// If any input CUE file has @test annotations, verify that the
 		// assertions pass on both the original and the fixed output.
 		// This ensures the fix is semantics-preserving.
-		runInlineTests(t.T, t.Archive, t.Dir, fixedFiles)
+		runInlineTests(t.T, t.Archive, t.Dir, t.Path, fixedFiles)
 	})
 }
 
 // runInlineTests runs @test assertions on both the original archive and
 // on a post-fix archive built from fixedFiles. Skipped if the archive
 // has no @test annotations (making this a no-op for existing tests).
-func runInlineTests(t *testing.T, archive *txtar.Archive, dir string, fixedFiles map[string][]byte) {
+//
+// path is the file of the original archive, whose out/errors.txt section
+// the pre-fix run maintains, or empty for an archive which is not on disk.
+func runInlineTests(t *testing.T, archive *txtar.Archive, dir, path string, fixedFiles map[string][]byte) {
 	t.Helper()
 
 	if !archiveHasTestAttrs(archive) {
@@ -88,6 +91,9 @@ func runInlineTests(t *testing.T, archive *txtar.Archive, dir string, fixedFiles
 	t.Run("pre-fix", func(t *testing.T) {
 		cap := &cuetxtar.FailCapture{TB: t}
 		runner := cuetxtar.NewInlineRunnerCapture(t, nil, archive, dir, cap).SuppressWritebacks()
+		if path != "" {
+			runner.RecordErrors(path)
+		}
 		runner.Run()
 		if cap.Failed() {
 			t.Errorf("@test assertions failed on original (pre-fix) input:\n%s", cap.Messages())
@@ -158,7 +164,7 @@ tests: {
 }
 `),
 		}
-		runInlineTests(t, archive, dir, correctFixed)
+		runInlineTests(t, archive, dir, "", correctFixed)
 	})
 
 	// Broken fix: __reclose is missing, X becomes open, t1 should fail.

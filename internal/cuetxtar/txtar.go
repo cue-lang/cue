@@ -134,6 +134,9 @@ type Test struct {
 
 	// The absolute path of the current test directory.
 	Dir string
+
+	// The absolute path of the archive file.
+	Path string
 }
 
 // Ensure that Test always implements testing.TB.
@@ -483,6 +486,8 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				t.Fatalf("error parsing txtar file: %v", err)
 			}
 
+			abs := filepath.Join(dir, fullpath)
+
 			// Archives with @test attributes use inline assertions instead of
 			// golden-file comparison.  The inline runner is self-contained and
 			// does not write to the Test output files, so we return immediately
@@ -500,8 +505,8 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					t:            t,
 					m:            m,
 					archive:      a,
-					dir:          filepath.Dir(filepath.Join(dir, fullpath)),
-					filePath:     filepath.Join(dir, fullpath),
+					dir:          filepath.Dir(abs),
+					filePath:     abs,
 					recordErrors: true,
 					recordStats:  x.RecordStats,
 				}
@@ -522,7 +527,8 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				T:       t,
 				M:       m,
 				Archive: a,
-				Dir:     filepath.Dir(filepath.Join(dir, fullpath)),
+				Dir:     filepath.Dir(abs),
+				Path:    abs,
 
 				prefix:     path.Join("out", x.Name),
 				LoadConfig: x.LoadConfig,

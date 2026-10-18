@@ -92,6 +92,50 @@ package foo
 
 #Split: l: [...int]
 -- out/errors.txt --
+[eval] dataErr: incompatible list lengths (2 and 3):
+    ./a.cue:6:7
+[eval] patternErr: incompatible list lengths (2 and 3):
+    ./a.cue:14:21
+patternErr: incompatible list lengths (2 and 3):
+    ./a.cue:15:14
+[eval] defX.l: incompatible list lengths (1 and 2):
+    ./a.cue:20:19
+[eval] defX.l: incompatible list lengths (1 and 2):
+    ./a.cue:20:19
+[eval] pairErr: incompatible list lengths (2 and 3):
+    ./a.cue:26:8
+[eval] twice.l: incompatible list lengths (1 and 2):
+    ./a.cue:28:12
+[eval] twice.l: incompatible list lengths (1 and 2):
+    ./a.cue:28:12
+[eval] emb.l: incompatible list lengths (1 and 2):
+    ./a.cue:32:18
+[eval] emb.l: incompatible list lengths (1 and 2):
+    ./a.cue:32:18
+[eval] closedX.l: incompatible list lengths (1 and 2):
+    ./a.cue:36:13
+closedX.l: incompatible list lengths (1 and 2):
+    ./a.cue:37:13
+[eval] closedX.l: incompatible list lengths (1 and 2):
+    ./a.cue:36:13
+closedX.l: incompatible list lengths (1 and 2):
+    ./a.cue:37:13
+[eval] concatErr: incompatible list lengths (2 and 3)
+[eval] sliceErr: incompatible list lengths (1 and 2)
+[eval] closedErr: incompatible list lengths (1 and 2):
+    ./a.cue:48:15
+[eval] hashSliceErr: incompatible list lengths (1 and 2)
+[eval] hashIdxClose: cannot use 1 (type int) as (list|struct) in argument 1 to close:
+    ./a.cue:52:5
+[eval] hashSliceCloseErr: incompatible list lengths (1 and 2)
+[eval] strSlice: cannot slice "abc" (type string):
+    ./a.cue:62:11
+[eval] split.l: incompatible list lengths (1 and 2):
+    ./a.cue:67:12
+[eval] split.l: incompatible list lengths (1 and 2):
+    ./a.cue:67:12
+[eval] selErr: incompatible list lengths (1 and 2):
+    ./a.cue:73:10
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "openlists.test"

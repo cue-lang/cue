@@ -144,17 +144,20 @@ func NewInlineRunnerCapture(t *testing.T, m *cuetdtest.M, archive *txtar.Archive
 }
 
 // RecordErrors enables the out/errors.txt documentary section, which
-// [RunInlineTests] maintains for the archives it walks and which a runner over an
-// archive owned by some other test has no home for. It returns ir.
-func (ir *InlineRunner) RecordErrors() *InlineRunner {
+// [RunInlineTests] maintains for the archives it walks, and sets the file
+// to write it back to under CUE_UPDATE=1: the one the archive was read
+// from, or empty for an archive which is not on disk. It returns ir.
+func (ir *InlineRunner) RecordErrors(path string) *InlineRunner {
 	ir.r.recordErrors = true
+	ir.r.filePath = path
 	return ir
 }
 
-// SuppressWritebacks runs the assertions without maintaining the archive, so that
-// CUE_UPDATE=1 rewrites nothing and CUE_UPDATE=diff reports no staleness. It
-// is for a runner over an archive that the test derives rather than owns, and
-// whose assertions are therefore not the archive's to complete. It returns ir.
+// SuppressWritebacks runs the assertions without completing them in the
+// archive, so that CUE_UPDATE=1 rewrites none of them and CUE_UPDATE=diff
+// reports none as stale. It is for a runner over an archive that the test
+// derives rather than owns, and whose assertions are therefore not the
+// archive's to complete. It returns ir.
 func (ir *InlineRunner) SuppressWritebacks() *InlineRunner {
 	ir.r.suppressWritebacks = true
 	return ir
@@ -499,6 +502,11 @@ func (r *inlineRunner) runArchive() {
 func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	const sectionName = "out/errors.txt"
 
+	// A plain run does nothing with the section, so do not build it.
+	if !cuetest.UpdateOrDiffGoldenFiles() {
+		return
+	}
+
 	// Collect all errors (including incomplete) from the evaluated value.
 	// Do not pass Cwd: cueerrors.Print prepends "./" to relative paths for
 	// IDE compatibility, which we don't want in the golden section. Strip the
@@ -543,9 +551,6 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 	}
 
 	// Section needs to be added, removed, or updated.
-	if !cuetest.UpdateOrDiffGoldenFiles() {
-		return
-	}
 	if cuetest.DiffGoldenFiles() {
 		cuetest.StaleGoldenFile(r.sinkOrT(), sectionName, existing, resultBytes)
 		return

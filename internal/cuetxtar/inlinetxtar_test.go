@@ -317,7 +317,7 @@ func (ctx *sectionCtx) apply(s section) {
 // assertion failures into cap and maintains the documentary sections, as
 // the runner over the archives on disk does.
 func newCaptureRunner(t *testing.T, archive *txtar.Archive, cap *cuetxtar.FailCapture) *cuetxtar.InlineRunner {
-	return cuetxtar.NewInlineRunnerCapture(t, nil, archive, t.TempDir(), cap).RecordErrors()
+	return cuetxtar.NewInlineRunnerCapture(t, nil, archive, t.TempDir(), cap).RecordErrors("")
 }
 
 // withCUEUpdate sets CUE_UPDATE to v for the duration of fn, then restores it.

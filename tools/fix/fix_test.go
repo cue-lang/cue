@@ -21,6 +21,8 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+
+	"github.com/go-quicktest/qt"
 )
 
 // oldEmbedVersion is the last language version with the pre-explicitopen
@@ -1106,4 +1108,30 @@ func TestX(t *testing.T) {
 		t.Fatalf("format: %v", fmtErr)
 	}
 	t.Error(string(out))
+}
+
+// TestFileKeepsOwnExperiments checks that a file keeps the experiments it
+// enables with its own @experiment attribute after a rewrite: the returned
+// AST carries that state, so the operators the file already uses under the
+// attribute remain valid for whoever builds it next.
+func TestFileKeepsOwnExperiments(t *testing.T) {
+	const src = "@experiment(explicitopen)\n\npackage p\n\n#D: {x: int}\n\na: #D...\n"
+	f, err := parser.ParseFile("a.cue", src, parser.ParseComments, parser.Version("v0.17.0"))
+	qt.Assert(t, qt.IsNil(err))
+	f = File(f)
+	exp := f.Experiment()
+	qt.Assert(t, qt.IsTrue(exp.ExplicitOpen))
+	qt.Assert(t, qt.Equals(exp.LanguageVersion(), "v0.17.0"))
+
+	// Upgrading to the version where the experiment is stable drops the
+	// attribute and still reports the experiment as enabled.
+	f, err = parser.ParseFile("a.cue", src, parser.ParseComments, parser.Version("v0.17.0"))
+	qt.Assert(t, qt.IsNil(err))
+	f = File(f, UpgradeVersion("v0.18.0"))
+	exp = f.Experiment()
+	qt.Assert(t, qt.IsTrue(exp.ExplicitOpen))
+	qt.Assert(t, qt.Equals(exp.LanguageVersion(), "v0.18.0"))
+	b, err := format.Node(f)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Not(qt.StringContains(string(b), "@experiment")))
 }

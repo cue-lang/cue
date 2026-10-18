@@ -26,6 +26,12 @@ import (
 // Instances modifies all files contained in the given build instances at once.
 //
 // It also applies the fixes from [File].
+//
+// A file that cannot be rewritten or sanitized does not stop the others:
+// every such failure is reported together, positioned in the file it
+// concerns, once all instances have been processed. A failure that applies
+// to a whole instance, such as an experiment that cannot apply at its
+// language version, is reported at once.
 func Instances(insts []*build.Instance, o ...Option) errors.Error {
 	// Parse options to check for upgrade
 	opts := options{}
@@ -34,6 +40,7 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 	}
 
 	done := map[*ast.File]bool{}
+	var errs errors.Error
 
 	for _, b := range insts {
 		version := b.LanguageVersion()
@@ -67,15 +74,16 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 				continue
 			}
 			done[f] = true
-			_, err := file(f, version, o...)
-			if err != nil {
-				return err
+			if _, err := file(f, version, o...); err != nil {
+				errs = errors.Append(errs, err)
 			}
 		}
 
+		// Sanitizing sees every file of the package, so that a name a
+		// rewrite inserted is renamed where a sibling file declares it.
 		if err := astutil.SanitizeFiles(b.Files); err != nil {
-			return errors.Wrapf(err, token.NoPos, "fix: sanitize failed")
+			errs = errors.Append(errs, errors.Promote(err, "fix: sanitize failed"))
 		}
 	}
-	return nil
+	return errs
 }

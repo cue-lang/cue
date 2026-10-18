@@ -21,9 +21,16 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/mod/modfile"
+	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
 
@@ -237,4 +244,99 @@ func buildPostFixArchive(orig *txtar.Archive, fixedFiles map[string][]byte) *txt
 		return strings.HasPrefix(f.Name, "out/")
 	})
 	return result
+}
+
+// conflictFile builds a file a let clause and a field of one name, which
+// cannot be sanitized. The parser rejects the same text, so it is built.
+func conflictFile(name string) *ast.File {
+	return &ast.File{Decls: []ast.Decl{
+		&ast.LetClause{Ident: ast.NewIdent(name), Expr: ast.NewLit(token.INT, "1")},
+		&ast.Field{Label: ast.NewIdent(name), Value: ast.NewLit(token.INT, "2")},
+	}}
+}
+
+// TestInstancesAccumulates checks that Instances reports every file that
+// fails to sanitize and still sanitizes the rest of the package.
+func TestInstancesAccumulates(t *testing.T) {
+	spec := ast.NewImport(nil, "list")
+	good := &ast.File{Decls: []ast.Decl{
+		&ast.Field{
+			Label: ast.NewIdent("a"),
+			Value: ast.NewCall(ast.NewSel(&ast.Ident{Name: "list", Node: spec}, "Min"),
+				ast.NewList(ast.NewLit(token.INT, "1"))),
+		},
+	}}
+	inst := &build.Instance{Files: []*ast.File{conflictFile("X"), conflictFile("Y"), good}}
+
+	err := Instances([]*build.Instance{inst})
+	qt.Assert(t, qt.IsNotNil(err))
+	errs := errors.Errors(err)
+	qt.Assert(t, qt.HasLen(errs, 2))
+	qt.Assert(t, qt.StringContains(errs[0].Error(), `"X"`))
+	qt.Assert(t, qt.StringContains(errs[1].Error(), `"Y"`))
+
+	b, ferr := format.Node(good)
+	qt.Assert(t, qt.IsNil(ferr))
+	qt.Assert(t, qt.StringContains(string(b), `import "list"`))
+}
+
+// TestInstancesUpgradeAliasForm checks that an alias the sanitizer inserts
+// while upgrading a module is written in the form the target version
+// accepts: the postfix form from v0.18.0, where aliasv2 is stable, even
+// though the file was parsed at v0.17.0.
+func TestInstancesUpgradeAliasForm(t *testing.T) {
+	mf, err := modfile.Parse([]byte("module: \"t.test@v0\"\nlanguage: version: \"v0.17.0\"\n"), "cue.mod/module.cue")
+	qt.Assert(t, qt.IsNil(err))
+
+	// A reference to the outer field a from a scope where a is shadowed;
+	// sanitizing must bind the outer a to a name, which takes an alias.
+	outer := &ast.Field{Label: ast.NewIdent("a"), Value: ast.NewString("b")}
+	f := &ast.File{Decls: []ast.Decl{
+		outer,
+		&ast.Field{
+			Label: ast.NewIdent("c"),
+			Value: ast.NewStruct(
+				ast.NewIdent("a"), ast.NewStruct(),
+				ast.NewIdent("b"), &ast.Ident{Name: "a", Node: outer.Value},
+			),
+		},
+	}}
+	exp, err := cueexperiment.NewFile("v0.17.0")
+	qt.Assert(t, qt.IsNil(err))
+	f.SetExperiments(exp)
+
+	inst := &build.Instance{ModuleFile: mf, Files: []*ast.File{f}}
+	qt.Assert(t, qt.IsNil(Instances([]*build.Instance{inst}, UpgradeVersion("v0.18.0"))))
+
+	b, ferr := format.Node(f)
+	qt.Assert(t, qt.IsNil(ferr))
+	qt.Assert(t, qt.StringContains(string(b), "a~(a_9): \"b\""))
+	_, perr := parser.ParseFile("out.cue", b, parser.Version("v0.18.0"))
+	qt.Assert(t, qt.IsNil(perr))
+}
+
+// TestInstancesSharedModuleFile checks that every instance of a module is
+// rewritten for the upgrade, not only the first: the instances share one
+// module file, whose version the upgrade raises, and the version each
+// instance is rewritten from must be the one the module declared.
+func TestInstancesSharedModuleFile(t *testing.T) {
+	mf, err := modfile.Parse([]byte("module: \"t.test@v0\"\nlanguage: version: \"v0.14.0\"\n"), "cue.mod/module.cue")
+	qt.Assert(t, qt.IsNil(err))
+	parse := func(name, src string) *ast.File {
+		f, err := parser.ParseFile(name, src, parser.ParseComments, parser.Version("v0.14.0"))
+		qt.Assert(t, qt.IsNil(err))
+		return f
+	}
+	a := parse("a.cue", "package a\n\nX=a: {b: X.c, c: 1}\n")
+	b := parse("b.cue", "package b\n\nY=a: {b: Y.c, c: 1}\n")
+	insts := []*build.Instance{
+		{ModuleFile: mf, Files: []*ast.File{a}},
+		{ModuleFile: mf, Files: []*ast.File{b}},
+	}
+	qt.Assert(t, qt.IsNil(Instances(insts, UpgradeVersion("v0.18.0"))))
+	for _, f := range []*ast.File{a, b} {
+		out, err := format.Node(f)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.StringContains(string(out), "~("), qt.Commentf("%s", out))
+	}
 }

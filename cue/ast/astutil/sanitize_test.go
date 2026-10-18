@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -888,4 +889,41 @@ c: {
 			qt.Assert(t, qt.IsNil(err))
 		})
 	}
+}
+
+// TestSanitizeFilesAccumulates checks that SanitizeFiles reports every file
+// that fails to sanitize and still sanitizes the files that can be, rather
+// than stopping at the first failure and leaving the rest untouched.
+func TestSanitizeFilesAccumulates(t *testing.T) {
+	// A let clause and a field of the same name in one scope cannot be
+	// sanitized; the parser rejects this too, so the files are built.
+	conflict := func(name string) *ast.File {
+		return &ast.File{Decls: []ast.Decl{
+			&ast.LetClause{Ident: ast.NewIdent(name), Expr: ast.NewLit(token.INT, "1")},
+			&ast.Field{Label: ast.NewIdent(name), Value: ast.NewLit(token.INT, "2")},
+		}}
+	}
+	spec := ast.NewImport(nil, "list")
+	good := &ast.File{Decls: []ast.Decl{
+		&ast.Field{
+			Label: ast.NewIdent("a"),
+			Value: ast.NewCall(ast.NewSel(&ast.Ident{Name: "list", Node: spec}, "Min"),
+				ast.NewList(ast.NewLit(token.INT, "1"))),
+		},
+	}}
+
+	err := astutil.SanitizeFiles([]*ast.File{conflict("X"), conflict("Y"), good})
+	qt.Assert(t, qt.IsNotNil(err))
+	msgs := []string{}
+	for _, e := range errors.Errors(err) {
+		msgs = append(msgs, e.Error())
+	}
+	qt.Assert(t, qt.HasLen(msgs, 2))
+	qt.Assert(t, qt.StringContains(msgs[0], `"X"`))
+	qt.Assert(t, qt.StringContains(msgs[1], `"Y"`))
+
+	// The file after the failures was sanitized: its import was inserted.
+	b, ferr := format.Node(good)
+	qt.Assert(t, qt.IsNil(ferr))
+	qt.Assert(t, qt.StringContains(string(b), `import "list"`))
 }

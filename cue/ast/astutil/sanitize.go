@@ -33,6 +33,10 @@ import (
 
 // SanitizeFiles sanitizes all CUE files belonging to a single package,
 // detecting cross-file shadowing of predeclared identifiers.
+//
+// Every file is sanitized, whether or not an earlier one failed; the
+// errors of all failing files are returned together, each positioned in
+// the file it concerns.
 func SanitizeFiles(files []*ast.File) error {
 	names := make(map[string]bool)
 	for _, f := range files {
@@ -44,10 +48,14 @@ func SanitizeFiles(files []*ast.File) error {
 			}
 		}
 	}
+	var errs errors.Error
 	for _, f := range files {
 		if err := sanitize(f, names); err != nil {
-			return err
+			errs = errors.Append(errs, errors.Promote(err, "sanitize"))
 		}
+	}
+	if errs != nil {
+		return errs
 	}
 	return nil
 }

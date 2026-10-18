@@ -128,7 +128,9 @@ func File(f *ast.File, o ...Option) *ast.File {
 }
 
 func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
-	existingExps := f.Pos().Experiment()
+	// A parsed file carries its experiments on its positions; one that was
+	// built, or rewritten before, carries them itself.
+	existingExps := f.Experiment()
 	if version == "" {
 		version = existingExps.LanguageVersion()
 	}
@@ -144,8 +146,20 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 	}
 	options.exps = exps
 
+	// The file keeps the experiments it enables itself, less those the
+	// target version makes stable, whose attributes are removed below. They
+	// are part of the state the output is written for: an operator the file
+	// already uses under its own attribute stays valid only if that state
+	// says so.
+	keep := slices.Clone(options.exps)
+	for _, exp := range existingExps.Experiments() {
+		if !cueexperiment.IsStable(exp, targetVersion) && !slices.Contains(keep, exp) {
+			keep = append(keep, exp)
+		}
+	}
+
 	// TODO: should this error be wrapped better to not panic?
-	wantExps, err := cueexperiment.NewFile(targetVersion, options.exps...)
+	wantExps, err := cueexperiment.NewFile(targetVersion, keep...)
 	if err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "fix: invalid experiment")
 	}
@@ -227,6 +241,12 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 	if options.simplify {
 		f = simplify(f)
 	}
+
+	// The file is now written for the target version and the experiments
+	// the rewrite applied. Record that, so that whatever is inserted into
+	// it afterwards, such as an alias the sanitizer binds a shadowed field
+	// to, takes the form that version accepts.
+	f.SetExperiments(wantExps)
 
 	return f, nil
 }

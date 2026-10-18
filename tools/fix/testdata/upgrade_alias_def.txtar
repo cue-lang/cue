@@ -1,0 +1,73 @@
+#upgrade:v0.18.0
+
+# A definition whose value carries an old-style alias, #App: X={...}, with
+# an embedded definition in the body. The definition label closes the
+# value on its own, so the explicitopen rewrite must not put a __closeAll
+# around the body: the alias becomes "let X = self" outside such a wrapper,
+# and a nested path through the alias, X.deps.default.kind, then no longer
+# resolves through the builtin call ("undefined field: deps").
+
+-- cue.mod/module.cue --
+module: "upgrade.test"
+
+language: { version: "v0.17.0" }
+
+-- a.cue --
+package foo
+
+#Base: name: string
+#Dep: kind: string | *"k"
+
+#App: X={
+	#Base
+	mode: "a" | "b" | *"c"
+	deps: default: #Dep
+	if X.deps.default.kind == "k" {
+		other: int
+	}
+	if X.mode == "a" {
+		extra: string
+	}
+}
+
+out: #App & {name: "n", mode: "a", extra: "e", other: 1}
+out: other: 1 @test(eq, 1)
+out: deps: default: kind: "k" @test(eq, "k")
+
+// An aliased value inside a comprehension keeps its wrapper: the old
+// semantics closed the field, which no sibling declaration widens.
+v: {if true {f: X={#Base, b: X.name}}}
+vv: v & {f: {name: "n", c: 3}} @test(err, code=eval, contains="field not allowed")
+err: #App & {name: "n", bogus: 1} @test(err, code=eval, contains="field not allowed")
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "upgrade.test"
+language: version: "v0.18.0"
+--- a.cue
+package foo
+
+#Base: name: string
+#Dep: kind:  string | *"k"
+
+#App: {
+	let X = self
+	#Base...
+	mode: "a" | "b" | *"c"
+	deps: default: #Dep
+	if X.deps.default.kind == "k" {
+		other: int
+	}
+	if X.mode == "a" {
+		extra: string
+	}
+}
+
+out: #App & {name: "n", mode: "a", extra: "e", other: 1}
+out: other: 1 @test(eq, 1)
+out: deps: default: kind: "k" @test(eq, "k")
+
+// An aliased value inside a comprehension keeps its wrapper: the old
+// semantics closed the field, which no sibling declaration widens.
+v:   {if true {f: {let X = self, __closeAll({#Base..., b: X.name...})}}}
+vv:  v & {f: {name: "n", c: 3}}   @test(err, code=eval, contains="field not allowed")
+err: #App & {name: "n", bogus: 1} @test(err, code=eval, contains="field not allowed")

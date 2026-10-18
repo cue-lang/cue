@@ -1,0 +1,133 @@
+#upgrade:v0.18.0
+
+# A regular field whose value carries an old-style alias and embeds a
+# definition keeps its wrapper: the old semantics closed the field. The
+# alias becomes "let X = self" outside the wrapper, and from inside the
+# wrapper's argument a comprehension guard that reads a field through X
+# resolves only when a conjunct outside the wrapper supplies that field:
+# the use below supplies mode and deps, so both guards fire. Declared in
+# the wrapped struct alone, as the defaults of mode and #Dep are, the
+# guard fails with "undefined field". The rewrite marks every guard that
+# reads through the alias; a field value reading the same path (y) is
+# fine and left alone.
+
+-- cue.mod/module.cue --
+module: "upgrade.test"
+
+language: { version: "v0.17.0" }
+
+-- a.cue --
+package foo
+
+#Base: name: string
+#Dep: kind: string | *"k"
+
+app: X={
+	#Base
+	mode: "a" | "b" | *"c"
+	deps: default: #Dep
+	y: X.deps.default.kind
+	if X.deps.default.kind == "k" {
+		other: int
+	}
+	if X.mode == "a" {
+		extra: string
+	}
+}
+
+// The marker also finds a wrapper inside a disjunction and a guard that
+// reads through a let of the alias.
+disj: X=*{#Base, mode: *"c" | string, if X.mode == "c" {o: 1}} | close({kind: string})
+viaLet: X={
+	#Base
+	mode: *"c" | string
+	let m = X.mode
+	if m == "c" {o: 1}
+}
+u1: disj & {name: "n", mode: "c"}
+u1: o: 1 @test(eq, 1)
+u2: viaLet & {name: "n", mode: "c"}
+u2: o: 1 @test(eq, 1)
+
+out: app & {name: "n", mode: "a", deps: default: kind: "k", extra: "e", other: 1}
+out: other: 1 @test(eq, 1)
+out: extra: "e" @test(eq, "e")
+out: y: "k" @test(eq, "k")
+err: app & {name: "n", mode: "a", deps: default: kind: "k", bogus: 1} @test(err, code=eval, contains="field not allowed")
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "upgrade.test"
+language: version: "v0.18.0"
+--- a.cue
+package foo
+
+#Base: name: string
+#Dep: kind:  string | *"k"
+
+app: {
+	let X = self
+	__closeAll({
+		#Base...
+		mode: "a" | "b" | *"c"
+		deps: default: #Dep
+		y: X.deps.default.kind
+		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
+		// bound to self outside the wrapper builtin, resolves only when a conjunct
+		// outside the wrapper supplies that field; declared in the wrapped struct
+		// alone, it fails with "undefined field".
+		if X.deps.default.kind == "k" {
+			other: int
+		}
+
+		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
+		// bound to self outside the wrapper builtin, resolves only when a conjunct
+		// outside the wrapper supplies that field; declared in the wrapped struct
+		// alone, it fails with "undefined field".
+		if X.mode == "a" {
+			extra: string
+		}
+	})
+}
+
+// The marker also finds a wrapper inside a disjunction and a guard that
+// reads through a let of the alias.
+disj: {
+	let X = self
+	*__closeAll({
+		#Base...
+		mode: *"c" | string
+		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
+		// bound to self outside the wrapper builtin, resolves only when a conjunct
+		// outside the wrapper supplies that field; declared in the wrapped struct
+		// alone, it fails with "undefined field".
+		if X.mode == "c" {o: 1}
+	}) | close({kind: string})
+}
+viaLet: {
+	let X = self
+	__closeAll({
+		#Base...
+		mode: *"c" | string
+		let m = X.mode
+
+		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so a
+		// comprehension guard that depends on a field unified into the struct from
+		// elsewhere stays incomplete.
+		//
+		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
+		// bound to self outside the wrapper builtin, resolves only when a conjunct
+		// outside the wrapper supplies that field; declared in the wrapped struct
+		// alone, it fails with "undefined field".
+		if m == "c" {o: 1}
+	})
+}
+u1: disj & {name: "n", mode: "c"}
+u1: o: 1 @test(eq, 1)
+u2: viaLet & {name: "n", mode: "c"}
+u2: o: 1 @test(eq, 1)
+
+out: app & {name: "n", mode: "a", deps: default: kind: "k", extra: "e", other: 1}
+out: other: 1   @test(eq, 1)
+out: extra: "e" @test(eq, "e")
+out: y:     "k" @test(eq, "k")
+err: app & {name: "n", mode: "a", deps: default: kind: "k", bogus: 1} @test(err, code=eval, contains="field not allowed")

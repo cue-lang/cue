@@ -1,0 +1,118 @@
+#upgrade:v0.18.0
+
+# Inside a definition a nested literal keeps its wrapper: the wrapper
+# closes the literal on its own, the definition closes what all its
+# conjuncts declare together, and the two differ once the literal is
+# selected from a unified value (w), combined with a disjunction outside
+# it (o), or handed to a validator (v). The one exception is a literal
+# with a comprehension guard reading the literal's own field through an
+# alias of an enclosing field (a): a wrapper builtin's argument cannot
+# resolve such a guard, and the literal would never complete, so there
+# the definition's closing has to do, and the guard is marked. A guard
+# reading a sibling's field through the alias (s) is no such guard.
+
+-- cue.mod/module.cue --
+module: "upgrade.test"
+
+language: { version: "v0.17.0" }
+
+-- a.cue --
+package foo
+
+#E: y: int
+other: w: int
+
+#D: X={
+	if true {f: {#E, x: 1}}
+	g: {other, x: 1}
+	l: [{#E, x: 1}]
+	d: (*{#E, b: 1} | {z: 4}) & {y: 3, c: 2}
+	spec: {#E, x: 1}
+	a: {
+		#E
+		mode: *"k" | string
+		if X.a.mode == "k" {k: int}
+	}
+	m: matchN(1, [{b: {#E, x: 1}}])
+}
+
+#D2: {a: {#E, x: 1}} & (*{a: z: 1} | {b: 2})
+
+// A guard reading a field outside the literal through the alias, here a
+// sibling's, resolves from inside a wrapper, so the literal keeps it, and
+// the closed literal still rejects the default branch.
+#D3: X={
+	flag: false
+	a: {#E, x: 1, if X.flag {unused: 1}}
+} & (*{a: z: 1} | {b: 2})
+
+out1: #D & {f: {y: 2, z: 1}} @test(err, code=eval, contains="field not allowed")
+out2: #D & {l: [{y: 2, z: 1}]} @test(err, code=eval, contains="field not allowed")
+out3: #D & {g: {w: 2, z: 1}} @test(err, code=eval, contains="field not allowed")
+out4: #D & {a: {y: 2, z: 1}} @test(err, code=eval, contains="field not allowed")
+inst: #D & {spec: y: 2}
+w: inst.spec & {z: 1} @test(err, code=eval, contains="field not allowed")
+o: #D2 & {a: y: 1}
+o: b: 2 @test(eq, 2)
+s: #D3 & {a: y: 3}
+s: b: 2 @test(eq, 2)
+v: #D & {m: b: {y: 1, x: 1, z: 1}} @test(err, code=eval, contains="matchN")
+ok: #D & {a: {y: 2, k: 3}, f: {y: 1}, l: [{y: 1}], spec: {y: 1}, m: b: {y: 1, x: 1}}
+ok: a: k: 3 @test(eq, 3)
+ok: d: {y: 3, c: 2, z: 4} @test(eq, {y: 3, c: 2, z: 4})
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "upgrade.test"
+language: version: "v0.18.0"
+--- a.cue
+package foo
+
+#E: y:    int
+other: w: int
+
+#D: {
+	let X = self
+	if true {f: {#E..., x: 1}}
+	g:    __reclose({other..., x: 1})
+	l:    [__closeAll({#E..., x: 1})]
+	d:    (*__closeAll({#E..., b: 1}) | {z: 4}) & {y: 3, c: 2}
+	spec: __closeAll({#E..., x: 1})
+	a: {
+		#E...
+		mode: *"k" | string
+		// TODO(cue-fix): this struct takes no wrapper builtin: this guard reads the
+		// struct's own field through an alias of an enclosing field, which a wrapper's
+		// argument cannot resolve; the enclosing definition closes the struct instead,
+		// admitting the fields of every conjunct.
+		if X.a.mode == "k" {k: int}
+	}
+	m: matchN(1, [{b: __closeAll({#E..., x: 1})}])
+}
+
+#D2: {a: __closeAll({#E..., x: 1})} & (*{a: z: 1} | {b: 2})
+
+// A guard reading a field outside the literal through the alias, here a
+// sibling's, resolves from inside a wrapper, so the literal keeps it, and
+// the closed literal still rejects the default branch.
+#D3: {
+	let X = self
+	{
+		flag: false
+		a:    __closeAll({#E..., x: 1, if X.flag {unused: 1}})
+	} & (*{a: z: 1} | {b: 2})
+}
+
+out1: #D & {f: {y: 2, z: 1}}   @test(err, code=eval, contains="field not allowed")
+out2: #D & {l: [{y: 2, z: 1}]} @test(err, code=eval, contains="field not allowed")
+out3: #D & {g: {w: 2, z: 1}}   @test(err, code=eval, contains="field not allowed")
+out4: #D & {a: {y: 2, z: 1}}   @test(err, code=eval, contains="field not allowed")
+inst: #D & {spec: y: 2}
+w:    inst.spec & {z: 1}       @test(err, code=eval, contains="field not allowed")
+o:    #D2 & {a: y: 1}
+o: b: 2 @test(eq, 2)
+s: #D3 & {a: y: 3}
+s: b: 2 @test(eq, 2)
+v:  #D & {m: b: {y: 1, x: 1, z: 1}} @test(err, code=eval, contains="matchN")
+ok: #D & {a: {y: 2, k: 3}, f: {y: 1}, l: [{y: 1}], spec: {y: 1}, m: b: {y: 1, x: 1}}
+ok: a: k: 3 @test(eq, 3)
+ok: d: {y: 3, c: 2, z: 4} @test(eq, {y: 3, c: 2, z: 4})

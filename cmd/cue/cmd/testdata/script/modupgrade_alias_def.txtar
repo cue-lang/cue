@@ -1,0 +1,66 @@
+# TestLatest: skip
+# A definition whose value carries an old-style alias and embeds another
+# definition, with comprehension guards that select nested paths through
+# the alias. The upgrade must leave the body without a __closeAll wrapper
+# (the definition label closes it), so that the alias, now "let X = self",
+# still reaches those paths. Before the fixer change this printed
+# "undefined field: deps" on every use of the definition; on a real module
+# it surfaced as "field not allowed" on every application's own fields.
+
+exec cue export ./use
+cp stdout export.before
+
+exec cue mod upgrade v0.18.0
+! stderr .
+cmp kit/kit.cue _expect/kit.cue.want
+
+exec cue export ./use
+cmp stdout export.before
+exec cue vet -c ./use
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- kit/kit.cue --
+package kit
+
+#Base: name: string
+#Dep: kind: string | *"k"
+
+#App: X={
+	#Base
+	mode: "a" | "b" | *"c"
+	deps: default: #Dep
+	if X.deps.default.kind == "k" {
+		other: int
+	}
+	if X.mode == "a" {
+		extra: string
+	}
+}
+-- use/use.cue --
+package use
+
+import "mod.test/kit"
+
+app: kit.#App & {name: "n", mode: "a", extra: "e", other: 1}
+-- _expect/kit.cue.want --
+package kit
+
+#Base: name: string
+#Dep: kind:  string | *"k"
+
+#App: {
+	let X = self
+	#Base...
+	mode: "a" | "b" | *"c"
+	deps: default: #Dep
+	if X.deps.default.kind == "k" {
+		other: int
+	}
+	if X.mode == "a" {
+		extra: string
+	}
+}

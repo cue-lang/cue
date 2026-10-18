@@ -1,0 +1,68 @@
+#exp:explicitopen
+
+# Old-style value aliases under the explicitopen rewrite alone: a
+# definition's aliased body takes no wrapper (the label closes it), a
+# regular field's does, and an aliased value inside a comprehension keeps
+# its wrapper, since the old semantics closed a comprehension's field that
+# no sibling declaration widens. No TODO is added: the alias still binds
+# the field's value, wrapper and all, until the aliasv2 rewrite moves it.
+
+-- cue.mod/module.cue --
+module: "fix.test"
+
+language: { version: "v0.17.0" }
+
+-- a.cue --
+package foo
+
+#Base: name: string
+
+#App: X={
+	#Base
+	mode: string
+	if X.mode == "a" {extra: string}
+}
+
+app: X={
+	#Base
+	mode: string
+	if X.mode == "a" {extra: string}
+}
+
+v: {if true {f: X={#Base, b: X.name}}}
+
+out: #App & {name: "n", mode: "a", extra: "e"}
+out: extra: "e" @test(eq, "e")
+out2: app & {name: "n", mode: "a", extra: "e"}
+out2: extra: "e" @test(eq, "e")
+vv: v & {f: {name: "n", c: 3}} @test(err, code=eval, contains="field not allowed")
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "fix.test"
+language: version: "v0.17.0"
+--- a.cue
+@experiment(explicitopen)
+
+package foo
+
+#Base: name: string
+
+#App: X={
+	#Base...
+	mode: string
+	if X.mode == "a" {extra: string}
+}
+
+app: X=__closeAll({
+	#Base...
+	mode: string
+	if X.mode == "a" {extra: string}
+})
+
+v: {if true {f: X=__closeAll({#Base..., b: X.name...})}}
+
+out: #App & {name: "n", mode: "a", extra: "e"}
+out: extra: "e" @test(eq, "e")
+out2: app & {name: "n", mode: "a", extra: "e"}
+out2: extra: "e" @test(eq, "e")
+vv: v & {f: {name: "n", c: 3}} @test(err, code=eval, contains="field not allowed")

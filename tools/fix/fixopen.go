@@ -78,6 +78,28 @@ type closeInfo struct {
 	// Do not close enclosing structs if non-zero. This may be the case
 	// for comprehensions, nested structs, etc.
 	suspendReclose int
+	// The scope is the value of a field with a definition label, which
+	// closes that value on its own. Not inherited.
+	defLabel bool
+
+	// The scope is lexically inside a definition field, outside any let
+	// value, disjunction operand or call argument, which a definition
+	// does not close on their own. A nested literal there still takes
+	// its wrapper: the wrapper closes the literal on its own, where the
+	// definition closes what all its conjuncts declare together, and the
+	// two differ once the literal is selected from a unified value or
+	// combined with a disjunction. The one exception is a literal with a
+	// comprehension guard reading the literal's own field through an
+	// alias of an enclosing field: a wrapper builtin's argument cannot
+	// resolve such a guard, so there the definition's closing has to do.
+	// Like inComprehension it is inherited by nested scopes (see
+	// pushScope).
+	inDefinition bool
+
+	// The value aliases of the enclosing fields, innermost last, which a
+	// guard inside a nested literal may read a field through. Inherited
+	// by nested scopes.
+	aliases []*ast.Alias
 
 	// The scope is lexically inside a comprehension value. Unlike the
 	// rest of closeInfo, it is inherited by nested scopes (see pushScope).
@@ -118,6 +140,10 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 	// comprehensions.
 	pushScope := func(next closeInfo) {
 		next.inComprehension = next.inComprehension || info.inComprehension
+		next.inDefinition = next.inDefinition || info.inDefinition
+		if next.aliases == nil {
+			next.aliases = info.aliases
+		}
 		recloseStack = append(recloseStack, info)
 		info = next
 	}
@@ -148,7 +174,11 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// inside comprehensions never wrap: a wrapper would deny
 			// fields that the old semantics allowed (see
 			// openCompFieldValue).
-			if internal.IsDefinition(n.Label) || info.inComprehension {
+			if internal.IsDefinition(n.Label) {
+				next.defLabel = true
+				next.inDefinition = true
+			}
+			if next.defLabel || info.inComprehension {
 				next.suspendReclose = 1
 			}
 			pushScope(next)
@@ -156,9 +186,16 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 		case *ast.BinaryExpr:
 			if n.Op == token.AND || n.Op == token.OR {
 				pushScope(closeInfo{wholeValue: true})
+				// An operand keeps its wrapper even inside a definition:
+				// the old semantics closed it on its own, and in a
+				// disjunction that is what eliminates a branch, so the
+				// fields nested in the operands keep theirs as well.
+				if n.Op == token.OR {
+					info.inDefinition = false
+				}
 			}
 
-		case *ast.LetClause, *ast.ListLit, *ast.Alias:
+		case *ast.ListLit:
 			pushScope(closeInfo{wholeValue: true})
 
 		case *ast.CallExpr:
@@ -167,7 +204,33 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// to wrapper level along with the literal it closes.
 			if !isCloseCall(n) {
 				pushScope(closeInfo{wholeValue: true})
+				// A definition does not close the arguments of a
+				// validator such as matchN or or(), so a literal there
+				// keeps its wrapper whatever reads through it.
+				info.inDefinition = false
 			}
+
+		case *ast.LetClause:
+			// A let value is not part of what a definition closes.
+			pushScope(closeInfo{wholeValue: true})
+			info.inDefinition = false
+
+		case *ast.Alias:
+			// A value alias, X={...}, binds the field's value; its literal
+			// is still that whole value. A definition label closes it on
+			// its own, so the literal takes no wrapper there: with one, the
+			// alias, which the aliasv2 rewrite binds to self outside the
+			// wrapper, no longer reaches nested fields through the builtin
+			// call. Inside a comprehension the literal keeps its wrapper,
+			// since the comprehension's own suspension serves the
+			// conjunct widening of openCompFieldValue, which the aliased
+			// literal does not take part in.
+			next := closeInfo{wholeValue: true}
+			if info.defLabel {
+				next.suspendReclose = 1
+			}
+			next.aliases = append(slices.Clone(info.aliases), n)
+			pushScope(next)
 
 		case *ast.Comprehension:
 			// Comprehensions are a scope boundary like conjunctions:
@@ -282,6 +345,23 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 					}
 				}
 
+				// Inside a definition, a literal with a guard that reads the
+				// literal's own field through an alias of an enclosing field
+				// takes no wrapper: the alias becomes self outside the
+				// wrapper, through which a builtin's argument cannot resolve
+				// the field, and the literal would never complete. The
+				// definition closes it instead, with every conjunct's fields
+				// admitted, which is the one way such a struct still
+				// evaluates; the guard is marked so.
+				if info.inDefinition && flags.mayBeClosed() {
+					if comp := guardThroughAliases(n, info.aliases); comp != nil {
+						ast.AddComment(comp, todoComment(
+							"this struct takes no wrapper builtin: this guard reads the struct's own field through an alias of an enclosing field, which a wrapper's argument cannot resolve; the enclosing definition closes the struct instead, admitting the fields of every conjunct."))
+						c.ClearEnclosingModified()
+						break
+					}
+				}
+
 				if comp := compReferringToStruct(n); comp != nil {
 					ast.AddComment(comp, todoComment(
 						"a wrapper builtin evaluates its argument on its own, so a comprehension guard that depends on a field unified into the struct from elsewhere stays incomplete."))
@@ -311,6 +391,144 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 		}
 		return true
 	}).(*ast.File), hasChanges
+}
+
+// guardsThroughAliases returns the comprehensions anywhere inside s with a
+// clause that reads s, or a field of s, through one of aliases, the value
+// aliases of the fields enclosing s: directly, as X.a.mode reads field mode
+// of the literal at a in X's value, or through a let whose value does so.
+// A guard reading through an alias a field outside s, such as a sibling's,
+// does not count: the wrapper's argument resolves that field as the
+// wrapper's surroundings do.
+func guardsThroughAliases(s *ast.StructLit, aliases []*ast.Alias) []*ast.Comprehension {
+	if len(aliases) == 0 {
+		return nil
+	}
+	lets := map[ast.Node]bool{}
+	for {
+		added := false
+		ast.Walk(s, func(n ast.Node) bool {
+			if l, ok := n.(*ast.LetClause); ok && !lets[l] && readsInto(l.Expr, s, aliases, lets) {
+				lets[l] = true
+				added = true
+			}
+			return true
+		}, nil)
+		if !added {
+			break
+		}
+	}
+	var comps []*ast.Comprehension
+	ast.Walk(s, func(n ast.Node) bool {
+		c, ok := n.(*ast.Comprehension)
+		if !ok {
+			return true
+		}
+		for _, cl := range c.Clauses {
+			if readsInto(cl, s, aliases, lets) {
+				comps = append(comps, c)
+				break
+			}
+		}
+		return true
+	}, nil)
+	return comps
+}
+
+// guardThroughAliases is the first of [guardsThroughAliases], or nil.
+func guardThroughAliases(s *ast.StructLit, aliases []*ast.Alias) *ast.Comprehension {
+	if comps := guardsThroughAliases(s, aliases); len(comps) > 0 {
+		return comps[0]
+	}
+	return nil
+}
+
+// readsInto reports whether n holds a reference to one of lets, or a
+// selector path through one of aliases that reaches s.
+func readsInto(n ast.Node, s *ast.StructLit, aliases []*ast.Alias, lets map[ast.Node]bool) bool {
+	found := false
+	ast.Walk(n, func(n ast.Node) bool {
+		if found {
+			return false
+		}
+		var labels []string
+		x := n
+		for {
+			sel, ok := x.(*ast.SelectorExpr)
+			if !ok {
+				break
+			}
+			name, _, err := ast.LabelName(sel.Sel)
+			if err != nil {
+				return true
+			}
+			labels = append([]string{name}, labels...)
+			x = sel.X
+		}
+		id, ok := x.(*ast.Ident)
+		if !ok || id.Node == nil {
+			return true
+		}
+		if lets[id.Node] {
+			found = true
+			return false
+		}
+		for _, a := range aliases {
+			if id.Node == a && reaches(a.Expr, labels, s) {
+				found = true
+				return false
+			}
+		}
+		// The path is settled; its parts need no second look.
+		return false
+	}, nil)
+	return found
+}
+
+// reaches reports whether following labels from expr, as a selector does,
+// passes through s.
+func reaches(expr ast.Node, labels []string, s *ast.StructLit) bool {
+	if expr == s {
+		return true
+	}
+	switch x := expr.(type) {
+	case *ast.ParenExpr:
+		return reaches(x.X, labels, s)
+	case *ast.UnaryExpr:
+		return reaches(x.X, labels, s)
+	case *ast.BinaryExpr:
+		return reaches(x.X, labels, s) || reaches(x.Y, labels, s)
+	case *ast.Alias:
+		return reaches(x.Expr, labels, s)
+	case *ast.CallExpr:
+		if fn, ok := x.Fun.(*ast.Ident); ok && len(x.Args) == 1 {
+			switch fn.Name {
+			case "close", "__closeAll", "__reclose":
+				return reaches(x.Args[0], labels, s)
+			}
+		}
+	case *ast.StructLit:
+		for _, d := range x.Elts {
+			switch d := d.(type) {
+			case *ast.EmbedDecl:
+				if reaches(d.Expr, labels, s) {
+					return true
+				}
+			case *ast.Comprehension:
+				if reaches(d.Value, labels, s) {
+					return true
+				}
+			case *ast.Field:
+				if len(labels) == 0 {
+					continue
+				}
+				if name, _, err := ast.LabelName(d.Label); err == nil && name == labels[0] && reaches(d.Value, labels[1:], s) {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // compReferringToStruct returns a comprehension among the declarations of

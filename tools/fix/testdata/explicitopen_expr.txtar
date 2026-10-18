@@ -865,6 +865,46 @@ nestedOpenRefPlain: {
 	t1: v & {foo: other: 6} @test(err, code=eval, contains="field not allowed")
 }
 
+// An embedded literal declares an open literal at the extended path,
+// which holds the closing a level further down.
+nestedOpenLitDeep: {
+	#F: {foo?: _}
+	v: {
+		{a: foo: #F}
+		a: foo: allowed: 5
+	}
+
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
+	t3: v & {a: sib: 7}          @test(eq, {a: {foo: {allowed: 5, foo?: _}, sib: 7}}) @test(todo, why="rewritten closing stays strict")
+}
+
+// A selector path below a definition is closed recursively like the
+// definition itself.
+nestedOpenRefPath: {
+	#D: a: foo: {foo?: _}
+	v: {
+		close({foo?: #D.a.foo})
+		foo: allowed: 5
+	}
+
+	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}}) @test(todo, why="rewritten closing stays strict")
+	t2: v & {foo: other: 6}   @test(err, code=eval, contains="field not allowed")
+	t3: v & {sib: 7}          @test(err, code=eval, contains="field not allowed")
+}
+
+// Both at once: an open literal holding a path below a definition.
+nestedOpenLitPath: {
+	#D: a: foo: {foo?: _}
+	v: {
+		{a: foo: #D.a.foo}
+		a: foo: allowed: 5
+	}
+
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
+}
+
 // A wrapped struct is evaluated on its own, so a comprehension guard which
 // depends on what the struct is unified with never resolves; the rewrite
 // says so.
@@ -1113,14 +1153,22 @@ compExtends: {
     ./in.cue:837:11
 [eval] nestedOpenRefPlain.t1.foo.other: field not allowed:
     ./in.cue:851:16
+[eval] nestedOpenLitDeep.t2.a.foo.other: field not allowed:
+    ./in.cue:864:19
+[eval] nestedOpenRefPath.t2.foo.other: field not allowed:
+    ./in.cue:878:16
+[eval] nestedOpenRefPath.t3.sib: field not allowed:
+    ./in.cue:879:11
+[eval] nestedOpenLitPath.t2.a.foo.other: field not allowed:
+    ./in.cue:891:19
 [incomplete] wrapperComp.v: incomplete bool: bool:
-    ./in.cue:859:13
+    ./in.cue:899:13
 [incomplete] compAdmitsNothing.s: incomplete bool: bool:
-    ./in.cue:866:9
+    ./in.cue:906:9
 [eval] compAdmitsNothing.out.f.b: field not allowed:
-    ./in.cue:868:25
+    ./in.cue:908:25
 [eval] compExtends.t2.foo.other: field not allowed:
-    ./in.cue:883:16
+    ./in.cue:923:16
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -1969,6 +2017,46 @@ nestedOpenRefPlain: {
 	})
 
 	t1: v & {foo: other: 6} @test(err, code=eval, contains="field not allowed")
+}
+
+// An embedded literal declares an open literal at the extended path,
+// which holds the closing a level further down.
+nestedOpenLitDeep: {
+	#F: {foo?: _}
+	v: {
+		{a: foo: #F}
+		a: foo: allowed: 5
+	}
+
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
+	t3: v & {a: sib: 7}          @test(eq, {a: {foo: {allowed: 5, foo?: _}, sib: 7}}) @test(todo, why="rewritten closing stays strict")
+}
+
+// A selector path below a definition is closed recursively like the
+// definition itself.
+nestedOpenRefPath: {
+	#D: a: foo: {foo?: _}
+	v: close({
+		{foo?: #D.a.foo}
+		foo: allowed: 5
+	})
+
+	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}}) @test(todo, why="rewritten closing stays strict")
+	t2: v & {foo: other: 6}   @test(err, code=eval, contains="field not allowed")
+	t3: v & {sib: 7}          @test(err, code=eval, contains="field not allowed")
+}
+
+// Both at once: an open literal holding a path below a definition.
+nestedOpenLitPath: {
+	#D: a: foo: {foo?: _}
+	v: {
+		{a: foo: #D.a.foo}
+		a: foo: allowed: 5
+	}
+
+	t1: v & {a: foo: allowed: 5} @test(eq, {a: {foo: {allowed: 5, foo?: _}}}) @test(todo, why="rewritten closing stays strict")
+	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 }
 
 // A wrapped struct is evaluated on its own, so a comprehension guard which

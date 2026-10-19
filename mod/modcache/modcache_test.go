@@ -134,8 +134,10 @@ package x
 		// Check that we can access a module file directly.
 		srcPath := filepath.Join(root, loc.Dir, "example.cue")
 		data, err := os.ReadFile(srcPath)
-		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.Equals(string(data), "package example\n"))
+		if !qt.Check(t, qt.IsNil(err)) {
+			return false
+		}
+		qt.Check(t, qt.Equals(string(data), "package example\n"))
 		// Check that the actual paths are as expected.
 		qt.Check(t, qt.Equals(srcPath, filepath.Join(dir, "mod", "extract", "example.com", "foo@v0.0.1", "example.cue")))
 		return true

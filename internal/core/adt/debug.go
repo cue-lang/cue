@@ -41,13 +41,6 @@ func RecordDebugGraph(ctx *OpContext, v *Vertex, name string) {
 }
 
 var (
-	// DebugDeps enables dependency tracking for debugging purposes.
-	// It is off by default, as it adds a significant overhead.
-	//
-	// TODO: hook this init CUE_DEBUG, once we have set this up as a single
-	// environment variable. For instance, CUE_DEBUG=matchdeps=1.
-	DebugDeps = false
-
 	OpenGraphs = false
 
 	// GraphDir is the directory under which the debug graphs are written.

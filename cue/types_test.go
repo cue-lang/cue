@@ -2774,7 +2774,6 @@ func TestUnify(t *testing.T) {
 	}}
 
 	matrix := cuetdtest.FullMatrix
-	// adt.DebugDeps = true
 	// adt.OpenGraphs = true
 	// matrix[0].Flags.LogEval = 1
 

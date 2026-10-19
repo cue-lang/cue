@@ -335,7 +335,6 @@ func TestScript(t *testing.T) {
 func TestX(t *testing.T) {
 	t.Skip()
 	// adt.OpenGraphs = true
-	// adt.DebugDeps = true
 	cuedebug.Init()
 	cuedebug.Flags.LogEval = 1
 	const path = "./testdata/script/eval_e.txtar"

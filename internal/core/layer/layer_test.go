@@ -24,14 +24,11 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestLayers(t *testing.T) {
-	adt.DebugDeps = true // check unmatched dependencies.
-
 	test := cuetxtar.TxTarTest{
 		Root: "./testdata",
 		Name: "layer",

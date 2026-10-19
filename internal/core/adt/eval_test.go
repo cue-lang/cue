@@ -38,8 +38,6 @@ import (
 )
 
 func TestEvalV3(t *testing.T) {
-	adt.DebugDeps = true // check unmatched dependencies.
-
 	// TxTarTest.run dispatches inline archives (those with @test attributes)
 	// to the inline runner automatically; non-inline archives use golden-file
 	// comparison as before.  No separate RunInlineTests call is needed.
@@ -123,7 +121,6 @@ func TestIssue3985(t *testing.T) {
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	adt.DebugDeps = true
 	// adt.OpenGraphs = true
 
 	flags := cuedebug.Config{

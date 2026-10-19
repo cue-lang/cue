@@ -31,9 +31,8 @@ func TestCompareLocations(t *testing.T) {
 		}}
 	}
 	// Locations with equal starts are ordered by their ends.
-	// Each order wrongly compares as greater, even for equal locations.
 	short, long := loc(3), loc(5)
-	qt.Assert(t, qt.Equals(rangeStartCompare(src, short, long), 1))
-	qt.Assert(t, qt.Equals(rangeStartCompare(src, long, short), 1))
-	qt.Assert(t, qt.Equals(rangeStartCompare(src, short, short), 1))
+	qt.Assert(t, qt.Equals(compareLocations(src, short, long), -1))
+	qt.Assert(t, qt.Equals(compareLocations(src, long, short), 1))
+	qt.Assert(t, qt.Equals(compareLocations(src, short, short), 0))
 }

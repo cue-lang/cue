@@ -118,7 +118,7 @@ func (m *Module) markFileDirty(file protocol.DocumentURI) {
 	m.dirtyFiles[m.modFileURI] = struct{}{}
 }
 
-// MarkFileDirty implements [packageOrModule]
+// encloses implements [packageOrModule]
 func (m *Module) encloses(file protocol.DocumentURI) bool {
 	return m.modFileURI == file
 }
@@ -320,6 +320,7 @@ func (m *Module) descendantCuePackages(ip ast.ImportPath) iter.Seq[*Package] {
 // new packages.
 func (m *Module) ascendantCuePackages(pkg *Package) iter.Seq[*Package] {
 	return func(yield func(*Package) bool) {
+	packages:
 		for _, p := range m.packages {
 			if p == pkg || !p.isCue {
 				continue
@@ -330,7 +331,7 @@ func (m *Module) ascendantCuePackages(pkg *Package) iter.Seq[*Package] {
 						if !yield(p) {
 							return
 						}
-						break
+						continue packages
 					}
 				}
 			}

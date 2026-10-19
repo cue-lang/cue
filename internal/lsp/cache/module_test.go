@@ -48,10 +48,9 @@ func TestAscendantCuePackages(t *testing.T) {
 	}}
 
 	// Each of foo's dirs encloses one of sub's dirs; foo is yielded once.
-	// It is wrongly yielded once per dir.
 	var got []string
 	for p := range m.ascendantCuePackages(sub) {
 		got = append(got, p.importPath.String())
 	}
-	qt.Assert(t, qt.DeepEquals(got, []string{"example.com/foo", "example.com/foo"}))
+	qt.Assert(t, qt.DeepEquals(got, []string{"example.com/foo"}))
 }

@@ -84,7 +84,7 @@ func (w *Workspace) Definition(file *File, fe *eval.FileEvaluator, srcMapper *pr
 	// should come first; everything else follows, sorted by filename
 	// then offset.
 	slices.SortFunc(locations, func(a, b protocol.Location) int {
-		return rangeStartCompare(srcMapper.URI, a, b)
+		return compareLocations(srcMapper.URI, a, b)
 	})
 
 	return locations
@@ -141,7 +141,7 @@ func (w *Workspace) References(file *File, fe *eval.FileEvaluator, srcMapper *pr
 	// should come first; everything else follows, sorted by filename
 	// then offset.
 	slices.SortFunc(locations, func(a, b protocol.Location) int {
-		return rangeStartCompare(srcMapper.URI, a, b)
+		return compareLocations(srcMapper.URI, a, b)
 	})
 	return locations
 }
@@ -506,20 +506,22 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadExtra 
 	return file, fe, srcMapper, nil
 }
 
-// rangeStartCompare compares a and b.
+// compareLocations compares a and b.
 //
 // * If they both come from the same uri, then they are ordered by
-// their range starts.
+// their range starts, then their range ends.
 // * Otherwise which ever comes from srcUri comes first.
 // * Otherwise they're sorted by uri.
-func rangeStartCompare(srcUri protocol.DocumentURI, a, b protocol.Location) int {
+func compareLocations(srcUri protocol.DocumentURI, a, b protocol.Location) int {
 	switch c := cmp.Compare(a.URI, b.URI); {
 	case c == 0:
-		aStart, bStart := a.Range.Start, b.Range.Start
-		if aStart.Line < bStart.Line || (aStart.Line == bStart.Line && aStart.Character < bStart.Character) {
-			return -1
-		}
-		return 1
+		ar, br := a.Range, b.Range
+		return cmp.Or(
+			cmp.Compare(ar.Start.Line, br.Start.Line),
+			cmp.Compare(ar.Start.Character, br.Start.Character),
+			cmp.Compare(ar.End.Line, br.End.Line),
+			cmp.Compare(ar.End.Character, br.End.Character),
+		)
 	case a.URI == srcUri:
 		return -1
 	case b.URI == srcUri:

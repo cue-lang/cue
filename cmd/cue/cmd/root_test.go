@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -215,6 +216,10 @@ func TestInterrupt(t *testing.T) {
 		// TODO: how could we support and test graceful cmd/cue cancellation on Windows?
 		t.Skip("interrupt signals are not supported in Windows")
 	}
+	if signal.Ignored(os.Interrupt) {
+		// The cue command would inherit the ignored signal.
+		t.Skip("interrupt signals are ignored by the test process")
+	}
 
 	t.Parallel()
 
@@ -298,6 +303,12 @@ func TestInterrupt(t *testing.T) {
 			t.Logf("error: %v", err)
 			stderr := stderrBuf.String()
 			t.Logf("stderr: %s", stderr)
+
+			// If the timeout killed the program, it ignored the interrupt signal,
+			// for example due to a signal handler which does not stop the program.
+			if ctx.Err() != nil {
+				t.Fatal("the cue command did not stop after the interrupt signal")
+			}
 
 			// When we expect an abrupt stop, we want the program to exit immediately
 			// due to the lack of a signal handler, which is Go's default behavior.

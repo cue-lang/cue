@@ -27,8 +27,5 @@ y: true
 -- out/modfetch/instance-info --
 main.org@v0:main module=main.org@v0 version=v0.9.0-main
 	local.org/x module=local version=v0.9.0-main
-	local.org/x@v0 module=local version=v0.9.0-main
 -- out/modfetch/result --
 {x: y: true}
--- out/modfetch/duplicate-instances --
-package x in local loaded as two instances: "local.org/x" and "local.org/x@v0"

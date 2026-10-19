@@ -116,18 +116,22 @@ type Package struct {
 	flags atomicLoadPkgFlags
 
 	// Populated by [loader.load].
-	mod             module.Version   // module providing package
-	modRoot         module.SourceLoc // root location of module
-	files           []modimports.ModuleFile
-	locs            []module.SourceLoc // location of source code directories
-	err             error              // error loading package
-	imports         []*Package         // packages imported by this one
-	inStd           bool
-	fromExternal    bool
-	resolvedImports map[string]string // raw import path → canonical versioned path
+	mod           module.Version   // module providing package
+	modRoot       module.SourceLoc // root location of module
+	files         []modimports.ModuleFile
+	locs          []module.SourceLoc // location of source code directories
+	err           error              // error loading package
+	imports       []*Package         // packages imported by this one
+	inStd         bool
+	fromExternal  bool
+	importsByPath map[string]*Package // canonical import path as written → imported package; only if fromExternal
 
 	// Populated by postprocessing in [Packages.buildStacks]:
 	stack *Package // package importing this one in minimal import stack for this pkg
+
+	// Populated at construction time and updated by postprocessing in
+	// [Packages.addCanonicalPaths]:
+	canonicalPath string // see [Package.CanonicalPath]
 }
 
 func (pkg *Package) ImportPath() string {
@@ -174,26 +178,44 @@ func (pkg *Package) Mod() module.Version {
 	return pkg.mod
 }
 
-// CanonicalImportPath returns the canonical versioned import path for the
-// given raw import path.
+// CanonicalPath returns the import path which identifies the package
+// regardless of how its importers spell it: with the major version of the
+// providing module for packages in dependency modules, and without a major
+// version otherwise. The main module is always the default major version
+// for its own path, and local packages in cue.mod are found regardless
+// of the major version.
+// A package which failed to load keeps the import path it was loaded by,
+// as does one whose canonical path identifies a different package.
+func (pkg *Package) CanonicalPath() string {
+	return pkg.canonicalPath
+}
+
+// CanonicalImportPath returns the [Package.CanonicalPath] of the package
+// which pkg imports by the given raw import path.
 // This is used for external module packages where the importing module's
 // default major versions differ from the main module's.
 func (pkg *Package) CanonicalImportPath(rawPath string) string {
-	// The resolvedImports keys are canonical import paths (see
+	// The importsByPath keys are canonical import paths (see
 	// [modimports.AllImports]), so canonicalize the raw path before looking
 	// it up; e.g. "foo.com/bar:bar" is stored as "foo.com/bar".
 	path := ast.ParseImportPath(rawPath).Canonical().String()
-	if p, ok := pkg.resolvedImports[path]; ok {
-		return p
+	if imp, ok := pkg.importsByPath[path]; ok {
+		return imp.CanonicalPath()
 	}
 	return path
 }
 
 // ResolvedImports yields each canonical import path written in the
-// package's files which [Package.CanonicalImportPath] rewrites,
-// along with the canonical versioned import path it resolves to.
+// package's files whose package was loaded by a different import path,
+// along with that path.
 func (pkg *Package) ResolvedImports() iter.Seq2[string, string] {
-	return maps.All(pkg.resolvedImports)
+	return func(yield func(string, string) bool) {
+		for path, imp := range pkg.importsByPath {
+			if imp.path != path && !yield(path, imp.path) {
+				return
+			}
+		}
+	}
 }
 
 func (pkg *Package) ModRoot() module.SourceLoc {
@@ -246,31 +268,32 @@ func LoadPackages(
 	}
 	<-pkgs.work.Idle()
 	pkgs.buildStacks()
-	pkgs.addVersionedPaths()
+	pkgs.addCanonicalPaths()
 	return pkgs
 }
 
-// addVersionedPaths makes each package that was imported without a major
-// version also available from [Packages.Pkg] by its path with the major
-// version of the module that provides it, unless another package is already
-// registered by that path. Imports in the main module are loaded as spelled
-// in its source files, while imports in external modules are resolved to
-// versioned paths, so this lets callers look up any package by its canonical
-// versioned path, regardless of how its importers spelled it.
-func (pkgs *Packages) addVersionedPaths() {
+// addCanonicalPaths sets the [Package.CanonicalPath] of each loaded package
+// and makes the package available from [Packages.Pkg] by it. Imports in the
+// main module are loaded as spelled in its source files, while imports in
+// external modules are resolved to versioned paths.
+//
+// When a canonical path is already registered by a package which failed or
+// comes from another module, such as an ambiguous import of a package
+// found both in cue.mod and in a dependency, the package keeps the import
+// path it was loaded by as its canonical path.
+func (pkgs *Packages) addCanonicalPaths() {
 	for _, pkg := range pkgs.pkgs {
-		if pkg.err != nil || pkg.inStd || !pkg.mod.IsValid() || pkg.mod.IsLocal() {
+		if pkg.err != nil || pkg.inStd {
 			continue
 		}
+		// Drops the major version for the main module and local packages.
 		ip := ast.ParseImportPath(pkg.path)
-		if ip.Version != "" {
-			continue
+		ip.Version = semver.Major(pkg.mod.Version())
+		path := ip.Canonical().String()
+		other := pkgs.pkgCache.Do(path, func() *Package { return pkg })
+		if other == pkg || (other.err == nil && other.mod == pkg.mod) {
+			pkg.canonicalPath = path
 		}
-		// Packages in the main module have no version to add.
-		if ip.Version = semver.Major(pkg.mod.Version()); ip.Version == "" {
-			continue
-		}
-		pkgs.pkgCache.Do(ip.Canonical().String(), func() *Package { return pkg })
 	}
 }
 
@@ -305,8 +328,7 @@ func (pkgs *Packages) All() []*Package {
 }
 
 // Pkg obtains a given package given its canonical import path.
-// A package imported without a major version can also be obtained
-// by its path with the major version of the module that provides it.
+// A package can also be obtained by its [Package.CanonicalPath].
 func (pkgs *Packages) Pkg(canonicalPkgPath string) *Package {
 	pkg, _ := pkgs.pkgCache.Get(canonicalPkgPath)
 	return pkg
@@ -315,8 +337,8 @@ func (pkgs *Packages) Pkg(canonicalPkgPath string) *Package {
 func (pkgs *Packages) addPkg(ctx context.Context, pkgPath string, flags Flags) *Package {
 	pkg := pkgs.pkgCache.Do(pkgPath, func() *Package {
 		pkg := &Package{
-			path:            pkgPath,
-			resolvedImports: make(map[string]string),
+			path:          pkgPath,
+			canonicalPath: pkgPath,
 		}
 		pkgs.applyPkgFlags(pkg, flags)
 
@@ -414,52 +436,57 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	// not rewrite imports in other modules (or the main module): a third
 	// party that depends on the replacement module directly should see it
 	// under its own path, not the original's.
-	if pkgs.replacements != nil {
-		if _, replaced := pkgs.replacements.Lookup(pkg.mod.Path()); replaced {
-			for i, imp := range imports {
-				if resolved := pkgs.replacements.CanonicalImportPath(imp); resolved != imp {
-					pkg.resolvedImports[imp] = resolved
-					imports[i] = resolved
-				}
-			}
-		}
-	}
-
+	_, replaced := pkgs.replacements.Lookup(pkg.mod.Path())
 	if pkg.fromExternal {
-		// This package is from an external module: resolve unversioned
-		// imports using the importing module's own default major versions.
-		for i, imp := range imports {
-			ip := ast.ParseImportPath(imp)
-			if ip.Version != "" {
-				// Explicit major version in the import path.
-				continue
-			}
-			m, _, _, err := pkgs.importFromModules(ctx, imp, func(prefix string) (string, modrequirements.MajorVersionDefaultStatus, error) {
-				return pkgs.requirements.DependencyDefaultMajorVersion(ctx, pkg.mod, prefix)
-			})
-			if err != nil || !m.IsValid() {
-				if err != nil && !errors.As(err, new(*ImportMissingError)) {
-					pkg.err = err
-				}
-				continue
-			}
-			ip.Version = semver.Major(m.Version())
-			if resolved := ip.Canonical().String(); resolved != imp {
-				pkg.resolvedImports[imp] = resolved
-				imports[i] = resolved
-			}
-		}
+		pkg.importsByPath = make(map[string]*Package, len(imports))
 	}
-
 	pkg.imports = make([]*Package, 0, len(imports))
 	var importFlags Flags
 	if pkg.flags.has(PkgInAll) {
 		importFlags = PkgInAll
 	}
-	for _, path := range imports {
-		pkg.imports = append(pkg.imports, pkgs.addPkg(ctx, path, importFlags))
+	for _, imp := range imports {
+		if replaced {
+			imp = pkgs.replacements.CanonicalImportPath(imp)
+		}
+		path := imp
+		if pkg.fromExternal {
+			var err error
+			if path, err = pkgs.resolveExternalImport(ctx, pkg, path); err != nil {
+				pkg.err = err
+			}
+		}
+		ipkg := pkgs.addPkg(ctx, path, importFlags)
+		pkg.imports = append(pkg.imports, ipkg)
+		if pkg.fromExternal {
+			// Keyed by the import with replacements applied, as given to
+			// [Package.CanonicalImportPath].
+			pkg.importsByPath[imp] = ipkg
+		}
 	}
 	pkgs.applyPkgFlags(pkg, PkgImportsLoaded)
+}
+
+// resolveExternalImport resolves an import path without a major version in
+// pkg, a package from an external module, using that module's own default
+// major versions. The path is returned unchanged if it cannot be resolved.
+func (pkgs *Packages) resolveExternalImport(ctx context.Context, pkg *Package, path string) (string, error) {
+	ip := ast.ParseImportPath(path)
+	if ip.Version != "" {
+		// Explicit major version in the import path.
+		return path, nil
+	}
+	m, _, _, err := pkgs.importFromModules(ctx, path, func(prefix string) (string, modrequirements.MajorVersionDefaultStatus, error) {
+		return pkgs.requirements.DependencyDefaultMajorVersion(ctx, pkg.mod, prefix)
+	})
+	if err != nil || !m.IsValid() {
+		if errors.As(err, new(*ImportMissingError)) {
+			err = nil
+		}
+		return path, err
+	}
+	ip.Version = semver.Major(m.Version())
+	return ip.Canonical().String(), nil
 }
 
 // applyPkgFlags updates pkg.flags to set the given flags and propagate the

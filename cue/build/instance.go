@@ -79,9 +79,10 @@ type Instance struct {
 	// so that the same package always gets the same hidden-field namespace
 	// regardless of how it was imported.
 	//
-	// TODO it would be better to just canonicalize ImportPath but
-	// doing so runs the risk of breaking existing users which assume
-	// a direct mapping from import path to [Instance.ImportPath].
+	// TODO it would be better to just canonicalize ImportPath, but
+	// imports of main module packages report their path without a major
+	// version, which tools such as cue exp gengotypes rely on, and root
+	// instances keep the import path they were loaded by.
 	// See https://cuelang.org/issue/4264 for some background.
 	CanonicalID string
 

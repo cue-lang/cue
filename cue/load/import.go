@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/module"
 	pkgpath "cuelang.org/go/pkg/path"
 )
@@ -549,33 +548,25 @@ func (l *loader) absPathForSourceLoc(loc module.SourceLoc) (string, error) {
 	return pkgpath.Join([]string{osPath, loc.Dir}, os), nil
 }
 
-// canonicalImportPath returns the canonical form of an import path found in
-// the main module. Beyond dropping a redundant package qualifier, it adds the
-// major version of the dependency module that provides the package, as
-// selected by the main module's default major versions, when the path omits
-// it. This is the same form that [modpkgload.Package.CanonicalImportPath]
-// produces for imports in dependency modules, so that a package shares one
-// build instance regardless of how each importer spells its path.
+// canonicalImportPath returns the [modpkgload.Package.CanonicalPath] of the
+// package imported by an import path found in the main module, so that a
+// package shares one build instance regardless of how each importer spells
+// its path. Paths of packages which were not loaded are only made canonical
+// with [ast.ImportPath.Canonical].
 func (l *loader) canonicalImportPath(importPath string) string {
-	ip := ast.ParseImportPath(importPath).Canonical()
-	if ip.Version != "" {
-		return ip.String()
+	path := ast.ParseImportPath(importPath).Canonical().String()
+	if pkg := l.pkgs.Pkg(path); pkg != nil {
+		return pkg.CanonicalPath()
 	}
-	pkg := l.pkgs.Pkg(ip.String())
-	if pkg == nil || pkg.Error() != nil {
-		return ip.String()
-	}
-	// Packages in the main module and in the local cue.mod directories have
-	// no version to add; neither do packages that could not be resolved.
-	ip.Version = semver.Major(pkg.Mod().Version())
-	return ip.String()
+	return path
 }
 
 // setCanonicalImportPath sets a CanonicalImportPath function on the build instance.
 // This handles two kinds of canonicalization:
-//   - Rewriting unversioned imports to include the correct major version:
-//     for external module packages, based on the importing module's own
-//     defaults; for main module packages, based on the main module's.
+//   - Rewriting imports to the [modpkgload.Package.CanonicalPath] of the
+//     imported package, resolving unversioned imports in external module
+//     packages with the importing module's own default major versions,
+//     and in main module packages with the main module's.
 //   - For all packages, rewriting imports that reference a replacement module's
 //     namespace back to the original module's namespace.
 func (l *loader) setCanonicalImportPath(p *build.Instance) {

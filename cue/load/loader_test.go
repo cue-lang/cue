@@ -823,8 +823,7 @@ display:./spellings
 files:
     $CWD/testdata/testmod/spellings/spellings.cue
 imports:
-    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue
-    mod.test/test/sub@v0: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		// A package in cue.mod is found regardless of the major version,
 		// so its one ID has none, even when loaded as a root with one.

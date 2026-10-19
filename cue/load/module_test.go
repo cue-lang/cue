@@ -130,7 +130,11 @@ func writeInstanceInfo(t *testing.T, w io.Writer, inst *build.Instance, depth in
 		qt.Assert(t, qt.IsNil(inst.ModuleFile))
 	} else {
 		qt.Assert(t, qt.Not(qt.IsNil(inst.ModuleFile)))
-		qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
+		// Packages in cue.mod belong to the "local" pseudo-module,
+		// but have the main module's file.
+		if m != "local" {
+			qt.Assert(t, qt.Equals(inst.ModuleFile.QualifiedModule(), inst.Module))
+		}
 		versionStr = fmt.Sprintf(" version=%v", inst.ModuleFile.Language.Version)
 	}
 	errStr := ""

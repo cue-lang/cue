@@ -1,0 +1,70 @@
+# A dependency imports packages of the main module with and without a
+# major version, spelling each import path either as the main module does
+# or differently. Every spelling of a package must load as one build
+# instance, reported by its path without a major version.
+#
+# The golden output below records the current, incorrect behavior: the
+# spellings of bar and baz with and without a major version load as two
+# instances each.
+
+-- cue.mod/module.cue --
+module: "main.org"
+language: version: "v0.9.0-main"
+deps: "dep.org@v0": v: "v0.1.0"
+
+-- main.cue --
+package main
+
+import (
+	"dep.org/x"
+	"main.org/bar"
+	"main.org/baz@v0"
+	"main.org/qux@v0"
+)
+
+out: x.out & bar.x & baz.x & qux.x
+
+-- bar/bar.cue --
+package bar
+
+x: true
+
+-- baz/baz.cue --
+package baz
+
+x: true
+
+-- qux/qux.cue --
+package qux
+
+x: true
+
+-- _registry/dep.org_v0.1.0/cue.mod/module.cue --
+module: "dep.org@v0"
+language: version: "v0.9.0-dep"
+deps: "main.org@v0": v: "v0.1.0"
+
+-- _registry/dep.org_v0.1.0/x/x.cue --
+package x
+
+import (
+	"main.org/bar@v0"
+	"main.org/baz"
+	"main.org/qux@v0"
+)
+
+out: bar.x & baz.x & qux.x
+-- out/modfetch/instance-info --
+main.org@v0:main module=main.org@v0 version=v0.9.0-main
+	dep.org/x@v0 module=dep.org@v0 version=v0.9.0-dep
+		main.org/bar@v0 module=main.org@v0 version=v0.9.0-main
+		main.org/baz module=main.org@v0 version=v0.9.0-main
+		main.org/qux@v0 module=main.org@v0 version=v0.9.0-main
+	main.org/bar module=main.org@v0 version=v0.9.0-main
+	main.org/baz@v0 module=main.org@v0 version=v0.9.0-main
+	main.org/qux@v0 module=main.org@v0 version=v0.9.0-main
+-- out/modfetch/result --
+{out: true}
+-- out/modfetch/duplicate-instances --
+package bar in main.org@v0 loaded as two instances: "main.org/bar@v0" and "main.org/bar"
+package baz in main.org@v0 loaded as two instances: "main.org/baz" and "main.org/baz@v0"

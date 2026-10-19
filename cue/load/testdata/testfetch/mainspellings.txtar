@@ -1,0 +1,49 @@
+# The main module imports one of its own packages by every spelling of its
+# import path, with and without a major version and a redundant qualifier,
+# and imports another one only with a major version, which module.cue omits.
+# Every spelling of a package must load as one build instance, reported by
+# its path without a major version.
+#
+# The golden output below records the current, incorrect behavior: the
+# spellings with and without a major version load as two instances, and
+# the major version is kept.
+
+-- cue.mod/module.cue --
+module: "main.org"
+language: version: "v0.9.0-main"
+
+-- main.cue --
+package main
+
+import (
+	bar0 "main.org/bar"
+	bar1 "main.org/bar:bar"
+	bar2 "main.org/bar@v0"
+	bar3 "main.org/bar@v0:bar"
+	"main.org/baz@v0"
+)
+
+bar: bar0 & bar1 & bar2 & bar3
+baz.x
+
+-- bar/bar.cue --
+package bar
+
+x: true
+
+-- baz/baz.cue --
+package baz
+
+x: y: true
+-- out/modfetch/instance-info --
+main.org@v0:main module=main.org@v0 version=v0.9.0-main
+	main.org/bar module=main.org@v0 version=v0.9.0-main
+	main.org/bar@v0 module=main.org@v0 version=v0.9.0-main
+	main.org/baz@v0 module=main.org@v0 version=v0.9.0-main
+-- out/modfetch/result --
+{
+	bar: x: true
+	y: true
+}
+-- out/modfetch/duplicate-instances --
+package bar in main.org@v0 loaded as two instances: "main.org/bar" and "main.org/bar@v0"

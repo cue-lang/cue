@@ -1,0 +1,34 @@
+# The main module imports a package in cue.mod/pkg by every spelling of its
+# import path, with and without a major version and a redundant qualifier.
+# Local packages are found regardless of the major version, so every
+# spelling must load as one build instance, reported by its path without
+# a major version.
+
+-- cue.mod/module.cue --
+module: "main.org"
+language: version: "v0.9.0-main"
+
+-- main.cue --
+package main
+
+import (
+	x0 "local.org/x"
+	x1 "local.org/x:x"
+	x2 "local.org/x@v0"
+	x3 "local.org/x@v0:x"
+)
+
+x: x0 & x1 & x2 & x3
+
+-- cue.mod/pkg/local.org/x/x.cue --
+package x
+
+y: true
+-- out/modfetch/instance-info --
+main.org@v0:main module=main.org@v0 version=v0.9.0-main
+	local.org/x module=local version=v0.9.0-main
+	local.org/x@v0 module=local version=v0.9.0-main
+-- out/modfetch/result --
+{x: y: true}
+-- out/modfetch/duplicate-instances --
+package x in local loaded as two instances: "local.org/x" and "local.org/x@v0"

@@ -1,0 +1,49 @@
+# A package in cue.mod/pkg conflicts with a dependency providing the same
+# package, so importing it without a major version is ambiguous. Local
+# packages are found regardless of the major version, so importing it with
+# a major version which no dependency provides is not ambiguous, even when
+# the ambiguous import is loaded alongside it.
+
+! exec cue export ./plain
+cmp stderr want-plain-stderr
+exec cue export ./major
+cmp stdout want-major-stdout
+! exec cue eval ./major ./plain
+cmp stderr want-plain-stderr
+
+-- want-plain-stderr --
+test.org/plain@v0: import failed: cannot find package "example.com/e": ambiguous import: found package example.com/e in multiple locations:
+	example.com/e@v0 v0.0.1 (.)
+	local (cue.mod/pkg/example.com/e):
+    ./plain/plain.cue:3:8
+-- want-major-stdout --
+{
+    "foo": "cue.mod/pkg source"
+}
+-- cue.mod/module.cue --
+module: "test.org"
+language: version: "v0.17.0"
+deps: "example.com/e@v0": v: "v0.0.1"
+-- plain/plain.cue --
+package plain
+
+import "example.com/e"
+
+foo: e.foo
+-- major/major.cue --
+package major
+
+import "example.com/e@v1"
+
+foo: e.foo
+-- cue.mod/pkg/example.com/e/e.cue --
+package e
+
+foo: "cue.mod/pkg source"
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.8.0"
+-- _registry/example.com_e_v0.0.1/e.cue --
+package e
+
+foo: "registry source"

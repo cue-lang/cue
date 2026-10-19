@@ -20,6 +20,7 @@ func TestTransportWithSlog(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("hello"))
 	}))
+	defer srv.Close()
 	var buf strings.Builder
 
 	client := &http.Client{
@@ -45,6 +46,7 @@ func TestTransportWithSlog(t *testing.T) {
 func TestQueryParamAllowList(t *testing.T) {
 	seq.Store(10)
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {}))
+	defer srv.Close()
 
 	var recorder logRecorder
 	client := &http.Client{
@@ -112,6 +114,7 @@ func TestQueryParamAllowList(t *testing.T) {
 func TestAuthorizationHeaderRedacted(t *testing.T) {
 	seq.Store(10)
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {}))
+	defer srv.Close()
 
 	var recorder logRecorder
 	client := &http.Client{
@@ -163,6 +166,7 @@ func TestAuthorizationHeaderRedacted(t *testing.T) {
 func TestIncludeAllQueryParams(t *testing.T) {
 	seq.Store(10)
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {}))
+	defer srv.Close()
 
 	var recorder logRecorder
 	client := &http.Client{
@@ -203,6 +207,7 @@ func TestOmitBody(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("response body"))
 	}))
+	defer srv.Close()
 
 	var recorder logRecorder
 	client := &http.Client{
@@ -255,6 +260,7 @@ func TestLongBody(t *testing.T) {
 		qt.Check(t, qt.Equals(string(data), strings.Repeat("a", 30)))
 		w.Write(bytes.Repeat([]byte("b"), 20))
 	}))
+	defer srv.Close()
 
 	var recorder logRecorder
 	client := &http.Client{
@@ -343,6 +349,7 @@ func TestBodyBinaryData(t *testing.T) {
 		qt.Check(t, qt.Equals(string(data), "\xff"))
 		w.Write([]byte{0xff})
 	}))
+	defer srv.Close()
 
 	var recorder logRecorder
 	client := &http.Client{

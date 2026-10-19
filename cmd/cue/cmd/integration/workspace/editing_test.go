@@ -57,8 +57,8 @@ v4: v2
 				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Created", rootURI),
 				I.LogExactf(protocol.Debug, 1, false, "Module dir=%v module=mod.example/x@v0 Loading packages [mod.example/x/a@v0]", rootURI),
 				I.LogExactf(protocol.Debug, 1, false, "Package dirs=[%v/a] importPath=mod.example/x/a@v0 Reloaded", rootURI),
-				// We do not load stdlib packages
-				I.NoLogExactf(protocol.Debug, "module=mod.example/x@v0 Loaded Package dirs=[] importPath=strings"),
+				// The module does not load stdlib packages itself.
+				I.NoLogMatching(protocol.Debug, "importPath=strings Reloaded"),
 			)
 		})
 	})

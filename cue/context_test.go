@@ -19,8 +19,10 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"runtime"
 	"testing"
 	"time"
+	"weak"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -31,7 +33,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
+	cueruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/tdtest"
@@ -439,7 +441,7 @@ x:  _h
 	// noY is a scope which does not resolve y.
 	noY := cue.Scope(ctx.CompileString("z: 1"))
 	both := func(opts ...cue.BuildOption) cue.BuildOption {
-		return func(o *runtime.Config) {
+		return func(o *cueruntime.Config) {
 			for _, opt := range opts {
 				opt(o)
 			}
@@ -676,6 +678,47 @@ out: scoped.x
 	ctx := cuecontext.New()
 	v = ctx.BuildInstance(scoped, cue.Scope(ctx.CompileString("y: 1")))
 	qt.Check(t, qt.Equals(errString(v.Err()), ""))
+}
+
+// TestCompileRetention checks that a Context does not keep alive the values
+// it compiles from source or builds with options once they are no longer
+// referenced, while a live value still reports its build instance.
+func TestCompileRetention(t *testing.T) {
+	ctx := cuecontext.New()
+	parse := func(src string) *ast.File {
+		f, err := parser.ParseFile("x.cue", src)
+		qt.Assert(t, qt.IsNil(err))
+		return f
+	}
+	compile := []func(src string) cue.Value{
+		func(src string) cue.Value { return ctx.CompileString(src) },
+		func(src string) cue.Value { return ctx.CompileBytes([]byte(src)) },
+		func(src string) cue.Value { return ctx.BuildFile(parse(src)) },
+		// A build with options builds a copy of its build instance.
+		func(src string) cue.Value {
+			inst := build.NewContext().NewInstance("", nil)
+			qt.Assert(t, qt.IsNil(inst.AddSyntax(parse(src))))
+			return ctx.BuildInstance(inst, cue.InferBuiltins(true))
+		},
+	}
+	var insts []weak.Pointer[build.Instance]
+	var v cue.Value
+	for i := range 2 * len(compile) {
+		v = compile[i%len(compile)](fmt.Sprintf("a: %d", i))
+		// Formatting looks up the value's instance, which may cache it.
+		qt.Assert(t, qt.Equals(fmt.Sprint(v), fmt.Sprintf("{a: %d}", i)))
+		inst := v.BuildInstance()
+		qt.Assert(t, qt.IsNotNil(inst))
+		insts = append(insts, weak.Make(inst))
+	}
+	runtime.GC()
+	last := len(insts) - 1
+	for i, inst := range insts[:last] {
+		// TODO: the Context keeps every compiled value alive; see
+		// https://cuelang.org/issue/2121.
+		qt.Assert(t, qt.IsNotNil(inst.Value()), qt.Commentf("value %d", i))
+	}
+	qt.Assert(t, qt.Equals(insts[last].Value(), v.BuildInstance()))
 }
 
 // TestHiddenFieldScope tests looking up hidden fields with [cue.Hid] across the

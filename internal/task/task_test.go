@@ -15,11 +15,17 @@
 package task_test
 
 import (
+	"context"
+	"runtime"
+	"sync/atomic"
 	"testing"
+	"weak"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/task"
+	"cuelang.org/go/internal/value"
 	"cuelang.org/go/tools/flow"
 )
 
@@ -86,4 +92,99 @@ func TestStartBackgroundWhenReady(t *testing.T) {
 	// of the services which already ran, does not hold it back.
 	close(releaseSlowServe)
 	<-started
+}
+
+type resultRunner struct{}
+
+func (resultRunner) Run(ctx *task.Context) (any, error) {
+	return map[string]any{"success": true}, nil
+}
+
+// TestReleaseEarlierConfigurations runs a chain of tasks through the
+// runners registered with this package. Each task runs against the
+// configuration computed after the previous task's result. Only the
+// runners are kept alive once the flow is done: a runner outlives its
+// Run calls, and must not keep the configuration it ran against.
+func TestReleaseEarlierConfigurations(t *testing.T) {
+	task.Register("test/result", func(v cue.Value) (task.Runner, error) {
+		return resultRunner{}, nil
+	})
+	v := cuecontext.New().CompileString(`
+		import "list"
+
+		command: run: {
+			t0: {$id: "test/result", path: "x-0", success?: bool}
+			for i in list.Range(1, 10, 1) {
+				"t\(i)": {
+					$id:      "test/result"
+					path:     "x-\(i)-\(command.run["t\(i-1)"].success)"
+					success?: bool
+				}
+			}
+		}
+	`)
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	// Each completed task leads to a new configuration, which the
+	// completed task's value belongs to. The initial configuration
+	// is left out, as v keeps it alive regardless.
+	initial := rootOf(v)
+	var configs []weak.Pointer[adt.Vertex]
+	cfg := &flow.Config{
+		Root: cue.ParsePath("command.run"),
+		UpdateFunc: func(_ *flow.Controller, ft *flow.Task) error {
+			if ft != nil {
+				if root := rootOf(ft.Value()); root != initial {
+					configs = append(configs, weak.Make(root))
+				}
+			}
+			return nil
+		},
+	}
+	ctx := task.Context{
+		TaskKey: func(v cue.Value) (string, error) {
+			id := v.LookupPath(cue.ParsePath("$id"))
+			if !id.Exists() {
+				return "", nil
+			}
+			return id.String()
+		},
+	}
+	newTask := ctx.TaskFunc(new(atomic.Bool))
+	var runners []flow.Runner
+	taskFunc := func(v cue.Value) (flow.Runner, error) {
+		r, err := newTask(v)
+		if r != nil {
+			runners = append(runners, r)
+		}
+		return r, err
+	}
+	// The controller is not kept alive, as it holds the latest
+	// configuration itself.
+	if err := flow.New(cfg, v, taskFunc).Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	runtime.GC()
+	retained := 0
+	for _, wp := range configs {
+		if wp.Value() != nil {
+			retained++
+		}
+	}
+	runtime.KeepAlive(runners)
+	// Each runner keeps the configuration its task ran against; only
+	// the last one, computed after the final task, is released.
+	if retained != len(configs)-1 {
+		t.Fatalf("%d of %d configurations stay reachable", retained, len(configs))
+	}
+}
+
+// rootOf returns the root of the configuration v belongs to.
+func rootOf(v cue.Value) *adt.Vertex {
+	root := value.Vertex(v)
+	for root.Parent != nil {
+		root = root.Parent
+	}
+	return root
 }

@@ -63,7 +63,7 @@ func parseFunc(sig string) (*ast.Func, error) {
 		// error more user-friendly by returning the position.
 		return nil, errors.New("not a function")
 	}
-	for _, arg := range append(f.Args, f.Ret) {
+	for _, arg := range funcTypes(f) {
 		switch arg.(type) {
 		case *ast.Ident, *ast.SelectorExpr:
 			continue
@@ -76,9 +76,19 @@ func parseFunc(sig string) (*ast.Func, error) {
 	return f, nil
 }
 
+// funcTypes returns the parameter types of f followed by its result type.
+func funcTypes(f *ast.Func) []ast.Expr {
+	params := f.Parameters()
+	types := make([]ast.Expr, 0, len(params)+1)
+	for _, p := range params {
+		types = append(types, p.Value)
+	}
+	return append(types, f.Ret)
+}
+
 func args(f *ast.Func) []string {
 	var args []string
-	for _, arg := range append(f.Args, f.Ret) {
+	for _, arg := range funcTypes(f) {
 		switch v := arg.(type) {
 		case *ast.Ident:
 			args = append(args, v.Name)

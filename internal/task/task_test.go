@@ -19,6 +19,7 @@ import (
 	"runtime"
 	"sync/atomic"
 	"testing"
+	"testing/synctest"
 	"weak"
 
 	"cuelang.org/go/cue"
@@ -42,56 +43,59 @@ func (r testRunner) Run(t *flow.Task, err error) error {
 func (r testRunner) IsService() bool { return r.service }
 
 func TestStartBackgroundWhenReady(t *testing.T) {
-	v := cuecontext.New().CompileString(`
-		serve: $id: "serve"
-		slowServe: $id: "slowServe"
-		client: $id: "client"
-		waitingServe: {
-			$id:    "waitingServe"
-			$after: client
-		}
-	`)
-	started := make(chan struct{})
-	serveDone := make(chan struct{})
-	releaseSlowServe := make(chan struct{})
-	runners := map[string]testRunner{
-		"serve": {service: true, run: func() {
-			(&task.Context{}).BackgroundTask(func() { close(started) })
-		}},
-		"slowServe":    {service: true, run: func() { <-releaseSlowServe }},
-		"client":       {run: func() { <-t.Context().Done() }},
-		"waitingServe": {service: true, run: func() {}},
-	}
-	cfg := &flow.Config{
-		UpdateFunc: func(c *flow.Controller, ft *flow.Task) error {
-			err := task.StartBackgroundWhenReady(c, ft)
-			if ft != nil && ft.Path().String() == "serve" {
-				close(serveDone)
+	synctest.Test(t, func(t *testing.T) {
+		v := cuecontext.New().CompileString(`
+			serve: $id: "serve"
+			slowServe: $id: "slowServe"
+			client: $id: "client"
+			waitingServe: {
+				$id:    "waitingServe"
+				$after: client
 			}
-			return err
-		},
-	}
-	c := flow.New(cfg, v, func(v cue.Value) (flow.Runner, error) {
-		id, err := v.LookupPath(cue.ParsePath("$id")).String()
-		if err != nil {
-			return nil, nil
+		`)
+		started := make(chan struct{})
+		serveDone := make(chan struct{})
+		releaseSlowServe := make(chan struct{})
+		runners := map[string]testRunner{
+			"serve": {service: true, run: func() {
+				(&task.Context{}).BackgroundTask(func() { close(started) })
+			}},
+			"slowServe":    {service: true, run: func() { <-releaseSlowServe }},
+			"client":       {run: func() { <-t.Context().Done() }},
+			"waitingServe": {service: true, run: func() {}},
 		}
-		return runners[id], nil
+		cfg := &flow.Config{
+			UpdateFunc: func(c *flow.Controller, ft *flow.Task) error {
+				err := task.StartBackgroundWhenReady(c, ft)
+				if ft != nil && ft.Path().String() == "serve" {
+					close(serveDone)
+				}
+				return err
+			},
+		}
+		c := flow.New(cfg, v, func(v cue.Value) (flow.Runner, error) {
+			id, err := v.LookupPath(cue.ParsePath("$id")).String()
+			if err != nil {
+				return nil, nil
+			}
+			return runners[id], nil
+		})
+		go c.Run(t.Context())
+
+		// A service which is still running holds back background work.
+		<-serveDone
+		synctest.Wait()
+		select {
+		case <-started:
+			t.Error("background work started while a service was still running")
+		default:
+		}
+
+		// A service waiting on another task, which might be a client
+		// of the services which already ran, does not hold it back.
+		close(releaseSlowServe)
+		<-started
 	})
-	go c.Run(t.Context())
-
-	// A service which is still running holds back background work.
-	<-serveDone
-	select {
-	case <-started:
-		t.Fatal("background work started while a service was still running")
-	default:
-	}
-
-	// A service waiting on another task, which might be a client
-	// of the services which already ran, does not hold it back.
-	close(releaseSlowServe)
-	<-started
 }
 
 type resultRunner struct{}
@@ -161,9 +165,15 @@ func TestReleaseEarlierConfigurations(t *testing.T) {
 		return r, err
 	}
 	// The controller is not kept alive, as it holds the latest
-	// configuration itself.
-	if err := flow.New(cfg, v, taskFunc).Run(context.Background()); err != nil {
-		t.Fatal(err)
+	// configuration itself. Run in a bubble, so that the goroutines
+	// of the finished tasks have exited before the garbage collection.
+	synctest.Test(t, func(t *testing.T) {
+		if err := flow.New(cfg, v, taskFunc).Run(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+	})
+	if len(configs) != 10 {
+		t.Fatalf("collected %d configurations, want 10", len(configs))
 	}
 	runtime.GC()
 	retained := 0

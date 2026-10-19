@@ -455,23 +455,6 @@ func TestStore_Make_ZeroValueInt(t *testing.T) {
 	qt.Assert(t, qt.Equals(u1.Value(), 0))
 }
 
-func TestStore_WriteHash_DifferentSeeds(t *testing.T) {
-	s := anyunique.New(stringHasher{})
-
-	u := s.Make("test")
-
-	// Different seeds should produce different hashes
-	var h1, h2 maphash.Hash
-	h1.SetSeed(maphash.MakeSeed())
-	h2.SetSeed(maphash.MakeSeed())
-
-	s.WriteHash(&h1, u)
-	s.WriteHash(&h2, u)
-
-	// With extremely high probability, different seeds give different hashes
-	// Note: This could theoretically fail, but it's astronomically unlikely
-}
-
 func TestStore_Make_LargeStructPointers(t *testing.T) {
 	s := anyunique.New(nodeHasher{})
 

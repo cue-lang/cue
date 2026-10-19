@@ -154,9 +154,8 @@ func TestValidate(t *testing.T) {
 				Source:   f,
 			}, cfg)
 			// The config may be shared between decoders, so it is not mutated.
-			// NewDecoder wrongly fills in the default parser config.
-			if !cfg.ParserConfig.IsValid() {
-				t.Errorf("NewDecoder did not fill in cfg.ParserConfig")
+			if cfg.ParserConfig.IsValid() {
+				t.Errorf("NewDecoder filled in cfg.ParserConfig")
 			}
 			err = d.Err()
 			if (tc.err == "") != (err == nil) {

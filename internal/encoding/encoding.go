@@ -326,9 +326,10 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	if cfg == nil {
 		cfg = &Config{}
 	}
-	if !cfg.ParserConfig.IsValid() {
-		// Avoid mutating cfg.
-		cfg.ParserConfig = parser.NewConfig(parser.ParseComments)
+	// Avoid mutating cfg, which callers may share between decoders.
+	parserConfig := cfg.ParserConfig
+	if !parserConfig.IsValid() {
+		parserConfig = parser.NewConfig(parser.ParseComments)
 	}
 	i := &Decoder{filename: f.Filename, ctx: ctx, cfg: cfg}
 	i.next = func() (ast.Expr, error) {
@@ -419,9 +420,9 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		// original contents without reading the file from disk again.
 		f.Source = b
 		if cfg.ParseFile == nil {
-			i.file, i.err = parser.ParseFile(path, b, cfg.ParserConfig)
+			i.file, i.err = parser.ParseFile(path, b, parserConfig)
 		} else {
-			i.file, i.err = cfg.ParseFile(path, b, cfg.ParserConfig)
+			i.file, i.err = cfg.ParseFile(path, b, parserConfig)
 		}
 		i.validate(i.file, f)
 		if i.err == nil {

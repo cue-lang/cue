@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"cuelang.org/go/cue/ast"
@@ -475,7 +476,7 @@ func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
 
 	entries, err := os.ReadDir(path)
 	if err != nil {
-		if errors.Is(err, iofs.ErrNotExist) {
+		if isNotDir(err) {
 			return false, nil
 		}
 		return false, err
@@ -509,6 +510,12 @@ func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+// isNotDir reports whether err means that there is no directory at a
+// path: nothing exists there, or it is a file, or it is below a file.
+func isNotDir(err error) bool {
+	return errors.Is(err, iofs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR)
 }
 
 // ReadDir implements [iofs.ReadDirFS]

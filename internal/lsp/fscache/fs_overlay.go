@@ -572,19 +572,21 @@ func (fs *rootedOverlayFS) Open(name string) (iofs.File, error) {
 		// wins.
 		delegateHandle, err := fs.delegatefs.Open(name)
 		if err == nil {
-			if st, err := delegateHandle.Stat(); err == nil && st.IsDir() {
+			st, err := delegateHandle.Stat()
+			if err == nil && st.IsDir() {
 				return &combinedDir{
 					overlayHandle:  entry.open(),
 					delegateHandle: delegateHandle.(iofs.ReadDirFile),
 				}, nil
 			}
-			defer delegateHandle.Close()
-		} else if errors.Is(err, iofs.ErrNotExist) {
+			delegateHandle.Close()
+			if err != nil {
+				return nil, err
+			}
+		} else if !isNotDir(err) {
 			// something's really bad with the delegate.
 			return nil, err
 		}
-		// either the delegate doesn't exist, or it does, but it's a
-		// file. In both cases, the overlay wins.
 		return entry.open(), nil
 
 	default:
@@ -623,13 +625,16 @@ func (fs *rootedOverlayFS) IsDirWithCUEFiles(path string) (bool, error) {
 	entry, err := fs.overlayfs.getEntry(fs.pathComponents(path))
 	if errors.Is(err, iofs.ErrNotExist) {
 		return fs.delegatefs.IsDirWithCUEFiles(path)
+	} else if errors.Is(err, iofs.ErrInvalid) {
+		// The path is below an overlay file.
+		return false, nil
 	} else if err != nil {
 		return false, err
 	}
 
 	dir, isDir := entry.(*overlayDirEntry)
 	if !isDir {
-		return false, iofs.ErrInvalid
+		return false, nil
 	}
 
 	overlayEntries, err := dir.open().ReadDir(0)
@@ -680,11 +685,12 @@ func (fs *rootedOverlayFS) ReadDir(name string) ([]iofs.DirEntry, error) {
 	}
 
 	delegateEntries, err := fs.delegatefs.ReadDir(name)
-	if err != nil {
-		// If there's any error at all, we ignore it: we know that there
-		// is an overlay here, and overlays always win. Empty out
-		// delegateEntries just to be sure.
+	if isNotDir(err) {
+		// There is no dir in the delegate, so the overlay wins. Empty
+		// out delegateEntries just to be sure.
 		delegateEntries = nil
+	} else if err != nil {
+		return nil, err
 	}
 
 	// delegateEntries will already be sorted. We need to sort the

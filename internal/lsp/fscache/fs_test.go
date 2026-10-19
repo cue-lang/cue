@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"slices"
 	"strings"
-	"syscall"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -173,8 +172,7 @@ func TestOverlayFS(t *testing.T) {
 	// remove foo/baz.cue file from onDiskFiles
 	onDiskFiles = append(slices.Delete(onDiskFiles, 2, 3), extraFiles...)
 	err = fstest.TestFS(fs, onDiskFiles...)
-	// The qux dir, which exists only in the overlay, wrongly cannot be opened.
-	qt.Assert(t, qt.ErrorMatches(err, `(?s).*\nqux: Open: .*`))
+	qt.Assert(t, qt.IsNil(err))
 
 	// Paths which are not dirs, or are dirs without CUE files, are
 	// reported without an error.
@@ -184,17 +182,12 @@ func TestOverlayFS(t *testing.T) {
 		return err
 	}
 	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("missing")))
-	// The errors below are wrongly returned.
-	qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("foo/bar/c.cue"), iofs.ErrInvalid))     // an overlay file
-	qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("foo/bar/c.cue/sub"), iofs.ErrInvalid)) // below an overlay file
-	// Reading a file, or a path below one, as a dir fails with
-	// ErrNotExist on Windows.
-	if runtime.GOOS != "windows" {
-		qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("arble.cue"), syscall.ENOTDIR))     // an on-disk file
-		qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("arble.cue/sub"), syscall.ENOTDIR)) // below an on-disk file
-		// An overlay dir below an on-disk file, holding only a dir.
-		qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("foo/baz.cue/deep"), syscall.ENOTDIR))
-	}
+	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("arble.cue")))         // an on-disk file
+	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("foo/bar/c.cue")))     // an overlay file
+	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("foo/bar/c.cue/sub"))) // below an overlay file
+	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("arble.cue/sub")))     // below an on-disk file
+	// An overlay dir below an on-disk file, holding only a dir.
+	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("foo/baz.cue/deep")))
 }
 
 func TestReadCUEPartialYAML(t *testing.T) {

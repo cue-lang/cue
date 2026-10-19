@@ -17,7 +17,6 @@ package cmd
 // This file contains code or initializing and running custom commands.
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -184,6 +183,11 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	//    }
 	//    $ cue cmd shouldFail
 	//    command.shouldFail: no tasks found
+	//    command.shouldFail.NESTED: invalid interpolation: non-concrete value string (type string)
+	//    command.shouldFail.NESTED: key value of dynamic field must be concrete, found _|_(command.shouldFail.NESTED: invalid interpolation: non-concrete value string (type string))
+	//
+	// As shown above, any errors within the command's value are reported
+	// alongside, even incomplete ones, as they may be why no tasks were found.
 	//
 	// Note that the case of the RHS of a task being incomplete is different. We
 	// care simply at this stage that tasks are discovered, sufficient for the
@@ -223,10 +227,24 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	}
 
 	if !didWork.Load() {
-		return fmt.Errorf("%v: no tasks found", cmdPath)
+		err := errors.Newf(token.NoPos, "%v: no tasks found", cmdPath)
+		return errors.Append(err, commandErrors(ctx.Root.LookupPath(cmdPath)))
 	}
 
 	return nil
+}
+
+// commandErrors returns all errors within v, including incomplete ones.
+// Like task discovery, it only visits regular fields.
+func commandErrors(v cue.Value) errors.Error {
+	var errs errors.Error
+	v.Walk(func(v cue.Value) bool {
+		if err := v.Err(); err != nil {
+			errs = errors.Append(errs, errors.Promote(err, ""))
+		}
+		return true
+	}, nil)
+	return errs
 }
 
 // func (r *customRunner) tagReference(t *task, ref cue.Value) error {

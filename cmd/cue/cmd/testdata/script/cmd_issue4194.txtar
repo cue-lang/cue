@@ -1,9 +1,15 @@
 # Verify that using a non-existent task type reports the actual CUE error
-# rather than "no tasks found".
-# TODO(#4194): the error should mention "undefined field: Mkdir".
+# alongside "no tasks found".
 
 ! exec cue cmd testdata
 stderr 'no tasks found'
+stderr 'command.testdata.mkdirInputs: undefined field: Mkdir'
+
+# TODO(#4194): with a working task alongside, the undefined task type is
+# skipped silently and the command succeeds; it should fail with the same error.
+exec cue cmd withSibling
+stdout '^ok$'
+! stderr .
 
 -- cue.mod/module.cue --
 module: "mod.test/test"
@@ -17,4 +23,11 @@ command: testdata: {
 	mkdirInputs: cli.Mkdir & {
 		path: "input"
 	}
+}
+
+command: withSibling: {
+	mkdirInputs: cli.Mkdir & {
+		path: "input"
+	}
+	print: cli.Print & {text: "ok"}
 }

@@ -9,8 +9,7 @@ stderr 'command\.tc2: invalid interpolation: non-concrete value string \(type st
 cmp stderr noTasks.stderr
 
 # The errors of fields and comprehensions which would declare the tasks,
-# even incomplete ones, should explain why no tasks were found.
-# TODO: these errors are not reported.
+# even incomplete ones, explain why no tasks were found.
 ! exec cue cmd tc3
 cmp stderr tc3.stderr
 ! exec cue cmd undefinedSource
@@ -60,11 +59,24 @@ command: undefinedCondition: task: {
 }
 -- tc3.stderr --
 command.tc3: no tasks found
+command.tc3.NESTED: invalid interpolation: non-concrete value string (type string):
+    ./p_tool.cue:14:2
+    ./p_tool.cue:5:8
+command.tc3.NESTED: key value of dynamic field must be concrete, found _|_(command.tc3.NESTED: invalid interpolation: non-concrete value string (type string)):
+    ./p_tool.cue:14:2
 -- noTasks.stderr --
 command.noTasks: no tasks found
 -- undefinedSource.stderr --
 command.undefinedSource: no tasks found
+command.undefinedSource.task: undefined field: foo:
+    ./p_tool.cue:24:24
+    ./p_tool.cue:17:1
 -- nonConcreteSource.stderr --
 command.nonConcreteSource: no tasks found
+command.nonConcreteSource.task: invalid non-ground value string (must be concrete string):
+    ./p_tool.cue:18:22
 -- undefinedCondition.stderr --
 command.undefinedCondition: no tasks found
+command.undefinedCondition.task: undefined field: enabled:
+    ./p_tool.cue:34:15
+    ./p_tool.cue:17:1

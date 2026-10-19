@@ -16,6 +16,7 @@ package diff
 
 import (
 	"bytes"
+	"slices"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -640,50 +641,92 @@ func TestMemoization(t *testing.T) {
 		a: g
 		b: g
 	`
-	const modSrc = `
-		g: {x: 99, y: 2}
-		a: g
-		b: g
-	`
+	tests := []struct {
+		name string
+		x, y string
+		kind Kind
+		// With structure sharing, seen is the number of memoized pairs and
+		// hitB is whether comparing 'b' is a cache hit, which returns no
+		// sub-script. Without sharing, the cache stays empty.
+		seen int
+		hitB bool
+	}{{
+		name: "identity",
+		x:    src,
+		y:    src,
+		kind: Identity,
+		seen: 1,
+	}, {
+		name: "modified",
+		x:    src,
+		y: `
+			g: {x: 99, y: 2}
+			a: g
+			b: g
+		`,
+		kind: Modified,
+		seen: 1,
+		hitB: true,
+	}, {
+		// Distinct vertex pairs must not share a cache entry: (x.g, y.g) is
+		// identical, while (x.g, y.h) is not.
+		name: "distinct",
+		x: `
+			g: {x: 1}
+			h: {x: 1}
+			a: g
+			b: g
+		`,
+		y: `
+			g: {x: 1}
+			h: {x: 2}
+			a: g
+			b: h
+		`,
+		kind: Modified,
+		seen: 2,
+	}}
+	for _, tc := range tests {
+		cuetdtest.FullMatrix.Run(t, tc.name, func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
+			x := ctx.CompileString(tc.x)
+			y := ctx.CompileString(tc.y)
 
-	cuetdtest.FullMatrix.Run(t, "identity", func(t *testing.T, m *cuetdtest.M) {
-		ctx := m.CueContext()
-		x := ctx.CompileString(src)
-		y := ctx.CompileString(src)
-
-		d := &differ{cfg: *Schema}
-		kind, script := d.diffValue(x, y)
-		if kind != Identity {
-			t.Fatalf("got %v; want Identity", kind)
-		}
-		if script != nil {
-			t.Errorf("expected nil script for identical values")
-		}
-		// Under the v3 evaluator, 'a' and 'b' share g's vertex (IsShared==true),
-		// so the (x.g, y.g) pair is inserted once when processing 'a' and reused
-		// for 'b'. The cache must contain at most 1 entry.
-		// Under v2 (no IsShared), the cache remains empty — both are acceptable.
-		if n := len(d.seen); n > 1 {
-			t.Errorf("expected at most 1 memoized pair; got %d", n)
-		}
-	})
-
-	cuetdtest.FullMatrix.Run(t, "modified", func(t *testing.T, m *cuetdtest.M) {
-		ctx := m.CueContext()
-		x := ctx.CompileString(src)
-		y := ctx.CompileString(modSrc)
-
-		d := &differ{cfg: *Schema}
-		kind, _ := d.diffValue(x, y)
-		if kind != Modified {
-			t.Fatalf("got %v; want Modified", kind)
-		}
-		// Same cache-size invariant: the (x.g, y.g) pair is inserted at most
-		// once, regardless of how many shared references point to g.
-		if n := len(d.seen); n > 1 {
-			t.Errorf("expected at most 1 memoized pair; got %d", n)
-		}
-	})
+			d := &differ{cfg: *Schema}
+			kind, script := d.diffValue(x, y)
+			if kind != tc.kind {
+				t.Fatalf("got %v; want %v", kind, tc.kind)
+			}
+			wantSeen := 0
+			if m.Flags.Sharing {
+				wantSeen = tc.seen
+			}
+			if n := len(d.seen); n != wantSeen {
+				t.Errorf("expected %d memoized pairs; got %d", wantSeen, n)
+			}
+			if kind == Identity {
+				if script != nil {
+					t.Errorf("expected nil script for identical values")
+				}
+				return
+			}
+			if script == nil {
+				t.Fatal("expected an edit script for modified values")
+			}
+			i := slices.IndexFunc(script.Edits, func(e Edit) bool { return e.XSel.String() == "b" })
+			if i < 0 {
+				t.Fatal("no edit for b")
+			}
+			b := script.Edits[i]
+			if b.Kind != Modified {
+				t.Errorf("b: got %v; want Modified", b.Kind)
+			}
+			wantHit := m.Flags.Sharing && tc.hitB
+			if hit := b.Sub == nil; hit != wantHit {
+				t.Errorf("cache hit for b: got %v; want %v", hit, wantHit)
+			}
+		})
+	}
 }
 
 func TestX(t *testing.T) {

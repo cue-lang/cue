@@ -39,15 +39,15 @@ func TestUpdateField(t *testing.T) {
 		{true, "true"},
 		{int(1), "1"},
 		{int8(2), "2"},
-		{int16(3), "`3`"}, // TODO: should be an integer literal.
+		{int16(3), "3"},
 		{int32(4), "4"},
 		{int64(5), "5"},
 		{uint(6), "6"},
 		{uint8(7), "7"},
-		{uint16(8), "`8`"}, // TODO: should be an integer literal.
+		{uint16(8), "8"},
 		{uint32(9), "9"},
 		{uint64(10), "10"},
-		{uintptr(11), "`11`"}, // TODO: should be an integer literal.
+		{uintptr(11), "11"},
 	}
 	for _, test := range tests {
 		info := updateTableField(t, "[]testCase{{field: 0}}", test.value)
@@ -75,8 +75,7 @@ func TestUpdateFieldPositional(t *testing.T) {
 		return
 	}
 	out := RunFailing(t, t.Name())
-	// The error path panics with a nil dereference.
-	want := "invalid memory address or nil pointer dereference"
+	want := "1:13: elements must be key value pairs"
 	if !strings.Contains(out, want) {
 		t.Errorf("output does not contain %q:\n%s", want, out)
 	}

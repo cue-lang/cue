@@ -375,12 +375,12 @@ func (t *T) updateField(info *info, ci *callInfo, newValue any) {
 			value = &ast.BasicLit{Kind: token.IDENT, Value: "false"}
 			isZero = true
 		}
-	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int8:
+	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
 		i := x.Int()
 		value = &ast.BasicLit{Kind: token.INT,
 			Value: strconv.FormatInt(i, 10)}
 		isZero = i == 0
-	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint8:
+	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8, reflect.Uintptr:
 		i := x.Uint()
 		value = &ast.BasicLit{Kind: token.INT,
 			Value: strconv.FormatUint(i, 10)}
@@ -391,7 +391,7 @@ func (t *T) updateField(info *info, ci *callInfo, newValue any) {
 		kv, ok := x.(*ast.KeyValueExpr)
 		if !ok {
 			t.Fatalf("%v: elements must be key value pairs",
-				fset.Position(kv.Pos()))
+				fset.Position(x.Pos()))
 		}
 		ident, ok := kv.Key.(*ast.Ident)
 		if !ok {

@@ -4,8 +4,21 @@ stdout 'success!'
 ! exec cue cmd tc2
 stderr 'command\.tc2: invalid interpolation: non-concrete value string \(type string\)'
 
+# A command declaring no tasks at all reports nothing else.
+! exec cue cmd noTasks
+cmp stderr noTasks.stderr
+
+# The errors of fields and comprehensions which would declare the tasks,
+# even incomplete ones, should explain why no tasks were found.
+# TODO: these errors are not reported.
 ! exec cue cmd tc3
-stderr 'command\.tc3: no tasks found'
+cmp stderr tc3.stderr
+! exec cue cmd undefinedSource
+cmp stderr undefinedSource.stderr
+! exec cue cmd nonConcreteSource
+cmp stderr nonConcreteSource.stderr
+! exec cue cmd undefinedCondition
+cmp stderr undefinedCondition.stderr
 
 -- p_tool.cue --
 package p
@@ -23,3 +36,35 @@ command: tc2: {
 command: tc3: NESTED: {
 	"\(input)": cli.Print & {text: "ok"}
 }
+
+instances: {}
+missingInstanceName: string
+
+command: noTasks: {
+	data: string
+}
+command: undefinedSource: task: {
+	for _, t in instances["foo"] {
+		(t): cli.Print & {text: t}
+	}
+}
+command: nonConcreteSource: task: {
+	for _, t in instances[missingInstanceName] {
+		(t): cli.Print & {text: t}
+	}
+}
+command: undefinedCondition: task: {
+	if instances.enabled {
+		print: cli.Print & {text: "ok"}
+	}
+}
+-- tc3.stderr --
+command.tc3: no tasks found
+-- noTasks.stderr --
+command.noTasks: no tasks found
+-- undefinedSource.stderr --
+command.undefinedSource: no tasks found
+-- nonConcreteSource.stderr --
+command.nonConcreteSource: no tasks found
+-- undefinedCondition.stderr --
+command.undefinedCondition: no tasks found

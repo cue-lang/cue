@@ -337,18 +337,22 @@ func embedStruct(s *ast.StructLit) *ast.EmbedDecl {
 func constraintDependencies(key string, n cue.Value, s *state) {
 	allowSchemas := false
 	allowRequired := false
+	var want string
 	switch key {
 	case "dependencies":
 		allowSchemas = true
 		allowRequired = true
+		want = "an array of strings, an object, or a boolean"
 	case "dependentSchemas":
 		allowSchemas = true
+		want = "an object or boolean"
 	case "dependentRequired":
 		allowRequired = true
+		want = "an array of strings"
 	}
 
 	if n.Kind() != cue.StructKind {
-		s.errf(n, `"%q expected an object, found %v`, key, n.Kind())
+		s.errf(n, `%q expected an object, found %v`, key, n.Kind())
 		return
 	}
 	// Our approach here is to make an outer-level struct which contains
@@ -381,14 +385,14 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 	// aliasv2 is what enables the postfix alias form, whether because the
 	// target language version has it stable or because it names it outright.
 	postfixAliases := s.targetExp.AliasV2
-	s.processMap(n, func(key string, n cue.Value) {
+	s.processMap(n, func(entry string, n cue.Value) {
 		var ident *ast.Ident
 		// TODO we could potentially avoid declaring the field
 		// by checking whether there's a field already in
 		// scope with the correct name.
 		var label ast.Label
 		var alias *ast.PostfixAlias
-		if ast.IsValidIdent(key) {
+		if ast.IsValidIdent(entry) {
 			// TODO if the inner schema contains a reference to some
 			// outer-level entity that has the same identifier then this
 			// will stop that from working correctly. It would be nice
@@ -401,7 +405,7 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 			// - when the value is a schema, generate it and then inspect the
 			//   resulting syntax to check for references.
 			// - fix astutil.Sanitize
-			ident = ast.NewIdent(key)
+			ident = ast.NewIdent(entry)
 			label = ident
 		} else {
 			ident = ast.NewIdent(fmt.Sprintf("_t%d", count))
@@ -410,10 +414,10 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 			// the guard below, in whichever spelling the target language
 			// version parses.
 			if postfixAliases {
-				label = ast.NewString(key)
+				label = ast.NewString(entry)
 				alias = &ast.PostfixAlias{Field: ident}
 			} else {
-				label = &ast.Alias{Ident: ident, Expr: ast.NewString(key)}
+				label = &ast.Alias{Ident: ident, Expr: ast.NewString(entry)}
 			}
 		}
 		// TODO this is not quite right, because by adding this optional
@@ -432,12 +436,8 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 			Value:      ast.NewIdent("_"),
 		})
 		var consequence *ast.StructLit
-		switch n.Kind() {
-		case cue.ListKind:
-			if !allowRequired {
-				s.errf(n, "expected schema but got %v", n.Kind())
-				return
-			}
+		switch k := n.Kind(); {
+		case k == cue.ListKind && allowRequired:
 			required := &ast.StructLit{}
 			for i, _ := n.List(); i.Next(); {
 				f, ok := s.strValue(i.Value())
@@ -452,11 +452,7 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 			}
 			consequence = required
 
-		case cue.StructKind, cue.BoolKind:
-			if !allowSchemas {
-				s.errf(n, "expected schema but got %v", n.Kind())
-				return
-			}
+		case (k == cue.StructKind || k == cue.BoolKind) && allowSchemas:
 			switch s := s.schema(n).(type) {
 			case *ast.StructLit:
 				consequence = s
@@ -470,7 +466,7 @@ func constraintDependencies(key string, n cue.Value, s *state) {
 				}
 			}
 		default:
-			s.errf(n, "dependency value must be array or schema. found %v", n.Kind())
+			s.errf(n, `value of %q in %q must be %s, found %v`, entry, key, want, k)
 			return
 		}
 		obj.Elts = append(obj.Elts, &ast.Comprehension{

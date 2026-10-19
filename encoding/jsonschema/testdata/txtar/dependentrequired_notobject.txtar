@@ -7,5 +7,5 @@ A dependentRequired keyword whose value is not an object is an error.
 }
 -- out/decode/extract --
 ERROR:
-""dependentRequired" expected an object, found int:
+"dependentRequired" expected an object, found int:
     schema.json:3:6

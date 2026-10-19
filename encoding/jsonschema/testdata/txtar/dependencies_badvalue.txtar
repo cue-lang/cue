@@ -9,5 +9,5 @@ Entries of a dependencies keyword must be arrays of strings or schemas.
 }
 -- out/decode/extract --
 ERROR:
-dependency value must be array or schema. found int:
+value of "a" in "dependencies" must be an array of strings, an object, or a boolean, found int:
     schema.json:4:10

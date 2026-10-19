@@ -213,7 +213,7 @@ package v1alpha3
 	// the resource is present. In other words, the Gateway resource must
 	// reside in the same namespace as the gateway workload instance.
 	selector?: {[string]: string} @protobuf(2,map[string]string)
-	selector?: {[_]~(name,_): name}
+	selector?: [_]~(name,_): name
 }
 
 // `Server` describes the properties of the proxy on a given load balancer
@@ -353,10 +353,10 @@ package v1alpha3
 		}
 
 		#TLSmode_value: {
-			"PASSTHROUGH":      0
-			"SIMPLE":           1
-			"MUTUAL":           2
-			"AUTO_PASSTHROUGH": 3
+			PASSTHROUGH:      0
+			SIMPLE:           1
+			MUTUAL:           2
+			AUTO_PASSTHROUGH: 3
 		}
 
 		// Optional: Indicates whether connections to this port should be
@@ -419,11 +419,11 @@ package v1alpha3
 		}
 
 		#TLSProtocol_value: {
-			"TLS_AUTO": 0
-			"TLSV1_0":  1
-			"TLSV1_1":  2
-			"TLSV1_2":  3
-			"TLSV1_3":  4
+			TLS_AUTO: 0
+			TLSV1_0:  1
+			TLSV1_1:  2
+			TLSV1_2:  3
+			TLSV1_3:  4
 		}
 
 		// Optional: Minimum TLS protocol version.

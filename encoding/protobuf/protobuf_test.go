@@ -53,7 +53,13 @@ func TestExtractDefinitions(t *testing.T) {
 			if f, err := Extract(filename, nil, c); err != nil {
 				fmt.Fprintln(out, err)
 			} else {
-				b, _ := format.Node(f, format.Simplify())
+				b, err := format.Node(f)
+				qt.Assert(t, qt.IsNil(err))
+				// Extract documents that its result is already
+				// in the style of format.Simplify.
+				simplified, err := format.Node(f, format.Simplify())
+				qt.Assert(t, qt.IsNil(err))
+				qt.Check(t, qt.Equals(string(b), string(simplified)))
 				out.Write(b)
 			}
 

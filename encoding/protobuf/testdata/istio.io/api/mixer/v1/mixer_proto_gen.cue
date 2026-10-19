@@ -114,10 +114,10 @@ import (
 	}
 
 	#Condition_value: {
-		"CONDITION_UNSPECIFIED": 0
-		"ABSENCE":               1
-		"EXACT":                 2
-		"REGEX":                 3
+		CONDITION_UNSPECIFIED: 0
+		ABSENCE:               1
+		EXACT:                 2
+		REGEX:                 3
 	}
 
 	// Describes a single attribute match.
@@ -172,9 +172,9 @@ import (
 	}
 
 	#Operation_value: {
-		"REPLACE": 0
-		"REMOVE":  1
-		"APPEND":  2
+		REPLACE: 0
+		REMOVE:  1
+		APPEND:  2
 	}
 
 	// Header name.
@@ -226,8 +226,8 @@ import (
 	}
 
 	#RepeatedAttributesSemantics_value: {
-		"DELTA_ENCODING":       0
-		"INDEPENDENT_ENCODING": 1
+		DELTA_ENCODING:       0
+		INDEPENDENT_ENCODING: 1
 	}
 
 	// The attributes to use for this request.

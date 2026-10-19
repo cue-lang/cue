@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -141,6 +142,10 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	}
 
 	err = astutil.Sanitize(p.file)
+
+	// Some labels, like enum values, are generated quoted;
+	// the rewrites of format.Simplify unquote those which can be identifiers.
+	format.ASTStyle{Labels: true, InlineStructs: true, Ellipsis: true}.Apply(p.file)
 
 	dropLeadingStructSection(p.file)
 

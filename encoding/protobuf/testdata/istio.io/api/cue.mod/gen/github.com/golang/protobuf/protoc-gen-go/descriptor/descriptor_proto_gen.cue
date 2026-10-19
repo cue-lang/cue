@@ -193,24 +193,24 @@ package descriptor
 	}
 
 	#Type_value: {
-		"TYPE_DOUBLE":   1
-		"TYPE_FLOAT":    2
-		"TYPE_INT64":    3
-		"TYPE_UINT64":   4
-		"TYPE_INT32":    5
-		"TYPE_FIXED64":  6
-		"TYPE_FIXED32":  7
-		"TYPE_BOOL":     8
-		"TYPE_STRING":   9
-		"TYPE_GROUP":    10
-		"TYPE_MESSAGE":  11
-		"TYPE_BYTES":    12
-		"TYPE_UINT32":   13
-		"TYPE_ENUM":     14
-		"TYPE_SFIXED32": 15
-		"TYPE_SFIXED64": 16
-		"TYPE_SINT32":   17
-		"TYPE_SINT64":   18
+		TYPE_DOUBLE:   1
+		TYPE_FLOAT:    2
+		TYPE_INT64:    3
+		TYPE_UINT64:   4
+		TYPE_INT32:    5
+		TYPE_FIXED64:  6
+		TYPE_FIXED32:  7
+		TYPE_BOOL:     8
+		TYPE_STRING:   9
+		TYPE_GROUP:    10
+		TYPE_MESSAGE:  11
+		TYPE_BYTES:    12
+		TYPE_UINT32:   13
+		TYPE_ENUM:     14
+		TYPE_SFIXED32: 15
+		TYPE_SFIXED64: 16
+		TYPE_SINT32:   17
+		TYPE_SINT64:   18
 	}
 
 	#Label: {
@@ -221,9 +221,9 @@ package descriptor
 		{"LABEL_REPEATED", #enumValue: 3}
 
 	#Label_value: {
-		"LABEL_OPTIONAL": 1
-		"LABEL_REQUIRED": 2
-		"LABEL_REPEATED": 3
+		LABEL_OPTIONAL: 1
+		LABEL_REQUIRED: 2
+		LABEL_REPEATED: 3
 	}
 	name?:   string @protobuf(1,string)
 	number?: int32  @protobuf(3,int32)
@@ -374,9 +374,9 @@ package descriptor
 	}
 
 	#OptimizeMode_value: {
-		"SPEED":        1
-		"CODE_SIZE":    2
-		"LITE_RUNTIME": 3
+		SPEED:        1
+		CODE_SIZE:    2
+		LITE_RUNTIME: 3
 	}
 	optimizeFor?: #OptimizeMode @protobuf(9,OptimizeMode,name=optimize_for,"default=SPEED")
 
@@ -523,9 +523,9 @@ package descriptor
 		{"STRING_PIECE", #enumValue: 2}
 
 	#CType_value: {
-		"STRING":       0
-		"CORD":         1
-		"STRING_PIECE": 2
+		STRING:       0
+		CORD:         1
+		STRING_PIECE: 2
 	}
 
 	// The packed option can be enabled for repeated primitive fields to enable
@@ -563,9 +563,9 @@ package descriptor
 	}
 
 	#JSType_value: {
-		"JS_NORMAL": 0
-		"JS_STRING": 1
-		"JS_NUMBER": 2
+		JS_NORMAL: 0
+		JS_STRING: 1
+		JS_NUMBER: 2
 	}
 
 	// Should this field be parsed lazily?  Lazy applies only to message-type
@@ -682,9 +682,9 @@ package descriptor
 	}
 
 	#IdempotencyLevel_value: {
-		"IDEMPOTENCY_UNKNOWN": 0
-		"NO_SIDE_EFFECTS":     1
-		"IDEMPOTENT":          2
+		IDEMPOTENCY_UNKNOWN: 0
+		NO_SIDE_EFFECTS:     1
+		IDEMPOTENT:          2
 	}
 	idempotencyLevel?: #IdempotencyLevel @protobuf(34,IdempotencyLevel,name=idempotency_level,"default=IDEMPOTENCY_UNKNOWN")
 

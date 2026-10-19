@@ -34,7 +34,7 @@ import (
 		#enumValue: 0
 	}
 
-	#FailPolicy_value: "FAIL_OPEN": 0
+	#FailPolicy_value: FAIL_OPEN: 0
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	policy?: #FailPolicy @protobuf(1,FailPolicy)

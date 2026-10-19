@@ -169,6 +169,8 @@ type Config struct {
 // specified Root (or current working directory if none is specified).
 // All other imported files are assigned to the CUE pkg dir ($Root/pkg)
 // according to their Go package import path.
+//
+// The generated files follow the same style as the result of [Extract].
 type Extractor struct {
 	root     string
 	cwd      string
@@ -413,6 +415,8 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 // if it does not. Imports are resolved using the paths defined in Config.
 //
 // The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
+// It follows the style of [format.Simplify], so formatting it with that
+// option makes no difference.
 func Extract(filename string, src any, c *Config) (f *ast.File, err error) {
 	if c == nil {
 		c = &Config{}

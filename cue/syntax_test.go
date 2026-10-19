@@ -457,8 +457,12 @@ a: [1]`,
 		`,
 		path:    "x",
 		options: o(cue.Final(), cue.Definitions(true), cue.Optional(false)),
-		// The skipped definition makes #D export inline as an open struct.
-		out: `{m: matchN(1, [{a: int}])}`,
+		out: `{
+	m: matchN(1, [D.#x])
+
+	//cue:path: #D
+	let D = {#x: a: int}
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

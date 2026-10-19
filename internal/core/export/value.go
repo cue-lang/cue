@@ -677,10 +677,6 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 
 		e.addField(label, f, f.Value)
 
-		if label.IsDef() {
-			e.inDefinition++
-		}
-
 		arc := v.LookupRaw(label)
 		if arc == nil {
 			continue
@@ -698,17 +694,19 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		// Errors created while exporting a structure-shared arc report
 		// the arc's own path rather than that of the shared vertex.
 		saved := e.pushArc(arc)
+		if label.IsDef() {
+			e.inDefinition++
+		}
 		if e.cfg.Concrete && arc.ArcType == adt.ArcRequired && e.inDefinition == 0 {
 			// Like validation, report that a required field is not present.
 			f.Value = e.bottom(adt.NewRequiredNotPresentError(e.ctx, arc))
 		} else {
 			f.Value = e.vertex(arc.DerefValue())
 		}
-		e.popArc(saved)
-
 		if label.IsDef() {
 			e.inDefinition--
 		}
+		e.popArc(saved)
 
 		if p.ShowAttributes {
 			f.Attrs = e.exportAttrs(ExtractFieldAttrs(arc))

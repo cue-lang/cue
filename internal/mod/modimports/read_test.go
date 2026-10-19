@@ -181,7 +181,8 @@ var readFailuresTests = []readTest{
 }
 
 func TestReadFailures(t *testing.T) {
-	// Errors should be reported (true arg to readImports).
+	// Syntax errors are left to the parser; only invalid input such as
+	// a NUL byte is reported.
 	testRead(t, readFailuresTests, func(r io.Reader) ([]byte, errors.Error) {
 		return readImports(r)
 	})

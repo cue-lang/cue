@@ -548,7 +548,7 @@ deps: {
 }
 `,
 	}, {
-		name: "WithoutLanguage",
+		name: "WithoutDeps",
 		file: &File{
 			Module: "foo.com/bar@v0",
 			Language: &Language{
@@ -559,6 +559,12 @@ deps: {
 language: version: "v0.8.0"
 `,
 	}, {
+		name: "WithoutLanguage",
+		file: &File{
+			Module: "foo.com/bar@v0",
+		},
+		wantError: `no language version declared in module.cue`,
+	}, {
 		name: "WithVersionTooEarly",
 		file: &File{
 			Module: "foo.com/bar@v0",
@@ -568,7 +574,7 @@ language: version: "v0.8.0"
 		},
 		wantError: `cannot find schema suitable for reading module file with language version "v0.4.3"`,
 	}, {
-		name: "WithInvalidModuleVersion",
+		name: "WithInvalidLanguageVersion",
 		file: &File{
 			Module: "foo.com/bar@v0",
 			Language: &Language{

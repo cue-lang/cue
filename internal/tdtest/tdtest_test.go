@@ -51,21 +51,14 @@ func TestEqualUnnamedField(t *testing.T) {
 		test string
 		want string
 	}{
-		// Equal panics, as the call has no field name.
-		{"TestOutsideHelper", "invalid memory address or nil pointer dereference"},
-		// The test is only looked up in the file of the Equal call.
-		{"TestOutsideHelperOtherFile", `could not find test "TestOutsideHelperOtherFile" in file`},
-		// Updating panics, as the call has no field name.
-		{"TestOutsideHelperUpdate", "invalid memory address or nil pointer dereference"},
-		// Finding the Run call panics, as its function is not a literal.
-		{"TestOutsideRunFunc", "interface conversion: ast.Expr is *ast.Ident, not *ast.FuncLit"},
-		// Finding the Run call panics, as its function is not a literal.
-		{"TestOutsideRunFuncType", "interface conversion: ast.Expr is *ast.Ident, not *ast.FuncLit"},
+		{"TestOutsideHelper", "unexpected value:\ngot:  bar;\nwant: foo"},
+		{"TestOutsideHelperOtherFile", "unexpected value:\ngot:  bar;\nwant: foo"},
+		{"TestOutsideHelperUpdate", "cannot update a field: Equal call is outside the test function:\ngot:  bar;\nwant: foo"},
+		{"TestOutsideRunFunc", "unexpected value:\ngot:  bar;\nwant: foo"},
+		{"TestOutsideRunFuncType", "unexpected value:\ngot:  bar;\nwant: foo"},
 		{"TestOutsideDuplicateName", "unexpected value for field want:\ngot:  bar;\nwant: foo"},
-		// Failing to analyze these tests fails their parent test from the
-		// subtest, so the mismatch is not reported.
-		{"TestNonFieldEqual", "subtest may have called FailNow on a parent test"},
-		{"TestInlineTableUpdate", "subtest may have called FailNow on a parent test"},
+		{"TestNonFieldEqual", "unexpected value:\ngot:  1;\nwant: 3"},
+		{"TestInlineTableUpdate", "arg 2 of Run must be a reference to the table:\ngot:  bar;\nwant: foo"},
 	}
 	for _, test := range tests {
 		t.Run(test.test, func(t *testing.T) {

@@ -23,6 +23,7 @@
 package tdtest
 
 import (
+	"errors"
 	"fmt"
 	"go/token"
 	"path/filepath"
@@ -105,11 +106,9 @@ type T struct {
 	updateEnabled bool
 }
 
-func (t *T) info(file string) *info {
-	return t.infoSrc.getInfo(file)
-}
-
-func (t *T) getCallInfo() (*info, *callInfo) {
+// getCallInfo returns the information needed to update the field compared by
+// the calling Equal, or an error saying why the field cannot be updated.
+func (t *T) getCallInfo() (*info, *callInfo, error) {
 	_, file, line, ok := runtime.Caller(2)
 	if !ok {
 		t.Fatalf("could not update file for test %s", t.Name())
@@ -118,25 +117,39 @@ func (t *T) getCallInfo() (*info, *callInfo) {
 	// might not be in canonical format (under Windows, it can contain
 	// forward slashes), so clean it.
 	file = filepath.Clean(file)
-	info := t.info(file)
-	return info, info.calls[token.Position{Filename: file, Line: line}]
+	info := t.infoSrc.getInfo(file)
+	if info.err != nil {
+		return nil, nil, info.err
+	}
+	ci := info.calls[token.Position{Filename: file, Line: line}]
+	if ci == nil {
+		return nil, nil, errors.New("Equal call is outside the test function")
+	}
+	return info, ci, nil
 }
 
 // Equal compares two fields.
 //
 // For auto updating to work, field must reference a field in the test case
-// directly.
+// directly, and the call must be within the test function itself rather
+// than in a helper.
 func (t *T) Equal(actual, field any, msgAndArgs ...any) {
 	t.Helper()
 
 	switch {
 	case field == actual:
 	case t.updateEnabled:
-		info, ci := t.getCallInfo()
+		info, ci, err := t.getCallInfo()
+		if err != nil {
+			t.Fatalf("cannot update a field: %v:\ngot:  %v;\nwant: %v", err, actual, field)
+		}
 		t.updateField(info, ci, actual)
 	case len(msgAndArgs) == 0:
-		_, ci := t.getCallInfo()
-		t.Errorf("unexpected value for field %s:\ngot:  %v;\nwant: %v", ci.fieldName, actual, field)
+		if _, ci, err := t.getCallInfo(); err == nil {
+			t.Errorf("unexpected value for field %s:\ngot:  %v;\nwant: %v", ci.fieldName, actual, field)
+		} else {
+			t.Errorf("unexpected value:\ngot:  %v;\nwant: %v", actual, field)
+		}
 	default:
 		format := msgAndArgs[0].(string) + ":\ngot:  %v;\nwant: %v"
 		args := append(msgAndArgs[1:], actual, field)

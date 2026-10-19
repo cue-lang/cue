@@ -22,10 +22,10 @@ import (
 	"go/types"
 	"os"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
-	"testing"
 
 	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/go/packages"
@@ -33,8 +33,6 @@ import (
 
 // info contains information needed to update files.
 type info struct {
-	t *testing.T
-
 	tcType reflect.Type
 
 	needsUpdate bool // an updateable field has changed
@@ -45,6 +43,10 @@ type info struct {
 
 	calls   map[token.Position]*callInfo
 	patches map[ast.Node]ast.Expr
+
+	// err is why the test could not be analyzed, if it could not.
+	// The fields above may then be incomplete.
+	err error
 }
 
 type callInfo struct {
@@ -71,26 +73,33 @@ func (s *set[T]) getInfo(file string) *info {
 		return s.info
 	}
 	info := &info{
-		t:       s.t,
 		tcType:  reflect.TypeFor[T](),
 		calls:   make(map[token.Position]*callInfo),
 		patches: make(map[ast.Node]ast.Expr),
 	}
 	s.info = info
+	// In cuetdtest the function of the test may be a subtest, like TestFoo/v3.
+	// We need to strip the last part.
+	testName, _, _ := strings.Cut(s.t.Name(), "/")
+	info.err = info.load(testName, file)
+	return info
+}
 
-	t := s.t
-
-	pkgs, pkgsErr := loadPackages()
-	if pkgsErr != nil {
-		t.Fatalf("load: %v\n", pkgsErr)
+// load analyzes the source of the named test function, given the file of
+// an Equal call which needs the analysis.
+func (i *info) load(testName, file string) error {
+	pkgs, err := loadPackages()
+	if err != nil {
+		return fmt.Errorf("load: %v", err)
 	}
 
-	// Get package under test.
-	f, pkg := findFileAndPackage(file, pkgs)
-	if f == nil {
-		t.Fatalf("failed to load package for file %s", file)
+	// Find the function declaration of this test, which may be in a different
+	// file or package than the Equal call which needs the info.
+	f, fn, pkg := findTestFunc(testName, file, pkgs)
+	if fn == nil {
+		return fmt.Errorf("could not find test %q", testName)
 	}
-	info.testPkg = pkg
+	i.testPkg = pkg
 
 	// TODO: not necessary at the moment, but this is tricky so leaving this in
 	// so as to not to forget how to do it.
@@ -104,36 +113,21 @@ func (s *set[T]) getInfo(file string) *info {
 	// 	t.Fatalf("could not find test package")
 	// }
 
-	// In cuetdtest the function of the test may be a subtest, like TestFoo/v3.
-	// We need to strip the last part.
-	testName := strings.SplitN(t.Name(), "/", 2)[0]
-
-	// Find function declaration of this test.
-	var fn *ast.FuncDecl
-	for _, d := range f.Decls {
-		if fd, ok := d.(*ast.FuncDecl); ok && fd.Name.Name == testName {
-			fn = fd
-		}
-	}
-	if fn == nil {
-		t.Fatalf("could not find test %q in file %q", testName, file)
-	}
-
 	// Find CompositLit table used for the test:
 	// - find call to which CompositLit was passed,
-	a := info.findCalls(fn.Body, "New", "Run")
+	a := i.findCalls(fn.Body, "New", "Run")
 	if len(a) != 1 {
 		// TODO: allow more than one.
-		t.Fatalf("only one Run or New function allowed per test")
+		return fmt.Errorf("only one Run or New function allowed per test")
 	}
 
 	// - analyse second argument of call,
 	call := a[0].ast
-	fset := info.testPkg.Fset
-	ti := info.testPkg.TypesInfo
+	fset := i.testPkg.Fset
+	ti := i.testPkg.TypesInfo
 	ident, ok := call.Args[1].(*ast.Ident)
 	if !ok {
-		t.Fatalf("%v: arg 2 of %s must be a reference to the table",
+		return fmt.Errorf("%v: arg 2 of %s must be a reference to the table",
 			fset.Position(call.Args[1].Pos()), a[0].funcName)
 	}
 	def := ti.Uses[ident]
@@ -142,31 +136,31 @@ func (s *set[T]) getInfo(file string) *info {
 	// - locate the CompositeLit in the AST based on position.
 	v0 := findVar(pos, f)
 	if v0 == nil {
-		t.Fatalf("cannot find composite literal in source code")
+		return fmt.Errorf("cannot find composite literal in source code")
 	}
 	v, ok := v0.(*ast.CompositeLit)
 	if !ok {
 		// generics should avoid this.
-		t.Fatalf("expected composite literal, found %T", v0)
+		return fmt.Errorf("expected composite literal, found %T", v0)
 	}
-	info.table = v
+	i.table = v
 
 	// Find and index assertion calls.
-	a = info.findCalls(fn.Body, "Equal")
+	a = i.findCalls(fn.Body, "Equal")
 	for _, x := range a {
-		info.initFieldRef(x, f)
+		if err := i.initFieldRef(x); err != nil {
+			return err
+		}
 	}
-
-	return info
+	return nil
 }
 
 // initFieldRef updates c with information about the field referenced
 // in its corresponding call:
 //   - name of the field
 //   - indexes the field based on filename and line number.
-func (i *info) initFieldRef(c *callInfo, f *ast.File) {
+func (i *info) initFieldRef(c *callInfo) error {
 	call := c.ast
-	t := i.t
 	info := i.testPkg.TypesInfo
 	fset := i.testPkg.Fset
 	pos := fset.Position(call.Pos())
@@ -174,33 +168,43 @@ func (i *info) initFieldRef(c *callInfo, f *ast.File) {
 	sel, ok := call.Args[1].(*ast.SelectorExpr)
 	s := info.Selections[sel]
 	if !ok || s == nil || s.Kind() != types.FieldVal {
-		t.Fatalf("%v: arg 2 of %s must be a reference to a test case field",
+		return fmt.Errorf("%v: arg 2 of %s must be a reference to a test case field",
 			fset.Position(call.Args[1].Pos()), c.funcName)
 	}
 
 	obj := s.Obj()
 	c.fieldName = obj.Name()
 	if _, ok := i.tcType.FieldByName(c.fieldName); !ok {
-		t.Fatalf("%v: could not find field %s",
+		return fmt.Errorf("%v: could not find field %s",
 			fset.Position(obj.Pos()), c.fieldName)
 	}
 
 	pos.Column = 0
 	pos.Offset = 0
 	i.calls[pos] = c
+	return nil
 }
 
-// findFileAndPackage locates the ast.File and package within the given slice
-// of packages, in which the given file is located.
-func findFileAndPackage(path string, pkgs []*packages.Package) (*ast.File, *packages.Package) {
-	for _, p := range pkgs {
-		for i, gf := range p.GoFiles {
-			if gf == path {
-				return p.Syntax[i], p
+// findTestFunc locates the declaration of the named test function within the
+// given slice of packages, along with the file and package which hold it.
+// A package and its external test package may both declare a test with the
+// same name, so the package holding the given file is searched first.
+func findTestFunc(name, file string, pkgs []*packages.Package) (*ast.File, *ast.FuncDecl, *packages.Package) {
+	for _, sameFile := range []bool{true, false} {
+		for _, p := range pkgs {
+			if slices.Contains(p.GoFiles, file) != sameFile {
+				continue
+			}
+			for _, f := range p.Syntax {
+				for _, d := range f.Decls {
+					if fd, ok := d.(*ast.FuncDecl); ok && fd.Recv == nil && fd.Name.Name == name {
+						return f, fd, p
+					}
+				}
 			}
 		}
 	}
-	return nil, nil
+	return nil, nil, nil
 }
 
 func isT(s string) bool {
@@ -235,12 +239,12 @@ func (i *info) findCalls(block *ast.BlockStmt, names ...string) []*callInfo {
 					// Method.
 				} else if len(c.Args) == 3 {
 					// Run function.
-					fn := c.Args[2].(*ast.FuncLit)
-					if len(fn.Type.Params.List) != 2 {
+					typ := info.TypeOf(c.Args[2])
+					if typ == nil {
 						return true
 					}
-					argType := info.TypeOf(fn.Type.Params.List[0].Type).String()
-					if !isT(argType) {
+					sig, ok := typ.Underlying().(*types.Signature)
+					if !ok || sig.Params().Len() != 2 || !isT(sig.Params().At(0).Type().String()) {
 						return true
 					}
 				} else {

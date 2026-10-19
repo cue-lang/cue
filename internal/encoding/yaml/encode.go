@@ -17,7 +17,6 @@ package yaml
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"math/big"
 	"regexp"
 	"strings"
@@ -116,6 +115,9 @@ func encode(n ast.Node) (y *yaml.Node, err error) {
 		b, ok := x.X.(*ast.BasicLit)
 		if ok && x.Op == token.SUB && (b.Kind == token.INT || b.Kind == token.FLOAT) {
 			y, err = encodeScalar(b)
+			if err != nil {
+				return nil, err
+			}
 			if !strings.HasPrefix(y.Value, "-") {
 				y.Value = "-" + y.Value
 				break
@@ -160,7 +162,7 @@ func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 		}
 		str, err := info.Unquote(b.Value[nStart:])
 		if err != nil {
-			panic(fmt.Sprintf("invalid string: %v", err))
+			return nil, errors.Newf(b.Pos(), "invalid string literal %q: %v", b.Value, err)
 		}
 		n.SetString(str)
 

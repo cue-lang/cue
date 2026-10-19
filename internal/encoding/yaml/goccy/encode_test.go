@@ -15,7 +15,6 @@
 package goccy_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -798,22 +797,12 @@ true
 		`,
 	}, {
 		// A hand-built AST can hold a string literal which the parser rejects.
-		// The encoder panics on it rather than returning an error.
 		in:  &ast.BasicLit{Kind: token.STRING, Value: `"\z"`},
-		out: `panic: invalid string: invalid syntax`,
+		out: `invalid string literal "\"\\z\"": invalid syntax`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var b []byte
-			var err error
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				b, err = goccy.Encode(tc.in, goccy.EncodeOptions{})
-			}()
+			b, err := goccy.Encode(tc.in, goccy.EncodeOptions{})
 			var got string
 			if err != nil {
 				got = err.Error()

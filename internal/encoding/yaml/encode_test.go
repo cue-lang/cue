@@ -15,7 +15,6 @@
 package yaml
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -525,26 +524,15 @@ true
 			Op: token.SUB,
 			X:  &ast.BasicLit{Kind: token.INT, Value: "1__0"},
 		},
-		// TODO: encoding should fail with an error rather than panic.
-		out: `panic: runtime error: invalid memory address or nil pointer dereference`,
+		out: `illegal '_' in number`,
 	}, {
 		// A hand-built AST can hold a string literal which the parser rejects.
-		// The encoder panics on it rather than returning an error.
 		in:  &ast.BasicLit{Kind: token.STRING, Value: `"\z"`},
-		out: `panic: invalid string: invalid syntax`,
+		out: `invalid string literal "\"\\z\"": invalid syntax`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var n *yaml.Node
-			var err error
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				n, err = encode(tc.in)
-			}()
+			n, err := encode(tc.in)
 			var got string
 			if err != nil {
 				got = err.Error()

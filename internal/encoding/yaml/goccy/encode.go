@@ -726,7 +726,7 @@ func encodeScalar(b *ast.BasicLit) (any, *encInfo, error) {
 		}
 		str, err := qi.Unquote(b.Value[nStart:])
 		if err != nil {
-			panic(fmt.Sprintf("invalid string: %v", err))
+			return nil, nil, errors.Newf(b.Pos(), "invalid string literal %q: %v", b.Value, err)
 		}
 		switch {
 		case !qi.IsDouble():

@@ -173,9 +173,7 @@ func TestReleaseEarlierConfigurations(t *testing.T) {
 		}
 	}
 	runtime.KeepAlive(runners)
-	// Each runner keeps the configuration its task ran against; only
-	// the last one, computed after the final task, is released.
-	if retained != len(configs)-1 {
+	if retained != 0 {
 		t.Fatalf("%d of %d configurations stay reachable", retained, len(configs))
 	}
 }

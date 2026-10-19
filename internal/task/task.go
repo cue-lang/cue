@@ -161,13 +161,16 @@ type flowRunner struct {
 }
 
 func (r *flowRunner) Run(t *flow.Task, err error) error {
-	// Set task-specific values.
-	r.c.Context = t.Context()
-	r.c.Obj = t.Value()
+	// Work on a copy: the runner outlives this call, and c.Obj would
+	// otherwise keep the task's configuration tree reachable for the
+	// rest of the flow.
+	c := r.c
+	c.Context = t.Context()
+	c.Obj = t.Value()
 	if r.v.Exists() {
-		r.c.Obj = r.c.Obj.Unify(r.v)
+		c.Obj = c.Obj.Unify(r.v)
 	}
-	value, runErr := r.runner.Run(&r.c)
+	value, runErr := r.runner.Run(&c)
 	if runErr != nil {
 		return runErr
 	}

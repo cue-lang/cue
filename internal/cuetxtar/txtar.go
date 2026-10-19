@@ -725,7 +725,10 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				qt.Assert(t, qt.IsNil(err))
 				resp, err := http.DefaultClient.Do(req)
 				qt.Assert(t, qt.IsNil(err))
-				qt.Assert(t, qt.Equals(resp.StatusCode, http.StatusOK))
+				respBody, err := io.ReadAll(resp.Body)
+				resp.Body.Close()
+				qt.Assert(t, qt.IsNil(err))
+				qt.Assert(t, qt.Equals(resp.StatusCode, http.StatusOK), qt.Commentf("%s", respBody))
 			}
 			a.Files = files
 

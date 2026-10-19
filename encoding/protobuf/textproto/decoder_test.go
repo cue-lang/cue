@@ -65,10 +65,12 @@ func TestParse(t *testing.T) {
 		f, err := astutil.ToFile(x)
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, "test"))
+			return
 		}
 		b, err = format.Node(f)
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, "test"))
+			return
 		}
 		_, _ = t.Write(b)
 	})

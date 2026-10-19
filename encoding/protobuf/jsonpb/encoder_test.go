@@ -60,6 +60,7 @@ func TestEncoder(t *testing.T) {
 			schema = t.CueContext().BuildFile(file)
 			if err := schema.Err(); err != nil {
 				t.WriteErrors(errors.Promote(err, "test"))
+				return
 			}
 		}
 

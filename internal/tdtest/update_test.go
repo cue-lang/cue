@@ -134,3 +134,14 @@ func SkipUnlessFailing(t *testing.T) {
 		t.Skip("run by RunFailing")
 	}
 }
+
+// CheckOutsideOtherFile calls Equal outside the test function, in a file
+// other than the one with the tests which use it; see TestEqualUnnamedField
+// in the external test package.
+func CheckOutsideOtherFile(t *T, want string) {
+	t.Equal("bar", want)
+}
+
+// TestOutsideDuplicateName shares its name with the test in the external
+// test package which calls Run; see TestEqualUnnamedField there.
+func TestOutsideDuplicateName(t *testing.T) {}

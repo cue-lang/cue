@@ -168,9 +168,8 @@ patterns: {
 patternAttr: {[string]: _ @foo(bar)}
 -- shadowed.input --
 // A binding named string may shadow the predeclared type, in which case
-// [string]: _ is not an open marker. Yet each [string]: _ in this file
-// collapses to an ellipsis, breaking the let clause and opening the
-// structs constrained by a pattern.
+// [string]: _ is not an open marker. References are not resolved, so no
+// [string]: _ in a file binding that name collapses to an ellipsis.
 letShadow: {
     let string = "allowed"
     nested: {[string]: _}
@@ -184,6 +183,8 @@ forShadow: {
         nested: {[string]: _}
     }
 }
+// No binding named string is in scope here, yet the pattern is kept.
+// TODO: resolve the reference lexically, so that this collapses.
 unshadowed: {[string]: _, a: 1}
 
 // The blank identifier cannot be bound.
@@ -359,23 +360,24 @@ patterns: {
 patternAttr: {[string]: _ @foo(bar)}
 -- out/format/shadowed.golden --
 // A binding named string may shadow the predeclared type, in which case
-// [string]: _ is not an open marker. Yet each [string]: _ in this file
-// collapses to an ellipsis, breaking the let clause and opening the
-// structs constrained by a pattern.
+// [string]: _ is not an open marker. References are not resolved, so no
+// [string]: _ in a file binding that name collapses to an ellipsis.
 letShadow: {
 	let string = "allowed"
-	nested: {...}
+	nested: [string]: _
 }
 fieldShadow: {
 	string: "f"
-	nested: {a: 1, ...}
+	nested: {a: 1, [string]: _}
 }
 forShadow: {
 	for string in ["h"] {
-		nested: {...}
+		nested: [string]: _
 	}
 }
-unshadowed: {a: 1, ...}
+// No binding named string is in scope here, yet the pattern is kept.
+// TODO: resolve the reference lexically, so that this collapses.
+unshadowed: {[string]: _, a: 1}
 
 // The blank identifier cannot be bound.
 blank: {a: 1, ...}
@@ -383,4 +385,4 @@ blank: {a: 1, ...}
 // An import binds its package name too, here string.
 import "example.com/string"
 
-x: {a: 1, ...}
+x: {[string]: _, a: 1}

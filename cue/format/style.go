@@ -198,7 +198,7 @@ func (cfg ASTStyle) apply(n ast.Node, allowChanges bool) bool {
 	if n == nil || cfg == (ASTStyle{}) {
 		return false
 	}
-	w := walker{cfg: cfg, allowChanges: allowChanges}
+	w := walker{cfg: cfg, allowChanges: allowChanges, root: n}
 
 	if cfg.Labels {
 		w.simplifyLabels(n)
@@ -259,6 +259,14 @@ type walker struct {
 	// when allowChanges is false. The passes then have nothing left to
 	// learn and unwind.
 	stopped bool
+
+	// root is the node being rewritten.
+	root ast.Node
+
+	// stringBound caches whether root binds the name string,
+	// once scannedString reports that it is known.
+	scannedString bool
+	stringBound   bool
 }
 
 // tryMutate reports whether the caller may carry out a rewrite it has

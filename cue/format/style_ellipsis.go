@@ -14,11 +14,14 @@
 
 package format
 
-import "cuelang.org/go/cue/ast"
+import (
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
+)
 
 // mergeEllipsisDecls applies the [ASTStyle] Ellipsis rule to a body's
 // decl slice, mutating it in place. We remove every decl matching
-// [isEllipsisDecl] and, if any were removed, append a single fresh
+// [walker.isEllipsisDecl] and, if any were removed, append a single fresh
 // trailing [*ast.Ellipsis] carrying the comments of every removed
 // marker in source order, so no comment is lost.
 func (w *walker) mergeEllipsisDecls(decls *[]ast.Decl) {
@@ -26,7 +29,7 @@ func (w *walker) mergeEllipsisDecls(decls *[]ast.Decl) {
 	kept := make([]ast.Decl, 0, len(*decls))
 	removed := false
 	for _, d := range *decls {
-		if isEllipsisDecl(d) {
+		if w.isEllipsisDecl(d) {
 			removed = true
 			mergedComments = append(mergedComments, ast.Comments(d)...)
 			continue
@@ -47,8 +50,8 @@ func (w *walker) mergeEllipsisDecls(decls *[]ast.Decl) {
 //   - a literal [*ast.Ellipsis];
 //   - an [*ast.Field] whose label is `[string]` or `[_]` (a pattern
 //     constraint with a single-Ident pattern) and whose value is the
-//     bare `_` identifier.
-func isEllipsisDecl(d ast.Decl) bool {
+//     bare `_` identifier, unless the tree binds the name string.
+func (w *walker) isEllipsisDecl(d ast.Decl) bool {
 	if e, ok := d.(*ast.Ellipsis); ok {
 		return e.Type == nil
 	}
@@ -74,5 +77,59 @@ func isEllipsisDecl(d ast.Decl) bool {
 		len(ast.Comments(i)) > 0 || len(ast.Comments(v)) > 0 {
 		return false
 	}
-	return i.Name == "string" || i.Name == "_"
+	switch i.Name {
+	case "_":
+		return true
+	case "string":
+		// A binding named string may shadow the predeclared type.
+		// We don't resolve references, so we give up if any exists.
+		if !w.scannedString {
+			w.scannedString = true
+			w.stringBound = bindsName(w.root, "string")
+		}
+		return !w.stringBound
+	}
+	return false
+}
+
+// bindsName reports whether anything in n binds name, such as a field,
+// alias, let clause, comprehension variable, or import.
+func bindsName(n ast.Node, name string) bool {
+	found := false
+	is := func(i *ast.Ident) bool { return i != nil && i.Name == name }
+	ast.Walk(n, func(n ast.Node) bool {
+		if found {
+			return false
+		}
+		switch x := n.(type) {
+		case *ast.Field:
+			found = labelBinds(x.Label, name)
+		case *ast.FuncParam:
+			found = labelBinds(x.Label, name)
+		case *ast.PostfixAlias:
+			found = is(x.Label) || is(x.Field)
+		case *ast.Alias:
+			found = is(x.Ident)
+		case *ast.LetClause:
+			found = is(x.Ident)
+		case *ast.TryClause:
+			found = is(x.Ident)
+		case *ast.ForClause:
+			found = is(x.Key) || is(x.Value)
+		case *ast.ImportSpec:
+			info, _ := astutil.ParseImportSpec(x)
+			found = info.Ident == name
+		}
+		return !found
+	}, nil)
+	return found
+}
+
+// labelBinds reports whether a field with the given label binds name.
+func labelBinds(label ast.Label, name string) bool {
+	if a, ok := label.(*ast.Alias); ok {
+		label, _ = a.Expr.(ast.Label)
+	}
+	i, ok := label.(*ast.Ident)
+	return ok && i.Name == name
 }

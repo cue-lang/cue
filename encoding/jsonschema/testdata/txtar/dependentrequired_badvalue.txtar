@@ -1,0 +1,31 @@
+Entries of a dependentRequired keyword must be arrays of strings,
+and entries of a dependentSchemas keyword must be schemas.
+The error for a dependentRequired entry which is a schema
+says that a schema is expected, and the error for an entry of any other kind
+says that an array or schema is expected, whichever the keyword.
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "dependentRequired": {
+        "a": {"type": "string"},
+        "b": true,
+        "c": 1234
+    },
+    "dependentSchemas": {
+        "d": ["e"],
+        "f": 1234
+    }
+}
+-- out/decode/extract --
+ERROR:
+expected schema but got struct:
+    schema.json:4:10
+expected schema but got bool:
+    schema.json:5:10
+dependency value must be array or schema. found int:
+    schema.json:6:10
+expected schema but got list:
+    schema.json:9:10
+dependency value must be array or schema. found int:
+    schema.json:10:10

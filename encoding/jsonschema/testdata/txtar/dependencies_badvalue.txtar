@@ -1,0 +1,13 @@
+Entries of a dependencies keyword must be arrays of strings or schemas.
+
+-- schema.json --
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "dependencies": {
+        "a": 1234
+    }
+}
+-- out/decode/extract --
+ERROR:
+dependency value must be array or schema. found int:
+    schema.json:4:10

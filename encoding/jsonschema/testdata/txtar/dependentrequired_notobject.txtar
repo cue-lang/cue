@@ -1,0 +1,11 @@
+A dependentRequired keyword whose value is not an object is an error.
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "dependentRequired": 1234
+}
+-- out/decode/extract --
+ERROR:
+""dependentRequired" expected an object, found int:
+    schema.json:3:6

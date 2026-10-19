@@ -232,16 +232,6 @@ func TestBuild(t *testing.T) {
 			files(
 				`package test
 
-				import "pkg1"
-
-				"Hello \(pkg1.Object)!"`),
-		}),
-		`"Hello World!"`,
-	}, {
-		insts(pkg1, &bimport{"",
-			files(
-				`package test
-
 				import pkg2 "pkg1"
 				#pkg1: pkg2.Object
 

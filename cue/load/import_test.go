@@ -70,7 +70,7 @@ func TestEmptyFolderImport(t *testing.T) {
 	path := testdata("testmod", "empty")
 	_, err := getInst(".", path)
 	if _, ok := err.(*NoFilesError); !ok {
-		t.Fatalf(`Import(%q) did not return NoCUEError, but instead %#v (%v)`, path, err, err)
+		t.Fatalf(`Import(%q) did not return NoFilesError, but instead %#v (%v)`, path, err, err)
 	}
 }
 

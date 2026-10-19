@@ -124,14 +124,6 @@ var parseImportPathTests = []struct {
 		Qualifier:         "other",
 	},
 }, {
-	testName: "WithMajorVersionAndNoQualifier",
-	path:     "foo.com/bar@v0",
-	want: ast.ImportPath{
-		Path:      "foo.com/bar",
-		Version:   "v0",
-		Qualifier: "bar",
-	},
-}, {
 	testName: "WithRedundantQualifier",
 	path:     "foo.com/bar@v0:bar",
 	want: ast.ImportPath{

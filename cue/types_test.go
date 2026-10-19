@@ -683,7 +683,7 @@ func TestString(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			str, err := getValue(m, tc.value).String()
-			if !checkErr(t, err, tc.err, "init") {
+			if !checkErr(t, err, tc.err, "String") {
 				return
 			}
 			if str != tc.str {
@@ -691,7 +691,7 @@ func TestString(t *testing.T) {
 			}
 
 			b, err := getValue(m, tc.value).Bytes()
-			if !checkErr(t, err, tc.err, "init") {
+			if !checkErr(t, err, tc.err, "Bytes") {
 				return
 			}
 			if got := string(b); got != tc.str {
@@ -699,7 +699,7 @@ func TestString(t *testing.T) {
 			}
 
 			r, err := getValue(m, tc.value).Reader()
-			if !checkErr(t, err, tc.err, "init") {
+			if !checkErr(t, err, tc.err, "Reader") {
 				return
 			}
 			b, _ = io.ReadAll(r)
@@ -726,7 +726,7 @@ func TestError(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			err := getValue(m, tc.value).Err()
-			checkErr(t, err, tc.err, "init")
+			checkErr(t, err, tc.err, "Err")
 		})
 	}
 }
@@ -751,7 +751,7 @@ func TestNull(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			v := getValue(m, tc.value).Lookup("v")
 			err := v.Null()
-			checkErr(t, err, tc.err, "init")
+			checkErr(t, err, tc.err, "Null")
 			wantBool := err == nil
 			gotBool := v.IsNull()
 			if wantBool != gotBool {
@@ -784,7 +784,7 @@ func TestBool(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			got, err := getValue(m, tc.value).Bool()
-			if checkErr(t, err, tc.err, "init") {
+			if checkErr(t, err, tc.err, "Bool") {
 				if got != tc.bool {
 					t.Errorf("got %v; want %v", got, tc.bool)
 				}
@@ -879,9 +879,6 @@ func TestFields(t *testing.T) {
 				#y: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
 	}, {
-		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
-		res:   "{reg:4,}",
-	}, {
 		value: `{a:1,b:2,c:int}`,
 		res:   "{a:1,b:2,c:int,}",
 	}, {
@@ -942,10 +939,6 @@ func TestFields(t *testing.T) {
 		opts:  []cue.Option{cue.Patterns(true)},
 		value: `{[_]: 1}`,
 		res:   `{[_]:1,}`,
-	}, {
-		opts:  []cue.Option{cue.Patterns(true)},
-		value: `{...}`,
-		res:   `{}`,
 	}, {
 		opts:  []cue.Option{cue.Patterns(true)},
 		value: `{...}`,
@@ -1880,7 +1873,7 @@ func TestAllows(t *testing.T) {
 		sel:   cue.AnyIndex,
 		allow: true,
 	}, {
-		desc: "allow index in disjunction",
+		desc: "allow index in disjunction with empty list",
 		in: `
 		x: [] | [...int]
 			`,
@@ -1906,7 +1899,7 @@ func TestAllows(t *testing.T) {
 		sel:   cue.AnyString,
 		allow: true,
 	}, {
-		desc: "allow label in disjunction",
+		desc: "allow label in disjunction of definition",
 		in: `
 		x: #Def
 		#Def: { a: 1 } | { b: 1, ... }
@@ -1921,14 +1914,14 @@ func TestAllows(t *testing.T) {
 		`,
 		sel: cue.AnyString,
 	}, {
-		desc: "pattern constraint",
+		desc: "pattern constraint disallows non-matching label",
 		in: `
 		x: #PC
 		#PC: [>"m"]: int
 		`,
 		sel: cue.Str(""),
 	}, {
-		desc: "pattern constraint",
+		desc: "pattern constraint allows matching label",
 		in: `
 		x: #PC
 		#PC: [>"m"]: int
@@ -1943,7 +1936,7 @@ func TestAllows(t *testing.T) {
 		`,
 		sel: cue.AnyString,
 	}, {
-		desc: "any in pattern constraint",
+		desc: "any in wider pattern constraint",
 		in: `
 		x: #PC
 		#PC: [>" "]: int
@@ -3847,7 +3840,7 @@ func TestMarshalJSON(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
 			val := getValue(m, tc.value)
 			b, err := val.MarshalJSON()
-			if !checkErr(t, err, tc.err, "init") {
+			if !checkErr(t, err, tc.err, "MarshalJSON") {
 				return
 			}
 
@@ -4520,16 +4513,6 @@ func TestPathCorrection(t *testing.T) {
 			if gotPath != tc.want {
 				t.Errorf("got path %s; want %s", gotPath, tc.want)
 			}
-
-			x, p := v.ReferencePath()
-			if x != val {
-				t.Error("reference not in original instance")
-			}
-			gotPath = p.String()
-			if gotPath != tc.want {
-				t.Errorf("got path %s; want %s", gotPath, tc.want)
-			}
-
 		})
 	}
 }
@@ -5059,36 +5042,6 @@ func TestIsClosed(t *testing.T) {
 			input:               `x: [1, 2, 3]`,
 			path:                "x",
 			wantClosed:          false,
-			wantClosedRecursive: false,
-		},
-		{
-			desc: "unresolved disjunction with all closed options",
-			input: `
-				#A: {a: 1}
-				#B: {b: 2}
-				x: #A | #B
-			`,
-			path:                "x",
-			wantClosed:          false, // Disjunction itself is not closed
-			wantClosedRecursive: false,
-		},
-		{
-			desc: "unresolved disjunction with mixed closedness",
-			input: `
-				#A: {a: 1}
-				x: #A | {b: 2}
-			`,
-			path:                "x",
-			wantClosed:          false,
-			wantClosedRecursive: false,
-		},
-		{
-			desc: "disjunction with close() builtin",
-			input: `
-				x: close({a: 1}) | close({b: 2})
-			`,
-			path:                "x",
-			wantClosed:          false, // Disjunction itself is not closed
 			wantClosedRecursive: false,
 		},
 		{

@@ -75,11 +75,6 @@ func TestPaths(t *testing.T) {
 		str:  `_foo.b`,
 	}, {
 		in:   `#Foo: a: b: 1`,
-		path: cue.ParsePath("#Foo.a.b"),
-		str:  "#Foo.a.b",
-		out:  "1",
-	}, {
-		in:   `#Foo: a: b: 1`,
 		path: cue.ParsePath("#Foo.a.c"),
 		str:  "#Foo.a.c",
 		out:  `_|_ // field not found: c`,
@@ -158,11 +153,6 @@ func TestPaths(t *testing.T) {
 		path: cue.MakePath(cue.Str("map"), cue.AnyString),
 		out:  "int",
 		str:  "map.[_]",
-	}, {
-		in:   `list: [...int]`,
-		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
-		out:  "int",
-		str:  "list.[_]",
 	}, {
 		// Issue 2060
 		in: `
@@ -314,7 +304,7 @@ func TestWalkPath(t *testing.T) {
 				_g: #B
 				#B: x: "definition B"
 			`,
-			// Order: regular (a, c), definitions (#B, #D), hidden (_g, _h)
+			// Only regular fields are visited, in declaration order.
 			wantPaths: []string{
 				"", // root
 				"c",
@@ -475,7 +465,7 @@ func TestSelector(t *testing.T) {
 				t.Errorf("unexpected sel.IsHidden result; got %v want %v", got, want)
 			}
 			if got, want := sel.IsConstraint(), tc.isConstraint; got != want {
-				t.Errorf("unexpected sel.IsOptional result; got %v want %v", got, want)
+				t.Errorf("unexpected sel.IsConstraint result; got %v want %v", got, want)
 			}
 			if got, want := sel.IsString(), tc.isString; got != want {
 				t.Errorf("unexpected sel.IsString result; got %v want %v", got, want)

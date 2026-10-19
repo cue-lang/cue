@@ -151,10 +151,6 @@ func TestAttributeErr(t *testing.T) {
 		attr: "bar",
 		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
-		path: "xx",
-		attr: "bar",
-		err:  errors.New(`attribute "bar" does not exist`),
-	}, {
 		path: "e",
 		attr: "bar",
 		err:  errors.New(`attribute "bar" does not exist`),

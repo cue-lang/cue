@@ -57,7 +57,7 @@ func TestSanitize(t *testing.T) {
 {list: list_9.Min()}
 `,
 	}, {
-		desc: "Take existing import and rename it",
+		desc: "Take existing import and rename it in a field",
 		file: func() *ast.File {
 			spec := ast.NewImport(nil, "list")
 			return &ast.File{Decls: []ast.Decl{
@@ -400,7 +400,7 @@ c: {
 }
 `,
 	}, {
-		desc: "Add let clause to shadowed field",
+		desc: "Add let clause to shadowed aliased field",
 		// Resolve both identifiers to same clause.
 		file: func() *ast.File {
 			fieldX := &ast.Field{

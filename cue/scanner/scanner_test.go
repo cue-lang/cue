@@ -379,7 +379,6 @@ var lines = []string{
 	"1.2^\n",
 	"'x'^\n",
 	"_|_^\n",
-	"_|_^\n",
 	`"x"` + "^\n",
 	"#'x'#^\n",
 	`"""
@@ -923,7 +922,7 @@ func BenchmarkScan(b *testing.B) {
 
 func BenchmarkScanFile(b *testing.B) {
 	b.StopTimer()
-	const filename = "go"
+	const filename = "scanner.go"
 	src, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)

@@ -55,9 +55,8 @@
 package regexp
 
 import (
-	"regexp"
-
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
 )
 
@@ -66,7 +65,7 @@ var errNoMatch = errors.New("no match")
 // Find returns a string holding the text of the leftmost match in s of the regular expression.
 // A return value of bottom indicates no match.
 func Find(pattern, s string) (string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return "", err
 	}
@@ -82,7 +81,7 @@ func Find(pattern, s string) (string, error) {
 // package comment.
 // A return value of bottom indicates no match.
 func FindAll(pattern, s string, n int) ([]string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +96,7 @@ func FindAll(pattern, s string, n int) ([]string, error) {
 // with the names used in capturing groups. See [FindNamedSubmatch] for an
 // example on how to use named groups.
 func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +123,7 @@ func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error)
 // description in the package comment.
 // A return value of bottom indicates no match.
 func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +146,7 @@ func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 //
 //	{person: "World"}
 func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +170,7 @@ func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
 // comment.
 // A return value of bottom indicates no match.
 func FindSubmatch(pattern, s string) ([]string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +197,7 @@ func FindSubmatch(pattern, s string) ([]string, error) {
 //
 // To insert a literal $ in the output, use $$ in the template.
 func ReplaceAll(pattern, src, repl string) (string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return "", err
 	}
@@ -209,7 +208,7 @@ func ReplaceAll(pattern, src, repl string) (string, error) {
 // pattern with the replacement string repl. The replacement repl is substituted
 // directly.
 func ReplaceAllLiteral(pattern, src, repl string) (string, error) {
-	re, err := regexp.Compile(pattern)
+	re, err := adt.CompileRegexp(pattern)
 	if err != nil {
 		return "", err
 	}
@@ -219,6 +218,6 @@ func ReplaceAllLiteral(pattern, src, repl string) (string, error) {
 // Valid reports whether the given regular expression
 // is valid.
 func Valid(pattern string) (pkg.Validator, error) {
-	_, err := regexp.Compile(pattern)
+	_, err := adt.CompileRegexp(pattern)
 	return err == nil, err
 }

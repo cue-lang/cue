@@ -19,12 +19,20 @@
 //cue:pure
 package regexp
 
-import "regexp"
+import (
+	"regexp"
+
+	"cuelang.org/go/internal/core/adt"
+)
 
 // Match reports whether the string s
 // contains any match of the regular expression pattern.
 func Match(pattern string, s string) (matched bool, err error) {
-	return regexp.MatchString(pattern, s)
+	re, err := adt.CompileRegexp(pattern)
+	if err != nil {
+		return false, err
+	}
+	return re.MatchString(s), nil
 }
 
 // QuoteMeta returns a string that escapes all regular expression metacharacters

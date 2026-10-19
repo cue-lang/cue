@@ -2168,6 +2168,13 @@ var regexpCache = newMemoizer(func(pattern string) (*regexp.Regexp, error) {
 	return regexp.Compile(pattern)
 })
 
+// CompileRegexp is like [regexp.Compile], but reuses compiled patterns
+// while they are still referenced. Failures are not cached.
+// The result is shared, so [regexp.Regexp.Longest] must not be called on it.
+func CompileRegexp(pattern string) (*regexp.Regexp, error) {
+	return regexpCache.get(pattern)
+}
+
 func (c *OpContext) regexp(v Value) *regexp.Regexp {
 	v = Unwrap(v)
 	if isError(v) {

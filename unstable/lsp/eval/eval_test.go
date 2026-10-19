@@ -5560,8 +5560,8 @@ func (tcs testCases) run(t *testing.T) {
 			for _, fh := range ar.Files {
 				fileAst, _ := parser.ParseFile(fh.Name, fh.Data,
 					parser.ParseComments, parser.Version(tc.langVersion))
-				fileAst.Pos().File().SetContent(fh.Data)
 				qt.Assert(t, qt.IsNotNil(fileAst))
+				fileAst.Pos().File().SetContent(fh.Data)
 				files = append(files, fileAst)
 				filesByName[fh.Name] = fileAst
 				pkgName := fileAst.PackageName()
@@ -5659,8 +5659,7 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 
 		for posFrom, positionsWant := range tc.expectDefinitions {
 			filename := posFrom.filename
-			fileEval := evalByFilename[filename].ForFile(filename)
-			qt.Check(t, qt.IsNotNil(fileEval))
+			fileEval := forFile(t, evalByFilename, filename)
 
 			offset := posFrom.offset
 			ranges.Add(filename, offset, offset+len(posFrom.str)+1)
@@ -5691,7 +5690,7 @@ func (tc *testCase) testDefinitions(t *testing.T, files []*ast.File, analysis te
 		// expectations, resolve to nothing.
 		for _, fileAst := range files {
 			filename := fileAst.Filename
-			fileEval := evalByFilename[filename].ForFile(filename)
+			fileEval := forFile(t, evalByFilename, filename)
 			for i := range fileAst.Pos().File().Content() {
 				if ranges.Contains(filename, i) {
 					continue
@@ -5913,8 +5912,7 @@ func (tc *testCase) testUsages(t *testing.T, files []*ast.File, analysis testCas
 
 			for posUse, positionsWant := range expectUsages {
 				filename := posUse.filename
-				fe := analysis.evalByFilename[filename].ForFile(filename)
-				qt.Assert(t, qt.IsNotNil(fe))
+				fe := forFile(t, analysis.evalByFilename, filename)
 
 				fileOffsetsWant := make([]fileOffset, len(positionsWant))
 				for j, p := range positionsWant {
@@ -5956,8 +5954,7 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 			slices.Sort(fieldCompletionWant)
 			slices.Sort(embedCompletionWant)
 			filename := curRange.filename
-			fe := evalByFilename[filename].ForFile(filename)
-			qt.Check(t, qt.IsNotNil(fe))
+			fe := forFile(t, evalByFilename, filename)
 
 			ranges.Add(filename, curRange.from, curRange.to)
 
@@ -5985,7 +5982,7 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 		// expectations, complete to nothing.
 		for _, fileAst := range files {
 			filename := fileAst.Filename
-			fe := evalByFilename[filename].ForFile(filename)
+			fe := forFile(t, evalByFilename, filename)
 
 			for i := range fileAst.Pos().File().Content() {
 				if ranges.Contains(filename, i) {
@@ -5998,10 +5995,21 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 	})
 }
 
+// forFile returns the evaluator of the named file, failing the test if
+// there is none.
+func forFile(t *testing.T, evalByFilename map[string]*eval.Evaluator, filename string) *eval.FileEvaluator {
+	t.Helper()
+	e := evalByFilename[filename]
+	qt.Assert(t, qt.IsNotNil(e), qt.Commentf("file: %q", filename))
+	fe := e.ForFile(filename)
+	qt.Assert(t, qt.IsNotNil(fe), qt.Commentf("file: %q", filename))
+	return fe
+}
+
 func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, evalByFilename map[string]*eval.Evaluator) {
 	for _, fileAst := range files {
 		filename := fileAst.Filename
-		fe := evalByFilename[filename].ForFile(filename)
+		fe := forFile(t, evalByFilename, filename)
 		content := fileAst.Pos().File().Content()
 
 		var strs []string

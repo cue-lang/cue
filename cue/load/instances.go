@@ -156,7 +156,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		opts := []build.Option{
 			build.ParseFile(c.ParseFile),
 		}
-		if f := l.loadFunc(); l != nil {
+		if f := l.loadFunc(); f != nil {
 			opts = append(opts, build.Loader(f))
 		}
 		c.Context = build.NewContext(opts...)

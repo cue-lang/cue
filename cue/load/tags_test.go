@@ -90,6 +90,16 @@ func TestTags(t *testing.T) {
 		u1: string @tag(bar,var=user)
 		`,
 		err: `tag variable 'user' not found`,
+	}, {
+		in: `
+		u1: string @tag(bar,short=prod|)
+		`,
+		err: `invalid shorthand ""`,
+	}, {
+		in: `
+		u1: string @tag(bar,short=a=b)
+		`,
+		err: `invalid shorthand "a=b"`,
 	}}
 
 	for _, tc := range testCases {

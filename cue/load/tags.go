@@ -197,8 +197,10 @@ func parseTag(astAttr *ast.Attribute) (t *tag, err errors.Error) {
 
 	if s, ok, _ := a.Lookup(1, "short"); ok {
 		for s := range strings.SplitSeq(s, "|") {
-			if !ast.IsValidIdent(t.key) {
-				return t, errors.Newf(a.Pos, "invalid identifier %q", s)
+			// An empty shorthand is meaningless, and one containing '='
+			// can never match, as injectTags cuts on '=' first.
+			if s == "" || strings.Contains(s, "=") {
+				return t, errors.Newf(a.Pos, "invalid shorthand %q", s)
 			}
 			t.shorthands = append(t.shorthands, s)
 		}

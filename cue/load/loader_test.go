@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -155,6 +156,8 @@ imports:
 		name: "RelativeImportPathWildcard",
 		cfg:  dirCfg,
 		args: []string{"./other/..."},
+		// TODO: the import error of one package takes the whole pattern,
+		// so the other package it matches, other/file, is dropped.
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
 path:   ""
@@ -977,4 +980,44 @@ func race(t *testing.T, f func() error) {
 		})
 	}
 	wg.Wait()
+}
+
+// TestWildcardSkipsUnreadableEntries loads ./... over a module holding a
+// directory the user cannot read, before a package whose import is
+// resolved inside the module.
+//
+// TODO: the expansion stops at the unreadable directory, so the packages
+// after it are left out of the packages loaded and the import of zz does
+// not resolve; that import error then turns the whole pattern into a
+// single error instance, dropping lib/l as well.
+func TestWildcardSkipsUnreadableEntries(t *testing.T) {
+	if runtime.GOOS == "windows" || os.Getuid() == 0 {
+		t.Skip("needs a directory the user cannot read")
+	}
+	dir := t.TempDir()
+	write := func(name, content string) {
+		p := filepath.Join(dir, filepath.FromSlash(name))
+		qt.Assert(t, qt.IsNil(os.MkdirAll(filepath.Dir(p), 0o777)))
+		qt.Assert(t, qt.IsNil(os.WriteFile(p, []byte(content), 0o666)))
+	}
+	write("cue.mod/module.cue", "module: \"mod.test/m\"\nlanguage: version: \"v0.17.0\"\n")
+	write("a/a.cue", "package a\n\nx: 1\n")
+	write("lib/l/l.cue", "package l\n\nv: 1\n")
+	write("zz/z.cue", "package zz\n\nimport \"mod.test/m/lib/l\"\n\nw: l.v\n")
+	unreadable := filepath.Join(dir, "a")
+	qt.Assert(t, qt.IsNil(os.Chmod(unreadable, 0)))
+	t.Cleanup(func() { os.Chmod(unreadable, 0o777) })
+
+	insts := Instances([]string{"./..."}, &Config{Dir: dir})
+	var got []string
+	for _, inst := range insts {
+		s := inst.ImportPath
+		if inst.Err != nil {
+			s += " (error)"
+		}
+		got = append(got, s)
+	}
+	qt.Assert(t, qt.DeepEquals(got, []string{
+		" (error)",
+	}))
 }

@@ -54,6 +54,9 @@ out: other: 1 @test(eq, 1)
 out: extra: "e" @test(eq, "e")
 out: y: "k" @test(eq, "k")
 err: app & {name: "n", mode: "a", deps: default: kind: "k", bogus: 1} @test(err, code=eval, contains="field not allowed")
+-- out/errors.txt --
+[eval] err.bogus: field not allowed:
+    ./a.cue:37:61
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "upgrade.test"

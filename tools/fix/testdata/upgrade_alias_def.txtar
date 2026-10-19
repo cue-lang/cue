@@ -39,6 +39,11 @@ out: deps: default: kind: "k" @test(eq, "k")
 v: {if true {f: X={#Base, b: X.name}}}
 vv: v & {f: {name: "n", c: 3}} @test(err, code=eval, contains="field not allowed")
 err: #App & {name: "n", bogus: 1} @test(err, code=eval, contains="field not allowed")
+-- out/errors.txt --
+[eval] vv.f.c: field not allowed:
+    ./a.cue:25:25
+[eval] err.bogus: field not allowed:
+    ./a.cue:26:25
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "upgrade.test"

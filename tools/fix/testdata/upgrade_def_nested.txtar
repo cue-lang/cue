@@ -60,6 +60,24 @@ v: #D & {m: b: {y: 1, x: 1, z: 1}} @test(err, code=eval, contains="matchN")
 ok: #D & {a: {y: 2, k: 3}, f: {y: 1}, l: [{y: 1}], spec: {y: 1}, m: b: {y: 1, x: 1}}
 ok: a: k: 3 @test(eq, 3)
 ok: d: {y: 3, c: 2, z: 4} @test(eq, {y: 3, c: 2, z: 4})
+-- out/errors.txt --
+[eval] out1.f.z: field not allowed:
+    ./a.cue:30:23
+[eval] out2.l.0.z: field not allowed:
+    ./a.cue:31:24
+[eval] out3.g.z: field not allowed:
+    ./a.cue:32:23
+[eval] out4.a.z: field not allowed:
+    ./a.cue:33:23
+[eval] w.z: field not allowed:
+    ./a.cue:35:17
+[eval] v.m: invalid value {b:{y:1,x:1,z:1}} (does not satisfy matchN): 0 matched, expected 1:
+    ./a.cue:17:5
+    ./a.cue:17:12
+    ./a.cue:40:13
+v.m.b.z: field not allowed:
+    ./a.cue:17:5
+    ./a.cue:40:32
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "upgrade.test"

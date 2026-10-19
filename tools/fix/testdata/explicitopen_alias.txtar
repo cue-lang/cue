@@ -36,6 +36,15 @@ out: extra: "e" @test(eq, "e")
 out2: app & {name: "n", mode: "a", extra: "e"}
 out2: extra: "e" @test(eq, "e")
 vv: v & {f: {name: "n", c: 3}} @test(err, code=eval, contains="field not allowed")
+-- out/errors.txt --
+[incomplete] #App: non-concrete value string in operand to ==:
+    ./a.cue:8:5
+    ./a.cue:7:8
+[incomplete] app: non-concrete value string in operand to ==:
+    ./a.cue:14:5
+    ./a.cue:13:8
+[eval] vv.f.c: field not allowed:
+    ./a.cue:23:25
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "fix.test"

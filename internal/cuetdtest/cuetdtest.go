@@ -32,6 +32,14 @@ type T struct {
 	M *M
 }
 
+// Update fails the test. Tables are updated from the default matrix entry
+// when CUE_UPDATE is set, and enabling updates from a test would let the
+// other entries rewrite the table with their own results.
+func (t *T) Update(bool) {
+	t.Helper()
+	t.Fatal("cuetdtest tables update via CUE_UPDATE; do not call Update")
+}
+
 // Run creates a new table-driven test using the CUE testing defaults.
 func Run[TC any](t *testing.T, table []TC, fn func(t *T, tc *TC)) {
 	FullMatrix.Do(t, func(t *testing.T, m *M) {

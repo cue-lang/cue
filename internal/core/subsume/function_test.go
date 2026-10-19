@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/cuetdtest"
-	"cuelang.org/go/internal/cuetest"
 )
 
 // TestFunctions tests subsumption of native function values and function
@@ -495,8 +494,6 @@ func TestFunctions(t *testing.T) {
 	}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *subsumeTest) {
-		t.Update(cuetest.UpdateGoldenFiles())
-
 		// Log descriptive name for debugging
 		t.Log(tc.in)
 

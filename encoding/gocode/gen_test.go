@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/encoding/gocode/testdata/pkg1"
 	"cuelang.org/go/encoding/gocode/testdata/pkg2"
 	"cuelang.org/go/internal/cuetdtest"
-	"cuelang.org/go/internal/cuetest"
 )
 
 type validator interface {
@@ -104,8 +103,6 @@ I.a: invalid value 1000 (out of bound <100):
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
-		t.Update(cuetest.UpdateGoldenFiles())
-
 		got := errStr(tc.value.Validate())
 		// The expected values in the test table have extra whitespace, but we trim both
 		// sides for comparison. We need to store the trimmed version back for auto-update.

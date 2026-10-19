@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/cuetdtest"
-	"cuelang.org/go/internal/cuetest"
 )
 
 const (
@@ -1484,8 +1483,6 @@ func TestValues(t *testing.T) {
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *subsumeTest) {
-		t.Update(cuetest.UpdateGoldenFiles())
-
 		if tc.in == "" {
 			t.Skip("empty test case")
 		}

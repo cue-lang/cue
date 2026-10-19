@@ -194,9 +194,8 @@ func TestMergeAllOf(t *testing.T) {
 			name: "EmptyAllOfBecomesSingleElementAndIsUnwrapped",
 			item: u.intern(&itemAllOf{
 				elems: []internItem{
-					u.intern(&itemAllOf{
-						elems: []internItem{itemString},
-					}),
+					u.intern(&itemAllOf{}),
+					itemString,
 				},
 			}),
 			want: itemString,

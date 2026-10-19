@@ -126,7 +126,7 @@ func TestComplete(t *testing.T) {
 		value:  &Sum{A: 1, B: 4, C: 5},
 		result: &Sum{A: 1, B: 4, C: 5},
 	}, {
-		name:   "*Sum",
+		name:   "*Sum: missing C",
 		value:  &Sum{A: 1, B: 4},
 		result: &Sum{A: 1, B: 4, C: 5},
 	}, {

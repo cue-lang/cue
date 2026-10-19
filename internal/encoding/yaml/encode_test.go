@@ -242,7 +242,7 @@ f4: {} # line 4
 		`,
 		out: `yaml: unsupported node import "foo" (*ast.ImportDecl)`,
 	}, {
-		name: "disallowMultipleEmbeddings",
+		name: "disallowEmbeddingWithFields",
 		in: `
 		1
 		a: 2

@@ -127,7 +127,6 @@ func TestValidate(t *testing.T) {
 		{form: "data", err: "imports", in: `import "foo" `},
 		{form: "data", err: "references", in: `a: a`},
 		{form: "data", err: "expressions", in: `a: 1 + 3`},
-		{form: "data", err: "expressions", in: `a: 1 + 3`},
 		{form: "data", err: "definitions", in: `#a: 1`},
 		{form: "data", err: "constraints", in: `a: <1`},
 		{form: "data", err: "expressions", in: `a: !true`},

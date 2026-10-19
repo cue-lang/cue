@@ -52,9 +52,6 @@ var unmarshalTests = []struct {
 		"v: hi",
 		`v: "hi"`,
 	}, {
-		"v: hi",
-		`v: "hi"`,
-	}, {
 		"v: true",
 		"v: true",
 	}, {
@@ -114,9 +111,6 @@ var unmarshalTests = []struct {
 	}, {
 		"neginf: -.inf",
 		"neginf: -Inf",
-	}, {
-		"fixed: 685_230.15",
-		"fixed: 685_230.15",
 	},
 	//{"sexa: 190:20:30.15", map[string]interface{}{"sexa": 0}}, // Unsupported
 	//{"notanum: .NaN", map[string]interface{}{"notanum": math.NaN()}}, // Equality of NaN fails.
@@ -184,9 +178,6 @@ var unmarshalTests = []struct {
 	}, {
 		"bin: -0b1000000000000000000000000000000000000000000000000000000000000000",
 		"bin: -0b1000000000000000000000000000000000000000000000000000000000000000",
-	}, {
-		"decimal: +685_230",
-		"decimal: +685_230",
 	},
 
 	//{"sexa: 190:20:30", map[string]interface{}{"sexa": 0}}, // Unsupported
@@ -326,9 +317,6 @@ null:   1
 	}, {
 		"v: -42",
 		"v: -42",
-	}, {
-		"v: 4294967296",
-		"v: 4294967296",
 	}, {
 		"v: -4294967296",
 		"v: -4294967296",

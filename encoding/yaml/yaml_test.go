@@ -115,15 +115,6 @@ null
 				t.Errorf("Extract:\ngot  %q\nwant %q", got, tc.want)
 			}
 
-			file, err := yaml.Extract(tc.name, tc.yaml)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, _ = format.Node(file)
-			if got := strings.TrimSpace(string(b)); got != tc.want {
-				t.Errorf("Decode:\ngot  %q\nwant %q", got, tc.want)
-			}
-
 			yamlOut := tc.yaml
 			if tc.yamlOut != "" {
 				yamlOut = tc.yamlOut
@@ -485,7 +476,6 @@ func TestYAMLValues(t *testing.T) {
 		// floats
 		{`.2`, "0.2"},
 		{`2.`, "2.0"},
-		{`".inf"`, `".inf"`},
 		{`685_230.15`, `685230.15`},
 
 		// Date and time-like

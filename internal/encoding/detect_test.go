@@ -61,7 +61,7 @@ func TestDetect(t *testing.T) {
 		`,
 		out: build.JSONSchema,
 	}, {
-		name: "validJSONSchema",
+		name: "validJSONSchemaDraft07",
 		in: `
 		$schema: "https://json-schema.org/draft-07/schema#"
 		`,

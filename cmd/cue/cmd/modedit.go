@@ -29,7 +29,6 @@ import (
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 func newModEditCmd(c *Command) *cobra.Command {
@@ -64,14 +63,15 @@ The --drop-source flag removes the source field.
 		RunE: mkRunE(c, editCmd.run),
 		Args: cobra.ExactArgs(0),
 	}
-	addFlagVar(cmd, flagFunc(editCmd.flagSource), string(flagSource), "set the source field")
-	addFlagVar(cmd, boolFlagFunc(editCmd.flagDropSource), "drop-source", "remove the source field")
-	addFlagVar(cmd, flagFunc(editCmd.flagLanguageVersion), string(flagLanguageVersion), "set language.version ('current' means current language version)")
-	addFlagVar(cmd, flagFunc(editCmd.flagModule), "module", "set the module path")
-	addFlagVar(cmd, flagFunc(editCmd.flagRequire), "require", "add a required module@version")
-	addFlagVar(cmd, flagFunc(editCmd.flagDropRequire), "drop-require", "remove a requirement")
-	addFlagVar(cmd, flagFunc(editCmd.flagReplace), "replace", "add a module replace (path@majorversion=replacement) to local-module.cue")
-	addFlagVar(cmd, flagFunc(editCmd.flagDropReplace), "drop-replace", "remove a module replace from local-module.cue")
+	flags := cmd.Flags()
+	flags.Var(flagFunc(editCmd.flagSource), string(flagSource), "set the source field")
+	flags.Var(boolFlagFunc(editCmd.flagDropSource), "drop-source", "remove the source field")
+	flags.Var(flagFunc(editCmd.flagLanguageVersion), string(flagLanguageVersion), "set language.version ('current' means current language version)")
+	flags.Var(flagFunc(editCmd.flagModule), "module", "set the module path")
+	flags.Var(flagFunc(editCmd.flagRequire), "require", "add a required module@version")
+	flags.Var(flagFunc(editCmd.flagDropRequire), "drop-require", "remove a requirement")
+	flags.Var(flagFunc(editCmd.flagReplace), "replace", "add a module replace (path@majorversion=replacement) to local-module.cue")
+	flags.Var(flagFunc(editCmd.flagDropReplace), "drop-replace", "remove a module replace from local-module.cue")
 
 	return cmd
 }
@@ -345,15 +345,6 @@ func (c *modEditCmd) flagDropReplace(arg string) error {
 		return nil
 	})
 	return nil
-}
-
-func addFlagVar(cmd *cobra.Command, v pflag.Value, name string, usage string) {
-	flags := cmd.Flags()
-	flags.Var(v, name, usage)
-	// This works around https://github.com/spf13/pflag/issues/281
-	if v, ok := v.(interface{ IsBoolFlag() bool }); ok && v.IsBoolFlag() {
-		flags.Lookup(name).NoOptDefVal = "true"
-	}
 }
 
 type flagFunc func(string) error

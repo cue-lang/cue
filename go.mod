@@ -18,7 +18,7 @@ require (
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20261013103202-7c8a61a7a736
 	github.com/rogpeppe/go-internal v1.16.1-0.20261002162744-ce71b23481ca
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.0.11-0.20261019083819-70f284b93daa
 	github.com/tetratelabs/wazero v1.12.0
 	github.com/yuin/goldmark/v2 v2.1.6
 	go.yaml.in/yaml/v3 v3.0.5

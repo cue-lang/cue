@@ -26,16 +26,16 @@ graph TD
 	text:   "03"
 }
 -- out/run-v3/t1/stats --
-Leaks:  6
-Freed:  23
-Reused: 14
+Leaks:  3
+Freed:  20
+Reused: 8
 Allocs: 15
 Retain: 0
 
-Unifications: 23
-Conjuncts:    34
+Unifications: 18
+Conjuncts:    29
 Disjuncts:    2
-ResolveDep:   8
+ResolveDep:   4
 
 NumCloseIDs: 4
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
@@ -44,8 +44,7 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  8
-+Leaks:  6
- Freed:  23
+-Freed:  23
 -Reused: 19
 -Allocs: 12
 -Retain: 24
@@ -53,14 +52,16 @@ diff old new
 -Unifications: 27
 -Conjuncts:    38
 -Disjuncts:    41
-+Reused: 14
++Leaks:  3
++Freed:  20
++Reused: 8
 +Allocs: 15
 +Retain: 0
 +
-+Unifications: 23
-+Conjuncts:    34
++Unifications: 18
++Conjuncts:    29
 +Disjuncts:    2
-+ResolveDep:   8
++ResolveDep:   4
 +
 +NumCloseIDs: 4
 -- out/run/t1/stats --
@@ -74,16 +75,16 @@ Unifications: 27
 Conjuncts:    38
 Disjuncts:    41
 -- out/run-v3/stats/totals --
-Leaks:  6
-Freed:  23
-Reused: 14
+Leaks:  3
+Freed:  20
+Reused: 8
 Allocs: 15
 Retain: 0
 
-Unifications: 23
-Conjuncts:    34
+Unifications: 18
+Conjuncts:    29
 Disjuncts:    2
-ResolveDep:   8
+ResolveDep:   4
 
 NumCloseIDs: 4
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
@@ -92,8 +93,7 @@ diff old new
 +++ new
 @@ -1,9 +1,12 @@
 -Leaks:  8
-+Leaks:  6
- Freed:  23
+-Freed:  23
 -Reused: 19
 -Allocs: 12
 -Retain: 24
@@ -101,14 +101,16 @@ diff old new
 -Unifications: 27
 -Conjuncts:    38
 -Disjuncts:    41
-+Reused: 14
++Leaks:  3
++Freed:  20
++Reused: 8
 +Allocs: 15
 +Retain: 0
 +
-+Unifications: 23
-+Conjuncts:    34
++Unifications: 18
++Conjuncts:    29
 +Disjuncts:    2
-+ResolveDep:   8
++ResolveDep:   4
 +
 +NumCloseIDs: 4
 -- out/run/stats/totals --

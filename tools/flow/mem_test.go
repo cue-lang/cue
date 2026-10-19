@@ -80,8 +80,7 @@ func TestReleaseEarlierConfigurations(t *testing.T) {
 				}
 			}
 			runtime.KeepAlive(c)
-			// Earlier configurations all stay reachable from the latest one.
-			if retained != len(earlier) {
+			if retained != 0 {
 				t.Fatalf("%d of %d earlier configurations stay reachable", retained, len(earlier))
 			}
 		})

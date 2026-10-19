@@ -193,6 +193,42 @@ package task
 	}
 }
 
+// TestFlowValueOfCompletedTask reads a completed task's value from another
+// task's runner while unrelated tasks complete, which makes the run loop
+// update that value. The race detector catches unsynchronized access.
+func TestFlowValueOfCompletedTask(t *testing.T) {
+	v := cuecontext.New().CompileString(`
+		import "list"
+
+		a: {$id: "task", success?: bool}
+		b: {$id: "task", dep: a.success, success?: bool}
+		// Enough unrelated tasks, completing while b reads the value of a,
+		// for the race detector to fire reliably on unsynchronized access.
+		for i in list.Range(0, 20, 1) {
+			"x\(i)": {$id: "task", success?: bool}
+		}
+	`)
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	c := flow.New(nil, v, func(v cue.Value) (flow.Runner, error) {
+		if !v.LookupPath(cue.ParsePath("$id")).Exists() {
+			return nil, nil
+		}
+		return flow.RunnerFunc(func(t *flow.Task) error {
+			for range 1000 {
+				for _, d := range t.Dependencies() {
+					d.Value()
+				}
+			}
+			return t.Fill(map[string]any{"success": true})
+		}), nil
+	})
+	if err := c.Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // TestFlowNonRootValue tests that when the value passed to New is not at the
 // root of its instance, a task at the top of that value is run with the
 // correct value and its results are filled in at the right place.

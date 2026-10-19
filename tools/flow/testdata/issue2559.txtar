@@ -59,18 +59,18 @@ graph TD
 	text:   "5"
 }
 -- out/run-v3/t1/stats --
-Leaks:  124
-Freed:  709
-Reused: 685
+Leaks:  122
+Freed:  703
+Reused: 677
 Allocs: 148
 Retain: 0
 
-Unifications: 565
-Conjuncts:    1661
-Disjuncts:    178
-ResolveDep:   246
+Unifications: 561
+Conjuncts:    1649
+Disjuncts:    176
+ResolveDep:   123
 
-NumCloseIDs: 304
+NumCloseIDs: 301
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
 diff old new
 --- old
@@ -87,18 +87,18 @@ diff old new
 -Disjuncts:    25826
 -
 -NumCloseIDs: 72
-+Leaks:  124
-+Freed:  709
-+Reused: 685
++Leaks:  122
++Freed:  703
++Reused: 677
 +Allocs: 148
 +Retain: 0
 +
-+Unifications: 565
-+Conjuncts:    1661
-+Disjuncts:    178
-+ResolveDep:   246
++Unifications: 561
++Conjuncts:    1649
++Disjuncts:    176
++ResolveDep:   123
 +
-+NumCloseIDs: 304
++NumCloseIDs: 301
 -- out/run/t1/stats --
 Leaks:  0
 Freed:  25577
@@ -112,18 +112,18 @@ Disjuncts:    25826
 
 NumCloseIDs: 72
 -- out/run-v3/stats/totals --
-Leaks:  124
-Freed:  709
-Reused: 685
+Leaks:  122
+Freed:  703
+Reused: 677
 Allocs: 148
 Retain: 0
 
-Unifications: 565
-Conjuncts:    1661
-Disjuncts:    178
-ResolveDep:   246
+Unifications: 561
+Conjuncts:    1649
+Disjuncts:    176
+ResolveDep:   123
 
-NumCloseIDs: 304
+NumCloseIDs: 301
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
 diff old new
 --- old
@@ -140,18 +140,18 @@ diff old new
 -Disjuncts:    25826
 -
 -NumCloseIDs: 72
-+Leaks:  124
-+Freed:  709
-+Reused: 685
++Leaks:  122
++Freed:  703
++Reused: 677
 +Allocs: 148
 +Retain: 0
 +
-+Unifications: 565
-+Conjuncts:    1661
-+Disjuncts:    178
-+ResolveDep:   246
++Unifications: 561
++Conjuncts:    1649
++Disjuncts:    176
++ResolveDep:   123
 +
-+NumCloseIDs: 304
++NumCloseIDs: 301
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  25577

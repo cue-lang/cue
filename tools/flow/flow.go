@@ -71,6 +71,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"cuelang.org/go/cue"
@@ -384,12 +385,13 @@ type Task struct {
 	deps     map[*Task]bool
 	pathDeps map[string][]*Task
 
-	conjunctSeq int64
-	valueSeq    int64
-	v           cue.Value
-	err         errors.Error
-	state       State
-	depTasks    []*Task
+	// v is written by the run loop only; mu lets other goroutines read
+	// it through [Task.Value] while the run loop keeps it up to date.
+	mu       sync.Mutex
+	v        cue.Value
+	err      errors.Error
+	state    State
+	depTasks []*Task
 
 	stats stats.Counts
 }
@@ -510,8 +512,15 @@ func (t *Task) Fill(x interface{}) error {
 // This method may currently only be called before Run is called or after a
 // Task completed, or from within a call to UpdateFunc.
 func (t *Task) Value() cue.Value {
-	// TODO: synchronize
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	return t.v
+}
+
+func (t *Task) setValue(v cue.Value) {
+	t.mu.Lock()
+	t.v = v
+	t.mu.Unlock()
 }
 
 // Dependencies reports the Tasks t depends on.

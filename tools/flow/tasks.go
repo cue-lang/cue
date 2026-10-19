@@ -51,6 +51,13 @@ func (c *Controller) initTasks(addStats bool) {
 	// Note that the list of tasks may grow as this loop progresses.
 	for i := 0; i < len(c.tasks); i++ {
 		t := c.tasks[i]
+		if t.state != Waiting {
+			// Only tasks yet to run need their dependencies marked. A
+			// completed task's value follows the configuration, and a
+			// reference that only resolves once its own result is in must
+			// not add a dependency, or a cycle, after the fact.
+			continue
+		}
 		start := *c.opCtx.Stats()
 		c.markTaskDependencies(t, t.vertex())
 		if addStats {
@@ -154,7 +161,7 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 	// Look up cached task from previous evaluation.
 	//
 	// Task paths and labels are stored relative to the value passed to New,
-	// as updateTaskValue and updateTaskResults resolve against that value,
+	// as updateValue and updateTaskResults resolve against that value,
 	// which may not be at the root of its instance
 	// (https://cuelang.org/issue/2185). Inferred tasks outside that value
 	// keep their absolute path; they can never resolve and are skipped at
@@ -191,15 +198,14 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 			}
 			index := len(c.tasks)
 			t = &Task{
-				v:        v,
-				c:        c,
-				r:        r,
-				path:     p,
-				labels:   labels,
-				key:      key,
-				index:    index,
-				err:      errs,
-				valueSeq: -1, // Ensure first updateTaskValue call updates the value
+				v:      v,
+				c:      c,
+				r:      r,
+				path:   p,
+				labels: labels,
+				key:    key,
+				index:  index,
+				err:    errs,
 			}
 			// If the runner declares it is a service, mark the task accordingly.
 			if ce, ok := r.(Service); ok && ce.IsService() {
@@ -216,7 +222,7 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 		if t.state <= Ready {
 			// Don't set the value if the task is currently running as this may
 			// result in all kinds of inconsistency issues.
-			t.v = v
+			t.setValue(v)
 		}
 
 		c.tagChildren(w, t)

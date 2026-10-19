@@ -55,7 +55,7 @@ Retain: 0
 Unifications: 26
 Conjuncts:    59
 Disjuncts:    21
-ResolveDep:   6
+ResolveDep:   5
 
 NumCloseIDs: 2
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
@@ -79,7 +79,7 @@ diff old new
 +Unifications: 26
 +Conjuncts:    59
 +Disjuncts:    21
-+ResolveDep:   6
++ResolveDep:   5
 +
 +NumCloseIDs: 2
 -- out/run/t1/stats --
@@ -133,7 +133,7 @@ Retain: 0
 Unifications: 26
 Conjuncts:    64
 Disjuncts:    21
-ResolveDep:   9
+ResolveDep:   4
 
 NumCloseIDs: 3
 -- diff/-out/run-v3/t2/stats<==>+out/run/t2/stats --
@@ -157,7 +157,7 @@ diff old new
 +Unifications: 26
 +Conjuncts:    64
 +Disjuncts:    21
-+ResolveDep:   9
++ResolveDep:   4
 +
 +NumCloseIDs: 3
 -- out/run/t2/stats --
@@ -180,7 +180,7 @@ Retain: 0
 Unifications: 52
 Conjuncts:    123
 Disjuncts:    42
-ResolveDep:   15
+ResolveDep:   9
 
 NumCloseIDs: 5
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
@@ -204,7 +204,7 @@ diff old new
 +Unifications: 52
 +Conjuncts:    123
 +Disjuncts:    42
-+ResolveDep:   15
++ResolveDep:   9
 +
 +NumCloseIDs: 5
 -- out/run/stats/totals --

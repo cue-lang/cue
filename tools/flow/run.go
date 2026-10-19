@@ -68,7 +68,10 @@ func (c *Controller) runLoop() {
 
 			case Ready:
 				t.state = Running
-				c.updateTaskValue(t)
+				// A task found through a dependency may hold a vertex from
+				// a different tree than the configuration's; run it against
+				// the configuration.
+				t.setValue(c.inst.LookupPath(t.path))
 
 				// If the task's path no longer resolves in the configuration
 				// (e.g. because a conditional guard was eliminated as the
@@ -79,7 +82,11 @@ func (c *Controller) runLoop() {
 				}
 
 				running = true
-				t.ctxt = value.OpContext(t.v)
+				// Fill's context must not be bound to the task's vertex:
+				// the conjuncts it produces stay in c.conjuncts for the
+				// whole run, and an environment pointing into the current
+				// tree would keep every replaced tree reachable.
+				t.ctxt = adt.NewContext(c.opCtx.Runtime, nil)
 
 				go func(t *Task) {
 					if err := t.r.Run(t, nil); err != nil {
@@ -141,9 +148,10 @@ func (c *Controller) runLoop() {
 				// initTasks was already called in New to catch initialization
 				// errors earlier and add stats.
 				c.initTasks(false)
+			} else {
+				// The configuration may have been recomputed while t ran.
+				t.setValue(c.inst.LookupPath(t.path))
 			}
-
-			c.updateTaskValue(t)
 
 			t.stats.Add(c.opCtx.Stats().Since(start))
 
@@ -205,29 +213,16 @@ func (c *Controller) updateValue() bool {
 
 	c.inst = value.Make(c.opCtx, v)
 	c.valueSeqNum = c.conjunctSeq
-	return true
-}
 
-// updateTaskValue updates the value of the task in the configuration if it is
-// out of date.
-func (c *Controller) updateTaskValue(t *Task) {
-	required := t.conjunctSeq
-	for _, dep := range t.depTasks {
-		if dep.conjunctSeq > required {
-			required = dep.conjunctSeq
+	// Completed tasks are not dispatched again, so point them at the new
+	// configuration here, keeping their values current and releasing the
+	// configuration computed when each of them completed.
+	for _, t := range c.tasks {
+		if t.state == Terminated {
+			t.setValue(c.inst.LookupPath(t.path))
 		}
 	}
-
-	if t.valueSeq == required {
-		return
-	}
-
-	if c.valueSeqNum < required {
-		c.updateValue()
-	}
-
-	t.v = c.inst.LookupPath(t.path)
-	t.valueSeq = required
+	return true
 }
 
 // updateTaskResults updates the result status of the task and adds any result
@@ -270,7 +265,6 @@ func (c *Controller) updateTaskResults(t *Task) bool {
 	// conjunct before. This will allow for serving applications.
 	c.conjuncts = append(c.conjuncts, adt.MakeRootConjunct(c.env, expr))
 	c.conjunctSeq++
-	t.conjunctSeq = c.conjunctSeq
 
 	return true
 }
@@ -283,7 +277,7 @@ func taskFailed(t *Task, err error) errors.Error {
 		return perr
 	}
 	e := &taskError{}
-	for _, sel := range t.v.Path().Selectors() {
+	for _, sel := range t.Value().Path().Selectors() {
 		e.path = append(e.path, sel.String())
 	}
 	return errors.Wrap(e, perr)

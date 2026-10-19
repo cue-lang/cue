@@ -45,7 +45,7 @@ Retain: 0
 Unifications: 9
 Conjuncts:    15
 Disjuncts:    0
-ResolveDep:   3
+ResolveDep:   2
 
 NumCloseIDs: 1
 -- out/run/t2 --
@@ -74,7 +74,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    19
 Disjuncts:    0
-ResolveDep:   6
+ResolveDep:   1
 
 NumCloseIDs: 1
 -- out/run/stats/totals --
@@ -87,6 +87,6 @@ Retain: 0
 Unifications: 19
 Conjuncts:    34
 Disjuncts:    0
-ResolveDep:   9
+ResolveDep:   3
 
 NumCloseIDs: 2

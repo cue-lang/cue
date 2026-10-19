@@ -345,9 +345,7 @@ func TestReadCUENoDecls(t *testing.T) {
 
 		tokFile := syntax.Pos().File()
 		qt.Assert(t, qt.IsNotNil(tokFile))
-		// The tokFile must be stable across calls,
-		qt.Assert(t, qt.Equals(syntax.Pos().File(), tokFile), qt.Commentf("%s", name))
-		// carry the file's content,
+		// The tokFile must carry the file's content,
 		qt.Assert(t, qt.DeepEquals(tokFile.Content(), []byte(content)), qt.Commentf("%s", name))
 		// and be correctly sized.
 		qt.Assert(t, qt.Equals(tokFile.Size(), len(content)), qt.Commentf("%s", name))

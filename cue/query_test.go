@@ -221,10 +221,12 @@ func TestLookupPath(t *testing.T) {
 
 			v = v.LookupPath(tc.path)
 
-			if err := v.Err(); err != nil || tc.err != "" {
-				if got := err.Error(); got != tc.err {
-					t.Errorf("error: got %v; want %v", got, tc.err)
-				}
+			got := ""
+			if err := v.Err(); err != nil {
+				got = err.Error()
+			}
+			if got != tc.err {
+				t.Errorf("error: got %q; want %q", got, tc.err)
 			}
 
 			if exists := v.Exists(); exists != tc.exists {

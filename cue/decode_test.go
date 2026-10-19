@@ -38,7 +38,7 @@ func TestDecode(t *testing.T) {
 		A int `json:"A"`
 		B int `json:"B"`
 		C int `json:"C"`
-		M map[string]interface{}
+		M map[string]any
 		*Nested
 	}
 	type Untagged struct{ X int }
@@ -50,297 +50,297 @@ func TestDecode(t *testing.T) {
 		Untagged
 		Tagged
 	}
-	one := 1
 	intList := func(ints ...int) *[]int {
 		ints = append([]int{}, ints...)
 		return &ints
 	}
 	testCases := []struct {
-		value string
-		dst   interface{}
-		want  interface{}
-		err   string
+		value  string
+		newDst func() any // a new destination for each run
+		want   any
+		err    string
 	}{{
-		value: `1`,
-		err:   "cannot decode into unsettable value",
+		value:  `1`,
+		newDst: func() any { return nil },
+		err:    "cannot decode into unsettable value",
 	}, {
-		dst:   new(interface{}),
-		value: `_|_`,
-		err:   "explicit error (_|_ literal) in source",
-	}, {
-		// clear pointer
-		value: `null`,
-		dst:   &[]int{1},
-		want:  []int(nil),
+		newDst: func() any { return new(any) },
+		value:  `_|_`,
+		err:    "explicit error (_|_ literal) in source",
 	}, {
 		// clear pointer
-		value: `[null]`,
-		dst:   &[]*int{&one},
-		want:  []*int{nil},
+		value:  `null`,
+		newDst: func() any { return &[]int{1} },
+		want:   []int(nil),
 	}, {
-		value: `true`,
-		dst:   new(bool),
-		want:  true,
+		// clear pointer
+		value:  `[null]`,
+		newDst: func() any { return &[]*int{new(1)} },
+		want:   []*int{nil},
 	}, {
-		value: `false`,
-		dst:   new(bool),
-		want:  false,
+		value:  `true`,
+		newDst: func() any { return new(bool) },
+		want:   true,
 	}, {
-		value: `bool`,
-		dst:   new(bool),
-		err:   "cannot convert non-concrete value bool",
+		value:  `false`,
+		newDst: func() any { return new(bool) },
+		want:   false,
 	}, {
-		value: `_`,
-		dst:   new([]int),
-		want:  []int(nil),
+		value:  `bool`,
+		newDst: func() any { return new(bool) },
+		err:    "cannot convert non-concrete value bool",
 	}, {
-		value: `"str"`,
-		dst:   new(string),
-		want:  "str",
+		value:  `_`,
+		newDst: func() any { return new([]int) },
+		want:   []int(nil),
 	}, {
-		value: `"str"`,
-		dst:   new(int),
-		err:   "cannot use value \"str\" (type string) as int",
+		value:  `"str"`,
+		newDst: func() any { return new(string) },
+		want:   "str",
 	}, {
-		value: `'bytes'`,
-		dst:   new([]byte),
-		want:  []byte("bytes"),
+		value:  `"str"`,
+		newDst: func() any { return new(int) },
+		err:    "cannot use value \"str\" (type string) as int",
 	}, {
-		value: `'bytes'`,
-		dst:   &[3]byte{},
-		want:  [3]byte{0x62, 0x79, 0x74},
+		value:  `'bytes'`,
+		newDst: func() any { return new([]byte) },
+		want:   []byte("bytes"),
 	}, {
-		value: `1`,
-		dst:   new(float32),
-		want:  float32(1),
+		value:  `'bytes'`,
+		newDst: func() any { return &[3]byte{} },
+		want:   [3]byte{0x62, 0x79, 0x74},
 	}, {
-		value: `500`,
-		dst:   new(uint8),
-		err:   "integer 500 overflows uint8",
+		value:  `1`,
+		newDst: func() any { return new(float32) },
+		want:   float32(1),
 	}, {
-		value: `501`,
-		dst:   new(int8),
-		err:   "integer 501 overflows int8",
+		value:  `500`,
+		newDst: func() any { return new(uint8) },
+		err:    "integer 500 overflows uint8",
 	}, {
-		value: `{}`,
-		dst:   &fields{},
-		want:  fields{},
+		value:  `501`,
+		newDst: func() any { return new(int8) },
+		err:    "integer 501 overflows int8",
 	}, {
-		value: `{A:1,b:2,c:3}`,
-		dst:   &fields{},
-		want:  fields{A: 1, B: 2, C: 3},
+		value:  `{}`,
+		newDst: func() any { return &fields{} },
+		want:   fields{},
+	}, {
+		value:  `{A:1,b:2,c:3}`,
+		newDst: func() any { return &fields{} },
+		want:   fields{A: 1, B: 2, C: 3},
 	}, {
 		// allocate map
-		value: `{a:1,m:{a: 3}}`,
-		dst:   &fields{},
+		value:  `{a:1,m:{a: 3}}`,
+		newDst: func() any { return &fields{} },
 		want: fields{A: 1,
-			M: map[string]interface{}{"a": int64(3)}},
+			M: map[string]any{"a": int64(3)}},
 	}, {
 		// indirect int
-		value: `{p: 1}`,
-		dst:   &fields{},
-		want:  fields{Nested: &Nested{P: &one}},
+		value:  `{p: 1}`,
+		newDst: func() any { return &fields{} },
+		want:   fields{Nested: &Nested{P: new(1)}},
 	}, {
-		value: `{X: 1}`,
-		dst:   &embedTagged{},
-		want:  embedTagged{Tagged: Tagged{X: 1}},
+		value:  `{X: 1}`,
+		newDst: func() any { return &embedTagged{} },
+		want:   embedTagged{Tagged: Tagged{X: 1}},
 	}, {
 		value: `{for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,
-		dst:  &fields{},
-		want: fields{B: 2, C: 3},
+		newDst: func() any { return &fields{} },
+		want:   fields{B: 2, C: 3},
 	}, {
-		value: `{a:1,b:2,c:int}`,
-		dst:   new(fields),
-		err:   "c: cannot convert non-concrete value int",
+		value:  `{a:1,b:2,c:int}`,
+		newDst: func() any { return new(fields) },
+		err:    "c: cannot convert non-concrete value int",
 	}, {
-		value: `[]`,
-		dst:   intList(),
-		want:  *intList(),
+		value:  `[]`,
+		newDst: func() any { return intList() },
+		want:   *intList(),
 	}, {
-		value: `[1,2,3]`,
-		dst:   intList(),
-		want:  *intList(1, 2, 3),
+		value:  `[1,2,3]`,
+		newDst: func() any { return intList() },
+		want:   *intList(1, 2, 3),
 	}, {
 		// shorten list
-		value: `[1,2,3]`,
-		dst:   intList(1, 2, 3, 4),
-		want:  *intList(1, 2, 3),
+		value:  `[1,2,3]`,
+		newDst: func() any { return intList(1, 2, 3, 4) },
+		want:   *intList(1, 2, 3),
 	}, {
 		// shorter array
-		value: `[1,2,3]`,
-		dst:   &[2]int{},
-		want:  [2]int{1, 2},
+		value:  `[1,2,3]`,
+		newDst: func() any { return &[2]int{} },
+		want:   [2]int{1, 2},
 	}, {
 		// longer array
-		value: `[1,2,3]`,
-		dst:   &[4]int{},
-		want:  [4]int{1, 2, 3, 0},
+		value:  `[1,2,3]`,
+		newDst: func() any { return &[4]int{} },
+		want:   [4]int{1, 2, 3, 0},
 	}, {
 		value: `[for x in #y if x > 1 { x }]
 				#y: [1,2,3]`,
-		dst:  intList(),
-		want: *intList(2, 3),
+		newDst: func() any { return intList() },
+		want:   *intList(2, 3),
 	}, {
-		value: `[int]`,
-		dst:   intList(),
-		err:   "0: cannot convert non-concrete value int",
+		value:  `[int]`,
+		newDst: func() any { return intList() },
+		err:    "0: cannot convert non-concrete value int",
 	}, {
-		value: `{a: 1, b: 2, c: 3}`,
-		dst:   &map[string]int{},
-		want:  map[string]int{"a": 1, "b": 2, "c": 3},
+		value:  `{a: 1, b: 2, c: 3}`,
+		newDst: func() any { return &map[string]int{} },
+		want:   map[string]int{"a": 1, "b": 2, "c": 3},
 	}, {
-		value: `{"1": 1, "-2": 2, "3": 3}`,
-		dst:   &map[int]int{},
-		want:  map[int]int{1: 1, -2: 2, 3: 3},
+		value:  `{"1": 1, "-2": 2, "3": 3}`,
+		newDst: func() any { return &map[int]int{} },
+		want:   map[int]int{1: 1, -2: 2, 3: 3},
 	}, {
-		value: `{"1": 1, "2": 2, "3": 3}`,
-		dst:   &map[uint]int{},
-		want:  map[uint]int{1: 1, 2: 2, 3: 3},
+		value:  `{"1": 1, "2": 2, "3": 3}`,
+		newDst: func() any { return &map[uint]int{} },
+		want:   map[uint]int{1: 1, 2: 2, 3: 3},
 	}, {
-		value: `{a: 1, b: 2, c: true, d: e: 2}`,
-		dst:   &map[string]interface{}{},
-		want: map[string]interface{}{
+		value:  `{a: 1, b: 2, c: true, d: e: 2}`,
+		newDst: func() any { return &map[string]any{} },
+		want: map[string]any{
 			"a": int64(1), "b": int64(2), "c": true,
-			"d": map[string]interface{}{"e": int64(2)}},
+			"d": map[string]any{"e": int64(2)}},
 	}, {
-		value: `{a: b: *2 | int}`,
-		dst:   &map[string]interface{}{},
-		want:  map[string]interface{}{"a": map[string]interface{}{"b": int64(2)}},
+		value:  `{a: b: *2 | int}`,
+		newDst: func() any { return &map[string]any{} },
+		want:   map[string]any{"a": map[string]any{"b": int64(2)}},
 	}, {
-		value: `{a: 1, b: 2, c: true}`,
-		dst:   &map[string]int{},
-		err:   "c: cannot use value true (type bool) as int",
+		value:  `{a: 1, b: 2, c: true}`,
+		newDst: func() any { return &map[string]int{} },
+		err:    "c: cannot use value true (type bool) as int",
 	}, {
-		value: `{"300": 3}`,
-		dst:   &map[int8]int{},
-		err:   "key integer 300 overflows int8",
+		value:  `{"300": 3}`,
+		newDst: func() any { return &map[int8]int{} },
+		err:    "key integer 300 overflows int8",
 	}, {
-		value: `{"300": 3}`,
-		dst:   &map[uint8]int{},
-		err:   "key integer 300 overflows uint8",
+		value:  `{"300": 3}`,
+		newDst: func() any { return &map[uint8]int{} },
+		err:    "key integer 300 overflows uint8",
 	}, {
 		// Issue #1401
-		value: `a: b: _ | *[0, ...]`,
-		dst:   &map[string]interface{}{},
-		want: map[string]interface{}{
-			"a": map[string]interface{}{
-				"b": []interface{}{int64(0)},
+		value:  `a: b: _ | *[0, ...]`,
+		newDst: func() any { return &map[string]any{} },
+		want: map[string]any{
+			"a": map[string]any{
+				"b": []any{int64(0)},
 			},
 		},
 	}, {
 		// Issue #1466
-		value: `{myDuration: "1s"}`,
-		dst:   &Types{},
-		want:  Types{DurationStruct: MyDuration{D: 1000000000}},
+		value:  `{myDuration: "1s"}`,
+		newDst: func() any { return &Types{} },
+		want:   Types{DurationStruct: MyDuration{D: 1000000000}},
 	}, {
 		// Issue #1466
-		value: `{myDuration: '1s'}`,
-		dst:   &Types{},
-		want:  Types{DurationStruct: MyDuration{D: 1000000000}},
+		value:  `{myDuration: '1s'}`,
+		newDst: func() any { return &Types{} },
+		want:   Types{DurationStruct: MyDuration{D: 1000000000}},
 	}, {
 		// Issue #1466
-		value: `{myDuration: 1}`,
-		dst:   &Types{},
-		err:   "Decode: myDuration: cannot use value 1 (type int) as (string|bytes)",
+		value:  `{myDuration: 1}`,
+		newDst: func() any { return &Types{} },
+		err:    "Decode: myDuration: cannot use value 1 (type int) as (string|bytes)",
 	}, {
-		value: `{intPtr: null}`,
-		dst:   &Types{IntPtr: new(999)}, // the original value is wiped
-		want:  Types{},
+		value:  `{intPtr: null}`,
+		newDst: func() any { return &Types{IntPtr: new(999)} }, // the original value is wiped
+		want:   Types{},
 	}, {
-		value: `{intPtr: 123}`,
-		dst:   &Types{},
-		want:  Types{IntPtr: new(123)},
+		value:  `{intPtr: 123}`,
+		newDst: func() any { return &Types{} },
+		want:   Types{IntPtr: new(123)},
 	}, {
-		value: `{intPtr: int}`,
-		dst:   &Types{},
-		err:   "intPtr: cannot convert non-concrete value int",
+		value:  `{intPtr: int}`,
+		newDst: func() any { return &Types{} },
+		err:    "intPtr: cannot convert non-concrete value int",
 	}, {
-		value: `[]`,
-		dst:   new(interface{}),
-		want:  []interface{}{},
+		value:  `[]`,
+		newDst: func() any { return new(any) },
+		want:   []any{},
 	}, {
 		// large integer which doesn't fit into an int32 or int on 32-bit platforms
-		value: `8000000000`,
-		dst:   new(interface{}),
-		want:  int64(8000000000),
+		value:  `8000000000`,
+		newDst: func() any { return new(any) },
+		want:   int64(8000000000),
 	}, {
 		// same as the above, but negative
-		value: `-8000000000`,
-		dst:   new(interface{}),
-		want:  int64(-8000000000),
+		value:  `-8000000000`,
+		newDst: func() any { return new(any) },
+		want:   int64(-8000000000),
 	}, {
 		// even larger integer which doesn't fit into an int64
-		value: `9500000000000000000`,
-		dst:   new(interface{}),
-		want:  bigInt("9500000000000000000"),
+		value:  `9500000000000000000`,
+		newDst: func() any { return new(any) },
+		want:   bigInt("9500000000000000000"),
 	}, {
 		// same as the above, but negative
-		value: `-9500000000000000000`,
-		dst:   new(interface{}),
-		want:  bigInt("-9500000000000000000"),
+		value:  `-9500000000000000000`,
+		newDst: func() any { return new(any) },
+		want:   bigInt("-9500000000000000000"),
 	}, {
-		value: `9500000000000000000`,
-		dst:   new(*big.Int),
-		want:  bigInt("9500000000000000000"),
+		value:  `9500000000000000000`,
+		newDst: func() any { return new(*big.Int) },
+		want:   bigInt("9500000000000000000"),
 	}, {
-		value: `-9500000000000000000`,
-		dst:   new(*big.Int),
-		want:  bigInt("-9500000000000000000"),
-	}, {
-		// TODO: should this work?
-		value: `9500000000000000000`,
-		dst:   new(*apd.Decimal),
-		err:   "Decode: cannot use value 9500000000000000000 (type int) as (string|bytes)",
+		value:  `-9500000000000000000`,
+		newDst: func() any { return new(*big.Int) },
+		want:   bigInt("-9500000000000000000"),
 	}, {
 		// TODO: should this work?
-		value: `-9500000000000000000`,
-		dst:   new(*apd.Decimal),
-		err:   "Decode: cannot use value -9500000000000000000 (type int) as (string|bytes)",
+		value:  `9500000000000000000`,
+		newDst: func() any { return new(*apd.Decimal) },
+		err:    "Decode: cannot use value 9500000000000000000 (type int) as (string|bytes)",
+	}, {
+		// TODO: should this work?
+		value:  `-9500000000000000000`,
+		newDst: func() any { return new(*apd.Decimal) },
+		err:    "Decode: cannot use value -9500000000000000000 (type int) as (string|bytes)",
 	}, {
 		// large float which doesn't fit into a float32
-		value: `1.797693134e+308`,
-		dst:   new(interface{}),
-		want:  float64(1.797693134e+308),
+		value:  `1.797693134e+308`,
+		newDst: func() any { return new(any) },
+		want:   float64(1.797693134e+308),
 	}, {
-		value: `1.99769313499e+508`,
-		dst:   new(interface{}),
-		want:  bigFloat(`1.99769313499e+508`),
+		value:  `1.99769313499e+508`,
+		newDst: func() any { return new(any) },
+		want:   bigFloat(`1.99769313499e+508`),
 	}, {
-		value: `-1.99769313499e+508`,
-		dst:   new(interface{}),
-		want:  bigFloat(`-1.99769313499e+508`),
+		value:  `-1.99769313499e+508`,
+		newDst: func() any { return new(any) },
+		want:   bigFloat(`-1.99769313499e+508`),
 	}, {
-		value: `1.99769313499e+508`,
-		dst:   new(*big.Float),
-		want:  bigFloat(`1.99769313499e+508`),
+		value:  `1.99769313499e+508`,
+		newDst: func() any { return new(*big.Float) },
+		want:   bigFloat(`1.99769313499e+508`),
 	}, {
-		value: `-1.99769313499e+508`,
-		dst:   new(*big.Float),
-		want:  bigFloat(`-1.99769313499e+508`),
+		value:  `-1.99769313499e+508`,
+		newDst: func() any { return new(*big.Float) },
+		want:   bigFloat(`-1.99769313499e+508`),
 	}, {
-		value: `{RawMessage: 123.0}`,
-		dst:   &Unmarshalers{},
-		want:  Unmarshalers{RawMessage: json.RawMessage("123.0")},
+		value:  `{RawMessage: 123.0}`,
+		newDst: func() any { return &Unmarshalers{} },
+		want:   Unmarshalers{RawMessage: json.RawMessage("123.0")},
 	}, {
-		value: `{RawMessage: null}`,
-		dst:   &Unmarshalers{},
-		want:  Unmarshalers{RawMessage: json.RawMessage("null")},
+		value:  `{RawMessage: null}`,
+		newDst: func() any { return &Unmarshalers{} },
+		want:   Unmarshalers{RawMessage: json.RawMessage("null")},
 	}, {
-		value: `{NetIP: "127.0.0.1"}`,
-		dst:   &Unmarshalers{},
-		want:  Unmarshalers{NetIP: net.IP{127, 0, 0, 1}},
+		value:  `{NetIP: "127.0.0.1"}`,
+		newDst: func() any { return &Unmarshalers{} },
+		want:   Unmarshalers{NetIP: net.IP{127, 0, 0, 1}},
 	}, {
-		value: `{NetIP: null}`,
-		dst:   &Unmarshalers{},
-		want:  Unmarshalers{NetIP: nil},
+		value:  `{NetIP: null}`,
+		newDst: func() any { return &Unmarshalers{} },
+		want:   Unmarshalers{NetIP: nil},
 	}, {
-		value: `{Value: 1.99769313499e+508}`,
-		dst:   new(StructWithFloat),
-		want:  StructWithFloat{bigFloat("1.99769313499e+508")},
+		value:  `{Value: 1.99769313499e+508}`,
+		newDst: func() any { return new(StructWithFloat) },
+		want:   StructWithFloat{bigFloat("1.99769313499e+508")},
 	}, {
-		value: "{name: \"John Doe\"}",
-		dst:   new(Custom),
+		value:  "{name: \"John Doe\"}",
+		newDst: func() any { return new(Custom) },
 		want: Custom{
 			UnmarshalCalled: true,
 			Name:            "John Doe",
@@ -348,12 +348,13 @@ func TestDecode(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
-			err := getValue(m, tc.value).Decode(tc.dst)
+			dst := tc.newDst()
+			err := getValue(m, tc.value).Decode(dst)
 			if !checkErr(t, err, tc.err, "init") {
 				return
 			}
 
-			got := reflect.ValueOf(tc.dst).Elem().Interface()
+			got := reflect.ValueOf(dst).Elem().Interface()
 			qt.Assert(t, qt.CmpEquals(got, tc.want,
 				cmp.Comparer(func(a, b *big.Int) bool {
 					return a.Cmp(b) == 0

@@ -2108,6 +2108,7 @@ func TestDefaults(t *testing.T) {
 	testCases := []struct {
 		value      string
 		def        string
+		op         cue.Op
 		val        string
 		ok         bool
 		firstField bool
@@ -2117,29 +2118,34 @@ func TestDefaults(t *testing.T) {
 		val:   "number",
 		ok:    true,
 	}, {
+		// Evaluation swaps each default to the front of the disjunction.
+		// TODO: keep the relative order of the other disjuncts.
 		value: `1 | 2 | *3`,
 		def:   "3",
-		val:   "1|2|3",
+		op:    cue.OrOp,
+		val:   "3|2|1",
 		ok:    true,
 	}, {
 		value: `*{a:1,b:2}|{a:1}|{b:2}`,
 		def:   "{a:1,b:2}",
-		val:   "{a: 1}|{b: 2}",
+		op:    cue.OrOp,
+		val:   "{a:1}|{b:2}",
 		ok:    true,
 	}, {
 		value: `{a:1}&{b:2}`,
 		def:   `{a:1,b:2}`,
-		val:   ``,
+		val:   `{a:1,b:2}`,
 		ok:    false,
 	}, {
 		value: `*_|_ | (*"x" | string)`,
 		def:   `"x" | string`,
+		op:    cue.OrOp,
 		val:   `"x"|string`,
 		ok:    false,
 	}, {
 		value: `{#x: {y: #y}, #y: {a: int}}.#y`,
 		def:   `{a:int}`,
-		val:   `{a: int}`,
+		val:   `{a:int}`,
 		ok:    false,
 	}, {
 		value:      `{x?: []}`,
@@ -2175,13 +2181,13 @@ func TestDefaults(t *testing.T) {
 				t.Errorf("default: got %v; want %v", got, tc.def)
 			}
 
-			op, val := d.Expr()
-			if op != cue.OrOp {
-				return
+			op, val := v.Expr()
+			if op != tc.op {
+				t.Errorf("op: got %v; want %v", op, tc.op)
 			}
 			vars := []string{}
 			for _, v := range val {
-				vars = append(vars, fmt.Sprint(v))
+				vars = append(vars, compactRawStr(v))
 			}
 			if got := strings.Join(vars, "|"); got != tc.val {
 				t.Errorf("value: got %v; want %v", got, tc.val)
@@ -4576,14 +4582,14 @@ func TestPathCorrection(t *testing.T) {
 // }
 
 // checkErr checks that err contains str, or is nil when str is empty,
-// and reports whether err is nil.
+// and reports whether err is nil and no error was expected.
 func checkErr(t *testing.T, err error, str, name string) bool {
 	t.Helper()
 	if err == nil {
 		if str != "" {
 			t.Errorf(`err:%s: got ""; want %q`, name, str)
 		}
-		return true
+		return str == ""
 	}
 	return checkFailed(t, err, str, name)
 }

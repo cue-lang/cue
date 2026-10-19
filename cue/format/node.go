@@ -56,7 +56,7 @@ func printNode(node interface{}, f *printer) error {
 	// 	s.walk(x)
 	case []ast.Decl:
 		if f.cfg.simplify {
-			ls.processDecls(x)
+			ls.processDecls(x, false)
 		}
 		s.walkDeclList(x)
 	default:

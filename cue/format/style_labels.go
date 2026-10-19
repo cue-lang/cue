@@ -69,11 +69,11 @@ func (s *labelSimplifier) markReferences(n ast.Node) bool {
 	}
 	switch x := n.(type) {
 	case *ast.File:
-		s.processDecls(x.Decls)
+		s.processDecls(x.Decls, true)
 		return false
 
 	case *ast.StructLit:
-		s.processDecls(x.Elts)
+		s.processDecls(x.Elts, false)
 		return false
 
 	case *ast.SelectorExpr:
@@ -124,7 +124,8 @@ func (s *labelSimplifier) markReference(x *ast.Ident) {
 }
 
 // processDecls runs the three sub-passes we apply to one body.
-func (s *labelSimplifier) processDecls(decls []ast.Decl) {
+// file is set when decls are a file's top-level declarations.
+func (s *labelSimplifier) processDecls(decls []ast.Decl, file bool) {
 	sc := &labelSimplifier{parent: s, scope: map[string]bool{}, bound: map[string]bool{}, walker: s.walker}
 
 	// Sub-pass 1: collect candidates and bound names from labels, after
@@ -172,6 +173,11 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 			continue
 		}
 		if !sc.scope[str] {
+			continue
+		}
+		// At the top level of a file, these would parse
+		// as a package clause or an import declaration.
+		if file && (str == "import" || str == "package") {
 			continue
 		}
 		if !s.walker.tryMutate() {

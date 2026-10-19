@@ -103,13 +103,11 @@ func TestASTStyleWouldMutate(t *testing.T) {
 		// At the top level of a file, import and package stay quoted,
 		// as they would parse as an import declaration or a package
 		// clause. Nested, they are plain fields.
-		// TODO: the top-level labels are wrongly unquoted,
-		// yielding a file that does not parse.
 		name:  "LabelsFileLevelKeywords",
 		src:   "\"import\": 1\n\"package\": 2\nx: \"import\": 3\n",
 		style: format.ASTStyle{Labels: true},
 		want:  true,
-		out:   "import:  1\npackage: 2\nx: import: 3\n",
+		out:   "\"import\":  1\n\"package\": 2\nx: import: 3\n",
 	}, {
 		name:  "ZeroStyle",
 		src:   "package p\nx: 1\n",

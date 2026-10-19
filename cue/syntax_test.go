@@ -444,6 +444,21 @@ a: [1]`,
 		out: `{
 	a: _|_ // a: 2 errors in empty disjunction: (and 2 more errors)
 }`,
+	}, {
+		// A skipped optional definition does not affect how a closed
+		// definition referenced from a validator argument is exported.
+		name: "closed definition in a validator after a skipped definition",
+		in: `
+		#D: {a: int}
+		x: {
+			#o?: {q: int}
+			m: matchN(1, [#D])
+		}
+		`,
+		path:    "x",
+		options: o(cue.Final(), cue.Definitions(true), cue.Optional(false)),
+		// The skipped definition makes #D export inline as an open struct.
+		out: `{m: matchN(1, [{a: int}])}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

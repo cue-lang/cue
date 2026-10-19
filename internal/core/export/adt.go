@@ -246,8 +246,7 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		for _, arg := range x.Args {
 			v := e.innerExpr(env, arg)
 			if v == nil {
-				e.innerExpr(env, arg)
-				panic("")
+				panic(fmt.Sprintf("cannot export call argument %T", arg))
 			}
 			a = append(a, v)
 		}

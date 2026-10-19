@@ -103,7 +103,7 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 		}
 		v, err := compile.Files(nil, ctx.Runtime, importPath, f)
 		if err != nil {
-			panic(fmt.Errorf("could compile parse %v: %v", p.CUE, err))
+			panic(fmt.Errorf("could not compile %v: %v", p.CUE, err))
 		}
 		for _, c := range v.Conjuncts {
 			obj.AddConjunct(c)

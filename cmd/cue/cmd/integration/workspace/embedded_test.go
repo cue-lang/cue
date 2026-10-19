@@ -495,7 +495,7 @@ func TestEmbedCompletion(t *testing.T) {
 			env.DoneWithOpen(),
 			I.LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Created`, rootURI),
 			I.LogMatching(protocol.Debug, 2, false, `Package dirs=\[%v/data\] importPath=mod\.example/x/data@v0:_.+ Reloaded`, rootURI),
-			I.NoLogMatching(protocol.Debug, `Package dirs=\[%v/data\] importPath=mod\.example/x@v0:a Created`, rootURI),
+			I.NoLogMatching(protocol.Debug, `Package dirs=\[%v\] importPath=mod\.example/x@v0:a Created`, rootURI),
 		)
 
 		mappers := makeMappers(env, filesHoverComplete)

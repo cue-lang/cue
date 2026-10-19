@@ -197,7 +197,7 @@ func TestVersion(t *testing.T) {
 		`\s+Go version go1\.\d+`,
 		`\s+-buildmode\s`,
 		`\s+GOARCH\s`,
-		`\s+GOARCH\s`,
+		`\s+GOOS\s`,
 		`\s+vcs git`,
 		`\s+vcs.revision\s`,
 		`\s+vcs.time\s`,

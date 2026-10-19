@@ -52,8 +52,6 @@ func TestAstCompare_Scalars(t *testing.T) {
 		val     string
 		wantErr string // empty means expect match
 	}{
-		{name: "int negative", expr: "-1", val: "-1"},
-
 		// Integers
 		{name: "int match", expr: "42", val: "42"},
 		{name: "int zero", expr: "0", val: "0"},

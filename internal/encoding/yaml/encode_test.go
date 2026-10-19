@@ -15,6 +15,7 @@
 package yaml
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -23,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
 
 func TestEncodeFile(t *testing.T) {
@@ -517,18 +519,42 @@ true
 - first
 - !Env second
 		`,
+	}, {
+		// A hand-built AST can hold a number literal which the parser rejects.
+		in: &ast.UnaryExpr{
+			Op: token.SUB,
+			X:  &ast.BasicLit{Kind: token.INT, Value: "1__0"},
+		},
+		// TODO: encoding should fail with an error rather than panic.
+		out: `panic: runtime error: invalid memory address or nil pointer dereference`,
+	}, {
+		// A hand-built AST can hold a string literal which the parser rejects.
+		// The encoder panics on it rather than returning an error.
+		in:  &ast.BasicLit{Kind: token.STRING, Value: `"\z"`},
+		out: `panic: invalid string: invalid syntax`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			n, err := encode(tc.in)
+			var n *yaml.Node
+			var err error
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				n, err = encode(tc.in)
+			}()
+			var got string
 			if err != nil {
-				t.Fatal(err)
+				got = err.Error()
+			} else {
+				b, err := yaml.Marshal(n)
+				if err != nil {
+					t.Fatal(err)
+				}
+				got = strings.TrimSpace(string(b))
 			}
-			b, err := yaml.Marshal(n)
-			if err != nil {
-				t.Fatal(err)
-			}
-			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
 			qt.Assert(t, qt.Equals(got, want))
 		})

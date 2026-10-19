@@ -15,6 +15,7 @@
 package goccy_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -23,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding/yaml/goccy"
 )
 
@@ -794,14 +796,30 @@ true
 - first
 - !Env second
 		`,
+	}, {
+		// A hand-built AST can hold a string literal which the parser rejects.
+		// The encoder panics on it rather than returning an error.
+		in:  &ast.BasicLit{Kind: token.STRING, Value: `"\z"`},
+		out: `panic: invalid string: invalid syntax`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := goccy.Encode(tc.in, goccy.EncodeOptions{})
+			var b []byte
+			var err error
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				b, err = goccy.Encode(tc.in, goccy.EncodeOptions{})
+			}()
+			var got string
 			if err != nil {
-				t.Fatal(err)
+				got = err.Error()
+			} else {
+				got = strings.TrimSpace(string(b))
 			}
-			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
 			qt.Assert(t, qt.Equals(got, want))
 		})

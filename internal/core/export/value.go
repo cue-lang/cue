@@ -199,7 +199,13 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 		result = e.boundValue(x)
 
 	case *adt.Builtin:
-		result = e.builtin(x)
+		if x.Foreign {
+			result = e.bottom(&adt.Bottom{
+				Err: errors.Newf(token.NoPos, "cannot convert function %q to CUE", x.Name),
+			})
+		} else {
+			result = e.builtin(x)
+		}
 
 	case *adt.ExternalFunc:
 		// TODO: we might be able to represent this as a reference or some

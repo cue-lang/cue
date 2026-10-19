@@ -873,6 +873,128 @@ defaults: {
 	nestedDirect: fill()
 	nestedCall:   id(fill())
 }
+// A consumer's parameter signature entitles it to call the argument with
+// every value the signature admits. A caller clause of the supplied function
+// that permits less is rejected where the argument is bound, whether or not
+// the consumer makes such a call (the implementation's own declaration is
+// checked separately, see admission.hofBad).
+entitlement: {
+	#Cb:   func(x: int) -> int
+	cb:    #Cb & (func(x: number) -> int: 1)
+	loud:  func(g: func(number) -> int) -> int: g(1.5)
+	quiet: func(g: func(number) -> int) -> int: 7
+	bad1:  loud(cb)
+	bad2:  quiet(cb)
+
+	// No clause, or a clause as wide as the entitlement, is admitted.
+	cbW:  func(x: number) -> int: 1
+	#CbN: func(x: number) -> int
+	cbN:  #CbN & cbW
+	ok1:  loud(cbW)
+	ok2:  quiet(cbN)
+	ok3:  loud(cbN)
+
+	// An entitlement no wider than the clause is admitted; the clause keeps
+	// fencing the consumer's calls.
+	narrow: func(g: func(int) -> int) -> int: g(2)
+	ok4:    narrow(cb)
+	nFrac:  func(g: func(int) -> int) -> int: g(1.5)
+	bad3:   nFrac(cb)
+
+	// The signature may be reached through a definition or a conjunction;
+	// every signature counts.
+	#G:     func(number) -> int
+	viaDef: func(g: #G) -> int: 7
+	bad4:   viaDef(cb)
+	conj:   func(g: #G & func(_) -> int) -> int: 7
+	cbAny:  func(x: _) -> int: 1
+	bad5:   conj(cbN)
+	ok5:    conj(cbAny)
+	// The implementation's own declaration is still checked by admission.
+	bad5b:  conj(cbW)
+
+	// A signature attached to the consumer constrains its parameters too.
+	#Consumer: func(g: func(number) -> int) -> int
+	attached:  #Consumer & (func(g: func(_) -> int) -> int: 7)
+	bad6:      attached(cb)
+	ok6:       attached(cbAny)
+
+	// A supplied builtin is checked through its attached signatures.
+	up:    (func(s: string) -> string) & strings.ToUpper
+	anyIn: func(g: func(_) -> string) -> string: g("x")
+	bad7:  anyIn(up)
+	strIn: func(g: func(string) -> string) -> string: g("x")
+	ok7:   strIn(up)
+
+	// A partial application binds and checks the argument at once.
+	apply2: func(g: func(number) -> int, x: number) -> int: g(x)
+	bad8:   apply2(cb, ...)
+	ok8:    apply2(cbW, ...)(1.5)
+	// A partially applied argument is left to the binding, which cannot
+	// tighten it; its clauses still describe the parameter it has bound.
+	#Ap:    func(g: func(number) -> int, x: number) -> int
+	ap:     #Ap & (func(g: func(number) -> int, x: number) -> int: g(x))
+	part:   ap(cbW, ...)
+	bad15:  quiet(part)
+
+	// A clause that no witness refutes admits; the call still fences.
+	#CbD: func(x: <=0 | >0) -> int
+	cbD:  #CbD & cbW
+	ok9:  loud(cbD)
+
+	// A labeled entitlement matches the clause's parameter in the slot the
+	// label binds.
+	#CbL: func(a: int) -> int
+	cbL:  #CbL & (func(a: number) -> int: 1)
+	lab:  func(g: func(a: number) -> int) -> int: g(a: 1.5)
+	bad9: lab(cbL)
+
+	// The supplied function may be reached through an alias or a field.
+	alias: cb
+	obj: {f: cb}
+	bad10: quiet(alias)
+	bad11: quiet(obj.f)
+
+	// A default supplies the argument and is checked the same way, whether
+	// the function or an attached signature declares it.
+	dq:    func(g: func(number) -> int = cb) -> int: 7
+	bad12: dq()
+	ok10:  dq(cbW)
+	#DQ:   func(g: func(number) -> int = cb) -> int
+	dq2:   #DQ & (func(g: func(number) -> int) -> int: 7)
+	bad13: dq2()
+
+	// A label the consumer's signature introduces binds a clause parameter
+	// that matched no slot before.
+	cbOpt:  (func(a?: int, ...) -> int) & (func(number) -> int: 1)
+	labOpt: func(g: func(a: number) -> int) -> int: g(a: 1.5)
+	bad14:  labOpt(cbOpt)
+
+	// Only a literal or a reference is inspected at the binding. An argument
+	// or a signature computed by an expression is left to the call, which
+	// still enforces the fence; evaluating it at the binding would run ahead
+	// of the call's cycle detection (see rec below).
+	lim1:   quiet(cb | cb)
+	mkSig:  func() -> _: func(number) -> int
+	made:   func(g: mkSig()) -> int: 7
+	lim2:   made(cb)
+	madeL:  func(g: mkSig()) -> int: g(1.5)
+	lim3:   madeL(cb)
+	rec:    func(g: func() -> int = rec()) -> _: (func() -> int: 1)
+	recBad: rec()
+	rec2:    func(g: func() -> int = rec2().a) -> _: {a: func() -> int: 1}
+	rec2Bad: rec2()
+	// A constraint that would call the function is not compared either,
+	// whatever form the call takes.
+	fcb:      func(g: func(x: fcb(cb)) -> int) -> int: 1
+	fcbOut:   fcb(cb)
+	cbA:      #Cb & cbAny
+	fsl:      func(g: func(x: fsl(cbA)[:]) -> int) -> _: [1]
+	fslOut:   fsl(cbA)[0]
+	fcomp:    func(g: func(x: [for y in fcomp(cbA) {y}]) -> int) -> _: [1]
+	fcompOut: fcomp(cbA)[0]
+}
+
 -- out/compile --
 --- in.cue
 {
@@ -1641,5 +1763,96 @@ defaults: {
     id: func(x: int) -> int: 〈0;x〉
     nestedDirect: 〈0;fill〉()
     nestedCall: 〈0;id〉(〈0;fill〉())
+  }
+  entitlement: {
+    #Cb: func(x: int) -> int
+    cb: (〈0;#Cb〉 & func(x: number) -> int: 1)
+    loud: func(g: func(number) -> int) -> int: 〈0;g〉(1.5)
+    quiet: func(g: func(number) -> int) -> int: 7
+    bad1: 〈0;loud〉(〈0;cb〉)
+    bad2: 〈0;quiet〉(〈0;cb〉)
+    cbW: func(x: number) -> int: 1
+    #CbN: func(x: number) -> int
+    cbN: (〈0;#CbN〉 & 〈0;cbW〉)
+    ok1: 〈0;loud〉(〈0;cbW〉)
+    ok2: 〈0;quiet〉(〈0;cbN〉)
+    ok3: 〈0;loud〉(〈0;cbN〉)
+    narrow: func(g: func(int) -> int) -> int: 〈0;g〉(2)
+    ok4: 〈0;narrow〉(〈0;cb〉)
+    nFrac: func(g: func(int) -> int) -> int: 〈0;g〉(1.5)
+    bad3: 〈0;nFrac〉(〈0;cb〉)
+    #G: func(number) -> int
+    viaDef: func(g: 〈0;#G〉) -> int: 7
+    bad4: 〈0;viaDef〉(〈0;cb〉)
+    conj: func(g: (〈0;#G〉 & func(_) -> int)) -> int: 7
+    cbAny: func(x: _) -> int: 1
+    bad5: 〈0;conj〉(〈0;cbN〉)
+    ok5: 〈0;conj〉(〈0;cbAny〉)
+    bad5b: 〈0;conj〉(〈0;cbW〉)
+    #Consumer: func(g: func(number) -> int) -> int
+    attached: (〈0;#Consumer〉 & func(g: func(_) -> int) -> int: 7)
+    bad6: 〈0;attached〉(〈0;cb〉)
+    ok6: 〈0;attached〉(〈0;cbAny〉)
+    up: (func(s: string) -> string & 〈import;strings〉.ToUpper)
+    anyIn: func(g: func(_) -> string) -> string: 〈0;g〉("x")
+    bad7: 〈0;anyIn〉(〈0;up〉)
+    strIn: func(g: func(string) -> string) -> string: 〈0;g〉("x")
+    ok7: 〈0;strIn〉(〈0;up〉)
+    apply2: func(g: func(number) -> int, x: number) -> int: 〈0;g〉(〈0;x〉)
+    bad8: 〈0;apply2〉(〈0;cb〉)
+    ok8: 〈0;apply2〉(〈0;cbW〉)(1.5)
+    #Ap: func(g: func(number) -> int, x: number) -> int
+    ap: (〈0;#Ap〉 & func(g: func(number) -> int, x: number) -> int: 〈0;g〉(〈0;x〉))
+    part: 〈0;ap〉(〈0;cbW〉)
+    bad15: 〈0;quiet〉(〈0;part〉)
+    #CbD: func(x: (<=0|>0)) -> int
+    cbD: (〈0;#CbD〉 & 〈0;cbW〉)
+    ok9: 〈0;loud〉(〈0;cbD〉)
+    #CbL: func(a: int) -> int
+    cbL: (〈0;#CbL〉 & func(a: number) -> int: 1)
+    lab: func(g: func(a: number) -> int) -> int: 〈0;g〉(a: 1.5)
+    bad9: 〈0;lab〉(〈0;cbL〉)
+    alias: 〈0;cb〉
+    obj: {
+      f: 〈1;cb〉
+    }
+    bad10: 〈0;quiet〉(〈0;alias〉)
+    bad11: 〈0;quiet〉(〈0;obj〉.f)
+    dq: func(g: func(number) -> int = 〈0;cb〉) -> int: 7
+    bad12: 〈0;dq〉()
+    ok10: 〈0;dq〉(〈0;cbW〉)
+    #DQ: func(g: func(number) -> int = 〈0;cb〉) -> int
+    dq2: (〈0;#DQ〉 & func(g: func(number) -> int) -> int: 7)
+    bad13: 〈0;dq2〉()
+    cbOpt: (func(a?: int, ...) -> int & func(number) -> int: 1)
+    labOpt: func(g: func(a: number) -> int) -> int: 〈0;g〉(a: 1.5)
+    bad14: 〈0;labOpt〉(〈0;cbOpt〉)
+    lim1: 〈0;quiet〉((〈0;cb〉|〈0;cb〉))
+    mkSig: func() -> _: func(number) -> int
+    made: func(g: 〈0;mkSig〉()) -> int: 7
+    lim2: 〈0;made〉(〈0;cb〉)
+    madeL: func(g: 〈0;mkSig〉()) -> int: 〈0;g〉(1.5)
+    lim3: 〈0;madeL〉(〈0;cb〉)
+    rec: func(g: func() -> int = 〈0;rec〉()) -> _: func() -> int: 1
+    recBad: 〈0;rec〉()
+    rec2: func(g: func() -> int = 〈0;rec2〉().a) -> _: {
+      a: func() -> int: 1
+    }
+    rec2Bad: 〈0;rec2〉()
+    fcb: func(g: func(x: 〈0;fcb〉(〈0;cb〉)) -> int) -> int: 1
+    fcbOut: 〈0;fcb〉(〈0;cb〉)
+    cbA: (〈0;#Cb〉 & 〈0;cbAny〉)
+    fsl: func(g: func(x: 〈0;fsl〉(〈0;cbA〉)[:]) -> int) -> _: [
+      1,
+    ]
+    fslOut: 〈0;fsl〉(〈0;cbA〉)[0]
+    fcomp: func(g: func(x: [
+      for _, y in 〈1;fcomp〉(〈1;cbA〉) {
+        〈1;y〉
+      },
+    ]) -> int) -> _: [
+      1,
+    ]
+    fcompOut: 〈0;fcomp〉(〈0;cbA〉)[0]
   }
 }

@@ -873,6 +873,128 @@ defaults: {
 	nestedDirect: fill() @test(eq, 2)
 	nestedCall:   id(fill()) @test(eq, 2)
 }
+// A consumer's parameter signature entitles it to call the argument with
+// every value the signature admits. A caller clause of the supplied function
+// that permits less is rejected where the argument is bound, whether or not
+// the consumer makes such a call (the implementation's own declaration is
+// checked separately, see admission.hofBad).
+entitlement: {
+	#Cb:   func(x: int) -> int
+	cb:    #Cb & (func(x: number) -> int: 1)
+	loud:  func(g: func(number) -> int) -> int: g(1.5)
+	quiet: func(g: func(number) -> int) -> int: 7
+	bad1:  loud(cb) @test(err, code=eval, contains="parameter x of the function supplied for parameter g permits only int, but parameter g permits number")
+	bad2:  quiet(cb) @test(err, code=eval, contains="parameter x of the function supplied for parameter g permits only int, but parameter g permits number")
+
+	// No clause, or a clause as wide as the entitlement, is admitted.
+	cbW:  func(x: number) -> int: 1
+	#CbN: func(x: number) -> int
+	cbN:  #CbN & cbW
+	ok1:  loud(cbW) @test(eq, 1)
+	ok2:  quiet(cbN) @test(eq, 7)
+	ok3:  loud(cbN) @test(eq, 1)
+
+	// An entitlement no wider than the clause is admitted; the clause keeps
+	// fencing the consumer's calls.
+	narrow: func(g: func(int) -> int) -> int: g(2)
+	ok4:    narrow(cb) @test(eq, 1)
+	nFrac:  func(g: func(int) -> int) -> int: g(1.5)
+	bad3:   nFrac(cb) @test(err, code=eval, contains="conflicting values 1.5 and int")
+
+	// The signature may be reached through a definition or a conjunction;
+	// every signature counts.
+	#G:     func(number) -> int
+	viaDef: func(g: #G) -> int: 7
+	bad4:   viaDef(cb) @test(err, code=eval, contains="permits only int, but parameter g permits number")
+	conj:   func(g: #G & func(_) -> int) -> int: 7
+	cbAny:  func(x: _) -> int: 1
+	bad5:   conj(cbN) @test(err, code=eval, contains="parameter x of the function supplied for parameter g permits only number, but parameter g permits _")
+	ok5:    conj(cbAny) @test(eq, 7)
+	// The implementation's own declaration is still checked by admission.
+	bad5b:  conj(cbW) @test(err, code=eval, contains="parameter 1 of function accepts number, but its signature requires _")
+
+	// A signature attached to the consumer constrains its parameters too.
+	#Consumer: func(g: func(number) -> int) -> int
+	attached:  #Consumer & (func(g: func(_) -> int) -> int: 7)
+	bad6:      attached(cb) @test(err, code=eval, contains="permits only int, but parameter g permits")
+	ok6:       attached(cbAny) @test(eq, 7)
+
+	// A supplied builtin is checked through its attached signatures.
+	up:    (func(s: string) -> string) & strings.ToUpper
+	anyIn: func(g: func(_) -> string) -> string: g("x")
+	bad7:  anyIn(up) @test(err, code=eval, contains="parameter s of the function supplied for parameter g permits only string, but parameter g permits _")
+	strIn: func(g: func(string) -> string) -> string: g("x")
+	ok7:   strIn(up) @test(eq, "X")
+
+	// A partial application binds and checks the argument at once.
+	apply2: func(g: func(number) -> int, x: number) -> int: g(x)
+	bad8:   apply2(cb, ...) @test(err, code=eval, contains="permits only int, but parameter g permits number")
+	ok8:    apply2(cbW, ...)(1.5) @test(eq, 1)
+	// A partially applied argument is left to the binding, which cannot
+	// tighten it; its clauses still describe the parameter it has bound.
+	#Ap:    func(g: func(number) -> int, x: number) -> int
+	ap:     #Ap & (func(g: func(number) -> int, x: number) -> int: g(x))
+	part:   ap(cbW, ...)
+	bad15:  quiet(part) @test(err, code=eval, contains="cannot tighten a partially applied function")
+
+	// A clause that no witness refutes admits; the call still fences.
+	#CbD: func(x: <=0 | >0) -> int
+	cbD:  #CbD & cbW
+	ok9:  loud(cbD) @test(eq, 1)
+
+	// A labeled entitlement matches the clause's parameter in the slot the
+	// label binds.
+	#CbL: func(a: int) -> int
+	cbL:  #CbL & (func(a: number) -> int: 1)
+	lab:  func(g: func(a: number) -> int) -> int: g(a: 1.5)
+	bad9: lab(cbL) @test(err, code=eval, contains="parameter a of the function supplied for parameter g permits only int, but parameter g permits number")
+
+	// The supplied function may be reached through an alias or a field.
+	alias: cb
+	obj: {f: cb}
+	bad10: quiet(alias) @test(err, code=eval, contains="permits only int, but parameter g permits number")
+	bad11: quiet(obj.f) @test(err, code=eval, contains="permits only int, but parameter g permits number")
+
+	// A default supplies the argument and is checked the same way, whether
+	// the function or an attached signature declares it.
+	dq:    func(g: func(number) -> int = cb) -> int: 7
+	bad12: dq() @test(err, code=eval, contains="permits only int, but parameter g permits number")
+	ok10:  dq(cbW) @test(eq, 7)
+	#DQ:   func(g: func(number) -> int = cb) -> int
+	dq2:   #DQ & (func(g: func(number) -> int) -> int: 7)
+	bad13: dq2() @test(err, code=eval, contains="permits only int, but parameter g permits number")
+
+	// A label the consumer's signature introduces binds a clause parameter
+	// that matched no slot before.
+	cbOpt:  (func(a?: int, ...) -> int) & (func(number) -> int: 1)
+	labOpt: func(g: func(a: number) -> int) -> int: g(a: 1.5)
+	bad14:  labOpt(cbOpt) @test(err, code=eval, contains="parameter a of the function supplied for parameter g permits only int, but parameter g permits number")
+
+	// Only a literal or a reference is inspected at the binding. An argument
+	// or a signature computed by an expression is left to the call, which
+	// still enforces the fence; evaluating it at the binding would run ahead
+	// of the call's cycle detection (see rec below).
+	lim1:   quiet(cb | cb) @test(eq, 7)
+	mkSig:  func() -> _: func(number) -> int
+	made:   func(g: mkSig()) -> int: 7
+	lim2:   made(cb) @test(eq, 7)
+	madeL:  func(g: mkSig()) -> int: g(1.5)
+	lim3:   madeL(cb) @test(err, code=eval, contains="conflicting values 1.5 and int")
+	rec:    func(g: func() -> int = rec()) -> _: (func() -> int: 1)
+	recBad: rec() @test(err, contains="structural cycle")
+	rec2:    func(g: func() -> int = rec2().a) -> _: {a: func() -> int: 1}
+	rec2Bad: rec2() @test(err, contains="structural cycle")
+	// A constraint that would call the function is not compared either,
+	// whatever form the call takes.
+	fcb:      func(g: func(x: fcb(cb)) -> int) -> int: 1
+	fcbOut:   fcb(cb) @test(eq, 1)
+	cbA:      #Cb & cbAny
+	fsl:      func(g: func(x: fsl(cbA)[:]) -> int) -> _: [1]
+	fslOut:   fsl(cbA)[0] @test(eq, 1)
+	fcomp:    func(g: func(x: [for y in fcomp(cbA) {y}]) -> int) -> _: [1]
+	fcompOut: fcomp(cbA)[0] @test(eq, 1)
+}
+
 -- out/errors.txt --
 [eval] tighten.y: missing argument b:
     ./in.cue:12:5
@@ -1151,15 +1273,71 @@ x: invalid value "c" (out of bound =~"b"):
 [eval] defaults.orderTV: parameter b of function not allowed by closed function type:
     ./in.cue:844:11
     ./in.cue:846:11
+[eval] entitlement.bad1: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:872:17
+[eval] entitlement.bad2: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:873:17
+[eval] x: conflicting values 1.5 and int (mismatched types float and int):
+    ./in.cue:889:23
+    ./in.cue:889:46
+[eval] entitlement.bad4: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:894:10
+[eval] entitlement.bad5: parameter x of the function supplied for parameter g permits only number, but parameter g permits _:
+    ./in.cue:879:8
+    ./in.cue:897:23
+[eval] g: parameter 1 of function accepts number, but its signature requires _:
+    ./in.cue:878:8
+    ./in.cue:897:23
+[eval] entitlement.bad6: parameter x of the function supplied for parameter g permits only int, but parameter g permits _:
+    ./in.cue:870:9
+    ./in.cue:906:34
+[eval] entitlement.bad7: parameter s of the function supplied for parameter g permits only string, but parameter g permits _:
+    strings:28:15
+    ./in.cue:912:17
+[eval] entitlement.bad8: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:918:18
+[eval] g: cannot tighten a partially applied function:
+    ./in.cue:925:10
+    ./in.cue:873:17
+    ./in.cue:924:17
+[eval] entitlement.bad9: parameter a of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:935:8
+    ./in.cue:937:16
+[eval] entitlement.bad10: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:873:17
+[eval] entitlement.bad11: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:873:17
+[eval] entitlement.bad12: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:948:17
+[eval] entitlement.bad13: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:870:9
+    ./in.cue:952:24
+[eval] entitlement.bad14: parameter a of the function supplied for parameter g permits only int, but parameter g permits number:
+    ./in.cue:957:11
+    ./in.cue:958:18
+[eval] x: conflicting values 1.5 and int (mismatched types float and int):
+    ./in.cue:870:17
+    ./in.cue:969:37
+[structural_cycle] structural cycle:
+    ./in.cue:971:34
+[structural_cycle] structural cycle:
+    ./in.cue:973:35
 -- out/eval/stats --
-Leaks:  43
-Freed:  1642
-Reused: 1452
-Allocs: 233
+Leaks:  55
+Freed:  1858
+Reused: 1679
+Allocs: 234
 Retain: 0
 
-Unifications: 1563
-Conjuncts:    4664
-Disjuncts:    93
+Unifications: 1765
+Conjuncts:    5216
+Disjuncts:    119
 
-NumCloseIDs: 674
+NumCloseIDs: 762

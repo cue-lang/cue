@@ -2300,6 +2300,10 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			return nil
 		}
 		if arg != nil {
+			if b := c.checkEntitlement(x, i, arg, callEnv); b != nil {
+				c.AddBottom(b)
+				return nil
+			}
 			bindings[i] = funcArg{expr: arg, env: callEnv}
 		}
 	}
@@ -2391,6 +2395,13 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 			// Nothing binds this parameter: no argument was provided and
 			// there is neither a constraint nor a default.
 			continue
+		}
+		if arg == nil {
+			// A default supplies the argument and is checked like one.
+			if b := c.checkDefaultEntitlement(x, i); b != nil {
+				c.AddBottom(b)
+				return nil
+			}
 		}
 
 		// The activation carries one arc per parameter. The argument is
@@ -3022,10 +3033,58 @@ func (builtin *Builtin) callPerDisjunct(c *OpContext, callCtx BuiltinCallContext
 // Like native function constraints, these expressions are
 // evaluated in the environment in which their signature was declared.
 func (builtin *Builtin) applyParamTypes(c *OpContext, args []Value) ([]Value, *Bottom) {
-	for _, t := range builtin.Types {
-		matches := matchBuiltinParams(t.Fn, builtin)
+	if len(builtin.Types) == 0 {
+		return args, nil
+	}
+	// This runs on every call. The parameter matches depend on the builtin
+	// and its types only, so they are computed once for both passes below.
+	matches := make([][]int, len(builtin.Types))
+	for k, t := range builtin.Types {
+		matches[k] = matchBuiltinParams(t.Fn, builtin)
+	}
+
+	// A parameter typed by a signature entitles the builtin to call its
+	// argument accordingly; the argument's own signatures must permit that,
+	// as for a call to a function value (see [OpContext.checkEntitlement]).
+	// The signatures of all types constraining an argument are gathered
+	// first, so that a label one of them introduces takes part in matching
+	// the clauses against another, and the arguments are checked as
+	// supplied, before any type's constraints are applied to them. Only a
+	// function argument has signatures to check, so any other argument
+	// skips the search for function types.
+	var argSigs [][]FuncType
+	var argNames []string
+	for k, t := range builtin.Types {
 		for j, tp := range t.Fn.Params {
-			i := matches[j]
+			i := matches[k][j]
+			if tp.Value == nil || i < 0 || i >= len(args) || args[i] == nil ||
+				args[i].Kind()&FuncKind == 0 {
+				continue
+			}
+			sigs := c.funcTypeConstraints(t.Env, tp.Value)
+			if len(sigs) == 0 {
+				continue
+			}
+			if argSigs == nil {
+				argSigs = make([][]FuncType, len(args))
+				argNames = make([]string, len(args))
+			}
+			argSigs[i] = append(argSigs[i], sigs...)
+			if argNames[i] == "" {
+				argNames[i] = funcParamName(c, j, &tp)
+			}
+		}
+	}
+	for i, sigs := range argSigs {
+		if len(sigs) > 0 {
+			if b := c.checkSuppliedEntitlement(sigs, args[i], argNames[i]); b != nil {
+				return nil, b
+			}
+		}
+	}
+	for k, t := range builtin.Types {
+		for j, tp := range t.Fn.Params {
+			i := matches[k][j]
 			if tp.Value == nil || i < 0 || i >= len(args) || args[i] == nil {
 				continue
 			}
@@ -3087,6 +3146,18 @@ type Builtin struct {
 	// TODO:  make these values for better type checking.
 	Params []Param
 	Result Kind
+
+	// ResultValue is the declared result, when it is more precise than the
+	// kind Result: a builtin registered for a Go function with a sized
+	// integer result declares that range. It is nil for a kind-level
+	// declaration.
+	ResultValue Value
+
+	// Foreign marks a builtin registered by the program embedding the
+	// evaluator rather than by a built-in package. It has no package
+	// identity and cannot be referred to by name from CUE source, so it is
+	// not exportable.
+	Foreign bool
 
 	// NonConcrete should be set to true if a builtin supports non-concrete
 	// arguments. By default, all arguments are checked to be concrete.
@@ -3171,7 +3242,7 @@ func (x *Builtin) Kind() Kind {
 }
 
 func (x *Builtin) BareValidator() *BuiltinValidator {
-	if len(x.Params) != 1 ||
+	if x.Foreign || len(x.Params) != 1 ||
 		(x.Result != BoolKind && x.Result != BottomKind) {
 		return nil
 	}
@@ -3179,9 +3250,10 @@ func (x *Builtin) BareValidator() *BuiltinValidator {
 }
 
 // IsValidator reports whether b should be interpreted as a Validator for the
-// given number of arguments.
+// given number of arguments. A foreign builtin never is: the embedding
+// program registers validators separately (see [ExternalValidator]).
 func (b *Builtin) IsValidator(numArgs int) bool {
-	return numArgs == len(b.Params)-1 &&
+	return !b.Foreign && numArgs == len(b.Params)-1 &&
 		b.Result&^BoolKind == 0 &&
 		b.Params[numArgs].Default() == nil
 }

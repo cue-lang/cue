@@ -195,7 +195,7 @@ func (s *subsumer) builtinResultConstraint(env *adt.Environment, x adt.Expr, b *
 	if b.Result == adt.BottomKind {
 		return true
 	}
-	if s.funcConstraint(env, x, nil, &adt.BasicType{K: b.Result}) {
+	if s.funcConstraint(env, x, nil, b.DeclaredResult()) {
 		return true
 	}
 	for _, t := range b.Types {

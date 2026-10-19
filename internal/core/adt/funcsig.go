@@ -348,6 +348,332 @@ func (c *OpContext) checkDeclared(sig, impl FuncType, types []FuncType) *Bottom 
 	return nil
 }
 
+// checkEntitlement checks a function value supplied as the argument arg,
+// compiled in argEnv, for parameter i of a call to x against the bodyless
+// signatures that constrain that parameter. Such a signature S entitles the
+// callee to call the argument with every value S's parameters admit. The
+// supplied value's caller clauses, the bodyless signatures it was unified
+// with, must permit those calls; otherwise a call the callee is entitled to
+// would fail inside its body, or never be reported if the callee happens not
+// to make it. Unifying S with the value cannot establish this: callers get
+// the intersection of the clauses, so a narrower clause silently restricts
+// what the callee was promised. The comparison is contravariant on the
+// parameters and reuses the coverage relation of admission, so it admits
+// wherever that relation is undecided; the value's own declaration is
+// checked by that admission when S is unified with it.
+func (c *OpContext) checkEntitlement(x *FuncValue, i int, arg Expr, argEnv *Environment) *Bottom {
+	sigs := c.paramSignatures(x, i)
+	if len(sigs) == 0 {
+		return nil
+	}
+	return c.checkSuppliedEntitlement(sigs, c.suppliedFunc(argEnv, arg), funcParamName(c, i, &x.Fn.Params[i]))
+}
+
+// checkSuppliedEntitlement checks the supplied value v, a function value or
+// builtin, against the bodyless signatures sigs that constrain the parameter
+// named name (see [OpContext.checkEntitlement]). Any other value, including
+// one not determined yet, is not checked here, nor is a partial application,
+// whose clauses still describe the parameters it has bound: binding it to a
+// signature fails regardless, as a partial application cannot be tightened.
+func (c *OpContext) checkSuppliedEntitlement(sigs []FuncType, v Value, name string) *Bottom {
+	// Parameters are matched through the labels of the value's own types and
+	// of the signatures about to be unified with it: a label the latter
+	// introduce binds a name-only clause parameter that matched nothing so
+	// far, so that clause then constrains the slot.
+	var clauses, types []FuncType
+	var match func(*Function) []int
+	if v != nil {
+		v = Unwrap(v)
+	}
+	switch v := v.(type) {
+	case *FuncValue:
+		if v.Fn == nil || v.IsPartial() {
+			return nil
+		}
+		clauses = v.Types
+		if v.Fn.Body == nil {
+			clauses = append([]FuncType{{Fn: v.Fn, Env: v.Env}}, clauses...)
+		}
+		types = append(append(types, v.Types...), sigs...)
+		match = func(f *Function) []int { return matchFuncParamsToValue(f, v.Fn, types) }
+	case *Builtin:
+		clauses = v.Types
+		types = append(append(types, v.Types...), sigs...)
+		match = func(f *Function) []int { return matchBuiltinParamsWith(f, v, types) }
+	default:
+		return nil
+	}
+	for _, s := range sigs {
+		ms := match(s.Fn)
+		for _, t := range clauses {
+			if t.Fn.Body != nil {
+				continue
+			}
+			mt := match(t.Fn)
+			for k, j := range ms {
+				if j < 0 {
+					continue
+				}
+				for m, jt := range mt {
+					if jt != j {
+						continue
+					}
+					sp, tp := &s.Fn.Params[k], &t.Fn.Params[m]
+					if hasCall(sp.Value) || hasCall(tp.Value) {
+						continue // left to the call, see hasCall
+					}
+					if !c.covers(t.Env, tp.Value, s.Env, sp.Value) {
+						return admissionErr(c, t.Fn, s.Fn,
+							"parameter %s of the function supplied for parameter %s permits only %s, but parameter %s permits %s",
+							funcParamName(c, m, tp), name, constraintString(c, tp.Value), name, constraintString(c, sp.Value))
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// checkDefaultEntitlement checks the default that supplies the unbound
+// parameter i of x, whether declared by the function or by an attached
+// signature, as [OpContext.checkEntitlement] checks an argument.
+func (c *OpContext) checkDefaultEntitlement(x *FuncValue, i int) *Bottom {
+	if d := x.Fn.Params[i].Default; d != nil {
+		if b := c.checkEntitlement(x, i, d, x.Env); b != nil {
+			return b
+		}
+	}
+	for _, t := range x.Types {
+		for m, j := range matchFuncParamsToValue(t.Fn, x.Fn, x.Types) {
+			if d := t.Fn.Params[m].Default; j == i && d != nil {
+				if b := c.checkEntitlement(x, i, d, t.Env); b != nil {
+					return b
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// paramSignatures returns the bodyless signatures that constrain parameter i
+// of x: those in the parameter's own constraint and in the constraints of
+// the parameters of x's attached types that match it.
+func (c *OpContext) paramSignatures(x *FuncValue, i int) []FuncType {
+	sigs := c.funcTypeConstraints(x.Env, x.Fn.Params[i].Value)
+	for _, t := range x.Types {
+		for m, j := range matchFuncParamsToValue(t.Fn, x.Fn, x.Types) {
+			if j == i {
+				sigs = append(sigs, c.funcTypeConstraints(t.Env, t.Fn.Params[m].Value)...)
+			}
+		}
+	}
+	return sigs
+}
+
+// funcTypeConstraints returns the bodyless signatures that the constraint x,
+// compiled in env, imposes: a function literal without a body, the
+// signatures of a function type a reference resolves to, or those of the
+// operands of a conjunction. Any other constraint, such as a call producing
+// a signature, is not evaluated here and imposes none for this check; the
+// call enforces it. Evaluating it here would run before the call's own
+// cycle detection is in place.
+func (c *OpContext) funcTypeConstraints(env *Environment, x Expr) []FuncType {
+	switch x := x.(type) {
+	case *Function:
+		if x.Body == nil {
+			return []FuncType{{Fn: x, Env: env}}
+		}
+	case *BinaryExpr:
+		if x.Op == AndOp {
+			return append(c.funcTypeConstraints(env, x.X), c.funcTypeConstraints(env, x.Y)...)
+		}
+	case Resolver:
+		if callFree(x) {
+			return funcTypeSigs(c.resolvedFunc(env, x))
+		}
+	}
+	return nil
+}
+
+// hasCall reports whether evaluating the constraint x may evaluate a call.
+// Such a constraint is not compared at the binding (see
+// [OpContext.checkEntitlement]): evaluating it there would run ahead of the
+// enclosing call's cycle detection, so a constraint calling the function
+// itself would recurse without limit. The call enforces it regardless. Only
+// forms known not to call count as call-free: literals, kinds, bounds,
+// operators, interpolations, disjunctions, struct and list literals without
+// comprehensions, nested signatures, and call-free references composed of
+// such parts; any other form is treated as if it could call.
+func hasCall(x Node) bool {
+	return !callFreeExpr(x)
+}
+
+func callFreeExpr(x Node) bool {
+	switch x := x.(type) {
+	case nil, *BasicType, *Top, *Null, *Bool, *Num, *String, *Bytes, *BoundValue, *Vertex:
+		return true
+	case Resolver:
+		return callFree(x)
+	case *BoundExpr:
+		return callFreeExpr(x.Expr)
+	case *UnaryExpr:
+		return callFreeExpr(x.X)
+	case *BinaryExpr:
+		return callFreeExpr(x.X) && callFreeExpr(x.Y)
+	case *Interpolation:
+		for _, p := range x.Parts {
+			if !callFreeExpr(p) {
+				return false
+			}
+		}
+		return true
+	case *DisjunctionExpr:
+		for _, d := range x.Values {
+			if !callFreeExpr(d.Val) {
+				return false
+			}
+		}
+		return true
+	case *Function:
+		for _, p := range x.Params {
+			if !callFreeExpr(p.Value) || !callFreeExpr(p.Default) {
+				return false
+			}
+		}
+		return callFreeExpr(x.Ret)
+	case *StructLit:
+		for _, d := range x.Decls {
+			var es []Expr
+			switch d := d.(type) {
+			case *Field:
+				es = []Expr{d.Value}
+			case *LetField:
+				es = []Expr{d.Value}
+			case *Ellipsis:
+				es = []Expr{d.Value}
+			case *BulkOptionalField:
+				es = []Expr{d.Filter, d.Value}
+			case *DynamicField:
+				es = []Expr{d.Key, d.Value}
+			case Expr:
+				es = []Expr{d}
+			default:
+				return false // a comprehension, or a form not known here
+			}
+			for _, e := range es {
+				if !callFreeExpr(e) {
+					return false
+				}
+			}
+		}
+		return true
+	case *ListLit:
+		for _, el := range x.Elems {
+			switch el := el.(type) {
+			case *Ellipsis:
+				if !callFreeExpr(el.Value) {
+					return false
+				}
+			case Expr:
+				if !callFreeExpr(el) {
+					return false
+				}
+			default:
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+// callFree reports whether resolving the reference x evaluates no call: a
+// field, label, let, import, or value reference, possibly selected or
+// indexed by a literal or another such reference. A reference through a
+// call, such as f().x, is not inspected at the binding: the call would run
+// ahead of the enclosing call's cycle detection, so a default or argument
+// that reaches the function itself would recurse without limit. A reference
+// to a field shares that field's vertex, whose evaluation the evaluator's
+// ordinary cycle handling guards.
+func callFree(x Node) bool {
+	switch x := x.(type) {
+	case *FieldReference, *LabelReference, *LetReference, *ImportReference, *ValueReference:
+		return true
+	case *SelectorExpr:
+		return callFree(x.X)
+	case *IndexExpr:
+		return callFree(x.X) && callFree(x.Index)
+	case *Num, *String:
+		return true
+	}
+	return false
+}
+
+// funcTypeSigs returns the bodyless signatures of v if it is a function
+// value, and nothing otherwise.
+func funcTypeSigs(v Value) []FuncType {
+	fv, ok := v.(*FuncValue)
+	if !ok || fv.Fn == nil {
+		return nil
+	}
+	var sigs []FuncType
+	if fv.Fn.Body == nil {
+		sigs = append(sigs, FuncType{Fn: fv.Fn, Env: fv.Env})
+	}
+	for _, t := range fv.Types {
+		if t.Fn.Body == nil {
+			sigs = append(sigs, t)
+		}
+	}
+	return sigs
+}
+
+// suppliedFunc returns the function value or builtin that the argument arg,
+// compiled in argEnv, supplies, or nil if it supplies none or none can be
+// determined here. Only a literal and a reference are inspected, without
+// evaluating anything else: an argument computed by a call, a conjunction,
+// or a disjunction is left to the call, which enforces the parameter's
+// signatures regardless. Evaluating such an argument at the binding would
+// run before the call's own cycle detection is in place, so a default that
+// calls the function itself would recurse without limit.
+func (c *OpContext) suppliedFunc(argEnv *Environment, arg Expr) Value {
+	switch x := arg.(type) {
+	case *Function:
+		return &FuncValue{Src: x.Src, Fn: x, Env: argEnv}
+	case Resolver:
+		if callFree(x) {
+			return c.resolvedFunc(argEnv, x)
+		}
+	}
+	return nil
+}
+
+// resolvedFunc resolves the reference x in env and returns the function
+// value or builtin it holds, or nil for any other value or for a reference
+// that cannot be resolved. Errors the resolution raises are not retained.
+// The value may still be provisional: its clauses can only grow, so a
+// provisional view can at most admit a binding that the call would reject.
+func (c *OpContext) resolvedFunc(env *Environment, x Resolver) Value {
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() { c.errs = savedErrs }()
+	v, _ := c.resolveState(MakeConjunct(env, x, c.ci), x, Flags{
+		status:    partial,
+		condition: concreteKnown,
+		mode:      yield,
+	})
+	if v == nil {
+		return nil
+	}
+	switch f := Unwrap(v).(type) {
+	case *FuncValue:
+		return f
+	case *Builtin:
+		return f
+	}
+	return nil
+}
+
 // covers reports whether the constraint a, compiled in enva, admits every
 // value that the constraint b, compiled in envb, admits. A nil constraint is
 // top. It reports false only when this is refuted (see [OpContext.admits]).
@@ -1042,12 +1368,13 @@ func (c *OpContext) builtinParamCovers(pv Value, env *Environment, x Expr) bool 
 }
 
 // builtinResultCovered reports whether the signature result ret, compiled in
-// env, admits every value of a builtin's result kind k. A builtin declares
-// its result at the level of kinds only, so a structural constraint of a
-// fitting kind, such as a list of strings over a builtin returning a list,
-// is not refuted: the builtin's real result may well be narrower than its
-// kind.
-func (c *OpContext) builtinResultCovered(env *Environment, ret Expr, k Kind) bool {
+// env, admits every value of a builtin's declared result rv (see
+// [Builtin.DeclaredResult]). A builtin usually declares its result at the level
+// of kinds only, so a structural constraint of a fitting kind, such as a list
+// of strings over a builtin returning a list, is not refuted: the builtin's
+// real result may well be narrower than its kind.
+func (c *OpContext) builtinResultCovered(env *Environment, ret Expr, rv Value) bool {
+	k := rv.Kind()
 	if kr, ok := kindOnlyConstraint(ret); ok {
 		return k&^kr == 0
 	}
@@ -1063,7 +1390,17 @@ func (c *OpContext) builtinResultCovered(env *Environment, ret Expr, k Kind) boo
 	case *Vertex:
 		return k&^x.Kind() == 0
 	}
-	return c.admits(v, kindValue(k))
+	return c.admits(v, rv)
+}
+
+// DeclaredResult returns the builtin's declared result: ResultValue when
+// set, else the value admitting exactly the kind Result. It is exported for
+// use by internal/core/subsume.
+func (x *Builtin) DeclaredResult() Value {
+	if x.ResultValue != nil {
+		return x.ResultValue
+	}
+	return kindValue(x.Result)
 }
 
 // evalConstraint evaluates the signature constraint x in env to a complete
@@ -1989,10 +2326,10 @@ func checkBuiltinAdmission(c *OpContext, b *Builtin, t FuncType, types []FuncTyp
 		}
 	}
 	if t.Fn.Ret != nil && b.Result != BottomKind &&
-		!c.builtinResultCovered(t.Env, t.Fn.Ret, b.Result) {
+		!c.builtinResultCovered(t.Env, t.Fn.Ret, b.DeclaredResult()) {
 		return admissionErr(c, t.Fn, nil,
 			"builtin %s returns %s, but its signature requires %s",
-			b.qualifiedName(c), b.Result, c.Str(t.Fn.Ret))
+			b.qualifiedName(c), c.Str(b.DeclaredResult()), c.Str(t.Fn.Ret))
 	}
 	return nil
 }

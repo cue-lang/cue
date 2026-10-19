@@ -172,7 +172,7 @@ func doVendor(commit string) error {
 			byDescription[skipKey{filename, schema.Description, ""}] = schema.Skip
 			for _, test := range schema.Tests {
 				byJSON[skipKey{filename, string(schema.Schema), string(test.Data)}] = test.Skip
-				byDescription[skipKey{filename, schema.Description, test.Description}] = schema.Skip
+				byDescription[skipKey{filename, schema.Description, test.Description}] = test.Skip
 			}
 		}
 	}

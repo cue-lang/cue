@@ -196,7 +196,7 @@ func (c *cmdRemoveAll) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, ctx.Err
 	}
 
-	if _, err := os.Stat(path); err != nil {
+	if _, err := os.Lstat(path); err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return map[string]interface{}{"success": false}, nil
 		}

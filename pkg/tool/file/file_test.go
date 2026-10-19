@@ -288,16 +288,15 @@ func TestRemoveAll(t *testing.T) {
 	})
 
 	// A symlink whose target does not exist is itself a path to remove.
-	// TODO: the link is wrongly treated as missing and left in place.
 	t.Run("danglingSymlink", func(t *testing.T) {
 		dir := t.TempDir()
 		path := filepath.Join(dir, "link")
 		qt.Assert(t, qt.IsNil(os.Symlink(filepath.Join(dir, "gone"), path)))
 		got, err := run(t, path)
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.DeepEquals(got, any(map[string]interface{}{"success": false})))
+		qt.Assert(t, qt.DeepEquals(got, any(map[string]interface{}{"success": true})))
 		_, err = os.Lstat(path)
-		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.ErrorIs(err, fs.ErrNotExist))
 	})
 
 	// A path we cannot stat is not a path which does not exist;

@@ -14,7 +14,12 @@
 
 package adt
 
-import "testing"
+import (
+	"slices"
+	"testing"
+
+	"cuelang.org/go/cue/token"
+)
 
 func TestMergeBuiltinsRejectsConflictingContractLabels(t *testing.T) {
 	raw := &Builtin{Params: []Param{{Value: &Top{}}, {Value: &Top{}}}}
@@ -61,4 +66,31 @@ func TestMergeBuiltinsRejectsConflictingContractLabels(t *testing.T) {
 			t.Fatal("merge accepted one contract label at different raw positions")
 		}
 	})
+}
+
+// An error moved to the site of a call keeps positions of its own: a position
+// added to the moved copy or to the original afterwards does not overwrite one
+// of the other's, even while both are held in the original's bootstrap array.
+func TestMoveToCallSiteCopiesPositions(t *testing.T) {
+	f := token.NewFile("x.cue", -1, 10)
+	pos := func(offset int) token.Pos { return f.Pos(offset, token.NoRelPos) }
+	args, site := &Vertex{}, &Vertex{}
+	e := &ValueError{baseError: baseError{v: &Vertex{Parent: args}}}
+	e.auxpos = e.auxposBootstrap[:0]
+	e.AddPos(pos(1))
+
+	moved, ok := (&OpContext{}).moveToCallSite(e, site, args, nil)
+	if !ok {
+		t.Fatal("error in the arguments was not moved to the call site")
+	}
+	m := moved.(*ValueError)
+	m.AddPos(pos(2))
+	e.AddPos(pos(3))
+
+	if got, want := e.InputPositions(), []token.Pos{pos(1), pos(3)}; !slices.Equal(got, want) {
+		t.Errorf("original positions: got %v, want %v", got, want)
+	}
+	if got, want := m.InputPositions(), []token.Pos{pos(1), pos(2)}; !slices.Equal(got, want) {
+		t.Errorf("moved positions: got %v, want %v", got, want)
+	}
 }

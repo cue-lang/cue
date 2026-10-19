@@ -2220,6 +2220,9 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 	}
 
 	callEnv := c.Env(0)
+	// site is the vertex holding the call, at whose path errors arising in
+	// the call are reported (see [OpContext.atCallSite]).
+	site := c.vertex
 
 	// A call's result is fully determined by its call site, the caller
 	// environment in which its arguments resolve, and the callee. If this
@@ -2460,7 +2463,7 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 	result := c.newInlineVertex(anchor, nil, MakeConjunct(bodyEnv, ref, c.ci))
 	result.Finalize(c)
 	if b := result.Bottom(); b != nil && !b.IsIncomplete() {
-		return b
+		return c.atCallSite(b, site, activation, result)
 	}
 
 	// Force validation of parameters the body did not reference: an argument
@@ -2474,7 +2477,7 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 	for _, a := range arcs {
 		a.Finalize(c)
 		if b := a.Bottom(); b != nil {
-			return b
+			return c.atCallSite(b, site, activation, result)
 		}
 	}
 
@@ -3098,7 +3101,7 @@ func (builtin *Builtin) applyParamTypes(c *OpContext, args []Value) ([]Value, *B
 				MakeConjunct(nil, args[i], c.ci))
 			w.Finalize(c)
 			if b := w.Bottom(); b != nil && !b.IsIncomplete() {
-				return nil, b
+				return nil, c.atCallSite(b, c.vertex, w, nil)
 			}
 			args[i] = w
 		}

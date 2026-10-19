@@ -373,6 +373,11 @@ type baseError struct {
 
 	altPath []string
 
+	// site, if set, is the vertex holding the function call in which the
+	// error arose. The error is then reported at the path of site followed
+	// by altPath (see [OpContext.atCallSite]).
+	site *Vertex
+
 	// auxposBootstrap lets auxpos avoid extra allocations for few positions,
 	// which is a very common scenario.
 	auxposBootstrap [4]token.Pos
@@ -403,6 +408,12 @@ func (e *baseError) InputPositions() []token.Pos {
 }
 
 func (e *baseError) Path() (a []string) {
+	if e.site != nil {
+		for _, f := range appendPath(nil, e.site) {
+			a = append(a, f.SelectorString(e.r))
+		}
+		return append(a, e.altPath...)
+	}
 	if len(e.altPath) > 0 {
 		return e.altPath
 	}

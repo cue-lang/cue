@@ -736,9 +736,9 @@ admission: {
     ./in.cue:50:12
 [eval] defaults.reference: missing argument a:
     ./in.cue:69:13
-[structural_cycle] structural cycle:
+[structural_cycle] defaults.recursive: structural cycle:
     ./in.cue:63:31
-[structural_cycle] structural cycle:
+[structural_cycle] defaults.mutualRecursive: structural cycle:
     ./in.cue:64:31
 [incomplete] declaredDefaults.topArgSum: non-concrete value int in operand to +:
     ./in.cue:98:41
@@ -771,31 +771,31 @@ admission: {
     ./in.cue:239:21
 [eval] scoping.parameter.omitted: missing argument b:
     ./in.cue:263:12
-[eval] invalid value 50 (out of bound <10):
+[eval] scoping.returnType.bad: invalid value 50 (out of bound <10):
     ./in.cue:276:10
     ./in.cue:279:13
-[eval] conflicting values 1 and string (mismatched types int and string):
+[eval] scoping.returnConstraint: conflicting values 1 and string (mismatched types int and string):
     ./in.cue:282:31
     ./in.cue:282:39
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.direct.out: structural cycle:
     ./in.cue:325:29
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.mutual.out: structural cycle:
     ./in.cue:330:29
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.fibonacci.out: structural cycle:
     ./in.cue:336:29
-structural cycle:
+cycles.fibonacci.out: structural cycle:
     ./in.cue:336:40
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.ackermann.out: structural cycle:
     ./in.cue:341:37
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.selfApply.omega: structural cycle:
     ./in.cue:351:22
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.selfApply.out: structural cycle:
     ./in.cue:355:38
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.selfApply.fact5: structural cycle:
     ./in.cue:355:38
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.selfApply.factLet: structural cycle:
     ./in.cue:370:25
-[structural_cycle] structural cycle:
+[structural_cycle] cycles.selfApply.factDeep: structural cycle:
     ./in.cue:380:28
 [structural_cycle] 2 errors in empty disjunction::
     ./in.cue:397:29
@@ -805,7 +805,7 @@ structural cycle:
     ./in.cue:397:38
 structural cycle:
     ./in.cue:397:38
-4 errors in empty disjunction::
+cycles.disjunct.bad: 4 errors in empty disjunction::
     ./in.cue:398:8
 [incomplete] disjunction.ambiguous.out: cannot call h: unresolved disjunction func(a: int) -> int: ... | func(a: int) -> int: ... (type func):
     ./in.cue:476:8
@@ -818,7 +818,7 @@ structural cycle:
     ./in.cue:505:16
 [incomplete] disjunction.callee.incomplete.out: cannot call non-concrete value x (type _):
     ./in.cue:508:9
-[incomplete] a: undefined field: q:
+[incomplete] incompleteArgs.x: undefined field: q:
     ./in.cue:556:9
     ./in.cue:555:2
 [incomplete] incompleteArgs.z: undefined field: q:
@@ -828,12 +828,12 @@ structural cycle:
     ./in.cue:598:8
 [eval] partial.missing: missing argument c:
     ./in.cue:634:11
-[eval] b: invalid value 50 (out of bound <10):
+[eval] partial.oob: invalid value 50 (out of bound <10):
     ./in.cue:637:27
     ./in.cue:639:18
 [eval] partial.tooMany: too many positional arguments in function call:
     ./in.cue:643:11
-[structural_cycle] structural cycle:
+[structural_cycle] partial.recOut: structural cycle:
     ./in.cue:647:31
 [eval] partial.conflictArgs: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
     ./in.cue:606:7

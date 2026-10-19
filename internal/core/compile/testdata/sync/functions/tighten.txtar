@@ -414,6 +414,20 @@ compose: {
 	builtin: (func(x: number) -> number: x) & len
 }
 
+// Errors arising in a call are reported at the field holding the call, not
+// at the parameter they concern; out/errors.txt records the paths.
+errorPaths: {
+	g:      func(x: int) -> int: x
+	arg:    g(1.5)
+	s:      func(x: int) -> string: "\(x)"
+	interp: s(1.5)
+	nested: inner: g(true)
+	// An error from a call inside a function body is reported at the field
+	// holding the outer call, followed by its path within the result.
+	h:     func() -> {foo: int}: {foo: g("bad")}
+	outer: h()
+}
+
 // Tightening must preserve all structural cycle semantics: the cycle
 // anchor and call-site identity remain those of the function value being
 // called.
@@ -1373,6 +1387,21 @@ entitlement: {
     }: (〈1;f〉(〈0;a〉) & 〈1;g〉(〈0;a〉))
     bothX: 〈0;both〉(1)
     builtin: (func(x: number) -> number: 〈0;x〉 & len)
+  }
+  errorPaths: {
+    g: func(x: int) -> int: 〈0;x〉
+    arg: 〈0;g〉(1.5)
+    s: func(x: int) -> string: "\(〈0;x〉)"
+    interp: 〈0;s〉(1.5)
+    nested: {
+      inner: 〈1;g〉(true)
+    }
+    h: func() -> {
+      foo: int
+    }: {
+      foo: 〈2;g〉("bad")
+    }
+    outer: 〈0;h〉()
   }
   cycles: {
     T: func(n: int, ...) -> number

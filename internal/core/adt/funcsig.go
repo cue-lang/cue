@@ -2507,6 +2507,111 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue, at ...posInfo) (*FuncValue, 
 	return &merged, nil
 }
 
+// atCallSite returns b with the errors that arose in a call reported at the
+// path of site, the vertex holding the call, rather than at the path of the
+// call's own vertices, which are not part of the configuration: an error in
+// an argument, at or under args, takes the path of site, and an error in the
+// result, at or under result, takes the path of site followed by its path
+// within the result. Errors from other vertices, such as a field an argument
+// refers to, keep their paths.
+func (c *OpContext) atCallSite(b *Bottom, site, args, result *Vertex) *Bottom {
+	if b == nil || b.Err == nil || site == nil {
+		return b
+	}
+	var errs errors.Error
+	changed := false
+	for _, e := range errors.Errors(b.Err) {
+		if moved, ok := c.moveToCallSite(e, site, args, result); ok {
+			e = moved
+			changed = true
+		}
+		errs = errors.Append(errs, e)
+	}
+	if !changed {
+		return b
+	}
+	moved := *b
+	moved.Err = errs
+	return &moved
+}
+
+// moveToCallSite returns a copy of e reported at the call site, if e arose
+// in the call's own vertices (see [OpContext.atCallSite]). An error that
+// wraps another without a path of its own, such as an invalid
+// interpolation, takes the path of the error it wraps and is moved with it.
+// An error already moved to the site of a call nested in this one is moved
+// again, keeping its path below that site, so that it ends up at the
+// outermost call in the configuration.
+func (c *OpContext) moveToCallSite(e errors.Error, site, args, result *Vertex) (errors.Error, bool) {
+	var base *baseError
+	var moved errors.Error
+	switch x := e.(type) {
+	case *ValueError:
+		m := *x
+		base, moved = &m.baseError, &m
+	case *ConflictError:
+		m := *x
+		base, moved = &m.baseError, &m
+	default:
+		u, ok := errors.Unwrap(e).(errors.Error)
+		if !ok || u == nil || !slices.Equal(e.Path(), u.Path()) {
+			return e, false
+		}
+		inner, ok := c.moveToCallSite(u, site, args, result)
+		if !ok {
+			return e, false
+		}
+		format, a := e.Msg()
+		return errors.Wrapf(inner, e.Position(), format, a...), true
+	}
+	from := base.v
+	if base.site != nil {
+		from = base.site
+	} else if len(base.altPath) > 0 {
+		return e, false // a path set for structure sharing
+	}
+	below, inArgs, ok := callSiteOf(from, args, result)
+	if !ok {
+		return e, false
+	}
+	// The copy's positions may still be held in e's bootstrap array; give it
+	// its own, so that a position added to either does not overwrite one of
+	// the other's.
+	base.auxpos = append(base.auxposBootstrap[:0], base.auxpos...)
+	if inArgs {
+		base.altPath = nil
+	} else {
+		suffix := make([]string, 0, len(below)+len(base.altPath))
+		for i := len(below) - 1; i >= 0; i-- {
+			suffix = append(suffix, below[i].SelectorString(c))
+		}
+		if base.site != nil {
+			suffix = append(suffix, base.altPath...)
+		}
+		base.altPath = suffix
+	}
+	base.site = site
+	return moved, true
+}
+
+// callSiteOf reports whether v lies at or under args, or at or under result,
+// and in the latter case returns the labels from v up to result, innermost
+// first.
+func callSiteOf(v, args, result *Vertex) (below []Feature, inArgs, ok bool) {
+	for w := v; w != nil; w = w.Parent {
+		if w == args {
+			return nil, true, true
+		}
+		if result != nil && w == result {
+			return below, false, true
+		}
+		if w.Label != 0 {
+			below = append(below, w.Label)
+		}
+	}
+	return nil, false, false
+}
+
 // composeImplementations enables the pointwise composition of distinct
 // function implementations, (f & g)(x) = f(x) & g(x). It is disabled: two
 // distinct implementations conflict when they are unified. Composition would

@@ -289,18 +289,18 @@ typeDefaults: {
     ./in.cue:43:12
     ./in.cue:44:12
     ./in.cue:44:16
-[eval] invalid value "zz" (out of bound <="m"):
+[eval] dynamic.oob: invalid value "zz" (out of bound <="m"):
     ./in.cue:51:11
     ./in.cue:55:10
 [eval] dynamic.up2: builtin strings.ToUpper returns string, but its signature requires "HI":
     ./in.cue:60:7
-[eval] invalid value "zz" (out of bound <="m"):
+[eval] dynamic.hi: invalid value "zz" (out of bound <="m"):
     ./in.cue:65:12
     ./in.cue:69:11
 [eval] optionalExtra.bad: parameter sep of function type not allowed by builtin strings.ToUpper: no parameter of the builtin has this label:
     ./in.cue:87:48
     ./in.cue:87:8
-[eval] invalid value 5 (out of bound <3):
+[eval] labelMatch.optBad: invalid value 5 (out of bound <3):
     ./in.cue:93:56
     ./in.cue:95:20
 [eval] labelMatch.unknown: parameter times of function type not allowed by builtin strings.Repeat: no parameter of the builtin has this label:
@@ -311,7 +311,7 @@ typeDefaults: {
     ./in.cue:124:12
 [eval] polymorphic.any: parameter 1 of builtin len accepts (string|bytes|list|struct), but its signature requires _:
     ./in.cue:136:9
-[eval] conflicting values string and [1,2] (mismatched types string and list):
+[eval] polymorphic.sBad: conflicting values string and [1,2] (mismatched types string and list):
     ./in.cue:140:13
     ./in.cue:143:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:

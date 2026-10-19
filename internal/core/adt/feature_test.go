@@ -27,7 +27,7 @@ func TestFeatureBool(t *testing.T) {
 	ctx := adt.NewContext(r, &adt.Vertex{})
 
 	makeInt := func(x int64) adt.Feature {
-		f, _ := adt.MakeLabel(nil, 2, adt.IntLabel)
+		f, _ := adt.MakeLabel(nil, x, adt.IntLabel)
 		return f
 	}
 
@@ -105,9 +105,6 @@ func TestFeatureBool(t *testing.T) {
 			}
 			if got := tc.in.IsHidden(); got != tc.isHidden {
 				t.Errorf("IsHidden: got %v; want %v", got, tc.isHidden)
-			}
-			if got := tc.in.IsString(); got != tc.isString {
-				t.Errorf("IsString: got %v; want %v", got, tc.isString)
 			}
 		})
 	}

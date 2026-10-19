@@ -334,7 +334,7 @@ func TestAllPermutations(t *testing.T) {
 For inputs: %v
   Expected: %v
        Got: %v`,
-					tc.inputs, tc.expected, permutations)
+					tc.inputs, tc.expected, permutationsNames)
 			}
 		})
 	}

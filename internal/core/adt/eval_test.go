@@ -227,7 +227,7 @@ func BenchmarkUnifyAPI(b *testing.B) {
 			if j == 400 {
 				b.StartTimer()
 			}
-			v = v.FillPath(cue.ParsePath(fmt.Sprintf("i_%d", i)), i)
+			v = v.FillPath(cue.ParsePath(fmt.Sprintf("i_%d", j)), j)
 		}
 	}
 }

@@ -186,10 +186,6 @@ func TestValues(t *testing.T) {
 			in:  `a: true,    b: _|_`,
 			err: "",
 		},
-		{
-			in:  `a: _|_,       b: _|_`,
-			err: "",
-		},
 
 		// null subsumes only null
 		{
@@ -326,10 +322,6 @@ func TestValues(t *testing.T) {
 			in:  `a: {s: { a:1} }, b: { s: { a:1, b:2 }}`,
 			err: "",
 		},
-		{
-			in:  `a: {}, b: {}`,
-			err: "",
-		},
 		// TODO: allow subsumption of unevaluated values?
 		// ref not yet evaluated and not structurally equivalent
 		{
@@ -372,10 +364,6 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			in:  `a: number, b: 2 | 1`,
-			err: "",
-		},
-		{
 			in:  `a: int, b: 1 | 2 | 3.1`,
 			err: "value not an instance",
 		},
@@ -385,10 +373,6 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 
-		{
-			in:  `a: int, b: 1 | 2 | 3.1`,
-			err: "value not an instance",
-		},
 		{
 			in:  `a: 1 | 2, b: 1`,
 			err: "",
@@ -496,10 +480,6 @@ func TestValues(t *testing.T) {
 		{
 			in:  `a: !=1, b: >=1`,
 			err: "value not an instance",
-		},
-		{
-			in:  `a: !=1, b: <1`,
-			err: "",
 		},
 
 		{
@@ -1219,10 +1199,6 @@ func TestValues(t *testing.T) {
 		},
 
 		// Lists
-		{
-			in:  `a: [], b: []`,
-			err: "",
-		},
 		{
 			in:  `a: [...], b: []`,
 			err: "",

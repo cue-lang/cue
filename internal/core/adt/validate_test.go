@@ -61,7 +61,7 @@ func TestValidate(t *testing.T) {
 		_foo: { use: string }
 		`,
 	}, {
-		name: "hidden fields not considered for completeness",
+		name: "hidden fields not considered for completeness by default",
 		in: `
 		_foo: { use: string }
 		`,
@@ -147,7 +147,7 @@ func TestValidate(t *testing.T) {
 				    test:3:6`,
 	}, {
 		// TODO: different error position
-		name: "disallow cycle",
+		name: "disallow cycle next to a list cycle",
 		cfg:  &adt.ValidateConfig{DisallowCycles: true},
 		in: `
 		a: b - 100
@@ -206,7 +206,7 @@ func TestValidate(t *testing.T) {
 				x.a: incomplete value int:
 				    test:3:7`,
 	}, {
-		name: "pick up non-concrete value in default",
+		name: "pick up non-concrete disjunction in default",
 		cfg:  &adt.ValidateConfig{Concrete: true},
 		in: `
 			x: null | *{
@@ -350,13 +350,6 @@ func TestValidate(t *testing.T) {
 			y: int
 				`,
 		out: "",
-	}, {
-		name: "allow incomplete error with final while in definition",
-		cfg:  &adt.ValidateConfig{Final: true},
-		in: `
-			#D: x: #D.y + 1
-			#D: y: int
-				`,
 	}, {
 		name: "allow incomplete error with final while in definition",
 		cfg:  &adt.ValidateConfig{Final: true},

@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/tools/flow"
+	"github.com/go-quicktest/qt"
 )
 
 // TestTasks tests the logic that determines which nodes are tasks and what are
@@ -296,6 +297,9 @@ c: {$id: "c"}
 	}
 	tasks := ctrl.Tasks()
 	check("Tasks", tasks, "a1", "a2", "a3", "b", "c")
+	if t.Failed() {
+		return
+	}
 	b, c := tasks[3], tasks[4]
 
 	// Appending to one result leaves the other results unchanged.
@@ -388,29 +392,31 @@ func TestFlowValuePanic(t *testing.T) {
 	ctx := cuecontext.New()
 	v := ctx.CompileString(f)
 
-	ch := make(chan bool, 1)
+	ch := make(chan struct{})
 
+	// Stop the run and wait for it to finish once the test ends.
+	runCtx := t.Context()
 	cfg := &flow.Config{
 		Root: cue.ParsePath("root"),
 		UpdateFunc: func(c *flow.Controller, t *flow.Task) error {
-			ch <- true
+			select {
+			case ch <- struct{}{}:
+			case <-runCtx.Done():
+			}
 			return nil
 		},
 	}
 
 	c := flow.New(cfg, v, taskFunc)
 
-	defer func() { recover() }()
+	var wg sync.WaitGroup
+	t.Cleanup(wg.Wait)
+	wg.Go(func() { c.Run(runCtx) })
 
-	go c.Run(context.TODO())
-
-	// Call Value amidst two task runs. This should trigger a panic as the flow
-	// is not terminated.
+	// Run blocks in the first UpdateFunc call until we receive, so Value is
+	// called before the flow has terminated and must panic.
 	<-ch
-	c.Value()
-	<-ch
-
-	t.Errorf("Value() did not panic")
+	qt.Check(t, qt.PanicMatches(func() { c.Value() }, "can't retrieve value before flow has terminated"))
 }
 
 func taskFunc(v cue.Value) (flow.Runner, error) {

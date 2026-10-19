@@ -232,10 +232,13 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 			}
 		}
 
-		// We keep the directory if we can import it, or if we can't import it
-		// due to invalid CUE source files. This means that directories
-		// containing parse errors will be built (and fail) instead of being
-		// silently skipped as not matching the pattern.
+		// We keep the directory if we can import it, or if we can't import
+		// it, whether due to invalid CUE source files or to an import that
+		// does not resolve. Such directories are built (and fail) instead
+		// of being silently skipped as not matching the pattern, and the
+		// error stays with the package's own instance: a package whose
+		// import fails must not turn the whole pattern into one error
+		// instance, dropping every other package it matched.
 		// Do not take root, as we want to stay relative
 		// to one dir only.
 		relPath, err2 := pkgpath.Rel(c.Dir, path, c.pathOS)
@@ -251,15 +254,9 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		inst := l.newRelInstance(token.NoPos, relPath, pkgName)
 		pkgs := l.importPkg(token.NoPos, inst)
 		for _, p := range pkgs {
-			if err := p.Err; err != nil && (p == nil || len(p.InvalidFiles) == 0) {
-				switch err.(type) {
-				case *NoFilesError:
-					if c.DataFiles && len(p.OrphanedFiles) > 0 {
-						break
-					}
+			if err := p.Err; err != nil && len(p.InvalidFiles) == 0 {
+				if _, ok := err.(*NoFilesError); ok && !(c.DataFiles && len(p.OrphanedFiles) > 0) {
 					return nil
-				default:
-					m.Err = errors.Append(m.Err, err)
 				}
 			}
 		}
@@ -589,7 +586,9 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern as
 	var prevImportPath ast.ImportPath
 	for f, err := range modimports.AllModuleFiles(mainModRoot.FS, dir) {
 		if err != nil {
-			break
+			// Skip just this entry; stopping would leave every package
+			// after it unloaded, and their imports unresolved.
+			continue
 		}
 		fileDir := path.Dir(f.FilePath)
 		if !match(fileDir) {

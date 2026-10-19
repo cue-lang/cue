@@ -156,15 +156,25 @@ imports:
 		name: "RelativeImportPathWildcard",
 		cfg:  dirCfg,
 		args: []string{"./other/..."},
-		// TODO: the import error of one package takes the whole pattern,
-		// so the other package it matches, other/file, is dropped.
+		// The package whose import fails keeps its error; the other
+		// packages the pattern matches are still returned.
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
-path:   ""
+path:   mod.test/test/other@v0:main
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    ""
-display:""`,
+dir:    $CWD/testdata/testmod/other
+display:./other
+files:
+    $CWD/testdata/testmod/other/main.cue
+
+path:   mod.test/test/other/file@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/other/file
+display:./other/file
+files:
+    $CWD/testdata/testmod/other/file/file.cue`,
 	}, {
 		name: "NoMatchingPackageName",
 		cfg:  dirCfg,
@@ -982,14 +992,11 @@ func race(t *testing.T, f func() error) {
 	wg.Wait()
 }
 
-// TestWildcardSkipsUnreadableEntries loads ./... over a module holding a
-// directory the user cannot read, before a package whose import is
-// resolved inside the module.
-//
-// TODO: the expansion stops at the unreadable directory, so the packages
-// after it are left out of the packages loaded and the import of zz does
-// not resolve; that import error then turns the whole pattern into a
-// single error instance, dropping lib/l as well.
+// TestWildcardSkipsUnreadableEntries checks that a directory the wildcard
+// expansion cannot read does not stop the expansion: the packages after it
+// are still loaded, so that their imports resolve, and the unreadable
+// directory is left out, as the walk that builds the instances leaves it
+// out.
 func TestWildcardSkipsUnreadableEntries(t *testing.T) {
 	if runtime.GOOS == "windows" || os.Getuid() == 0 {
 		t.Skip("needs a directory the user cannot read")
@@ -1018,6 +1025,7 @@ func TestWildcardSkipsUnreadableEntries(t *testing.T) {
 		got = append(got, s)
 	}
 	qt.Assert(t, qt.DeepEquals(got, []string{
-		" (error)",
+		"mod.test/m/lib/l@v0",
+		"mod.test/m/zz@v0",
 	}))
 }

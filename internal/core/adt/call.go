@@ -66,8 +66,7 @@ func (c BuiltinCallContext) Arg(i int) Value {
 	// offset by 1.
 	if c.isValidator {
 		if i == 0 {
-			c.Errf("Expr may not be called for 0th argument of validator")
-			return nil
+			return c.Errf("Arg may not be called for 0th argument of validator")
 		}
 		i--
 	}
@@ -92,8 +91,7 @@ func (c BuiltinCallContext) Expr(i int) Expr {
 	// offset by 1.
 	if c.isValidator {
 		if i == 0 {
-			c.Errf("Expr may not be called for 0th argument of validator")
-			return nil
+			return c.Errf("Expr may not be called for 0th argument of validator")
 		}
 		i--
 	}

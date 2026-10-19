@@ -197,9 +197,9 @@ func (v *validator) validate(x *Vertex) {
 
 	for _, a := range x.Arcs {
 		if a.ArcType == ArcRequired && v.Final && v.inDefinition == 0 {
-			v.ctx.PushArcAndLabel(a)
+			saved := v.ctx.PushArcAndLabel(a)
 			v.add(NewRequiredNotPresentError(v.ctx, a, v.sharedPositions...))
-			v.ctx.PopArcAndLabel(a)
+			v.ctx.PopArcAndLabel(saved)
 			continue
 		}
 

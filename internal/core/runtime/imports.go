@@ -17,6 +17,7 @@ package runtime
 import (
 	"path"
 	"sync"
+	"weak"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -89,6 +90,10 @@ type index struct {
 	// other options may succeed.
 	buildErrs map[*build.Instance]errors.Error
 
+	// self identifies the index on the roots which record it, without being
+	// kept alive by them.
+	self weak.Pointer[index]
+
 	nextUniqueID uint64
 	typeCache    sync.Map // map[reflect.Type]evaluated
 }
@@ -108,7 +113,22 @@ func newIndex() *index {
 		importsByBuild: map[*build.Instance]*adt.Vertex{},
 		buildErrs:      map[*build.Instance]errors.Error{},
 	}
+	i.self = weak.Make(i)
 	return i
+}
+
+// rootInfo is what a runtime records on a root which it builds.
+type rootInfo struct {
+	inst *build.Instance
+
+	// owner is the index of the runtime which built the root.
+	owner weak.Pointer[index]
+}
+
+// recordRoot records that v is the root which x built from p. It must be
+// called before v is shared.
+func (x *index) recordRoot(v *adt.Vertex, p *build.Instance) {
+	v.SetRootInfo(&rootInfo{inst: p, owner: x.self})
 }
 
 func (r *Runtime) AddInst(key *adt.Vertex, p *build.Instance) {
@@ -123,20 +143,16 @@ func (r *Runtime) AddInst(key *adt.Vertex, p *build.Instance) {
 	x.importsByBuild[p] = key
 }
 
-// addOwnedInst records that key is the root built from p, which no later
-// build of p reuses.
-func (r *Runtime) addOwnedInst(key *adt.Vertex, p *build.Instance) {
-	r.index.lock.Lock()
-	defer r.index.lock.Unlock()
-
-	r.index.imports[key] = p
-}
-
 func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
 	// A per-evaluation instance of an imported package is not registered
 	// itself; resolve it to the shared package root that is.
 	if t := key.ImportTemplate(); t != nil {
 		key = t
+	}
+	// Roots are shared with the values of other runtimes, for which they are
+	// not the root of any instance.
+	if info, ok := key.RootInfo().(*rootInfo); ok && info.owner == r.index.self {
+		return info.inst
 	}
 	r.index.lock.RLock()
 	defer r.index.lock.RUnlock()

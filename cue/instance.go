@@ -92,7 +92,14 @@ func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex, er
 		return inst
 	}
 
-	inst = &Instance{
+	inst = newUncachedInstance(x, p, v, errs)
+	x.SetBuildData(p, inst)
+	return inst
+}
+
+// newUncachedInstance is like [getImportFromBuild], without using the cache.
+func newUncachedInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex, errs errors.Error) *Instance {
+	inst := &Instance{
 		ImportPath:  p.ImportPath,
 		Dir:         p.Dir,
 		PkgName:     p.PkgName,
@@ -107,9 +114,6 @@ func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex, er
 	if errs != nil {
 		inst.setListOrError(errs)
 	}
-
-	x.SetBuildData(p, inst)
-
 	return inst
 }
 
@@ -128,7 +132,16 @@ func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
 		root = root.Parent
 	}
 
-	return getImportFromBuild(x, p, root, nil)
+	if inst := lookupInstance(x, p); inst != nil {
+		return inst
+	}
+	inst := newUncachedInstance(x, p, root, nil)
+	// An instance which the runtime does not index must not outlive its
+	// root, so only cache the others.
+	if x.LoadInstance(p) != nil {
+		x.SetBuildData(p, inst)
+	}
+	return inst
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.

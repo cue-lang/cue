@@ -926,7 +926,7 @@ func (c *OpContext) importInstance(template *Vertex) *Vertex {
 	}
 	v := &Vertex{
 		Parent:             template.Parent,
-		importTemplate:     template,
+		origin:             &rootOrigin{template: template},
 		Label:              template.Label,
 		ClosedRecursive:    template.ClosedRecursive,
 		ClosedNonRecursive: template.ClosedNonRecursive,

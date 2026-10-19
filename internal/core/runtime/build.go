@@ -64,15 +64,16 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (*adt.Vertex, errors.Err
 	return v, errs
 }
 
-// buildOwned builds b, which no other build uses, so that no later build of b
-// reuses it. It records the errors in b for the caller.
+// buildOwned builds b, which no other build uses, and records its errors in
+// b. Only the resulting vertex leads back to b, so it is neither indexed nor
+// reused.
 func (x *Runtime) buildOwned(cfg *Config, b *build.Instance) (*adt.Vertex, errors.Error) {
 	if err := b.Complete(); err != nil {
 		return nil, b.Err
 	}
 	v, errs := x.build(cfg, b)
 	b.Err = errs
-	x.addOwnedInst(v, b)
+	x.index.recordRoot(v, b)
 	return v, errs
 }
 

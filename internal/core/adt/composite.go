@@ -189,10 +189,9 @@ type Vertex struct {
 	// TODO: move to nodeContext.
 	overlay *Vertex
 
-	// importTemplate, for a per-evaluation instance of an imported package
-	// created by [OpContext.importInstance], links back to the shared package
-	// root that the runtime registers. It is nil for all other vertices.
-	importTemplate *Vertex
+	// origin, for the root of an instance and its copies, records what the
+	// root was made from; see [Vertex.ImportTemplate] and [Vertex.RootInfo].
+	origin *rootOrigin
 
 	// finalizedBy is the [OpContext.finalizeID] of the [Vertex.Finalize]
 	// call whose evaluation finalized this vertex, cleared once
@@ -360,7 +359,39 @@ func equalDeref(a, b *Vertex) bool {
 // of an imported package. The runtime registers only the shared root, so use
 // this to map an instance back to its [build.Instance].
 func (v *Vertex) ImportTemplate() *Vertex {
-	return v.importTemplate
+	if o := v.origin; o != nil {
+		return o.template
+	}
+	return nil
+}
+
+// rootOrigin records what a root vertex was made from. Copies of the vertex
+// share it.
+type rootOrigin struct {
+	// template is the shared package root that an instance created by
+	// [OpContext.importInstance] was instantiated from.
+	template *Vertex
+
+	// root is the vertex which info was recorded for, so that its copies are
+	// not mistaken for it.
+	root *Vertex
+	info any
+}
+
+// RootInfo returns what [Vertex.SetRootInfo] recorded for v, or nil if there
+// is nothing, as for a copy of a root.
+func (v *Vertex) RootInfo() any {
+	if o := v.origin; o != nil && o.root == v {
+		return o.info
+	}
+	return nil
+}
+
+// SetRootInfo records info for v, the root of an instance, for the runtime
+// which built it, so that info lives exactly as long as v does. It must be
+// called before v is shared.
+func (v *Vertex) SetRootInfo(info any) {
+	v.origin = &rootOrigin{root: v, info: info}
 }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for

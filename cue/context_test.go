@@ -714,9 +714,7 @@ func TestCompileRetention(t *testing.T) {
 	runtime.GC()
 	last := len(insts) - 1
 	for i, inst := range insts[:last] {
-		// TODO: the Context keeps every compiled value alive; see
-		// https://cuelang.org/issue/2121.
-		qt.Assert(t, qt.IsNotNil(inst.Value()), qt.Commentf("value %d", i))
+		qt.Assert(t, qt.IsNil(inst.Value()), qt.Commentf("value %d", i))
 	}
 	qt.Assert(t, qt.Equals(insts[last].Value(), v.BuildInstance()))
 }

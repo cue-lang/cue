@@ -771,9 +771,6 @@ func (w *printer) node(n adt.Node) {
 		}
 		w.string(x.Name)
 
-	case *adt.ExternalFunc:
-		w.string(x.Name)
-
 	case *adt.BuiltinValidator:
 		w.node(x.Builtin)
 		w.string("(")

@@ -173,7 +173,6 @@ func (*BoundValue) Concreteness() Concreteness  { return Constraint }
 func (*Builtin) Concreteness() Concreteness           { return Concrete }
 func (*BuiltinValidator) Concreteness() Concreteness  { return Constraint }
 func (*FuncValue) Concreteness() Concreteness         { return Concrete }
-func (*ExternalFunc) Concreteness() Concreteness      { return Concrete }
 func (*ExternalValidator) Concreteness() Concreteness { return Constraint }
 
 // Value and Expr
@@ -220,7 +219,6 @@ func (*BuiltinValidator) expr()  {}
 func (*Builtin) expr()           {}
 func (*FuncValue) expr()         {}
 func (*ExternalValidator) expr() {}
-func (*ExternalFunc) expr()      {}
 
 // Expr and Resolver
 
@@ -355,8 +353,6 @@ func (*Function) declNode()          {}
 func (*Function) elemNode()          {}
 func (*Builtin) declNode()           {}
 func (*Builtin) elemNode()           {}
-func (*ExternalFunc) declNode()      {}
-func (*ExternalFunc) elemNode()      {}
 func (*DisjunctionExpr) declNode()   {}
 func (*DisjunctionExpr) elemNode()   {}
 
@@ -375,7 +371,6 @@ func (*Disjunction) node()       {}
 func (*BoundValue) node()        {}
 func (*Builtin) node()           {}
 func (*BuiltinValidator) node()  {}
-func (*ExternalFunc) node()      {}
 func (*ExternalValidator) node() {}
 func (*Bottom) node()            {}
 func (*Null) node()              {}

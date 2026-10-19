@@ -111,10 +111,6 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 		}
 		return false
 
-	case *adt.ExternalFunc:
-		y, ok := b.(*adt.ExternalFunc)
-		return ok && x == y
-
 	case *adt.BuiltinValidator:
 		env := x.Env
 		if env == nil {

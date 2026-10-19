@@ -2781,9 +2781,6 @@ func (x *CallExpr) evaluate(c *OpContext, state Flags) Value {
 	case *FuncValue:
 		return f.call(c, x, state)
 
-	case *ExternalFunc:
-		return f.rawCall(c, x, state)
-
 	case *BuiltinValidator:
 		if x.hasArgLabels() {
 			// A bare validator's argument is the value it validates; its
@@ -3402,80 +3399,10 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 
 func (x *Builtin) Source() ast.Node { return nil }
 
-// A BuiltinValidator is a Value that results from evaluation a partial call
-// to a builtin (using CallExpr).
-//
-//	strings.MinRunes(4)
-//
-// ExternalFunc is a function supplied by the program embedding the evaluator,
-// rather than one registered by a built-in package. Unlike [Builtin] it
-// carries no package identity and supports no default arguments,
-// non-concrete argument handling, or implicit validators: it is
-// constructed at run time and called with concrete arguments.
-type ExternalFunc struct {
-	// Func is called with the evaluated concrete arguments.
-	Func func(ctx *OpContext, args []Value) Expr
-
-	Name string
-}
-
-func (f *ExternalFunc) Source() ast.Node { return nil }
-func (f *ExternalFunc) Kind() Kind       { return FuncKind }
-
-func (f *ExternalFunc) rawCall(c *OpContext, call *CallExpr, state Flags) Value {
-	saved := c.ci
-	c.ci.FromDef = false
-	c.ci.FromEmbed = false
-	defer func() {
-		c.ci.FromDef = saved.FromDef
-		c.ci.FromEmbed = saved.FromEmbed
-	}()
-
-	args := make([]Value, 0, len(call.Args))
-	for i, a := range call.Args {
-		savedErrs := c.errs
-		c.errs = nil
-
-		expr := c.value(a, Flags{
-			status:    state.status,
-			condition: state.condition | fieldSetKnown | concreteKnown | disjunctionTask,
-			mode:      state.mode,
-		})
-
-		switch v := expr.(type) {
-		case nil:
-			if c.errs == nil {
-				// There SHOULD be an error in the context. If not, we generate
-				// one.
-				c.Assertf(Pos(call.Fun), c.HasErr(),
-					"argument %d to function %s is incomplete", i, call.Fun)
-			}
-
-		case *Bottom:
-			c.errs = CombineErrors(a.Source(), c.errs, v)
-
-		default:
-			args = append(args, expr)
-		}
-		c.errs = CombineErrors(a.Source(), savedErrs, c.errs)
-	}
-	if c.HasErr() {
-		return nil
-	}
-
-	result := f.Func(c, args)
-	if result == nil {
-		return nil
-	}
-	v, ci := c.evalStateCI(result, Flags{status: partial, condition: state.condition, mode: state.mode})
-	c.ci = ci
-	return v
-}
-
-// ExternalValidator is to [BuiltinValidator] what [ExternalFunc] is to
-// [Builtin]: a
-// validator supplied by the embedding program. When unified with a
-// concrete value, Validate is called with it.
+// ExternalValidator is a validator supplied by the program embedding the
+// evaluator rather than by a built-in package; a function supplied that way
+// is a [Builtin] marked Foreign. When unified with a concrete value,
+// Validate is called with it.
 type ExternalValidator struct {
 	Validate func(ctx *OpContext, v Value) *Bottom
 
@@ -3489,6 +3416,10 @@ func (f *ExternalValidator) validate(c *OpContext, v Value) *Bottom {
 	return f.Validate(c, v)
 }
 
+// A BuiltinValidator is a Value that results from evaluation a partial call
+// to a builtin (using CallExpr).
+//
+//	strings.MinRunes(4)
 type BuiltinValidator struct {
 	Src     *CallExpr
 	Builtin *Builtin

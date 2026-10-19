@@ -207,13 +207,6 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 			result = e.builtin(x)
 		}
 
-	case *adt.ExternalFunc:
-		// TODO: we might be able to represent this as a reference or some
-		// other expression in the future.
-		result = e.bottom(&adt.Bottom{
-			Err: errors.Newf(token.NoPos, "cannot convert function %q to CUE", x.Name),
-		})
-
 	case *adt.ExternalValidator:
 		result = e.bottom(&adt.Bottom{
 			Err: errors.Newf(token.NoPos, "cannot convert validator %q to CUE", x.Name),

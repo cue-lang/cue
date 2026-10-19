@@ -334,7 +334,7 @@ func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
 		// If the directory entry is a symlink, stat it to obtain the info for the
 		// link target instead of the link itself.
 		if ftype&fs.ModeSymlink != 0 {
-			info, err := fs.Stat(fsys, filepath.Join(loc.Dir, e.Name()))
+			info, err := fs.Stat(fsys, path.Join(loc.Dir, e.Name()))
 			if err != nil {
 				continue // Ignore broken symlinks.
 			}

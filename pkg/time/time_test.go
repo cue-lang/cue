@@ -64,7 +64,7 @@ func TestTimestamp(t *testing.T) {
 				t.Errorf("Time failed unexpectedly: %v", err)
 			}
 			if _, err := pkgtime.Parse(pkgtime.RFC3339Nano, str); err != nil {
-				t.Errorf("Parse failed unexpectedly")
+				t.Errorf("Parse failed unexpectedly: %v", err)
 			}
 		})
 	}
@@ -88,17 +88,17 @@ func TestTimestamp(t *testing.T) {
 			var tm time.Time
 
 			if err := json.Unmarshal([]byte(tc), &tm); err == nil {
-				t.Errorf("unmarshal JSON succeeded unexpectedly: %v", err)
+				t.Errorf("unmarshal JSON succeeded unexpectedly")
 			}
 
 			str, _ := strconv.Unquote(tc)
 
 			if _, err := pkgtime.Time(str); err == nil {
-				t.Errorf("CUE eval succeeded unexpectedly")
+				t.Errorf("Time succeeded unexpectedly")
 			}
 
 			if _, err := pkgtime.Parse(pkgtime.RFC3339Nano, str); err == nil {
-				t.Errorf("CUE eval succeeded unexpectedly")
+				t.Errorf("Parse succeeded unexpectedly")
 			}
 		})
 	}

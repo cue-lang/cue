@@ -85,7 +85,7 @@ func TestParseDuration(t *testing.T) {
 		t.Run(tc.in, func(t *testing.T) {
 			i, err := pkgtime.ParseDuration(tc.in)
 			if got := err != nil; got != tc.err {
-				t.Fatalf("error: got %v; want %v", i, tc.out)
+				t.Fatalf("error: got %v; want error %v", err, tc.err)
 			}
 			if i != tc.out {
 				t.Errorf("got %v; want %v", i, tc.out)

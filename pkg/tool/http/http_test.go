@@ -273,7 +273,7 @@ func TestRedirect(t *testing.T) {
 			name:            "/b with explicit followRedirects: false",
 			path:            "/b",
 			statusCode:      200,
-			followRedirects: new(true),
+			followRedirects: new(false),
 			body:            new("hello"),
 		},
 	}
@@ -298,13 +298,13 @@ func TestRedirect(t *testing.T) {
 			response := resp.(map[string]any)["response"].(map[string]any)
 
 			if got := response["statusCode"]; got != tc.statusCode {
-				t.Fatalf("status not as expected: wanted %d, got %d", got, tc.statusCode)
+				t.Fatalf("status not as expected: wanted %d, got %d", tc.statusCode, got)
 			}
 
 			if tc.body != nil {
 				want := *tc.body
 				if got := response["body"]; got != want {
-					t.Fatalf("body not as expected; wanted %q, got %q", got, want)
+					t.Fatalf("body not as expected; wanted %q, got %q", want, got)
 				}
 			}
 		})

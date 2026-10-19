@@ -262,11 +262,7 @@ func TestMkdirTemp(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = os.Stat(path)
-	if err == nil {
-		t.Fatal(err)
-	}
-
+	qt.Assert(t, qt.ErrorIs(mustStatErr(t, path), fs.ErrNotExist))
 }
 
 func TestRemoveAll(t *testing.T) {

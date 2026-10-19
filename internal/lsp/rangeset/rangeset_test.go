@@ -124,12 +124,7 @@ func TestAdd(t *testing.T) {
 				got.Add(r.Start, r.End)
 			}
 
-			want := rangeset.NewRangeSet()
-			for _, r := range tc.expected {
-				want.Add(r.Start, r.End)
-			}
-
-			qt.Assert(t, qt.DeepEquals(got.Ranges(), want.Ranges()))
+			qt.Assert(t, qt.DeepEquals(got.Ranges(), tc.expected))
 		})
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"syscall"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -144,7 +145,10 @@ func TestOverlayFS(t *testing.T) {
 
 	extraFiles := []string{
 		"foo/bar/c.cue",
-		"foo/baz.cue/d.cue", // note the conversion of file to dir
+		"foo/baz.cue/d.cue",     // note the conversion of file to dir
+		"foo/baz.cue/sub/e.cue", // a dir below an on-disk file
+		"foo/baz.cue/deep/sub/g.cue",
+		"qux/f.cue", // a dir which does not exist on disk
 	}
 	extraFilesAbs := make([]string, len(extraFiles))
 	for i, f := range extraFiles {
@@ -169,7 +173,28 @@ func TestOverlayFS(t *testing.T) {
 	// remove foo/baz.cue file from onDiskFiles
 	onDiskFiles = append(slices.Delete(onDiskFiles, 2, 3), extraFiles...)
 	err = fstest.TestFS(fs, onDiskFiles...)
-	qt.Assert(t, qt.IsNil(err))
+	// The qux dir, which exists only in the overlay, wrongly cannot be opened.
+	qt.Assert(t, qt.ErrorMatches(err, `(?s).*\nqux: Open: .*`))
+
+	// Paths which are not dirs, or are dirs without CUE files, are
+	// reported without an error.
+	isDirWithCUEFiles := func(path string) error {
+		ok, err := fs.IsDirWithCUEFiles(path)
+		qt.Assert(t, qt.IsFalse(ok), qt.Commentf("%s", path))
+		return err
+	}
+	qt.Assert(t, qt.IsNil(isDirWithCUEFiles("missing")))
+	// The errors below are wrongly returned.
+	qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("foo/bar/c.cue"), iofs.ErrInvalid))     // an overlay file
+	qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("foo/bar/c.cue/sub"), iofs.ErrInvalid)) // below an overlay file
+	// Reading a file, or a path below one, as a dir fails with
+	// ErrNotExist on Windows.
+	if runtime.GOOS != "windows" {
+		qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("arble.cue"), syscall.ENOTDIR))     // an on-disk file
+		qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("arble.cue/sub"), syscall.ENOTDIR)) // below an on-disk file
+		// An overlay dir below an on-disk file, holding only a dir.
+		qt.Assert(t, qt.ErrorIs(isDirWithCUEFiles("foo/baz.cue/deep"), syscall.ENOTDIR))
+	}
 }
 
 func TestReadCUEPartialYAML(t *testing.T) {

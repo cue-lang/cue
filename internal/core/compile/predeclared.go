@@ -16,6 +16,7 @@ package compile
 
 import (
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -92,17 +93,18 @@ func predeclared(n *ast.Ident) adt.Expr {
 		return testExperiment
 	}
 
-	if r, ok := predefinedRanges[n.Name]; ok {
+	if r := LookupRange(n.Name); r != nil {
 		return r
 	}
 
 	return nil
 }
 
-// LookupRange returns a CUE expressions for the given predeclared identifier
-// representing a range, such as uint8, int128, and float64.
+// LookupRange returns a CUE expression for the given predeclared identifier
+// representing a range, such as uint8, int128, and float64, or nil if there
+// is none. Like other predeclared identifiers, a range may carry a "__" prefix.
 func LookupRange(name string) adt.Expr {
-	return predefinedRanges[name]
+	return predefinedRanges[strings.TrimPrefix(name, "__")]
 }
 
 // Predeclared returns the adt expression for a predeclared identifier
@@ -142,12 +144,6 @@ var predefinedRanges = map[string]adt.Expr{
 		"-1.797693134862315708145274237317043567981e+308",
 		"1.797693134862315708145274237317043567981e+308",
 	),
-}
-
-func init() {
-	for k, v := range predefinedRanges {
-		predefinedRanges["__"+k] = v
-	}
 }
 
 // TODO: use an adt.BoundValue here. and conjunctions here.

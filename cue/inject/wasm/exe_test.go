@@ -63,7 +63,9 @@ func TestExe(t *testing.T) {
 		RequireExplicitExec: true,
 		RequireUniqueNames:  true,
 		Setup: func(e *testscript.Env) error {
-			copyWasmFiles(t, e.WorkDir, wasmFiles)
+			if err := copyWasmFiles(e.WorkDir, wasmFiles); err != nil {
+				return err
+			}
 			e.Vars = append(e.Vars, "CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"))
 			return nil
 		},
@@ -75,24 +77,29 @@ func TestExe(t *testing.T) {
 	testscript.Run(t, p)
 }
 
-func copyWasmFiles(t *testing.T, dstDir, srcDir string) {
-	filepath.WalkDir(dstDir, func(path string, d fs.DirEntry, err error) error {
+func copyWasmFiles(dstDir, srcDir string) error {
+	return filepath.WalkDir(dstDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if filepath.Ext(path) != ".wasm" {
 			return nil
 		}
-		relPath := must(filepath.Rel(dstDir, path))(t)
+		relPath, err := filepath.Rel(dstDir, path)
+		if err != nil {
+			return err
+		}
 		from := filepath.Join(srcDir, relPath)
-		copyFile(t, path, from)
-		return nil
+		return copyFile(path, from)
 	})
 }
 
-func copyFile(t *testing.T, dst, src string) {
-	buf := must(os.ReadFile(src))(t)
-	err := os.WriteFile(dst, buf, 0664)
+func copyFile(dst, src string) error {
+	buf, err := os.ReadFile(src)
 	if err != nil {
-		t.Fatal(err)
+		return err
 	}
+	return os.WriteFile(dst, buf, 0664)
 }
 
 func check(t *testing.T, dir string, got string) {

@@ -15,48 +15,31 @@ import (
 // ModificationSource identifies the origin of a change.
 type ModificationSource int
 
+//go:generate go tool stringer -type=ModificationSource -linecomment
+
 const (
 	// FromDidOpen is from a didOpen notification.
-	FromDidOpen = ModificationSource(iota)
+	FromDidOpen = ModificationSource(iota) // opened files
 
 	// FromDidChange is from a didChange notification.
-	FromDidChange
+	FromDidChange // changed files
 
 	// FromDidChangeWatchedFiles is from didChangeWatchedFiles notification.
-	FromDidChangeWatchedFiles
+	FromDidChangeWatchedFiles // files changed on disk
 
 	// FromDidSave is from a didSave notification.
-	FromDidSave
+	FromDidSave // saved files
 
 	// FromDidClose is from a didClose notification.
-	FromDidClose
+	FromDidClose // close files
 
 	// FromDidChangeConfiguration is from a didChangeConfiguration notification.
-	FromDidChangeConfiguration
+	FromDidChangeConfiguration // changed configuration
 
 	// FromInitialWorkspaceLoad refers to the loading of all packages in the
 	// workspace when the view is first created.
-	FromInitialWorkspaceLoad
+	FromInitialWorkspaceLoad // initial workspace load
 )
-
-func (m ModificationSource) String() string {
-	switch m {
-	case FromDidOpen:
-		return "opened files"
-	case FromDidChange:
-		return "changed files"
-	case FromDidChangeWatchedFiles:
-		return "files changed on disk"
-	case FromDidSave:
-		return "saved files"
-	case FromDidClose:
-		return "close files"
-	case FromInitialWorkspaceLoad:
-		return "initial workspace load"
-	default:
-		return "unknown file modification"
-	}
-}
 
 var openRange = &protocol.Range{
 	Start: protocol.Position{Line: 0, Character: 0},

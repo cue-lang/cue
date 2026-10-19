@@ -150,57 +150,32 @@ func (p *taskContext) freeTask(t *task) {
 
 type taskState uint8
 
-const (
-	taskREADY taskState = iota
+// See the stringer directive in doc.go for the generated String method.
 
-	taskRUNNING // processing conjunct(s)
-	taskWAITING // task is blocked on a property of an arc to hold
-	taskSUCCESS
-	taskFAILED
-	taskCANCELLED
+const (
+	taskREADY taskState = iota // READY
+
+	// processing conjunct(s)
+	taskRUNNING // RUNNING
+	// task is blocked on a property of an arc to hold
+	taskWAITING   // WAITING
+	taskSUCCESS   // SUCCESS
+	taskFAILED    // FAILED
+	taskCANCELLED // CANCELLED
 )
 
 type schedState uint8
 
+// See the stringer directive in doc.go for the generated String method.
+
 const (
-	schedREADY schedState = iota
+	schedREADY schedState = iota // READY
 
-	schedRUNNING // processing conjunct(s)
-	schedSUCCESS
-	schedFAILED
+	// processing conjunct(s)
+	schedRUNNING // RUNNING
+	schedSUCCESS // SUCCESS
+	schedFAILED  // FAILED
 )
-
-func (s taskState) String() string {
-	switch s {
-	case taskREADY:
-		return "READY"
-	case taskRUNNING:
-		return "RUNNING"
-	case taskWAITING:
-		return "WAITING"
-	case taskSUCCESS:
-		return "SUCCESS"
-	case taskFAILED:
-		return "FAILED"
-	default:
-		return "UNKNOWN"
-	}
-}
-
-func (s schedState) String() string {
-	switch s {
-	case schedREADY:
-		return "READY"
-	case schedRUNNING:
-		return "RUNNING"
-	case schedSUCCESS:
-		return "SUCCESS"
-	case schedFAILED:
-		return "FAILED"
-	default:
-		return "UNKNOWN"
-	}
-}
 
 // runMode indicates how to proceed after a condition could not be met.
 type runMode uint8

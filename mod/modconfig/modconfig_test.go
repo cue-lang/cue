@@ -86,10 +86,12 @@ package x
 	qt.Assert(t, qt.IsNil(err))
 	r1, err := modregistrytest.New(r1fs, "")
 	qt.Assert(t, qt.IsNil(err))
+	t.Cleanup(r1.Close)
 	r2fs, err := fs.Sub(fsys, "r2")
 	qt.Assert(t, qt.IsNil(err))
 	r2, err := modregistrytest.New(r2fs, "")
 	qt.Assert(t, qt.IsNil(err))
+	t.Cleanup(r2.Close)
 
 	dir := t.TempDir()
 	t.Setenv("DOCKER_CONFIG", dir)
@@ -178,6 +180,7 @@ package x
 		rh.ServeHTTP(w, req)
 	})
 	srv := httptest.NewServer(checkUserAgentHandler)
+	t.Cleanup(srv.Close)
 	u, err := url.Parse(srv.URL)
 	qt.Assert(t, qt.IsNil(err))
 
@@ -390,7 +393,7 @@ func TestTokenRefreshWaiterDeadline(t *testing.T) {
 	}()
 	select {
 	case err := <-second:
-		qt.Assert(t, qt.ErrorIs(err, context.DeadlineExceeded))
+		qt.Check(t, qt.ErrorIs(err, context.DeadlineExceeded))
 	case <-time.After(10 * time.Second):
 		t.Error("request is still waiting for the refresh")
 	}

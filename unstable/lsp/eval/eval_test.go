@@ -3713,8 +3713,6 @@ q: o.p
 r: o.k
 `,
 			expectDefinitions: map[position][]position{
-				ln(4, 1, "k"):  {},
-				ln(4, 1, "v"):  {},
 				ln(4, 1, "a"):  {ln(1, 1, "a")},
 				ln(5, 1, "k"):  {ln(4, 1, "k")},
 				ln(5, 1, "v"):  {ln(4, 1, "v")},

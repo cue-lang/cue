@@ -112,6 +112,18 @@ func TestEvalRequestMsgRejectsWrongType(t *testing.T) {
 	}
 }
 
+type unmarshaler interface{ UnmarshalBytes([]byte) error }
+
+// checkRejectsTruncated checks that every proper prefix of full,
+// including the empty one, fails to unmarshal into m.
+func checkRejectsTruncated(t *testing.T, full []byte, m unmarshaler) {
+	for i := range full {
+		if err := m.UnmarshalBytes(full[:i]); err == nil {
+			t.Errorf("expected error for truncation at %d/%d bytes", i, len(full))
+		}
+	}
+}
+
 func TestEvalRequestMsgRejectsTruncated(t *testing.T) {
 	orig := &protocol.EvalRequestMsg{
 		RequestID: "req-1",
@@ -119,15 +131,7 @@ func TestEvalRequestMsgRejectsTruncated(t *testing.T) {
 		CommitID:  "commit",
 		ZipData:   []byte{0x01, 0x02},
 	}
-	full := orig.MarshalBytes()
-
-	// Try every possible truncation.
-	for i := 0; i < len(full)-1; i++ {
-		var m protocol.EvalRequestMsg
-		if err := m.UnmarshalBytes(full[:i]); err == nil {
-			t.Errorf("expected error for truncation at %d/%d bytes", i, len(full))
-		}
-	}
+	checkRejectsTruncated(t, orig.MarshalBytes(), new(protocol.EvalRequestMsg))
 }
 
 func TestEvalResultMsgRoundTrip(t *testing.T) {
@@ -224,14 +228,7 @@ func TestEvalResultMsgRejectsTruncated(t *testing.T) {
 			},
 		},
 	}
-	full := orig.MarshalBytes()
-
-	for i := 0; i < len(full)-1; i++ {
-		var m protocol.EvalResultMsg
-		if err := m.UnmarshalBytes(full[:i]); err == nil {
-			t.Errorf("expected error for truncation at %d/%d bytes", i, len(full))
-		}
-	}
+	checkRejectsTruncated(t, orig.MarshalBytes(), new(protocol.EvalResultMsg))
 }
 
 func TestEvalFinishedMsgRoundTrip(t *testing.T) {
@@ -296,15 +293,7 @@ func TestEvalFinishedMsgRejectsTruncated(t *testing.T) {
 	orig := &protocol.EvalFinishedMsg{
 		RequestID: "req-1",
 	}
-	full := orig.MarshalBytes()
-
-	// Try every possible truncation.
-	for i := 0; i < len(full)-1; i++ {
-		var m protocol.EvalFinishedMsg
-		if err := m.UnmarshalBytes(full[:i]); err == nil {
-			t.Errorf("expected error for truncation at %d/%d bytes", i, len(full))
-		}
-	}
+	checkRejectsTruncated(t, orig.MarshalBytes(), new(protocol.EvalFinishedMsg))
 }
 
 func TestPeekMessageType(t *testing.T) {

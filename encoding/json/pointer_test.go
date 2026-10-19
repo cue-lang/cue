@@ -256,7 +256,7 @@ func TestPointerFromCUEPathEdgeCases(t *testing.T) {
 		path := cue.MakePath(cue.Def("foo")) // Definition selector should error
 
 		got, err := PointerFromCUEPath(path)
-		qt.Check(t, qt.IsNotNil(err))
+		qt.Assert(t, qt.IsNotNil(err))
 		qt.Check(t, qt.Equals(string(got), ""))
 		qt.Check(t, qt.StringContains(err.Error(), "cannot convert selector"))
 	})

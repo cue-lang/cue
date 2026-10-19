@@ -59,13 +59,13 @@ func Parse(path string) (file *File, err error) {
 	// mistakes.
 	v := ctx.BuildFile(astFile)
 	if err := v.Validate(cue.Concrete(true)); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module file value")
+		return nil, errors.Wrapf(err, token.NoPos, "invalid config file value")
 	}
-	var mf File
-	if err := v.Decode(&mf); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into modFile struct")
+	var cfg File
+	if err := v.Decode(&cfg); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "cannot decode config file")
 	}
-	return &mf, nil
+	return &cfg, nil
 }
 
 func parseDataOnlyCUE(ctx *cue.Context, cueData []byte, filename string) (*ast.File, error) {

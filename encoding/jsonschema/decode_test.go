@@ -164,10 +164,7 @@ func TestDecode(t *testing.T) {
 			t.Fatal("no expression was extracted")
 		}
 
-		b, err := format.Node(expr, format.Simplify())
-		if err != nil {
-			t.Fatal(errors.Details(err, nil))
-		}
+		b := formatExtracted(t, expr)
 		b = append(bytes.TrimSpace(b), '\n')
 		w.Write(b)
 		// Verify that the generated CUE compiles, at the language version it
@@ -311,16 +308,29 @@ func TestDecodeCRD(t *testing.T) {
 				schemav := crd.Source.LookupPath(schemaPath)
 				qt.Check(t, qt.IsTrue(schemav.Exists()))
 				f := crd.Versions[version]
-				b, err := format.Node(f, format.Simplify())
-				if err != nil {
-					t.Fatal(errors.Details(err, nil))
-				}
+				b := formatExtracted(t, f)
 				b = append(bytes.TrimSpace(b), '\n')
 				w.Write(b)
 				// TODO test that schema actually works.
 			}
 		}
 	})
+}
+
+// formatExtracted formats n, checking that it is already in the style
+// of [format.Simplify], as the extractors document.
+func formatExtracted(t testing.TB, n ast.Node) []byte {
+	t.Helper()
+	b, err := format.Node(n)
+	if err != nil {
+		t.Fatal(errors.Details(err, nil))
+	}
+	simplified, err := format.Node(n, format.Simplify())
+	if err != nil {
+		t.Fatal(errors.Details(err, nil))
+	}
+	qt.Check(t, qt.Equals(string(b), string(simplified)))
+	return b
 }
 
 func readSchema(ctx *cue.Context, fsys fs.FS) (cue.Value, error) {
@@ -365,10 +375,7 @@ properties: x: $ref: "https://something.test/foo#/definitions/blah"
 		},
 	})
 	qt.Assert(t, qt.IsNil(err))
-	b, err := format.Node(expr, format.Simplify())
-	if err != nil {
-		t.Fatal(errors.Details(err, nil))
-	}
+	b := formatExtracted(t, expr)
 	qt.Assert(t, qt.DeepEquals(calls, []string{"https://something.test/foo"}))
 	qt.Assert(t, qt.Equals(string(b), `
 import "other.test/something:blah"
@@ -424,10 +431,7 @@ properties: x: $ref: "https://something.test/foo#/$defs/blah"
 		},
 	})
 	qt.Assert(t, qt.IsNil(err))
-	b, err := format.Node(expr, format.Simplify())
-	if err != nil {
-		t.Fatal(errors.Details(err, nil))
-	}
+	b := formatExtracted(t, expr)
 	qt.Assert(t, qt.DeepEquals(calls, []string{
 		"id=https://this.test#/$defs/foo localPath=$defs.foo",
 		"id=https://something.test/foo#/$defs/blah",
@@ -485,10 +489,7 @@ $ref: "#/$defs/foo"
 		},
 	})
 	qt.Assert(t, qt.IsNil(err))
-	b, err := format.Node(expr, format.Simplify())
-	if err != nil {
-		t.Fatal(errors.Details(err, nil))
-	}
+	b := formatExtracted(t, expr)
 	qt.Check(t, qt.DeepEquals(calls, []string{
 		"id=https://this.test#/$defs/foo localPath=$defs.foo",
 		"id=https://this.test#/$defs/bar localPath=$defs.bar",
@@ -537,9 +538,7 @@ allOf: [{properties: run: minLength: 1}]
 			TargetLanguageVersion: version,
 		})
 		qt.Assert(t, qt.IsNil(err))
-		b, err := format.Node(expr, format.Simplify())
-		qt.Assert(t, qt.IsNil(err))
-		return string(b)
+		return string(formatExtracted(t, expr))
 	}
 	// The empty version means the current one, where explicitopen is stable.
 	qt.Assert(t, qt.Equals(extract("v0.17.0"), extract("")))

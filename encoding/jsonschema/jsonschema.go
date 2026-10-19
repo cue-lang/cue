@@ -38,6 +38,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/cueexperiment"
 )
@@ -48,7 +49,15 @@ import (
 // a valid instance of the source JSON schema.
 //
 // The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
+// It follows the style of [format.Simplify], so formatting it with that
+// option makes no difference.
 func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
+	return extract(data, cfg, nil)
+}
+
+// extract implements [Extract], adding extra to the file's
+// declarations before sanitizing it and applying the style.
+func extract(data cue.InstanceOrValue, cfg *Config, extra []ast.Decl) (*ast.File, error) {
 	cfg = new(*cfg)
 	if cfg.MapURL == nil {
 		cfg.MapURL = DefaultMapURL
@@ -104,9 +113,11 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
 	if d.errs != nil {
 		return nil, d.errs
 	}
+	f.Decls = append(f.Decls, extra...)
 	if err := astutil.Sanitize(f); err != nil {
 		return nil, fmt.Errorf("cannot sanitize jsonschema resulting syntax: %v", err)
 	}
+	format.ASTStyle{Labels: true, InlineStructs: true, Ellipsis: true}.Apply(f)
 	return f, nil
 }
 

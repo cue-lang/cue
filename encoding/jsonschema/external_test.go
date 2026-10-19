@@ -119,7 +119,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 	if extractErr == nil {
 		// Round-trip via bytes because that's what will usually happen
 		// to the generated schema.
-		extracted, err = format.Node(schemaAST, format.Simplify())
+		extracted, err = format.Node(schemaAST)
 		qt.Assert(t, qt.IsNil(err))
 		schemaValue = ctx.CompileBytes(extracted, cue.Filename("generated.cue"))
 		if err := schemaValue.Err(); err != nil {

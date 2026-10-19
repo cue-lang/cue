@@ -109,7 +109,7 @@ func TestExtX(t *testing.T) {
 		DefaultVersion: vers,
 	})
 	qt.Assert(t, qt.IsNil(extractErr))
-	b, err := format.Node(schemaAST, format.Simplify())
+	b, err := format.Node(schemaAST)
 	qt.Assert(t, qt.IsNil(err))
 	t.Logf("SCHEMA: %v", string(b))
 	schemaValue := ctx.CompileBytes(b, cue.Filename("generated.cue"))

@@ -86,7 +86,7 @@ func extractV2Test(t *cuetxtar.Test) {
 	_, err = openapi.GenerateV2(built, &openapi.GenerateConfig{Version: cfg.Version})
 	qt.Assert(t, qt.IsNil(err))
 
-	b, err := format.Node(f, format.Simplify())
+	b, err := format.Node(f)
 	qt.Assert(t, qt.IsNil(err))
 	_, err = t.Writer("out.cue").Write(append(bytes.TrimSpace(b), '\n'))
 	qt.Assert(t, qt.IsNil(err))

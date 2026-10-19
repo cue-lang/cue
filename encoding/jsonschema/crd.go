@@ -69,6 +69,9 @@ type ExtractedCRD struct {
 // will be ignored.
 //
 // If cfg is nil, it's equivalent to passing a pointer to the zero-valued [CRDConfig].
+//
+// Like the result of [Extract], the extracted schemas follow the style
+// of [format.Simplify].
 func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 	if cfg == nil {
 		cfg = &CRDConfig{}
@@ -90,26 +93,13 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 				cue.Str("openAPIV3Schema"),
 			)
 			versionToPath[version.Name] = rootPath
-			f, err := Extract(crdValues[crdIndex], &Config{
-				PkgName: version.Name,
-				// There are several kubernetes-related keywords that aren't implemented yet
-				StrictFeatures:        false,
-				StrictKeywords:        true,
-				Root:                  "#" + mustCUEPathToJSONPointer(rootPath),
-				SingleRoot:            true,
-				DefaultVersion:        VersionKubernetesCRD,
-				TargetLanguageVersion: cfg.TargetLanguageVersion,
-			})
-			if err != nil {
-				return nil, err
-			}
 			namespaceConstraint := token.OPTION
 			if crd.Spec.Scope == "Namespaced" {
 				namespaceConstraint = token.NOT
 			}
 			// TODO provide a way to let this refer to a shared definition
 			// in another package as the canonical definition for the schema.
-			f.Decls = append(f.Decls,
+			resourceDecls := []ast.Decl{
 				&ast.Field{
 					Label: ast.NewIdent("apiVersion"),
 					Value: ast.NewString(crd.Spec.Group + "/" + version.Name),
@@ -124,7 +114,6 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 					Value: ast.NewStruct(
 						"name", token.NOT, ast.NewIdent("string"),
 						"namespace", namespaceConstraint, ast.NewIdent("string"),
-						// TODO inline struct lit
 						"labels", token.OPTION, ast.NewStruct(
 							ast.NewList(ast.NewIdent("string")), ast.NewIdent("string"),
 						),
@@ -139,7 +128,20 @@ func ExtractCRDs(data cue.Value, cfg *CRDConfig) ([]*ExtractedCRD, error) {
 						&ast.Ellipsis{},
 					),
 				},
-			)
+			}
+			f, err := extract(crdValues[crdIndex], &Config{
+				PkgName: version.Name,
+				// There are several kubernetes-related keywords that aren't implemented yet
+				StrictFeatures:        false,
+				StrictKeywords:        true,
+				Root:                  "#" + mustCUEPathToJSONPointer(rootPath),
+				SingleRoot:            true,
+				DefaultVersion:        VersionKubernetesCRD,
+				TargetLanguageVersion: cfg.TargetLanguageVersion,
+			}, resourceDecls)
+			if err != nil {
+				return nil, err
+			}
 			versions[version.Name] = f
 		}
 		crds[crdIndex] = &ExtractedCRD{

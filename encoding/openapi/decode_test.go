@@ -122,7 +122,7 @@ func TestDecode(t *testing.T) {
 					t.Fatal(errors.Details(err, nil))
 				}
 
-				b, err := format.Node(gotFile, format.Simplify())
+				b, err := format.Node(gotFile)
 				if err != nil {
 					t.Fatal(err)
 				}

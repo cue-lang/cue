@@ -1,0 +1,19 @@
+# An additionalProperties schema allowing any value is extracted
+# as a trailing `...`, placed after the definitions.
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": {},
+    "$defs": {
+        "a": {
+            "type": "integer"
+        }
+    }
+}
+-- out/decode/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+
+#a: int
+...

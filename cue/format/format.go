@@ -13,6 +13,9 @@
 // limitations under the License.
 
 // Package format implements standard formatting of CUE configurations.
+//
+// [Node] and [Source] print CUE in its conventional style.
+// To rewrite an AST in that style without printing it, see [ASTStyle].
 package format
 
 // TODO: this package is in need of a rewrite. When doing so, the API should
@@ -40,7 +43,8 @@ import (
 type Option func(c *config)
 
 // Simplify allows the formatter to simplify output, such as removing
-// unnecessary quotes.
+// unnecessary quotes. The formatv2 formatter applies the [ASTStyle.Labels],
+// [ASTStyle.InlineStructs], and [ASTStyle.Ellipsis] rewrites before printing.
 func Simplify() Option {
 	return func(c *config) { c.simplify = true }
 }
@@ -110,7 +114,7 @@ func LineWidth(n int) Option {
 // KeepRelPos specifies that the relative positions of nodes, comments
 // and blank lines are kept as they are found in the AST rather than
 // being adjusted to CUE's conventional layout, as described by
-// [ASTStyle].RelPos. The simplifications implied by [Simplify] are
+// [ASTStyle.RelPos]. The simplifications implied by [Simplify] are
 // still applied when that option is given; without it, the AST is
 // formatted entirely unchanged.
 //
@@ -130,6 +134,9 @@ func KeepRelPos() Option {
 // unbounded, so the only line breaks are the ones the syntax requires,
 // such as those inside multi-line strings; specify [LineWidth] as a later
 // option to wrap the result at a given width instead.
+//
+// It applies the [ASTStyle.ClearPositions] and [ASTStyle.ClearComments]
+// rewrites before printing.
 //
 // This option is only honored by the formatv2 formatter, so using it
 // selects that formatter even when the formatv2 experiment is disabled.

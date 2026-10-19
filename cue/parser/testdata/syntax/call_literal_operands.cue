@@ -1,0 +1,7 @@
+// versions: v0.8.0..; outcome: ok
+x: int(1)
+y: "s"(1)
+z: [1](0)
+w: {}(1)
+v: 1(2)
+u: true(1)

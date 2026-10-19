@@ -1,0 +1,3 @@
+// versions: v0.8.0..v0.17.0; outcome: error 3:5: postfix ... operator requires @experiment(explicitopen)
+// versions: v0.18.0..; outcome: ok
+a: 1...

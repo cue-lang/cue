@@ -71,8 +71,7 @@ func TestReleaseEarlierEvaluations(t *testing.T) {
 		}
 	}
 	runtime.KeepAlive(latest)
-	// Earlier evaluations all stay reachable from the latest one.
-	if retained != len(earlier) {
+	if retained != 0 {
 		t.Fatalf("%d of %d earlier evaluations stay reachable", retained, len(earlier))
 	}
 }

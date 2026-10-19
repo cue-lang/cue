@@ -503,23 +503,23 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 				constraintKind: TopKind,
 				defaultKind:    TopKind,
 			},
-			toFree:            n.toFree[:0],
-			arcMap:            n.arcMap[:0],
-			cyclicConjuncts:   n.cyclicConjuncts[:0],
-			notify:            n.notify[:0],
-			sharedIDs:         n.sharedIDs[:0],
-			checks:            n.checks[:0],
-			postChecks:        n.postChecks[:0],
-			funcDefaultChecks: n.funcDefaultChecks[:0],
-			reqDefIDs:         n.reqDefIDs[:0],
-			replaceIDs:        n.replaceIDs[:0],
-			flatReplaceIDs:    n.flatReplaceIDs[:0],
-			conjunctInfo:      n.conjunctInfo[:0],
-			reqSets:           n.reqSets[:0],
-			disjunctions:      n.disjunctions[:0],
-			disjunctErrs:      n.disjunctErrs[:0],
-			userErrs:          n.userErrs[:0],
-			disjuncts:         n.disjuncts[:0],
+			toFree:            reuse(n.toFree),
+			arcMap:            reuse(n.arcMap),
+			cyclicConjuncts:   reuse(n.cyclicConjuncts),
+			notify:            reuse(n.notify),
+			sharedIDs:         reuse(n.sharedIDs),
+			checks:            reuse(n.checks),
+			postChecks:        reuse(n.postChecks),
+			funcDefaultChecks: reuse(n.funcDefaultChecks),
+			reqDefIDs:         reuse(n.reqDefIDs),
+			replaceIDs:        reuse(n.replaceIDs),
+			flatReplaceIDs:    reuse(n.flatReplaceIDs),
+			conjunctInfo:      reuse(n.conjunctInfo),
+			reqSets:           reuse(n.reqSets),
+			disjunctions:      reuse(n.disjunctions),
+			disjunctErrs:      reuse(n.disjunctErrs),
+			userErrs:          reuse(n.userErrs),
+			disjuncts:         reuse(n.disjuncts),
 		}
 		n.scheduler.clear()
 	} else {
@@ -546,6 +546,13 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		n.isDisjunct = p.state.isDisjunct
 	}
 	return n
+}
+
+// reuse clears the whole backing array of s and returns it empty, so that a
+// recycled [nodeContext] does not keep the previous evaluation reachable.
+func reuse[S ~[]E, E any](s S) S {
+	clear(s[:cap(s)])
+	return s[:0]
 }
 
 //lint:ignore U1000 kept for when freeing is reintroduced; see Vertex.unify

@@ -79,11 +79,19 @@ package e
 import "strings"
 
 n: strings.ByteAt(b: "abc", i: 0)
+-- g/g.cue --
+@experiment(functions)
+
+package g
+
+#F: func(a: int) -> int
+f: #F & func(a: int) -> int: a + 1
+r: f(a: 1)
 `
 
 	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		rootURI := env.Sandbox.Workdir.RootURI()
-		for _, filename := range []string{"a/a.cue", "b/b.cue", "c/c.cue", "d/d.cue", "e/e.cue"} {
+		for _, filename := range []string{"a/a.cue", "b/b.cue", "c/c.cue", "d/d.cue", "e/e.cue", "g/g.cue"} {
 			env.OpenFile(filename)
 		}
 		env.Await(env.DoneWithOpen())
@@ -110,9 +118,10 @@ n: strings.ByteAt(b: "abc", i: 0)
 			fln("a/a.cue", 7, 2, "by"): {"a/a.cue:7:21"},
 			// The reference to factor in by's default: the field.
 			fln("a/a.cue", 7, 1, "factor"): {"a/a.cue:5:1"},
-			// The call label x.
-			fln("a/a.cue", 9, 1, "x"): {},
-			// The call label b of a standard library function.
+			// The call label x: the parameter.
+			fln("a/a.cue", 9, 1, "x"): {"a/a.cue:7:13"},
+			// The call label b of a standard library function: the
+			// standard library's files have no location on disk.
 			fln("e/e.cue", 7, 1, "b"): {},
 		}
 		for p, want := range definitions {
@@ -120,11 +129,16 @@ n: strings.ByteAt(b: "abc", i: 0)
 		}
 
 		references := map[position][]string{
-			// The parameter x: its declaration and the body's x.
-			fln("a/a.cue", 7, 1, "x"): {"a/a.cue:7:13", "a/a.cue:7:47"},
+			// The parameter x: its declaration, the body's x and the
+			// call label.
+			fln("a/a.cue", 7, 1, "x"): {"a/a.cue:7:13", "a/a.cue:7:47", "a/a.cue:9:10"},
 			// The field factor: its declaration and the default's
 			// reference.
 			fln("a/a.cue", 5, 1, "factor"): {"a/a.cue:5:1", "a/a.cue:7:31"},
+			// The call label b of a standard library function: the
+			// label itself; the parameter's declaration has no location
+			// on disk.
+			fln("e/e.cue", 7, 1, "b"): {"e/e.cue:7:19"},
 		}
 		for p, want := range references {
 			qt.Check(t, qt.DeepEquals(where(env.References(at(p))), want), qt.Commentf("references at %v", p))
@@ -170,6 +184,9 @@ n: strings.ByteAt(b: "abc", i: 0)
 			// The field factor: the declaration and the default's
 			// reference.
 			{fln("a/a.cue", 5, 1, "factor"), "k"}: {"a/a.cue:5:1=k", "a/a.cue:7:31=k"},
+			// The parameter x, at its declaration: the declaration, the
+			// body's x and the call label.
+			{fln("a/a.cue", 7, 1, "x"), "n"}: {"a/a.cue:7:13=n", "a/a.cue:7:47=n", "a/a.cue:9:10=n"},
 			// The body's b, which aliases the parameter labeled by: the
 			// alias and the body change; the label by, and the field
 			// by, do not.
@@ -177,6 +194,12 @@ n: strings.ByteAt(b: "abc", i: 0)
 			// The reference to #Port in p's constraint: the definition
 			// and the constraint.
 			{fln("d/d.cue", 6, 1, "#Port"), "#Number"}: {"d/d.cue:5:1=#Number", "d/d.cue:6:12=#Number"},
+			// The parameter a of two unified literals, from #F's
+			// declaration and from f's body: both declarations, the
+			// body and the call label change, so that the result is
+			// still valid CUE.
+			{fln("g/g.cue", 5, 1, "a"), "z"}: {"g/g.cue:5:10=z", "g/g.cue:6:14=z", "g/g.cue:6:30=z", "g/g.cue:7:6=z"},
+			{fln("g/g.cue", 6, 2, "a"), "z"}: {"g/g.cue:5:10=z", "g/g.cue:6:14=z", "g/g.cue:6:30=z", "g/g.cue:7:6=z"},
 		}
 		for r, want := range renameCases {
 			qt.Check(t, qt.DeepEquals(renames(r.from, r.newName), want), qt.Commentf("rename at %v", r.from))

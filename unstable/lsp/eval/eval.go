@@ -693,9 +693,9 @@ type FileEvaluator struct {
 	// likely to reference imported packages. It is lazily populated by
 	// [FileEvaluator.findLikelyUseOffsets].
 	likelyUseOffsets map[string]useOffsets
-	// labelOffsets contains the file offsets of the parameter labels
-	// spelled like a given name. It is lazily populated by
-	// [FileEvaluator.findLabelOffsets].
+	// labelOffsets contains the file offsets of the call labels and
+	// parameter labels spelled like a given name. It is lazily
+	// populated by [FileEvaluator.findLabelOffsets].
 	labelOffsets map[string][]int
 	// importSpecNavigables contains entries for every import within this
 	// file. Within this file, all import specs that are of the
@@ -1162,10 +1162,11 @@ func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []
 	return slices.Collect(maps.Keys(exprs))
 }
 
-// readLabels finds and reads the parameter labels spelled like the
-// parameter n names, so that each records itself as a use of the
-// parameters it resolves to before the search for n's uses begins.
-// For a navigable that is not a labeled parameter it does nothing.
+// readLabels finds and reads the call labels and parameter labels
+// that may bind the parameter n names, so that each records itself as
+// a use of the parameters it resolves to before the search for n's
+// uses begins. For a navigable that is not a labeled parameter it
+// does nothing.
 //
 // Labels are found by spelling, in the files of n's package and, when
 // the field holding the function is exported (see
@@ -1420,12 +1421,13 @@ func (fe *FileEvaluator) definitionsForOffset(offsets ...int) iter.Seq[*navigabl
 //
 // It cuts out some subtrees: where a field definition label matches
 // the given name, or where a let clause, a for clause or a function
-// literal's parameter creates a binding for the given name. Parameter
-// labels and aliases name parameters rather than use a name, and are
-// left out. Thus the intention is to return offsets that are for
-// idents which match the given name, and are unlikely to resolve to
-// other fields. This is approximate and false positives will
-// definitely be returned, but it's a single fast pass over the AST.
+// literal's parameter creates a binding for the given name. Call
+// labels and parameter labels and aliases name parameters rather than
+// use a name, and are left out. Thus the intention is to return
+// offsets that are for idents which match the given name, and are
+// unlikely to resolve to other fields. This is approximate and false
+// positives will definitely be returned, but it's a single fast pass
+// over the AST.
 func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
 	likelyUseOffsets := fe.likelyUseOffsets
 	if likelyUseOffsets == nil {
@@ -1486,6 +1488,13 @@ func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
 					}
 				}
 				return false
+			case *ast.CallExpr:
+				// A call's labels name the callee's parameters.
+				ast.Walk(n.Fun, visit, nil)
+				for _, arg := range n.Args {
+					ast.Walk(arg, visit, nil)
+				}
+				return false
 			case *ast.Ident:
 				if n.Name == name {
 					offsets.idents = append(offsets.idents, n.Pos().Offset())
@@ -1500,10 +1509,11 @@ func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
 	return offsets
 }
 
-// findLabelOffsets walks the file's syntax for the parameter labels
-// spelled like the given name, and returns their offsets. Unlike
-// [FileEvaluator.findLikelyUseOffsets], it prunes nothing: a label
-// names a parameter by spelling, whatever is in scope around it.
+// findLabelOffsets walks the file's syntax for the call labels and
+// parameter labels spelled like the given name, and returns their
+// offsets. Unlike [FileEvaluator.findLikelyUseOffsets], it prunes
+// nothing: a label binds a parameter by spelling, whatever is in
+// scope around it.
 func (fe *FileEvaluator) findLabelOffsets(name string) []int {
 	labelOffsets := fe.labelOffsets
 	if labelOffsets == nil {
@@ -1514,7 +1524,14 @@ func (fe *FileEvaluator) findLabelOffsets(name string) []int {
 	offsets, found := labelOffsets[name]
 	if !found {
 		ast.Walk(fe.File, func(n ast.Node) bool {
-			if n, ok := n.(*ast.FuncParam); ok {
+			switch n := n.(type) {
+			case *ast.CallExpr:
+				for _, label := range n.ArgLabels {
+					if ident, ok := label.(*ast.Ident); ok && ident.Name == name {
+						offsets = append(offsets, ident.Pos().Offset())
+					}
+				}
+			case *ast.FuncParam:
 				if label, ok := n.Label.(*ast.Ident); ok && label.Name == name {
 					offsets = append(offsets, label.Pos().Offset())
 				}
@@ -1813,6 +1830,11 @@ func navigateByName(navs map[*navigable]struct{}, name string) []*navigable {
 			results = append(results, childNav)
 		}
 
+		if name == paramsName {
+			// An ellipsis stands in for the fields or elements a value
+			// may have, never for a function's parameters.
+			continue
+		}
 		for _, fr := range nav.frames {
 			childFrs, found := fr.bindings[name]
 			// If there is also a matching binding in the frame, but it
@@ -2139,7 +2161,7 @@ func (f *frame) eval() {
 
 	//fmt.Printf("%p eval with key %v node %T; nav: %p\n", f, f.key, f.node, f.navigable)
 
-	var embeddedResolvable, resolvable []ast.Expr
+	var embeddedResolvable []ast.Expr
 	// A comprehensionTail is the remainder of a comprehension, stashed
 	// under the clause being processed: the body for the last clause,
 	// or a comprehension holding the remaining clauses.
@@ -2414,26 +2436,12 @@ func (f *frame) eval() {
 			f.ellipses = append(f.ellipses, childFr.navigable)
 
 		case *ast.CallExpr:
-			var childFr *frame
+			var argFr *frame
 			for _, arg := range node.Args {
-				childFr = f.newFrame(arg, nil, false)
-				childFr.docsNode = arg
+				argFr = f.newFrame(arg, nil, false)
+				argFr.docsNode = arg
 			}
-
-			if len(node.Args) == 1 {
-				f.createPath(node.Fun, func(navs []*navigable) {
-					for nav := range expandNavigables(navs) {
-						if nav.name == "__close" {
-							f.navigable.ensureResolvesTo([]*navigable{childFr.navigable})
-							childFr.navigable.recordUsage(node, f)
-							return
-						}
-					}
-				})
-
-			} else {
-				resolvable = append(resolvable, node.Fun)
-			}
+			f.createPath(node.Fun, f.callReceiver(node, argFr))
 
 		case *ast.Func:
 			// A function literal is one lexical scope, the signature
@@ -2738,10 +2746,10 @@ func (f *frame) eval() {
 	for _, expr := range embeddedResolvable {
 		f.createPath(expr, f.navigable.ensureResolvesTo)
 	}
-	for _, expr := range resolvable {
-		f.createPath(expr, nil)
-	}
 	for _, p := range f.childPaths {
+		if p.resolveOnRead {
+			continue
+		}
 		p.resolvesToChanged(0)
 	}
 
@@ -3014,6 +3022,71 @@ func (f *frame) newPathRootedAt(key ast.Node, nav *navigable, name string, value
 	f.childPaths = append(f.childPaths, p)
 }
 
+// callReceiver creates the paths that lead from the call's callee to
+// the parameters of the functions it may denote, and returns the
+// receiver for the callee's path, which roots them at the navigables
+// the callee resolves to, adding to their roots whenever the callee's
+// resolution grows. argFr evaluates the call's argument when it has
+// exactly one.
+//
+// Each labeled argument whose label is an identifier gets a path
+// through the __params child of the callee's navigables to the
+// like-named parameter of every function literal the callee denotes.
+// The __params component has no syntax of its own, and leads the path
+// so that no lookup by position can land on it. Resolving a label
+// path expands the callee, which only a query at the label needs, so
+// the paths are resolved when read rather than with f's other paths.
+//
+// Given the navigables the callee resolves to, the receiver also makes
+// the value of a call of close denote its argument, and the value of a
+// partial application (a call whose arguments end in ...) denote the
+// callee, as an embedding of it would: the result of a partial
+// application is the function it was applied to, so labels in later
+// calls of it reach the callee's parameters through that link, which
+// records nothing but the link itself.
+func (f *frame) callReceiver(call *ast.CallExpr, argFr *frame) func([]*navigable) {
+	var labelPaths []*path
+	for _, label := range call.ArgLabels {
+		ident, ok := label.(*ast.Ident)
+		if !ok {
+			continue
+		}
+		p := &path{
+			frame:         f,
+			resolveOnRead: true,
+			components: []pathComponent{{
+				name: paramsName,
+			}, {
+				name:  ident.Name,
+				node:  ident,
+				start: ident.Pos(),
+				end:   ident.End(),
+			}, {
+				node: ident,
+			}},
+		}
+		labelPaths = append(labelPaths, p)
+		f.childPaths = append(f.childPaths, p)
+	}
+	return func(navs []*navigable) {
+		if len(call.Args) == 1 {
+			for nav := range expandNavigables(navs) {
+				if nav.name == "__close" {
+					f.navigable.ensureResolvesTo([]*navigable{argFr.navigable})
+					argFr.navigable.recordUsage(call, f)
+					break
+				}
+			}
+		}
+		if call.Ellipsis.IsValid() {
+			f.navigable.ensureResolvesTo(navs)
+		}
+		for _, p := range labelPaths {
+			p.addRoots(navs)
+		}
+	}
+}
+
 // newBinding creates and returns a new [frame], and stores it under
 // the given name in the current frame only.
 func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
@@ -3222,6 +3295,12 @@ func (f *frame) createPath(expr ast.Expr, receiver func([]*navigable)) {
 	}
 
 	if len(components) == 0 {
+		if rootNav != nil && receiver != nil {
+			// The expression is inline in its entirety, with no name
+			// to look up after it: it resolves to its own navigable,
+			// which the receiver gets at once.
+			receiver([]*navigable{rootNav})
+		}
 		return
 	}
 	slices.Reverse(components)
@@ -3448,6 +3527,12 @@ type path struct {
 	// startsInline records whether this path started with an inline
 	// struct or list (which will not be part of the components).
 	startsInline bool
+	// resolveOnRead marks a path that the evaluation of its frame
+	// leaves unresolved: it is resolved, and the mark cleared, the
+	// first time [path.definitionsForOffset] or
+	// [path.definitionsForNode] finds a component in it. It is set on a
+	// call's label paths, whose resolution expands the callee.
+	resolveOnRead bool
 }
 
 // pathComponent models part of a path.
@@ -3583,6 +3668,34 @@ func (p *path) resolvesToChanged(i int) {
 	p.receiver(components[i].unexpanded)
 }
 
+// addRoots adds navs to the set of navigables the path's first
+// component resolves from, and resolves the path again unless its
+// resolution still waits for its first read.
+func (p *path) addRoots(navs []*navigable) {
+	pc := &p.components[0]
+	grown := false
+	for _, nav := range navs {
+		if slices.Contains(pc.unexpanded, nav) {
+			continue
+		}
+		pc.unexpanded = append(pc.unexpanded, nav)
+		grown = true
+	}
+	if grown && !p.resolveOnRead {
+		p.resolvesToChanged(0)
+	}
+}
+
+// read resolves the path if its resolution waits for a read, and
+// clears the mark.
+func (p *path) read() {
+	if !p.resolveOnRead {
+		return
+	}
+	p.resolveOnRead = false
+	p.resolvesToChanged(0)
+}
+
 // definitionsForOffset searches the components of this path for a
 // component that contains the given offset. If found, the component's
 // index, and the results of its resolution (not its inputs) are
@@ -3620,6 +3733,7 @@ func (p *path) definitionsForOffset(offset int) (int, []*navigable) {
 	if !found {
 		return -1, nil
 	}
+	p.read()
 	return i, components[i+1].unexpanded
 }
 
@@ -3633,6 +3747,7 @@ func (p *path) definitionsForNode(el ast.Node) (int, []*navigable) {
 		if components[i].node != el {
 			continue
 		}
+		p.read()
 		// The results of resolving a component are stored in the
 		// component that follows it. The final component of a
 		// multi-component path exists only to hold the results of

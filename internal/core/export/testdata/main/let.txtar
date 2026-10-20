@@ -563,8 +563,8 @@ diff old new
 		x: "a foo z"
 		run: a: "foo"
 	}
-	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(comprehension.filepath: invalid interpolation: invalid interpolation: undefined field: name) (and 1 more errors)
-	files:         _|_ // files: key value of dynamic field must be concrete, found _|_(filepath: invalid interpolation: invalid interpolation: undefined field: name) (and 3 more errors)
+	comprehension: _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name
+	files:         _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)
 	incomplete: {
 		a: {
 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -1078,8 +1078,8 @@ diff old new
 +		x: "a foo z"
 +		run: a: "foo"
 +	}
-+	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(comprehension.filepath: invalid interpolation: invalid interpolation: undefined field: name) (and 1 more errors)
-+	files:         _|_ // files: key value of dynamic field must be concrete, found _|_(filepath: invalid interpolation: invalid interpolation: undefined field: name) (and 3 more errors)
++	comprehension: _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name
++	files:         _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)
  	incomplete: {
  		a: {
  			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)

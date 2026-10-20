@@ -89,7 +89,6 @@ issue3801: nonRooted: full: {
 		patch: _
 		output: (namespace): patch
 
-		// TODO(eval): our message is substituted as a string instead of being wrapped as an error.
 	}
 
 	#Base: {

@@ -3800,7 +3800,7 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		// Issue #326
 		value: `x: "\(string)": "v"`,
-		err:   `x: key value of dynamic field must be concrete, found _|_(x: invalid interpolation: non-concrete value string (type string)) (and 1 more errors)`,
+		err:   `cue: marshal error: x: invalid dynamic field key: invalid interpolation: non-concrete value string (type string)`,
 	}, {
 		// Issue #326
 		value: `x: "\(bool)": "v"`,

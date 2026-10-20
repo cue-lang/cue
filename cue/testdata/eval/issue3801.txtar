@@ -107,7 +107,7 @@ issue3801: let: full: {
 		#JSONPatch: {
 			namespace?: string
 			patch: []
-			output: _|_ @test(err, code=incomplete, contains="key value of dynamic field must be concrete", pos=[20:28])
+			output: _|_ @test(err, code=incomplete, contains="invalid dynamic field key: cannot reference optional field: namespace", pos=[20:28])
 		}
 		#JSONOp: {op: "add", path: string, value: _} | {op: "remove", path: string}
 		#Main: {
@@ -139,11 +139,7 @@ issue3801: nonRooted: full: {
 		patch: _
 		output: (namespace): patch
 
-		// TODO(eval): our message is substituted as a string instead of being wrapped as an error.
-		@test(err, at=output, code=incomplete,
-			suberr=(code=incomplete, contains="key value of dynamic field must be concrete, found %v",
-				args=[_|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace)], pos=[4:12]),
-			suberr=(code=incomplete, contains="cannot reference optional field: %s", args=[namespace], pos=[4:12]))
+		@test(err, at=output, code=incomplete, contains="invalid dynamic field key: cannot reference optional field: namespace", pos=[4:12])
 	}
 
 	#Base: {
@@ -169,9 +165,7 @@ issue3801: nonRooted: full: {
 [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
     ./nested.cue:58:25
     ./nested.cue:54:12
-[incomplete] issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace:
-    ./nested.cue:72:28
-issue3801.let.full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(issue3801.let.full.#JSONPatch.output: cannot reference optional field: namespace):
+[incomplete] issue3801.let.full.#JSONPatch.output: invalid dynamic field key: cannot reference optional field: namespace:
     ./nested.cue:72:28
 [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
     ./nested.cue:72:28
@@ -179,9 +173,7 @@ issue3801.let.full.#JSONPatch.output: key value of dynamic field must be concret
 [incomplete] issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string:
     ./nested.cue:138:12
     ./nested.cue:135:15
-[incomplete] issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace:
-    ./nested.cue:138:12
-issue3801.nonRooted.full.#SubOutput.output: key value of dynamic field must be concrete, found _|_(issue3801.nonRooted.full.#SubOutput.output: cannot reference optional field: namespace):
+[incomplete] issue3801.nonRooted.full.#SubOutput.output: invalid dynamic field key: cannot reference optional field: namespace:
     ./nested.cue:138:12
 -- out/eval/stats --
 Leaks:  40

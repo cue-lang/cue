@@ -1097,9 +1097,7 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
 [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
     ./large.cue:7:25
     ./large.cue:3:12
-[incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
-    ./large.cue:21:28
-full.#JSONPatch.output: key value of dynamic field must be concrete, found _|_(full.#JSONPatch.output: cannot reference optional field: namespace):
+[incomplete] full.#JSONPatch.output: invalid dynamic field key: cannot reference optional field: namespace:
     ./large.cue:21:28
 [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
     ./large.cue:21:28

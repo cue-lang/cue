@@ -183,8 +183,7 @@ func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	//    }
 	//    $ cue cmd shouldFail
 	//    command.shouldFail: no tasks found
-	//    command.shouldFail.NESTED: invalid interpolation: non-concrete value string (type string)
-	//    command.shouldFail.NESTED: key value of dynamic field must be concrete, found _|_(command.shouldFail.NESTED: invalid interpolation: non-concrete value string (type string))
+	//    command.shouldFail.NESTED: invalid dynamic field key: invalid interpolation: non-concrete value string (type string)
 	//
 	// As shown above, any errors within the command's value are reported
 	// alongside, even incomplete ones, as they may be why no tasks were found.

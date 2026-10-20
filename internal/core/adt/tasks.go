@@ -19,6 +19,7 @@ import (
 	"slices"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -194,6 +195,21 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 			Node: n.node,
 			Err: ctx.NewPosf(Pos(field.Key),
 				"key value of dynamic field not yet known"),
+		})
+		return
+	}
+
+	// Like Interpolation.evaluate, report a key which failed to evaluate as a
+	// single error at the key's position, rather than wrapped below.
+	if b, ok := v.(*Bottom); ok {
+		if b != ctx.errs {
+			ctx.AddBottom(b)
+		}
+		err := ctx.Err()
+		n.addBottom(&Bottom{
+			Code: err.Code,
+			Node: n.node,
+			Err:  errors.Wrapf(err.Err, Pos(field.Key), "invalid dynamic field key"),
 		})
 		return
 	}

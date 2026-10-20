@@ -63,16 +63,14 @@ _Service: {
 	_output: [for _, svc in _service {svc}]
 }
 -- out/errors.txt --
-[incomplete] _Service._service: key value of dynamic field must be concrete, found _|_(_Service._service: undefined field: name):
+[incomplete] _Service._service: invalid dynamic field key: undefined field: name:
     ./in.cue:54:13
-_Service._service: undefined field: name:
-    ./in.cue:54:20
     ./in.cue:50:2
-[incomplete] _Service._service: key value of dynamic field must be concrete, found _|_(_Service._service: undefined field: name):
+    ./in.cue:54:20
+[incomplete] _Service._service: invalid dynamic field key: undefined field: name:
     ./in.cue:54:13
-_Service._service: undefined field: name:
-    ./in.cue:54:20
     ./in.cue:50:2
+    ./in.cue:54:20
 -- out/eval/stats --
 Leaks:  15
 Freed:  115

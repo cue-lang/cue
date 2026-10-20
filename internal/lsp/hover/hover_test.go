@@ -777,6 +777,66 @@ package b
 			// declaration containing the cursor is omitted.
 			want: "int",
 		},
+		{
+			name: "func_body_reference",
+			archive: `-- a.cue --
+@experiment(functions)
+factor: 2
+scale: func(x: int, by: int = factor) -> int: ‸x * by
+`,
+			want: "",
+		},
+		{
+			name: "func_call_label",
+			archive: `-- a.cue --
+@experiment(functions)
+scale: func(x: int, by: int = 2) -> int: x * by
+y: scale(‸x: 3)
+`,
+			want: "",
+		},
+		{
+			name: "func_value_rendered_as_written",
+			archive: `-- a.cue --
+@experiment(functions)
+factor: 2
+scale: func(x: int, by: int = factor) -> int: x * by
+‸t: {fn: scale, n: 1}
+`,
+			want: "{fn: func(x: int, by: int = factor) -> int: x * by, n: 1}",
+		},
+		{
+			name: "func_body_field",
+			archive: `-- a.cue --
+@experiment(functions)
+w: func(a: int) -> _: {‸b: a}
+`,
+			want: "",
+		},
+		{
+			name: "func_param_declaration",
+			archive: `-- a.cue --
+@experiment(functions)
+// f returns a.
+f: func(
+	_~v: string = "",
+	// a is returned.
+	‸a: int,
+) -> int: a
+r: f("x", a: 1)
+`,
+			want: "",
+		},
+		{
+			name: "func_body_literal_yields_nothing",
+			archive: `-- a.cue --
+@experiment(functions)
+#F: func(x: int) -> int
+scale: #F
+scale: func(x: int) -> int: x + ‸1
+`,
+			want: "func(x: int) -> int",
+		},
 	}
 
 	for _, tc := range testCases {

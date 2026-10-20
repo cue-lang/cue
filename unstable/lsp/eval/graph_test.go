@@ -1493,6 +1493,36 @@ v: {w: 1}
 				t.checkDocs(pkgDecl, "// Package dep is a dependency.")
 			},
 		},
+
+		{
+			name: "Func_param_decls",
+			archive: `-- main.cue --
+@experiment(functions)
+
+package p
+
+// f returns a.
+f: func(
+	_~v: string = "",
+	// a is returned.
+	a: int,
+) -> int: a
+s: {a: int}
+r: f("x", a: 1)
+`,
+			check: func(t *graphTest) {
+				fDecl := t.soleDecl(t.field("f"), eval.DeclField)
+				fn := fDecl.Value().(*ast.Func)
+
+				// A function literal contributes no fields to its node.
+				t.checkFields(t.field("f"))
+
+				// Neither the body's a nor the alias v at its
+				// declaration resolves.
+				t.checkResolve(fDecl, fn.Body)
+				t.checkResolve(fDecl, fn.Params[0].Alias.Field)
+			},
+		},
 	}.run(t)
 }
 

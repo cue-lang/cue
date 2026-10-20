@@ -62,3 +62,35 @@ func TestResolveWithoutPositions(t *testing.T) {
 	// resolves to nothing.
 	qt.Assert(t, qt.HasLen(yDecl.Resolve(ast.NewIdent("x")), 0))
 }
+
+// TestFuncArgsWithoutPositions checks how a reference resolves within
+// a function literal built with the deprecated [ast.Func.Args] field,
+// which the parser never produces.
+func TestFuncArgsWithoutPositions(t *testing.T) {
+	kRef := ast.NewIdent("k")
+	f := &ast.File{
+		Filename: "nopos.cue",
+		Decls: []ast.Decl{
+			&ast.Field{Label: ast.NewIdent("k"), Value: ast.NewIdent("int")},
+			&ast.Field{Label: ast.NewIdent("f"), Value: &ast.Func{
+				Args: []ast.Expr{kRef},
+				Ret:  ast.NewIdent("int"),
+			}},
+		},
+	}
+	ev := eval.New(eval.Config{
+		IP: ast.ParseImportPath("example.test/p").Canonical(),
+	}, f)
+
+	fNode := ev.Root().Field("f")
+	qt.Assert(t, qt.IsNotNil(fNode))
+	var fDecl *eval.Decl
+	for d := range fNode.Decls() {
+		if d.Kind() == eval.DeclField {
+			fDecl = d
+		}
+	}
+	qt.Assert(t, qt.IsNotNil(fDecl))
+
+	qt.Assert(t, qt.HasLen(fDecl.Resolve(kRef), 0))
+}

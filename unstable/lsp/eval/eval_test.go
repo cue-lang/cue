@@ -5505,6 +5505,517 @@ out: {
 				or1(116):     {f: []string{"a", "b", "c", "d", "x", "y"}, e: []string{"out"}},
 			},
 		},
+
+		{
+			name: "Func_AliasInBody",
+			archive: `-- a.cue --
+@experiment(functions)
+a: 1
+f: func(a~x: int) -> int: x + a
+r: f(a: 10)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "a"): {self},
+				ln(3, 1, "f"): {self},
+				ln(4, 1, "r"): {self},
+				ln(4, 1, "f"): {ln(3, 1, "f")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"a", "f", "r"}},
+				or1(25):    {e: []string{"a", "f", "r"}},
+				or1(27):    {e: []string{"a", "f", "r"}},
+				or(28, 30): {f: []string{"a", "f", "r"}},
+				or1(30):    {e: []string{"a", "f", "r"}},
+				or1(59):    {e: []string{"a", "f", "r"}},
+				or(60, 62): {f: []string{"a", "f", "r"}},
+				or(62, 68): {e: []string{"a", "f", "r"}},
+				or(70, 72): {e: []string{"a", "f", "r"}},
+			},
+		},
+
+		{
+			name: "Func_DefaultFromEnclosingScope",
+			archive: `-- a.cue --
+@experiment(functions)
+k: 1
+f: func(a: int = k) -> int: a
+r: f()
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "k"): {self},
+				ln(3, 1, "f"): {self},
+				ln(4, 1, "r"): {self},
+				ln(4, 1, "f"): {ln(3, 1, "f")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"f", "k", "r"}},
+				or1(25):    {e: []string{"f", "k", "r"}},
+				or1(27):    {e: []string{"f", "k", "r"}},
+				or(28, 30): {f: []string{"f", "k", "r"}},
+				or1(30):    {e: []string{"f", "k", "r"}},
+				or1(57):    {e: []string{"f", "k", "r"}},
+				or(58, 60): {f: []string{"f", "k", "r"}},
+				or(60, 65): {e: []string{"f", "k", "r"}},
+			},
+		},
+
+		{
+			name: "Func_SiblingInConstraint",
+			archive: `-- a.cue --
+@experiment(functions)
+a: "outer"
+g: func(a: int, b: a) -> int: b
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "a"): {self},
+				ln(3, 1, "g"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"a", "g"}},
+				or1(25):    {e: []string{"a", "g"}},
+				or1(33):    {e: []string{"a", "g"}},
+				or(34, 36): {f: []string{"a", "g"}},
+				or1(36):    {e: []string{"a", "g"}},
+				or1(65):    {e: []string{"a", "g"}},
+			},
+		},
+
+		{
+			name: "Func_BodyNotValue",
+			archive: `-- a.cue --
+@experiment(functions)
+x: func(a: int) -> _: {b: a}
+y: x.b
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "x"): {self},
+				ln(3, 1, "y"): {self},
+				ln(3, 1, "x"): {ln(2, 1, "x")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"x", "y"}},
+				or1(25):    {e: []string{"x", "y"}},
+				or1(51):    {e: []string{"x", "y"}},
+				or(52, 54): {f: []string{"x", "y"}},
+				or(54, 57): {e: []string{"x", "y"}},
+			},
+		},
+
+		{
+			name: "Func_NestedShadowing",
+			archive: `-- a.cue --
+@experiment(functions)
+h: func(a: int) -> _: func(a: string) -> string: a
+r: h(1)("s")
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "h"): {self},
+				ln(3, 1, "r"): {self},
+				ln(3, 1, "h"): {ln(2, 1, "h")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"h", "r"}},
+				or1(25):    {e: []string{"h", "r"}},
+				or1(73):    {e: []string{"h", "r"}},
+				or(74, 76): {f: []string{"h", "r"}},
+				or(76, 79): {e: []string{"h", "r"}},
+				or(80, 82): {e: []string{"h", "r"}},
+				or(85, 87): {e: []string{"h", "r"}},
+			},
+		},
+
+		{
+			name: "Func_CompletionPositions",
+			archive: `-- a.cue --
+@experiment(functions)
+k: 1
+f: func(a: int, b: int = k) -> int: a + b
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "k"): {self},
+				ln(3, 1, "f"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"f", "k"}},
+				or1(25):    {e: []string{"f", "k"}},
+				or1(27):    {e: []string{"f", "k"}},
+				or(28, 30): {f: []string{"f", "k"}},
+				or1(30):    {e: []string{"f", "k"}},
+				or1(69):    {e: []string{"f", "k"}},
+			},
+		},
+
+		{
+			name: "Func_UnifiedLiterals",
+			archive: `-- a.cue --
+@experiment(functions)
+#F: func(a: int) -> int
+f: #F & func(a: int) -> int: a + 1
+r: f(a: 1)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "#F"): {self},
+				ln(3, 1, "f"):  {self},
+				ln(3, 1, "#F"): {ln(2, 1, "#F")},
+				ln(4, 1, "r"):  {self},
+				ln(4, 1, "f"):  {ln(3, 1, "f")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 26): {f: []string{"#F", "f", "r"}},
+				or1(26):    {e: []string{"#F", "f", "r"}},
+				or1(46):    {e: []string{"#F", "f", "r"}},
+				or(47, 49): {f: []string{"#F", "f", "r"}},
+				or(49, 55): {e: []string{"#F", "f", "r"}},
+				or1(81):    {e: []string{"#F", "f", "r"}},
+				or(82, 84): {f: []string{"#F", "f", "r"}},
+				or(84, 90): {e: []string{"#F", "f", "r"}},
+				or(91, 93): {e: []string{"#F", "f", "r"}},
+			},
+		},
+
+		{
+			name: "Func_AliasedLabel",
+			archive: `-- a.cue --
+@experiment(functions)
+by: 0
+scale: func(x: int, by~b: int = 2) -> int: x * b
+y: scale(x: 3, by: 4)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "by"):    {self},
+				ln(3, 1, "scale"): {self},
+				ln(4, 1, "y"):     {self},
+				ln(4, 1, "scale"): {ln(3, 1, "scale")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 26):  {f: []string{"by", "scale", "y"}},
+				or1(26):     {e: []string{"by", "scale", "y"}},
+				or1(28):     {e: []string{"by", "scale", "y"}},
+				or(29, 35):  {f: []string{"by", "scale", "y"}},
+				or1(35):     {e: []string{"by", "scale", "y"}},
+				or1(77):     {e: []string{"by", "scale", "y"}},
+				or(78, 80):  {f: []string{"by", "scale", "y"}},
+				or(80, 90):  {e: []string{"by", "scale", "y"}},
+				or(91, 97):  {e: []string{"by", "scale", "y"}},
+				or(98, 100): {e: []string{"by", "scale", "y"}},
+			},
+		},
+
+		{
+			name: "Func_PositionalOnly",
+			archive: `-- a.cue --
+@experiment(functions)
+f: func(_~v: int) -> int: v
+r: f(v: 1)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "f"): {self},
+				ln(3, 1, "r"): {self},
+				ln(3, 1, "f"): {ln(2, 1, "f")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"f", "r"}},
+				or1(25):    {e: []string{"f", "r"}},
+				or1(50):    {e: []string{"f", "r"}},
+				or(51, 53): {f: []string{"f", "r"}},
+				or(53, 59): {e: []string{"f", "r"}},
+				or(60, 62): {e: []string{"f", "r"}},
+			},
+		},
+
+		{
+			name: "Func_CallThroughReference",
+			archive: `-- a.cue --
+@experiment(functions)
+g: scale
+scale: func(x: int, by: int = 2) -> int: x * by
+y: g(x: 3)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "g"):     {self},
+				ln(2, 1, "scale"): {ln(3, 1, "scale")},
+				ln(3, 1, "scale"): {self},
+				ln(4, 1, "y"):     {self},
+				ln(4, 1, "g"):     {ln(2, 1, "g")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"g", "scale", "y"}},
+				or(25, 32): {e: []string{"g", "scale", "y"}},
+				or(32, 38): {f: []string{"g", "scale", "y"}},
+				or1(38):    {e: []string{"g", "scale", "y"}},
+				or1(79):    {e: []string{"g", "scale", "y"}},
+				or(80, 82): {f: []string{"g", "scale", "y"}},
+				or(82, 88): {e: []string{"g", "scale", "y"}},
+				or(89, 91): {e: []string{"g", "scale", "y"}},
+			},
+		},
+
+		{
+			name: "Func_PartialApplication",
+			archive: `-- a.cue --
+@experiment(functions)
+scale: func(x: int, by: int = 2) -> int: x * by
+p: scale(by: 3, ...)
+q: p(x: 2)
+q2: p(x: 2, by: 4)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "scale"): {self},
+				ln(3, 1, "p"):     {self},
+				ln(3, 1, "scale"): {ln(2, 1, "scale")},
+				ln(4, 1, "q"):     {self},
+				ln(4, 1, "p"):     {ln(3, 1, "p")},
+				ln(5, 1, "q2"):    {self},
+				ln(5, 1, "p"):     {ln(3, 1, "p")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 29):   {f: []string{"p", "q", "q2", "scale"}},
+				or1(29):      {e: []string{"p", "q", "q2", "scale"}},
+				or1(70):      {e: []string{"p", "q", "q2", "scale"}},
+				or(71, 73):   {f: []string{"p", "q", "q2", "scale"}},
+				or(73, 84):   {e: []string{"p", "q", "q2", "scale"}},
+				or(85, 92):   {e: []string{"p", "q", "q2", "scale"}},
+				or(92, 94):   {f: []string{"p", "q", "q2", "scale"}},
+				or(94, 100):  {e: []string{"p", "q", "q2", "scale"}},
+				or(101, 103): {e: []string{"p", "q", "q2", "scale"}},
+				or(103, 106): {f: []string{"p", "q", "q2", "scale"}},
+				or(106, 112): {e: []string{"p", "q", "q2", "scale"}},
+				or(113, 119): {e: []string{"p", "q", "q2", "scale"}},
+				or(120, 122): {e: []string{"p", "q", "q2", "scale"}},
+			},
+		},
+
+		{
+			name: "Func_PartialApplicationChain",
+			archive: `-- a.cue --
+@experiment(functions)
+add3: func(a: int, b: int, c: int) -> int: a + b + c
+p1: add3(a: 1, ...)
+p2: p1(b: 2, ...)
+r: p2(c: 3)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "add3"): {self},
+				ln(3, 1, "p1"):   {self},
+				ln(3, 1, "add3"): {ln(2, 1, "add3")},
+				ln(4, 1, "p2"):   {self},
+				ln(4, 1, "p1"):   {ln(3, 1, "p1")},
+				ln(5, 1, "r"):    {self},
+				ln(5, 1, "p2"):   {ln(4, 1, "p2")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 28):   {f: []string{"add3", "p1", "p2", "r"}},
+				or1(28):      {e: []string{"add3", "p1", "p2", "r"}},
+				or1(75):      {e: []string{"add3", "p1", "p2", "r"}},
+				or(76, 79):   {f: []string{"add3", "p1", "p2", "r"}},
+				or(79, 88):   {e: []string{"add3", "p1", "p2", "r"}},
+				or(89, 96):   {e: []string{"add3", "p1", "p2", "r"}},
+				or(96, 99):   {f: []string{"add3", "p1", "p2", "r"}},
+				or(99, 106):  {e: []string{"add3", "p1", "p2", "r"}},
+				or(107, 114): {e: []string{"add3", "p1", "p2", "r"}},
+				or(114, 116): {f: []string{"add3", "p1", "p2", "r"}},
+				or(116, 123): {e: []string{"add3", "p1", "p2", "r"}},
+				or(124, 126): {e: []string{"add3", "p1", "p2", "r"}},
+			},
+		},
+
+		{
+			name: "Func_PartialApplicationInline",
+			archive: `-- a.cue --
+@experiment(functions)
+add3: func(a: int, b: int, c: int) -> int: a + b + c
+y: add3(a: 1, ...)(b: 2, c: 3)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "add3"): {self},
+				ln(3, 1, "y"):    {self},
+				ln(3, 1, "add3"): {ln(2, 1, "add3")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 28):   {f: []string{"add3", "y"}},
+				or1(28):      {e: []string{"add3", "y"}},
+				or1(75):      {e: []string{"add3", "y"}},
+				or(76, 78):   {f: []string{"add3", "y"}},
+				or(78, 87):   {e: []string{"add3", "y"}},
+				or(88, 98):   {e: []string{"add3", "y"}},
+				or(99, 104):  {e: []string{"add3", "y"}},
+				or(105, 107): {e: []string{"add3", "y"}},
+			},
+		},
+
+		{
+			name: "Func_ParenthesizedLiteralCall",
+			archive: `-- a.cue --
+@experiment(functions)
+y: (func(a: int) -> int: a)(a: 1)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "y"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"y"}},
+				or(25, 27): {e: []string{"y"}},
+				or(49, 54): {e: []string{"y"}},
+				or(55, 57): {e: []string{"y"}},
+			},
+		},
+
+		{
+			name: "Func_DefaultReference",
+			archive: `-- a.cue --
+@experiment(functions)
+factor: 2
+scale: func(x: int, by: int = factor) -> int: x * by
+y: scale(x: 3)
+z: scale(x: 3, by: 5)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "factor"): {self},
+				ln(3, 1, "scale"):  {self},
+				ln(4, 1, "y"):      {self},
+				ln(4, 1, "scale"):  {ln(3, 1, "scale")},
+				ln(5, 1, "z"):      {self},
+				ln(5, 1, "scale"):  {ln(3, 1, "scale")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 30):   {f: []string{"factor", "scale", "y", "z"}},
+				or1(30):      {e: []string{"factor", "scale", "y", "z"}},
+				or1(32):      {e: []string{"factor", "scale", "y", "z"}},
+				or(33, 39):   {f: []string{"factor", "scale", "y", "z"}},
+				or1(39):      {e: []string{"factor", "scale", "y", "z"}},
+				or1(85):      {e: []string{"factor", "scale", "y", "z"}},
+				or(86, 88):   {f: []string{"factor", "scale", "y", "z"}},
+				or(88, 98):   {e: []string{"factor", "scale", "y", "z"}},
+				or(99, 101):  {e: []string{"factor", "scale", "y", "z"}},
+				or(101, 103): {f: []string{"factor", "scale", "y", "z"}},
+				or(103, 113): {e: []string{"factor", "scale", "y", "z"}},
+				or(114, 120): {e: []string{"factor", "scale", "y", "z"}},
+				or(121, 123): {e: []string{"factor", "scale", "y", "z"}},
+			},
+		},
+
+		{
+			name: "Func_DefaultNotTheValue",
+			archive: `-- a.cue --
+@experiment(functions)
+cfg: func(c: {port: int} = {port: 80, host: "local"}) -> _: c.host
+r1: cfg()
+r2: cfg(c: {port: 8080})
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "cfg"):  {self},
+				ln(3, 1, "r1"):   {self},
+				ln(3, 1, "cfg"):  {ln(2, 1, "cfg")},
+				ln(4, 1, "r2"):   {self},
+				ln(4, 1, "cfg"):  {ln(2, 1, "cfg")},
+				ln(4, 1, "port"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 27):   {f: []string{"cfg", "r1", "r2"}},
+				or1(27):      {e: []string{"cfg", "r1", "r2"}},
+				or1(89):      {e: []string{"cfg", "r1", "r2"}},
+				or(90, 93):   {f: []string{"cfg", "r1", "r2"}},
+				or(93, 100):  {e: []string{"cfg", "r1", "r2"}},
+				or(100, 103): {f: []string{"cfg", "r1", "r2"}},
+				or(103, 111): {e: []string{"cfg", "r1", "r2"}},
+				or1(111):     {f: []string{"port"}, e: []string{"cfg", "r1", "r2"}},
+				or(112, 117): {f: []string{"port"}},
+				or1(117):     {e: []string{"cfg", "port", "r1", "r2"}},
+				or1(122):     {e: []string{"cfg", "port", "r1", "r2"}},
+				or1(124):     {e: []string{"cfg", "r1", "r2"}},
+			},
+		},
+
+		{
+			name: "Func_ResultTypeReference",
+			archive: `-- a.cue --
+@experiment(functions)
+#T: int
+f: func(a: int) -> #T: a
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "#T"): {self},
+				ln(3, 1, "f"):  {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 26): {f: []string{"#T", "f"}},
+				or(26, 31): {e: []string{"#T", "f"}},
+				or(31, 33): {f: []string{"#T", "f"}},
+				or1(33):    {e: []string{"#T", "f"}},
+				or1(55):    {e: []string{"#T", "f"}},
+			},
+		},
+
+		{
+			name: "Func_AnonymousParameter",
+			archive: `-- a.cue --
+@experiment(functions)
+f: func(int) -> int: 1
+r: f(a: 1)
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "f"): {self},
+				ln(3, 1, "r"): {self},
+				ln(3, 1, "f"): {ln(2, 1, "f")},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"f", "r"}},
+				or1(25):    {e: []string{"f", "r"}},
+				or1(45):    {e: []string{"f", "r"}},
+				or(46, 48): {f: []string{"f", "r"}},
+				or(48, 54): {e: []string{"f", "r"}},
+				or(55, 57): {e: []string{"f", "r"}},
+			},
+		},
+
+		{
+			name: "Func_IncompleteParameterList",
+			archive: `-- a.cue --
+@experiment(functions)
+f: func(a: int,
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "f"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"f"}},
+				or1(25):    {e: []string{"f"}},
+				or1(31):    {e: []string{"f"}},
+				or(32, 39): {f: []string{"f"}},
+			},
+		},
+
+		{
+			name: "Func_IncompleteConstraint",
+			archive: `-- a.cue --
+@experiment(functions)
+f: func(a: ) -> int: 1
+`,
+			expectDefinitions: map[position][]position{
+				ln(2, 1, "f"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(22, 25): {f: []string{"f"}},
+				or1(25):    {e: []string{"f"}},
+				or1(31):    {e: []string{"f"}},
+				or(32, 46): {f: []string{"f"}},
+			},
+		},
+
+		{
+			name: "Func_WithoutExperiment",
+			archive: `-- a.cue --
+f: func(a: int) -> int: a
+`,
+			expectDefinitions: map[position][]position{
+				ln(1, 1, "f"): {self},
+			},
+			expectCompletions: map[offsetRange]fieldEmbedCompletions{
+				or(0, 2): {f: []string{"f"}},
+				or1(2):   {e: []string{"f"}},
+				or1(25):  {e: []string{"f"}},
+			},
+		},
 	}.run(t)
 }
 

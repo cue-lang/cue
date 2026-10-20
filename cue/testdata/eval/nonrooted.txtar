@@ -4,6 +4,8 @@
 # that creates a conflict detectable from the root.
 # https://cuelang.org/issue/3977
 -- in.cue --
+import "strings"
+
 issue3977: inlineExpr: {
 	#NetworkID: 1
 	#fn: {
@@ -56,55 +58,242 @@ issue3977: inlineLet: {
 		x: 2
 	}
 
-	err: p.out @test(eq, 12, incorrect) @test(err:todo, p=1, code=eval,
-		contains="conflicting values", args=[1, 2])
+	err: p.out @test(eq, 12, incorrect) @test(err:todo, p=1, code=eval, contains="conflicting values", args=[1, 2])
+}
+
+// A scalar of an inline struct, struct literal, or let that is read through an
+// interpolation is checked against all its validators, not only its bounds.
+// https://cuelang.org/issue/4510
+issue4510: inline: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	ok:  (#C & {id: "other"}).out   @test(eq, "k/other")
+	err: (#C & {id: "storage"}).out @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+}
+issue4510: literal: {
+	err: {
+		id:  string & !="storage"
+		id:  "storage"
+		out: "k/\(id)"
+	}.out @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+}
+issue4510: let: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	let L = #C & {id: "storage"}
+	err: L.out @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+}
+issue4510: regexp: {
+	#C: {
+		id:  =~"^a"
+		out: "k/\(id)"
+	}
+	err: (#C & {id: "b"}).out @test(eq, "k/b", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+}
+issue4510: builtin: {
+	#C: {
+		id:  strings.MaxRunes(2)
+		out: "k/\(id)"
+	}
+	err: (#C & {id: "abc"}).out @test(eq, "k/abc", incorrect) @test(err:todo, p=1, code=eval, contains="does not satisfy strings.MaxRunes(2)")
+}
+// A validator of the read scalar may refer to the reading field: it is checked
+// once that field has its value, as it would be for a regular field.
+issue4510: selfRef: {
+	ok1: ({x: 1 & !=ok1, out: x + 1}).out @test(eq, 2)
+	let L = {x: 1 & !=ok2, out: x + 1}
+	ok2: L.out                            @test(eq, 2)
+	err: ({x: 1 & !=err, out: x + 0}).out @test(eq, 1, incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+}
+// The reading field may be a disjunction, in which case each disjunct checks
+// the read scalar on its own.
+issue4510: disjunct: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	ok:  (#C & {id: "other"}).out & (string | int)   @test(eq, "k/other")
+	err: (#C & {id: "storage"}).out & (string | int) @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, suberr=(contains="out of bound"), suberr=(contains="empty disjunction"), suberr=(contains="mismatched types"))
+
+	let L = #C & {id: "storage"}
+	errLet: L.out & (*"k/storage" | string) @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+
+	#N: 1
+	#fn: {
+		x:   #N
+		out: x + 10
+	}
+	okConflict:  (#fn & {x: 1}).out & (int | string) @test(eq, 11)
+	errConflict: (#fn & {x: 2}).out & (int | string) @test(err, code=eval, suberr=(contains="conflicting values 1 and 2"), suberr=(contains="empty disjunction"), suberr=(contains="mismatched types"))
+}
+// The reading task may belong to a nested internal node, as when the read
+// value feeds an expression. The rooted field completes the read node then too.
+issue4510: binop: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	err: (#C & {id: "storage"}).out + "y" @test(eq, "k/storagey", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+
+	let L = #C & {id: "storage"}
+	errLet: L.out + "y" @test(eq, "k/storagey", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+
+	#N: 1
+	#fn: {
+		x:   #N
+		out: x + 10
+	}
+	errConflict: (#fn & {x: 2}).out + 1 @test(err, code=eval, contains="conflicting values", args=[1, 2])
+}
+// The read scalar may be consumed by a builtin call, whose argument is read
+// with its tasks already finished, or be a default that is then eliminated.
+issue4510: consumers: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	errBuiltin: strings.ToUpper((#C & {id: "storage"}).out) @test(eq, "K/STORAGE", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+
+	errLen: len((#C & {id: "storage"}).out) @test(eq, 9, incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+
+	errArith: ({x: 1 & !=1, out: x + 1}).out @test(eq, 2, incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+
+	fallback: *(#C & {id: "storage"}).out | "fallback" @test(eq, *"k/storage" | "fallback", incorrect) @test(eq:todo, p=1, "fallback")
+}
+// A disjunct that fails on its own value must not complete the deferred nodes,
+// which it shares with the other disjuncts: a validator among them that refers
+// to the reading field would fail against the conflicting value, in any order
+// of the disjuncts.
+issue4510: disjunctOrder: {
+	ok1: ({x: 1 & !=ok1, out: x + 1}).out & (string | int) @test(eq, 2)
+	ok2: ({x: 1 & !=ok2, out: x + 1}).out & (int | string) @test(eq, 2)
+
+	let L1 = {x: 1 & !=ok3, out: x + 1}
+	ok3: L1.out & (string | int) @test(eq, 2)
+
+	let L2 = {x: 1 & !=ok4, out: x + 1}
+	ok4: L2.out & (int | string) @test(eq, 2)
+}
+// A comprehension's let clause has no path of its own: its validators run
+// where its value is used, so the error reports that path. A clause only read
+// by an expression is not checked at all.
+issue4510: compLet: {
+	l: [1, 2]
+	errList: [for v in l let y = v & !=2 if y > 0 {y}] @test(err, at=1, code=eval, contains="out of bound")
+	errField: {for v in l let y = v & !=2 if y > 0 {"k\(v)": y}} @test(err, at=k2, code=eval, contains="out of bound")
+	expr: [for v in l let y = v & !=2 {y + 0}] @test(eq, [1, 2], incorrect) @test(err:todo, p=2, code=eval, contains="out of bound")
+}
+// A let inside a definition is reached only through an instance of it. Its
+// field conflicts with the default of a disjunction, and the referrer reads a
+// list in which that field sits several levels down, in an interpolation. The
+// error is reported on the definition as well, whose lets are evaluated like
+// those of any other struct.
+issue4510: letInDefinition: {
+	#Resources: {
+		scaling: limits: memory: float | *1.0
+		block: limits: memory: "\(2 * scaling.limits.memory)Mi"
+		patch: [{value: block}]
+	}
+	#Config: {
+		let r = #Resources & {scaling: limits: memory: 2}
+		patches: r.patch
+	}
+	err: #Config @test(eq, {patches: [{value: {limits: {memory: "4Mi"}}}]}, incorrect) @test(err:todo, p=1, at=patches[0].value.limits.memory, code=eval, suberr=(contains="conflicting values 2 and 1.0"), suberr=(contains="conflicting values 2 and float"))
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  53
-Reused: 43
-Allocs: 14
+Leaks:  48
+Freed:  250
+Reused: 227
+Allocs: 71
 Retain: 0
 
-Unifications: 43
-Conjuncts:    82
-Disjuncts:    10
+Unifications: 242
+Conjuncts:    469
+Disjuncts:    34
 
-NumCloseIDs: 13
+NumCloseIDs: 69
 -- out/errors.txt --
 [eval] x: conflicting values 1 and 2:
-    ./in.cue:2:14
-    ./in.cue:4:8
-    ./in.cue:8:8
-    ./in.cue:8:18
+    ./in.cue:4:14
+    ./in.cue:6:8
+    ./in.cue:10:8
+    ./in.cue:10:18
 [incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
-    ./in.cue:15:8
+    ./in.cue:17:8
 [eval] x: conflicting values "2" and "invalid":
-    ./in.cue:12:14
-    ./in.cue:14:8
-    ./in.cue:18:8
-    ./in.cue:18:18
+    ./in.cue:14:14
+    ./in.cue:16:8
+    ./in.cue:20:8
+    ./in.cue:20:18
 x: conflicting values "3" and "invalid":
-    ./in.cue:12:20
-    ./in.cue:14:8
-    ./in.cue:18:8
-    ./in.cue:18:18
+    ./in.cue:14:20
+    ./in.cue:16:8
+    ./in.cue:20:8
+    ./in.cue:20:18
 x: conflicting values "4" and "invalid":
-    ./in.cue:12:26
-    ./in.cue:14:8
-    ./in.cue:18:8
-    ./in.cue:18:18
+    ./in.cue:14:26
+    ./in.cue:16:8
+    ./in.cue:20:8
+    ./in.cue:20:18
 x: 3 errors in empty disjunction::
-    ./in.cue:15:8
+    ./in.cue:17:8
 [eval] x: conflicting values 2 and 1:
-    ./in.cue:25:14
-    ./in.cue:27:8
-    ./in.cue:31:8
-    ./in.cue:31:19
+    ./in.cue:27:14
+    ./in.cue:29:8
+    ./in.cue:33:8
+    ./in.cue:33:19
 x: conflicting values 4 and 1:
-    ./in.cue:25:14
-    ./in.cue:27:8
-    ./in.cue:31:8
-    ./in.cue:31:23
+    ./in.cue:27:14
+    ./in.cue:29:8
+    ./in.cue:33:8
+    ./in.cue:33:23
 x: 2 errors in empty disjunction::
-    ./in.cue:28:8
+    ./in.cue:30:8
+[incomplete] issue4510.inline.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:64:8
+    ./in.cue:63:17
+[incomplete] issue4510.let.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:79:8
+    ./in.cue:78:17
+[incomplete] issue4510.regexp.#C.out: invalid interpolation: non-concrete value =~"^a" (type string):
+    ./in.cue:87:8
+    ./in.cue:86:8
+[incomplete] issue4510.builtin.#C.out: invalid interpolation: non-concrete value strings.MaxRunes(2) (type string):
+    ./in.cue:94:8
+    ./in.cue:93:8
+[incomplete] issue4510.disjunct.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:111:8
+    ./in.cue:110:17
+[eval] issue4510.disjunct.errConflict: 2 errors in empty disjunction:
+issue4510.disjunct.errConflict: conflicting values 12 and string (mismatched types int and string):
+    ./in.cue:122:8
+    ./in.cue:125:15
+    ./in.cue:125:43
+x: conflicting values 1 and 2:
+    ./in.cue:119:6
+    ./in.cue:121:8
+    ./in.cue:125:16
+    ./in.cue:125:26
+[incomplete] issue4510.binop.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:132:8
+    ./in.cue:131:17
+[eval] x: conflicting values 1 and 2:
+    ./in.cue:139:6
+    ./in.cue:141:8
+    ./in.cue:144:16
+    ./in.cue:144:26
+[incomplete] issue4510.consumers.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:151:8
+    ./in.cue:150:17
+[eval] issue4510.compLet.errList.1: invalid value 2 (out of bound !=2):
+    ./in.cue:180:35
+    ./in.cue:179:9
+    ./in.cue:180:48
+[eval] issue4510.compLet.errField.k2: invalid value 2 (out of bound !=2):
+    ./in.cue:181:36
+    ./in.cue:179:9
+    ./in.cue:181:59

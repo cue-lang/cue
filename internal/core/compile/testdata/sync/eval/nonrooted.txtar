@@ -4,6 +4,8 @@
 # that creates a conflict detectable from the root.
 # https://cuelang.org/issue/3977
 -- in.cue --
+import "strings"
+
 issue3977: inlineExpr: {
 	#NetworkID: 1
 	#fn: {
@@ -50,6 +52,150 @@ issue3977: inlineLet: {
 	}
 
 	err: p.out
+}
+
+// A scalar of an inline struct, struct literal, or let that is read through an
+// interpolation is checked against all its validators, not only its bounds.
+// https://cuelang.org/issue/4510
+issue4510: inline: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	ok:  (#C & {id: "other"}).out
+	err: (#C & {id: "storage"}).out
+}
+issue4510: literal: {
+	err: {
+		id:  string & !="storage"
+		id:  "storage"
+		out: "k/\(id)"
+	}.out
+}
+issue4510: let: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	let L = #C & {id: "storage"}
+	err: L.out
+}
+issue4510: regexp: {
+	#C: {
+		id:  =~"^a"
+		out: "k/\(id)"
+	}
+	err: (#C & {id: "b"}).out
+}
+issue4510: builtin: {
+	#C: {
+		id:  strings.MaxRunes(2)
+		out: "k/\(id)"
+	}
+	err: (#C & {id: "abc"}).out
+}
+// A validator of the read scalar may refer to the reading field: it is checked
+// once that field has its value, as it would be for a regular field.
+issue4510: selfRef: {
+	ok1: ({x: 1 & !=ok1, out: x + 1}).out
+	let L = {x: 1 & !=ok2, out: x + 1}
+	ok2: L.out
+	err: ({x: 1 & !=err, out: x + 0}).out
+}
+// The reading field may be a disjunction, in which case each disjunct checks
+// the read scalar on its own.
+issue4510: disjunct: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	ok:  (#C & {id: "other"}).out & (string | int)
+	err: (#C & {id: "storage"}).out & (string | int)
+
+	let L = #C & {id: "storage"}
+	errLet: L.out & (*"k/storage" | string)
+
+	#N: 1
+	#fn: {
+		x:   #N
+		out: x + 10
+	}
+	okConflict:  (#fn & {x: 1}).out & (int | string)
+	errConflict: (#fn & {x: 2}).out & (int | string)
+}
+// The reading task may belong to a nested internal node, as when the read
+// value feeds an expression. The rooted field completes the read node then too.
+issue4510: binop: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	err: (#C & {id: "storage"}).out + "y"
+
+	let L = #C & {id: "storage"}
+	errLet: L.out + "y"
+
+	#N: 1
+	#fn: {
+		x:   #N
+		out: x + 10
+	}
+	errConflict: (#fn & {x: 2}).out + 1
+}
+// The read scalar may be consumed by a builtin call, whose argument is read
+// with its tasks already finished, or be a default that is then eliminated.
+issue4510: consumers: {
+	#C: {
+		id:  string & !="storage"
+		out: "k/\(id)"
+	}
+	errBuiltin: strings.ToUpper((#C & {id: "storage"}).out)
+
+	errLen: len((#C & {id: "storage"}).out)
+
+	errArith: ({x: 1 & !=1, out: x + 1}).out
+
+	fallback: *(#C & {id: "storage"}).out | "fallback"
+}
+// A disjunct that fails on its own value must not complete the deferred nodes,
+// which it shares with the other disjuncts: a validator among them that refers
+// to the reading field would fail against the conflicting value, in any order
+// of the disjuncts.
+issue4510: disjunctOrder: {
+	ok1: ({x: 1 & !=ok1, out: x + 1}).out & (string | int)
+	ok2: ({x: 1 & !=ok2, out: x + 1}).out & (int | string)
+
+	let L1 = {x: 1 & !=ok3, out: x + 1}
+	ok3: L1.out & (string | int)
+
+	let L2 = {x: 1 & !=ok4, out: x + 1}
+	ok4: L2.out & (int | string)
+}
+// A comprehension's let clause has no path of its own: its validators run
+// where its value is used, so the error reports that path. A clause only read
+// by an expression is not checked at all.
+issue4510: compLet: {
+	l: [1, 2]
+	errList: [for v in l let y = v & !=2 if y > 0 {y}]
+	errField: {for v in l let y = v & !=2 if y > 0 {"k\(v)": y}}
+	expr: [for v in l let y = v & !=2 {y + 0}]
+}
+// A let inside a definition is reached only through an instance of it. Its
+// field conflicts with the default of a disjunction, and the referrer reads a
+// list in which that field sits several levels down, in an interpolation. The
+// error is reported on the definition as well, whose lets are evaluated like
+// those of any other struct.
+issue4510: letInDefinition: {
+	#Resources: {
+		scaling: limits: memory: float | *1.0
+		block: limits: memory: "\(2 * scaling.limits.memory)Mi"
+		patch: [{value: block}]
+	}
+	#Config: {
+		let r = #Resources & {scaling: limits: memory: 2}
+		patches: r.patch
+	}
+	err: #Config
 }
 -- out/compile --
 --- in.cue
@@ -112,6 +258,230 @@ issue3977: inlineLet: {
         x: 2
       })
       err: 〈0;let p#1〉.out
+    }
+  }
+  issue4510: {
+    inline: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      ok: (〈0;#C〉 & {
+        id: "other"
+      }).out
+      err: (〈0;#C〉 & {
+        id: "storage"
+      }).out
+    }
+  }
+  issue4510: {
+    literal: {
+      err: {
+        id: (string & !="storage")
+        id: "storage"
+        out: "k/\(〈0;id〉)"
+      }.out
+    }
+  }
+  issue4510: {
+    let: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      let L#2 = (〈0;#C〉 & {
+        id: "storage"
+      })
+      err: 〈0;let L#2〉.out
+    }
+  }
+  issue4510: {
+    regexp: {
+      #C: {
+        id: =~"^a"
+        out: "k/\(〈0;id〉)"
+      }
+      err: (〈0;#C〉 & {
+        id: "b"
+      }).out
+    }
+  }
+  issue4510: {
+    builtin: {
+      #C: {
+        id: 〈import;strings〉.MaxRunes(2)
+        out: "k/\(〈0;id〉)"
+      }
+      err: (〈0;#C〉 & {
+        id: "abc"
+      }).out
+    }
+  }
+  issue4510: {
+    selfRef: {
+      ok1: {
+        x: (1 & !=〈1;ok1〉)
+        out: (〈0;x〉 + 1)
+      }.out
+      let L#3 = {
+        x: (1 & !=〈1;ok2〉)
+        out: (〈0;x〉 + 1)
+      }
+      ok2: 〈0;let L#3〉.out
+      err: {
+        x: (1 & !=〈1;err〉)
+        out: (〈0;x〉 + 0)
+      }.out
+    }
+  }
+  issue4510: {
+    disjunct: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      ok: ((〈0;#C〉 & {
+        id: "other"
+      }).out & (string|int))
+      err: ((〈0;#C〉 & {
+        id: "storage"
+      }).out & (string|int))
+      let L#4 = (〈0;#C〉 & {
+        id: "storage"
+      })
+      errLet: (〈0;let L#4〉.out & (*"k/storage"|string))
+      #N: 1
+      #fn: {
+        x: 〈1;#N〉
+        out: (〈0;x〉 + 10)
+      }
+      okConflict: ((〈0;#fn〉 & {
+        x: 1
+      }).out & (int|string))
+      errConflict: ((〈0;#fn〉 & {
+        x: 2
+      }).out & (int|string))
+    }
+  }
+  issue4510: {
+    binop: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      err: ((〈0;#C〉 & {
+        id: "storage"
+      }).out + "y")
+      let L#5 = (〈0;#C〉 & {
+        id: "storage"
+      })
+      errLet: (〈0;let L#5〉.out + "y")
+      #N: 1
+      #fn: {
+        x: 〈1;#N〉
+        out: (〈0;x〉 + 10)
+      }
+      errConflict: ((〈0;#fn〉 & {
+        x: 2
+      }).out + 1)
+    }
+  }
+  issue4510: {
+    consumers: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      errBuiltin: 〈import;strings〉.ToUpper((〈0;#C〉 & {
+        id: "storage"
+      }).out)
+      errLen: len((〈0;#C〉 & {
+        id: "storage"
+      }).out)
+      errArith: {
+        x: (1 & !=1)
+        out: (〈0;x〉 + 1)
+      }.out
+      fallback: (*(〈0;#C〉 & {
+        id: "storage"
+      }).out|"fallback")
+    }
+  }
+  issue4510: {
+    disjunctOrder: {
+      ok1: ({
+        x: (1 & !=〈1;ok1〉)
+        out: (〈0;x〉 + 1)
+      }.out & (string|int))
+      ok2: ({
+        x: (1 & !=〈1;ok2〉)
+        out: (〈0;x〉 + 1)
+      }.out & (int|string))
+      let L1#6 = {
+        x: (1 & !=〈1;ok3〉)
+        out: (〈0;x〉 + 1)
+      }
+      ok3: (〈0;let L1#6〉.out & (string|int))
+      let L2#7 = {
+        x: (1 & !=〈1;ok4〉)
+        out: (〈0;x〉 + 1)
+      }
+      ok4: (〈0;let L2#7〉.out & (int|string))
+    }
+  }
+  issue4510: {
+    compLet: {
+      l: [
+        1,
+        2,
+      ]
+      errList: [
+        for _, v in 〈1;l〉 let y = (〈0;v〉 & !=2) if (〈0;y〉 > 0) {
+          〈1;y〉
+        },
+      ]
+      errField: {
+        for _, v in 〈1;l〉 let y = (〈0;v〉 & !=2) if (〈0;y〉 > 0) {
+          "k\(〈2;v〉)": 〈1;y〉
+        }
+      }
+      expr: [
+        for _, v in 〈1;l〉 let y = (〈0;v〉 & !=2) {
+          (〈1;y〉 + 0)
+        },
+      ]
+    }
+  }
+  issue4510: {
+    letInDefinition: {
+      #Resources: {
+        scaling: {
+          limits: {
+            memory: (float|*1.0)
+          }
+        }
+        block: {
+          limits: {
+            memory: "\((2 * 〈2;scaling〉.limits.memory))Mi"
+          }
+        }
+        patch: [
+          {
+            value: 〈2;block〉
+          },
+        ]
+      }
+      #Config: {
+        let r#8 = (〈1;#Resources〉 & {
+          scaling: {
+            limits: {
+              memory: 2
+            }
+          }
+        })
+        patches: 〈0;let r#8〉.patch
+      }
+      err: 〈0;#Config〉
     }
   }
 }

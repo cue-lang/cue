@@ -32,6 +32,7 @@ var (
 	handleListLit           *runner
 	handleListVertex        *runner
 	handleDisjunctions      *runner
+	handleDeferred          *runner
 )
 
 // Use init to avoid a (spurious?) cyclic dependency in Go.
@@ -76,6 +77,16 @@ func init() {
 		f:         processDisjunctions,
 		completes: genericDisjunction,
 		priority:  1,
+	}
+	// handleDeferred completes an internal node whose value a task of this
+	// node read before all of its conjuncts were processed, see
+	// [OpContext.evalStateCI]. It runs after the other tasks, once this
+	// node's own value is known.
+	handleDeferred = &runner{
+		name:      "Deferred",
+		f:         processDeferred,
+		completes: allTasksCompleted,
+		priority:  2,
 	}
 }
 
@@ -520,5 +531,30 @@ func (n *nodeContext) updateListType(list Expr, id CloseInfo, isClosed bool, ell
 
 	if n.kind != ListKind {
 		n.updateNodeType(ListKind, list, id)
+	}
+}
+
+// processDeferred completes the internal node a task of this node read, see
+// [handleDeferred], and takes over its error.
+func processDeferred(ctx *OpContext, t *task, mode runMode) {
+	n := t.node
+	// An erroneous node, such as a disjunct whose own value conflicts, gains
+	// nothing from the error. The deferred node is not cloned per disjunct
+	// as the referrer's arcs are, so a validator in it that refers to this
+	// node would fail against the conflicting value and stick to the other
+	// disjuncts too. The cycle placeholder set while this node evaluates is
+	// not an error.
+	if n.errs != nil || n.node.IsErr() && !isCyclePlaceholder(n.node.BaseValue) {
+		return
+	}
+	v := t.x.(*Vertex)
+	// A vertex whose state was dropped before it was finalized, as by the
+	// close builtin, must not get a new one: that would schedule its
+	// conjuncts again.
+	if v.state != nil {
+		v.CompleteArcsShallow(ctx)
+	}
+	if b := v.Bottom(); b != nil {
+		ctx.AddBottom(b)
 	}
 }

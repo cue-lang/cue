@@ -58,7 +58,7 @@ issue3977: inlineLet: {
 		x: 2
 	}
 
-	err: p.out @test(eq, 12, incorrect) @test(err:todo, p=1, code=eval, contains="conflicting values", args=[1, 2])
+	err: p.out @test(err, code=eval, contains="conflicting values", args=[1, 2])
 }
 
 // A scalar of an inline struct, struct literal, or let that is read through an
@@ -85,7 +85,7 @@ issue4510: let: {
 		out: "k/\(id)"
 	}
 	let L = #C & {id: "storage"}
-	err: L.out @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	err: L.out @test(err, code=eval, contains="out of bound")
 }
 issue4510: regexp: {
 	#C: {
@@ -117,10 +117,10 @@ issue4510: disjunct: {
 		out: "k/\(id)"
 	}
 	ok:  (#C & {id: "other"}).out & (string | int)   @test(eq, "k/other")
-	err: (#C & {id: "storage"}).out & (string | int) @test(err, code=eval, suberr=(contains="out of bound"), suberr=(contains="empty disjunction"), suberr=(contains="mismatched types"))
+	err: (#C & {id: "storage"}).out & (string | int) @test(err, code=eval, suberr=(contains="out of bound"), suberr=(contains="mismatched types"))
 
 	let L = #C & {id: "storage"}
-	errLet: L.out & (*"k/storage" | string) @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	errLet: L.out & (*"k/storage" | string) @test(err, code=eval, contains="out of bound")
 
 	#N: 1
 	#fn: {
@@ -128,7 +128,7 @@ issue4510: disjunct: {
 		out: x + 10
 	}
 	okConflict:  (#fn & {x: 1}).out & (int | string) @test(eq, 11)
-	errConflict: (#fn & {x: 2}).out & (int | string) @test(err, code=eval, suberr=(contains="conflicting values 1 and 2"), suberr=(contains="empty disjunction"), suberr=(contains="mismatched types"))
+	errConflict: (#fn & {x: 2}).out & (int | string) @test(err, code=eval, suberr=(contains="conflicting values 1 and 2"), suberr=(contains="mismatched types"))
 }
 // The reading task may belong to a nested internal node, as when the read
 // value feeds an expression. The rooted field completes the read node then too.
@@ -140,7 +140,7 @@ issue4510: binop: {
 	err: (#C & {id: "storage"}).out + "y" @test(err, code=eval, contains="out of bound")
 
 	let L = #C & {id: "storage"}
-	errLet: L.out + "y" @test(eq, "k/storagey", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	errLet: L.out + "y" @test(err, code=eval, contains="out of bound")
 
 	#N: 1
 	#fn: {
@@ -202,20 +202,20 @@ issue4510: letInDefinition: {
 		let r = #Resources & {scaling: limits: memory: 2}
 		patches: r.patch
 	}
-	err: #Config @test(eq, {patches: [{value: {limits: {memory: "4Mi"}}}]}, incorrect) @test(err:todo, p=1, at=patches[0].value.limits.memory, code=eval, suberr=(contains="conflicting values 2 and 1.0"), suberr=(contains="conflicting values 2 and float"))
+	err: #Config @test(err, at=patches[0].value.limits.memory, code=eval, suberr=(contains="conflicting values 2 and 1.0"), suberr=(contains="conflicting values 2 and float"))
 }
 -- out/eval/stats --
-Leaks:  48
-Freed:  250
-Reused: 227
+Leaks:  47
+Freed:  253
+Reused: 229
 Allocs: 71
 Retain: 0
 
 Unifications: 242
-Conjuncts:    469
-Disjuncts:    34
+Conjuncts:    472
+Disjuncts:    36
 
-NumCloseIDs: 69
+NumCloseIDs: 70
 -- out/errors.txt --
 [eval] x: conflicting values 1 and 2:
     ./in.cue:4:14
@@ -224,7 +224,8 @@ NumCloseIDs: 69
     ./in.cue:10:18
 [incomplete] issue3977.inlineDisj1.#fn.out: invalid interpolation: unresolved disjunction "2" | "3" | "4" (type string):
     ./in.cue:17:8
-[eval] x: conflicting values "2" and "invalid":
+[eval] x: 3 errors in empty disjunction:
+x: conflicting values "2" and "invalid":
     ./in.cue:14:14
     ./in.cue:16:8
     ./in.cue:20:8
@@ -239,8 +240,6 @@ x: conflicting values "4" and "invalid":
     ./in.cue:16:8
     ./in.cue:20:8
     ./in.cue:20:18
-x: 3 errors in empty disjunction::
-    ./in.cue:17:8
 [eval] x: conflicting values 2 and 1:
     ./in.cue:27:14
     ./in.cue:29:8
@@ -253,6 +252,10 @@ x: conflicting values 4 and 1:
     ./in.cue:33:23
 x: 2 errors in empty disjunction::
     ./in.cue:30:8
+[eval] issue3977.inlineLet.p.x: conflicting values 1 and 2:
+    ./in.cue:47:14
+    ./in.cue:49:8
+    ./in.cue:52:6
 [incomplete] issue4510.inline.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:64:8
     ./in.cue:63:17
@@ -267,6 +270,10 @@ x: 2 errors in empty disjunction::
 [incomplete] issue4510.let.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:79:8
     ./in.cue:78:17
+[eval] issue4510.let.L.id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:78:17
+    ./in.cue:78:8
+    ./in.cue:81:20
 [incomplete] issue4510.regexp.#C.out: invalid interpolation: non-concrete value =~"^a" (type string):
     ./in.cue:87:8
     ./in.cue:86:8
@@ -295,6 +302,10 @@ id: invalid value "storage" (out of bound !="storage"):
     ./in.cue:110:17
     ./in.cue:110:8
     ./in.cue:114:18
+[eval] issue4510.disjunct.L.id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:110:17
+    ./in.cue:110:8
+    ./in.cue:116:20
 [eval] issue4510.disjunct.errConflict: 2 errors in empty disjunction:
 issue4510.disjunct.errConflict: conflicting values 12 and string (mismatched types int and string):
     ./in.cue:122:8
@@ -312,6 +323,10 @@ x: conflicting values 1 and 2:
     ./in.cue:131:17
     ./in.cue:131:8
     ./in.cue:134:18
+[eval] issue4510.binop.L.id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:131:17
+    ./in.cue:131:8
+    ./in.cue:136:20
 [eval] x: conflicting values 1 and 2:
     ./in.cue:139:6
     ./in.cue:141:8

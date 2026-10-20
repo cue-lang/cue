@@ -873,13 +873,6 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 		if arc == nil {
 			return nil, c.ci
 		}
-		// TODO(3977): register internal nodes for later verifications. The
-		// following limits the possibility of some common and useful cycles.
-		//
-		// if arc.Internal() {
-		//  mode := state.conditions()
-		//  state = final(partial, mode|allTasksCompleted)
-		// }
 		orig := arc
 		// TODO(deref): what is the right level of dereferencing here?
 		// DerefValue seems to work too.
@@ -954,9 +947,11 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 
 				v := c.evaluate(arc, x, state)
 
-				if arc.nonRooted && !allTasksFinished(s) {
-					if t := c.current(); t != nil {
-						t.node.deferred = append(t.node.deferred, s)
+				// A dynamic vertex itself is completed by whatever
+				// created it.
+				if arc.Internal() && !arc.IsDynamic && !allTasksFinished(s) {
+					if n := c.rootedTaskNode(); n != nil {
+						n.scheduleTask(handleDeferred, nil, arc, CloseInfo{})
 					}
 				}
 

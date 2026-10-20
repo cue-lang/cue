@@ -1138,9 +1138,8 @@ func (x *SelectorExpr) resolve(c *OpContext, state Flags) *Vertex {
 	if n == emptyNode {
 		return n
 	}
-	// TODO(eval): dynamic nodes should be fully evaluated here as the result
-	// will otherwise be discarded and there will be no other chance to check
-	// the struct is valid.
+	// The selected field is completed by the node reading it, see
+	// [handleDeferred]; the rest of the struct is discarded unchecked.
 
 	savedErrs := c.errs
 	c.errs = nil
@@ -1185,9 +1184,8 @@ func (x *IndexExpr) resolve(ctx *OpContext, state Flags) *Vertex {
 	if n == emptyNode {
 		return n
 	}
-	// TODO(eval): dynamic nodes should be fully evaluated here as the result
-	// will otherwise be discarded and there will be no other chance to check
-	// the struct is valid.
+	// The selected field is completed by the node reading it, see
+	// [handleDeferred]; the rest of the struct is discarded unchecked.
 
 	f := ctx.Label(x.Index, i)
 

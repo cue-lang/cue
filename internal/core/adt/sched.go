@@ -110,6 +110,24 @@ func (p *taskContext) current() *task {
 	return p.stack[len(p.stack)-1]
 }
 
+// rootedTaskNode returns the node of the innermost running task that is not
+// internal, or that of the current task when every running task is. Nothing
+// finalizes an internal node, so work deferred from its tasks is recorded on
+// the rooted node whose evaluation reached it. The exception is a field of a
+// let's copy, which runs with no rooted task when the referrer shares it: it
+// records the work on itself, and the referrer finalizes it.
+func (p *taskContext) rootedTaskNode() *nodeContext {
+	for _, t := range slices.Backward(p.stack) {
+		if !t.node.node.Internal() {
+			return t.node
+		}
+	}
+	if t := p.current(); t != nil {
+		return t.node
+	}
+	return nil
+}
+
 func (p *taskContext) pushTask(t *task) {
 	p.stack = append(p.stack, t)
 }
@@ -283,13 +301,6 @@ type scheduler struct {
 	// freed and recycled for a wait on another scheduler. Readers must check
 	// that a task is still blocked on this scheduler.
 	blocking []*task
-
-	// deferred tracks nodes that were not completed during computation and that
-	// still need to be finalized. This is especially important for inline
-	// structs, which may not be included in the output and thus the errors
-	// would never be discovered. But it is also important for models where we
-	// only do partial evaluation.
-	deferred []*nodeContext
 }
 
 func (s *scheduler) clear() {
@@ -321,7 +332,6 @@ func (s *scheduler) clear() {
 		tasks:       s.tasks[:0],
 		parentTasks: s.parentTasks[:0],
 		blocking:    s.blocking[:0],
-		deferred:    s.deferred[:0],
 	}
 }
 
@@ -1163,15 +1173,8 @@ func runTask(t *task, mode runMode) {
 
 	t.run.f(ctx, t, mode)
 
-	// Clear context error so that it does not leak into deferred tasks.
+	// Take the context error now, so that a retry does not leave it behind.
 	errs := ctx.Err()
-
-	for _, d := range t.node.deferred {
-		d.node.CompleteArcsShallow(ctx)
-		if b, ok := d.node.BaseValue.(*Bottom); ok {
-			t.node.addBottom(b)
-		}
-	}
 
 	if t.retry {
 		// The task ran without effect but may succeed later; requeue it

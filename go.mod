@@ -12,7 +12,7 @@ require (
 	github.com/goccy/go-yaml v1.19.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
-	github.com/opencontainers/go-digest v1.0.1-0.20260914153615-3650f26df2a1
+	github.com/opencontainers/go-digest v1.0.1-0.20261015205711-63db54280247
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20261013103202-7c8a61a7a736

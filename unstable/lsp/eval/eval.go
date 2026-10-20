@@ -368,6 +368,12 @@ type ImportersFunc = func() []*Evaluator
 // the [embed.Embed] attributes that expanded to this package.
 type EmbeddersFunc = func() map[*Evaluator][]*embed.Embed
 
+// paramsName is the name of the hidden child of a function's
+// navigable through which the function's labeled parameters are
+// reached by name. Like every name starting with "__", it is never
+// reported by the graph API or offered as a completion.
+const paramsName = "__params"
+
 type Evaluator struct {
 	config Config
 	// pkgFrame is the top level (or root) lexical scope
@@ -518,6 +524,7 @@ func (e *Evaluator) Reset() {
 
 	for _, fe := range e.byFilename {
 		clear(fe.likelyUseOffsets)
+		clear(fe.labelOffsets)
 		clear(fe.importSpecNavigables)
 		fileFr := fe.newFrame(pkgFrame, fe.File, fileFramesNavigable)
 		fileFr.kind = DeclFile
@@ -686,6 +693,10 @@ type FileEvaluator struct {
 	// likely to reference imported packages. It is lazily populated by
 	// [FileEvaluator.findLikelyUseOffsets].
 	likelyUseOffsets map[string]useOffsets
+	// labelOffsets contains the file offsets of the parameter labels
+	// spelled like a given name. It is lazily populated by
+	// [FileEvaluator.findLabelOffsets].
+	labelOffsets map[string][]int
 	// importSpecNavigables contains entries for every import within this
 	// file. Within this file, all import specs that are of the
 	// same (canonical) import path, share the same
@@ -860,6 +871,11 @@ nextFrame:
 		fieldDecl, ok := fr.node.(*fieldDeclExpr)
 		inFieldDecl := ok && token.WithinInclusive(offset, fieldDecl.start, fieldDecl.end)
 		if inFieldDecl {
+			if fieldDecl.valueFrame.kind == DeclParam {
+				// A parameter's label and alias name the parameter; no
+				// field can take their place.
+				continue nextFrame
+			}
 			// Only make suggestions if we're really within the field key ident.
 			if keyIdent, ok := fieldDecl.key.(*ast.Ident); ok {
 				start := keyIdent.Pos()
@@ -924,9 +940,11 @@ nextFrame:
 				// with an ident. The first component must be resolvable
 				// lexically, the same as embeds.
 				suggestEmbedsFrom[fr] = embedCompletions
-				if len(p.components) == 2 {
+				_, inStruct := fr.node.(*ast.StructLit)
+				if len(p.components) == 2 && (inStruct || !fr.noFieldForm()) {
 					// This path only has 1 component, so we offer to
-					// switch it to a field.
+					// switch it to a field: a path embedded in a struct
+					// literal can always be one.
 					fieldCompletions := embedCompletions
 					fieldCompletions.Suffix = ": "
 					suggestFieldsFrom[fr.navigable] = fieldCompletions
@@ -964,11 +982,14 @@ nextFrame:
 			//
 			// The key thing here is the detection that we have a field
 			// decl to our left, and so injecting additional fields is
-			// sensible.
-			suggestFieldsFrom[fr.navigable] = Completion{
-				Start:  offset,
-				End:    offset,
-				Suffix: ": ",
+			// sensible. A parameter's label to our left is not a field
+			// decl.
+			if !ancestor.noFieldForm() {
+				suggestFieldsFrom[fr.navigable] = Completion{
+					Start:  offset,
+					End:    offset,
+					Suffix: ": ",
+				}
 			}
 			suggestEmbedsFrom[fr] = Completion{
 				Start: offset,
@@ -994,8 +1015,12 @@ nextFrame:
 
 		_, isFile := node.(*ast.File)
 		if isFile || isStruct {
-			// We must be between fields.
-			suggestFieldsFrom[fr.navigable] = Completion{Start: offset, End: offset}
+			// We must be between fields. The offset of the "{" itself
+			// precedes the struct, where a field is valid only if the
+			// struct's own value could start with one.
+			if !(isStruct && offset == s.Lbrace.Offset() && fr.noFieldForm()) {
+				suggestFieldsFrom[fr.navigable] = Completion{Start: offset, End: offset}
+			}
 		}
 	}
 
@@ -1100,6 +1125,9 @@ func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []
 		}
 	}
 
+	for _, nav := range navs {
+		nav.readLabels()
+	}
 	usages(navs)
 
 	exprs := make(map[ast.Node]struct{})
@@ -1124,6 +1152,165 @@ func (fe *FileEvaluator) UsagesForOffset(offset int, includeDefinitions bool) []
 	return slices.Collect(maps.Keys(exprs))
 }
 
+// readLabels finds and reads the parameter labels spelled like the
+// parameter n names, so that each records itself as a use of the
+// parameters it resolves to before the search for n's uses begins.
+// For a navigable that is not a labeled parameter it does nothing.
+//
+// Labels are found by spelling, in the files of n's package and, when
+// the field holding the function is exported (see
+// [navigable.exported]), in the files of every package importing it,
+// directly or through other packages. A label is read only where it
+// is found, so nothing else in those files is evaluated.
+func (n *navigable) readLabels() {
+	if n.name == "" || !slices.ContainsFunc(n.frames, func(fr *frame) bool { return fr.kind == DeclParam }) {
+		return
+	}
+	// The parameter's navigable is a child of the signature navigable,
+	// which is a child of the function's. The function's navigable is
+	// anonymous when the literal is written inline, as in a call of
+	// it: the field holding the function is then the nearest named
+	// ancestor.
+	fieldNav := n.parent.parent
+	for fieldNav.name == "" && fieldNav.parent != nil {
+		fieldNav = fieldNav.parent
+	}
+	exported := fieldNav.exported()
+	pkgs := newWorkqueue(n.evaluator)
+	for pkg := range pkgs.items() {
+		if exported {
+			pkgs.enqueue(pkg.config.PkgImporters()...)
+		}
+		for _, fe := range pkg.byFilename {
+			// Reading a label resolves its path, which records the use;
+			// the definitions themselves are not needed here.
+			for range fe.definitionsForOffset(fe.findLabelOffsets(n.name)...) {
+			}
+		}
+	}
+}
+
+// usageSearchRoot reports where the search for uses of n evaluates:
+// root is the navigable whose frames, and their descendants, the
+// search evaluates, and targets are the navigables from n up to, but
+// excluding, root, whose uses the search inspects. exported reports
+// whether n is reachable from the package root by field names, so
+// that packages importing this one may use it.
+//
+// The walk up from n stops at the transition from an unnamed navigable
+// to a named parent:
+//
+//	x: (({y: 6} & {y: int}).y + 1)
+//
+// For uses of the first y, it walks up until it finds the x navigable
+// binding, whose frames must all be evaluated.
+func (n *navigable) usageSearchRoot() (root *navigable, targets []*navigable, exported bool) {
+	pkgNav := n.evaluator.pkgFrame.navigable
+	var child *navigable
+	for parent := n; parent != nil; child, parent = parent, parent.parent {
+		if parent == pkgNav {
+			exported = true
+			if child != nil {
+				for _, fr := range n.frames {
+					if _, ok := fr.node.(*ast.ImportSpec); ok {
+						// We're looking for usages of an imported pkg
+						// within the current pkg. Imports do not
+						// automatically get re-exported by a package,
+						// so although we've reached the pkgNav, this
+						// import spec is not exported.
+						exported = false
+						break
+					}
+				}
+			}
+		}
+		root = parent
+		if child == nil {
+			continue
+		}
+		targets = append(targets, child)
+		if parent.name != "" && child.name == "" {
+			break
+		}
+	}
+	return root, targets, exported
+}
+
+// exported reports whether packages importing this one can use n:
+// whether n is reachable from the package root by field names, or
+// escapes, through a use that resolves to it or to a navigable on
+// its climb, into a navigable that is. It climbs as [usages] does,
+// from n and then from each navigable escaped into, and stops at the
+// first climb that reaches the package root. A climb that stops
+// short of the root evaluates the tree it stops at, to find the
+// uses; the root's tree is never evaluated.
+func (n *navigable) exported() bool {
+	navsWorkqueue := newWorkqueue(n)
+
+	traversedNavs := make(map[*navigable]struct{})
+	evaluatedNavs := make(map[*navigable]struct{})
+
+	for nav := range navsWorkqueue.items() {
+		if _, seen := traversedNavs[nav]; seen {
+			continue
+		}
+		traversedNavs[nav] = struct{}{}
+
+		root, targetNavs, isExported := nav.usageSearchRoot()
+		if isExported {
+			return true
+		}
+		for _, target := range targetNavs {
+			traversedNavs[target] = struct{}{}
+		}
+		root.evalTree(evaluatedNavs)
+		for _, target := range targetNavs {
+			navsWorkqueue.enqueueSeq(target.escapesInto())
+		}
+	}
+	return false
+}
+
+// evalTree evaluates n's frames and their descendants, except those
+// in embedded packages, skipping the navigables in evaluated and
+// adding to it each one it evaluates.
+//
+// An embedded package, such as a json file, is assumed not to support
+// references, so evaluating it cannot find a use of anything: skipping
+// it avoids evaluating an enormous json file for nothing.
+func (n *navigable) evalTree(evaluated map[*navigable]struct{}) {
+	evalWorkqueue := newWorkqueue(n)
+	for nav := range evalWorkqueue.items() {
+		if _, seen := evaluated[nav]; seen {
+			continue
+		}
+		evaluated[nav] = struct{}{}
+		if nav.evaluator.config.PackageIsEmbedded {
+			continue
+		}
+		nav.eval()
+		for _, fr := range nav.frames {
+			for _, childFr := range fr.childFrames {
+				evalWorkqueue.enqueue(childFr.navigable)
+			}
+		}
+	}
+}
+
+// escapesInto reports the navigables n escapes into: those of the
+// uses of n that resolve to it, as an embedding does. A use through
+// which no path reaches n, such as x in x: n + 1, does not count: the
+// search for n's uses need not go on to the uses of x.
+func (n *navigable) escapesInto() iter.Seq[*navigable] {
+	return func(yield func(*navigable) bool) {
+		for _, use := range n.usedBy {
+			if _, found := use.navigable.resolvesTo[n]; found && !yield(use.navigable) {
+				return
+			}
+		}
+	}
+}
+
 // usages attempts to discover all uses of the given navs whilst doing
 // as little work as possible.
 func usages(navsWorklist []*navigable) {
@@ -1141,75 +1328,14 @@ func usages(navsWorklist []*navigable) {
 		// We're going to have to evaluate everything in nav.frames. But
 		// we might need to evaluate frames from the ancestors of nav
 		// too.
-		isExported := false
-		var targetNavs []*navigable
-		var evalWorkqueue *workqueue[*navigable]
-		{
-			pkgNav := nav.evaluator.pkgFrame.navigable
-			var child *navigable
-			for parent := nav; parent != nil; child, parent = parent, parent.parent {
-				if parent == pkgNav {
-					isExported = true
-					if child != nil {
-						for _, fr := range nav.frames {
-							if _, ok := fr.node.(*ast.ImportSpec); ok {
-								// We're looking for usages of an imported pkg
-								// within the current pkg. Imports do not
-								// automatically get re-exported by a package,
-								// so although we've reached the pkgNav, this
-								// import spec is not exported.
-								isExported = false
-								break
-							}
-						}
-					}
-				}
-				evalWorkqueue = newWorkqueue(parent)
-				if child == nil {
-					continue
-				}
-				// Because each nav has a role to play as a parent and
-				// then a child, we only add navs to the traversedNavs
-				// set once they've played both roles.
-				traversedNavs[child] = struct{}{}
-				targetNavs = append(targetNavs, child)
-				if parent.name != "" && child.name == "" {
-					// The transition from an unnamed child nav to a named
-					// parent nav is the place to stop.
-					//
-					//	x: (({y: 6} & {y: int}).y + 1)
-					//
-					// If the user is asking for usages of the first y, we
-					// must walk up until we find the x navigable binding
-					// and evaluate all its frames.
-					break
-				}
-			}
+		root, targetNavs, isExported := nav.usageSearchRoot()
+		// Because each nav has a role to play as a parent and then a
+		// child, we only add navs to the traversedNavs set once
+		// they've played both roles.
+		for _, target := range targetNavs {
+			traversedNavs[target] = struct{}{}
 		}
-
-		for nav := range evalWorkqueue.items() {
-			if _, seen := evaluatedNavs[nav]; seen {
-				continue
-			}
-			evaluatedNavs[nav] = struct{}{}
-
-			// If this nav's evaluator is embedded, we assume it does not
-			// support references, (e.g. json) and so there's no point
-			// evaluating it, because doing so cannot possibly find any
-			// uses of the targetNavs. This massively reduces the amount
-			// of evaluation done for enormous json files, for example
-			// (without this, we'd evaluate the entire json file for no
-			// reason).
-			if nav.evaluator.config.PackageIsEmbedded {
-				continue
-			}
-			nav.eval()
-			for _, fr := range nav.frames {
-				for _, childFr := range fr.childFrames {
-					evalWorkqueue.enqueue(childFr.navigable)
-				}
-			}
-		}
+		root.evalTree(evaluatedNavs)
 
 		// We must evaluate every frame (and consider their ancestors
 		// for evaluation) that uses any navigable in targetNavs.
@@ -1226,16 +1352,7 @@ func usages(navsWorklist []*navigable) {
 		// escaped from the in-line struct and so at least some of x's
 		// ancestors must now be evaluated.
 		for _, target := range targetNavs {
-			for _, use := range target.usedBy {
-				// Only if the use of target is basically an embedding
-				// (i.e. appears in resolvesTo) do we need to go
-				// further. So for example, when inspecting the uses of y,
-				// if we found x: y + 1 we would not then need to inspect
-				// the uses of x.
-				if _, found := use.navigable.resolvesTo[target]; found {
-					navsWorkqueue.enqueue(use.navigable)
-				}
-			}
+			navsWorkqueue.enqueueSeq(target.escapesInto())
 		}
 
 		if isExported {
@@ -1292,10 +1409,12 @@ func (fe *FileEvaluator) definitionsForOffset(offsets ...int) iter.Seq[*navigabl
 // searching for uses of the given name. It returns their offsets.
 //
 // It cuts out some subtrees: where a field definition label matches
-// the given name, or where a let- or for-clause creates a binding for
-// the given name. Thus the intention is to return offsets that are
-// for idents which match the given name, and are unlikely to resolve
-// to other fields. This is approximate and false positives will
+// the given name, or where a let clause, a for clause or a function
+// literal's parameter creates a binding for the given name. Parameter
+// labels and aliases name parameters rather than use a name, and are
+// left out. Thus the intention is to return offsets that are for
+// idents which match the given name, and are unlikely to resolve to
+// other fields. This is approximate and false positives will
 // definitely be returned, but it's a single fast pass over the AST.
 func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
 	likelyUseOffsets := fe.likelyUseOffsets
@@ -1306,7 +1425,8 @@ func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
 
 	offsets, found := likelyUseOffsets[name]
 	if !found {
-		ast.Walk(fe.File, func(n ast.Node) bool {
+		var visit func(n ast.Node) bool
+		visit = func(n ast.Node) bool {
 			switch n := n.(type) {
 			case *ast.ImportSpec:
 				if nameIdent := n.Name; nameIdent != nil && nameIdent.Name == name {
@@ -1334,14 +1454,64 @@ func (fe *FileEvaluator) findLikelyUseOffsets(name string) useOffsets {
 				if n.Value != nil && n.Value.Name == name {
 					return false
 				}
+			case *ast.Func:
+				// A parameter binds its local name (its alias when
+				// present and not blank, otherwise its label) throughout
+				// the literal, as a let clause binds its name.
+				for _, param := range n.Parameters() {
+					local, _ := param.Label.(*ast.Ident)
+					if alias := param.Alias; alias != nil && isNonBlank(alias.Field) {
+						local = alias.Field
+					}
+					if isNonBlank(local) && local.Name == name {
+						return false
+					}
+				}
+			case *ast.FuncParam:
+				// The label and alias name the parameter; only the
+				// constraint and the default can use name.
+				for _, expr := range []ast.Expr{n.Value, n.Default} {
+					if expr != nil {
+						ast.Walk(expr, visit, nil)
+					}
+				}
+				return false
 			case *ast.Ident:
 				if n.Name == name {
 					offsets.idents = append(offsets.idents, n.Pos().Offset())
 				}
 			}
 			return true
-		}, nil)
+		}
+		ast.Walk(fe.File, visit, nil)
 		likelyUseOffsets[name] = offsets
+	}
+
+	return offsets
+}
+
+// findLabelOffsets walks the file's syntax for the parameter labels
+// spelled like the given name, and returns their offsets. Unlike
+// [FileEvaluator.findLikelyUseOffsets], it prunes nothing: a label
+// names a parameter by spelling, whatever is in scope around it.
+func (fe *FileEvaluator) findLabelOffsets(name string) []int {
+	labelOffsets := fe.labelOffsets
+	if labelOffsets == nil {
+		labelOffsets = make(map[string][]int)
+		fe.labelOffsets = labelOffsets
+	}
+
+	offsets, found := labelOffsets[name]
+	if !found {
+		ast.Walk(fe.File, func(n ast.Node) bool {
+			if n, ok := n.(*ast.FuncParam); ok {
+				if label, ok := n.Label.(*ast.Ident); ok && label.Name == name {
+					offsets = append(offsets, label.Pos().Offset())
+				}
+			}
+			return true
+		}, nil)
+		labelOffsets[name] = offsets
 	}
 
 	return offsets
@@ -1742,6 +1912,11 @@ type frame struct {
 	// recording it, the evaluator makes no use of optionality: `x?: v`
 	// declares `x` exactly as `x: v` does.
 	constraint Constraint
+	// signature marks the frame of a function literal's signature: the
+	// scope binding the literal's parameters, whose child frames
+	// evaluate the parameters' constraints and defaults, the result
+	// type and the body.
+	signature bool
 	// parent is the parent frame.
 	parent *frame
 	// childFrames contains every frame that is a child of this
@@ -1832,6 +2007,21 @@ func (f *frame) isFileFrame() bool {
 	return f.fileEvaluator == nil || f.parent == f.fileEvaluator.evaluator.pkgFrame
 }
 
+// noFieldForm reports whether no field form (a completion such as
+// "port: ") may be offered at the start of the frame's value or in
+// place of it. A field form is valid only where the code unifies the
+// value with the struct holding the field. The parts of a function
+// literal are not: a parameter's constraint or default, the result
+// type and the body are expressions that a field cannot start, and
+// nor can an operand of a conjunction, disjunction or default marker
+// within them.
+func (f *frame) noFieldForm() bool {
+	for f.parent != nil && f.embedded && (f.kind == DeclConjunct || f.kind == DeclDisjunct || f.kind == DeclDefault) {
+		f = f.parent
+	}
+	return f.parent != nil && f.parent.signature
+}
+
 // addRange records that the frame covers the range from the node's
 // start file-offset to its end file-offset. Because the AST is
 // non-recursive in a few areas (e.g. comprehensions), it's sometimes
@@ -1882,6 +2072,35 @@ func (f *frame) addUnknownRange(start, end int) {
 		f.unknownRanges = unknownRanges
 	}
 	unknownRanges.Add(start, end)
+}
+
+// addUnknownRangesBetweenChildren ensures that no completions will be
+// offered at the offsets within the frame's range that none of its
+// child frames covers: the syntax the frame models without a child
+// frame of its own. The ranges added never overlap a child frame's.
+// The frame's end offset, the position just after its syntax, is not
+// covered: it ends the value the frame is part of, where completions
+// are offered as after any value.
+func (f *frame) addUnknownRangesBetweenChildren() {
+	if !f.start.IsValid() || !f.end.IsValid() {
+		return
+	}
+	covered := rangeset.NewRangeSet()
+	for _, child := range f.childFrames {
+		if child.start.IsValid() && child.end.IsValid() {
+			covered.Add(child.start.Offset(), child.end.Offset()+1)
+		}
+	}
+	next := f.start.Offset()
+	for _, r := range covered.Ranges() {
+		if r.Start > next {
+			f.addUnknownRange(next, r.Start)
+		}
+		next = max(next, r.End)
+	}
+	if end := f.end.Offset(); next < end {
+		f.addUnknownRange(next, end)
+	}
 }
 
 // newFrame creates a new [frame] which is a child of the current
@@ -2206,10 +2425,75 @@ func (f *frame) eval() {
 				resolvable = append(resolvable, node.Fun)
 			}
 
+		case *ast.Func:
+			// A function literal is one lexical scope, the signature
+			// frame, binding its parameters under their local names. Its
+			// constraints, defaults, result type and body are evaluated in
+			// child frames of that scope, so a parameter name in any of
+			// them reaches the parameter. The signature frame's navigable
+			// is fresh and anonymous: a function has no fields, so
+			// nothing in the literal contributes to f's navigable.
+			sigFr := f.newFrame(nil, nil, false)
+			sigFr.signature = true
+			sigFr.addRange(node)
+			for _, param := range node.Parameters() {
+				sigFr.newParam(param)
+			}
+			if ret := node.Ret; ret != nil {
+				retFr := sigFr.newFrame(ret, nil, false)
+				if node.Arrow.IsValid() {
+					retFr.start = node.Arrow.Add(len("->"))
+				}
+			}
+			if body := node.Body; body != nil {
+				bodyFr := sigFr.newFrame(body, nil, false)
+				if node.Colon.IsValid() {
+					bodyFr.start = node.Colon.Add(1)
+				}
+			}
+			// Positions in the literal that none of its parts covers (the
+			// func, -> and : tokens, parentheses, commas, the = of a
+			// default, attributes) offer no completions.
+			sigFr.addUnknownRangesBetweenChildren()
+			// The function's navigable has a hidden __params child that
+			// resolves to the signature navigable of each of its
+			// literals, and, as [navigable.eval] links like-named
+			// children, to the __params of whatever the function unifies
+			// with. Call labels reach labeled parameters through it. The
+			// signature navigable resolves back to it, so that a name in
+			// the literal reaches the like-named parameter of every
+			// literal the function's value unifies it with, as a field's
+			// name reaches the field's other declarations; it stays
+			// anonymous so that the search for a parameter's uses stops at
+			// the function's navigable.
+			paramsNav := f.navigable.ensureNavigable(paramsName)
+			paramsNav.ensureResolvesTo([]*navigable{sigFr.navigable})
+			sigFr.navigable.ensureResolvesTo([]*navigable{paramsNav})
+
 		case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr:
 			embeddedResolvable = append(embeddedResolvable, node.(ast.Expr))
 
 		case *fieldDeclExpr:
+			if node.valueFrame.kind == DeclParam {
+				// A parameter's label and alias each name the parameter
+				// by its label in the signature navigable, which reaches
+				// the like-named parameters of the literals the function
+				// unifies with. A lexical lookup of the label would miss
+				// the parameter: for a~x only x is bound. A
+				// positional-only parameter has no name at call sites, so
+				// its alias names the parameter alone.
+				nav, name := node.valueFrame.navigable.parent, node.keyName
+				if name == "" {
+					nav = node.valueFrame.navigable
+				}
+				if key := node.key; key != nil {
+					f.newPathRootedAt(key, nav, name, node.valueFrame)
+				}
+				if alias := node.valueAliasIdent; alias != nil {
+					f.newPathRootedAt(alias, nav, name, node.valueFrame)
+				}
+				break
+			}
 			if key := node.key; key != nil && !strings.HasPrefix(node.keyName, "__") {
 				f.newPathFromAncestralNames(key, node.keyName)
 			}
@@ -2612,6 +2896,114 @@ func isNonBlank(ident *ast.Ident) bool {
 	return ident != nil && ident.Name != "_"
 }
 
+// newParam creates the frames that model a function parameter under
+// the signature frame f: the parameter's own frame, which evaluates
+// its constraint, a key frame for its label and alias, and a frame for
+// its default, which is not part of the parameter's value. A labeled
+// parameter's navigable is the child of f's navigable named by the
+// label, so that call sites can reach it by name; a positional-only
+// or anonymous parameter gets a fresh anonymous navigable. The
+// parameter's local name (its alias when present and not blank,
+// otherwise its label when not blank) is bound in f.
+func (f *frame) newParam(param *ast.FuncParam) {
+	label, _ := param.Label.(*ast.Ident)
+	var alias *ast.Ident
+	if param.Alias != nil {
+		alias = param.Alias.Field
+	}
+
+	var nav *navigable
+	if isNonBlank(label) {
+		nav = f.navigable.ensureNavigable(label.Name)
+	}
+	paramFr := f.newFrame(param.Value, nav, false)
+	paramFr.kind = DeclParam
+	paramFr.label = param.Label
+	paramFr.constraint = constraintFromToken(param.Constraint)
+	paramFr.docsNode = param
+	if param.TokenPos.IsValid() {
+		paramFr.start = param.TokenPos.Add(1)
+	}
+	paramFr.attrs = append(paramFr.attrs, param.Attrs...)
+	for _, attr := range param.Attrs {
+		paramFr.addRange(attr)
+		// Attribute text is not CUE expression syntax: offer no
+		// completions within it.
+		paramFr.addUnknownRange(attr.Pos().Offset(), attr.End().Offset())
+	}
+
+	switch {
+	case isNonBlank(alias):
+		f.appendBinding(alias.Name, paramFr)
+	case isNonBlank(label):
+		f.appendBinding(label.Name, paramFr)
+	}
+
+	if def := param.Default; def != nil {
+		defFr := f.newFrame(def, nil, false)
+		if param.Equal.IsValid() {
+			defFr.start = param.Equal.Add(1)
+		}
+	}
+
+	decl := &fieldDeclExpr{
+		label:      param.Label,
+		valueFrame: paramFr,
+	}
+	if isNonBlank(label) {
+		paramFr.key = label
+		decl.key = label
+		decl.keyName = label.Name
+	}
+	if isNonBlank(alias) {
+		if paramFr.key == nil {
+			paramFr.key = alias
+		}
+		decl.valueAliasIdent = alias
+	}
+	if param.Label == nil && param.Alias == nil {
+		// An anonymous parameter has no key syntax.
+		return
+	}
+	// The key frame spans the label and alias, up to the colon. A blank
+	// label or alias names nothing, but is still the parameter's key
+	// syntax.
+	if param.Label != nil {
+		decl.start = param.Label.Pos()
+		decl.end = param.Label.End()
+	} else {
+		decl.start = param.Alias.Pos()
+	}
+	if param.Alias != nil {
+		decl.end = param.Alias.End()
+	}
+	if param.TokenPos.IsValid() {
+		decl.end = param.TokenPos
+	}
+	paramFr.keyFrame = f.newFrame(decl, nil, false)
+}
+
+// newPathRootedAt adds to the frame's childPaths a path for the key of
+// a declaration, in place of the lexical lookup of
+// [frame.newPathFromAncestralNames]: the path looks name up in nav,
+// or, when name is empty, resolves to nav itself. The path is
+// attributed to valueFrame, as a field's key path is.
+func (f *frame) newPathRootedAt(key ast.Node, nav *navigable, name string, valueFrame *frame) {
+	p := &path{
+		frame: valueFrame,
+		components: []pathComponent{{
+			name:       name,
+			node:       key,
+			start:      key.Pos(),
+			end:        key.End(),
+			unexpanded: []*navigable{nav},
+		}, {
+			node: key,
+		}},
+	}
+	f.childPaths = append(f.childPaths, p)
+}
+
 // newBinding creates and returns a new [frame], and stores it under
 // the given name in the current frame only.
 func (f *frame) newBinding(key *ast.Ident, unprocessed ast.Node) *frame {
@@ -2960,8 +3352,9 @@ func (n *frame) docComments() []*ast.CommentGroup {
 }
 
 // fieldDeclExpr models all the different possible parts of a field
-// declaration label in a more readily accessible form than the AST
-// itself.
+// declaration label, or of a function parameter's label and alias, in
+// a more readily accessible form than the AST itself. The kind of the
+// valueFrame tells the two apart.
 type fieldDeclExpr struct {
 	// Always nil: make the struct implement [ast.Node]
 	ast.Node

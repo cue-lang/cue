@@ -34,6 +34,9 @@ type copier struct {
 	// d is the declaration whose syntax is being copied; references
 	// found within it are resolved via [eval.Decl.Resolve].
 	d *eval.Decl
+	// verbatim is set while copying the inside of a function literal,
+	// whose references are copied as written rather than inlined.
+	verbatim bool
 }
 
 var (
@@ -41,6 +44,7 @@ var (
 	identType     = reflect.TypeFor[ast.Ident]()
 	exprType      = reflect.TypeFor[ast.Expr]()
 	callExprType  = reflect.TypeFor[ast.CallExpr]()
+	funcType      = reflect.TypeFor[ast.Func]()
 	structLitType = reflect.TypeFor[ast.StructLit]()
 	listLitType   = reflect.TypeFor[ast.ListLit]()
 
@@ -125,6 +129,14 @@ func (c copier) value(owner reflect.Type, v reflect.Value) reflect.Value {
 			c.r.depth++
 			defer func() { c.r.depth-- }()
 		}
+		if t == funcType {
+			// A function literal renders as written: its parameters
+			// are names, not values, and its body is not a value until
+			// the function is called. Replacing the references inside
+			// it with what they refer to would show the reader a
+			// different function (`x * by` as `int * int`).
+			c.verbatim = true
+		}
 		out := reflect.New(t).Elem()
 		for i := range t.NumField() {
 			f := t.Field(i)
@@ -151,11 +163,12 @@ func (c copier) value(owner reflect.Type, v reflect.Value) reflect.Value {
 // expression position, where a reference can be replaced by what it
 // refers to; slots of any other static type (labels, binding idents,
 // a selector's Sel) hold names or declarations, which are copied as
-// written. The one expression slot that must not be inlined is a
-// call's callee: `f` names the function in `f(x)`, and replacing it
-// with the function value would be nonsense.
+// written. Two kinds of expression slot are not inlined either: a
+// call's callee, since `f` names the function in `f(x)`, and
+// replacing it with the function value would be nonsense; and every
+// slot inside a function literal (see [copier.verbatim]).
 func (c copier) slot(owner reflect.Type, field string, static reflect.Type, v reflect.Value) reflect.Value {
-	if static != exprType || v.IsNil() {
+	if static != exprType || v.IsNil() || c.verbatim {
 		return c.value(owner, v)
 	}
 	if owner == callExprType && field == "Fun" {

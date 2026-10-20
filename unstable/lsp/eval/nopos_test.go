@@ -63,9 +63,10 @@ func TestResolveWithoutPositions(t *testing.T) {
 	qt.Assert(t, qt.HasLen(yDecl.Resolve(ast.NewIdent("x")), 0))
 }
 
-// TestFuncArgsWithoutPositions checks how a reference resolves within
+// TestFuncArgsWithoutPositions pins that a reference resolves within
 // a function literal built with the deprecated [ast.Func.Args] field,
-// which the parser never produces.
+// which the parser never produces: the anonymous parameters it
+// synthesizes evaluate their constraints like any others.
 func TestFuncArgsWithoutPositions(t *testing.T) {
 	kRef := ast.NewIdent("k")
 	f := &ast.File{
@@ -92,5 +93,7 @@ func TestFuncArgsWithoutPositions(t *testing.T) {
 	}
 	qt.Assert(t, qt.IsNotNil(fDecl))
 
-	qt.Assert(t, qt.HasLen(fDecl.Resolve(kRef), 0))
+	ns := fDecl.Resolve(kRef)
+	qt.Assert(t, qt.HasLen(ns, 1))
+	qt.Assert(t, qt.Equals(ns[0], ev.Root().Field("k")))
 }

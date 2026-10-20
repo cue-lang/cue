@@ -1511,16 +1511,104 @@ s: {a: int}
 r: f("x", a: 1)
 `,
 			check: func(t *graphTest) {
-				fDecl := t.soleDecl(t.field("f"), eval.DeclField)
+				f := t.field("f")
+				fDecl := t.soleDecl(f, eval.DeclField)
 				fn := fDecl.Value().(*ast.Func)
 
-				// A function literal contributes no fields to its node.
-				t.checkFields(t.field("f"))
+				// A function literal contributes no fields to its node,
+				// and the link through which call sites reach its
+				// parameters is not a field either.
+				t.checkFields(f)
+				qt.Assert(t, qt.IsNil(f.Field("__params")))
 
-				// Neither the body's a nor the alias v at its
-				// declaration resolves.
-				t.checkResolve(fDecl, fn.Body)
-				t.checkResolve(fDecl, fn.Params[0].Alias.Field)
+				// The body's a resolves to the parameter a: a node named
+				// after the label, declared by a param Decl whose key and
+				// label are the label, whose value is the constraint, and
+				// which carries the parameter's doc comment.
+				resolved := fDecl.Resolve(fn.Body)
+				qt.Assert(t, qt.HasLen(resolved, 1))
+				aNode := resolved[0]
+				qt.Assert(t, qt.Equals(aNode.Name(), "a"))
+				aDecl := t.soleDecl(aNode, eval.DeclParam)
+				qt.Assert(t, qt.Equals(aDecl.Kind().String(), "param"))
+				qt.Assert(t, qt.IsFalse(aDecl.Kind().Embedded()))
+				t.checkKey(aDecl, "a @ main.cue:9")
+				qt.Assert(t, qt.Equals(aDecl.Label(), fn.Params[1].Label))
+				t.checkValue(aDecl, "int")
+				t.checkDocs(aDecl, "// a is returned.")
+				qt.Assert(t, qt.Equals(aDecl.Constraint(), eval.ConstraintRegular))
+				qt.Assert(t, qt.HasLen(aDecl.Attrs(), 0))
+				t.checkResolve(aDecl, aDecl.Key(), aNode)
+
+				// The alias v at its declaration resolves to the
+				// positional-only parameter: an anonymous node whose
+				// param Decl has the alias as its key and the blank
+				// label as its label.
+				resolved = fDecl.Resolve(fn.Params[0].Alias.Field)
+				qt.Assert(t, qt.HasLen(resolved, 1))
+				vNode := resolved[0]
+				qt.Assert(t, qt.Equals(vNode.Name(), ""))
+				vDecl := t.soleDecl(vNode, eval.DeclParam)
+				t.checkKey(vDecl, "v @ main.cue:7")
+				qt.Assert(t, qt.Equals(vDecl.Label(), fn.Params[0].Label))
+				t.checkValue(vDecl, "string")
+				t.checkDocs(vDecl, "")
+				t.checkResolve(vDecl, vDecl.Key(), vNode)
+
+				// The default is an inline expression of an anonymous
+				// node, reached by offset: it is not part of the
+				// parameter's value.
+				defaultOffset := fn.Params[0].Default.Pos().Offset()
+				defaultDecls := t.ev.ForFile("main.cue").DeclsForOffset(defaultOffset)
+				qt.Assert(t, qt.HasLen(defaultDecls, 1))
+				defaultDecl := defaultDecls[0]
+				qt.Assert(t, qt.Equals(defaultDecl.Kind(), eval.DeclExpression))
+				qt.Assert(t, qt.Equals(defaultDecl.Node().Name(), ""))
+				t.checkValue(defaultDecl, `""`)
+				qt.Assert(t, qt.Not(qt.Equals(defaultDecl.Node(), vNode)))
+
+				// A like-named struct field is an ordinary field
+				// declaration.
+				sA := t.field("s.a")
+				sADecl := t.soleDecl(sA, eval.DeclField)
+				t.checkKey(sADecl, "a @ main.cue:11")
+				t.checkValue(sADecl, "int")
+				qt.Assert(t, qt.Not(qt.Equals(sA, aNode)))
+			},
+		},
+
+		{
+			name: "Func_param_syntax_by_offset",
+			archive: `-- main.cue --
+@experiment(functions)
+
+package p
+
+f: func(_: bool, a: int @tag(x)) -> int: a
+`,
+			check: func(t *graphTest) {
+				fDecl := t.soleDecl(t.field("f"), eval.DeclField)
+				fn := fDecl.Value().(*ast.Func)
+				fe := t.ev.ForFile("main.cue")
+
+				// Every offset of a parameter's syntax, including its
+				// attributes, reports the parameter's declaration.
+				attr := fn.Params[1].Attrs[0]
+				decls := fe.DeclsForOffset(attr.Pos().Offset() + 1)
+				qt.Assert(t, qt.HasLen(decls, 1))
+				qt.Assert(t, qt.Equals(decls[0].Kind(), eval.DeclParam))
+				t.checkKey(decls[0], "a @ main.cue:5")
+				qt.Assert(t, qt.HasLen(decls[0].Attrs(), 1))
+				qt.Assert(t, qt.Equals(decls[0].Attrs()[0], attr))
+
+				// A blank label is the key syntax of a positional-only
+				// parameter, which has no key.
+				decls = fe.DeclsForOffset(fn.Params[0].Label.Pos().Offset())
+				qt.Assert(t, qt.HasLen(decls, 1))
+				qt.Assert(t, qt.Equals(decls[0].Kind(), eval.DeclParam))
+				qt.Assert(t, qt.IsNil(decls[0].Key()))
+				qt.Assert(t, qt.Equals(decls[0].Label(), fn.Params[0].Label))
+				t.checkValue(decls[0], "bool")
 			},
 		},
 	}.run(t)

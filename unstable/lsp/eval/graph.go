@@ -974,6 +974,16 @@ const (
 	// DeclEllipsis is an ellipsis declaration ("..." or "...T"),
 	// within either a struct or a list. See [Node.Ellipses].
 	DeclEllipsis
+
+	// DeclParam is a parameter of a function literal:
+	//
+	//	f: func(_~x: string = "", a: int) -> int: a
+	//
+	// The Decl's Value is the parameter's constraint, and its Key is the
+	// parameter's label, or its alias when the label is absent or blank.
+	// A parameter's node is named after its label when it has one, and
+	// is otherwise anonymous; it is not a field of any node.
+	DeclParam
 )
 
 // Embedded reports whether declarations of this kind are merged into
@@ -1036,6 +1046,8 @@ func (k DeclKind) String() string {
 		return "comprehension"
 	case DeclEllipsis:
 		return "ellipsis"
+	case DeclParam:
+		return "param"
 	}
 	return fmt.Sprintf("DeclKind(%d)", int(k))
 }
@@ -1081,9 +1093,14 @@ func (d *Decl) Key() ast.Node {
 // bracketed [string], so the actual pattern remains accessible; the
 // second pattern's Key and Label are both the label [int].
 //
-// Label returns nil for declarations that do not model a field
-// declaration (files, package clauses, imports, operands, ellipses,
-// ...), and for fields synthesized by the evaluator (list elements).
+// For a function parameter ([DeclParam]), Label is the label as
+// written, whatever its aliasing: _~v: int has the blank ident _ as
+// its Label and the alias ident v as its Key.
+//
+// Label returns nil for declarations that do not model a field or
+// parameter declaration (files, package clauses, imports, operands,
+// ellipses, ...), for anonymous parameters, and for fields synthesized
+// by the evaluator (list elements).
 func (d *Decl) Label() ast.Label {
 	return d.label
 }

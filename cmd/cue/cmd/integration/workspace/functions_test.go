@@ -106,10 +106,10 @@ n: strings.ByteAt(b: "abc", i: 0)
 		}
 
 		definitions := map[position][]string{
-			// The body's by.
-			fln("a/a.cue", 7, 2, "by"): {},
-			// The reference to factor in by's default.
-			fln("a/a.cue", 7, 1, "factor"): {},
+			// The body's by: the parameter.
+			fln("a/a.cue", 7, 2, "by"): {"a/a.cue:7:21"},
+			// The reference to factor in by's default: the field.
+			fln("a/a.cue", 7, 1, "factor"): {"a/a.cue:5:1"},
 			// The call label x.
 			fln("a/a.cue", 9, 1, "x"): {},
 			// The call label b of a standard library function.
@@ -120,10 +120,11 @@ n: strings.ByteAt(b: "abc", i: 0)
 		}
 
 		references := map[position][]string{
-			// The parameter x.
-			fln("a/a.cue", 7, 1, "x"): {},
-			// The field factor.
-			fln("a/a.cue", 5, 1, "factor"): {"a/a.cue:5:1"},
+			// The parameter x: its declaration and the body's x.
+			fln("a/a.cue", 7, 1, "x"): {"a/a.cue:7:13", "a/a.cue:7:47"},
+			// The field factor: its declaration and the default's
+			// reference.
+			fln("a/a.cue", 5, 1, "factor"): {"a/a.cue:5:1", "a/a.cue:7:31"},
 		}
 		for p, want := range references {
 			qt.Check(t, qt.DeepEquals(where(env.References(at(p))), want), qt.Commentf("references at %v", p))
@@ -166,12 +167,16 @@ n: strings.ByteAt(b: "abc", i: 0)
 			newName string
 		}
 		renameCases := map[rename][]string{
-			// The field factor.
-			{fln("a/a.cue", 5, 1, "factor"), "k"}: {"a/a.cue:5:1=k"},
-			// The body's b, which aliases the parameter labeled by.
-			{bodyB, "k"}: {},
-			// The reference to #Port in p's constraint.
-			{fln("d/d.cue", 6, 1, "#Port"), "#Number"}: {},
+			// The field factor: the declaration and the default's
+			// reference.
+			{fln("a/a.cue", 5, 1, "factor"), "k"}: {"a/a.cue:5:1=k", "a/a.cue:7:31=k"},
+			// The body's b, which aliases the parameter labeled by: the
+			// alias and the body change; the label by, and the field
+			// by, do not.
+			{bodyB, "k"}: {"b/b.cue:6:24=k", "b/b.cue:6:48=k"},
+			// The reference to #Port in p's constraint: the definition
+			// and the constraint.
+			{fln("d/d.cue", 6, 1, "#Port"), "#Number"}: {"d/d.cue:5:1=#Number", "d/d.cue:6:12=#Number"},
 		}
 		for r, want := range renameCases {
 			qt.Check(t, qt.DeepEquals(renames(r.from, r.newName), want), qt.Commentf("rename at %v", r.from))
@@ -182,8 +187,11 @@ n: strings.ByteAt(b: "abc", i: 0)
 			fln("a/a.cue", 9, 1, "x"): "",
 			// The call label b of a standard library function.
 			fln("e/e.cue", 7, 1, "b"): "",
-			// The documented parameter a, at its declaration.
-			fln("c/c.cue", 9, 1, "a"): "",
+			// The documented parameter a, at its declaration: its doc
+			// comment, as at a field's declaration.
+			fln("c/c.cue", 9, 1, "a"): fmt.Sprintf(`
+a is returned.
+([c.cue line 9](%s/c/c.cue#L9))`[1:], rootURI),
 		}
 		for p, want := range hovers {
 			got, _ := env.Hover(at(p))

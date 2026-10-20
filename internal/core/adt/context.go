@@ -219,6 +219,18 @@ type OpContext struct {
 	capturesCompared map[captureKey]bool
 	dataPairs        map[[2]*Vertex]bool
 
+	// funcTypeDepth counts the function types being compared as parameters
+	// or results of other function types, which bounds that recursion. See
+	// [OpContext.funcTypeAdmits].
+	funcTypeDepth int
+
+	// funcTypePairs records the outcome of each pair of function types
+	// compared during one outermost comparison, and funcTypeActive the pairs
+	// of literals being compared, which a nested comparison of the same
+	// literals takes to admit. See [OpContext.funcTypeAdmits].
+	funcTypePairs  map[[2]FuncType]bool
+	funcTypeActive map[[2]*Function]bool
+
 	// checkingDefaults tracks the function literals, per closure, whose
 	// declared parameter defaults are being checked against their constraints
 	// (see [Function.checkDefaults]). The check runs outside any call, so a

@@ -727,6 +727,8 @@ func (c *OpContext) kindCovers(k Kind, env *Environment, b Expr) bool {
 //     some value of each of its kinds. Any other constraint must be shown to
 //     by a witness, as below, or for a struct or list by its fields or
 //     elements (see [OpContext.admitsKind]).
+//   - Two function types compare as function types (see
+//     [OpContext.funcTypeAdmits]).
 //   - For two structs, a refutes b on a regular field both declare that no
 //     other part of b refers to (see [OpContext.correlatedFields]).
 //   - For two lists, a refutes b on an element at the same index or on an
@@ -789,6 +791,10 @@ func (c *OpContext) refutes(a, b Value) bool {
 	case *Top, *BasicType:
 		return false // a admits every value of its kinds
 	case *FuncValue:
+		if y, ok := b.(*FuncValue); ok {
+			ok, decided := c.funcTypeAdmits(x, y)
+			return decided && !ok
+		}
 		return false
 	case *Vertex:
 		if y, ok := b.(*Vertex); ok {
@@ -1355,6 +1361,94 @@ func witnessCandidates(a, b Value) []Value {
 		add(&Bytes{B: []byte(s)})
 	}
 	return ws
+}
+
+// maxFuncTypeDepth bounds how deeply function types nested in parameters and
+// results are compared by [OpContext.funcTypeAdmits]; a comparison nested
+// deeper is left undecided, which admits.
+const maxFuncTypeDepth = 8
+
+// funcTypeAdmits reports whether the function type a admits every function
+// value that the function type b admits. A function value is admitted by a
+// type when its implementation covers the type, so a admits all that b
+// admits exactly when each parameter of b admits every value the matching
+// parameter of a admits and a's result admits every value b's result admits:
+// parameters compare contravariantly and results covariantly, as in standard
+// function subtyping. A parameter that is itself a function type is compared
+// by the same rule, so variance flips again at each level of nesting.
+//
+// It decides only when both are a single bodiless signature with the same
+// parameters and neither is open; anything else, including a conjunction of
+// signatures, is left undecided. Each pair of signatures is compared once per
+// outermost comparison. A comparison of two literals reached again while those
+// literals are being compared, as recursive types reach themselves, possibly
+// in other instances, is taken to admit, so that recursive types compare in
+// time proportional to the pairs of literals they reach.
+func (c *OpContext) funcTypeAdmits(a, b *FuncValue) (ok, decided bool) {
+	sa, oka := plainFuncType(a)
+	sb, okb := plainFuncType(b)
+	if !oka || !okb || sa.Fn.Open || sb.Fn.Open || len(sa.Fn.Params) != len(sb.Fn.Params) {
+		return false, false
+	}
+	if sa == sb {
+		return true, true
+	}
+	if c.funcTypeDepth >= maxFuncTypeDepth {
+		return false, false
+	}
+	matches := matchFuncParams(sa.Fn, sb.Fn, true)
+	if slices.Contains(matches, -1) {
+		return false, false
+	}
+	pair := [2]FuncType{sa, sb}
+	if ok, seen := c.funcTypePairs[pair]; seen {
+		return ok, true
+	}
+	lits := [2]*Function{sa.Fn, sb.Fn}
+	if c.funcTypeActive[lits] {
+		return true, true
+	}
+	if c.funcTypePairs == nil {
+		c.funcTypePairs = map[[2]FuncType]bool{}
+		c.funcTypeActive = map[[2]*Function]bool{}
+		defer func() { c.funcTypePairs, c.funcTypeActive = nil, nil }()
+	}
+	c.funcTypeActive[lits] = true
+	c.funcTypeDepth++
+	ok = c.funcSignatureAdmits(sa, sb, matches)
+	c.funcTypeDepth--
+	delete(c.funcTypeActive, lits)
+	c.funcTypePairs[pair] = ok
+	return ok, true
+}
+
+// funcSignatureAdmits reports whether each parameter of b admits every value
+// the parameter of a that matches it admits, and a's result every value b's
+// result admits (see [OpContext.funcTypeAdmits]).
+func (c *OpContext) funcSignatureAdmits(sa, sb FuncType, matches []int) bool {
+	for i, j := range matches {
+		if !c.covers(sb.Env, sb.Fn.Params[j].Value, sa.Env, sa.Fn.Params[i].Value) {
+			return false
+		}
+	}
+	return c.covers(sa.Env, sa.Fn.Ret, sb.Env, sb.Fn.Ret)
+}
+
+// plainFuncType returns the signature of v when v is a single bodiless
+// signature with no arguments bound.
+func plainFuncType(v *FuncValue) (FuncType, bool) {
+	if v.Fn == nil || v.Fn.Body != nil || v.IsPartial() {
+		return FuncType{}, false
+	}
+	head := FuncType{Fn: v.Fn, Env: v.Env}
+	for _, t := range v.Types {
+		// The same literal in different closures can denote different
+		// constraints. Keep those clauses instead of selecting one of them.
+		if t != head {
+			return FuncType{}, false
+		}
+	}
+	return head, true
 }
 
 // builtinParamCovers reports whether the builtin parameter value pv admits

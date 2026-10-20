@@ -1,0 +1,76 @@
+# Two distinct but structurally equal recursive function types must compare
+# each pair of types once, not once for every path through their parameters,
+# which grows exponentially with the depth bound. Admission compares them when
+# the implementation meets the signature, and entitlement when a callback is
+# bound. Types whose parameters are fresh instances of their definitions are
+# compared once per pair of literals, which no pair of instances repeats.
+# Three parameters make the difference plain in out/eval/stats without making
+# the regression test expensive.
+#inlinetest:exclude skip — performance regression guarded by out/eval/stats
+-- in.cue --
+@experiment(functions)
+
+#F: func(a: #F, b: #F, c: #F) -> #F
+#G: func(a: #G, b: #G, c: #G) -> #G
+
+admitted: #F & (func(a: #G, b: #G, c: #G) -> #G: a)
+
+cb:    #G & (func(a: #G, b: #G, c: #G) -> #G: a)
+use:   func(g: #F) -> int: 1
+bound: use(cb)
+
+#H: {n: int, m: n + 1, t: func(p1: (#H & {n: m}).t, p2: (#H & {n: m}).t, p3: (#H & {n: m}).t) -> int}
+#K: {n: int, m: n + 1, t: func(p1: (#K & {n: m}).t, p2: (#K & {n: m}).t, p3: (#K & {n: m}).t) -> int}
+instances: (func(f: #H.t) -> int) & (func(f: #K.t) -> int: 1)
+-- out/eval/stats --
+Leaks:  24
+Freed:  594
+Reused: 555
+Allocs: 63
+Retain: 0
+
+Unifications: 576
+Conjuncts:    1015
+Disjuncts:    0
+
+NumCloseIDs: 292
+-- out/evalalpha --
+(struct){
+  #F: (func){ func(a: 〈0;#F〉, b: 〈0;#F〉, c: 〈0;#F〉) -> 〈0;#F〉 }
+  #G: (func){ func(a: 〈0;#G〉, b: 〈0;#G〉, c: 〈0;#G〉) -> 〈0;#G〉 }
+  admitted: (func){ func(a: 〈0;#G〉, b: 〈0;#G〉, c: 〈0;#G〉) -> 〈0;#G〉: 〈0;a〉 & func(a: 〈0;#F〉, b: 〈0;#F〉, c: 〈0;#F〉) -> 〈0;#F〉 }
+  cb: (func){ func(a: 〈0;#G〉, b: 〈0;#G〉, c: 〈0;#G〉) -> 〈0;#G〉: 〈0;a〉 & func(a: 〈0;#G〉, b: 〈0;#G〉, c: 〈0;#G〉) -> 〈0;#G〉 }
+  use: (func){ func(g: 〈0;#F〉) -> int: 1 }
+  bound: (int){ 1 }
+  #H: (#struct){
+    n: (int){ int }
+    m: (_|_){
+      // [incomplete] #H.m: non-concrete value int in operand to +:
+      //     ./in.cue:12:17
+      //     ./in.cue:12:9
+    }
+    t: (func){ func(p1: (〈1;#H〉 & {
+        n: 〈1;m〉
+      }).t, p2: (〈1;#H〉 & {
+        n: 〈1;m〉
+      }).t, p3: (〈1;#H〉 & {
+        n: 〈1;m〉
+      }).t) -> int }
+  }
+  #K: (#struct){
+    n: (int){ int }
+    m: (_|_){
+      // [incomplete] #K.m: non-concrete value int in operand to +:
+      //     ./in.cue:13:17
+      //     ./in.cue:13:9
+    }
+    t: (func){ func(p1: (〈1;#K〉 & {
+        n: 〈1;m〉
+      }).t, p2: (〈1;#K〉 & {
+        n: 〈1;m〉
+      }).t, p3: (〈1;#K〉 & {
+        n: 〈1;m〉
+      }).t) -> int }
+  }
+  instances: (func){ func(f: 〈0;#K〉.t) -> int: 1 & func(f: 〈0;#H〉.t) -> int }
+}

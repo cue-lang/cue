@@ -537,9 +537,54 @@ admission: {
 	hofBad: apply(cbInt, 1)
 	hofOK:  apply(cbNum, 1.5)
 
-	// Distinct recursive signatures compare approximately for admission.
-	// Avoid structural descent through their signatures. These calls do not
-	// execute the callbacks.
+	// Each parameter position reverses the comparison direction, and each
+	// result position preserves it. A parameter typed by a
+	// signature compares as a function type: the implementation's parameter
+	// must admit every function the signature's parameter admits. So an
+	// implementation that calls its callback with 1.5 cannot take one typed
+	// func(int) -> int, while one that calls it with 1 can take one typed
+	// func(number) -> int. One parameter level deeper the direction flips back.
+	n1Bad: (func(f: func(int) -> int) -> int) & (func(f: func(number) -> int) -> int: f(1.5))
+	n1OK:  ((func(f: func(number) -> int) -> int) & (func(f: func(int) -> int) -> int: f(1)))(cbNum)
+	n2Bad: (func(f: func(g: func(number) -> int) -> int) -> int) & (func(f: func(g: func(int) -> int) -> int) -> int: f(cbInt))
+	hInt:  func(g: func(int) -> int) -> int: g(1)
+	n2OK:  ((func(f: func(g: func(int) -> int) -> int) -> int) & (func(f: func(g: func(number) -> int) -> int) -> int: f(cbNum)))(hInt)
+	nrBad: (func(f: func(int) -> number) -> int) & (func(f: func(int) -> int) -> int: f(1))
+
+	// A supplied callback's own signatures are compared the same way.
+	#CbN: func(h: func(number) -> int) -> int
+	cbN:  #CbN & (func(h: func(number) -> int) -> int: 1)
+	k:    func(g: func(h: func(int) -> int) -> int) -> int: 7
+	nEnt: k(cbN)
+
+	// A conjunction of signatures as a parameter type compares
+	// approximately, and the call checks what it binds.
+	nConj:  (func(f: (func(x: int) -> int) & (func(x: int) -> int)) -> int) & (func(f: func(x: number) -> int) -> int: 1)
+	nConjX: nConj(cbInt)
+
+	// The same signature literal in different closures still contributes
+	// distinct clauses. Neither conjunction order is a single signature.
+	nMake: func(t: _) -> _: func(x: t) -> int
+	nI: nMake(int)
+	nN: nMake(number)
+	nIN: nI & nN
+	nNI: nN & nI
+	nClosureIN: (func(f: nIN) -> int) & (func(f: func(number) -> int) -> int: 1)
+	nClosureNI: (func(f: nNI) -> int) & (func(f: func(number) -> int) -> int: 1)
+	nClosureINX: nClosureIN(cbNum)
+	nClosureNIX: nClosureNI(cbNum)
+	nClosureINBad: nClosureIN(cbInt)
+	nClosureNIBad: nClosureNI(cbInt)
+
+	// A signature that refers to itself compares without recursing forever.
+	#Rec: func(f: #Rec) -> int
+	rec:  #Rec & (func(f: #Rec) -> int: 1)
+	recX: rec(rec)
+
+	// Distinct recursive signatures cannot use the identity shortcut. A pair
+	// of literals reached again while it is being compared admits, and the
+	// comparison is bounded in depth. These calls do not execute the
+	// callbacks.
 	#RecA: func(f: #RecA) -> int
 	#RecB: func(f: #RecB) -> int
 	recDistinct: (func(f: #RecA) -> int) & (func(f: #RecB) -> int: 1)
@@ -669,9 +714,9 @@ admission: {
 		#O: int
 	}
 
-	// Function-valued constraints compare approximately, as structural
-	// function subsumption is covariant in parameters; a bound that admits
-	// every value of a kind is decided exactly.
+	// Function types compare as function types, so a result typed
+	// func(number) -> int is within one typed func(int) -> int, and a
+	// bound admitting every value of a kind admits that kind.
 	hs:  func(g: func({n: int}) -> int) -> int
 	hs:  func(g: func({n: int}) -> int) -> int: g({n: 1})
 	hsX: hs(func(v: {n: int}) -> int: v.n)
@@ -971,9 +1016,11 @@ entitlement: {
 	// The implementation's own declaration is still checked by admission.
 	bad5b:  conj(cbW)
 
-	// A signature attached to the consumer constrains its parameters too.
+	// A signature attached to the consumer constrains its parameters too:
+	// the implementation alone would accept an int-only callback, so only
+	// the attached signature rejects cb.
 	#Consumer: func(g: func(number) -> int) -> int
-	attached:  #Consumer & (func(g: func(_) -> int) -> int: 7)
+	attached:  #Consumer & (func(g: func(int) -> int) -> int: 7)
 	bad6:      attached(cb)
 	ok6:       attached(cbAny)
 
@@ -1480,6 +1527,32 @@ entitlement: {
     cbNum: func(x: number) -> int: 1
     hofBad: 〈0;apply〉(〈0;cbInt〉, 1)
     hofOK: 〈0;apply〉(〈0;cbNum〉, 1.5)
+    n1Bad: (func(f: func(int) -> int) -> int & func(f: func(number) -> int) -> int: 〈0;f〉(1.5))
+    n1OK: (func(f: func(number) -> int) -> int & func(f: func(int) -> int) -> int: 〈0;f〉(1))(〈0;cbNum〉)
+    n2Bad: (func(f: func(g: func(number) -> int) -> int) -> int & func(f: func(g: func(int) -> int) -> int) -> int: 〈0;f〉(〈1;cbInt〉))
+    hInt: func(g: func(int) -> int) -> int: 〈0;g〉(1)
+    n2OK: (func(f: func(g: func(int) -> int) -> int) -> int & func(f: func(g: func(number) -> int) -> int) -> int: 〈0;f〉(〈1;cbNum〉))(〈0;hInt〉)
+    nrBad: (func(f: func(int) -> number) -> int & func(f: func(int) -> int) -> int: 〈0;f〉(1))
+    #CbN: func(h: func(number) -> int) -> int
+    cbN: (〈0;#CbN〉 & func(h: func(number) -> int) -> int: 1)
+    k: func(g: func(h: func(int) -> int) -> int) -> int: 7
+    nEnt: 〈0;k〉(〈0;cbN〉)
+    nConj: (func(f: (func(x: int) -> int & func(x: int) -> int)) -> int & func(f: func(x: number) -> int) -> int: 1)
+    nConjX: 〈0;nConj〉(〈0;cbInt〉)
+    nMake: func(t: _) -> _: func(x: 〈0;t〉) -> int
+    nI: 〈0;nMake〉(int)
+    nN: 〈0;nMake〉(number)
+    nIN: (〈0;nI〉 & 〈0;nN〉)
+    nNI: (〈0;nN〉 & 〈0;nI〉)
+    nClosureIN: (func(f: 〈0;nIN〉) -> int & func(f: func(number) -> int) -> int: 1)
+    nClosureNI: (func(f: 〈0;nNI〉) -> int & func(f: func(number) -> int) -> int: 1)
+    nClosureINX: 〈0;nClosureIN〉(〈0;cbNum〉)
+    nClosureNIX: 〈0;nClosureNI〉(〈0;cbNum〉)
+    nClosureINBad: 〈0;nClosureIN〉(〈0;cbInt〉)
+    nClosureNIBad: 〈0;nClosureNI〉(〈0;cbInt〉)
+    #Rec: func(f: 〈0;#Rec〉) -> int
+    rec: (〈0;#Rec〉 & func(f: 〈0;#Rec〉) -> int: 1)
+    recX: 〈0;rec〉(〈0;rec〉)
     #RecA: func(f: 〈0;#RecA〉) -> int
     #RecB: func(f: 〈0;#RecB〉) -> int
     recDistinct: (func(f: 〈0;#RecA〉) -> int & func(f: 〈0;#RecB〉) -> int: 1)
@@ -1964,7 +2037,7 @@ entitlement: {
     ok5: 〈0;conj〉(〈0;cbAny〉)
     bad5b: 〈0;conj〉(〈0;cbW〉)
     #Consumer: func(g: func(number) -> int) -> int
-    attached: (〈0;#Consumer〉 & func(g: func(_) -> int) -> int: 7)
+    attached: (〈0;#Consumer〉 & func(g: func(int) -> int) -> int: 7)
     bad6: 〈0;attached〉(〈0;cb〉)
     ok6: 〈0;attached〉(〈0;cbAny〉)
     up: (func(s: string) -> string & 〈import;strings〉.ToUpper)

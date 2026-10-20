@@ -299,6 +299,7 @@ value: "from local directory"
 }
 
 func writeFile(t *testing.T, fpath string, content string) {
+	t.Helper()
 	err := os.MkdirAll(filepath.Dir(fpath), 0o777)
 	qt.Assert(t, qt.IsNil(err))
 	err = os.WriteFile(fpath, []byte(content), 0o666)

@@ -455,6 +455,7 @@ func TestCreateOrder(t *testing.T) {
 }
 
 func assertNoExcludedFiles(t *testing.T, zf string) {
+	t.Helper()
 	z, err := zip.OpenReader(zf)
 	if err != nil {
 		t.Fatal(err)
@@ -978,6 +979,7 @@ func mustWriteFile(name string, content string) {
 }
 
 func tempFile(t *testing.T, name string) *os.File {
+	t.Helper()
 	f, err := os.Create(filepath.Join(t.TempDir(), name))
 	if err != nil {
 		t.Fatal(err)

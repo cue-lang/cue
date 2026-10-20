@@ -482,6 +482,7 @@ x: 42
 
 // createStoredZip is like createZip, but stores the files uncompressed.
 func createStoredZip(t *testing.T, txtarData string) []byte {
+	t.Helper()
 	var buf bytes.Buffer
 	zw := zip.NewWriter(&buf)
 	for _, f := range txtar.Parse([]byte(txtarData)).Files {
@@ -521,6 +522,7 @@ func TestModuleVersionsOnNonExistentModule(t *testing.T) {
 }
 
 func putModule(t *testing.T, c *Client, mv module.Version, txtarData string) []byte {
+	t.Helper()
 	zipData := createZip(t, mv, txtarData)
 	err := c.PutModule(t.Context(), mv, bytes.NewReader(zipData), int64(len(zipData)))
 	qt.Assert(t, qt.IsNil(err))
@@ -528,6 +530,7 @@ func putModule(t *testing.T, c *Client, mv module.Version, txtarData string) []b
 }
 
 func createZip(t *testing.T, mv module.Version, txtarData string) []byte {
+	t.Helper()
 	ar := txtar.Parse([]byte(txtarData))
 	var zipContent bytes.Buffer
 	//lint:ignore SA1019 no replacement API yet

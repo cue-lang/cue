@@ -115,6 +115,7 @@ package x
 	wantContents, err := txtarContents(fsSub(registryFS, "example.com_foo_v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
 	checkContents := func(t *testing.T, loc module.SourceLoc) bool {
+		t.Helper()
 		gotContents, err := txtarContents(fsSub(loc.FS, loc.Dir))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return false
@@ -294,6 +295,7 @@ func txtarContents(fsys fs.FS) ([]byte, error) {
 }
 
 func newRegistry(t *testing.T, fsys fs.FS) ociregistry.Interface {
+	t.Helper()
 	regSrv, err := modregistrytest.New(fsys, "")
 	qt.Assert(t, qt.IsNil(err))
 	t.Cleanup(regSrv.Close)

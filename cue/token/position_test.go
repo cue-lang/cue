@@ -22,6 +22,7 @@ import (
 )
 
 func checkPos(t *testing.T, msg string, got, want Position) {
+	t.Helper()
 	if got.Filename != want.Filename {
 		t.Errorf("%s: got filename = %q; want %q", msg, got.Filename, want.Filename)
 	}
@@ -81,6 +82,7 @@ func linecol(lines []int, offs int) (int, int) {
 }
 
 func verifyPositions(t *testing.T, f *File, lines []int) {
+	t.Helper()
 	if got := f.Lines(); !slices.Equal(got, lines) {
 		t.Fatalf("File.Lines got %v instead of %v", got, lines)
 	}

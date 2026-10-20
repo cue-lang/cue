@@ -260,12 +260,14 @@ a: b: 6
 }
 
 func addStructBuilderBase(t *testing.T, b *structBuilder, src string) {
+	t.Helper()
 	f, err := parser.ParseFile("base.cue", src)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsNil(b.addBase(f)))
 }
 
 func assertStructBuilderSyntax(t *testing.T, b *structBuilder, want string) {
+	t.Helper()
 	f, err := b.syntax()
 	qt.Assert(t, qt.IsNil(err))
 	err = astutil.Sanitize(f)

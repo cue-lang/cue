@@ -186,6 +186,7 @@ func TestGit(t *testing.T) {
 }
 
 func mustRunCmd(t *testing.T, dir string, env []string, exe string, args ...string) {
+	t.Helper()
 	c := exec.Command(exe, args...)
 	c.Dir = dir
 	c.Env = env
@@ -194,6 +195,7 @@ func mustRunCmd(t *testing.T, dir string, env []string, exe string, args ...stri
 }
 
 func skipIfNoExecutable(t *testing.T, exeName string) {
+	t.Helper()
 	if _, err := exec.LookPath(exeName); err != nil {
 		t.Skipf("cannot find %q executable: %v", exeName, err)
 	}

@@ -174,6 +174,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 // marking all its tests as failed too.
 // The tests are not run as subtests, as each would only be skipped.
 func schemaExtractFailed(t *testing.T, m *cuetdtest.M, variant string, s *externaltest.Schema, reason string) {
+	t.Helper()
 	for _, test := range s.Tests {
 		if problem := recordFailure(m, variant, &test.Skip, "could not extract schema"); problem != "" {
 			t.Errorf("test %q: %s", test.Description, problem)
@@ -183,6 +184,7 @@ func schemaExtractFailed(t *testing.T, m *cuetdtest.M, variant string, s *extern
 }
 
 func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externaltest.Schema) {
+	t.Helper()
 	switch {
 	case vers == jsonschema.VersionUnknown:
 		t.Skipf("skipping test for unknown schema version %v", versStr)
@@ -319,6 +321,7 @@ func testName(s string) string {
 // given error message, and updates the
 // skip field pointed to by skipField if necessary.
 func testFailed(t *testing.T, m *cuetdtest.M, variant string, skipField *externaltest.Skip, p positioner, errStr string) {
+	t.Helper()
 	if problem := recordFailure(m, variant, skipField, errStr); problem != "" {
 		t.Fatal(problem)
 	}
@@ -356,6 +359,7 @@ func recordFailure(m *cuetdtest.M, variant string, skipField *externaltest.Skip,
 // testFails marks the current test as succeeded and updates the
 // skip field pointed to by skipField if necessary.
 func testSucceeded(t *testing.T, m *cuetdtest.M, variant string, skipField *externaltest.Skip, p positioner) {
+	t.Helper()
 	name := skipName(m, variant)
 	if cuetest.UpdateGoldenFiles() {
 		delete(*skipField, name)

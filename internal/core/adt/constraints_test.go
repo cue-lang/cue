@@ -36,6 +36,7 @@ func TestMatchPatternValue(t *testing.T) {
 	ctx := adt.NewContext(r, nil)
 
 	pv := func(t *testing.T, s string) adt.Value {
+		t.Helper()
 		switch s {
 		case "_":
 			return &adt.Top{}

@@ -407,6 +407,7 @@ func TestTokenRefreshWaiterDeadline(t *testing.T) {
 // access token "access_n", which expires after the given number of seconds.
 // The returned function reads the access token stored in logins.json.
 func newLoginRegistry(t *testing.T, expiresIn int64, onRefresh func(n int32)) (_ Registry, storedToken func() string) {
+	t.Helper()
 	fsys, err := txtar.FS(txtar.Parse([]byte(`
 -- foo.mod_v0.0.1/cue.mod/module.cue --
 module: "foo.mod@v0"

@@ -98,6 +98,7 @@ func TestTrimFiles(t *testing.T) {
 }
 
 func formatFiles(t *cuetxtar.Test, files []*ast.File) string {
+	t.Helper()
 	var buf bytes.Buffer
 	for _, f := range files {
 		b, err := format.Node(f)

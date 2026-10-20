@@ -77,6 +77,7 @@ func stringFromFile(fsys fs.FS, file string) string {
 }
 
 func newRegistry(t *testing.T, fsys fs.FS) (Registry, string) {
+	t.Helper()
 	fsys, err := fs.Sub(fsys, "_registry")
 	qt.Assert(t, qt.IsNil(err))
 	regSrv, err := modregistrytest.New(fsys, "")

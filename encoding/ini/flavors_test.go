@@ -122,6 +122,7 @@ func encodeTo(t *cuetxtar.Test, w io.Writer, cfg ini.Config, v cue.Value) {
 // decode decodes data under cfg and writes the formatted CUE, or the error
 // with its positions, to w. It returns the decoded expression, or nil on error.
 func decode(t *cuetxtar.Test, w io.Writer, data []byte, cfg ini.Config) ast.Expr {
+	t.Helper()
 	expr, err := ini.NewDecoder("in.ini", bytes.NewReader(data), cfg).Decode()
 	if err != nil {
 		fmt.Fprint(w, errors.Details(err, nil))
@@ -138,6 +139,7 @@ func decode(t *cuetxtar.Test, w io.Writer, data []byte, cfg ini.Config) ast.Expr
 // checkTrimmedValues checks that expr holds exactly the properties of data,
 // each with its trimmed source text as the value.
 func checkTrimmedValues(t *cuetxtar.Test, expr ast.Expr, data []byte) {
+	t.Helper()
 	got := flattenStrings(t, expr, nil, map[string]string{})
 	var section string
 	properties := 0

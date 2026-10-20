@@ -110,6 +110,7 @@ func buildFile(t *testing.T, r *cue.Context, b *build.Instance) cue.Value {
 // patch replaces the package at the root of the Archive with the given CUE
 // file.
 func patch(t *testing.T, r *cue.Context, orig *txtar.Archive, f *ast.File) cue.Value {
+	t.Helper()
 	a := *orig
 	a.Files = slices.Clone(orig.Files)
 
@@ -144,6 +145,7 @@ func patch(t *testing.T, r *cue.Context, orig *txtar.Archive, f *ast.File) cue.V
 }
 
 func doDiff(t *testing.T, v, w cue.Value) {
+	t.Helper()
 	var bb bytes.Buffer
 	p := *diff.Schema
 	p.SkipHidden = true

@@ -805,6 +805,7 @@ func TestSanitizeAliasSyntax(t *testing.T) {
 	// shadows it. Sanitize has to bind the outer field to a fresh name for
 	// that reference to keep working.
 	build := func(t *testing.T, attr, version string) *ast.File {
+		t.Helper()
 		f, err := parser.ParseFile("in.cue", attr+`a: "b"
 c: {
 	a: {}

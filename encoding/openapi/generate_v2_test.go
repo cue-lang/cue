@@ -93,6 +93,7 @@ func generateV2Test(t *cuetxtar.Test) {
 }
 
 func v2Version(t *cuetxtar.Test, s string) openapi.Version {
+	t.Helper()
 	switch s {
 	case "3.0":
 		return openapi.Version3_0

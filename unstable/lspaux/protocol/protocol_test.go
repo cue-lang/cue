@@ -117,6 +117,7 @@ type unmarshaler interface{ UnmarshalBytes([]byte) error }
 // checkRejectsTruncated checks that every proper prefix of full,
 // including the empty one, fails to unmarshal into m.
 func checkRejectsTruncated(t *testing.T, full []byte, m unmarshaler) {
+	t.Helper()
 	for i := range full {
 		if err := m.UnmarshalBytes(full[:i]); err == nil {
 			t.Errorf("expected error for truncation at %d/%d bytes", i, len(full))

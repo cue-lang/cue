@@ -32,6 +32,7 @@ func TestBuiltin(t *testing.T) {
 }
 
 func num(t *testing.T, s string, k adt.Kind) *adt.Num {
+	t.Helper()
 	d, _, err := apd.NewFromString(s)
 	qt.Assert(t, qt.IsNil(err))
 	return &adt.Num{X: *d, K: k}

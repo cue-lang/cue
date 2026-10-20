@@ -122,6 +122,7 @@ func TestModuleFetch(t *testing.T) {
 }
 
 func writeInstanceInfo(t *testing.T, w io.Writer, inst *build.Instance, depth int) {
+	t.Helper()
 	m := inst.Module
 	versionStr := ""
 	if m == "" {

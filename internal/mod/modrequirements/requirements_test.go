@@ -214,6 +214,7 @@ func mustParseVersion(s string) module.Version {
 }
 
 func newRegistry(t *testing.T, registryContents string) Registry {
+	t.Helper()
 	regFS, err := txtar.FS(txtar.Parse([]byte(registryContents)))
 	qt.Assert(t, qt.IsNil(err))
 	regSrv, err := modregistrytest.New(regFS, "")

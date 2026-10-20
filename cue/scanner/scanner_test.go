@@ -224,6 +224,7 @@ func newlineCount(s string) int {
 }
 
 func checkPosScan(t *testing.T, lit string, p token.Pos, expected token.Position) {
+	t.Helper()
 	pos := p.Position()
 	if pos.Filename != expected.Filename {
 		t.Errorf("bad filename for %q: got %s, expected %s", lit, pos.Filename, expected.Filename)
@@ -335,6 +336,7 @@ func TestScan(t *testing.T) {
 }
 
 func checkComma(t *testing.T, line string, mode Mode) {
+	t.Helper()
 	var S Scanner
 	file := token.NewFile("TestCommas", -1, len(line))
 	S.Init(file, []byte(line), nil, mode)

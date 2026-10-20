@@ -35,6 +35,7 @@ import (
 // codec closes successfully.
 func TestEncoderClose(t *testing.T) {
 	encodeToFile := func(t *testing.T, filename string, closeErr error) error {
+		t.Helper()
 		resetRegistry(t)
 		err := filetypes.RegisterEncoding(filetypes.DynamicEncoding{
 			Name:       "closeerr",

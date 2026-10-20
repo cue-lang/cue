@@ -684,19 +684,17 @@ func TestPathCompare(t *testing.T) {
 }
 
 func checkPanic(t *testing.T, wantPanicStr string, f func()) {
-	gotPanicStr := ""
-	func() {
-		defer func() {
-			e := recover()
-			if e == nil {
-				t.Errorf("function did not panic")
-				return
-			}
-			gotPanicStr = fmt.Sprint(e)
-		}()
+	t.Helper()
+	e := func() (e any) {
+		defer func() { e = recover() }()
 		f()
+		return nil
 	}()
-	if got, want := gotPanicStr, wantPanicStr; got != want {
+	if e == nil {
+		t.Errorf("function did not panic")
+		return
+	}
+	if got, want := fmt.Sprint(e), wantPanicStr; got != want {
 		t.Errorf("unexpected panic message; got %q want %q", got, want)
 	}
 }

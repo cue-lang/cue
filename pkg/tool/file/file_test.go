@@ -267,6 +267,7 @@ func TestMkdirTemp(t *testing.T) {
 
 func TestRemoveAll(t *testing.T) {
 	run := func(t *testing.T, path string) (any, error) {
+		t.Helper()
 		v := parse(t, "tool/file.RemoveAll", fmt.Sprintf(`{path: #"%s"#}`, path))
 		return (*cmdRemoveAll).Run(nil, &task.Context{Obj: v})
 	}

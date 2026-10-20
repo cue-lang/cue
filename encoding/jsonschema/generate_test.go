@@ -253,6 +253,7 @@ b: #: {y: a.#}
 }
 
 func formatNode(t *testing.T, n ast.Node) string {
+	t.Helper()
 	data, err := format.Node(n)
 	qt.Assert(t, qt.IsNil(err))
 	return string(data)
@@ -266,6 +267,7 @@ type generateDataTest struct {
 // testVersion maps a short version name used in the #version test tag
 // to a [jsonschema.Version].
 func testVersion(t *cuetxtar.Test, s string) jsonschema.Version {
+	t.Helper()
 	switch s {
 	case "2020-12":
 		return jsonschema.VersionDraft2020_12

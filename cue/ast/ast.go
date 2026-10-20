@@ -1088,6 +1088,15 @@ func (x *Func) End() token.Pos {
 	if x.Rparen != token.NoPos {
 		return x.Rparen.Add(1)
 	}
+	// The parameter list's ")" is missing: as for a struct literal
+	// missing its "}", the literal extends to the last of what was
+	// parsed.
+	if n := len(x.Params); n > 0 {
+		return x.Params[n-1].End()
+	}
+	if x.Ellipsis != token.NoPos {
+		return x.Ellipsis.Add(len("..."))
+	}
 	if x.Lparen != token.NoPos {
 		return x.Lparen.Add(1)
 	}

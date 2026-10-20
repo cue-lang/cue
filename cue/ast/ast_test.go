@@ -184,13 +184,15 @@ func TestFuncEndMissingRparen(t *testing.T) {
 		return f.Decls[1].(*ast.Field).Value.(*ast.Func)
 	}
 
+	// The literal extends to its last parameter.
 	fn := funcOf("@experiment(functions)\nf: func(a: int,\n")
 	qt.Assert(t, qt.HasLen(fn.Params, 1))
-	qt.Check(t, qt.Equals(fn.End(), fn.Lparen.Add(1)))
+	qt.Check(t, qt.Equals(fn.End(), fn.Params[0].End()))
 
+	// Or to its "...".
 	fn = funcOf("@experiment(functions)\nf: func(...\n")
 	qt.Assert(t, qt.IsTrue(fn.Ellipsis.IsValid()))
-	qt.Check(t, qt.Equals(fn.End(), fn.Lparen.Add(1)))
+	qt.Check(t, qt.Equals(fn.End(), fn.Ellipsis.Add(len("..."))))
 }
 
 func TestFileExperiments(t *testing.T) {

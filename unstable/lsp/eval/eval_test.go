@@ -5980,8 +5980,8 @@ f: func(a: int,
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(22, 25): {f: []string{"f"}},
 				or1(25):    {e: []string{"f"}},
-				or1(31):    {e: []string{"f"}},
-				or(32, 39): {f: []string{"f"}},
+				or1(37):    {e: []string{"f"}},
+				or1(38):    {f: []string{"f"}},
 			},
 		},
 
@@ -5997,8 +5997,6 @@ f: func(a: ) -> int: 1
 			expectCompletions: map[offsetRange]fieldEmbedCompletions{
 				or(22, 25): {f: []string{"f"}},
 				or1(25):    {e: []string{"f"}},
-				or1(31):    {e: []string{"f"}},
-				or(32, 46): {f: []string{"f"}},
 			},
 		},
 

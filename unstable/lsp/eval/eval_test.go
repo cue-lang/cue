@@ -6360,7 +6360,8 @@ y: f(a: 1)
 }
 
 // TestCompletionRanges checks the range of text that the completions
-// offered within a path element replace.
+// offered within a path element replace: the element itself, in its
+// entirety, whatever precedes or follows it.
 func TestCompletionRanges(t *testing.T) {
 	src := `
 @experiment(functions)
@@ -6375,20 +6376,17 @@ r: g(x: 3)
 
 	testCases := []struct {
 		name string
-		// elem is the path element whose completions are checked; the
+		// want is the element the completions must replace; the
 		// cursor is at its start, shifted by delta.
-		elem  position
+		want  position
 		delta int
-		// start and end place the replaced range relative to the
-		// element's start and end.
-		start, end int
 	}{
-		{name: "ident starting a dotted path", elem: ln(3, 1, "a"), end: -1},
-		{name: "ident before a period, cursor at the period", elem: ln(3, 1, "a"), delta: 1, end: -1},
-		{name: "selector within a dotted path", elem: ln(3, 1, "b"), end: -1},
-		{name: "selector ending a dotted path, cursor after it", elem: ln(3, 1, "c"), delta: 1, end: -1},
-		{name: "lone ident, cursor after it", elem: ln(4, 1, "a"), delta: 1, end: -1},
-		{name: "selector after a spaced period", elem: ln(5, 1, "b"), start: -1, end: -1},
+		{name: "ident starting a dotted path", want: ln(3, 1, "a")},
+		{name: "ident before a period, cursor at the period", want: ln(3, 1, "a"), delta: 1},
+		{name: "selector within a dotted path", want: ln(3, 1, "b")},
+		{name: "selector ending a dotted path, cursor after it", want: ln(3, 1, "c"), delta: 1},
+		{name: "lone ident, cursor after it", want: ln(4, 1, "a"), delta: 1},
+		{name: "selector after a spaced period", want: ln(5, 1, "b")},
 	}
 
 	for _, tc := range testCases {
@@ -6399,12 +6397,11 @@ r: g(x: 3)
 			ev := eval.New(eval.Config{IP: ast.ImportPath{Path: "p"}.Canonical()}, fileAst)
 			fe := ev.ForFile("a.cue")
 
-			elem := tc.elem
-			elem.determineOffset(map[string]*ast.File{"a.cue": fileAst})
-			wantStart := elem.offset + tc.start
-			wantEnd := elem.offset + len(elem.str) + tc.end
+			want := tc.want
+			want.determineOffset(map[string]*ast.File{"a.cue": fileAst})
+			wantStart, wantEnd := want.offset, want.offset+len(want.str)
 
-			completions := fe.CompletionsForOffset(elem.offset + tc.delta)
+			completions := fe.CompletionsForOffset(want.offset + tc.delta)
 			qt.Assert(t, qt.Not(qt.HasLen(completions, 0)))
 			for completion := range completions {
 				qt.Check(t, qt.Equals(completion.Start, wantStart), qt.Commentf("%#v", completion))
@@ -6437,8 +6434,8 @@ z: _ @embed(file=z.json)
 		// wantStart and wantEnd bound the text the completions replace.
 		wantStart, wantEnd int
 	}{
-		{name: "after a period ending a line", cursor: afterPeriod, want: "b", wantStart: afterPeriod, wantEnd: afterPeriod + 1},
-		{name: "after an embed attribute", cursor: afterAttr, want: "a", wantStart: 0, wantEnd: 0},
+		{name: "after a period ending a line", cursor: afterPeriod, want: "b", wantStart: afterPeriod, wantEnd: afterPeriod},
+		{name: "after an embed attribute", cursor: afterAttr, want: "a", wantStart: afterAttr, wantEnd: afterAttr},
 	}
 
 	for _, tc := range testCases {

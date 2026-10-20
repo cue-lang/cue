@@ -927,13 +927,23 @@ nextFrame:
 				continue
 			}
 			pc := p.components[compIdx]
-			// We're going to make suggestions that replace the whole of
-			// the existing path element.
-			embedCompletions := Completion{Start: pc.start.Offset(), End: pc.end.Offset()}
-			if compIdx < len(p.components)-1 {
-				// We're before the last component in the path, so
-				// back off the end so it doesn't include the .
-				embedCompletions.End--
+			if _, isAttr := pc.node.(*ast.Attribute); isAttr {
+				// An attribute's path leads from the attribute to what
+				// it embeds, for definitions; the attribute is not a
+				// path element that a completion could replace.
+				continue
+			}
+			// The suggestions replace the path element at the cursor in
+			// its entirety. The component's start and end bound the
+			// cursor positions it owns, which reach a following "." and
+			// begin after a preceding one; the element's own text is
+			// that of its node: an ident, a selector's name, a call's
+			// label, or an index literal. After a "." ending a line the
+			// parser synthesizes the selector on the next line, after
+			// the cursor: the suggestions then insert at the cursor.
+			embedCompletions := Completion{Start: pc.node.Pos().Offset(), End: pc.node.End().Offset()}
+			if embedCompletions.Start > offset {
+				embedCompletions = Completion{Start: offset, End: offset}
 			}
 			if compIdx == 0 && !p.startsInline {
 				// We're in the first component of a path which starts

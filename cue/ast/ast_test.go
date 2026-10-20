@@ -174,6 +174,25 @@ func TestFuncParamType(t *testing.T) {
 	}
 }
 
+// TestFuncEndMissingRparen checks where a function literal ends when
+// its parameter list is missing the closing ")".
+func TestFuncEndMissingRparen(t *testing.T) {
+	funcOf := func(src string) *ast.Func {
+		t.Helper()
+		f, _ := parser.ParseFile("in", src)
+		qt.Assert(t, qt.IsNotNil(f))
+		return f.Decls[1].(*ast.Field).Value.(*ast.Func)
+	}
+
+	fn := funcOf("@experiment(functions)\nf: func(a: int,\n")
+	qt.Assert(t, qt.HasLen(fn.Params, 1))
+	qt.Check(t, qt.Equals(fn.End(), fn.Lparen.Add(1)))
+
+	fn = funcOf("@experiment(functions)\nf: func(...\n")
+	qt.Assert(t, qt.IsTrue(fn.Ellipsis.IsValid()))
+	qt.Check(t, qt.Equals(fn.End(), fn.Lparen.Add(1)))
+}
+
 func TestFileExperiments(t *testing.T) {
 	forVersion := func(t *testing.T, version string) *cueexperiment.File {
 		t.Helper()

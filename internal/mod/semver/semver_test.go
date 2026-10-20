@@ -175,7 +175,7 @@ var (
 )
 
 func BenchmarkCompare(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if Compare(v1, v2) != 0 {
 			b.Fatalf("bad compare")
 		}

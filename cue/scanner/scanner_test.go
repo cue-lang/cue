@@ -905,11 +905,9 @@ func TestNoLiteralComments(t *testing.T) {
 }
 
 func BenchmarkScan(b *testing.B) {
-	b.StopTimer()
 	file := token.NewFile("", -1, len(source))
 	var s Scanner
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		s.Init(file, source, nil, ScanComments)
 		for {
 			_, tok, _ := s.Scan()
@@ -921,7 +919,6 @@ func BenchmarkScan(b *testing.B) {
 }
 
 func BenchmarkScanFile(b *testing.B) {
-	b.StopTimer()
 	const filename = "scanner.go"
 	src, err := os.ReadFile(filename)
 	if err != nil {
@@ -930,8 +927,7 @@ func BenchmarkScanFile(b *testing.B) {
 	file := token.NewFile(filename, -1, len(src))
 	b.SetBytes(int64(len(src)))
 	var s Scanner
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		s.Init(file, src, nil, ScanComments)
 		for {
 			_, tok, _ := s.Scan()

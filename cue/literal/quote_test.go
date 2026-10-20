@@ -190,7 +190,7 @@ func BenchmarkQuote(b *testing.B) {
 		String.WithOptionalTabIndent(3),
 	} {
 		b.Run("", func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				for _, s := range inputs {
 					f.Quote(s)
 				}

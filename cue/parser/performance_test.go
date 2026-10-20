@@ -33,7 +33,7 @@ func readFile(filename string) []byte {
 
 func BenchmarkParse(b *testing.B) {
 	b.SetBytes(int64(len(src)))
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if _, err := parser.ParseFile("", src, parser.ParseComments); err != nil {
 			b.Fatalf("benchmark failed due to parse error: %s", err)
 		}

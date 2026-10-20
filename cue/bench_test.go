@@ -96,7 +96,7 @@ func Benchmark(b *testing.B) {
 			for _, m := range matrix {
 				b.Run(m.Name(), func(b *testing.B) {
 					b.ReportAllocs()
-					for i := 0; i < b.N; i++ {
+					for b.Loop() {
 						ctx := m.CueContext()
 						value := ctx.BuildInstance(cuetxtar.Load(a, b.TempDir())[0])
 						value.Validate()
@@ -205,9 +205,8 @@ func BenchmarkLargeValueMarshalJSON(b *testing.B) {
 			if err := val.Err(); err != nil {
 				b.Fatal(err)
 			}
-			b.ResetTimer()
 			b.ReportAllocs()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				data, err := val.MarshalJSON()
 				if err != nil {
 					b.Fatal(err)

@@ -216,7 +216,7 @@ b: c: a @test(shareID=A)
 }
 
 func BenchmarkUnifyAPI(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		b.StopTimer()
 		ctx := cuecontext.New()
 		v := ctx.CompileString("")

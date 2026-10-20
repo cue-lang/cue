@@ -129,10 +129,7 @@ func TestValueX(t *testing.T) {
 	ctx.LogEval = 1
 	v.Finalize(ctx)
 
-	p := export.All
-	p.ShowErrors = true
-
-	p = &export.Profile{
+	p := export.Profile{
 		TakeDefaults:    true,
 		ShowOptional:    true,
 		ShowDefinitions: true,

@@ -56,7 +56,7 @@ func Run(name string, t *testing.T) {
 			fmt.Fprintln(t, "Result:")
 		}
 
-		p := export.All
+		p := *export.All
 		p.ShowErrors = true
 
 		files, errs := p.Vertex(r, test.Name, v)

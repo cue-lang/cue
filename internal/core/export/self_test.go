@@ -184,7 +184,7 @@ language: version: "v0.9.0"
 	v = v.LookupPath(cue.ParsePath("a.b"))
 
 	tValue := v.Core()
-	self := export.All
+	self := *export.All
 	self.SelfContained = true
 	self.InlineImports = true
 

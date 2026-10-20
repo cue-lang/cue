@@ -26,7 +26,7 @@ $ cue version
 ### What did you do?
 
 <!--
-If possible, provide a recipe for reproducing the error.
+Please provide a minimal recipe for reproducing the error.
 
 For advice on how to create a good reproducer, please see:
 

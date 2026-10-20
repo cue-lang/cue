@@ -7,23 +7,30 @@ requests, proposals, and code are all coordinated through
 ## Start with an issue
 
 The most valuable contribution you can make to CUE is a well-written issue:
-a bug report with a reproducible test case, or a feature request that
-explains the problem you are trying to solve. Agreeing on what to build —
-and whether to build it — is the hard part of most changes. Once that
-agreement exists, implementing it is usually quick, and a maintainer will
-often do so directly.
+a bug report with a [minimal
+reproducer](https://github.com/cue-lang/cue/wiki/Creating-test-or-performance-reproducers)
+(ideally a self-contained `testscript` archive which runs `cue`), or a
+feature request that explains the problem you are trying to solve.
+Agreeing on what to build — and whether to build it — is the hard part of
+most changes. Once that agreement exists, implementing it is usually
+quick, and a maintainer will often do so directly.
 
-For that reason, always open an issue on the [issue
-tracker](https://github.com/cue-lang/cue/issues) before sending code.
-Except for trivial changes such as typo fixes, we do not review pull
-requests that are not connected to an issue whose approach has been agreed
-first. In particular, unsolicited large or AI-generated pull requests
-without such an issue will be closed without review.
+For that reason, please open an issue on the [issue
+tracker](https://github.com/cue-lang/cue/issues) before writing code, and
+agree on an approach there before sending a pull request; only trivial
+changes such as typo fixes can skip this step. Discussing a change on the
+issue tracker first gives everyone a chance to validate the design, helps
+prevent duplication of effort, and ensures the idea fits the goals of the
+language and tools. A pull request is not the place for high-level design
+discussion.
 
-Discussing a change on the issue tracker first gives everyone a chance to
-validate the design, helps prevent duplication of effort, and ensures the
-idea fits the goals of the language and tools. A pull request is not the
-place for high-level design discussion.
+An approach is agreed once a maintainer has said so on the issue, or has
+labeled it [`NeedsFix`](#finding-an-issue-to-work-on). An issue which only
+describes a goal, or which tracks broader future work, does not settle how
+to implement it: describe the approach you have in mind on the issue, and a
+maintainer will let you know whether to go ahead. We may not be able to
+review a pull request whose approach was not agreed first, particularly a
+large or AI-generated one.
 
 You can also exchange ideas or feedback with other contributors in the
 `#contributing` channel on [Slack](https://cuelang.org/s/slack) and
@@ -55,15 +62,16 @@ are to queries in the issue tracker):
   Requires review by one of the core project maintainers.
 - [**NeedsInvestigation**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation):
   The issue is not fully understood and requires analysis to understand the root
-cause.
+  cause.
 - [**NeedsDecision**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsDecision):
   the issue is relatively well understood, but the CUE team hasn't yet decided
-  the best way to address it.  It would be better to wait for a decision before
-  writing code.  If you are interested on working on an issue in this state, feel
-  free to "ping" maintainers in the issue's comments if some time has passed
+  the best way to address it, so please wait for a decision before writing
+  code. If you are interested in working on an issue in this state, feel free
+  to "ping" maintainers in the issue's comments if some time has passed
   without a decision.
 - [**NeedsFix**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix):
-  the issue is fully understood and code can be written to fix it.
+  the issue is fully understood and the approach is agreed, so code can be
+  written to fix it.
 - [**help wanted**](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3A"help+wanted"):
   project maintainers need input from someone who has experience or expertise to
   answer or progress this issue.
@@ -109,9 +117,11 @@ has been agreed; see [Start with an issue](#start-with-an-issue). Then
 [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
 the CUE project and clone your fork locally.
 
-Make your planned changes and create a signed-off commit from the staged
-changes, following the guidelines on [good commit
-messages](#good-commit-messages):
+Make your planned changes; a bug fix should include a regression test
+which fails without the fix, typically based on the reproducer from the
+issue. Then create a signed-off commit from the staged changes, following
+the guidelines on [good commit messages](#good-commit-messages) and
+[referencing the issue](#referencing-issues):
 
 ```console
 $ git add file1 file2
@@ -220,6 +230,9 @@ just like for your comments in CUE.  Don't use HTML, Markdown, or any other
 markup language.
 
 ### Referencing issues
+
+Unless a change is trivial, its commit message should reference the issue
+where its approach was [agreed](#start-with-an-issue).
 
 The special notation `Fixes #12345` associates the change with issue 12345 in
 the [CUE issue tracker](https://cuelang.org/issue/12345).  When this change is

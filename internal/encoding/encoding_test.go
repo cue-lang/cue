@@ -146,12 +146,18 @@ func TestValidate(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			cfg := &encoding.Config{}
 			d := encoding.NewDecoder(cuecontext.New(), &build.File{
 				Filename: "foo.cue",
 				Encoding: build.CUE,
 				Form:     tc.form,
 				Source:   f,
-			}, nil)
+			}, cfg)
+			// The config may be shared between decoders, so it is not mutated.
+			// NewDecoder wrongly fills in the default parser config.
+			if !cfg.ParserConfig.IsValid() {
+				t.Errorf("NewDecoder did not fill in cfg.ParserConfig")
+			}
 			err = d.Err()
 			if (tc.err == "") != (err == nil) {
 				t.Errorf("got error %v; want error %v", err, tc.err != "")

@@ -56,10 +56,10 @@ func (e *countingError) Error() string {
 // TestRemoveMultiplesRenders records how many times [errors.Sanitize] renders
 // each error in a list while sorting and deduplicating it, along with which
 // errors survive and the rendered result. Rendering fully formats an error's
-// message, so the counts are worth pinning: later commits that change how
-// errors are deduplicated or rendered show their effect as updates here.
+// message, so the counts are worth pinning: a change to how errors are
+// deduplicated or rendered shows its effect as updates here.
 //
-// Each error sharing a position and path with another is now rendered exactly
+// Each error sharing a position and path with another is rendered exactly
 // once, and errors with a unique position and path are never rendered.
 func TestRemoveMultiplesRenders(t *testing.T) {
 	f := token.NewFile("test", 0, 100)

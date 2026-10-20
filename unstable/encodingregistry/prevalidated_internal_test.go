@@ -24,8 +24,8 @@ import (
 
 // TestPrevalidatedSkipsTemplateValidation is a white-box test: it asserts
 // that RegisterWithoutFullValidation never calls validateInfo — the only path that
-// compiles the types.cue template — while Register does. This is the
-// startup-cost guarantee of D-007.
+// compiles the types.cue template — while Register does, so that
+// prevalidated registrations avoid that cost at startup.
 func TestPrevalidatedSkipsTemplateValidation(t *testing.T) {
 	stub := func(*build.File, io.Reader) (Decoder, error) { return nil, nil }
 

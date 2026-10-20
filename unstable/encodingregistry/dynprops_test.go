@@ -33,12 +33,15 @@ type decoderFunc func() (ast.Expr, error)
 
 func (d decoderFunc) Decode() (ast.Expr, error) { return d() }
 
-// TestDynamicPropertiesPreserved pins the three ways a dynamic
-// encoding's declared file-type properties used to be silently dropped.
+// TestDynamicPropertiesPreserved checks that a dynamic encoding's
+// declared file-type properties are not silently dropped: an aspect
+// override alongside an interpretation, a per-mode overlay on the
+// explicit-qualifier path, and a declared form's default and
+// refinement domain.
 func TestDynamicPropertiesPreserved(t *testing.T) {
-	// 5a: a declared aspect override must survive even when an
-	// interpretation is also present (the interpretation used to cause
-	// the encoding's own form/aspect entry to be skipped).
+	// A declared aspect override must survive even when an
+	// interpretation is also present, so the interpretation must not
+	// cause the encoding's own form/aspect entry to be skipped.
 	t.Run("aspects-with-interpretation", func(t *testing.T) {
 		reset(t)
 		err := encodingregistry.Register(encodingregistry.Encoding{
@@ -57,7 +60,7 @@ func TestDynamicPropertiesPreserved(t *testing.T) {
 		qt.Assert(t, qt.IsTrue(fi.Stream)) // declared aspect honored
 	})
 
-	// 5b: a per-mode overlay must apply on the explicit-qualifier path,
+	// A per-mode overlay must apply on the explicit-qualifier path,
 	// not only the extension path.
 	t.Run("permode-on-qualifier", func(t *testing.T) {
 		reset(t)
@@ -71,18 +74,18 @@ func TestDynamicPropertiesPreserved(t *testing.T) {
 		})
 		qt.Assert(t, qt.IsNil(err))
 
-		// Extension path (already worked).
+		// Extension path.
 		fe, err := filetypes.ParseFile("x.pm", filetypes.Input)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fe.Interpretation, build.Interpretation("jsonschema")))
 
-		// Qualifier path (used to drop the overlay).
+		// Qualifier path, which must apply the overlay too.
 		fq, err := filetypes.ParseFileAndType("x", "pm", filetypes.Input)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fq.Interpretation, build.Interpretation("jsonschema")))
 	})
 
-	// 5c: a declared form supplies the built-in default and retains the
+	// A declared form supplies the built-in default and retains the
 	// built-in refinement domain. Schema can be explicitly refined to
 	// final, while dag defaults to dag and can refine to data but not back
 	// to graph.

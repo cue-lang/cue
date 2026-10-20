@@ -25,11 +25,11 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 )
 
-// TestRegistrationSchemaRoundTrip guards the D-004 round-trip
-// invariant of the registration contract: every declarative field of
-// the Encoding record is expressible as CUE data against
-// registration-schema.cue, and the schema rejects the same name and
-// extension shapes checkStructure rejects. The schema is a contract
+// TestRegistrationSchemaRoundTrip guards the round-trip invariant of
+// the registration contract: every declarative field of the Encoding
+// record is expressible as CUE data against registration-schema.cue,
+// and the schema rejects the same name and extension shapes
+// checkStructure rejects. The schema is a contract
 // document with no other automated tie to the code, so this is the
 // only check that keeps the two from drifting.
 func TestRegistrationSchemaRoundTrip(t *testing.T) {

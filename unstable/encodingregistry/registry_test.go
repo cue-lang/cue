@@ -31,11 +31,11 @@ import (
 	"cuelang.org/go/unstable/encodingregistry"
 )
 
-// TestEndToEnd is the SC-003 end-to-end test (T021): a previously
-// unknown encoding is registered with a distinct extension; file
-// arguments using the extension and the explicit qualifier resolve to
-// the registered properties, and decoding and encoding work through
-// internal/encoding, the same path CUE commands use.
+// TestEndToEnd registers a previously unknown encoding with a distinct
+// extension and checks that file arguments using the extension and the
+// explicit qualifier resolve to the registered properties, and that
+// decoding and encoding work through internal/encoding, the same path
+// CUE commands use.
 func TestEndToEnd(t *testing.T) {
 	reset(t)
 
@@ -50,8 +50,8 @@ func TestEndToEnd(t *testing.T) {
 
 	// Resolution by extension. Like built-in data encodings (yaml,
 	// jsonl, ...), the build.File carries the encoding; the declared
-	// form surfaces through FromFile below (DYNFT-REG-002: same
-	// resolution semantics as built-ins).
+	// form surfaces through FromFile below, with the same resolution
+	// semantics as built-ins.
 	f, err := filetypes.ParseFile("creds.kv", filetypes.Input)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(f.Encoding, build.Encoding("kv")))
@@ -184,8 +184,8 @@ func TestRegisterValidation(t *testing.T) {
 	qt.Assert(t, qt.ErrorMatches(err, `cannot register encoding "kvx": extension "kvx" must start with a dot and name a suffix`))
 }
 
-// TestConflicts (T022) checks the add-only conflict semantics of
-// D-002: collisions with a built-in name, a built-in extension, a
+// TestConflicts checks the add-only conflict semantics of
+// registration: collisions with a built-in name, a built-in extension, a
 // prior registration's name, and a prior registration's extension are
 // each refused with deterministic ConflictError text naming the
 // conflicting owner.
@@ -325,7 +325,7 @@ func TestLateRegistration(t *testing.T) {
 	qt.Assert(t, qt.Equals(late.Encoding, "kvlate"))
 }
 
-// TestConcurrency (T023) exercises parallel registration and
+// TestConcurrency exercises parallel registration and
 // resolution under the race detector: concurrent Register calls are
 // serialized, resolution is race-free against them, and every
 // registration either fully succeeds or fails with a deterministic
@@ -391,9 +391,9 @@ func TestConcurrency(t *testing.T) {
 
 // TestBuiltinEncodingNameConflict pins that a registration cannot claim
 // the name of a built-in encoding that is not also a top-level tag.
-// "binarypb" is the one such name; it used to slip the name check
-// (which consulted only the qualifier/tag space) and get half-absorbed:
-// its declared file-info was dropped while its codec went live.
+// "binarypb" is the one such name, so a name check consulting only the
+// qualifier/tag space would miss it and half-absorb the registration:
+// its declared file-info would be dropped while its codec would go live.
 func TestBuiltinEncodingNameConflict(t *testing.T) {
 	reset(t)
 

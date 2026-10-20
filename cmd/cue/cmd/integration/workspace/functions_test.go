@@ -206,15 +206,23 @@ r: f(a: 1)
 		}
 
 		hovers := map[position]string{
-			// The call label x.
-			fln("a/a.cue", 9, 1, "x"): "",
-			// The call label b of a standard library function.
-			fln("e/e.cue", 7, 1, "b"): "",
+			// The call label x: the parameter's constraint.
+			fln("a/a.cue", 9, 1, "x"): "Unified with: `int`",
+			// The call label b of a standard library function: the
+			// parameter's constraint.
+			fln("e/e.cue", 7, 1, "b"): "Unified with: `bytes | string`",
 			// The documented parameter a, at its declaration: its doc
 			// comment, as at a field's declaration.
 			fln("c/c.cue", 9, 1, "a"): fmt.Sprintf(`
 a is returned.
 ([c.cue line 9](%s/c/c.cue#L9))`[1:], rootURI),
+			// The call label a binding the documented parameter: its
+			// doc comment and its constraint.
+			fln("c/c.cue", 11, 1, "a"): fmt.Sprintf(`
+a is returned.
+([c.cue line 9](%s/c/c.cue#L9))
+
+Unified with: %s`[1:], rootURI, "`int`"),
 		}
 		for p, want := range hovers {
 			got, _ := env.Hover(at(p))

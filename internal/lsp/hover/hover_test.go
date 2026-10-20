@@ -784,7 +784,9 @@ package b
 factor: 2
 scale: func(x: int, by: int = factor) -> int: ‸x * by
 `,
-			want: "",
+			// The literal is a barrier: the reference shows its
+			// parameter's constraint, not scale's value.
+			want: "int",
 		},
 		{
 			name: "func_call_label",
@@ -793,7 +795,8 @@ scale: func(x: int, by: int = factor) -> int: ‸x * by
 scale: func(x: int, by: int = 2) -> int: x * by
 y: scale(‸x: 3)
 `,
-			want: "",
+			// The label names the parameter it binds.
+			want: "int",
 		},
 		{
 			name: "func_value_rendered_as_written",
@@ -811,7 +814,8 @@ scale: func(x: int, by: int = factor) -> int: x * by
 @experiment(functions)
 w: func(a: int) -> _: {‸b: a}
 `,
-			want: "",
+			// The reference to the parameter is inlined.
+			want: "int",
 		},
 		{
 			name: "func_param_declaration",
@@ -825,6 +829,8 @@ f: func(
 ) -> int: a
 r: f("x", a: 1)
 `,
+			// As at a field's declaration, the constraint in view is
+			// not repeated.
 			want: "",
 		},
 		{
@@ -835,7 +841,45 @@ r: f("x", a: 1)
 scale: #F
 scale: func(x: int) -> int: x + ‸1
 `,
-			want: "func(x: int) -> int",
+			// The literal is a barrier: scale's other declaration is
+			// not the value of a position in the body.
+			want: "",
+		},
+		{
+			name: "func_body_reference_unified_literals",
+			archive: `-- a.cue --
+@experiment(functions)
+#F: func(a: int) -> int
+f: #F & func(a: int) -> int: ‸a + 1
+r: f(a: 1)
+`,
+			// The reference reaches the parameter a of both literals,
+			// as a field reference reaches every declaration of the
+			// field: their constraints are unified.
+			want: "int & int",
+		},
+		{
+			name: "func_call_label_unified_literals",
+			archive: `-- a.cue --
+@experiment(functions)
+#F: func(a: int) -> int
+f: #F & func(a: int) -> int: a + 1
+r: f(‸a: 1)
+`,
+			// The label binds the parameter a of both literals.
+			want: "int & int",
+		},
+		{
+			name: "func_param_declaration_reference",
+			archive: `-- a.cue --
+@experiment(functions)
+#Port: int
+f: func(‸p: #Port) -> int: p
+`,
+			// As at a field's declaration, the constraint is not
+			// repeated as written, but the reference in it is shown
+			// expanded.
+			want: "int",
 		},
 	}
 

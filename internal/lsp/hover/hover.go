@@ -220,15 +220,17 @@ func contains(tokFile *token.File, offset int, n ast.Node) bool {
 // level following the child that contains the offset. It reports:
 //
 //   - ref: the innermost path expression (ident, selector, or index
-//     expression) containing the offset, if any. This is a candidate
-//     for reference resolution wherever it sits, even beyond a
-//     barrier.
+//     expression) containing the offset, if any; or the label of a
+//     labeled call argument, which names a parameter of the callee.
+//     This is a candidate for reference resolution wherever it sits,
+//     even beyond a barrier.
 //
 //   - barrier: whether the descent crossed into a construct whose
 //     interior is never unified with the enclosing field's other
-//     declarations: call arguments, interpolation expressions,
-//     comprehension clause sources, conditions and let values, and
-//     the declarations of pattern constraints and dynamic fields.
+//     declarations: call arguments and labels, interpolation
+//     expressions, comprehension clause sources, conditions and let
+//     values, the declarations of pattern constraints and dynamic
+//     fields, and function literals.
 func walkDown(tokFile *token.File, offset int, node ast.Node) (ref ast.Expr, barrier bool) {
 	// beyondBarrier continues the walk from n, marking the result as
 	// having crossed a barrier.
@@ -300,6 +302,11 @@ walk:
 
 		case *ast.CallExpr:
 			if n.Lparen.IsValid() && offset > n.Lparen.Offset() {
+				for _, label := range n.ArgLabels {
+					if ident, ok := label.(*ast.Ident); ok && contains(tokFile, offset, ident) {
+						return ident, true
+					}
+				}
 				for _, arg := range n.Args {
 					if contains(tokFile, offset, arg) {
 						return beyondBarrier(arg)
@@ -405,6 +412,27 @@ walk:
 				continue
 			}
 			return nil, false
+
+		case *ast.Func:
+			// A function literal's parameters and body are not part
+			// of the enclosing field's value, so no position in the
+			// literal shows that value. A reference in a parameter's
+			// constraint or default, the result type or the body
+			// still shows its target; positions in the remaining
+			// syntax (labels, keywords, punctuation) denote no value.
+			for _, param := range n.Parameters() {
+				for _, part := range []ast.Expr{param.Value, param.Default} {
+					if contains(tokFile, offset, part) {
+						return beyondBarrier(part)
+					}
+				}
+			}
+			for _, part := range []ast.Expr{n.Ret, n.Body} {
+				if contains(tokFile, offset, part) {
+					return beyondBarrier(part)
+				}
+			}
+			return nil, true
 
 		default:
 			// BasicLit, BadExpr, BottomLit, attributes, ...
@@ -525,17 +553,19 @@ func declPos(d *eval.Decl) token.Pos {
 }
 
 // renderableDecls returns the declarations of n that render as
-// conjuncts: those that carry a value of their own.
+// conjuncts: those that carry a value of their own. A function
+// parameter's value is its constraint.
 func renderableDecls(n *eval.Node) []*eval.Decl {
 	var decls []*eval.Decl
 	for d := range n.Decls() {
 		switch d.Kind() {
-		case eval.DeclField, eval.DeclAlias, eval.DeclPattern, eval.DeclDynamic:
+		case eval.DeclField, eval.DeclAlias, eval.DeclPattern, eval.DeclDynamic, eval.DeclParam:
 		default:
 			// Embedded declarations (conjuncts, disjuncts, defaults,
-			// comprehension bodies) are parts of a DeclField's value and
-			// are rendered within it; files, packages, imports and
-			// inline expressions carry no value of their own.
+			// comprehension bodies) are parts of a renderable
+			// declaration's value and are rendered within it; files,
+			// packages, imports and inline expressions carry no value
+			// of their own.
 			continue
 		}
 		value, ok := d.Value().(ast.Expr)

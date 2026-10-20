@@ -126,7 +126,7 @@ package x
 		}),
 	})
 	qt.Assert(t, qt.IsNil(err))
-	ctx := context.Background()
+	ctx := t.Context()
 	mf, err := r.ModFile(ctx, module.MustNewVersion("foo.example@v0", "v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(mf.DepVersions(), []module.Version{
@@ -167,7 +167,7 @@ language: version: "v0.8.0"
 package x
 `)))
 	qt.Assert(t, qt.IsNil(err))
-	ctx := context.Background()
+	ctx := t.Context()
 	rmem := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
 	err = modregistrytest.Upload(ctx, rmem, regFS)
 	qt.Assert(t, qt.IsNil(err))
@@ -226,7 +226,7 @@ package bar
 		qt.Assert(t, qt.IsNil(err))
 		mux := http.NewServeMux()
 		r := ocimem.New()
-		err = modregistrytest.Upload(context.Background(), r, fsys)
+		err = modregistrytest.Upload(t.Context(), r, fsys)
 		qt.Assert(t, qt.IsNil(err))
 		rh := ociserver.New(r, nil)
 		mux.HandleFunc("/v2/", func(w http.ResponseWriter, r *http.Request) {
@@ -306,7 +306,7 @@ package bar
 	for i := range registries {
 		mod := registries[i].mod
 		g.Go(func() error {
-			ctx := context.Background()
+			ctx := t.Context()
 			loc, err := r.Fetch(ctx, module.MustNewVersion(mod+"@v0", "v0.0.1"))
 			if err != nil {
 				return err
@@ -331,7 +331,7 @@ package bar
 // and that it is not cut short when the request which needs it is canceled.
 func TestTokenRefreshCanceledRequest(t *testing.T) {
 	// The third refresh cancels the request which needs it.
-	ctx3, cancel3 := context.WithCancel(context.Background())
+	ctx3, cancel3 := context.WithCancel(t.Context())
 	defer cancel3()
 	var refreshes atomic.Int32
 	// The tokens expire within oauth2's expiry delta,
@@ -343,13 +343,13 @@ func TestTokenRefreshCanceledRequest(t *testing.T) {
 		}
 	})
 
-	ctx1, cancel1 := context.WithCancel(context.Background())
+	ctx1, cancel1 := context.WithCancel(t.Context())
 	versions, err := reg.ModuleVersions(ctx1, "foo.mod@v0")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(versions, []string{"v0.0.1"}))
 	cancel1()
 
-	versions, err = reg.ModuleVersions(context.Background(), "foo.mod@v0")
+	versions, err = reg.ModuleVersions(t.Context(), "foo.mod@v0")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(versions, []string{"v0.0.1"}))
 	qt.Assert(t, qt.Equals(refreshes.Load(), 2))
@@ -379,12 +379,12 @@ func TestTokenRefreshWaiterDeadline(t *testing.T) {
 
 	first := make(chan error, 1)
 	go func() {
-		_, err := reg.ModuleVersions(context.Background(), "foo.mod@v0")
+		_, err := reg.ModuleVersions(t.Context(), "foo.mod@v0")
 		first <- err
 	}()
 	<-started
 
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
 	defer cancel()
 	second := make(chan error, 1)
 	go func() {
@@ -414,7 +414,7 @@ language: version: "v0.8.0"
 `)))
 	qt.Assert(t, qt.IsNil(err))
 	r := ocimem.New()
-	err = modregistrytest.Upload(context.Background(), r, fsys)
+	err = modregistrytest.Upload(t.Context(), r, fsys)
 	qt.Assert(t, qt.IsNil(err))
 	rh := ociserver.New(r, nil)
 	mux := http.NewServeMux()

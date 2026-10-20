@@ -61,7 +61,7 @@ module: "baz.org@v0"
 language: version: "v0.8.0"
 `
 
-	ctx := context.Background()
+	ctx := t.Context()
 	reg := newRegistry(t, registryContents)
 
 	rootVersion := mustParseVersion("example.com@v0")
@@ -113,7 +113,7 @@ module: "foo.com/bar/hello@v0"
 language: version: "v0.8.0"
 deps: "bar.com@v0": v: "v0.0.2"	// doesn't exist
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	reg := newRegistry(t, registryContents)
 
 	rootVersion := mustParseVersion("example.com@v0")

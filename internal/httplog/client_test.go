@@ -54,7 +54,7 @@ func TestQueryParamAllowList(t *testing.T) {
 			Logger: &recorder,
 		}),
 	}
-	ctx := ContextWithAllowedURLQueryParams(context.Background(),
+	ctx := ContextWithAllowedURLQueryParams(t.Context(),
 		func(key string) bool {
 			return key == "x1"
 		},
@@ -122,7 +122,7 @@ func TestAuthorizationHeaderRedacted(t *testing.T) {
 			Logger: &recorder,
 		}),
 	}
-	ctx := context.Background()
+	ctx := t.Context()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", srv.URL+"/foo", nil)
 	qt.Assert(t, qt.IsNil(err))
@@ -175,7 +175,7 @@ func TestIncludeAllQueryParams(t *testing.T) {
 			IncludeAllQueryParams: true,
 		}),
 	}
-	ctx := context.Background()
+	ctx := t.Context()
 	req, err := http.NewRequestWithContext(ctx, "GET", srv.URL+"/foo/bar?x1=ok&x2=redact1&x2=redact2", nil)
 	qt.Assert(t, qt.IsNil(err))
 	resp, err := client.Do(req)
@@ -215,7 +215,7 @@ func TestOmitBody(t *testing.T) {
 			Logger: &recorder,
 		}),
 	}
-	ctx := context.Background()
+	ctx := t.Context()
 	ctx = RedactRequestBody(ctx, "not keen on request bodies")
 	ctx = RedactResponseBody(ctx, "response bodies are right out")
 	req, err := http.NewRequestWithContext(ctx, "GET", srv.URL+"/foo/bar", strings.NewReader("request body"))
@@ -269,7 +269,7 @@ func TestLongBody(t *testing.T) {
 			MaxBodySize: 10,
 		}),
 	}
-	ctx := context.Background()
+	ctx := t.Context()
 	req, err := http.NewRequestWithContext(ctx, "GET", srv.URL+"/foo/bar", strings.NewReader(strings.Repeat("a", 30)))
 	qt.Assert(t, qt.IsNil(err))
 	resp, err := client.Do(req)
@@ -319,7 +319,7 @@ func TestRoundTripError(t *testing.T) {
 			Logger:    &recorder,
 		}),
 	}
-	ctx := context.Background()
+	ctx := t.Context()
 	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:1234/foo/bar", nil)
 	qt.Assert(t, qt.IsNil(err))
 	_, err = client.Do(req)
@@ -357,7 +357,7 @@ func TestBodyBinaryData(t *testing.T) {
 			Logger: &recorder,
 		}),
 	}
-	ctx := context.Background()
+	ctx := t.Context()
 	req, err := http.NewRequestWithContext(ctx, "GET", srv.URL+"/foo/bar", bytes.NewReader([]byte{0xff}))
 	qt.Assert(t, qt.IsNil(err))
 	resp, err := client.Do(req)

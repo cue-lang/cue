@@ -15,7 +15,6 @@
 package task_test
 
 import (
-	"context"
 	"runtime"
 	"sync/atomic"
 	"testing"
@@ -168,7 +167,7 @@ func TestReleaseEarlierConfigurations(t *testing.T) {
 	// configuration itself. Run in a bubble, so that the goroutines
 	// of the finished tasks have exited before the garbage collection.
 	synctest.Test(t, func(t *testing.T) {
-		if err := flow.New(cfg, v, taskFunc).Run(context.Background()); err != nil {
+		if err := flow.New(cfg, v, taskFunc).Run(t.Context()); err != nil {
 			t.Fatal(err)
 		}
 	})

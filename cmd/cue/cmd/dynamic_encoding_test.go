@@ -16,7 +16,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -98,7 +97,7 @@ foo_bar: int @protobuf(1,int64)
 		var stdout, stderr bytes.Buffer
 		c.SetOut(&stdout)
 		c.SetErr(&stderr)
-		err = c.Run(context.Background())
+		err = c.Run(t.Context())
 		qt.Assert(t, qt.IsNil(err), qt.Commentf("stderr: %s", stderr.String()))
 		return stdout.String()
 	}

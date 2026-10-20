@@ -22,7 +22,7 @@ import (
 
 func TestRequirements(t *testing.T) {
 	dir := t.TempDir()
-	ctx := context.Background()
+	ctx := t.Context()
 	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
@@ -96,7 +96,7 @@ func TestFetch(t *testing.T) {
 	t.Cleanup(func() {
 		RemoveAll(dir)
 	})
-	ctx := context.Background()
+	ctx := t.Context()
 	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
@@ -180,7 +180,7 @@ func TestFetchMemoized(t *testing.T) {
 	t.Cleanup(func() {
 		RemoveAll(dir)
 	})
-	ctx := context.Background()
+	ctx := t.Context()
 	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
@@ -229,14 +229,14 @@ package example
 	qt.Assert(t, qt.IsNil(err))
 	mv := module.MustNewVersion("example.com/foo", "v0.0.1")
 
-	canceledCtx, cancel := context.WithCancel(context.Background())
+	canceledCtx, cancel := context.WithCancel(t.Context())
 	cancel()
 	_, err = cr.ModFile(canceledCtx, mv)
 	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
 	_, err = cr.Fetch(canceledCtx, mv)
 	qt.Assert(t, qt.ErrorIs(err, context.Canceled))
 
-	ctx := context.Background()
+	ctx := t.Context()
 	_, err = cr.ModFile(ctx, mv)
 	qt.Assert(t, qt.IsNil(err))
 	_, err = cr.Fetch(ctx, mv)
@@ -255,7 +255,7 @@ func TestWriteDiskCacheFailure(t *testing.T) {
 	err = os.MkdirAll(filepath.Join(file, "sub"), 0o777)
 	qt.Assert(t, qt.IsNil(err))
 
-	err = cr.writeDiskCache(context.Background(), file, []byte("data"))
+	err = cr.writeDiskCache(t.Context(), file, []byte("data"))
 	qt.Assert(t, qt.Not(qt.IsNil(err)))
 	entries, err := os.ReadDir(entryDir)
 	qt.Assert(t, qt.IsNil(err))

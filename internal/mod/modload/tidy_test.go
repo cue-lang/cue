@@ -1,7 +1,6 @@
 package modload
 
 import (
-	"context"
 	"fmt"
 	"io/fs"
 	"path/filepath"
@@ -34,7 +33,7 @@ func TestTidy(t *testing.T) {
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
 
-			err = CheckTidy(context.Background(), tfs, ".", reg, nil)
+			err = CheckTidy(t.Context(), tfs, ".", reg, nil)
 			wantCheckTidyError := stringFromFile(tfs, "tidy-check-error")
 			if wantCheckTidyError == "" {
 				qt.Check(t, qt.IsNil(err))
@@ -44,7 +43,7 @@ func TestTidy(t *testing.T) {
 
 			var out strings.Builder
 			var tidyFile []byte
-			res, err := Tidy(context.Background(), tfs, ".", reg, nil)
+			res, err := Tidy(t.Context(), tfs, ".", reg, nil)
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
@@ -65,7 +64,7 @@ func TestTidy(t *testing.T) {
 				}
 				tfs, err := txtar.FS(ar)
 				qt.Assert(t, qt.IsNil(err))
-				err = CheckTidy(context.Background(), tfs, ".", reg, nil)
+				err = CheckTidy(t.Context(), tfs, ".", reg, nil)
 				qt.Check(t, qt.IsNil(err), qt.Commentf("CheckTidy after a successful Tidy should not fail"))
 			}
 		})

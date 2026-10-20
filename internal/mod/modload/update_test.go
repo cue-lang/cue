@@ -1,7 +1,6 @@
 package modload
 
 import (
-	"context"
 	"fmt"
 	"io/fs"
 	"path"
@@ -38,7 +37,7 @@ func TestUpdateVersions(t *testing.T) {
 			versions := strings.Fields(string(versionsData))
 
 			var out strings.Builder
-			mf, err := UpdateVersions(context.Background(), tfs, ".", reg, versions)
+			mf, err := UpdateVersions(t.Context(), tfs, ".", reg, versions)
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
@@ -66,7 +65,7 @@ func TestResolveAbsolutePackage(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 			for _, e := range testEntries {
 				t.Run(e.Name(), func(t *testing.T) {
-					ctx := context.Background()
+					ctx := t.Context()
 					pkgData, err := fs.ReadFile(tfs, path.Join("tests", e.Name(), "package"))
 					qt.Assert(t, qt.IsNil(err))
 					pkg := strings.TrimSpace(string(pkgData))

@@ -1,7 +1,6 @@
 package modregistrytest
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -48,7 +47,7 @@ func TestRegistry(t *testing.T) {
 }
 
 func runTest(t *testing.T, registry ociregistry.Interface, script string, ar *txtar.Archive) {
-	ctx := context.Background()
+	ctx := t.Context()
 	client := modregistry.NewClient(registry)
 	for line := range strings.SplitSeq(script, "\n") {
 		if line == "" || line[0] == '#' {

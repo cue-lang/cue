@@ -38,7 +38,7 @@ import (
 // Ensure that they continue to work as advertised.
 
 func TestCommand(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	// Create one command and run it, only checking that it succeeds.
 	c, err := cmd.New([]string{"help", "export"})

@@ -162,7 +162,7 @@ func TestGenerateDefaultedStructDisjunction(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=^"+t.Name()+"$")
 	cmd.Env = append(os.Environ(), env+"=1")

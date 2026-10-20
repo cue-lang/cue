@@ -15,7 +15,6 @@
 package flow_test
 
 import (
-	"context"
 	"runtime"
 	"testing"
 	"weak"
@@ -67,7 +66,7 @@ func TestReleaseEarlierConfigurations(t *testing.T) {
 				},
 			}
 			c := flow.New(cfg, v, taskFunc)
-			if err := c.Run(context.Background()); err != nil {
+			if err := c.Run(t.Context()); err != nil {
 				t.Fatal(err)
 			}
 			// The controller keeps the last configuration.

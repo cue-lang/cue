@@ -373,7 +373,7 @@ func TestX(t *testing.T) {
 		b := &bytes.Buffer{}
 		c.SetOut(b)
 		c.SetErr(b)
-		err = c.Run(context.Background())
+		err = c.Run(t.Context())
 		// Always create an error to show
 		t.Error(err, "\n", b.String())
 		return

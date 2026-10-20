@@ -61,7 +61,7 @@ language: version: "v0.8.0"
 -- x.cue --
 x: 42
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("example.com/module@v1.2.3")
 	c := newTestClient(t)
 	zipData := putModule(t, c, mv, testMod)
@@ -86,7 +86,7 @@ x: 42
 }
 
 func TestModuleVersions(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	c := newTestClient(t)
 	for _, v := range []string{"v1.0.0", "v2.3.3-alpha", "v1.2.3", "v0.23.676", "v3.2.1"} {
 		mpath := "example.com/module@" + semver.Major(v)
@@ -126,7 +126,7 @@ import (
 )
 x: a.foo + something.bar
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
 	c := newTestClient(t)
 	zipData := putModule(t, c, mv, testMod)
@@ -154,7 +154,7 @@ language: version: "v0.8.0"
 -- x.cue --
 x: 42
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("example.com/module@v1.2.3")
 	c := newTestClient(t)
 	zipData := putModule(t, c, mv, testMod)
@@ -207,7 +207,7 @@ func TestNotFound(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	client := NewClient(reg)
 	checkNotFound := func(writeResp func(w http.ResponseWriter)) {
-		ctx := context.Background()
+		ctx := t.Context()
 		writeResponse = writeResp
 		mv := module.MustNewVersion("foo.com/bar@v1", "v1.2.3")
 		_, err := client.GetModule(ctx, mv)
@@ -237,7 +237,7 @@ language: version: "v0.8.0"
 -- x.cue --
 package bar
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
 	c := newTestClient(t)
 	zipData := createZip(t, mv, testMod)
@@ -246,7 +246,7 @@ package bar
 		VCSCommit:     "2ff5afa7cda41bf030654ab03caeba3fadf241ae",
 		VCSCommitTime: time.Date(2024, 4, 23, 15, 16, 17, 0, time.UTC),
 	}
-	err := c.PutModuleWithMetadata(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)), meta)
+	err := c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(zipData), int64(len(zipData)), meta)
 	qt.Assert(t, qt.IsNil(err))
 
 	m, err := c.GetModule(ctx, mv)
@@ -266,7 +266,7 @@ language: version: "v0.8.0"
 -- x.cue --
 package bar
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
 	c := newTestClient(t)
 	zipData := createZip(t, mv, testMod)
@@ -296,7 +296,7 @@ import (
 )
 x: a.foo + something.bar
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
 	// Note that we delete a tag below, so we want a mutable registry.
 	reg := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: false})
@@ -353,7 +353,7 @@ x: 42
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
 	c := newTestClient(t)
 	zipData := createZip(t, mv, testMod)
-	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
+	err := c.PutModule(t.Context(), mv, bytes.NewReader(zipData), int64(len(zipData)))
 	qt.Assert(t, qt.ErrorMatches(err, `cannot put module "foo.com/bar@v0.5.100": invalid module file cue.mod/module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`))
 }
 
@@ -433,7 +433,7 @@ x: 42
 
 	mv := module.MustParseVersion("example.com/module@v1.0.2")
 	zipData := createZip(t, mv, testMod)
-	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
+	err := c.PutModule(t.Context(), mv, bytes.NewReader(zipData), int64(len(zipData)))
 	qt.Assert(t, qt.IsNil(err))
 }
 
@@ -446,7 +446,7 @@ language: version: "v0.8.0"
 -- x.cue --
 x: 42
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	c := newTestClient(t)
 	mv := module.MustParseVersion("example.com/module@v1.0.0")
 	meta := &Metadata{
@@ -508,7 +508,7 @@ func (r noBlobOverwriteRegistry) PushBlob(ctx context.Context, repo string, desc
 
 func TestModuleVersionsOnNonExistentModule(t *testing.T) {
 	c := newTestClient(t)
-	ctx := context.Background()
+	ctx := t.Context()
 	tags, err := c.ModuleVersions(ctx, "not/there@v0")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.HasLen(tags, 0))
@@ -522,7 +522,7 @@ func TestModuleVersionsOnNonExistentModule(t *testing.T) {
 
 func putModule(t *testing.T, c *Client, mv module.Version, txtarData string) []byte {
 	zipData := createZip(t, mv, txtarData)
-	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
+	err := c.PutModule(t.Context(), mv, bytes.NewReader(zipData), int64(len(zipData)))
 	qt.Assert(t, qt.IsNil(err))
 	return zipData
 }
@@ -583,7 +583,7 @@ language: version: "v0.8.0"
 -- x.cue --
 x: 42
 `
-	ctx := context.Background()
+	ctx := t.Context()
 	mv := module.MustParseVersion("example.com/module@v1.2.3")
 
 	// Create registry and client
@@ -817,7 +817,7 @@ func TestHTTPErrorMessages(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			writeResponse = test.writeResp
 			mv := module.MustNewVersion("foo.com/bar@v1", "v1.2.3")
-			_, err := client.GetModule(context.Background(), mv)
+			_, err := client.GetModule(t.Context(), mv)
 			qt.Assert(t, qt.ErrorMatches(err, regexp.QuoteMeta(test.wantErr)))
 			// The HTTP details must remain available to callers.
 			herr, ok := errors.AsType[ociregistry.HTTPError](err)

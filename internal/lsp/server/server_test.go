@@ -58,7 +58,7 @@ func (c *testClient) PublishDiagnostics(context.Context, *protocol.PublishDiagno
 // send delivers one message from the client to the handler, and
 // describes how the server responds: "ok", "error" with a JSON-RPC
 // error code, or "panic".
-func send(handler jsonrpc2.Handler, req jsonrpc2.Request) (outcome string) {
+func send(ctx context.Context, handler jsonrpc2.Handler, req jsonrpc2.Request) (outcome string) {
 	defer func() {
 		if r := recover(); r != nil {
 			outcome = "panic"
@@ -76,7 +76,7 @@ func send(handler jsonrpc2.Handler, req jsonrpc2.Request) (outcome string) {
 		}
 		return nil
 	}
-	if err := handler(context.Background(), reply, req); err != nil {
+	if err := handler(ctx, reply, req); err != nil {
 		return fmt.Sprintf("handler error: %v", err)
 	}
 	return outcome
@@ -204,7 +204,7 @@ func TestLifecycle(t *testing.T) {
 			handler := s.Handler(jsonrpc2.MethodNotFound)
 
 			for i, step := range test.steps {
-				if got := send(handler, step.req); got != step.want {
+				if got := send(t.Context(), handler, step.req); got != step.want {
 					t.Errorf("step %d, %s: got %q, want %q", i, step.req.Method(), got, step.want)
 				}
 			}

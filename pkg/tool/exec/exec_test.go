@@ -15,7 +15,6 @@
 package exec
 
 import (
-	"context"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -37,7 +36,7 @@ func TestEmptyCmd(t *testing.T) {
 			t.Fatal(err)
 		}
 		_, _, err := mkCommand(&task.Context{
-			Context: context.Background(),
+			Context: t.Context(),
 			Obj:     v,
 		})
 		if err == nil {
@@ -101,7 +100,7 @@ func TestEnv(t *testing.T) {
 			}
 
 			cmd, _, err := mkCommand(&task.Context{
-				Context: context.Background(),
+				Context: t.Context(),
 				Obj:     v,
 			})
 			if err != nil {

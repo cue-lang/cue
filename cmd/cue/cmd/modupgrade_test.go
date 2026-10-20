@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"context"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -188,7 +187,7 @@ func runPolicyFixture(t *testing.T, path string) {
 		var stdout, stderr bytes.Buffer
 		c.root.SetErr(&stderr)
 		c.SetOut(&stdout)
-		err = c.Run(context.Background())
+		err = c.Run(t.Context())
 		if err != nil && err != ErrPrintedError {
 			errors.Print(&stderr, err, &errors.Config{Cwd: dir, ToSlash: true})
 		}

@@ -15,7 +15,6 @@
 package flow_test
 
 import (
-	"context"
 	"fmt"
 	"slices"
 	"strconv"
@@ -96,7 +95,7 @@ func TestIsCyclic(t *testing.T) {
 				t.Errorf("got dependencies:\n%s\nwant:\n%s", got, want)
 			}
 
-			err := c.Run(context.Background())
+			err := c.Run(t.Context())
 			if tc.cycle {
 				if err == nil || !strings.Contains(err.Error(), "cyclic task dependency") {
 					t.Errorf("got error %v; want a cyclic task dependency", err)

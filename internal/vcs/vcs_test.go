@@ -15,7 +15,6 @@
 package vcs
 
 import (
-	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -28,7 +27,7 @@ import (
 
 func TestGit(t *testing.T) {
 	skipIfNoExecutable(t, "git")
-	ctx := context.Background()
+	ctx := t.Context()
 	dir := t.TempDir()
 
 	testFS, err := txtar.FS(txtar.Parse([]byte(`

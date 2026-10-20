@@ -1,7 +1,6 @@
 package flow_test
 
 import (
-	"context"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -86,7 +85,7 @@ func TestStaticDeferredMixing(t *testing.T) {
 	c := flow.New(nil, val, flow.TaskFunc(runner))
 
 	// Run the flow
-	err := c.Run(context.Background())
+	err := c.Run(t.Context())
 	if err != nil {
 		t.Fatalf("Flow run failed: %v", err)
 	}

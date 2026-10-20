@@ -58,7 +58,7 @@ func TestLoadPackages(t *testing.T) {
 					fmt.Fprintf(&out, f, a...)
 				}
 				pkgs := LoadPackages(
-					context.Background(),
+					t.Context(),
 					mainModulePath,
 					module.SourceLoc{FS: tfs, Dir: "."},
 					initialRequirements,
@@ -165,7 +165,7 @@ package C
 			return module.SourceLoc{}, false, fmt.Errorf("no module")
 		}
 	}
-	locs, err := FindPackageLocations(context.Background(), "foo.bar/a/b/c/d", versionForModule, fetch)
+	locs, err := FindPackageLocations(t.Context(), "foo.bar/a/b/c/d", versionForModule, fetch)
 	qt.Assert(t, qt.IsNil(err))
 	var dirs []string
 	for _, loc := range locs {

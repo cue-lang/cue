@@ -91,7 +91,7 @@ func TestFlow(t *testing.T) {
 		c := flow.New(cfg, v, taskFunc)
 
 		w := t.Writer("errors")
-		if err := c.Run(context.Background()); err != nil {
+		if err := c.Run(t.Context()); err != nil {
 			cwd, _ := os.Getwd()
 			fmt.Fprint(w, "error: ")
 			errors.Print(w, err, &errors.Config{
@@ -188,7 +188,7 @@ package task
 				return t.Fill(top)
 			}), nil
 		})
-		if err := c.Run(context.Background()); err != nil {
+		if err := c.Run(t.Context()); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -225,7 +225,7 @@ func TestFlowValueOfCompletedTask(t *testing.T) {
 			return t.Fill(map[string]any{"success": true})
 		}), nil
 	})
-	if err := c.Run(context.Background()); err != nil {
+	if err := c.Run(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -261,7 +261,7 @@ func TestFlowNonRootValue(t *testing.T) {
 			return t.Fill(map[string]bool{"done": true})
 		}), nil
 	})
-	if err := c.Run(context.Background()); err != nil {
+	if err := c.Run(t.Context()); err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
 	if runs != 1 {
@@ -583,7 +583,7 @@ func TestX(t *testing.T) {
 
 	t.Error(mermaidGraph(c))
 
-	if err := c.Run(context.Background()); err != nil {
+	if err := c.Run(t.Context()); err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
 

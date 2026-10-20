@@ -162,6 +162,7 @@ x: _
 			URI:   rootURI + "/sym%20link/a.cue",
 			Range: protocol.Range{Start: protocol.Position{Line: 2, Character: 3}},
 		})
+		qt.Assert(t, qt.IsNotNil(got))
 		qt.Assert(t, qt.IsTrue(strings.HasPrefix(got.Value, "docs for x")))
 
 		// add a newline (and comment so that the hover coords exist), before line 2

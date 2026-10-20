@@ -718,6 +718,7 @@ a: {
 type definitionsTestCases map[position][]position
 
 func (tcs definitionsTestCases) run(t *testing.T, env *I.Env, mappers map[string]*protocol.Mapper) {
+	t.Helper()
 	for posFrom, posWants := range tcs {
 		posFrom.determinePos(mappers)
 		for i := range posWants {
@@ -734,10 +735,10 @@ func (tcs definitionsTestCases) run(t *testing.T, env *I.Env, mappers map[string
 				URI:   posFrom.mapper.URI,
 				Range: protocol.Range{Start: pos},
 			})
-			qt.Assert(t, qt.Equals(len(posGots), len(posWants)))
+			qt.Assert(t, qt.Equals(len(posGots), len(posWants)), qt.Commentf("%v(+%d)", &posFrom, i))
 
-			for i, posWant := range posWants {
-				posGot := posGots[i]
+			for j, posWant := range posWants {
+				posGot := posGots[j]
 				posWantLoc := protocol.Location{
 					URI: posWant.mapper.URI,
 					Range: protocol.Range{
@@ -746,7 +747,7 @@ func (tcs definitionsTestCases) run(t *testing.T, env *I.Env, mappers map[string
 					},
 				}
 				posWantLoc.Range.End.Character += uint32(len(posWant.str))
-				qt.Assert(t, qt.Equals(posGot, posWantLoc))
+				qt.Assert(t, qt.Equals(posGot, posWantLoc), qt.Commentf("%v(+%d)", &posFrom, i))
 			}
 		}
 	}

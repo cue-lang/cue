@@ -110,6 +110,7 @@ c3: p3.result
 			},
 		})
 		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.IsNotNil(result))
 		// PrepareRename should return the range which is the whole of out
 		qt.Assert(t, qt.DeepEquals(result.Range, protocol.Range{
 			Start: protocol.Position{Line: 6, Character: 7},

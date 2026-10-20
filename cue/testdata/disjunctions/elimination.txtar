@@ -1281,14 +1281,14 @@ issue2685: {
     ./in.cue:434:20
 -- out/eval/stats --
 Leaks:  256
-Freed:  2842
-Reused: 2799
+Freed:  2828
+Reused: 2785
 Allocs: 299
 Retain: 0
 
 Unifications: 839
-Conjuncts:    3100
-Disjuncts:    1423
+Conjuncts:    3086
+Disjuncts:    1409
 Notifications: 8
 
 NumCloseIDs: 209

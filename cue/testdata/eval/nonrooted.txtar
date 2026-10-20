@@ -70,14 +70,14 @@ issue4510: inline: {
 		out: "k/\(id)"
 	}
 	ok:  (#C & {id: "other"}).out   @test(eq, "k/other")
-	err: (#C & {id: "storage"}).out @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	err: (#C & {id: "storage"}).out @test(err, code=eval, contains="out of bound")
 }
 issue4510: literal: {
 	err: {
 		id:  string & !="storage"
 		id:  "storage"
 		out: "k/\(id)"
-	}.out @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	}.out @test(err, code=eval, contains="out of bound")
 }
 issue4510: let: {
 	#C: {
@@ -92,14 +92,14 @@ issue4510: regexp: {
 		id:  =~"^a"
 		out: "k/\(id)"
 	}
-	err: (#C & {id: "b"}).out @test(eq, "k/b", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	err: (#C & {id: "b"}).out @test(err, code=eval, contains="out of bound")
 }
 issue4510: builtin: {
 	#C: {
 		id:  strings.MaxRunes(2)
 		out: "k/\(id)"
 	}
-	err: (#C & {id: "abc"}).out @test(eq, "k/abc", incorrect) @test(err:todo, p=1, code=eval, contains="does not satisfy strings.MaxRunes(2)")
+	err: (#C & {id: "abc"}).out @test(err, code=eval, contains="does not satisfy strings.MaxRunes(2)")
 }
 // A validator of the read scalar may refer to the reading field: it is checked
 // once that field has its value, as it would be for a regular field.
@@ -107,7 +107,7 @@ issue4510: selfRef: {
 	ok1: ({x: 1 & !=ok1, out: x + 1}).out @test(eq, 2)
 	let L = {x: 1 & !=ok2, out: x + 1}
 	ok2: L.out                            @test(eq, 2)
-	err: ({x: 1 & !=err, out: x + 0}).out @test(eq, 1, incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	err: ({x: 1 & !=err, out: x + 0}).out @test(err, code=eval, contains="out of bound")
 }
 // The reading field may be a disjunction, in which case each disjunct checks
 // the read scalar on its own.
@@ -117,7 +117,7 @@ issue4510: disjunct: {
 		out: "k/\(id)"
 	}
 	ok:  (#C & {id: "other"}).out & (string | int)   @test(eq, "k/other")
-	err: (#C & {id: "storage"}).out & (string | int) @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, suberr=(contains="out of bound"), suberr=(contains="empty disjunction"), suberr=(contains="mismatched types"))
+	err: (#C & {id: "storage"}).out & (string | int) @test(err, code=eval, suberr=(contains="out of bound"), suberr=(contains="empty disjunction"), suberr=(contains="mismatched types"))
 
 	let L = #C & {id: "storage"}
 	errLet: L.out & (*"k/storage" | string) @test(eq, "k/storage", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
@@ -137,7 +137,7 @@ issue4510: binop: {
 		id:  string & !="storage"
 		out: "k/\(id)"
 	}
-	err: (#C & {id: "storage"}).out + "y" @test(eq, "k/storagey", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	err: (#C & {id: "storage"}).out + "y" @test(err, code=eval, contains="out of bound")
 
 	let L = #C & {id: "storage"}
 	errLet: L.out + "y" @test(eq, "k/storagey", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
@@ -156,13 +156,13 @@ issue4510: consumers: {
 		id:  string & !="storage"
 		out: "k/\(id)"
 	}
-	errBuiltin: strings.ToUpper((#C & {id: "storage"}).out) @test(eq, "K/STORAGE", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	errBuiltin: strings.ToUpper((#C & {id: "storage"}).out) @test(err, code=eval, contains="out of bound")
 
-	errLen: len((#C & {id: "storage"}).out) @test(eq, 9, incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	errLen: len((#C & {id: "storage"}).out) @test(err, code=eval, contains="out of bound")
 
-	errArith: ({x: 1 & !=1, out: x + 1}).out @test(eq, 2, incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	errArith: ({x: 1 & !=1, out: x + 1}).out @test(err, code=eval, contains="out of bound")
 
-	fallback: *(#C & {id: "storage"}).out | "fallback" @test(eq, *"k/storage" | "fallback", incorrect) @test(eq:todo, p=1, "fallback")
+	fallback: *(#C & {id: "storage"}).out | "fallback" @test(eq, "fallback")
 }
 // A disjunct that fails on its own value must not complete the deferred nodes,
 // which it shares with the other disjuncts: a validator among them that refers
@@ -256,18 +256,45 @@ x: 2 errors in empty disjunction::
 [incomplete] issue4510.inline.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:64:8
     ./in.cue:63:17
+[eval] id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:63:17
+    ./in.cue:63:8
+    ./in.cue:67:18
+[eval] id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:71:17
+    ./in.cue:71:8
+    ./in.cue:72:8
 [incomplete] issue4510.let.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:79:8
     ./in.cue:78:17
 [incomplete] issue4510.regexp.#C.out: invalid interpolation: non-concrete value =~"^a" (type string):
     ./in.cue:87:8
     ./in.cue:86:8
+[eval] id: invalid value "b" (out of bound =~"^a"):
+    ./in.cue:86:8
+    ./in.cue:89:18
 [incomplete] issue4510.builtin.#C.out: invalid interpolation: non-concrete value strings.MaxRunes(2) (type string):
     ./in.cue:94:8
     ./in.cue:93:8
+[eval] id: invalid value "abc" (does not satisfy strings.MaxRunes(2)):
+    ./in.cue:93:8
+    ./in.cue:93:25
+    ./in.cue:96:18
+[eval] x: invalid value 1 (out of bound !=1):
+    ./in.cue:104:16
+    ./in.cue:104:12
 [incomplete] issue4510.disjunct.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:111:8
     ./in.cue:110:17
+[eval] issue4510.disjunct.err: 2 errors in empty disjunction:
+issue4510.disjunct.err: conflicting values "k/storage" and int (mismatched types string and int):
+    ./in.cue:111:8
+    ./in.cue:114:7
+    ./in.cue:114:46
+id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:110:17
+    ./in.cue:110:8
+    ./in.cue:114:18
 [eval] issue4510.disjunct.errConflict: 2 errors in empty disjunction:
 issue4510.disjunct.errConflict: conflicting values 12 and string (mismatched types int and string):
     ./in.cue:122:8
@@ -281,6 +308,10 @@ x: conflicting values 1 and 2:
 [incomplete] issue4510.binop.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:132:8
     ./in.cue:131:17
+[eval] id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:131:17
+    ./in.cue:131:8
+    ./in.cue:134:18
 [eval] x: conflicting values 1 and 2:
     ./in.cue:139:6
     ./in.cue:141:8
@@ -289,6 +320,17 @@ x: conflicting values 1 and 2:
 [incomplete] issue4510.consumers.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
     ./in.cue:151:8
     ./in.cue:150:17
+[eval] id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:150:17
+    ./in.cue:150:8
+    ./in.cue:153:41
+[eval] id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:150:17
+    ./in.cue:150:8
+    ./in.cue:155:25
+[eval] x: invalid value 1 (out of bound !=1):
+    ./in.cue:157:21
+    ./in.cue:157:17
 [eval] issue4510.compLet.errList.1: invalid value 2 (out of bound !=2):
     ./in.cue:180:35
     ./in.cue:179:9

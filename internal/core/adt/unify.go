@@ -424,26 +424,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		}
 
 		if v := n.node.Value(); v != nil && IsConcrete(v) {
-			// Ensure that checks are not run again when this value is used
-			// in a validator.
-			checks := n.checks
-			n.checks = n.checks[:0]
-			// Validators do not run on an erroneous value. Adding the error
-			// of a validator given one would replace a child error with a
-			// copy that no longer leads to the other child errors.
-			// A node with conflicting kinds is erroneous too, even if its
-			// error is only set as its value below.
-			if isError(v) || n.kind == BottomKind {
-				checks = nil
-			}
-			for _, v := range checks {
-				// TODO(errors): make Validate return bottom and generate
-				// optimized conflict message. Also track and inject IDs
-				// to determine origin location.s
-				if b := c.Validate(v, n.node); b != nil {
-					n.addBottom(b)
-				}
-			}
+			n.runChecks(c)
 		}
 
 	// TODO(pushdown): remove
@@ -647,6 +628,52 @@ func (n *nodeContext) updateScalar() {
 			n.setBaseValue(n.scalar)
 		}
 		n.signal(scalarKnown)
+		n.validateScalar()
+	}
+}
+
+// validateScalar runs the collected validators of a scalar value as soon as
+// all its conjuncts are in, rather than once its subfields are processed, as
+// [Vertex.unify] does for any value. A scalar has no subfields to wait for, and
+// a node that is only read through a reference, such as a field of an inline
+// struct or let, may never be processed that far, so a referrer would see the
+// value but never the validation error. A dynamic vertex, such as a
+// comprehension's let clause, has no path of its own and is checked by
+// whatever created it, where its value is used.
+func (n *nodeContext) validateScalar() {
+	if len(n.checks) > 0 && !n.node.IsDynamic && allTasksFinished(n) {
+		// The value may be reached from a task of another node; the error
+		// belongs to this one.
+		c := n.ctx
+		defer c.PopArc(c.PushArc(n.node))
+		n.runChecks(c)
+	}
+}
+
+// runChecks runs the collected validators against the node's value, once:
+// they are not run again when the value is used in a validator. The errors go
+// to c, which may be a context other than the node's own when that context
+// finalizes the node, as a builtin marshaling its argument does.
+func (n *nodeContext) runChecks(c *OpContext) {
+	if len(n.checks) == 0 {
+		return
+	}
+	checks := n.checks
+	n.checks = n.checks[:0]
+	// Validators do not run on an erroneous value. Adding the error of a
+	// validator given one would replace a child error with a copy that no
+	// longer leads to the other child errors. A node with conflicting kinds
+	// is erroneous too, even if its error is only set as its value later.
+	if n.kind == BottomKind || n.node.IsErr() {
+		return
+	}
+	for _, check := range checks {
+		// TODO(errors): make Validate return bottom and generate
+		// optimized conflict message. Also track and inject IDs
+		// to determine origin location.s
+		if b := c.Validate(check, n.node); b != nil {
+			n.addBottom(b)
+		}
 	}
 }
 

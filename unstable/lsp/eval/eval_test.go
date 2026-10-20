@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/inject/embed"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -6356,6 +6357,114 @@ y: f(a: 1)
 			},
 		},
 	}.run(t)
+}
+
+// TestCompletionRanges checks the range of text that the completions
+// offered within a path element replace.
+func TestCompletionRanges(t *testing.T) {
+	src := `
+@experiment(functions)
+a: b: c: 1
+x: a.b.c
+y: a
+z: a . b
+g: scale
+scale: func(x: int, by: int = 2) -> int: x * by
+r: g(x: 3)
+`[1:]
+
+	testCases := []struct {
+		name string
+		// elem is the path element whose completions are checked; the
+		// cursor is at its start, shifted by delta.
+		elem  position
+		delta int
+		// start and end place the replaced range relative to the
+		// element's start and end.
+		start, end int
+	}{
+		{name: "ident starting a dotted path", elem: ln(3, 1, "a"), end: -1},
+		{name: "ident before a period, cursor at the period", elem: ln(3, 1, "a"), delta: 1, end: -1},
+		{name: "selector within a dotted path", elem: ln(3, 1, "b"), end: -1},
+		{name: "selector ending a dotted path, cursor after it", elem: ln(3, 1, "c"), delta: 1, end: -1},
+		{name: "lone ident, cursor after it", elem: ln(4, 1, "a"), delta: 1, end: -1},
+		{name: "selector after a spaced period", elem: ln(5, 1, "b"), start: -1, end: -1},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			fileAst, err := parser.ParseFile("a.cue", src, parser.ParseComments)
+			qt.Assert(t, qt.IsNil(err))
+			fileAst.Pos().File().SetContent([]byte(src))
+			ev := eval.New(eval.Config{IP: ast.ImportPath{Path: "p"}.Canonical()}, fileAst)
+			fe := ev.ForFile("a.cue")
+
+			elem := tc.elem
+			elem.determineOffset(map[string]*ast.File{"a.cue": fileAst})
+			wantStart := elem.offset + tc.start
+			wantEnd := elem.offset + len(elem.str) + tc.end
+
+			completions := fe.CompletionsForOffset(elem.offset + tc.delta)
+			qt.Assert(t, qt.Not(qt.HasLen(completions, 0)))
+			for completion := range completions {
+				qt.Check(t, qt.Equals(completion.Start, wantStart), qt.Commentf("%#v", completion))
+				qt.Check(t, qt.Equals(completion.End, wantEnd), qt.Commentf("%#v", completion))
+			}
+		})
+	}
+}
+
+// TestCompletionRangesWithNoElement checks the range of the
+// completions offered where the path at the cursor has no element the
+// cursor is in: after a "." ending a line, whose selector the parser
+// synthesizes on the next line, and just after an embed attribute,
+// which only leads to what it embeds.
+func TestCompletionRangesWithNoElement(t *testing.T) {
+	src := `
+a: b: 1
+x: a.
+y: 1
+z: _ @embed(file=z.json)
+`[1:]
+	afterPeriod := strings.Index(src, "a.") + len("a.")
+	afterAttr := strings.Index(src, "@embed") + len("@embed(file=z.json)")
+
+	testCases := []struct {
+		name   string
+		cursor int
+		// want is a name the completions must include.
+		want string
+		// wantStart and wantEnd bound the text the completions replace.
+		wantStart, wantEnd int
+	}{
+		{name: "after a period ending a line", cursor: afterPeriod, want: "b", wantStart: afterPeriod, wantEnd: afterPeriod + 1},
+		{name: "after an embed attribute", cursor: afterAttr, want: "a", wantStart: 0, wantEnd: 0},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			fileAst, _ := parser.ParseFile("a.cue", src, parser.ParseComments)
+			qt.Assert(t, qt.IsNotNil(fileAst))
+			fileAst.Pos().File().SetContent([]byte(src))
+			ev := eval.New(eval.Config{
+				IP: ast.ImportPath{Path: "p"}.Canonical(),
+				ForEmbedAttribute: func(token.Pos) (*embed.Embed, []*eval.Evaluator) {
+					return &embed.Embed{}, []*eval.Evaluator{eval.New(eval.Config{PackageIsEmbedded: true})}
+				},
+			}, fileAst)
+			fe := ev.ForFile("a.cue")
+
+			completions := fe.CompletionsForOffset(tc.cursor)
+			qt.Assert(t, qt.Not(qt.HasLen(completions, 0)))
+			found := false
+			for completion, names := range completions {
+				qt.Check(t, qt.Equals(completion.Start, tc.wantStart), qt.Commentf("%#v", completion))
+				qt.Check(t, qt.Equals(completion.End, tc.wantEnd), qt.Commentf("%#v", completion))
+				_, found = names[tc.want]
+			}
+			qt.Assert(t, qt.IsTrue(found))
+		})
+	}
 }
 
 // definitionKeysForOffset reports the source-level keys of the

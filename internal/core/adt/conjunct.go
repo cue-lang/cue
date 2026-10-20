@@ -420,7 +420,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	if deref(n.node) == deref(arc) {
 		n.linkCyclicResolver(arc, closeInfo)
 		if n.isShared {
-			n.addShared(closeInfo)
+			n.addShared(n.shared, n.node.BaseValue.(*Vertex), closeInfo)
 		}
 		return
 	}

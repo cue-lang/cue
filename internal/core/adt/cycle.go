@@ -701,12 +701,17 @@ func (n *nodeContext) markNonCyclic(id CloseInfo) {
 	switch id.CycleType {
 	case NoCycle, IsOptional:
 		n.hasNonCyclic = true
+	case IsCyclic:
+		// A copied conjunct can carry cycle evidence from a different
+		// ancestry without detecting the cycle again at this node.
+		n.node.markCycleSensitive()
 	}
 }
 
 // markCyclic marks a conjunct as being cyclic. Also, it postpones processing
 // the conjunct in the absence of evidence of a non-cyclic conjunct.
 func (n *nodeContext) markCyclic(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
+	n.node.markCycleSensitive()
 	ci.CycleType = IsCyclic
 
 	n.hasAnyCyclicConjunct = true
@@ -723,6 +728,7 @@ func (n *nodeContext) markCyclic(arc *Vertex, env *Environment, x Resolver, ci C
 }
 
 func (n *nodeContext) markCyclicPath(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
+	n.node.markCycleSensitive()
 	ci.CycleType = IsCyclic
 
 	n.hasAnyCyclicConjunct = true
@@ -881,6 +887,7 @@ func assertStructuralCycle(n *nodeContext) bool {
 }
 
 func (n *nodeContext) reportCycleError() {
+	n.node.markCycleSensitive()
 	b := &Bottom{
 		Code:  StructuralCycleError,
 		Err:   n.ctx.Newf("structural cycle"),
@@ -896,6 +903,22 @@ func (n *nodeContext) reportCycleError() {
 	// n.node.Arcs = nil here instead would orphan the arcs' node contexts,
 	// leaking them for the lifetime of the OpContext.
 	n.node.clearArcs(n.ctx)
+}
+
+// markCycleSensitive preserves cycle evidence for enclosing values, including
+// after their descendants' nodeContexts have been reclaimed. Do not stop at an
+// already marked vertex: an overlay clone or a reparented shared value may have
+// acquired new ancestors since it was marked.
+func (v *Vertex) markCycleSensitive() {
+	for p := v; p != nil; p = p.Parent {
+		// Synthetic arcs used by API lookups can point into a completed,
+		// concurrently readable value. Their cycles belong to the new
+		// evaluation and must not mutate that immutable ancestor.
+		if p != v && p.status == finalized && (p.state == nil || p.state.refCount == 0) {
+			break
+		}
+		p.cycleSensitive = true
+	}
 }
 
 // makeAnonymousConjunct creates a conjunct that tracks self-references when

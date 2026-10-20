@@ -300,7 +300,68 @@ func hasDeferredCompAncestor(v *Vertex) bool {
 	return false
 }
 
+// selectExclusiveDisjunct selects a sole remaining alternative when existing
+// fields permanently rule out all others. A member field cannot satisfy an
+// optional bottom constraint, regardless of its value. This avoids an overlay
+// for simple exclusive-field schemas without evaluating any field early.
+// Alternatives must contain only reference-free type constraints; branches that
+// introduce values or structure retain their normal disjunction context.
+func (n *nodeContext) selectExclusiveDisjunct() bool {
+	if len(n.ctx.overlays) != 0 || len(n.disjunctions) != 1 {
+		return false
+	}
+	d := n.disjunctions[0]
+	remaining := -1
+	for i, alt := range d.disjuncts {
+		if alt.mode != maybeDefault {
+			return false
+		}
+		lit, ok := alt.expr.(*StructLit)
+		if !ok {
+			return false
+		}
+		impossible := false
+		for _, decl := range lit.Decls {
+			f, ok := decl.(*Field)
+			if !ok {
+				return false
+			}
+			switch f.Value.(type) {
+			case *BasicType, *Top, *Bottom:
+			default:
+				return false
+			}
+			if f.ArcType != ArcOptional {
+				continue
+			}
+			if _, ok := f.Value.(*Bottom); !ok {
+				continue
+			}
+			if a := n.node.LookupRaw(f.Label); a != nil && a.ArcType == ArcMember {
+				impossible = true
+			}
+		}
+		if !impossible {
+			if remaining >= 0 {
+				return false
+			}
+			remaining = i
+		}
+	}
+	if remaining < 0 {
+		return false
+	}
+	n.disjunctions = n.disjunctions[:0]
+	n.hasDisjunction = false
+	c := MakeConjunct(d.env, d.disjuncts[remaining].expr, d.cloneID)
+	n.scheduleConjunct(c, c.CloseInfo)
+	return true
+}
+
 func (n *nodeContext) processDisjunctions() *Bottom {
+	if n.selectExclusiveDisjunct() {
+		return nil
+	}
 	ID := n.pushDisjunctionTask()
 	defer ID.pop()
 

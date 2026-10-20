@@ -30,6 +30,14 @@ package adt
 //
 // Maybe this is okay, though, as #Def itself can be shared, at least.
 
+// sharedConjunct retains the original reference for replay if sharing stops.
+// Different references may share one target when one includes the other.
+type sharedConjunct struct {
+	c   Conjunct
+	arc *Vertex
+	id  CloseInfo
+}
+
 func (n *nodeContext) unshare() {
 	n.noSharing = true
 
@@ -40,14 +48,12 @@ func (n *nodeContext) unshare() {
 	n.node.IsShared = false
 	n.node.OpenedShared = false
 
-	v := n.node.BaseValue.(*Vertex)
-
 	// TODO: the use of cycle for BaseValue is getting increasingly outdated.
 	// Find another mechanism once we get rid of the old evaluator.
 	n.node.BaseValue = n.origBaseValue
 
-	for _, id := range n.sharedIDs {
-		n.scheduleVertexConjuncts(n.shared, v, id)
+	for _, x := range n.sharedConjuncts {
+		n.scheduleVertexConjuncts(x.c, x.arc, x.id)
 	}
 
 	n.decSharedIDs()
@@ -87,8 +93,8 @@ func (n *nodeContext) finalizeSharing() {
 	}
 }
 
-func (n *nodeContext) addShared(id CloseInfo) {
-	if len(n.sharedIDs) == 0 || n.shareCycleType < id.CycleType {
+func (n *nodeContext) addShared(c Conjunct, arc *Vertex, id CloseInfo) {
+	if len(n.sharedConjuncts) == 0 || n.shareCycleType < id.CycleType {
 		n.shareCycleType = id.CycleType
 	}
 
@@ -97,7 +103,7 @@ func (n *nodeContext) addShared(id CloseInfo) {
 	// have been processed and it is clear that sharing is possible. Delaying
 	// such a count should not hurt performance, as a shared node is completed
 	// anyway.
-	n.sharedIDs = append(n.sharedIDs, id)
+	n.sharedConjuncts = append(n.sharedConjuncts, sharedConjunct{c, arc, id})
 }
 
 func (n *nodeContext) decSharedIDs() {
@@ -105,8 +111,8 @@ func (n *nodeContext) decSharedIDs() {
 		return
 	}
 	n.shareDecremented = true
-	for _, id := range n.sharedIDs {
-		n.updateConjunctInfo(n.node.Kind(), id, 0)
+	for _, x := range n.sharedConjuncts {
+		n.updateConjunctInfo(n.node.Kind(), x.id, 0)
 	}
 }
 
@@ -119,8 +125,11 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.node.IsShared = true
 	n.isShared = true
 	n.shared = c
-	n.addShared(id)
+	n.addShared(c, arc, id)
 	n.node.OpenedShared = id.Opened || id.ConjunctOpened
+	if arc.cycleSensitive || arc.DerefValue().cycleSensitive {
+		n.node.markCycleSensitive()
+	}
 
 	if arc.IsDetached() && arc.MayAttach() { // TODO: Second check necessary?
 		// This node can safely be shared. Since it is not rooted, though, it
@@ -171,24 +180,17 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 		return false
 	}
 
-	if n.noSharing || n.isShared || n.ctx.errs != nil {
+	if n.noSharing || n.ctx.errs != nil {
 		return false
 	}
 
-	// This line is to deal with this case:
-	//
-	//     reg: {}
-	//     #def: sub: reg
-	//
-	// Ideally we find a different solution, like passing closedness
-	// down elsewhere. In fact, as we do this in closeContexts, it probably
-	// already works, it will just not be reflected in the debug output.
-	// We could fix that by not printing structure shared nodes, which is
-	// probably a good idea anyway.
-	//
-	// TODO: come up with a mechanism to allow this case.
+	// A forward reference may not have processed its definition yet, and so
+	// may not be marked recursively closed. Complete it before deciding
+	// whether it can be shared with the same definition at this destination.
 	if n.node.ClosedRecursive && !arc.ClosedRecursive {
-		return false
+		if !n.completeSharingTarget(arc, id) {
+			return false
+		}
 	}
 
 	// Sharing let expressions is not supported and will result in unmarked
@@ -200,8 +202,110 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 		return false
 	}
 
+	if n.isShared {
+		// A value already constrained by a definition can be unified with
+		// that definition again without unfolding either reference. In
+		// particular, [...#T] need not copy a value declared as #T.
+		if id.CycleType == IsCyclic || n.shareCycleType == IsCyclic ||
+			id.Opened || id.ConjunctOpened || n.node.OpenedShared {
+			return false
+		}
+		shared := n.node.BaseValue.(*Vertex)
+		switch {
+		case n.includesDefinition(shared, arc):
+		// Detached targets require share's parent attachment bookkeeping.
+		case !arc.IsDetached() && n.includesDefinition(arc, shared):
+			n.node.BaseValue = arc
+			n.shared = c
+		default:
+			return false
+		}
+		n.addShared(c, arc, id)
+		return true
+	}
+
 	n.share(c, arc, id)
 	return true
+}
+
+// completeSharingTarget completes an idle forward reference whose declaration
+// and destination name the same definition. This only changes scheduling; the
+// completed target still has to pass the normal sharing and containment checks.
+func (n *nodeContext) completeSharingTarget(v *Vertex, id CloseInfo) bool {
+	if len(n.ctx.overlays) > 0 || v.Parent == nil || v.Label.IsDef() || v.Label.IsLet() || id.IsCyclic() ||
+		id.Opened || id.ConjunctOpened || !n.hasSameDefinitionConjunct(v) {
+		return false
+	}
+	s := v.state
+	if s == nil || s.ctx != n.ctx || s.opID != n.ctx.opID || s.refCount > 0 || s.isCompleting > 0 ||
+		n.hasAncestor(v) || n.ctx.derefRoot(v) != v || !v.Parent.allChildConjunctsKnown(n.ctx) {
+		return false
+	}
+
+	for _, t := range s.tasks {
+		if t.state == taskRUNNING {
+			return false
+		}
+	}
+
+	owner := n.node.BaseValue
+	v.Finalize(n.ctx)
+	// Completing a dependency can run tasks on this node as well.
+	return n.node.state == n && !n.noSharing && n.node.BaseValue == owner &&
+		len(n.node.Arcs) == 0 && n.ctx.errs == nil && v.ClosedRecursive
+}
+
+// hasSameDefinitionConjunct finds a common direct definition reference without
+// evaluating either vertex. It is a scheduling hint, not a containment proof.
+func (n *nodeContext) hasSameDefinitionConjunct(v *Vertex) bool {
+	for a := range n.node.LeafConjuncts() {
+		if a.Env == nil || a.CloseInfo.Opened || a.CloseInfo.ConjunctOpened {
+			continue
+		}
+		def := n.ctx.refTarget(a.Env, a.Expr())
+		if def == nil || !def.Label.IsDef() {
+			continue
+		}
+		for b := range v.LeafConjuncts() {
+			if b.Env == nil || b.CloseInfo.Opened || b.CloseInfo.ConjunctOpened {
+				continue
+			}
+			if n.ctx.refTarget(b.Env, b.Expr()) == def {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// includesDefinition reports whether v already includes a closed reference to
+// def. Only direct, resolved definition references are evidence: opened values
+// and references inside embeddings have different closedness semantics.
+// Missing, unfinished, stale, or cycle-dependent state cannot establish that
+// the same constraint can be reused in a different evaluation context.
+func (n *nodeContext) includesDefinition(v, def *Vertex) bool {
+	if !def.Label.IsDef() || n.ctx.derefRoot(v) != v || n.ctx.derefRoot(def) != def {
+		return false
+	}
+	v = v.DerefDisjunct()
+	s := v.state
+	if s == nil || s.ctx != n.ctx || s.opID != n.ctx.opID || n.ctx.derefRoot(v) != v {
+		return false
+	}
+	if !v.isFinal() || disjunctionOf(v) != nil || v.cycleSensitive || v.DerefValue().cycleSensitive {
+		return false
+	}
+	// Replaying erroneous values preserves diagnostics at the referring path.
+	if v.Bottom() != nil || v.ChildErrors != nil || v.DerefValue().ChildErrors != nil {
+		return false
+	}
+	for _, r := range s.reqDefIDs {
+		if r.v == def && r.kind == defReference && !r.ignore &&
+			!r.conjunctOpened && r.parent == 0 && r.embed == 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // Vertex values that are held in BaseValue will be wrapped in the following

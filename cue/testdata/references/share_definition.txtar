@@ -1,0 +1,142 @@
+Sharing a reference with a definition it already includes must preserve errors,
+closedness, disjunction selection, lexical scope, and later constraints.
+-- in.cue --
+#T: {cmd: string, extra?: int}
+
+valid: {
+	a: #T & {cmd: "ok"}
+	left:  a & #T @test(eq, {cmd: "ok", extra?: int})
+	right: #T & a @test(eq, {cmd: "ok", extra?: int})
+}
+
+unconstrained: {
+	a: {cmd: 1}
+	out: a & #T @test(err, at=cmd, code=eval, contains="conflicting values")
+}
+
+invalidSource: {
+	a: #T & {cmd: 1} @test(err, at=cmd, code=eval, contains="conflicting values")
+	out: a & #T @test(err, at=cmd, code=eval, contains="conflicting values")
+}
+
+invalidClosedSource: {
+	a: #T & {cmd: "ok", unexpected: true} @test(err, at=unexpected, code=eval, contains="field not allowed")
+	out: a & #T @test(err, at=unexpected, code=eval, contains="field not allowed")
+}
+
+stricter: {
+	#U: {cmd: "other", extra?: int}
+	a: #T & {cmd: "ok"}
+	out: a & #T & #U @test(err, at=cmd, code=eval, contains="conflicting values")
+}
+
+closed: {
+	a: #T & {cmd: "ok"}
+	out: a & #T & {unexpected: true} @test(err, at=unexpected, code=eval, contains="field not allowed")
+}
+
+opened: {
+	a: {#T..., cmd: "ok", unexpected: true}
+	out: a & #T @test(err, at=unexpected, code=eval, contains="field not allowed")
+}
+
+openedConjunction: {
+	a: {(#T & {})..., cmd: "ok", unexpected: true}
+	out: a & #T @test(err, at=unexpected, code=eval, contains="field not allowed")
+}
+
+alternatives: {
+	a: (#T & {cmd: "ok"}) | {script: "x"}
+	out: a & #T @test(eq, {cmd: "ok", extra?: int})
+}
+
+defaults: {
+	a: #T & {cmd: *"default" | "other"}
+	out: a & #T @test(eq, {cmd: *"default" | "other", extra?: int})
+	selected: out & {cmd: "other"} @test(eq, {cmd: "other", extra?: int})
+}
+
+scopes: {
+	#Wrapper: {
+		tag: string
+		#Local: {cmd: tag}
+		a: #Local & {cmd: tag}
+		out: a & #Local
+	}
+	x: #Wrapper & {tag: "x"} @test(eq, "x", at=out.cmd)
+	y: #Wrapper & {tag: "y"} @test(eq, "y", at=out.cmd)
+}
+
+late: {
+	a: #T & {cmd: "ok"}
+	out: a & #T
+	if out.cmd == "ok" {
+		out: extra: "bad"
+	}
+	@test(err, at=out.extra, code=eval, contains="conflicting values")
+}
+
+choice: {
+	#Choice: {
+		cmd?: string
+		script?: string
+		({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+	}
+	a: #Choice & {cmd: "ok"}
+	out: a & #Choice @test(eq, {cmd: "ok"})
+	bad: out & {script: "bad"} @test(err, code=user, contains="empty disjunction")
+}
+-- out/errors.txt --
+[eval] unconstrained.out.cmd: conflicting values 1 and string (mismatched types int and string):
+    ./in.cue:1:11
+    ./in.cue:10:11
+    ./in.cue:11:7
+    ./in.cue:11:11
+[eval] invalidSource.a.cmd: conflicting values 1 and string (mismatched types int and string):
+    ./in.cue:1:11
+    ./in.cue:15:5
+    ./in.cue:15:16
+[eval] invalidSource.out.cmd: conflicting values 1 and string (mismatched types int and string):
+    ./in.cue:1:11
+    ./in.cue:15:16
+    ./in.cue:16:7
+    ./in.cue:16:11
+[eval] invalidClosedSource.a.unexpected: field not allowed:
+    ./in.cue:20:22
+[eval] invalidClosedSource.out.unexpected: field not allowed:
+    ./in.cue:20:22
+[eval] stricter.out.cmd: conflicting values "other" and "ok":
+    ./in.cue:25:12
+    ./in.cue:26:16
+    ./in.cue:27:7
+    ./in.cue:27:16
+[eval] closed.out.unexpected: field not allowed:
+    ./in.cue:32:17
+[eval] opened.out.unexpected: field not allowed:
+    ./in.cue:36:24
+[eval] openedConjunction.out.unexpected: field not allowed:
+    ./in.cue:41:31
+[eval] late.out.extra: conflicting values int and "bad" (mismatched types int and string):
+    ./in.cue:1:27
+    ./in.cue:69:7
+    ./in.cue:69:11
+    ./in.cue:71:15
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:80:28
+[user] choice.bad: 2 errors in empty disjunction:
+explicit error (_|_ literal) in source:
+    ./in.cue:80:28
+explicit error (_|_ literal) in source:
+    ./in.cue:80:59
+-- out/eval/stats --
+Leaks:  4
+Freed:  145
+Reused: 118
+Allocs: 31
+Retain: 0
+
+Unifications: 125
+Conjuncts:    276
+Disjuncts:    12
+
+NumCloseIDs: 42

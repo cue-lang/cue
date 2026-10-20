@@ -1280,17 +1280,17 @@ issue2685: {
 [incomplete] patternDistinct.nestedDefaultSel: unresolved disjunction {a:1} | {a:*1 | 2} (type struct):
     ./in.cue:434:20
 -- out/eval/stats --
-Leaks:  256
-Freed:  2842
-Reused: 2799
-Allocs: 299
+Leaks:  254
+Freed:  2838
+Reused: 2795
+Allocs: 297
 Retain: 0
 
-Unifications: 839
-Conjuncts:    3100
-Disjuncts:    1423
+Unifications: 837
+Conjuncts:    3088
+Disjuncts:    1421
 Notifications: 8
 
-NumCloseIDs: 209
+NumCloseIDs: 204
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.

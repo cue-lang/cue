@@ -148,22 +148,17 @@ value0: Only: [{UseSectionName: true}]
     ./x.cue:116:5
     ./x.cue:114:18
 -- out/eval/stats --
-Leaks:  345
-Freed:  1738
-Reused: 1680
-Allocs: 403
+Leaks:  183
+Freed:  1349
+Reused: 1302
+Allocs: 230
 Retain: 0
 
-Unifications: 368
-Conjuncts:    2310
-Disjuncts:    572
+Unifications: 347
+Conjuncts:    1476
+Disjuncts:    451
 
-NumCloseIDs: 590
-
-ConjunctInfos:       850
-MaxConjunctInfos:    6
-MaxReqSets:          6
-MaxRedirect:         6
+NumCloseIDs: 300
 -- out/todo.txt --
 value0: v2 and v3 both evaluate correctly to Only:[{UseSectionName:true}] with
 orgSyntax "Only [UseSectionName]"; the fix was for evalv3 previously including

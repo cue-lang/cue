@@ -262,6 +262,13 @@ type Vertex struct {
 	// The debug printer, for instance, takes extra care not to print in a loop.
 	IsShared bool
 
+	// cycleSensitive records that evaluating this vertex or its descendants
+	// encountered a structural cycle. Even a finalized value may then depend
+	// on the evaluation context: replaying its conjuncts elsewhere can expose
+	// a cycle that was deferred or bounded here. Keep this on the vertex so
+	// that reclaiming its nodeContext does not discard that information.
+	cycleSensitive bool
+
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
 

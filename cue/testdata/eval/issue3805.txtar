@@ -232,22 +232,17 @@ tabcatsExample: {
 	})
 }
 -- out/eval/stats --
-Leaks:  77
-Freed:  162
-Reused: 129
-Allocs: 110
+Leaks:  23
+Freed:  88
+Reused: 64
+Allocs: 47
 Retain: 0
 
-Unifications: 171
-Conjuncts:    284
-Disjuncts:    16
+Unifications: 89
+Conjuncts:    131
+Disjuncts:    6
 
-NumCloseIDs: 57
-
-ConjunctInfos:       243
-MaxConjunctInfos:    5
-MaxReqSets:          14
-MaxRedirect:         3
+NumCloseIDs: 15
 -- out/todo.txt --
 v3 uses structure sharing (~) for nested _json fields, v2 expands them; field ordering also differs.
 #PatientViewSection: v3 uses ~(#PvSection), v2 expands it.

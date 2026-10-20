@@ -1,0 +1,62 @@
+A recursive element constraint with an embedded disjunction must not
+re-evaluate the dependency chain once per disjunct at every level.
+-- in.cue --
+package p
+
+#T: {
+	cmd?: string
+	script?: string
+	({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+	deps?: [...#T]
+}
+
+tasks: [string]: #T
+tasks: {
+	n0: {cmd: "x"} @test(shareID=N0)
+	n1: {cmd: "x", deps: [n0]} @test(shareID=N0, at=deps[0])
+	n2: {cmd: "x", deps: [n1]}
+	n3: {cmd: "x", deps: [n2]}
+	n4: {cmd: "x", deps: [n3]}
+	n5: {cmd: "x", deps: [n4]}
+	n6: {cmd: "x", deps: [n5]}
+	n7: {cmd: "x", deps: [n6]}
+	n8: {cmd: "x", deps: [n7]}
+	n9: {cmd: "x", deps: [n8]} @test(shareID=N9)
+	n10: {cmd: "x", deps: [n9]} @test(shareID=N9, at=deps[0])
+}
+@test(eq, "x", at=tasks.n10.cmd)
+-- out/errors.txt --
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+[user] explicit error (_|_ literal) in source:
+    ./in.cue:6:27
+-- out/eval/stats --
+Leaks:  0
+Freed:  68
+Reused: 50
+Allocs: 18
+Retain: 0
+
+Unifications: 60
+Conjuncts:    165
+Disjuncts:    2
+
+NumCloseIDs: 11

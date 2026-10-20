@@ -202,13 +202,13 @@ embeddedDisjunction.conjunction.t2.z: field not allowed:
     ./in.cue:152:7
 -- out/eval/stats --
 Leaks:  25
-Freed:  422
-Reused: 395
+Freed:  421
+Reused: 394
 Allocs: 52
 Retain: 0
 
-Unifications: 292
-Conjuncts:    670
+Unifications: 291
+Conjuncts:    661
 Disjuncts:    32
 
-NumCloseIDs: 171
+NumCloseIDs: 165

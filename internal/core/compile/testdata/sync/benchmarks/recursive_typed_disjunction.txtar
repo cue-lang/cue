@@ -1,0 +1,112 @@
+A recursive element constraint with an embedded disjunction must not
+re-evaluate the dependency chain once per disjunct at every level.
+-- in.cue --
+package p
+
+#T: {
+	cmd?: string
+	script?: string
+	({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+	deps?: [...#T]
+}
+
+tasks: [string]: #T
+tasks: {
+	n0: {cmd: "x"}
+	n1: {cmd: "x", deps: [n0]}
+	n2: {cmd: "x", deps: [n1]}
+	n3: {cmd: "x", deps: [n2]}
+	n4: {cmd: "x", deps: [n3]}
+	n5: {cmd: "x", deps: [n4]}
+	n6: {cmd: "x", deps: [n5]}
+	n7: {cmd: "x", deps: [n6]}
+	n8: {cmd: "x", deps: [n7]}
+	n9: {cmd: "x", deps: [n8]}
+	n10: {cmd: "x", deps: [n9]}
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    cmd?: string
+    script?: string
+    ({
+      cmd!: string
+      script?: _|_(explicit error (_|_ literal) in source)
+    }|{
+      script!: string
+      cmd?: _|_(explicit error (_|_ literal) in source)
+    })
+    deps?: [
+      ...〈2;#T〉,
+    ]
+  }
+  tasks: {
+    [string]: 〈1;#T〉
+  }
+  tasks: {
+    n0: {
+      cmd: "x"
+    }
+    n1: {
+      cmd: "x"
+      deps: [
+        〈2;n0〉,
+      ]
+    }
+    n2: {
+      cmd: "x"
+      deps: [
+        〈2;n1〉,
+      ]
+    }
+    n3: {
+      cmd: "x"
+      deps: [
+        〈2;n2〉,
+      ]
+    }
+    n4: {
+      cmd: "x"
+      deps: [
+        〈2;n3〉,
+      ]
+    }
+    n5: {
+      cmd: "x"
+      deps: [
+        〈2;n4〉,
+      ]
+    }
+    n6: {
+      cmd: "x"
+      deps: [
+        〈2;n5〉,
+      ]
+    }
+    n7: {
+      cmd: "x"
+      deps: [
+        〈2;n6〉,
+      ]
+    }
+    n8: {
+      cmd: "x"
+      deps: [
+        〈2;n7〉,
+      ]
+    }
+    n9: {
+      cmd: "x"
+      deps: [
+        〈2;n8〉,
+      ]
+    }
+    n10: {
+      cmd: "x"
+      deps: [
+        〈2;n9〉,
+      ]
+    }
+  }
+}

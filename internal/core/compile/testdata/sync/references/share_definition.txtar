@@ -1,0 +1,221 @@
+Sharing a reference with a definition it already includes must preserve errors,
+closedness, disjunction selection, lexical scope, and later constraints.
+-- in.cue --
+#T: {cmd: string, extra?: int}
+
+valid: {
+	a: #T & {cmd: "ok"}
+	left:  a & #T
+	right: #T & a
+}
+
+unconstrained: {
+	a: {cmd: 1}
+	out: a & #T
+}
+
+invalidSource: {
+	a: #T & {cmd: 1}
+	out: a & #T
+}
+
+invalidClosedSource: {
+	a: #T & {cmd: "ok", unexpected: true}
+	out: a & #T
+}
+
+stricter: {
+	#U: {cmd: "other", extra?: int}
+	a: #T & {cmd: "ok"}
+	out: a & #T & #U
+}
+
+closed: {
+	a: #T & {cmd: "ok"}
+	out: a & #T & {unexpected: true}
+}
+
+opened: {
+	a: {#T..., cmd: "ok", unexpected: true}
+	out: a & #T
+}
+
+openedConjunction: {
+	a: {(#T & {})..., cmd: "ok", unexpected: true}
+	out: a & #T
+}
+
+alternatives: {
+	a: (#T & {cmd: "ok"}) | {script: "x"}
+	out: a & #T
+}
+
+defaults: {
+	a: #T & {cmd: *"default" | "other"}
+	out: a & #T
+	selected: out & {cmd: "other"}
+}
+
+scopes: {
+	#Wrapper: {
+		tag: string
+		#Local: {cmd: tag}
+		a: #Local & {cmd: tag}
+		out: a & #Local
+	}
+	x: #Wrapper & {tag: "x"}
+	y: #Wrapper & {tag: "y"}
+}
+
+late: {
+	a: #T & {cmd: "ok"}
+	out: a & #T
+	if out.cmd == "ok" {
+		out: extra: "bad"
+	}
+}
+
+choice: {
+	#Choice: {
+		cmd?: string
+		script?: string
+		({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+	}
+	a: #Choice & {cmd: "ok"}
+	out: a & #Choice
+	bad: out & {script: "bad"}
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    cmd: string
+    extra?: int
+  }
+  valid: {
+    a: (〈1;#T〉 & {
+      cmd: "ok"
+    })
+    left: (〈0;a〉 & 〈1;#T〉)
+    right: (〈1;#T〉 & 〈0;a〉)
+  }
+  unconstrained: {
+    a: {
+      cmd: 1
+    }
+    out: (〈0;a〉 & 〈1;#T〉)
+  }
+  invalidSource: {
+    a: (〈1;#T〉 & {
+      cmd: 1
+    })
+    out: (〈0;a〉 & 〈1;#T〉)
+  }
+  invalidClosedSource: {
+    a: (〈1;#T〉 & {
+      cmd: "ok"
+      unexpected: true
+    })
+    out: (〈0;a〉 & 〈1;#T〉)
+  }
+  stricter: {
+    #U: {
+      cmd: "other"
+      extra?: int
+    }
+    a: (〈1;#T〉 & {
+      cmd: "ok"
+    })
+    out: ((〈0;a〉 & 〈1;#T〉) & 〈0;#U〉)
+  }
+  closed: {
+    a: (〈1;#T〉 & {
+      cmd: "ok"
+    })
+    out: ((〈0;a〉 & 〈1;#T〉) & {
+      unexpected: true
+    })
+  }
+  opened: {
+    a: {
+      〈2;#T〉...
+      cmd: "ok"
+      unexpected: true
+    }
+    out: (〈0;a〉 & 〈1;#T〉)
+  }
+  openedConjunction: {
+    a: {
+      (〈2;#T〉 & {})...
+      cmd: "ok"
+      unexpected: true
+    }
+    out: (〈0;a〉 & 〈1;#T〉)
+  }
+  alternatives: {
+    a: ((〈1;#T〉 & {
+      cmd: "ok"
+    })|{
+      script: "x"
+    })
+    out: (〈0;a〉 & 〈1;#T〉)
+  }
+  defaults: {
+    a: (〈1;#T〉 & {
+      cmd: (*"default"|"other")
+    })
+    out: (〈0;a〉 & 〈1;#T〉)
+    selected: (〈0;out〉 & {
+      cmd: "other"
+    })
+  }
+  scopes: {
+    #Wrapper: {
+      tag: string
+      #Local: {
+        cmd: 〈1;tag〉
+      }
+      a: (〈0;#Local〉 & {
+        cmd: 〈1;tag〉
+      })
+      out: (〈0;a〉 & 〈0;#Local〉)
+    }
+    x: (〈0;#Wrapper〉 & {
+      tag: "x"
+    })
+    y: (〈0;#Wrapper〉 & {
+      tag: "y"
+    })
+  }
+  late: {
+    a: (〈1;#T〉 & {
+      cmd: "ok"
+    })
+    out: (〈0;a〉 & 〈1;#T〉)
+    if (〈0;out〉.cmd == "ok") {
+      out: {
+        extra: "bad"
+      }
+    }
+  }
+  choice: {
+    #Choice: {
+      cmd?: string
+      script?: string
+      ({
+        cmd!: string
+        script?: _|_(explicit error (_|_ literal) in source)
+      }|{
+        script!: string
+        cmd?: _|_(explicit error (_|_ literal) in source)
+      })
+    }
+    a: (〈0;#Choice〉 & {
+      cmd: "ok"
+    })
+    out: (〈0;a〉 & 〈0;#Choice〉)
+    bad: (〈0;out〉 & {
+      script: "bad"
+    })
+  }
+}

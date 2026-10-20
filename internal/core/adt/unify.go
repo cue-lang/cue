@@ -270,6 +270,15 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		return true // already completed
 	}
 
+	// Sharing and disjunction evaluation may select a value whose cycle
+	// evidence was recorded under a different parent. Carry that evidence
+	// back to this vertex and its ancestors after the target has run.
+	defer func() {
+		if v.cycleSensitive || v.DerefValue().cycleSensitive {
+			v.markCycleSensitive()
+		}
+	}()
+
 	n.retainProcess()
 	defer func() {
 		n.releaseProcess()

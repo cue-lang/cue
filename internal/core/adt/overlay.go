@@ -280,7 +280,7 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 
 	d.arcMap = append(d.arcMap, n.arcMap...)
 	d.checks = append(d.checks, n.checks...)
-	d.sharedIDs = append(d.sharedIDs, n.sharedIDs...)
+	d.sharedConjuncts = append(d.sharedConjuncts, n.sharedConjuncts...)
 
 	d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
 	d.replaceIDs = append(d.replaceIDs, n.replaceIDs...)

@@ -1,0 +1,193 @@
+A recursive element constraint must not unfold an already constrained DAG.
+Each layer has two values and four edges; evaluation should grow with layers.
+-- in.cue --
+package p
+
+#T: {cmd: string, deps?: [...#T]}
+
+tasks: [string]: #T
+tasks: {
+	a0: {cmd: "x"}
+	b0: {cmd: "x"}
+	a1: {cmd: "x", deps: [a0, b0]}
+	b1: {cmd: "x", deps: [a0, b0]}
+	a2: {cmd: "x", deps: [a1, b1]}
+	b2: {cmd: "x", deps: [a1, b1]}
+	a3: {cmd: "x", deps: [a2, b2]}
+	b3: {cmd: "x", deps: [a2, b2]}
+	a4: {cmd: "x", deps: [a3, b3]}
+	b4: {cmd: "x", deps: [a3, b3]}
+	a5: {cmd: "x", deps: [a4, b4]}
+	b5: {cmd: "x", deps: [a4, b4]}
+	a6: {cmd: "x", deps: [a5, b5]}
+	b6: {cmd: "x", deps: [a5, b5]}
+	a7: {cmd: "x", deps: [a6, b6]}
+	b7: {cmd: "x", deps: [a6, b6]}
+	a8: {cmd: "x", deps: [a7, b7]}
+	b8: {cmd: "x", deps: [a7, b7]}
+	a9: {cmd: "x", deps: [a8, b8]}
+	b9: {cmd: "x", deps: [a8, b8]}
+	a10: {cmd: "x", deps: [a9, b9]}
+	b10: {cmd: "x", deps: [a9, b9]}
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    cmd: string
+    deps?: [
+      ...〈2;#T〉,
+    ]
+  }
+  tasks: {
+    [string]: 〈1;#T〉
+  }
+  tasks: {
+    a0: {
+      cmd: "x"
+    }
+    b0: {
+      cmd: "x"
+    }
+    a1: {
+      cmd: "x"
+      deps: [
+        〈2;a0〉,
+        〈2;b0〉,
+      ]
+    }
+    b1: {
+      cmd: "x"
+      deps: [
+        〈2;a0〉,
+        〈2;b0〉,
+      ]
+    }
+    a2: {
+      cmd: "x"
+      deps: [
+        〈2;a1〉,
+        〈2;b1〉,
+      ]
+    }
+    b2: {
+      cmd: "x"
+      deps: [
+        〈2;a1〉,
+        〈2;b1〉,
+      ]
+    }
+    a3: {
+      cmd: "x"
+      deps: [
+        〈2;a2〉,
+        〈2;b2〉,
+      ]
+    }
+    b3: {
+      cmd: "x"
+      deps: [
+        〈2;a2〉,
+        〈2;b2〉,
+      ]
+    }
+    a4: {
+      cmd: "x"
+      deps: [
+        〈2;a3〉,
+        〈2;b3〉,
+      ]
+    }
+    b4: {
+      cmd: "x"
+      deps: [
+        〈2;a3〉,
+        〈2;b3〉,
+      ]
+    }
+    a5: {
+      cmd: "x"
+      deps: [
+        〈2;a4〉,
+        〈2;b4〉,
+      ]
+    }
+    b5: {
+      cmd: "x"
+      deps: [
+        〈2;a4〉,
+        〈2;b4〉,
+      ]
+    }
+    a6: {
+      cmd: "x"
+      deps: [
+        〈2;a5〉,
+        〈2;b5〉,
+      ]
+    }
+    b6: {
+      cmd: "x"
+      deps: [
+        〈2;a5〉,
+        〈2;b5〉,
+      ]
+    }
+    a7: {
+      cmd: "x"
+      deps: [
+        〈2;a6〉,
+        〈2;b6〉,
+      ]
+    }
+    b7: {
+      cmd: "x"
+      deps: [
+        〈2;a6〉,
+        〈2;b6〉,
+      ]
+    }
+    a8: {
+      cmd: "x"
+      deps: [
+        〈2;a7〉,
+        〈2;b7〉,
+      ]
+    }
+    b8: {
+      cmd: "x"
+      deps: [
+        〈2;a7〉,
+        〈2;b7〉,
+      ]
+    }
+    a9: {
+      cmd: "x"
+      deps: [
+        〈2;a8〉,
+        〈2;b8〉,
+      ]
+    }
+    b9: {
+      cmd: "x"
+      deps: [
+        〈2;a8〉,
+        〈2;b8〉,
+      ]
+    }
+    a10: {
+      cmd: "x"
+      deps: [
+        〈2;a9〉,
+        〈2;b9〉,
+      ]
+    }
+    b10: {
+      cmd: "x"
+      deps: [
+        〈2;a9〉,
+        〈2;b9〉,
+      ]
+    }
+  }
+}

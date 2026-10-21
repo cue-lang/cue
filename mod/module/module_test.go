@@ -5,6 +5,7 @@
 package module
 
 import (
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
@@ -32,6 +33,11 @@ var checkTests = []struct {
 	{"github.com/go-yaml/yaml@v2", "v3.0.0", false},
 
 	{"rsc.io/quote", "v17.0.0", false},
+
+	// The OCI spec limits tags to 128 characters, which CheckPath applies
+	// to the major version in a module path.
+	{"github.com/go-yaml/yaml@v1" + strings.Repeat("0", 126), "v1" + strings.Repeat("0", 126) + ".0.0", true},
+	{"github.com/go-yaml/yaml@v1" + strings.Repeat("0", 127), "v1" + strings.Repeat("0", 127) + ".0.0", false},
 }
 
 func TestCheck(t *testing.T) {

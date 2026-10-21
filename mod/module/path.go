@@ -13,14 +13,11 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 )
 
-// The following regular expressions come from https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
-// and ensure that we can store modules inside OCI registries.
+// The following regular expression comes from https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
+// and ensures that we can store modules inside OCI registries.
 var (
 	basePathPat = sync.OnceValue(func() *regexp.Regexp {
 		return regexp.MustCompile(`^[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*$`)
-	})
-	tagPat = sync.OnceValue(func() *regexp.Regexp {
-		return regexp.MustCompile(`^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$`)
 	})
 )
 
@@ -167,7 +164,9 @@ func CheckPath(mpath string) (err error) {
 		if semver.Major(vers) != vers {
 			return fmt.Errorf("path can contain major version only")
 		}
-		if !tagPat().MatchString(vers) {
+		// semver.Major only allows characters which are valid in OCI tags,
+		// but the spec also limits tags to 128 characters.
+		if len(vers) > 128 {
 			return fmt.Errorf("non-conforming version %q", vers)
 		}
 	} else {

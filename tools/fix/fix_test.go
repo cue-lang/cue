@@ -1101,7 +1101,7 @@ func TestX(t *testing.T) {
 		t.Fatalf("parse: %v", parseErr)
 	}
 
-	file(astFile, "v0.15.0", Experiments("explicitopen"))
+	file(astFile, "v0.15.0", false, Experiments("explicitopen"))
 
 	out, fmtErr := format.Node(astFile)
 	if fmtErr != nil {

@@ -20,6 +20,7 @@
 package fix
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
 	"strings"
@@ -111,7 +112,7 @@ func (o options) resolveExperiments(version string) ([]string, string, errors.Er
 
 // File applies fixes to f and returns it. It alters the original f.
 func File(f *ast.File, o ...Option) *ast.File {
-	f, err := file(f, "", o...)
+	f, err := file(f, "", false, o...)
 	// TODO: this File method is public, and its signature was fixed
 	// before we started calling Sanitize. Ideally, we want to return
 	// this error, but that would require deprecating this File method,
@@ -127,7 +128,10 @@ func File(f *ast.File, o ...Option) *ast.File {
 	return f
 }
 
-func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
+// file applies fixes to f, judged at version. If outsideModule, f belongs to
+// no module, and a @version attribute records the version at which any
+// experiment added to it was applied.
+func file(f *ast.File, version string, outsideModule bool, o ...Option) (*ast.File, errors.Error) {
 	// A parsed file carries its experiments on its positions; one that was
 	// built, or rewritten before, carries them itself.
 	existingExps := f.Experiment()
@@ -164,18 +168,29 @@ func file(f *ast.File, version string, o ...Option) (*ast.File, errors.Error) {
 		return nil, errors.Wrapf(err, token.NoPos, "fix: invalid experiment")
 	}
 
+	// added is the first @experiment attribute added to f, if any.
+	var added *ast.Attribute
+	fix := func(fn func(*ast.File) (*ast.File, bool), exp string) {
+		var a *ast.Attribute
+		f, a = fixExperiment(fn, f, exp, targetVersion)
+		added = cmp.Or(added, a)
+	}
 	if wantExps.ExplicitOpen && !existingExps.ExplicitOpen {
-		f = fixExperiment(fixExplicitOpen, f, "explicitopen", targetVersion)
+		fix(fixExplicitOpen, "explicitopen")
 	}
-
 	if wantExps.AliasV2 && !existingExps.AliasV2 {
-		f = fixExperiment(fixAliasV2, f, "aliasv2", targetVersion)
+		fix(fixAliasV2, "aliasv2")
 	}
-
 	if wantExps.OpenLists && !existingExps.OpenLists {
-		f = fixExperiment(func(f *ast.File) (*ast.File, bool) {
-			return fixOpenLists(f)
-		}, f, "openlists", targetVersion)
+		fix(fixOpenLists, "openlists")
+	}
+	// Experiments can change while in preview, so a file outside any module,
+	// where nothing else records it, notes the version at which an
+	// experiment was applied to it.
+	if outsideModule && added != nil && internal.VersionAttr(f) == nil {
+		at := slices.Index(f.Decls, ast.Decl(added))
+		versionAttr := &ast.Attribute{Text: fmt.Sprintf("@version(%s)", targetVersion)}
+		f.Decls = slices.Insert(f.Decls, at, ast.Decl(versionAttr))
 	}
 
 	removeStableExperiments(f, targetVersion)
@@ -374,8 +389,11 @@ func removeStableExperiments(f *ast.File, version string) {
 	}
 }
 
-func fixExperiment(fn func(*ast.File) (*ast.File, bool), f *ast.File, exp, version string) *ast.File {
+// fixExperiment applies fn, the fix for experiment exp, to f, and returns the
+// result and the @experiment attribute it added, if any.
+func fixExperiment(fn func(*ast.File) (*ast.File, bool), f *ast.File, exp, version string) (*ast.File, *ast.Attribute) {
 	result, hasChanges := fn(f)
+	var expAttr *ast.Attribute
 
 	// If we made any changes, add the @experiment(explicitopen) attribute at the top
 	if hasChanges {
@@ -391,7 +409,7 @@ func fixExperiment(fn func(*ast.File) (*ast.File, bool), f *ast.File, exp, versi
 		}
 
 		if !cueexperiment.IsStable(exp, version) {
-			expAttr := &ast.Attribute{Text: fmt.Sprintf("@experiment(%s)", exp)}
+			expAttr = &ast.Attribute{Text: fmt.Sprintf("@experiment(%s)", exp)}
 
 			// Insert the attribute as the first declaration after any
 			// @version attribute.
@@ -399,7 +417,7 @@ func fixExperiment(fn func(*ast.File) (*ast.File, bool), f *ast.File, exp, versi
 		}
 	}
 
-	return result
+	return result, expAttr
 }
 
 func fixAliasV2(f *ast.File) (result *ast.File, hasChanges bool) {

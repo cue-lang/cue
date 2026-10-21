@@ -15,7 +15,9 @@
 package fix
 
 import (
+	"path/filepath"
 	"slices"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -85,7 +87,7 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 			if ownVersion(f) {
 				fileVersion = f.Pos().LanguageVersion()
 			}
-			if _, err := file(f, fileVersion, o...); err != nil {
+			if _, err := file(f, fileVersion, outsideModule(b, f), o...); err != nil {
 				errs = errors.Append(errs, err)
 			}
 		}
@@ -97,4 +99,24 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 		}
 	}
 	return errs
+}
+
+// outsideModule reports whether f, a file of b, belongs to no module: b has
+// no module, or f lies outside its root, as a file named on the command line
+// may while still joining the load of the module holding the working
+// directory. Files under cue.mod, and those of an instance that knows no
+// root, belong to the module, whose version they are fixed and read at.
+func outsideModule(b *build.Instance, f *ast.File) bool {
+	if b.ModuleFile == nil {
+		return true
+	}
+	if b.Root == "" {
+		return false
+	}
+	rel, err := filepath.Rel(b.Root, f.Filename)
+	if err != nil {
+		return false
+	}
+	first, _, _ := strings.Cut(filepath.ToSlash(rel), "/")
+	return first == ".."
 }

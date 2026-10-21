@@ -10,9 +10,10 @@ stderr '^fix: experiment "explicitopen" is already stable as of language version
 cmp z.cue in.cue
 
 # At v0.17.0 the migration applies, and the rewrite is the one a v0.17.0
-# module gets.
+# module gets. As the file belongs to no module, a @version attribute
+# records the version at which the experiment was applied.
 exec cue fix --language-version v0.17.0 --exp=explicitopen z.cue
-cmp z.cue mod/expect-explicitopen
+cmp z.cue expect/loose-explicitopen
 cp in.cue mod/z.cue
 cd mod
 exec cue fix --exp=explicitopen z.cue
@@ -22,12 +23,33 @@ cd ..
 # --exp=all expands to the experiments that apply at v0.17.0.
 cp in.cue z.cue
 exec cue fix --language-version v0.17.0 --exp=all z.cue
-cp z.cue all-loose
+cmp z.cue expect/loose-explicitopen
 cp in.cue mod/z.cue
 cd mod
 exec cue fix --exp=all z.cue
-cmp z.cue ../all-loose
+cmp z.cue expect-explicitopen
 cd ..
+
+# A file outside the module root, named from within the module, is judged
+# at the module's version without the flag, but belongs to no module, so it
+# records that version too.
+cp in.cue w.cue
+cd mod
+exec cue fix --exp=explicitopen ../w.cue
+cmp ../w.cue ../expect/loose-explicitopen
+cd ..
+
+# A file within cue.mod is fixed and read at the module's version, so it
+# needs no @version.
+cd mod
+exec cue fix --exp=explicitopen cue.mod/gen/g/g.cue
+cmp cue.mod/gen/g/g.cue expect-explicitopen
+cd ..
+
+# Without the flag, a loose file to which an experiment is added records the
+# current version, at which the experiment was applied.
+exec cue fix --exp=openlists o.cue
+cmp o.cue expect/o
 
 # An experiment that is not yet available at the chosen version is refused.
 cp in.cue z.cue
@@ -54,6 +76,36 @@ exec cue fix --language-version v0.18.0 --exp=explicitopen
 cmp z.cue expect-explicitopen
 cd ..
 
+-- mod/cue.mod/gen/g/g.cue --
+#A: a: int
+#B: b: int
+
+X: {
+	#A
+	#B
+	b: string
+}
+-- o.cue --
+#L: [int, int]
+a: #L & [1, 2]
+-- expect/o --
+@version(v0.18.0)
+@experiment(openlists)
+
+#L: #[int, int]
+a:  #L & #[1, 2]
+-- expect/loose-explicitopen --
+@version(v0.17.0)
+@experiment(explicitopen)
+
+#A: a: int
+#B: b: int
+
+X: __closeAll({
+	#A...
+	#B...
+	b: string
+})
 -- in.cue --
 #A: a: int
 #B: b: int

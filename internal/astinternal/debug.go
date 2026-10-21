@@ -106,7 +106,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		}
 		if v.IsNil() {
 			if !d.cfg.OmitEmpty {
-				d.printf("nil")
+				d.buf = append(d.buf, "nil"...)
 			}
 			return
 		}
@@ -130,23 +130,32 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		return
 	}
 
+	// The cases below append directly rather than use fmt,
+	// and use TypeAssert to avoid the copies that Interface makes,
+	// as this printer is used on large syntax trees.
 	t := v.Type()
-	switch v := v.Interface().(type) {
 	// Simple types which can stringify themselves.
-	case token.Pos:
-		d.printf("%s(%q", t, d.position(v))
+	if p, ok := reflect.TypeAssert[token.Pos](v); ok {
+		d.buf = append(d.buf, t.String()...)
+		d.buf = append(d.buf, '(')
+		d.buf = strconv.AppendQuote(d.buf, d.position(p).String())
 		// Show relative positions too, if there are any, as they affect formatting.
-		if v.HasRelPos() {
-			d.printf(", %v", v.RelPos())
+		if p.HasRelPos() {
+			d.buf = append(d.buf, ", "...)
+			d.buf = append(d.buf, p.RelPos().String()...)
 		}
-		d.printf(")")
+		d.buf = append(d.buf, ')')
 		return
-	case token.Token:
-		if d.cfg.OmitEmpty && v == token.ILLEGAL {
+	}
+	if tok, ok := reflect.TypeAssert[token.Token](v); ok {
+		if d.cfg.OmitEmpty && tok == token.ILLEGAL {
 			// ILLEGAL is the zero value, meaning "no token".
 			return
 		}
-		d.printf("%s(%q)", t, v)
+		d.buf = append(d.buf, t.String()...)
+		d.buf = append(d.buf, '(')
+		d.buf = strconv.AppendQuote(d.buf, tok.String())
+		d.buf = append(d.buf, ')')
 		return
 	}
 
@@ -155,16 +164,19 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		// We assume all other kinds are basic in practice, like string or bool.
 		if t.PkgPath() != "" {
 			// Mention defined and non-predeclared types, for clarity.
-			d.printf("%s(%#v)", t, v)
+			d.buf = append(d.buf, t.String()...)
+			d.buf = append(d.buf, '(')
+			d.basicValue(v)
+			d.buf = append(d.buf, ')')
 		} else {
-			d.printf("%#v", v)
+			d.basicValue(v)
 		}
 
 	case reflect.Slice, reflect.Struct:
 		valueStart := d.pos()
 		// We print the concrete type when it differs from an implied type.
 		if concreteType != impliedType {
-			d.printf("%s", concreteType)
+			d.buf = append(d.buf, concreteType.String()...)
 		}
 		if d.cfg.IncludePointers {
 			if ptrVal != 0 {
@@ -176,7 +188,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		if d.cfg.AllPositions && startPos.IsValid() {
 			d.printf("[%v]", d.positionRange(startPos, endPos))
 		}
-		d.printf("{")
+		d.buf = append(d.buf, '{')
 		d.level++
 		var anyElems bool
 		if t.Kind() == reflect.Slice {
@@ -191,8 +203,19 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 			if anyElems {
 				d.newline()
 			}
-			d.printf("}")
+			d.buf = append(d.buf, '}')
 		}
+	}
+}
+
+func (d *debugPrinter) basicValue(v reflect.Value) {
+	switch v.Kind() {
+	case reflect.String:
+		d.buf = strconv.AppendQuote(d.buf, v.String())
+	case reflect.Bool:
+		d.buf = strconv.AppendBool(d.buf, v.Bool())
+	default:
+		d.printf("%#v", v.Interface())
 	}
 }
 
@@ -270,7 +293,8 @@ func (d *debugPrinter) structFields(v reflect.Value) (anyElems bool) {
 		}
 		elemStart := d.pos()
 		d.newline()
-		d.printf("%s: ", f.Name)
+		d.buf = append(d.buf, f.Name...)
+		d.buf = append(d.buf, ": "...)
 		if d.value(fv, nil) {
 			anyElems = true
 		} else {
@@ -295,7 +319,10 @@ func (d *debugPrinter) printf(format string, args ...any) {
 }
 
 func (d *debugPrinter) newline() {
-	d.buf = fmt.Appendf(d.buf, "\n%s", strings.Repeat("\t", d.level))
+	d.buf = append(d.buf, '\n')
+	for range d.level {
+		d.buf = append(d.buf, '\t')
+	}
 }
 
 func (d *debugPrinter) pos() int {

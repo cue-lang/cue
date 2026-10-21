@@ -16,9 +16,9 @@ package token
 
 import (
 	"cmp"
-	"fmt"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"sync"
 
 	"cuelang.org/go/internal/core/layer"
@@ -56,7 +56,7 @@ func (pos Position) String() string {
 		if s != "" {
 			s += ":"
 		}
-		s += fmt.Sprintf("%d:%d", pos.Line, pos.Column)
+		s += strconv.Itoa(pos.Line) + ":" + strconv.Itoa(pos.Column)
 	}
 	if s == "" {
 		s = "-"

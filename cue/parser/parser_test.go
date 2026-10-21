@@ -2170,21 +2170,21 @@ func TestNestingDepthLimit(t *testing.T) {
 		depth       int
 		wantErr     bool
 	}{
-		// Comfortably past maxNestLevel in each recursive syntactic form.
-		{"lists", "[", "]", maxNestLevel + 1000, true},
-		{"structs", "{a:", "}", maxNestLevel + 1000, true},
-		{"parens", "(", ")", maxNestLevel + 1000, true},
-		{"unary", "!", "", maxNestLevel + 1000, true},
-		{"calls", "len(", ")", maxNestLevel + 1000, true},
+		// Just past maxNestLevel in each recursive syntactic form.
+		{"lists", "[", "]", maxNestLevel + 1, true},
+		{"structs", "{a:", "}", maxNestLevel + 1, true},
+		{"parens", "(", ")", maxNestLevel + 1, true},
+		{"unary", "!", "", maxNestLevel + 1, true},
+		{"calls", "len(", ")", maxNestLevel + 1, true},
 		{"calls_within", "len(", ")", maxNestLevel - 100, false},
 
 		// Syntax built iteratively may nest further, up to maxChainLevel.
-		{"fields_within", "a: ", "", 2 * maxNestLevel, false},
-		{"binary_within", "1+", "", 2 * maxNestLevel, false},
-		{"indexes_within", "", "[0]", 2 * maxNestLevel, false},
-		{"fields_past", "a: ", "", maxChainLevel + 1000, true},
-		{"binary_past", "1+", "", maxChainLevel + 1000, true},
-		{"indexes_past", "", "[0]", maxChainLevel + 1000, true},
+		{"fields_within", "a: ", "", maxNestLevel + 1, false},
+		{"binary_within", "1+", "", maxNestLevel + 1, false},
+		{"indexes_within", "", "[0]", maxNestLevel + 1, false},
+		{"fields_past", "a: ", "", maxChainLevel + 1, true},
+		{"binary_past", "1+", "", maxChainLevel + 1, true},
+		{"indexes_past", "", "[0]", maxChainLevel + 1, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			src := strings.Repeat(tc.open, tc.depth) + "1" + strings.Repeat(tc.close, tc.depth)

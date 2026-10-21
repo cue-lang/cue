@@ -127,8 +127,8 @@ func TestScript(t *testing.T) {
 					ts.Check(os.WriteFile(path, []byte(data), 0o666))
 				}
 			},
-			// env-read sets the content of a file as the value of an
-			// environment variable.
+			// env-read sets the content of a file, minus any trailing newline,
+			// as the value of an environment variable.
 			"env-read": func(ts *testscript.TestScript, neg bool, args []string) {
 				if neg || len(args) != 2 {
 					ts.Fatalf("usage: env-read env-var filepath")
@@ -136,7 +136,7 @@ func TestScript(t *testing.T) {
 				key := args[0]
 				path := ts.MkAbs(args[1])
 				data := ts.ReadFile(path)
-				ts.Setenv(key, data)
+				ts.Setenv(key, strings.TrimSuffix(data, "\n"))
 			},
 			// mod-time prints the modification time of a file to stdout.
 			// The time is displayed as nanoseconds since the Unix epoch.

@@ -1,11 +1,17 @@
+# Locating pprof via the go command costs about as much as a small build,
+# so do it once.
+go tool -n pprof
+cp stdout pprof-path
+env-read PPROF pprof-path
+
 # Grab a CPU profile and check that it's valid.
 exec cue eval --cpuprofile cpu.out x.cue
-go tool pprof -top cpu.out
+exec $PPROF -top cpu.out
 stdout 'Type: cpu'
 
 # Grab an allocation profile and check that it's valid.
 exec cue eval --memprofile mem.out x.cue
-go tool pprof -top mem.out
+exec $PPROF -top mem.out
 stdout 'Type: inuse_space'
 
 # Both flags can be used at the same time.
@@ -17,7 +23,7 @@ exists mem.out
 # The flags should still work with 'cue cmd', which runs a command within a command.
 rm cpu.out
 exec cue cmd --cpuprofile=cpu.out hello
-go tool pprof -top cpu.out
+exec $PPROF -top cpu.out
 stdout 'Type: cpu'
 
 -- x.cue --

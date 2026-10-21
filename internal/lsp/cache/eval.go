@@ -55,39 +55,7 @@ func (w *Workspace) Definition(file *File, fe *eval.FileEvaluator, srcMapper *pr
 		return nil
 	}
 
-	locations := make([]protocol.Location, len(targets))
-	mappers := make(map[*token.File]*protocol.Mapper)
-	for i, target := range targets {
-		startPos := target.Pos().Position()
-		endPos := target.End().Position()
-
-		targetFile := target.Pos().File()
-		targetMapper := w.mapperFor(mappers, targetFile)
-		if targetMapper == nil {
-			w.debugLog("mapper not found: " + targetFile.Name())
-			return nil
-		}
-		r, err := targetMapper.OffsetRange(startPos.Offset, endPos.Offset)
-		if err != nil {
-			w.debugLog(err.Error())
-			return nil
-		}
-
-		locations[i] = protocol.Location{
-			URI:   protocol.URIFromPath(startPos.Filename),
-			Range: r,
-		}
-	}
-
-	// Although not required by the LSP spec, general advice seems to
-	// be that results from the file from which the query was made
-	// should come first; everything else follows, sorted by filename
-	// then offset.
-	slices.SortFunc(locations, func(a, b protocol.Location) int {
-		return compareLocations(srcMapper.URI, a, b)
-	})
-
-	return locations
+	return w.locationsFor(srcMapper.URI, targets)
 }
 
 func (w *Workspace) References(file *File, fe *eval.FileEvaluator, srcMapper *protocol.Mapper, params *protocol.ReferenceParams) []protocol.Location {
@@ -108,42 +76,7 @@ func (w *Workspace) References(file *File, fe *eval.FileEvaluator, srcMapper *pr
 		return nil
 	}
 
-	var locations []protocol.Location
-	mappers := make(map[*token.File]*protocol.Mapper)
-	for _, target := range targets {
-		startPos := target.Pos().Position()
-		endPos := target.End().Position()
-
-		targetFile := target.Pos().File()
-		targetMapper := w.mapperFor(mappers, targetFile)
-		if targetMapper == nil {
-			// The target may have no mapper, such as a declaration
-			// within a standard library package, which has no on-disk
-			// location an editor could open. Skip it and report the
-			// rest.
-			w.debugLog("mapper not found: " + targetFile.Name())
-			continue
-		}
-		r, err := targetMapper.OffsetRange(startPos.Offset, endPos.Offset)
-		if err != nil {
-			w.debugLog(err.Error())
-			return nil
-		}
-
-		locations = append(locations, protocol.Location{
-			URI:   protocol.URIFromPath(startPos.Filename),
-			Range: r,
-		})
-	}
-
-	// Although not required by the LSP spec, general advice seems to
-	// be that results from the file from which the query was made
-	// should come first; everything else follows, sorted by filename
-	// then offset.
-	slices.SortFunc(locations, func(a, b protocol.Location) int {
-		return compareLocations(srcMapper.URI, a, b)
-	})
-	return locations
+	return w.locationsFor(srcMapper.URI, targets)
 }
 
 // Hover is very similar to Definition. It attempts to resolve the
@@ -504,6 +437,47 @@ func (w *Workspace) FileEvaluatorForURI(fileUri protocol.DocumentURI, loadExtra 
 	}
 
 	return file, fe, srcMapper, nil
+}
+
+// locationsFor returns the sorted locations of targets, as found from
+// a query within srcUri.
+func (w *Workspace) locationsFor(srcUri protocol.DocumentURI, targets []ast.Node) []protocol.Location {
+	locations := make([]protocol.Location, 0, len(targets))
+	mappers := make(map[*token.File]*protocol.Mapper)
+	for _, target := range targets {
+		startPos := target.Pos().Position()
+		endPos := target.End().Position()
+
+		targetFile := target.Pos().File()
+		targetMapper := w.mapperFor(mappers, targetFile)
+		if targetMapper == nil {
+			// The target may have no mapper, such as a declaration
+			// within a standard library package, which has no on-disk
+			// location an editor could open. Skip it and report the
+			// rest.
+			w.debugLog("mapper not found: " + targetFile.Name())
+			continue
+		}
+		r, err := targetMapper.OffsetRange(startPos.Offset, endPos.Offset)
+		if err != nil {
+			w.debugLog(err.Error())
+			continue
+		}
+
+		locations = append(locations, protocol.Location{
+			URI:   targetMapper.URI,
+			Range: r,
+		})
+	}
+
+	// Although not required by the LSP spec, general advice seems to
+	// be that results from the file from which the query was made
+	// should come first; everything else follows, sorted by filename
+	// then offset.
+	slices.SortFunc(locations, func(a, b protocol.Location) int {
+		return compareLocations(srcUri, a, b)
+	})
+	return locations
 }
 
 // compareLocations compares a and b.

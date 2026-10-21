@@ -142,8 +142,7 @@ cmd: run.cmd
 		// A field declared both in user code and in a stdlib definition
 		// jumps to the declaration in user code.
 		definitionsTestCases{
-			// The stdlib declaration wrongly drops all locations.
-			fln("a.cue", 11, 2, "cmd"): {},
+			fln("a.cue", 11, 2, "cmd"): {fln("a.cue", 10, 1, "cmd")},
 		}.run(t, env, mappers)
 	})
 }

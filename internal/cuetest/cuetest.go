@@ -53,8 +53,6 @@ const (
 	// tracker conditions (e.g. [golang.org/issues/1234]) to be considered
 	// non-issues.
 	envNonIssues = "CUE_NON_ISSUES"
-
-	envFormatTxtar = "CUE_FORMAT_TXTAR"
 )
 
 var (
@@ -164,13 +162,6 @@ func WriteGoldenFile(t testing.TB, path string, data []byte) {
 	if err := os.WriteFile(path, data, 0o666); err != nil {
 		t.Fatal(err)
 	}
-}
-
-// FormatTxtar ensures that .cue files in txtar test archives are well
-// formatted, updating the archive as required prior to running a test.
-// It is controlled by setting CUE_FORMAT_TXTAR to a non-empty string like "true".
-func FormatTxtar() bool {
-	return os.Getenv(envFormatTxtar) != ""
 }
 
 // Condition adds support for CUE-specific testscript conditions within

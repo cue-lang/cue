@@ -556,7 +556,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			}
 
 			// Format CUE files as required, whatever CUE_UPDATE is.
-			if cuetest.FormatTxtar() && !tc.HasTag("noformat") {
+			if os.Getenv("CUE_FORMAT_TXTAR") != "" && !tc.HasTag("noformat") {
 				formatted := false
 				for i, f := range a.Files {
 					if !strings.HasSuffix(f.Name, ".cue") {

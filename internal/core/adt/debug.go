@@ -17,7 +17,7 @@ package adt
 import (
 	"bytes"
 	"fmt"
-	"html/template"
+	"html"
 	"io"
 	"log"
 	"os"
@@ -78,55 +78,12 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 	}
 	defer w.Close()
 
-	data := struct {
-		Title string
-		Code  string
-		Out   string
-		Graph string
-	}{
-		Title: title,
-		Code:  code,
-		Out:   out,
-		Graph: graph,
-	}
-
-	tmpl := template.Must(template.New("").Parse(`
-	<!DOCTYPE html>
-	<html>
-	<head>
-		<title>{{.Title}}</title>
-		<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-		<script>mermaid.initialize({startOnLoad:true});</script>
-		<style>
-			.container {
-				display: flex;
-				flex-direction: column;
-				align-items: stretch;
-			}
-			.row {
-				display: flex;
-				flex-direction: row;
-			}
-			// ...
-		</style>
-	</head>
-	<body>
-		<div class="mermaid">{{.Graph}}</div>
-		<div class="row">
-			<div class="column">
-				<h1><b>Input</b></h1>
-				<pre>{{.Code}}</pre>
-			</div>
-			<div class="column">
-				<h1><b>Output</b></h1>
-				<pre>{{.Out}}</pre>
-			</div>
-		</div>
-	</body>
-	</html>
-`))
-
-	err = tmpl.Execute(w, data)
+	_, err = fmt.Fprintf(w, debugGraphPage,
+		html.EscapeString(title),
+		html.EscapeString(graph),
+		html.EscapeString(code),
+		html.EscapeString(out),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -513,3 +470,45 @@ func openBrowser(url string) {
 	}
 	go cmd.Wait()
 }
+
+// debugGraphPage is the page OpenNodeGraph writes, with the title, the
+// mermaid graph, the input and the output as escaped HTML text, in that
+// order. Formatting it directly keeps html/template, and through it
+// text/template, out of every binary that links the evaluator: text/template
+// calls reflect.Value.MethodByName with a variable name, which makes the Go
+// linker keep every exported method of every type converted to an interface.
+const debugGraphPage = `
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>%s</title>
+		<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+		<script>mermaid.initialize({startOnLoad:true});</script>
+		<style>
+			.container {
+				display: flex;
+				flex-direction: column;
+				align-items: stretch;
+			}
+			.row {
+				display: flex;
+				flex-direction: row;
+			}
+			// ...
+		</style>
+	</head>
+	<body>
+		<div class="mermaid">%s</div>
+		<div class="row">
+			<div class="column">
+				<h1><b>Input</b></h1>
+				<pre>%s</pre>
+			</div>
+			<div class="column">
+				<h1><b>Output</b></h1>
+				<pre>%s</pre>
+			</div>
+		</div>
+	</body>
+	</html>
+`

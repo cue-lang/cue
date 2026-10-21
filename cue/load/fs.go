@@ -148,12 +148,14 @@ func newOverlayFS(cfg *Config) (*overlayFileSystem, error) {
 				break
 			}
 			m := fs.getDir(parent, true)
-			if m[base] == nil {
-				m[base] = &overlayFile{
-					basename: base,
-					modtime:  time.Now(),
-					isDir:    true,
-				}
+			if m[base] != nil {
+				// An earlier overlay file already added dir and its parents.
+				break
+			}
+			m[base] = &overlayFile{
+				basename: base,
+				modtime:  time.Now(),
+				isDir:    true,
 			}
 			dir = parent
 		}

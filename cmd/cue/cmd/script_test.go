@@ -312,6 +312,10 @@ func TestScript(t *testing.T) {
 			// Set up the environment that the cue command expects: the
 			// registries described by the script's _registry* directories,
 			// the cache directory, and the language version variables.
+			//
+			// Each script runs in a new work directory, so without
+			// -trimpath the go commands it runs would never hit the build cache.
+			e.Setenv("GOFLAGS", "-trimpath")
 			return cuetestscript.Setup(setupEnv{e})
 		},
 		Condition: cuetest.Condition,

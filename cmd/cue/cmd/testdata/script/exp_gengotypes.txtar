@@ -32,7 +32,9 @@ cmp imported/multipkg/cue_types_multipkg_two_gen.go imported/multipkg/cue_types_
 grep '^// emptyStruct has a doc comment\.$' root/cue_types_gen.go
 
 # The resulting Go should all build without error.
-go build ./...
+# gotest is left out, as it is a main package which go run builds below,
+# and only go run caches the linked binary.
+go build ./root ./imported/...
 
 # Sanity check that our valid data tests validate against the schema with cmd/cue.
 exec cue vet -c cuetest/pass_check.cue cuetest/all.cue

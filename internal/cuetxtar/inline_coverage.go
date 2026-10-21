@@ -292,8 +292,8 @@ type coverageNode struct {
 	refs map[string]bool
 }
 
-// propagateCoverage runs a fixed-point BFS, spreading coverage from
-// already-covered fields to the fields they reference.
+// propagateCoverage spreads coverage from already-covered fields to the
+// fields they reference, visiting each newly covered field once.
 // covered is modified in place.
 func propagateCoverage(
 	nodes []coverageNode,
@@ -303,28 +303,37 @@ func propagateCoverage(
 	compGroups []map[string]bool,
 	covered map[string]bool,
 ) {
-	for changed := true; changed; {
-		changed = false
-		for _, n := range nodes {
-			if !covered[n.name] {
-				continue
-			}
+	byName := make(map[string][]coverageNode, len(nodes))
+	for _, n := range nodes {
+		byName[n.name] = append(byName[n.name], n)
+	}
+	var pending []string
+	for name := range covered {
+		pending = append(pending, name)
+	}
+	cover := func(name string) {
+		if !covered[name] {
+			covered[name] = true
+			pending = append(pending, name)
+		}
+	}
+	for len(pending) > 0 {
+		name := pending[len(pending)-1]
+		pending = pending[:len(pending)-1]
+		for _, n := range byName[name] {
 			for ident := range n.refs {
 				// Direct identifier reference.
-				if allNames[ident] && !covered[ident] {
-					covered[ident] = true
-					changed = true
+				if allNames[ident] {
+					cover(ident)
 				}
 				// Postfix alias: identifier resolves to a field via ~.
-				if fieldName, ok := aliasToField[ident]; ok && !covered[fieldName] {
-					covered[fieldName] = true
-					changed = true
+				if fieldName, ok := aliasToField[ident]; ok {
+					cover(fieldName)
 				}
 				// Let binding: identifier is a let variable referencing other fields.
 				for ref := range letRefs[ident] {
-					if allNames[ref] && !covered[ref] {
-						covered[ref] = true
-						changed = true
+					if allNames[ref] {
+						cover(ref)
 					}
 				}
 			}
@@ -332,19 +341,9 @@ func propagateCoverage(
 		// Comprehension group propagation: if any member of a group is covered,
 		// all members become covered.
 		for _, group := range compGroups {
-			anyCovered := false
-			for name := range group {
-				if covered[name] {
-					anyCovered = true
-					break
-				}
-			}
-			if anyCovered {
-				for name := range group {
-					if !covered[name] {
-						covered[name] = true
-						changed = true
-					}
+			if group[name] {
+				for member := range group {
+					cover(member)
 				}
 			}
 		}

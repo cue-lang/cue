@@ -226,12 +226,11 @@ func TestInterrupt(t *testing.T) {
 
 	t.Parallel()
 
-	// Run the same tool binary for each of the test cases.
-	// This helps because we need to wait for the signal handler to be set up,
-	// and having to also wait for `go build` to finish at the same time is messy.
-	toolOut, err := exec.CommandContext(t.Context(), "go", "tool", "-n", "cue").Output()
+	// Run this test binary as the cue command, like testscript does via TestMain,
+	// as building the cue tool costs a link and, whenever the code has changed,
+	// a compile of this package without its tests.
+	exe, err := os.Executable()
 	qt.Assert(t, qt.IsNil(err))
-	toolPath := strings.TrimSpace(string(toolOut))
 
 	// We set up a mock registry so the OAuth flow used by `cue login` is always pending.
 	srv := newMockRegistryOauth("pending-forever")
@@ -276,7 +275,8 @@ func TestInterrupt(t *testing.T) {
 			ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 			defer cancel()
 
-			cmd := exec.CommandContext(ctx, toolPath, test.args...)
+			cmd := exec.CommandContext(ctx, exe, test.args...)
+			cmd.Args[0] = "cue" // see [testscript.Main]
 			cmd.Env = append(cmd.Environ(), "CUE_REGISTRY="+regURL.Host+"+insecure")
 
 			// Hook up stdin to be present but block forever without having any bytes to read.

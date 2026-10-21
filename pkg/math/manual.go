@@ -104,14 +104,6 @@ func RoundToEven(x *internal.Decimal) (*big.Int, error) {
 	return roundToInt(x, roundEvenContext.RoundToIntegralExact)
 }
 
-// remContext takes a remainder exactly: apd reports "division impossible"
-// when the integer quotient has more digits than the precision, and a
-// precision of zero admits no quotient at all.
-//
-// TODO: use [internal.BaseContext] once
-// https://github.com/cockroachdb/apd/issues/134 is resolved.
-var remContext = internal.BaseContext.WithPrecision(1<<32 - 1)
-
 // MultipleOf reports whether x is a multiple of y.
 func MultipleOf(x, y *internal.Decimal) (pkg.Validator, error) {
 	if y.IsZero() {
@@ -124,7 +116,7 @@ func MultipleOf(x, y *internal.Decimal) (pkg.Validator, error) {
 	// A quotient would be rounded to the context's precision, so that a
 	// wide non-multiple could come back whole; the remainder is exact.
 	var d apd.Decimal
-	_, err := remContext.Rem(&d, x, y)
+	_, err := internal.ExactContext.Rem(&d, x, y)
 	if err != nil {
 		return false, err
 	}

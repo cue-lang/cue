@@ -196,13 +196,15 @@ func (c *listenCmd) Run(ctx *task.Context) (res any, err error) {
 
 // variableRegex is a regular expression to find all instances of {variableName} in a path.
 // It captures the content inside the braces.
-var variableRegex = regexp.MustCompile(`\{([^{}\.]+)(\.\.\.)?\}`)
+var variableRegex = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`\{([^{}\.]+)(\.\.\.)?\}`)
+})
 
 // extractPathVariables parses a URL pattern string and returns a slice of the variable names.
 // For example, given "/users/{userID}/posts/{postID}", it returns ["userID", "postID"].
 // The special pattern {$} (exact path match in http.ServeMux) is excluded.
 func extractPathVariables(pattern string) []string {
-	matches := variableRegex.FindAllStringSubmatch(pattern, -1)
+	matches := variableRegex().FindAllStringSubmatch(pattern, -1)
 	if matches == nil {
 		return nil
 	}

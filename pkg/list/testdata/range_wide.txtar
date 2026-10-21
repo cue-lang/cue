@@ -1,0 +1,16 @@
+# Range works on integers wider than the 34 digits of the decimal context,
+# and reports a step which rounds away beside its start, as adding 1 to 1e40
+# does, rather than never advancing.
+-- in.cue --
+import "list"
+
+wide:    list.Range(10000000000000000000000000000000000000000, 10000000000000000000000000000000000000002, 1)
+rounded: list.Range(1e40, 2e40, 1)
+-- out/list-v3 --
+Errors:
+rounded: error in call to list.Range: step 1 is too small to advance from 1E+40:
+    ./in.cue:4:10
+
+Result:
+wide:    [10000000000000000000000000000000000000000, 10000000000000000000000000000000000000001]
+rounded: _|_ // rounded: error in call to list.Range: step 1 is too small to advance from 1E+40

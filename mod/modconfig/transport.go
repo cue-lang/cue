@@ -1,21 +1,23 @@
-package cueversion
+package modconfig
 
 import (
 	"maps"
 	"net/http"
+
+	"cuelang.org/go/internal/cueversion"
 )
 
-// NewTransport returns an [http.RoundTripper] implementation
+// newUserAgentTransport returns an [http.RoundTripper] implementation
 // that wraps next and adds a "User-Agent" header to every
-// HTTP request containing the result of UserAgent(clientType).
+// HTTP request containing the result of [cueversion.UserAgent](clientType).
 // If next is nil, [http.DefaultTransport] will be used.
-func NewTransport(clientType string, next http.RoundTripper) http.RoundTripper {
+func newUserAgentTransport(clientType string, next http.RoundTripper) http.RoundTripper {
 	if next == nil {
 		next = http.DefaultTransport
 	}
 	return &userAgentTransport{
 		next:      next,
-		userAgent: UserAgent(clientType),
+		userAgent: cueversion.UserAgent(clientType),
 	}
 }
 

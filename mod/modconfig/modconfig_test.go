@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
@@ -153,6 +154,22 @@ package x
 
 	// Check that the underlying custom transport was used.
 	qt.Assert(t, qt.IsTrue(transportInvoked.Load()))
+}
+
+func TestUserAgentTransport(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.Write([]byte(req.UserAgent()))
+	}))
+	defer srv.Close()
+	client := &http.Client{
+		Transport: newUserAgentTransport("foo", nil),
+	}
+	resp, err := client.Get(srv.URL)
+	qt.Assert(t, qt.IsNil(err))
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Matches(string(data), `Cue/[^ ]+ \(foo; lang v[^)]+\) Go/[^ ]+ \([^/]+/[^/]+\)`))
 }
 
 func TestDefaultTransportSetsUserAgent(t *testing.T) {

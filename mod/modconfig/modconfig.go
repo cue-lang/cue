@@ -20,7 +20,6 @@ import (
 	"golang.org/x/oauth2"
 
 	"cuelang.org/go/internal/cueconfig"
-	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modresolve"
@@ -115,7 +114,7 @@ type Config struct {
 // The contents of the configuration will not be mutated.
 func NewResolver(cfg *Config) (*Resolver, error) {
 	cfg = newRef(cfg)
-	cfg.Transport = cueversion.NewTransport(cfg.ClientType, cfg.Transport)
+	cfg.Transport = newUserAgentTransport(cfg.ClientType, cfg.Transport)
 	getenv := getenvFunc(cfg.Env)
 	var configData []byte
 	var configPath string

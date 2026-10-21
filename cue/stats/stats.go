@@ -17,9 +17,8 @@
 package stats
 
 import (
+	"fmt"
 	"strings"
-	"sync"
-	"text/template"
 
 	"cuelang.org/go/internal"
 )
@@ -202,39 +201,45 @@ func (s Counts) Leaks() int64 {
 	return s.Allocs + s.Reused - s.Freed
 }
 
-var stats = sync.OnceValue(func() *template.Template {
-	return template.Must(template.New("stats").Parse(`{{"" -}}
-
-Leaks:  {{.Leaks}}
-Freed:  {{.Freed}}
-Reused: {{.Reused}}
-Allocs: {{.Allocs}}
-Retain: {{.Retained}}
-
-Unifications: {{.Unifications}}
-Conjuncts:    {{.Conjuncts}}
-Disjuncts:    {{.Disjuncts}}{{if .Notifications}}
-Notifications: {{.Notifications}}{{end}}{{if .ResolveDep}}
-ResolveDep:   {{.ResolveDep}}{{end}}{{if or .GenerationMismatch .MisalignedConjunct .MisalignedConstraint .SkippedNotification}}
-{{if .GenerationMismatch}}
-GenerationMismatch: {{.GenerationMismatch}}{{end}}{{if .MisalignedConjunct}}
-MisalignedConjunct: {{.MisalignedConjunct}}{{end}}{{if .MisalignedConstraint}}
-MisalignedConstraint: {{.MisalignedConstraint}}{{end}}{{if .SkippedNotification}}
-SkippedNotification: {{.SkippedNotification}}{{end}}{{end}}{{if .NumCloseIDs}}
-
-NumCloseIDs: {{.NumCloseIDs}}{{end}}{{if or (ge .MaxReqSets 150) (ge .MaxConjunctInfos 8) (ge .MaxRedirect 2)}}
-
-ConjunctInfos:       {{.ConjunctInfos}}
-MaxConjunctInfos:    {{.MaxConjunctInfos}}{{if .MaxReqSets}}
-MaxReqSets:          {{.MaxReqSets}}{{end}}{{if .MaxRedirect}}
-MaxRedirect:         {{.MaxRedirect}}{{end}}{{end}}`))
-})
-
+// String formats the counts as a report. The rarer counters are listed only
+// when they are set, and the sizes only once one of them is large enough to
+// matter.
 func (s Counts) String() string {
-	buf := &strings.Builder{}
-	err := stats().Execute(buf, s)
-	if err != nil {
-		panic(err)
+	var b strings.Builder
+	fmt.Fprintf(&b, "Leaks:  %d\nFreed:  %d\nReused: %d\nAllocs: %d\nRetain: %d\n\n", s.Leaks(), s.Freed, s.Reused, s.Allocs, s.Retained)
+	fmt.Fprintf(&b, "Unifications: %d\nConjuncts:    %d\nDisjuncts:    %d", s.Unifications, s.Conjuncts, s.Disjuncts)
+	if s.Notifications != 0 {
+		fmt.Fprintf(&b, "\nNotifications: %d", s.Notifications)
 	}
-	return buf.String()
+	if s.ResolveDep != 0 {
+		fmt.Fprintf(&b, "\nResolveDep:   %d", s.ResolveDep)
+	}
+	if s.GenerationMismatch != 0 || s.MisalignedConjunct != 0 || s.MisalignedConstraint != 0 || s.SkippedNotification != 0 {
+		b.WriteString("\n")
+		if s.GenerationMismatch != 0 {
+			fmt.Fprintf(&b, "\nGenerationMismatch: %d", s.GenerationMismatch)
+		}
+		if s.MisalignedConjunct != 0 {
+			fmt.Fprintf(&b, "\nMisalignedConjunct: %d", s.MisalignedConjunct)
+		}
+		if s.MisalignedConstraint != 0 {
+			fmt.Fprintf(&b, "\nMisalignedConstraint: %d", s.MisalignedConstraint)
+		}
+		if s.SkippedNotification != 0 {
+			fmt.Fprintf(&b, "\nSkippedNotification: %d", s.SkippedNotification)
+		}
+	}
+	if s.NumCloseIDs != 0 {
+		fmt.Fprintf(&b, "\n\nNumCloseIDs: %d", s.NumCloseIDs)
+	}
+	if s.MaxReqSets >= 150 || s.MaxConjunctInfos >= 8 || s.MaxRedirect >= 2 {
+		fmt.Fprintf(&b, "\n\nConjunctInfos:       %d\nMaxConjunctInfos:    %d", s.ConjunctInfos, s.MaxConjunctInfos)
+		if s.MaxReqSets != 0 {
+			fmt.Fprintf(&b, "\nMaxReqSets:          %d", s.MaxReqSets)
+		}
+		if s.MaxRedirect != 0 {
+			fmt.Fprintf(&b, "\nMaxRedirect:         %d", s.MaxRedirect)
+		}
+	}
+	return b.String()
 }

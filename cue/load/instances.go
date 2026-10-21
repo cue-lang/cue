@@ -36,7 +36,6 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
-	pkgpath "cuelang.org/go/pkg/path"
 )
 
 // Instances returns the instances named by the command line arguments 'args'.
@@ -54,27 +53,15 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	ctx := context.TODO()
-	newC, err := c.complete()
+	newC, err := c.completeFor(args)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
 
-	// Rewrite absolute directory arguments as relative paths rooted at
-	// [Config.Dir] so the rest of the loading logic handles them as ordinary
-	// local import paths. Must happen before the package/file split, as
-	// [filetypes.IsPackage] rejects Windows paths like `C:\foo` due to the colon.
-	// Also rewrite \ to / as a courtesy to Windows developers.
-	args = slices.Clone(args)
-	for i, p := range args {
-		if pkgpath.IsAbs(p, c.pathOS) {
-			rel, err := pkgpath.Rel(c.Dir, p, c.pathOS)
-			if err != nil {
-				return []*build.Instance{c.newErrInstance(err)}
-			}
-			p = "./" + rel
-		}
-		args[i] = pkgpath.ToSlash(p, c.pathOS)
+	args, err = c.normalizeArgs(args)
+	if err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
 	}
 
 	// Packages and files may be interspersed in any order; split them apart.
@@ -176,6 +163,12 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	if len(otherFiles) > 0 {
 		a = append(a, l.cueFilesPackage(otherFiles))
+	}
+
+	if c.modFile == nil {
+		for _, p := range a {
+			p.SetTargetLanguageVersion(c.LanguageVersion)
+		}
 	}
 
 	// A file may be shared by multiple instances, such as one inherited from

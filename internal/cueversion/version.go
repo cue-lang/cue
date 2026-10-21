@@ -4,6 +4,8 @@ package cueversion
 
 import (
 	"fmt"
+
+	"cuelang.org/go/internal/mod/semver"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -76,4 +78,25 @@ func UserAgent(clientType string) string {
 	goVersion := strings.ReplaceAll(runtime.Version(), " ", "_")
 
 	return fmt.Sprintf("Cue/%s (%s; lang %s) Go/%s (%s/%s)", ModuleVersion(), clientType, LanguageVersion(), goVersion, runtime.GOOS, runtime.GOARCH)
+}
+
+// EarliestLanguageVersion is the earliest language version that a module
+// file may declare. It must equal what
+// cuelang.org/go/mod/modfile.EarliestClosedSchemaVersion derives from the
+// module file schema, which that package's tests check.
+const EarliestLanguageVersion = "v0.8.0-alpha.0"
+
+// CheckLanguageVersion reports whether v is a language version that a module
+// file may declare.
+func CheckLanguageVersion(v string) (string, error) {
+	if semver.Canonical(v) != v {
+		return "", fmt.Errorf("language version %q is not canonical (must include major, minor and patch versions)", v)
+	}
+	if semver.Compare(v, EarliestLanguageVersion) < 0 {
+		return "", fmt.Errorf("language version %q is too early for module.cue schema (earliest allowed is %s)", v, EarliestLanguageVersion)
+	}
+	if max := LanguageVersion(); semver.Compare(v, max) > 0 {
+		return "", fmt.Errorf("language version %q may not be after current language version %s", v, max)
+	}
+	return v, nil
 }

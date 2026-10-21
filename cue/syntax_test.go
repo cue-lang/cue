@@ -15,10 +15,13 @@
 package cue_test
 
 import (
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 	"testing/fstest"
+
+	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -579,4 +582,36 @@ x: test.#x
 	if got != want {
 		t.Errorf("got: %v; want %v", got, want)
 	}
+}
+
+// TestSyntaxLanguageVersionOutsideModule checks that a value loaded outside a
+// module at a chosen language version is exported as syntax valid at that
+// version, as it would be in a module declaring it.
+func TestSyntaxLanguageVersionOutsideModule(t *testing.T) {
+	dir := t.TempDir()
+	insts := cueload.Instances([]string{"x.cue"}, &cueload.Config{
+		Dir:             dir,
+		LanguageVersion: "v0.17.0",
+		Overlay: map[string]cueload.Source{
+			filepath.Join(dir, "x.cue"): cueload.FromString("a: X={b: 1, c: X.b}\n"),
+		},
+	})
+	v := cuecontext.New().BuildInstance(insts[0])
+	qt.Assert(t, qt.IsNil(v.Err()))
+	b, err := format.Node(v.Syntax(cue.Raw()))
+	qt.Assert(t, qt.IsNil(err))
+	// The prefix alias form; at v0.18.0 the exporter would use a let clause.
+	qt.Assert(t, qt.StringContains(string(b), "a: X_1={"))
+}
+
+// A source version is not an export target. Without a loader-selected target,
+// directly supplied ASTs export at the current language version.
+func TestSyntaxLanguageVersionFromFile(t *testing.T) {
+	f, err := parser.ParseFile("x.cue", "a: X={b: 1, c: X.b}\n", parser.Version("v0.17.0"))
+	qt.Assert(t, qt.IsNil(err))
+	v := cuecontext.New().BuildFile(f)
+	qt.Assert(t, qt.IsNil(v.Err()))
+	b, err := format.Node(v.Syntax(cue.Raw()))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.StringContains(string(b), "let X_1 = self"))
 }

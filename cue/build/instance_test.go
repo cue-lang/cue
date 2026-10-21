@@ -18,6 +18,8 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/cueversion"
+	"cuelang.org/go/internal/mod/modfiledata"
 )
 
 // TestPartiallyResolved tests that the resolve will detect the usage of
@@ -58,5 +60,38 @@ func TestPartiallyResolved(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)
+	}
+}
+
+// Selecting an export target must not change the source version or the
+// default for subsequently added files.
+func TestTargetLanguageVersion(t *testing.T) {
+	inst := &Instance{}
+	inst.SetTargetLanguageVersion("v0.16.0")
+	if err := inst.AddFile("a.cue", "a: 1"); err != nil {
+		t.Fatal(err)
+	}
+	if got := inst.LanguageVersion(); got != "" {
+		t.Fatalf("module version = %q", got)
+	}
+	if got := inst.TargetLanguageVersion(); got != "v0.16.0" {
+		t.Fatalf("export version = %q", got)
+	}
+	if got := inst.Files[0].Pos().LanguageVersion(); got != cueversion.LanguageVersion() {
+		t.Fatalf("source version = %q", got)
+	}
+	if err := inst.AddFile("b.cue", "b: 2"); err != nil {
+		t.Fatal(err)
+	}
+	if got := inst.Files[1].Pos().LanguageVersion(); got != cueversion.LanguageVersion() {
+		t.Fatalf("default version = %q", got)
+	}
+}
+
+func TestTargetLanguageVersionInModule(t *testing.T) {
+	inst := &Instance{ModuleFile: &modfiledata.File{Language: &modfiledata.Language{Version: "v0.17.0"}}}
+	inst.SetTargetLanguageVersion("v0.16.0")
+	if got := inst.TargetLanguageVersion(); got != "v0.17.0" {
+		t.Fatalf("module export version = %q", got)
 	}
 }

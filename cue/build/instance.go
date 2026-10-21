@@ -120,6 +120,10 @@ type Instance struct {
 	// ModuleFile holds the actual module file data, if available.
 	ModuleFile *modfiledata.File
 
+	// targetLanguageVersion is the output target selected by the loader for
+	// input outside a module. It does not control parsing or evaluation.
+	targetLanguageVersion string
+
 	// Root is the root of the directory hierarchy, it may be "" if this an
 	// instance has no imports.
 	// If Module != "", this corresponds to the module root.
@@ -248,6 +252,32 @@ func (inst *Instance) LanguageVersion() string {
 		return ""
 	}
 	return inst.ModuleFile.Language.Version
+}
+
+// TargetLanguageVersion reports the target language version for CUE output.
+// A module's language version takes precedence over the loader-selected target
+// for input outside a module. An empty target selects the current version.
+// Source files' own versions do not change this target. It can be older
+// than a source file's version when the loader chooses an older output
+// target; formatting and export use the requested target.
+func (inst *Instance) TargetLanguageVersion() string {
+	if inst == nil {
+		return ""
+	}
+	if v := inst.LanguageVersion(); v != "" {
+		return v
+	}
+	return inst.targetLanguageVersion
+}
+
+type hiddenInstance = Instance
+
+// SetTargetLanguageVersion sets the target for output from input outside a module.
+// It does not change the version used to parse or evaluate any source file.
+//
+// NOTE: this is an internal API and may change at any time without notice.
+func (inst *hiddenInstance) SetTargetLanguageVersion(v string) {
+	inst.targetLanguageVersion = v
 }
 
 func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {

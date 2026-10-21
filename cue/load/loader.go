@@ -132,7 +132,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 // addFiles populates p.Files by reading CUE syntax from p.BuildFiles.
 func (l *loader) addFiles(p *build.Instance) {
 	for _, bf := range p.BuildFiles {
-		f, err := l.cfg.fileSystem.getCUESyntax(bf, l.cfg.parserConfigFor(p))
+		f, err := l.cfg.fileSystem.getCUESyntax(bf, l.cfg.parserConfigForFile(p, bf, bf.Filename))
 		if err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}

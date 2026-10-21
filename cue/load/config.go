@@ -149,6 +149,31 @@ type Config struct {
 	// to accept module files that lack a language.version field.
 	AcceptLegacyModules bool
 
+	// LanguageVersion sets the fallback language version for input outside a
+	// CUE module, such as standalone CUE files or standard input. For example,
+	// "v0.17.0" selects that version. An empty value defaults to
+	// [cue.LanguageVersion].
+	//
+	// It is only a fallback: files of a module that declares a language
+	// version keep the module's version, and it is not an error if the
+	// fallback applies to no input at all, so that the same load can be
+	// repeated while files move into modules.
+	//
+	// Outside a module, it also selects the target version for exported and
+	// generated CUE.
+	//
+	// AST overlays added with [FromFile] are used as given, so their
+	// language version is the one they were parsed with.
+	LanguageVersion string
+
+	// fallbackVersion is [Config.LanguageVersion] for a load in which some
+	// inputs belong to a module, so that the load is that of the module
+	// holding [Config.Dir], and only the files belonging to no module fall
+	// back to it. fallbackFiles records which files do, as decided when they
+	// are first read.
+	fallbackVersion string
+	fallbackFiles   map[*build.File]bool
+
 	// modFile holds the contents of the module file, or nil
 	// if no module file was present. If non-nil, then
 	// after calling Config.complete, modFile.Module will be
@@ -417,7 +442,11 @@ func (c Config) complete() (cfg *Config, err error) {
 	// TODO(mvdan): note that setting Config.ModuleRoot to a directory
 	// without a cue.mod file does not result in any error, which is confusing
 	// or can lead to not using the right CUE module silently.
-	if c.ModuleRoot == "" {
+	if c.LanguageVersion != "" {
+		// No input belongs to a module, so none is loaded; see
+		// [Config.completeFor].
+		c.ModuleRoot = c.Dir
+	} else if c.ModuleRoot == "" {
 		// Only consider the current directory by default
 		c.ModuleRoot = c.Dir
 		if root := c.findModRoot(c.Dir); root != "" {
@@ -442,6 +471,10 @@ func (c Config) complete() (cfg *Config, err error) {
 		}}
 	}
 	c.parserConfig = parser.NewConfig(parser.ParseComments)
+	if c.LanguageVersion != "" {
+		c.parserConfig = c.parserConfig.Apply(parser.Version(c.LanguageVersion))
+		return &c, nil
+	}
 	if err := c.loadModule(); err != nil {
 		return nil, err
 	}
@@ -510,13 +543,35 @@ func (c *Config) completeFS() error {
 // passing an empty version to [parser.Version] would instead select the
 // current one.
 func (c *Config) parserConfigFor(p *build.Instance) parser.Config {
-	if v := p.LanguageVersion(); v != "" {
-		return c.parserConfig.Apply(parser.Version(v))
+	if mf := p.ModuleFile; mf != nil && mf.Language != nil && mf.Language.Version != "" {
+		return c.parserConfig.Apply(parser.Version(mf.Language.Version))
 	}
 	return c.parserConfig
 }
 
+// parserConfigForFile is [Config.parserConfigFor] for the file f of p, at
+// path, which falls back to [Config.fallbackVersion] if it belongs to no
+// module.
+func (c *Config) parserConfigForFile(p *build.Instance, f *build.File, path string) parser.Config {
+	cfg := c.parserConfigFor(p)
+	if c.fallbackVersion == "" {
+		return cfg
+	}
+	fallback, ok := c.fallbackFiles[f]
+	if !ok {
+		fallback = path == "-" || !c.inModule(pkgpath.Dir(path, c.pathOS))
+		c.fallbackFiles[f] = fallback
+	}
+	if fallback {
+		cfg = cfg.Apply(parser.Version(c.fallbackVersion))
+	}
+	return cfg
+}
+
 func (c *Config) languageVersion() string {
+	if c.LanguageVersion != "" {
+		return c.LanguageVersion
+	}
 	if c.modFile == nil || c.modFile.Language == nil {
 		return ""
 	}

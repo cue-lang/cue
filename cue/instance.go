@@ -162,13 +162,12 @@ func (inst *Instance) ID() string {
 	return inst.inst.ID()
 }
 
-// languageVersion reports the language version declared by the module that
-// inst belongs to, or the empty string when there is none to be had.
+// languageVersion reports the target language version for exported CUE.
 func (inst *Instance) languageVersion() string {
 	if inst == nil {
 		return ""
 	}
-	return inst.inst.LanguageVersion()
+	return inst.inst.TargetLanguageVersion()
 }
 
 // Value returns the root value of the configuration. If the configuration

@@ -23,6 +23,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/mod/module"
 )
 
@@ -613,6 +614,8 @@ language: version: "v0.8.0"
 
 func TestEarliestClosedSchemaVersion(t *testing.T) {
 	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), "v0.8.0-alpha.0"))
+	// The language version checks use a copy of this bound.
+	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), cueversion.EarliestLanguageVersion))
 }
 
 func TestParseLocal(t *testing.T) {

@@ -25,7 +25,6 @@ import (
 
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	"github.com/spf13/cobra"
@@ -230,17 +229,10 @@ func (c *modEditCmd) flagLanguageVersion(arg string) error {
 func addLanguageVersion(v string) (func(*modfile.File) error, error) {
 	if v == "current" {
 		v = cueversion.LanguageVersion()
-	} else {
-		if semver.Canonical(v) != v {
-			return nil, fmt.Errorf("language version %q is not canonical (must include major, minor and patch versions)", v)
-		}
-
-		if min := modfile.EarliestClosedSchemaVersion(); semver.Compare(v, min) < 0 {
-			return nil, fmt.Errorf("language version %q is too early for module.cue schema (earliest allowed is %s)", v, min)
-		}
-		if max := cueversion.LanguageVersion(); semver.Compare(v, max) > 0 {
-			return nil, fmt.Errorf("language version %q may not be after current language version %s", v, max)
-		}
+	}
+	v, err := cueversion.CheckLanguageVersion(v)
+	if err != nil {
+		return nil, err
 	}
 	return func(f *modfile.File) error {
 		if f.Language == nil {

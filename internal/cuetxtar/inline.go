@@ -47,7 +47,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	cueerrors "cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
@@ -180,8 +179,8 @@ type inlineRunner struct {
 	filePath string           // path to the archive file on disk; empty for in-memory tests
 	cueFiles []*cueFileResult // set by runArchive; used by runPermuteAssertion
 	byPath   recordsByPath    // set by runArchive; all @test records by path
-	inst     *build.Instance  // set by runArchive; the instance cueFiles belong to
-	ctx      *cue.Context     // set by runArchive; the context inst was built with
+	ctx      *cue.Context     // set by runArchive; the context cueFiles were built with
+	compiled []adt.Conjunct   // set by runArchive; the unevaluated root conjuncts of cueFiles
 
 	// pendingPosWrites accumulates pos= attribute updates to write back to the
 	// archive file after all subtests have run (CUE_UPDATE mode only).
@@ -679,7 +678,6 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, stats.Coun
 	if inst.Err != nil {
 		return cue.Value{}, stats.Counts{}, nil, inst.Err
 	}
-	r.inst = inst
 
 	var allRecords []attrRecord
 	for _, f := range inst.Files {
@@ -695,25 +693,21 @@ func (r *inlineRunner) buildFromArchive(ctx *cue.Context) (cue.Value, stats.Coun
 
 	// Build from the original instance so that error positions match the
 	// original source, not a reformatted stripped copy.
-	val, counts, err := buildInstance(ctx, inst)
+	v, err := (*runtime.Runtime)(ctx).Build(nil, inst)
 	if err != nil {
 		return cue.Value{}, stats.Counts{}, nil, err
 	}
+	r.compiled = slices.Clone(v.Conjuncts)
+	val, counts := finalize(ctx, v)
 	return val, counts, allRecords, nil
 }
 
-// buildInstance is like [cue.Context.BuildInstance], but it evaluates with an
-// OpContext of its own and returns its stats, which only count this build even
-// when others run in parallel.
-func buildInstance(ctx *cue.Context, inst *build.Instance) (cue.Value, stats.Counts, error) {
-	rt := (*runtime.Runtime)(ctx)
-	v, err := rt.Build(nil, inst)
-	if err != nil {
-		return cue.Value{}, stats.Counts{}, err
-	}
-	opCtx := adt.NewContext(rt, nil)
+// finalize evaluates v with an OpContext of its own and returns its stats,
+// which only count this evaluation even when others run in parallel.
+func finalize(ctx *cue.Context, v *adt.Vertex) (cue.Value, stats.Counts) {
+	opCtx := adt.NewContext((*runtime.Runtime)(ctx), nil)
 	v.Finalize(opCtx)
-	return value.Make(opCtx, v), *opCtx.Stats(), nil
+	return value.Make(opCtx, v), *opCtx.Stats()
 }
 
 // cueContext returns the appropriate cue.Context for the current matrix entry.

@@ -27,6 +27,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuetest"
 	"golang.org/x/sync/errgroup"
 )
@@ -185,11 +186,9 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	// Locate the struct literal and the indices of permutable fields in the AST.
 	var targetLit *ast.StructLit
 	var permIndices []int
-	var targetFile int
-	for i, cf := range r.cueFiles {
+	for _, cf := range r.cueFiles {
 		targetLit, permIndices = findPermFieldsAtPath(cf.strippedAST, structPath, fieldNames)
 		if targetLit != nil && len(permIndices) >= 2 {
-			targetFile = i
 			break
 		}
 	}
@@ -200,8 +199,10 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	n := len(permIndices)
 
 	// Name the permuted fields, for reporting a failing ordering.
+	fields := make([]ast.Node, n)
 	labels := make([]string, n)
 	for i, idx := range permIndices {
+		fields[i] = targetLit.Elts[idx]
 		if f, ok := targetLit.Elts[idx].(*ast.Field); ok {
 			labels[i] = identStr(f.Label)
 		} else {
@@ -248,7 +249,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	g.SetLimit(runtime.GOMAXPROCS(0))
 	for _, o := range orderings {
 		g.Go(func() error {
-			o.val, o.err = r.buildPermuted(targetFile, structPath, fieldNames, o.perm)
+			o.val, o.err = r.buildPermuted(targetLit, fields, o.perm)
 			return nil
 		})
 	}
@@ -310,30 +311,66 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 	return len(orderings)
 }
 
-// buildPermuted evaluates the archive with the permutable fields of the
-// struct at structPath in r.cueFiles[fileIdx] reordered so that position i
-// holds the field originally at position perm[i]. It reorders a clone of
-// the file, so it may be called concurrently.
+// buildPermuted evaluates the archive with the fields of target reordered so
+// that the position of fields[i] holds fields[perm[i]]. Rather than compiling
+// a reordered copy of the file, it reorders the compiled declarations, copying
+// only the structs and fields on the path to them. Evaluation does not modify
+// compiled values, so it may be called concurrently.
 //
 // The fields keep their source positions, so only the evaluation order
 // changes, and errors still point at the archive's source lines.
-func (r *inlineRunner) buildPermuted(fileIdx int, structPath cue.Path, fieldNames []string, perm []int) (cue.Value, error) {
-	file := ast.Clone(r.cueFiles[fileIdx].strippedAST)
-	lit, indices := findPermFieldsAtPath(file, structPath, fieldNames)
-	elts := slices.Clone(lit.Elts)
-	for i, p := range perm {
-		elts[indices[i]] = lit.Elts[indices[p]]
+func (r *inlineRunner) buildPermuted(target *ast.StructLit, fields []ast.Node, perm []int) (cue.Value, error) {
+	conjuncts := slices.Clone(r.compiled)
+	for i, c := range conjuncts {
+		if lit := permuteCompiled(c.Expr(), target, fields, perm); lit != nil {
+			// Reuse the archive's context, which is safe for concurrent use,
+			// rather than loading the builtin packages again for each ordering.
+			conjuncts[i] = adt.MakeRootConjunct(c.Env, lit)
+			val, _ := finalize(r.ctx, &adt.Vertex{Conjuncts: conjuncts})
+			return val, nil
+		}
 	}
-	lit.Elts = elts
+	return cue.Value{}, fmt.Errorf("cannot find the compiled fields")
+}
 
-	// r.cueFiles holds the files of r.inst in the same order.
-	// Reuse the archive's context, which is safe for concurrent use,
-	// rather than loading the builtin packages again for each ordering.
-	inst := *r.inst
-	inst.Files = slices.Clone(inst.Files)
-	inst.Files[fileIdx] = file
-	val, _, err := buildInstance(r.ctx, &inst)
-	return val, err
+// permuteCompiled returns a copy of x with the declarations of the struct
+// compiled from target reordered as in [inlineRunner.buildPermuted], or nil
+// if x does not contain them.
+func permuteCompiled(x adt.Expr, target *ast.StructLit, fields []ast.Node, perm []int) *adt.StructLit {
+	lit, ok := x.(*adt.StructLit)
+	if !ok {
+		return nil
+	}
+	if lit.Src == target {
+		at := make([]int, len(fields)) // the index in lit.Decls of each field
+		found := 0
+		for i, d := range lit.Decls {
+			if k := slices.Index(fields, d.Source()); k >= 0 {
+				at[k] = i
+				found++
+			}
+		}
+		if found != len(fields) {
+			return nil
+		}
+		decls := slices.Clone(lit.Decls)
+		for i, p := range perm {
+			decls[at[i]] = lit.Decls[at[p]]
+		}
+		return &adt.StructLit{Src: lit.Src, Decls: decls}
+	}
+	for i, d := range lit.Decls {
+		if f, ok := d.(*adt.Field); ok {
+			if sub := permuteCompiled(f.Value, target, fields, perm); sub != nil {
+				f2 := *f
+				f2.Value = sub
+				decls := slices.Clone(lit.Decls)
+				decls[i] = &f2
+				return &adt.StructLit{Src: lit.Src, Decls: decls}
+			}
+		}
+	}
+	return nil
 }
 
 // findPermFieldsAtPath walks file following structPath and returns the

@@ -156,6 +156,8 @@ func TestEnv() []string {
 	return []string{
 		"PATH=" + os.Getenv("PATH"),
 		homeEnvName() + "=/no-home",
+		// Like the home directory above, ignore any system-wide git config.
+		"GIT_CONFIG_NOSYSTEM=1",
 		// Stop git from starting background maintenance after commits,
 		// which only costs extra processes in short-lived test repositories.
 		"GIT_CONFIG_COUNT=1",

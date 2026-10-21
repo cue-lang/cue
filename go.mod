@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20261008151123-94f4aa6e0087
 	github.com/bufbuild/protocompile v0.14.2-0.20260824170637-a01cc8856977
-	github.com/cockroachdb/apd/v3 v3.2.4-0.20261020175533-d451b150d46f
+	github.com/cockroachdb/apd/v3 v3.2.4-0.20261021202135-0e59bffd422b
 	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0

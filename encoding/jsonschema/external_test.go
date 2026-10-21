@@ -123,6 +123,17 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 			extractErr = fmt.Errorf("cannot compile resulting schema: %v", errors.Details(err, nil))
 		}
 	}
+	// Both variants validate the same instances, so build them once.
+	var instValues []cue.Value
+	if extractErr == nil {
+		for _, test := range s.Tests {
+			instAST, err := json.Extract("instance.json", test.Data)
+			qt.Assert(t, qt.IsNil(err), qt.Commentf("location: %v", testdataPos(test)))
+			instValue := ctx.BuildExpr(instAST)
+			qt.Assert(t, qt.IsNil(instValue.Err()), qt.Commentf("location: %v", testdataPos(test)))
+			instValues = append(instValues, instValue)
+		}
+	}
 	t.Run("Extract", func(t *testing.T) {
 		if extractErr != nil {
 			logOnFailure(t, func() {
@@ -132,9 +143,9 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 			return
 		}
 		testSucceeded(t, m, "", &s.Skip, s)
-		for _, test := range s.Tests {
+		for i, test := range s.Tests {
 			t.Run(testName(test.Description), func(t *testing.T) {
-				runExternalSchemaTest(t, m, ctx, "", s, test, schemaValue)
+				runExternalSchemaTest(t, m, "", s, test, schemaValue, instValues[i])
 			})
 		}
 	})
@@ -159,9 +170,9 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, ctx *cue.Context, file
 			return
 		}
 		testSucceeded(t, m, variant, &s.Skip, s)
-		for _, test := range s.Tests {
+		for i, test := range s.Tests {
 			t.Run(testName(test.Description), func(t *testing.T) {
-				runExternalSchemaTest(t, m, ctx, variant, s, test, roundTripSchemaValue)
+				runExternalSchemaTest(t, m, variant, s, test, roundTripSchemaValue, instValues[i])
 			})
 		}
 	})
@@ -189,21 +200,12 @@ func maybeSkip(t *testing.T, vers jsonschema.Version, versStr string, s *externa
 }
 
 // runExternalSchemaTest runs a single test case against a given schema value.
-func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, ctx *cue.Context, variant string, s *externaltest.Schema, test *externaltest.Test, schemaValue cue.Value) {
+func runExternalSchemaTest(t *testing.T, m *cuetdtest.M, variant string, s *externaltest.Schema, test *externaltest.Test, schemaValue, instValue cue.Value) {
 	logOnFailure(t, func() {
 		t.Logf("location: %v", testdataPos(test))
 		t.Logf("txtar:\n%s", testCaseTxtar(s, test))
 	})
-	instAST, err := json.Extract("instance.json", test.Data)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	qt.Assert(t, qt.IsNil(err), qt.Commentf("test data: %q; details: %v", test.Data, errors.Details(err, nil)))
-
-	instValue := ctx.BuildExpr(instAST)
-	qt.Assert(t, qt.IsNil(instValue.Err()))
-	err = instValue.Unify(schemaValue).Validate(cue.Concrete(true))
+	err := instValue.Unify(schemaValue).Validate(cue.Concrete(true))
 	if test.Valid {
 		if err != nil {
 			testFailed(t, m, variant, &test.Skip, test, errors.Details(err, nil))

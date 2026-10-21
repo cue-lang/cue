@@ -1,0 +1,45 @@
+# MarshalSchema reports an error for a value which is not itself an error
+# as the result of the call.
+-- in.cue --
+import (
+	"encoding/openapi"
+	"strings"
+)
+
+k: int
+config: openapi.#Config & {version: "3.0.0", info: {title: "T", version: "1"}}
+schema: #S: s: strings.MinRunes(k)
+result: openapi.MarshalSchema(config, schema)
+-- out/openapi-v3 --
+Errors:
+result: error in call to encoding/openapi.MarshalSchema: could not retrieve int: schema.#S.s: non-concrete value int:
+    ./in.cue:9:9
+    ./in.cue:6:4
+
+Result:
+import "strings"
+
+k: int
+config: {
+	version: "3.0.0"
+	info: {
+		title:           "T"
+		version:         "1"
+		summary?:        string
+		description?:    string
+		termsOfService?: string
+		contact?: {
+			name?:  string
+			url?:   string
+			email?: string
+		}
+		license?: {
+			name!: string
+			url?:  string
+		}
+	}
+	selfContained:    *false | bool
+	expandReferences: *false | bool
+}
+schema: #S: s: strings.MinRunes(int)
+result: _|_ // result: error in call to encoding/openapi.MarshalSchema: could not retrieve int: schema.#S.s: non-concrete value int

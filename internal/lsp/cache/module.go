@@ -27,9 +27,11 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/extvalidator"
 	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/mod/langversion"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/modfile"
@@ -187,9 +189,19 @@ func (m *Module) ReadCUEFile(file protocol.DocumentURI) (*ast.File, *build.File,
 	if err != nil {
 		return nil, nil, parser.Config{}, nil, err
 	}
-	versionOption := parser.Version(m.modFile.Language.Version)
-	cfg := parser.NewConfig(versionOption, parser.ParseComments)
+	version := m.modFile.Language.Version
+	cfg := parser.NewConfig(parser.Version(version), parser.ParseComments)
 	parsedFile, bf, err := fh.ReadCUE(cfg)
+	if err == nil && parsedFile != nil {
+		// The module file decides the version of the module's files, as
+		// cue/load enforces; the file is still returned so that it can be
+		// edited.
+		// As for cue/load, files within cue.mod belong to no module.
+		inCueMod := strings.HasPrefix(file.Path(), m.rootURI.Path()+"/cue.mod/")
+		if a := internal.VersionAttr(parsedFile); a != nil && !inCueMod {
+			err = langversion.AttrInModuleError(a.Pos(), "cue.mod/module.cue", version)
+		}
+	}
 	return parsedFile, bf, cfg, fh, err
 }
 

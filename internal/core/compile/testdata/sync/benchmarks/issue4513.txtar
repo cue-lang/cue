@@ -1,0 +1,262 @@
+# A reference into a recursively closed struct is shared whether or not the
+# referenced field has been evaluated yet, so the cost of the pipeline below
+# does not depend on whether it is declared before or after the tasks. With
+# pipelines first, the task chain is reached through forward references only.
+# Each task is evaluated as a disjunction, so copying a forward reference
+# instead of sharing it copies the rest of the chain once per disjunct.
+#
+# https://cuelang.org/issue/4513
+-- in.cue --
+#Task: {
+	cmd?:    string
+	script?: string
+	({cmd!: string} | {script!: string, cmd?: _|_})
+	deps?: [...]
+}
+#Group: {group!: [...]}
+#Project: close({
+	pipelines?: [string]: close({tasks?: [...]})
+	tasks?: [string]: #Task | #Group
+})
+
+first: p: #Project
+first: p: {
+	pipelines: main: "tasks": [tasks.n4]
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+	}
+}
+
+last: p: #Project
+last: p: {
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+	}
+	pipelines: main: "tasks": [tasks.n4]
+}
+
+// A shared forward reference keeps the closedness of the task.
+closed: {
+	p: #Project
+	p: {
+		pipelines: main: "tasks": [tasks.n0]
+		tasks: n0: {cmd: "x"}
+	}
+	q: p.pipelines.main.tasks[0]
+}
+
+// A forward reference into a struct embedded in the definition is shared too.
+embedded: {
+	Open: b: {x: 1}
+	#P: {a: {Open}, c: _}
+	p: #P
+	p: {
+		c: a.b
+		a: b: _
+	}
+	q: p.c & {y: 2}
+}
+
+// A forward reference to a field admitted by an ellipsis is not shared: the
+// target is open, and a definition field referring to it stays closed.
+open: {
+	#E: {
+		req: {...}
+		out: req.features
+	}
+	x: #E
+	x: {
+		out: req.features
+		req: features: devMode: true
+	}
+	f: x.req.features
+	o: x.out
+}
+-- out/compile --
+--- in.cue
+{
+  #Task: {
+    cmd?: string
+    script?: string
+    ({
+      cmd!: string
+    }|{
+      script!: string
+      cmd?: _|_(explicit error (_|_ literal) in source)
+    })
+    deps?: [
+      ...,
+    ]
+  }
+  #Group: {
+    group!: [
+      ...,
+    ]
+  }
+  #Project: close({
+    pipelines?: {
+      [string]: close({
+        tasks?: [
+          ...,
+        ]
+      })
+    }
+    tasks?: {
+      [string]: (〈2;#Task〉|〈2;#Group〉)
+    }
+  })
+  first: {
+    p: 〈1;#Project〉
+  }
+  first: {
+    p: {
+      pipelines: {
+        main: {
+          tasks: [
+            〈3;tasks〉.n4,
+          ]
+        }
+      }
+      tasks: {
+        n0: {
+          cmd: "x"
+        }
+        n1: {
+          cmd: "x"
+          deps: [
+            〈2;n0〉,
+          ]
+        }
+        n2: {
+          cmd: "x"
+          deps: [
+            〈2;n1〉,
+          ]
+        }
+        n3: {
+          cmd: "x"
+          deps: [
+            〈2;n2〉,
+          ]
+        }
+        n4: {
+          cmd: "x"
+          deps: [
+            〈2;n3〉,
+          ]
+        }
+      }
+    }
+  }
+  last: {
+    p: 〈1;#Project〉
+  }
+  last: {
+    p: {
+      tasks: {
+        n0: {
+          cmd: "x"
+        }
+        n1: {
+          cmd: "x"
+          deps: [
+            〈2;n0〉,
+          ]
+        }
+        n2: {
+          cmd: "x"
+          deps: [
+            〈2;n1〉,
+          ]
+        }
+        n3: {
+          cmd: "x"
+          deps: [
+            〈2;n2〉,
+          ]
+        }
+        n4: {
+          cmd: "x"
+          deps: [
+            〈2;n3〉,
+          ]
+        }
+      }
+      pipelines: {
+        main: {
+          tasks: [
+            〈3;tasks〉.n4,
+          ]
+        }
+      }
+    }
+  }
+  closed: {
+    p: 〈1;#Project〉
+    p: {
+      pipelines: {
+        main: {
+          tasks: [
+            〈3;tasks〉.n0,
+          ]
+        }
+      }
+      tasks: {
+        n0: {
+          cmd: "x"
+        }
+      }
+    }
+    q: 〈0;p〉.pipelines.main.tasks[0]
+  }
+  embedded: {
+    Open: {
+      b: {
+        x: 1
+      }
+    }
+    #P: {
+      a: {
+        〈2;Open〉
+      }
+      c: _
+    }
+    p: 〈0;#P〉
+    p: {
+      c: 〈0;a〉.b
+      a: {
+        b: _
+      }
+    }
+    q: (〈0;p〉.c & {
+      y: 2
+    })
+  }
+  open: {
+    #E: {
+      req: {
+        ...
+      }
+      out: 〈0;req〉.features
+    }
+    x: 〈0;#E〉
+    x: {
+      out: 〈0;req〉.features
+      req: {
+        features: {
+          devMode: true
+        }
+      }
+    }
+    f: 〈0;x〉.req.features
+    o: 〈0;x〉.out
+  }
+}

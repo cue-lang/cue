@@ -1,0 +1,114 @@
+# A reference into a recursively closed struct is shared whether or not the
+# referenced field has been evaluated yet, so the cost of the pipeline below
+# does not depend on whether it is declared before or after the tasks. With
+# pipelines first, the task chain is reached through forward references only.
+# Each task is evaluated as a disjunction, so copying a forward reference
+# instead of sharing it copies the rest of the chain once per disjunct.
+#
+# https://cuelang.org/issue/4513
+-- in.cue --
+#Task: {
+	cmd?:    string
+	script?: string
+	({cmd!: string} | {script!: string, cmd?: _|_})
+	deps?: [...]
+}
+#Group: {group!: [...]}
+#Project: close({
+	pipelines?: [string]: close({tasks?: [...]})
+	tasks?: [string]: #Task | #Group
+})
+
+first: p: #Project
+first: p: {
+	pipelines: main: "tasks": [tasks.n4] @test(eq, [{
+		cmd: "x"
+		deps: [{
+			cmd: "x"
+			deps: [{
+				cmd: "x"
+				deps: [{
+					cmd: "x"
+					deps: [{cmd: "x", script?: string, deps?: []}]
+					script?: string
+				}]
+				script?: string
+			}]
+			script?: string
+		}]
+		script?: string
+	}])
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+	}
+}
+
+last: p: #Project
+last: p: {
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]} @test(shareID=N4)
+	}
+	pipelines: main: "tasks": [tasks.n4] @test(shareID=N4, at=0)
+}
+
+// A shared forward reference keeps the closedness of the task.
+closed: {
+	p: #Project
+	p: {
+		pipelines: main: "tasks": [tasks.n0]
+		tasks: n0: {cmd: "x"}
+	}
+	q: p.pipelines.main.tasks[0] @test(closed) @test(allows=false, extra)
+}
+
+// A forward reference into a struct embedded in the definition is shared too.
+embedded: {
+	Open: b: {x: 1}
+	#P: {a: {Open}, c: _}
+	p: #P
+	p: {
+		c: a.b
+		a: b: _
+	}
+	q: p.c & {y: 2} @test(eq, {x: 1, y: 2})
+}
+
+// A forward reference to a field admitted by an ellipsis is not shared: the
+// target is open, and a definition field referring to it stays closed.
+open: {
+	#E: {
+		req: {...}
+		out: req.features
+	}
+	x: #E
+	x: {
+		out: req.features
+		req: features: devMode: true
+	}
+	f: x.req.features @test(closed=false) @test(allows, extra)
+	o: x.out @test(closed) @test(allows=false, extra)
+}
+-- out/errors.txt --
+[incomplete] open.#E.out: undefined field: features:
+    ./in.cue:80:12
+    ./in.cue:79:3
+-- out/eval/stats --
+Leaks:  238
+Freed:  2247
+Reused: 2217
+Allocs: 268
+Retain: 0
+
+Unifications: 763
+Conjuncts:    2682
+Disjuncts:    534
+
+NumCloseIDs: 406

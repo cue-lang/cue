@@ -61,6 +61,7 @@ workflow commands.
 	}
 
 	addInjectionFlags(cmd)
+	addLanguageVersionFlag(cmd)
 
 	// Load custom commands from the current package so that `cue cmd --help`
 	// lists them. The guard ensures we only do this for `cue cmd` itself,

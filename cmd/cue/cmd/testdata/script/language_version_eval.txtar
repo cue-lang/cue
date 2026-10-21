@@ -1,0 +1,91 @@
+# --language-version selects the language version of input outside any
+# module. Here x.cue uses a prefix alias, which is valid before v0.18.0,
+# where the aliasv2 experiment made the postfix form mandatory.
+#
+# TestLatest: skip -- the input deliberately uses the prefix alias form.
+
+# Without the flag, the file is judged at the current version.
+! exec cue eval x.cue
+stderr 'old-style alias syntax'
+! exec cue eval --language-version current x.cue
+stderr 'language version "current" is not canonical'
+
+# At v0.17.0 the file evaluates as it does in a module declaring v0.17.0.
+exec cue eval --language-version v0.17.0 x.cue
+cmp stdout expect/eval
+cd mod
+exec cue eval x.cue
+cmp stdout ../expect/eval
+cd ..
+exec cue export --language-version v0.17.0 x.cue
+cmp stdout expect/export
+exec cue vet -c --language-version v0.17.0 x.cue
+exec cue def --language-version v0.17.0 x.cue
+cp stdout def-loose
+cd mod
+exec cue def x.cue
+cmp stdout ../def-loose
+cd ..
+
+# Standard input and the expression flags are parsed at the chosen version.
+stdin x.cue
+exec cue export --language-version v0.17.0 -
+cmp stdout expect/export
+exec cue export --language-version v0.17.0 -e '{_y: Y={a: 1, b: Y.a}, c: _y.b}.c' x.cue
+cmp stdout expect/expr
+! exec cue export -e '{_y: Y={a: 1, b: Y.a}, c: _y.b}.c' y.cue
+stderr 'old-style alias syntax'
+
+# cue cmd and cue trim take the flag too.
+exec cue cmd --language-version v0.17.0 hello
+cmp stdout expect/hello
+exec cue trim --language-version v0.17.0 -o - x.cue
+cp stdout trim-loose
+cd mod
+exec cue trim -o - x.cue
+cmp stdout ../trim-loose
+cd ..
+
+# Values are checked as cue mod edit checks them.
+! exec cue eval --language-version v0.17 x.cue
+cmp stderr expect/not-canonical
+! exec cue eval --language-version v0.7.0 x.cue
+cmp stderr expect/too-early
+! exec cue eval --language-version v9.0.0 x.cue
+stderr '^language version "v9.0.0" may not be after current language version v'
+
+-- x.cue --
+_alias: X={a: 1, b: X.a}
+out: _alias.b
+-- y.cue --
+y: 1
+-- hello_tool.cue --
+package hello
+
+import "tool/cli"
+
+_alias: X={msg: "hello", copy: X.msg}
+
+command: hello: cli.Print & {text: _alias.copy}
+-- hello.cue --
+package hello
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- mod/x.cue --
+_alias: X={a: 1, b: X.a}
+out: _alias.b
+-- expect/eval --
+out: 1
+-- expect/export --
+{
+    "out": 1
+}
+-- expect/expr --
+1
+-- expect/hello --
+hello
+-- expect/not-canonical --
+language version "v0.17" is not canonical (must include major, minor and patch versions)
+-- expect/too-early --
+language version "v0.7.0" is too early for module.cue schema (earliest allowed is v0.8.0-alpha.0)

@@ -20,6 +20,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	"cuelang.org/go/internal/cueversion"
 )
 
 // Common flags
@@ -130,6 +132,26 @@ func addOrphanFlags(cmd *cobra.Command) {
 	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
 	f.String(string(flagProtoEnum), "int", "mode for rendering enums (int|json)")
 	f.Bool(string(flagMerge), true, "merge non-CUE files")
+}
+
+// addLanguageVersionFlag adds the flag which selects the language version of
+// input outside a module.
+func addLanguageVersionFlag(cmd *cobra.Command) {
+	cmd.Flags().String(string(flagLanguageVersion), "",
+		"fallback language version for input outside a module (for example, v0.17.0)")
+}
+
+// languageVersionFlag returns the language version selected with
+// --language-version, or "" if the flag is unset or was not added.
+func languageVersionFlag(flags *pflag.FlagSet) (string, error) {
+	f := flags.Lookup(string(flagLanguageVersion))
+	if f == nil {
+		return "", nil
+	}
+	if v := f.Value.String(); v != "" {
+		return cueversion.CheckLanguageVersion(v)
+	}
+	return "", nil
 }
 
 func addInjectionFlags(cmd *cobra.Command) {

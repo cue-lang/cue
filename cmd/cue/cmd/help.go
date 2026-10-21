@@ -523,6 +523,20 @@ a different file. The -files flag may only be used in
 combination with the import command.
 
 
+Choosing the language version
+
+The --language-version flag selects a fallback language version
+for CUE that belongs to no module, such as files outside any
+module, standard input, and the --expression and --schema flags,
+and the target version of CUE that commands generate from it. It
+accepts a canonical semantic version, such as v0.17.0.
+
+The flag is only a fallback. The files of a module that declares a
+language version keep that version. It is not an error if the flag
+applies to no input, so the same command can be repeated while
+files move into modules.
+
+
 Examples:
 
 # Put a value at a path based on its "kind" and "name" fields.
@@ -533,6 +547,9 @@ $ cue eval -l myschema: schema: foo.json
 
 # Base the path values on its kind and file name.
 $ cue eval --with-context -l 'path.Base(filename)' -l data.kind foo.yaml
+
+# Evaluate a file outside any module as written for v0.17.0.
+$ cue eval --language-version v0.17.0 report.cue
 `,
 }
 

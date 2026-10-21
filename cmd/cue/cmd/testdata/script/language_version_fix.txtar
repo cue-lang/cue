@@ -1,0 +1,96 @@
+# cue fix judges a loose file at the version chosen with --language-version,
+# as it would judge the same file in a module declaring that version.
+#
+# TestLatest: skip -- the inputs are deliberately written for v0.17.0.
+
+# Without the flag, the file is judged at the current version, where the
+# experiment is already stable, so the migration is refused.
+! exec cue fix --exp=explicitopen z.cue
+stderr '^fix: experiment "explicitopen" is already stable as of language version v0.18.0'
+cmp z.cue in.cue
+
+# At v0.17.0 the migration applies, and the rewrite is the one a v0.17.0
+# module gets.
+exec cue fix --language-version v0.17.0 --exp=explicitopen z.cue
+cmp z.cue mod/expect-explicitopen
+cp in.cue mod/z.cue
+cd mod
+exec cue fix --exp=explicitopen z.cue
+cmp z.cue expect-explicitopen
+cd ..
+
+# --exp=all expands to the experiments that apply at v0.17.0.
+cp in.cue z.cue
+exec cue fix --language-version v0.17.0 --exp=all z.cue
+cp z.cue all-loose
+cp in.cue mod/z.cue
+cd mod
+exec cue fix --exp=all z.cue
+cmp z.cue ../all-loose
+cd ..
+
+# An experiment that is not yet available at the chosen version is refused.
+cp in.cue z.cue
+! exec cue fix --language-version v0.16.0 --exp=shortcircuit z.cue
+stderr 'experiment "shortcircuit" requires language version v0.17.0 or later'
+
+# An attribute for an experiment that is stable at the chosen version is
+# dropped as redundant, as in a module.
+exec cue fix --language-version v0.17.0 r.cue
+cp r.cue r-loose
+cd mod
+exec cue fix r.cue
+cmp r.cue ../r-loose
+cd ..
+
+# Inside a versioned module, the flag is only a fallback that applies to
+# nothing, with or without package arguments.
+cd mod
+cp ../in.cue z.cue
+exec cue fix --language-version v0.18.0 --exp=explicitopen .
+cmp z.cue expect-explicitopen
+cp ../in.cue z.cue
+exec cue fix --language-version v0.18.0 --exp=explicitopen
+cmp z.cue expect-explicitopen
+cd ..
+
+-- in.cue --
+#A: a: int
+#B: b: int
+
+X: {
+	#A
+	#B
+	b: string
+}
+-- z.cue --
+#A: a: int
+#B: b: int
+
+X: {
+	#A
+	#B
+	b: string
+}
+-- r.cue --
+@experiment(structcmp)
+
+a: 1
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- mod/r.cue --
+@experiment(structcmp)
+
+a: 1
+-- mod/expect-explicitopen --
+@experiment(explicitopen)
+
+#A: a: int
+#B: b: int
+
+X: __closeAll({
+	#A...
+	#B...
+	b: string
+})

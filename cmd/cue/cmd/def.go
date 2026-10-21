@@ -40,6 +40,7 @@ The --expression flag is used to only print parts of a configuration.
 
 	addOutFlags(cmd)
 	addOrphanFlags(cmd)
+	addLanguageVersionFlag(cmd)
 	addInjectionFlags(cmd)
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")

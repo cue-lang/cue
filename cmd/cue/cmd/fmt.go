@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"io"
 	"io/fs"
@@ -35,6 +36,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/source"
+	"cuelang.org/go/mod/modfile"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {
@@ -48,6 +50,7 @@ Arguments are interpreted as import paths (see 'cue help inputs') and all CUE fi
 in them are formatted, including those behind build attributes or without package names.
 
 Use --files to treat arguments as paths to files or directories to recursively format.
+--files cannot be combined with --language-version.
 Directories named "cue.mod" and those beginning with "." and "_" are skipped unless
 given as explicit arguments.
 
@@ -71,14 +74,20 @@ Examples:
 				formatOpts = append(formatOpts, format.Simplify())
 			}
 
+			langVersion, err := languageVersionFlag(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
 			var foundBadlyFormatted bool
 			if !flagFiles.Bool(cmd) { // format packages
 				builds := loadFromArgs(args, &load.Config{
-					Tests:       true,
-					Tools:       true,
-					AllCUEFiles: true,
-					Package:     "*",
-					SkipImports: true,
+					Tests:           true,
+					Tools:           true,
+					AllCUEFiles:     true,
+					Package:         "*",
+					SkipImports:     true,
+					LanguageVersion: langVersion,
 				})
 				if len(builds) == 0 {
 					return errors.Newf(token.NoPos, "invalid args")
@@ -87,7 +96,7 @@ Examples:
 					if err := inst.Err; err != nil {
 						return err
 					}
-					version := inst.LanguageVersion()
+					version := cmp.Or(inst.LanguageVersion(), langVersion)
 					for _, file := range inst.BuildFiles {
 						shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
 						if !shouldFormat {
@@ -104,6 +113,9 @@ Examples:
 					}
 				}
 			} else { // format individual files
+				if langVersion != "" {
+					return errors.New("cannot combine --files with --language-version")
+				}
 				hasDots := slices.ContainsFunc(args, func(arg string) bool {
 					return strings.Contains(arg, "...")
 				})
@@ -129,7 +141,7 @@ Examples:
 						file.Source = contents
 					}
 
-					wasModified, err := formatFile(file, formatOpts, "", doDiff, check, cmd)
+					wasModified, err := formatFile(file, formatOpts, langVersion, doDiff, check, cmd)
 					if err != nil {
 						return err
 					}
@@ -185,8 +197,53 @@ Examples:
 	cmd.Flags().BoolP(string(flagDiff), "d", false, "display diffs instead of rewriting files")
 	cmd.Flags().Bool(string(flagFiles), false, "treat arguments as paths to files or directories to recursively format")
 	addCUEOutputFlags(cmd)
+	addLanguageVersionFlag(cmd)
 
 	return cmd
+}
+
+// owningModuleFile returns the module file of the module that the file at
+// path belongs to, by the rule of cue/load, shown relative to the working
+// directory when it lies below it, and the language version it declares. It
+// returns an empty module file if the file belongs to no module.
+func owningModuleFile(path string) (modFile, declared string, _ error) {
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return "", "", err
+	}
+	root := loaderModuleRoot(filepath.Dir(abs))
+	if root == "" {
+		return "", "", nil
+	}
+	modFile = filepath.Join(root, "cue.mod", "module.cue")
+	data, err := os.ReadFile(modFile)
+	if err != nil {
+		return "", "", nil // a cue.mod without a module file does not make a module
+	}
+	if mf, err := modfile.ParseNonStrict(data, modFile); err == nil && mf.Language != nil {
+		declared = mf.Language.Version
+	}
+	if rel, err := filepath.Rel(rootWorkingDir(), modFile); err == nil && !strings.HasPrefix(rel, "..") {
+		modFile = filepath.ToSlash(rel)
+	}
+	return modFile, declared, nil
+}
+
+// loaderModuleRoot returns the module root that cue/load finds for files in
+// dir: the nearest ancestor of dir, or dir itself, holding a cue.mod entry.
+// It returns "" if there is none, or if the walk leaves a cue.mod directory,
+// as files within cue.mod belong to no module.
+func loaderModuleRoot(dir string) string {
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if filepath.Base(parent) == "cue.mod" || parent == dir {
+			return ""
+		}
+		dir = parent
+	}
 }
 
 // formatFile formats a single file.

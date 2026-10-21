@@ -358,6 +358,9 @@ func newBuildPlan(cmd *Command, cfg *config) (p *buildPlan, err error) {
 		cfg.loadCfg = defCfg.loadCfg
 	}
 	cfg.loadCfg.Stdin = cmd.InOrStdin()
+	if cfg.loadCfg.LanguageVersion, err = languageVersionFlag(cmd.Flags()); err != nil {
+		return nil, err
+	}
 
 	p = &buildPlan{
 		cfg:       cfg,
@@ -544,9 +547,11 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	}
 
 	// Any CUE we generate from another encoding lands in this module, so it
-	// must be valid at the language version the module declares.
+	// must be valid at the language version the module declares. Outside a
+	// module, it targets the version chosen with --language-version.
+	p.encConfig.TargetLanguageVersion = cfg.loadCfg.LanguageVersion
 	for _, b := range builds {
-		if version := b.LanguageVersion(); version != "" {
+		if version := b.TargetLanguageVersion(); version != "" {
 			p.encConfig.TargetLanguageVersion = version
 			break
 		}
@@ -844,6 +849,9 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	loadCfg := *cfg.loadCfg
 	loadCfg.Tools = true
 	setTags(&loadCfg, cmd.cmdCmd.Flags())
+	if loadCfg.LanguageVersion, err = languageVersionFlag(cmd.cmdCmd.Flags()); err != nil {
+		return nil, err
+	}
 
 	binst := loadFromArgs(args, &loadCfg)
 	if len(binst) == 0 {

@@ -72,6 +72,7 @@ Available Commands:
 Flags:
   -t, --inject stringArray         set the value of a tagged field
   -T, --inject-vars[=true|false]   inject system variables in tags (default true)
+      --language-version string    fallback language version for input outside a module (for example, v0.17.0)
 
 Global Flags:
   -E, --all-errors[=true|false]   print all available errors

@@ -1,0 +1,69 @@
+# Every command that reads CUE accepts --language-version, so that a loose
+# file is read the same way by all of them. Here x.cue uses a prefix alias,
+# valid before v0.18.0.
+#
+# TestLatest: skip -- the input deliberately uses the prefix alias form.
+
+# cue exp ast print, loading packages and with --files.
+! exec cue exp ast print x.cue
+stderr 'old-style alias syntax'
+exec cue exp ast print --language-version v0.17.0 x.cue
+stdout 'Alias'
+! exec cue exp ast print --files x.cue
+stderr 'old-style alias syntax'
+exec cue exp ast print --files --language-version v0.17.0 x.cue
+stdout 'Alias'
+
+# cue exp ast join.
+exec cue exp ast join --language-version v0.17.0 x.cue
+stdout '_alias: X='
+
+# cue exp gengotypes.
+exec cue exp gengotypes --language-version v0.17.0 ./p
+exists p/cue_types_p_gen.go
+
+# cue add.
+stdin add.cue
+! exec cue add x.cue
+stdin add.cue
+exec cue add --language-version v0.17.0 x.cue
+cmp x.cue expect/x
+
+# Inside a module declaring a version, the flag is only a fallback, as
+# elsewhere.
+cd mod
+exec cue exp ast print --files --language-version v0.17.0 p.cue
+stdout 'Field'
+stdin ../add.cue
+exec cue add --language-version v0.18.0 m.cue
+cmp m.cue m.cue.added
+
+cd ..
+
+-- x.cue --
+_alias: X={a: 1, b: X.a}
+out:    _alias.b
+-- add.cue --
+added: 2
+-- expect/x --
+_alias: X={a: 1, b: X.a}
+out:    _alias.b
+added:  2
+-- p/p.cue --
+package p
+
+_alias: X={a: int, b: X.a}
+
+#T: {
+	a: _alias.b
+}
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.16.0"
+-- mod/m.cue --
+_m: M={a: 1, b: M.a}
+-- mod/p.cue --
+p: 1
+-- mod/m.cue.added --
+_m:    M={a: 1, b: M.a}
+added: 2

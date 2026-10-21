@@ -69,6 +69,7 @@ func newVetCmd(c *Command) *cobra.Command {
 	}
 
 	addOrphanFlags(cmd)
+	addLanguageVersionFlag(cmd)
 	addInjectionFlags(cmd)
 
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,

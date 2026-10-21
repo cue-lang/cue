@@ -1,0 +1,141 @@
+# Commands that generate or format CUE target the version chosen with
+# --language-version for input outside a module.
+#
+# TestLatest: skip -- the inputs deliberately use the prefix alias form.
+
+# cue import: a key which is not an identifier needs an alias, written in
+# prefix form before v0.18.0 and in postfix form from v0.18.0. The output at
+# v0.17.0 matches the output inside a module declaring v0.17.0.
+exec cue import -o - jsonschema: schema.json
+cmp stdout expect/import-current
+exec cue import --language-version v0.17.0 -o - jsonschema: schema.json
+cmp stdout expect/import-v0.17.0
+cd mod
+exec cue import -o - jsonschema: ../schema.json
+cmp stdout ../expect/import-v0.17.0
+cd ..
+
+# cue get crd accepts the flag outside a module, and inside one, where it is
+# only a fallback.
+exec cue get crd --language-version v0.17.0 --group example.com crd.yaml
+exists v1/foo.cue
+cd mod
+exec cue get crd --language-version v0.17.0 --group example.com crd.yaml
+exists v1/foo.cue
+cd ..
+
+# cue fmt parses packages at the chosen version. --files rejects a chosen
+# version before changing any file.
+! exec cue fmt alias.cue
+stderr 'old-style alias syntax'
+exec cue fmt --language-version v0.17.0 alias.cue
+cmp alias.cue expect/alias
+cp alias-unformatted.cue alias.cue
+! exec cue fmt --files alias.cue
+stderr 'old-style alias syntax'
+! exec cue fmt --files --language-version v0.17.0 alias.cue
+stderr 'cannot combine --files with --language-version'
+cmp alias.cue alias-unformatted.cue
+! exec cue fmt --files --language-version v0.17.0 -
+stderr 'cannot combine --files with --language-version'
+
+# A directory holding a loose file and a nested module is rejected at once.
+! exec cue fmt --files --language-version v0.17.0 dir
+stderr 'cannot combine --files with --language-version'
+cmp dir/a.cue dir-a-unformatted.cue
+
+# Without the flag, cue fmt --files formats each file as it finds it, as
+# before: a missing argument does not stop earlier files from being written.
+! exec cue fmt --files good.cue missing.cue
+cmp good.cue expect/good
+
+-- good.cue --
+good:    1
+-- expect/good --
+good: 1
+-- mod/cue.mod/gen/g.cue --
+g: 1
+-- schema.json --
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "dependentRequired": {"x-y": ["a"]}
+}
+-- crd.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.example.com
+spec:
+  group: example.com
+  names:
+    plural: foos
+    singular: foo
+    kind: Foo
+  scope: Namespaced
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              replicas:
+                type: integer
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- mod/crd.yaml --
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: foos.example.com
+spec:
+  group: example.com
+  names:
+    plural: foos
+    singular: foo
+    kind: Foo
+  scope: Namespaced
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+-- alias.cue --
+_alias:   X={a: 1, b: X.a}
+-- alias-unformatted.cue --
+_alias:   X={a: 1, b: X.a}
+-- dir/a.cue --
+a:    1
+-- dir-a-unformatted.cue --
+a:    1
+-- dir/nested/cue.mod/module.cue --
+module: "nested.test"
+language: version: "v0.16.0"
+-- dir/nested/n.cue --
+n: 1
+-- expect/import-current --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+"x-y"~(_t0)?: _
+if _t0 != _|_ {
+	a!: _
+}
+{}
+...
+-- expect/import-v0.17.0 --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+_t0="x-y"?: _
+if _t0 != _|_ {
+	a!: _
+}
+{}
+...
+-- expect/alias --
+_alias: X={a: 1, b: X.a}

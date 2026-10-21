@@ -59,6 +59,7 @@ Example:
 	}
 
 	cmd.Flags().StringP(string(flagGroup), "g", "", "CRD group to filter by")
+	addLanguageVersionFlag(cmd)
 	return cmd
 }
 
@@ -70,7 +71,11 @@ func runCRD(cmd *Command, args []string) error {
 	// TODO could potentially support URLs as arguments, as
 	// it's common to use URLs to specify CRDs in other
 	// Kubernetes-related tools.
-	insts := load.Instances(args, nil)
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return err
+	}
+	insts := load.Instances(args, &load.Config{LanguageVersion: langVersion})
 	if len(insts) != 1 {
 		if len(insts) > 1 {
 			return fmt.Errorf("cannot specify multiple packages to cue get crd")
@@ -92,13 +97,13 @@ func runCRD(cmd *Command, args []string) error {
 	groups := make(map[string]bool)
 	autoGroup := group == ""
 	for _, f := range inst.OrphanedFiles {
-		d := encoding.NewDecoder(cmd.ctx, f, nil)
+		d := encoding.NewDecoder(cmd.ctx, f, &encoding.Config{TargetLanguageVersion: langVersion})
 		for ; !d.Done(); d.Next() {
 			v := cmd.ctx.BuildFile(d.EvalFile())
 			if err := v.Err(); err != nil {
 				return err
 			}
-			crds, err := jsonschema.ExtractCRDs(v, nil)
+			crds, err := jsonschema.ExtractCRDs(v, &jsonschema.CRDConfig{TargetLanguageVersion: langVersion})
 			if err != nil {
 				// TODO include the filename of the original in the error message?
 				return err

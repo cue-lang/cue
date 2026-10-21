@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"go/ast"
 	"go/constant"
@@ -306,6 +307,7 @@ generate Go types from them with "cue exp gengotypes".
 	cmd.Flags().StringP(string(flagPackage), "p", "", "package name for generated CUE files")
 
 	cmd.Flags().String(string(flagOutFile), "", "generate one CUE file for a single Go package")
+	addLanguageVersionFlag(cmd)
 
 	cmd.Flags().String(string(flagCodec), defaultCodec,
 		"comma-separated priority list of codecs, such as json, jsonv2, yaml, or toml")
@@ -378,6 +380,10 @@ type extractor struct {
 	omittedMethods map[omittedMethod]bool
 
 	codecs []*codec
+
+	// langVersion is the language version of the generated CUE: the module's,
+	// or the one chosen with --language-version outside a module.
+	langVersion string
 
 	// explicitOpen reports whether the module's language version
 	// enables explicitopen, where embedding a definition closes the struct.
@@ -574,7 +580,12 @@ func extract(cmd *Command, args []string) error {
 	// command specifies a Go package(s) that belong to the main module
 	// and where for some reason the
 	// determine module root:
-	binst := loadFromArgs([]string{"."}, nil)[0]
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return err
+	}
+	binst := loadFromArgs([]string{"."}, &load.Config{LanguageVersion: langVersion})[0]
+	version := cmp.Or(binst.TargetLanguageVersion(), langVersion)
 
 	// TODO: require explicitly set root.
 	root := binst.Root
@@ -602,7 +613,8 @@ func extract(cmd *Command, args []string) error {
 
 	e := extractor{
 		cmd:            cmd,
-		explicitOpen:   cueexperiment.IsStable("explicitopen", binst.LanguageVersion()),
+		langVersion:    version,
+		explicitOpen:   cueexperiment.IsStable("explicitopen", version),
 		allPkgs:        map[string]*packages.Package{},
 		orig:           map[types.Type]*ast.StructType{},
 		omitted:        map[types.Object]bool{},
@@ -1098,7 +1110,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 						sv = r.RatString()
 					}
 					var err error
-					cv, err = parser.ParseExpr("", sv)
+					cv, err = parser.ParseExpr("", sv, parser.Version(e.langVersion))
 					if err != nil {
 						panic(fmt.Errorf("failed to parse %v: %v", sv, err))
 					}
@@ -1880,7 +1892,7 @@ func (e *extractor) addFieldsAt(x *types.Struct, st *cueast.StructLit, prefix st
 		add(field)
 
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
-			expr, err := parser.ParseExpr("get go", s)
+			expr, err := parser.ParseExpr("get go", s, parser.Version(e.langVersion))
 			if err != nil {
 				e.logf("error parsing struct tag %q:", s, err)
 			}

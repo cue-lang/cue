@@ -1,0 +1,66 @@
+# --language-version is a fallback for input that belongs to no module: the
+# files of a module that declares a language version keep that version, and
+# it is not an error if the flag applies to no input at all. Here x.cue uses
+# a prefix alias, which v0.16.0 accepts and v0.18.0 rejects, so the result
+# shows which version applied.
+#
+# TestLatest: skip -- the inputs deliberately use the prefix alias form.
+
+cd mod
+exec cue eval --language-version v0.18.0 .
+cmp stdout ../expect/mod-eval
+exec cue eval --language-version v0.18.0 x.cue
+cmp stdout ../expect/mod-eval
+exec cue eval --language-version v0.18.0 -e 'out' .
+stdout '^1$'
+
+# A file outside the module root belongs to no module, even with the working
+# directory inside the module, so it falls back to the flag. In a mix of
+# loose and module files, each keeps its own version.
+exec cue eval --language-version v0.17.0 ../outside/y.cue
+cmp stdout ../expect/outside-eval
+exec cue eval --language-version v0.17.0 ../outside/w.cue x.cue
+cmp stdout ../expect/mixed-eval
+
+# A file of a nested module is read as without the flag.
+exec cue eval --language-version v0.17.0 nested/n.cue
+stdout '^n: 1$'
+cd ..
+
+# A module file that declares no version still asks for cue mod fix.
+cd empty
+! exec cue eval --language-version v0.17.0 e.cue
+stderr 'no language version declared in module.cue; run ''cue mod fix'''
+cd ..
+
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.16.0"
+-- mod/x.cue --
+package x
+
+_alias: X={a: 1, b: X.a}
+out: _alias.b
+-- mod/nested/cue.mod/module.cue --
+module: "nested.test"
+language: version: "v0.15.0"
+-- mod/nested/n.cue --
+n: 1
+-- outside/y.cue --
+_alias: Y={a: 2, b: Y.a}
+out: _alias.b
+-- outside/w.cue --
+package x
+
+_w: W={a: 3, b: W.a}
+w: _w.b
+-- empty/cue.mod/module.cue --
+-- empty/e.cue --
+e: 1
+-- expect/mod-eval --
+out: 1
+-- expect/outside-eval --
+out: 2
+-- expect/mixed-eval --
+out: 1
+w:   3

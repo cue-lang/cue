@@ -261,6 +261,7 @@ Example:
 
 	addOutFlags(cmd)
 	addOrphanFlags(cmd)
+	addLanguageVersionFlag(cmd)
 
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().Bool(string(flagDryRun), false, "show what files would be created")
@@ -479,7 +480,7 @@ func handleFile(b *buildPlan, f *ast.File) (err error) {
 	}
 
 	if flagRecursive.Bool(b.cmd) {
-		h := hoister{fields: map[string]bool{}}
+		h := hoister{fields: map[string]bool{}, version: b.encConfig.TargetLanguageVersion}
 		h.hoist(f)
 	}
 
@@ -511,6 +512,9 @@ func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
 
 type hoister struct {
 	fields map[string]bool
+
+	// version is the language version to parse hoisted data at.
+	version string
 }
 
 func (h *hoister) hoist(f *ast.File) {
@@ -555,7 +559,7 @@ func (h *hoister) hoist(f *ast.File) {
 				return true
 			}
 
-			expr, enc := tryParse(str)
+			expr, enc := tryParse(str, h.version)
 			if expr == nil {
 				return true
 			}
@@ -581,10 +585,10 @@ func (h *hoister) hoist(f *ast.File) {
 	astutil.Sanitize(f)
 }
 
-func tryParse(str string) (s ast.Expr, pkg string) {
+func tryParse(str, version string) (s ast.Expr, pkg string) {
 	b := []byte(str)
 	if json.Valid(b) {
-		expr, err := parser.ParseExpr("", b)
+		expr, err := parser.ParseExpr("", b, parser.Version(version))
 		if err != nil {
 			// TODO: report error
 			return nil, ""

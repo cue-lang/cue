@@ -85,6 +85,7 @@ current version.
 	cmd.Flags().Bool("remove-list-commas", false,
 		"remove commas from multiline list elements (v0.17.0+)")
 	addCUEOutputFlags(cmd)
+	addLanguageVersionFlag(cmd)
 
 	return cmd
 }
@@ -114,6 +115,11 @@ func runFixAll(cmd *Command, args []string) error {
 // cue mod upgrade selects and groups them, at the module's own language
 // version. Without force a failed rewrite leaves every file unwritten.
 func fixModule(cmd *Command, force bool, opts ...fix.Option) error {
+	// The module's files are at its own version, so --language-version,
+	// a fallback for files outside any module, never applies here.
+	if _, err := languageVersionFlag(cmd.Flags()); err != nil {
+		return err
+	}
 	root, err := findModuleRoot()
 	if err != nil {
 		return err
@@ -141,10 +147,15 @@ func fixModule(cmd *Command, force bool, opts ...fix.Option) error {
 // is the explicit-argument path of cue fix. Without arguments, fix and mod
 // upgrade select the module's files by walking it instead (fixModule).
 func fixInstances(cmd *Command, args []string, force bool, opts ...fix.Option) ([]*build.Instance, errors.Error) {
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return nil, errors.Promote(err, "")
+	}
 	instances := load.Instances(args, &load.Config{
-		Tests:   true,
-		Tools:   true,
-		Package: "*",
+		Tests:           true,
+		Tools:           true,
+		Package:         "*",
+		LanguageVersion: langVersion,
 	})
 
 	errs := fix.Instances(instances, opts...)

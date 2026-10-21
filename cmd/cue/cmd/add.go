@@ -52,6 +52,7 @@ func newAddCmd(c *Command) *cobra.Command {
 	f.BoolP(string(flagDryRun), "n", false,
 		"only run simulation")
 	f.StringP(string(flagPackage), "p", "", "package to append to")
+	addLanguageVersionFlag(cmd)
 
 	return cmd
 }
@@ -76,12 +77,16 @@ func doAdd(cmd *Command, args []string) (err error) {
 
 	// build instance cache
 	builds := map[string]*build.Instance{}
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return err
+	}
 
 	getBuild := func(path string) *build.Instance {
 		if b, ok := builds[path]; ok {
 			return b
 		}
-		b := load.Instances([]string{path}, nil)[0]
+		b := load.Instances([]string{path}, &load.Config{LanguageVersion: langVersion})[0]
 		builds[path] = b
 		return b
 	}
@@ -292,9 +297,10 @@ func (fi *fileInfo) appendAndCheck() (fo originalFile, err error) {
 	}
 	b = append(b, fi.contents.Bytes()...)
 
-	// Format at the language version of the module owning the file, so that
-	// syntax only some versions accept is parsed the way the file means it.
-	b, err = format.Source(b, format.Version(fi.build.LanguageVersion()))
+	// Format at the language version of the module owning the file, or the
+	// one chosen for a file outside any module, so that syntax only some
+	// versions accept is parsed the way the file means it.
+	b, err = format.Source(b, format.Version(fi.build.TargetLanguageVersion()))
 	if err != nil {
 		return originalFile{}, err
 	}

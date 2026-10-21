@@ -92,6 +92,7 @@ removal.
 	addCUEOutputFlags(cmd)
 	cmd.Flags().Bool(string(flagTrace), false, "trace computation")
 	cmd.Flags().BoolP(string(flagDryRun), "n", false, "only run simulation")
+	addLanguageVersionFlag(cmd)
 
 	return cmd
 }
@@ -102,6 +103,9 @@ func runTrim(cmd *Command, args []string) error {
 		return err
 	}
 	defCfg.loadCfg.Stdin = cmd.InOrStdin()
+	if defCfg.loadCfg.LanguageVersion, err = languageVersionFlag(cmd.Flags()); err != nil {
+		return err
+	}
 	binst := loadFromArgs(args, defCfg.loadCfg)
 	if binst == nil {
 		return nil

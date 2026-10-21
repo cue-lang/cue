@@ -67,6 +67,7 @@ still has its partial syntax tree printed.
 	f.Bool(string(flagRefs), false, "print node references for Node fields")
 	f.Bool(string(flagFiles), false, "treat arguments as literal files; do not try to load as package")
 	f.Bool(string(flagPos), false, "print position info for all nodes")
+	addLanguageVersionFlag(cmd)
 	// Note that DebugConfig also has a Filter func, but that doesn't lend itself well
 	// to a command line flag. Perhaps we could provide some commonly used filters,
 	// such as "positions only" or "skip positions".
@@ -85,6 +86,10 @@ func runExpASTPrint(cmd *Command, args []string) error {
 		_, err := w.Write(astinternal.AppendDebug(nil, file, cfg))
 		return err
 	}
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return err
+	}
 	if flagFiles.Bool(cmd) {
 		var errs errors.Error
 		for _, name := range args {
@@ -92,7 +97,19 @@ func runExpASTPrint(cmd *Command, args []string) error {
 			if name == "-" {
 				src = cmd.InOrStdin()
 			}
-			file, err := parser.ParseFile(name, src, parser.ParseComments)
+			// --language-version is a fallback for files outside any
+			// module; the files of a module are read as without it.
+			version := langVersion
+			if name != "-" {
+				modFile, declared, err := owningModuleFile(name)
+				if err != nil {
+					return err
+				}
+				if modFile != "" && declared != "" {
+					version = ""
+				}
+			}
+			file, err := parser.ParseFile(name, src, parser.ParseComments, parser.Version(version))
 			if file == nil {
 				return err // the source could not be read
 			}
@@ -111,7 +128,7 @@ func runExpASTPrint(cmd *Command, args []string) error {
 	// more clearly separating the AST for each file?
 	// [ast.File.Filename] already has the full filename,
 	// but as one of the first fields it's not a great separator.
-	for _, inst := range loadExpASTInstances(cmd, args) {
+	for _, inst := range loadExpASTInstances(cmd, args, langVersion) {
 		if err := inst.Err; err != nil {
 			return err
 		}
@@ -124,12 +141,13 @@ func runExpASTPrint(cmd *Command, args []string) error {
 	return nil
 }
 
-func loadExpASTInstances(cmd *Command, args []string) []*build.Instance {
+func loadExpASTInstances(cmd *Command, args []string, langVersion string) []*build.Instance {
 	return load.Instances(args, &load.Config{
 		// cue exp ast only cares about syntax trees; loading the imports just causes
 		// extra work and may lead to errors we don't care about.
-		SkipImports: true,
-		Stdin:       cmd.InOrStdin(),
+		SkipImports:     true,
+		Stdin:           cmd.InOrStdin(),
+		LanguageVersion: langVersion,
 	})
 }
 
@@ -148,7 +166,7 @@ func relativeFilename(name string) string {
 
 func newExpASTJoinCmd(c *Command) *cobra.Command {
 	// TODO: add a flag to drop comments, which is useful when reducing bug reproducers.
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "join [flags] [inputs]",
 		Short: "join a package into a single file",
 		Long: `
@@ -160,10 +178,16 @@ See 'cue help inputs' as well.
 `[1:],
 		RunE: mkRunE(c, runExpASTJoin),
 	}
+	addLanguageVersionFlag(cmd)
+	return cmd
 }
 
 func runExpASTJoin(cmd *Command, args []string) error {
-	insts := loadExpASTInstances(cmd, args)
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return err
+	}
+	insts := loadExpASTInstances(cmd, args, langVersion)
 	if len(insts) != 1 {
 		return errors.New("joining multiple instances is not possible yet")
 	}

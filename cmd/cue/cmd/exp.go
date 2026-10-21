@@ -130,13 +130,18 @@ The default is "zero", representing a missing field as the zero value.
 		RunE: mkRunE(c, runExpGenGoTypes),
 	}
 	cmd.Flags().StringP(string(flagOutFile), "o", "", "generate one Go file for a single CUE package")
+	addLanguageVersionFlag(cmd)
 
 	return cmd
 }
 
 func runExpGenGoTypes(cmd *Command, args []string) error {
 	outFile := flagOutFile.String(cmd)
-	insts := load.Instances(args, &load.Config{})
+	langVersion, err := languageVersionFlag(cmd.Flags())
+	if err != nil {
+		return err
+	}
+	insts := load.Instances(args, &load.Config{LanguageVersion: langVersion})
 	writeFile := defaultGenGoTypesWrite
 	if outFile != "" {
 		if len(insts) != 1 {

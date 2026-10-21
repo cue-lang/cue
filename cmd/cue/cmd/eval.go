@@ -57,6 +57,7 @@ Examples:
 
 	addOutFlags(cmd)
 	addOrphanFlags(cmd)
+	addLanguageVersionFlag(cmd)
 	addCUEOutputFlags(cmd)
 	addInjectionFlags(cmd)
 

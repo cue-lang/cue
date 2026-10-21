@@ -1,0 +1,38 @@
+# cue get go targets the version chosen with --language-version outside a
+# CUE module: before v0.18.0, an embedded definition needs no opening.
+#
+# TestLatest: skip -- the output deliberately targets v0.17.0.
+
+exec cue get go --local ./decls
+grep '#Base\.\.\.' decls/p_go_gen.cue
+exec cue get go --local --language-version v0.17.0 ./decls
+! grep '#Base\.\.\.' decls/p_go_gen.cue
+grep '^\t#Base$' decls/p_go_gen.cue
+
+# Inside a CUE module declaring a version, the flag is only a fallback: the
+# module's v0.17.0 applies, so the embedding is not opened.
+rm decls/p_go_gen.cue
+cp module.cue.in cue.mod/module.cue
+exec cue get go --local --language-version v0.18.0 ./decls
+! grep '#Base\.\.\.' decls/p_go_gen.cue
+rm decls/p_go_gen.cue
+
+-- go.mod --
+module mod.test
+
+go 1.21
+-- module.cue.in --
+module: "mod.test"
+language: version: "v0.17.0"
+-- cue.mod/.keep --
+-- decls/p.go --
+package decls
+
+type Base struct {
+	Name string `json:"name"`
+}
+
+type Derived struct {
+	Base
+	Size int `json:"size"`
+}

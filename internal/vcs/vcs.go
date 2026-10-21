@@ -156,5 +156,10 @@ func TestEnv() []string {
 	return []string{
 		"PATH=" + os.Getenv("PATH"),
 		homeEnvName() + "=/no-home",
+		// Stop git from starting background maintenance after commits,
+		// which only costs extra processes in short-lived test repositories.
+		"GIT_CONFIG_COUNT=1",
+		"GIT_CONFIG_KEY_0=maintenance.auto",
+		"GIT_CONFIG_VALUE_0=false",
 	}
 }

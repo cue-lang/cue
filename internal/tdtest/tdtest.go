@@ -108,7 +108,7 @@ type T struct {
 
 // getCallInfo returns the information needed to update the field compared by
 // the calling Equal, or an error saying why the field cannot be updated.
-func (t *T) getCallInfo() (*info, *callInfo, error) {
+func (t *T) getCallInfo() (*info, string, error) {
 	_, file, line, ok := runtime.Caller(2)
 	if !ok {
 		t.Fatalf("could not update file for test %s", t.Name())
@@ -119,34 +119,34 @@ func (t *T) getCallInfo() (*info, *callInfo, error) {
 	file = filepath.Clean(file)
 	info := t.infoSrc.getInfo(file)
 	if info.err != nil {
-		return nil, nil, info.err
+		return nil, "", info.err
 	}
-	ci := info.calls[token.Position{Filename: file, Line: line}]
-	if ci == nil {
-		return nil, nil, errors.New("Equal call is outside the test function")
+	fieldName, ok := info.calls[token.Position{Filename: file, Line: line}]
+	if !ok {
+		return nil, "", errors.New("Equal call is outside the function passed to Run")
 	}
-	return info, ci, nil
+	return info, fieldName, nil
 }
 
 // Equal compares two fields.
 //
 // For auto updating to work, field must reference a field in the test case
-// directly, and the call must be within the test function itself rather
-// than in a helper.
+// directly, and the call must be within the function literal which the test
+// function passes to Run, rather than in a helper.
 func (t *T) Equal(actual, field any, msgAndArgs ...any) {
 	t.Helper()
 
 	switch {
 	case field == actual:
 	case t.updateEnabled:
-		info, ci, err := t.getCallInfo()
+		info, fieldName, err := t.getCallInfo()
 		if err != nil {
 			t.Fatalf("cannot update a field: %v:\ngot:  %v;\nwant: %v", err, actual, field)
 		}
-		t.updateField(info, ci, actual)
+		t.updateField(info, fieldName, actual)
 	case len(msgAndArgs) == 0:
-		if _, ci, err := t.getCallInfo(); err == nil {
-			t.Errorf("unexpected value for field %s:\ngot:  %v;\nwant: %v", ci.fieldName, actual, field)
+		if _, fieldName, err := t.getCallInfo(); err == nil {
+			t.Errorf("unexpected value for field %s:\ngot:  %v;\nwant: %v", fieldName, actual, field)
 		} else {
 			t.Errorf("unexpected value:\ngot:  %v;\nwant: %v", actual, field)
 		}

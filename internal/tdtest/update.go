@@ -18,17 +18,14 @@ import (
 	"fmt"
 	"go/ast"
 	"go/format"
+	"go/parser"
 	"go/token"
-	"go/types"
 	"os"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
-	"sync"
 
 	"golang.org/x/tools/go/ast/astutil"
-	"golang.org/x/tools/go/packages"
 )
 
 // info contains information needed to update files.
@@ -37,11 +34,11 @@ type info struct {
 
 	needsUpdate bool // an updateable field has changed
 
+	fset  *token.FileSet
+	file  *ast.File         // the file of the test
 	table *ast.CompositeLit // the table that is the source of the tests
 
-	testPkg *packages.Package
-
-	calls   map[token.Position]*callInfo
+	calls   map[token.Position]string // the field compared by each Equal call
 	patches map[ast.Node]ast.Expr
 
 	// err is why the test could not be analyzed, if it could not.
@@ -49,31 +46,14 @@ type info struct {
 	err error
 }
 
-type callInfo struct {
-	ast       *ast.CallExpr
-	funcName  string
-	fieldName string
-}
-
-var loadPackages = sync.OnceValues(func() ([]*packages.Package, error) {
-	cfg := &packages.Config{
-		Mode: packages.NeedFiles |
-			packages.NeedTypes |
-			packages.NeedTypesInfo |
-			packages.NeedSyntax,
-		Tests: true,
-	}
-
-	return packages.Load(cfg, ".")
-})
-
 func (s *set[T]) getInfo(file string) *info {
 	if s.info != nil {
 		return s.info
 	}
 	info := &info{
 		tcType:  reflect.TypeFor[T](),
-		calls:   make(map[token.Position]*callInfo),
+		fset:    token.NewFileSet(),
+		calls:   make(map[token.Position]string),
 		patches: make(map[ast.Node]ast.Expr),
 	}
 	s.info = info
@@ -85,55 +65,44 @@ func (s *set[T]) getInfo(file string) *info {
 }
 
 // load analyzes the source of the named test function, given the file of
-// an Equal call which needs the analysis.
+// an Equal call which needs the analysis. The analysis is syntactic, so the
+// test must be in that same file, and it must call Run with a table variable
+// and a function literal which holds the Equal calls.
 func (i *info) load(testName, file string) error {
-	pkgs, err := loadPackages()
+	f, err := parser.ParseFile(i.fset, file, nil, parser.ParseComments|parser.SkipObjectResolution)
 	if err != nil {
 		return fmt.Errorf("load: %v", err)
 	}
+	i.file = f
 
-	// Find the function declaration of this test, which may be in a different
-	// file or package than the Equal call which needs the info.
-	f, fn, pkg := findTestFunc(testName, file, pkgs)
+	var fn *ast.FuncDecl
+	for _, d := range f.Decls {
+		if fd, ok := d.(*ast.FuncDecl); ok && fd.Recv == nil && fd.Name.Name == testName {
+			fn = fd
+		}
+	}
 	if fn == nil {
 		return fmt.Errorf("could not find test %q", testName)
 	}
-	i.testPkg = pkg
-
-	// TODO: not necessary at the moment, but this is tricky so leaving this in
-	// so as to not to forget how to do it.
-	//
-	// for _, p := range pkg.Types.Imports() {
-	// 	if p.Path() == "cuelang.org/go/internal/tdtest" {
-	// 		info.thisPkg = p
-	// 	}
-	// }
-	// if info.thisPkg == nil {
-	// 	t.Fatalf("could not find test package")
-	// }
 
 	// Find CompositLit table used for the test:
 	// - find call to which CompositLit was passed,
-	a := i.findCalls(fn.Body, "New", "Run")
+	a := findCalls(fn.Body, "", "Run", 3)
 	if len(a) != 1 {
 		// TODO: allow more than one.
-		return fmt.Errorf("only one Run or New function allowed per test")
+		return fmt.Errorf("only one Run function allowed per test")
 	}
 
 	// - analyse second argument of call,
-	call := a[0].ast
-	fset := i.testPkg.Fset
-	ti := i.testPkg.TypesInfo
+	call := a[0]
 	ident, ok := call.Args[1].(*ast.Ident)
 	if !ok {
-		return fmt.Errorf("%v: arg 2 of %s must be a reference to the table",
-			fset.Position(call.Args[1].Pos()), a[0].funcName)
+		return fmt.Errorf("%v: arg 2 of Run must be a reference to the table",
+			i.fset.Position(call.Args[1].Pos()))
 	}
-	def := ti.Uses[ident]
-	pos := def.Pos()
 
-	// - locate the CompositeLit in the AST based on position.
-	v0 := findVar(pos, f)
+	// - locate the CompositeLit in the declaration of the variable.
+	v0 := findVar(f, fn, ident.Name, call.Pos())
 	if v0 == nil {
 		return fmt.Errorf("cannot find composite literal in source code")
 	}
@@ -144,9 +113,15 @@ func (i *info) load(testName, file string) error {
 	}
 	i.table = v
 
-	// Find and index assertion calls.
-	a = i.findCalls(fn.Body, "Equal")
-	for _, x := range a {
+	// Find and index assertion calls, which are on the first parameter
+	// of the function literal and refer to a field of the second.
+	lit, ok := call.Args[2].(*ast.FuncLit)
+	if !ok || len(lit.Type.Params.List) != 2 || len(lit.Type.Params.List[0].Names) != 1 {
+		return fmt.Errorf("%v: arg 3 of Run must be a function literal",
+			i.fset.Position(call.Args[2].Pos()))
+	}
+	t := lit.Type.Params.List[0].Names[0].Name
+	for _, x := range findCalls(lit.Body, t, "Equal", 2) {
 		if err := i.initFieldRef(x); err != nil {
 			return err
 		}
@@ -154,157 +129,110 @@ func (i *info) load(testName, file string) error {
 	return nil
 }
 
-// initFieldRef updates c with information about the field referenced
-// in its corresponding call:
-//   - name of the field
-//   - indexes the field based on filename and line number.
-func (i *info) initFieldRef(c *callInfo) error {
-	call := c.ast
-	info := i.testPkg.TypesInfo
-	fset := i.testPkg.Fset
-	pos := fset.Position(call.Pos())
+// initFieldRef indexes the field referenced by an Equal call
+// by the call's filename and line number.
+func (i *info) initFieldRef(call *ast.CallExpr) error {
+	pos := i.fset.Position(call.Pos())
 
 	sel, ok := call.Args[1].(*ast.SelectorExpr)
-	s := info.Selections[sel]
-	if !ok || s == nil || s.Kind() != types.FieldVal {
-		return fmt.Errorf("%v: arg 2 of %s must be a reference to a test case field",
-			fset.Position(call.Args[1].Pos()), c.funcName)
+	if !ok {
+		return fmt.Errorf("%v: arg 2 of Equal must be a reference to a test case field",
+			i.fset.Position(call.Args[1].Pos()))
 	}
 
-	obj := s.Obj()
-	c.fieldName = obj.Name()
-	if _, ok := i.tcType.FieldByName(c.fieldName); !ok {
+	fieldName := sel.Sel.Name
+	if _, ok := i.tcType.FieldByName(fieldName); !ok {
 		return fmt.Errorf("%v: could not find field %s",
-			fset.Position(obj.Pos()), c.fieldName)
+			i.fset.Position(sel.Sel.Pos()), fieldName)
 	}
 
 	pos.Column = 0
 	pos.Offset = 0
-	i.calls[pos] = c
+	i.calls[pos] = fieldName
 	return nil
 }
 
-// findTestFunc locates the declaration of the named test function within the
-// given slice of packages, along with the file and package which hold it.
-// A package and its external test package may both declare a test with the
-// same name, so the package holding the given file is searched first.
-func findTestFunc(name, file string, pkgs []*packages.Package) (*ast.File, *ast.FuncDecl, *packages.Package) {
-	for _, sameFile := range []bool{true, false} {
-		for _, p := range pkgs {
-			if slices.Contains(p.GoFiles, file) != sameFile {
-				continue
-			}
-			for _, f := range p.Syntax {
-				for _, d := range f.Decls {
-					if fd, ok := d.(*ast.FuncDecl); ok && fd.Recv == nil && fd.Name.Name == name {
-						return f, fd, p
-					}
-				}
-			}
-		}
-	}
-	return nil, nil, nil
-}
-
-func isT(s string) bool {
-	// TODO: parametrize this so that tdtest does not have to know of cuetdtest.
-	return s == "*cuelang.org/go/internal/tdtest.T" ||
-		s == "*cuelang.org/go/internal/cuetdtest.T" ||
-		s == "*cuelang.org/go/internal/cuetest.T"
-}
-
-// findCalls finds all call expressions within a given block for functions
-// or methods defined within the tdtest package.
-func (i *info) findCalls(block *ast.BlockStmt, names ...string) []*callInfo {
-	var a []*callInfo
+// findCalls finds all calls within block to a function or method with the
+// given name and at least nargs arguments, called on the identifier recv,
+// or on any identifier if recv is empty.
+func findCalls(block *ast.BlockStmt, recv, name string, nargs int) []*ast.CallExpr {
+	var a []*ast.CallExpr
 	ast.Inspect(block, func(n ast.Node) bool {
 		c, ok := n.(*ast.CallExpr)
-		if !ok {
+		if !ok || len(c.Args) < nargs {
 			return true
 		}
 		sel, ok := c.Fun.(*ast.SelectorExpr)
-		if !ok {
+		if !ok || sel.Sel.Name != name {
 			return true
 		}
-
-		// TODO: also test package. It would be better to test the equality
-		// using the information in the types.Info/packages to ensure that
-		// we really got the right function.
-		info := i.testPkg.TypesInfo
-		for _, name := range names {
-			if sel.Sel.Name == name {
-				receiver := info.TypeOf(sel.X).String()
-				if isT(receiver) {
-					// Method.
-				} else if len(c.Args) == 3 {
-					// Run function.
-					typ := info.TypeOf(c.Args[2])
-					if typ == nil {
-						return true
-					}
-					sig, ok := typ.Underlying().(*types.Signature)
-					if !ok || sig.Params().Len() != 2 || !isT(sig.Params().At(0).Type().String()) {
-						return true
-					}
-				} else {
-					return true
-				}
-				ci := &callInfo{
-					funcName: name,
-					ast:      c,
-				}
-				a = append(a, ci)
-				return true
-			}
+		if x, ok := sel.X.(*ast.Ident); ok && (recv == "" || x.Name == recv) {
+			a = append(a, c)
 		}
-
 		return true
 	})
 	return a
 }
 
-func findVar(pos token.Pos, n0 ast.Node) (ret ast.Expr) {
-	ast.Inspect(n0, func(n ast.Node) bool {
-		if n == nil {
-			return true
+// findVar returns the value of the variable name as seen at pos in fn:
+// that of its last declaration in fn before pos, or else of its declaration
+// at the top level of f.
+func findVar(f *ast.File, fn *ast.FuncDecl, name string, pos token.Pos) (val ast.Expr) {
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		if n == nil || n.Pos() > pos {
+			return false
 		}
-		switch n := n.(type) {
-		case *ast.AssignStmt:
-			for i, v := range n.Lhs {
-				if v.Pos() == pos {
-					ret = n.Rhs[i]
-				}
-			}
-			return false
-		case *ast.ValueSpec:
-			for i, v := range n.Names {
-				if v.Pos() == pos {
-					ret = n.Values[i]
-				}
-			}
-			return false
+		if v := declValue(n, name); v != nil {
+			val = v
 		}
 		return true
 	})
-	return ret
+	if val != nil {
+		return val
+	}
+	for _, d := range f.Decls {
+		if d, ok := d.(*ast.GenDecl); ok {
+			for _, spec := range d.Specs {
+				if v := declValue(spec, name); v != nil {
+					return v
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// declValue returns the value which n gives to the variable name,
+// if n declares it.
+func declValue(n ast.Node, name string) ast.Expr {
+	switch n := n.(type) {
+	case *ast.AssignStmt:
+		if n.Tok == token.DEFINE && len(n.Lhs) == len(n.Rhs) {
+			for i, x := range n.Lhs {
+				if x.(*ast.Ident).Name == name {
+					return n.Rhs[i]
+				}
+			}
+		}
+	case *ast.ValueSpec:
+		if len(n.Names) == len(n.Values) {
+			for i, x := range n.Names {
+				if x.Name == name {
+					return n.Values[i]
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func (s *set[TC]) update() {
 	info := s.info
 
 	t := s.t
-	fset := info.testPkg.Fset
-
-	file := fset.Position(info.table.Pos()).Filename
-	var f *ast.File
-	for i, gof := range info.testPkg.GoFiles {
-		if gof == file {
-			f = info.testPkg.Syntax[i]
-		}
-	}
-	if f == nil {
-		t.Fatalf("file %s not in package", file)
-	}
+	fset := info.fset
+	f := info.file
+	file := fset.File(f.Pos()).Name()
 
 	// TODO: use text-based insertion instead:
 	// - sort insertions and replacements on position in descending order.
@@ -345,10 +273,10 @@ func (s *set[TC]) update() {
 	}
 }
 
-func (t *T) updateField(info *info, ci *callInfo, newValue any) {
+func (t *T) updateField(info *info, fieldName string, newValue any) {
 	info.needsUpdate = true
 
-	fset := info.testPkg.Fset
+	fset := info.fset
 
 	e, ok := info.table.Elts[t.iter].(*ast.CompositeLit)
 	if !ok {
@@ -401,7 +329,7 @@ func (t *T) updateField(info *info, ci *callInfo, newValue any) {
 			t.Fatalf("%v: key must be an identifier",
 				fset.Position(kv.Pos()))
 		}
-		if ident.Name == ci.fieldName {
+		if ident.Name == fieldName {
 			info.patches[kv.Value] = value
 			return
 		}
@@ -409,7 +337,7 @@ func (t *T) updateField(info *info, ci *callInfo, newValue any) {
 
 	if !isZero {
 		kv := &ast.KeyValueExpr{
-			Key:   &ast.Ident{Name: ci.fieldName},
+			Key:   &ast.Ident{Name: fieldName},
 			Value: value,
 		}
 		if len(e.Elts) > 0 {

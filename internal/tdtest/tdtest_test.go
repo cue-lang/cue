@@ -53,7 +53,7 @@ func TestEqualUnnamedField(t *testing.T) {
 	}{
 		{"TestOutsideHelper", "unexpected value:\ngot:  bar;\nwant: foo"},
 		{"TestOutsideHelperOtherFile", "unexpected value:\ngot:  bar;\nwant: foo"},
-		{"TestOutsideHelperUpdate", "cannot update a field: Equal call is outside the test function:\ngot:  bar;\nwant: foo"},
+		{"TestOutsideHelperUpdate", "cannot update a field: Equal call is outside the function passed to Run:\ngot:  bar;\nwant: foo"},
 		{"TestOutsideRunFunc", "unexpected value:\ngot:  bar;\nwant: foo"},
 		{"TestOutsideRunFuncType", "unexpected value:\ngot:  bar;\nwant: foo"},
 		{"TestOutsideDuplicateName", "unexpected value for field want:\ngot:  bar;\nwant: foo"},

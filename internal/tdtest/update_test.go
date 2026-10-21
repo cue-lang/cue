@@ -24,8 +24,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"golang.org/x/tools/go/packages"
 )
 
 // TestUpdateField checks the source that updating a field
@@ -55,7 +53,7 @@ func TestUpdateField(t *testing.T) {
 		var patched []string
 		for _, expr := range info.patches {
 			var sb strings.Builder
-			if err := format.Node(&sb, info.testPkg.Fset, expr); err != nil {
+			if err := format.Node(&sb, info.fset, expr); err != nil {
 				t.Fatal(err)
 			}
 			patched = append(patched, sb.String())
@@ -81,6 +79,49 @@ func TestUpdateFieldPositional(t *testing.T) {
 	}
 }
 
+// TestFindVar checks which declaration of the table variable tbl is found
+// for the Run call in TestB.
+func TestFindVar(t *testing.T) {
+	tests := []struct {
+		src  string
+		want string
+	}{
+		{"func TestB() { tbl := 1; tbl = 2; Run(tbl) }", "1"},
+		{"func TestB() { tbl := 1; { tbl := 2 }; Run(tbl) }", "2"}, // scopes are ignored
+		{"func TestB() { Run(tbl); tbl := 1 }; var tbl = 2", "2"},
+		{"func TestA() { tbl := 1 }; func TestB() { Run(tbl) }; var tbl = 2", "2"},
+		{"var a, tbl = 1, 2; func TestB() { Run(tbl) }", "2"},
+		{"var tbl int; func TestB() { Run(tbl) }", ""},
+	}
+	for _, test := range tests {
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, "", "package p; "+test.src, parser.SkipObjectResolution)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var fn *ast.FuncDecl
+		var run token.Pos
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch n := n.(type) {
+			case *ast.FuncDecl:
+				if n.Name.Name == "TestB" {
+					fn = n
+				}
+			case *ast.CallExpr:
+				run = n.Pos()
+			}
+			return true
+		})
+		got := ""
+		if v := findVar(f, fn, "tbl", run); v != nil {
+			got = v.(*ast.BasicLit).Value
+		}
+		if got != test.want {
+			t.Errorf("%s: got %q, want %q", test.src, got, test.want)
+		}
+	}
+}
+
 // updateTableField updates the field named "field" of the only row of the
 // given table source, returning the info holding the resulting patches.
 func updateTableField(t *testing.T, table string, value any) *info {
@@ -91,12 +132,12 @@ func updateTableField(t *testing.T, table string, value any) *info {
 		t.Fatal(err)
 	}
 	info := &info{
+		fset:    fset,
 		table:   expr.(*ast.CompositeLit),
-		testPkg: &packages.Package{Fset: fset},
 		patches: make(map[ast.Node]ast.Expr),
 	}
 	tt := &T{T: t}
-	tt.updateField(info, &callInfo{fieldName: "field"}, value)
+	tt.updateField(info, "field", value)
 	return info
 }
 

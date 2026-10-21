@@ -156,13 +156,12 @@ func (s *headerStream) Write(ctx context.Context, msg Message) (int64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("marshaling message: %v", err)
 	}
-	n, err := fmt.Fprintf(s.conn, "Content-Length: %v\r\n\r\n", len(data))
-	total := int64(n)
-	if err == nil {
-		n, err = s.conn.Write(data)
-		total += int64(n)
-	}
-	return total, err
+	// Send the header and the body with a single write.
+	buf := make([]byte, 0, len(data)+32)
+	buf = fmt.Appendf(buf, "Content-Length: %v\r\n\r\n", len(data))
+	buf = append(buf, data...)
+	n, err := s.conn.Write(buf)
+	return int64(n), err
 }
 
 func (s *headerStream) Close() error {

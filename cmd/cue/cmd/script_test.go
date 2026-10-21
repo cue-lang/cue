@@ -111,7 +111,6 @@ const latestSkipMarker = "# TestLatest: skip"
 func TestScript(t *testing.T) {
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
-		UpdateScripts:       cuetest.UpdateGoldenFiles(),
 		RequireExplicitExec: true,
 		RequireUniqueNames:  true,
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
@@ -324,6 +323,7 @@ func TestScript(t *testing.T) {
 		t.Fatal(err)
 	}
 	goproxytest.Setup(&p)
+	cuetest.UpdateScripts(&p)
 	testscript.Run(t, p)
 }
 

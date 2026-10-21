@@ -41,18 +41,7 @@ func TestSpecCheck(t *testing.T) {
 
 	doc := mdparser.New().Parse(source)
 
-	updated := walkNode(t, doc, source)
-
-	if bytes.Equal(source, updated) {
-		return
-	}
-	if cuetest.UpdateGoldenFiles() {
-		if err := os.WriteFile("spec.md", updated, 0o666); err != nil {
-			t.Fatal(err)
-		}
-	} else {
-		t.Error("spec.md needs updating; run with CUE_UPDATE=1")
-	}
+	cuetest.WriteGoldenFile(t, "spec.md", walkNode(t, doc, source))
 }
 
 // TestSpecEdits checks that the error comment following a code block
@@ -100,13 +89,7 @@ func TestSpecEdits(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			source := []byte(test.source)
 			doc := mdparser.New().Parse(source)
-			updated := walkNode(t, doc, source)
-			// Like TestSpecCheck, only a difference from the source is an update.
-			got := test.source
-			if !bytes.Equal(source, updated) {
-				got = string(updated)
-			}
-			qt.Assert(t, qt.Equals(got, test.want))
+			qt.Assert(t, qt.Equals(string(walkNode(t, doc, source)), test.want))
 		})
 	}
 }

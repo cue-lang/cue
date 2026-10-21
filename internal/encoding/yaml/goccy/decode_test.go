@@ -1237,16 +1237,7 @@ func TestFiles(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			got := cueStr(expr)
-			if cuetest.UpdateGoldenFiles() {
-				os.WriteFile(filename, []byte(got), 0666)
-				return
-			}
-			b, err := os.ReadFile(filename)
-			if err != nil {
-				t.Fatal(err)
-			}
-			qt.Assert(t, qt.Equals(got, string(b)))
+			cuetest.WriteGoldenFile(t, filename, []byte(cueStr(expr)))
 		})
 	}
 }

@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -65,7 +64,7 @@ func Benchmark(b *testing.B) {
 		ctx := adt.NewContext(r, v)
 		v.Finalize(ctx)
 
-		if cuetest.UpdateGoldenFiles() {
+		if cuetest.UpdateOrDiffGoldenFiles() {
 			const statsFile = "stats.txt"
 			var stats txtar.File
 			var statsPos int
@@ -84,12 +83,7 @@ func Benchmark(b *testing.B) {
 			}
 
 			a.Files[statsPos].Data = []byte(ctx.Stats().String() + "\n\n")
-
-			info, err := entry.Info()
-			if err != nil {
-				b.Fatal(err)
-			}
-			os.WriteFile(fullpath, txtar.Format(a), info.Mode())
+			cuetest.WriteGoldenFile(b, fullpath, txtar.Format(a))
 		}
 
 		b.Run(entry.Name(), func(b *testing.B) {

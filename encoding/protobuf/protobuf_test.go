@@ -25,7 +25,6 @@ import (
 
 	"github.com/go-quicktest/qt"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetest"
@@ -64,17 +63,7 @@ func TestExtractDefinitions(t *testing.T) {
 			}
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")
-			if cuetest.UpdateGoldenFiles() {
-				_ = os.WriteFile(wantFile, out.Bytes(), 0666)
-				return
-			}
-
-			b, err := os.ReadFile(wantFile)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			qt.Assert(t, qt.Equals(out.String(), string(b)))
+			cuetest.WriteGoldenFile(t, wantFile, out.Bytes())
 		})
 	}
 }
@@ -102,62 +91,29 @@ func TestBuild(t *testing.T) {
 		t.Fatal(errors.Details(err, nil))
 	}
 
-	if cuetest.UpdateGoldenFiles() {
-		for _, f := range files {
-			b, err := format.Node(f)
-			if err != nil {
-				t.Fatal(err)
-			}
-			_ = os.MkdirAll(filepath.Dir(f.Filename), 0777)
-			err = os.WriteFile(f.Filename, b, 0666)
-			if err != nil {
-				t.Fatal(err)
-			}
-		}
-		return
-	}
-
-	gotFiles := map[string]*ast.File{}
-
+	produced := map[string]bool{}
 	for _, f := range files {
 		rel, err := filepath.Rel(cwd, f.Filename)
 		if err != nil {
 			t.Fatal(err)
 		}
-		gotFiles[rel] = f
+		produced[rel] = true
+		b, err := format.Node(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cuetest.WriteGoldenFile(t, rel, b)
 	}
 
 	_ = filepath.WalkDir("testdata/istio.io/api", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || entry.IsDir() || !strings.HasSuffix(path, ".cue") {
 			return err
 		}
-
-		f := gotFiles[path]
-		if f == nil {
+		if !produced[path] {
 			t.Errorf("did not produce file %q", path)
-			return nil
-		}
-		delete(gotFiles, path)
-
-		got, err := format.Node(f)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		want, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if !bytes.Equal(got, want) {
-			t.Errorf("%s: files differ", path)
 		}
 		return nil
 	})
-
-	for filename := range gotFiles {
-		t.Errorf("did not expect file %q", filename)
-	}
 }
 
 func TestExtractErrorPath(t *testing.T) {

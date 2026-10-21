@@ -38,7 +38,6 @@ import (
 	"fmt"
 	"io/fs"
 	"maps"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -535,30 +534,21 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 		}
 	}
 
-	// Determine the existing content (nil if absent, []byte{} if present-but-empty).
+	// Determine the existing content, if any.
 	var existing []byte
 	if sectionIdx >= 0 {
 		existing = r.archive.Files[sectionIdx].Data
 	}
 
-	// No change needed only when section exists with matching non-empty content.
-	if sectionIdx >= 0 && len(resultBytes) > 0 && bytes.Equal(existing, resultBytes) {
-		return // already up to date
-	}
-	// No section and no errors: nothing to do.
-	if sectionIdx < 0 && len(resultBytes) == 0 {
-		return
-	}
-
-	// Section needs to be added, removed, or updated.
-	if cuetest.DiffGoldenFiles() {
-		cuetest.StaleGoldenFile(r.sinkOrT(), sectionName, existing, resultBytes)
-		return
-	}
 	switch {
 	case sectionIdx >= 0 && len(resultBytes) == 0:
 		// Section exists but should be absent — remove it.
+		if !cuetest.RemoveGolden(r.sinkOrT(), sectionName) {
+			return
+		}
 		r.archive.Files = slices.Delete(r.archive.Files, sectionIdx, sectionIdx+1)
+	case !cuetest.UpdateGolden(r.sinkOrT(), sectionName, existing, resultBytes):
+		return
 	case sectionIdx >= 0:
 		// Section exists with wrong content — update in place.
 		r.archive.Files[sectionIdx].Data = resultBytes
@@ -568,18 +558,15 @@ func (r *inlineRunner) handleErrorsTxtSection(val cue.Value) {
 		r.archive.Files = slices.Insert(r.archive.Files, insertIdx,
 			txtar.File{Name: sectionName, Data: resultBytes})
 	}
-	r.writeArchive(sectionName)
+	r.writeArchive()
 }
 
-// writeArchive writes the archive back to its file, if it has one, after
-// what was updated in it.
-func (r *inlineRunner) writeArchive(what string) {
+// writeArchive writes the archive back to its file, if it has one.
+func (r *inlineRunner) writeArchive() {
 	if r.filePath == "" {
 		return
 	}
-	if err := os.WriteFile(r.filePath, txtar.Format(r.archive), 0o644); err != nil {
-		r.t.Errorf("inline: %s write-back to %s: %v", what, r.filePath, err)
-	}
+	cuetest.WriteGoldenFile(r.t, r.filePath, txtar.Format(r.archive))
 }
 
 // handleStatsSection manages the out/eval/stats documentary section.
@@ -615,8 +602,7 @@ func (r *inlineRunner) handleStatsSection(counts stats.Counts) {
 			return
 		}
 	}
-	if cuetest.DiffGoldenFiles() {
-		cuetest.StaleGoldenFile(r.sinkOrT(), sectionName, existing, resultBytes)
+	if !cuetest.UpdateGolden(r.sinkOrT(), sectionName, existing, resultBytes) {
 		return
 	}
 	if sectionIdx >= 0 {
@@ -625,7 +611,7 @@ func (r *inlineRunner) handleStatsSection(counts stats.Counts) {
 		// Section absent but should exist — append it to the archive.
 		r.archive.Files = append(r.archive.Files, txtar.File{Name: sectionName, Data: resultBytes})
 	}
-	r.writeArchive(sectionName)
+	r.writeArchive()
 }
 
 // errorsInsertIdx returns the index at which to insert out/errors.txt:

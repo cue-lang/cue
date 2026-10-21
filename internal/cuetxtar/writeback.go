@@ -21,7 +21,6 @@ package cuetxtar
 // cleanup operations.
 
 import (
-	"bytes"
 	"slices"
 
 	"cuelang.org/go/internal/cuetest"
@@ -95,17 +94,13 @@ func (r *inlineRunner) applyInlineFillWritebacks() {
 			data = append(data[:w.attrOffset:w.attrOffset],
 				append([]byte(w.newAttrText), data[end:]...)...)
 		}
-		if bytes.Equal(f.Data, data) {
-			continue
-		}
-		if cuetest.DiffGoldenFiles() {
-			cuetest.StaleGoldenFile(r.sinkOrT(), f.Name, f.Data, data)
+		if !cuetest.UpdateGolden(r.sinkOrT(), f.Name, f.Data, data) {
 			continue
 		}
 		r.archive.Files[i].Data = data
 		changed = true
 	}
 	if changed {
-		r.writeArchive("fill")
+		r.writeArchive()
 	}
 }

@@ -41,7 +41,6 @@ import (
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"github.com/go-quicktest/qt"
-	"github.com/google/go-cmp/cmp"
 	"github.com/rogpeppe/go-internal/diff"
 	"golang.org/x/tools/txtar"
 )
@@ -112,9 +111,9 @@ type TxTarTest struct {
 // The #noformat tag causes the $CUE_FORMAT_TXTAR value
 // to be ignored.
 //
-// If the output differs and $CUE_UPDATE is non-empty, the txtar file will be
+// If the output differs and $CUE_UPDATE is 1, the txtar file will be
 // updated and written to disk with the actual output data replacing the
-// out files.
+// out files; see [cuetest] for the other values.
 //
 // If $CUE_FORMAT_TXTAR is non-empty, any CUE files in the txtar
 // file will be updated to be properly formatted, unless the #noformat
@@ -556,21 +555,27 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				t.Skip(msg)
 			}
 
-			update := false
-
-			// Format CUE files as required
+			// Format CUE files as required, whatever CUE_UPDATE is.
 			if cuetest.FormatTxtar() && !tc.HasTag("noformat") {
+				formatted := false
 				for i, f := range a.Files {
 					if !strings.HasSuffix(f.Name, ".cue") {
 						continue
 					}
 					if ff, err := format.Source(f.Data); err == nil && !bytes.Equal(f.Data, ff) {
-						update = true
+						formatted = true
 						a.Files[i].Data = ff
+					}
+				}
+				if formatted {
+					if err := os.WriteFile(fullpath, txtar.Format(a), 0o644); err != nil {
+						t.Fatal(err)
 					}
 				}
 			}
 			f(tc)
+
+			update := false
 
 			// Track the position of the fallback files.
 			index := make(map[string]int, len(a.Files))
@@ -618,20 +623,15 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 						})
 
 					default:
-						// Only update file if anything changes.
-						if _, ok := index[sub.name]; ok {
-							delete(index, sub.name)
-							if !cuetest.UpdateGoldenFiles() {
-								t.Errorf("file %q exists but is equal to fallback", sub.name)
+						// The result equals the fallback, so neither the
+						// result's own file nor an empty diff should exist.
+						for _, name := range []string{sub.name, diffName} {
+							if _, ok := index[name]; ok {
+								delete(index, name)
+								if cuetest.RemoveGolden(t, name) {
+									update = true
+								}
 							}
-							update = cuetest.UpdateGoldenFiles()
-						}
-						if _, ok := index[diffName]; ok {
-							delete(index, diffName)
-							if !cuetest.UpdateGoldenFiles() {
-								t.Errorf("file %q exists but is empty", diffName)
-							}
-							update = cuetest.UpdateGoldenFiles()
 						}
 					}
 				}
@@ -671,28 +671,15 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					}
 				}
 
-				if cuetest.UpdateGoldenFiles() {
+				// Neither diff nor doc sections fail a plain run.
+				// TODO: also fail on diffs once they are fully in use.
+				if (sub.diff || sub.doc) && !cuetest.UpdateOrDiffGoldenFiles() {
+					continue
+				}
+				if cuetest.UpdateGolden(t, sub.name, gold.Data, result) {
 					update = true
 					gold.Data = result
-					continue
 				}
-
-				// Skip the test if just the diff differs, unless CUE_UPDATE=diff.
-				// TODO: also fail once diffs are fully in use.
-				if sub.diff && !cuetest.DiffGoldenFiles() {
-					continue
-				}
-
-				// Doc sections never fail unless CUE_UPDATE=diff.
-				if sub.doc && !cuetest.DiffGoldenFiles() {
-					continue
-				}
-
-				t.Errorf("result for %s differs: (-want +got)\n%s",
-					sub.name,
-					cmp.Diff(string(gold.Data), string(result)),
-				)
-				t.Errorf("actual result: %q", result)
 			}
 
 			// Add remaining unrelated files, ignoring files that were already
@@ -745,10 +732,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					return p - q
 				})
 
-				err = os.WriteFile(fullpath, txtar.Format(a), 0644)
-				if err != nil {
-					t.Fatal(err)
-				}
+				cuetest.WriteGoldenFile(t, fullpath, txtar.Format(a))
 			}
 		})
 

@@ -95,11 +95,11 @@ func runUpdateTest(t *testing.T, filePath string) {
 
 	// ctx holds the values that are constant across all applySection calls.
 	ctx := &sectionCtx{
-		t:           t,
-		outerForce:  cuetest.ForceUpdateGoldenFiles(),
-		outerUpdate: cuetest.UpdateGoldenFiles(),
-		outer:       outer,
-		filePath:    filePath,
+		t:                 t,
+		outerForce:        cuetest.ForceUpdateGoldenFiles(),
+		outerUpdateOrDiff: cuetest.UpdateOrDiffGoldenFiles(),
+		outer:             outer,
+		filePath:          filePath,
 	}
 	// --- Plain run (no update mode) ---
 
@@ -242,9 +242,7 @@ func runUpdateTest(t *testing.T, filePath string) {
 
 	// Write the outer testdata file if any sections were updated.
 	if ctx.modified {
-		if err := os.WriteFile(filePath, txtar.Format(outer), 0o644); err != nil {
-			t.Errorf("update %s: %v", filePath, err)
-		}
+		cuetest.WriteGoldenFile(t, filePath, txtar.Format(outer))
 	}
 }
 
@@ -258,12 +256,12 @@ func singleFile(content string) *txtar.Archive {
 // a single runUpdateTest invocation, and accumulates whether any section was
 // modified.
 type sectionCtx struct {
-	t           *testing.T
-	outerForce  bool
-	outerUpdate bool
-	outer       *txtar.Archive
-	filePath    string
-	modified    bool
+	t                 *testing.T
+	outerForce        bool
+	outerUpdateOrDiff bool
+	outer             *txtar.Archive
+	filePath          string
+	modified          bool
 }
 
 // section describes one output section group to manage.
@@ -278,8 +276,10 @@ type section struct {
 // sets ctx.modified if the archive was changed.
 //
 //   - outerForce: write if shouldExist, remove otherwise; always sets modified.
-//   - outerUpdate: write if missing and shouldExist; validate if present and
-//     shouldExist; remove if present but !shouldExist.
+//   - outerUpdateOrDiff: write if missing and shouldExist; validate if
+//     present and shouldExist; remove if present but !shouldExist. Under
+//     CUE_UPDATE=diff, the final [cuetest.WriteGoldenFile] reports these
+//     changes instead.
 //   - default: validate if shouldExist; log staleMsg (if non-empty) when the
 //     section exists but should not.
 func (ctx *sectionCtx) apply(s section) {
@@ -293,7 +293,7 @@ func (ctx *sectionCtx) apply(s section) {
 			removeTxtarSectionPrefix(ctx.outer, s.prefix)
 		}
 		ctx.modified = true
-	case ctx.outerUpdate:
+	case ctx.outerUpdateOrDiff:
 		switch {
 		case s.shouldExist && !exists:
 			replaceTxtarSections(ctx.outer, s.prefix, s.content)

@@ -59,7 +59,6 @@ func TestExe(t *testing.T) {
 	wasmFiles := filepath.Join(root, "cue")
 	p := testscript.Params{
 		Dir:                 "testdata/cue",
-		UpdateScripts:       cuetest.UpdateGoldenFiles(),
 		RequireExplicitExec: true,
 		RequireUniqueNames:  true,
 		Setup: func(e *testscript.Env) error {
@@ -74,6 +73,7 @@ func TestExe(t *testing.T) {
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)
 	}
+	cuetest.UpdateScripts(&p)
 	testscript.Run(t, p)
 }
 
@@ -100,19 +100,6 @@ func copyFile(dst, src string) error {
 		return err
 	}
 	return os.WriteFile(dst, buf, 0664)
-}
-
-func check(t *testing.T, dir string, got string) {
-	golden := filepath.Join("testdata", dir) + ".golden"
-
-	if cuetest.UpdateGoldenFiles() {
-		os.WriteFile(golden, []byte(got), 0666)
-	}
-
-	want := string(must(os.ReadFile(golden))(t))
-	if got != want {
-		t.Errorf("want %v, got %v", want, got)
-	}
 }
 
 func loadDir(t *testing.T, name string) cue.Value {

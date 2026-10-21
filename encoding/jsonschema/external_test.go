@@ -77,10 +77,7 @@ func TestExternal(t *testing.T) {
 		return
 	}
 	if t.Failed() {
-		if cuetest.DiffGoldenFiles() {
-			return // an update would refuse to write anything
-		}
-		t.Fatalf("not writing test data back because of test failures (try CUE_UPDATE=force to proceed regardless of test regressions)")
+		t.Fatalf("not updating test data because of test failures (try CUE_UPDATE=force to proceed regardless of test regressions)")
 	}
 	files, err := externaltest.FormatTestDir(testDir, tests)
 	qt.Assert(t, qt.IsNil(err))
@@ -325,7 +322,7 @@ func testFailed(t *testing.T, m *cuetdtest.M, variant string, skipField *externa
 	if problem := recordFailure(m, variant, skipField, errStr); problem != "" {
 		t.Fatal(problem)
 	}
-	if !cuetest.UpdateGoldenFiles() {
+	if !cuetest.UpdateOrDiffGoldenFiles() {
 		t.Skipf("skipping due to known error: %v", errStr)
 	}
 }
@@ -336,7 +333,7 @@ func testFailed(t *testing.T, m *cuetdtest.M, variant string, skipField *externa
 func recordFailure(m *cuetdtest.M, variant string, skipField *externaltest.Skip, errStr string) (problem string) {
 	name := skipName(m, variant)
 	reason := (*skipField)[name]
-	if cuetest.UpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		if reason == "" && !cuetest.ForceUpdateGoldenFiles() {
 			return fmt.Sprintf("test regression; was succeeding, now failing: %v", errStr)
 		}
@@ -361,7 +358,7 @@ func recordFailure(m *cuetdtest.M, variant string, skipField *externaltest.Skip,
 func testSucceeded(t *testing.T, m *cuetdtest.M, variant string, skipField *externaltest.Skip, p positioner) {
 	t.Helper()
 	name := skipName(m, variant)
-	if cuetest.UpdateGoldenFiles() {
+	if cuetest.UpdateOrDiffGoldenFiles() {
 		delete(*skipField, name)
 		if len(*skipField) == 0 {
 			*skipField = nil

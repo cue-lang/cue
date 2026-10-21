@@ -207,11 +207,8 @@ func syncTestdataInputsCUE(t *testing.T) {
 		if _, ok := want[dstPath]; ok {
 			return nil
 		}
-		if cuetest.DiffGoldenFiles() {
-			t.Errorf("%s is stale; CUE_UPDATE=1 would remove it", dstPath)
-			return nil
-		}
-		return os.Remove(dstPath)
+		cuetest.RemoveGoldenFile(t, dstPath)
+		return nil
 	})
 	if err != nil {
 		t.Fatal(err)

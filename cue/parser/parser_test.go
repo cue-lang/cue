@@ -17,7 +17,6 @@ package parser_test
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -28,6 +27,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cueversion"
 	"golang.org/x/tools/txtar"
 )
@@ -1936,17 +1936,17 @@ func TestFunctionOrderingErrors(t *testing.T) {
 		t.Fatal(err)
 	}
 	var src []byte
-	var want string
-	for _, f := range a.Files {
+	wantIdx := -1
+	for i, f := range a.Files {
 		switch f.Name {
 		case "in.cue":
 			src = f.Data
 		case "out/errors":
-			want = string(f.Data)
+			wantIdx = i
 		}
 	}
-	if src == nil {
-		t.Fatal("missing in.cue")
+	if src == nil || wantIdx < 0 {
+		t.Fatal("missing in.cue or out/errors")
 	}
 	file, err := parser.ParseFile("in.cue", src, parser.AllErrors, parser.ParseComments)
 	if err == nil {
@@ -1954,20 +1954,9 @@ func TestFunctionOrderingErrors(t *testing.T) {
 	}
 	var buf bytes.Buffer
 	printParserErrorsWithPaths(&buf, file, err)
-	got := buf.String()
-	if got != want {
-		if os.Getenv("CUE_UPDATE") == "1" {
-			for i := range a.Files {
-				if a.Files[i].Name == "out/errors" {
-					a.Files[i].Data = []byte(got)
-					if err := os.WriteFile(filename, txtar.Format(a), 0666); err != nil {
-						t.Fatal(err)
-					}
-					return
-				}
-			}
-		}
-		t.Fatalf("unexpected errors:\ngot:\n%s\nwant:\n%s", got, want)
+	if got := buf.Bytes(); cuetest.UpdateGolden(t, "out/errors", a.Files[wantIdx].Data, got) {
+		a.Files[wantIdx].Data = got
+		cuetest.WriteGoldenFile(t, filename, txtar.Format(a))
 	}
 }
 

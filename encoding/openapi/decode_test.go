@@ -17,7 +17,6 @@ package openapi_test
 import (
 	"bytes"
 	"io/fs"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -130,17 +129,9 @@ func TestDecode(t *testing.T) {
 				b = bytes.TrimSpace(b)
 				out = bytes.TrimSpace(out)
 
-				if !bytes.Equal(b, out) {
-					if cuetest.UpdateGoldenFiles() {
-						a.Files[outIndex].Data = b
-						b = txtar.Format(a)
-						err = os.WriteFile(fullpath, b, 0666)
-						if err != nil {
-							t.Fatal(err)
-						}
-						return
-					}
-					qt.Assert(t, qt.Equals(string(b), string(out)))
+				if cuetest.UpdateGolden(t, a.Files[outIndex].Name, out, b) {
+					a.Files[outIndex].Data = b
+					cuetest.WriteGoldenFile(t, fullpath, txtar.Format(a))
 				}
 			}
 		})

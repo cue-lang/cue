@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/rogpeppe/go-internal/testscript"
 
 	"cuelang.org/go/internal/tdtest"
 )
@@ -100,29 +101,78 @@ func DiffGoldenFiles() bool {
 }
 
 // UpdateOrDiffGoldenFiles reports whether tests should work out what
-// CUE_UPDATE=1 would write, either to write it ([UpdateGoldenFiles]) or to
-// fail when it differs from what is stored ([DiffGoldenFiles]).
+// CUE_UPDATE=1 would write. Tests hand the result to [UpdateGolden],
+// [RemoveGolden], [WriteGoldenFile] or [RemoveGoldenFile], which are the
+// only places that tell CUE_UPDATE=1 and CUE_UPDATE=diff apart: the former
+// writes, the latter fails with what would have been written. A test which
+// writes only through them cannot pass under CUE_UPDATE=diff while
+// CUE_UPDATE=1 would still change a file.
+//
+// Output that a plain run never compares, such as documentary sections or
+// unfilled placeholders, is worked out only when this reports true.
 func UpdateOrDiffGoldenFiles() bool {
 	return os.Getenv(envUpdate) != ""
 }
 
-// WriteGoldenFile writes data to path when updating golden files, creating
-// parent directories as needed and skipping the write when the file already
-// holds data so that its modification time, which the go test cache keys on,
-// is left alone. Under CUE_UPDATE=diff it writes nothing and instead fails t
-// with a diff when the file differs. Callers must be gated on
-// [UpdateOrDiffGoldenFiles].
+// UpdateScripts sets p.UpdateScripts under CUE_UPDATE=1. testscript only
+// rewrites a script where its cmp fails, which is also what fails a plain
+// run and a CUE_UPDATE=diff run.
+func UpdateScripts(p *testscript.Params) {
+	p.UpdateScripts = UpdateGoldenFiles()
+}
+
+// UpdateGolden reports whether the caller should replace old, stored golden
+// output named name, such as a file or an archive section, with new. It
+// does so under CUE_UPDATE=1 when they differ; otherwise it fails t with
+// the rewrite that CUE_UPDATE=1 would make.
+//
+// A caller storing new into a file must write it via [WriteGoldenFile].
+func UpdateGolden(t testing.TB, name string, old, new []byte) bool {
+	t.Helper()
+	if bytes.Equal(old, new) {
+		return false
+	}
+	if UpdateGoldenFiles() {
+		return true
+	}
+	t.Errorf("%s is stale; CUE_UPDATE=1 would rewrite it: (-want +got)\n%s",
+		name, cmp.Diff(string(old), string(new)))
+	return false
+}
+
+// RemoveGolden is like [UpdateGolden] for golden output name which should
+// no longer exist.
+func RemoveGolden(t testing.TB, name string) bool {
+	t.Helper()
+	if UpdateGoldenFiles() {
+		return true
+	}
+	t.Errorf("%s is stale; CUE_UPDATE=1 would remove it", name)
+	return false
+}
+
+// RemoveGoldenFile removes the golden file at path when [RemoveGolden]
+// allows it.
+func RemoveGoldenFile(t testing.TB, path string) {
+	t.Helper()
+	if RemoveGolden(t, path) {
+		if err := os.Remove(path); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// WriteGoldenFile writes data to path when [UpdateGolden] allows it,
+// creating parent directories as needed and skipping the write when the
+// file already holds data so that its modification time, which the go test
+// cache keys on, is left alone.
 func WriteGoldenFile(t testing.TB, path string, data []byte) {
 	t.Helper()
 	old, err := os.ReadFile(path)
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		t.Fatal(err)
 	}
-	if bytes.Equal(old, data) {
-		return
-	}
-	if DiffGoldenFiles() {
-		StaleGoldenFile(t, path, old, data)
+	if !UpdateGolden(t, path, old, data) {
 		return
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
@@ -131,15 +181,6 @@ func WriteGoldenFile(t testing.TB, path string, data []byte) {
 	if err := os.WriteFile(path, data, 0o666); err != nil {
 		t.Fatal(err)
 	}
-}
-
-// StaleGoldenFile fails t under CUE_UPDATE=diff, reporting that CUE_UPDATE=1
-// would rewrite the file or section name from old to new. It is for callers
-// which cannot use [WriteGoldenFile], such as those updating part of a file.
-func StaleGoldenFile(t testing.TB, name string, old, new []byte) {
-	t.Helper()
-	t.Errorf("%s is stale; CUE_UPDATE=1 would rewrite it: (-want +got)\n%s",
-		name, cmp.Diff(string(old), string(new)))
 }
 
 // FormatTxtar ensures that .cue files in txtar test archives are well

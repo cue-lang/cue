@@ -12,8 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package testing is a helper package for test packages in the CUE project.
+// Package cuetest is a helper package for test packages in the CUE project.
 // As such it should only be imported in _test.go files.
+//
+// CUE_UPDATE selects what tests do with their expected output: when it is
+// unset they only compare it, "1" or another value updates it, "diff" fails
+// wherever "1" would change it, and "force" also makes updates which "1"
+// refuses. Tests must not read CUE_UPDATE themselves. Only this package may
+// tell "1" and "diff" apart, so that a diff run cannot pass while an update
+// run would still change a file, which is what CI relies on. Tests instead
+// ask [UpdateOrDiffGoldenFiles] and [ForceUpdateGoldenFiles] what to work
+// out, and hand the results to [UpdateGolden], [RemoveGolden],
+// [WriteGoldenFile] or [RemoveGoldenFile], which write under "1" and fail
+// under "diff". testscript tests use [UpdateScripts].
 package cuetest
 
 import (
@@ -59,23 +70,14 @@ var (
 	}
 )
 
-// UpdateGoldenFiles determines whether tests should update expected
-// output in test files in the event of comparison failures (for example
-// after a cmp failure in a testscript-based test). It is controlled by
-// setting CUE_UPDATE to a non-empty string like "1" or "true". It
-// corresponds to testscript.Params.UpdateGoldenFiles; see its docs for
-// details.
-//
-// In some cases, tests might refuse to perform some updates by default.
-// The special value "force" can be used to force updates in that situation.
-//
-// The special value "diff" does not update files but fails the test with
-// a diff of the changes that would be applied; see [DiffGoldenFiles].
+// updateGoldenFiles reports whether CUE_UPDATE is set to a value such as
+// "1" or "true", other than "diff", so that tests should update their
+// expected output.
 //
 // These flags are functions rather than variables so that the environment
 // is read while a test runs; see the comment on Init in internal/cueexperiment
 // for why that matters to the go test cache.
-func UpdateGoldenFiles() bool {
+func updateGoldenFiles() bool {
 	return os.Getenv(envUpdate) != "" && os.Getenv(envUpdate) != "diff"
 }
 
@@ -86,30 +88,11 @@ func ForceUpdateGoldenFiles() bool {
 	return os.Getenv(envUpdate) == "force"
 }
 
-// DiffGoldenFiles determines whether tests should fail with a diff wherever
-// CUE_UPDATE=1 would write a file, without actually writing anything.
-// It is controlled by setting CUE_UPDATE=diff, and is otherwise a regular
-// test run: a diff run passes exactly when the tests pass and an update
-// run would leave every file unchanged, which is what CI relies on.
-//
-// Output that a regular run never compares, such as documentary sections
-// or unfilled placeholders, must therefore check [UpdateOrDiffGoldenFiles]
-// rather than [UpdateGoldenFiles] and report a difference in diff mode,
-// for instance via [WriteGoldenFile].
-func DiffGoldenFiles() bool {
-	return os.Getenv(envUpdate) == "diff"
-}
-
 // UpdateOrDiffGoldenFiles reports whether tests should work out what
-// CUE_UPDATE=1 would write. Tests hand the result to [UpdateGolden],
-// [RemoveGolden], [WriteGoldenFile] or [RemoveGoldenFile], which are the
-// only places that tell CUE_UPDATE=1 and CUE_UPDATE=diff apart: the former
-// writes, the latter fails with what would have been written. A test which
-// writes only through them cannot pass under CUE_UPDATE=diff while
-// CUE_UPDATE=1 would still change a file.
-//
-// Output that a plain run never compares, such as documentary sections or
-// unfilled placeholders, is worked out only when this reports true.
+// CUE_UPDATE=1 would write, to hand it to the golden sinks described in the
+// package documentation. Output that a plain run never compares, such as
+// documentary sections or unfilled placeholders, is worked out only when
+// this reports true.
 func UpdateOrDiffGoldenFiles() bool {
 	return os.Getenv(envUpdate) != ""
 }
@@ -118,7 +101,7 @@ func UpdateOrDiffGoldenFiles() bool {
 // rewrites a script where its cmp fails, which is also what fails a plain
 // run and a CUE_UPDATE=diff run.
 func UpdateScripts(p *testscript.Params) {
-	p.UpdateScripts = UpdateGoldenFiles()
+	p.UpdateScripts = updateGoldenFiles()
 }
 
 // UpdateGolden reports whether the caller should replace old, stored golden
@@ -132,7 +115,7 @@ func UpdateGolden(t testing.TB, name string, old, new []byte) bool {
 	if bytes.Equal(old, new) {
 		return false
 	}
-	if UpdateGoldenFiles() {
+	if updateGoldenFiles() {
 		return true
 	}
 	t.Errorf("%s is stale; CUE_UPDATE=1 would rewrite it: (-want +got)\n%s",
@@ -144,7 +127,7 @@ func UpdateGolden(t testing.TB, name string, old, new []byte) bool {
 // no longer exist.
 func RemoveGolden(t testing.TB, name string) bool {
 	t.Helper()
-	if UpdateGoldenFiles() {
+	if updateGoldenFiles() {
 		return true
 	}
 	t.Errorf("%s is stale; CUE_UPDATE=1 would remove it", name)
@@ -215,9 +198,10 @@ func Condition(cond string) (bool, error) {
 type T = tdtest.T
 
 func init() {
+	// tdtest only rewrites a field where Equal fails, as testscript does.
 	// Assign the function value; tdtest calls it while a test runs so the
 	// CUE_UPDATE read is recorded by the go test cache.
-	tdtest.UpdateTests = UpdateGoldenFiles
+	tdtest.UpdateTests = updateGoldenFiles
 }
 
 // Run creates a new table-driven test using the CUE testing defaults.

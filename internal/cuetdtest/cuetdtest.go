@@ -19,13 +19,10 @@ package cuetdtest
 import (
 	"testing"
 
-	"cuelang.org/go/internal/cuetest"
+	// cuetest sets up tdtest to update tables via CUE_UPDATE.
+	_ "cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
 )
-
-func init() {
-	tdtest.UpdateTests = cuetest.UpdateGoldenFiles
-}
 
 type T struct {
 	*tdtest.T

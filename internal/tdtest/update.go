@@ -58,7 +58,6 @@ type callInfo struct {
 var loadPackages = sync.OnceValues(func() ([]*packages.Package, error) {
 	cfg := &packages.Config{
 		Mode: packages.NeedFiles |
-			packages.NeedDeps |
 			packages.NeedTypes |
 			packages.NeedTypesInfo |
 			packages.NeedSyntax,

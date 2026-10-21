@@ -37,13 +37,13 @@ first: p: {
 			script?: string
 		}]
 		script?: string
-	}])
+	}]) @test(shareID=M4, at=0)
 	tasks: {
 		n0: {cmd: "x"}
 		n1: {cmd: "x", deps: [n0]}
 		n2: {cmd: "x", deps: [n1]}
 		n3: {cmd: "x", deps: [n2]}
-		n4: {cmd: "x", deps: [n3]}
+		n4: {cmd: "x", deps: [n3]} @test(shareID=M4)
 	}
 }
 
@@ -75,8 +75,8 @@ embedded: {
 	#P: {a: {Open}, c: _}
 	p: #P
 	p: {
-		c: a.b
-		a: b: _
+		c: a.b @test(shareID=B)
+		a: b: _ @test(shareID=B)
 	}
 	q: p.c & {y: 2} @test(eq, {x: 1, y: 2})
 }
@@ -101,14 +101,14 @@ open: {
     ./in.cue:80:12
     ./in.cue:79:3
 -- out/eval/stats --
-Leaks:  238
-Freed:  2247
-Reused: 2217
-Allocs: 268
+Leaks:  63
+Freed:  269
+Reused: 234
+Allocs: 98
 Retain: 0
 
-Unifications: 763
-Conjuncts:    2682
-Disjuncts:    534
+Unifications: 154
+Conjuncts:    363
+Disjuncts:    46
 
-NumCloseIDs: 406
+NumCloseIDs: 38

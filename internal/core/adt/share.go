@@ -175,19 +175,15 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 		return false
 	}
 
-	// This line is to deal with this case:
+	// An open value is not shared into a recursively closed node, as in
 	//
 	//     reg: {}
 	//     #def: sub: reg
 	//
-	// Ideally we find a different solution, like passing closedness
-	// down elsewhere. In fact, as we do this in closeContexts, it probably
-	// already works, it will just not be reflected in the debug output.
-	// We could fix that by not printing structure shared nodes, which is
-	// probably a good idea anyway.
+	// since the node would then take its closedness from the open value.
 	//
 	// TODO: come up with a mechanism to allow this case.
-	if n.node.ClosedRecursive && !arc.ClosedRecursive {
+	if n.node.ClosedRecursive && !arc.ClosedRecursive && !arc.closedByConjunct() {
 		return false
 	}
 
@@ -278,4 +274,19 @@ func (v *Vertex) DerefNonShared() *Vertex {
 		}
 		v = arc
 	}
+}
+
+// closedByConjunct reports whether v, whose conjuncts have not been scheduled
+// yet, holds a conjunct from a definition. Scheduling that conjunct closes v,
+// so until then the flag is stale, which is how a forward reference finds it.
+func (v *Vertex) closedByConjunct() bool {
+	if v.isInitialized() {
+		return false
+	}
+	for _, c := range v.Conjuncts {
+		if c.CloseInfo.FromDef {
+			return true
+		}
+	}
+	return false
 }

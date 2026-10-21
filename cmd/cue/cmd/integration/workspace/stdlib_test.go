@@ -87,7 +87,8 @@ js:    json.Marshal
 
 // TestStdlibHover checks that hovering over the member of a standard
 // library package shows the member's documentation, which comes from
-// the doc comment in the package's definition file.
+// the doc comment in the package's definition file, and that jumping to
+// a definition skips declarations within standard library packages.
 func TestStdlibHover(t *testing.T) {
 	t.Parallel()
 	const files = `
@@ -98,16 +99,22 @@ language: version: "v0.16.0"
 -- a.cue --
 package a
 
-import "strings"
+import (
+	"strings"
+	"tool/exec"
+)
 
 out: strings.ToUpper
+
+run: exec.Run & {cmd: "ls"}
+cmd: run.cmd
 `
 	I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 		env.OpenFile("a.cue")
 		env.Await(env.DoneWithOpen())
 
 		mappers := makeMappers(env, files)
-		p := fln("a.cue", 5, 1, "ToUpper")
+		p := fln("a.cue", 8, 1, "ToUpper")
 		p.determinePos(mappers)
 
 		got, _ := env.Hover(protocol.Location{
@@ -131,6 +138,13 @@ out: strings.ToUpper
 			Range: protocol.Range{Start: p.pos},
 		})
 		qt.Assert(t, qt.HasLen(locs, 0))
+
+		// A field declared both in user code and in a stdlib definition
+		// jumps to the declaration in user code.
+		definitionsTestCases{
+			// The stdlib declaration wrongly drops all locations.
+			fln("a.cue", 11, 2, "cmd"): {},
+		}.run(t, env, mappers)
 	})
 }
 

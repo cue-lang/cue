@@ -1,13 +1,8 @@
 # A file in the main module at the path of a submodule, or of a
 # directory within it, does not hide the packages of the submodule.
 
-# Windows reports reading a file as a directory as not found,
-# so the file does not hide the submodule there.
-[windows] skip 'the bug only occurs with ENOTDIR'
-
-# The file wrongly hides the submodule.
-! exec cue eval .
-stderr 'cannot find package "main.org/foo": .*not a directory'
+exec cue eval .
+cmp stdout expect-stdout
 -- expect-stdout --
 a: {
     f: true

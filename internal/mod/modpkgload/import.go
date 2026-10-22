@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"syscall"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modrequirements"
@@ -315,13 +316,12 @@ func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
 			return result, err
 		}
 	}
-	// It would be nice if we could inspect the error returned from ReadDir to see
-	// if it's failing because it's not a directory, but unfortunately that doesn't
-	// seem to be something defined by the Go fs interface.
-	// For now, catching fs.ErrNotExist seems to be enough.
 	entries, err := fs.ReadDir(fsys, loc.Dir)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
+		// There is no directory here: nothing exists, or the path is a
+		// file or is below one. The fs interfaces define no error for
+		// the latter, so we rely on ENOTDIR from the OS.
+		if errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
 			return false, nil
 		}
 		return false, err

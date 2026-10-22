@@ -2,9 +2,6 @@ A file in the main module at the path of a submodule does not hide the
 packages of the submodule, even on a file system which does not report
 ENOTDIR when the file is read as a directory.
 
-The file wrongly hides the submodule's root package; the file system's
-error for reading a file as a directory is reported instead.
-
 -- test0/initial-requirements --
 main.test@v0
 main.test/foo@v0.0.1
@@ -28,9 +25,11 @@ main.test/foo/bar@v0
 	location: _registry/main.test_foo_v0.0.1/bar
 	file: _registry/main.test_foo_v0.0.1/bar/bar.cue: bar
 main.test/foo@v0
-	flags: inAll,isRoot,fromRoot
-	error: cannot find package: readdir foo: not implemented
-	missing: false
+	flags: inAll,isRoot,fromRoot,importsLoaded
+	mod: main.test/foo@v0.0.1
+	external: true
+	location: _registry/main.test_foo_v0.0.1
+	file: _registry/main.test_foo_v0.0.1/foo.cue: foo
 -- main.cue --
 package main
 import (

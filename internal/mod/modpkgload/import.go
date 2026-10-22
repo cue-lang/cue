@@ -320,8 +320,12 @@ func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
 	if err != nil {
 		// There is no directory here: nothing exists, or the path is a
 		// file or is below one. The fs interfaces define no error for
-		// the latter, so we rely on ENOTDIR from the OS.
+		// the latter, so we rely on ENOTDIR from the OS, or failing that,
+		// on a stat of the path.
 		if errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
+			return false, nil
+		}
+		if info, serr := fs.Stat(fsys, loc.Dir); serr == nil && !info.IsDir() {
 			return false, nil
 		}
 		return false, err

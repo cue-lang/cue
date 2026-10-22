@@ -1,0 +1,727 @@
+# Issue #4512: a reference unified with the definition its target was declared
+# with keeps being structure shared, so a dependency graph typed through that
+# definition is evaluated once per node rather than once per path. The stats
+# are the point of this test: they record how the unification count grows
+# with the depth of the graphs below. The deepest reference of each graph
+# asserts the sharing that keeps the count linear.
+
+-- in.cue --
+// Each node is referenced through #T by two parents.
+fanin: {
+	#T: {cmd: string, deps?: [...#T]}
+	tasks: [string]: #T
+	tasks: {
+		a0: {cmd: "x"}
+		b0: {cmd: "x"}
+		a1: {cmd: "x", deps: [a0, b0]}
+		b1: {cmd: "x", deps: [a0, b0]}
+		a2: {cmd: "x", deps: [a1, b1]}
+		b2: {cmd: "x", deps: [a1, b1]}
+		a3: {cmd: "x", deps: [a2, b2]}
+		b3: {cmd: "x", deps: [a2, b2]}
+		a4: {cmd: "x", deps: [a3, b3]}
+		b4: {cmd: "x", deps: [a3, b3]}
+		a5: {cmd: "x", deps: [a4, b4]}
+		b5: {cmd: "x", deps: [a4, b4]}
+		a6: {cmd: "x", deps: [a5, b5]}
+		b6: {cmd: "x", deps: [a5, b5]}
+	}
+}
+faninLeaf: fanin.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd
+
+// The same graph with every dependency a forward reference, so that the
+// referenced node is not evaluated yet when it is shared.
+forward: {
+	#T: {cmd: string, deps?: [...#T]}
+	tasks: [string]: #T
+	tasks: {
+		a6: {cmd: "x", deps: [a5, b5]}
+		b6: {cmd: "x", deps: [a5, b5]}
+		a5: {cmd: "x", deps: [a4, b4]}
+		b5: {cmd: "x", deps: [a4, b4]}
+		a4: {cmd: "x", deps: [a3, b3]}
+		b4: {cmd: "x", deps: [a3, b3]}
+		a3: {cmd: "x", deps: [a2, b2]}
+		b3: {cmd: "x", deps: [a2, b2]}
+		a2: {cmd: "x", deps: [a1, b1]}
+		b2: {cmd: "x", deps: [a1, b1]}
+		a1: {cmd: "x", deps: [a0, b0]}
+		b1: {cmd: "x", deps: [a0, b0]}
+		a0: {cmd: "x"}
+		b0: {cmd: "x"}
+	}
+}
+forwardLeaf: forward.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd
+
+// Each node is typed by its own conjunction with #T rather than through a
+// pattern constraint, and declared before its dependencies.
+explicit: {
+	#T: {cmd: string, deps?: [...#T]}
+	tasks: {
+		a6: #T & {cmd: "x", deps: [a5, b5]}
+		b6: #T & {cmd: "x", deps: [a5, b5]}
+		a5: #T & {cmd: "x", deps: [a4, b4]}
+		b5: #T & {cmd: "x", deps: [a4, b4]}
+		a4: #T & {cmd: "x", deps: [a3, b3]}
+		b4: #T & {cmd: "x", deps: [a3, b3]}
+		a3: #T & {cmd: "x", deps: [a2, b2]}
+		b3: #T & {cmd: "x", deps: [a2, b2]}
+		a2: #T & {cmd: "x", deps: [a1, b1]}
+		b2: #T & {cmd: "x", deps: [a1, b1]}
+		a1: #T & {cmd: "x", deps: [a0, b0]}
+		b1: #T & {cmd: "x", deps: [a0, b0]}
+		a0: #T & {cmd: "x"}
+		b0: #T & {cmd: "x"}
+	}
+}
+explicitLeaf: explicit.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd
+
+// The definition embeds a disjunction, which is replayed per reference.
+embedded: {
+	#T: {
+		cmd?:    string
+		script?: string
+		({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+		deps?: [...#T]
+	}
+	tasks: [string]: #T
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+		n5: {cmd: "x", deps: [n4]}
+		n6: {cmd: "x", deps: [n5]}
+	}
+}
+embeddedLeaf: embedded.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd
+
+// The type is a disjunction of definitions, one of which the referenced
+// node is an instance of; the other fails only on closedness.
+disjunctive: {
+	#Task: {cmd: string, deps?: [...#Node]}
+	#Group: {type: "group", deps?: [...#Node]}
+	#Node: #Task | #Group
+	tasks: [string]: #Task
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+		n5: {cmd: "x", deps: [n4]}
+		n6: {cmd: "x", deps: [n5]}
+	}
+}
+disjunctiveLeaf: disjunctive.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd
+
+// The same graph declared deepest first, so that each dependency is a
+// forward reference to a node whose pattern constraint is not applied yet.
+reversed: {
+	#Task: {cmd: string, deps?: [...#Node]}
+	#Group: {type: "group", deps?: [...#Node]}
+	#Node: #Task | #Group
+	tasks: [string]: #Task
+	tasks: {
+		n6: {cmd: "x", deps: [n5]}
+		n5: {cmd: "x", deps: [n4]}
+		n4: {cmd: "x", deps: [n3]}
+		n3: {cmd: "x", deps: [n2]}
+		n2: {cmd: "x", deps: [n1]}
+		n1: {cmd: "x", deps: [n0]}
+		n0: {cmd: "x"}
+	}
+}
+reversedLeaf: reversed.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd
+
+// Both the type and the task declaration are disjunctions, and the failing
+// disjuncts fail on a field.
+union: {
+	#Task: {
+		type?:   _|_
+		cmd?:    string
+		script?: string
+		({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+		env?: [string]: string | {secret: string}
+		deps?: [...#Node]
+	}
+	#Group: {
+		type: "group"
+		deps?: [...#Node]
+		[!~"^(type|deps)$"]: #Task | #Group
+	}
+	#Sequence: [...#Node]
+	#Node: #Task | #Group | #Sequence
+	tasks: [string]: ((#Task | #Group) & {_kind: "task"}) | #Sequence
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+	}
+}
+unionLeaf: union.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd
+-- out/compile --
+--- in.cue
+{
+  fanin: {
+    #T: {
+      cmd: string
+      deps?: [
+        ...〈2;#T〉,
+      ]
+    }
+    tasks: {
+      [string]: 〈1;#T〉
+    }
+    tasks: {
+      a0: {
+        cmd: "x"
+      }
+      b0: {
+        cmd: "x"
+      }
+      a1: {
+        cmd: "x"
+        deps: [
+          〈2;a0〉,
+          〈2;b0〉,
+        ]
+      }
+      b1: {
+        cmd: "x"
+        deps: [
+          〈2;a0〉,
+          〈2;b0〉,
+        ]
+      }
+      a2: {
+        cmd: "x"
+        deps: [
+          〈2;a1〉,
+          〈2;b1〉,
+        ]
+      }
+      b2: {
+        cmd: "x"
+        deps: [
+          〈2;a1〉,
+          〈2;b1〉,
+        ]
+      }
+      a3: {
+        cmd: "x"
+        deps: [
+          〈2;a2〉,
+          〈2;b2〉,
+        ]
+      }
+      b3: {
+        cmd: "x"
+        deps: [
+          〈2;a2〉,
+          〈2;b2〉,
+        ]
+      }
+      a4: {
+        cmd: "x"
+        deps: [
+          〈2;a3〉,
+          〈2;b3〉,
+        ]
+      }
+      b4: {
+        cmd: "x"
+        deps: [
+          〈2;a3〉,
+          〈2;b3〉,
+        ]
+      }
+      a5: {
+        cmd: "x"
+        deps: [
+          〈2;a4〉,
+          〈2;b4〉,
+        ]
+      }
+      b5: {
+        cmd: "x"
+        deps: [
+          〈2;a4〉,
+          〈2;b4〉,
+        ]
+      }
+      a6: {
+        cmd: "x"
+        deps: [
+          〈2;a5〉,
+          〈2;b5〉,
+        ]
+      }
+      b6: {
+        cmd: "x"
+        deps: [
+          〈2;a5〉,
+          〈2;b5〉,
+        ]
+      }
+    }
+  }
+  faninLeaf: 〈0;fanin〉.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd
+  forward: {
+    #T: {
+      cmd: string
+      deps?: [
+        ...〈2;#T〉,
+      ]
+    }
+    tasks: {
+      [string]: 〈1;#T〉
+    }
+    tasks: {
+      a6: {
+        cmd: "x"
+        deps: [
+          〈2;a5〉,
+          〈2;b5〉,
+        ]
+      }
+      b6: {
+        cmd: "x"
+        deps: [
+          〈2;a5〉,
+          〈2;b5〉,
+        ]
+      }
+      a5: {
+        cmd: "x"
+        deps: [
+          〈2;a4〉,
+          〈2;b4〉,
+        ]
+      }
+      b5: {
+        cmd: "x"
+        deps: [
+          〈2;a4〉,
+          〈2;b4〉,
+        ]
+      }
+      a4: {
+        cmd: "x"
+        deps: [
+          〈2;a3〉,
+          〈2;b3〉,
+        ]
+      }
+      b4: {
+        cmd: "x"
+        deps: [
+          〈2;a3〉,
+          〈2;b3〉,
+        ]
+      }
+      a3: {
+        cmd: "x"
+        deps: [
+          〈2;a2〉,
+          〈2;b2〉,
+        ]
+      }
+      b3: {
+        cmd: "x"
+        deps: [
+          〈2;a2〉,
+          〈2;b2〉,
+        ]
+      }
+      a2: {
+        cmd: "x"
+        deps: [
+          〈2;a1〉,
+          〈2;b1〉,
+        ]
+      }
+      b2: {
+        cmd: "x"
+        deps: [
+          〈2;a1〉,
+          〈2;b1〉,
+        ]
+      }
+      a1: {
+        cmd: "x"
+        deps: [
+          〈2;a0〉,
+          〈2;b0〉,
+        ]
+      }
+      b1: {
+        cmd: "x"
+        deps: [
+          〈2;a0〉,
+          〈2;b0〉,
+        ]
+      }
+      a0: {
+        cmd: "x"
+      }
+      b0: {
+        cmd: "x"
+      }
+    }
+  }
+  forwardLeaf: 〈0;forward〉.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd
+  explicit: {
+    #T: {
+      cmd: string
+      deps?: [
+        ...〈2;#T〉,
+      ]
+    }
+    tasks: {
+      a6: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a5〉,
+          〈2;b5〉,
+        ]
+      })
+      b6: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a5〉,
+          〈2;b5〉,
+        ]
+      })
+      a5: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a4〉,
+          〈2;b4〉,
+        ]
+      })
+      b5: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a4〉,
+          〈2;b4〉,
+        ]
+      })
+      a4: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a3〉,
+          〈2;b3〉,
+        ]
+      })
+      b4: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a3〉,
+          〈2;b3〉,
+        ]
+      })
+      a3: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a2〉,
+          〈2;b2〉,
+        ]
+      })
+      b3: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a2〉,
+          〈2;b2〉,
+        ]
+      })
+      a2: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a1〉,
+          〈2;b1〉,
+        ]
+      })
+      b2: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a1〉,
+          〈2;b1〉,
+        ]
+      })
+      a1: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a0〉,
+          〈2;b0〉,
+        ]
+      })
+      b1: (〈1;#T〉 & {
+        cmd: "x"
+        deps: [
+          〈2;a0〉,
+          〈2;b0〉,
+        ]
+      })
+      a0: (〈1;#T〉 & {
+        cmd: "x"
+      })
+      b0: (〈1;#T〉 & {
+        cmd: "x"
+      })
+    }
+  }
+  explicitLeaf: 〈0;explicit〉.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd
+  embedded: {
+    #T: {
+      cmd?: string
+      script?: string
+      ({
+        cmd!: string
+        script?: _|_(explicit error (_|_ literal) in source)
+      }|{
+        script!: string
+        cmd?: _|_(explicit error (_|_ literal) in source)
+      })
+      deps?: [
+        ...〈2;#T〉,
+      ]
+    }
+    tasks: {
+      [string]: 〈1;#T〉
+    }
+    tasks: {
+      n0: {
+        cmd: "x"
+      }
+      n1: {
+        cmd: "x"
+        deps: [
+          〈2;n0〉,
+        ]
+      }
+      n2: {
+        cmd: "x"
+        deps: [
+          〈2;n1〉,
+        ]
+      }
+      n3: {
+        cmd: "x"
+        deps: [
+          〈2;n2〉,
+        ]
+      }
+      n4: {
+        cmd: "x"
+        deps: [
+          〈2;n3〉,
+        ]
+      }
+      n5: {
+        cmd: "x"
+        deps: [
+          〈2;n4〉,
+        ]
+      }
+      n6: {
+        cmd: "x"
+        deps: [
+          〈2;n5〉,
+        ]
+      }
+    }
+  }
+  embeddedLeaf: 〈0;embedded〉.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd
+  disjunctive: {
+    #Task: {
+      cmd: string
+      deps?: [
+        ...〈2;#Node〉,
+      ]
+    }
+    #Group: {
+      type: "group"
+      deps?: [
+        ...〈2;#Node〉,
+      ]
+    }
+    #Node: (〈0;#Task〉|〈0;#Group〉)
+    tasks: {
+      [string]: 〈1;#Task〉
+    }
+    tasks: {
+      n0: {
+        cmd: "x"
+      }
+      n1: {
+        cmd: "x"
+        deps: [
+          〈2;n0〉,
+        ]
+      }
+      n2: {
+        cmd: "x"
+        deps: [
+          〈2;n1〉,
+        ]
+      }
+      n3: {
+        cmd: "x"
+        deps: [
+          〈2;n2〉,
+        ]
+      }
+      n4: {
+        cmd: "x"
+        deps: [
+          〈2;n3〉,
+        ]
+      }
+      n5: {
+        cmd: "x"
+        deps: [
+          〈2;n4〉,
+        ]
+      }
+      n6: {
+        cmd: "x"
+        deps: [
+          〈2;n5〉,
+        ]
+      }
+    }
+  }
+  disjunctiveLeaf: 〈0;disjunctive〉.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd
+  reversed: {
+    #Task: {
+      cmd: string
+      deps?: [
+        ...〈2;#Node〉,
+      ]
+    }
+    #Group: {
+      type: "group"
+      deps?: [
+        ...〈2;#Node〉,
+      ]
+    }
+    #Node: (〈0;#Task〉|〈0;#Group〉)
+    tasks: {
+      [string]: 〈1;#Task〉
+    }
+    tasks: {
+      n6: {
+        cmd: "x"
+        deps: [
+          〈2;n5〉,
+        ]
+      }
+      n5: {
+        cmd: "x"
+        deps: [
+          〈2;n4〉,
+        ]
+      }
+      n4: {
+        cmd: "x"
+        deps: [
+          〈2;n3〉,
+        ]
+      }
+      n3: {
+        cmd: "x"
+        deps: [
+          〈2;n2〉,
+        ]
+      }
+      n2: {
+        cmd: "x"
+        deps: [
+          〈2;n1〉,
+        ]
+      }
+      n1: {
+        cmd: "x"
+        deps: [
+          〈2;n0〉,
+        ]
+      }
+      n0: {
+        cmd: "x"
+      }
+    }
+  }
+  reversedLeaf: 〈0;reversed〉.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd
+  union: {
+    #Task: {
+      type?: _|_(explicit error (_|_ literal) in source)
+      cmd?: string
+      script?: string
+      ({
+        cmd!: string
+        script?: _|_(explicit error (_|_ literal) in source)
+      }|{
+        script!: string
+        cmd?: _|_(explicit error (_|_ literal) in source)
+      })
+      env?: {
+        [string]: (string|{
+          secret: string
+        })
+      }
+      deps?: [
+        ...〈2;#Node〉,
+      ]
+    }
+    #Group: {
+      type: "group"
+      deps?: [
+        ...〈2;#Node〉,
+      ]
+      [!~"^(type|deps)$"]: (〈1;#Task〉|〈1;#Group〉)
+    }
+    #Sequence: [
+      ...〈1;#Node〉,
+    ]
+    #Node: (〈0;#Task〉|〈0;#Group〉|〈0;#Sequence〉)
+    tasks: {
+      [string]: (((〈1;#Task〉|〈1;#Group〉) & {
+        _kind: "task"
+      })|〈1;#Sequence〉)
+    }
+    tasks: {
+      n0: {
+        cmd: "x"
+      }
+      n1: {
+        cmd: "x"
+        deps: [
+          〈2;n0〉,
+        ]
+      }
+      n2: {
+        cmd: "x"
+        deps: [
+          〈2;n1〉,
+        ]
+      }
+      n3: {
+        cmd: "x"
+        deps: [
+          〈2;n2〉,
+        ]
+      }
+      n4: {
+        cmd: "x"
+        deps: [
+          〈2;n3〉,
+        ]
+      }
+    }
+  }
+  unionLeaf: 〈0;union〉.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd
+}

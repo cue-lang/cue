@@ -1,0 +1,182 @@
+# Issue #4512: a reference unified with the definition its target was declared
+# with keeps being structure shared, so a dependency graph typed through that
+# definition is evaluated once per node rather than once per path. The stats
+# are the point of this test: they record how the unification count grows
+# with the depth of the graphs below. The deepest reference of each graph
+# asserts the sharing that keeps the count linear.
+
+-- in.cue --
+// Each node is referenced through #T by two parents.
+fanin: {
+	#T: {cmd: string, deps?: [...#T]}
+	tasks: [string]: #T
+	tasks: {
+		a0: {cmd: "x"}
+		b0: {cmd: "x"}
+		a1: {cmd: "x", deps: [a0, b0]}
+		b1: {cmd: "x", deps: [a0, b0]}
+		a2: {cmd: "x", deps: [a1, b1]}
+		b2: {cmd: "x", deps: [a1, b1]}
+		a3: {cmd: "x", deps: [a2, b2]}
+		b3: {cmd: "x", deps: [a2, b2]}
+		a4: {cmd: "x", deps: [a3, b3]}
+		b4: {cmd: "x", deps: [a3, b3]}
+		a5: {cmd: "x", deps: [a4, b4]} @test(shareID:todo=faninA5)
+		b5: {cmd: "x", deps: [a4, b4]}
+		a6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=faninA5, at=deps[0])
+		b6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=faninA5, at=deps[0])
+	}
+}
+faninLeaf: fanin.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd @test(eq, "x")
+
+// The same graph with every dependency a forward reference, so that the
+// referenced node is not evaluated yet when it is shared.
+forward: {
+	#T: {cmd: string, deps?: [...#T]}
+	tasks: [string]: #T
+	tasks: {
+		a6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=forwardA5, at=deps[0])
+		b6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=forwardA5, at=deps[0])
+		a5: {cmd: "x", deps: [a4, b4]} @test(shareID:todo=forwardA5)
+		b5: {cmd: "x", deps: [a4, b4]}
+		a4: {cmd: "x", deps: [a3, b3]}
+		b4: {cmd: "x", deps: [a3, b3]}
+		a3: {cmd: "x", deps: [a2, b2]}
+		b3: {cmd: "x", deps: [a2, b2]}
+		a2: {cmd: "x", deps: [a1, b1]}
+		b2: {cmd: "x", deps: [a1, b1]}
+		a1: {cmd: "x", deps: [a0, b0]}
+		b1: {cmd: "x", deps: [a0, b0]}
+		a0: {cmd: "x"}
+		b0: {cmd: "x"}
+	}
+}
+forwardLeaf: forward.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd @test(eq, "x")
+
+// Each node is typed by its own conjunction with #T rather than through a
+// pattern constraint, and declared before its dependencies.
+explicit: {
+	#T: {cmd: string, deps?: [...#T]}
+	tasks: {
+		a6: #T & {cmd: "x", deps: [a5, b5]} @test(shareID:todo=explicitA5, at=deps[0])
+		b6: #T & {cmd: "x", deps: [a5, b5]} @test(shareID:todo=explicitA5, at=deps[0])
+		a5: #T & {cmd: "x", deps: [a4, b4]} @test(shareID:todo=explicitA5)
+		b5: #T & {cmd: "x", deps: [a4, b4]}
+		a4: #T & {cmd: "x", deps: [a3, b3]}
+		b4: #T & {cmd: "x", deps: [a3, b3]}
+		a3: #T & {cmd: "x", deps: [a2, b2]}
+		b3: #T & {cmd: "x", deps: [a2, b2]}
+		a2: #T & {cmd: "x", deps: [a1, b1]}
+		b2: #T & {cmd: "x", deps: [a1, b1]}
+		a1: #T & {cmd: "x", deps: [a0, b0]}
+		b1: #T & {cmd: "x", deps: [a0, b0]}
+		a0: #T & {cmd: "x"}
+		b0: #T & {cmd: "x"}
+	}
+}
+explicitLeaf: explicit.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd @test(eq, "x")
+
+// The definition embeds a disjunction, which is replayed per reference.
+embedded: {
+	#T: {
+		cmd?:    string
+		script?: string
+		({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+		deps?: [...#T]
+	}
+	tasks: [string]: #T
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+		n5: {cmd: "x", deps: [n4]} @test(shareID:todo=embeddedN5)
+		n6: {cmd: "x", deps: [n5]} @test(shareID:todo=embeddedN5, at=deps[0])
+	}
+}
+embeddedLeaf: embedded.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
+
+// The type is a disjunction of definitions, one of which the referenced
+// node is an instance of; the other fails only on closedness.
+disjunctive: {
+	#Task: {cmd: string, deps?: [...#Node]}
+	#Group: {type: "group", deps?: [...#Node]}
+	#Node: #Task | #Group
+	tasks: [string]: #Task
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]}
+		n4: {cmd: "x", deps: [n3]}
+		n5: {cmd: "x", deps: [n4]} @test(shareID:todo=disjunctiveN5)
+		n6: {cmd: "x", deps: [n5]} @test(shareID:todo=disjunctiveN5, at=deps[0])
+	}
+}
+disjunctiveLeaf: disjunctive.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
+
+// The same graph declared deepest first, so that each dependency is a
+// forward reference to a node whose pattern constraint is not applied yet.
+reversed: {
+	#Task: {cmd: string, deps?: [...#Node]}
+	#Group: {type: "group", deps?: [...#Node]}
+	#Node: #Task | #Group
+	tasks: [string]: #Task
+	tasks: {
+		n6: {cmd: "x", deps: [n5]} @test(shareID:todo=reversedN5, at=deps[0])
+		n5: {cmd: "x", deps: [n4]} @test(shareID:todo=reversedN5)
+		n4: {cmd: "x", deps: [n3]}
+		n3: {cmd: "x", deps: [n2]}
+		n2: {cmd: "x", deps: [n1]}
+		n1: {cmd: "x", deps: [n0]}
+		n0: {cmd: "x"}
+	}
+}
+reversedLeaf: reversed.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
+
+// Both the type and the task declaration are disjunctions, and the failing
+// disjuncts fail on a field.
+union: {
+	#Task: {
+		type?:   _|_
+		cmd?:    string
+		script?: string
+		({cmd!: string, script?: _|_} | {script!: string, cmd?: _|_})
+		env?: [string]: string | {secret: string}
+		deps?: [...#Node]
+	}
+	#Group: {
+		type: "group"
+		deps?: [...#Node]
+		[!~"^(type|deps)$"]: #Task | #Group
+	}
+	#Sequence: [...#Node]
+	#Node: #Task | #Group | #Sequence
+	tasks: [string]: ((#Task | #Group) & {_kind: "task"}) | #Sequence
+	tasks: {
+		n0: {cmd: "x"}
+		n1: {cmd: "x", deps: [n0]}
+		n2: {cmd: "x", deps: [n1]}
+		n3: {cmd: "x", deps: [n2]} @test(shareID:todo=unionN3)
+		n4: {cmd: "x", deps: [n3]} @test(shareID:todo=unionN3, at=deps[0])
+	}
+}
+unionLeaf: union.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
+-- out/eval/stats --
+Leaks:  12570
+Freed:  103425
+Reused: 103291
+Allocs: 12704
+Retain: 0
+
+Unifications: 25984
+Conjuncts:    110860
+Disjuncts:    35981
+
+NumCloseIDs: 12143
+
+ConjunctInfos:       47460
+MaxConjunctInfos:    5
+MaxReqSets:          19
+MaxRedirect:         6

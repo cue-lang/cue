@@ -17,7 +17,7 @@ package adt
 import (
 	"bytes"
 	"fmt"
-	"html/template"
+	"html"
 	"io"
 	"log"
 	"os"
@@ -78,23 +78,11 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 	}
 	defer w.Close()
 
-	data := struct {
-		Title string
-		Code  string
-		Out   string
-		Graph string
-	}{
-		Title: title,
-		Code:  code,
-		Out:   out,
-		Graph: graph,
-	}
-
-	tmpl := template.Must(template.New("").Parse(`
+	_, err = fmt.Fprintf(w, `
 	<!DOCTYPE html>
 	<html>
 	<head>
-		<title>{{.Title}}</title>
+		<title>%s</title>
 		<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 		<script>mermaid.initialize({startOnLoad:true});</script>
 		<style>
@@ -107,26 +95,25 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 				display: flex;
 				flex-direction: row;
 			}
-			// ...
 		</style>
 	</head>
 	<body>
-		<div class="mermaid">{{.Graph}}</div>
+		<div class="mermaid">%s</div>
 		<div class="row">
 			<div class="column">
 				<h1><b>Input</b></h1>
-				<pre>{{.Code}}</pre>
+				<pre>%s</pre>
 			</div>
 			<div class="column">
 				<h1><b>Output</b></h1>
-				<pre>{{.Out}}</pre>
+				<pre>%s</pre>
 			</div>
 		</div>
 	</body>
 	</html>
-`))
-
-	err = tmpl.Execute(w, data)
+`,
+		html.EscapeString(title), html.EscapeString(graph),
+		html.EscapeString(code), html.EscapeString(out))
 	if err != nil {
 		log.Fatal(err)
 	}

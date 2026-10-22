@@ -715,17 +715,26 @@ func TestError(t *testing.T) {
 		value string
 		err   string
 	}{{
-		value: `_|_`,
+		value: `v: _|_`,
 		err:   "explicit error (_|_ literal) in source",
 	}, {
-		value: `"Hello world!"`,
+		value: `v: "Hello world!"`,
 	}, {
-		value: `string`,
+		value: `v: string`,
+		err:   "",
+	}, {
+		// v shares the structure of x, and Err does not see the shared
+		// error yet.
+		value: `v: x, x: 1 & 2`,
+		err:   "",
+	}, {
+		value: `v: x, x: {a: 1 & 2}`,
 		err:   "",
 	}}
+	// Only the cases referring to another field depend on structure sharing.
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
-			err := getValue(m, tc.value).Err()
+		cuetdtest.SmallMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			err := getValue(m, tc.value).Lookup("v").Err()
 			checkErr(t, err, tc.err, "Err")
 		})
 	}
@@ -2266,9 +2275,15 @@ func TestLen(t *testing.T) {
 	}, {
 		input:  "3",
 		length: "_|_ // len not supported for type int",
+	}, {
+		// a shares the structure of b, and Len does not see the shared
+		// string yet.
+		input:  "b\nb: \"foo\"",
+		length: "_|_ // len not supported for type string",
 	}}
+	// Only the case referring to another field depends on structure sharing.
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+		cuetdtest.SmallMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
 			v := getValue(m, "a: "+tc.input).Lookup("a")
 
 			length := v.Len()

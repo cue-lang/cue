@@ -27,7 +27,6 @@ import (
 	_ "cuelang.org/go/pkg/strings"
 	_ "cuelang.org/go/pkg/struct"
 	_ "cuelang.org/go/pkg/text/tabwriter"
-	_ "cuelang.org/go/pkg/text/template"
 	_ "cuelang.org/go/pkg/time"
 	_ "cuelang.org/go/pkg/tool"
 	_ "cuelang.org/go/pkg/tool/cli"

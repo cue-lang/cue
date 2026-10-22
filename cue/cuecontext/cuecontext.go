@@ -15,6 +15,10 @@
 // Package cuecontext creates [cue.Context] values,
 // which are needed for creating [cue.Value] values
 // and using the core API in the [cue] package.
+//
+// The cuenotemplate build tag leaves out the text/template builtin package,
+// whose method lookup by name stops the linker from discarding unused methods.
+// The tag is temporary; see https://go.dev/issue/82062.
 package cuecontext
 
 import (

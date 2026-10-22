@@ -35,6 +35,5 @@ func TestDeadcodeElimination(t *testing.T) {
 	out, err = exec.Command("go", "tool", "nm", bin).CombinedOutput()
 	qt.Assert(t, qt.IsNil(err), qt.Commentf("%s", out))
 	kept := strings.Contains(string(out), "main.canary.DeadcodeCanary")
-	// The cuenotemplate tag does not leave out the text/template builtin.
-	qt.Check(t, qt.IsTrue(kept))
+	qt.Check(t, qt.IsFalse(kept))
 }

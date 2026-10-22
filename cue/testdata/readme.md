@@ -410,7 +410,8 @@ and the expected correct behavior:
 x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
 ```
 
-The `:todo` qualifier is available on `eq`, `err`, `kind` and `debugCheck`.
+The `:todo` qualifier is available on `eq`, `err`, `kind`, `debugCheck` and
+`shareID`.
 
 ### `p=N` — fix priority
 
@@ -477,6 +478,12 @@ only option when the fields carry no `@test(eq, {...})` body:
 #T: ["d", ...#T] @test(shareID=T)
 x: #T            @test(shareID=T)
 ```
+
+`@test(shareID:todo=name)` on a field marks the whole group as expected to
+fail. Members without the qualifier belong to that group too, and are also
+checked as a plain group. A group that is not shared is logged as "still
+failing"; one that is shared emits a WARNING and, under `CUE_UPDATE`, has
+`:todo` dropped from its attributes.
 
 ---
 

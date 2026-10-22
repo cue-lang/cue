@@ -466,9 +466,11 @@ func (r *inlineRunner) runArchive() {
 	// nesting depth may form groups spanning different roots. These cross-root
 	// sharing assertions cannot be detected per-root, so we collect them once
 	// over all records and check after all subtests run.
-	if fileShareGroups := r.collectDirectShareIDs(runRecords, version); len(fileShareGroups) > 0 {
+	fileShareGroups := r.collectDirectShareIDs(runRecords, version)
+	if len(fileShareGroups) > 0 {
 		r.runShareIDChecks(r.sinkOrT(), val, fileShareGroups)
 	}
+	r.runTodoShareIDChecks(r.sinkOrT(), val, fileShareGroups, r.collectTodoShareIDs(runRecords))
 
 	// After all subtests complete, write back any pending updates.
 	// Byte-level write-backs (pos, inline-fill) run first so subsequent
@@ -1173,16 +1175,16 @@ func attrHasSkip(raw *internal.Attr) (ver string, ok bool) {
 	return "", false
 }
 
-// promoteTodoAttr returns the replacement text for an @test(eq:todo, ...)
+// promoteTodoAttr returns the replacement text for a @test(dir:todo, ...)
 // attribute that now passes: the :todo qualifier is stripped from the
 // directive name, leaving the rest of pa.srcAttr.Text untouched. Replacing
-// the FIRST literal "eq:todo" is safe because parseTestAttr already
+// the FIRST literal "dir:todo" is safe because parseTestAttr already
 // verified the attribute starts with that directive.
 func promoteTodoAttr(pa parsedTestAttr) string {
 	if pa.srcAttr == nil {
 		return ""
 	}
-	return strings.Replace(pa.srcAttr.Text, "eq:todo", "eq", 1)
+	return strings.Replace(pa.srcAttr.Text, pa.directive+":todo", pa.directive, 1)
 }
 
 // enqueueInlineFill appends a byte-level replacement for pa's @test attribute.

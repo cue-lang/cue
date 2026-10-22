@@ -20,12 +20,14 @@ package cuetxtar
 // regressions in structure sharing.
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/cuetest"
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -207,14 +209,9 @@ func (r *inlineRunner) collectDirectShareIDs(records []attrRecord, version strin
 		}
 		switch pa.directive {
 		case "shareID":
-			if len(pa.raw.Fields) == 0 {
-				continue
+			if name, p, ok := shareIDMember(rec); ok {
+				add(name, p)
 			}
-			shareIDName := pa.raw.Fields[0].Value()
-			if shareIDName == "" {
-				continue
-			}
-			add(shareIDName, applyShareIDAt(rec.path, pa))
 
 		case "eq":
 			// Extract in-place @test(shareID=name) from fields in the eq body.
@@ -250,28 +247,107 @@ func (r *inlineRunner) collectDirectShareIDs(records []attrRecord, version strin
 func (r *inlineRunner) runShareIDChecks(t testing.TB, fileVal cue.Value, shareGroups map[string][]cue.Path) {
 	t.Helper()
 	for id, paths := range shareGroups {
-		if len(paths) < 2 {
-			continue // need at least two to assert sharing
-		}
-		firstVal := fileVal.LookupPath(paths[0])
-		firstCore := firstVal.Core()
-		if firstCore.V == nil {
-			t.Errorf("@test(shareID=%s): path %s: not found in evaluated value", id, paths[0])
+		r.checkShareIDGroup(t, fileVal, id, paths)
+	}
+}
+
+// checkShareIDGroup reports the paths of one shareID group that do not
+// dereference to the vertex of its first path.
+func (r *inlineRunner) checkShareIDGroup(t testing.TB, fileVal cue.Value, id string, paths []cue.Path) {
+	t.Helper()
+	if len(paths) < 2 {
+		return // need at least two to assert sharing
+	}
+	firstVal := fileVal.LookupPath(paths[0])
+	firstCore := firstVal.Core()
+	if firstCore.V == nil {
+		t.Errorf("@test(shareID=%s): path %s: not found in evaluated value", id, paths[0])
+		return
+	}
+	derefFirst := firstCore.V.DerefValue()
+	for _, p := range paths[1:] {
+		otherVal := fileVal.LookupPath(p)
+		otherCore := otherVal.Core()
+		if otherCore.V == nil {
+			t.Errorf("@test(shareID=%s): path %s: not found in evaluated value", id, p)
 			continue
 		}
-		derefFirst := firstCore.V.DerefValue()
-		for _, p := range paths[1:] {
-			otherVal := fileVal.LookupPath(p)
-			otherCore := otherVal.Core()
-			if otherCore.V == nil {
-				t.Errorf("@test(shareID=%s): path %s: not found in evaluated value", id, p)
-				continue
-			}
-			derefOther := otherCore.V.DerefValue()
-			if derefFirst != derefOther {
-				t.Errorf("@test(shareID=%s): %s and %s are not shared (different vertices)",
-					id, paths[0], p)
-			}
+		derefOther := otherCore.V.DerefValue()
+		if derefFirst != derefOther {
+			t.Errorf("@test(shareID=%s): %s and %s are not shared (different vertices)",
+				id, paths[0], p)
+		}
+	}
+}
+
+// todoShareID is a direct @test(shareID:todo=name) attribute with the path
+// it asserts.
+type todoShareID struct {
+	attr parsedTestAttr
+	path cue.Path
+}
+
+// shareIDMember returns the group name and asserted path of a direct
+// shareID attribute record, or false for one without a group name.
+func shareIDMember(rec attrRecord) (name string, p cue.Path, ok bool) {
+	pa := rec.parsed
+	if len(pa.raw.Fields) == 0 {
+		return "", cue.Path{}, false
+	}
+	name = pa.raw.Fields[0].Value()
+	if name == "" {
+		return "", cue.Path{}, false
+	}
+	return name, applyShareIDAt(rec.path, pa), true
+}
+
+// collectTodoShareIDs collects the direct @test(shareID:todo=name)
+// attributes by group name.
+func (r *inlineRunner) collectTodoShareIDs(records []attrRecord) map[string][]todoShareID {
+	var todos map[string][]todoShareID
+	for _, rec := range records {
+		pa := rec.parsed
+		if pa.directive != "shareID" || pa.version != "todo" {
+			continue
+		}
+		name, p, ok := shareIDMember(rec)
+		if !ok {
+			continue
+		}
+		if todos == nil {
+			todos = make(map[string][]todoShareID)
+		}
+		todos[name] = append(todos[name], todoShareID{pa, p})
+	}
+	return todos
+}
+
+// runTodoShareIDChecks checks each group of todos, joined by the members of
+// the same name in groups, as expected to fail: a group that is not shared
+// is logged, and one that is shared warns and, under CUE_UPDATE, has the
+// :todo qualifier dropped from its attributes.
+func (r *inlineRunner) runTodoShareIDChecks(t testing.TB, fileVal cue.Value, groups map[string][]cue.Path, todos map[string][]todoShareID) {
+	t.Helper()
+	for id, members := range todos {
+		paths := slices.Clone(groups[id])
+		for _, m := range members {
+			paths = append(paths, m.path)
+		}
+		if len(paths) < 2 {
+			continue // asserts nothing, so it can neither fail nor pass
+		}
+		cap := &failCapture{TB: t}
+		r.checkShareIDGroup(cap, fileVal, id, paths)
+		if cap.failed {
+			t.Logf("TODO shareID:todo (still failing): %s\n%s", id, cap.msgs.String())
+			continue
+		}
+		t.Logf("WARNING: TODO shareID:todo now passes for %s — consider upgrading to @test(shareID=%s)", id, id)
+		if !cuetest.UpdateOrDiffGoldenFiles() {
+			continue
+		}
+		for _, m := range members {
+			r.enqueueInlineFill(m.attr, promoteTodoAttr(m.attr))
 		}
 	}
 }

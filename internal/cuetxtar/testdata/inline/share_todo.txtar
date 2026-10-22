@@ -1,0 +1,56 @@
+# Tests that @test(shareID:todo=name) is expected to fail: a group that is
+# not shared is logged rather than reported, and one that is shared has
+# :todo dropped under CUE_UPDATE.
+-- in/test.cue --
+// p and q reference g, so the todo passes and CUE_UPDATE drops it.
+g: {x: 1}
+p: g @test(shareID:todo=V)
+q: g @test(shareID:todo=V)
+
+// Two literals are not shared, so the todo stays.
+a: {x: 1} @test(shareID:todo=W)
+b: {x: 1} @test(shareID:todo=W)
+
+// The plain attribute joins the todo group and is left as is.
+l: [g] @test(shareID:todo=EL, at=0)
+m: g   @test(shareID=EL)
+
+// So does a plain attribute within an @test(eq) body.
+body: {
+	a: g
+	@test(eq, {
+		a: {x: 1} @test(shareID=B)
+	})
+}
+c: g @test(shareID:todo=B)
+
+// A lone member asserts nothing, so the todo stays.
+s: g @test(shareID:todo=S)
+-- out/update/test.cue --
+// p and q reference g, so the todo passes and CUE_UPDATE drops it.
+g: {x: 1}
+p: g @test(shareID=V)
+q: g @test(shareID=V)
+
+// Two literals are not shared, so the todo stays.
+a: {x: 1} @test(shareID:todo=W)
+b: {x: 1} @test(shareID:todo=W)
+
+// The plain attribute joins the todo group and is left as is.
+l: [g] @test(shareID=EL, at=0)
+m: g   @test(shareID=EL)
+
+// So does a plain attribute within an @test(eq) body.
+body: {
+	a: g
+	@test(eq, {
+		a: {x: 1} @test(shareID=B)
+	})
+}
+c: g @test(shareID=B)
+
+// A lone member asserts nothing, so the todo stays.
+s: g @test(shareID:todo=S)
+-- out/status.txt --
+update: output passes run
+force:  identical to update

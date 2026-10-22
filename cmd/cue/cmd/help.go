@@ -18,7 +18,6 @@ package cmd
 //go:generate go run gen_environment_help.go
 
 import (
-	"bufio"
 	"fmt"
 	"strings"
 
@@ -963,18 +962,15 @@ cuelang.org/go/pkg/tool/tool.cue.
 `,
 }
 
-// indent returns s with all lines indented by one tab.
+// indent returns s with all non-empty lines indented by one tab.
 func indent(s string) string {
 	var buf strings.Builder
-	for scan := bufio.NewScanner(strings.NewReader(s)); scan.Scan(); {
-		line := scan.Bytes()
-		if len(line) == 0 {
-			buf.WriteString("\n")
-			continue
+	buf.Grow(len(s) + strings.Count(s, "\n") + 1)
+	for line := range strings.Lines(s) {
+		if line != "\n" {
+			buf.WriteString("\t")
 		}
-		buf.WriteString("\t")
-		buf.Write(line)
-		buf.WriteString("\n")
+		buf.WriteString(line)
 	}
 	return buf.String()
 }

@@ -178,14 +178,14 @@ var (
 )
 
 //go:embed schema.cue
-var configSchemaData []byte
+var configSchemaData string
 
 // RegistryConfigSchema returns the CUE schema
 // for the configuration parsed by [ParseConfig].
 func RegistryConfigSchema() string {
 	// Cut out the copyright header and the header that's
 	// not pure schema.
-	schema := string(configSchemaData)
+	schema := configSchemaData
 	i := strings.Index(schema, "\n// #file ")
 	if i == -1 {
 		panic("no file definition found in schema")
@@ -200,7 +200,7 @@ func RegistryConfigSchema() string {
 func ParseConfig(configFile []byte, filename string, catchAllDefault string) (LocationResolver, error) {
 	configSchemaOnce.Do(func() {
 		ctx := cuecontext.New()
-		schemav := ctx.CompileBytes(configSchemaData, cue.Filename("cuelang.org/go/internal/mod/modresolve/schema.cue"))
+		schemav := ctx.CompileString(configSchemaData, cue.Filename("cuelang.org/go/internal/mod/modresolve/schema.cue"))
 		schemav = schemav.LookupPath(cue.MakePath(cue.Def("#file")))
 		if err := schemav.Validate(); err != nil {
 			panic(fmt.Errorf("internal error: invalid CUE registry config schema: %v", errors.Details(err, nil)))

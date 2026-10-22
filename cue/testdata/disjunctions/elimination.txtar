@@ -357,6 +357,14 @@ vacuousDuplicates: {
 	// may yet have its constraints satisfied, so they count. In particular,
 	// an open struct allows a field that the other disjunct forbids.
 	open: {a: 1} | {a: 1, b?: _|_} @test(eq, {a: 1} | {a: 1, b?: _|_ @test(err, code=user)})
+
+	// A definition's disjunct that forbids an optional field the other
+	// disjunct declares is distinct from it as well, in either order.
+	#T: {a: 1, b?: string}
+	#N: #T | {a: int}
+	#M: {a: int} | #T
+	defOptional: #T & #N @test(eq, {a: 1, b?: string} | {a: 1, b?: _|_ @test(err, code=eval)})
+	defOptionalSwapped: #T & #M @test(eq, {a: 1, b?: _|_ @test(err, code=eval)} | {a: 1, b?: string})
 	openDistinct: {a?: _|_} | {b?: _|_} @test(eq, {a?: _|_ @test(err, code=user)} | {b?: _|_ @test(err, code=user)})
 	openPattern: {a: 1} | {a: 1, [=~"^b"]: _|_} @test(eq, {a: 1} | {a: 1})
 	openList: [...int] | [...string] @test(eq, [] | [])
@@ -1272,25 +1280,25 @@ issue2685: {
 }
 -- out/errors.txt --
 [incomplete] patternDistinct.sel: unresolved disjunction {a:1} | {a:1} (type struct):
-    ./in.cue:391:7
+    ./in.cue:399:7
 [incomplete] patternDistinct.selOptional: unresolved disjunction {a:1,b?:int} | {a:1} (type struct):
-    ./in.cue:393:15
+    ./in.cue:401:15
 [incomplete] patternDistinct.selHidden: unresolved disjunction {a:1,_h:1} | {a:1,_h:2} (type struct):
-    ./in.cue:400:13
+    ./in.cue:408:13
 [incomplete] patternDistinct.nestedDefaultSel: unresolved disjunction {a:1} | {a:*1 | 2} (type struct):
-    ./in.cue:434:20
+    ./in.cue:442:20
 -- out/eval/stats --
 Leaks:  256
-Freed:  2823
-Reused: 2780
+Freed:  2848
+Reused: 2805
 Allocs: 299
 Retain: 0
 
-Unifications: 836
-Conjuncts:    3078
-Disjuncts:    1407
+Unifications: 853
+Conjuncts:    3113
+Disjuncts:    1415
 Notifications: 8
 
-NumCloseIDs: 207
+NumCloseIDs: 213
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.

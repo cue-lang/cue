@@ -283,6 +283,14 @@ vacuousDuplicates: {
 	// may yet have its constraints satisfied, so they count. In particular,
 	// an open struct allows a field that the other disjunct forbids.
 	open: {a: 1} | {a: 1, b?: _|_}
+
+	// A definition's disjunct that forbids an optional field the other
+	// disjunct declares is distinct from it as well, in either order.
+	#T: {a: 1, b?: string}
+	#N: #T | {a: int}
+	#M: {a: int} | #T
+	defOptional: #T & #N
+	defOptionalSwapped: #T & #M
 	openDistinct: {a?: _|_} | {b?: _|_}
 	openPattern: {a: 1} | {a: 1, [=~"^b"]: _|_}
 	openList: [...int] | [...string]
@@ -1686,6 +1694,18 @@ issue2685: {
       a: 1
       b?: _|_(explicit error (_|_ literal) in source)
     })
+    #T: {
+      a: 1
+      b?: string
+    }
+    #N: (〈0;#T〉|{
+      a: int
+    })
+    #M: ({
+      a: int
+    }|〈0;#T〉)
+    defOptional: (〈0;#T〉 & 〈0;#N〉)
+    defOptionalSwapped: (〈0;#T〉 & 〈0;#M〉)
     openDistinct: ({
       a?: _|_(explicit error (_|_ literal) in source)
     }|{

@@ -380,6 +380,10 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		// Mark no final in nodeContext and observe later.
 		results = n.crossProduct(results, cross, d, mode)
 
+		// The disjuncts inherited any sharing of n and each kept or ended
+		// it for itself; n now only holds their result.
+		n.dropSharing()
+
 		// TODO: do we unwind only at the end or also intermittently?
 		switch len(results) {
 		case 0:

@@ -48,19 +48,65 @@ func (n *nodeContext) unshare() {
 	if !n.isShared {
 		return
 	}
+	n.dropSharing()
+	for _, s := range n.shared {
+		n.scheduleVertexConjuncts(s.c, s.arc, s.id)
+	}
+}
+
+// sharesSingleValue reports whether the vertex n shares holds a value known
+// not to be a disjunction, which requires it to be finalized.
+func (n *nodeContext) sharesSingleValue() bool {
+	v, ok := n.node.BaseValue.(*Vertex)
+	if !ok || !v.isFinal() {
+		return false
+	}
+	return disjunctionOf(v) == nil
+}
+
+// hasResolver reports whether a disjunct of x is a reference, possibly in a
+// conjunction, which is the only kind of disjunct that can keep sharing.
+func hasResolver(x *DisjunctionExpr) bool {
+	for _, d := range x.Values {
+		for y := range andOperands(d.Val) {
+			if _, ok := y.(Resolver); ok {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// andOperands yields the operands of a conjunction x, descending into nested
+// conjunctions, x itself for any other expression, and nothing for a nil x.
+func andOperands(x Expr) iter.Seq[Expr] {
+	return func(yield func(Expr) bool) {
+		walkAndOperands(x, yield)
+	}
+}
+
+func walkAndOperands(x Expr, yield func(Expr) bool) bool {
+	if b, ok := x.(*BinaryExpr); ok && b.Op == AndOp {
+		return walkAndOperands(b.X, yield) && walkAndOperands(b.Y, yield)
+	}
+	return x == nil || yield(x)
+}
+
+// dropSharing ends sharing without replaying the shared vertex, for a
+// node whose value is computed elsewhere, such as in its disjuncts.
+func (n *nodeContext) dropSharing() {
+	if !n.isShared {
+		return
+	}
 	n.isShared = false
+	n.noSharing = true
 	n.node.IsShared = false
 	n.node.OpenedShared = false
+	n.decShared()
 
 	// TODO: the use of cycle for BaseValue is getting increasingly outdated.
 	// Find another mechanism once we get rid of the old evaluator.
 	n.node.BaseValue = n.origBaseValue
-
-	for _, s := range n.shared {
-		n.scheduleVertexConjuncts(s.c, s.arc, s.id)
-	}
-
-	n.decShared()
 }
 
 // finalizeSharing should be called when it is known for sure a node can be
@@ -304,21 +350,6 @@ func (v *Vertex) closedByConjunct() bool {
 		}
 	}
 	return false
-}
-
-// andOperands yields the operands of a conjunction x, descending into nested
-// conjunctions, x itself for any other expression, and nothing for a nil x.
-func andOperands(x Expr) iter.Seq[Expr] {
-	return func(yield func(Expr) bool) {
-		walkAndOperands(x, yield)
-	}
-}
-
-func walkAndOperands(x Expr, yield func(Expr) bool) bool {
-	if b, ok := x.(*BinaryExpr); ok && b.Op == AndOp {
-		return walkAndOperands(b.X, yield) && walkAndOperands(b.Y, yield)
-	}
-	return x == nil || yield(x)
 }
 
 // directExpr returns the expression of a conjunct that applies to its vertex

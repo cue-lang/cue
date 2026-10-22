@@ -118,6 +118,7 @@ disjunctiveLeaf: disjunctive.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].de
 
 // The same graph declared deepest first, so that each dependency is a
 // forward reference to a node whose pattern constraint is not applied yet.
+// This case is still evaluated once per path.
 reversed: {
 	#Task: {cmd: string, deps?: [...#Node]}
 	#Group: {type: "group", deps?: [...#Node]}

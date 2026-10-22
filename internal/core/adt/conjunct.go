@@ -160,7 +160,14 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.scheduleTask(handleListLit, env, x, id)
 
 	case *DisjunctionExpr:
-		n.unshare()
+		// The disjuncts are cloned with any sharing and each keeps or ends
+		// it on its own, so a settled, single value stays shared when a
+		// disjunct refers to it and may add nothing. A shared disjunction
+		// is replayed, as its defaults combine differently in the disjuncts.
+		keep := n.isShared && hasResolver(x) && n.sharesSingleValue()
+		if !keep {
+			n.unshare()
+		}
 		id := id
 		id.setOptional(n)
 

@@ -139,7 +139,7 @@ func (r *rewriter) rewriteDecls(schema cue.Value, decls []ast.Decl) {
 	}
 }
 
-var enumValuePath = cue.ParsePath("#enumValue").Optional()
+var enumValuePath = cue.MakePath(cue.Def("#enumValue").Optional())
 
 func (r *rewriter) rewrite(schema cue.Value, expr ast.Expr) (x ast.Expr) {
 	defer func() {

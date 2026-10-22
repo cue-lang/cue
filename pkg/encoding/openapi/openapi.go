@@ -29,8 +29,8 @@ import (
 )
 
 var (
-	expandReferencesPath = cue.ParsePath("expandReferences")
-	infoPath             = cue.ParsePath("info")
+	expandReferencesPath = cue.MakePath(cue.Str("expandReferences"))
+	infoPath             = cue.MakePath(cue.Str("info"))
 )
 
 // Marshal returns the OpenAPI encoding of schema for the given OpenAPI version.

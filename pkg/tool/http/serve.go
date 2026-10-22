@@ -57,16 +57,16 @@ func (c *listenCmd) IsService() bool {
 var m sync.Mutex
 
 var (
-	listenPath = cue.ParsePath("listenAddr")
-	pathPath   = cue.ParsePath("routing.path")
-	methodPath = cue.ParsePath("routing.method")
+	listenPath = cue.MakePath(cue.Str("listenAddr"))
+	pathPath   = cue.MakePath(cue.Str("routing"), cue.Str("path"))
+	methodPath = cue.MakePath(cue.Str("routing"), cue.Str("method"))
 
-	requestPath  = cue.ParsePath("request")
-	responsePath = cue.ParsePath("response")
+	requestPath  = cue.MakePath(cue.Str("request"))
+	responsePath = cue.MakePath(cue.Str("response"))
 
 	// Relative to responsePath.
-	respBodyPath       = cue.ParsePath("body")
-	respStatusCodePath = cue.ParsePath("statusCode")
+	respBodyPath       = cue.MakePath(cue.Str("body"))
+	respStatusCodePath = cue.MakePath(cue.Str("statusCode"))
 )
 
 // httpRequest represents the request data to fill into the CUE value.

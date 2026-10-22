@@ -168,7 +168,13 @@ func extractDeclAttrs(attrs []*ast.Attribute, n ast.Node) []*ast.Attribute {
 	switch x := n.(type) {
 	case nil:
 	case *ast.File:
-		attrs = appendDeclAttrs(attrs, x.Decls[len(x.Preamble()):])
+		decls := x.Decls[len(x.Preamble()):]
+		// A @version attribute declares the version of the source file,
+		// not of the exported value, which targets the instance's version.
+		if v := internal.VersionAttr(x); v != nil {
+			decls = slices.DeleteFunc(slices.Clone(decls), func(d ast.Decl) bool { return d == v })
+		}
+		attrs = appendDeclAttrs(attrs, decls)
 	case *ast.StructLit:
 		attrs = appendDeclAttrs(attrs, x.Elts)
 	}

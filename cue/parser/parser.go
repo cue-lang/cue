@@ -15,6 +15,7 @@
 package parser
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
 	"strings"
@@ -27,6 +28,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
 )
 
@@ -38,6 +40,12 @@ type parser struct {
 
 	expList     []string // list of experiments to enable
 	experiments *cueexperiment.File
+
+	// versionAttr is the file's @version attribute, if it has one in the
+	// right place, and fileVersion the language version it declares.
+	versionAttr *ast.Attribute
+	fileVersion string
+	fileAttrs   int // number of file attributes read so far
 
 	// Tracing/debugging
 	cfg       Config
@@ -1185,18 +1193,67 @@ func (p *parser) parseAttribute(inPreamble bool) *ast.Attribute {
 	a := &ast.Attribute{At: p.pos, Text: p.lit}
 
 	if inPreamble {
-		p.addExperiment(a)
+		p.addFileAttribute(a, true)
 	}
 	p.next()
 	c.closeNode(p, a)
 	return a
 }
 
-// addExperiment records the experiments enabled by a, a file attribute,
-// if it is an @experiment attribute.
-func (p *parser) addExperiment(a *ast.Attribute) {
-	if key, body := a.Split(); key == "experiment" {
+// addFileAttribute records the experiments enabled by a, a file attribute,
+// if it is an @experiment attribute, and the language version it declares
+// if it is the file's @version attribute: the first file attribute, before
+// the package clause. [parser.checkVersionAttrs] reports any other @version
+// attribute.
+func (p *parser) addFileAttribute(a *ast.Attribute, beforePackage bool) {
+	defer func() { p.fileAttrs++ }()
+	switch a.Name() {
+	case "experiment":
+		_, body := a.Split()
 		p.expList = append(p.expList, body)
+	case "version":
+		if p.fileAttrs > 0 || !beforePackage {
+			return
+		}
+		p.versionAttr = a
+		attr := internal.ParseAttr(a)
+		var v string
+		var err error
+		switch {
+		case attr.Err != nil:
+			err = attr.Err
+		case len(attr.Fields) != 1:
+			err = fmt.Errorf("want a single language version")
+		default:
+			if v, err = attr.String(0); err == nil {
+				v, err = cueversion.CheckLanguageVersion(v)
+			}
+		}
+		if err != nil {
+			p.errf(a.At, "invalid @version attribute: %v", err)
+			return
+		}
+		p.fileVersion = v
+	}
+}
+
+// checkVersionAttrs reports any top-level @version attribute of decls other
+// than the file's own: one among the leading attributes repeats it, and any
+// other is misplaced.
+func (p *parser) checkVersionAttrs(decls []ast.Decl) {
+	leading := true
+	for _, d := range decls {
+		a, ok := d.(*ast.Attribute)
+		switch {
+		case !ok:
+			_, comment := d.(*ast.CommentGroup)
+			leading = leading && comment
+		case a == p.versionAttr || a.Name() != "version":
+		case leading && p.versionAttr != nil:
+			p.errf(a.At, "repeated @version attribute")
+		default:
+			p.errf(a.At, "@version must be the first file attribute, before the package clause, any @experiment attribute, and any declaration")
+		}
 	}
 }
 
@@ -2628,11 +2685,13 @@ func (p *parser) parseFile() *ast.File {
 	}
 	if p.tok == token.IDENT && p.lit == "import" {
 		for _, a := range attrs {
-			p.addExperiment(a)
+			p.addFileAttribute(a, false)
 		}
 	}
 
-	v := p.cfg.Version
+	// A file's own @version attribute takes precedence over the configured
+	// version, which is the default for files without one.
+	v := cmp.Or(p.fileVersion, p.cfg.Version)
 	exp, err := cueexperiment.NewFile(v, p.expList...)
 	if err != nil {
 		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", v)
@@ -2658,6 +2717,7 @@ func (p *parser) parseFile() *ast.File {
 		}
 	}
 	p.closeList()
+	p.checkVersionAttrs(decls)
 
 	f := &ast.File{Decls: decls}
 	c.closeNode(p, f)

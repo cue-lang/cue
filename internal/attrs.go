@@ -292,3 +292,21 @@ func tokenMaskStr(m uint64) string {
 	}
 	return buf.String()
 }
+
+// VersionAttr returns the @version file attribute of f, or nil if it has
+// none. The parser only accepts one among the attributes leading the file,
+// before the package clause, so only those need to be searched.
+func VersionAttr(f *ast.File) *ast.Attribute {
+	for _, d := range f.Decls {
+		switch d := d.(type) {
+		case *ast.CommentGroup:
+		case *ast.Attribute:
+			if d.Name() == "version" {
+				return d
+			}
+		default:
+			return nil
+		}
+	}
+	return nil
+}

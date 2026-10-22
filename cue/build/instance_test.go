@@ -63,12 +63,26 @@ func TestPartiallyResolved(t *testing.T) {
 	}
 }
 
+// A file's version must not become the default for files added after it.
+func TestAddFileLanguageVersion(t *testing.T) {
+	inst := &Instance{}
+	if err := inst.AddFile("a.cue", "@version(v0.17.0)\na: 1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := inst.AddFile("b.cue", "b: 2"); err != nil {
+		t.Fatal(err)
+	}
+	if got := inst.Files[1].Pos().LanguageVersion(); got != cueversion.LanguageVersion() {
+		t.Fatalf("second file version = %q; want current", got)
+	}
+}
+
 // Selecting an export target must not change the source version or the
 // default for subsequently added files.
 func TestTargetLanguageVersion(t *testing.T) {
 	inst := &Instance{}
 	inst.SetTargetLanguageVersion("v0.16.0")
-	if err := inst.AddFile("a.cue", "a: 1"); err != nil {
+	if err := inst.AddFile("a.cue", "@version(v0.17.0)\na: 1"); err != nil {
 		t.Fatal(err)
 	}
 	if got := inst.LanguageVersion(); got != "" {
@@ -77,7 +91,7 @@ func TestTargetLanguageVersion(t *testing.T) {
 	if got := inst.TargetLanguageVersion(); got != "v0.16.0" {
 		t.Fatalf("export version = %q", got)
 	}
-	if got := inst.Files[0].Pos().LanguageVersion(); got != cueversion.LanguageVersion() {
+	if got := inst.Files[0].Pos().LanguageVersion(); got != "v0.17.0" {
 		t.Fatalf("source version = %q", got)
 	}
 	if err := inst.AddFile("b.cue", "b: 2"); err != nil {

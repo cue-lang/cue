@@ -275,3 +275,123 @@ func TestLanguageVersionOverlay(t *testing.T) {
 	qt.Assert(t, qt.IsNil(insts[0].Err))
 	qt.Assert(t, qt.DeepEquals(fileVersions(insts[0]), []string{"v0.17.0"}))
 }
+
+const versionAttrTree = `
+-- loose/attr.cue --
+@version(v0.17.0)
+
+a: 1
+-- loose/plain.cue --
+b: 2
+-- mod/cue.mod/module.cue --
+module: "mod.example@v0"
+language: version: "v0.16.0"
+-- mod/v.cue --
+@version(v0.17.0)
+
+package x
+
+v: 1
+`
+
+func TestVersionAttributeLoad(t *testing.T) {
+	root := writeTree(t, versionAttrTree)
+	current := cueversion.LanguageVersion()
+
+	tests := []struct {
+		name    string
+		dir     string
+		args    []string
+		version string
+
+		want         []string // versions of the instance's files
+		wantInstance string   // the instance's TargetLanguageVersion
+		wantErr      string
+	}{{
+		name:         "Attribute",
+		dir:          "loose",
+		args:         []string{"attr.cue"},
+		want:         []string{"v0.17.0"},
+		wantInstance: "",
+	}, {
+		name:         "WinsOverOption",
+		dir:          "loose",
+		args:         []string{"attr.cue"},
+		version:      "v0.16.0",
+		want:         []string{"v0.17.0"},
+		wantInstance: "v0.16.0",
+	}, {
+		// Files without the attribute take the option; the files disagree,
+		// but export still targets the option's version.
+		name:         "MixedWithOption",
+		dir:          "loose",
+		args:         []string{"attr.cue", "plain.cue"},
+		version:      "v0.16.0",
+		want:         []string{"v0.17.0", "v0.16.0"},
+		wantInstance: "v0.16.0",
+	}, {
+		name:         "MixedWithoutOption",
+		dir:          "loose",
+		args:         []string{"attr.cue", "plain.cue"},
+		want:         []string{"v0.17.0", current},
+		wantInstance: "",
+	}, {
+		name:    "InsideModule",
+		dir:     "mod",
+		args:    []string{"."},
+		wantErr: "the @version attribute cannot be used in a file of the module whose cue.mod/module.cue declares language version v0.16.0",
+	}, {
+		name:    "InsideModuleFile",
+		dir:     "mod",
+		args:    []string{"v.cue"},
+		wantErr: "the @version attribute cannot be used in a file of the module whose cue.mod/module.cue declares language version v0.16.0",
+	}, {
+		// A file outside the module root belongs to no module, whatever the
+		// working directory: its attribute applies, then the option, and only
+		// without either the version of the working directory's module, whose
+		// load it joins without the option.
+		name:         "OutsideRootAttribute",
+		dir:          "mod",
+		args:         []string{"../loose/attr.cue"},
+		want:         []string{"v0.17.0"},
+		wantInstance: "v0.16.0",
+	}, {
+		name:         "OutsideRootAttributeWithOption",
+		dir:          "mod",
+		args:         []string{"../loose/attr.cue"},
+		version:      "v0.15.0",
+		want:         []string{"v0.17.0"},
+		wantInstance: "v0.15.0",
+	}, {
+		name:         "OutsideRootPlainWithOption",
+		dir:          "mod",
+		args:         []string{"../loose/plain.cue"},
+		version:      "v0.17.0",
+		want:         []string{"v0.17.0"},
+		wantInstance: "v0.17.0",
+	}, {
+		name:         "OutsideRootPlain",
+		dir:          "mod",
+		args:         []string{"../loose/plain.cue"},
+		want:         []string{"v0.16.0"},
+		wantInstance: "v0.16.0",
+	}}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			insts := load.Instances(test.args, &load.Config{
+				Dir:             filepath.Join(root, test.dir),
+				LanguageVersion: test.version,
+			})
+			qt.Assert(t, qt.HasLen(insts, 1))
+			inst := insts[0]
+			if test.wantErr != "" {
+				qt.Assert(t, qt.IsNotNil(inst.Err))
+				qt.Assert(t, qt.StringContains(inst.Err.Error(), test.wantErr))
+				return
+			}
+			qt.Assert(t, qt.IsNil(inst.Err))
+			qt.Assert(t, qt.DeepEquals(fileVersions(inst), test.want))
+			qt.Assert(t, qt.Equals(inst.TargetLanguageVersion(), test.wantInstance))
+		})
+	}
+}

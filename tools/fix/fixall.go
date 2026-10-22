@@ -15,11 +15,14 @@
 package fix
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/mod/modfile"
 )
 
@@ -60,10 +63,14 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 			}
 		}
 
+		// A file that declares its own version with a @version attribute is
+		// judged at that version rather than the instance's.
+		ownVersion := func(f *ast.File) bool { return internal.VersionAttr(f) != nil }
+
 		// Validate the requested experiments against the instance's
 		// language version, so that an instance whose files do not even
 		// parse at that version, and so has no files, reports them too.
-		if version != "" {
+		if version != "" && !slices.ContainsFunc(b.Files, ownVersion) {
 			if _, _, err := opts.resolveExperiments(version); err != nil {
 				return err
 			}
@@ -74,7 +81,11 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 				continue
 			}
 			done[f] = true
-			if _, err := file(f, version, o...); err != nil {
+			fileVersion := version
+			if ownVersion(f) {
+				fileVersion = f.Pos().LanguageVersion()
+			}
+			if _, err := file(f, fileVersion, o...); err != nil {
 				errs = errors.Append(errs, err)
 			}
 		}

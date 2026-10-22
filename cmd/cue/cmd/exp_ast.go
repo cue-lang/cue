@@ -116,6 +116,11 @@ func runExpASTPrint(cmd *Command, args []string) error {
 			if err != nil {
 				errs = errors.Append(errs, errors.Promote(err, "parse error"))
 			}
+			// Files read without the loader must follow its rule for
+			// @version too.
+			if err := checkVersionAttr(name, file); err != nil {
+				errs = errors.Append(errs, errors.Promote(err, ""))
+			}
 			// Even if there are errors, it can still be useful to
 			// show a (possibly) partial AST.
 			if err := printFile(file); err != nil {

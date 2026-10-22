@@ -28,13 +28,16 @@ import (
 	"github.com/rogpeppe/go-internal/diff"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/mod/langversion"
 	"cuelang.org/go/internal/source"
 	"cuelang.org/go/mod/modfile"
 )
@@ -229,6 +232,21 @@ func owningModuleFile(path string) (modFile, declared string, _ error) {
 	return modFile, declared, nil
 }
 
+// checkVersionAttr reports an error if syntax, the file at path, carries a
+// @version attribute while it belongs to a module that declares a language
+// version, as cue/load does for the files it loads.
+func checkVersionAttr(path string, syntax *ast.File) error {
+	a := internal.VersionAttr(syntax)
+	if a == nil || path == "-" {
+		return nil
+	}
+	modFile, declared, err := owningModuleFile(path)
+	if err != nil || modFile == "" || declared == "" {
+		return err
+	}
+	return langversion.AttrInModuleError(a.Pos(), modFile, declared)
+}
+
 // loaderModuleRoot returns the module root that cue/load finds for files in
 // dir: the nearest ancestor of dir, or dir itself, holding a cue.mod entry.
 // It returns "" if there is none, or if the walk leaves a cue.mod directory,
@@ -260,6 +278,10 @@ func formatFile(file *build.File, opts []format.Option, version string, doDiff, 
 	parseOpts := []parser.Option{parser.ParseComments, parser.Version(version)}
 	syntax, err := parser.ParseFile(file.Filename, src, parseOpts...)
 	if err != nil {
+		return false, err
+	}
+	// Files read without the loader must follow its rule for @version too.
+	if err := checkVersionAttr(file.Filename, syntax); err != nil {
 		return false, err
 	}
 

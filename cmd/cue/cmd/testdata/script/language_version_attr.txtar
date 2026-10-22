@@ -1,0 +1,153 @@
+# A @version file attribute declares the language version of a file outside
+# any module. The attribute wins over the flag for parsing and evaluation;
+# the flag independently selects the export target. Here the files use a
+# prefix alias, valid before v0.18.0.
+#
+# TestLatest: skip -- the inputs deliberately use the prefix alias form.
+
+exec cue eval x.cue
+cp stdout eval-attr
+exec cue eval --language-version v0.17.0 plain.cue
+cmp stdout eval-attr
+exec cue eval --language-version v0.16.0 x.cue
+cmp stdout eval-attr
+
+# cue def targets the flag's version independently of the source attribute.
+exec cue def --language-version v0.17.0 x.cue
+cmp stdout expect/def
+exec cue def --language-version v0.17.0 plain.cue
+cmp stdout expect/def
+exec cue def --language-version v0.17.0 pkg.cue
+cmp stdout expect/def-pkg
+
+# Without a chosen target, output uses the current version even for old input.
+exec cue def x.cue
+stdout 'let X_1 = self'
+cp stdout def-current
+exec cue def --language-version v0.18.0 x.cue
+cmp stdout def-current
+
+# Flag expressions follow the selected version, not the file's attribute.
+! exec cue export -e '{_y: Y={a: 1, b: Y.a}, c: _y.b}.c' x.cue
+stderr 'old-style alias syntax'
+exec cue export --language-version v0.17.0 -e '{_y: Y={a: 1, b: Y.a}, c: _y.b}.c' x.cue
+stdout '^1$'
+
+# cue fmt keeps the file at its declared version, in both modes.
+exec cue fmt x.cue
+cmp x.cue expect/x
+exec cue fmt --files x.cue
+cmp x.cue expect/x
+
+# cue fix judges the file at its declared version, so the migration that
+# is refused at the current version applies; the attribute stays first.
+exec cue fix --exp=explicitopen z.cue
+cmp z.cue expect/z
+
+# In a load mixing a marked file and an unmarked one, each file is fixed at
+# its own version: the prefix alias of the v0.17.0 file stays.
+cp x.cue.orig mixed.cue
+exec cue fix --language-version v0.18.0 mixed.cue y.cue
+cmp mixed.cue x.cue.orig
+
+# The attribute is rejected in a file of a module declaring a version.
+cd mod
+! exec cue eval .
+stderr 'the @version attribute cannot be used in a file of the module whose cue.mod/module.cue declares language version v0.16.0'
+! exec cue fmt --files v.cue
+stderr 'the @version attribute cannot be used in a file of the module whose cue.mod/module.cue declares language version v0.16.0'
+cmp v.cue v.cue.orig
+cd ..
+
+# A misplaced attribute is an error at the attribute.
+! exec cue eval late.cue
+stderr '^@version must be the first file attribute'
+
+-- x.cue --
+@version(v0.17.0)
+
+_alias:   X={a: 1, b: X.a}
+out: _alias.b
+-- x.cue.orig --
+@version(v0.17.0)
+
+_alias: X={a: 1, b: X.a}
+out:    _alias.b
+-- y.cue --
+y: 1
+-- plain.cue --
+_alias:   X={a: 1, b: X.a}
+out: _alias.b
+-- expect/def --
+_alias: X_1={
+	a: 1
+	b: X_1.a
+}
+out: _alias_9.b
+
+let _alias_9 = _alias
+-- pkg.cue --
+@version(v0.17.0)
+
+package p
+
+_alias: X={a: 1, b: X.a}
+out:    _alias.b
+-- expect/def-pkg --
+package p
+
+_alias: X_1={
+	a: 1
+	b: X_1.a
+}
+out: _alias_9.b
+
+let _alias_9 = _alias
+-- expect/x --
+@version(v0.17.0)
+
+_alias: X={a: 1, b: X.a}
+out:    _alias.b
+-- z.cue --
+@version(v0.17.0)
+
+#A: a: int
+#B: b: int
+
+X: {
+	#A
+	#B
+	b: string
+}
+-- expect/z --
+@version(v0.17.0)
+@experiment(explicitopen)
+
+#A: a: int
+#B: b: int
+
+X: __closeAll({
+	#A...
+	#B...
+	b: string
+})
+-- late.cue --
+@experiment(try)
+@version(v0.17.0)
+
+a: 1
+-- mod/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.16.0"
+-- mod/v.cue --
+@version(v0.17.0)
+
+package x
+
+v:    1
+-- mod/v.cue.orig --
+@version(v0.17.0)
+
+package x
+
+v:    1

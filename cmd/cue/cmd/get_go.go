@@ -49,6 +49,7 @@ import (
 	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/mod/langversion"
 )
 
 // TODO:
@@ -585,6 +586,12 @@ func extract(cmd *Command, args []string) error {
 		return err
 	}
 	binst := loadFromArgs([]string{"."}, &load.Config{LanguageVersion: langVersion})[0]
+	// The CUE package may well be empty, and other load errors are tolerated
+	// too, but not a @version attribute that a module forbids: it must stop
+	// us before we generate anything.
+	if versionErr := (*langversion.Error)(nil); errors.As(binst.Err, &versionErr) {
+		return binst.Err
+	}
 	version := cmp.Or(binst.TargetLanguageVersion(), langVersion)
 
 	// TODO: require explicitly set root.

@@ -342,6 +342,10 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) boo
 		badFile(errors.Promote(perr, "add failed"))
 		return false
 	}
+	if err := fp.c.checkVersionAttr(fullPath, pf); err != nil {
+		badFile(err)
+		return false
+	}
 
 	pkg := pf.PackageName()
 	if pkg == "" {

@@ -22,6 +22,13 @@ cmp stdout ../expect/outside-eval
 exec cue eval --language-version v0.17.0 ../outside/w.cue x.cue
 cmp stdout ../expect/mixed-eval
 
+# The same command can be repeated while files are fixed one way or another:
+# once the loose file declares its own version, the flag applies to nothing,
+# and that is no error either.
+cp ../outside/y-attr.cue ../outside/y.cue
+exec cue eval --language-version v0.18.0 ../outside/y.cue
+cmp stdout ../expect/outside-eval
+
 # A file of a nested module is read as without the flag.
 exec cue eval --language-version v0.17.0 nested/n.cue
 stdout '^n: 1$'
@@ -47,6 +54,11 @@ language: version: "v0.15.0"
 -- mod/nested/n.cue --
 n: 1
 -- outside/y.cue --
+_alias: Y={a: 2, b: Y.a}
+out: _alias.b
+-- outside/y-attr.cue --
+@version(v0.17.0)
+
 _alias: Y={a: 2, b: Y.a}
 out: _alias.b
 -- outside/w.cue --

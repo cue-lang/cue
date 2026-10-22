@@ -615,3 +615,28 @@ func TestSyntaxLanguageVersionFromFile(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.StringContains(string(b), "let X_1 = self"))
 }
+
+func TestSyntaxLanguageVersionOverridesAttribute(t *testing.T) {
+	for _, version := range []string{"", "v0.18.0", "v0.16.0"} {
+		t.Run(version, func(t *testing.T) {
+			dir := t.TempDir()
+			insts := cueload.Instances([]string{"x.cue"}, &cueload.Config{
+				Dir: dir, LanguageVersion: version,
+				Overlay: map[string]cueload.Source{
+					filepath.Join(dir, "x.cue"): cueload.FromString("@version(v0.17.0)\na: X={b: 1, c: X.b}\n"),
+				},
+			})
+			qt.Assert(t, qt.IsNil(insts[0].Err))
+			qt.Assert(t, qt.Equals(insts[0].Files[0].Pos().LanguageVersion(), "v0.17.0"))
+			v := cuecontext.New().BuildInstance(insts[0])
+			qt.Assert(t, qt.IsNil(v.Err()))
+			b, err := format.Node(v.Syntax(cue.Raw()))
+			qt.Assert(t, qt.IsNil(err))
+			if version == "v0.16.0" {
+				qt.Assert(t, qt.StringContains(string(b), "a: X_1={"))
+			} else {
+				qt.Assert(t, qt.StringContains(string(b), "let X_1 = self"))
+			}
+		})
+	}
+}

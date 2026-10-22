@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/mod/langversion"
 )
 
 func newAddCmd(c *Command) *cobra.Command {
@@ -82,11 +83,17 @@ func doAdd(cmd *Command, args []string) (err error) {
 		return err
 	}
 
+	// versionErr is the first error of a language version that cannot apply
+	// to the files to append to, which must stop us before any write.
+	var versionErr error
 	getBuild := func(path string) *build.Instance {
 		if b, ok := builds[path]; ok {
 			return b
 		}
 		b := load.Instances([]string{path}, &load.Config{LanguageVersion: langVersion})[0]
+		if e := (*langversion.Error)(nil); versionErr == nil && errors.As(b.Err, &e) {
+			versionErr = b.Err
+		}
 		builds[path] = b
 		return b
 	}
@@ -126,6 +133,10 @@ func doAdd(cmd *Command, args []string) (err error) {
 				return fmt.Errorf("instance info not available for %s", fi.filename)
 			}
 		}
+	}
+
+	if versionErr != nil {
+		return versionErr
 	}
 
 	// Read text to be appended.

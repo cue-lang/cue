@@ -38,6 +38,10 @@ stdin ../add.cue
 exec cue add --language-version v0.18.0 m.cue
 cmp m.cue m.cue.added
 
+# Without the flag, a @version attribute in a module file is an error, also
+# for commands that read files without the loader.
+! exec cue exp ast print --files v.cue
+stderr 'the @version attribute cannot be used in a file of the module whose cue.mod/module.cue declares language version v0.16.0'
 cd ..
 
 -- x.cue --
@@ -67,3 +71,7 @@ p: 1
 -- mod/m.cue.added --
 _m:    M={a: 1, b: M.a}
 added: 2
+-- mod/v.cue --
+@version(v0.17.0)
+
+v: 1

@@ -379,14 +379,23 @@ func fixExperiment(fn func(*ast.File) (*ast.File, bool), f *ast.File, exp, versi
 
 	// If we made any changes, add the @experiment(explicitopen) attribute at the top
 	if hasChanges {
+		// A @version attribute must stay the first file attribute, so the
+		// new attribute goes after it.
+		at := 0
+		if a := internal.VersionAttr(result); a != nil {
+			at = slices.Index(result.Decls, ast.Decl(a)) + 1
+		}
 		// there must be at least one decl for there to be any changes.
-		ast.SetRelPos(result.Decls[0], token.NewSection)
+		if at < len(result.Decls) {
+			ast.SetRelPos(result.Decls[at], token.NewSection)
+		}
 
 		if !cueexperiment.IsStable(exp, version) {
 			expAttr := &ast.Attribute{Text: fmt.Sprintf("@experiment(%s)", exp)}
 
-			// Insert the attribute as the first declaration
-			result.Decls = append([]ast.Decl{expAttr}, result.Decls...)
+			// Insert the attribute as the first declaration after any
+			// @version attribute.
+			result.Decls = slices.Insert(result.Decls, at, ast.Decl(expAttr))
 		}
 	}
 

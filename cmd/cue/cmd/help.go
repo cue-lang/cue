@@ -532,9 +532,16 @@ and the target version of CUE that commands generate from it. It
 accepts a canonical semantic version, such as v0.17.0.
 
 The flag is only a fallback. The files of a module that declares a
-language version keep that version. It is not an error if the flag
-applies to no input, so the same command can be repeated while
-files move into modules.
+language version keep that version, and a file's @version attribute
+takes precedence. It is not an error if the flag applies to no
+input, so the same command can be repeated while files move into
+modules or gain @version attributes.
+
+A file outside any module may declare its own version with a
+@version(v0.17.0) file attribute. It must be the file's first
+attribute, before the package clause and any @experiment attribute.
+In a file of a module that declares a language version, it is an
+error.
 
 
 Examples:

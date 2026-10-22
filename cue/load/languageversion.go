@@ -22,8 +22,11 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/mod/langversion"
 	pkgpath "cuelang.org/go/pkg/path"
 )
 
@@ -136,4 +139,32 @@ func (c *Config) absPath(name string) string {
 		return pkgpath.Clean(name, c.pathOS)
 	}
 	return pkgpath.Join([]string{c.Dir, name}, c.pathOS)
+}
+
+// checkVersionAttr reports an error if f, the file at path, carries a
+// @version attribute while it belongs to a module that declares a language
+// version, as the module file decides the version of its files. As for
+// [Config.LanguageVersion], a file belongs to the module found by walking up
+// from its location, whichever load it is part of.
+func (c *Config) checkVersionAttr(path string, f *ast.File) errors.Error {
+	a := internal.VersionAttr(f)
+	if a == nil || path == "-" {
+		return nil
+	}
+	root := c.findModRoot(pkgpath.Dir(path, c.pathOS))
+	if root == "" {
+		return nil
+	}
+	mf := c.modFile
+	if c.modFile == nil || root != c.ModuleRoot {
+		mf = c.replaceDirModFile(root)
+	}
+	if mf == nil || mf.Language == nil || mf.Language.Version == "" {
+		return nil
+	}
+	modFile := pkgpath.Join([]string{root, modDir, moduleFile}, c.pathOS)
+	if rel, err := pkgpath.Rel(c.Dir, modFile, c.pathOS); err == nil && !strings.HasPrefix(rel, "..") {
+		modFile = pkgpath.ToSlash(rel, c.pathOS)
+	}
+	return langversion.AttrInModuleError(a.Pos(), modFile, mf.Language.Version)
 }

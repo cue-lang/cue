@@ -157,10 +157,10 @@ type Config struct {
 	// It is only a fallback: files of a module that declares a language
 	// version keep the module's version, and it is not an error if the
 	// fallback applies to no input at all, so that the same load can be
-	// repeated while files move into modules.
+	// repeated while files move into modules or gain @version attributes.
 	//
-	// Outside a module, it also selects the target version for exported and
-	// generated CUE.
+	// For a file outside a module, @version takes precedence for that file;
+	// LanguageVersion still selects the export target.
 	//
 	// AST overlays added with [FromFile] are used as given, so their
 	// language version is the one they were parsed with.

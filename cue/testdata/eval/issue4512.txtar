@@ -118,15 +118,14 @@ disjunctiveLeaf: disjunctive.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].de
 
 // The same graph declared deepest first, so that each dependency is a
 // forward reference to a node whose pattern constraint is not applied yet.
-// This case is still evaluated once per path.
 reversed: {
 	#Task: {cmd: string, deps?: [...#Node]}
 	#Group: {type: "group", deps?: [...#Node]}
 	#Node: #Task | #Group
 	tasks: [string]: #Task
 	tasks: {
-		n6: {cmd: "x", deps: [n5]} @test(shareID:todo=reversedN5, at=deps[0])
-		n5: {cmd: "x", deps: [n4]} @test(shareID:todo=reversedN5)
+		n6: {cmd: "x", deps: [n5]} @test(shareID=reversedN5, at=deps[0])
+		n5: {cmd: "x", deps: [n4]} @test(shareID=reversedN5)
 		n4: {cmd: "x", deps: [n3]}
 		n3: {cmd: "x", deps: [n2]}
 		n2: {cmd: "x", deps: [n1]}
@@ -165,19 +164,19 @@ union: {
 }
 unionLeaf: union.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
 -- out/eval/stats --
-Leaks:  618
-Freed:  2932
-Reused: 2832
-Allocs: 718
+Leaks:  222
+Freed:  2254
+Reused: 2154
+Allocs: 322
 Retain: 0
 
-Unifications: 1243
-Conjuncts:    4235
-Disjuncts:    629
+Unifications: 847
+Conjuncts:    2765
+Disjuncts:    431
 
-NumCloseIDs: 829
+NumCloseIDs: 433
 
-ConjunctInfos:       2679
+ConjunctInfos:       1803
 MaxConjunctInfos:    5
 MaxReqSets:          19
-MaxRedirect:         6
+MaxRedirect:         5

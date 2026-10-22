@@ -219,8 +219,6 @@ foo: {
     ./in.cue:60:12
 [incomplete] #Config.auth0: incomplete bool: bool:
     ./in.cue:60:12
-[incomplete] #Config.auth0: incomplete bool: bool:
-    ./in.cue:60:12
 [incomplete] #Flux.auth0: incomplete bool: bool:
     ./in.cue:60:12
 [incomplete] #Flux.auth0: incomplete bool: bool:

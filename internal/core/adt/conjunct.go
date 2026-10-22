@@ -420,13 +420,24 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	if deref(n.node) == deref(arc) {
 		n.linkCyclicResolver(arc, closeInfo)
 		if n.isShared {
-			n.addShared(closeInfo)
+			n.addShared(c, arc, closeInfo)
 		}
 		return
 	}
 
 	if n.shareIfPossible(c, arc, closeInfo) {
 		arc.getState(n.ctx)
+		return
+	}
+
+	// A definition the shared vertex was already directly unified with adds
+	// nothing: unification is idempotent, so keep sharing rather than replay
+	// the vertex for it. Not so through an opened reference, which the
+	// definition re-closes.
+	if n.isShared && !n.node.OpenedShared &&
+		!closeInfo.Opened && !closeInfo.ConjunctOpened &&
+		n.sharedClosedBy(arc) {
+		n.addShared(c, arc, closeInfo)
 		return
 	}
 

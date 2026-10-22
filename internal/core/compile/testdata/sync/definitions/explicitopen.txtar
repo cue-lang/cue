@@ -222,6 +222,15 @@ issue4150: {
 	// erroneous, depending on the value foo is set to.
 	z: 1...
 }
+
+// A definition re-closes a reference opened with `...`, even when the
+// referenced value is itself an instance of that definition and is shared.
+reclose: {
+	#D: a: int
+	x: #D & {a: 1}
+	y: x... & #D
+	t1: err: y & {b: 2}
+}
 -- out/compile --
 --- issues.cue
 {
@@ -241,6 +250,20 @@ issue4150: {
     }
     y: (〈0;foo〉... & 〈0;bar〉...)
     z: 1...
+  }
+  reclose: {
+    #D: {
+      a: int
+    }
+    x: (〈0;#D〉 & {
+      a: 1
+    })
+    y: (〈0;x〉... & 〈0;#D〉)
+    t1: {
+      err: (〈1;y〉 & {
+        b: 2
+      })
+    }
   }
 }
 --- new.cue

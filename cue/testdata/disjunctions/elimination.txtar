@@ -1281,16 +1281,16 @@ issue2685: {
     ./in.cue:434:20
 -- out/eval/stats --
 Leaks:  256
-Freed:  2828
-Reused: 2785
+Freed:  2823
+Reused: 2780
 Allocs: 299
 Retain: 0
 
-Unifications: 839
-Conjuncts:    3086
-Disjuncts:    1409
+Unifications: 836
+Conjuncts:    3078
+Disjuncts:    1407
 Notifications: 8
 
-NumCloseIDs: 209
+NumCloseIDs: 207
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.

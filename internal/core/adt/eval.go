@@ -284,12 +284,12 @@ type nodeContext struct {
 	// TODO: also use this to communicate increasingly more concrete values.
 	notify []receiver
 
-	// sharedIDs contains all the CloseInfos that are involved in a shared node.
-	// There can be more than one if the same Vertex is shared multiple times.
-	// It is important to keep track of each instance as we need to insert each
-	// of them separately in case a Vertex is "unshared" to ensure that
+	// shared holds the conjuncts a shared node did not schedule. There can be
+	// more than one if the same Vertex is shared multiple times. It is
+	// important to keep track of each instance as we need to insert each of
+	// them separately in case a Vertex is "unshared" to ensure that
 	// closedness information is correctly computed in such cases.
-	sharedIDs []CloseInfo
+	shared []sharedConjunct
 
 	cyclicConjuncts []cyclicConjunct
 
@@ -387,10 +387,9 @@ type nodeContextState struct {
 
 	isShared         bool       // set if we are currently structure sharing
 	noSharing        bool       // set if structure sharing is not allowed
-	shared           Conjunct   // the original conjunct that led to sharing
 	shareCycleType   CyclicType // keeps track of the cycle type of shared nodes
 	origBaseValue    BaseValue  // the BaseValue that structure sharing replaces
-	shareDecremented bool       // counters of sharedIDs have been decremented
+	shareDecremented bool       // the counters of n.shared have been decremented
 
 	depth           int32
 	defaultMode     defaultMode    // cumulative default mode
@@ -507,7 +506,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			arcMap:            reuse(n.arcMap),
 			cyclicConjuncts:   reuse(n.cyclicConjuncts),
 			notify:            reuse(n.notify),
-			sharedIDs:         reuse(n.sharedIDs),
+			shared:            reuse(n.shared),
 			checks:            reuse(n.checks),
 			postChecks:        reuse(n.postChecks),
 			funcDefaultChecks: reuse(n.funcDefaultChecks),

@@ -21,10 +21,10 @@ fanin: {
 		b3: {cmd: "x", deps: [a2, b2]}
 		a4: {cmd: "x", deps: [a3, b3]}
 		b4: {cmd: "x", deps: [a3, b3]}
-		a5: {cmd: "x", deps: [a4, b4]} @test(shareID:todo=faninA5)
+		a5: {cmd: "x", deps: [a4, b4]} @test(shareID=faninA5)
 		b5: {cmd: "x", deps: [a4, b4]}
-		a6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=faninA5, at=deps[0])
-		b6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=faninA5, at=deps[0])
+		a6: {cmd: "x", deps: [a5, b5]} @test(shareID=faninA5, at=deps[0])
+		b6: {cmd: "x", deps: [a5, b5]} @test(shareID=faninA5, at=deps[0])
 	}
 }
 faninLeaf: fanin.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cmd @test(eq, "x")
@@ -35,9 +35,9 @@ forward: {
 	#T: {cmd: string, deps?: [...#T]}
 	tasks: [string]: #T
 	tasks: {
-		a6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=forwardA5, at=deps[0])
-		b6: {cmd: "x", deps: [a5, b5]} @test(shareID:todo=forwardA5, at=deps[0])
-		a5: {cmd: "x", deps: [a4, b4]} @test(shareID:todo=forwardA5)
+		a6: {cmd: "x", deps: [a5, b5]} @test(shareID=forwardA5, at=deps[0])
+		b6: {cmd: "x", deps: [a5, b5]} @test(shareID=forwardA5, at=deps[0])
+		a5: {cmd: "x", deps: [a4, b4]} @test(shareID=forwardA5)
 		b5: {cmd: "x", deps: [a4, b4]}
 		a4: {cmd: "x", deps: [a3, b3]}
 		b4: {cmd: "x", deps: [a3, b3]}
@@ -58,9 +58,9 @@ forwardLeaf: forward.tasks.a6.deps[1].deps[0].deps[1].deps[0].deps[1].deps[0].cm
 explicit: {
 	#T: {cmd: string, deps?: [...#T]}
 	tasks: {
-		a6: #T & {cmd: "x", deps: [a5, b5]} @test(shareID:todo=explicitA5, at=deps[0])
-		b6: #T & {cmd: "x", deps: [a5, b5]} @test(shareID:todo=explicitA5, at=deps[0])
-		a5: #T & {cmd: "x", deps: [a4, b4]} @test(shareID:todo=explicitA5)
+		a6: #T & {cmd: "x", deps: [a5, b5]} @test(shareID=explicitA5, at=deps[0])
+		b6: #T & {cmd: "x", deps: [a5, b5]} @test(shareID=explicitA5, at=deps[0])
+		a5: #T & {cmd: "x", deps: [a4, b4]} @test(shareID=explicitA5)
 		b5: #T & {cmd: "x", deps: [a4, b4]}
 		a4: #T & {cmd: "x", deps: [a3, b3]}
 		b4: #T & {cmd: "x", deps: [a3, b3]}
@@ -91,8 +91,8 @@ embedded: {
 		n2: {cmd: "x", deps: [n1]}
 		n3: {cmd: "x", deps: [n2]}
 		n4: {cmd: "x", deps: [n3]}
-		n5: {cmd: "x", deps: [n4]} @test(shareID:todo=embeddedN5)
-		n6: {cmd: "x", deps: [n5]} @test(shareID:todo=embeddedN5, at=deps[0])
+		n5: {cmd: "x", deps: [n4]} @test(shareID=embeddedN5)
+		n6: {cmd: "x", deps: [n5]} @test(shareID=embeddedN5, at=deps[0])
 	}
 }
 embeddedLeaf: embedded.tasks.n6.deps[0].deps[0].deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
@@ -164,19 +164,19 @@ union: {
 }
 unionLeaf: union.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
 -- out/eval/stats --
-Leaks:  12570
-Freed:  103425
-Reused: 103291
-Allocs: 12704
+Leaks:  11496
+Freed:  97383
+Reused: 97249
+Allocs: 11630
 Retain: 0
 
-Unifications: 25984
-Conjuncts:    110860
-Disjuncts:    35981
+Unifications: 20788
+Conjuncts:    94870
+Disjuncts:    35501
 
-NumCloseIDs: 12143
+NumCloseIDs: 8783
 
-ConjunctInfos:       47460
+ConjunctInfos:       37476
 MaxConjunctInfos:    5
 MaxReqSets:          19
 MaxRedirect:         6

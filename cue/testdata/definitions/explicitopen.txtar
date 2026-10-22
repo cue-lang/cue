@@ -224,7 +224,18 @@ issue4150: {
 	// erroneous, depending on the value foo is set to.
 	z: 1... @test(eq, 1)
 }
+
+// A definition re-closes a reference opened with `...`, even when the
+// referenced value is itself an instance of that definition and is shared.
+reclose: {
+	#D: a: int
+	x: #D & {a: 1}
+	y: x... & #D @test(eq, {a: 1})
+	t1: err: y & {b: 2} @test(err, code=eval, contains="field not allowed")
+}
 -- out/errors.txt --
+[eval] reclose.t1.err.b: field not allowed:
+    ./issues.cue:36:16
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:
@@ -297,13 +308,13 @@ f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
 Leaks:  0
-Freed:  424
-Reused: 343
-Allocs: 81
+Freed:  435
+Reused: 353
+Allocs: 82
 Retain: 0
 
-Unifications: 424
-Conjuncts:    1139
+Unifications: 435
+Conjuncts:    1167
 Disjuncts:    0
 
-NumCloseIDs: 488
+NumCloseIDs: 498

@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"syscall"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -197,7 +198,8 @@ func (c *cmdRemoveAll) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	if _, err := os.Lstat(path); err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
+		// A path below a file does not exist either, but fails with ENOTDIR.
+		if errors.Is(err, fs.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
 			return map[string]interface{}{"success": false}, nil
 		}
 		return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to remove path")

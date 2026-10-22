@@ -21,7 +21,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
-	"syscall"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -280,16 +279,12 @@ func TestRemoveAll(t *testing.T) {
 	})
 
 	// A path below a file does not exist either.
-	// It wrongly fails, as the stat reports ENOTDIR.
 	t.Run("belowFile", func(t *testing.T) {
-		if runtime.GOOS == "windows" {
-			t.Skip("Windows reports a path below a file as not found")
-		}
 		file := filepath.Join(t.TempDir(), "file")
 		qt.Assert(t, qt.IsNil(os.WriteFile(file, nil, 0o666)))
 		got, err := run(t, filepath.Join(file, "child"))
-		qt.Assert(t, qt.ErrorIs(err, syscall.ENOTDIR))
-		qt.Assert(t, qt.IsNil(got))
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.DeepEquals(got, any(map[string]interface{}{"success": false})))
 	})
 
 	t.Run("existing", func(t *testing.T) {

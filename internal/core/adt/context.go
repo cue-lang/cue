@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"unicode/utf8"
 
@@ -1382,7 +1383,9 @@ func (c *OpContext) bytesValue(v Value, as interface{}) []byte {
 	return x.B
 }
 
-var matchNone = regexp.MustCompile("^$")
+var matchNone = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile("^$")
+})
 
 // regexpCache caches compiled regular expressions by pattern string.
 // Uses weak references so unused patterns can be garbage collected.
@@ -1396,7 +1399,7 @@ var regexpCache = newMemoizer(func(pattern string) (*regexp.Regexp, error) {
 func (c *OpContext) regexp(v Value) *regexp.Regexp {
 	v = Unwrap(v)
 	if isError(v) {
-		return matchNone
+		return matchNone()
 	}
 	var pattern string
 	switch x := v.(type) {
@@ -1406,12 +1409,12 @@ func (c *OpContext) regexp(v Value) *regexp.Regexp {
 		pattern = string(x.B)
 	default:
 		c.typeError(v, StringKind|BytesKind)
-		return matchNone
+		return matchNone()
 	}
 	re, err := regexpCache.get(pattern)
 	if err != nil {
 		c.AddErrf("invalid regexp: %s", err)
-		return matchNone
+		return matchNone()
 	}
 	return re
 }

@@ -16,6 +16,7 @@ package openapi
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -93,6 +94,7 @@ func simplify(b *builder, t *ast.StructLit) {
 }
 
 func simplifyNumber(t *ast.StructLit, format string) string {
+	minMap, maxMap := formatBounds()
 	fields := t.Elts
 	k := 0
 	for i, d := range fields {
@@ -140,17 +142,21 @@ func mustDecimal(s string) *apd.Decimal {
 	return d
 }
 
-var (
-	minMap = map[string]*apd.Decimal{
+// formatBounds returns the minimum and maximum values implied by each
+// numeric format. They are built on first use, as parsing them is costly
+// at init time.
+var formatBounds = sync.OnceValues(func() (mins, maxs map[string]*apd.Decimal) {
+	mins = map[string]*apd.Decimal{
 		"int32":  mustDecimal("-2147483648"),
 		"int64":  mustDecimal("-9223372036854775808"),
 		"float":  mustDecimal("-3.40282346638528859811704183484516925440e+38"),
 		"double": mustDecimal("-1.797693134862315708145274237317043567981e+308"),
 	}
-	maxMap = map[string]*apd.Decimal{
+	maxs = map[string]*apd.Decimal{
 		"int32":  mustDecimal("2147483647"),
 		"int64":  mustDecimal("9223372036854775807"),
 		"float":  mustDecimal("+3.40282346638528859811704183484516925440e+38"),
 		"double": mustDecimal("+1.797693134862315708145274237317043567981e+308"),
 	}
-)
+	return mins, maxs
+})

@@ -15,6 +15,8 @@
 package literal
 
 import (
+	"sync"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"github.com/cockroachdb/apd/v3"
@@ -75,7 +77,7 @@ func (p *NumInfo) decimal(v *apd.Decimal) error {
 		if p.mul != 0 {
 			// apd.BaseContext has no precision, so it never rounds: a literal
 			// keeps every digit however wide it is, as the spec requires.
-			_, _ = apd.BaseContext.Mul(v, v, mulToRat[p.mul])
+			_, _ = apd.BaseContext.Mul(v, v, mulToRat()[p.mul])
 			cond, _ := apd.BaseContext.RoundToIntegralExact(v, v)
 			if cond.Inexact() {
 				return p.errorf("number cannot be represented as int")
@@ -362,9 +364,10 @@ var charToMul = map[byte]Multiplier{
 	'Y': mul8,
 }
 
-var mulToRat = map[Multiplier]*apd.Decimal{}
-
-func init() {
+// mulToRat returns the value of each multiplier.
+// It is built on first use, as building it is costly at init time.
+var mulToRat = sync.OnceValue(func() map[Multiplier]*apd.Decimal {
+	m := map[Multiplier]*apd.Decimal{}
 	d := apd.New(1, 0)
 	b := apd.New(1, 0)
 	dm := apd.New(1000, 0)
@@ -378,7 +381,8 @@ func init() {
 		d = &dn
 		_, _ = c.Mul(&bn, b, bm)
 		b = &bn
-		mulToRat[mulDec|i] = d
-		mulToRat[mulBin|i] = b
+		m[mulDec|i] = d
+		m[mulBin|i] = b
 	}
-}
+	return m
+})

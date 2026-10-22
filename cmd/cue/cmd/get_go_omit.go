@@ -23,6 +23,7 @@ import (
 	"path"
 	"slices"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -31,16 +32,16 @@ import (
 
 // encodingMethods lists the methods which get go considers
 // when deciding whether a type encodes itself.
-var encodingMethods = func() []string {
+var encodingMethods = sync.OnceValue(func() []string {
 	var names []string
-	for _, iface := range slices.Concat(toTop, toString) {
+	for _, iface := range slices.Concat(toTop(), toString()) {
 		names = append(names, iface.Method(0).Name())
 	}
 	for _, m := range jsontextMethods {
 		names = append(names, m.name)
 	}
 	return names
-}()
+})
 
 // omitSelector is a selector given to the --omit flag of get go.
 type omitSelector struct {
@@ -129,13 +130,13 @@ func (r *omitReading) init(elems []string) error {
 	}
 	r.name = elems[0]
 	if len(elems) == 2 {
-		for _, name := range encodingMethods {
+		for _, name := range encodingMethods() {
 			if ok, _ := path.Match(elems[1], name); ok {
 				r.methods = append(r.methods, name)
 			}
 		}
 		if len(r.methods) == 0 {
-			return fmt.Errorf("method %q must match one of %s", elems[1], strings.Join(encodingMethods, ", "))
+			return fmt.Errorf("method %q must match one of %s", elems[1], strings.Join(encodingMethods(), ", "))
 		}
 	}
 	return nil
@@ -372,7 +373,7 @@ func (e *extractor) omitMethods(typ types.Type, names []string) bool {
 // hasEncodingMethod reports whether typ or *typ has the encoding method name,
 // with the signature that get go looks for, regardless of any omissions.
 func hasEncodingMethod(typ types.Type, name string) bool {
-	for _, iface := range slices.Concat(toTop, toString) {
+	for _, iface := range slices.Concat(toTop(), toString()) {
 		if iface.Method(0).Name() == name {
 			return implementsEither(typ, iface)
 		}

@@ -14,7 +14,11 @@
 
 package adt
 
-import "github.com/cockroachdb/apd/v3"
+import (
+	"sync"
+
+	"github.com/cockroachdb/apd/v3"
+)
 
 type builtinRange struct {
 	name   string
@@ -29,33 +33,38 @@ func mustDec(s string) *apd.Decimal {
 	return d
 }
 
-var intBuiltinRanges = []builtinRange{
-	{"int8", mustDec("-128"), mustDec("127")},
-	{"int16", mustDec("-32768"), mustDec("32767")},
-	{"int32", mustDec("-2147483648"), mustDec("2147483647")},
-	{"int64", mustDec("-9223372036854775808"), mustDec("9223372036854775807")},
-	{"int128",
-		mustDec("-170141183460469231731687303715884105728"),
-		mustDec("170141183460469231731687303715884105727")},
+// builtinRanges returns the bounds of the sized numeric types.
+// They are built on first use, as parsing them is costly at init time.
+var builtinRanges = sync.OnceValues(func() (ints, floats []builtinRange) {
+	ints = []builtinRange{
+		{"int8", mustDec("-128"), mustDec("127")},
+		{"int16", mustDec("-32768"), mustDec("32767")},
+		{"int32", mustDec("-2147483648"), mustDec("2147483647")},
+		{"int64", mustDec("-9223372036854775808"), mustDec("9223372036854775807")},
+		{"int128",
+			mustDec("-170141183460469231731687303715884105728"),
+			mustDec("170141183460469231731687303715884105727")},
 
-	{"uint8", mustDec("0"), mustDec("255")},
-	{"uint16", mustDec("0"), mustDec("65535")},
-	{"uint32", mustDec("0"), mustDec("4294967295")},
-	{"uint64", mustDec("0"), mustDec("18446744073709551615")},
-	{"uint128", mustDec("0"), mustDec("340282366920938463463374607431768211455")},
-}
+		{"uint8", mustDec("0"), mustDec("255")},
+		{"uint16", mustDec("0"), mustDec("65535")},
+		{"uint32", mustDec("0"), mustDec("4294967295")},
+		{"uint64", mustDec("0"), mustDec("18446744073709551615")},
+		{"uint128", mustDec("0"), mustDec("340282366920938463463374607431768211455")},
+	}
 
-var floatBuiltinRanges = []builtinRange{
-	// 2**127 * (2**24 - 1) / 2**23
-	{"float32",
-		mustDec("-3.40282346638528859811704183484516925440e+38"),
-		mustDec("3.40282346638528859811704183484516925440e+38")},
+	floats = []builtinRange{
+		// 2**127 * (2**24 - 1) / 2**23
+		{"float32",
+			mustDec("-3.40282346638528859811704183484516925440e+38"),
+			mustDec("3.40282346638528859811704183484516925440e+38")},
 
-	// 2**1023 * (2**53 - 1) / 2**52
-	{"float64",
-		mustDec("-1.797693134862315708145274237317043567981e+308"),
-		mustDec("1.797693134862315708145274237317043567981e+308")},
-}
+		// 2**1023 * (2**53 - 1) / 2**52
+		{"float64",
+			mustDec("-1.797693134862315708145274237317043567981e+308"),
+			mustDec("1.797693134862315708145274237317043567981e+308")},
+	}
+	return ints, floats
+})
 
 // MatchBuiltinRange reports the predeclared identifier name (e.g. "int16",
 // "uint8", "float32", "uint") that a Conjunction precisely represents, or the
@@ -110,9 +119,10 @@ func MatchBuiltinRange(c *Conjunction) string {
 	if lo == nil || hi == nil {
 		return ""
 	}
-	ranges := floatBuiltinRanges
+	ints, floats := builtinRanges()
+	ranges := floats
 	if hasInt {
-		ranges = intBuiltinRanges
+		ranges = ints
 	}
 	for _, r := range ranges {
 		if lo.X.Cmp(r.lo) == 0 && hi.X.Cmp(r.hi) == 0 {

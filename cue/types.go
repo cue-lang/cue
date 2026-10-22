@@ -23,6 +23,7 @@ import (
 	"math/big"
 	"slices"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v3"
@@ -491,14 +492,18 @@ func (v Value) Uint64() (uint64, error) {
 	return i, nil
 }
 
+// The bounds of float64 used by [Value.Float64].
+// They are built on first use, as parsing them is costly at init time.
 var (
+	float64BoundsOnce sync.Once
+
 	smallestPosFloat64 *apd.Decimal
 	smallestNegFloat64 *apd.Decimal
 	maxPosFloat64      *apd.Decimal
 	maxNegFloat64      *apd.Decimal
 )
 
-func init() {
+func initFloat64Bounds() {
 	const (
 		// math.SmallestNonzeroFloat64: 1 / 2**(1023 - 1 + 52)
 		smallest = "4.940656458412465441765687928682213723651e-324"
@@ -558,6 +563,7 @@ func (v Value) Float64() (float64, error) {
 	if n.X.IsZero() {
 		return 0.0, nil
 	}
+	float64BoundsOnce.Do(initFloat64Bounds)
 	if n.X.Negative {
 		if n.X.Cmp(smallestNegFloat64) == 1 {
 			return math.Copysign(0, -1), ErrAbove

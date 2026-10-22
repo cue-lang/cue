@@ -17,6 +17,7 @@ package compile
 import (
 	"strconv"
 	"strings"
+	"sync"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -104,7 +105,7 @@ func predeclared(n *ast.Ident) adt.Expr {
 // representing a range, such as uint8, int128, and float64, or nil if there
 // is none. Like other predeclared identifiers, a range may carry a "__" prefix.
 func LookupRange(name string) adt.Expr {
-	return predefinedRanges[strings.TrimPrefix(name, "__")]
+	return predefinedRanges()[strings.TrimPrefix(name, "__")]
 }
 
 // Predeclared returns the adt expression for a predeclared identifier
@@ -115,36 +116,40 @@ func Predeclared(name string) adt.Expr {
 	return predeclared(&ast.Ident{Name: name})
 }
 
-var predefinedRanges = map[string]adt.Expr{
-	"rune":  mkIntRange("0", strconv.Itoa(0x10FFFF)),
-	"int8":  mkIntRange("-128", "127"),
-	"int16": mkIntRange("-32768", "32767"),
-	"int32": mkIntRange("-2147483648", "2147483647"),
-	"int64": mkIntRange("-9223372036854775808", "9223372036854775807"),
-	"int128": mkIntRange(
-		"-170141183460469231731687303715884105728",
-		"170141183460469231731687303715884105727"),
+// predefinedRanges returns the expressions for the predeclared range types.
+// They are built on first use, as building them is costly at init time.
+var predefinedRanges = sync.OnceValue(func() map[string]adt.Expr {
+	return map[string]adt.Expr{
+		"rune":  mkIntRange("0", strconv.Itoa(0x10FFFF)),
+		"int8":  mkIntRange("-128", "127"),
+		"int16": mkIntRange("-32768", "32767"),
+		"int32": mkIntRange("-2147483648", "2147483647"),
+		"int64": mkIntRange("-9223372036854775808", "9223372036854775807"),
+		"int128": mkIntRange(
+			"-170141183460469231731687303715884105728",
+			"170141183460469231731687303715884105727"),
 
-	// Do not include an alias for "byte", as it would be too easily confused
-	// with the builtin "bytes".
-	"uint":    mkUint(),
-	"uint8":   mkIntRange("0", "255"),
-	"uint16":  mkIntRange("0", "65535"),
-	"uint32":  mkIntRange("0", "4294967295"),
-	"uint64":  mkIntRange("0", "18446744073709551615"),
-	"uint128": mkIntRange("0", "340282366920938463463374607431768211455"),
+		// Do not include an alias for "byte", as it would be too easily confused
+		// with the builtin "bytes".
+		"uint":    mkUint(),
+		"uint8":   mkIntRange("0", "255"),
+		"uint16":  mkIntRange("0", "65535"),
+		"uint32":  mkIntRange("0", "4294967295"),
+		"uint64":  mkIntRange("0", "18446744073709551615"),
+		"uint128": mkIntRange("0", "340282366920938463463374607431768211455"),
 
-	// 2**127 * (2**24 - 1) / 2**23
-	"float32": mkFloatRange(
-		"-3.40282346638528859811704183484516925440e+38",
-		"3.40282346638528859811704183484516925440e+38",
-	),
-	// 2**1023 * (2**53 - 1) / 2**52
-	"float64": mkFloatRange(
-		"-1.797693134862315708145274237317043567981e+308",
-		"1.797693134862315708145274237317043567981e+308",
-	),
-}
+		// 2**127 * (2**24 - 1) / 2**23
+		"float32": mkFloatRange(
+			"-3.40282346638528859811704183484516925440e+38",
+			"3.40282346638528859811704183484516925440e+38",
+		),
+		// 2**1023 * (2**53 - 1) / 2**52
+		"float64": mkFloatRange(
+			"-1.797693134862315708145274237317043567981e+308",
+			"1.797693134862315708145274237317043567981e+308",
+		),
+	}
+})
 
 // TODO: use an adt.BoundValue here. and conjunctions here.
 

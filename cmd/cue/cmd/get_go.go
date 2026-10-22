@@ -33,6 +33,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -512,41 +513,45 @@ func typeSignature(params, results []types.Type) *types.Signature {
 // the logs like "interface{MarshalJSON() ([]uint8, error)}" rather than
 // encoding/json.Marshaler. We could construct named types if need be.
 
-var toTop = []*types.Interface{
-	// json.Marshaler: interface { MarshalJSON() ([]byte, error) }
-	types.NewInterfaceType([]*types.Func{
-		typeMethod("MarshalJSON", nil, []types.Type{typeBytes, typeError}),
-	}, nil).Complete(),
+var toTop = sync.OnceValue(func() []*types.Interface {
+	return []*types.Interface{
+		// json.Marshaler: interface { MarshalJSON() ([]byte, error) }
+		types.NewInterfaceType([]*types.Func{
+			typeMethod("MarshalJSON", nil, []types.Type{typeBytes, typeError}),
+		}, nil).Complete(),
 
-	// json.Unmarshaler: interface { UnmarshalJSON([]byte) error }
-	types.NewInterfaceType([]*types.Func{
-		typeMethod("UnmarshalJSON", []types.Type{typeBytes}, []types.Type{typeError}),
-	}, nil).Complete(),
+		// json.Unmarshaler: interface { UnmarshalJSON([]byte) error }
+		types.NewInterfaceType([]*types.Func{
+			typeMethod("UnmarshalJSON", []types.Type{typeBytes}, []types.Type{typeError}),
+		}, nil).Complete(),
 
-	// yaml.Marshaler: interface { MarshalYAML() (any, error) }
-	types.NewInterfaceType([]*types.Func{
-		typeMethod("MarshalYAML", nil, []types.Type{typeAny, typeError}),
-	}, nil).Complete(),
+		// yaml.Marshaler: interface { MarshalYAML() (any, error) }
+		types.NewInterfaceType([]*types.Func{
+			typeMethod("MarshalYAML", nil, []types.Type{typeAny, typeError}),
+		}, nil).Complete(),
 
-	// yaml.Unmarshaler: interface { UnmarshalYAML(func(any) error) error }
-	types.NewInterfaceType([]*types.Func{
-		typeMethod("UnmarshalYAML", []types.Type{
-			typeSignature([]types.Type{typeAny}, []types.Type{typeError}),
-		}, []types.Type{typeError}),
-	}, nil).Complete(),
-}
+		// yaml.Unmarshaler: interface { UnmarshalYAML(func(any) error) error }
+		types.NewInterfaceType([]*types.Func{
+			typeMethod("UnmarshalYAML", []types.Type{
+				typeSignature([]types.Type{typeAny}, []types.Type{typeError}),
+			}, []types.Type{typeError}),
+		}, nil).Complete(),
+	}
+})
 
-var toString = []*types.Interface{
-	// encoding.TextMarshaler: interface { MarshalText() ([]byte, error) }
-	types.NewInterfaceType([]*types.Func{
-		typeMethod("MarshalText", nil, []types.Type{typeBytes, typeError}),
-	}, nil).Complete(),
+var toString = sync.OnceValue(func() []*types.Interface {
+	return []*types.Interface{
+		// encoding.TextMarshaler: interface { MarshalText() ([]byte, error) }
+		types.NewInterfaceType([]*types.Func{
+			typeMethod("MarshalText", nil, []types.Type{typeBytes, typeError}),
+		}, nil).Complete(),
 
-	// encoding.TextUnmarshaler: interface { UnmarshalText([]byte) error }
-	types.NewInterfaceType([]*types.Func{
-		typeMethod("UnmarshalText", []types.Type{typeBytes}, []types.Type{typeError}),
-	}, nil).Complete(),
-}
+		// encoding.TextUnmarshaler: interface { UnmarshalText([]byte) error }
+		types.NewInterfaceType([]*types.Func{
+			typeMethod("UnmarshalText", []types.Type{typeBytes}, []types.Type{typeError}),
+		}, nil).Complete(),
+	}
+})
 
 // TODO:
 // - consider not including types with any dropped fields.
@@ -1188,7 +1193,7 @@ func (e *extractor) ownEncoding(typ types.Type) ownEncoding {
 }
 
 func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
-	for _, iface := range toTop {
+	for _, iface := range toTop() {
 		if e.implements(typ, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to _", t, iface)
@@ -1199,7 +1204,7 @@ func (e *extractor) findOwnEncoding(typ types.Type) ownEncoding {
 		e.logf("    %v has method %s; setting type to _", shortTypeName(typ), name)
 		return encodesAsTop
 	}
-	for _, iface := range toString {
+	for _, iface := range toString() {
 		if e.implements(typ, iface) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to string", t, iface)
@@ -1456,7 +1461,7 @@ func (e *extractor) supportedMapKey(t types.Type) bool {
 	if i, ok := t.Underlying().(*types.Interface); ok && i.Empty() {
 		return true
 	}
-	for _, iface := range toString {
+	for _, iface := range toString() {
 		if e.implements(t, iface) {
 			return true
 		}

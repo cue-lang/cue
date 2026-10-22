@@ -16,8 +16,6 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode"
-
-	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 )
 
 // A DocumentURI is the URI of a client editor document.
@@ -123,7 +121,7 @@ func (uri DocumentURI) Dir() DocumentURI {
 // Encloses reports whether uri's path, considered as a sequence of segments,
 // is a prefix of file's path.
 func (uri DocumentURI) Encloses(file DocumentURI) bool {
-	return pathutil.InDir(uri.FilePath(), file.FilePath())
+	return InDir(uri.FilePath(), file.FilePath())
 }
 
 func filename(uri DocumentURI) (string, error) {

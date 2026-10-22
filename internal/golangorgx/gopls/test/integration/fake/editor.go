@@ -21,7 +21,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake/glob"
-	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2/servertest"
 )
@@ -1266,7 +1265,7 @@ func (e *Editor) renameBuffers(oldPath, newPath string) (closed []protocol.TextD
 
 	for path := range e.buffers {
 		abs := e.sandbox.Workdir.AbsPath(path)
-		if oldAbs == abs || pathutil.InDir(oldAbs, abs) {
+		if protocol.InDir(oldAbs, abs) {
 			rel, err := filepath.Rel(oldAbs, abs)
 			if err != nil {
 				return nil, nil, fmt.Errorf("filepath.Rel(%q, %q): %v", oldAbs, abs, err)

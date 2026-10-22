@@ -723,17 +723,15 @@ func TestError(t *testing.T) {
 		value: `v: string`,
 		err:   "",
 	}, {
-		// v shares the structure of x, and Err does not see the shared
-		// error yet.
+		// v shares the structure of x; its error is x's.
 		value: `v: x, x: 1 & 2`,
-		err:   "",
+		err:   "conflicting values 2 and 1",
 	}, {
 		value: `v: x, x: {a: 1 & 2}`,
-		err:   "",
+		err:   "a: conflicting values 2 and 1",
 	}}
-	// Only the cases referring to another field depend on structure sharing.
 	for _, tc := range testCases {
-		cuetdtest.SmallMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			err := getValue(m, tc.value).Lookup("v").Err()
 			checkErr(t, err, tc.err, "Err")
 		})
@@ -2276,14 +2274,12 @@ func TestLen(t *testing.T) {
 		input:  "3",
 		length: "_|_ // len not supported for type int",
 	}, {
-		// a shares the structure of b, and Len does not see the shared
-		// string yet.
+		// a shares the structure of b.
 		input:  "b\nb: \"foo\"",
-		length: "_|_ // len not supported for type string",
+		length: "3",
 	}}
-	// Only the case referring to another field depends on structure sharing.
 	for _, tc := range testCases {
-		cuetdtest.SmallMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
 			v := getValue(m, "a: "+tc.input).Lookup("a")
 
 			length := v.Len()

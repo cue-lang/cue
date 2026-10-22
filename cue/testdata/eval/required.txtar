@@ -109,7 +109,7 @@ issue3918: {
 			out: in @test(err, code=incomplete, contains="required field missing: %s", args=[in], pos=[0:9])
 		}
 		_foo: #disjuncts & {} @test(err, at=out, code=incomplete, contains="required field missing: %s", args=[in], pos=[-2:9])
-		x: _foo.out @test(err, code=incomplete, path=_foo.out, contains="required field missing: %s", args=[in], pos=[-3:9])
+		x: _foo.out @test(err, code=incomplete, path=issue3918.noFunction._foo.out, contains="required field missing: %s", args=[in], pos=[-3:9])
 		@test(eq, {
 			#disjuncts: {
 				in!: []

@@ -21,10 +21,9 @@ cmp stdout expect/issue999/stdout
 exec cue eval -e _out issue4202/x.cue
 cmp stdout expect/issue4202/stdout
 
-# An expression sharing the structure of an erroring value must fail
-# like the value itself. It succeeds for now, printing the error as a
-# bottom, as Value.Err does not see through structure sharing.
-exec cue eval -e y shared/x.cue
+# An expression sharing the structure of an erroring value fails like
+# the value itself, reporting the error at the shared value.
+! exec cue eval -e y shared/x.cue
 cmp stdout expect/shared/stdout
 cmp stderr expect/shared/stderr
 
@@ -109,5 +108,8 @@ let K = {#x: string}
 x: #D & {a: "bad"}
 y: x
 -- expect/shared/stdout --
-_|_ // x.a: conflicting values "bad" and int (mismatched types string and int)
 -- expect/shared/stderr --
+x.a: conflicting values "bad" and int (mismatched types string and int):
+    ./shared/x.cue:1:9
+    ./shared/x.cue:2:4
+    ./shared/x.cue:2:13

@@ -479,8 +479,7 @@ func (v Value) eval(ctx *adt.OpContext) adt.Value {
 	if v.v == nil {
 		panic("undefined value")
 	}
-	x := manifest(ctx, v.v)
-	return x.Value()
+	return manifest(ctx, v.v).DerefValue().Value()
 }
 
 // TODO: change from Vertex to Vertex.

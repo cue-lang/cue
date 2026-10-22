@@ -993,8 +993,8 @@ Reused: 644
 Allocs: 166
 Retain: 0
 
-Unifications: 543
-Conjuncts:    992
+Unifications: 541
+Conjuncts:    990
 Disjuncts:    149
 
 NumCloseIDs: 105

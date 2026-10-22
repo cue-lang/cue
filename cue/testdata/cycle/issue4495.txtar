@@ -326,14 +326,14 @@ out.items.items: structural cycle:
     ./review.cue:41:45
     ./review.cue:41:33
 -- out/eval/stats --
-Leaks:  183
-Freed:  850
-Reused: 811
-Allocs: 222
+Leaks:  182
+Freed:  769
+Reused: 730
+Allocs: 221
 Retain: 0
 
-Unifications: 653
-Conjuncts:    1513
-Disjuncts:    105
+Unifications: 592
+Conjuncts:    1383
+Disjuncts:    87
 
-NumCloseIDs: 396
+NumCloseIDs: 369

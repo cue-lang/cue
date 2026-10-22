@@ -18,14 +18,14 @@ t: {a: 0, out: 1} | {
 
 out: (t & {a: 0}).out @test(eq, 1)
 -- out/eval/stats --
-Leaks:  12
-Freed:  55
-Reused: 39
-Allocs: 28
+Leaks:  8
+Freed:  25
+Reused: 16
+Allocs: 17
 Retain: 0
 
-Unifications: 38
-Conjuncts:    76
-Disjuncts:    12
+Unifications: 18
+Conjuncts:    32
+Disjuncts:    6
 
-NumCloseIDs: 10
+NumCloseIDs: 4

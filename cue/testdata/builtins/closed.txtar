@@ -259,11 +259,11 @@ Reused: 511
 Allocs: 55
 Retain: 0
 
-Unifications: 352
-Conjuncts:    639
+Unifications: 351
+Conjuncts:    636
 Disjuncts:    76
 
-NumCloseIDs: 140
+NumCloseIDs: 139
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7

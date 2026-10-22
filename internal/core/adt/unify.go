@@ -718,6 +718,16 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 			success = false
 		}
 
+		// A failing field eliminates the disjunct this node is part of;
+		// its remaining arcs cannot change that, so skip their work.
+		// TODO: leave the skipped arcs out of the error message, which now
+		// prints them as cycle errors.
+		if n.isDisjunct && a.faultsParent() {
+			if b := a.Bottom(); b != nil && !b.IsIncomplete() {
+				break
+			}
+		}
+
 		// At this point we need to ensure that all notification cycles
 		// for Arc a have been processed.
 
@@ -763,9 +773,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 	}
 
 	for _, a := range n.node.Arcs {
-		// Errors are allowed in let fields. Handle errors and failure to
-		// complete accordingly.
-		if !a.Label.IsLet() && a.ArcType <= ArcRequired {
+		if a.faultsParent() {
 			if err := a.Bottom(); err != nil {
 				n.AddChildError(err)
 			}

@@ -776,7 +776,7 @@ func (n *nodeContext) getErrorAll() *Bottom {
 		return err
 	}
 	for _, a := range n.node.Arcs {
-		if a.ArcType > ArcRequired || a.Label.IsLet() {
+		if !a.faultsParent() {
 			return nil
 		}
 		n := a.getState(n.ctx)

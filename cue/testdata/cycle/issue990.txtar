@@ -189,18 +189,18 @@ out: #sub & {#p: _test.s1}
 })
 -- out/eval/stats --
 Leaks:  163
-Freed:  540
-Reused: 510
+Freed:  351
+Reused: 321
 Allocs: 193
 Retain: 0
 
-Unifications: 274
-Conjuncts:    1118
-Disjuncts:    86
+Unifications: 215
+Conjuncts:    783
+Disjuncts:    58
 
-NumCloseIDs: 304
+NumCloseIDs: 199
 
-ConjunctInfos:       790
+ConjunctInfos:       541
 MaxConjunctInfos:    5
-MaxReqSets:          17
+MaxReqSets:          15
 MaxRedirect:         4

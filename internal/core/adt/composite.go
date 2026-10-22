@@ -390,6 +390,13 @@ func (v *Vertex) IsConstraint() bool {
 	return v.ArcType == ArcOptional || v.ArcType == ArcRequired
 }
 
+// faultsParent reports whether an error in v is an error of its parent, which
+// holds for regular and required fields. Errors are allowed in let fields, and
+// an optional, pending, or absent arc is not part of the parent's value.
+func (v *Vertex) faultsParent() bool {
+	return !v.Label.IsLet() && v.ArcType <= ArcRequired
+}
+
 // IsDefined indicates whether this arc is defined meaning it is not a
 // required or optional constraint and not a "void" arc.
 // It will evaluate the arc, and thus evaluate any comprehension, to make this

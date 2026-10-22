@@ -165,19 +165,19 @@ union: {
 }
 unionLeaf: union.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
 -- out/eval/stats --
-Leaks:  6987
-Freed:  75282
-Reused: 75167
-Allocs: 7102
+Leaks:  618
+Freed:  2932
+Reused: 2832
+Allocs: 718
 Retain: 0
 
-Unifications: 16105
-Conjuncts:    70378
-Disjuncts:    22871
+Unifications: 1243
+Conjuncts:    4235
+Disjuncts:    629
 
-NumCloseIDs: 7715
+NumCloseIDs: 829
 
-ConjunctInfos:       31017
+ConjunctInfos:       2679
 MaxConjunctInfos:    5
 MaxReqSets:          19
 MaxRedirect:         6

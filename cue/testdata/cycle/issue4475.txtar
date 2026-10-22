@@ -64,17 +64,17 @@ undeclared: {
 	out: (#T & {t: "r1"}).out
 }
 -- out/eval/stats --
-Leaks:  158
-Freed:  1379
-Reused: 1357
-Allocs: 180
+Leaks:  59
+Freed:  338
+Reused: 309
+Allocs: 88
 Retain: 0
 
-Unifications: 790
-Conjuncts:    1624
-Disjuncts:    255
+Unifications: 153
+Conjuncts:    378
+Disjuncts:    84
 
-NumCloseIDs: 99
+NumCloseIDs: 41
 -- out/evalalpha --
 (struct){
   wrapped: (struct){

@@ -116,7 +116,7 @@ let _globalScope = self
 #manifests: error in call to encoding/yaml.MarshalStream: 4 errors in empty disjunction::
     ./export.cue:18:14
     ./export.cue:16:4
-#manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,let this#4=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#6=_|_(#entries.0.argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_,let this#3=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#2=_|_(#entries.0.argocd.app.apps.this: structural cycle),name:string}:
+#manifests: error in call to encoding/yaml.MarshalStream: <- invalid {namespace:string,let this#4=_|_(#entries.0.argocd.app.apps.this: structural cycle),let this#6=_|_(#entries.0.argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_,let this#3=_|_(cycle error),let this#2=_|_(cycle error),name:_|_(cycle error)}:
     ./export.cue:18:14
     ./in.cue:17:33
     ./in.cue:19:8
@@ -142,7 +142,7 @@ argocd.app.apps.k8s.kind: field not allowed:
 argocd.app.apps.k8s.metadata: field not allowed:
     ./in.cue:6:7
     ./in.cue:13:7
-argocd.app.apps: <- invalid {namespace:string,let this#4=_|_(argocd.app.apps.this: structural cycle),let this#6=_|_(argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_(argocd.app.apps.k8s.apiVersion: field not allowed (and 2 more errors)),let this#3=_|_(argocd.app.apps.this: structural cycle),let this#2=_|_(argocd.app.apps.this: structural cycle),name:string}:
+argocd.app.apps: <- invalid {namespace:string,let this#4=_|_(argocd.app.apps.this: structural cycle),let this#6=_|_(argocd.app.apps.this: structural cycle),revisionHistoryLimit:*3 | int,k8s:_|_(argocd.app.apps.k8s.apiVersion: field not allowed (and 2 more errors)),let this#3=_|_(cycle error),let this#2=_|_(cycle error),name:string}:
     ./in.cue:19:8
     ./in.cue:17:33
     ./in.cue:44:8

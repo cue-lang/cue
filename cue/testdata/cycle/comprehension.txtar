@@ -783,17 +783,17 @@ issue4100: {
 }
 -- out/eval/stats --
 Leaks:  75
-Freed:  789
-Reused: 757
+Freed:  787
+Reused: 755
 Allocs: 107
 Retain: 0
 
-Unifications: 531
-Conjuncts:    1445
+Unifications: 511
+Conjuncts:    1418
 Disjuncts:    135
 Notifications: 14
 
-NumCloseIDs: 311
+NumCloseIDs: 307
 -- out/errors.txt --
 [incomplete] B.a.children: cannot range over v.children (incomplete type list):
     ./in.cue:24:40

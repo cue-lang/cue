@@ -154,13 +154,13 @@ Reused: 1680
 Allocs: 401
 Retain: 0
 
-Unifications: 368
-Conjuncts:    2125
+Unifications: 364
+Conjuncts:    2120
 Disjuncts:    572
 
 NumCloseIDs: 528
 
-ConjunctInfos:       787
+ConjunctInfos:       783
 MaxConjunctInfos:    6
 MaxReqSets:          5
 MaxRedirect:         6

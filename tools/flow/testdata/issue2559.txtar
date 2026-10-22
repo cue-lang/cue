@@ -65,8 +65,8 @@ Reused: 677
 Allocs: 148
 Retain: 0
 
-Unifications: 561
-Conjuncts:    1649
+Unifications: 521
+Conjuncts:    1609
 Disjuncts:    176
 ResolveDep:   123
 
@@ -93,8 +93,8 @@ diff old new
 +Allocs: 148
 +Retain: 0
 +
-+Unifications: 561
-+Conjuncts:    1649
++Unifications: 521
++Conjuncts:    1609
 +Disjuncts:    176
 +ResolveDep:   123
 +
@@ -118,8 +118,8 @@ Reused: 677
 Allocs: 148
 Retain: 0
 
-Unifications: 561
-Conjuncts:    1649
+Unifications: 521
+Conjuncts:    1609
 Disjuncts:    176
 ResolveDep:   123
 
@@ -146,8 +146,8 @@ diff old new
 +Allocs: 148
 +Retain: 0
 +
-+Unifications: 561
-+Conjuncts:    1649
++Unifications: 521
++Conjuncts:    1609
 +Disjuncts:    176
 +ResolveDep:   123
 +

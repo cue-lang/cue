@@ -1,9 +1,13 @@
 -- in.cue --
 e1: int16
 e1: 100_000   @test(err, code=eval, contains="invalid value 100000", pos=[0:5])
+
+e2: rune & "foo" @test(err, code=eval, contains="conflicting values int & >=0 & <=1114111 and", pos=[0:12])
 -- out/errors.txt --
 [eval] e1: invalid value 100000 (out of bound <=32767):
     ./in.cue:2:5
+[eval] e2: conflicting values int & >=0 & <=1114111 and "foo" (mismatched types int and string):
+    ./in.cue:4:12
 -- out/eval/stats --
 Leaks:  0
 Freed:  2

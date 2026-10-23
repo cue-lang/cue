@@ -1,0 +1,251 @@
+Simplified exports print the predeclared numeric types by name.
+Where a field shadows such a name, the export must use its __-prefixed
+form, so that the output still refers to the predeclared type.
+
+TODO: rune prints as uint & <=1114111, and the names in shadowed print
+unqualified, so that they refer to the fields instead.
+
+-- in.cue --
+plain: {
+	r:    rune
+	i8:   int8
+	i16:  int16
+	i32:  int32
+	i64:  int64
+	i128: int128
+	u:    uint
+	u8:   uint8
+	u16:  uint16
+	u32:  uint32
+	u64:  uint64
+	u128: uint128
+	f32:  float32
+	f64:  float64
+	ub:   uint & <=1000
+	ib:   int & >=-1 & <=1000
+}
+
+shadowed: {
+	rune:  "a"
+	uint8: "b"
+	uint:  "c"
+	int:   "d"
+
+	r:  __rune
+	u8: __uint8
+	ub: __uint & <=1000
+	ib: __int & >=-1 & <=1000
+}
+-- out/definition --
+plain: {
+	r:    uint & <=1114111
+	i8:   int8
+	i16:  int16
+	i32:  int32
+	i64:  int64
+	i128: int128
+	u:    uint
+	u8:   uint8
+	u16:  uint16
+	u32:  uint32
+	u64:  uint64
+	u128: uint128
+	f32:  float32
+	f64:  float64
+	ub:   uint & <=1000
+	ib:   int & >=-1 & <=1000
+}
+shadowed: {
+	rune:  "a"
+	uint8: "b"
+	uint:  "c"
+	int:   "d"
+	r:     uint & <=1114111
+	u8:    uint8
+	ub:    uint & <=1000
+	ib:    int & >=-1 & <=1000
+}
+-- out/doc --
+[]
+[plain]
+[plain r]
+[plain i8]
+[plain i16]
+[plain i32]
+[plain i64]
+[plain i128]
+[plain u]
+[plain u8]
+[plain u16]
+[plain u32]
+[plain u64]
+[plain u128]
+[plain f32]
+[plain f64]
+[plain ub]
+[plain ib]
+[shadowed]
+[shadowed rune]
+[shadowed uint8]
+[shadowed uint]
+[shadowed int]
+[shadowed r]
+[shadowed u8]
+[shadowed ub]
+[shadowed ib]
+-- out/value --
+== Simplified
+{
+	plain: {
+		r:    uint & <=1114111
+		i8:   int8
+		i16:  int16
+		i32:  int32
+		i64:  int64
+		i128: int128
+		u:    uint
+		u8:   uint8
+		u16:  uint16
+		u32:  uint32
+		u64:  uint64
+		u128: uint128
+		f32:  float32
+		f64:  float64
+		ub:   uint & <=1000
+		ib:   int & >=-1 & <=1000
+	}
+	shadowed: {
+		rune:  "a"
+		uint8: "b"
+		uint:  "c"
+		int:   "d"
+		r:     uint & <=1114111
+		u8:    uint8
+		ub:    uint & <=1000
+		ib:    int & >=-1 & <=1000
+	}
+}
+== Raw
+{
+	plain: {
+		r:    int & >=0 & <=1114111
+		i8:   int & >=-128 & <=127
+		i16:  int & >=-32768 & <=32767
+		i32:  int & >=-2147483648 & <=2147483647
+		i64:  int & >=-9223372036854775808 & <=9223372036854775807
+		i128: int & >=-170141183460469231731687303715884105728 & <=170141183460469231731687303715884105727
+		u:    int & >=0
+		u8:   int & >=0 & <=255
+		u16:  int & >=0 & <=65535
+		u32:  int & >=0 & <=4294967295
+		u64:  int & >=0 & <=18446744073709551615
+		u128: int & >=0 & <=340282366920938463463374607431768211455
+		f32:  >=-340282346638528859811704183484516925440.0 & <=340282346638528859811704183484516925440.0
+		f64:  >=-1.797693134862315708145274237317043567981e+308 & <=1.797693134862315708145274237317043567981e+308
+		ub:   int & <=1000 & >=0
+		ib:   int & >=-1 & <=1000
+	}
+	shadowed: {
+		rune:  "a"
+		uint8: "b"
+		uint:  "c"
+		int:   "d"
+		r:     __int & >=0 & <=1114111
+		u8:    __int & >=0 & <=255
+		ub:    __int & <=1000 & >=0
+		ib:    __int & >=-1 & <=1000
+	}
+}
+== Final
+{
+	plain: {
+		r:    uint & <=1114111
+		i8:   int8
+		i16:  int16
+		i32:  int32
+		i64:  int64
+		i128: int128
+		u:    uint
+		u8:   uint8
+		u16:  uint16
+		u32:  uint32
+		u64:  uint64
+		u128: uint128
+		f32:  float32
+		f64:  float64
+		ub:   uint & <=1000
+		ib:   int & >=-1 & <=1000
+	}
+	shadowed: {
+		rune:  "a"
+		uint8: "b"
+		uint:  "c"
+		int:   "d"
+		r:     uint & <=1114111
+		u8:    uint8
+		ub:    uint & <=1000
+		ib:    int & >=-1 & <=1000
+	}
+}
+== All
+{
+	plain: {
+		r:    uint & <=1114111
+		i8:   int8
+		i16:  int16
+		i32:  int32
+		i64:  int64
+		i128: int128
+		u:    uint
+		u8:   uint8
+		u16:  uint16
+		u32:  uint32
+		u64:  uint64
+		u128: uint128
+		f32:  float32
+		f64:  float64
+		ub:   uint & <=1000
+		ib:   int & >=-1 & <=1000
+	}
+	shadowed: {
+		rune:  "a"
+		uint8: "b"
+		uint:  "c"
+		int:   "d"
+		r:     uint & <=1114111
+		u8:    uint8
+		ub:    uint & <=1000
+		ib:    int & >=-1 & <=1000
+	}
+}
+== Eval
+{
+	plain: {
+		r:    int & >=0 & <=1114111
+		i8:   int & >=-128 & <=127
+		i16:  int & >=-32768 & <=32767
+		i32:  int & >=-2147483648 & <=2147483647
+		i64:  int & >=-9223372036854775808 & <=9223372036854775807
+		i128: int & >=-170141183460469231731687303715884105728 & <=170141183460469231731687303715884105727
+		u:    int & >=0
+		u8:   int & >=0 & <=255
+		u16:  int & >=0 & <=65535
+		u32:  int & >=0 & <=4294967295
+		u64:  int & >=0 & <=18446744073709551615
+		u128: int & >=0 & <=340282366920938463463374607431768211455
+		f32:  >=-340282346638528859811704183484516925440.0 & <=340282346638528859811704183484516925440.0
+		f64:  >=-1.797693134862315708145274237317043567981e+308 & <=1.797693134862315708145274237317043567981e+308
+		ub:   int & <=1000 & >=0
+		ib:   int & >=-1 & <=1000
+	}
+	shadowed: {
+		rune:  "a"
+		uint8: "b"
+		uint:  "c"
+		int:   "d"
+		r:     __int & >=0 & <=1114111
+		u8:    __int & >=0 & <=255
+		ub:    __int & <=1000 & >=0
+		ib:    __int & >=-1 & <=1000
+	}
+}

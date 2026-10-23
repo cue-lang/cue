@@ -33,25 +33,30 @@ env CUE_TEST_SYSUSAGE=sysusage.json
 
 env CUE_STATS_FILE=stats.json
 exec cue export x.cue
-cmp stats.json out/stats.json
+cmp stats.json out/export.json
 
 # overwrite existing files.
 env CUE_STATS_FILE=overwrite_stats.json
 exec cue export x.cue
-cmp overwrite_stats.json out/stats.json
+cmp overwrite_stats.json out/export.json
 
 env CUE_STATS_FILE=stats.cue
 exec cue export x.cue
-cmp stats.cue out/stats.cue
+cmp stats.cue out/export.cue
 
 env CUE_STATS_FILE=stats.yaml
 exec cue export x.cue
-cmp stats.yaml out/stats.yaml
+cmp stats.yaml out/export.yaml
+
+# def exports in a context of its own, whose work must be counted too.
+env CUE_STATS_FILE=def.json
+exec cue def x.cue
+cmp def.json out/def.json
 
 # default output is JSON.
 env CUE_STATS_FILE=-
 exec cue export x.cue
-cmp stderr out/stderr
+cmp stderr out/export.json
 
 -- x.cue --
 a: 1
@@ -72,7 +77,7 @@ a: 1 & 2
 }
 -- overwrite_stats.json --
 contents overwritten
--- out/stats.json --
+-- out/export.json --
 {
     "CUE": {
         "EvalVersion": 3,
@@ -105,7 +110,7 @@ contents overwritten
         "MaxRssBytes": 789000
     }
 }
--- out/stats.cue --
+-- out/export.cue --
 CUE: {
 	EvalVersion:          3
 	Unifications:         4
@@ -136,7 +141,7 @@ Proc: {
 	SysNano:     456000
 	MaxRssBytes: 789000
 }
--- out/stats.yaml --
+-- out/export.yaml --
 CUE:
   EvalVersion: 3
   Unifications: 4
@@ -164,7 +169,7 @@ Proc:
   UserNano: 123000
   SysNano: 456000
   MaxRssBytes: 789000
--- out/stderr --
+-- out/def.json --
 {
     "CUE": {
         "EvalVersion": 3,

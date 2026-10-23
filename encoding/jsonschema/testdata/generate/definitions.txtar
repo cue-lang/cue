@@ -1,6 +1,8 @@
+# bar repeats a conjunct, which the schema holds only once.
 -- test.cue --
 package test
 foo!: #D1
+bar?: #D2 & #D2
 #D1: {
 	x!: int
 	y?: #D2
@@ -36,7 +38,10 @@ missingX: {
 		D3: enum: ["a", "b", "c"]
 	}
 	type: "object"
-	properties: foo: $ref: "#/$defs/D1"
+	properties: {
+		bar: $ref: "#/$defs/D2"
+		foo: $ref: "#/$defs/D1"
+	}
 	required: ["foo"]
 }
 -- out/generate-v3/simple --

@@ -1,14 +1,18 @@
 # Tests unification of CUE function values with function types (bodyless
 # signatures, possibly partial/open) and of function types with each other.
-# Static checks at unification time cover only what is decidable from the
-# compiled signatures: parameter names, positions, closedness, and whether a
-# parameter declares a default. Requiredness combines as for struct fields
-# and is enforced when a call omits a parameter. Parameter and
-# result constraint conflicts and missing arguments remain dynamic and
-# surface when the function is called; two declared defaults for the same
-# parameter are unified when the signatures are.
+# Static checks at unification time cover what is decidable from the
+# compiled signatures: parameter names, positions, closedness, whether a
+# parameter declares a default, and declared compatibility: the value must
+# accept, for each parameter, every value the type admits, and must declare
+# a result the type's result admits. Requiredness combines as for struct
+# fields and is enforced when a call omits a parameter. The type's
+# constraints restrict every call regardless of what the value accepts;
+# missing arguments surface when the function is called; two declared
+# defaults for the same parameter are unified when the signatures are.
 -- in.cue --
 @experiment(functions)
+
+import "strings"
 
 tighten: {
 	T: func(a: int, ...) -> number
@@ -24,21 +28,24 @@ tighten: {
 	xRev: fRev(1, 2)
 
 	// The type's result constraint is enforced on calls through the
-	// tightened value.
+	// tightened value, and the value must declare a result the type admits.
 	r: (T & (func(a: int) -> int: a))(3)
-	retConflict: ((func(a: int, ...) -> string) & (func(a: int) -> int: a))(3)
+	retConflict: (func(a: int, ...) -> string) & (func(a: int) -> int: a)
+	// A declared result wider than the signature's is rejected too, whatever
+	// the body returns.
+	retWide: (func(a: int, ...) -> int) & (func(a: int) -> number: 7)
 
-	// A parameter constraint conflict (int versus string) is not decidable
-	// from the signature shapes alone and surfaces when called, not when
-	// the type and value are unified.
-	s:    T & (func(a: string) -> int: 1)
-	sErr: s(1)
+	// The value must accept every value the type admits for a parameter: a
+	// string-only value does not satisfy an int signature, whether or not
+	// it is ever called.
+	s: T & (func(a: string) -> int: 1)
 }
 
 closed: {
 	U: func(a: int) -> number
 
-	// An exact signature match tightens.
+	// Matching parameters and a narrower result are admitted: the
+	// implementation's int result is within the signature's number.
 	g:  U & (func(a: int) -> int: a)
 	gx: g(1)
 
@@ -83,10 +90,13 @@ anonymous: {
 	// A type constraint matched to an anonymous positional parameter of
 	// the value is enforced per call: the argument is bound to a synthetic
 	// parameter slot even though the body cannot reference it.
-	D:    func(<10, ...) -> int
+	D:    func(int & <10, ...) -> int
 	d:    D & (func(int) -> int: 1)
 	dOk:  d(5)
 	dOob: d(15)
+	// The other way around is not admitted: an implementation accepting
+	// only integers below 10 does not cover a signature over every integer.
+	dNarrow: (func(int) -> int) & (func(int & <10) -> int: 1)
 
 	// The value's own constraint on an anonymous parameter is enforced on
 	// its argument as well.
@@ -110,7 +120,7 @@ contractLabels: {
 	byPosition: add1(2)
 
 	// Another compatible signature may repeat the same contract label.
-	add1: func(x: <10) -> int
+	add1: func(x: int & <10) -> int
 	byRepeatedName: add1(x: 3)
 
 	// Named and unnamed bodyless signatures compose in either order. Once a
@@ -127,7 +137,7 @@ contractLabels: {
 	// A constraint from a named signature attached to an unnamed slot follows
 	// the same positional match as its contract label.
 	limited: func(_~n: int) -> int: n
-	limited: func(input: <10) -> int
+	limited: func(input: int & <10) -> int
 	limitedOK: limited(input: 5)
 
 	// A contributed contract label also binds partial applications.
@@ -145,15 +155,23 @@ meet: {
 	// Calling a type, met or not, remains an error.
 	nc: n(1)
 
-	// A value unified with the meet is constrained by both signatures.
+	// A value unified with the meet must satisfy both signatures: the number
+	// signature requires a value accepting every number, which an int-only
+	// value does not.
 	v:  n & (func(a: int) -> int: a)
-	vx: v(3)
+	// A value accepting every number is admitted; calls stay limited to
+	// integers by the int signature.
+	vn: n & (func(a: number) -> int: 1)
+	vx: vn(3)
 
 	// Both types' parameter constraints apply on calls: a string conflicts
-	// with both, a float only with the int signature.
-	w:   n & (func(a: _) -> _: a)
+	// with both, a float only with the int signature, although the value
+	// accepts any number. The value must also declare a result the
+	// signatures admit.
+	w:   n & (func(a: _) -> int: 1)
 	wx:  w("x")
 	wx2: w(0.5)
+	wr:  n & (func(a: _) -> _: a)
 
 	// Positional parameters align by ordinal, but two different contract
 	// labels for the same slot are incompatible.
@@ -266,7 +284,7 @@ values: {
 	// The order in which types tighten a value does not matter: the
 	// recorded type constraints compare as a set, so both orders unify
 	// and deduplicate in a disjunction.
-	U:      func(a: number, ...) -> number
+	U:      func(a: int & >=0, ...) -> number
 	o1:     T & U & f
 	o2:     U & T & f
 	both2:  o1 & o2
@@ -281,8 +299,8 @@ values: {
 // Distinct function values with compatible signatures compose: a call
 // evaluates every implementation and unifies the results.
 compose: {
-	f: func(a: int) -> _: {in: a}
-	g: func(a~x: int) -> _: {out: x + 1}
+	f: func(a: int) -> {...}: {in: a}
+	g: func(a~x: int) -> {...}: {out: x + 1}
 
 	fg:     f & g
 	fgX:    fg(1)
@@ -335,10 +353,15 @@ compose: {
 	roX:    ro(n: 4)
 	roOmit: ro()
 
-	// A type tightens all implementations.
-	T:     func(a: int) -> {in: int, ...}
+	// A type tightens all implementations. Each declares a struct result,
+	// which the type's result constrains at every call, filling in what
+	// neither promises.
+	T:     func(a: int) -> {...}
 	tfg:   T & fg
 	tfgX:  tfg(1)
+	Tin:  func(a: int) -> {in: int, ...}
+	tin:  Tin & fg
+	tinX: tin(1)
 
 	// Signatures must be compatible.
 	labels: f & (func(b: int) -> int: b)
@@ -369,13 +392,14 @@ cycles: {
 
 // Tightening narrows the values a call accepts and returns, beyond mere
 // kind checks: bounds and struct restrictions of the type apply to every
-// call of the tightened value.
+// call of the tightened value. The value must still accept the whole domain
+// the type declares, and declare a result within the type's result.
 narrow: {
 	// The type narrows the parameter to a bound, resolved in the type's
 	// own scope.
 	lim: 10
 	T:   func(n: <lim, ...) -> number
-	f:   T & (func(n: int) -> int: n + 1)
+	f:   T & (func(n: number) -> number: n + 1)
 
 	ok:  f(5)
 	oob: f(15)
@@ -383,7 +407,7 @@ narrow: {
 	// The type narrows the result: the value's result must satisfy it per
 	// call.
 	R:  func(n: int, ...) -> <100
-	sq: R & (func(n: int) -> int: n * n)
+	sq: R & (func(n: int) -> int & <100: n * n)
 
 	small: sq(5)
 	big:   sq(20)
@@ -400,11 +424,365 @@ narrow: {
 	// Narrowing stacks across a chain of tightenings.
 	N:  func(n: >=0, ...) -> number
 	M:  func(n: <10, ...) -> number
-	g:  N & M & (func(n: int) -> int: n)
+	g:  N & M & (func(n: number) -> number: n)
 
 	mid: g(5)
 	neg: g(-1)
 	hi:  g(11)
+}
+
+// Declared compatibility: a value unified with a bodyless signature must
+// accept every value the signature admits for each parameter and declare a
+// result the signature's result admits. Each value is checked against each
+// signature on its own, in any grouping; another value or the constraints
+// enforced per call cannot make up for a declaration that falls short, and
+// the signatures keep restricting calls regardless.
+admission: {
+	// A wider value satisfies an int signature, whose int constraint still
+	// fences calls.
+	#f: func(x: int) -> int
+	#f: func(x: number) -> int: 2
+	fOK:  #f(1)
+	fBad: #f(1.5)
+
+	// Two signatures require int and number coverage while calls remain
+	// limited to int. An int-only value fails the number requirement in
+	// every grouping; a number-capable one passes.
+	I: func(x: int) -> string
+	N: func(x: number) -> string
+	b: func(x: int) -> string: "int"
+	w: func(x: number) -> string: "number"
+	bad1: I & (N & b)
+	bad2: (I & N) & b
+	bad3: (b & I) & N
+	ok1:  (I & (N & w))(1)
+	ok2:  ((I & N) & w)(1)
+	okF:  ((I & N) & w)(1.5)
+
+	// A value declaring a wider result than required fails, even beside a
+	// conforming value and even though both would return 1; a call-side
+	// result constraint does not stand in for the declaration.
+	R:   func(x: int) -> int
+	W:   func(x: int) -> number: 1
+	C:   func(x: int) -> int: 1
+	rw:  R & W
+	rwc: R & W & C
+	wcr: W & (C & R)
+	rc:  (R & C)(1)
+	rwx: (R & W)(1)
+
+	// An int-only callback does not satisfy a consumer entitled to call it
+	// with any number, whether or not the consumer does so.
+	apply:  func(f: func(number) -> int, x: number) -> int: f(x)
+	cbInt:  func(x: int) -> int: 1
+	cbNum:  func(x: number) -> int: 1
+	hofBad: apply(cbInt, 1)
+	hofOK:  apply(cbNum, 1.5)
+
+	// Distinct recursive signatures compare approximately for admission.
+	// Avoid structural descent through their signatures. These calls do not
+	// execute the callbacks.
+	#RecA: func(f: #RecA) -> int
+	#RecB: func(f: #RecB) -> int
+	recDistinct: (func(f: #RecA) -> int) & (func(f: #RecB) -> int: 1)
+	recDistinctX: recDistinct(#RecA)
+	#RetA: func() -> #RetA
+	#RetB: func() -> #RetB
+	recResult: (func(f: #RetA) -> int) & (func(f: #RetB) -> int: 1)
+	recResultX: recResult(#RetA)
+	#OpenA: func(f: #OpenA, ...) -> int
+	#OpenB: func(f: #OpenB, ...) -> int
+	recOpen: (func(f: #OpenA) -> int) & (func(f: #OpenB) -> int: 1)
+	recOpenX: recOpen(#OpenA)
+
+	// Structural comparisons can reach recursive signatures inside a field
+	// or element. An undecided function comparison must not hide a definite
+	// mismatch in a later field or element.
+	recStruct: (func(v: {f: #RecA}) -> int) & (func(v: {f: #RecB}) -> int: 1)
+	recStructX: recStruct({f: #RecA})
+	recList: (func(v: [#RecA]) -> int) & (func(v: [#RecB]) -> int: 1)
+	recListX: recList([#RecA])
+	recStructBad: (func(v: {f: #RecA, x: string}) -> int) & (func(v: {f: #RecB, x: int}) -> int: 1)
+	recListBad: (func(v: [#RecA, string]) -> int) & (func(v: [#RecB, int]) -> int: 1)
+	recKindBad: (func(v: int) -> int) & (func(v: #RecA) -> int: 1)
+	recKindReverseBad: (func(v: #RecA) -> int) & (func(v: int) -> int: 1)
+	recStructKindBad: (func(v: {f: int}) -> int) & (func(v: {f: #RecA}) -> int: 1)
+	recListKindBad: (func(v: [int]) -> int) & (func(v: [#RecA]) -> int: 1)
+
+	// A signature over any value requires a value accepting any value.
+	Any:    func(_) -> _
+	anyBad: Any & (func(x: int) -> int: x)
+	anyOK:  (Any & (func(x: _) -> _: x))("s")
+
+	// A value without a signature is bound by its own declaration alone.
+	direct: func(x: int) -> int: x
+	dOK:    direct(1)
+	dBad:   direct(1.5)
+
+	// Constraints referring to definitions are compared by their values:
+	// int covers an integer bound, while a positive bound does not cover it.
+	#Small: int & <10
+	S:    func(x: #Small) -> int
+	sOK:  (S & (func(x: int) -> int: x))(3)
+	sBad: S & (func(x: #Small & >0) -> int: x)
+
+	// A declaration referring to a definition means its final value: with
+	// #Res narrowed to int, a value declared to return #Res satisfies an int
+	// requirement.
+	#Res: number
+	#Res: int
+	Q:    func(x: int) -> int
+	q:    (Q & (func(x: int) -> #Res: x))(2)
+
+	// Compound constraints compare by their evaluated values.
+	sp:  func(x: {n: int}) -> {m: int}
+	sp:  func(x: {n: int}) -> {m: int}: {m: x.n}
+	spX: sp({n: 1})
+	lp:  func(x: [int, int]) -> int
+	lp:  func(x: [int, int]) -> int: x[0] + x[1]
+	lpX: lp([1, 2])
+
+	// A reference to an open list is the same constraint as the literal.
+	#L:  [...]
+	la:  func(x: int) -> #L
+	la:  func(x: int) -> [...]: [x]
+	laX: la(1)
+
+	// A union of bounds covers the required domain although no single
+	// disjunct does: no witness refutes it. A union of concrete values is
+	// refuted by a value it misses.
+	dc:  func(x: number) -> int
+	dc:  func(x: <=0 | >0) -> int: 1
+	dcX: dc(1)
+	ec:  func(x: string) -> int
+	ec:  func(x: "a" | "b") -> int: 1
+
+	// A constraint referring to a value that a comprehension in the same
+	// scope refines is checked against the refined value.
+	rf: {
+		#R: number
+		f:  func(x: int) -> #R: 1
+		f:  func(x: int) -> int
+		if f(1) == 1 {
+			#R: int
+		}
+		out: f(2)
+	}
+
+	// A callback is checked where it is bound, whether or not the callee
+	// calls it.
+	consume: func(f: func(number) -> int) -> int: 7
+	cBad:    consume(cbInt)
+
+	// Validators and regular-expression bounds are decided by witnesses: no
+	// candidate value is admitted by these signatures and rejected by their
+	// implementations.
+	mv:  func(s: strings.MinRunes(1)) -> int
+	mv:  func(s: strings.MinRunes(1)) -> int: 1
+	mvX: mv("a")
+	re:  func(s: =~"^a$") -> int
+	re:  func(s: =~"^[a-z]+$") -> int: 1
+	reX: re("a")
+	// They still reject on kind: an implementation accepting only
+	// integers covers neither a validator nor a pattern on strings.
+	vk: (func(s: strings.MinRunes(1)) -> int) & (func(s: int) -> int: 1)
+	rk: (func(s: =~"a") -> int) & (func(s: int) -> int: 1)
+	// A string implementation covers both pattern signatures, and calls
+	// still satisfy both: "c" fails each pattern, "ab" matches both.
+	#rx:  func(x: =~"a") -> int
+	#rx:  func(x: =~"b") -> int
+	#rx:  func(x: string) -> int: 1
+	rxC:  #rx("c")
+	rxAB: #rx("ab")
+
+	// A disjunct that fails admission is eliminated like any other
+	// erroneous alternative.
+	alt: (((func(x: number) -> int) & (func(x: int) -> int: x)) | *7)
+
+	// A reference to a value that an outer scope refines after a call
+	// leaves the check undone rather than rejecting on the provisional
+	// value.
+	#O: number
+	ov: {
+		f:   (func(x: int) -> #O: 1) & (func(x: int) -> int)
+		out: f(1)
+	}
+	if ov.out == 1 {
+		#O: int
+	}
+
+	// Function-valued constraints compare approximately, as structural
+	// function subsumption is covariant in parameters; a bound that admits
+	// every value of a kind is decided exactly.
+	hs:  func(g: func({n: int}) -> int) -> int
+	hs:  func(g: func({n: int}) -> int) -> int: g({n: 1})
+	hsX: hs(func(v: {n: int}) -> int: v.n)
+	hv:  func(x: int) -> (func(int) -> int)
+	hv:  func(x: int) -> (func(number) -> int): func(y: number) -> int: x
+	hvX: hv(2)(3)
+	nn:  func() -> !=null
+	nn:  func() -> int: 1
+	nnX: nn()
+	lsp:  func(x: [...{n: int}]) -> int
+	lsp:  func(x: [...{n: int}]) -> int: len(x)
+	lspX: lsp([{n: 1}])
+
+	// A pending reference inside a compound constraint is recognized too.
+	#P: number
+	pc: {
+		f:   (func(x: int) -> (#P & number): 1) & (func(x: int) -> int)
+		out: f(1)
+	}
+	if pc.out == 1 {
+		#P: int
+	}
+
+	// An exhaustive union of concrete values covers a finite kind; a default
+	// preference is no obligation; a struct is not null.
+	bl:  func(x: bool) -> int
+	bl:  func(x: true | false) -> int: 1
+	blX: bl(true)
+	#A:  *"a" | "b"
+	da:  func(x: #A) -> int
+	da:  func(x: "a" | "b") -> int: 1
+	daX: da("b")
+	ns:  func() -> !=null
+	ns:  func() -> {}: {}
+	nsX: ns()
+
+	// A pending reference inside a struct literal is recognized too.
+	#Q: number
+	qc: {
+		f:   (func() -> {v: #Q}: {v: 1}) & (func() -> {v: int})
+		out: f().v
+	}
+	if qc.out == 1 {
+		#Q: int
+	}
+
+	// Bounds compare with bytes, with other bounds, and with whole kinds.
+	by:  func() -> !='bad'
+	by:  func() -> 'ok': 'ok'
+	byX: by()
+	nb:  func(x: >0) -> int
+	nb:  func(x: !=null) -> int: 1
+	nbX: nb(1)
+	ge:  func(x: string) -> int
+	ge:  func(x: >="") -> int: 1
+	geX: ge("a")
+
+	// A pending reference inside a pattern constraint is recognized too.
+	#W: number
+	wc: {
+		f:   (func() -> {[string]: #W}: {v: 1}) & (func() -> {[string]: int})
+		out: f().v
+	}
+	if wc.out == 1 {
+		#W: int
+	}
+
+	// Integers and floats are comparable, and a numeric bound admits only
+	// numbers: != 5.0 admits neither every int nor any string.
+	ne:  func() -> !=5.0
+	ne:  func() -> int: 1
+	nes: func() -> !=5.0
+	nes: func() -> string: "a"
+
+	// Only a proof rejects: a kind that the implementation excludes, or a
+	// value that the signature admits and the implementation does not. So an
+	// open struct naming some of a definition's fields covers it, a regular
+	// field covers a required one, a field the implementation adds or
+	// defaults covers its absence, an enumeration covers a pattern or bounds
+	// admitting exactly its values, a value covers a constraint admitting
+	// only it, and a constraint covers only the kinds it actually admits.
+	#Person: {first: string, last: string, full: "\(first) \(last)"}
+	greet:   func(p: #Person) -> string
+	greet:   func(p: {first: string, ...}) -> string: "hi \(p.first)"
+	greetX:  greet({first: "A", last: "B"})
+	pat:     (func(p: {[string]~V: {name: V}}) -> int) & (func(p: {[string]~V: {name: V}}) -> int: 1)
+	patX:    pat({})
+	req:     (func(x: {a!: int}) -> int) & (func(x: {a: int}) -> int: x.a)
+	reqX:    req({a: 2})
+	rxe:     (func(x: =~"^[ab]$") -> int) & (func(x: "a" | "b") -> int: 1)
+	rxeX:    rxe("b")
+	bde:     (func(x: int & >=0 & <=2) -> int) & (func(x: 0 | 1 | 2) -> int: 1)
+	bdeX:    bde(2)
+	one:     (func(x: =~"^a$") -> int) & (func(x: "a") -> int: 1)
+	oneX:    one("a")
+	oneN:    (func(x: int & >=1 & <2) -> int) & (func(x: 1) -> int: 1)
+	oneNX:   oneN(1)
+	cfg:     (func(c: {port?: int}) -> int) & (func(c: {port: *8080 | int}) -> int: c.port)
+	cfgX:    cfg({})
+	pr:      (func() -> {in: int, ...}) & (func() -> {...}: {in: 1})
+	prX:     pr().in
+	#ID:     matchN(1, [int, string])
+	id:      (func(x: #ID) -> int) & (func(x: int | string) -> int: 1)
+	idX:     id(3)
+	unit:    (func(x: >0 & <1) -> int) & (func(x: float) -> int: 1)
+	unitX:   unit(0.5)
+	// The same comparisons reject where the signature admits more.
+	rxeBad: (func(x: =~"^[a-z]$") -> int) & (func(x: "a" | "b") -> int: 1)
+	bdeBad: (func(x: int & >=0 & <=3) -> int) & (func(x: 0 | 1 | 2) -> int: 1)
+	stBad:  (func(p: {n: int}) -> int) & (func(p: {n: string}) -> int: 1)
+	idBad:  (func(x: #ID) -> int) & (func(x: bool) -> int: 1)
+	tlBad:  (func(x: [...string]) -> int) & (func(x: [...int]) -> int: 1)
+	lnBad:  (func(x: [int, int]) -> int) & (func(x: [int]) -> int: 1)
+
+	// A field that another part of the signature's struct refers to may be
+	// restricted beyond its own constraint, so a value it admits alone is no
+	// witness; fields nothing refers to still are. A constraint that admits
+	// no value of a kind it names, as no string is below "", refutes nothing
+	// of that kind, and neither does a list no value satisfies.
+	corr:    (func(x: {a: int, b: 0 & a}) -> int) & (func(x: {a: 0, b: 0}) -> int: 0)
+	corrX:   corr({a: 0})
+	corrIf:  (func(x: {a: int, if a > 0 {b: 1}}) -> int) & (func(x: {a: 0, ...}) -> int: 0)
+	corrIfX: corrIf({a: 0})
+	corrBad: (func(x: {a: int, b: 0 & a, d: string}) -> int) & (func(x: {a: 0, b: 0, d: int}) -> int: 0)
+	emp:     (func(x: int | <"") -> int) & (func(x: int) -> int: x)
+	empX:    emp(1)
+	empL:    (func(x: [...<""]) -> int) & (func(x: []) -> int: 1)
+	empLX:   empL([])
+	empN:    (func(x: [<""]) -> int) & (func(x: [int, int]) -> int: 1)
+	empNX:   len([empN])
+	empBad:  (func(x: int | <"b") -> int) & (func(x: int) -> int: x)
+
+	// A value that a comprehension refines is pending behind a call too.
+	#PC: number
+	getPC: func() -> _: #PC
+	pcall: {
+		f:   (func() -> getPC(): 1) & (func() -> int)
+		out: f()
+	}
+	if pcall.out == 1 {
+		#PC: int
+	}
+
+	// Whether a constraint is pending does not depend on the order of
+	// fields: a definition that has not been evaluated yet is decided like
+	// one that has.
+	late:   (func(x: #Late) -> int) & (func(x: string) -> int: 1)
+	#Late:  int
+	#Early: int
+	early:  (func(x: #Early) -> int) & (func(x: string) -> int: 1)
+
+	// A pending reference inside a list comprehension or a let of a struct
+	// literal is recognized too.
+	#LC: number
+	lc: {
+		f:   (func() -> [for x in [1] {#LC}]: [1]) & (func() -> [int])
+		out: f()[0]
+	}
+	if lc.out == 1 {
+		#LC: int
+	}
+	#LT: number
+	lt: {
+		f:   (func() -> {let y = #LT, v: y}: {v: 1}) & (func() -> {v: int})
+		out: f().v
+	}
+	if lt.out == 1 {
+		#LT: int
+	}
 }
 // Declared defaults are part of a signature. A default on one side carries
 // over to a call; defaults on both sides must unify and conflict when the
@@ -506,9 +884,9 @@ defaults: {
     fRev: (func(a: int, b: int) -> int: (〈0;a〉 + 〈0;b〉) & 〈0;T〉)
     xRev: 〈0;fRev〉(1, 2)
     r: (〈0;T〉 & func(a: int) -> int: 〈0;a〉)(3)
-    retConflict: (func(a: int, ...) -> string & func(a: int) -> int: 〈0;a〉)(3)
+    retConflict: (func(a: int, ...) -> string & func(a: int) -> int: 〈0;a〉)
+    retWide: (func(a: int, ...) -> int & func(a: int) -> number: 7)
     s: (〈0;T〉 & func(a: string) -> int: 1)
-    sErr: 〈0;s〉(1)
   }
   closed: {
     U: func(a: int) -> number
@@ -533,10 +911,11 @@ defaults: {
     C: func(int) -> int
     cOk: (〈0;C〉 & func(n: int) -> int: 〈0;n〉)
     cx: 〈0;cOk〉(5)
-    D: func(<10, ...) -> int
+    D: func((int & <10), ...) -> int
     d: (〈0;D〉 & func(int) -> int: 1)
     dOk: 〈0;d〉(5)
     dOob: 〈0;d〉(15)
+    dNarrow: (func(int) -> int & func((int & <10)) -> int: 1)
     f: func(int) -> int: 1
     fOk: 〈0;f〉(1)
     fBad: 〈0;f〉("x")
@@ -548,7 +927,7 @@ defaults: {
     add1: func(x: int) -> int
     byLabel: 〈0;add1〉(x: 2)
     byPosition: 〈0;add1〉(2)
-    add1: func(x: <10) -> int
+    add1: func(x: (int & <10)) -> int
     byRepeatedName: 〈0;add1〉(x: 3)
     Named: func(x: int) -> int
     Unnamed: func(int) -> int
@@ -558,7 +937,7 @@ defaults: {
     namedCall: 〈0;namedFirst〉(x: 6)
     reverseCall: 〈0;unnamedFirst〉(x: 7)
     limited: func(int) -> int: 〈0;n〉
-    limited: func(input: <10) -> int
+    limited: func(input: (int & <10)) -> int
     limitedOK: 〈0;limited〉(input: 5)
     sum: func(int, int) -> int: (〈0;a〉 + 〈0;b〉)
     sum: func(x: int, y: int) -> int
@@ -569,10 +948,12 @@ defaults: {
     n: (func(a: number, ...) -> number & func(a: int, ...) -> int)
     nc: 〈0;n〉(1)
     v: (〈0;n〉 & func(a: int) -> int: 〈0;a〉)
-    vx: 〈0;v〉(3)
-    w: (〈0;n〉 & func(a: _) -> _: 〈0;a〉)
+    vn: (〈0;n〉 & func(a: number) -> int: 1)
+    vx: 〈0;vn〉(3)
+    w: (〈0;n〉 & func(a: _) -> int: 1)
     wx: 〈0;w〉("x")
     wx2: 〈0;w〉(0.5)
+    wr: (〈0;n〉 & func(a: _) -> _: 〈0;a〉)
     badName: (func(a: int) -> int & func(b: int) -> int)
     badNameRev: (func(b: int) -> int & func(a: int) -> int)
     reqNamed: (func(a!: int) -> int & func(a: int, ...) -> int)
@@ -641,7 +1022,7 @@ defaults: {
     bothX: 〈0;both〉(1)
     pick: (〈0;t1〉|〈0;t2〉)
     pickX: 〈0;pick〉(1)
-    U: func(a: number, ...) -> number
+    U: func(a: (int & >=0), ...) -> number
     o1: ((〈0;T〉 & 〈0;U〉) & 〈0;f〉)
     o2: ((〈0;U〉 & 〈0;T〉) & 〈0;f〉)
     both2: (〈0;o1〉 & 〈0;o2〉)
@@ -650,10 +1031,14 @@ defaults: {
     pick2X: 〈0;pick2〉(1)
   }
   compose: {
-    f: func(a: int) -> _: {
+    f: func(a: int) -> {
+      ...
+    }: {
       in: 〈1;a〉
     }
-    g: func(a: int) -> _: {
+    g: func(a: int) -> {
+      ...
+    }: {
       out: (〈1;x〉 + 1)
     }
     fg: (〈0;f〉 & 〈0;g〉)
@@ -707,11 +1092,16 @@ defaults: {
     roX: 〈0;ro〉(n: 4)
     roOmit: 〈0;ro〉()
     T: func(a: int) -> {
-      in: int
       ...
     }
     tfg: (〈0;T〉 & 〈0;fg〉)
     tfgX: 〈0;tfg〉(1)
+    Tin: func(a: int) -> {
+      in: int
+      ...
+    }
+    tin: (〈0;Tin〉 & 〈0;fg〉)
+    tinX: 〈0;tin〉(1)
     labels: (〈0;f〉 & func(b: int) -> int: 〈0;b〉)
     arity: (〈0;f〉 & func(a: int, b: int) -> int: 〈0;a〉)
     named: (〈0;f〉 & func(a!: int) -> int: 〈0;a〉)
@@ -733,11 +1123,11 @@ defaults: {
   narrow: {
     lim: 10
     T: func(n: <〈0;lim〉, ...) -> number
-    f: (〈0;T〉 & func(n: int) -> int: (〈0;n〉 + 1))
+    f: (〈0;T〉 & func(n: number) -> number: (〈0;n〉 + 1))
     ok: 〈0;f〉(5)
     oob: 〈0;f〉(15)
     R: func(n: int, ...) -> <100
-    sq: (〈0;R〉 & func(n: int) -> int: (〈0;n〉 * 〈0;n〉))
+    sq: (〈0;R〉 & func(n: int) -> (int & <100): (〈0;n〉 * 〈0;n〉))
     small: 〈0;sq〉(5)
     big: 〈0;sq〉(20)
     S: func(cfg: {
@@ -761,10 +1151,448 @@ defaults: {
     })
     N: func(n: >=0, ...) -> number
     M: func(n: <10, ...) -> number
-    g: ((〈0;N〉 & 〈0;M〉) & func(n: int) -> int: 〈0;n〉)
+    g: ((〈0;N〉 & 〈0;M〉) & func(n: number) -> number: 〈0;n〉)
     mid: 〈0;g〉(5)
     neg: 〈0;g〉(-1)
     hi: 〈0;g〉(11)
+  }
+  admission: {
+    #f: func(x: int) -> int
+    #f: func(x: number) -> int: 2
+    fOK: 〈0;#f〉(1)
+    fBad: 〈0;#f〉(1.5)
+    I: func(x: int) -> string
+    N: func(x: number) -> string
+    b: func(x: int) -> string: "int"
+    w: func(x: number) -> string: "number"
+    bad1: (〈0;I〉 & (〈0;N〉 & 〈0;b〉))
+    bad2: ((〈0;I〉 & 〈0;N〉) & 〈0;b〉)
+    bad3: ((〈0;b〉 & 〈0;I〉) & 〈0;N〉)
+    ok1: (〈0;I〉 & (〈0;N〉 & 〈0;w〉))(1)
+    ok2: ((〈0;I〉 & 〈0;N〉) & 〈0;w〉)(1)
+    okF: ((〈0;I〉 & 〈0;N〉) & 〈0;w〉)(1.5)
+    R: func(x: int) -> int
+    W: func(x: int) -> number: 1
+    C: func(x: int) -> int: 1
+    rw: (〈0;R〉 & 〈0;W〉)
+    rwc: ((〈0;R〉 & 〈0;W〉) & 〈0;C〉)
+    wcr: (〈0;W〉 & (〈0;C〉 & 〈0;R〉))
+    rc: (〈0;R〉 & 〈0;C〉)(1)
+    rwx: (〈0;R〉 & 〈0;W〉)(1)
+    apply: func(f: func(number) -> int, x: number) -> int: 〈0;f〉(〈0;x〉)
+    cbInt: func(x: int) -> int: 1
+    cbNum: func(x: number) -> int: 1
+    hofBad: 〈0;apply〉(〈0;cbInt〉, 1)
+    hofOK: 〈0;apply〉(〈0;cbNum〉, 1.5)
+    #RecA: func(f: 〈0;#RecA〉) -> int
+    #RecB: func(f: 〈0;#RecB〉) -> int
+    recDistinct: (func(f: 〈0;#RecA〉) -> int & func(f: 〈0;#RecB〉) -> int: 1)
+    recDistinctX: 〈0;recDistinct〉(〈0;#RecA〉)
+    #RetA: func() -> 〈0;#RetA〉
+    #RetB: func() -> 〈0;#RetB〉
+    recResult: (func(f: 〈0;#RetA〉) -> int & func(f: 〈0;#RetB〉) -> int: 1)
+    recResultX: 〈0;recResult〉(〈0;#RetA〉)
+    #OpenA: func(f: 〈0;#OpenA〉, ...) -> int
+    #OpenB: func(f: 〈0;#OpenB〉, ...) -> int
+    recOpen: (func(f: 〈0;#OpenA〉) -> int & func(f: 〈0;#OpenB〉) -> int: 1)
+    recOpenX: 〈0;recOpen〉(〈0;#OpenA〉)
+    recStruct: (func(v: {
+      f: 〈1;#RecA〉
+    }) -> int & func(v: {
+      f: 〈1;#RecB〉
+    }) -> int: 1)
+    recStructX: 〈0;recStruct〉({
+      f: 〈1;#RecA〉
+    })
+    recList: (func(v: [
+      〈1;#RecA〉,
+    ]) -> int & func(v: [
+      〈1;#RecB〉,
+    ]) -> int: 1)
+    recListX: 〈0;recList〉([
+      〈1;#RecA〉,
+    ])
+    recStructBad: (func(v: {
+      f: 〈1;#RecA〉
+      x: string
+    }) -> int & func(v: {
+      f: 〈1;#RecB〉
+      x: int
+    }) -> int: 1)
+    recListBad: (func(v: [
+      〈1;#RecA〉,
+      string,
+    ]) -> int & func(v: [
+      〈1;#RecB〉,
+      int,
+    ]) -> int: 1)
+    recKindBad: (func(v: int) -> int & func(v: 〈0;#RecA〉) -> int: 1)
+    recKindReverseBad: (func(v: 〈0;#RecA〉) -> int & func(v: int) -> int: 1)
+    recStructKindBad: (func(v: {
+      f: int
+    }) -> int & func(v: {
+      f: 〈1;#RecA〉
+    }) -> int: 1)
+    recListKindBad: (func(v: [
+      int,
+    ]) -> int & func(v: [
+      〈1;#RecA〉,
+    ]) -> int: 1)
+    Any: func(_) -> _
+    anyBad: (〈0;Any〉 & func(x: int) -> int: 〈0;x〉)
+    anyOK: (〈0;Any〉 & func(x: _) -> _: 〈0;x〉)("s")
+    direct: func(x: int) -> int: 〈0;x〉
+    dOK: 〈0;direct〉(1)
+    dBad: 〈0;direct〉(1.5)
+    #Small: (int & <10)
+    S: func(x: 〈0;#Small〉) -> int
+    sOK: (〈0;S〉 & func(x: int) -> int: 〈0;x〉)(3)
+    sBad: (〈0;S〉 & func(x: (〈0;#Small〉 & >0)) -> int: 〈0;x〉)
+    #Res: number
+    #Res: int
+    Q: func(x: int) -> int
+    q: (〈0;Q〉 & func(x: int) -> 〈0;#Res〉: 〈0;x〉)(2)
+    sp: func(x: {
+      n: int
+    }) -> {
+      m: int
+    }
+    sp: func(x: {
+      n: int
+    }) -> {
+      m: int
+    }: {
+      m: 〈1;x〉.n
+    }
+    spX: 〈0;sp〉({
+      n: 1
+    })
+    lp: func(x: [
+      int,
+      int,
+    ]) -> int
+    lp: func(x: [
+      int,
+      int,
+    ]) -> int: (〈0;x〉[0] + 〈0;x〉[1])
+    lpX: 〈0;lp〉([
+      1,
+      2,
+    ])
+    #L: [
+      ...,
+    ]
+    la: func(x: int) -> 〈0;#L〉
+    la: func(x: int) -> [
+      ...,
+    ]: [
+      〈1;x〉,
+    ]
+    laX: 〈0;la〉(1)
+    dc: func(x: number) -> int
+    dc: func(x: (<=0|>0)) -> int: 1
+    dcX: 〈0;dc〉(1)
+    ec: func(x: string) -> int
+    ec: func(x: ("a"|"b")) -> int: 1
+    rf: {
+      #R: number
+      f: func(x: int) -> 〈0;#R〉: 1
+      f: func(x: int) -> int
+      if (〈0;f〉(1) == 1) {
+        #R: int
+      }
+      out: 〈0;f〉(2)
+    }
+    consume: func(f: func(number) -> int) -> int: 7
+    cBad: 〈0;consume〉(〈0;cbInt〉)
+    mv: func(s: 〈import;strings〉.MinRunes(1)) -> int
+    mv: func(s: 〈import;strings〉.MinRunes(1)) -> int: 1
+    mvX: 〈0;mv〉("a")
+    re: func(s: =~"^a$") -> int
+    re: func(s: =~"^[a-z]+$") -> int: 1
+    reX: 〈0;re〉("a")
+    vk: (func(s: 〈import;strings〉.MinRunes(1)) -> int & func(s: int) -> int: 1)
+    rk: (func(s: =~"a") -> int & func(s: int) -> int: 1)
+    #rx: func(x: =~"a") -> int
+    #rx: func(x: =~"b") -> int
+    #rx: func(x: string) -> int: 1
+    rxC: 〈0;#rx〉("c")
+    rxAB: 〈0;#rx〉("ab")
+    alt: ((func(x: number) -> int & func(x: int) -> int: 〈0;x〉)|*7)
+    #O: number
+    ov: {
+      f: (func(x: int) -> 〈1;#O〉: 1 & func(x: int) -> int)
+      out: 〈0;f〉(1)
+    }
+    if (〈0;ov〉.out == 1) {
+      #O: int
+    }
+    hs: func(g: func({
+      n: int
+    }) -> int) -> int
+    hs: func(g: func({
+      n: int
+    }) -> int) -> int: 〈0;g〉({
+      n: 1
+    })
+    hsX: 〈0;hs〉(func(v: {
+      n: int
+    }) -> int: 〈0;v〉.n)
+    hv: func(x: int) -> func(int) -> int
+    hv: func(x: int) -> func(number) -> int: func(y: number) -> int: 〈1;x〉
+    hvX: 〈0;hv〉(2)(3)
+    nn: func() -> !=null
+    nn: func() -> int: 1
+    nnX: 〈0;nn〉()
+    lsp: func(x: [
+      ...{
+        n: int
+      },
+    ]) -> int
+    lsp: func(x: [
+      ...{
+        n: int
+      },
+    ]) -> int: len(〈0;x〉)
+    lspX: 〈0;lsp〉([
+      {
+        n: 1
+      },
+    ])
+    #P: number
+    pc: {
+      f: (func(x: int) -> (〈1;#P〉 & number): 1 & func(x: int) -> int)
+      out: 〈0;f〉(1)
+    }
+    if (〈0;pc〉.out == 1) {
+      #P: int
+    }
+    bl: func(x: bool) -> int
+    bl: func(x: (true|false)) -> int: 1
+    blX: 〈0;bl〉(true)
+    #A: (*"a"|"b")
+    da: func(x: 〈0;#A〉) -> int
+    da: func(x: ("a"|"b")) -> int: 1
+    daX: 〈0;da〉("b")
+    ns: func() -> !=null
+    ns: func() -> {}: {}
+    nsX: 〈0;ns〉()
+    #Q: number
+    qc: {
+      f: (func() -> {
+        v: 〈2;#Q〉
+      }: {
+        v: 1
+      } & func() -> {
+        v: int
+      })
+      out: 〈0;f〉().v
+    }
+    if (〈0;qc〉.out == 1) {
+      #Q: int
+    }
+    by: func() -> !='bad'
+    by: func() -> 'ok': 'ok'
+    byX: 〈0;by〉()
+    nb: func(x: >0) -> int
+    nb: func(x: !=null) -> int: 1
+    nbX: 〈0;nb〉(1)
+    ge: func(x: string) -> int
+    ge: func(x: >="") -> int: 1
+    geX: 〈0;ge〉("a")
+    #W: number
+    wc: {
+      f: (func() -> {
+        [string]: 〈2;#W〉
+      }: {
+        v: 1
+      } & func() -> {
+        [string]: int
+      })
+      out: 〈0;f〉().v
+    }
+    if (〈0;wc〉.out == 1) {
+      #W: int
+    }
+    ne: func() -> !=5.0
+    ne: func() -> int: 1
+    nes: func() -> !=5.0
+    nes: func() -> string: "a"
+    #Person: {
+      first: string
+      last: string
+      full: "\(〈0;first〉) \(〈0;last〉)"
+    }
+    greet: func(p: 〈0;#Person〉) -> string
+    greet: func(p: {
+      first: string
+      ...
+    }) -> string: "hi \(〈0;p〉.first)"
+    greetX: 〈0;greet〉({
+      first: "A"
+      last: "B"
+    })
+    pat: (func(p: {
+      [string]: {
+        name: 〈1;(〈0;-〉)〉
+      }
+    }) -> int & func(p: {
+      [string]: {
+        name: 〈1;(〈0;-〉)〉
+      }
+    }) -> int: 1)
+    patX: 〈0;pat〉({})
+    req: (func(x: {
+      a!: int
+    }) -> int & func(x: {
+      a: int
+    }) -> int: 〈0;x〉.a)
+    reqX: 〈0;req〉({
+      a: 2
+    })
+    rxe: (func(x: =~"^[ab]$") -> int & func(x: ("a"|"b")) -> int: 1)
+    rxeX: 〈0;rxe〉("b")
+    bde: (func(x: ((int & >=0) & <=2)) -> int & func(x: (0|1|2)) -> int: 1)
+    bdeX: 〈0;bde〉(2)
+    one: (func(x: =~"^a$") -> int & func(x: "a") -> int: 1)
+    oneX: 〈0;one〉("a")
+    oneN: (func(x: ((int & >=1) & <2)) -> int & func(x: 1) -> int: 1)
+    oneNX: 〈0;oneN〉(1)
+    cfg: (func(c: {
+      port?: int
+    }) -> int & func(c: {
+      port: (*8080|int)
+    }) -> int: 〈0;c〉.port)
+    cfgX: 〈0;cfg〉({})
+    pr: (func() -> {
+      in: int
+      ...
+    } & func() -> {
+      ...
+    }: {
+      in: 1
+    })
+    prX: 〈0;pr〉().in
+    #ID: matchN(1, [
+      int,
+      string,
+    ])
+    id: (func(x: 〈0;#ID〉) -> int & func(x: (int|string)) -> int: 1)
+    idX: 〈0;id〉(3)
+    unit: (func(x: (>0 & <1)) -> int & func(x: float) -> int: 1)
+    unitX: 〈0;unit〉(0.5)
+    rxeBad: (func(x: =~"^[a-z]$") -> int & func(x: ("a"|"b")) -> int: 1)
+    bdeBad: (func(x: ((int & >=0) & <=3)) -> int & func(x: (0|1|2)) -> int: 1)
+    stBad: (func(p: {
+      n: int
+    }) -> int & func(p: {
+      n: string
+    }) -> int: 1)
+    idBad: (func(x: 〈0;#ID〉) -> int & func(x: bool) -> int: 1)
+    tlBad: (func(x: [
+      ...string,
+    ]) -> int & func(x: [
+      ...int,
+    ]) -> int: 1)
+    lnBad: (func(x: [
+      int,
+      int,
+    ]) -> int & func(x: [
+      int,
+    ]) -> int: 1)
+    corr: (func(x: {
+      a: int
+      b: (0 & 〈0;a〉)
+    }) -> int & func(x: {
+      a: 0
+      b: 0
+    }) -> int: 0)
+    corrX: 〈0;corr〉({
+      a: 0
+    })
+    corrIf: (func(x: {
+      a: int
+      if (〈0;a〉 > 0) {
+        b: 1
+      }
+    }) -> int & func(x: {
+      a: 0
+      ...
+    }) -> int: 0)
+    corrIfX: 〈0;corrIf〉({
+      a: 0
+    })
+    corrBad: (func(x: {
+      a: int
+      b: (0 & 〈0;a〉)
+      d: string
+    }) -> int & func(x: {
+      a: 0
+      b: 0
+      d: int
+    }) -> int: 0)
+    emp: (func(x: (int|<"")) -> int & func(x: int) -> int: 〈0;x〉)
+    empX: 〈0;emp〉(1)
+    empL: (func(x: [
+      ...<"",
+    ]) -> int & func(x: []) -> int: 1)
+    empLX: 〈0;empL〉([])
+    empN: (func(x: [
+      <"",
+    ]) -> int & func(x: [
+      int,
+      int,
+    ]) -> int: 1)
+    empNX: len([
+      〈1;empN〉,
+    ])
+    empBad: (func(x: (int|<"b")) -> int & func(x: int) -> int: 〈0;x〉)
+    #PC: number
+    getPC: func() -> _: 〈1;#PC〉
+    pcall: {
+      f: (func() -> 〈1;getPC〉(): 1 & func() -> int)
+      out: 〈0;f〉()
+    }
+    if (〈0;pcall〉.out == 1) {
+      #PC: int
+    }
+    late: (func(x: 〈0;#Late〉) -> int & func(x: string) -> int: 1)
+    #Late: int
+    #Early: int
+    early: (func(x: 〈0;#Early〉) -> int & func(x: string) -> int: 1)
+    #LC: number
+    lc: {
+      f: (func() -> [
+        for _, x in [
+          1,
+        ] {
+          〈4;#LC〉
+        },
+      ]: [
+        1,
+      ] & func() -> [
+        int,
+      ])
+      out: 〈0;f〉()[0]
+    }
+    if (〈0;lc〉.out == 1) {
+      #LC: int
+    }
+    #LT: number
+    lt: {
+      f: (func() -> {
+        let y#1 = 〈2;#LT〉
+        v: 〈0;let y#1〉
+      }: {
+        v: 1
+      } & func() -> {
+        v: int
+      })
+      out: 〈0;f〉().v
+    }
+    if (〈0;lt〉.out == 1) {
+      #LT: int
+    }
   }
   defaults: {
     T: func(a: int = 2) -> int

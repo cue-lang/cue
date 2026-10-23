@@ -10,8 +10,9 @@
 # contributes no slot or label. Defaults declared by the signatures fill
 # omitted arguments and must agree with the builtin's own defaults.
 # Statically checked at unification time are parameter matching, arity, and
-# kind-level compatibility where the constraint is literally a basic type;
-# all other constraints surface when the tightened builtin is called.
+# declared compatibility: the builtin's parameter kinds must admit every value
+# a type parameter admits, and its result kind must be within the type's
+# result; the type's constraints then restrict every call.
 -- in.cue --
 @experiment(functions)
 
@@ -69,12 +70,11 @@ dynamic: {
 	ok:  up("hi") @test(eq, "HI")
 	oob: up("zz") @test(err, code=eval, contains="out of bound")
 
-	// The type narrows the result.
+	// The type cannot require a result the builtin does not declare: a
+	// builtin returning any string does not satisfy a signature requiring
+	// one particular string.
 	R:   func(string, ...) -> "HI"
-	up2: R & strings.ToUpper
-
-	good: up2("hi") @test(eq, "HI")
-	bad:  up2("no") @test(err, code=eval, contains="conflicting values")
+	up2: R & strings.ToUpper @test(err, code=eval, contains="builtin strings.ToUpper returns string, but its signature requires \"HI\"")
 
 	// Narrowing stacks across a chain of tightenings.
 	A:   func(string, ...) -> string
@@ -106,7 +106,7 @@ optionalExtra: {
 // A required or optional parameter of a type and the builtin parameter with
 // the same label are the same parameter, so the type covers it.
 labelMatch: {
-	opt:     strings.Repeat & (func(string, count?: <3) -> string)
+	opt:     strings.Repeat & (func(string, count?: int & <3) -> string)
 	optOK:   opt("x", 2) @test(eq, "xx")
 	optBad:  opt("x", 5) @test(err, code=eval, contains="out of bound")
 	req:     strings.Repeat & (func(string, count!: int) -> string)
@@ -141,13 +141,15 @@ partial: {
 }
 
 // len is polymorphic over strings, bytes, lists, and structs; its kind-level
-// signature is compatible with a type over any of these.
+// signature is compatible with a type over any of these. A type over every
+// value requires a builtin accepting every value, which len is not.
 polymorphic: {
-	L: func(_, ...) -> int
+	L: func(string | bytes | [...] | {...}, ...) -> int
 	l: L & len
 
 	str:  l("foo") @test(eq, 3)
 	list: l([1, 2]) @test(eq, 2)
+	any:  (func(_, ...) -> int) & len @test(err, code=eval, contains="parameter 1 of builtin len accepts")
 
 	// The type may narrow the accepted arguments to a subset of the kinds
 	// the builtin accepts; the narrowing applies per call.
@@ -158,6 +160,34 @@ polymorphic: {
 
 	// A statically incompatible result kind is rejected.
 	bad: (func(_, ...) -> string) & len @test(err, code=eval, contains="result of function type has kind string, conflicting with result kind int of builtin len")
+}
+
+// A builtin declares its result at the level of kinds, which admits a
+// structural result constraint of a fitting kind, written out or referred
+// to, and rejects one of another kind.
+aliases: {
+	#L:   [...]
+	S:    func(s: string, sep: string) -> #L
+	sp:   S & strings.Split
+	spX:  sp("a,b", ",") @test(eq, ["a", "b"])
+	#Strs: [...string]
+	S2:   func(s: string, sep: string) -> #Strs
+	sp2:  S2 & strings.Split
+	sp2X: sp2("a,b", ",") @test(eq, ["a", "b"])
+	S3:   func(s: string, sep: string) -> {...}
+	sp3:  S3 & strings.Split @test(err, code=eval, contains="builtin strings.Split returns list, but its signature requires")
+	// A string bound may admit every string.
+	GeUp: func(s: string) -> >=""
+	geUp: (GeUp & strings.ToUpper)("a") @test(eq, "A")
+}
+
+// Admission is repeated as signatures arrive, so the outcome does not depend
+// on the order in which a name-only parameter gains its label.
+labelOrder: {
+	A:  func(x?: string | int, ...) -> int
+	B:  func(x: string, ...) -> int
+	ab: (len & A) & B @test(err, code=eval, contains="parameter x of builtin len accepts")
+	ba: (len & B) & A @test(err, code=eval, contains="parameter x of builtin len accepts")
 }
 
 // A labeled argument binds through the contract labels of the builtin's
@@ -215,16 +245,29 @@ typeDefaults: {
 	repBothRev: Rep3 & strings.Repeat & Rep @test(err, code=eval, contains="conflicting defaults for parameter count")
 	repSame:    (Rep & strings.Repeat & Rep)("ab", 3) @test(eq, "ababab")
 
-	// A declared default must agree with the builtin's own default.
-	Join:   func(elem: [...string], os: string = "windows") -> string
-	join:   Join & path.Join @test(err, code=eval, contains="conflicting defaults for parameter os")
+	// A declared default must agree with the builtin's own default; the
+	// parameter type must stay within the values the builtin accepts.
+	Join:    func(elem: [...string], os: "unix" | "windows" = "windows") -> string
+	join:    Join & path.Join @test(err, code=eval, contains="conflicting defaults for parameter os")
+	JoinAny: func(elem: [...string], os: string = "unix") -> string
+	joinAny: JoinAny & path.Join @test(err, code=eval, contains="parameter os of builtin path.Join accepts")
+	// A type may leave the default out: the builtin's own default then
+	// fills the omitted argument.
+	JoinND:  func(elem: [...string], os: "unix" | "windows") -> string
+	joinND:  (JoinND & path.Join)(["a", "b"]) @test(eq, "a/b")
+	joinNDW: (JoinND & path.Join)(["a", "b"], "windows") @test(eq, "a\\b")
+	// A differing default preference in the type is no obligation on the
+	// values the builtin must accept.
+	#OS:    *"windows" | "unix"
+	JoinOS: func(elem: [...string], os: #OS) -> string
+	joinOS: (JoinOS & path.Join)(["a", "b"], "unix") @test(eq, "a/b")
 
 	// A default declared on a type fills an omitted argument of a builtin
 	// as it would for a function value.
 	_rep: strings.Repeat
 	_rep: func(s: string, count: int = 3) -> string
 	split: _rep("a") @test(eq, "aaa")
-	Unix:   func(elem: [...string], os: string = "unix") -> string
+	Unix:   func(elem: [...string], os: "unix" | "windows" = "unix") -> string
 	unix:   Unix & path.Join
 	unixX:  unix(["a", "b"]) @test(eq, "a/b")
 	unixOS: unix(["a", "b"], "windows") @test(eq, "a\\b")
@@ -249,64 +292,74 @@ typeDefaults: {
 [eval] invalid value "zz" (out of bound <="m"):
     ./in.cue:51:11
     ./in.cue:55:10
-[eval] conflicting values "HI" and "NO":
-    ./in.cue:58:28
-    ./in.cue:62:8
+[eval] dynamic.up2: builtin strings.ToUpper returns string, but its signature requires "HI":
+    ./in.cue:60:7
 [eval] invalid value "zz" (out of bound <="m"):
-    ./in.cue:66:12
-    ./in.cue:70:11
+    ./in.cue:65:12
+    ./in.cue:69:11
 [eval] optionalExtra.bad: parameter sep of function type not allowed by builtin strings.ToUpper: no parameter of the builtin has this label:
-    ./in.cue:88:48
-    ./in.cue:88:8
+    ./in.cue:87:48
+    ./in.cue:87:8
 [eval] invalid value 5 (out of bound <3):
-    ./in.cue:94:50
-    ./in.cue:96:20
+    ./in.cue:93:56
+    ./in.cue:95:20
 [eval] labelMatch.unknown: parameter times of function type not allowed by builtin strings.Repeat: no parameter of the builtin has this label:
-    ./in.cue:100:29
+    ./in.cue:99:29
 [eval] partial.contains: partial application of builtin strings.Contains is not supported:
-    ./in.cue:124:12
+    ./in.cue:123:12
 [eval] partial.length: partial application of builtin len is not supported:
-    ./in.cue:125:12
+    ./in.cue:124:12
+[eval] polymorphic.any: parameter 1 of builtin len accepts (string|bytes|list|struct), but its signature requires _:
+    ./in.cue:136:9
 [eval] conflicting values string and [1,2] (mismatched types string and list):
-    ./in.cue:139:13
-    ./in.cue:142:11
+    ./in.cue:140:13
+    ./in.cue:143:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:
-    ./in.cue:145:8
+    ./in.cue:146:8
+[eval] aliases.sp3: builtin strings.Split returns list, but its signature requires {...}:
+    ./in.cue:161:8
+[eval] labelOrder.ab: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
+    ./in.cue:171:6
+    ./in.cue:172:6
+[eval] labelOrder.ba: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
+    ./in.cue:171:6
 [eval] labeled.errors.unknown: unknown argument lst in call to list.Drop:
-    ./in.cue:161:12
+    ./in.cue:190:12
 [eval] labeled.errors.dup: argument s provided by position and label in call to strings.Repeat:
-    ./in.cue:164:8
+    ./in.cue:193:8
 [eval] labeled.errors.hole: missing argument 2 in call to list.Slice:
-    ./in.cue:167:9
+    ./in.cue:196:9
 [eval] labeled.user.f: builtin strings.SplitN has more parameters than closed function type:
-    ./in.cue:173:6
+    ./in.cue:202:6
 [eval] labeled.user.badName: conflicting parameter labels text and s for positional parameter 1 in function type and function type:
-    ./in.cue:181:50
-    ./in.cue:181:13
+    ./in.cue:210:50
+    ./in.cue:210:13
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:197:43
-    ./in.cue:189:40
-    ./in.cue:198:20
+    ./in.cue:226:43
+    ./in.cue:218:40
+    ./in.cue:227:20
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:197:43
-    ./in.cue:189:40
-    ./in.cue:199:37
+    ./in.cue:226:43
+    ./in.cue:218:40
+    ./in.cue:228:37
 [eval] conflicting defaults for parameter count: conflicting values 3 and 2:
-    ./in.cue:189:40
-    ./in.cue:197:43
-    ./in.cue:200:38
+    ./in.cue:218:40
+    ./in.cue:226:43
+    ./in.cue:229:38
 [eval] conflicting defaults for parameter os: conflicting values "unix" and "windows":
-    ./in.cue:204:47
-    ./in.cue:205:10
+    ./in.cue:234:60
+    ./in.cue:235:11
+[eval] typeDefaults.joinAny: parameter os of builtin path.Join accepts *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos", but its signature requires string:
+    ./in.cue:236:11
 -- out/eval/stats --
-Leaks:  3
-Freed:  167
-Reused: 144
-Allocs: 26
+Leaks:  13
+Freed:  367
+Reused: 326
+Allocs: 54
 Retain: 0
 
-Unifications: 122
-Conjuncts:    288
-Disjuncts:    38
+Unifications: 236
+Conjuncts:    607
+Disjuncts:    128
 
-NumCloseIDs: 56
+NumCloseIDs: 113

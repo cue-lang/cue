@@ -51,13 +51,13 @@ paramScope: {
 
 typedAdd1: func(_~x: int) -> int: x + 1
 typedAdd1: func(x: int) -> int
-typedAdd1: func(x: <10) -> int
+typedAdd1: func(x: int & <10) -> int
 
 _reviewerAdd1: func(_~x: int) -> int: x + 1
 _reviewerAdd1: func(x: int) -> int
 
 limited: func(_~n: int) -> int: n
-limited: func(input: <10) -> int
+limited: func(input: int & <10) -> int
 
 typedSum: func(_~a: int, _~b: int) -> int: a + b
 typedSum: func(x: int, y: int) -> int
@@ -149,7 +149,7 @@ func TestNativeFunctionErrors(t *testing.T) {
 @experiment(functions)
 
 f: func(_~n: int) -> int: n
-f: func(input: <10) -> int
+f: func(input: int & <10) -> int
 out: f(input: 15)
 `,
 			err: "invalid value 15 (out of bound <10)",
@@ -169,7 +169,7 @@ out: (func(a: int) -> int) & (func(b: int) -> int)
 @experiment(functions)
 
 f: func(_~n: int) -> int: n
-f: func(input: <10) -> int
+f: func(input: int & <10) -> int
 out: f(15)
 `,
 			err: "invalid value 15 (out of bound <10)",
@@ -179,7 +179,7 @@ out: f(15)
 			in: `
 @experiment(functions)
 
-T1: func(x?: <10, ...) -> int
+T1: func(x?: int & <10, ...) -> int
 T2: func(x: int, ...) -> int
 f: (T1 & T2) & (func(_~v: int) -> int: v)
 out: f(x: 20)
@@ -344,7 +344,7 @@ out: p & (func(b: int) -> int)
 import "path"
 
 short: (func(path: string) -> string) & path.Clean
-long: (func(path: string, os: string) -> string) & path.Clean
+long: (func(path: string, os: "unix" | "windows") -> string) & path.Clean
 out: short & long
 `,
 			err: "parameter os of function type not allowed by closed function type",

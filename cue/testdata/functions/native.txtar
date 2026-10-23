@@ -698,6 +698,25 @@ disjunctEnv: {
 			suberr=(contains="invalid default for parameter a"))
 	}
 }
+
+// Declared compatibility aligns parameters as calls bind them: a type's
+// constraint on a labeled or omittable parameter must be covered by the
+// implementation parameter it binds to, while a default is no coverage
+// obligation.
+admission: {
+	T:   func(a: int, b?: int) -> int
+	f:   T & (func(a: number, b: number = 2) -> int: 1)
+	fX:  f(1) @test(eq, 1)
+	fB:  f(1, b: 3) @test(eq, 1)
+	bad: T & (func(a: number, b: string = "x") -> int: 1) @test(err, code=eval, contains="parameter b of function accepts string, but its signature requires int")
+
+	// A labeled signature parameter binds the implementation's positional
+	// parameter in that position and must be covered there.
+	U:    func(n: int) -> int
+	g:    U & (func(_~v: number) -> int: 1)
+	gX:   g(n: 2) @test(eq, 1)
+	gBad: U & (func(_~v: string) -> int: 1) @test(err, code=eval, contains="parameter n of function accepts string, but its signature requires int")
+}
 -- out/errors.txt --
 [eval] arguments.sum.tooMany: too many positional arguments in function call:
     ./in.cue:13:19
@@ -837,19 +856,25 @@ invalid default for parameter a: invalid value 9 (out of bound <5):
     ./in.cue:692:32
     ./in.cue:692:27
     ./in.cue:693:25
+[eval] admission.bad: parameter b of function accepts string, but its signature requires int:
+    ./in.cue:710:12
+    ./in.cue:706:7
+[eval] admission.gBad: parameter n of function accepts string, but its signature requires int:
+    ./in.cue:717:13
+    ./in.cue:714:8
 -- out/eval/stats --
 Leaks:  126
-Freed:  1482
-Reused: 1444
-Allocs: 164
+Freed:  1502
+Reused: 1463
+Allocs: 165
 Retain: 0
 
-Unifications: 1284
-Conjuncts:    3685
+Unifications: 1304
+Conjuncts:    3746
 Disjuncts:    232
 Notifications: 8
 
-NumCloseIDs: 636
+NumCloseIDs: 643
 
-ConjunctInfos:       1455
+ConjunctInfos:       1479
 MaxConjunctInfos:    8

@@ -10,8 +10,9 @@
 # contributes no slot or label. Defaults declared by the signatures fill
 # omitted arguments and must agree with the builtin's own defaults.
 # Statically checked at unification time are parameter matching, arity, and
-# kind-level compatibility where the constraint is literally a basic type;
-# all other constraints surface when the tightened builtin is called.
+# declared compatibility: the builtin's parameter kinds must admit every value
+# a type parameter admits, and its result kind must be within the type's
+# result; the type's constraints then restrict every call.
 -- in.cue --
 @experiment(functions)
 
@@ -69,12 +70,11 @@ dynamic: {
 	ok:  up("hi")
 	oob: up("zz")
 
-	// The type narrows the result.
+	// The type cannot require a result the builtin does not declare: a
+	// builtin returning any string does not satisfy a signature requiring
+	// one particular string.
 	R:   func(string, ...) -> "HI"
 	up2: R & strings.ToUpper
-
-	good: up2("hi")
-	bad:  up2("no")
 
 	// Narrowing stacks across a chain of tightenings.
 	A:   func(string, ...) -> string
@@ -106,7 +106,7 @@ optionalExtra: {
 // A required or optional parameter of a type and the builtin parameter with
 // the same label are the same parameter, so the type covers it.
 labelMatch: {
-	opt:     strings.Repeat & (func(string, count?: <3) -> string)
+	opt:     strings.Repeat & (func(string, count?: int & <3) -> string)
 	optOK:   opt("x", 2)
 	optBad:  opt("x", 5)
 	req:     strings.Repeat & (func(string, count!: int) -> string)
@@ -141,13 +141,15 @@ partial: {
 }
 
 // len is polymorphic over strings, bytes, lists, and structs; its kind-level
-// signature is compatible with a type over any of these.
+// signature is compatible with a type over any of these. A type over every
+// value requires a builtin accepting every value, which len is not.
 polymorphic: {
-	L: func(_, ...) -> int
+	L: func(string | bytes | [...] | {...}, ...) -> int
 	l: L & len
 
 	str:  l("foo")
 	list: l([1, 2])
+	any:  (func(_, ...) -> int) & len
 
 	// The type may narrow the accepted arguments to a subset of the kinds
 	// the builtin accepts; the narrowing applies per call.
@@ -158,6 +160,34 @@ polymorphic: {
 
 	// A statically incompatible result kind is rejected.
 	bad: (func(_, ...) -> string) & len
+}
+
+// A builtin declares its result at the level of kinds, which admits a
+// structural result constraint of a fitting kind, written out or referred
+// to, and rejects one of another kind.
+aliases: {
+	#L:   [...]
+	S:    func(s: string, sep: string) -> #L
+	sp:   S & strings.Split
+	spX:  sp("a,b", ",")
+	#Strs: [...string]
+	S2:   func(s: string, sep: string) -> #Strs
+	sp2:  S2 & strings.Split
+	sp2X: sp2("a,b", ",")
+	S3:   func(s: string, sep: string) -> {...}
+	sp3:  S3 & strings.Split
+	// A string bound may admit every string.
+	GeUp: func(s: string) -> >=""
+	geUp: (GeUp & strings.ToUpper)("a")
+}
+
+// Admission is repeated as signatures arrive, so the outcome does not depend
+// on the order in which a name-only parameter gains its label.
+labelOrder: {
+	A:  func(x?: string | int, ...) -> int
+	B:  func(x: string, ...) -> int
+	ab: (len & A) & B
+	ba: (len & B) & A
 }
 
 // A labeled argument binds through the contract labels of the builtin's
@@ -215,16 +245,29 @@ typeDefaults: {
 	repBothRev: Rep3 & strings.Repeat & Rep
 	repSame:    (Rep & strings.Repeat & Rep)("ab", 3)
 
-	// A declared default must agree with the builtin's own default.
-	Join:   func(elem: [...string], os: string = "windows") -> string
-	join:   Join & path.Join
+	// A declared default must agree with the builtin's own default; the
+	// parameter type must stay within the values the builtin accepts.
+	Join:    func(elem: [...string], os: "unix" | "windows" = "windows") -> string
+	join:    Join & path.Join
+	JoinAny: func(elem: [...string], os: string = "unix") -> string
+	joinAny: JoinAny & path.Join
+	// A type may leave the default out: the builtin's own default then
+	// fills the omitted argument.
+	JoinND:  func(elem: [...string], os: "unix" | "windows") -> string
+	joinND:  (JoinND & path.Join)(["a", "b"])
+	joinNDW: (JoinND & path.Join)(["a", "b"], "windows")
+	// A differing default preference in the type is no obligation on the
+	// values the builtin must accept.
+	#OS:    *"windows" | "unix"
+	JoinOS: func(elem: [...string], os: #OS) -> string
+	joinOS: (JoinOS & path.Join)(["a", "b"], "unix")
 
 	// A default declared on a type fills an omitted argument of a builtin
 	// as it would for a function value.
 	_rep: strings.Repeat
 	_rep: func(s: string, count: int = 3) -> string
 	split: _rep("a")
-	Unix:   func(elem: [...string], os: string = "unix") -> string
+	Unix:   func(elem: [...string], os: "unix" | "windows" = "unix") -> string
 	unix:   Unix & path.Join
 	unixX:  unix(["a", "b"])
 	unixOS: unix(["a", "b"], "windows")
@@ -260,8 +303,6 @@ typeDefaults: {
     oob: 〈0;up〉("zz")
     R: func(string, ...) -> "HI"
     up2: (〈0;R〉 & 〈import;strings〉.ToUpper)
-    good: 〈0;up2〉("hi")
-    bad: 〈0;up2〉("no")
     A: func(string, ...) -> string
     B: func(<="m", ...) -> _
     up3: ((〈0;A〉 & 〈0;B〉) & 〈import;strings〉.ToUpper)
@@ -278,7 +319,7 @@ typeDefaults: {
     bad: (func(string, sep!: string) -> string & 〈import;strings〉.ToUpper)
   }
   labelMatch: {
-    opt: (〈import;strings〉.Repeat & func(string, count?: <3) -> string)
+    opt: (〈import;strings〉.Repeat & func(string, count?: (int & <3)) -> string)
     optOK: 〈0;opt〉("x", 2)
     optBad: 〈0;opt〉("x", 5)
     req: (〈import;strings〉.Repeat & func(string, count!: int) -> string)
@@ -303,13 +344,18 @@ typeDefaults: {
     ])
   }
   polymorphic: {
-    L: func(_, ...) -> int
+    L: func((string|bytes|[
+      ...,
+    ]|{
+      ...
+    }), ...) -> int
     l: (〈0;L〉 & len)
     str: 〈0;l〉("foo")
     list: 〈0;l〉([
       1,
       2,
     ])
+    any: (func(_, ...) -> int & len)
     S: func(string, ...) -> int
     ls: (〈0;S〉 & len)
     sOk: 〈0;ls〉("foo")
@@ -318,6 +364,32 @@ typeDefaults: {
       2,
     ])
     bad: (func(_, ...) -> string & len)
+  }
+  aliases: {
+    #L: [
+      ...,
+    ]
+    S: func(s: string, sep: string) -> 〈0;#L〉
+    sp: (〈0;S〉 & 〈import;strings〉.Split)
+    spX: 〈0;sp〉("a,b", ",")
+    #Strs: [
+      ...string,
+    ]
+    S2: func(s: string, sep: string) -> 〈0;#Strs〉
+    sp2: (〈0;S2〉 & 〈import;strings〉.Split)
+    sp2X: 〈0;sp2〉("a,b", ",")
+    S3: func(s: string, sep: string) -> {
+      ...
+    }
+    sp3: (〈0;S3〉 & 〈import;strings〉.Split)
+    GeUp: func(s: string) -> >=""
+    geUp: (〈0;GeUp〉 & 〈import;strings〉.ToUpper)("a")
+  }
+  labelOrder: {
+    A: func(x?: (string|int), ...) -> int
+    B: func(x: string, ...) -> int
+    ab: ((len & 〈0;A〉) & 〈0;B〉)
+    ba: ((len & 〈0;B〉) & 〈0;A〉)
   }
   labeled: {
     import1: {
@@ -367,14 +439,37 @@ typeDefaults: {
     repSame: ((〈0;Rep〉 & 〈import;strings〉.Repeat) & 〈0;Rep〉)("ab", 3)
     Join: func(elem: [
       ...string,
-    ], os: string = "windows") -> string
+    ], os: ("unix"|"windows") = "windows") -> string
     join: (〈0;Join〉 & 〈import;path〉.Join)
+    JoinAny: func(elem: [
+      ...string,
+    ], os: string = "unix") -> string
+    joinAny: (〈0;JoinAny〉 & 〈import;path〉.Join)
+    JoinND: func(elem: [
+      ...string,
+    ], os: ("unix"|"windows")) -> string
+    joinND: (〈0;JoinND〉 & 〈import;path〉.Join)([
+      "a",
+      "b",
+    ])
+    joinNDW: (〈0;JoinND〉 & 〈import;path〉.Join)([
+      "a",
+      "b",
+    ], "windows")
+    #OS: (*"windows"|"unix")
+    JoinOS: func(elem: [
+      ...string,
+    ], os: 〈0;#OS〉) -> string
+    joinOS: (〈0;JoinOS〉 & 〈import;path〉.Join)([
+      "a",
+      "b",
+    ], "unix")
     _rep: 〈import;strings〉.Repeat
     _rep: func(s: string, count: int = 3) -> string
     split: 〈0;_rep〉("a")
     Unix: func(elem: [
       ...string,
-    ], os: string = "unix") -> string
+    ], os: ("unix"|"windows") = "unix") -> string
     unix: (〈0;Unix〉 & 〈import;path〉.Join)
     unixX: 〈0;unix〉([
       "a",

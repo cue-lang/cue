@@ -18,8 +18,11 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/cockroachdb/apd/v3"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // This file implements unification of CUE function values and
@@ -56,9 +59,10 @@ import (
 // constraint are scheduled alongside those of the value (see
 // [nodeContext.scheduleFuncCall]). In particular:
 //
-//   - conflicts between a type's and a value's parameter constraints (e.g.
-//     int versus string) surface when the function is called, not when it is
-//     unified;
+//   - the conjunction of a type's and a value's parameter constraints is
+//     enforced when the function is called; that the value's declaration
+//     admits what the type's requires is checked where the two meet (see
+//     [checkFuncAdmission]);
 //   - the type's parameter order does not replace the value's implementation
 //     signature. A plain name can supply the contract label of an otherwise
 //     unnamed matched slot, while positional calls and the function body's
@@ -237,7 +241,7 @@ func checkParamsDeclared(c *OpContext, x, y *Function, byLabel bool, xd, yd stri
 // signatures: positional parameters align by ordinal and unify their contract
 // labels, name-only parameters match by label, and a parameter present in only
 // one is allowed only if the other signature is open or the parameter is
-// optional.
+// omittable, optional or declaring a default.
 func checkFuncTypeMeet(c *OpContext, x, y *Function) *Bottom {
 	if b := checkParamsDeclared(c, x, y, true, "function type", "function type"); b != nil {
 		return b
@@ -282,6 +286,1003 @@ func checkFuncComposition(c *OpContext, x, y *Function) *Bottom {
 		return b
 	}
 	return checkParamsDeclared(c, y, x, false, "function", "function")
+}
+
+// checkFuncAdmission verifies declared compatibility between the
+// implementations and the bodyless signatures among head and types. An
+// implementation must declare, for every parameter it shares with a
+// signature, a constraint admitting every value the signature's constraint
+// admits, and a result constraint whose values the signature's result
+// admits. Each implementation is checked against each signature on its own:
+// neither another implementation nor the constraints enforced per call can
+// stand in for a declaration that falls short, and a signature's constraints
+// keep restricting calls regardless of what an implementation accepts.
+//
+// Incompatibility is established from complete evidence only: a constraint
+// that does not yet evaluate to a complete value, or a comparison that no
+// rule of [OpContext.admits] decides, does not reject the binding.
+func checkFuncAdmission(c *OpContext, head FuncType, types []FuncType) *Bottom {
+	for _, sig := range types {
+		if sig.Fn.Body != nil {
+			continue
+		}
+		if head.Fn.Body != nil {
+			if b := c.checkDeclared(sig, head, types); b != nil {
+				return b
+			}
+		}
+		for _, impl := range types {
+			if impl.Fn.Body == nil {
+				continue
+			}
+			if b := c.checkDeclared(sig, impl, types); b != nil {
+				return b
+			}
+		}
+	}
+	return nil
+}
+
+// checkDeclared verifies that the implementation impl satisfies the bodyless
+// signature sig (see [checkFuncAdmission]). Parameters match as calls bind
+// them, through the labels all of types contribute; a signature parameter
+// that matches no parameter of the implementation is never bound through
+// the signature.
+func (c *OpContext) checkDeclared(sig, impl FuncType, types []FuncType) *Bottom {
+	for i, j := range matchFuncParamsToValue(sig.Fn, impl.Fn, types) {
+		if j < 0 {
+			continue
+		}
+		sp, ip := &sig.Fn.Params[i], &impl.Fn.Params[j]
+		if !c.covers(impl.Env, ip.Value, sig.Env, sp.Value) {
+			return admissionErr(c, impl.Fn, sig.Fn,
+				"parameter %s of function accepts %s, but its signature requires %s",
+				funcParamName(c, i, sp), constraintString(c, ip.Value), constraintString(c, sp.Value))
+		}
+	}
+	if !c.covers(sig.Env, sig.Fn.Ret, impl.Env, impl.Fn.Ret) {
+		return admissionErr(c, impl.Fn, sig.Fn,
+			"function returns %s, but its signature requires %s",
+			constraintString(c, impl.Fn.Ret), constraintString(c, sig.Fn.Ret))
+	}
+	return nil
+}
+
+// covers reports whether the constraint a, compiled in enva, admits every
+// value that the constraint b, compiled in envb, admits. A nil constraint is
+// top. It reports false only when this is refuted (see [OpContext.admits]).
+func (c *OpContext) covers(enva *Environment, a Expr, envb *Environment, b Expr) bool {
+	if a == nil {
+		return true
+	}
+	if k, ok := kindOnlyConstraint(a); ok {
+		return c.kindCovers(k, envb, b)
+	}
+	va, ok := c.evalConstraint(enva, a)
+	if !ok {
+		return true
+	}
+	var vb Value = &Top{}
+	if b != nil {
+		if vb, ok = c.evalConstraint(envb, b); !ok {
+			return true
+		}
+	}
+	return c.admits(va, vb)
+}
+
+// kindCovers reports whether a constraint admitting every value of the kinds
+// k admits every value that the constraint b, compiled in env, admits. A
+// kind-only b reveals its kinds without evaluation. Any other b is evaluated
+// and compared as [OpContext.admits] does, as it need not admit a value of
+// each of its kinds.
+func (c *OpContext) kindCovers(k Kind, env *Environment, b Expr) bool {
+	if k == TopKind {
+		return true
+	}
+	if b == nil {
+		return false
+	}
+	if kb, ok := kindOnlyConstraint(b); ok {
+		return kb&^k == 0
+	}
+	v, ok := c.evalConstraint(env, b)
+	return !ok || c.admits(kindValue(k), v)
+}
+
+// admits reports whether the constraint value a admits every value that b
+// admits, that is, whether a subsumes b. Only a proof that b admits a value
+// that a rejects, with unification failing on a definite conflict, makes it
+// report false. The proofs are:
+//
+//   - a refutes a disjunct of b.
+//   - b admits a value of a kind that a excludes. A basic type, a numeric
+//     bound, a validator of a definite kind, or a function is taken to admit
+//     some value of each of its kinds. Any other constraint must be shown to
+//     by a witness, as below, or for a struct or list by its fields or
+//     elements (see [OpContext.admitsKind]).
+//   - For two structs, a refutes b on a regular field both declare that no
+//     other part of b refers to (see [OpContext.correlatedFields]).
+//   - For two lists, a refutes b on an element at the same index or on an
+//     element that a's element constraint governs, or b admits a length
+//     that a forbids.
+//   - For other values, a witness: a concrete value of b's kinds that b
+//     admits and a rejects. The candidates are a few fixed values and the
+//     values a and b mention, with their neighbors; unifying a candidate
+//     with a constraint decides whether the constraint admits it.
+//
+// Any comparison these do not decide admits, for instance on a field that
+// only one side declares, which unification adds or supplies, a pattern, or
+// closedness. The outcomes of comparing pairs of structs or lists are
+// remembered for the duration of the outermost call, so that values shared
+// along many paths are compared once (see [admissionMemo]).
+func (c *OpContext) admits(a, b Value) bool {
+	if c.admission == nil {
+		c.admission = &admissionMemo{
+			pairs:      map[[2]*Vertex]bool{},
+			inhabited:  map[*Vertex]bool{},
+			correlated: map[*Vertex]map[Feature]bool{},
+		}
+		defer func() { c.admission = nil }()
+	}
+	return !c.refutes(a, b)
+}
+
+// An admissionMemo holds what one outermost [OpContext.admits] call has
+// established about the structs and lists it reached: for each pair compared
+// whether the first refutes the second, with a pair still being compared
+// taken not to; for each value whether it admits some value; and for each
+// struct which of its fields another part of it refers to.
+type admissionMemo struct {
+	pairs      map[[2]*Vertex]bool
+	inhabited  map[*Vertex]bool
+	correlated map[*Vertex]map[Feature]bool
+}
+
+// refutes reports whether one of the proofs of [OpContext.admits] shows that
+// b admits a value that a rejects.
+func (c *OpContext) refutes(a, b Value) bool {
+	if a == b {
+		return false
+	}
+	switch y := b.(type) {
+	case *Bottom:
+		return false // b admits no value
+	case *Disjunction:
+		for _, d := range y.Values {
+			if c.refutes(a, Unwrap(d)) {
+				return true
+			}
+		}
+		return false
+	}
+	if k := b.Kind() &^ a.Kind(); k != 0 && c.admitsKind(b, k) {
+		return true
+	}
+	switch x := a.(type) {
+	case *Top, *BasicType:
+		return false // a admits every value of its kinds
+	case *FuncValue:
+		return false
+	case *Vertex:
+		if y, ok := b.(*Vertex); ok {
+			return c.refutesComposite(x, y)
+		}
+		return false
+	}
+	if _, ok := b.(*Vertex); ok || Equal(c, a, b, CheckStructural) {
+		return false
+	}
+	return c.refutesByWitness(a, b)
+}
+
+// admitsKind reports whether b admits some value of one of the kinds ks, all
+// of which are among b's kinds. A basic type, a numeric bound, a validator of
+// a definite kind, or a function admits a value of each of its kinds. A
+// struct or list admits a value if its fields or elements do (see
+// [OpContext.inhabited]), and a disjunction if a disjunct does. Any other
+// constraint must be shown to by a witness: a conjunction may admit no value
+// of a kind it names, as >0 & <1 admits no integer; a bound on strings or
+// bytes may admit nothing, as <"" does, and so may a regular expression; and
+// a validator that applies to every kind, such as matchN, admits what its
+// arguments say.
+func (c *OpContext) admitsKind(b Value, ks Kind) bool {
+	switch x := b.(type) {
+	case *Top, *BasicType, *FuncValue, *Builtin:
+		return true
+	case *Vertex:
+		return c.inhabited(x)
+	case *Disjunction:
+		for _, d := range x.Values {
+			if d := Unwrap(d); d.Kind()&ks != 0 && c.admitsKind(d, d.Kind()&ks) {
+				return true
+			}
+		}
+		return false
+	case *BoundValue:
+		if x.Op != MatchOp && x.Op != NotMatchOp && x.Value.Kind()&(StringKind|BytesKind) == 0 {
+			return true
+		}
+	case *BuiltinValidator:
+		if x.Kind() != TopKind {
+			return true
+		}
+	}
+	for _, w := range witnessCandidates(b, b) {
+		if w.Kind()&ks != 0 {
+			if ok, _ := c.admitsConcrete(b, w); ok {
+				return true
+			}
+		}
+	}
+	if ks&StructKind != 0 {
+		if ok, _ := c.admitsConcrete(b, &StructLit{}); ok {
+			return true
+		}
+	}
+	if ks&ListKind != 0 {
+		if ok, _ := c.admitsConcrete(b, &ListLit{}); ok {
+			return true
+		}
+	}
+	return false
+}
+
+// admitsAny reports whether v admits some value (see [OpContext.admitsKind]).
+func (c *OpContext) admitsAny(v Value) bool {
+	if _, ok := v.(*Bottom); ok {
+		return false
+	}
+	return c.admitsKind(v, v.Kind())
+}
+
+// inhabited reports whether the struct or list v admits some value: every
+// field that its values must have, and every element, admits one. A value
+// reached again while it is being examined, through a reference cycle,
+// counts as inhabited.
+func (c *OpContext) inhabited(v *Vertex) bool {
+	if r, seen := c.admission.inhabited[v]; seen {
+		return r
+	}
+	c.admission.inhabited[v] = true
+	r := true
+	for _, a := range v.Arcs {
+		if v.IsList() && !a.Label.IsInt() || !v.IsList() && (!a.Label.IsRegular() || a.ArcType > ArcRequired) {
+			continue
+		}
+		if !c.admitsAny(Unwrap(a)) {
+			r = false
+			break
+		}
+	}
+	c.admission.inhabited[v] = r
+	return r
+}
+
+// refutesComposite reports whether the struct or list a refutes the struct
+// or list b (see [OpContext.admits]). Each pair is compared once per
+// outermost comparison, so that values shared along many paths are not
+// compared once per path; a pair met again while it is being compared counts
+// as not refuted, which can only admit more.
+func (c *OpContext) refutesComposite(a, b *Vertex) bool {
+	key := [2]*Vertex{a, b}
+	if r, seen := c.admission.pairs[key]; seen {
+		return r
+	}
+	c.admission.pairs[key] = false
+	var r bool
+	switch {
+	case a.IsList() && b.IsList():
+		r = c.refutesElems(a, b)
+	case !a.IsList() && !b.IsList():
+		r = c.refutesFields(a, b)
+	}
+	c.admission.pairs[key] = r
+	return r
+}
+
+// refutesFields reports whether the struct a refutes the struct b on a
+// regular field that both declare (see [OpContext.admits]). A field that
+// another part of b refers to is not compared: a value it admits on its own
+// need not extend to a value of b (see [OpContext.correlatedFields]).
+func (c *OpContext) refutesFields(a, b *Vertex) bool {
+	correlated := c.correlatedFields(b)
+	for _, y := range b.Arcs {
+		if !y.Label.IsRegular() || y.ArcType == ArcNotPresent || correlated[y.Label] {
+			continue
+		}
+		x := a.LookupRaw(y.Label)
+		if x == nil || x.ArcType == ArcNotPresent {
+			continue
+		}
+		if c.refutes(Unwrap(x), Unwrap(y)) {
+			return true
+		}
+	}
+	return false
+}
+
+// correlatedFields returns the fields of s that an expression within s refers
+// to. Another field's value, a comprehension, or a pattern constraint of s
+// that mentions a field may restrict it beyond its own constraint, as
+// b: 0 & a restricts a in {a: int, b: 0 & a}, so a value such a field admits
+// on its own need not extend to a value of s. References are found in the
+// values of s's fields, which are resolved in their own environments, and in
+// the literals that s was built from, whose declarations are resolved in an
+// environment holding s, following references to the structs embedded in s.
+// Expressions in nested scopes resolve in an environment with an empty
+// vertex, so that only references to s or beyond resolve; the nested
+// scopes' own correlations are found when their values are compared.
+func (c *OpContext) correlatedFields(s *Vertex) map[Feature]bool {
+	if m, ok := c.admission.correlated[s]; ok {
+		return m
+	}
+	m := map[Feature]bool{}
+	c.admission.correlated[s] = m
+	mark := func(v *Vertex) {
+		for w := v; w != nil; w = w.Parent {
+			if w.Parent == s {
+				m[w.Label] = true
+				return
+			}
+		}
+	}
+	resolve := func(env *Environment, r Resolver) bool {
+		savedErrs := c.errs
+		c.errs = nil
+		v, _ := c.resolveState(MakeConjunct(env, r, c.ci), r, Flags{
+			status:    partial,
+			condition: concreteKnown,
+			mode:      yield,
+		})
+		c.errs = savedErrs
+		if v == nil {
+			return false
+		}
+		mark(v)
+		return true
+	}
+	var walk func(env *Environment, x Node)
+	var decls func(env *Environment, ds []Decl)
+	comprehension := func(env *Environment, x *Comprehension) {
+		if x.Fallback != nil {
+			walk(env, x.Fallback)
+		}
+		for _, cl := range x.Clauses {
+			switch cl := cl.(type) {
+			case *ForClause:
+				walk(env, cl.Src)
+				env = &Environment{Up: env, Vertex: &Vertex{}}
+			case *LetClause:
+				walk(env, cl.Expr)
+				env = &Environment{Up: env, Vertex: &Vertex{}}
+			case *IfClause:
+				walk(env, cl.Condition)
+			}
+		}
+		walk(env, x.Value)
+	}
+	decls = func(env *Environment, ds []Decl) {
+		for _, d := range ds {
+			switch d := d.(type) {
+			case *Field:
+				walk(env, d.Value)
+			case *LetField:
+				walk(env, d.Value)
+			case *Ellipsis:
+				walk(env, d.Value)
+			case *BulkOptionalField:
+				walk(env, d.Filter)
+				walk(env, d.Value)
+			case *DynamicField:
+				walk(env, d.Key)
+				walk(env, d.Value)
+			case *Comprehension:
+				comprehension(env, d)
+			case Expr:
+				walk(env, d)
+			}
+		}
+	}
+	walk = func(env *Environment, x Node) {
+		switch x := x.(type) {
+		case nil:
+		case *SelectorExpr:
+			if !resolve(env, x) {
+				walk(env, x.X)
+			}
+		case *IndexExpr:
+			if !resolve(env, x) {
+				walk(env, x.X)
+				walk(env, x.Index)
+			}
+		case Resolver:
+			resolve(env, x)
+		case *SliceExpr:
+			walk(env, x.X)
+			walk(env, x.Lo)
+			walk(env, x.Hi)
+			walk(env, x.Stride)
+		case *BoundExpr:
+			walk(env, x.Expr)
+		case *UnaryExpr:
+			walk(env, x.X)
+		case *BinaryExpr:
+			walk(env, x.X)
+			walk(env, x.Y)
+		case *Interpolation:
+			for _, p := range x.Parts {
+				walk(env, p)
+			}
+		case *DisjunctionExpr:
+			for _, d := range x.Values {
+				walk(env, d.Val)
+			}
+		case *CallExpr:
+			walk(env, x.Fun)
+			for _, a := range x.Args {
+				walk(env, a)
+			}
+		case *Function:
+			for _, p := range x.Params {
+				walk(env, p.Value)
+				walk(env, p.Default)
+			}
+			walk(env, x.Ret)
+			walk(&Environment{Up: env, Vertex: &Vertex{}}, x.Body)
+		case *StructLit:
+			decls(&Environment{Up: env, Vertex: &Vertex{}}, x.Decls)
+		case *ListLit:
+			inner := &Environment{Up: env, Vertex: &Vertex{}}
+			for _, e := range x.Elems {
+				switch e := e.(type) {
+				case *Ellipsis:
+					walk(inner, e.Value)
+				case *Comprehension:
+					comprehension(inner, e)
+				case Expr:
+					walk(inner, e)
+				}
+			}
+		}
+	}
+	// The literals s was built from, directly or through the references
+	// among its conjuncts, declare their fields in s.
+	seen := map[*Vertex]bool{s: true}
+	var literals func(v *Vertex)
+	literals = func(v *Vertex) {
+		for x := range v.LeafConjuncts() {
+			switch e := x.Expr().(type) {
+			case *StructLit:
+				decls(&Environment{Up: x.Env, Vertex: s}, e.Decls)
+			case Resolver:
+				savedErrs := c.errs
+				c.errs = nil
+				r, _ := c.resolveState(MakeConjunct(x.Env, e, c.ci), e, Flags{
+					status:    partial,
+					condition: concreteKnown,
+					mode:      yield,
+				})
+				c.errs = savedErrs
+				if r = r.DerefValue(); r != nil && !seen[r] {
+					seen[r] = true
+					literals(r)
+				}
+			}
+		}
+	}
+	literals(s)
+	for _, a := range s.Arcs {
+		for x := range a.LeafConjuncts() {
+			walk(x.Env, x.Expr())
+		}
+	}
+	return m
+}
+
+// refutesElems reports whether the list a refutes the list b (see
+// [OpContext.admits]). The lengths refute it when b admits a list longer than
+// a closed a admits, or when a closed b admits only lists shorter than a
+// requires, provided that b admits a list at all. Otherwise an element of b
+// is compared with the element of a at its index, or, beyond a's elements,
+// with a's element constraint, which in turn is compared with b's element
+// constraint beyond b's elements.
+func (c *OpContext) refutesElems(a, b *Vertex) bool {
+	xs := slices.Collect(a.Elems())
+	ys := slices.Collect(b.Elems())
+	for _, y := range ys {
+		if !c.admitsAny(Unwrap(y)) {
+			return false // b admits no list
+		}
+	}
+	var tb Value // b's element constraint beyond its elements, if any
+	if !b.IsClosedList() {
+		if tb = c.listTail(b); !c.admitsAny(tb) {
+			tb = nil // no further element is admitted
+		}
+	}
+	switch {
+	case tb == nil && len(ys) < len(xs):
+		return true
+	case a.IsClosedList():
+		if len(ys) > len(xs) || tb != nil {
+			return true
+		}
+	default:
+		ta := c.listTail(a)
+		for _, y := range ys[min(len(xs), len(ys)):] {
+			if c.refutes(ta, Unwrap(y)) {
+				return true
+			}
+		}
+		if tb != nil && c.refutes(ta, tb) {
+			return true
+		}
+	}
+	for i := range min(len(xs), len(ys)) {
+		if c.refutes(Unwrap(xs[i]), Unwrap(ys[i])) {
+			return true
+		}
+	}
+	return false
+}
+
+// listTail returns the constraint that the open list v places on elements
+// beyond its own: top if it places none, and bottom if it admits none.
+func (c *OpContext) listTail(v *Vertex) Value {
+	w := &Vertex{Label: AnyIndex}
+	v.MatchAndInsert(c, w)
+	if !w.HasConjuncts() {
+		return &Top{}
+	}
+	w.Finalize(c)
+	return Unwrap(w)
+}
+
+// maxWitnesses bounds the number of candidate values that
+// [OpContext.refutesByWitness] tries.
+const maxWitnesses = 48
+
+// refutesByWitness reports whether some concrete value of b's kinds is
+// admitted by b and rejected by a (see [OpContext.admits]). A concrete b is
+// its own only candidate.
+func (c *OpContext) refutesByWitness(a, b Value) bool {
+	if isConcreteScalar(b) {
+		ok, decided := c.admitsConcrete(a, b)
+		return !ok && decided
+	}
+	for _, w := range witnessCandidates(a, b) {
+		if ok, decided := c.admitsConcrete(a, w); ok || !decided {
+			continue
+		}
+		if ok, _ := c.admitsConcrete(b, w); ok {
+			return true
+		}
+	}
+	return false
+}
+
+// admitsConcrete reports whether the constraint value v admits the concrete
+// value w, and whether that is decided: an incomplete unification is not. For
+// a scalar w, a kind, a concrete value, or a disjunction of concrete values
+// decides without unifying.
+func (c *OpContext) admitsConcrete(v Value, w Expr) (ok, decided bool) {
+	if w, scalar := w.(Value); scalar && isConcreteScalar(w) {
+		switch x := v.(type) {
+		case *Top:
+			return true, true
+		case *BasicType:
+			return w.Kind()&^x.K == 0, true
+		case *Disjunction:
+			if !slices.ContainsFunc(x.Values, func(y Value) bool { return !isConcreteScalar(Unwrap(y)) }) {
+				return slices.ContainsFunc(x.Values, func(y Value) bool {
+					return Equal(c, Unwrap(y), w, CheckStructural)
+				}), true
+			}
+		}
+		if isConcreteScalar(v) {
+			return Equal(c, v, w, CheckStructural), true
+		}
+	}
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() { c.errs = savedErrs }()
+	n := c.newInlineVertex(nil, nil, MakeRootConjunct(nil, v), MakeRootConjunct(nil, w))
+	if b := n.Err(c); b != nil {
+		return false, !b.IsIncomplete()
+	}
+	return true, true
+}
+
+// isConcreteScalar reports whether v is a concrete value other than a struct,
+// list, or function.
+func isConcreteScalar(v Value) bool {
+	switch v.(type) {
+	case *Null, *Bool, *Num, *String, *Bytes:
+		return true
+	}
+	return false
+}
+
+// witnessCandidates returns the concrete values of b's kinds that
+// [OpContext.refutesByWitness] tries for a b that is not concrete: the
+// numbers, strings, and bytes that a and b mention with their neighbors, and
+// a few fixed values of each kind.
+func witnessCandidates(a, b Value) []Value {
+	k := b.Kind()
+	var ws []Value
+	seen := map[string]bool{}
+	add := func(v Value) {
+		var key string
+		switch x := v.(type) {
+		case *Num:
+			key = x.K.String() + ":" + x.X.String()
+		case *String:
+			key = "s:" + x.Str
+		case *Bytes:
+			key = "b:" + string(x.B)
+		case *Bool:
+			key = fmt.Sprint(x.B)
+		case *Null:
+			key = "null"
+		}
+		if len(ws) < maxWitnesses && v.Kind()&^k == 0 && !seen[key] {
+			seen[key] = true
+			ws = append(ws, v)
+		}
+	}
+	var nums []*Num
+	var strs []string
+	var bytes [][]byte
+	var mention func(v Value)
+	mention = func(v Value) {
+		switch x := Unwrap(v).(type) {
+		case *Num:
+			nums = append(nums, x)
+		case *String:
+			strs = append(strs, x.Str)
+		case *Bytes:
+			bytes = append(bytes, x.B)
+		case *BoundValue:
+			mention(x.Value)
+		case *Conjunction:
+			for _, y := range x.Values {
+				mention(y)
+			}
+		case *Disjunction:
+			for _, y := range x.Values {
+				mention(y)
+			}
+		case *BuiltinValidator:
+			for _, y := range x.Args {
+				mention(y)
+			}
+		}
+	}
+	mention(a)
+	mention(b)
+	one := &Num{K: IntKind, X: *apd.New(1, 0)}
+	half := &Num{K: FloatKind, X: *apd.New(5, -1)}
+	for _, n := range nums {
+		if k&IntKind != 0 {
+			var f apd.Decimal
+			if _, err := internal.ExactContext.Floor(&f, &n.X); err == nil {
+				lo := &Num{K: IntKind, X: f}
+				add(lo)
+				if v, err := NumSub(lo, one); err == nil {
+					add(v)
+				}
+				if v, err := NumAdd(lo, one); err == nil {
+					add(v)
+					if v, err := NumAdd(v, one); err == nil {
+						add(v)
+					}
+				}
+			}
+		}
+		if k&FloatKind != 0 {
+			f := &Num{K: FloatKind, X: n.X}
+			add(f)
+			if v, err := NumSub(f, half); err == nil {
+				add(v)
+			}
+			if v, err := NumAdd(f, half); err == nil {
+				add(v)
+			}
+		}
+	}
+	all := ""
+	for _, s := range strs {
+		add(&String{Str: s})
+		add(&String{Str: s + "\x00"})
+		if s != "" {
+			add(&String{Str: s[:len(s)-1]})
+		}
+		all += s
+	}
+	if len(strs) > 0 {
+		add(&String{Str: all + "_"})
+	}
+	var allBytes []byte
+	for _, s := range bytes {
+		add(&Bytes{B: s})
+		add(&Bytes{B: append(slices.Clip(s), 0)})
+		if len(s) > 0 {
+			add(&Bytes{B: s[:len(s)-1]})
+		}
+		allBytes = append(allBytes, s...)
+	}
+	if len(bytes) > 0 {
+		add(&Bytes{B: append(allBytes, '_')})
+	}
+	add(&Null{})
+	add(&Bool{B: false})
+	add(&Bool{B: true})
+	for _, i := range []int64{0, 1, -1} {
+		add(&Num{K: IntKind, X: *apd.New(i, 0)})
+	}
+	for _, f := range []int64{0, 5, -5} {
+		add(&Num{K: FloatKind, X: *apd.New(f, -1)})
+	}
+	for _, s := range []string{"", "a", "b", "z", "A", "0", " ", "_"} {
+		add(&String{Str: s})
+		add(&Bytes{B: []byte(s)})
+	}
+	return ws
+}
+
+// builtinParamCovers reports whether the builtin parameter value pv admits
+// every value that the signature constraint x, compiled in env, admits.
+func (c *OpContext) builtinParamCovers(pv Value, env *Environment, x Expr) bool {
+	if k, ok := kindOnlyConstraint(x); ok {
+		return c.admits(pv, kindValue(k))
+	}
+	v, ok := c.evalConstraint(env, x)
+	return !ok || c.admits(pv, v)
+}
+
+// builtinResultCovered reports whether the signature result ret, compiled in
+// env, admits every value of a builtin's result kind k. A builtin declares
+// its result at the level of kinds only, so a structural constraint of a
+// fitting kind, such as a list of strings over a builtin returning a list,
+// is not refuted: the builtin's real result may well be narrower than its
+// kind.
+func (c *OpContext) builtinResultCovered(env *Environment, ret Expr, k Kind) bool {
+	if kr, ok := kindOnlyConstraint(ret); ok {
+		return k&^kr == 0
+	}
+	v, ok := c.evalConstraint(env, ret)
+	if !ok {
+		return true
+	}
+	switch x := v.(type) {
+	case *Top:
+		return true
+	case *BasicType:
+		return k&^x.K == 0
+	case *Vertex:
+		return k&^x.Kind() == 0
+	}
+	return c.admits(v, kindValue(k))
+}
+
+// evalConstraint evaluates the signature constraint x in env to a complete
+// value, with any struct fields or list elements evaluated, and reports
+// whether it is free of errors. Errors it raises are not retained: a
+// constraint that cannot be evaluated here is left to the call.
+func (c *OpContext) evalConstraint(env *Environment, x Expr) (Value, bool) {
+	if c.pendingConstraint(env, x) {
+		return nil, false
+	}
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() { c.errs = savedErrs }()
+	s := c.PushState(env, x.Source())
+	defer c.PopState(s)
+	v := c.newInlineVertex(nil, nil, MakeConjunct(env, x, c.ci))
+	v.Finalize(c)
+	if v.Bottom() != nil || c.errs != nil {
+		return nil, false
+	}
+	return Unwrap(v), true
+}
+
+// needsAdmission reports whether head and types combine an implementation
+// with a bodyless signature, so that there is a declaration to check.
+func needsAdmission(head FuncType, types []FuncType) bool {
+	impl, sig := head.Fn.Body != nil, false
+	for _, t := range types {
+		if t.Fn.Body != nil {
+			impl = true
+		} else {
+			sig = true
+		}
+	}
+	return impl && sig
+}
+
+// pendingConstraint reports whether the constraint x, compiled in env, refers
+// to a value that may still be refined, for instance by a comprehension whose
+// condition depends on the function value being formed. Such a constraint
+// leaves the check undone rather than rejecting on a provisional value;
+// calls enforce the constraint regardless. References are found in the
+// constraint itself, in the operands of its operators, bounds, disjunctions,
+// interpolations, slices, and calls, in the signature and body of a function
+// literal, such as that of a function the constraint calls, and in the
+// fields, lets, and elements of struct and list
+// literals, whose expressions are compiled in the literal's own scope: they
+// are inspected in a scope whose vertex is empty, so that only references
+// escaping the literal resolve. A comprehension in a literal counts as
+// pending, as its clauses have scopes of their own. Whether a referenced value
+// may still be refined is decided by [OpContext.unsettled].
+func (c *OpContext) pendingConstraint(env *Environment, x Expr) bool {
+	return c.pendingAt(env, x, map[*Vertex]bool{})
+}
+
+func (c *OpContext) pendingAt(env *Environment, x Expr, seen map[*Vertex]bool) bool {
+	switch x := x.(type) {
+	case Resolver:
+		savedErrs := c.errs
+		c.errs = nil
+		v, _ := c.resolveState(MakeConjunct(env, x, c.ci), x, Flags{
+			status:    partial,
+			condition: concreteKnown,
+			mode:      yield,
+		})
+		c.errs = savedErrs
+		return v != nil && c.unsettled(v, seen)
+	case *BinaryExpr:
+		return c.pendingAt(env, x.X, seen) || c.pendingAt(env, x.Y, seen)
+	case *UnaryExpr:
+		return c.pendingAt(env, x.X, seen)
+	case *BoundExpr:
+		return c.pendingAt(env, x.Expr, seen)
+	case *Interpolation:
+		for _, p := range x.Parts {
+			if c.pendingAt(env, p, seen) {
+				return true
+			}
+		}
+	case *SliceExpr:
+		for _, e := range []Expr{x.X, x.Lo, x.Hi, x.Stride} {
+			if e != nil && c.pendingAt(env, e, seen) {
+				return true
+			}
+		}
+	case *DisjunctionExpr:
+		for _, d := range x.Values {
+			if c.pendingAt(env, d.Val, seen) {
+				return true
+			}
+		}
+	case *CallExpr:
+		if c.pendingAt(env, x.Fun, seen) {
+			return true
+		}
+		for _, a := range x.Args {
+			if c.pendingAt(env, a, seen) {
+				return true
+			}
+		}
+	case *StructLit:
+		inner := &Environment{Up: env, Vertex: &Vertex{}}
+		for _, d := range x.Decls {
+			var es []Expr
+			switch d := d.(type) {
+			case *Field:
+				es = []Expr{d.Value}
+			case *LetField:
+				es = []Expr{d.Value}
+			case *Ellipsis:
+				es = []Expr{d.Value}
+			case *BulkOptionalField:
+				es = []Expr{d.Filter, d.Value}
+			case *DynamicField:
+				es = []Expr{d.Key, d.Value}
+			case *Comprehension:
+				return true
+			case Expr:
+				es = []Expr{d}
+			}
+			for _, e := range es {
+				if e != nil && c.pendingAt(inner, e, seen) {
+					return true
+				}
+			}
+		}
+	case *ListLit:
+		inner := &Environment{Up: env, Vertex: &Vertex{}}
+		for _, el := range x.Elems {
+			var e Expr
+			switch el := el.(type) {
+			case *Ellipsis:
+				e = el.Value
+			case *Comprehension:
+				return true
+			case Expr:
+				e = el
+			}
+			if e != nil && c.pendingAt(inner, e, seen) {
+				return true
+			}
+		}
+	case *Function:
+		for _, p := range x.Params {
+			if p.Value != nil && c.pendingAt(env, p.Value, seen) ||
+				p.Default != nil && c.pendingAt(env, p.Default, seen) {
+				return true
+			}
+		}
+		if x.Ret != nil && c.pendingAt(env, x.Ret, seen) {
+			return true
+		}
+		return x.Body != nil && c.pendingAt(&Environment{Up: env, Vertex: &Vertex{}}, x.Body, seen)
+	case *Vertex:
+		return c.unsettled(x, seen)
+	}
+	return false
+}
+
+// unsettled reports whether the value of v may still be refined: v is not
+// finalized, and conjuncts may still be added to it or one of its conjuncts
+// refers to such a value. A value whose conjuncts are all known is settled
+// however far its evaluation has progressed, so that whether a constraint is
+// pending does not depend on the order in which fields are evaluated. seen
+// records the values inspected so far, which a reference cycle reaches again.
+func (c *OpContext) unsettled(v *Vertex, seen map[*Vertex]bool) bool {
+	v = v.DerefValue()
+	if v.status == finalized || seen[v] {
+		return false
+	}
+	seen[v] = true
+	if !conjunctsKnown(c, v) {
+		return true
+	}
+	for x := range v.LeafConjuncts() {
+		if c.pendingAt(x.Env, x.Expr(), seen) {
+			return true
+		}
+	}
+	return false
+}
+
+// conjunctsKnown reports whether no further conjuncts can be added to v: no
+// comprehension that may add some to v or to one of its ancestors is pending,
+// and the fields of v's parent have all their conjuncts (see
+// [Vertex.allChildConjunctsKnown]).
+func conjunctsKnown(c *OpContext, v *Vertex) bool {
+	for w := v; w != nil; w = w.Parent {
+		if s := w.state; s != nil && w.status != finalized && s.hasActiveParentTask() {
+			return false
+		}
+	}
+	return v.Parent.allChildConjunctsKnown(c)
+}
+
+// admissionErr reports a declared-compatibility failure at the position of
+// the implementation's signature impl, adding that of the bodyless signature
+// sig when given.
+func admissionErr(c *OpContext, impl, sig Node, format string, args ...interface{}) *Bottom {
+	err := c.NewPosf(Pos(impl), format, args...)
+	if sig != nil {
+		err.AddPosition(sig)
+	}
+	return &Bottom{Src: impl.Source(), Code: EvalError, Err: err}
+}
+
+// kindValue returns the value admitting exactly the values of kind k.
+func kindValue(k Kind) Value {
+	if k == TopKind {
+		return &Top{}
+	}
+	return &BasicType{K: k}
+}
+
+func constraintString(c *OpContext, x Expr) string {
+	if x == nil {
+		return "_"
+	}
+	return c.Str(x).String()
 }
 
 // ExtraFuncParam returns the first non-omittable parameter of val that is
@@ -942,7 +1943,10 @@ func mergeBuiltinFunc(c *OpContext, b *Builtin, f *FuncValue) (*Builtin, *Bottom
 // not depend on the order in which the signatures were unified with it. A
 // builtin's own defaults are part of its signature, like the defaults of the
 // CUE signatures unified with it, so a declared default must also agree with
-// the builtin's default for the same parameter.
+// the builtin's default for the same parameter. The builtin's parameter
+// values and result kind are its declaration, which must admit what each
+// signature requires, as an implementation's declaration must (see
+// [checkFuncAdmission]).
 func checkBuiltinSignatures(c *OpContext, b *Builtin, types []FuncType) *Bottom {
 	for _, t := range types {
 		if err := checkBuiltinTightening(c, t.Fn, b, types); err != nil {
@@ -959,6 +1963,36 @@ func checkBuiltinSignatures(c *OpContext, b *Builtin, types []FuncType) *Bottom 
 				}
 			}
 		}
+		if err := checkBuiltinAdmission(c, b, t, types); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// checkBuiltinAdmission verifies that builtin b's declaration, its parameter
+// values and result kind, admits what the signature t requires, as an
+// implementation's declaration must (see [checkFuncAdmission]). types are
+// the signatures attached to b, which label its parameters; the check is
+// repeated with every signature as they arrive, since a name-only parameter
+// is matched only once a sibling signature has labeled the builtin's slot.
+func checkBuiltinAdmission(c *OpContext, b *Builtin, t FuncType, types []FuncType) *Bottom {
+	for k, j := range matchBuiltinParamsWith(t.Fn, b, types) {
+		tp := &t.Fn.Params[k]
+		if j < 0 || tp.Value == nil {
+			continue
+		}
+		if !c.builtinParamCovers(b.Params[j].Value, t.Env, tp.Value) {
+			return admissionErr(c, t.Fn, nil,
+				"parameter %s of builtin %s accepts %s, but its signature requires %s",
+				funcParamName(c, k, tp), b.qualifiedName(c), c.Str(b.Params[j].Value), c.Str(tp.Value))
+		}
+	}
+	if t.Fn.Ret != nil && b.Result != BottomKind &&
+		!c.builtinResultCovered(t.Env, t.Fn.Ret, b.Result) {
+		return admissionErr(c, t.Fn, nil,
+			"builtin %s returns %s, but its signature requires %s",
+			b.qualifiedName(c), b.Result, c.Str(t.Fn.Ret))
 	}
 	return nil
 }
@@ -1025,6 +2059,9 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 		merged := *a
 		merged.Types = mergeFuncTypes(a.Types, b.Types)
 		if err := checkFuncParamLabels(c, merged.Fn, merged.Types); err != nil {
+			return nil, err
+		}
+		if err := checkAdmission(c, FuncType{Fn: a.Fn, Env: a.Env}, merged.Types); err != nil {
 			return nil, err
 		}
 		return &merged, nil
@@ -1108,9 +2145,22 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 	if b := checkFuncParamLabels(c, prim.Fn, types); b != nil {
 		return nil, b
 	}
+	if b := checkAdmission(c, head, types); b != nil {
+		return nil, b
+	}
 	merged := *prim
 	merged.Types = types
 	return &merged, nil
+}
+
+// checkAdmission runs the declared-compatibility check of the implementations
+// among head and types against the bodyless signatures among them, if there
+// are both; see [checkFuncAdmission].
+func checkAdmission(c *OpContext, head FuncType, types []FuncType) *Bottom {
+	if !needsAdmission(head, types) {
+		return nil
+	}
+	return checkFuncAdmission(c, head, types)
 }
 
 // sameFunc reports whether two signatures with an implementation are the

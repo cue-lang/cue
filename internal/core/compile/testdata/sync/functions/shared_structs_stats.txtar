@@ -1,0 +1,109 @@
+# Two struct definitions that share their parts must compare each pair of
+# parts once, not once for every path through them, which grows exponentially
+# with the depth. The leaves differ in form but not in the values they admit,
+# so that comparing a pair of leaves tries witnesses; six levels make the
+# difference plain in out/eval/stats without making the regression test
+# expensive.
+#inlinetest:exclude skip — performance regression guarded by out/eval/stats
+-- in.cue --
+@experiment(functions)
+
+#A0: {v: int & >0}
+#B0: {v: int & >=1}
+#A1: {a: #A0, b: #A0, c: #A0, d: #A0}
+#B1: {a: #B0, b: #B0, c: #B0, d: #B0}
+#A2: {a: #A1, b: #A1, c: #A1, d: #A1}
+#B2: {a: #B1, b: #B1, c: #B1, d: #B1}
+#A3: {a: #A2, b: #A2, c: #A2, d: #A2}
+#B3: {a: #B2, b: #B2, c: #B2, d: #B2}
+#A4: {a: #A3, b: #A3, c: #A3, d: #A3}
+#B4: {a: #B3, b: #B3, c: #B3, d: #B3}
+#A5: {a: #A4, b: #A4, c: #A4, d: #A4}
+#B5: {a: #B4, b: #B4, c: #B4, d: #B4}
+#A6: {a: #A5, b: #A5, c: #A5, d: #A5}
+#B6: {a: #B5, b: #B5, c: #B5, d: #B5}
+
+admitted: (func(p: #A6) -> int) & (func(p: #B6) -> int: 1)
+-- out/compile --
+--- in.cue
+{
+  #A0: {
+    v: (int & >0)
+  }
+  #B0: {
+    v: (int & >=1)
+  }
+  #A1: {
+    a: 〈1;#A0〉
+    b: 〈1;#A0〉
+    c: 〈1;#A0〉
+    d: 〈1;#A0〉
+  }
+  #B1: {
+    a: 〈1;#B0〉
+    b: 〈1;#B0〉
+    c: 〈1;#B0〉
+    d: 〈1;#B0〉
+  }
+  #A2: {
+    a: 〈1;#A1〉
+    b: 〈1;#A1〉
+    c: 〈1;#A1〉
+    d: 〈1;#A1〉
+  }
+  #B2: {
+    a: 〈1;#B1〉
+    b: 〈1;#B1〉
+    c: 〈1;#B1〉
+    d: 〈1;#B1〉
+  }
+  #A3: {
+    a: 〈1;#A2〉
+    b: 〈1;#A2〉
+    c: 〈1;#A2〉
+    d: 〈1;#A2〉
+  }
+  #B3: {
+    a: 〈1;#B2〉
+    b: 〈1;#B2〉
+    c: 〈1;#B2〉
+    d: 〈1;#B2〉
+  }
+  #A4: {
+    a: 〈1;#A3〉
+    b: 〈1;#A3〉
+    c: 〈1;#A3〉
+    d: 〈1;#A3〉
+  }
+  #B4: {
+    a: 〈1;#B3〉
+    b: 〈1;#B3〉
+    c: 〈1;#B3〉
+    d: 〈1;#B3〉
+  }
+  #A5: {
+    a: 〈1;#A4〉
+    b: 〈1;#A4〉
+    c: 〈1;#A4〉
+    d: 〈1;#A4〉
+  }
+  #B5: {
+    a: 〈1;#B4〉
+    b: 〈1;#B4〉
+    c: 〈1;#B4〉
+    d: 〈1;#B4〉
+  }
+  #A6: {
+    a: 〈1;#A5〉
+    b: 〈1;#A5〉
+    c: 〈1;#A5〉
+    d: 〈1;#A5〉
+  }
+  #B6: {
+    a: 〈1;#B5〉
+    b: 〈1;#B5〉
+    c: 〈1;#B5〉
+    d: 〈1;#B5〉
+  }
+  admitted: (func(p: 〈0;#A6〉) -> int & func(p: 〈0;#B6〉) -> int: 1)
+}

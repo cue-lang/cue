@@ -687,6 +687,25 @@ disjunctEnv: {
 		out: x.j
 	}
 }
+
+// Declared compatibility aligns parameters as calls bind them: a type's
+// constraint on a labeled or omittable parameter must be covered by the
+// implementation parameter it binds to, while a default is no coverage
+// obligation.
+admission: {
+	T:   func(a: int, b?: int) -> int
+	f:   T & (func(a: number, b: number = 2) -> int: 1)
+	fX:  f(1)
+	fB:  f(1, b: 3)
+	bad: T & (func(a: number, b: string = "x") -> int: 1)
+
+	// A labeled signature parameter binds the implementation's positional
+	// parameter in that position and must be covered there.
+	U:    func(n: int) -> int
+	g:    U & (func(_~v: number) -> int: 1)
+	gX:   g(n: 2)
+	gBad: U & (func(_~v: string) -> int: 1)
+}
 -- out/compile --
 --- in.cue
 {
@@ -1208,5 +1227,16 @@ disjunctEnv: {
       }
       out: 〈0;x〉.j
     }
+  }
+  admission: {
+    T: func(a: int, b?: int) -> int
+    f: (〈0;T〉 & func(a: number, b: number = 2) -> int: 1)
+    fX: 〈0;f〉(1)
+    fB: 〈0;f〉(1, b: 3)
+    bad: (〈0;T〉 & func(a: number, b: string = "x") -> int: 1)
+    U: func(n: int) -> int
+    g: (〈0;U〉 & func(number) -> int: 1)
+    gX: 〈0;g〉(n: 2)
+    gBad: (〈0;U〉 & func(string) -> int: 1)
   }
 }

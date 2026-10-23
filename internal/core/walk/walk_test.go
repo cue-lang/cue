@@ -38,7 +38,7 @@ func TestFeaturesFuncCallRef(t *testing.T) {
 
 lim: 10
 T:   func(n: <lim, ...) -> _
-f:   T & (func(n: int) -> _: {v: n})
+f:   T & (func(n: number) -> _: {v: n})
 `
 	ctx := cuecontext.New()
 	scope := ctx.CompileString(config)

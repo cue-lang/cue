@@ -207,6 +207,11 @@ type OpContext struct {
 	// indexed by parameter position. See [anonParamLabel].
 	anonParamLabels []Feature
 
+	// admission holds what one outermost declared-compatibility comparison
+	// has established about the structs and lists it reached. See
+	// [OpContext.admits].
+	admission *admissionMemo
+
 	// checkingDefaults tracks the function literals, per closure, whose
 	// declared parameter defaults are being checked against their constraints
 	// (see [Function.checkDefaults]). The check runs outside any call, so a

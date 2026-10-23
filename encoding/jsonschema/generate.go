@@ -434,6 +434,7 @@ func mergeAllOf(it internItem, u *uniqueItems) internItem {
 		typeIndex := -1
 		var typeKind cue.Kind
 		for e := range siblings(it1) {
+			e = mergeAllOf(e, u)
 			// Remove elements that are entirely redundant.
 			if slices.Contains(it2.elems, e) {
 				continue
@@ -458,7 +459,7 @@ func mergeAllOf(it internItem, u *uniqueItems) internItem {
 				// conjunction already rejects everything, and collapsing it
 				// to the false schema is a separate simplification.
 			}
-			it2.elems = append(it2.elems, mergeAllOf(e, u))
+			it2.elems = append(it2.elems, e)
 		}
 		if len(it2.elems) == 1 {
 			return it2.elems[0]

@@ -1,5 +1,5 @@
 # bar repeats a conjunct, which the schema holds only once,
-# but baz, whose conjunct holds a nested allOf, is held twice.
+# and so is baz, whose conjunct holds a nested allOf.
 -- test.cue --
 package test
 foo!: #D1
@@ -42,27 +42,14 @@ missingX: {
 	type: "object"
 	properties: {
 		bar: $ref: "#/$defs/D2"
-		baz: allOf: [{
-			anyOf: [{
-				type: "integer"
-			}, {
-				allOf: [{
-					pattern: "b"
-				}, {
-					type:    "string"
-					pattern: "a"
-				}]
-			}]
+		baz: anyOf: [{
+			type: "integer"
 		}, {
-			anyOf: [{
-				type: "integer"
+			allOf: [{
+				pattern: "b"
 			}, {
-				allOf: [{
-					pattern: "b"
-				}, {
-					type:    "string"
-					pattern: "a"
-				}]
+				type:    "string"
+				pattern: "a"
 			}]
 		}]
 		foo: $ref: "#/$defs/D1"

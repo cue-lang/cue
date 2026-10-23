@@ -2,8 +2,6 @@ Simplified exports print the predeclared numeric types by name.
 Where a field shadows such a name, the export must use its __-prefixed
 form, so that the output still refers to the predeclared type.
 
-TODO: rune prints as uint & <=1114111.
-
 -- in.cue --
 plain: {
 	r:    rune
@@ -37,7 +35,7 @@ shadowed: {
 }
 -- out/definition --
 plain: {
-	r:    uint & <=1114111
+	r:    rune
 	i8:   int8
 	i16:  int16
 	i32:  int32
@@ -59,7 +57,7 @@ shadowed: {
 	uint8: "b"
 	uint:  "c"
 	int:   "d"
-	r:     __uint & <=1114111
+	r:     __rune
 	u8:    __uint8
 	ub:    __uint & <=1000
 	ib:    __int & >=-1 & <=1000
@@ -96,7 +94,7 @@ shadowed: {
 == Simplified
 {
 	plain: {
-		r:    uint & <=1114111
+		r:    rune
 		i8:   int8
 		i16:  int16
 		i32:  int32
@@ -118,7 +116,7 @@ shadowed: {
 		uint8: "b"
 		uint:  "c"
 		int:   "d"
-		r:     __uint & <=1114111
+		r:     __rune
 		u8:    __uint8
 		ub:    __uint & <=1000
 		ib:    __int & >=-1 & <=1000
@@ -158,7 +156,7 @@ shadowed: {
 == Final
 {
 	plain: {
-		r:    uint & <=1114111
+		r:    rune
 		i8:   int8
 		i16:  int16
 		i32:  int32
@@ -180,7 +178,7 @@ shadowed: {
 		uint8: "b"
 		uint:  "c"
 		int:   "d"
-		r:     __uint & <=1114111
+		r:     __rune
 		u8:    __uint8
 		ub:    __uint & <=1000
 		ib:    __int & >=-1 & <=1000
@@ -189,7 +187,7 @@ shadowed: {
 == All
 {
 	plain: {
-		r:    uint & <=1114111
+		r:    rune
 		i8:   int8
 		i16:  int16
 		i32:  int32
@@ -211,7 +209,7 @@ shadowed: {
 		uint8: "b"
 		uint:  "c"
 		int:   "d"
-		r:     __uint & <=1114111
+		r:     __rune
 		u8:    __uint8
 		ub:    __uint & <=1000
 		ib:    __int & >=-1 & <=1000

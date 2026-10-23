@@ -37,6 +37,7 @@ func mustDec(s string) *apd.Decimal {
 // They are built on first use, as parsing them is costly at init time.
 var builtinRanges = sync.OnceValues(func() (ints, floats []builtinRange) {
 	ints = []builtinRange{
+		{"rune", mustDec("0"), mustDec("1114111")}, // 0x10FFFF
 		{"int8", mustDec("-128"), mustDec("127")},
 		{"int16", mustDec("-32768"), mustDec("32767")},
 		{"int32", mustDec("-2147483648"), mustDec("2147483647")},

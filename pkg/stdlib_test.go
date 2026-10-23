@@ -229,7 +229,7 @@ func TestDefsMatchRegisteredPackages(t *testing.T) {
 					if p.Default == nil || builtinDefault == nil {
 						continue
 					}
-					wantExpr, err := export.Value(r, "", builtinDefault)
+					wantExpr, err := export.Value(adt.NewContext(r, nil), "", builtinDefault)
 					qt.Assert(t, qt.IsNil(err))
 					want := ctx.BuildExpr(wantExpr)
 					got := ctx.BuildExpr(p.Default)

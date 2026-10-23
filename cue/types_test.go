@@ -4171,11 +4171,12 @@ func TestDereferenceDefault(t *testing.T) {
 	qt.Assert(t, qt.Equals(fmt.Sprint(def), "1"))
 }
 
-func TestZeroValueBuildInstance(t *testing.T) {
-	inst := cue.Value{}.BuildInstance()
-	if inst != nil {
-		t.Error("unexpected non-nil instance")
-	}
+func TestZeroValue(t *testing.T) {
+	var v cue.Value
+	qt.Assert(t, qt.IsNil(v.BuildInstance()))
+	b, err := v.MarshalJSON()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(string(b), "null"))
 }
 
 // TestReferencePathEmbeddedImport is a regression test for

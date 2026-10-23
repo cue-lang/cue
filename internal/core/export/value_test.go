@@ -88,7 +88,7 @@ if false {
 		before := describeInput(r, v)
 		for _, tc := range []struct {
 			name string
-			fn   func(r adt.Runtime, id string, v adt.Value) (ast.Expr, errors.Error)
+			fn   func(ctx *adt.OpContext, id string, v adt.Value) (ast.Expr, errors.Error)
 		}{
 			{"Simplified", target(export.Simplified).Value},
 			{"Raw", target(export.Raw).Value},
@@ -97,7 +97,7 @@ if false {
 			{"Eval", evalWithOptions.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)
-			x, errs := tc.fn(r, pkgID, v)
+			x, errs := tc.fn(adt.NewContext(r, v), pkgID, v)
 			errors.Print(t, errs, nil)
 			_, _ = t.Write(formatNode(t.T, x))
 			fmt.Fprintln(t)
@@ -136,7 +136,7 @@ func TestValueX(t *testing.T) {
 		ShowAttributes:  true,
 	}
 
-	x, errs := p.Value(r, "main", v)
+	x, errs := p.Value(ctx, "main", v)
 	if errs != nil {
 		t.Fatal(errs)
 	}

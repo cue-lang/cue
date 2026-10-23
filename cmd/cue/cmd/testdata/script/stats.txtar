@@ -173,12 +173,12 @@ Proc:
 {
     "CUE": {
         "EvalVersion": 3,
-        "Unifications": 4,
+        "Unifications": 6,
         "Disjuncts": 2,
         "Notifications": 0,
-        "Conjuncts": 8,
+        "Conjuncts": 10,
         "NumCloseIDs": 2,
-        "ConjunctInfos": 6,
+        "ConjunctInfos": 8,
         "MaxConjunctInfos": 2,
         "MaxReqSets": 0,
         "MaxRedirect": 0,
@@ -187,9 +187,9 @@ Proc:
         "MisalignedConstraint": 0,
         "SkippedNotification": 0,
         "ResolveDep": 0,
-        "Freed": 6,
-        "Reused": 0,
-        "Allocs": 6,
+        "Freed": 8,
+        "Reused": 1,
+        "Allocs": 7,
         "Retained": 0
     },
     "Go": {

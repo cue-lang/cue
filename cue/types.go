@@ -833,7 +833,12 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
-	b, err = v.appendJSON(v.ctx(), nil)
+	if v.v == nil {
+		return []byte("null"), nil
+	}
+	ctx := v.ctx()
+	defer adt.AddStats(ctx)
+	b, err = v.appendJSON(ctx, nil)
 	if err != nil {
 		return nil, unwrapJSONError(err)
 	}

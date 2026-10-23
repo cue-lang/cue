@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/export"
 )
 
@@ -168,7 +169,9 @@ func formatCUE(state fmt.State, v Value, showDocs, showAll bool) {
 	if isDef {
 		n, _ = p.Def(v.idx, pkgPath, v.v)
 	} else {
-		n, _ = p.Value(v.idx, pkgPath, v.v)
+		ctx := adt.NewContext(v.idx, v.v)
+		n, _ = p.Value(ctx, pkgPath, v.v)
+		adt.AddStats(ctx)
 	}
 
 	formatExpr(state, n)

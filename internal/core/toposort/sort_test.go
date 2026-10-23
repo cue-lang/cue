@@ -59,7 +59,8 @@ func TestTopologicalSort(t *testing.T) {
 					ShowAttributes:  true,
 				}
 
-				expr, err := evalWithOptions.Value(run, inst.ID(), v)
+				ctx := adt.NewContext(run, v)
+				expr, err := evalWithOptions.Value(ctx, inst.ID(), v)
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -131,7 +131,8 @@ func Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
 // Def exports v as a definition.
 // It resolves references that point outside any of the vertices in v.
 func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, err errors.Error) {
-	e := newExporter(p, r, pkgID, v)
+	e := newExporter(p, adt.NewContext(r, v), pkgID, v)
+	defer adt.AddStats(e.ctx)
 	e.initPivot(v)
 
 	isDef := v.IsRecursivelyClosed()
@@ -196,7 +197,8 @@ func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 // Expr exports the given unevaluated expression (schema mode).
 // It does not resolve references that point outside the given expression.
 func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
-	e := newExporter(p, r, pkgID, nil)
+	e := newExporter(p, adt.NewContext(r, nil), pkgID, nil)
+	defer adt.AddStats(e.ctx)
 
 	return e.expr(nil, n), nil
 }
@@ -312,7 +314,8 @@ func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error
 // Vertex exports evaluated values (data mode).
 // It resolves incomplete references that point outside the current context.
 func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (f *ast.File, err errors.Error) {
-	e := newExporter(p, r, pkgID, n)
+	e := newExporter(p, adt.NewContext(r, n), pkgID, n)
+	defer adt.AddStats(e.ctx)
 	e.initPivot(n)
 
 	// Errors created while exporting report paths relative to n,
@@ -324,17 +327,16 @@ func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (f *ast.Fil
 
 // Value exports evaluated values (data mode).
 // It does not resolve references that point outside the given Value.
-func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
-	return Simplified.Value(r, pkgID, n)
+func Value(ctx *adt.OpContext, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
+	return Simplified.Value(ctx, pkgID, n)
 }
 
 // Value exports evaluated values (data mode).
-//
 // It does not resolve references that point outside the given Value.
-//
-// TODO: Should take context.
-func (p *Profile) Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
-	e := newExporter(p, r, pkgID, n)
+// Unlike [Profile.Def], [Profile.Expr] and [Profile.Vertex], it exports
+// within ctx, whose stats remain the caller's to add to the totals.
+func (p *Profile) Value(ctx *adt.OpContext, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
+	e := newExporter(p, ctx, pkgID, n)
 	v := e.value(n)
 	// finalize runs astutil.Sanitize, which edits v in place via the shared
 	// StructLit Elts.
@@ -436,7 +438,7 @@ func (e *exporter) linkIdentifier(v *adt.Vertex, ident *ast.Ident) {
 }
 
 // newExporter creates and initializes an exporter.
-func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter {
+func newExporter(p *Profile, ctx *adt.OpContext, pkgID string, v adt.Value) *exporter {
 	n, _ := v.(*adt.Vertex)
 	// The experiments of the target language version decide which spellings
 	// the output may use; aliasv2 is the one that enables postfix aliases.
@@ -452,8 +454,8 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion, carried...)
 	e := &exporter{
 		cfg:   p,
-		ctx:   adt.NewContext(r, n),
-		index: r,
+		ctx:   ctx,
+		index: ctx.Runtime,
 		pkgID: pkgID,
 
 		experiments:    exp,
@@ -463,7 +465,7 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 		references: map[*adt.Vertex]*referenceInfo{},
 	}
 
-	if r, ok := r.(interface{ IsInjectionKind(string) bool }); ok {
+	if r, ok := ctx.Runtime.(interface{ IsInjectionKind(string) bool }); ok {
 		e.isInjectionKind = r.IsInjectionKind
 	}
 

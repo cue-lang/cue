@@ -82,7 +82,7 @@ func (s *subsumer) funcValues(a, b *adt.FuncValue) bool {
 	if adt.IsFuncType(b) || !a.EqualArgs(b) {
 		return false
 	}
-	if (a.IsPartial() || b.IsPartial()) && (a.Fn != b.Fn || !a.Env.Equal(s.ctx, b.Env)) {
+	if (a.IsPartial() || b.IsPartial()) && !adt.SameFunc(s.ctx, adt.FuncType{Fn: a.Fn, Env: a.Env}, adt.FuncType{Fn: b.Fn, Env: b.Env}) {
 		// Bound arguments are indexed by the parameters of the head function.
 		return false
 	}
@@ -98,14 +98,14 @@ func (s *subsumer) funcValues(a, b *adt.FuncValue) bool {
 }
 
 // hasFunc reports whether t is b's own function or one of the signatures
-// recorded on b. Functions with an implementation are the same if they are
-// the same literal evaluated in the same environment.
+// recorded on b. Functions with an implementation are the same as
+// [adt.SameFunc] decides.
 func (s *subsumer) hasFunc(b *adt.FuncValue, t adt.FuncType) bool {
 	same := func(u adt.FuncType) bool {
 		if t.Fn.Body == nil {
 			return u == t
 		}
-		return u.Fn == t.Fn && u.Env.Equal(s.ctx, t.Env)
+		return adt.SameFunc(s.ctx, u, t)
 	}
 	return same(adt.FuncType{Fn: b.Fn, Env: b.Env}) || slices.ContainsFunc(b.Types, same)
 }

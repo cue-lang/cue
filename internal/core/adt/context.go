@@ -212,6 +212,13 @@ type OpContext struct {
 	// [OpContext.admits].
 	admission *admissionMemo
 
+	// capturesCompared records the comparisons of the values that two
+	// closures of one literal capture that are in progress, and dataPairs the
+	// outcome of comparing each pair of captured vertices as data. See
+	// [OpContext.sameCaptures].
+	capturesCompared map[captureKey]bool
+	dataPairs        map[[2]*Vertex]bool
+
 	// checkingDefaults tracks the function literals, per closure, whose
 	// declared parameter defaults are being checked against their constraints
 	// (see [Function.checkDefaults]). The check runs outside any call, so a

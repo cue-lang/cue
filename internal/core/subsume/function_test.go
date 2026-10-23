@@ -44,6 +44,22 @@ func TestFunctions(t *testing.T) {
 	}
 	const exp = "@experiment(functions)\n"
 	testCases := []subsumeTest{
+		// A function is the same function wherever it is evaluated if what
+		// it refers to outside itself is the same, as for unification;
+		// closures over different values are not.
+		{
+			in:  `x: {f: func(n: int) -> int: n}, a: x.f, b: {x}.f`,
+			err: "",
+		},
+		{
+			in:  `x: {k: 1, f: func(n: int) -> int: n + k}, a: x.f, b: {x}.f`,
+			err: "",
+		},
+		{
+			in:  `d: [for v in [1, 2] {func(n: int) -> int: n + v}], a: d[0], b: d[1]`,
+			err: "value not an instance",
+		},
+
 		// Type ⊑ type: open and closed signatures.
 		{
 			in:  `a: func(n: int, ...) -> int, b: func(n: int, m: int, ...) -> int`,

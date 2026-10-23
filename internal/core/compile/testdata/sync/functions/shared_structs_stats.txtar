@@ -1,9 +1,10 @@
 # Two struct definitions that share their parts must compare each pair of
 # parts once, not once for every path through them, which grows exponentially
 # with the depth. The leaves differ in form but not in the values they admit,
-# so that comparing a pair of leaves tries witnesses; six levels make the
-# difference plain in out/eval/stats without making the regression test
-# expensive.
+# so that comparing a pair of leaves tries witnesses. Two closures capturing
+# such definitions compare them as data, once per pair of parts as well. Six
+# levels make the difference plain in out/eval/stats without making the
+# regression test expensive.
 #inlinetest:exclude skip — performance regression guarded by out/eval/stats
 -- in.cue --
 @experiment(functions)
@@ -24,6 +25,23 @@
 #B6: {a: #B5, b: #B5, c: #B5, d: #B5}
 
 admitted: (func(p: #A6) -> int) & (func(p: #B6) -> int: 1)
+
+#C0: {v: 1}
+#D0: {v: 1}
+#C1: {a: #C0, b: #C0, c: #C0, d: #C0}
+#D1: {a: #D0, b: #D0, c: #D0, d: #D0}
+#C2: {a: #C1, b: #C1, c: #C1, d: #C1}
+#D2: {a: #D1, b: #D1, c: #D1, d: #D1}
+#C3: {a: #C2, b: #C2, c: #C2, d: #C2}
+#D3: {a: #D2, b: #D2, c: #D2, d: #D2}
+#C4: {a: #C3, b: #C3, c: #C3, d: #C3}
+#D4: {a: #D3, b: #D3, c: #D3, d: #D3}
+#C5: {a: #C4, b: #C4, c: #C4, d: #C4}
+#D5: {a: #D4, b: #D4, c: #D4, d: #D4}
+#C6: {a: #C5, b: #C5, c: #C5, d: #C5}
+#D6: {a: #D5, b: #D5, c: #D5, d: #D5}
+mk: func(x: _) -> _: func() -> _: x
+captured: mk(#C6) & mk(#D6)
 -- out/compile --
 --- in.cue
 {
@@ -106,4 +124,84 @@ admitted: (func(p: #A6) -> int) & (func(p: #B6) -> int: 1)
     d: 〈1;#B5〉
   }
   admitted: (func(p: 〈0;#A6〉) -> int & func(p: 〈0;#B6〉) -> int: 1)
+  #C0: {
+    v: 1
+  }
+  #D0: {
+    v: 1
+  }
+  #C1: {
+    a: 〈1;#C0〉
+    b: 〈1;#C0〉
+    c: 〈1;#C0〉
+    d: 〈1;#C0〉
+  }
+  #D1: {
+    a: 〈1;#D0〉
+    b: 〈1;#D0〉
+    c: 〈1;#D0〉
+    d: 〈1;#D0〉
+  }
+  #C2: {
+    a: 〈1;#C1〉
+    b: 〈1;#C1〉
+    c: 〈1;#C1〉
+    d: 〈1;#C1〉
+  }
+  #D2: {
+    a: 〈1;#D1〉
+    b: 〈1;#D1〉
+    c: 〈1;#D1〉
+    d: 〈1;#D1〉
+  }
+  #C3: {
+    a: 〈1;#C2〉
+    b: 〈1;#C2〉
+    c: 〈1;#C2〉
+    d: 〈1;#C2〉
+  }
+  #D3: {
+    a: 〈1;#D2〉
+    b: 〈1;#D2〉
+    c: 〈1;#D2〉
+    d: 〈1;#D2〉
+  }
+  #C4: {
+    a: 〈1;#C3〉
+    b: 〈1;#C3〉
+    c: 〈1;#C3〉
+    d: 〈1;#C3〉
+  }
+  #D4: {
+    a: 〈1;#D3〉
+    b: 〈1;#D3〉
+    c: 〈1;#D3〉
+    d: 〈1;#D3〉
+  }
+  #C5: {
+    a: 〈1;#C4〉
+    b: 〈1;#C4〉
+    c: 〈1;#C4〉
+    d: 〈1;#C4〉
+  }
+  #D5: {
+    a: 〈1;#D4〉
+    b: 〈1;#D4〉
+    c: 〈1;#D4〉
+    d: 〈1;#D4〉
+  }
+  #C6: {
+    a: 〈1;#C5〉
+    b: 〈1;#C5〉
+    c: 〈1;#C5〉
+    d: 〈1;#C5〉
+  }
+  #D6: {
+    a: 〈1;#D5〉
+    b: 〈1;#D5〉
+    c: 〈1;#D5〉
+    d: 〈1;#D5〉
+  }
+  mk: func(x: _) -> _: func() -> _: 〈1;x〉
+  captured: (〈0;mk〉(〈0;#C6〉) & 〈0;mk〉(〈0;#D6〉))
 }

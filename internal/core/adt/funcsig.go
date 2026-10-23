@@ -2383,10 +2383,11 @@ func BuiltinSubsumes(a, b *Builtin) bool {
 // thereof. It returns the resulting value, or a Bottom describing why the
 // signatures are incompatible. A nil, nil return indicates that a and b are
 // conflicting partial applications, to be reported like any other
-// conflicting scalars.
-func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
+// conflicting scalars. at gives the conjuncts in which a and b meet, whose
+// positions a conflict between two implementations reports.
+func mergeFuncValues(c *OpContext, a, b *FuncValue, at ...posInfo) (*FuncValue, *Bottom) {
 	composing := !IsFuncType(a) && !IsFuncType(b)
-	if composing && a.Fn == b.Fn && a.Env.Equal(c, b.Env) && equalFuncArgs(a.args, b.args) {
+	if composing && SameFunc(c, FuncType{Fn: a.Fn, Env: a.Env}, FuncType{Fn: b.Fn, Env: b.Env}) && equalFuncArgs(a.args, b.args) {
 		// VALUE & VALUE of the same function: only the recorded types need
 		// to be combined. Two partial applications are the same only when
 		// they bound the same arguments, mirroring [equalTerminal].
@@ -2404,15 +2405,31 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 		return &merged, nil
 	}
 
-	// VALUE & VALUE of distinct functions composes them: the result is a
-	// with b's implementation recorded among its signatures, and a call
-	// evaluates all implementations and unifies their results (see
-	// [nodeContext.scheduleFuncCall]). The bound arguments of a partial
-	// application cannot be carried over to another implementation, so
-	// distinct partial applications conflict like any other scalars.
+	// VALUE & VALUE of distinct functions conflicts, like two distinct
+	// concrete values: each function literal, closed over its environment,
+	// is a value of its own (see [composeImplementations]). The bound
+	// arguments of a partial application could not be carried over to
+	// another implementation in any case, so distinct partial applications
+	// conflict like any other scalars.
 	if composing && (a.IsPartial() || b.IsPartial()) {
 		return nil, nil
 	}
+	if composing && !composeImplementations {
+		why := "each function literal is a distinct value"
+		if a.Fn == b.Fn {
+			why = "the same function literal is closed over different values"
+		}
+		err := c.NewPosf(Pos(a.Fn), "conflicting function implementations: %s", why)
+		err.AddPosition(b.Fn)
+		for _, id := range at {
+			err.AddClosedPositions(c, id)
+		}
+		return nil, &Bottom{Code: EvalError, Err: err}
+	}
+	// With composition enabled, VALUE & VALUE of distinct functions
+	// composes them: the result is a with b's implementation recorded among
+	// its signatures, and a call evaluates all implementations and unifies
+	// their results (see [nodeContext.scheduleFuncCall]).
 
 	// Otherwise, at least one of the two is a type. Make prim the value, if
 	// any, so that the signatures of sec are added to it as constraints.
@@ -2441,8 +2458,8 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 		if t == head || slices.Contains(types, t) {
 			continue
 		}
-		if t.Fn.Body != nil && (sameFunc(c, t, head) || slices.ContainsFunc(types, func(u FuncType) bool {
-			return sameFunc(c, t, u)
+		if t.Fn.Body != nil && (SameFunc(c, t, head) || slices.ContainsFunc(types, func(u FuncType) bool {
+			return SameFunc(c, t, u)
 		})) {
 			continue
 		}
@@ -2490,6 +2507,16 @@ func mergeFuncValues(c *OpContext, a, b *FuncValue) (*FuncValue, *Bottom) {
 	return &merged, nil
 }
 
+// composeImplementations enables the pointwise composition of distinct
+// function implementations, (f & g)(x) = f(x) & g(x). It is disabled: two
+// distinct implementations conflict when they are unified. Composition would
+// defer any conflict between the implementations to a call, keep a
+// disjunction of functions from choosing one, and multiply the work of
+// nested calls, as every call runs every implementation. The machinery that
+// implements it is kept so that it can return as an experiment, possibly
+// with different semantics.
+const composeImplementations = false
+
 // checkAdmission runs the declared-compatibility check of the implementations
 // among head and types against the bodyless signatures among them, if there
 // are both; see [checkFuncAdmission].
@@ -2500,10 +2527,323 @@ func checkAdmission(c *OpContext, head FuncType, types []FuncType) *Bottom {
 	return checkFuncAdmission(c, head, types)
 }
 
-// sameFunc reports whether two signatures with an implementation are the
-// same function: the same literal evaluated in the same environment.
-func sameFunc(c *OpContext, x, y FuncType) bool {
-	return x.Fn == y.Fn && x.Env.Equal(c, y.Env)
+// SameFunc reports whether two signatures with an implementation are the
+// same function: the same literal, evaluated in equal environments, with the
+// same label if instantiated from a pattern, or in environments that agree
+// on everything the literal refers to outside itself (see
+// [OpContext.sameCaptures]). A function that captures nothing is therefore
+// the same function wherever it is evaluated, and x.f & {x}.f unifies whether
+// or not the embedding shares x, while closures over different values remain
+// distinct. It is exported for use by internal/core/subsume.
+func SameFunc(c *OpContext, x, y FuncType) bool {
+	if x.Fn != y.Fn {
+		return false
+	}
+	if x.Env.Equal(c, y.Env) && x.Env.DynamicLabel == y.Env.DynamicLabel {
+		return true
+	}
+	return c.sameCaptures(x.Fn, x.Env, y.Env)
+}
+
+// A captureKey identifies a comparison of [OpContext.sameCaptures] in
+// progress.
+type captureKey struct {
+	fn     *Function
+	ex, ey *Environment
+}
+
+// sameCaptures reports whether the literal fn refers to the same values from
+// the environments ex and ey: each reference by which it escapes to its
+// environment (see [walkEscapes]) resolves from both to the same value or to
+// equal data (see [isData]), and each label reference to the same label. A
+// construct that walkEscapes does not model, or a value that may still be
+// refined (see [OpContext.unsettled]), makes the two distinct. A comparison
+// already in progress, as for a closure that refers to itself, counts as
+// equal.
+func (c *OpContext) sameCaptures(fn *Function, ex, ey *Environment) bool {
+	key := captureKey{fn, ex, ey}
+	if c.capturesCompared[key] {
+		return true
+	}
+	if c.capturesCompared == nil {
+		c.capturesCompared = map[captureKey]bool{}
+		c.dataPairs = map[[2]*Vertex]bool{}
+		defer func() { c.capturesCompared, c.dataPairs = nil, nil }()
+	}
+	c.capturesCompared[key] = true
+	defer delete(c.capturesCompared, key)
+	return walkFuncEscapes(fn, func(r Node, up int32) bool {
+		return c.sameCapture(r, up, ex, ey)
+	})
+}
+
+// sameCapture reports whether the reference r, which refers to the
+// environment up levels above that of its literal, resolves to the same value
+// from ex and from ey.
+func (c *OpContext) sameCapture(r Node, up int32, ex, ey *Environment) bool {
+	var ref Expr
+	switch r := r.(type) {
+	case *LabelReference:
+		return ex.up(c, up).DynamicLabel == ey.up(c, up).DynamicLabel
+	case *FieldReference:
+		ref = &FieldReference{Src: r.Src, UpCount: up, Label: r.Label, Optional: r.Optional}
+	case *LetReference:
+		ref = &LetReference{Src: r.Src, UpCount: up, Label: r.Label, X: r.X}
+	case *ValueReference:
+		ref = &ValueReference{Src: r.Src, UpCount: up, Label: r.Label}
+	default:
+		return false
+	}
+	vx, okx := c.evalConstraint(ex, ref)
+	vy, oky := c.evalConstraint(ey, ref)
+	return okx && oky && c.equalData(vx, vy)
+}
+
+// equalData reports whether x and y are the same value or equal data:
+// concrete scalars of the same kind, equal functions, or structs or closed
+// lists, closed alike and without pattern constraints, whose regular fields
+// or elements are all present and equal data. Two such values behave the
+// same under any further unification. Values with references, defaults, or
+// constraints left need not, even when their evaluations are equal now. Each
+// pair of vertices is compared once per comparison of captures (see
+// [OpContext.sameCaptures]), so that data shared along many paths is
+// traversed once.
+func (c *OpContext) equalData(x, y Value) bool {
+	if x == y {
+		return true
+	}
+	switch x := x.(type) {
+	case *Null, *Bool, *Num, *String, *Bytes:
+		return isConcreteScalar(y) && x.Kind() == y.Kind() && Equal(c, x, y, CheckStructural)
+	case *FuncValue, *Builtin:
+		return Equal(c, x, y, CheckStructural)
+	case *Vertex:
+		yv, ok := y.(*Vertex)
+		if !ok {
+			return false
+		}
+		key := [2]*Vertex{x, yv}
+		if r, seen := c.dataPairs[key]; seen {
+			return r
+		}
+		c.dataPairs[key] = false
+		r := c.equalDataVertices(x, yv)
+		c.dataPairs[key] = r
+		return r
+	}
+	return false
+}
+
+func (c *OpContext) equalDataVertices(x, y *Vertex) bool {
+	switch x.BaseValue.(type) {
+	case *StructMarker:
+		if _, ok := y.BaseValue.(*StructMarker); !ok || x.IsClosedStruct() != y.IsClosedStruct() {
+			return false
+		}
+	case *ListMarker:
+		if _, ok := y.BaseValue.(*ListMarker); !ok || !x.IsClosedList() || !y.IsClosedList() {
+			return false
+		}
+	default:
+		return false
+	}
+	for _, v := range []*Vertex{x, y} {
+		if p := v.PatternConstraints; p != nil && len(p.Pairs) > 0 {
+			return false
+		}
+	}
+	if len(x.Arcs) != len(y.Arcs) {
+		return false
+	}
+	for _, a := range x.Arcs {
+		b := y.LookupRaw(a.Label)
+		if a.ArcType != ArcMember || !a.Label.IsRegular() || b == nil || b.ArcType != ArcMember || !c.equalData(Unwrap(a), Unwrap(b)) {
+			return false
+		}
+	}
+	return true
+}
+
+// walkFuncEscapes calls f for each reference by which a parameter constraint,
+// a default, or the result constraint of fn, which are evaluated in the
+// literal's environment, or its body, which is evaluated in a scope holding
+// the parameters, refers to a field, let, label, or alias outside fn, with
+// the number of levels above the literal's environment that the reference
+// goes. An import does not count, as it does not depend on the environment.
+// It reports false if f does, or if fn contains a construct that it does not
+// model.
+func walkFuncEscapes(fn *Function, f func(r Node, up int32) bool) bool {
+	for _, p := range fn.Params {
+		if !walkEscapes(p.Value, 0, f) || !walkEscapes(p.Default, 0, f) {
+			return false
+		}
+	}
+	return walkEscapes(fn.Ret, 0, f) && walkEscapes(fn.Body, 1, f)
+}
+
+// walkEscapes calls f for each reference in x, located inside depth scopes of
+// the function being walked, that refers to a scope outside that function. A
+// reference counts its levels from the scope it occurs in, so it escapes when
+// it goes up at least depth levels. Struct literals, list literals, function
+// bodies, and the for and let clauses of comprehensions count as scopes, as
+// each gets an environment of its own; a pattern or dynamic field is
+// evaluated in its struct's scope. It reports false if f does, or if x
+// contains a construct that it does not model, such as a try clause or an
+// evaluated value.
+func walkEscapes(x Node, depth int32, f func(r Node, up int32) bool) bool {
+	walk := func(xs ...Node) bool {
+		for _, x := range xs {
+			if !walkEscapes(x, depth, f) {
+				return false
+			}
+		}
+		return true
+	}
+	ref := func(up int32) bool {
+		return up < depth || f(x, up-depth)
+	}
+	switch x := x.(type) {
+	case nil, *ImportReference:
+		return true
+	case *FieldReference:
+		return ref(x.UpCount)
+	case *LetReference:
+		return ref(x.UpCount)
+	case *LabelReference:
+		return ref(x.UpCount)
+	case *ValueReference:
+		return ref(x.UpCount)
+	case *SelectorExpr:
+		return walk(x.X)
+	case *IndexExpr:
+		return walk(x.X, x.Index)
+	case *SliceExpr:
+		return walk(x.X, x.Lo, x.Hi, x.Stride)
+	case *BoundExpr:
+		return walk(x.Expr)
+	case *UnaryExpr:
+		return walk(x.X)
+	case *BinaryExpr:
+		return walk(x.X, x.Y)
+	case *Interpolation:
+		for _, p := range x.Parts {
+			if !walk(p) {
+				return false
+			}
+		}
+		return true
+	case *DisjunctionExpr:
+		for _, d := range x.Values {
+			if !walk(d.Val) {
+				return false
+			}
+		}
+		return true
+	case *CallExpr:
+		if !walk(x.Fun) {
+			return false
+		}
+		for _, a := range x.Args {
+			if !walk(a) {
+				return false
+			}
+		}
+		return true
+	case *ListLit:
+		for _, e := range x.Elems {
+			switch e := e.(type) {
+			case *Ellipsis:
+				if !walkEscapes(e.Value, depth+1, f) {
+					return false
+				}
+			case Expr:
+				if !walkEscapes(e, depth+1, f) {
+					return false
+				}
+			case *Comprehension:
+				if !walkComprehension(e, depth+1, f) {
+					return false
+				}
+			default:
+				return false
+			}
+		}
+		return true
+	case *StructLit:
+		for _, d := range x.Decls {
+			var es []Expr
+			switch d := d.(type) {
+			case *Field:
+				es = []Expr{d.Value}
+			case *LetField:
+				es = []Expr{d.Value}
+			case *Ellipsis:
+				es = []Expr{d.Value}
+			case *BulkOptionalField:
+				es = []Expr{d.Filter, d.Value}
+			case *DynamicField:
+				es = []Expr{d.Key, d.Value}
+			case Expr:
+				es = []Expr{d}
+			case *Comprehension:
+				if !walkComprehension(d, depth+1, f) {
+					return false
+				}
+				continue
+			default:
+				return false
+			}
+			for _, e := range es {
+				if !walkEscapes(e, depth+1, f) {
+					return false
+				}
+			}
+		}
+		return true
+	case *Function:
+		for _, p := range x.Params {
+			if !walk(p.Value, p.Default) {
+				return false
+			}
+		}
+		return walk(x.Ret) && walkEscapes(x.Body, depth+1, f)
+	case *Vertex, *FuncValue, *BuiltinValidator:
+		return false
+	case Value:
+		return true // a literal or another evaluated value
+	}
+	return false
+}
+
+// walkComprehension walks the comprehension x, located inside depth scopes, as
+// [walkEscapes] does. A for or let clause opens a scope for the clauses after
+// it and for the value; an if clause does not. The else clause is yielded in
+// the comprehension's own scope.
+func walkComprehension(x *Comprehension, depth int32, f func(r Node, up int32) bool) bool {
+	if x.Fallback != nil && !walkEscapes(x.Fallback, depth, f) {
+		return false
+	}
+	for _, cl := range x.Clauses {
+		switch cl := cl.(type) {
+		case *ForClause:
+			if !walkEscapes(cl.Src, depth, f) {
+				return false
+			}
+			depth++
+		case *LetClause:
+			if !walkEscapes(cl.Expr, depth, f) {
+				return false
+			}
+			depth++
+		case *IfClause:
+			if !walkEscapes(cl.Condition, depth, f) {
+				return false
+			}
+		default:
+			return false
+		}
+	}
+	return walkEscapes(x.Value, depth, f)
 }
 
 // checkFuncDefaultsMeet reports a conflict between the defaults that two
@@ -2650,7 +2990,7 @@ func equalFuncTypes(a, b []FuncType) bool {
 // bound the same arguments and consist of the same functions and types,
 // regardless of the order in which these were unified.
 func equalFuncValues(c *OpContext, x, y *FuncValue) bool {
-	if x.Fn == y.Fn && x.Env.Equal(c, y.Env) {
+	if SameFunc(c, FuncType{Fn: x.Fn, Env: x.Env}, FuncType{Fn: y.Fn, Env: y.Env}) {
 		return equalFuncTypes(x.Types, y.Types) && equalFuncArgs(x.args, y.args)
 	}
 	// Composed values: each side's functions must all occur on the other.
@@ -2664,7 +3004,7 @@ func equalFuncValues(c *OpContext, x, y *FuncValue) bool {
 			if t.Fn.Body == nil {
 				return u == t
 			}
-			return sameFunc(c, u, t)
+			return SameFunc(c, u, t)
 		}
 		return same(FuncType{Fn: v.Fn, Env: v.Env}) || slices.ContainsFunc(v.Types, same)
 	}
@@ -2687,11 +3027,18 @@ func equalFuncValues(c *OpContext, x, y *FuncValue) bool {
 // Add(5, ...) and Add(10, ...) are never treated as equal, while an expression
 // evaluated in different environments is not assumed equal.
 func equalFuncArgs(a, b []funcArg) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, x := range a {
-		if x.expr != b[i].expr || x.env != b[i].env {
+	// A missing entry is an unbound parameter, as is a nil one: a partial
+	// application that binds nothing, such as f(...), binds the same
+	// arguments as f itself.
+	for i := range max(len(a), len(b)) {
+		var x, y funcArg
+		if i < len(a) {
+			x = a[i]
+		}
+		if i < len(b) {
+			y = b[i]
+		}
+		if x.expr != y.expr || (x.expr != nil && x.env != y.env) {
 			return false
 		}
 	}

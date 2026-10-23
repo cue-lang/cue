@@ -260,9 +260,9 @@ values: {
 	f: func(a: int) -> int: a
 	g: func(a: int) -> int: a
 
-	// Distinct function values compose (see compose below).
-	composed:  f & g
-	composedX: composed(1) @test(eq, 1)
+	// Distinct function values conflict, even with equal text (see compose
+	// below).
+	composed: f & g @test(err, code=eval, contains="conflicting function implementations")
 
 	// A function value unifies with itself.
 	same:  f & f
@@ -293,87 +293,130 @@ values: {
 	pick2X: pick2(1) @test(eq, 1)
 }
 
-// Tightening must preserve all structural cycle semantics: the cycle
-// anchor and call-site identity remain those of the function value being
-// called.
-// Distinct function values with compatible signatures compose: a call
-// evaluates every implementation and unifies the results.
+// Distinct function implementations do not unify: each function literal,
+// closed over its environment, is a value of its own, and two of them
+// conflict like two distinct concrete values. Pointwise composition,
+// (f & g)(x) = f(x) & g(x), is disabled for now.
 compose: {
 	f: func(a: int) -> {...}: {in: a}
 	g: func(a~x: int) -> {...}: {out: x + 1}
 
-	fg:     f & g
-	fgX:    fg(1) @test(eq, {in: 1, out: 2})
-	fgL:    fg(a: 2) @test(eq, {in: 2, out: 3})
-	gf:     g & f
-	gfX:    gf(1) @test(eq, {in: 1, out: 2})
-	three:  f & g & (func(_~v: int) -> _: {w: v})
-	threeX: three(3) @test(eq, {in: 3, out: 4, w: 3})
+	fg: f & g @test(err, code=eval, contains="conflicting function implementations")
+	gf: g & f @test(err, code=eval, contains="conflicting function implementations")
 
-	// Composing a function again, in any order, does not add it twice.
-	again:  fg & gf & f
-	againX: again(1) @test(eq, {in: 1, out: 2})
-	pick:   fg | gf
-	pickX:  pick(1) @test(eq, {in: 1, out: 2})
+	// The conflict is reported whether or not the function is called.
+	inc:   func(a: int) -> int: a + 1
+	id:    func(a: int) -> int: a
+	clash: inc & id @test(err, code=eval, contains="conflicting function implementations")
 
-	// Two evaluations of the same literal in different environments are
-	// different values that compose: both give the same result.
+	// The same function, reached by different paths, unifies with itself.
+	again:  f & f & f
+	againX: again(1) @test(eq, {in: 1})
+	#A: {h: func(x: int) -> int: x}
+	a1:    #A
+	a2:    #A
+	inst:  a1.h & a2.h
+	instX: inst(2) @test(eq, 2)
+	let L = f
+	viaLet:  L & f
+	viaLetX: viaLet(3) @test(eq, {in: 3})
+	// A partial application that binds nothing is the function itself.
+	emptyPartial:  f & f(...)
+	emptyPartialX: emptyPartial(4) @test(eq, {in: 4})
+
+	// Identity is that of the literal and of what it refers to outside
+	// itself. Two literals with the same text are distinct, and so are
+	// closures over two different values of a comprehension, while closures
+	// over equal fields of two instances are the same function.
+	dup: (func(s: string) -> string: s) & (func(s: string) -> string: s) @test(err, code=eval, contains="conflicting function implementations: each function literal is a distinct value")
+	#T: {n: int, get: func() -> int: n}
+	t1:        #T & {n: 1}
+	t2:        #T & {n: 1}
+	closures:  t1.get & t2.get
+	closuresX: closures() @test(eq, 1)
+	_caps: [for v in [1, 2] {func(n: int) -> int: n + v}]
+	captured: _caps[0] & _caps[1] @test(err, code=eval, contains="conflicting function implementations: the same function literal is closed over different values")
+
+	// Only what a closure refers to counts, not where it was evaluated: a
+	// field of a struct that an embedding may or may not share, a definition
+	// shared by two instances that differ elsewhere, or the parameter of two
+	// calls with equal arguments.
+	_k: {k: 1, f: func() -> int: k}
+	embedded:  _k.f & {_k}.f
+	embeddedX: embedded() @test(eq, 1)
+	#H: func(x: int) -> int: x + 1
+	#S: {n: int, v: func(x: int) -> int: #H(x)}
+	shared:  (#S & {n: 1}).v & (#S & {n: 2}).v
+	sharedX: shared(1) @test(eq, 2)
+	mk:     func(n: int) -> _: {f: func() -> int: n}
+	calls:  mk(1)
+	calls:  mk(1)
+	callsX: calls.f() @test(eq, 1)
+
+	// Captured values compare as data, so a number of another kind, a
+	// default, or a reference that unification evaluates again keeps two
+	// closures distinct, while a comprehension, a pattern, or a dynamic field
+	// in a closure is no obstacle.
+	mkn:     func(n: number) -> _: func() -> number: n
+	num:     mkn(1) & mkn(1.0) @test(err, code=eval, contains="the same function literal is closed over different values")
+	mkd:     func(x: _) -> _: func() -> _: x
+	dflt:    mkd(*1 | 2) & mkd(1 | 2) @test(err, code=eval, contains="the same function literal is closed over different values")
+	mkr:     func(x: _) -> _: func(n: int) -> _: (x & {y: n}).a
+	refs:    mkr({y: _, a: y}) & mkr({y: _, a: _}) @test(err, code=eval, contains="the same function literal is closed over different values")
+	mkc:     func(n: int) -> _: func(xs: [...int]) -> [...int]: [for v in xs let w = v * 2 if w > 0 {w + n}]
+	comp:    mkc(1) & mkc(1)
+	compX:   comp([1, 2]) @test(eq, [3, 5])
+	compBad: mkc(1) & mkc(2) @test(err, code=eval, contains="the same function literal is closed over different values")
+	mkpat:   func(n: int) -> _: func(xs: {[string]: int}) -> _: {for k, v in xs {"\(k)": val: v}} & {[string]~(X, _): {name: X, v: n}}
+	patc:    mkpat(1) & mkpat(1)
+	patcX:   patc({a: 1}) @test(eq, {a: {val: 1, name: "a", v: 1}})
+	patcBad: mkpat(1) & mkpat(2) @test(err, code=eval, contains="the same function literal is closed over different values")
+	mkdyn:   func(n: int) -> _: func(k: string) -> _: {"\(k)": n}
+	dyn:     mkdyn(1) & mkdyn(1)
+	dynX:    dyn("z") @test(eq, {z: 1})
+	dynBad:  mkdyn(1) & mkdyn(2) @test(err, code=eval, contains="the same function literal is closed over different values")
+	// Two instances of a pattern's function differ in the label they
+	// capture, though their environments are otherwise the same.
+	labeled: {[string]~(K, _): func() -> string: K, a: _, b: _}
+	labA:    labeled.a() @test(eq, "a")
+	labBad:  labeled.a & labeled.b @test(err, code=eval, contains="the same function literal is closed over different values")
+	// A function with a pattern or a dynamic field captures nothing.
+	mkpf:    func() -> _: func() -> _: {[string]: int, ("a"): 1}
+	pf:      mkpf() & mkpf()
+	pfX:     pf() @test(eq, {a: 1})
+
+	// A function that refers to nothing outside itself is the same function
+	// wherever it is evaluated: reached through an embedding, or through an
+	// unrelated unification of its struct.
 	_x: h: func(a: int) -> int: a + 1
-	envs:  _x.h & {_x}.h
-	envsX: envs(1) @test(eq, 2)
+	envs:     _x.h & {_x}.h
+	envsX:    envs(1) @test(eq, 2)
+	unified:  _x.h & (_x & {other: 1}).h
+	unifiedX: unified(6) @test(eq, 7)
+	_z: l: func(n: int) -> [...int]: [n]
+	listCopy:  _z.l & {_z}.l
+	listCopyX: listCopy(3) @test(eq, [3])
 
-	// Results that do not unify make the call fail, not the composition.
-	inc:     func(a: int) -> int: a + 1
-	id:      func(a: int) -> int: a
-	clash:   inc & id
-	clashX:  clash(1) @test(err, code=eval, contains="conflicting values 2 and 1")
+	// A disjunction of functions can therefore select one by unification.
+	pick:  (f | g) & f
+	pickX: pick(1) @test(eq, {in: 1})
 
-	// All constraints apply to every implementation.
-	lt:  func(a: <10) -> _: {lt: a}
-	ltf: lt & f
-	ltX: ltf(3) @test(eq, {in: 3, lt: 3})
-	ltE: ltf(30) @test(err, code=eval, contains="out of bound")
+	// Signatures still combine with an implementation.
+	T:   func(a: int) -> {...}
+	tf:  T & f
+	tfX: tf(1) @test(eq, {in: 1})
 
-	// A defaulted parameter of one function cannot be bound, as the other
-	// does not declare it: its default applies.
-	d:    func(a: int, b: int = 3, c?: int) -> _: {sum: a + b}
-	df:   d & f
-	dfX:  df(1) @test(eq, {in: 1, sum: 4})
-	dfB:  df(1, 2) @test(err, code=eval, contains="too many positional arguments")
-	dfC:  df(1, c: 2) @test(err, code=eval, contains="unknown argument c")
-	fd:   f & d
-	fdX:  fd(1) @test(eq, {in: 1, sum: 4})
-	fdB:  fd(1, 2) @test(err, code=eval, contains="too many positional arguments")
-	fdC:  fd(1, c: 2) @test(err, code=eval, contains="unknown argument c")
+	// Combining the results of two functions is written explicitly.
+	both:  func(a: int) -> {...}: f(a) & g(a)
+	bothX: both(1) @test(eq, {in: 1, out: 2})
 
-	// Requiredness combines as for types.
-	req:    func(n!: int) -> _: {n1: n}
-	opt:    func(n?: int) -> _: {n2: n}
-	ro:     req & opt
-	roX:    ro(n: 4) @test(eq, {n1: 4, n2: 4})
-	roOmit: ro() @test(err, code=eval, contains="missing required argument n")
-
-	// A type tightens all implementations. Each declares a struct result,
-	// which the type's result constrains at every call, filling in what
-	// neither promises.
-	T:     func(a: int) -> {...}
-	tfg:   T & fg
-	tfgX:  tfg(1) @test(eq, {in: 1, out: 2})
-	Tin:  func(a: int) -> {in: int, ...}
-	tin:  Tin & fg
-	tinX: tin(1) @test(eq, {in: 1, out: 2})
-
-	// Signatures must be compatible.
-	labels: f & (func(b: int) -> int: b) @test(err, code=eval, contains="conflicting parameter labels")
-	arity:  f & (func(a: int, b: int) -> int: a) @test(err, code=eval, contains="parameter b of function not allowed by closed function")
-	// Calls bind positional arguments through either function, so a
-	// positional parameter must match a positional one.
-	named:  f & (func(a!: int) -> int: a) @test(err, code=eval, contains="parameter a of function not allowed by closed function")
-
-	// Builtins do not compose with function values.
+	// Builtins do not unify with function values either.
 	builtin: (func(x: number) -> number: x) & len @test(err, code=eval, contains="conflicting values")
 }
 
+// Tightening must preserve all structural cycle semantics: the cycle
+// anchor and call-site identity remain those of the function value being
+// called.
 cycles: {
 	T: func(n: int, ...) -> number
 
@@ -459,15 +502,16 @@ admission: {
 	ok2:  ((I & N) & w)(1) @test(eq, "number")
 	okF:  ((I & N) & w)(1.5) @test(err, code=eval, contains="conflicting values 1.5 and int")
 
-	// A value declaring a wider result than required fails, even beside a
-	// conforming value and even though both would return 1; a call-side
-	// result constraint does not stand in for the declaration.
+	// A value declaring a wider result than required fails, even though it
+	// would return 1; a call-side result constraint does not stand in for the
+	// declaration. A conforming implementation cannot rescue it, as two
+	// distinct implementations do not unify at all.
 	R:   func(x: int) -> int
 	W:   func(x: int) -> number: 1
 	C:   func(x: int) -> int: 1
 	rw:  R & W @test(err, code=eval, contains="function returns number, but its signature requires int")
 	rwc: R & W & C @test(err, code=eval, contains="function returns number, but its signature requires int")
-	wcr: W & (C & R) @test(err, code=eval, contains="function returns number, but its signature requires int")
+	wcr: W & (C & R) @test(err, code=eval, contains="conflicting function implementations")
 	rc:  (R & C)(1) @test(eq, 1)
 	rwx: (R & W)(1) @test(err, code=eval, contains="function returns number, but its signature requires int")
 
@@ -1071,273 +1115,295 @@ meet.wr: function returns _, but its signature requires number:
 [eval] optionalExtra.mBad: parameter b of function type not allowed by closed function type:
     ./in.cue:230:36
     ./in.cue:230:9
-[eval] conflicting values 2 and 1:
-    ./in.cue:314:32
-    ./in.cue:315:32
-    ./in.cue:317:17
-[eval] in: invalid value 30 (out of bound <10):
-    ./in.cue:320:15
-    ./in.cue:323:11
-[eval] compose.dfB: too many positional arguments in function call:
-    ./in.cue:330:8
-[eval] compose.dfC: unknown argument c:
-    ./in.cue:331:8
-[eval] compose.fdB: too many positional arguments in function call:
-    ./in.cue:334:8
-[eval] compose.fdC: unknown argument c:
-    ./in.cue:335:8
-[eval] compose.roOmit: missing required argument n:
-    ./in.cue:342:10
-[eval] compose.labels: conflicting parameter labels a and b for positional parameter 1 in function and function:
+[eval] values.composed: conflicting function implementations: each function literal is a distinct value:
+    ./in.cue:248:5
+    ./in.cue:249:5
+    ./in.cue:253:12
+    ./in.cue:253:16
+[eval] compose.fg: conflicting function implementations: each function literal is a distinct value:
+    ./in.cue:289:5
     ./in.cue:290:5
-    ./in.cue:355:15
-[eval] compose.arity: parameter b of function not allowed by closed function:
+    ./in.cue:292:6
+    ./in.cue:292:10
+[eval] compose.gf: conflicting function implementations: each function literal is a distinct value:
     ./in.cue:290:5
-    ./in.cue:356:15
-[eval] compose.named: parameter a of function not allowed by closed function:
-    ./in.cue:290:5
-    ./in.cue:359:15
+    ./in.cue:289:5
+    ./in.cue:293:6
+    ./in.cue:293:10
+[eval] compose.clash: conflicting function implementations: each function literal is a distinct value:
+    ./in.cue:296:9
+    ./in.cue:297:9
+    ./in.cue:298:9
+    ./in.cue:298:15
+[eval] compose.dup: conflicting function implementations: each function literal is a distinct value:
+    ./in.cue:319:8
+    ./in.cue:319:41
+[eval] compose.captured: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:325:27
+    ./in.cue:326:12
+    ./in.cue:326:23
+[eval] compose.num: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:348:33
+[eval] compose.dflt: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:350:28
+[eval] compose.refs: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:352:28
+[eval] compose.compBad: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:354:30
+[eval] compose.patcBad: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:358:30
+[eval] compose.dynBad: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:362:30
+[eval] compose.labBad: conflicting function implementations: the same function literal is closed over different values:
+    ./in.cue:368:29
+    ./in.cue:370:11
+    ./in.cue:370:23
 [eval] compose.builtin: conflicting values func(x: number) -> number: ... and len:
-    ./in.cue:362:12
+    ./in.cue:402:12
 [structural_cycle] structural cycle:
-    ./in.cue:369:34
+    ./in.cue:412:34
 [eval] n: invalid value 15 (out of bound <10):
-    ./in.cue:389:15
-    ./in.cue:393:9
+    ./in.cue:432:15
+    ./in.cue:436:9
 [eval] invalid value 400 (out of bound <100):
-    ./in.cue:398:33
-    ./in.cue:398:39
+    ./in.cue:441:33
+    ./in.cue:441:39
 [eval] conflicting values string and 42 (mismatched types string and int):
-    ./in.cue:405:61
-    ./in.cue:406:41
-    ./in.cue:409:23
+    ./in.cue:448:61
+    ./in.cue:449:41
+    ./in.cue:452:23
 [eval] cfg.port: invalid value 0 (out of bound >0):
-    ./in.cue:405:39
-    ./in.cue:410:35
+    ./in.cue:448:39
+    ./in.cue:453:35
 [eval] invalid value -1 (out of bound >=0):
-    ./in.cue:413:14
-    ./in.cue:418:9
+    ./in.cue:456:14
+    ./in.cue:461:9
 [eval] invalid value 11 (out of bound <10):
-    ./in.cue:414:14
-    ./in.cue:419:9
+    ./in.cue:457:14
+    ./in.cue:462:9
 [eval] x: conflicting values 1.5 and int (mismatched types float and int):
-    ./in.cue:431:14
-    ./in.cue:434:11
+    ./in.cue:474:14
+    ./in.cue:477:11
 [eval] admission.bad1: parameter x of function accepts int, but its signature requires number:
-    ./in.cue:441:5
-    ./in.cue:439:5
-    ./in.cue:440:5
+    ./in.cue:484:5
+    ./in.cue:482:5
+    ./in.cue:483:5
 [eval] admission.bad2: parameter x of function accepts int, but its signature requires number:
-    ./in.cue:441:5
-    ./in.cue:439:5
-    ./in.cue:440:5
+    ./in.cue:484:5
+    ./in.cue:482:5
+    ./in.cue:483:5
 [eval] admission.bad3: parameter x of function accepts int, but its signature requires number:
-    ./in.cue:441:5
-    ./in.cue:440:5
+    ./in.cue:484:5
+    ./in.cue:483:5
 [eval] x: conflicting values 1.5 and int (mismatched types float and int):
-    ./in.cue:439:13
-    ./in.cue:448:22
+    ./in.cue:482:13
+    ./in.cue:491:22
 [eval] admission.rw: function returns number, but its signature requires int:
-    ./in.cue:454:7
-    ./in.cue:453:7
+    ./in.cue:498:7
+    ./in.cue:497:7
 [eval] admission.rwc: function returns number, but its signature requires int:
-    ./in.cue:454:7
-    ./in.cue:453:7
-[eval] admission.wcr: function returns number, but its signature requires int:
-    ./in.cue:454:7
-    ./in.cue:453:7
+    ./in.cue:498:7
+    ./in.cue:497:7
+[eval] admission.wcr: conflicting function implementations: each function literal is a distinct value:
+    ./in.cue:498:7
+    ./in.cue:499:7
+    ./in.cue:502:7
+    ./in.cue:502:12
+admission.wcr: function returns number, but its signature requires int:
+    ./in.cue:498:7
+    ./in.cue:497:7
 [eval] function returns number, but its signature requires int:
-    ./in.cue:454:7
-    ./in.cue:453:7
+    ./in.cue:498:7
+    ./in.cue:497:7
 [eval] f: parameter 1 of function accepts int, but its signature requires number:
-    ./in.cue:465:10
-    ./in.cue:464:18
+    ./in.cue:509:10
+    ./in.cue:508:18
 [eval] admission.recStructBad: parameter v of function accepts {f:#RecB,x:int}, but its signature requires {f:#RecA,x:string}:
-    ./in.cue:493:59
-    ./in.cue:493:17
+    ./in.cue:537:59
+    ./in.cue:537:17
 [eval] admission.recListBad: parameter v of function accepts [#RecB,int], but its signature requires [#RecA,string]:
-    ./in.cue:494:51
-    ./in.cue:494:15
+    ./in.cue:538:51
+    ./in.cue:538:15
 [eval] admission.recKindBad: parameter v of function accepts #RecA, but its signature requires int:
-    ./in.cue:495:39
-    ./in.cue:495:15
+    ./in.cue:539:39
+    ./in.cue:539:15
 [eval] admission.recKindReverseBad: parameter v of function accepts int, but its signature requires #RecA:
-    ./in.cue:496:48
-    ./in.cue:496:22
+    ./in.cue:540:48
+    ./in.cue:540:22
 [eval] admission.recStructKindBad: parameter v of function accepts {f:#RecA}, but its signature requires {f:int}:
-    ./in.cue:497:50
-    ./in.cue:497:21
+    ./in.cue:541:50
+    ./in.cue:541:21
 [eval] admission.recListKindBad: parameter v of function accepts [#RecA], but its signature requires [int]:
-    ./in.cue:498:45
-    ./in.cue:498:19
+    ./in.cue:542:45
+    ./in.cue:542:19
 [eval] admission.anyBad: parameter 1 of function accepts int, but its signature requires _:
-    ./in.cue:502:17
-    ./in.cue:501:10
+    ./in.cue:546:17
+    ./in.cue:545:10
 [eval] conflicting values int and 1.5 (mismatched types int and float):
-    ./in.cue:506:26
-    ./in.cue:506:31
-    ./in.cue:508:17
+    ./in.cue:550:26
+    ./in.cue:550:31
+    ./in.cue:552:17
 [eval] admission.sBad: parameter x of function accepts (#Small & >0), but its signature requires #Small:
-    ./in.cue:515:13
-    ./in.cue:513:8
+    ./in.cue:559:13
+    ./in.cue:557:8
 [eval] admission.ec: parameter x of function accepts ("a"|"b"), but its signature requires string:
-    ./in.cue:546:7
-    ./in.cue:545:7
+    ./in.cue:590:7
+    ./in.cue:589:7
 [eval] f: parameter 1 of function accepts int, but its signature requires number:
-    ./in.cue:465:10
-    ./in.cue:562:19
+    ./in.cue:509:10
+    ./in.cue:606:19
 [eval] admission.vk: parameter s of function accepts int, but its signature requires strings.MinRunes(1):
-    ./in.cue:576:47
-    ./in.cue:576:7
+    ./in.cue:620:47
+    ./in.cue:620:7
 [eval] admission.rk: parameter s of function accepts int, but its signature requires =~"a":
-    ./in.cue:577:33
-    ./in.cue:577:7
+    ./in.cue:621:33
+    ./in.cue:621:7
 [eval] x: invalid value "c" (out of bound =~"a"):
-    ./in.cue:580:16
-    ./in.cue:581:16
-    ./in.cue:582:16
-    ./in.cue:583:12
+    ./in.cue:624:16
+    ./in.cue:625:16
+    ./in.cue:626:16
+    ./in.cue:627:12
 x: invalid value "c" (out of bound =~"b"):
-    ./in.cue:581:16
-    ./in.cue:580:16
-    ./in.cue:582:16
-    ./in.cue:583:12
+    ./in.cue:625:16
+    ./in.cue:624:16
+    ./in.cue:626:16
+    ./in.cue:627:12
 [eval] admission.ne: function returns int, but its signature requires !=5.0:
-    ./in.cue:675:7
-    ./in.cue:674:7
+    ./in.cue:719:7
+    ./in.cue:718:7
 [eval] admission.nes: function returns string, but its signature requires !=5.0:
-    ./in.cue:677:7
-    ./in.cue:676:7
+    ./in.cue:721:7
+    ./in.cue:720:7
 [incomplete] admission.#Person.full: invalid interpolation: non-concrete value string (type string):
-    ./in.cue:686:47
-    ./in.cue:686:19
+    ./in.cue:730:47
+    ./in.cue:730:19
 [eval] admission.rxeBad: parameter x of function accepts ("a"|"b"), but its signature requires =~"^[a-z]$":
-    ./in.cue:712:43
-    ./in.cue:712:11
+    ./in.cue:756:43
+    ./in.cue:756:11
 [eval] admission.bdeBad: parameter x of function accepts (0|1|2), but its signature requires ((int & >=0) & <=3):
-    ./in.cue:713:47
-    ./in.cue:713:11
+    ./in.cue:757:47
+    ./in.cue:757:11
 [eval] admission.stBad: parameter p of function accepts {n:string}, but its signature requires {n:int}:
-    ./in.cue:714:40
-    ./in.cue:714:11
+    ./in.cue:758:40
+    ./in.cue:758:11
 [eval] admission.idBad: parameter x of function accepts bool, but its signature requires #ID:
-    ./in.cue:715:35
-    ./in.cue:715:11
+    ./in.cue:759:35
+    ./in.cue:759:11
 [eval] admission.tlBad: parameter x of function accepts [...int], but its signature requires [...string]:
-    ./in.cue:716:43
-    ./in.cue:716:11
+    ./in.cue:760:43
+    ./in.cue:760:11
 [eval] admission.lnBad: parameter x of function accepts [int], but its signature requires [int,int]:
-    ./in.cue:717:42
-    ./in.cue:717:11
+    ./in.cue:761:42
+    ./in.cue:761:11
 [eval] admission.corrBad: parameter x of function accepts {a:0,b:0,d:int}, but its signature requires {a:int,b:(0 & a),d:string}:
-    ./in.cue:728:62
-    ./in.cue:728:12
+    ./in.cue:772:62
+    ./in.cue:772:12
 [eval] admission.empBad: parameter x of function accepts int, but its signature requires (int|<"b"):
-    ./in.cue:735:43
-    ./in.cue:735:12
+    ./in.cue:779:43
+    ./in.cue:779:12
 [eval] admission.late: parameter x of function accepts string, but its signature requires #Late:
-    ./in.cue:751:37
-    ./in.cue:751:11
+    ./in.cue:795:37
+    ./in.cue:795:11
 [eval] admission.early: parameter x of function accepts string, but its signature requires #Early:
-    ./in.cue:754:38
-    ./in.cue:754:11
+    ./in.cue:798:38
+    ./in.cue:798:11
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
-    ./in.cue:781:19
-    ./in.cue:797:10
-    ./in.cue:797:29
+    ./in.cue:825:19
+    ./in.cue:841:10
+    ./in.cue:841:29
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
-    ./in.cue:781:19
-    ./in.cue:798:28
-    ./in.cue:798:44
+    ./in.cue:825:19
+    ./in.cue:842:28
+    ./in.cue:842:44
 [eval] conflicting defaults for parameter a: conflicting values 4 and 2:
-    ./in.cue:803:24
-    ./in.cue:809:13
-    ./in.cue:809:32
+    ./in.cue:847:24
+    ./in.cue:853:13
+    ./in.cue:853:32
 [eval] defaults.extraBad: parameter b of function not allowed by closed function type:
-    ./in.cue:813:10
-    ./in.cue:816:17
+    ./in.cue:857:10
+    ./in.cue:860:17
 [eval] conflicting defaults for parameter x: conflicting values 2 and 3:
-    ./in.cue:835:26
-    ./in.cue:781:19
-    ./in.cue:836:14
+    ./in.cue:879:26
+    ./in.cue:825:19
+    ./in.cue:880:14
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
-    ./in.cue:781:19
-    ./in.cue:835:26
-    ./in.cue:837:15
+    ./in.cue:825:19
+    ./in.cue:879:26
+    ./in.cue:881:15
 [eval] defaults.orderDC: parameter b of function not allowed by closed function type:
-    ./in.cue:846:11
-    ./in.cue:844:11
+    ./in.cue:890:11
+    ./in.cue:888:11
 [eval] defaults.orderCD: parameter b of function not allowed by closed function type:
-    ./in.cue:846:11
-    ./in.cue:844:11
+    ./in.cue:890:11
+    ./in.cue:888:11
 [eval] defaults.orderTV: parameter b of function not allowed by closed function type:
-    ./in.cue:844:11
-    ./in.cue:846:11
+    ./in.cue:888:11
+    ./in.cue:890:11
 [eval] entitlement.bad1: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:872:17
+    ./in.cue:914:9
+    ./in.cue:916:17
 [eval] entitlement.bad2: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:873:17
+    ./in.cue:914:9
+    ./in.cue:917:17
 [eval] x: conflicting values 1.5 and int (mismatched types float and int):
-    ./in.cue:889:23
-    ./in.cue:889:46
+    ./in.cue:933:23
+    ./in.cue:933:46
 [eval] entitlement.bad4: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:894:10
+    ./in.cue:914:9
+    ./in.cue:938:10
 [eval] entitlement.bad5: parameter x of the function supplied for parameter g permits only number, but parameter g permits _:
-    ./in.cue:879:8
-    ./in.cue:897:23
+    ./in.cue:923:8
+    ./in.cue:941:23
 [eval] g: parameter 1 of function accepts number, but its signature requires _:
-    ./in.cue:878:8
-    ./in.cue:897:23
+    ./in.cue:922:8
+    ./in.cue:941:23
 [eval] entitlement.bad6: parameter x of the function supplied for parameter g permits only int, but parameter g permits _:
-    ./in.cue:870:9
-    ./in.cue:906:34
+    ./in.cue:914:9
+    ./in.cue:950:34
 [eval] entitlement.bad7: parameter s of the function supplied for parameter g permits only string, but parameter g permits _:
     strings:28:15
-    ./in.cue:912:17
+    ./in.cue:956:17
 [eval] entitlement.bad8: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:918:18
+    ./in.cue:914:9
+    ./in.cue:962:18
 [eval] g: cannot tighten a partially applied function:
-    ./in.cue:925:10
-    ./in.cue:873:17
-    ./in.cue:924:17
+    ./in.cue:969:10
+    ./in.cue:917:17
+    ./in.cue:968:17
 [eval] entitlement.bad9: parameter a of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:935:8
-    ./in.cue:937:16
+    ./in.cue:979:8
+    ./in.cue:981:16
 [eval] entitlement.bad10: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:873:17
+    ./in.cue:914:9
+    ./in.cue:917:17
 [eval] entitlement.bad11: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:873:17
+    ./in.cue:914:9
+    ./in.cue:917:17
 [eval] entitlement.bad12: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:948:17
+    ./in.cue:914:9
+    ./in.cue:992:17
 [eval] entitlement.bad13: parameter x of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:870:9
-    ./in.cue:952:24
+    ./in.cue:914:9
+    ./in.cue:996:24
 [eval] entitlement.bad14: parameter a of the function supplied for parameter g permits only int, but parameter g permits number:
-    ./in.cue:957:11
-    ./in.cue:958:18
+    ./in.cue:1001:11
+    ./in.cue:1002:18
 [eval] x: conflicting values 1.5 and int (mismatched types float and int):
-    ./in.cue:870:17
-    ./in.cue:969:37
+    ./in.cue:914:17
+    ./in.cue:1013:37
 [structural_cycle] structural cycle:
-    ./in.cue:971:34
+    ./in.cue:1015:34
 [structural_cycle] structural cycle:
-    ./in.cue:973:35
+    ./in.cue:1017:35
 -- out/eval/stats --
-Leaks:  55
-Freed:  1858
-Reused: 1679
-Allocs: 234
+Leaks:  71
+Freed:  1941
+Reused: 1762
+Allocs: 250
 Retain: 0
 
-Unifications: 1765
-Conjuncts:    5216
-Disjuncts:    119
+Unifications: 1862
+Conjuncts:    5383
+Disjuncts:    127
 
-NumCloseIDs: 762
+NumCloseIDs: 811

@@ -840,7 +840,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		n.updateCyclicStatus(id)
 
 		if y, ok := n.scalar.(*FuncValue); ok {
-			z, b := mergeFuncValues(ctx, y, x)
+			z, b := mergeFuncValues(ctx, y, x, n.scalarID, id.posInfo)
 			if b != nil {
 				if err, ok := b.Err.(*ValueError); ok {
 					err.AddPosition(y)

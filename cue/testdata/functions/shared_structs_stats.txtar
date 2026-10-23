@@ -1,9 +1,10 @@
 # Two struct definitions that share their parts must compare each pair of
 # parts once, not once for every path through them, which grows exponentially
 # with the depth. The leaves differ in form but not in the values they admit,
-# so that comparing a pair of leaves tries witnesses; six levels make the
-# difference plain in out/eval/stats without making the regression test
-# expensive.
+# so that comparing a pair of leaves tries witnesses. Two closures capturing
+# such definitions compare them as data, once per pair of parts as well. Six
+# levels make the difference plain in out/eval/stats without making the
+# regression test expensive.
 #inlinetest:exclude skip — performance regression guarded by out/eval/stats
 -- in.cue --
 @experiment(functions)
@@ -24,16 +25,35 @@
 #B6: {a: #B5, b: #B5, c: #B5, d: #B5}
 
 admitted: (func(p: #A6) -> int) & (func(p: #B6) -> int: 1)
+
+#C0: {v: 1}
+#D0: {v: 1}
+#C1: {a: #C0, b: #C0, c: #C0, d: #C0}
+#D1: {a: #D0, b: #D0, c: #D0, d: #D0}
+#C2: {a: #C1, b: #C1, c: #C1, d: #C1}
+#D2: {a: #D1, b: #D1, c: #D1, d: #D1}
+#C3: {a: #C2, b: #C2, c: #C2, d: #C2}
+#D3: {a: #D2, b: #D2, c: #D2, d: #D2}
+#C4: {a: #C3, b: #C3, c: #C3, d: #C3}
+#D4: {a: #D3, b: #D3, c: #D3, d: #D3}
+#C5: {a: #C4, b: #C4, c: #C4, d: #C4}
+#D5: {a: #D4, b: #D4, c: #D4, d: #D4}
+#C6: {a: #C5, b: #C5, c: #C5, d: #C5}
+#D6: {a: #D5, b: #D5, c: #D5, d: #D5}
+mk: func(x: _) -> _: func() -> _: x
+captured: mk(#C6) & mk(#D6)
 -- out/eval/stats --
 Leaks:  0
-Freed:  75
-Reused: 55
-Allocs: 20
+Freed:  149
+Reused: 112
+Allocs: 37
 Retain: 0
 
-Unifications: 75
-Conjuncts:    85
+Unifications: 149
+Conjuncts:    170
 Disjuncts:    0
+
+NumCloseIDs: 2
 -- out/evalalpha --
 (struct){
   #A0: (#struct){
@@ -115,4 +135,84 @@ Disjuncts:    0
     d: ~(#B5)
   }
   admitted: (func){ func(p: 〈0;#B6〉) -> int: 1 & func(p: 〈0;#A6〉) -> int }
+  #C0: (#struct){
+    v: (int){ 1 }
+  }
+  #D0: (#struct){
+    v: (int){ 1 }
+  }
+  #C1: (#struct){
+    a: ~(#C0)
+    b: ~(#C0)
+    c: ~(#C0)
+    d: ~(#C0)
+  }
+  #D1: (#struct){
+    a: ~(#D0)
+    b: ~(#D0)
+    c: ~(#D0)
+    d: ~(#D0)
+  }
+  #C2: (#struct){
+    a: ~(#C1)
+    b: ~(#C1)
+    c: ~(#C1)
+    d: ~(#C1)
+  }
+  #D2: (#struct){
+    a: ~(#D1)
+    b: ~(#D1)
+    c: ~(#D1)
+    d: ~(#D1)
+  }
+  #C3: (#struct){
+    a: ~(#C2)
+    b: ~(#C2)
+    c: ~(#C2)
+    d: ~(#C2)
+  }
+  #D3: (#struct){
+    a: ~(#D2)
+    b: ~(#D2)
+    c: ~(#D2)
+    d: ~(#D2)
+  }
+  #C4: (#struct){
+    a: ~(#C3)
+    b: ~(#C3)
+    c: ~(#C3)
+    d: ~(#C3)
+  }
+  #D4: (#struct){
+    a: ~(#D3)
+    b: ~(#D3)
+    c: ~(#D3)
+    d: ~(#D3)
+  }
+  #C5: (#struct){
+    a: ~(#C4)
+    b: ~(#C4)
+    c: ~(#C4)
+    d: ~(#C4)
+  }
+  #D5: (#struct){
+    a: ~(#D4)
+    b: ~(#D4)
+    c: ~(#D4)
+    d: ~(#D4)
+  }
+  #C6: (#struct){
+    a: ~(#C5)
+    b: ~(#C5)
+    c: ~(#C5)
+    d: ~(#C5)
+  }
+  #D6: (#struct){
+    a: ~(#D5)
+    b: ~(#D5)
+    c: ~(#D5)
+    d: ~(#D5)
+  }
+  mk: (func){ func(x: _) -> _: func() -> _: 〈1;x〉 }
+  captured: (func){ func() -> _: 〈1;x〉 }
 }

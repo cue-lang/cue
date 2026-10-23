@@ -12,57 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package adt
+package adt_test
 
 import (
 	"fmt"
 	"testing"
+
+	"cuelang.org/go/internal/core/adt"
 )
 
 func TestNilSource(t *testing.T) {
-	testCases := []Node{
-		&BasicType{},
-		&BinaryExpr{},
-		&Bool{},
-		&Bottom{},
-		&BoundExpr{},
-		&BoundValue{},
-		&Builtin{},
-		&BuiltinValidator{},
-		&BulkOptionalField{},
-		&Bytes{},
-		&CallExpr{},
-		&Comprehension{},
-		&Conjunction{},
-		&Disjunction{},
-		&DisjunctionExpr{},
-		&DynamicField{},
-		&DynamicReference{},
-		&Ellipsis{},
-		&Field{},
-		&FieldReference{},
-		&ForClause{},
-		&IfClause{},
-		&ImportReference{},
-		&IndexExpr{},
-		&Interpolation{},
-		&LabelReference{},
-		&LetClause{},
-		&LetField{},
-		&LetReference{},
-		&ListLit{},
-		&ListMarker{},
-		&NodeLink{},
-		&Null{},
-		&Num{},
-		&SelectorExpr{},
-		&SliceExpr{},
-		&String{},
-		&StructLit{},
-		&StructMarker{},
-		&Top{},
-		&UnaryExpr{},
-		&Vertex{},
+	testCases := []adt.Node{
+		&adt.BasicType{},
+		&adt.BinaryExpr{},
+		&adt.Bool{},
+		&adt.Bottom{},
+		&adt.BoundExpr{},
+		&adt.BoundValue{},
+		&adt.Builtin{},
+		&adt.BuiltinValidator{},
+		&adt.BulkOptionalField{},
+		&adt.Bytes{},
+		&adt.CallExpr{},
+		&adt.Comprehension{},
+		&adt.Conjunction{},
+		&adt.Disjunction{},
+		&adt.DisjunctionExpr{},
+		&adt.DynamicField{},
+		&adt.DynamicReference{},
+		&adt.Ellipsis{},
+		&adt.Field{},
+		&adt.FieldReference{},
+		&adt.ForClause{},
+		&adt.IfClause{},
+		&adt.ImportReference{},
+		&adt.IndexExpr{},
+		&adt.Interpolation{},
+		&adt.LabelReference{},
+		&adt.LetClause{},
+		&adt.LetField{},
+		&adt.LetReference{},
+		&adt.ListLit{},
+		&adt.ListMarker{},
+		&adt.NodeLink{},
+		&adt.Null{},
+		&adt.Num{},
+		&adt.SelectorExpr{},
+		&adt.SliceExpr{},
+		&adt.String{},
+		&adt.StructLit{},
+		&adt.StructMarker{},
+		&adt.Top{},
+		&adt.UnaryExpr{},
+		&adt.Vertex{},
 	}
 	for _, x := range testCases {
 		t.Run(fmt.Sprintf("%T", x), func(t *testing.T) {
@@ -94,7 +96,7 @@ func TestNumBigInt(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.decimal, func(t *testing.T) {
-			n := &Num{K: IntKind}
+			n := &adt.Num{K: adt.IntKind}
 			if _, _, err := n.X.SetString(tc.decimal); err != nil {
 				t.Fatal(err)
 			}

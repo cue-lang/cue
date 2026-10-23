@@ -12,78 +12,80 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package adt
+package adt_test
 
 import (
 	"testing"
+
+	"cuelang.org/go/internal/core/adt"
 )
 
-// TestEqualTerminal_BuiltinValidator checks equality of BuiltinValidator values.
-func TestEqualTerminal_BuiltinValidator(t *testing.T) {
-	b1 := &Builtin{Name: "MaxFields"}
-	b2 := &Builtin{Name: "MinFields"}
+// TestEqualBuiltinValidator checks equality of BuiltinValidator values.
+func TestEqualBuiltinValidator(t *testing.T) {
+	b1 := &adt.Builtin{Name: "MaxFields"}
+	b2 := &adt.Builtin{Name: "MinFields"}
 
 	// Use BasicType values as stand-in args: BasicType equality is purely
 	// structural (Kind comparison), so it exercises the recursive Equal call
 	// without requiring a fully-wired OpContext.
-	intArg := &BasicType{K: IntKind}
-	strArg := &BasicType{K: StringKind}
+	intArg := &adt.BasicType{K: adt.IntKind}
+	strArg := &adt.BasicType{K: adt.StringKind}
 
 	tests := []struct {
 		name string
-		v, w Value
+		v, w adt.Value
 		want bool
 	}{
 		{
 			name: "same builtin same args equal",
-			v:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg}},
-			w:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg}},
+			v:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg}},
+			w:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg}},
 			want: true,
 		},
 		{
 			name: "same builtin different args not equal",
-			v:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg}},
-			w:    &BuiltinValidator{Builtin: b1, Args: []Value{strArg}},
+			v:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg}},
+			w:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{strArg}},
 			want: false,
 		},
 		{
 			name: "different builtins same args not equal",
-			v:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg}},
-			w:    &BuiltinValidator{Builtin: b2, Args: []Value{intArg}},
+			v:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg}},
+			w:    &adt.BuiltinValidator{Builtin: b2, Args: []adt.Value{intArg}},
 			want: false,
 		},
 		{
 			name: "different arg counts not equal",
-			v:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg}},
-			w:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg, strArg}},
+			v:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg}},
+			w:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg, strArg}},
 			want: false,
 		},
 		{
 			name: "no-arg validators same builtin equal",
-			v:    &BuiltinValidator{Builtin: b1},
-			w:    &BuiltinValidator{Builtin: b1},
+			v:    &adt.BuiltinValidator{Builtin: b1},
+			w:    &adt.BuiltinValidator{Builtin: b1},
 			want: true,
 		},
 		{
 			name: "no-arg validators different builtins not equal",
-			v:    &BuiltinValidator{Builtin: b1},
-			w:    &BuiltinValidator{Builtin: b2},
+			v:    &adt.BuiltinValidator{Builtin: b1},
+			w:    &adt.BuiltinValidator{Builtin: b2},
 			want: false,
 		},
 		{
 			name: "validator vs non-validator not equal",
-			v:    &BuiltinValidator{Builtin: b1, Args: []Value{intArg}},
-			w:    &BasicType{K: StructKind},
+			v:    &adt.BuiltinValidator{Builtin: b1, Args: []adt.Value{intArg}},
+			w:    &adt.BasicType{K: adt.StructKind},
 			want: false,
 		},
 	}
 
-	ctx := &OpContext{}
+	ctx := &adt.OpContext{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := equalTerminal(ctx, tt.v, tt.w, 0)
+			got := adt.Equal(ctx, tt.v, tt.w, 0)
 			if got != tt.want {
-				t.Errorf("equalTerminal(%T, %T) = %v, want %v", tt.v, tt.w, got, tt.want)
+				t.Errorf("Equal(%T, %T) = %v, want %v", tt.v, tt.w, got, tt.want)
 			}
 		})
 	}

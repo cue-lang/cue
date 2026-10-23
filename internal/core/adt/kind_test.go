@@ -12,71 +12,73 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package adt
+package adt_test
 
 import (
 	"slices"
 	"testing"
 
 	"github.com/go-quicktest/qt"
+
+	"cuelang.org/go/internal/core/adt"
 )
 
 func TestKindString(t *testing.T) {
 	testCases := []struct {
-		input     Kind
+		input     adt.Kind
 		want      string
-		wantKinds []Kind
+		wantKinds []adt.Kind
 	}{{
-		input: BottomKind,
+		input: adt.BottomKind,
 		want:  "_|_",
 	}, {
-		input:     TopKind,
+		input:     adt.TopKind,
 		want:      "_",
-		wantKinds: []Kind{NullKind, BoolKind, IntKind, FloatKind, StringKind, BytesKind, FuncKind, ListKind, StructKind},
+		wantKinds: []adt.Kind{adt.NullKind, adt.BoolKind, adt.IntKind, adt.FloatKind, adt.StringKind, adt.BytesKind, adt.FuncKind, adt.ListKind, adt.StructKind},
 	}, {
-		input:     IntKind | ListKind,
+		input:     adt.IntKind | adt.ListKind,
 		want:      `(int|[...])`,
-		wantKinds: []Kind{IntKind, ListKind},
+		wantKinds: []adt.Kind{adt.IntKind, adt.ListKind},
 	}, {
-		input:     NullKind,
+		input:     adt.NullKind,
 		want:      "null",
-		wantKinds: []Kind{NullKind},
+		wantKinds: []adt.Kind{adt.NullKind},
 	}, {
-		input:     IntKind,
+		input:     adt.IntKind,
 		want:      "int",
-		wantKinds: []Kind{IntKind},
+		wantKinds: []adt.Kind{adt.IntKind},
 	}, {
-		input:     FloatKind,
+		input:     adt.FloatKind,
 		want:      "float",
-		wantKinds: []Kind{FloatKind},
+		wantKinds: []adt.Kind{adt.FloatKind},
 	}, {
-		input:     StringKind,
+		input:     adt.StringKind,
 		want:      "string",
-		wantKinds: []Kind{StringKind},
+		wantKinds: []adt.Kind{adt.StringKind},
 	}, {
-		input:     BytesKind,
+		input:     adt.BytesKind,
 		want:      "bytes",
-		wantKinds: []Kind{BytesKind},
+		wantKinds: []adt.Kind{adt.BytesKind},
 	}, {
-		input:     StructKind,
+		input:     adt.StructKind,
 		want:      "{...}",
-		wantKinds: []Kind{StructKind},
+		wantKinds: []adt.Kind{adt.StructKind},
 	}, {
-		input:     ListKind,
+		input:     adt.ListKind,
 		want:      "[...]",
-		wantKinds: []Kind{ListKind},
+		wantKinds: []adt.Kind{adt.ListKind},
 	}, {
-		input:     NumberKind,
+		input:     adt.NumberKind,
 		want:      "number",
-		wantKinds: []Kind{IntKind, FloatKind},
+		wantKinds: []adt.Kind{adt.IntKind, adt.FloatKind},
 	}, {
-		input:     BoolKind | NumberKind | ListKind,
+		input:     adt.BoolKind | adt.NumberKind | adt.ListKind,
 		want:      "(bool|[...]|number)",
-		wantKinds: []Kind{BoolKind, IntKind, FloatKind, ListKind},
+		wantKinds: []adt.Kind{adt.BoolKind, adt.IntKind, adt.FloatKind, adt.ListKind},
 	}, {
 		input:     1 << 15,
 		want:      "bad(15)",
-		wantKinds: []Kind{1 << 15},
+		wantKinds: []adt.Kind{1 << 15},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.want, func(t *testing.T) {

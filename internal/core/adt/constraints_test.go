@@ -140,6 +140,10 @@ func TestMatchPatternValue(t *testing.T) {
 			f = idx(tc.index)
 		}
 
-		t.Equal(adt.MatchPatternValue(ctx, expr, f), tc.result)
+		v := &adt.Vertex{PatternConstraints: &adt.Constraints{
+			Pairs: []adt.PatternConstraint{{Pattern: expr}},
+		}}
+		found, _ := adt.Accept(ctx, v, f)
+		t.Equal(found, tc.result)
 	})
 }

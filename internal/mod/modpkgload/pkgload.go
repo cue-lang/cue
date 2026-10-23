@@ -191,9 +191,11 @@ func (pkg *Package) CanonicalPath() string {
 }
 
 // CanonicalImportPath returns the [Package.CanonicalPath] of the package
-// which pkg imports by the given raw import path.
-// This is used for external module packages where the importing module's
-// default major versions differ from the main module's.
+// which pkg imports by the given raw import path, as spelled in its files.
+// This is used for external module packages, where the importing module's
+// default major versions differ from the main module's, and where a
+// replacement module's imports of its own packages are served under the
+// path of the module it replaces.
 func (pkg *Package) CanonicalImportPath(rawPath string) string {
 	// The importsByPath keys are canonical import paths (see
 	// [modimports.AllImports]), so canonicalize the raw path before looking
@@ -446,10 +448,10 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		importFlags = PkgInAll
 	}
 	for _, imp := range imports {
-		if replaced {
-			imp = pkgs.replacements.CanonicalImportPath(imp)
-		}
 		path := imp
+		if replaced {
+			path = pkgs.replacements.CanonicalImportPath(path)
+		}
 		if pkg.fromExternal {
 			var err error
 			if path, err = pkgs.resolveExternalImport(ctx, pkg, path); err != nil {
@@ -459,8 +461,6 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		ipkg := pkgs.addPkg(ctx, path, importFlags)
 		pkg.imports = append(pkg.imports, ipkg)
 		if pkg.fromExternal {
-			// Keyed by the import with replacements applied, as given to
-			// [Package.CanonicalImportPath].
 			pkg.importsByPath[imp] = ipkg
 		}
 	}

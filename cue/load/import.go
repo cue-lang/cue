@@ -561,28 +561,19 @@ func (l *loader) canonicalImportPath(importPath string) string {
 	return path
 }
 
-// setCanonicalImportPath sets a CanonicalImportPath function on the build instance.
-// This handles two kinds of canonicalization:
-//   - Rewriting imports to the [modpkgload.Package.CanonicalPath] of the
-//     imported package, resolving unversioned imports in external module
-//     packages with the importing module's own default major versions,
-//     and in main module packages with the main module's.
-//   - For all packages, rewriting imports that reference a replacement module's
-//     namespace back to the original module's namespace.
+// setCanonicalImportPath sets a CanonicalImportPath function on the build
+// instance, rewriting imports to the [modpkgload.Package.CanonicalPath] of
+// the imported package. Imports in external module packages are resolved as
+// modpkgload resolved them, with the importing module's own default major
+// versions and with replacements applied; imports in main module packages
+// are resolved with the main module's default major versions.
 func (l *loader) setCanonicalImportPath(p *build.Instance) {
 	if l.pkgs == nil {
 		return
 	}
-	canonical := l.canonicalImportPath
+	p.CanonicalImportPath = l.canonicalImportPath
 	if mpkg := l.pkgs.Pkg(ast.ParseImportPath(p.ImportPath).Canonical().String()); mpkg != nil && mpkg.FromExternalModule() {
-		canonical = mpkg.CanonicalImportPath
-	}
-	repls := l.cfg.replacements
-	p.CanonicalImportPath = func(importPath string) string {
-		if repls != nil {
-			importPath = repls.CanonicalImportPath(importPath)
-		}
-		return canonical(importPath)
+		p.CanonicalImportPath = mpkg.CanonicalImportPath
 	}
 }
 

@@ -3,12 +3,10 @@
 # imports within the replacement itself are served under foo's path, so the
 # main module and the other dependency must still see bar under its own path.
 
-# Imports of bar outside the replacement are rewritten to foo's path,
-# which is not loaded.
-! exec cue export .
-stderr 'no dependency found for package "example.com/foo/sub"'
-! exec cue export ./direct
-stderr 'no dependency found for package "example.com/foo/sub"'
+exec cue export .
+cmp stdout want-export.txt
+exec cue export ./direct
+cmp stdout want-direct.txt
 
 -- cue.mod/module.cue --
 module: "example.com/main@v0"

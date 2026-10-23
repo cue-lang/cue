@@ -92,9 +92,9 @@ func (s *boundSimplifier) expr(ctx *adt.OpContext) (e ast.Expr) {
 	}
 	if s.isInt {
 		if sign := s.minNum.X.Sign(); sign == -1 {
-			e = ast.NewIdent("int")
+			e = ast.NewPredeclared("int")
 		} else {
-			e = ast.NewIdent("uint")
+			e = ast.NewPredeclared("uint")
 			if sign == 0 && s.min.Op == adt.GreaterEqualOp {
 				s.min = nil
 			}

@@ -2,8 +2,7 @@ Simplified exports print the predeclared numeric types by name.
 Where a field shadows such a name, the export must use its __-prefixed
 form, so that the output still refers to the predeclared type.
 
-TODO: rune prints as uint & <=1114111, and the names in shadowed print
-unqualified, so that they refer to the fields instead.
+TODO: rune prints as uint & <=1114111.
 
 -- in.cue --
 plain: {
@@ -60,10 +59,10 @@ shadowed: {
 	uint8: "b"
 	uint:  "c"
 	int:   "d"
-	r:     uint & <=1114111
-	u8:    uint8
-	ub:    uint & <=1000
-	ib:    int & >=-1 & <=1000
+	r:     __uint & <=1114111
+	u8:    __uint8
+	ub:    __uint & <=1000
+	ib:    __int & >=-1 & <=1000
 }
 -- out/doc --
 []
@@ -119,10 +118,10 @@ shadowed: {
 		uint8: "b"
 		uint:  "c"
 		int:   "d"
-		r:     uint & <=1114111
-		u8:    uint8
-		ub:    uint & <=1000
-		ib:    int & >=-1 & <=1000
+		r:     __uint & <=1114111
+		u8:    __uint8
+		ub:    __uint & <=1000
+		ib:    __int & >=-1 & <=1000
 	}
 }
 == Raw
@@ -181,10 +180,10 @@ shadowed: {
 		uint8: "b"
 		uint:  "c"
 		int:   "d"
-		r:     uint & <=1114111
-		u8:    uint8
-		ub:    uint & <=1000
-		ib:    int & >=-1 & <=1000
+		r:     __uint & <=1114111
+		u8:    __uint8
+		ub:    __uint & <=1000
+		ib:    __int & >=-1 & <=1000
 	}
 }
 == All
@@ -212,10 +211,10 @@ shadowed: {
 		uint8: "b"
 		uint:  "c"
 		int:   "d"
-		r:     uint & <=1114111
-		u8:    uint8
-		ub:    uint & <=1000
-		ib:    int & >=-1 & <=1000
+		r:     __uint & <=1114111
+		u8:    __uint8
+		ub:    __uint & <=1000
+		ib:    __int & >=-1 & <=1000
 	}
 }
 == Eval

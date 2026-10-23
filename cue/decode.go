@@ -197,7 +197,7 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		}
 		x.SetInt(i)
 
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		i, err := v.Uint64()
 		d.addErr(err)
 		if x.OverflowUint(i) {

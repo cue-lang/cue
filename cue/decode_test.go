@@ -118,6 +118,10 @@ func TestDecode(t *testing.T) {
 		newDst: func() any { return new(uint8) },
 		err:    "integer 500 overflows uint8",
 	}, {
+		value:  `5`,
+		newDst: func() any { return new(uintptr) },
+		want:   uintptr(5),
+	}, {
 		value:  `501`,
 		newDst: func() any { return new(int8) },
 		err:    "integer 501 overflows int8",

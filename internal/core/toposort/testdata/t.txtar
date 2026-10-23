@@ -533,3 +533,14 @@ k2: {
 		z: 3
 	}
 }
+-- out/TestTopologicalSort/lexicographical=false/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+OrderEdges:   126

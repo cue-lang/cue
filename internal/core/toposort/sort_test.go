@@ -59,10 +59,16 @@ func TestTopologicalSort(t *testing.T) {
 					ShowAttributes:  true,
 				}
 
+				// A fresh context, so the stats cover only the export.
 				ctx := adt.NewContext(run, v)
 				expr, err := evalWithOptions.Value(ctx, inst.ID(), v)
 				if err != nil {
 					t.Fatal(err)
+				}
+				if !lexico {
+					// Record the stats once, for the mode whose graph
+					// keeps the edges it requests.
+					fmt.Fprintln(t.WriterFallback("stats"), ctx.Stats())
 				}
 
 				{

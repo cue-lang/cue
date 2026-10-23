@@ -38,3 +38,14 @@ _app2: {
 	#Exporter: objects: []
 	out: objects:       [{leafField: "leaf value"}]
 }
+-- out/TestTopologicalSort/lexicographical=false/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+OrderEdges:   7

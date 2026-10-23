@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/jsonschema/internal/structbuilder"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/value"
@@ -82,7 +83,7 @@ type decoder struct {
 	defs map[string]*definedSchema
 
 	// builder is used to build the final syntax tree as it becomes known.
-	builder structBuilder
+	builder structbuilder.Builder
 
 	// needAnotherPass is set to true when we know that
 	// we need another pass through the schema extraction
@@ -133,7 +134,7 @@ func (d *decoder) seedBase() error {
 	if d.cfg.Base == nil {
 		return nil
 	}
-	return d.builder.addBase(d.cfg.Base)
+	return d.builder.AddBase(d.cfg.Base)
 }
 
 func (d *decoder) decode(v cue.Value) *ast.File {
@@ -239,7 +240,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 				root.errf(v, "constraints are not possible to satisfy")
 				return nil
 			}
-			if !d.builder.put(cue.Path{}, expr, state.comment()) {
+			if !d.builder.Put(cue.Path{}, expr, state.comment()) {
 				root.errf(v, "duplicate definition at root") // TODO better error message
 				return nil
 			}
@@ -273,7 +274,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			break
 		}
 
-		d.builder = structBuilder{}
+		d.builder = structbuilder.Builder{}
 		if err := d.seedBase(); err != nil {
 			// Should never happen: the base was accepted before the first pass.
 			d.errf(cue.Value{}, "invalid Config.Base value: %v", err)
@@ -293,7 +294,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			}
 		}
 	}
-	f, err := d.builder.syntax()
+	f, err := d.builder.Syntax()
 	if err != nil {
 		d.errf(v, "cannot build final syntax: %v", err)
 		return nil
@@ -1093,7 +1094,7 @@ func (s *state) maybeDefine(expr ast.Expr, info schemaInfo) ast.Expr {
 	def.comment = info.comment()
 	if def.importPath == "" {
 		// It's a local definition that's not at the root.
-		if !s.builder.put(def.path, expr, s.comment()) {
+		if !s.builder.Put(def.path, expr, s.comment()) {
 			s.errf(s.pos, "redefinition of schema CUE path %v", def.path)
 			return expr
 		}
@@ -1163,7 +1164,7 @@ func (s *state) addDefinition(n cue.Value) *definedSchema {
 func (s *state) refExpr(n cue.Value, importPath string, path cue.Path) ast.Expr {
 	if importPath == "" {
 		// Internal reference
-		expr, err := s.builder.getRef(path)
+		expr, err := s.builder.GetRef(path)
 		if err != nil {
 			s.errf(n, "cannot generate reference: %v", err)
 			return nil
@@ -1179,7 +1180,7 @@ func (s *state) refExpr(n cue.Value, importPath string, path cue.Path) ast.Expr 
 	}
 	ident := ast.NewIdent(ip.Qualifier)
 	ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
-	expr, err := pathRefSyntax(path, ident)
+	expr, err := structbuilder.PathRefSyntax(path, ident)
 	if err != nil {
 		s.errf(n, "cannot determine CUE path: %v", err)
 		return nil

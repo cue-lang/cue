@@ -541,12 +541,12 @@ func constraintEmbeddedResource(key string, n cue.Value, s *state) {
 	// can share. If it already exists, that's fine.
 	// TODO add an attribute to make it clear what's going on here
 	// when encoding a CRD from CUE?
-	s.builder.put(resourceDefinitionPath, ast.NewStruct(
+	s.builder.Put(resourceDefinitionPath, ast.NewStruct(
 		"apiVersion", token.NOT, ast.NewIdent("string"),
 		"kind", token.NOT, ast.NewIdent("string"),
 		"metadata", token.OPTION, ast.NewStruct(&ast.Ellipsis{}),
 	), nil)
-	refExpr, err := s.builder.getRef(resourceDefinitionPath)
+	refExpr, err := s.builder.GetRef(resourceDefinitionPath)
 	if err != nil {
 		s.errf(n, `cannot get reference to embedded resource definition: %v`, err)
 	} else {

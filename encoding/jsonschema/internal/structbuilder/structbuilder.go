@@ -1,4 +1,18 @@
-package jsonschema
+// Copyright 2024 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package structbuilder
 
 import (
 	"cmp"
@@ -13,15 +27,15 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-// structBuilder builds a struct value incrementally by
+// Builder builds a struct value incrementally by
 // putting values for its component paths.
-// The [structBuilder.getRef] method can be used
+// The [Builder.GetRef] method can be used
 // to obtain reliable references into the resulting struct.
-type structBuilder struct {
+type Builder struct {
 	root structBuilderNode
 
 	// seeding is set while base data is being added (see
-	// [structBuilder.addBase]): nodes created while it is set are stamped
+	// [Builder.AddBase]): nodes created while it is set are stamped
 	// with a sequence number recording their relative order.
 	seeding bool
 
@@ -32,9 +46,9 @@ type structBuilder struct {
 	// at the top level of the struct, keyed by the selector
 	// they're referring to.
 	//
-	// The [Ident.Node] field needs to refer to the field value rather
-	// than the field label, and we don't know that until the syntax
-	// method has been invoked, so we fix up the [Ident.Node] fields when
+	// The [ast.Ident.Node] field needs to refer to the field value rather
+	// than the field label, and we don't know that until the Syntax
+	// method has been invoked, so we fix up the [ast.Ident.Node] fields when
 	// that happens.
 	refIdents map[cue.Selector][]*ast.Ident
 
@@ -48,7 +62,7 @@ type structBuilder struct {
 type structBuilderNode struct {
 	// value holds the value associated with the node, if any.
 	// This does not include entries added underneath it by
-	// [structBuilder.put].
+	// [Builder.Put].
 	value ast.Expr
 
 	// seq holds the node's ordering sequence number when the node was
@@ -65,15 +79,15 @@ type structBuilderNode struct {
 	entries map[cue.Selector]*structBuilderNode
 }
 
-// addBase seeds the builder with the contents of the given file, recording
-// the order of its fields so that [structBuilder.syntax] preserves it. The
+// AddBase seeds the builder with the contents of the given file, recording
+// the order of its fields so that [Builder.Syntax] preserves it. The
 // file must consist only of regular fields with identifier or simple string
 // labels, holding values composed of struct literals, list literals and
 // other expressions, which are treated as opaque leaf values. A field with
 // the placeholder value _ records the position of its path without
 // associating a value with it: a value put at that path later takes its
 // place, and the placeholder remains if none is.
-func (b *structBuilder) addBase(f *ast.File) error {
+func (b *Builder) AddBase(f *ast.File) error {
 	b.seeding = true
 	defer func() {
 		b.seeding = false
@@ -90,7 +104,7 @@ func (b *structBuilder) addBase(f *ast.File) error {
 	return nil
 }
 
-func (b *structBuilder) addBaseField(prefix []cue.Selector, fld *ast.Field) error {
+func (b *Builder) addBaseField(prefix []cue.Selector, fld *ast.Field) error {
 	if fld.Constraint != token.ILLEGAL {
 		return fmt.Errorf("unsupported field constraint %q in base data", fld.Constraint)
 	}
@@ -120,7 +134,7 @@ func (b *structBuilder) addBaseField(prefix []cue.Selector, fld *ast.Field) erro
 	return b.addBaseExpr(append(prefix, sel), fld.Value, baseDocComment(fld))
 }
 
-func (b *structBuilder) addBaseExpr(path []cue.Selector, e ast.Expr, comment *ast.CommentGroup) error {
+func (b *Builder) addBaseExpr(path []cue.Selector, e ast.Expr, comment *ast.CommentGroup) error {
 	cuePath := cue.MakePath(path...)
 	switch e := e.(type) {
 	case *ast.StructLit:
@@ -158,7 +172,7 @@ func (b *structBuilder) addBaseExpr(path []cue.Selector, e ast.Expr, comment *as
 			return nil
 		}
 	}
-	if !b.put(cuePath, e, comment) {
+	if !b.Put(cuePath, e, comment) {
 		return fmt.Errorf("duplicate value in base data at %v", cuePath)
 	}
 	return nil
@@ -166,7 +180,7 @@ func (b *structBuilder) addBaseExpr(path []cue.Selector, e ast.Expr, comment *as
 
 // setBaseComment ensures the node at the given path exists (stamping its
 // order) and associates the given doc comment with it if it has none.
-func (b *structBuilder) setBaseComment(p cue.Path, comment *ast.CommentGroup) {
+func (b *Builder) setBaseComment(p cue.Path, comment *ast.CommentGroup) {
 	e := b.entryForPath(p)
 	if e.comment == nil {
 		e.comment = comment
@@ -184,10 +198,10 @@ func baseDocComment(n ast.Node) *ast.CommentGroup {
 	return nil
 }
 
-// put associates value with the given path. It reports whether
+// Put associates value with the given path. It reports whether
 // the value was successfully put, returning false if a value
 // already exists for the path.
-func (b *structBuilder) put(p cue.Path, value ast.Expr, comment *ast.CommentGroup) bool {
+func (b *Builder) Put(p cue.Path, value ast.Expr, comment *ast.CommentGroup) bool {
 	e := b.entryForPath(p)
 	if e.value != nil {
 		// redefinition
@@ -202,10 +216,10 @@ func (b *structBuilder) put(p cue.Path, value ast.Expr, comment *ast.CommentGrou
 
 const rootIdentName = "_schema"
 
-// getRef returns CUE syntax for a reference to the path p within b.
+// GetRef returns CUE syntax for a reference to the path p within b.
 // It ensures that, if possible, the identifier at the start of the
 // reference expression has the correct target node.
-func (b *structBuilder) getRef(p cue.Path) (ast.Expr, error) {
+func (b *Builder) GetRef(p cue.Path) (ast.Expr, error) {
 	if err := p.Err(); err != nil {
 		return nil, fmt.Errorf("invalid path %v", p)
 	}
@@ -232,10 +246,10 @@ func (b *structBuilder) getRef(p cue.Path) (ast.Expr, error) {
 		b.refIdents = make(map[cue.Selector][]*ast.Ident)
 	}
 	b.refIdents[sels[0]] = append(b.refIdents[sels[0]], baseExpr)
-	return pathRefSyntax(cue.MakePath(sels[1:]...), baseExpr)
+	return PathRefSyntax(cue.MakePath(sels[1:]...), baseExpr)
 }
 
-func (b *structBuilder) entryForPath(p cue.Path) *structBuilderNode {
+func (b *Builder) entryForPath(p cue.Path) *structBuilderNode {
 	if err := p.Err(); err != nil {
 		panic(fmt.Errorf("invalid path %v", p))
 	}
@@ -260,8 +274,8 @@ func (b *structBuilder) entryForPath(p cue.Path) *structBuilderNode {
 	return n
 }
 
-// syntax returns an expression for the whole struct.
-func (b *structBuilder) syntax() (*ast.File, error) {
+// Syntax returns an expression for the whole struct.
+func (b *Builder) Syntax() (*ast.File, error) {
 	var db declBuilder
 	if err := b.appendDecls(&b.root, &db); err != nil {
 		return nil, err
@@ -271,7 +285,7 @@ func (b *structBuilder) syntax() (*ast.File, error) {
 	// to refer to).
 	for _, decl := range db.decls {
 		if f, ok := decl.(*ast.Field); ok {
-			for _, ident := range b.refIdents[selectorForLabel(f.Label)] {
+			for _, ident := range b.refIdents[SelectorForLabel(f.Label)] {
 				ident.Node = f.Value
 			}
 		}
@@ -289,7 +303,7 @@ func (b *structBuilder) syntax() (*ast.File, error) {
 		for _, ident := range b.rootRefIdents {
 			ident.Node = rootExpr
 		}
-		rootRef, err := b.getRef(cue.Path{})
+		rootRef, err := b.GetRef(cue.Path{})
 		if err != nil {
 			return nil, err
 		}
@@ -316,7 +330,7 @@ func (b *structBuilder) syntax() (*ast.File, error) {
 	return f, nil
 }
 
-func (b *structBuilder) appendDecls(n *structBuilderNode, db *declBuilder) (_err error) {
+func (b *Builder) appendDecls(n *structBuilderNode, db *declBuilder) (_err error) {
 	if isList, err := isListNode(n); err != nil {
 		return fmt.Errorf("at path %v: %v", cue.MakePath(db.path...), err)
 	} else if isList {
@@ -373,10 +387,10 @@ func (b *structBuilder) appendDecls(n *structBuilderNode, db *declBuilder) (_err
 }
 
 // appendBaseDecls renders a node that was created from base data (see
-// [structBuilder.addBase]): as a single field holding the node's contents,
+// [Builder.AddBase]): as a single field holding the node's contents,
 // preserving the base field order, rather than as the flattened
 // one-declaration-per-value form used for schema definitions.
-func (b *structBuilder) appendBaseDecls(n *structBuilderNode, db *declBuilder) error {
+func (b *Builder) appendBaseDecls(n *structBuilderNode, db *declBuilder) error {
 	if len(n.entries) == 0 {
 		v := n.value
 		if v == nil {
@@ -424,7 +438,7 @@ func (b *structBuilder) appendBaseDecls(n *structBuilderNode, db *declBuilder) e
 // sortedEntries returns the entry selectors of n in rendering order: entries
 // created from base data first, in base order, followed by the rest in
 // deterministic selector order.
-func (b *structBuilder) sortedEntries(n *structBuilderNode) []cue.Selector {
+func (b *Builder) sortedEntries(n *structBuilderNode) []cue.Selector {
 	return slices.SortedFunc(maps.Keys(n.entries), func(s1, s2 cue.Selector) int {
 		n1, n2 := n.entries[s1], n.entries[s2]
 		switch {
@@ -461,7 +475,7 @@ func isListNode(n *structBuilderNode) (bool, error) {
 // listSyntax returns a list literal holding n's entries, all of which
 // hold index selectors, at their respective indices. Indices with no
 // entry are filled with a top (_) placeholder.
-func (b *structBuilder) listSyntax(n *structBuilderNode) (ast.Expr, error) {
+func (b *Builder) listSyntax(n *structBuilderNode) (ast.Expr, error) {
 	maxIndex := -1
 	for sel := range n.entries {
 		maxIndex = max(maxIndex, sel.Index())
@@ -477,7 +491,7 @@ func (b *structBuilder) listSyntax(n *structBuilderNode) (ast.Expr, error) {
 		}
 		if len(db.decls) == 0 {
 			// The entry has no value or sub-entries (e.g. it was only
-			// the target of a getRef call); leave the placeholder.
+			// the target of a GetRef call); leave the placeholder.
 			continue
 		}
 		// Drop the new-section positioning that appendField gives

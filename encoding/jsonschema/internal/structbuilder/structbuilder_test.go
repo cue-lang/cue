@@ -1,4 +1,18 @@
-package jsonschema
+// Copyright 2024 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package structbuilder_test
 
 import (
 	"strings"
@@ -12,16 +26,17 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/jsonschema/internal/structbuilder"
 	"cuelang.org/go/internal"
 )
 
 func TestStructBuilderShadowedRef(t *testing.T) {
-	var b structBuilder
-	ref, err := b.getRef(cue.ParsePath("#foo.bar.baz"))
+	var b structbuilder.Builder
+	ref, err := b.GetRef(cue.ParsePath("#foo.bar.baz"))
 	qt.Assert(t, qt.IsNil(err))
-	ok := b.put(cue.ParsePath("#foo.bar.baz"), ast.NewString("hello"), nil)
+	ok := b.Put(cue.ParsePath("#foo.bar.baz"), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath("#bar.#foo.xxx"), ref, nil)
+	ok = b.Put(cue.ParsePath("#bar.#foo.xxx"), ref, nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `#bar: #foo: xxx: #foo_9.bar.baz
 
@@ -30,10 +45,10 @@ func TestStructBuilderShadowedRef(t *testing.T) {
 }
 
 func TestStructBuilderSelfRef(t *testing.T) {
-	var b structBuilder
-	ref, err := b.getRef(cue.Path{})
+	var b structbuilder.Builder
+	ref, err := b.GetRef(cue.Path{})
 	qt.Assert(t, qt.IsNil(err))
-	ok := b.put(cue.Path{}, ast.NewStruct(ast.NewIdent("next"), token.OPTION, ref), nil)
+	ok := b.Put(cue.Path{}, ast.NewStruct(ast.NewIdent("next"), token.OPTION, ref), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
 _schema
@@ -42,10 +57,10 @@ _schema: next?: _schema
 }
 
 func TestStructBuilderEntryInsideValue(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath("#foo"), ast.NewString("hello"), internal.NewComment(true, "foo comment"))
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath("#foo"), ast.NewString("hello"), internal.NewComment(true, "foo comment"))
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath("#foo.#bar.#baz"), ast.NewString("goodbye"), internal.NewComment(true, "baz comment"))
+	ok = b.Put(cue.ParsePath("#foo.#bar.#baz"), ast.NewString("goodbye"), internal.NewComment(true, "baz comment"))
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
 // foo comment
@@ -60,12 +75,12 @@ func TestStructBuilderEntryInsideValue(t *testing.T) {
 }
 
 func TestStructBuilderNonIdentifierStringNode(t *testing.T) {
-	var b structBuilder
-	ref, err := b.getRef(cue.ParsePath(`#foo."a b".baz`))
+	var b structbuilder.Builder
+	ref, err := b.GetRef(cue.ParsePath(`#foo."a b".baz`))
 	qt.Assert(t, qt.IsNil(err))
-	ok := b.put(cue.ParsePath(`#foo."a b".baz`), ast.NewString("hello"), nil)
+	ok := b.Put(cue.ParsePath(`#foo."a b".baz`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath("#bar.#foo.xxx"), ref, nil)
+	ok = b.Put(cue.ParsePath("#bar.#foo.xxx"), ref, nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
 #bar: #foo: xxx: #foo_9."a b".baz
@@ -75,60 +90,60 @@ func TestStructBuilderNonIdentifierStringNode(t *testing.T) {
 }
 
 func TestStructBuilderNonIdentifierStringNodeAtRoot(t *testing.T) {
-	var b structBuilder
-	_, err := b.getRef(cue.ParsePath(`"a b".baz`))
+	var b structbuilder.Builder
+	_, err := b.GetRef(cue.ParsePath(`"a b".baz`))
 	qt.Assert(t, qt.ErrorMatches(err, `initial element of path "\\"a b\\"\.baz" must be expressed as an identifier`))
 }
 
 func TestStructBuilderRedefinition(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath(`a.b.c`), ast.NewString("hello"), nil)
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath(`a.b.c`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath(`a.b.c`), ast.NewString("hello"), nil)
+	ok = b.Put(cue.ParsePath(`a.b.c`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsFalse(ok))
 }
 
 func TestStructBuilderNonPresentNodeOmittedFromSyntax(t *testing.T) {
-	var b structBuilder
-	_, err := b.getRef(cue.ParsePath(`b.c`))
+	var b structbuilder.Builder
+	_, err := b.GetRef(cue.ParsePath(`b.c`))
 	qt.Assert(t, qt.IsNil(err))
-	_, err = b.getRef(cue.ParsePath(`a.c.d`))
+	_, err = b.GetRef(cue.ParsePath(`a.c.d`))
 	qt.Assert(t, qt.IsNil(err))
-	ok := b.put(cue.ParsePath(`a.b`), ast.NewString("hello"), nil)
+	ok := b.Put(cue.ParsePath(`a.b`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `a: b: "hello"`)
 }
 
 func TestStructBuilderListIndex(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath(`a.b[1].c`), ast.NewString("hello"), nil)
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath(`a.b[1].c`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `a: b: [_, {c: "hello"}]`)
 }
 
 func TestStructBuilderListIndexMultipleElements(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath(`a[2]`), ast.NewString("two"), nil)
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath(`a[2]`), ast.NewString("two"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath(`a[0].x`), ast.NewString("zero"), nil)
+	ok = b.Put(cue.ParsePath(`a[0].x`), ast.NewString("zero"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `a: [{x: "zero"}, _, "two"]`)
 }
 
 func TestStructBuilderListIndexNested(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath(`a[1][0]`), ast.NewString("hello"), nil)
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath(`a[1][0]`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `a: [_, ["hello"]]`)
 }
 
 func TestStructBuilderListIndexRef(t *testing.T) {
-	var b structBuilder
-	ref, err := b.getRef(cue.ParsePath(`a.b[1].c`))
+	var b structbuilder.Builder
+	ref, err := b.GetRef(cue.ParsePath(`a.b[1].c`))
 	qt.Assert(t, qt.IsNil(err))
-	ok := b.put(cue.ParsePath(`a.b[1].c`), ast.NewString("hello"), nil)
+	ok := b.Put(cue.ParsePath(`a.b[1].c`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath(`#x.y`), ref, nil)
+	ok = b.Put(cue.ParsePath(`#x.y`), ref, nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `a: b: [_, {c: "hello"}]
 
@@ -137,27 +152,27 @@ func TestStructBuilderListIndexRef(t *testing.T) {
 }
 
 func TestStructBuilderListIndexMixedWithField(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath(`a[0]`), ast.NewString("zero"), nil)
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath(`a[0]`), ast.NewString("zero"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath(`a.b`), ast.NewString("bee"), nil)
+	ok = b.Put(cue.ParsePath(`a.b`), ast.NewString("bee"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	_, err := b.syntax()
+	_, err := b.Syntax()
 	qt.Assert(t, qt.ErrorMatches(err, `at path a: cannot mix list-index and field entries`))
 }
 
 func TestStructBuilderListIndexUnderValue(t *testing.T) {
-	var b structBuilder
-	ok := b.put(cue.ParsePath(`a`), ast.NewString("hello"), nil)
+	var b structbuilder.Builder
+	ok := b.Put(cue.ParsePath(`a`), ast.NewString("hello"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	ok = b.put(cue.ParsePath(`a[0]`), ast.NewString("zero"), nil)
+	ok = b.Put(cue.ParsePath(`a[0]`), ast.NewString("zero"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	_, err := b.syntax()
+	_, err := b.Syntax()
 	qt.Assert(t, qt.ErrorMatches(err, `cannot combine value and list elements at path a`))
 }
 
 func TestStructBuilderBase(t *testing.T) {
-	var b structBuilder
+	var b structbuilder.Builder
 	addStructBuilderBase(t, &b, `
 zed: "z"
 alpha: {
@@ -166,7 +181,7 @@ alpha: {
 }
 empty: {}
 `)
-	ok := b.put(cue.ParsePath(`alpha.gamma[0].epsilon.#`), ast.NewString("filled"), nil)
+	ok := b.Put(cue.ParsePath(`alpha.gamma[0].epsilon.#`), ast.NewString("filled"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
 zed: "z"
@@ -187,12 +202,12 @@ empty: {}
 }
 
 func TestStructBuilderBaseOrderPrecedesUnseeded(t *testing.T) {
-	var b structBuilder
+	var b structbuilder.Builder
 	addStructBuilderBase(t, &b, `
 zebra:    1
 aardvark: 2
 `)
-	ok := b.put(cue.ParsePath(`#def`), ast.NewString("v"), nil)
+	ok := b.Put(cue.ParsePath(`#def`), ast.NewString("v"), nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
 zebra: 1
@@ -204,7 +219,7 @@ aardvark: 2
 }
 
 func TestStructBuilderBaseUnfilledPlaceholder(t *testing.T) {
-	var b structBuilder
+	var b structbuilder.Builder
 	addStructBuilderBase(t, &b, `a: b: _`)
 	assertStructBuilderSyntax(t, &b, `a: b: _`)
 }
@@ -239,7 +254,7 @@ func TestStructBuilderBaseErrors(t *testing.T) {
 		wantErr:  `unsupported label type \*ast\.Alias in base data`,
 		// The old prefix alias syntax is rejected from v0.18.0 on, where
 		// @experiment(aliasv2) is stable, but *ast.Alias labels still
-		// reach addBase from modules pinning an earlier version.
+		// reach AddBase from modules pinning an earlier version.
 		langVersion: "v0.17.0",
 	}, {
 		testName: "DuplicateValue",
@@ -253,22 +268,22 @@ a: b: 6
 			f, err := parser.ParseFile("base.cue", test.base,
 				parser.Version(test.langVersion))
 			qt.Assert(t, qt.IsNil(err))
-			var b structBuilder
-			qt.Assert(t, qt.ErrorMatches(b.addBase(f), test.wantErr))
+			var b structbuilder.Builder
+			qt.Assert(t, qt.ErrorMatches(b.AddBase(f), test.wantErr))
 		})
 	}
 }
 
-func addStructBuilderBase(t *testing.T, b *structBuilder, src string) {
+func addStructBuilderBase(t *testing.T, b *structbuilder.Builder, src string) {
 	t.Helper()
 	f, err := parser.ParseFile("base.cue", src)
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.IsNil(b.addBase(f)))
+	qt.Assert(t, qt.IsNil(b.AddBase(f)))
 }
 
-func assertStructBuilderSyntax(t *testing.T, b *structBuilder, want string) {
+func assertStructBuilderSyntax(t *testing.T, b *structbuilder.Builder, want string) {
 	t.Helper()
-	f, err := b.syntax()
+	f, err := b.Syntax()
 	qt.Assert(t, qt.IsNil(err))
 	err = astutil.Sanitize(f)
 	qt.Assert(t, qt.IsNil(err))

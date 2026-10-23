@@ -26,6 +26,7 @@ import (
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 )
 
 // numString renders n the way its kind reads back: a float always carries a
@@ -372,7 +373,7 @@ func (w *printer) compactNode(n adt.Node) {
 
 	case *adt.Conjunction:
 		if w.compactBuiltins {
-			if name := adt.MatchBuiltinRange(x); name != "" {
+			if name := compile.MatchBuiltinRange(x); name != "" {
 				w.string(name)
 				break
 			}

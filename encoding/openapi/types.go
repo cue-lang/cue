@@ -16,7 +16,6 @@ package openapi
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/cockroachdb/apd/v3"
 
@@ -24,6 +23,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 )
 
 // See https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#data-types
@@ -45,11 +46,6 @@ var cueToOpenAPI = map[string]string{
 	`time.Format ("2006-01-02T15:04:05.999999999Z07:00")`: "date-time",
 
 	// TODO:  password.
-
-	">=-2147483648 & <=2147483647 & int":                                                                   "int32",
-	">=-9223372036854775808 & <=9223372036854775807 & int":                                                 "int64",
-	">=-340282346638528859811704183484516925440.0 & <=340282346638528859811704183484516925440.0":           "float",
-	">=-1.797693134862315708145274237317043567981e+308 & <=1.797693134862315708145274237317043567981e+308": "double",
 }
 
 func extractFormat(v cue.Value) string {
@@ -94,17 +90,23 @@ func simplify(b *builder, t *ast.StructLit) {
 }
 
 func simplifyNumber(t *ast.StructLit, format string) string {
-	minMap, maxMap := formatBounds()
+	var lo, hi *adt.Num
+	for _, r := range compile.BuiltinRanges() {
+		if cueToOpenAPI[r.Name] == format {
+			lo, hi = r.Lo, r.Hi
+			break
+		}
+	}
 	fields := t.Elts
 	k := 0
 	for i, d := range fields {
 		switch label(d) {
 		case "minimum":
-			if decimalEqual(minMap[format], value(d)) {
+			if decimalEqual(lo, value(d)) {
 				continue
 			}
 		case "maximum":
-			if decimalEqual(maxMap[format], value(d)) {
+			if decimalEqual(hi, value(d)) {
 				continue
 			}
 		}
@@ -115,8 +117,8 @@ func simplifyNumber(t *ast.StructLit, format string) string {
 	return format
 }
 
-func decimalEqual(d *apd.Decimal, v ast.Expr) bool {
-	if d == nil {
+func decimalEqual(bound *adt.Num, v ast.Expr) bool {
+	if bound == nil {
 		return false
 	}
 	lit, ok := v.(*ast.BasicLit)
@@ -131,32 +133,5 @@ func decimalEqual(d *apd.Decimal, v ast.Expr) bool {
 	if n.Decimal(&b) != nil {
 		return false
 	}
-	return d.Cmp(&b) == 0
+	return bound.X.Cmp(&b) == 0
 }
-
-func mustDecimal(s string) *apd.Decimal {
-	d, _, err := apd.NewFromString(s)
-	if err != nil {
-		panic(err)
-	}
-	return d
-}
-
-// formatBounds returns the minimum and maximum values implied by each
-// numeric format. They are built on first use, as parsing them is costly
-// at init time.
-var formatBounds = sync.OnceValues(func() (mins, maxs map[string]*apd.Decimal) {
-	mins = map[string]*apd.Decimal{
-		"int32":  mustDecimal("-2147483648"),
-		"int64":  mustDecimal("-9223372036854775808"),
-		"float":  mustDecimal("-3.40282346638528859811704183484516925440e+38"),
-		"double": mustDecimal("-1.797693134862315708145274237317043567981e+308"),
-	}
-	maxs = map[string]*apd.Decimal{
-		"int32":  mustDecimal("2147483647"),
-		"int64":  mustDecimal("9223372036854775807"),
-		"float":  mustDecimal("+3.40282346638528859811704183484516925440e+38"),
-		"double": mustDecimal("+1.797693134862315708145274237317043567981e+308"),
-	}
-	return mins, maxs
-})

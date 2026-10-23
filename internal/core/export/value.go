@@ -233,7 +233,7 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 		}
 
 		if e.cfg.Simplify {
-			if name := adt.MatchBuiltinRange(x); name != "" {
+			if name := compile.MatchBuiltinRange(x); name != "" {
 				return ast.NewPredeclared(name)
 			}
 		}

@@ -162,6 +162,19 @@ preserveClosedness: small: p2: {
 	}
 }
 
+// #A references #C both directly and through a disjunct of #B. The disjuncts
+// of #A which pick {} and #C from #B are equal and deduplicated; the kept one
+// must still relate the two references to #C, which both allow field a.
+preserveClosedness: small: p3: {
+	#A: #B & #C
+	#B: {
+		*{} | #C
+		*{} | {b: int}
+	}
+	#C: {a: string}
+	a: (#A & {a: "x"}).a
+}
+
 preserveClosedness: medium: p1: {
 	#A: #B & {a: string}
 	#B: {
@@ -1413,6 +1426,25 @@ issue2685: {
             b: int
           })
         }
+      }
+    }
+  }
+  preserveClosedness: {
+    small: {
+      p3: {
+        #A: (〈0;#B〉 & 〈0;#C〉)
+        #B: {
+          (*{}|〈1;#C〉)
+          (*{}|{
+            b: int
+          })
+        }
+        #C: {
+          a: string
+        }
+        a: (〈0;#A〉 & {
+          a: "x"
+        }).a
       }
     }
   }

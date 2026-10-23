@@ -197,6 +197,25 @@ preserveClosedness: small: p2: {
 	})
 }
 
+// #A references #C both directly and through a disjunct of #B. The disjuncts
+// of #A which pick {} and #C from #B are equal and deduplicated; the kept one
+// must still relate the two references to #C, which both allow field a.
+preserveClosedness: small: p3: {
+	#A: #B & #C
+	#B: {
+		*{} | #C
+		*{} | {b: int}
+	}
+	#C: {a: string}
+	a: (#A & {a: "x"}).a
+	@test(eq, {
+		#A: {a: string}
+		#B: *{} | {b: int} | {a: string}
+		#C: {a: string}
+		a: "x"
+	})
+}
+
 preserveClosedness: medium: p1: {
 	#A: #B & {a: string}
 	#B: {
@@ -1280,25 +1299,25 @@ issue2685: {
 }
 -- out/errors.txt --
 [incomplete] patternDistinct.sel: unresolved disjunction {a:1} | {a:1} (type struct):
-    ./in.cue:399:7
+    ./in.cue:418:7
 [incomplete] patternDistinct.selOptional: unresolved disjunction {a:1,b?:int} | {a:1} (type struct):
-    ./in.cue:401:15
+    ./in.cue:420:15
 [incomplete] patternDistinct.selHidden: unresolved disjunction {a:1,_h:1} | {a:1,_h:2} (type struct):
-    ./in.cue:408:13
+    ./in.cue:427:13
 [incomplete] patternDistinct.nestedDefaultSel: unresolved disjunction {a:1} | {a:*1 | 2} (type struct):
-    ./in.cue:442:20
+    ./in.cue:461:20
 -- out/eval/stats --
-Leaks:  244
-Freed:  2764
-Reused: 2721
-Allocs: 287
+Leaks:  248
+Freed:  2798
+Reused: 2755
+Allocs: 291
 Retain: 0
 
-Unifications: 853
-Conjuncts:    3011
-Disjuncts:    1319
+Unifications: 867
+Conjuncts:    3059
+Disjuncts:    1333
 Notifications: 8
 
-NumCloseIDs: 207
+NumCloseIDs: 214
 -- out/todo.txt --
 issue2685: only evaluated by v3 evaluator.

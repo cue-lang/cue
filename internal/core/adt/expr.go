@@ -2592,7 +2592,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		case IncompleteError:
 			// The referenced node is actively being computed and still has
 			// value-producing tasks pending; yield until valueKnown is met.
-			// schedRUNNING (not schedREADY) avoids deadlocking on a task that
+			// Requiring a running scheduler avoids deadlocking on a task that
 			// nobody else will trigger — a genuine cycle. The same yield
 			// serves both ArcPending (load-bearing: the comp body will fire
 			// and materialize the arc) and ArcOptional (usually a no-op, but
@@ -2600,7 +2600,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			// before valueKnown).
 			if v.Node != nil {
 				ns := v.Node.state
-				if ns != nil && ns.state == schedRUNNING &&
+				if ns != nil && ns.running &&
 					!ns.meets(valueKnown) &&
 					ns.provided&valueKnown != 0 {
 					if t := c.current(); t != nil {

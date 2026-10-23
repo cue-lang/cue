@@ -182,19 +182,6 @@ const (
 	taskCANCELLED // CANCELLED
 )
 
-type schedState uint8
-
-// See the stringer directive in doc.go for the generated String method.
-
-const (
-	schedREADY schedState = iota // READY
-
-	// processing conjunct(s)
-	schedRUNNING // RUNNING
-	schedSUCCESS // SUCCESS
-	schedFAILED  // FAILED
-)
-
 // runMode indicates how to proceed after a condition could not be met.
 type runMode uint8
 
@@ -247,7 +234,8 @@ type scheduler struct {
 	ctx  *OpContext
 	node *nodeContext
 
-	state schedState
+	// running is set once process has started handling conjuncts.
+	running bool
 
 	// completed is bit set of completed states.
 	completed condition
@@ -263,13 +251,6 @@ type scheduler struct {
 	// before making a node more specific.
 	// TODO: do we need a separate field for this, or can we use completed?
 	frozen condition
-
-	// isFrozen indicates if freeze was called explicitly.
-	//
-	// TODO: rename to isExplicitlyFrozen if it turns out we need both frozen
-	// and isFrozen. We probably do not. Check once the implementation of the
-	// new evaluator is complete.
-	isFrozen bool
 
 	// frozenBy is the node that referenced this node's field set, freezing
 	// it. It is used to point at the source of the freeze in errors about
@@ -396,22 +377,6 @@ func (s *scheduler) decrementCounts(x condition) {
 	s.signal(completed)
 }
 
-// finalize runs all tasks and signals that the scheduler is done upon
-// completion for the given signals.
-func (s *scheduler) finalize(completed condition) {
-	// Do not panic on cycle detection. Instead, post-process the tasks
-	// by collecting and marking cycle errors.
-	s.process(allKnown, finalize)
-	s.signal(completed)
-	if s.state == schedRUNNING {
-		if s.meets(s.needs) {
-			s.state = schedSUCCESS
-		} else {
-			s.state = schedFAILED
-		}
-	}
-}
-
 // process advances a scheduler by executing tasks that are required.
 // Depending on mode, if the scheduler is blocked on a condition, it will
 // forcefully unblock the tasks.
@@ -455,7 +420,7 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	}
 
 	// hasRunning := false
-	s.state = schedRUNNING
+	s.running = true
 	// Use variable instead of range, because s.tasks may grow during processes.
 
 	taskPos := 0
@@ -674,7 +639,6 @@ func (s *scheduler) unblockTasks(deferred []taskBlock) []taskBlock {
 			if canUnblock(b) {
 				t := b.task
 				t.blockedOn.freeze(t.blockCondition, t.x)
-				t.unblocked = true
 			}
 		}
 
@@ -798,7 +762,7 @@ func (s *scheduler) yield() {
 func (s *scheduler) meets(needs condition) bool {
 	s.node.assertInitialized()
 
-	if s.state != schedREADY {
+	if s.running {
 		// Automatically qualify for conditions that are not provided by this node.
 		// NOTE: in the evaluator this is generally not the case, as tasks my still
 		// be added during evaluation until all ancestor nodes are evaluated. This
@@ -857,7 +821,6 @@ func (s *scheduler) freeze(c condition, by Node) {
 	}
 	s.completed |= c
 	s.ctx.complete(s)
-	s.isFrozen = true
 }
 
 // deferFieldSetKnown filters fieldSetKnown out of c while a task other than
@@ -951,13 +914,6 @@ func (s *scheduler) hasRunningSiblingParentTask() bool {
 	return false
 }
 
-// signalDoneAdding signals that no more tasks will be added to this scheduler.
-// This allows unblocking tasks that depend on states for which there are no
-// tasks in this scheduler.
-func (s *scheduler) signalDoneAdding() {
-	s.signal(s.needs &^ s.provided)
-}
-
 // runner defines properties of a type of task, including a function to run it.
 type runner struct {
 	name string
@@ -983,9 +939,6 @@ type task struct {
 	// defunct indicates that this task is no longer relevant. This is the case
 	// when it has not yet been run before it is copied into a disjunction.
 	defunct bool
-
-	// unblocked indicates this task was unblocked by force.
-	unblocked bool
 
 	// inserting indicates that this comprehension task is inserting the
 	// conjuncts its clauses yielded; see hasInsertingComp in process.

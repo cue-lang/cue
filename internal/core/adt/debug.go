@@ -267,10 +267,10 @@ func (m *mermaidContext) vertex(v *Vertex, recursive bool) *mermaidVertex {
 	switch {
 	case v.Status() == finalized:
 		status = "finalized"
-	case v.state == nil:
+	case v.state == nil || !v.state.running:
 		status = "ready"
 	default:
-		status = v.state.scheduler.state.String()
+		status = "running"
 	}
 	path := m.vertexPath(v)
 	if v.ArcType != ArcMember {

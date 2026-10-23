@@ -78,4 +78,4 @@ package adt
 // more than stringer's own work, so a run per type would repeat it needlessly.
 // Note that -trimprefix and -linecomment apply to every type listed.
 //
-//go:generate go tool stringer -type=ArcType,vertexStatus,ErrorCode,Op,runMode,defIDType,taskState,schedState -trimprefix=Arc -linecomment -output=stringer_gen.go
+//go:generate go tool stringer -type=ArcType,vertexStatus,ErrorCode,Op,runMode,defIDType,taskState -trimprefix=Arc -linecomment -output=stringer_gen.go

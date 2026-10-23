@@ -308,7 +308,7 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 	ss := &src.scheduler
 	ds := &dst.scheduler
 
-	ds.state = ss.state
+	ds.running = ss.running
 	ds.completed = ss.completed
 	ds.needs = ss.needs
 	ds.provided = ss.provided
@@ -354,7 +354,6 @@ func (ctx *overlayContext) cloneTask(t *task, dst, src *scheduler) *task {
 	d.run = t.run
 	d.state = t.state
 	d.completes = t.completes
-	d.unblocked = t.unblocked
 	d.blockCondition = t.blockCondition
 	d.blockedOn = t.blockedOn // will be rewritten later
 	d.err = t.err

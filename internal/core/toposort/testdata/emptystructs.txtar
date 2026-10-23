@@ -1,0 +1,74 @@
+// Structs without fields pass the field order on without duplicating
+// it. The `out: {}` lines keep consecutive `out: {} & {}` lines from
+// merging into one batch.
+//
+// The stats record the doubling: sorting the last field requests an
+// edge from each of the 2^20 members of the frontier.
+-- in.cue --
+out: {b: 1}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {} & {}
+out: {}
+out: {a: 1}
+-- out/TestTopologicalSort/lexicographical=false --
+{
+	out: {
+		b: 1
+		a: 1
+	}
+}
+-- out/TestTopologicalSort/lexicographical=false/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+OrderEdges:   1048576
+-- out/TestTopologicalSort/lexicographical=true --
+{
+	out: {
+		a: 1
+		b: 1
+	}
+}

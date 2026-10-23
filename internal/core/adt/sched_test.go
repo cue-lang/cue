@@ -16,7 +16,6 @@ package adt
 
 import (
 	"fmt"
-	"math/bits"
 	"strings"
 	"testing"
 
@@ -56,19 +55,6 @@ func TestStateNames(t *testing.T) {
 	}
 	if autoFieldConjunctsKnown != fieldConjunctsKnown {
 		t.Error("inconsistent state name for fieldConjunctsKnown")
-	}
-	for _, tc := range []struct {
-		name string
-		cond condition
-		idx  int
-	}{
-		{"arcTypeKnownIdx", arcTypeKnown, arcTypeKnownIdx},
-		{"fieldConjunctsKnownIdx", fieldConjunctsKnown, fieldConjunctsKnownIdx},
-		{"allTasksCompletedIdx", allTasksCompleted, allTasksCompletedIdx},
-	} {
-		if idx := bits.TrailingZeros16(uint16(tc.cond)); idx != tc.idx {
-			t.Errorf("%s = %d, want %d", tc.name, tc.idx, idx)
-		}
 	}
 }
 

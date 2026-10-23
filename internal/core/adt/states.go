@@ -212,12 +212,10 @@ const (
 
 	// arcTypeKnownIdx is the bit-position index of arcTypeKnown, for use as
 	// a scheduler.counters index.
-	// It must equal bits.TrailingZeros16(uint16(arcTypeKnown)).
 	arcTypeKnownIdx = 1
 
 	// fieldConjunctsKnownIdx is the bit-position index of
 	// fieldConjunctsKnown, for use as a scheduler.counters index.
-	// It must equal bits.TrailingZeros16(uint16(fieldConjunctsKnown)).
 	fieldConjunctsKnownIdx = 4
 
 	// allTasksCompletedIdx is the bit index of allTasksCompleted in the
@@ -225,6 +223,15 @@ const (
 	// condition constants.
 	allTasksCompletedIdx = 6
 )
+
+// An "invalid array index" or "overflows" compiler error here means that a
+// counter index above no longer matches the bit position of its condition.
+func _() {
+	var x [1]struct{}
+	_ = x[arcTypeKnown-1<<arcTypeKnownIdx]
+	_ = x[fieldConjunctsKnown-1<<fieldConjunctsKnownIdx]
+	_ = x[allTasksCompleted-1<<allTasksCompletedIdx]
+}
 
 // schedConfig configures a taskContext with the states needed for the
 // CUE evaluator. It is used in OpContext.New as a template for creating

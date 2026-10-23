@@ -132,6 +132,29 @@ disjunction: {
 	x:    pick("hi") @test(eq, "HI")
 }
 
+// Separately tightened copies of one builtin unify into a copy carrying the
+// signatures of both, as long as together they give every raw position at
+// most one label and every label one position. A signature may not widen a
+// parameter beyond what the builtin accepts, so the os parameter of
+// path.Base is tightened to one of its values rather than to string.
+merge: {
+	unnamed: (func(string, ...) -> string) & path.Base
+	p:       (func(p: string, ...) -> string) & path.Base
+	o:       (func(_~x: string, o: "unix") -> string) & path.Base
+
+	unnamedP: unnamed & p
+	unnamedX: unnamedP(p: "a/b") @test(eq, "b")
+	same:     p & p
+	sameX:    same(p: "a/b") @test(eq, "b")
+	both:     p & o
+	bothX:    both(o: "unix", p: "a/b") @test(eq, "b")
+
+	q:         (func(q: string, ...) -> string) & path.Base
+	conflict:  p & q @test(err, code=eval, contains="conflicting parameter labels")
+	p2:        (func(_~x: string, p: "unix") -> string) & path.Base
+	ambiguous: p & p2 @test(err, code=eval, contains="ambiguous parameter label p refers to multiple positions")
+}
+
 // Partial application of builtins is not supported: a call with a trailing
 // "..." reports a clear error instead of silently dropping the "..." (len)
 // or morphing into a validator (strings.Contains).
@@ -305,61 +328,65 @@ typeDefaults: {
     ./in.cue:95:20
 [eval] labelMatch.unknown: parameter times of function type not allowed by builtin strings.Repeat: no parameter of the builtin has this label:
     ./in.cue:99:29
+[eval] merge.conflict: conflicting parameter labels q and p for positional parameter 1 in function type and function type:
+    ./in.cue:136:14
+[eval] merge.ambiguous: ambiguous parameter label p refers to multiple positions:
+    ./in.cue:138:14
 [eval] partial.contains: partial application of builtin strings.Contains is not supported:
-    ./in.cue:123:12
+    ./in.cue:146:12
 [eval] partial.length: partial application of builtin len is not supported:
-    ./in.cue:124:12
+    ./in.cue:147:12
 [eval] polymorphic.any: parameter 1 of builtin len accepts (string|bytes|list|struct), but its signature requires _:
-    ./in.cue:136:9
+    ./in.cue:159:9
 [eval] polymorphic.sBad: conflicting values string and [1,2] (mismatched types string and list):
-    ./in.cue:140:13
-    ./in.cue:143:11
+    ./in.cue:163:13
+    ./in.cue:166:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:
-    ./in.cue:146:8
+    ./in.cue:169:8
 [eval] aliases.sp3: builtin strings.Split returns list, but its signature requires {...}:
-    ./in.cue:161:8
+    ./in.cue:184:8
 [eval] labelOrder.ab: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
-    ./in.cue:171:6
-    ./in.cue:172:6
+    ./in.cue:194:6
+    ./in.cue:195:6
 [eval] labelOrder.ba: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
-    ./in.cue:171:6
+    ./in.cue:194:6
 [eval] labeled.errors.unknown: unknown argument lst in call to list.Drop:
-    ./in.cue:190:12
+    ./in.cue:213:12
 [eval] labeled.errors.dup: argument s provided by position and label in call to strings.Repeat:
-    ./in.cue:193:8
+    ./in.cue:216:8
 [eval] labeled.errors.hole: missing argument 2 in call to list.Slice:
-    ./in.cue:196:9
+    ./in.cue:219:9
 [eval] labeled.user.f: builtin strings.SplitN has more parameters than closed function type:
-    ./in.cue:202:6
+    ./in.cue:225:6
 [eval] labeled.user.badName: conflicting parameter labels text and s for positional parameter 1 in function type and function type:
-    ./in.cue:210:50
-    ./in.cue:210:13
+    ./in.cue:233:50
+    ./in.cue:233:13
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:226:43
-    ./in.cue:218:40
-    ./in.cue:227:20
+    ./in.cue:249:43
+    ./in.cue:241:40
+    ./in.cue:250:20
 [eval] conflicting defaults for parameter count: conflicting values 2 and 3:
-    ./in.cue:226:43
-    ./in.cue:218:40
-    ./in.cue:228:37
+    ./in.cue:249:43
+    ./in.cue:241:40
+    ./in.cue:251:37
 [eval] conflicting defaults for parameter count: conflicting values 3 and 2:
-    ./in.cue:218:40
-    ./in.cue:226:43
-    ./in.cue:229:38
+    ./in.cue:241:40
+    ./in.cue:249:43
+    ./in.cue:252:38
 [eval] conflicting defaults for parameter os: conflicting values "unix" and "windows":
-    ./in.cue:234:60
-    ./in.cue:235:11
+    ./in.cue:257:60
+    ./in.cue:258:11
 [eval] typeDefaults.joinAny: parameter os of builtin path.Join accepts *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos", but its signature requires string:
-    ./in.cue:236:11
+    ./in.cue:259:11
 -- out/eval/stats --
-Leaks:  13
-Freed:  367
-Reused: 326
-Allocs: 54
+Leaks:  16
+Freed:  439
+Reused: 397
+Allocs: 58
 Retain: 0
 
-Unifications: 236
-Conjuncts:    607
-Disjuncts:    128
+Unifications: 257
+Conjuncts:    723
+Disjuncts:    182
 
-NumCloseIDs: 113
+NumCloseIDs: 131

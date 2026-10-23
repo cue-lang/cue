@@ -132,6 +132,29 @@ disjunction: {
 	x:    pick("hi")
 }
 
+// Separately tightened copies of one builtin unify into a copy carrying the
+// signatures of both, as long as together they give every raw position at
+// most one label and every label one position. A signature may not widen a
+// parameter beyond what the builtin accepts, so the os parameter of
+// path.Base is tightened to one of its values rather than to string.
+merge: {
+	unnamed: (func(string, ...) -> string) & path.Base
+	p:       (func(p: string, ...) -> string) & path.Base
+	o:       (func(_~x: string, o: "unix") -> string) & path.Base
+
+	unnamedP: unnamed & p
+	unnamedX: unnamedP(p: "a/b")
+	same:     p & p
+	sameX:    same(p: "a/b")
+	both:     p & o
+	bothX:    both(o: "unix", p: "a/b")
+
+	q:         (func(q: string, ...) -> string) & path.Base
+	conflict:  p & q
+	p2:        (func(_~x: string, p: "unix") -> string) & path.Base
+	ambiguous: p & p2
+}
+
 // Partial application of builtins is not supported: a call with a trailing
 // "..." reports a clear error instead of silently dropping the "..." (len)
 // or morphing into a validator (strings.Contains).
@@ -335,6 +358,21 @@ typeDefaults: {
     t2: (〈0;T〉 & 〈import;strings〉.ToUpper)
     pick: (〈0;t1〉|〈0;t2〉)
     x: 〈0;pick〉("hi")
+  }
+  merge: {
+    unnamed: (func(string, ...) -> string & 〈import;path〉.Base)
+    p: (func(p: string, ...) -> string & 〈import;path〉.Base)
+    o: (func(string, o: "unix") -> string & 〈import;path〉.Base)
+    unnamedP: (〈0;unnamed〉 & 〈0;p〉)
+    unnamedX: 〈0;unnamedP〉(p: "a/b")
+    same: (〈0;p〉 & 〈0;p〉)
+    sameX: 〈0;same〉(p: "a/b")
+    both: (〈0;p〉 & 〈0;o〉)
+    bothX: 〈0;both〉(o: "unix", p: "a/b")
+    q: (func(q: string, ...) -> string & 〈import;path〉.Base)
+    conflict: (〈0;p〉 & 〈0;q〉)
+    p2: (func(string, p: "unix") -> string & 〈import;path〉.Base)
+    ambiguous: (〈0;p〉 & 〈0;p2〉)
   }
   partial: {
     contains: 〈import;strings〉.Contains("abcd")

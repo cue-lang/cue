@@ -12,23 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package adt
+package adt_test
 
 import (
 	"testing"
+
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/runtime"
 )
 
-// TestEmptyNodeInert checks that getting a node for an empty struct does not
-// cause a nodeContext to be created.
+// TestEmptyNodeInert checks that initializing the shared empty node, as
+// returned for a failed lookup or list conversion, does not create a
+// nodeContext for it.
 func TestEmptyNodeInert(t *testing.T) {
-	// We run the evaluator twice with different versions of the evaluator. Each
-	// results in the use of emptyNode. Ensure that the it does not get
-	// assigned a nodeContext.
+	ctx := adt.NewContext(runtime.New(), &adt.Vertex{})
 
-	ctx := &OpContext{}
+	// RawList returns the shared empty node for a value which is not a list.
+	empty := ctx.RawList(&adt.Top{})
+	ctx.Err() // discard the type error
+	if empty != ctx.RawList(&adt.Top{}) {
+		t.Fatal("RawList did not return a shared node")
+	}
+	ctx.Err()
 
-	s := emptyNode.getBareState(ctx)
-	if s != nil {
-		t.Fatal("expected nil state for empty struct")
+	// The empty node is shared, so an earlier test may already have given
+	// it a nodeContext. Check that it is finalized, and separately that a
+	// fresh finalized vertex does not get a nodeContext either.
+	done := &adt.Vertex{}
+	done.ForceDone()
+	if empty.Status() != done.Status() {
+		t.Fatalf("empty node has status %v, want %v", empty.Status(), done.Status())
+	}
+	for _, v := range []*adt.Vertex{empty, done} {
+		before := *ctx.Stats()
+		v.Init(ctx)
+		after := *ctx.Stats()
+		if after.Allocs != before.Allocs || after.Reused != before.Reused {
+			t.Fatalf("finalized node got a nodeContext: allocs %d -> %d, reused %d -> %d",
+				before.Allocs, after.Allocs, before.Reused, after.Reused)
+		}
 	}
 }

@@ -106,6 +106,13 @@ type Counts struct {
 	// ResolveDep counts the number calls to markResolver in dep.go.
 	ResolveDep int64
 
+	// Field ordering counters
+
+	// OrderEdges counts the edges requested between fields while sorting
+	// the fields of a struct for export. Requests for an edge which
+	// already exists are counted too.
+	OrderEdges int64
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object
@@ -161,6 +168,7 @@ func (c *Counts) Add(other Counts) {
 		c.MaxRedirect = other.MaxRedirect
 	}
 	c.ResolveDep += other.ResolveDep
+	c.OrderEdges += other.OrderEdges
 
 	c.Freed += other.Freed
 	c.Retained += other.Retained
@@ -180,6 +188,7 @@ func (c Counts) Since(start Counts) Counts {
 	c.NumCloseIDs -= start.NumCloseIDs
 	c.ConjunctInfos -= start.ConjunctInfos
 	c.ResolveDep -= start.ResolveDep
+	c.OrderEdges -= start.OrderEdges
 
 	// For max values, we don't subtract since they represent peaks
 	// c.MaxConjunctInfos and c.MaxReqSets and c.MaxRedirect remain as-is
@@ -221,6 +230,7 @@ Disjuncts:    %d`,
 	}
 	optional("\nNotifications: %d", s.Notifications)
 	optional("\nResolveDep:   %d", s.ResolveDep)
+	optional("\nOrderEdges:   %d", s.OrderEdges)
 	if s.GenerationMismatch != 0 || s.MisalignedConjunct != 0 ||
 		s.MisalignedConstraint != 0 || s.SkippedNotification != 0 {
 		b.WriteString("\n")

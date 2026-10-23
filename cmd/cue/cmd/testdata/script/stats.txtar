@@ -95,6 +95,7 @@ contents overwritten
         "MisalignedConstraint": 0,
         "SkippedNotification": 0,
         "ResolveDep": 0,
+        "OrderEdges": 2,
         "Freed": 6,
         "Reused": 0,
         "Allocs": 6,
@@ -127,6 +128,7 @@ CUE: {
 	MisalignedConstraint: 0
 	SkippedNotification:  0
 	ResolveDep:           0
+	OrderEdges:           2
 	Freed:                6
 	Reused:               0
 	Allocs:               6
@@ -158,6 +160,7 @@ CUE:
   MisalignedConstraint: 0
   SkippedNotification: 0
   ResolveDep: 0
+  OrderEdges: 2
   Freed: 6
   Reused: 0
   Allocs: 6
@@ -187,6 +190,7 @@ Proc:
         "MisalignedConstraint": 0,
         "SkippedNotification": 0,
         "ResolveDep": 0,
+        "OrderEdges": 0,
         "Freed": 8,
         "Reused": 1,
         "Allocs": 7,

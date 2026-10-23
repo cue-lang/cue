@@ -140,6 +140,7 @@ import (
 	"maps"
 	"slices"
 
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -368,6 +369,7 @@ func (batchesPtr *structMetaBatches) appendBatch(batch structMetaBatch) {
 type vertexFeatures struct {
 	builder      *GraphBuilder
 	dynFieldsMap map[*adt.DynamicField][]adt.Feature
+	stats        *stats.Counts
 }
 
 func (vf *vertexFeatures) compareStructMeta(a, b structMeta) int {
@@ -396,6 +398,7 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	vf := &vertexFeatures{
 		builder:      builder,
 		dynFieldsMap: dynFieldsMap,
+		stats:        ctx.Stats(),
 	}
 
 	slices.SortFunc(roots, vf.compareStructMeta)
@@ -511,6 +514,7 @@ func (vf *vertexFeatures) addEdges(previous []adt.Feature, sMeta *structMeta) []
 				node.structMeta = sMeta
 				next = append(next, currentLabel)
 				for _, prevLabel := range previous {
+					vf.stats.OrderEdges++
 					vf.builder.AddEdge(prevLabel, currentLabel)
 				}
 				previous = next

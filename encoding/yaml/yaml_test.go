@@ -288,6 +288,18 @@ list:
 		name:    "multi-line plain scalar with a blank line in a nested flow mapping",
 		yaml:    "k: {a: x\n\n  y}\n",
 		wantErr: true,
+	}, {
+		// TODO: the empty entry should be null, and b a sibling of a;
+		// see https://github.com/goccy/go-yaml/issues/766.
+		name: "empty entry at the end of an unindented sequence",
+		yaml: "a:\n- x\n-\nb: 1\n",
+		want: []string{`{
+	a: [
+		"x", {
+			b: 1
+		},
+	]
+}`},
 	}}
 
 	for _, tc := range testCases {

@@ -9,14 +9,14 @@ require (
 	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0
-	github.com/goccy/go-yaml v1.19.2
+	github.com/goccy/go-yaml v1.19.3-0.20260407131736-edee2f91616c
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/opencontainers/go-digest v1.0.1-0.20261015205711-63db54280247
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20261013103202-7c8a61a7a736
-	github.com/rogpeppe/go-internal v1.16.1-0.20261002162744-ce71b23481ca
+	github.com/rogpeppe/go-internal v1.16.1-0.20261005065351-38c169d642f5
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.11-0.20261019083819-70f284b93daa
 	github.com/tetratelabs/wazero v1.12.0

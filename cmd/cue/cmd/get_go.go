@@ -21,6 +21,7 @@ import (
 	"go/ast"
 	"go/constant"
 	goparser "go/parser"
+	"go/scanner"
 	"go/token"
 	"go/types"
 	"maps"
@@ -606,14 +607,20 @@ func extract(cmd *Command, args []string) error {
 		Mode: packages.NeedName | packages.NeedCompiledGoFiles |
 			packages.NeedImports | packages.NeedDeps | packages.NeedTypes |
 			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedModule,
-		ParseFile: parseFileWithoutBodies,
+		// Only declarations are extracted, yet loading dependencies from source
+		// type-checks every function body and variable initializer,
+		// which is most of the work.
+		ParseFile: func(fset *token.FileSet, filename string, src []byte) (*ast.File, error) {
+			const mode = goparser.AllErrors | goparser.ParseComments | goparser.SkipObjectResolution
+			return goparser.ParseFile(fset, filename, purgeFuncBodies(src), mode)
+		},
 	}
 	pkgs, err := packages.Load(cfg, args...)
 	if err != nil {
 		return err
 	}
 	packages.Visit(pkgs, nil, func(p *packages.Package) {
-		p.Errors = slices.DeleteFunc(p.Errors, isUnusedImportError)
+		p.Errors = slices.DeleteFunc(p.Errors, isPurgedBodyError)
 	})
 	if packages.PrintErrors(pkgs) > 0 {
 		return ErrPrintedError
@@ -656,37 +663,108 @@ func extract(cmd *Command, args []string) error {
 	return nil
 }
 
-// parseFileWithoutBodies implements [packages.Config.ParseFile].
-// Only declarations are extracted, yet loading dependencies from source
-// type-checks every function body, which is most of the work.
-// Each body is replaced with an empty endless loop,
-// which still terminates functions with results.
-func parseFileWithoutBodies(fset *token.FileSet, filename string, src []byte) (*ast.File, error) {
-	const mode = goparser.AllErrors | goparser.ParseComments | goparser.SkipObjectResolution
-	f, err := goparser.ParseFile(fset, filename, src, mode)
-	if f == nil {
-		return nil, err
+// isPurgedBodyError reports whether err is a type-checking error which
+// [purgeFuncBodies] causes, as functions with results no longer return,
+// and imports used only in the purged regions are unused. go/types skips
+// both checks entirely when ignoring function bodies, but go/packages
+// does not let us ask for that.
+//
+// TODO: match error codes rather than messages if https://go.dev/issue/82501 is accepted.
+func isPurgedBodyError(err packages.Error) bool {
+	if err.Kind != packages.TypeError {
+		return false
 	}
-	for _, decl := range f.Decls {
-		if fd, ok := decl.(*ast.FuncDecl); ok && fd.Body != nil {
-			pos := fd.Body.Lbrace
-			fd.Body.List = []ast.Stmt{&ast.ForStmt{
-				For:  pos,
-				Body: &ast.BlockStmt{Lbrace: pos, Rbrace: pos},
-			}}
-		}
-	}
-	return f, err
+	return err.Msg == "missing return" ||
+		strings.Contains(err.Msg, " imported ") && strings.HasSuffix(err.Msg, " and not used")
 }
 
-// isUnusedImportError reports whether err is a type-checking error about an
-// unused import, which [parseFileWithoutBodies] causes for any import used
-// only by function bodies. go/types skips this check entirely when ignoring
-// function bodies, but go/packages does not let us ask for that.
-func isUnusedImportError(err packages.Error) bool {
-	return err.Kind == packages.TypeError &&
-		strings.Contains(err.Msg, " imported ") &&
-		strings.HasSuffix(err.Msg, " and not used")
+// Copyright 2023 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// purgeFuncBodies is a copy of PurgeFuncBodies from x/tools, taken from
+// https://go.googlesource.com/tools/+/86210da64f15f98d41324ae4dd5ea1f8be5f92eb/internal/astutil/purge.go
+// as it is not exported. Rather than deleting the contents of each region,
+// it blanks them out while keeping newlines, so that positions are unchanged.
+//
+// purgeFuncBodies returns a copy of src in which the contents of each
+// outermost {...} region have been blanked out, except for struct and
+// interface type bodies and the bodies of length-elided array
+// literals ([...]T), whose element count is part of the type. It
+// includes function bodies, function-literal bodies, and the bodies
+// of slice, map, and explicitly-sized array composite literals (whose
+// contents don't affect the type of the enclosing declaration). This
+// reduces the amount of work required to parse the top-level
+// declarations.
+//
+// If the input is invalid, parsing the output of purgeFuncBodies may
+// result in a different tree due to its effects on parser error recovery.
+func purgeFuncBodies(src []byte) []byte {
+	// Destroy the content of any {...}-bracketed regions that are
+	// not immediately preceded by a "struct" or "interface" token,
+	// and that are not the body of a length-elided array literal.
+	// That includes function bodies, switch/select bodies, and most
+	// composite literals; this will lead to non-void functions that
+	// don't have return statements, which of course is a type error,
+	// but that's ok.
+
+	out := bytes.Clone(src)
+	file := token.NewFileSet().AddFile("", -1, len(src))
+	var sc scanner.Scanner
+	sc.Init(file, src, nil, 0)
+	var prev token.Token
+	var braces []token.Pos // stack of unclosed braces, or -1 for a region we preserve
+	var ellipsis bool      // saw "[...]" not yet consumed by a literal-body "{"
+	for {
+		pos, tok, _ := sc.Scan()
+		if tok == token.EOF {
+			break
+		}
+		switch tok {
+		case token.COMMENT:
+			// TODO(adonovan): opt: skip, to save an estimated 20% of time.
+
+		case token.SEMICOLON:
+			ellipsis = false
+
+		case token.RBRACK:
+			// "...]" occurs only in the array-type prefix of a
+			// composite literal; variadic "..." is followed by
+			// a type or ")", never "]".
+			if prev == token.ELLIPSIS {
+				ellipsis = true
+			}
+
+		case token.LBRACE:
+			if prev == token.STRUCT || prev == token.INTERFACE {
+				pos = -1 // type body: preserve (don't consume ellipsis)
+			} else if ellipsis {
+				pos = -1 // [...]T literal body: preserve
+				ellipsis = false
+			}
+			braces = append(braces, pos)
+
+		case token.RBRACE:
+			if last := len(braces) - 1; last >= 0 {
+				top := braces[last]
+				braces = braces[:last]
+				if top < 0 {
+					// preserve
+				} else if len(braces) == 0 { // toplevel only
+					// Blank out {...} body.
+					start := file.Offset(top)
+					end := file.Offset(pos)
+					for i := start + len("{"); i < end; i++ {
+						if out[i] != '\n' {
+							out[i] = ' '
+						}
+					}
+				}
+			}
+		}
+		prev = tok
+	}
+	return out
 }
 
 func (e *extractor) addPackage(p *packages.Package) {

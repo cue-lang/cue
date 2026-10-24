@@ -143,10 +143,20 @@ func NewServer(r ociregistry.Interface, auth *AuthConfig) (*Registry, error) {
 	if err != nil {
 		return nil, err
 	}
+	var wwwAuth string
+	var opts *ociserver.Options
+	if tokenSrv != nil {
+		wwwAuth = fmt.Sprintf("Bearer realm=%q,service=registrytest", tokenSrv.URL)
+		opts = &ociserver.Options{
+			WriteError: func(w http.ResponseWriter, _ *http.Request, err error) {
+				writeTokenError(w, wwwAuth, err)
+			},
+		}
+	}
 	srv := httptest.NewServer(&registryHandler{
 		auth:     auth,
-		registry: ociserver.New(r, nil),
-		tokenSrv: tokenSrv,
+		registry: ociserver.New(r, opts),
+		wwwAuth:  wwwAuth,
 	})
 	u, err := url.Parse(srv.URL)
 	if err != nil {
@@ -184,11 +194,8 @@ func authzRegistry(auth *AuthConfig, r ociregistry.Interface) (ociregistry.Inter
 	return ocifilter.AccessChecker(r, func(repoName string, access ocifilter.AccessKind) (_err error) {
 		if !allow(repoName) {
 			if auth.Use401InsteadOf403 {
-				// TODO this response should be associated with a
-				// Www-Authenticate header, but this won't do that.
-				// Given that the ociauth logic _should_ turn
-				// this back into a 403 error again, perhaps
-				// we're OK.
+				// Note that only the token server mode adds the
+				// Www-Authenticate header which this response needs.
 				return ociregistry.ErrUnauthorized
 			}
 			// TODO should we be a bit more sophisticated and only
@@ -221,7 +228,10 @@ func regexpMatcher(patStrs []string) (func(string) bool, error) {
 type registryHandler struct {
 	auth     *AuthConfig
 	registry http.Handler
-	tokenSrv *httptest.Server
+
+	// wwwAuth is the Www-Authenticate challenge pointing at the token server,
+	// or empty when not using one.
+	wwwAuth string
 }
 
 const (
@@ -234,23 +244,20 @@ func (h *registryHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		h.registry.ServeHTTP(w, req)
 		return
 	}
-	if h.tokenSrv == nil {
+	if h.wwwAuth == "" {
 		h.serveDirectAuth(w, req)
 		return
 	}
 
 	// Auth with token server.
-	wwwAuth := fmt.Sprintf("Bearer realm=%q,service=registrytest", h.tokenSrv.URL)
 	authHeader := req.Header.Get("Authorization")
 	if authHeader == "" {
-		w.Header().Set("Www-Authenticate", wwwAuth)
-		writeError(w, ociregistry.ErrUnauthorized)
+		writeTokenError(w, h.wwwAuth, ociregistry.ErrUnauthorized)
 		return
 	}
 	kind, token, ok := strings.Cut(authHeader, " ")
 	if !ok || kind != "Bearer" {
-		w.Header().Set("Www-Authenticate", wwwAuth)
-		writeError(w, ociregistry.ErrUnauthorized)
+		writeTokenError(w, h.wwwAuth, ociregistry.ErrUnauthorized)
 		return
 	}
 	switch token {
@@ -262,19 +269,19 @@ func (h *registryHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	default:
 		// If we don't recognize the token, then presumably
 		// the client isn't authenticated so it's 401 not 403.
-		w.Header().Set("Www-Authenticate", wwwAuth)
-		writeError(w, ociregistry.ErrUnauthorized)
+		writeTokenError(w, h.wwwAuth, ociregistry.ErrUnauthorized)
 		return
 	}
-	// If the underlying registry returns a 401 error,
-	// we need to add the Www-Authenticate header.
-	// As there's no way to get ociserver to do it,
-	// we hack it by wrapping the ResponseWriter
-	// with an implementation that does.
-	h.registry.ServeHTTP(&authHeaderWriter{
-		wwwAuth:        wwwAuth,
-		ResponseWriter: w,
-	}, req)
+	h.registry.ServeHTTP(w, req)
+}
+
+// writeTokenError is like writeError, but a 401 response also carries
+// the Www-Authenticate challenge which points clients at the token server.
+func writeTokenError(w http.ResponseWriter, wwwAuth string, err error) {
+	if _, status := ociregistry.MarshalError(err); status == http.StatusUnauthorized {
+		w.Header().Set("Www-Authenticate", wwwAuth)
+	}
+	writeError(w, err)
 }
 
 func (h *registryHandler) serveDirectAuth(w http.ResponseWriter, req *http.Request) {
@@ -391,18 +398,6 @@ func (r *Registry) Close() {
 	if r.tokenSrv != nil {
 		r.tokenSrv.Close()
 	}
-}
-
-type authHeaderWriter struct {
-	wwwAuth string
-	http.ResponseWriter
-}
-
-func (w *authHeaderWriter) WriteHeader(code int) {
-	if code == http.StatusUnauthorized && w.Header().Get("Www-Authenticate") == "" {
-		w.Header().Set("Www-Authenticate", w.wwwAuth)
-	}
-	w.ResponseWriter.WriteHeader(code)
 }
 
 // Host returns the hostname for the registry server;

@@ -90,8 +90,6 @@ c: baz
 ---
 null
 `,
-		// TODO(bug): seems like bug in yaml parser. Try moving to yaml.v3,
-		// or validate that this is indeed a correct interpretation.
 		want: `[
 	{a: "foo"},
 	null,
@@ -409,8 +407,7 @@ func TestYAMLValues(t *testing.T) {
 		{`"1Gi"`, `1Gi`},
 		{`"1.5Gi"`, `1.5Gi`},
 		{`"100m"`, `100m`},
-		// Note that go-yaml doesn't quote strings which look like hexadecimal numbers,
-		// but we do in our fork. See: https://github.com/go-yaml/yaml/issues/847
+		// Strings which look like hexadecimal numbers resolve as numbers.
 		{`"0x123456789012345678901234567890"`, `"0x123456789012345678901234567890"`},
 
 		// Strings whose lines end in a space do not survive a round-trip

@@ -1,8 +1,5 @@
 // test of non-standard list
 
-// TODO: there are many missing comments, but these really are consequences
-// of the buggy textpbfmt library.
-
 -- list.cue --
 empty1: [...int]
 empty2: [...int]

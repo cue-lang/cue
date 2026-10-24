@@ -565,7 +565,7 @@ func (d *Decoder) decodeExpr(rkey rootedKey, tnode *toml.Node) (ast.Expr, error)
 	default:
 		return nil, fmt.Errorf("encoding/toml.Decoder.decodeExpr: unknown %s %#v", tnode.Kind, tnode)
 	}
-	// TODO(mvdan): some go-toml nodes such as Kind=toml.Bool do not seem to have a Raw Range
+	// TODO(mvdan): go-toml nodes of Kind=toml.Array do not have a Raw Range
 	// which would let us grab their position information; fix this upstream.
 	if tnode.Raw.Length > 0 {
 		ast.SetPos(expr, d.tokenFile.Pos(d.shape(tnode).Start.Offset, token.NoRelPos))

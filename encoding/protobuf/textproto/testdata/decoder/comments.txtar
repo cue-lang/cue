@@ -1,5 +1,4 @@
-// TODO: there are many missing comments, but these really are consequences
-// of the buggy textpbfmt library.
+// TODO: blank lines between comments in a list are lost.
 
 -- foo.cue --
 a: string

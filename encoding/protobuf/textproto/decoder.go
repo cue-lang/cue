@@ -40,9 +40,7 @@ type options struct {
 
 // NewDecoder returns a new [Decoder].
 func NewDecoder(option ...Option) *Decoder {
-	d := &Decoder{}
-	_ = d.m // work around linter bug.
-	return d
+	return &Decoder{}
 }
 
 // A Decoder caches conversions of [cue.Value] between calls to its methods.

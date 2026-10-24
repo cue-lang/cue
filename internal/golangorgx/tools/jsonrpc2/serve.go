@@ -107,10 +107,8 @@ func Serve(ctx context.Context, ln net.Listener, server StreamServer, idleTimeou
 			if !ok {
 				return acceptErr
 			}
-			if activeConns == 0 && !connTimer.Stop() {
-				// connTimer.C may receive a value even after Stop returns.
-				// (See https://golang.org/issue/37196.)
-				<-connTimer.C
+			if activeConns == 0 {
+				connTimer.Stop()
 			}
 			activeConns++
 			stream := NewHeaderStream(netConn)

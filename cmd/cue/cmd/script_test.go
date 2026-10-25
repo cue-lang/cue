@@ -32,6 +32,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -160,11 +161,15 @@ func TestScript(t *testing.T) {
 			// * pending-success: polling for a token with device_code
 			//   responds with [tokenErrorCodePending] once, and then succeeds
 			// * immediate-success: polling for a token with device_code succeeds right away
+			//
+			// Each token request appends a line to $WORK/oauth-polls:
+			// "poll" when it respects the polling interval, or "poll too soon"
+			// when it follows the device code or a previous poll too quickly.
 			"oauthregistry": func(ts *testscript.TestScript, neg bool, args []string) {
 				if neg || len(args) != 1 {
 					ts.Fatalf("usage: oauthregistry <mode>")
 				}
-				srv := newMockRegistryOauth(args[0])
+				srv := newMockRegistryOauth(args[0], ts.MkAbs("oauth-polls"))
 				u, _ := url.Parse(srv.URL)
 				ts.Setenv("CUE_REGISTRY", u.Host+"+insecure")
 				ts.Defer(srv.Close)
@@ -588,7 +593,7 @@ func testCmd() {
 // Note that this HTTP server isn't an OCI registry yet, as that isn't needed for now.
 //
 // TODO: once we support refresh tokens, add those endpoints and test them too.
-func newMockRegistryOauth(mode string) *httptest.Server {
+func newMockRegistryOauth(mode, pollsPath string) *httptest.Server {
 	mux := http.NewServeMux()
 	ts := httptest.NewServer(mux)
 	const (
@@ -596,6 +601,10 @@ func newMockRegistryOauth(mode string) *httptest.Server {
 		staticDeviceCode  = "device-code-longer-string"
 		staticAccessToken = "secret-access-token"
 		intervalSecs      = 1 // 1s to keep the tests fast
+	)
+	var (
+		pollMu   sync.Mutex
+		lastPoll time.Time // when the device code or the last token was requested
 	)
 	// OAuth2 Device Authorization Request endpoint: https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
 	mux.HandleFunc("/login/device/code", func(w http.ResponseWriter, r *http.Request) {
@@ -607,6 +616,9 @@ func newMockRegistryOauth(mode string) *httptest.Server {
 			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
+		pollMu.Lock()
+		lastPoll = time.Now()
+		pollMu.Unlock()
 		writeJSON(w, http.StatusOK, oauth2.DeviceAuthResponse{
 			DeviceCode: staticDeviceCode,
 			UserCode:   staticUserCode,
@@ -618,9 +630,35 @@ func newMockRegistryOauth(mode string) *httptest.Server {
 			Interval: intervalSecs,
 		})
 	})
+	// recordPoll appends a line to pollsPath for each token request.
+	// Requests closer than half the interval are too soon for any client
+	// which waits for the interval between polls.
+	recordPoll := func() error {
+		pollMu.Lock()
+		defer pollMu.Unlock()
+		line := "poll\n"
+		now := time.Now()
+		if now.Sub(lastPoll) < intervalSecs*time.Second/2 {
+			line = "poll too soon\n"
+		}
+		lastPoll = now
+		f, err := os.OpenFile(pollsPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o666)
+		if err != nil {
+			return err
+		}
+		if _, err := f.WriteString(line); err != nil {
+			f.Close()
+			return err
+		}
+		return f.Close()
+	}
 	// OAuth2 Token endpoint: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
 	var tokenRequestCounter atomic.Int64
 	mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
+		if err := recordPoll(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		deviceCode := r.FormValue("device_code")
 		if deviceCode != staticDeviceCode {
 			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeDenied})

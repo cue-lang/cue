@@ -9,3 +9,10 @@ oauthregistry pending-success
 exec cue login
 stdout 'open:.*user_code=user-code'
 grep 'secret-access-token' cueconfig/logins.json
+# TODO: the client should wait for the polling interval between requests,
+# but it retries a failed poll right away with a different auth style.
+cmp oauth-polls want-polls
+
+-- want-polls --
+poll
+poll too soon

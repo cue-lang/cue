@@ -10,3 +10,10 @@ oauthregistry device-code-expired
 stdout 'open:.*user_code=user-code'
 stderr 'cannot obtain the OAuth2 token.*expired_token'
 ! exists cueconfig/logins.json
+# TODO: the client should wait for the polling interval between requests,
+# but it retries a failed poll right away with a different auth style.
+cmp oauth-polls want-polls
+
+-- want-polls --
+poll
+poll too soon

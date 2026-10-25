@@ -199,6 +199,10 @@ func RegistryOAuthConfig(host modresolve.Host) oauth2.Config {
 		Endpoint: oauth2.Endpoint{
 			DeviceAuthURL: scheme + host.Name + "/login/device/code",
 			TokenURL:      scheme + host.Name + "/login/oauth/token",
+			// We have no client credentials to send. Without an explicit style,
+			// x/oauth2 retries every failed token request with another style,
+			// such as each pending poll in the device flow.
+			AuthStyle: oauth2.AuthStyleInParams,
 		},
 	}
 }

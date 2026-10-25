@@ -40,7 +40,9 @@ import (
 //
 // If x is a struct, this same applies to all of its fields (matching the behavior of [json.Unmarshal])
 //
-// If x is a struct, Decode will validate the constraints specified in the field tags.
+// If x is a struct, fields of v match its fields by the names given by their
+// "json" tags as described for [Context.Encode], or case-insensitively when
+// there is no exact match, unless a field's tag has the "case:strict" option.
 //
 // If x contains a [Value], that part of x will be set to the value
 // at the corresponding part of v. This allows decoding values

@@ -331,7 +331,8 @@ func NilIsAny(isAny bool) EncodeOption {
 // stored under the "json" key in the struct field's tag. The format string
 // gives the name of the field, possibly followed by a comma-separated list of
 // options. The name may be empty in order to specify options without overriding
-// the default field name.
+// the default field name. Without a "json" key, the name is taken from the
+// "yaml" key, or else from the name option under the "protobuf" key.
 //
 // The "omitempty" option specifies that the field should be omitted from the
 // encoding if the field has an empty value, defined as false, 0, a nil pointer,
@@ -344,6 +345,9 @@ func NilIsAny(isAny bool) EncodeOption {
 // determine whether the value is zero.
 //
 // 2) Otherwise, the value is zero if it is the zero value for its type.
+//
+// The "embed" option, without a name, treats a field of struct type or an
+// unnamed pointer to one as an anonymous struct field, like encoding/json.
 //
 // See the documentation for Go's json.Marshal for more details on the field
 // tags and their meaning.
@@ -403,6 +407,15 @@ func (c *Context) Encode(x any, option ...EncodeOption) Value {
 }
 
 // EncodeType converts a Go type to a CUE [Value].
+//
+// A struct type converts to a CUE struct with the fields that [Context.Encode]
+// would encode, named the same way. A field is optional if it may be omitted,
+// such as with "omitempty" or "omitzero", or through a nil embedded pointer.
+//
+// The "cue" key in a struct field's tag gives a CUE expression constraining
+// its value, which may refer to other fields by name. It is not allowed on
+// a field whose fields are promoted, nor if a reference would then resolve
+// to a different field.
 //
 // The returned value will represent an error, accessible through [Value.Err],
 // if any error occurred.

@@ -233,7 +233,7 @@ func TestInterrupt(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 
 	// We set up a mock registry so the OAuth flow used by `cue login` is always pending.
-	srv := newMockRegistryOauth("pending-forever", filepath.Join(t.TempDir(), "oauth-polls"))
+	srv := newMockRegistryOauth("pending-forever")
 	regURL, _ := url.Parse(srv.URL)
 	t.Cleanup(srv.Close)
 

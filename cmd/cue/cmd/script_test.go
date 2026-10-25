@@ -151,25 +151,13 @@ func TestScript(t *testing.T) {
 				_, err = fmt.Fprint(ts.Stdout(), fi.ModTime().UnixNano())
 				ts.Check(err)
 			},
-			// oauthregistry starts an HTTP server with enough endpoints to test `cue login`.
-			// It takes a single argument to describe the oauth server's behavior:
-			//
-			// * device-code-not-found: /login/device/code responds with 404
-			// * device-code-method-not-allowed: /login/device/code responds with 405
-			// * device-code-expired: polling for a token with device_code
-			//   always responds with [tokenErrorCodeExpired]
-			// * pending-success: polling for a token with device_code
-			//   responds with [tokenErrorCodePending] once, and then succeeds
-			// * immediate-success: polling for a token with device_code succeeds right away
-			//
-			// Each token request appends a line to $WORK/oauth-polls:
-			// "poll" when it respects the polling interval, or "poll too soon"
-			// when it follows the device code or a previous poll too quickly.
+			// oauthregistry starts an HTTP server with enough endpoints to test `cue login`,
+			// taking a single argument to describe its behavior; see [mockRegistryOauth].
 			"oauthregistry": func(ts *testscript.TestScript, neg bool, args []string) {
 				if neg || len(args) != 1 {
 					ts.Fatalf("usage: oauthregistry <mode>")
 				}
-				srv := newMockRegistryOauth(args[0], ts.MkAbs("oauth-polls"))
+				srv := newMockRegistryOauth(args[0])
 				u, _ := url.Parse(srv.URL)
 				ts.Setenv("CUE_REGISTRY", u.Host+"+insecure")
 				ts.Defer(srv.Close)
@@ -588,19 +576,37 @@ func testCmd() {
 	}
 }
 
-// newMockRegistryOauth starts a test HTTP server with the OAuth2 device flow endpoints
-// used by `cue login` to obtain an access token.
-// Note that this HTTP server isn't an OCI registry yet, as that isn't needed for now.
+// newMockRegistryOauth starts a test HTTP server serving [mockRegistryOauth].
+func newMockRegistryOauth(mode string) *httptest.Server {
+	return httptest.NewServer(mockRegistryOauth(mode, io.Discard))
+}
+
+// mockRegistryOauth returns an HTTP handler with the OAuth2 device flow endpoints used by `cue login` to obtain an access token.
+// Note that it isn't an OCI registry yet, as that isn't needed for now.
+// The mode describes its behavior:
+//
+//   - device-code-not-found: /login/device/code responds with 404
+//   - device-code-method-not-allowed: /login/device/code responds with 405
+//   - device-code-expired: polling for a token with device_code
+//     always responds with [tokenErrorCodeExpired]
+//   - pending-forever: polling for a token with device_code
+//     always responds with [tokenErrorCodePending]
+//   - pending-success: polling for a token with device_code
+//     responds with [tokenErrorCodePending] once, and then succeeds
+//   - immediate-success: polling for a token with device_code succeeds right away
+//
+// Each token request writes a line to polls: "poll" when it respects
+// the polling interval, or "poll too soon" when it follows the device code
+// or a previous poll too quickly.
 //
 // TODO: once we support refresh tokens, add those endpoints and test them too.
-func newMockRegistryOauth(mode, pollsPath string) *httptest.Server {
+func mockRegistryOauth(mode string, polls io.Writer) http.Handler {
 	mux := http.NewServeMux()
-	ts := httptest.NewServer(mux)
 	const (
 		staticUserCode    = "user-code"
 		staticDeviceCode  = "device-code-longer-string"
 		staticAccessToken = "secret-access-token"
-		intervalSecs      = 1 // 1s to keep the tests fast
+		intervalSecs      = 5 // the RFC's default
 	)
 	var (
 		pollMu   sync.Mutex
@@ -619,21 +625,21 @@ func newMockRegistryOauth(mode, pollsPath string) *httptest.Server {
 		pollMu.Lock()
 		lastPoll = time.Now()
 		pollMu.Unlock()
+		baseURL := "http://" + r.Host
 		writeJSON(w, http.StatusOK, oauth2.DeviceAuthResponse{
 			DeviceCode: staticDeviceCode,
 			UserCode:   staticUserCode,
 
-			VerificationURI:         ts.URL + "/login/device",
-			VerificationURIComplete: ts.URL + "/login/device?user_code=" + url.QueryEscape(staticUserCode),
+			VerificationURI:         baseURL + "/login/device",
+			VerificationURIComplete: baseURL + "/login/device?user_code=" + url.QueryEscape(staticUserCode),
 
 			Expiry:   time.Now().Add(time.Minute),
 			Interval: intervalSecs,
 		})
 	})
-	// recordPoll appends a line to pollsPath for each token request.
 	// Requests closer than half the interval are too soon for any client
 	// which waits for the interval between polls.
-	recordPoll := func() error {
+	recordPoll := func() {
 		pollMu.Lock()
 		defer pollMu.Unlock()
 		line := "poll\n"
@@ -642,23 +648,12 @@ func newMockRegistryOauth(mode, pollsPath string) *httptest.Server {
 			line = "poll too soon\n"
 		}
 		lastPoll = now
-		f, err := os.OpenFile(pollsPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o666)
-		if err != nil {
-			return err
-		}
-		if _, err := f.WriteString(line); err != nil {
-			f.Close()
-			return err
-		}
-		return f.Close()
+		io.WriteString(polls, line)
 	}
 	// OAuth2 Token endpoint: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
 	var tokenRequestCounter atomic.Int64
 	mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
-		if err := recordPoll(); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		recordPoll()
 		deviceCode := r.FormValue("device_code")
 		if deviceCode != staticDeviceCode {
 			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeDenied})
@@ -686,7 +681,7 @@ func newMockRegistryOauth(mode, pollsPath string) *httptest.Server {
 			panic(fmt.Sprintf("unknown mode: %q", mode))
 		}
 	})
-	return ts
+	return mux
 }
 
 func writeJSON(w http.ResponseWriter, statusCode int, v any) {

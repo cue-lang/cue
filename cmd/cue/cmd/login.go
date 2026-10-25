@@ -140,9 +140,9 @@ To log into a standard OCI registry, use 'docker login' or 'podman login' instea
 				}
 				// TODO: we could try using $BROWSER or xdg-open here,
 				// falling back to the text instructions below
-				fmt.Printf("Enter the code %s via: %s\n", resp.UserCode, resp.VerificationURI)
-				fmt.Printf("Or just open: %s\n", resp.VerificationURIComplete)
-				fmt.Println()
+				fmt.Fprintf(cmd.OutOrStdout(), "Enter the code %s via: %s\n", resp.UserCode, resp.VerificationURI)
+				fmt.Fprintf(cmd.OutOrStdout(), "Or just open: %s\n", resp.VerificationURIComplete)
+				fmt.Fprintln(cmd.OutOrStdout())
 				tok, err = oauthCfg.DeviceAccessToken(ctx, resp)
 				if err != nil {
 					return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
@@ -174,7 +174,7 @@ To log into a standard OCI registry, use 'docker login' or 'podman login' instea
 			if err != nil {
 				return fmt.Errorf("cannot store CUE registry logins: %v", err)
 			}
-			fmt.Printf("Login for %s stored in %s\n", host.Name, loginsPath)
+			fmt.Fprintf(cmd.OutOrStdout(), "Login for %s stored in %s\n", host.Name, loginsPath)
 			// TODO: Once we support encryption, we should print a warning if it's not available.
 			return nil
 		}),

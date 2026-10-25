@@ -648,9 +648,9 @@ var (
 	table  = [...]string{"a", "b", "c"}
 	keyed  = [...]string{4: "e"}
 	nested = [...][]int{{1}, {2, 3}}
-	value  = func() A {
+	value  = func() int64 {
 		p := unsafe.Pointer(nil)
-		return A{UnsafePointer: p}
+		return int64(uintptr(p))
 	}()
 )
 

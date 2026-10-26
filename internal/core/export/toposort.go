@@ -61,39 +61,6 @@ func extractFeatures(in []adt.StructInfo) (a [][]adt.Feature) {
 	return a
 }
 
-// VertexFeaturesUnsorted returns the feature list of v. There will be
-// no duplicate features in the returned list, but there is also no
-// attempt made to sort the list.
-func VertexFeaturesUnsorted(v *adt.Vertex) (features []adt.Feature) {
-	seen := make(map[adt.Feature]struct{})
-
-	for _, s := range v.Structs {
-		for _, decl := range s.Decls {
-			field, ok := decl.(*adt.Field)
-			if !ok {
-				continue
-			}
-			label := field.Label
-			if _, found := seen[label]; found {
-				continue
-			}
-			seen[label] = struct{}{}
-			features = append(features, label)
-		}
-	}
-
-	for _, arc := range v.Arcs {
-		label := arc.Label
-		if _, found := seen[label]; found {
-			continue
-		}
-		seen[label] = struct{}{}
-		features = append(features, label)
-	}
-
-	return features
-}
-
 // sortArcs does a topological sort of arcs based on a variant of Kahn's
 // algorithm. See
 // https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/

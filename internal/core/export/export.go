@@ -190,12 +190,6 @@ func isDefinitionReference(x ast.Expr) bool {
 
 // Expr exports the given unevaluated expression (schema mode).
 // It does not resolve references that point outside the given expression.
-func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
-	return Simplified.Expr(r, pkgID, n)
-}
-
-// Expr exports the given unevaluated expression (schema mode).
-// It does not resolve references that point outside the given expression.
 func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 	e := newExporter(p, adt.NewContext(r, nil), pkgID, nil)
 	defer adt.AddStats(e.ctx)
@@ -303,12 +297,6 @@ func hasDocComment(comments []*ast.CommentGroup) bool {
 		}
 	}
 	return false
-}
-
-// Vertex exports evaluated values (data mode).
-// It resolves incomplete references that point outside the current context.
-func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
-	return Simplified.Vertex(r, pkgID, n)
 }
 
 // Vertex exports evaluated values (data mode).

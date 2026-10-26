@@ -22,10 +22,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-const (
-	NodeUnsorted = -1
-)
-
 type Graph struct {
 	nodes Nodes
 }
@@ -37,20 +33,6 @@ type Node struct {
 	// temporary state for calculating the Strongly Connected
 	// Components of a graph.
 	sccNodeState sccNodeState
-	position     int
-}
-
-func (n *Node) IsSorted() bool {
-	return n.position >= 0
-}
-
-// SafeName returns a string useful for debugging, regardless of the
-// type of the feature. So for IntLabels, you'll get back `1`, `10`
-// etc; for identifiers, you may get back a string with quotes in it,
-// eg `"runs-on"`. So this is not useful for comparisons, but it is
-// useful (and safe) for debugging.
-func (n *Node) SafeName(index adt.StringIndexer) string {
-	return n.Feature.SelectorString(index)
 }
 
 type Nodes []*Node
@@ -115,7 +97,7 @@ func (builder *GraphBuilder) AddEdge(from, to adt.Feature) {
 func (builder *GraphBuilder) EnsureNode(feature adt.Feature) *Node {
 	node, found := builder.nodesByFeature[feature]
 	if !found {
-		node = &Node{Feature: feature, position: NodeUnsorted}
+		node = &Node{Feature: feature}
 		builder.nodesByFeature[feature] = node
 	}
 	return node
@@ -191,7 +173,7 @@ func (graph *Graph) Sort(index adt.StringIndexer) []adt.Feature {
 		sccVisitedCount++
 		debug("scc current: %p %v\n", sccCurrent, sccCurrent)
 
-		nodesSorted = appendNodes(nodesSorted, sccCurrent.Nodes)
+		nodesSorted = append(nodesSorted, sccCurrent.Nodes...)
 
 		sccReadyNeedsSorting := false
 	SccNextOutgoing:
@@ -210,14 +192,6 @@ func (graph *Graph) Sort(index adt.StringIndexer) []adt.Feature {
 	}
 
 	return nodesSorted.Features()
-}
-
-func appendNodes(nodesSorted, nodesReady Nodes) Nodes {
-	for i, node := range nodesReady {
-		node.position = len(nodesSorted) + i
-	}
-	nodesSorted = append(nodesSorted, nodesReady...)
-	return nodesSorted
 }
 
 func debug(formatting string, args ...any) {

@@ -21,15 +21,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-// Features calls f for all features used in x and indicates whether the
-// feature is used as a reference or not.
-func Features(x adt.Expr, f func(label adt.Feature, src adt.Node)) {
-	w := Visitor{
-		Feature: f,
-	}
-	w.Elem(x)
-}
-
 // A Visitor walks over all elements in an ADT, recursively.
 type Visitor struct {
 	// Feature is invoked for all field names.

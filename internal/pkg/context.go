@@ -346,16 +346,6 @@ func (c *CallCtxt) CueList(i int) List {
 	return List{v, m.IsOpen && !m.NoEllipsis}
 }
 
-func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
-	arg := c.BuiltinCallContext.Value(i)
-	x := value.Make(c.ctx, arg)
-	v, err := x.List()
-	if err != nil {
-		c.invalidArgType(arg, i, "list", err)
-	}
-	return v
-}
-
 func (c *CallCtxt) getList(i int) *adt.Vertex {
 	x := c.BuiltinCallContext.Value(i)
 	if c.builtin.NonConcrete {

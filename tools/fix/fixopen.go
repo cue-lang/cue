@@ -313,11 +313,11 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			if todo {
 				dropNotes(newExpr)
 				ast.AddComment(embed, todoComment(
-					"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
+					"under the old semantics the embedding below closed the enclosing struct when the comprehension fired; it no longer does."))
 			}
 			if exprChanged && flags.def && len(recloseStack) == 0 {
 				ast.AddComment(embed, todoComment(
-					"top-level definition embedding opened; if this is intended as a schema, remove the '...'."))
+					"the top-level definition embedding below is opened; if it is intended as a schema, remove its '...'."))
 			}
 
 		case *ast.StructLit:
@@ -368,7 +368,7 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 				if info.inDefinition && flags.mayBeClosed() {
 					if comp := guardThroughAliases(n, info.aliases); comp != nil {
 						ast.AddComment(comp, todoComment(
-							"this struct takes no wrapper builtin: this guard reads the struct's own field through an alias of an enclosing field, which a wrapper's argument cannot resolve; the enclosing definition closes the struct instead, admitting the fields of every conjunct."))
+							"the enclosing struct takes no wrapper builtin: the guard below reads the struct's own field through an alias of an enclosing field, which a wrapper's argument cannot resolve; the enclosing definition closes the struct instead, admitting the fields of every conjunct."))
 						c.ClearEnclosingModified()
 						break
 					}
@@ -376,7 +376,7 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 
 				if comp := compReferringToStruct(n); comp != nil {
 					ast.AddComment(comp, todoComment(
-						"a wrapper builtin evaluates its argument on its own, so a comprehension guard that depends on a field unified into the struct from elsewhere stays incomplete."))
+						"a wrapper builtin evaluates its argument on its own, so the guard below stays incomplete if the field it depends on is unified into the struct from elsewhere."))
 				}
 				// The wrapper takes the place of the literal being replaced,
 				// which n is the sole embedding of when its braces were
@@ -1138,7 +1138,7 @@ func openNestedClosing(lit *ast.StructLit) (changed bool) {
 				if !flagged[c] {
 					flagged[c] = true
 					ast.AddComment(c, todoComment(
-						"the closed paths this comprehension extends are opened whether or not it fires; the old semantics opened them only when it fired."))
+						"the closed paths the comprehension below extends are opened whether or not it fires; the old semantics opened them only when it fired."))
 				}
 			}
 		}

@@ -107,10 +107,10 @@ other: w: int
 	a: {
 		#E...
 		mode: *"k" | string
-		// TODO(cue-fix): this struct takes no wrapper builtin: this guard reads the
-		// struct's own field through an alias of an enclosing field, which a wrapper's
-		// argument cannot resolve; the enclosing definition closes the struct instead,
-		// admitting the fields of every conjunct.
+		// TODO(cue-fix): the enclosing struct takes no wrapper builtin: the guard below
+		// reads the struct's own field through an alias of an enclosing field, which a
+		// wrapper's argument cannot resolve; the enclosing definition closes the struct
+		// instead, admitting the fields of every conjunct.
 		if X.a.mode == "k" {k: int}
 	}
 	m: matchN(1, [{b: __closeAll({#E..., x: 1})}])

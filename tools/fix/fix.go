@@ -522,7 +522,7 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 			for _, s := range wrappedStructs(alias.Expr) {
 				for _, comp := range guardsThroughAliases(s, []*ast.Alias{alias}) {
 					ast.AddComment(comp, todoComment(
-						"a comprehension guard that reads a field through the alias, bound to self outside the wrapper builtin, resolves only when a conjunct outside the wrapper supplies that field; declared in the wrapped struct alone, it fails with \"undefined field\"."))
+						"the guard below reads a field through the alias, bound to self outside the wrapper builtin, so it resolves only when a conjunct outside the wrapper supplies that field; declared in the wrapped struct alone, it fails with \"undefined field\"."))
 				}
 			}
 

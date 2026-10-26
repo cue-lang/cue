@@ -102,8 +102,8 @@ _repo: {}
 
 // Top-level definition embedding → opened with TODO.
 //
-// TODO(cue-fix): top-level definition embedding opened; if this is intended as
-// a schema, remove the '...'.
+// TODO(cue-fix): the top-level definition embedding below is opened; if it is
+// intended as a schema, remove its '...'.
 #A...
 
 // Single definition embedding → use definition directly.
@@ -134,8 +134,8 @@ embeddedSel: {
 // Definition in comprehension → TODO.
 compDef: {
 	for v in _repo {
-		// TODO(cue-fix): the old semantics closed the enclosing struct when the
-		// comprehension fired; this is no longer the case.
+		// TODO(cue-fix): under the old semantics the embedding below closed the
+		// enclosing struct when the comprehension fired; it no longer does.
 		#D...
 	}
 }
@@ -143,8 +143,8 @@ compDef: {
 // Non-def reference in comprehension → TODO.
 compRef: {
 	for v in _repo {
-		// TODO(cue-fix): the old semantics closed the enclosing struct when the
-		// comprehension fired; this is no longer the case.
+		// TODO(cue-fix): under the old semantics the embedding below closed the
+		// enclosing struct when the comprehension fired; it no longer does.
 		v...
 	}
 }
@@ -153,8 +153,8 @@ compRef: {
 // argument; the embedding inside it gets neither a TODO nor a NOTE.
 compClose: {
 	for v in _repo {
-		// TODO(cue-fix): the old semantics closed the enclosing struct when the
-		// comprehension fired; this is no longer the case.
+		// TODO(cue-fix): under the old semantics the embedding below closed the
+		// enclosing struct when the comprehension fired; it no longer does.
 		{_repo...}
 		x: 1
 	}
@@ -164,8 +164,8 @@ compClose: {
 // embedded in the value, whatever inside it was opened.
 compNested: {
 	for v in _repo {
-		// TODO(cue-fix): the old semantics closed the enclosing struct when the
-		// comprehension fired; this is no longer the case.
+		// TODO(cue-fix): under the old semantics the embedding below closed the
+		// enclosing struct when the comprehension fired; it no longer does.
 		{_repo...}
 		x: 1
 	}
@@ -175,13 +175,13 @@ compNested: {
 inList: {
 	steps: [
 		for v in _repo.checkoutCode {
-			// TODO(cue-fix): the old semantics closed the enclosing struct when the
-			// comprehension fired; this is no longer the case.
+			// TODO(cue-fix): under the old semantics the embedding below closed the
+			// enclosing struct when the comprehension fired; it no longer does.
 			v...
 		},
 		for v in _repo.installGo {
-			// TODO(cue-fix): the old semantics closed the enclosing struct when the
-			// comprehension fired; this is no longer the case.
+			// TODO(cue-fix): under the old semantics the embedding below closed the
+			// enclosing struct when the comprehension fired; it no longer does.
 			v...
 		},
 		{

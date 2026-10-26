@@ -2234,9 +2234,9 @@ wrapperComp: {
 	v: __closeAll({
 		#A...
 		c: bool
-		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so a
-		// comprehension guard that depends on a field unified into the struct from
-		// elsewhere stays incomplete.
+		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so the
+		// guard below stays incomplete if the field it depends on is unified into the
+		// struct from elsewhere.
 		if c {d: 1}
 	})
 }
@@ -2257,8 +2257,8 @@ compExtends: {
 	v: close({
 		{foo?: close({foo?: _, allowed?: _})}
 
-		// TODO(cue-fix): the closed paths this comprehension extends are opened whether
-		// or not it fires; the old semantics opened them only when it fired.
+		// TODO(cue-fix): the closed paths the comprehension below extends are opened
+		// whether or not it fires; the old semantics opened them only when it fired.
 		if true {
 			foo: allowed: 5
 		}

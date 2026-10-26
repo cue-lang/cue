@@ -74,18 +74,18 @@ app: {
 		mode: "a" | "b" | *"c"
 		deps: default: #Dep
 		y: X.deps.default.kind
-		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
-		// bound to self outside the wrapper builtin, resolves only when a conjunct
-		// outside the wrapper supplies that field; declared in the wrapped struct
-		// alone, it fails with "undefined field".
+		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
+		// outside the wrapper builtin, so it resolves only when a conjunct outside the
+		// wrapper supplies that field; declared in the wrapped struct alone, it fails
+		// with "undefined field".
 		if X.deps.default.kind == "k" {
 			other: int
 		}
 
-		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
-		// bound to self outside the wrapper builtin, resolves only when a conjunct
-		// outside the wrapper supplies that field; declared in the wrapped struct
-		// alone, it fails with "undefined field".
+		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
+		// outside the wrapper builtin, so it resolves only when a conjunct outside the
+		// wrapper supplies that field; declared in the wrapped struct alone, it fails
+		// with "undefined field".
 		if X.mode == "a" {
 			extra: string
 		}
@@ -99,10 +99,10 @@ disj: {
 	*__closeAll({
 		#Base...
 		mode: *"c" | string
-		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
-		// bound to self outside the wrapper builtin, resolves only when a conjunct
-		// outside the wrapper supplies that field; declared in the wrapped struct
-		// alone, it fails with "undefined field".
+		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
+		// outside the wrapper builtin, so it resolves only when a conjunct outside the
+		// wrapper supplies that field; declared in the wrapped struct alone, it fails
+		// with "undefined field".
 		if X.mode == "c" {o: 1}
 	}) | close({kind: string})
 }
@@ -113,14 +113,14 @@ viaLet: {
 		mode: *"c" | string
 		let m = X.mode
 
-		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so a
-		// comprehension guard that depends on a field unified into the struct from
-		// elsewhere stays incomplete.
+		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so the
+		// guard below stays incomplete if the field it depends on is unified into the
+		// struct from elsewhere.
 		//
-		// TODO(cue-fix): a comprehension guard that reads a field through the alias,
-		// bound to self outside the wrapper builtin, resolves only when a conjunct
-		// outside the wrapper supplies that field; declared in the wrapped struct
-		// alone, it fails with "undefined field".
+		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
+		// outside the wrapper builtin, so it resolves only when a conjunct outside the
+		// wrapper supplies that field; declared in the wrapped struct alone, it fails
+		// with "undefined field".
 		if m == "c" {o: 1}
 	})
 }

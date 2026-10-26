@@ -106,7 +106,7 @@ func (s *server) DidSave(ctx context.Context, params *protocol.DidSaveTextDocume
 
 func (s *server) didModifyFiles(ctx context.Context, modifications []file.Modification, cause ModificationSource) error {
 	if s.Options().VerboseWorkDoneProgress {
-		work := s.progress.Start(ctx, DiagnosticWorkTitle(cause), "Calculating file diagnostics...", nil, nil)
+		work := s.progress.Start(ctx, DiagnosticWorkTitle(cause), "Calculating file diagnostics...")
 		defer work.EndAsync(ctx, "Done.")
 	}
 

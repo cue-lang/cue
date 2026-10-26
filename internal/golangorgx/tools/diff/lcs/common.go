@@ -5,7 +5,6 @@
 package lcs
 
 import (
-	"log"
 	"sort"
 )
 
@@ -28,21 +27,6 @@ func (l lcs) sort() lcs {
 		return l[i].Len > l[j].Len
 	})
 	return l
-}
-
-// validate that the elements of the lcs do not overlap
-// (can only happen when the two-sided algorithm ends early)
-// expects the lcs to be sorted
-func (l lcs) valid() bool {
-	for i := 1; i < len(l); i++ {
-		if l[i-1].X+l[i-1].Len > l[i].X {
-			return false
-		}
-		if l[i-1].Y+l[i-1].Len > l[i].Y {
-			return false
-		}
-	}
-	return true
 }
 
 // repair overlapping lcs
@@ -72,9 +56,6 @@ func (l lcs) fix() lcs {
 		}
 	}
 	tmp.sort()
-	if false && !tmp.valid() { // debug checking
-		log.Fatalf("here %d", len(tmp))
-	}
 	return tmp
 }
 

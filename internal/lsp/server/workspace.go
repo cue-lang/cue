@@ -19,7 +19,7 @@ import (
 // WorkspaceFolders to the session.
 func (s *server) AddFolders(ctx context.Context, folders map[protocol.WorkspaceFolder]protocol.DocumentURI) error {
 	if s.Options().VerboseWorkDoneProgress {
-		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromInitialWorkspaceLoad), "Calculating diagnostics for initial workspace load...", nil, nil)
+		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromInitialWorkspaceLoad), "Calculating diagnostics for initial workspace load...")
 		defer work.EndAsync(ctx, "Done.")
 	}
 
@@ -78,7 +78,7 @@ func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol
 
 func (s *server) DidChangeConfiguration(ctx context.Context, _ *protocol.DidChangeConfigurationParams) error {
 	if s.Options().VerboseWorkDoneProgress {
-		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromDidChangeConfiguration), "Calculating diagnostics...", nil, nil)
+		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromDidChangeConfiguration), "Calculating diagnostics...")
 		defer work.EndAsync(ctx, "Done.")
 	}
 

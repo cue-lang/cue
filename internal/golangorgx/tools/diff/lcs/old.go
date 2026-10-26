@@ -16,10 +16,6 @@ type Diff struct {
 	ReplStart, ReplEnd int // offset of replacement text in B
 }
 
-// DiffStrings returns the differences between two strings.
-// It does not respect rune boundaries.
-func DiffStrings(a, b string) []Diff { return diff(stringSeqs{a, b}) }
-
 // DiffBytes returns the differences between two byte sequences.
 // It does not respect rune boundaries.
 func DiffBytes(a, b []byte) []Diff { return diff(bytesSeqs{a, b}) }
@@ -36,7 +32,7 @@ func diff(seqs sequences) []Diff {
 
 // compute computes the list of differences between two sequences,
 // along with the LCS. It is exercised directly by tests.
-// The algorithm is one of {forward, backward, twosided}.
+// The algorithm is one of {forward, twosided}.
 func compute(seqs sequences, algo func(*editGraph) lcs, limit int) ([]Diff, lcs) {
 	if limit <= 0 {
 		limit = 1 << 25 // effectively infinity
@@ -186,66 +182,6 @@ func (e *editGraph) getForward(d, k int) int {
 }
 
 // --- BACKWARD ---
-
-// bdone decides if the backward path has reached the lower left corner
-func (e *editGraph) bdone(D, k int) (bool, lcs) {
-	// x, y, k are relative to the rectangle
-	x := e.vb.get(D, k)
-	y := x - (k + e.delta)
-	if x == 0 && y == 0 {
-		return true, e.backwardlcs(D, k)
-	}
-	return false, nil
-}
-
-// run the backward algorithm, until success or up to the limit on D.
-func backward(e *editGraph) lcs {
-	e.setBackward(0, 0, e.ux)
-	if ok, ans := e.bdone(0, 0); ok {
-		return ans
-	}
-	// from D to D+1
-	for D := 0; D < e.limit; D++ {
-		e.setBackward(D+1, -(D + 1), e.getBackward(D, -D)-1)
-		if ok, ans := e.bdone(D+1, -(D + 1)); ok {
-			return ans
-		}
-		e.setBackward(D+1, D+1, e.getBackward(D, D))
-		if ok, ans := e.bdone(D+1, D+1); ok {
-			return ans
-		}
-		for k := -D + 1; k <= D-1; k += 2 {
-			// these are tricky and easy to get wrong
-			lookv := e.lookBackward(k, e.getBackward(D, k-1))
-			lookh := e.lookBackward(k, e.getBackward(D, k+1)-1)
-			if lookv < lookh {
-				e.setBackward(D+1, k, lookv)
-			} else {
-				e.setBackward(D+1, k, lookh)
-			}
-			if ok, ans := e.bdone(D+1, k); ok {
-				return ans
-			}
-		}
-	}
-
-	// D is too large
-	// find the D path with minimal x+y inside the rectangle and
-	// use that to compute the part of the lcs found
-	kmax := -e.limit - 1
-	diagmin := 1 << 25
-	for k := -e.limit; k <= e.limit; k += 2 {
-		x := e.getBackward(e.limit, k)
-		y := x - (k + e.delta)
-		if x+y < diagmin && x >= 0 && y >= 0 {
-			diagmin, kmax = x+y, k
-		}
-	}
-	if kmax < -e.limit {
-		panic(fmt.Sprintf("no paths when limit=%d?", e.limit))
-	}
-	return e.backwardlcs(e.limit, kmax)
-}
 
 // recover the lcs by backtracking
 func (e *editGraph) backwardlcs(D, k int) lcs {

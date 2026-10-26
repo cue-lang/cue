@@ -9,49 +9,6 @@ import (
 	"unicode/utf8"
 )
 
-// CompareLocation defines a three-valued comparison over locations,
-// lexicographically ordered by (URI, Range).
-func CompareLocation(x, y Location) int {
-	if x.URI != y.URI {
-		if x.URI < y.URI {
-			return -1
-		} else {
-			return +1
-		}
-	}
-	return CompareRange(x.Range, y.Range)
-}
-
-// CompareRange returns -1 if a is before b, 0 if a == b, and 1 if a is after b.
-//
-// A range a is defined to be 'before' b if a.Start is before b.Start, or
-// a.Start == b.Start and a.End is before b.End.
-func CompareRange(a, b Range) int {
-	if r := ComparePosition(a.Start, b.Start); r != 0 {
-		return r
-	}
-	return ComparePosition(a.End, b.End)
-}
-
-// ComparePosition returns -1 if a is before b, 0 if a == b, and 1 if a is after b.
-func ComparePosition(a, b Position) int {
-	if a.Line != b.Line {
-		if a.Line < b.Line {
-			return -1
-		} else {
-			return +1
-		}
-	}
-	if a.Character != b.Character {
-		if a.Character < b.Character {
-			return -1
-		} else {
-			return +1
-		}
-	}
-	return 0
-}
-
 func Intersect(a, b Range) bool {
 	if a.Start.Line > b.End.Line || a.End.Line < b.Start.Line {
 		return false

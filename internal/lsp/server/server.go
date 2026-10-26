@@ -194,13 +194,11 @@ func (s *server) Exit(ctx context.Context) error {
 
 // WorkDoneProgressCancel is a message from the editor/client
 // requesting the cancellation of a long-running process.
+// None of our progress reports are cancellable, so this always fails;
+// as it is a notification, we show the error rather than return it.
 func (s *server) WorkDoneProgressCancel(ctx context.Context, params *protocol.WorkDoneProgressCancelParams) error {
-	err := s.progress.Cancel(params.Token)
-	// WorkDoneProgressCancel is a notification, so if there's an
-	// error, we show it rather than return it.
-	if err != nil {
-		s.client.ShowMessage(ctx, &protocol.ShowMessageParams{Type: protocol.Error, Message: err.Error()})
-	}
+	msg := fmt.Sprintf("work %q is not cancellable", params.Token)
+	s.client.ShowMessage(ctx, &protocol.ShowMessageParams{Type: protocol.Error, Message: msg})
 	return nil
 }
 

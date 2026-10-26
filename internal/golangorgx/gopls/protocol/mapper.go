@@ -29,10 +29,9 @@ package protocol
 //          All fields are optional.
 //
 //    These types are useful as intermediate conversions of validated
-//    ranges (though MappedRange is superior as it is self contained
-//    and universally convertible).  Since their fields are optional
-//    they are also useful for parsing user-provided positions (e.g. in
-//    the CLI) before we have access to file contents.
+//    ranges.  Since their fields are optional they are also useful for
+//    parsing user-provided positions (e.g. in the CLI) before we have
+//    access to file contents.
 //
 // 4. protocol, the LSP RPC message format.
 //
@@ -46,16 +45,11 @@ package protocol
 //    protocol.Mapper holds the (URI, Content) of a file, enabling
 //    efficient mapping between byte offsets, cmd ranges, and
 //    protocol ranges.
-//
-//    protocol.MappedRange holds a protocol.Mapper and valid (start,
-//    end int) byte offsets, enabling infallible, efficient conversion
-//    to any other format.
 
 import (
 	"bytes"
 	"fmt"
 	"sort"
-	"strings"
 	"sync"
 	"unicode/utf8"
 )
@@ -167,7 +161,6 @@ func (m *Mapper) OffsetPosition(offset int) (Position, error) {
 	}
 	// No error may be returned after this point,
 	// even if the offset does not fall at a rune boundary.
-	// (See panic in MappedRange.Range reachable.)
 
 	line, col16 := m.lineCol16(offset)
 	return Position{Line: uint32(line), Character: uint32(col16)}, nil
@@ -221,15 +214,6 @@ func (m *Mapper) line(offset int) (int, int, bool) {
 	line-- // 0-based
 
 	return line, m.lineStart[line], cr
-}
-
-// OffsetMappedRange returns a MappedRange for the given byte offsets.
-// A MappedRange can be converted to any other form.
-func (m *Mapper) OffsetMappedRange(start, end int) (MappedRange, error) {
-	if !(0 <= start && start <= end && end <= len(m.Content)) {
-		return MappedRange{}, fmt.Errorf("invalid offsets (%d, %d) (file %s has size %d)", start, end, m.URI, len(m.Content))
-	}
-	return MappedRange{m, start, end}, nil
 }
 
 // -- conversions from protocol (UTF-16) domain --
@@ -294,62 +278,6 @@ func (m *Mapper) PositionOffset(p Position) (int, error) {
 // RangeLocation pairs a protocol Range with its URI, in a Location.
 func (m *Mapper) RangeLocation(rng Range) Location {
 	return Location{URI: m.URI, Range: rng}
-}
-
-// -- MappedRange --
-
-// A MappedRange represents a valid byte-offset range of a file.
-// Through its Mapper it can be converted into other forms such
-// as protocol.Range or UTF-8.
-//
-// Construct one by calling Mapper.OffsetMappedRange with start/end offsets.
-//
-// Two MappedRanges produced the same Mapper are equal if and only if they
-// denote the same range.  Two MappedRanges produced by different Mappers
-// are unequal even when they represent the same range of the same file.
-type MappedRange struct {
-	Mapper     *Mapper
-	start, end int // valid byte offsets:  0 <= start <= end <= len(Mapper.Content)
-}
-
-// Offsets returns the (start, end) byte offsets of this range.
-func (mr MappedRange) Offsets() (start, end int) { return mr.start, mr.end }
-
-// -- convenience functions --
-
-// URI returns the URI of the range's file.
-func (mr MappedRange) URI() DocumentURI {
-	return mr.Mapper.URI
-}
-
-// Range returns the range in protocol (UTF-16) form.
-func (mr MappedRange) Range() Range {
-	rng, err := mr.Mapper.OffsetRange(mr.start, mr.end)
-	if err != nil {
-		panic(err) // can't happen
-	}
-	return rng
-}
-
-// Location returns the range in protocol location (UTF-16) form.
-func (mr MappedRange) Location() Location {
-	return mr.Mapper.RangeLocation(mr.Range())
-}
-
-// String formats the range in UTF-8 notation.
-func (mr MappedRange) String() string {
-	var s strings.Builder
-	startLine, startCol8 := mr.Mapper.OffsetLineCol8(mr.start)
-	fmt.Fprintf(&s, "%d:%d", startLine, startCol8)
-	if mr.end != mr.start {
-		endLine, endCol8 := mr.Mapper.OffsetLineCol8(mr.end)
-		if endLine == startLine {
-			fmt.Fprintf(&s, "-%d", endCol8)
-		} else {
-			fmt.Fprintf(&s, "-%d:%d", endLine, endCol8)
-		}
-	}
-	return s.String()
 }
 
 // LocationTextDocumentPositionParams converts its argument to its result.

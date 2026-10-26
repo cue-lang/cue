@@ -7,7 +7,7 @@
 //	// Print sends text to the stdout of the current process.
 //	Print: {
 //		$id: _id
-//		_id: *"tool/cli.Print" | "print" // for backwards compatibility
+//		_id: "tool/cli.Print"
 //
 //		// text is the text to be printed.
 //		text: string
@@ -49,7 +49,7 @@ var p = &pkg.Package{
 	CUE: `
 Print: {
 	$id:  _id
-	_id:  *"tool/cli.Print" | "print"
+	_id:  "tool/cli.Print"
 	text: string
 }
 Ask: {

@@ -17,7 +17,7 @@ package cli
 // Print sends text to the stdout of the current process.
 Print: {
 	$id: _id
-	_id: *"tool/cli.Print" | "print" // for backwards compatibility
+	_id: "tool/cli.Print"
 
 	// text is the text to be printed.
 	text: string

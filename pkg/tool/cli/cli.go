@@ -26,9 +26,6 @@ import (
 func init() {
 	task.Register("tool/cli.Print", newPrintCmd)
 	task.Register("tool/cli.Ask", newAskCmd)
-
-	// For backwards compatibility.
-	task.Register("print", newPrintCmd)
 }
 
 type printCmd struct{}

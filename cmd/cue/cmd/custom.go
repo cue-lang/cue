@@ -267,14 +267,14 @@ func commandErrors(v cue.Value) errors.Error {
 // 	return nil
 // }
 
-func isTask(v cue.Value) bool {
+func taskKey(v cue.Value) (string, error) {
 	// This mimics the v0.2 behavior. The cutoff is really quite arbitrary. A
 	// sane implementation should not use InferTasks, really.
 	if len(v.Path().Selectors()) == 0 {
-		return false
+		return "", nil
 	}
 	if v.Kind() != cue.StructKind {
-		return false
+		return "", nil
 	}
 
 	// $id must exist and be a reference to the hidden _id field from a tool package.
@@ -282,7 +282,7 @@ func isTask(v cue.Value) bool {
 	// Or perhaps add a method on cue.Value to get the package info directly, like the import path.
 	id := v.LookupPath(cue.MakePath(cue.Str("$id")))
 	if !id.Exists() {
-		return false
+		return "", nil
 	}
 	fromToolsPackage := false
 	id.Walk(func(v cue.Value) bool {
@@ -291,35 +291,8 @@ func isTask(v cue.Value) bool {
 		}
 		return true
 	}, nil)
-	return fromToolsPackage
-}
-
-var legacyKinds = map[string]string{
-	"exec":  "tool/exec.Run",
-	"http":  "tool/http.Do",
-	"print": "tool/cli.Print",
-}
-
-func taskKey(v cue.Value) (string, error) {
-	if !isTask(v) {
+	if !fromToolsPackage {
 		return "", nil
 	}
-
-	kind, err := v.Lookup("$id").String()
-	if err != nil {
-		// Lookup kind for backwards compatibility.
-		// This should not be supported for cue run.
-		var err1 error
-		kind, err1 = v.Lookup("kind").String()
-		if err1 != nil || legacyKinds[kind] == "" {
-			return "", errors.Promote(err1, "newTask")
-		}
-	}
-
-	if k, ok := legacyKinds[kind]; ok {
-		kind = k
-		err = itask.ErrLegacy
-	}
-
-	return kind, err
+	return id.String()
 }

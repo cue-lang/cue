@@ -94,22 +94,11 @@ func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interfa
 	c.Err = errors.Append(c.Err, errors.Wrap(err, wrap))
 }
 
-// ErrLegacy is a sentinel error value that may be returned by a TaskKey
-// function to indicate that the task is a legacy task. This will cause the
-// configuration value to be passed to the RunnerFunc instead of an empty
-// value.
-var ErrLegacy error = errors.New("legacy task error")
-
-// NewTaskFunc creates a flow.TaskFunc that uses global settings from Context
+// TaskFunc creates a flow.TaskFunc that uses global settings from Context
 // and a taskKey function to determine the kind of task to run.
 func (c Context) TaskFunc(didWork *atomic.Bool) flow.TaskFunc {
 	return func(v cue.Value) (flow.Runner, error) {
 		kind, err := c.TaskKey(v)
-		var isLegacy bool
-		if err == ErrLegacy {
-			err = nil
-			isLegacy = true
-		}
 		if err != nil || kind == "" {
 			return nil, err
 		}
@@ -133,18 +122,13 @@ func (c Context) TaskFunc(didWork *atomic.Bool) flow.TaskFunc {
 			return nil, errors.Promote(err, "errors running task")
 		}
 
-		if !isLegacy {
-			v = cue.Value{}
-		}
-
-		return c.flowFunc(runner, v), nil
+		return c.flowFunc(runner), nil
 	}
 }
 
-// flowFunc takes a Runner and a schema v, which should only be defined for
-// legacy task ids.
-func (c Context) flowFunc(runner Runner, v cue.Value) flow.Runner {
-	wrapper := &flowRunner{c: c, runner: runner, v: v}
+// flowFunc wraps a Runner to implement flow.Runner.
+func (c Context) flowFunc(runner Runner) flow.Runner {
+	wrapper := &flowRunner{c: c, runner: runner}
 	// If the runner declares it is a service, return a
 	// wrapper that implements both Runner and Service.
 	if ce, ok := runner.(flow.Service); ok && ce.IsService() {
@@ -157,7 +141,6 @@ func (c Context) flowFunc(runner Runner, v cue.Value) flow.Runner {
 type flowRunner struct {
 	c      Context
 	runner Runner
-	v      cue.Value
 }
 
 func (r *flowRunner) Run(t *flow.Task, err error) error {
@@ -167,9 +150,6 @@ func (r *flowRunner) Run(t *flow.Task, err error) error {
 	c := r.c
 	c.Context = t.Context()
 	c.Obj = t.Value()
-	if r.v.Exists() {
-		c.Obj = c.Obj.Unify(r.v)
-	}
 	value, runErr := r.runner.Run(&c)
 	if runErr != nil {
 		return runErr
@@ -210,7 +190,7 @@ func (c Context) ForkRunLoop(ctx context.Context, path cue.Path, v cue.Value, r 
 	taskFunc := func(v cue.Value) (flow.Runner, error) {
 		// The node itself has a function to continue.
 		if v.Path().String() == path.String() {
-			return c.flowFunc(r, cue.Value{}), nil
+			return c.flowFunc(r), nil
 		}
 		var didWork atomic.Bool
 		// if !didWork.Load() {

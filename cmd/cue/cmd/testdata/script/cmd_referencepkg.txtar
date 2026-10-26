@@ -1,8 +1,6 @@
-# `cue cmd` used to support referring to tasks from tool/... packages via the
-# kind or $id string fields. This can result in surprising behavior
-# when unmarshalling data as a regular field alongside other tasks,
-# as the data can then declare further tasks to be run.
-# That is now only possible by setting CUE_EXPERIMENT=cmdreferencepkg=0.
+# `cue cmd` only runs tasks whose $id field comes from a tool/... package.
+# Data with kind, $id, or _id fields must not declare further tasks to run,
+# for example when unmarshalled as a regular field alongside other tasks.
 
 # Decoding input data containing a `kind` field outside other task values.
 exec cue cmd inputKindOutside
@@ -105,6 +103,6 @@ command: useCliPrintCopy: cliPrintCopy & {
 }
 cliPrintCopy: {
 	$id: _id
-	_id: *"tool/cli.Print" | "print"
+	_id: "tool/cli.Print"
 	text: string
 }

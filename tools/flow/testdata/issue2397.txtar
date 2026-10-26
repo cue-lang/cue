@@ -35,14 +35,14 @@ graph TD
 }
 -- out/run-v3/t1/stats --
 Leaks:  0
-Freed:  12
+Freed:  10
 Reused: 2
-Allocs: 10
+Allocs: 8
 Retain: 0
 
 Unifications: 10
-Conjuncts:    25
-Disjuncts:    2
+Conjuncts:    23
+Disjuncts:    0
 ResolveDep:   5
 
 NumCloseIDs: 2
@@ -56,16 +56,16 @@ diff old new
 -Reused: 7
 -Allocs: 7
 -Retain: 1
-+Freed:  12
++Freed:  10
 +Reused: 2
-+Allocs: 10
++Allocs: 8
 +Retain: 0
  
  Unifications: 10
 -Conjuncts:    29
 -Disjuncts:    15
-+Conjuncts:    25
-+Disjuncts:    2
++Conjuncts:    23
++Disjuncts:    0
 +ResolveDep:   5
 +
 +NumCloseIDs: 2
@@ -81,14 +81,14 @@ Conjuncts:    29
 Disjuncts:    15
 -- out/run-v3/stats/totals --
 Leaks:  0
-Freed:  12
+Freed:  10
 Reused: 2
-Allocs: 10
+Allocs: 8
 Retain: 0
 
 Unifications: 10
-Conjuncts:    25
-Disjuncts:    2
+Conjuncts:    23
+Disjuncts:    0
 ResolveDep:   5
 
 NumCloseIDs: 2
@@ -102,16 +102,16 @@ diff old new
 -Reused: 7
 -Allocs: 7
 -Retain: 1
-+Freed:  12
++Freed:  10
 +Reused: 2
-+Allocs: 10
++Allocs: 8
 +Retain: 0
  
  Unifications: 10
 -Conjuncts:    29
 -Disjuncts:    15
-+Conjuncts:    25
-+Disjuncts:    2
++Conjuncts:    23
++Disjuncts:    0
 +ResolveDep:   5
 +
 +NumCloseIDs: 2

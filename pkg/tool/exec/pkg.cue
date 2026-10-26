@@ -25,7 +25,7 @@ package exec
 // Run executes a program with the given arguments.
 Run: {
 	$id: _id
-	_id: *"tool/exec.Run" | "exec" // exec for backwards compatibility
+	_id: "tool/exec.Run"
 
 	// cmd is a non-empty list holding the program name to run
 	// and the arguments to be passed to it.

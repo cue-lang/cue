@@ -11,7 +11,7 @@
 //
 //	Do: {
 //		$id: _id
-//		_id: *"tool/http.Do" | "http" // http for backwards compatibility
+//		_id: "tool/http.Do"
 //
 //		method: string
 //		url:    string // TODO: make url.URL type
@@ -235,7 +235,7 @@ Put:    Do & {method: "PUT"}
 Delete: Do & {method: "DELETE"}
 Do: {
 	$id:             _id
-	_id:             *"tool/http.Do" | "http"
+	_id:             "tool/http.Do"
 	method:          string
 	url:             string
 	followRedirects: *true | bool

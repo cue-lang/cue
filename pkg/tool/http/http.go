@@ -31,9 +31,6 @@ import (
 func init() {
 	task.Register("tool/http.Do", newHTTPCmd)
 	task.Register("tool/http.Serve", newServeCmd)
-
-	// For backwards compatibility.
-	task.Register("http", newHTTPCmd)
 }
 
 type httpCmd struct{}

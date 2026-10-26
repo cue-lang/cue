@@ -27,9 +27,6 @@ import (
 
 func init() {
 	task.Register("tool/exec.Run", newExecCmd)
-
-	// For backwards compatibility.
-	task.Register("exec", newExecCmd)
 }
 
 type execCmd struct{}

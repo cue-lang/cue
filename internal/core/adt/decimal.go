@@ -19,14 +19,6 @@ import (
 	"github.com/cockroachdb/apd/v3"
 )
 
-func (n *Num) Impl() *apd.Decimal {
-	return &n.X
-}
-
-func (n *Num) Negative() bool {
-	return n.X.Negative
-}
-
 func (a *Num) Cmp(b *Num) int {
 	return a.X.Cmp(&b.X)
 }

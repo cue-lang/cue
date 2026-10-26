@@ -297,7 +297,7 @@ type Vertex struct {
 	// the final value of this Vertex.
 	//
 	// TODO: all access to Conjuncts should go through functions like
-	// [Vertex.LeafConjuncts] and [Vertex.AllConjuncts].
+	// [Vertex.LeafConjuncts].
 	// We should probably make this an unexported field.
 	Conjuncts ConjunctGroup
 
@@ -540,13 +540,6 @@ func (a ArcType) Suffix() string {
 	return ""
 }
 
-func (v *Vertex) Clone() *Vertex {
-	c := *v
-	c.state = nil
-	c.arcMap = nil // an arc index is never shared between vertices
-	return &c
-}
-
 type StructInfo struct {
 	*StructLit
 
@@ -677,8 +670,6 @@ func (v *Vertex) LeafConjuncts() iter.Seq[Conjunct] {
 }
 
 func iterConjuncts(a []Conjunct, yield func(Conjunct) bool) bool {
-	// TODO: note that this is iterAllConjuncts but without yielding ConjunctGroups.
-	// Can we reuse the code in a simple enough way?
 	for _, c := range a {
 		switch x := c.x.(type) {
 		case *ConjunctGroup:
@@ -699,34 +690,6 @@ func ConjunctsSeq(a []Conjunct) iter.Seq[Conjunct] {
 	return func(yield func(Conjunct) bool) {
 		_ = iterConjuncts(a, yield)
 	}
-}
-
-// AllConjuncts iterates through all conjuncts of v, including [ConjunctGroup]s.
-// Note that ConjunctGroups do not have an Environment associated with them.
-// The boolean reports whether the conjunct is a leaf.
-func (v *Vertex) AllConjuncts() iter.Seq2[Conjunct, bool] {
-	return func(yield func(Conjunct, bool) bool) {
-		_ = iterAllConjuncts(v.Conjuncts, yield)
-	}
-}
-
-func iterAllConjuncts(a []Conjunct, yield func(c Conjunct, isLeaf bool) bool) bool {
-	for _, c := range a {
-		switch x := c.x.(type) {
-		case *ConjunctGroup:
-			if !yield(c, false) {
-				return false
-			}
-			if !iterAllConjuncts(*x, yield) {
-				return false
-			}
-		default:
-			if !yield(c, true) {
-				return false
-			}
-		}
-	}
-	return true
 }
 
 // HasConjuncts reports whether v has any conjuncts.

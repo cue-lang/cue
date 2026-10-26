@@ -448,19 +448,6 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		return ident
 
 	case *adt.DynamicReference:
-		// TODO(unshadow): ensure we correctly unshadow newly visible fields.
-		//   before uncommenting this.
-		// if v := x.EvaluateLabel(e.ctx, env); v != 0 {
-		// 	str := v.StringValue(e.ctx)
-		// 	if ast.IsValidIdent(str) {
-		// 		label := e.ctx.StringLabel(str)
-		// 		ident, ok := e.newIdentForField(x.Src, label, x.UpCount)
-		// 		if ok {
-		// 			return ident
-		// 		}
-		// 	}
-		// }
-
 		name := "X"
 		if x.Src != nil {
 			name = x.Src.Name

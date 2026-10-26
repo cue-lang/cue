@@ -324,10 +324,6 @@ type OpContext struct {
 	// ==== Debugging ====
 	logID int // sequence number for log messages
 
-	// errorGraphs contains an analysis, represented as a Mermaid graph, for
-	// each node that has an error.
-	errorGraphs map[string]string
-
 	currentDisjunctionID int // sequence number for call to processDisjunctions
 
 	disjunctStack []disjunctInfo // stack of disjunct IDs
@@ -344,14 +340,7 @@ type OpContext struct {
 	importInstances map[*Vertex]*Vertex
 }
 
-// ErrorGraphs returns an analysis, represented as a Mermaid graph, for
-// each node that has an error.
-func (c *OpContext) ErrorGraphs() map[string]string {
-	return c.errorGraphs
-}
-
-func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }
-func (c *OpContext) UpdateCloseInfo(ci CloseInfo) { c.ci = ci }
+func (c *OpContext) CloseInfo() CloseInfo { return c.ci }
 
 func (c *OpContext) Pos() token.Pos {
 	if c.src == nil {
@@ -1271,24 +1260,6 @@ func (c *OpContext) Num(v Value, as interface{}) *Num {
 		return zero
 	}
 	return x
-}
-
-func (c *OpContext) Int64(v Value) int64 {
-	v = Unwrap(v)
-	if isError(v) {
-		return 0
-	}
-	x, ok := v.(*Num)
-	if !ok {
-		c.typeError(v, IntKind)
-		return 0
-	}
-	i, err := x.X.Int64()
-	if err != nil {
-		c.AddErrf("number is not an int64: %v", err)
-		return 0
-	}
-	return i
 }
 
 func (c *OpContext) uint64(v Value, as string) uint64 {

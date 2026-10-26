@@ -16,7 +16,6 @@ package adt_test
 
 import (
 	"fmt"
-	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -168,12 +167,6 @@ language: version: "v0.15.0"
 	v.Finalize(ctx)
 
 	out := debug.NodeString(r, v, nil)
-	if adt.OpenGraphs {
-		for p, g := range ctx.ErrorGraphs() {
-			path := filepath.Join(adt.GraphDir, p)
-			adt.OpenNodeGraph("TestX", path, in, out, g)
-		}
-	}
 
 	for _, b := range adt.ValidateAll(ctx, v, nil) {
 		t.Log(errors.Details(b.Err, nil))

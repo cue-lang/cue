@@ -338,9 +338,6 @@ func (f FeatureType) IsLet() bool {
 	return f == LetLabel
 }
 
-// IsValid reports whether f is a valid label.
-func (f Feature) IsValid() bool { return f != InvalidLabel }
-
 // Typ reports the type of label.
 func (f Feature) Typ() FeatureType { return FeatureType(f & fTypeMask) }
 

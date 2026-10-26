@@ -117,11 +117,6 @@ func (k Kind) IsAnyOf(of Kind) bool {
 	return k&of != BottomKind
 }
 
-// CanString reports whether the given type can convert to a string.
-func (k Kind) CanString() bool {
-	return k&StringKind|ScalarKinds != BottomKind
-}
-
 // String returns the representation of the Kind as
 // a CUE expression. For example:
 //

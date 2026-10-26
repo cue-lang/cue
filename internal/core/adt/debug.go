@@ -27,19 +27,6 @@ import (
 	"strings"
 )
 
-// RecordDebugGraph records debug output in ctx if there was an anomaly
-// discovered.
-func RecordDebugGraph(ctx *OpContext, v *Vertex, name string) {
-	graph, hasError := CreateMermaidGraph(ctx, v, true)
-	if hasError {
-		if ctx.errorGraphs == nil {
-			ctx.errorGraphs = map[string]string{}
-		}
-		path := ctx.PathToString(v.Path())
-		ctx.errorGraphs[path] = graph
-	}
-}
-
 var (
 	OpenGraphs = false
 
@@ -129,7 +116,7 @@ func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
 	if !OpenGraphs {
 		return
 	}
-	graph, _ := CreateMermaidGraph(ctx, v, true)
+	graph := CreateMermaidGraph(ctx, v)
 	path := filepath.Join(GraphDir, name, fmt.Sprintf("%v", v.Path()))
 	OpenNodeGraph(name, path, "in", "out", graph)
 }
@@ -138,10 +125,6 @@ func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
 type mermaidContext struct {
 	ctx *OpContext
 	v   *Vertex
-
-	all bool
-
-	hasError bool
 
 	// roots maps a Vertex to the analysis data for that Vertex.
 	roots map[*Vertex]*mermaidVertex
@@ -164,7 +147,7 @@ type mermaidVertex struct {
 
 // CreateMermaidGraph creates an analysis of relations and values involved in
 // nodes with unbalanced increments. The graph is in Mermaid format.
-func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasError bool) {
+func CreateMermaidGraph(ctx *OpContext, v *Vertex) string {
 	buf := &strings.Builder{}
 
 	m := &mermaidContext{
@@ -172,7 +155,6 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 		v:     v,
 		roots: map[*Vertex]*mermaidVertex{},
 		w:     buf,
-		all:   all,
 	}
 
 	io.WriteString(m.w, "graph TD\n")
@@ -206,9 +188,7 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 		m.w.Write(v.w.Bytes())
 	}
 
-	s := buf.String()
-
-	return s, m.hasError
+	return buf.String()
 }
 
 // vertex creates a blob of Mermaid graph representing one vertex. It has

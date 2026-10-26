@@ -253,6 +253,122 @@ sharedDisjunct: {
 	o: Z
 	p: o & {y: 3} @test(err, code=eval, contains="empty disjunction")
 }
+
+// A definition re-closes a reference to itself opened with `...` in either
+// order, also when reached through another field or through the only
+// disjunct left of a disjunction.
+recloseSame: {
+	#A: {x: 1}
+	#B: {x: 2}
+	D: #A | #B
+	X: #B
+
+	same: {
+		c: #B... @test(permute)
+		c: #B    @test(permute, count=2)
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed") @test(todo, why="stays open when the definition comes second")
+	}
+	field: {
+		c: #B...
+		c: X
+		m: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+	}
+	conjunction: {
+		c: (#B & #B)...
+		c: #B
+		m: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+	}
+	disjunct: {
+		c: #B...
+		c: D
+		m: c & {y: 3} @test(err, code=eval, contains="empty disjunction")
+	}
+	readDisjunct: {
+		v: #B...
+		v: D
+		c: #B...
+		c: v
+		m: c & {y: 3} @test(err, code=eval, contains="empty disjunction")
+	}
+
+	// A reference stays open when it reaches the opened vertex through
+	// fields that share it before it is evaluated.
+	forward: {
+		Z: w
+		w: #B...
+		c: #B...
+		c: Z
+		m: c & {y: 3} @test(eq, {x: 2, y: 3})
+	}
+	forwardSelf: {
+		Z: c
+		c: #B...
+		c: Z
+		m: c & {y: 3} @test(eq, {x: 2, y: 3})
+	}
+	forwardRead: {
+		n: c
+		c: #B...
+		m: n & {y: 3} @test(err, code=eval, contains="field not allowed", incorrect) @test(eq:todo, {x: 2, y: 3})
+	}
+	// A reference stays open when the only disjunct left of the field it
+	// reads shares the opened vertex.
+	readOpenedDisjunct: {
+		v: #B...
+		v: D...
+		c: #B...
+		c: v
+		m: c & {y: 3} @test(eq, {x: 2, y: 3})
+	}
+
+	// Only the definition the opened vertex is unified with closes it again,
+	// not the other definitions that vertex is closed by.
+	otherDefs: {
+		#P: {x?: int}
+		#Q: {x?: int, [=~"^z"]: int}
+		w: #P & #Q
+		c: w...
+		c: #Q
+		m: c & {z: 1} @test(eq, {x?: int, z: 1})
+		n: c & {q: 1} @test(err, code=eval, contains="field not allowed")
+	}
+
+	// A reference to a definition closes it, even when the definition shares
+	// a vertex through an opened reference, in either order.
+	def: {
+		#C: #B...
+		c: #C
+		m: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+
+		w: #B...
+		#D: w
+		d: #D
+		n: d & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+
+		e: #E
+		#E: #B...
+		o: e & {y: 3} @test(err, code=eval, contains="field not allowed")
+	}
+
+	// A reference naming a definition closes the opened field it reaches,
+	// also for a field reaching it through such a reference, while a
+	// reference through a regular field holding the definition does not.
+	crossing: {
+		#D: s: #B...
+		m: #D.s & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		c: #D.s
+		n: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		t: c
+		o: t & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		u: v
+		v: #D.s
+		p: u & {y: 3} @test(err, code=eval, contains="field not allowed")
+		d: #D
+		q: d.s & {y: 3} @test(eq, {x: 2, y: 3})
+		w: d.s
+		r: w & {y: 3} @test(eq, {x: 2, y: 3})
+	}
+}
 // A definition re-closes a conjunction it is an operand of, opened with
 // `...`, in either order, also when the conjuncts sit on a single field or
 // the definition is embedded in a struct.
@@ -297,14 +413,43 @@ sharedDisjunct.p.x: conflicting values 1 and 2:
     ./issues.cue:56:5
 sharedDisjunct.p.y: field not allowed:
     ./issues.cue:56:10
+[eval] recloseSame.disjunct.m: 2 errors in empty disjunction:
+recloseSame.disjunct.m.x: conflicting values 1 and 2:
+    ./issues.cue:63:10
+    ./issues.cue:64:10
+    ./issues.cue:65:5
+    ./issues.cue:84:6
+    ./issues.cue:85:6
+    ./issues.cue:86:6
+recloseSame.disjunct.m.y: field not allowed:
+    ./issues.cue:86:11
+[eval] recloseSame.readDisjunct.m: 2 errors in empty disjunction:
+recloseSame.readDisjunct.m.x: conflicting values 1 and 2:
+    ./issues.cue:63:10
+    ./issues.cue:64:10
+    ./issues.cue:65:5
+    ./issues.cue:90:6
+    ./issues.cue:91:6
+    ./issues.cue:92:6
+    ./issues.cue:93:6
+recloseSame.readDisjunct.m.y: field not allowed:
+    ./issues.cue:93:11
+[eval] recloseSame.forwardRead.m.y: field not allowed:
+    ./issues.cue:114:11
+[eval] recloseSame.otherDefs.n.q: field not allowed:
+    ./issues.cue:135:11
+[eval] recloseSame.def.o.y: field not allowed:
+    ./issues.cue:152:11
+[eval] recloseSame.crossing.p.y: field not allowed:
+    ./issues.cue:167:11
 [eval] recloseConjunction.field.m.y: field not allowed:
-    ./issues.cue:67:11
+    ./issues.cue:183:11
 [eval] recloseConjunction.inline.y: field not allowed:
-    ./issues.cue:69:34
+    ./issues.cue:185:34
 [eval] recloseConjunction.inlineRev.y: field not allowed:
-    ./issues.cue:70:34
+    ./issues.cue:186:34
 [eval] recloseConjunction.embedded.m.y: field not allowed:
-    ./issues.cue:74:11
+    ./issues.cue:190:11
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:
@@ -376,19 +521,19 @@ f9: combinenew.f9.ok is in error because two f9 declarations conflict.
 f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
-Leaks:  8
-Freed:  503
-Reused: 419
-Allocs: 92
+Leaks:  16
+Freed:  649
+Reused: 564
+Allocs: 101
 Retain: 0
 
-Unifications: 481
-Conjuncts:    1325
-Disjuncts:    14
+Unifications: 605
+Conjuncts:    1615
+Disjuncts:    32
 
-NumCloseIDs: 546
+NumCloseIDs: 614
 
-ConjunctInfos:       860
+ConjunctInfos:       1063
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         3

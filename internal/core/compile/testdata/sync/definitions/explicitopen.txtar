@@ -251,6 +251,122 @@ sharedDisjunct: {
 	o: Z
 	p: o & {y: 3}
 }
+
+// A definition re-closes a reference to itself opened with `...` in either
+// order, also when reached through another field or through the only
+// disjunct left of a disjunction.
+recloseSame: {
+	#A: {x: 1}
+	#B: {x: 2}
+	D: #A | #B
+	X: #B
+
+	same: {
+		c: #B...
+		c: #B
+		m: c & {y: 3}
+	}
+	field: {
+		c: #B...
+		c: X
+		m: c & {y: 3}
+	}
+	conjunction: {
+		c: (#B & #B)...
+		c: #B
+		m: c & {y: 3}
+	}
+	disjunct: {
+		c: #B...
+		c: D
+		m: c & {y: 3}
+	}
+	readDisjunct: {
+		v: #B...
+		v: D
+		c: #B...
+		c: v
+		m: c & {y: 3}
+	}
+
+	// A reference stays open when it reaches the opened vertex through
+	// fields that share it before it is evaluated.
+	forward: {
+		Z: w
+		w: #B...
+		c: #B...
+		c: Z
+		m: c & {y: 3}
+	}
+	forwardSelf: {
+		Z: c
+		c: #B...
+		c: Z
+		m: c & {y: 3}
+	}
+	forwardRead: {
+		n: c
+		c: #B...
+		m: n & {y: 3}
+	}
+	// A reference stays open when the only disjunct left of the field it
+	// reads shares the opened vertex.
+	readOpenedDisjunct: {
+		v: #B...
+		v: D...
+		c: #B...
+		c: v
+		m: c & {y: 3}
+	}
+
+	// Only the definition the opened vertex is unified with closes it again,
+	// not the other definitions that vertex is closed by.
+	otherDefs: {
+		#P: {x?: int}
+		#Q: {x?: int, [=~"^z"]: int}
+		w: #P & #Q
+		c: w...
+		c: #Q
+		m: c & {z: 1}
+		n: c & {q: 1}
+	}
+
+	// A reference to a definition closes it, even when the definition shares
+	// a vertex through an opened reference, in either order.
+	def: {
+		#C: #B...
+		c: #C
+		m: c & {y: 3}
+
+		w: #B...
+		#D: w
+		d: #D
+		n: d & {y: 3}
+
+		e: #E
+		#E: #B...
+		o: e & {y: 3}
+	}
+
+	// A reference naming a definition closes the opened field it reaches,
+	// also for a field reaching it through such a reference, while a
+	// reference through a regular field holding the definition does not.
+	crossing: {
+		#D: s: #B...
+		m: #D.s & {y: 3}
+		c: #D.s
+		n: c & {y: 3}
+		t: c
+		o: t & {y: 3}
+		u: v
+		v: #D.s
+		p: u & {y: 3}
+		d: #D
+		q: d.s & {y: 3}
+		w: d.s
+		r: w & {y: 3}
+	}
+}
 // A definition re-closes a conjunction it is an operand of, opened with
 // `...`, in either order, also when the conjuncts sit on a single field or
 // the definition is embedded in a struct.
@@ -327,6 +443,151 @@ recloseConjunction: {
     p: (〈0;o〉 & {
       y: 3
     })
+  }
+  recloseSame: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      x: 2
+    }
+    D: (〈0;#A〉|〈0;#B〉)
+    X: 〈0;#B〉
+    same: {
+      c: 〈1;#B〉...
+      c: 〈1;#B〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    field: {
+      c: 〈1;#B〉...
+      c: 〈1;X〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    conjunction: {
+      c: (〈1;#B〉 & 〈1;#B〉)...
+      c: 〈1;#B〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    disjunct: {
+      c: 〈1;#B〉...
+      c: 〈1;D〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    readDisjunct: {
+      v: 〈1;#B〉...
+      v: 〈1;D〉
+      c: 〈1;#B〉...
+      c: 〈0;v〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    forward: {
+      Z: 〈0;w〉
+      w: 〈1;#B〉...
+      c: 〈1;#B〉...
+      c: 〈0;Z〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    forwardSelf: {
+      Z: 〈0;c〉
+      c: 〈1;#B〉...
+      c: 〈0;Z〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    forwardRead: {
+      n: 〈0;c〉
+      c: 〈1;#B〉...
+      m: (〈0;n〉 & {
+        y: 3
+      })
+    }
+    readOpenedDisjunct: {
+      v: 〈1;#B〉...
+      v: 〈1;D〉...
+      c: 〈1;#B〉...
+      c: 〈0;v〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    otherDefs: {
+      #P: {
+        x?: int
+      }
+      #Q: {
+        x?: int
+        [=~"^z"]: int
+      }
+      w: (〈0;#P〉 & 〈0;#Q〉)
+      c: 〈0;w〉...
+      c: 〈0;#Q〉
+      m: (〈0;c〉 & {
+        z: 1
+      })
+      n: (〈0;c〉 & {
+        q: 1
+      })
+    }
+    def: {
+      #C: 〈1;#B〉...
+      c: 〈0;#C〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+      w: 〈1;#B〉...
+      #D: 〈0;w〉
+      d: 〈0;#D〉
+      n: (〈0;d〉 & {
+        y: 3
+      })
+      e: 〈0;#E〉
+      #E: 〈1;#B〉...
+      o: (〈0;e〉 & {
+        y: 3
+      })
+    }
+    crossing: {
+      #D: {
+        s: 〈2;#B〉...
+      }
+      m: (〈0;#D〉.s & {
+        y: 3
+      })
+      c: 〈0;#D〉.s
+      n: (〈0;c〉 & {
+        y: 3
+      })
+      t: 〈0;c〉
+      o: (〈0;t〉 & {
+        y: 3
+      })
+      u: 〈0;v〉
+      v: 〈0;#D〉.s
+      p: (〈0;u〉 & {
+        y: 3
+      })
+      d: 〈0;#D〉
+      q: (〈0;d〉.s & {
+        y: 3
+      })
+      w: 〈0;d〉.s
+      r: (〈0;w〉 & {
+        y: 3
+      })
+    }
   }
   recloseConjunction: {
     #B: {

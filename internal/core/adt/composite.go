@@ -306,10 +306,12 @@ type Vertex struct {
 	Structs []StructInfo
 }
 
+// deref is like [Vertex.derefSharedDisjunct], but returns the original
+// vertex that the result overlays while it is being evaluated, such as for
+// a disjunct.
 func deref(v *Vertex) *Vertex {
-	v = v.DerefValue()
-	n := v.state
-	if n != nil {
+	v = v.derefSharedDisjunct()
+	if n := v.state; n != nil {
 		v = n.underlying
 	}
 	if v == nil {

@@ -151,11 +151,10 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	if ctx.LogEval > 0 {
 		ctx.Logf(t.node.node, "RESOLVED %v to %v %v", r, arc.Label, fmt.Sprintf("%p", arc))
 	}
-	d := arc.DerefDisjunct()
 
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.
-	ci, skip := t.node.detectCycle(d, t.env, r, ci)
+	ci, skip := t.node.detectCycle(arc, t.env, r, ci)
 	if skip {
 		// Key by arc, the vertex addResolver stores for scheduled references.
 		t.node.linkCyclicResolver(arc, ci)
@@ -170,7 +169,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	}
 
 	// TODO: consider moving this to within if arc.nonRooted below.
-	if b, ok := d.BaseValue.(*Bottom); ok && b.Code == StructuralCycleError {
+	if b, ok := arc.DerefDisjunct().BaseValue.(*Bottom); ok && b.Code == StructuralCycleError {
 		// TODO: ensure better positioning information.
 		ctx.AddBottom(b)
 		return

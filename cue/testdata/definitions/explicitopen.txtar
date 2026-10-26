@@ -242,16 +242,16 @@ sharedDisjunct: {
 	D: #A | #B
 	c: #B...
 	c: D...
-	m: c & {y: 3} @test(eq, {x: 1, y: 3} | {y: 3}, incorrect) @test(eq:todo, {x: 2, y: 3})
+	m: c & {y: 3} @test(eq, {x: 2, y: 3})
 
 	// The definition closes a field reading such a reference again, also
 	// when read through another field.
 	Z: c
 	Z: #B
-	n: Z & {y: 3} @test(eq, {x: 1, y: 3} | {y: 3}, incorrect) @test(err:todo, code=eval)
+	n: Z & {y: 3} @test(err, code=eval, contains="empty disjunction")
 	o: c
 	o: Z
-	p: o & {y: 3} @test(eq, {x: 1, y: 3} | {y: 3}, incorrect) @test(err:todo, code=eval)
+	p: o & {y: 3} @test(err, code=eval, contains="empty disjunction")
 }
 // A definition re-closes a conjunction it is an operand of, opened with
 // `...`, in either order, also when the conjuncts sit on a single field or
@@ -275,6 +275,28 @@ recloseConjunction: {
 -- out/errors.txt --
 [eval] reclose.t1.err.b: field not allowed:
     ./issues.cue:36:16
+[eval] sharedDisjunct.n: 2 errors in empty disjunction:
+sharedDisjunct.n.x: conflicting values 1 and 2:
+    ./issues.cue:42:10
+    ./issues.cue:43:10
+    ./issues.cue:44:5
+    ./issues.cue:46:5
+    ./issues.cue:51:5
+    ./issues.cue:52:5
+    ./issues.cue:53:5
+sharedDisjunct.n.y: field not allowed:
+    ./issues.cue:53:10
+[eval] sharedDisjunct.p: 2 errors in empty disjunction:
+sharedDisjunct.p.x: conflicting values 1 and 2:
+    ./issues.cue:42:10
+    ./issues.cue:43:10
+    ./issues.cue:44:5
+    ./issues.cue:45:5
+    ./issues.cue:46:5
+    ./issues.cue:54:5
+    ./issues.cue:56:5
+sharedDisjunct.p.y: field not allowed:
+    ./issues.cue:56:10
 [eval] recloseConjunction.field.m.y: field not allowed:
     ./issues.cue:67:11
 [eval] recloseConjunction.inline.y: field not allowed:
@@ -354,19 +376,19 @@ f9: combinenew.f9.ok is in error because two f9 declarations conflict.
 f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
-Leaks:  1
-Freed:  494
-Reused: 410
-Allocs: 85
+Leaks:  8
+Freed:  503
+Reused: 419
+Allocs: 92
 Retain: 0
 
-Unifications: 479
-Conjuncts:    1289
-Disjuncts:    10
+Unifications: 481
+Conjuncts:    1325
+Disjuncts:    14
 
-NumCloseIDs: 531
+NumCloseIDs: 546
 
-ConjunctInfos:       843
+ConjunctInfos:       860
 MaxConjunctInfos:    5
 MaxReqSets:          9
-MaxRedirect:         2
+MaxRedirect:         3

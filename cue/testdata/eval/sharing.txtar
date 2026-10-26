@@ -246,7 +246,7 @@ sharedDisjunct: scalar: {
 		m?: string
 		m: c
 	}
-	e: #E @test(eq, {c: "b", m: "a" | string}, incorrect) @test(eq:todo, {c: "b", m: "b"})
+	e: #E @test(eq, {c: "b", m: "b"})
 	e: c: #B
 }
 sharedDisjunct: default: {
@@ -258,7 +258,7 @@ sharedDisjunct: default: {
 		m?: string
 		m: c
 	}
-	e: #E @test(eq, {c: "b", m: *"a" | string}, incorrect) @test(eq:todo, {c: "b", m: "b"})
+	e: #E @test(eq, {c: "b", m: "b"})
 	e: c: #B
 }
 sharedDisjunct: struct: {
@@ -271,7 +271,7 @@ sharedDisjunct: struct: {
 		m: c
 	}
 	b: #B
-	e: #E @test(eq, {c: {x: 2}, m: {x: 1} | {}}, incorrect) @test(eq:todo, {c: {x: 2}, m: {x: 2}})
+	e: #E @test(eq, {c: {x: 2}, m: {x: 2}})
 	e: c: b
 }
 -- issue3835.cue --
@@ -424,17 +424,17 @@ issue3903: noshare: {
     ./sharecycle.cue:11:11
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
-Leaks:  10
-Freed:  291
-Reused: 266
-Allocs: 35
+Leaks:  14
+Freed:  287
+Reused: 262
+Allocs: 39
 Retain: 0
 
 Unifications: 261
-Conjuncts:    523
+Conjuncts:    527
 Disjuncts:    30
 Notifications: 1
 
-NumCloseIDs: 120
+NumCloseIDs: 123
 -- out/todo.txt --
 v3 uses structure sharing (~) extensively in issue3641, issue3546, debug, issue3849, issue3903, and pending sections where v2 expanded values inline. v3 also omits shareCycle.t2.Y.x.x structural cycle error and instead reports conflicting values for shareCycle.t2.Y.x with additional position info.

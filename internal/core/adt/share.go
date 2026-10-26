@@ -271,6 +271,9 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 // DerefValue
 //   - get the value the node ultimately represents.
 //
+// derefSharedDisjunct
+//   - like DerefValue, but stop at a disjunct that shares a vertex.
+//
 
 // DerefValue unrolls indirections of Vertex values. These may be introduced,
 // for instance, by temporary bindings such as comprehension values.
@@ -282,6 +285,22 @@ func (v *Vertex) DerefValue() *Vertex {
 			return v
 		}
 		v = arc
+	}
+}
+
+// derefSharedDisjunct is like [Vertex.DerefValue], but stops at a disjunct
+// that structure shares a vertex, as the node holding the disjunct does not
+// share it.
+func (v *Vertex) derefSharedDisjunct() *Vertex {
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok {
+			return v
+		}
+		v = arc
+		if v.IsDisjunct && v.IsShared {
+			return v
+		}
 	}
 }
 

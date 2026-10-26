@@ -93,26 +93,6 @@ type envDisjunct struct {
 	disjuncts []disjunct
 }
 
-func (n *nodeContext) makeError() {
-	code := IncompleteError
-
-	if len(n.disjunctErrs) > 0 {
-		code = EvalError
-		for _, c := range n.disjunctErrs {
-			if c.Code > code {
-				code = c.Code
-			}
-		}
-	}
-
-	b := &Bottom{
-		Code: code,
-		Err:  n.disjunctError(),
-		Node: n.node,
-	}
-	n.node.SetValue(n.ctx, b)
-}
-
 func mode(hasDefault, marked bool) defaultMode {
 	var mode defaultMode
 	switch {

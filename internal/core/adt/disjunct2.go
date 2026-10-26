@@ -686,24 +686,8 @@ func (n *nodeContext) finalizeDisjunctions() {
 	// conjuncts would make close over a disjunction close the re-evaluated
 	// expression rather than the evaluated value; see embeddedDisjunction in
 	// cue/testdata/builtins/closed.txtar.
-	numErrs := 0
 	for _, x := range n.disjuncts {
 		x.node.Conjuncts = nil
-
-		if b := x.getErr(); b != nil {
-			if b.Code == UserError {
-				n.userErrs = append(n.userErrs, b)
-			} else {
-				n.disjunctErrs = append(n.disjunctErrs, b)
-			}
-			numErrs++
-			continue
-		}
-	}
-
-	if len(n.disjuncts) == numErrs {
-		n.makeError()
-		return
 	}
 
 	// Determine highest priority and if the default exists.

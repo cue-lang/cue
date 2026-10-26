@@ -1,3 +1,6 @@
+t13 to t15 and #S3 mix required fields and pattern constraints.
+Their generated schemas wrongly drop every object constraint.
+
 -- test.cue --
 package test
 import (
@@ -39,6 +42,15 @@ t12?: {
 	[_]: =~"bar"
 	[=~"x"]: strings.MinRunes(1)
 } & struct.MaxFields(100)
+t13?: {
+	a!: int
+	[=~"^b"]: string
+}
+t14?: #S3
+t15?: #S2 & {
+	a!: int
+	[=~"^b"]: string
+}
 
 #S1: {
 	a?: int
@@ -46,6 +58,10 @@ t12?: {
 #S2: {
 	a?: int
 	...
+}
+#S3: {
+	a!: int
+	[=~"^b"]: string
 }
 _foo: a?: int
 
@@ -63,6 +79,7 @@ _foo: a?: int
 			additionalProperties: true
 			properties: a: type: "integer"
 		}
+		S3: type: "object"
 		"_foo": {
 			type: "object"
 			properties: a: type: "integer"
@@ -150,6 +167,12 @@ _foo: a?: int
 				y: true
 			}
 			maxProperties: 100
+		}
+		t13: type: "object"
+		t14: $ref: "#/$defs/S3"
+		t15: {
+			type: "object"
+			$ref: "#/$defs/S2"
 		}
 	}
 }

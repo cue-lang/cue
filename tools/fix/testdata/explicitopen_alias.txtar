@@ -68,7 +68,16 @@ app: X=__closeAll({
 	if X.mode == "a" {extra: string}
 })
 
-v: {if true {f: X=__closeAll({#Base..., b: X.name...})}}
+v: {if true {
+	f: X=__closeAll({
+		#Base...
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		b: X.name...
+	})
+}}
 
 out: #App & {name: "n", mode: "a", extra: "e"}
 out: extra: "e" @test(eq, "e")

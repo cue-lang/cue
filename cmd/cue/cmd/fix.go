@@ -26,6 +26,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// fixCommentsHelp tells the user of a command which runs the rewrites what
+// the comments they leave behind ask of them.
+var fixCommentsHelp = `
+A TODO(cue-fix) comment marks a construct whose rewritten form does not
+mean what it did: the rewrite could not keep its behavior, and someone
+must decide what the file should say. A NOTE(cue-fix) comment marks a
+rewrite which keeps the behavior but may do more than needed, such as a
+spread on an embedded reference the rewrite cannot see to be open or
+closed; the file is correct as written, and the NOTE says what can go.
+`[1:]
+
 func newFixCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fix [flags] [packages]",
@@ -72,7 +83,8 @@ fix, as files use it without an attribute, and asking for one is an error.
 
 The special value --exp=all enables all experimental features that apply to the
 current version.
-`,
+
+` + fixCommentsHelp,
 		RunE: mkRunE(c, runFixAll),
 	}
 

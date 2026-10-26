@@ -91,7 +91,13 @@ other: w: int
 #D: {
 	let X = self
 	if true {f: {#E..., x: 1}}
-	g:    __reclose({other..., x: 1})
+	g: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		other...
+		x: 1
+	})
 	l:    [__closeAll({#E..., x: 1})]
 	d:    (*__closeAll({#E..., b: 1}) | {z: 4}) & {y: 3, c: 2}
 	spec: __closeAll({#E..., x: 1})

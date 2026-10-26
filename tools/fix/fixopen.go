@@ -26,13 +26,25 @@ import (
 	"cuelang.org/go/internal/core/compile"
 )
 
+// todoComment marks a rewrite which changed what the code means, for the
+// user to review.
 func todoComment(msg string) *ast.CommentGroup {
+	return fixComment("TODO", msg)
+}
+
+// noteComment marks a rewrite which the fixer could not tell was needed,
+// and which the user may undo. Unlike a TODO it does not call for review.
+func noteComment(msg string) *ast.CommentGroup {
+	return fixComment("NOTE", msg)
+}
+
+func fixComment(kind, msg string) *ast.CommentGroup {
 	// Wrap the message across several comment lines so no line runs much
 	// past 80 columns. The indentation the formatter adds is not counted,
 	// so a deeply nested comment may still spill a little.
 	const width = 80
 	var list []*ast.Comment
-	line := "// TODO(cue-fix):"
+	line := "// " + kind + "(cue-fix):"
 	for _, w := range strings.Fields(msg) {
 		if len(line)+1+len(w) > width {
 			list = append(list, &ast.Comment{Text: line})
@@ -260,11 +272,8 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// See openCompFieldValue: comprehension conjuncts did not
 			// close their fields under the old semantics, unless the
 			// field had no other declaration to widen it.
-			if info.inComprehension && !closedCompFields[n] {
-				if newValue, changed := openCompFieldValue(n.Value); changed {
-					n.Value = newValue
-					hasChanges = true
-				}
+			if info.inComprehension && !closedCompFields[n] && openCompFieldValue(n) {
+				hasChanges = true
 			}
 
 		case *ast.BinaryExpr:
@@ -292,18 +301,23 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// An embedding declared directly in a comprehension value
 			// lost the old conditional closing when anything in it was
 			// opened, an embedding nested in a literal it embeds
-			// included.
-			if inCompValue(c) && (exprChanged || c.Modified()) {
-				ast.AddComment(newExpr, todoComment(
+			// included. The TODO says it changed meaning whatever its
+			// value is, so no NOTE goes beside it.
+			todo := inCompValue(c) && (exprChanged || c.Modified())
+			embed := n
+			if exprChanged {
+				embed = newEmbed(n, newExpr, guessedSpread(flags) && !todo)
+				c.Replace(embed)
+				hasChanges = true
+			}
+			if todo {
+				dropNotes(newExpr)
+				ast.AddComment(embed, todoComment(
 					"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
 			}
-			if exprChanged {
-				if flags.def && len(recloseStack) == 0 {
-					ast.AddComment(newExpr, todoComment(
-						"top-level definition embedding opened; if this is intended as a schema, remove the '...'."))
-				}
-				c.Replace(&ast.EmbedDecl{Expr: newExpr})
-				hasChanges = true
+			if exprChanged && flags.def && len(recloseStack) == 0 {
+				ast.AddComment(embed, todoComment(
+					"top-level definition embedding opened; if this is intended as a schema, remove the '...'."))
 			}
 
 		case *ast.StructLit:
@@ -798,20 +812,26 @@ func declaresFields(expr ast.Expr) bool {
 	return false
 }
 
-// openCompFieldValue adds a postfix ellipsis to a field value inside a
-// comprehension when the value may resolve to a closed struct. Under the
-// old semantics, conjuncts inserted through comprehensions were treated
-// like embeddings and did not close their fields.
-func openCompFieldValue(expr ast.Expr) (ast.Expr, bool) {
+// openCompFieldValue adds a postfix ellipsis to the value of a field inside
+// a comprehension when the value may resolve to a closed struct, and
+// reports whether it did. Under the old semantics, conjuncts inserted
+// through comprehensions were treated like embeddings and did not close
+// their fields. The NOTE of a guessed spread goes on the field, where a
+// comment on the value would split it from its label.
+func openCompFieldValue(f *ast.Field) bool {
 	// PostfixExpr is excluded: the value already has an ellipsis.
-	switch expr.(type) {
+	switch f.Value.(type) {
 	case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr,
 		*ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
-		if collectEmbedFlags(expr).mayBeClosed() {
-			return addEllipsis(expr), true
+		if flags := collectEmbedFlags(f.Value); flags.mayBeClosed() {
+			f.Value = addEllipsis(f.Value)
+			if guessedSpread(flags) {
+				addDeclNote(f, spreadNote)
+			}
+			return true
 		}
 	}
-	return expr, false
+	return false
 }
 
 // isScalarPredeclared reports whether x is a use of a predeclared identifier
@@ -1027,7 +1047,7 @@ func openCloseArg(expr ast.Expr, whole bool) (ast.Expr, bool, embedFlags) {
 		f = f.or(ef)
 		if exprChanged {
 			changed = true
-			newElts[i] = &ast.EmbedDecl{Expr: newExpr}
+			newElts[i] = newEmbed(embed, newExpr, guessedSpread(ef))
 		}
 	}
 	if !changed {
@@ -1388,6 +1408,54 @@ func soleEmbedExpr(s *ast.StructLit) (ast.Expr, bool) {
 	return e.Expr, true
 }
 
+func addEllipsis(expr ast.Expr) *ast.PostfixExpr {
+	return &ast.PostfixExpr{
+		X:     expr,
+		Op:    token.ELLIPSIS,
+		OpPos: expr.End(),
+	}
+}
+
+// spreadNote is the NOTE of a spread the rewrite cannot tell is needed;
+// see [guessedSpread].
+const spreadNote = "the spread operator below may not be needed: it only matters if the value is a closed struct, or closes a nested struct at a path which the enclosing struct also declares."
+
+// guessedSpread reports whether the flags f, collected from an expression
+// being spread, leave it unknown whether the spread is needed: f proves
+// the value closed only through a definition or a close() call. Any
+// other value is a reference the fixer cannot resolve, which in practice
+// usually names an open struct, where the spread changes nothing.
+func guessedSpread(f embedFlags) bool {
+	return !f.def && !f.close
+}
+
+// newEmbed returns the embedding which replaces old once its expression
+// is rewritten to expr, with old's comments and, if note is set, the NOTE
+// of a guessed spread.
+func newEmbed(old *ast.EmbedDecl, expr ast.Expr, note bool) *ast.EmbedDecl {
+	e := &ast.EmbedDecl{Expr: expr}
+	astutil.CopyComments(e, old)
+	if note {
+		addDeclNote(e, spreadNote)
+	}
+	return e
+}
+
+// addDeclNote adds a NOTE with message msg as a doc comment of d, on the
+// line before it, taking d's own layout position so that a blank line
+// before d stays before the NOTE. A NOTE d already carries is not
+// repeated.
+func addDeclNote(d ast.Decl, msg string) {
+	cg := noteComment(msg)
+	for _, have := range ast.Comments(d) {
+		if len(have.List) > 0 && have.List[0].Text == cg.List[0].Text {
+			return
+		}
+	}
+	ast.SetRelPos(cg, d.Pos().RelPos())
+	ast.AddComment(d, cg)
+}
+
 // inCompValue reports whether the embedding at c is declared directly in
 // the value of a comprehension, rather than in a literal nested there.
 func inCompValue(c astutil.Cursor) bool {
@@ -1399,10 +1467,18 @@ func inCompValue(c astutil.Cursor) bool {
 	return ok && comp.Value == lit.Node()
 }
 
-func addEllipsis(expr ast.Expr) *ast.PostfixExpr {
-	return &ast.PostfixExpr{
-		X:     expr,
-		Op:    token.ELLIPSIS,
-		OpPos: expr.End(),
+// dropNotes removes the spread NOTEs of the embeddings anywhere inside n.
+func dropNotes(n ast.Node) {
+	first := noteComment(spreadNote).List[0].Text
+	isNote := func(cg *ast.CommentGroup) bool {
+		return len(cg.List) > 0 && cg.List[0].Text == first
 	}
+	ast.Walk(n, func(n ast.Node) bool {
+		if e, ok := n.(*ast.EmbedDecl); ok {
+			if cgs := ast.Comments(e); slices.ContainsFunc(cgs, isNote) {
+				ast.SetComments(e, slices.DeleteFunc(slices.Clone(cgs), isNote))
+			}
+		}
+		return true
+	}, nil)
 }

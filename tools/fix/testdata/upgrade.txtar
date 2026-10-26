@@ -32,6 +32,9 @@ package foo
 A: #A
 
 X: __reclose({
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
 	A...
 	b: int
 })

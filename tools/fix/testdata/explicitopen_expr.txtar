@@ -151,6 +151,31 @@ conjunctField: {
 	b: int
 }
 
+// A spread is needed for a value which is open itself but closes a nested
+// struct at a path the enclosing literal declares into: without it, the
+// literal's own field at that path is denied. The old semantics still
+// closed the nested struct to the union of both; the spread opens it.
+spreadNestedClosed: {
+	o: n: close({a: int})
+	v: {
+		o
+		n: b: 1
+	}
+
+	t1: v & {n: a: 2} @test(eq, {n: {a: 2, b: 1}})
+}
+
+// Conjunction of plain literals with extra field → spread as a whole,
+// with a NOTE since neither operand may be closed, and no wrapper.
+literalConjField: {
+	v: {
+		{a: int} & {b: int}
+		c: int
+	}
+
+	t1: v & {a: 1, b: 2, c: 3, d: 4} @test(eq, {a: 1, b: 2, c: 3, d: 4})
+}
+
 // Disjunction with extra field → __reclose, as the closing follows the
 // branch taken.
 disjunctField: {
@@ -243,6 +268,22 @@ compCallField: {
 
 	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
 		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
+}
+
+// A guessed spread on the value of a nested comprehension field carries
+// its NOTE on that field.
+compNestedRefField: {
+	o: hc: port: 1
+	#S: {
+		enable: bool
+		egress?: hc?: {...}
+		if enable {
+			egress: hc: o.hc
+		}
+	}
+
+	t1: #S & {enable: true, egress: hc: {port: 1, extra: {}}} @test(eq,
+		{enable: true, egress: hc: {port: 1, extra: {}}})
 }
 
 // Struct literal field values inside comprehensions get no wrapper;
@@ -1012,163 +1053,165 @@ compExtends: {
 [eval] embeddedCloseField.t3.c: field not allowed:
     ./in.cue:131:11
 [incomplete] defaultDisjunct.#S: incomplete bool: bool:
-    ./in.cue:167:11
+    ./in.cue:192:11
 [eval] andField.v.c: field not allowed:
-    ./in.cue:180:15
+    ./in.cue:205:15
 [eval] andField.t1.c: field not allowed:
-    ./in.cue:180:15
+    ./in.cue:205:15
 [eval] andField.t2.c: field not allowed:
-    ./in.cue:180:15
+    ./in.cue:205:15
 [eval] selConjField.t2.c: field not allowed:
-    ./in.cue:209:11
+    ./in.cue:234:11
 [incomplete] compCallField.#S: incomplete bool: bool:
-    ./in.cue:219:11
+    ./in.cue:244:11
+[incomplete] compNestedRefField.#S: incomplete bool: bool:
+    ./in.cue:264:11
 [incomplete] compLiteralField.#S: incomplete bool: bool:
-    ./in.cue:239:11
+    ./in.cue:280:11
 [eval] nestedLiteral.t2.more: field not allowed:
-    ./in.cue:271:11
+    ./in.cue:312:11
 [eval] nestedClose.t2.c: field not allowed:
-    ./in.cue:283:11
+    ./in.cue:324:11
 [eval] nestedSingleEmbed.t2.c: field not allowed:
-    ./in.cue:295:11
+    ./in.cue:336:11
 [eval] disjunctDefsField.t2.D: field not allowed:
-    ./in.cue:327:11
+    ./in.cue:368:11
 [eval] soleEmbedNested.t2.c: field not allowed:
-    ./in.cue:369:11
+    ./in.cue:410:11
 [eval] soleEmbedNested.t3.n.q: field not allowed:
-    ./in.cue:370:14
+    ./in.cue:411:14
 [eval] soleEmbedNested.t4.n.q: field not allowed:
-    ./in.cue:371:14
+    ./in.cue:412:14
 [eval] soleEmbedClose.t2.c: field not allowed:
-    ./in.cue:382:11
+    ./in.cue:423:11
 [eval] soleEmbedClose.t3.n.q: field not allowed:
-    ./in.cue:383:14
+    ./in.cue:424:14
 [eval] soleEmbedAttr.t1.c: field not allowed:
-    ./in.cue:395:11
+    ./in.cue:436:11
 [eval] soleEmbedAttr.t2.n.q: field not allowed:
-    ./in.cue:396:14
+    ./in.cue:437:14
 [eval] soleEmbedSibling.t2.d: field not allowed:
-    ./in.cue:409:11
+    ./in.cue:450:11
 [incomplete] compScalarField.s: incomplete bool: bool:
-    ./in.cue:417:6
+    ./in.cue:458:6
 [incomplete] compScalarField.shadow: incomplete bool: bool:
-    ./in.cue:427:11
+    ./in.cue:468:11
 [incomplete] compClosedField.plain: incomplete bool: bool:
-    ./in.cue:447:6
+    ./in.cue:488:6
 [eval] compClosedField.t2.f.b: field not allowed:
-    ./in.cue:453:28
+    ./in.cue:494:28
 [incomplete] compClosedField.sibling: incomplete bool: bool:
-    ./in.cue:457:7
+    ./in.cue:498:7
 [incomplete] compClosedField.otherLiteral: incomplete bool: bool:
-    ./in.cue:468:6
+    ./in.cue:509:6
 [eval] compClosedField.t4.f.b: field not allowed:
-    ./in.cue:474:35
+    ./in.cue:515:35
 [eval] compClosedField.t7.f.b: field not allowed:
-    ./in.cue:497:23
+    ./in.cue:538:23
 [incomplete] compBodyField.twice: incomplete bool: bool:
-    ./in.cue:508:6
+    ./in.cue:549:6
 [eval] compBodyField.t2.f.b: field not allowed:
-    ./in.cue:515:28
+    ./in.cue:556:28
 [incomplete] compBodyField.twiceOpen: incomplete bool: bool:
-    ./in.cue:519:6
-[eval] compBodyField.t3.f.b: field not allowed:
-    ./in.cue:522:8
-    ./in.cue:525:32
-[incomplete] compBodyField.otherBody: incomplete bool: bool:
-    ./in.cue:530:6
-[incomplete] compBodyField.nestedBody: incomplete bool: bool:
-    ./in.cue:541:6
-[incomplete] compNestedField.plain: incomplete bool: bool:
     ./in.cue:560:6
-[eval] compNestedField.t2.f.g.b: field not allowed:
-    ./in.cue:566:30
-[incomplete] compNestedField.sibling: incomplete bool: bool:
-    ./in.cue:570:6
-[incomplete] compNestedField.openEnclosing: incomplete bool: bool:
-    ./in.cue:581:6
-[eval] compNestedField.t4.f.g.b: field not allowed:
-    ./in.cue:587:38
-[incomplete] compNestedField.sameBody: incomplete bool: bool:
-    ./in.cue:591:6
-[eval] compNestedField.t5.f.g.b: field not allowed:
-    ./in.cue:594:11
-    ./in.cue:597:33
-[incomplete] compNestedField.sameBodyOpen: incomplete bool: bool:
+[eval] compBodyField.t3.f.b: field not allowed:
+    ./in.cue:563:8
+    ./in.cue:566:32
+[incomplete] compBodyField.otherBody: incomplete bool: bool:
+    ./in.cue:571:6
+[incomplete] compBodyField.nestedBody: incomplete bool: bool:
+    ./in.cue:582:6
+[incomplete] compNestedField.plain: incomplete bool: bool:
     ./in.cue:601:6
+[eval] compNestedField.t2.f.g.b: field not allowed:
+    ./in.cue:607:30
+[incomplete] compNestedField.sibling: incomplete bool: bool:
+    ./in.cue:611:6
+[incomplete] compNestedField.openEnclosing: incomplete bool: bool:
+    ./in.cue:622:6
+[eval] compNestedField.t4.f.g.b: field not allowed:
+    ./in.cue:628:38
+[incomplete] compNestedField.sameBody: incomplete bool: bool:
+    ./in.cue:632:6
+[eval] compNestedField.t5.f.g.b: field not allowed:
+    ./in.cue:635:11
+    ./in.cue:638:33
+[incomplete] compNestedField.sameBodyOpen: incomplete bool: bool:
+    ./in.cue:642:6
 [eval] compNestedField.t6.f.g.b: field not allowed:
-    ./in.cue:607:37
+    ./in.cue:648:37
 [eval] nestedUnwrap.t2.c: field not allowed:
-    ./in.cue:619:11
+    ./in.cue:660:11
 [eval] nestedOpen.t2.foo.other: field not allowed:
-    ./in.cue:631:16
-[eval] nestedOpen.t3.sib: field not allowed:
-    ./in.cue:632:11
-[eval] nestedOpenDeep.t2.foo.bar.other: field not allowed:
-    ./in.cue:643:21
-[eval] nestedOpenDeep.t3.foo.other: field not allowed:
-    ./in.cue:644:16
-[eval] nestedOpenSibling.t2.bar.zzz: field not allowed:
-    ./in.cue:656:16
-[eval] nestedOpenOperands.t2.foo.zzz: field not allowed:
     ./in.cue:672:16
+[eval] nestedOpen.t3.sib: field not allowed:
+    ./in.cue:673:11
+[eval] nestedOpenDeep.t2.foo.bar.other: field not allowed:
+    ./in.cue:684:21
+[eval] nestedOpenDeep.t3.foo.other: field not allowed:
+    ./in.cue:685:16
+[eval] nestedOpenSibling.t2.bar.zzz: field not allowed:
+    ./in.cue:697:16
+[eval] nestedOpenOperands.t2.foo.zzz: field not allowed:
+    ./in.cue:713:16
 [eval] nestedOpenOperands.t4.foo.zzz: field not allowed:
-    ./in.cue:674:16
+    ./in.cue:715:16
 [eval] nestedOpenEmbed.t2.foo.other: field not allowed:
-    ./in.cue:687:16
+    ./in.cue:728:16
 [eval] nestedOpenSelf.v.foo.allowed: field not allowed:
-    ./in.cue:695:33
+    ./in.cue:736:33
 [eval] nestedOpenRef.t2.foo.other: field not allowed:
-    ./in.cue:711:16
+    ./in.cue:752:16
 [eval] nestedOpenRef.t3.sib: field not allowed:
-    ./in.cue:712:11
+    ./in.cue:753:11
 [eval] nestedOpenRefSel.t2.foo.other: field not allowed:
-    ./in.cue:724:16
+    ./in.cue:765:16
 [eval] nestedOpenRefSel.t3.sib: field not allowed:
-    ./in.cue:725:11
+    ./in.cue:766:11
 [eval] nestedOpenRefEmbed.t2.foo.other: field not allowed:
-    ./in.cue:738:16
+    ./in.cue:779:16
 [eval] nestedOpenRefEmbed.t3.sib: field not allowed:
-    ./in.cue:739:11
+    ./in.cue:780:11
 [eval] nestedOpenRefDeep.t2.foo.foo.other: field not allowed:
-    ./in.cue:752:21
+    ./in.cue:793:21
 [eval] nestedOpenRefDeep.t3.foo.other: field not allowed:
-    ./in.cue:753:16
+    ./in.cue:794:16
 [eval] nestedOpenRefAdded.t3.foo.foo.qqq: field not allowed:
-    ./in.cue:767:21
+    ./in.cue:808:21
 [eval] nestedOpenRefAdded.t4.foo.other: field not allowed:
-    ./in.cue:768:16
+    ./in.cue:809:16
 [eval] nestedOpenRefStruct.t1.foo.bar.x: field not allowed:
-    ./in.cue:780:21
+    ./in.cue:821:21
 [eval] nestedOpenRefStruct.t2.foo.bar.y: field not allowed:
-    ./in.cue:781:21
+    ./in.cue:822:21
 [eval] nestedOpenRefOpen.t2.sib: field not allowed:
-    ./in.cue:799:11
+    ./in.cue:840:11
 [eval] nestedOpenRefOperands.t2.foo.zzz: field not allowed:
-    ./in.cue:820:16
+    ./in.cue:861:16
 [eval] nestedOpenRefOperands.t5.foo.zzz: field not allowed:
-    ./in.cue:823:16
+    ./in.cue:864:16
 [eval] nestedOpenRefDef.t2.foo.other: field not allowed:
-    ./in.cue:836:16
+    ./in.cue:877:16
 [eval] nestedOpenRefDef.t3.sib: field not allowed:
-    ./in.cue:837:11
+    ./in.cue:878:11
 [eval] nestedOpenRefPlain.t1.foo.other: field not allowed:
-    ./in.cue:851:16
+    ./in.cue:892:16
 [eval] nestedOpenLitDeep.t2.a.foo.other: field not allowed:
-    ./in.cue:864:19
+    ./in.cue:905:19
 [eval] nestedOpenRefPath.t2.foo.other: field not allowed:
-    ./in.cue:878:16
+    ./in.cue:919:16
 [eval] nestedOpenRefPath.t3.sib: field not allowed:
-    ./in.cue:879:11
+    ./in.cue:920:11
 [eval] nestedOpenLitPath.t2.a.foo.other: field not allowed:
-    ./in.cue:891:19
+    ./in.cue:932:19
 [incomplete] wrapperComp.v: incomplete bool: bool:
-    ./in.cue:899:13
+    ./in.cue:940:13
 [incomplete] compAdmitsNothing.s: incomplete bool: bool:
-    ./in.cue:906:9
+    ./in.cue:947:9
 [eval] compAdmitsNothing.out.f.b: field not allowed:
-    ./in.cue:908:25
+    ./in.cue:949:25
 [eval] compExtends.t2.foo.other: field not allowed:
-    ./in.cue:923:16
+    ./in.cue:964:16
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -1215,6 +1258,10 @@ singleCloseRef: {
 closeAndRef: {
 	v: close(__reclose({
 		{a: int}
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
 		_repo...
 	}))
 
@@ -1309,6 +1356,37 @@ conjunctField: __closeAll({
 	b: int
 })
 
+// A spread is needed for a value which is open itself but closes a nested
+// struct at a path the enclosing literal declares into: without it, the
+// literal's own field at that path is denied. The old semantics still
+// closed the nested struct to the union of both; the spread opens it.
+spreadNestedClosed: {
+	o: n: close({a: int})
+	v: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		o...
+		n: b: 1
+	})
+
+	t1: v & {n: a: 2} @test(eq, {n: {a: 2, b: 1}})
+}
+
+// Conjunction of plain literals with extra field → spread as a whole,
+// with a NOTE since neither operand may be closed, and no wrapper.
+literalConjField: {
+	v: {
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		({a: int} & {b: int})...
+		c: int
+	}
+
+	t1: v & {a: 1, b: 2, c: 3, d: 4} @test(eq, {a: 1, b: 2, c: 3, d: 4})
+}
+
 // Disjunction with extra field → __reclose, as the closing follows the
 // branch taken.
 disjunctField: __reclose({
@@ -1351,6 +1429,9 @@ andField: {
 	#A: {a: int, b?: int}
 	#D: {a: int, c?: int}
 	v: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
 		and([#A, #D])...
 		b: int
 	})
@@ -1364,6 +1445,9 @@ andField: {
 
 // or() with extra field → not simplified, __reclose wraps.
 orField: __reclose({
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
 	or([#A, #D])...
 	b: int
 })
@@ -1373,6 +1457,9 @@ selConjField: {
 	#A: a:    int
 	h: inner: #A
 	v: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
 		(h.inner & {a: 1})...
 		b: int
 	})
@@ -1392,15 +1479,42 @@ compCallField: {
 		egress?: [string]:  {...}
 		egress2?: [string]: {...}
 		if enable {
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
 			egress: (lib.v & {hc: port: 1})...
 		}
 		if enable {
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
 			egress2: and([lib.v])...
 		}
 	}
 
 	t1: #S & {enable: true, egress: {extra: {}}, egress2: {extra: {}}} @test(eq,
 		{enable: true, egress: {hc: {port: 1}, extra: {}}, egress2: {hc: {port: 1}, extra: {}}})
+}
+
+// A guessed spread on the value of a nested comprehension field carries
+// its NOTE on that field.
+compNestedRefField: {
+	o: hc: port: 1
+	#S: {
+		enable: bool
+		egress?: hc?: {...}
+		if enable {
+			egress: {
+				// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+				// if the value is a closed struct, or closes a nested struct at a path which
+				// the enclosing struct also declares.
+				hc: o.hc...
+			}
+		}
+	}
+
+	t1: #S & {enable: true, egress: hc: {port: 1, extra: {}}} @test(eq,
+		{enable: true, egress: hc: {port: 1, extra: {}}})
 }
 
 // Struct literal field values inside comprehensions get no wrapper;
@@ -1425,7 +1539,13 @@ compLiteralField: {
 siblingOperands: {
 	#A: {a: int, d: int}
 	o:  {}
-	v:  {#A} & __reclose({o..., d: 2})
+	v: {#A} & __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		o...
+		d: 2
+	})
 
 	t1: v & {a: 1} @test(eq, {a: 1, d: 2})
 }
@@ -1571,7 +1691,12 @@ soleEmbedAttr: {
 soleEmbedSibling: {
 	o: close({b: int})
 	v: __reclose({
-		{o...}
+		{
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
+			o...
+		}
 		c: int
 	})
 

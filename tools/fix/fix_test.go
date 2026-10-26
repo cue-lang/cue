@@ -175,6 +175,9 @@ ref: {a: int}
 v: __closeAll({
 	(#X & {
 		ctx: __reclose({
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
 			ref...
 			extra: 1
 		})
@@ -245,6 +248,9 @@ package foo
 h: inner: #A
 
 v: __reclose({
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
 	(h.inner & {a: 1})...
 	extra: 2
 })
@@ -288,9 +294,15 @@ lib: v:  #HC
 	egress?: [string]:  {...}
 	egress2?: [string]: {...}
 	if enable {
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
 		egress: (lib.v & {hc: port: 1})...
 	}
 	if enable {
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
 		egress2: and([lib.v])...
 	}
 }
@@ -648,7 +660,12 @@ v4: {
 	@foo()
 }
 w: __reclose({
-	{o...}
+	{
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		o...
+	}
 	b: int
 })
 `,
@@ -681,7 +698,13 @@ package foo
 #A: {a: int, d: int}
 o:  {}
 
-v: {#A} & __reclose({o..., d: 2})
+v: {#A} & __reclose({
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
+	o...
+	d: 2
+})
 
 w: __closeAll({
 	{#A...}
@@ -903,7 +926,13 @@ W: __closeAll({
 })
 V: close(__reclose({
 	// doc on embed
-	{o..., b: 1}
+	{
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		o...
+		b: 1
+	}
 }))
 `,
 		},

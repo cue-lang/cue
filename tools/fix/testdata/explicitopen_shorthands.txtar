@@ -101,6 +101,7 @@ package foo
 _repo: {}
 
 // Top-level definition embedding → opened with TODO.
+//
 // TODO(cue-fix): top-level definition embedding opened; if this is intended as
 // a schema, remove the '...'.
 #A...

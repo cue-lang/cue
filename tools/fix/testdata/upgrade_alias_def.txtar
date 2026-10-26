@@ -73,6 +73,18 @@ out: deps: default: kind: "k" @test(eq, "k")
 
 // An aliased value inside a comprehension keeps its wrapper: the old
 // semantics closed the field, which no sibling declaration widens.
-v:   {if true {f: {let X = self, __closeAll({#Base..., b: X.name...})}}}
+v: {if true {
+	f: {
+		let X = self
+		__closeAll({
+			#Base...
+
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
+			b: X.name...
+		})
+	}
+}}
 vv:  v & {f: {name: "n", c: 3}}   @test(err, code=eval, contains="field not allowed")
 err: #App & {name: "n", bogus: 1} @test(err, code=eval, contains="field not allowed")

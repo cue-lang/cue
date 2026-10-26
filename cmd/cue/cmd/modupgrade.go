@@ -68,8 +68,7 @@ records the version. --force is the shortcut that skips the second step:
 it writes the files that converted and bumps the version anyway, leaving
 the files it reports invalid at the new version until they are fixed.
 
-Where a rewrite changed what a construct means, it leaves a
-TODO(cue-fix) comment; the summary names those files for review.
+` + fixCommentsHelp + `The summary names the files with a TODO for review.
 
 Fixes are applied on a best-effort basis; check the result, for instance
 by comparing the output of cue export before and after. A module whose

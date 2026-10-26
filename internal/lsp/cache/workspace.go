@@ -455,10 +455,6 @@ func (w *Workspace) DidModifyFiles(ctx context.Context, modifications []file.Mod
 		if err != nil {
 			return err
 		}
-		if m.modFileURI == fileUri {
-			m.markFileDirty(fileUri)
-			continue
-		}
 		ip, dirUris, err := m.FindImportPathForFile(fileUri)
 		if err != nil {
 			if err == ErrBadModule {

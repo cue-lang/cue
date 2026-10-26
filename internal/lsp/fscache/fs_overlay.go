@@ -411,48 +411,6 @@ func (txn *ViewTxn) Get(uri protocol.DocumentURI) (FileHandle, error) {
 	return file, nil
 }
 
-// WalkFiles invokes fun on all the files present in the overlay
-// only. It stops walking if fun returns an error.
-//
-// It does not, under any circumstances, access the underlying
-// CUECacheFS. The function only gets passed files, never directories.
-// All files in a directory will be passed to fun before any
-// subdirectories; no other ordering guarantees are made.
-func (txn *ViewTxn) WalkFiles(fun func(FileHandle) error, uri protocol.DocumentURI) error {
-	entry, err := txn.getEntryLocked(txn.pathComponents(uri))
-	if err != nil {
-		return err
-	}
-	return txn.walkFiles(fun, entry)
-}
-
-func (txn *ViewTxn) walkFiles(fun func(FileHandle) error, entry dirEntry) error {
-	switch entry := entry.(type) {
-	case *overlayFileEntry:
-		if err := fun(entry); err != nil {
-			return err
-		}
-	case *overlayDirEntry:
-		for _, child := range entry.entries {
-			if child.IsDir() {
-				continue
-			}
-			if err := txn.walkFiles(fun, child); err != nil {
-				return err
-			}
-		}
-		for _, child := range entry.entries {
-			if !child.IsDir() {
-				continue
-			}
-			if err := txn.walkFiles(fun, child); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 // UpdateTxn provides methods to access the OverlayFS during a
 // read-write transaction (via [OverlayFS.Update]). An UpdateTxn must
 // not be used outside of a transaction.

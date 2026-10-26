@@ -2859,14 +2859,7 @@ func fieldNames(field *ast.Field) *fieldDeclExpr {
 
 	case *ast.ParenExpr:
 		result.dynamicField = true
-		if alias, ok := label.X.(*ast.Alias); ok {
-			// (X=e): field
-			// Although the spec supports this, the parser doesn't seem to.
-			result.keyAliasIdent = alias.Ident
-			result.keyExpr = alias.Expr
-		} else {
-			result.exprs = append(result.exprs, label.X)
-		}
+		result.exprs = append(result.exprs, label.X)
 
 	case *ast.ListLit:
 		result.patternField = true
@@ -3471,8 +3464,8 @@ type fieldDeclExpr struct {
 	// name is never computed by this evaluator, even when trivial.
 	dynamicField bool
 	// keyExpr contains the expression associated with the
-	// key. For (x=e]: y and [x=e]: y aliases, the alias x should
-	// resolve to the expression e, and not the field value y.
+	// key. For [x=e]: y aliases, the alias x should resolve to
+	// the expression e, and not the field value y.
 	keyExpr ast.Expr
 	// exprs contains expressions from within the field declaration
 	// that need to be evaluated. E.g. "\(w)-\(x.y)": _

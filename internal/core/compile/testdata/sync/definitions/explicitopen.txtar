@@ -231,6 +231,26 @@ reclose: {
 	y: x... & #D
 	t1: err: y & {b: 2}
 }
+
+// A reference opened with `...` stays open when the only disjunct left of a
+// disjunction opened alike shares it.
+sharedDisjunct: {
+	#A: {x: 1}
+	#B: {x: 2}
+	D: #A | #B
+	c: #B...
+	c: D...
+	m: c & {y: 3}
+
+	// The definition closes a field reading such a reference again, also
+	// when read through another field.
+	Z: c
+	Z: #B
+	n: Z & {y: 3}
+	o: c
+	o: Z
+	p: o & {y: 3}
+}
 // A definition re-closes a conjunction it is an operand of, opened with
 // `...`, in either order, also when the conjuncts sit on a single field or
 // the definition is embedded in a struct.
@@ -283,6 +303,30 @@ recloseConjunction: {
         b: 2
       })
     }
+  }
+  sharedDisjunct: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      x: 2
+    }
+    D: (〈0;#A〉|〈0;#B〉)
+    c: 〈0;#B〉...
+    c: 〈0;D〉...
+    m: (〈0;c〉 & {
+      y: 3
+    })
+    Z: 〈0;c〉
+    Z: 〈0;#B〉
+    n: (〈0;Z〉 & {
+      y: 3
+    })
+    o: 〈0;c〉
+    o: 〈0;Z〉
+    p: (〈0;o〉 & {
+      y: 3
+    })
   }
   recloseConjunction: {
     #B: {

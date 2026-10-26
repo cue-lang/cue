@@ -171,6 +171,47 @@ issue3679: {
 	b: list.Repeat([for k, v in [0] { "bar" }], 1)
 
 }
+
+// A field whose disjunction leaves a single disjunct that structure shares
+// one of its definitions has the value of that definition when read by
+// another field, even though the field also refers to the definition.
+sharedDisjunct: scalar: {
+	#A: "a"
+	#B: "b"
+	#D: #A | #B
+	#E: {
+		c: #D
+		m?: string
+		m: c
+	}
+	e: #E
+	e: c: #B
+}
+sharedDisjunct: default: {
+	#A: "a"
+	#B: "b"
+	#D: *#A | #B
+	#E: {
+		c: #D
+		m?: string
+		m: c
+	}
+	e: #E
+	e: c: #B
+}
+sharedDisjunct: struct: {
+	#A: {x: 1}
+	#B: {x: 2}
+	#D: #A | #B
+	#E: {
+		c: #D
+		m: {x?: int}
+		m: c
+	}
+	b: #B
+	e: #E
+	e: c: b
+}
 -- issue3835.cue --
 // evalv3 regression with "cycle with field" error involving a comprehension
 // with a let that references a top-level field via a pattern constraint.
@@ -274,6 +315,61 @@ issue3903: noshare: {
         "bar"
       },
     ], 1)
+  }
+  sharedDisjunct: {
+    scalar: {
+      #A: "a"
+      #B: "b"
+      #D: (〈0;#A〉|〈0;#B〉)
+      #E: {
+        c: 〈1;#D〉
+        m?: string
+        m: 〈0;c〉
+      }
+      e: 〈0;#E〉
+      e: {
+        c: 〈1;#B〉
+      }
+    }
+  }
+  sharedDisjunct: {
+    default: {
+      #A: "a"
+      #B: "b"
+      #D: (*〈0;#A〉|〈0;#B〉)
+      #E: {
+        c: 〈1;#D〉
+        m?: string
+        m: 〈0;c〉
+      }
+      e: 〈0;#E〉
+      e: {
+        c: 〈1;#B〉
+      }
+    }
+  }
+  sharedDisjunct: {
+    struct: {
+      #A: {
+        x: 1
+      }
+      #B: {
+        x: 2
+      }
+      #D: (〈0;#A〉|〈0;#B〉)
+      #E: {
+        c: 〈1;#D〉
+        m: {
+          x?: int
+        }
+        m: 〈0;c〉
+      }
+      b: 〈0;#B〉
+      e: 〈0;#E〉
+      e: {
+        c: 〈1;b〉
+      }
+    }
   }
 }
 --- dupshare.cue

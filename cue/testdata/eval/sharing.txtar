@@ -233,6 +233,47 @@ issue3679: {
 
 	@test(eq, {b: ["bar"]})
 }
+
+// A field whose disjunction leaves a single disjunct that structure shares
+// one of its definitions has the value of that definition when read by
+// another field, even though the field also refers to the definition.
+sharedDisjunct: scalar: {
+	#A: "a"
+	#B: "b"
+	#D: #A | #B
+	#E: {
+		c: #D
+		m?: string
+		m: c
+	}
+	e: #E @test(eq, {c: "b", m: "a" | string}, incorrect) @test(eq:todo, {c: "b", m: "b"})
+	e: c: #B
+}
+sharedDisjunct: default: {
+	#A: "a"
+	#B: "b"
+	#D: *#A | #B
+	#E: {
+		c: #D
+		m?: string
+		m: c
+	}
+	e: #E @test(eq, {c: "b", m: *"a" | string}, incorrect) @test(eq:todo, {c: "b", m: "b"})
+	e: c: #B
+}
+sharedDisjunct: struct: {
+	#A: {x: 1}
+	#B: {x: 2}
+	#D: #A | #B
+	#E: {
+		c: #D
+		m: {x?: int}
+		m: c
+	}
+	b: #B
+	e: #E @test(eq, {c: {x: 2}, m: {x: 1} | {}}, incorrect) @test(eq:todo, {c: {x: 2}, m: {x: 2}})
+	e: c: b
+}
 -- issue3835.cue --
 // evalv3 regression with "cycle with field" error involving a comprehension
 // with a let that references a top-level field via a pattern constraint.
@@ -383,17 +424,17 @@ issue3903: noshare: {
     ./sharecycle.cue:11:11
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
-Leaks:  7
-Freed:  229
-Reused: 205
-Allocs: 31
+Leaks:  10
+Freed:  291
+Reused: 266
+Allocs: 35
 Retain: 0
 
-Unifications: 224
-Conjuncts:    413
-Disjuncts:    6
+Unifications: 261
+Conjuncts:    523
+Disjuncts:    30
 Notifications: 1
 
-NumCloseIDs: 105
+NumCloseIDs: 120
 -- out/todo.txt --
 v3 uses structure sharing (~) extensively in issue3641, issue3546, debug, issue3849, issue3903, and pending sections where v2 expanded values inline. v3 also omits shareCycle.t2.Y.x.x structural cycle error and instead reports conflicting values for shareCycle.t2.Y.x with additional position info.

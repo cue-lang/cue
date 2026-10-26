@@ -29,7 +29,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
-	"strings"
 	"testing"
 )
 
@@ -161,35 +160,4 @@ func (t *T) Equal(actual, field any, msgAndArgs ...any) {
 // It overrides the default setting.
 func (t *T) Update(enable bool) {
 	t.updateEnabled = enable
-}
-
-// Select species which tests to run. The test may be an int, in which case
-// it selects the table entry to run, or a string, which is matched against
-// the last path of the test. An empty list runs all tests.
-func (t *T) Select(tests ...any) {
-	if len(tests) == 0 {
-		return
-	}
-
-	t.Helper()
-
-	name := t.Name()
-	parts := strings.Split(name, "/")
-
-	for _, n := range tests {
-		switch n := n.(type) {
-		case int:
-			if n == t.iter {
-				return
-			}
-		case string:
-			n = strings.ReplaceAll(n, " ", "_")
-			if n == parts[len(parts)-1] {
-				return
-			}
-		default:
-			panic("unexpected type passed to Select")
-		}
-	}
-	t.Skip("not selected")
 }

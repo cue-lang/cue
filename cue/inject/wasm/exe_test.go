@@ -68,7 +68,6 @@ func TestExe(t *testing.T) {
 			e.Vars = append(e.Vars, "CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"))
 			return nil
 		},
-		Condition: cuetest.Condition,
 	}
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)

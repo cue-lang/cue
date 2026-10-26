@@ -311,7 +311,6 @@ func TestScript(t *testing.T) {
 			e.Setenv("GOFLAGS", "-trimpath")
 			return cuetestscript.Setup(setupEnv{e})
 		},
-		Condition: cuetest.Condition,
 	}
 	// Add the commands that come with the cue testscript environment,
 	// such as memregistry; see [cuetestscript.Cmds].

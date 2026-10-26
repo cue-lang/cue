@@ -30,11 +30,9 @@ package cuetest
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"regexp"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -43,30 +41,7 @@ import (
 	"cuelang.org/go/internal/tdtest"
 )
 
-const (
-	envUpdate = "CUE_UPDATE"
-
-	// envNonIssues can be set to a regular expression which indicates what
-	// issues we no longer consider issues, i.e. they should have been fixed.
-	// This should generally result in tests that would otherwise be skipped no
-	// longer being skipped.  e.g.  CUE_NON_ISSUES=. will cause all issue
-	// tracker conditions (e.g. [golang.org/issues/1234]) to be considered
-	// non-issues.
-	envNonIssues = "CUE_NON_ISSUES"
-)
-
-var (
-	// issuesConditions is a set of regular expressions that defines the set of
-	// conditions that can be used to declare links to issues in various issue
-	// trackers. e.g. in testscript condition form
-	//
-	//     [golang.org/issues/1234]
-	//     [github.com/govim/govim/issues/4321]
-	issuesConditions = []*regexp.Regexp{
-		regexp.MustCompile(`^golang\.org/issues?/\d+$`),
-		regexp.MustCompile(`^cuelang\.org/issues?/\d+$`),
-	}
-)
+const envUpdate = "CUE_UPDATE"
 
 // updateGoldenFiles reports whether CUE_UPDATE is set to a value such as
 // "1" or "true", other than "diff", so that tests should update their
@@ -164,27 +139,6 @@ func WriteGoldenFile(t testing.TB, path string, data []byte) {
 	}
 }
 
-// Condition adds support for CUE-specific testscript conditions within
-// testscript scripts. Supported conditions include:
-//
-// [golang.org/issue/N] - evaluates to true unless CUE_NON_ISSUES
-// is set to a regexp that matches the condition, i.e. golang.org/issue/N
-// in this case
-//
-// [cuelang.org/issue/N] - evaluates to true unless CUE_NON_ISSUES
-// is set to a regexp that matches the condition, i.e. cuelang.org/issue/N
-// in this case
-func Condition(cond string) (bool, error) {
-	isIssue, nonIssue, err := checkIssueCondition(cond)
-	if err != nil {
-		return false, err
-	}
-	if isIssue {
-		return !nonIssue, nil
-	}
-	return false, fmt.Errorf("unknown condition %v", cond)
-}
-
 // T is an alias to tdtest.T
 type T = tdtest.T
 
@@ -201,47 +155,6 @@ func init() {
 // version of tdtest directly, or use the cuetdtest wrapper.
 func Run[TC any](t *testing.T, table []TC, fn func(t *T, tc *TC)) {
 	tdtest.Run(t, table, fn)
-}
-
-// IssueSkip causes the test t to be skipped unless the issue identified
-// by s is deemed to be a non-issue by CUE_NON_ISSUES.
-func IssueSkip(t *testing.T, s string) {
-	t.Helper()
-
-	isIssue, nonIssue, err := checkIssueCondition(s)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !isIssue {
-		t.Fatalf("issue %q does not match a known issue pattern", s)
-	}
-	if nonIssue {
-		t.Skipf("issue %s", s)
-	}
-}
-
-// checkIssueCondition examines s to determine whether it is an issue
-// condition, in which case isIssue is true. If isIssue, then we check
-// CUE_NON_ISSUES for a match, in which case nonIssue is true (a value of true
-// indicates roughly that we don't believe issue s is an issue any more). In
-// case of any errors err is set.
-func checkIssueCondition(s string) (isIssue bool, nonIssue bool, err error) {
-	var r *regexp.Regexp
-	if v := os.Getenv(envNonIssues); v != "" {
-		r, err = regexp.Compile(v)
-		if err != nil {
-			return false, false, fmt.Errorf("failed to compile regexp %q specified via %v: %v", v, envNonIssues, err)
-		}
-	}
-	for _, c := range issuesConditions {
-		if c.MatchString(s) {
-			isIssue = true
-		}
-	}
-	if !isIssue {
-		return false, false, nil
-	}
-	return isIssue, r != nil && r.MatchString(s), nil
 }
 
 // DenyRegistryAccess sets $CUE_REGISTRY to "none" for the rest of the process,

@@ -31,6 +31,8 @@ package foo
 #A: a: int
 A: #A
 
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
 X: __reclose({
 	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
 	// if the value is a closed struct, or closes a nested struct at a path which

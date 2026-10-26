@@ -391,6 +391,12 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 					if flags.close {
 						wrapper = wrapCall("close", wrapper)
 					}
+					// Without a definition among the embeddings, the
+					// wrapper closes the struct only if one of the
+					// guessed spreads inside turns out closed.
+					if !flags.def {
+						noteRecloseWrapper(c)
+					}
 				case flags.close:
 					wrapper = wrapCall("close", n)
 				}
@@ -1465,6 +1471,20 @@ func inCompValue(c astutil.Cursor) bool {
 	}
 	comp, ok := lit.Parent().Node().(*ast.Comprehension)
 	return ok && comp.Value == lit.Node()
+}
+
+// noteRecloseWrapper marks the __reclose wrapper replacing the literal at
+// c as one the rewrite cannot tell is needed, on the line before it: as a
+// doc comment on the nearest enclosing declaration, since on the wrapper
+// itself it would split a field from its label.
+func noteRecloseWrapper(c astutil.Cursor) {
+	for p := c.Parent(); p != nil; p = p.Parent() {
+		switch d := p.Node().(type) {
+		case *ast.Field, *ast.EmbedDecl, *ast.LetClause:
+			addDeclNote(d.(ast.Decl), "the __reclose wrapper below may not be needed: it only closes the struct if one of the spread values in it is a closed struct.")
+			return
+		}
+	}
 }
 
 // dropNotes removes the spread NOTEs of the embeddings anywhere inside n.

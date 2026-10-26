@@ -174,6 +174,8 @@ ref: {a: int}
 
 v: __closeAll({
 	(#X & {
+		// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+		// the struct if one of the spread values in it is a closed struct.
 		ctx: __reclose({
 			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
 			// if the value is a closed struct, or closes a nested struct at a path which
@@ -247,6 +249,8 @@ package foo
 #A: a:    int
 h: inner: #A
 
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
 v: __reclose({
 	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
 	// if the value is a closed struct, or closes a nested struct at a path which
@@ -659,6 +663,8 @@ v4: {
 	{o}
 	@foo()
 }
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
 w: __reclose({
 	{
 		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
@@ -698,6 +704,8 @@ package foo
 #A: {a: int, d: int}
 o:  {}
 
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
 v: {#A} & __reclose({
 	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
 	// if the value is a closed struct, or closes a nested struct at a path which
@@ -924,6 +932,8 @@ W: __closeAll({
 	// doc on embed
 	{#A..., b: 1} // line on embed
 })
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
 V: close(__reclose({
 	// doc on embed
 	{

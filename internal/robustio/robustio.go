@@ -59,20 +59,6 @@ func Stat(name string) (os.FileInfo, error) {
 	return stat(name)
 }
 
-// IsEphemeralError reports whether err is one of the errors that the functions
-// in this package attempt to mitigate.
-//
-// Errors considered ephemeral include:
-//   - syscall.ERROR_ACCESS_DENIED
-//   - syscall.ERROR_FILE_NOT_FOUND
-//   - internal/syscall/windows.ERROR_SHARING_VIOLATION
-//
-// This set may be expanded in the future; programs must not rely on the
-// non-ephemerality of any given error.
-func IsEphemeralError(err error) bool {
-	return isEphemeralError(err)
-}
-
 // A FileID uniquely identifies a file in the file system.
 //
 // If GetFileID(name1) returns the same ID as GetFileID(name2), the two file

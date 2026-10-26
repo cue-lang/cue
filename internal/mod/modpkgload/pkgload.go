@@ -292,10 +292,6 @@ func (pkgs *Packages) buildStacks() {
 	}
 }
 
-func (pkgs *Packages) Roots() []*Package {
-	return slices.Clip(pkgs.rootPkgs)
-}
-
 func (pkgs *Packages) All() []*Package {
 	return slices.Clip(pkgs.pkgs)
 }

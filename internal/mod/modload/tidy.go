@@ -725,9 +725,7 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 //     Note that certain root patterns (such as '...') may explode the root set
 //     to contain every module that provides any package imported (or merely
 //     required) by any other module.
-//  2. Each root appears only once, at the selected version of its path
-//     (if rs.graph is non-nil) or at the highest version otherwise present as a
-//     root (otherwise).
+//  2. Each root appears only once, at the selected version of its path.
 //  3. Every module path that appears as a root in rs remains a root.
 //  4. Every version in add is selected at its given version unless upgraded by
 //     (the dependencies of) an existing root or another module in add.
@@ -763,9 +761,6 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 // detail.)
 func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requirements, pkgs *modpkgload.Packages, add []module.Version) (*modrequirements.Requirements, error) {
 	roots := rs.RootModules()
-	rootsUpgraded := false
-
-	spotCheckRoot := map[module.Version]bool{}
 
 	// “The selected version of the module providing each package marked with
 	// either pkgInAll or pkgIsRoot is included as a root.”
@@ -815,35 +810,8 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 			// the package that imported it.
 			continue
 		}
-		if _, ok := rs.RootSelected(pkg.Mod().Path()); ok {
-			// It is possible that the main module's go.mod file is incomplete or
-			// otherwise erroneous — for example, perhaps the author forgot to 'git
-			// add' their updated go.mod file after adding a new package import, or
-			// perhaps they made an edit to the go.mod file using a third-party tool
-			// ('git merge'?) that doesn't maintain consistency for module
-			// dependencies. If that happens, ideally we want to detect the missing
-			// requirements and fix them up here.
-			//
-			// However, we also need to be careful not to be too aggressive. For
-			// transitive dependencies of external tests, the go.mod file for the
-			// module containing the test itself is expected to provide all of the
-			// relevant dependencies, and we explicitly don't want to pull in
-			// requirements on *irrelevant* requirements that happen to occur in the
-			// go.mod files for these transitive-test-only dependencies. (See the test
-			// in mod_lazy_test_horizon.txt for a concrete example).
-			//
-			// The “goldilocks zone” seems to be to spot-check exactly the same
-			// modules that we promote to explicit roots: namely, those that provide
-			// packages transitively imported by the main module, and those that
-			// provide roots of the package-import graph. That will catch erroneous
-			// edits to the main module's go.mod file and inconsistent requirements in
-			// dependencies that provide imported packages, but will ignore erroneous
-			// or misleading requirements in dependencies that aren't obviously
-			// relevant to the packages in the main module.
-			spotCheckRoot[pkg.Mod()] = true
-		} else {
+		if _, ok := rs.RootSelected(pkg.Mod().Path()); !ok {
 			roots = append(roots, pkg.Mod())
-			rootsUpgraded = true
 			// The roots slice was initially sorted because rs.rootModules was sorted,
 			// but the root we just added could be out of order.
 			needSort = true
@@ -856,7 +824,6 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		}
 		if v, ok := rs.RootSelected(m.Path()); !ok || semver.Compare(v, m.Version()) < 0 {
 			roots = append(roots, m)
-			rootsUpgraded = true
 			needSort = true
 		}
 	}
@@ -864,46 +831,18 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		slices.SortFunc(roots, module.Version.Compare)
 	}
 
-	// “Each root appears only once, at the selected version of its path ….”
+	// “Each root appears only once, at the selected version of its path.”
 	for {
-		var mg *modrequirements.ModuleGraph
-		if rootsUpgraded {
-			// We've added or upgraded one or more roots, so load the full module
-			// graph so that we can update those roots to be consistent with other
-			// requirements.
-
-			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions())
-			var err error
-			mg, err = rs.Graph(ctx)
-			if err != nil {
-				return rs, err
-			}
-		} else {
-			// Since none of the roots have been upgraded, we have no reason to
-			// suspect that they are inconsistent with the requirements of any other
-			// roots. Only look at the full module graph if we've already loaded it;
-			// otherwise, just spot-check the explicit requirements of the roots from
-			// which we loaded packages.
-			if rs.GraphIsLoaded() {
-				// We've already loaded the full module graph, which includes the
-				// requirements of all of the root modules — even the transitive
-				// requirements, if they are unpruned!
-				mg, _ = rs.Graph(ctx)
-			} else if !ld.spotCheckRoots(ctx, rs, spotCheckRoot) {
-				// We spot-checked the explicit requirements of the roots that are
-				// relevant to the packages we've loaded. Unfortunately, they're
-				// inconsistent in some way; we need to load the full module graph
-				// so that we can fix the roots properly.
-				var err error
-				mg, err = rs.Graph(ctx)
-				if err != nil {
-					return rs, err
-				}
-			}
+		// Load the full module graph so that we can update the roots to be
+		// consistent with other requirements.
+		rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions())
+		mg, err := rs.Graph(ctx)
+		if err != nil {
+			return rs, err
 		}
 
 		roots = make([]module.Version, 0, len(rs.RootModules()))
-		rootsUpgraded = false
+		rootsUpgraded := false
 		inRootPaths := map[string]bool{
 			ld.mainModule.Path(): true,
 		}
@@ -928,12 +867,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 				continue
 			}
 
-			var v string
-			if mg == nil {
-				v, _ = rs.RootSelected(m.Path())
-			} else {
-				v = mg.Selected(m.Path())
-			}
+			v := mg.Selected(m.Path())
 			mv, err := module.NewVersion(m.Path(), v)
 			if err != nil {
 				return nil, fmt.Errorf("internal error: cannot form module version from %q@%q", m.Path(), v)
@@ -959,7 +893,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 
 	if slices.Equal(roots, rs.RootModules()) {
 		// The root set is unchanged and rs was already pruned, so keep rs to
-		// preserve its cached ModuleGraph (if any).
+		// preserve its cached ModuleGraph.
 		return rs, nil
 	}
 	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions()), nil
@@ -1057,20 +991,8 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 		roots      []module.Version
 		pathIsRoot = map[string]bool{ld.mainModule.Path(): true}
 	)
-	// We start by adding roots for every package in "all".
-	//
-	// Once that is done, we may still need to add more roots to cover upgraded or
-	// otherwise-missing test dependencies for packages in "all". For those test
-	// dependencies, we prefer to add roots for packages with shorter import
-	// stacks first, on the theory that the module requirements for those will
-	// tend to fill in the requirements for their transitive imports (which have
-	// deeper import stacks). So we add the missing dependencies for one depth at
-	// a time, starting with the packages actually in "all" and expanding outwards
-	// until we have scanned every package that was loaded.
-	var (
-		queue  []*modpkgload.Package
-		queued = map[*modpkgload.Package]bool{}
-	)
+	// Add roots for every package in "all". Every loaded package is in "all",
+	// so this also maintains invariant 2.
 	for _, pkg := range pkgs.All() {
 		if !pkg.HasFlags(modpkgload.PkgInAll) {
 			continue
@@ -1079,45 +1001,9 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 			roots = append(roots, pkg.Mod())
 			pathIsRoot[pkg.Mod().Path()] = true
 		}
-		queue = append(queue, pkg)
-		queued[pkg] = true
 	}
 	slices.SortFunc(roots, module.Version.Compare)
 	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, old.DefaultMajorVersions())
-
-	for len(queue) > 0 {
-		roots = tidy.RootModules()
-		mg, err := tidy.Graph(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		prevQueue := queue
-		queue = nil
-		for _, pkg := range prevQueue {
-			m := pkg.Mod()
-			if m.Path() == "" {
-				continue
-			}
-			for _, dep := range pkg.Imports() {
-				if !queued[dep] {
-					queue = append(queue, dep)
-					queued[dep] = true
-				}
-			}
-			if !pathIsRoot[m.Path()] {
-				if s := mg.Selected(m.Path()); semver.Compare(s, m.Version()) < 0 {
-					roots = append(roots, m)
-					pathIsRoot[m.Path()] = true
-				}
-			}
-		}
-
-		if tidyRoots := tidy.RootModules(); len(roots) > len(tidyRoots) {
-			slices.SortFunc(roots, module.Version.Compare)
-			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, tidy.DefaultMajorVersions())
-		}
-	}
 
 	// A module-version replacement target is reached only through the
 	// replacement, so the loop above never records it as a root even though
@@ -1159,42 +1045,6 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 	// to test-only dependencies, which we don't have, so leave it out for now.
 
 	return tidy, nil
-}
-
-// spotCheckRoots reports whether the versions of the roots in rs satisfy the
-// explicit requirements of the modules in mods.
-func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requirements, mods map[module.Version]bool) bool {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	work := par.NewQueue(runtime.GOMAXPROCS(0))
-	for m := range mods {
-		work.Add(func() {
-			if ctx.Err() != nil {
-				return
-			}
-			mf, err := ld.registry.ModFile(ctx, m)
-			if err != nil {
-				cancel()
-				return
-			}
-			for _, r := range mf.DepVersions() {
-				if v, ok := rs.RootSelected(r.Path()); ok && semver.Compare(v, r.Version()) < 0 {
-					cancel()
-					return
-				}
-			}
-		})
-	}
-	<-work.Idle()
-
-	if ctx.Err() != nil {
-		// Either we failed a spot-check, or the caller no longer cares about our
-		// answer anyway.
-		return false
-	}
-
-	return true
 }
 
 func withoutIgnoredFiles(modFiles iter.Seq2[modimports.ModuleFile, error]) iter.Seq2[modimports.ModuleFile, error] {

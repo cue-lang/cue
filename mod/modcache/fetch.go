@@ -141,19 +141,10 @@ func (c *Cache) fetch(ctx context.Context, mv module.Version) (module.SourceLoc,
 	}
 	_, dirExists := dirErr.(*downloadDirPartialError)
 
-	// Clean up any partially extracted directories (indicated by
-	// DownloadDirPartialError, usually because of a .partial file). This is only
-	// safe to do because the lock file ensures that their writers are no longer
+	// Clean up a partially extracted directory (indicated by
+	// downloadDirPartialError, usually because of a .partial file). This is only
+	// safe to do because the lock file ensures that its writer is no longer
 	// active.
-	parentDir := filepath.Dir(dir)
-	tmpPrefix := filepath.Base(dir) + ".tmp-"
-
-	entries, _ := os.ReadDir(parentDir)
-	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), tmpPrefix) {
-			RemoveAll(filepath.Join(parentDir, entry.Name())) // best effort
-		}
-	}
 	if dirExists {
 		if err := RemoveAll(dir); err != nil {
 			return module.SourceLoc{}, err
@@ -175,7 +166,7 @@ func (c *Cache) fetch(ctx context.Context, mv module.Version) (module.SourceLoc,
 	// then rename it into place with os.Rename. On Windows, this can fail with
 	// ERROR_ACCESS_DENIED when another process (usually an anti-virus scanner)
 	// opened files in the temporary directory.
-	if err := os.MkdirAll(parentDir, 0777); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dir), 0777); err != nil {
 		return module.SourceLoc{}, err
 	}
 	// Unlike upstream Go's modfetch, retry via robustio: recreating a

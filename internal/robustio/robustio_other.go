@@ -29,7 +29,3 @@ func writeFile(filename string, data []byte, perm os.FileMode) error {
 func stat(name string) (os.FileInfo, error) {
 	return os.Stat(name)
 }
-
-func isEphemeralError(err error) bool {
-	return false
-}

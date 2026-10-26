@@ -3026,11 +3026,12 @@ func (c *converter) parenExpr(x *ast.ParenExpr) doc {
 // between string fragments (BasicLit, which already include the \( and
 // ) delimiters and are emitted verbatim) and interpolated expressions.
 //
-// Multi-line strings get special treatment: the body's strip prefix
-// (the leading whitespace before the closing `"""`) is parsed and
-// lifted into the renderer's nest level via [docAtIndent], so any
-// [docNest] inside an interpolated expression lands one level deeper
-// than the line that contained `\(` rather than at the field's level.
+// Multi-line strings get special treatment in
+// [converter.multiLineInterpolation]: the body's strip prefix (the
+// leading whitespace before the closing `"""`) is removed and the body
+// is re-indented by the renderer's nest level, so any [docNest] inside
+// an interpolated expression lands one level deeper than the line that
+// contained `\(` rather than at the field's level.
 func (c *converter) interpolation(x *ast.Interpolation) doc {
 	multiLine := false
 	for _, e := range x.Elts {

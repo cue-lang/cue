@@ -36,7 +36,6 @@ package cuetxtar
 import (
 	"bytes"
 	"fmt"
-	"io/fs"
 	"maps"
 	"path/filepath"
 	"slices"
@@ -61,67 +60,6 @@ import (
 	"cuelang.org/go/internal/value"
 )
 
-// RunInlineTests iterates over txtar archives in dir, detects inline-assertion
-// mode (presence of any @test(...) attribute), and runs inline assertions.
-// Archives without @test attributes are left for the existing TxTarTest.Run.
-func RunInlineTests(t *testing.T, matrix cuetdtest.Matrix, dir string) {
-	t.Helper()
-	if matrix == nil {
-		runInlineTestsForMatrix(t, nil, dir)
-		return
-	}
-	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
-		runInlineTestsForMatrix(t, m, dir)
-	})
-}
-
-func runInlineTestsForMatrix(t *testing.T, m *cuetdtest.M, dir string) {
-	t.Helper()
-
-	// Determine the base for test names (strip everything up to and including /testdata/).
-	baseDir := dir
-
-	err := filepath.WalkDir(dir, func(fullpath string, entry fs.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if entry.IsDir() || filepath.Ext(fullpath) != ".txtar" {
-			return nil
-		}
-
-		archive, err := txtar.ParseFile(fullpath)
-		if err != nil || !isInlineMode(archive) {
-			return nil
-		}
-
-		// Derive test name from path relative to dir.
-		rel, err := filepath.Rel(baseDir, fullpath)
-		if err != nil {
-			rel = filepath.Base(fullpath)
-		}
-		// Use forward slashes and strip .txtar extension.
-		testName := filepath.ToSlash(rel)
-		testName = testName[:len(testName)-len(".txtar")]
-
-		t.Run(testName, func(t *testing.T) {
-			runner := &inlineRunner{
-				t:            t,
-				m:            m,
-				archive:      archive,
-				dir:          filepath.Dir(fullpath),
-				filePath:     fullpath,
-				recordErrors: true,
-			}
-			runner.runArchive()
-		})
-
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("inline: walk %s: %v", dir, err)
-	}
-}
-
 // InlineRunner is the exported handle for running inline-assertion tests
 // against a single txtar archive. Primarily for use in tests.
 type InlineRunner struct {
@@ -142,9 +80,9 @@ func NewInlineRunnerCapture(t *testing.T, m *cuetdtest.M, archive *txtar.Archive
 }
 
 // RecordErrors enables the out/errors.txt documentary section, which
-// [RunInlineTests] maintains for the archives it walks, and sets the file
-// to write it back to under CUE_UPDATE=1: the one the archive was read
-// from, or empty for an archive which is not on disk. It returns ir.
+// [TxTarTest.Run] maintains for the inline archives it runs, and sets the
+// file to write it back to under CUE_UPDATE=1: the one the archive was
+// read from, or empty for an archive which is not on disk. It returns ir.
 func (ir *InlineRunner) RecordErrors(path string) *InlineRunner {
 	ir.r.recordErrors = true
 	ir.r.filePath = path

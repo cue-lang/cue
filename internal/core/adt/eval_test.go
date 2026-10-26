@@ -38,8 +38,8 @@ import (
 
 func TestEvalV3(t *testing.T) {
 	// TxTarTest.run dispatches inline archives (those with @test attributes)
-	// to the inline runner automatically; non-inline archives use golden-file
-	// comparison as before.  No separate RunInlineTests call is needed.
+	// to the inline runner automatically; other archives use golden-file
+	// comparison.
 	//
 	// Fallback lets existing out/eval golden-file sections pass until
 	// out/evalalpha sections are generated with CUE_UPDATE=1.

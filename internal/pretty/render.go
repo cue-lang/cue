@@ -19,7 +19,6 @@ import (
 	"iter"
 	"math"
 	"slices"
-	"unicode/utf8"
 )
 
 type mode uint8
@@ -45,7 +44,7 @@ func (cfg Config) Render(doc doc) []byte {
 		r.buf.WriteString(r.prefix.str)
 		r.col = r.prefix.width
 	}
-	r.renderInMode(0, "", modeBreak, false, doc)
+	r.renderInMode(0, modeBreak, false, doc)
 	b := r.buf.Bytes()
 	// A trailing newline should not be followed by a prefix-only line.
 	if r.prefix != nil && bytes.HasSuffix(b, []byte("\n"+r.prefix.str)) {
@@ -63,10 +62,10 @@ type renderer struct {
 	indent string
 	// indentWidth is the visual column width of one indent level.
 	indentWidth int
-	// prefix is emitted at the start of every line, before basePrefix
-	// and the nest-driven indent. It is held as a [docStringLit] so
-	// that its width is counted once rather than on every newline, and
-	// is nil when there is no prefix.
+	// prefix is emitted at the start of every line, before the
+	// nest-driven indent. It is held as a [docStringLit] so that its
+	// width is counted once rather than on every newline, and is nil
+	// when there is no prefix.
 	prefix *docStringLit
 	// buf accumulates the rendered output bytes.
 	buf bytes.Buffer
@@ -180,8 +179,7 @@ func (s walkState) switchModeBranch(d *docSwitchMode) doc {
 // renderFrame is one frame on renderInMode's explicit evaluation
 // stack.
 type renderFrame struct {
-	indent     int
-	basePrefix string
+	indent int
 	walkState
 	doc doc
 }
@@ -189,19 +187,16 @@ type renderFrame struct {
 // renderInMode renders a doc using the given indent, mode, and
 // infWidth flag. Under infWidth, width-based break decisions see an
 // unlimited budget - docGroups pick flat unless a hard line break
-// forces them broken. basePrefix is a verbatim string we prepend
-// before the nest-driven indent on each newline; only [docAtIndent]
-// overrides it.
-func (r *renderer) renderInMode(indent int, basePrefix string, m mode, infWidth bool, doc doc) {
+// forces them broken.
+func (r *renderer) renderInMode(indent int, m mode, infWidth bool, doc doc) {
 	if doc == nil {
 		return
 	}
 	base := len(r.renderStack)
 	r.renderStack.push(renderFrame{
-		indent:     indent,
-		basePrefix: basePrefix,
-		walkState:  walkState{mode: m, infWidth: infWidth},
-		doc:        doc,
+		indent:    indent,
+		walkState: walkState{mode: m, infWidth: infWidth},
+		doc:       doc,
 	})
 	for len(r.renderStack) > base {
 		f := r.renderStack.pop()
@@ -220,11 +215,11 @@ func (r *renderer) renderInMode(indent int, basePrefix string, m mode, infWidth 
 				r.buf.WriteString(d.flat)
 				r.col += d.flatWidth
 			} else {
-				r.newline(f.indent, f.basePrefix)
+				r.newline(f.indent)
 			}
 
 		case *docLineBreakHard:
-			r.newline(f.indent, f.basePrefix)
+			r.newline(f.indent)
 
 		case *docLineBreakBare:
 			r.buf.WriteByte('\n')
@@ -270,12 +265,6 @@ func (r *renderer) renderInMode(indent int, basePrefix string, m mode, infWidth 
 
 		case *docFiniteWidth:
 			f.enterFiniteWidth()
-			f.doc = d.child
-			r.renderStack.push(f)
-
-		case *docAtIndent:
-			f.indent = 0
-			f.basePrefix = d.prefix
 			f.doc = d.child
 			r.renderStack.push(f)
 
@@ -380,10 +369,10 @@ func (r *renderer) renderTableInMode(f renderFrame, d *docTable) {
 		// here, so handing it 0 would dedent its body to the left margin.
 		for i, row := range rows {
 			if i > 0 {
-				r.renderInMode(f.indent, f.basePrefix, modeFlat, f.infWidth, row.sep)
+				r.renderInMode(f.indent, modeFlat, f.infWidth, row.sep)
 			}
 			if row.raw != nil {
-				r.renderInMode(f.indent, f.basePrefix, modeFlat, f.infWidth, row.raw)
+				r.renderInMode(f.indent, modeFlat, f.infWidth, row.raw)
 				continue
 			}
 			for j, cell := range row.cells {
@@ -391,7 +380,7 @@ func (r *renderer) renderTableInMode(f renderFrame, d *docTable) {
 					r.buf.WriteByte(' ')
 					r.col++
 				}
-				r.renderInMode(f.indent, f.basePrefix, modeFlat, f.infWidth, cell)
+				r.renderInMode(f.indent, modeFlat, f.infWidth, cell)
 			}
 		}
 		return
@@ -415,7 +404,7 @@ func (r *renderer) renderTableInMode(f renderFrame, d *docTable) {
 		r.infoScratch = r.infoScratch[:required]
 		info := r.infoScratch[base:required]
 		n := r.longestAlignedPrefix(rows, avail, f.infWidth, first, info)
-		r.renderTableSegment(f.indent, f.basePrefix, f.infWidth, rows[:n], info, !first)
+		r.renderTableSegment(f.indent, f.infWidth, rows[:n], info, !first)
 		first = false
 		rows = rows[n:]
 	}
@@ -500,7 +489,7 @@ func rowFlatWidth(ri rowInfo) int {
 // widths. emitFirstSep controls whether we render the first row's Sep
 // (true for segments after the first, so we honour the break between
 // sub-tables).
-func (r *renderer) renderTableSegment(indent int, basePrefix string, infiniteWidth bool, rows []row, info []rowInfo, emitFirstSep bool) {
+func (r *renderer) renderTableSegment(indent int, infiniteWidth bool, rows []row, info []rowInfo, emitFirstSep bool) {
 	numCols := 0
 	for _, row := range rows {
 		if row.raw == nil {
@@ -579,17 +568,17 @@ func (r *renderer) renderTableSegment(indent int, basePrefix string, infiniteWid
 
 	for i, row := range rows {
 		if i > 0 || emitFirstSep {
-			r.renderInMode(indent, basePrefix, modeBreak, infiniteWidth, row.sep)
+			r.renderInMode(indent, modeBreak, infiniteWidth, row.sep)
 		}
 		if row.raw != nil {
-			r.renderInMode(indent, basePrefix, modeBreak, infiniteWidth, row.raw)
+			r.renderInMode(indent, modeBreak, infiniteWidth, row.raw)
 			continue
 		}
 		if row.docComment != nil {
 			// DocComment carries its own trailing separator (HardLine or
 			// BlankLine) so the blank-line-after-doc-comment case
 			// renders correctly when the node itself has NewSection.
-			r.renderInMode(indent, basePrefix, modeBreak, infiniteWidth, row.docComment)
+			r.renderInMode(indent, modeBreak, infiniteWidth, row.docComment)
 		}
 		// Identify the last non-nil cell so trailing reserved slots
 		// don't emit spurious trailing whitespace.
@@ -612,7 +601,7 @@ func (r *renderer) renderTableSegment(indent int, basePrefix string, infiniteWid
 		// descends as deep as needed. Cells past index 1 (attrs, comment)
 		// continue to render normally with inter-cell spaces.
 		if useMerged && row.mergedFirstCell != nil {
-			r.renderInMode(indent, basePrefix, modeBreak, infiniteWidth, row.mergedFirstCell)
+			r.renderInMode(indent, modeBreak, infiniteWidth, row.mergedFirstCell)
 			for c := 2; c < len(row.cells); c++ {
 				cell := row.cells[c]
 				if cell == nil || (colMaxW[c] == 0 && colCount[c] == 0) {
@@ -623,7 +612,7 @@ func (r *renderer) renderTableSegment(indent int, basePrefix string, infiniteWid
 				}
 				r.buf.WriteByte(' ')
 				r.col++
-				r.renderInMode(indent, basePrefix, modeBreak, infiniteWidth, cell)
+				r.renderInMode(indent, modeBreak, infiniteWidth, cell)
 			}
 			continue
 		}
@@ -680,7 +669,7 @@ func (r *renderer) renderTableSegment(indent int, basePrefix string, infiniteWid
 				// wherever cell 0 last broke (or one deeper than the
 				// row's indent if cell 0 stayed flat).
 				breakIndent := r.lastIndent + 1
-				r.newline(breakIndent, basePrefix)
+				r.newline(breakIndent)
 				cellIndent = breakIndent
 			} else if !firstCol {
 				r.buf.WriteByte(' ')
@@ -696,7 +685,7 @@ func (r *renderer) renderTableSegment(indent int, basePrefix string, infiniteWid
 			}
 			firstCol = false
 			colStart := r.col
-			r.renderInMode(cellIndent, basePrefix, modeBreak, infiniteWidth, cell)
+			r.renderInMode(cellIndent, modeBreak, infiniteWidth, cell)
 			if c == lastNonNilIdx {
 				continue
 			}
@@ -1027,13 +1016,6 @@ func measureDoc(d doc, startMode mode, budget int) (width int, broken, canBreak 
 			f.enterFiniteWidth()
 			f.doc = d.child
 			stack.push(f)
-		case *docAtIndent:
-			// Indentation is irrelevant to width measurement (we
-			// accumulate visual width along the descent, and the
-			// rebase to indent 0 happens at newlines we don't emit
-			// during measurement). Pass through to the child.
-			f.doc = d.child
-			stack.push(f)
 		case *docSwitchMode:
 			if !f.infWidth {
 				canBreak = true
@@ -1085,19 +1067,18 @@ func measureDoc(d doc, startMode mode, budget int) (width int, broken, canBreak 
 	return width, false, canBreak
 }
 
-// newline writes a newline followed by basePrefix and the configured
-// indent string repeated indent times. basePrefix is written verbatim.
-func (r *renderer) newline(indent int, basePrefix string) {
+// newline writes a newline followed by the configured indent string
+// repeated indent times.
+func (r *renderer) newline(indent int) {
 	r.buf.WriteByte('\n')
 	prefixWidth := 0
 	if r.prefix != nil {
 		r.buf.WriteString(r.prefix.str)
 		prefixWidth = r.prefix.width
 	}
-	r.buf.WriteString(basePrefix)
 	for range indent {
 		r.buf.WriteString(r.indent)
 	}
-	r.col = prefixWidth + utf8.RuneCountInString(basePrefix) + indent*r.indentWidth
+	r.col = prefixWidth + indent*r.indentWidth
 	r.lastIndent = indent
 }

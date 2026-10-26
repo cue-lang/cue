@@ -34,10 +34,7 @@
 //     content must be preserved verbatim.
 //   - Composition: [docCat] concatenates two Docs.
 //   - Indentation: [docNest] increases the indent applied on
-//     subsequent newlines. [docAtIndent] anchors its child at a fixed
-//     visual indent independent of the surrounding nest level (used
-//     for multi-line string bodies whose closing-quote indent is
-//     verbatim).
+//     subsequent newlines.
 //   - Mode control: [docGroup] picks flat-mode if its child fits the
 //     line-width budget, otherwise broken-mode. [docSwitchMode] emits
 //     different content per mode.
@@ -260,36 +257,6 @@ func nest(d doc) doc {
 			breaks:   d.canBreak(),
 		},
 		child: d,
-	}
-}
-
-// docAtIndent anchors child at a fixed visual indent independent of
-// the surrounding nest level.
-//
-// We use it for multi-line string bodies: the whitespace before the
-// closing quote is preserved verbatim in prefix.
-type docAtIndent struct {
-	docBase
-	prefix string
-	child  doc
-}
-
-// atIndent returns a Doc that renders d with newlines emitting prefix
-// verbatim before the nest-driven indentation. Inside d the nest
-// level resets to 0, so an internal nest one level deep emits prefix
-// + indent on its newlines, two levels deep emits prefix + indent +
-// indent, and so on.
-func atIndent(prefix string, d doc) doc {
-	if d == nil {
-		return nil
-	}
-	return &docAtIndent{
-		docBase: docBase{
-			converts: d.asInfiniteWidthConverts(),
-			breaks:   d.canBreak(),
-		},
-		prefix: prefix,
-		child:  d,
 	}
 }
 
@@ -548,8 +515,6 @@ func asInfiniteWidth(d doc) doc {
 		return cat(asInfiniteWidth(d.left), asInfiniteWidth(d.right))
 	case *docNest:
 		return nest(asInfiniteWidth(d.child))
-	case *docAtIndent:
-		return atIndent(d.prefix, asInfiniteWidth(d.child))
 	case *docSwitchMode:
 		return switchMode(asInfiniteWidth(d.broken), asInfiniteWidth(d.flat))
 	case *docTable:

@@ -41,12 +41,6 @@ func defaultTimeout() time.Duration {
 
 var runner *Runner
 
-// The integrationTestRunner interface abstracts the Run operation,
-// enables decorators for various optional features.
-type integrationTestRunner interface {
-	Run(t *testing.T, files string, f TestFunc)
-}
-
 func Run(t *testing.T, files string, f TestFunc) {
 	runner.Run(t, files, f)
 }
@@ -73,19 +67,6 @@ func (r configuredRunner) Run(t *testing.T, files string, f TestFunc) {
 	}
 
 	runner.Run(t, files, f, r.opts...)
-}
-
-type RunMultiple []struct {
-	Name   string
-	Runner integrationTestRunner
-}
-
-func (r RunMultiple) Run(t *testing.T, files string, f TestFunc) {
-	for _, runner := range r {
-		t.Run(runner.Name, func(t *testing.T) {
-			runner.Runner.Run(t, files, f)
-		})
-	}
 }
 
 // DefaultModes returns the default modes to run for each regression test (they

@@ -5,7 +5,6 @@
 package integration
 
 import (
-	"context"
 	"encoding/json"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
@@ -21,17 +20,6 @@ func (e *Env) RemoveWorkspaceFile(name string) {
 	}
 }
 
-// ReadWorkspaceFile reads a file from the workspace, calling t.Fatal on any
-// error.
-func (e *Env) ReadWorkspaceFile(name string) string {
-	e.T.Helper()
-	content, err := e.Sandbox.Workdir.ReadFile(name)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return string(content)
-}
-
 // WriteWorkspaceFile writes a file to disk but does nothing in the editor.
 // It calls t.Fatal on any error.
 func (e *Env) WriteWorkspaceFile(name, content string) {
@@ -39,26 +27,6 @@ func (e *Env) WriteWorkspaceFile(name, content string) {
 	if err := e.Sandbox.Workdir.WriteFile(e.Ctx, name, content); err != nil {
 		e.T.Fatal(err)
 	}
-}
-
-// WriteWorkspaceFiles deletes a file on disk but does nothing in the
-// editor. It calls t.Fatal on any error.
-func (e *Env) WriteWorkspaceFiles(files map[string]string) {
-	e.T.Helper()
-	if err := e.Sandbox.Workdir.WriteFiles(e.Ctx, files); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// ListFiles lists relative paths to files in the given directory.
-// It calls t.Fatal on any error.
-func (e *Env) ListFiles(dir string) []string {
-	e.T.Helper()
-	paths, err := e.Sandbox.Workdir.ListFiles(dir)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return paths
 }
 
 // OpenFile opens a file in the editor, calling t.Fatal on any error.
@@ -112,18 +80,6 @@ func (e *Env) SetBufferContent(name string, content string) {
 	}
 }
 
-// ReadFile returns the file content for name that applies to the current
-// editing session: if the file is open, it returns its buffer content,
-// otherwise it returns on disk content.
-func (e *Env) FileContent(name string) string {
-	e.T.Helper()
-	text, ok := e.Editor.BufferText(name)
-	if ok {
-		return text
-	}
-	return e.ReadWorkspaceFile(name)
-}
-
 // RegexpSearch returns the starting position of the first match for re in the
 // buffer specified by name, calling t.Fatal on any error. It first searches
 // for the position in open buffers, then in workspace files.
@@ -156,13 +112,6 @@ func (e *Env) SaveBuffer(name string) {
 	}
 }
 
-func (e *Env) SaveBufferWithoutActions(name string) {
-	e.T.Helper()
-	if err := e.Editor.SaveBufferWithoutActions(e.Ctx, name); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
 // Definition goes to definitions in the editor, calling t.Fatal on any
 // error. It returns the paths and positions of the resulting jump.
 func (e *Env) Definition(loc protocol.Location) []protocol.Location {
@@ -174,37 +123,10 @@ func (e *Env) Definition(loc protocol.Location) []protocol.Location {
 	return locs
 }
 
-func (e *Env) TypeDefinition(loc protocol.Location) protocol.Location {
-	e.T.Helper()
-	loc, err := e.Editor.TypeDefinition(e.Ctx, loc)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return loc
-}
-
 // FormatBuffer formats the editor buffer, calling t.Fatal on any error.
 func (e *Env) FormatBuffer(name string) {
 	e.T.Helper()
 	if err := e.Editor.FormatBuffer(e.Ctx, name); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// OrganizeImports processes the source.organizeImports codeAction, calling
-// t.Fatal on any error.
-func (e *Env) OrganizeImports(name string) {
-	e.T.Helper()
-	if err := e.Editor.OrganizeImports(e.Ctx, name); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// ApplyQuickFixes processes the quickfix codeAction, calling t.Fatal on any error.
-func (e *Env) ApplyQuickFixes(path string, diagnostics []protocol.Diagnostic) {
-	e.T.Helper()
-	loc := protocol.Location{URI: e.Sandbox.Workdir.URI(path)} // zero Range => whole file
-	if err := e.Editor.ApplyQuickFixes(e.Ctx, loc, diagnostics); err != nil {
 		e.T.Fatal(err)
 	}
 }
@@ -217,17 +139,6 @@ func (e *Env) ApplyCodeAction(action protocol.CodeAction) {
 	}
 }
 
-// GetQuickFixes returns the available quick fix code actions.
-func (e *Env) GetQuickFixes(path string, diagnostics []protocol.Diagnostic) []protocol.CodeAction {
-	e.T.Helper()
-	loc := protocol.Location{URI: e.Sandbox.Workdir.URI(path)} // zero Range => whole file
-	actions, err := e.Editor.GetQuickFixes(e.Ctx, loc, diagnostics)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return actions
-}
-
 // Hover in the editor, calling t.Fatal on any error.
 func (e *Env) Hover(loc protocol.Location) (*protocol.MarkupContent, protocol.Location) {
 	e.T.Helper()
@@ -236,24 +147,6 @@ func (e *Env) Hover(loc protocol.Location) (*protocol.MarkupContent, protocol.Lo
 		e.T.Fatal(err)
 	}
 	return c, loc
-}
-
-func (e *Env) DocumentLink(name string) []protocol.DocumentLink {
-	e.T.Helper()
-	links, err := e.Editor.DocumentLink(e.Ctx, name)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return links
-}
-
-func (e *Env) DocumentHighlight(loc protocol.Location) []protocol.DocumentHighlight {
-	e.T.Helper()
-	highlights, err := e.Editor.DocumentHighlight(e.Ctx, loc)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return highlights
 }
 
 // CheckForFileChanges triggers a manual poll of the workspace for any file
@@ -301,27 +194,6 @@ func (e *Env) ExecuteCommand(params *protocol.ExecuteCommandParams, result inter
 	}
 }
 
-// InlayHints calls textDocument/inlayHints for the given path, calling t.Fatal on
-// any error.
-func (e *Env) InlayHints(path string) []protocol.InlayHint {
-	e.T.Helper()
-	hints, err := e.Editor.InlayHint(e.Ctx, path)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return hints
-}
-
-// Symbol calls workspace/symbol
-func (e *Env) Symbol(query string) []protocol.SymbolInformation {
-	e.T.Helper()
-	ans, err := e.Editor.Symbols(e.Ctx, query)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return ans
-}
-
 // References wraps Editor.References, calling t.Fatal on any error.
 func (e *Env) References(loc protocol.Location) []protocol.Location {
 	e.T.Helper()
@@ -340,34 +212,6 @@ func (e *Env) Rename(loc protocol.Location, newName string) {
 	}
 }
 
-// Implementations wraps Editor.Implementations, calling t.Fatal on any error.
-func (e *Env) Implementations(loc protocol.Location) []protocol.Location {
-	e.T.Helper()
-	locations, err := e.Editor.Implementations(e.Ctx, loc)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return locations
-}
-
-// RenameFile wraps Editor.RenameFile, calling t.Fatal on any error.
-func (e *Env) RenameFile(oldPath, newPath string) {
-	e.T.Helper()
-	if err := e.Editor.RenameFile(e.Ctx, oldPath, newPath); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// SignatureHelp wraps Editor.SignatureHelp, calling t.Fatal on error
-func (e *Env) SignatureHelp(loc protocol.Location) *protocol.SignatureHelp {
-	e.T.Helper()
-	sighelp, err := e.Editor.SignatureHelp(e.Ctx, loc)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return sighelp
-}
-
 // Completion executes a completion request on the server.
 func (e *Env) Completion(loc protocol.Location) *protocol.CompletionList {
 	e.T.Helper()
@@ -376,27 +220,6 @@ func (e *Env) Completion(loc protocol.Location) *protocol.CompletionList {
 		e.T.Fatal(err)
 	}
 	return completions
-}
-
-// AcceptCompletion accepts a completion for the given item at the given
-// position.
-func (e *Env) AcceptCompletion(loc protocol.Location, item protocol.CompletionItem) {
-	e.T.Helper()
-	if err := e.Editor.AcceptCompletion(e.Ctx, loc, item); err != nil {
-		e.T.Fatal(err)
-	}
-}
-
-// CodeAction calls textDocument/codeAction for the given path, and calls
-// t.Fatal if there are errors.
-func (e *Env) CodeAction(path string, diagnostics []protocol.Diagnostic) []protocol.CodeAction {
-	e.T.Helper()
-	loc := protocol.Location{URI: e.Sandbox.Workdir.URI(path)} // no Range => whole file
-	actions, err := e.Editor.CodeAction(e.Ctx, loc, diagnostics)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return actions
 }
 
 // ChangeConfiguration updates the editor config, calling t.Fatal on any error.
@@ -413,39 +236,5 @@ func (e *Env) ChangeWorkspaceFolders(newFolders ...string) {
 	e.T.Helper()
 	if err := e.Editor.ChangeWorkspaceFolders(e.Ctx, newFolders); err != nil {
 		e.T.Fatal(err)
-	}
-}
-
-// SemanticTokensFull invokes textDocument/semanticTokens/full, calling t.Fatal
-// on any error.
-func (e *Env) SemanticTokensFull(path string) []fake.SemanticToken {
-	e.T.Helper()
-	toks, err := e.Editor.SemanticTokensFull(e.Ctx, path)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return toks
-}
-
-// SemanticTokensRange invokes textDocument/semanticTokens/range, calling t.Fatal
-// on any error.
-func (e *Env) SemanticTokensRange(loc protocol.Location) []fake.SemanticToken {
-	e.T.Helper()
-	toks, err := e.Editor.SemanticTokensRange(e.Ctx, loc)
-	if err != nil {
-		e.T.Fatal(err)
-	}
-	return toks
-}
-
-// Close shuts down the editor session and cleans up the sandbox directory,
-// calling t.Error on any error.
-func (e *Env) Close() {
-	ctx := context.WithoutCancel(e.Ctx)
-	if err := e.Editor.Close(ctx); err != nil {
-		e.T.Errorf("closing editor: %v", err)
-	}
-	if err := e.Sandbox.Close(); err != nil {
-		e.T.Errorf("cleaning up sandbox: %v", err)
 	}
 }

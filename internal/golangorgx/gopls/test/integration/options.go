@@ -7,7 +7,6 @@ package integration
 import (
 	"maps"
 
-	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"cuelang.org/go/internal/lsp/cache"
 )
@@ -60,20 +59,6 @@ func Modes(modes Mode) RunOption {
 			panic("modes set more than once")
 		}
 		opts.modes = modes
-	})
-}
-
-// WindowsLineEndings configures the editor to use windows line endings.
-func WindowsLineEndings() RunOption {
-	return optionSetter(func(opts *runConfig) {
-		opts.editor.WindowsLineEndings = true
-	})
-}
-
-// ClientName sets the LSP client name.
-func ClientName(name string) RunOption {
-	return optionSetter(func(opts *runConfig) {
-		opts.editor.ClientName = name
 	})
 }
 
@@ -144,14 +129,6 @@ func (fs FolderSettings) set(opts *runConfig) {
 		folders[k] = v
 	}
 	opts.editor.FolderSettings = folders
-}
-
-// MessageResponder configures the editor to respond to
-// window/showMessageRequest messages using the provided function.
-func MessageResponder(f func(*protocol.ShowMessageRequestParams) (*protocol.MessageActionItem, error)) RunOption {
-	return optionSetter(func(opts *runConfig) {
-		opts.editor.MessageResponder = f
-	})
 }
 
 // Registry configures the server to use the provided [cache.Registry]

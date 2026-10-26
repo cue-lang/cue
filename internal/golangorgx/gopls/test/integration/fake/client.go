@@ -14,6 +14,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake/glob"
+	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
 )
 
 // ClientHooks are a set of optional hooks called during handling of
@@ -25,21 +26,15 @@ type ClientHooks struct {
 	OnDiagnostics            func(context.Context, *protocol.PublishDiagnosticsParams) error
 	OnWorkDoneProgressCreate func(context.Context, *protocol.WorkDoneProgressCreateParams) error
 	OnProgress               func(context.Context, *protocol.ProgressParams) error
-	OnShowDocument           func(context.Context, *protocol.ShowDocumentParams) error
 	OnShowMessage            func(context.Context, *protocol.ShowMessageParams) error
-	OnShowMessageRequest     func(context.Context, *protocol.ShowMessageRequestParams) error
-	OnRegisterCapability     func(context.Context, *protocol.RegistrationParams) error
-	OnUnregisterCapability   func(context.Context, *protocol.UnregistrationParams) error
-	OnApplyEdit              func(context.Context, *protocol.ApplyWorkspaceEditParams) error
 }
 
 // Client is an implementation of the [protocol.Client] interface
 // based on the test's fake [Editor]. It mostly delegates
 // functionality to hooks that can be configured by tests.
 type Client struct {
-	editor         *Editor
-	hooks          ClientHooks
-	skipApplyEdits bool // don't apply edits from ApplyEdit downcalls to Editor
+	editor *Editor
+	hooks  ClientHooks
 }
 
 func (c *Client) CodeLensRefresh(context.Context) error { return nil }
@@ -63,16 +58,22 @@ func (c *Client) ShowMessage(ctx context.Context, params *protocol.ShowMessagePa
 	return nil
 }
 
-func (c *Client) ShowMessageRequest(ctx context.Context, params *protocol.ShowMessageRequestParams) (*protocol.MessageActionItem, error) {
-	if c.hooks.OnShowMessageRequest != nil {
-		if err := c.hooks.OnShowMessageRequest(ctx, params); err != nil {
-			return nil, err
-		}
-	}
-	if c.editor.config.MessageResponder != nil {
-		return c.editor.config.MessageResponder(params)
-	}
-	return nil, nil // don't choose, which is effectively dismissing the message
+// ShowMessageRequest, [Client.ShowDocument] and [Client.ApplyEdit] return an
+// error, as the server never calls them.
+func (c *Client) ShowMessageRequest(context.Context, *protocol.ShowMessageRequestParams) (*protocol.MessageActionItem, error) {
+	return nil, notImplemented("window/showMessageRequest")
+}
+
+func (c *Client) ShowDocument(context.Context, *protocol.ShowDocumentParams) (*protocol.ShowDocumentResult, error) {
+	return nil, notImplemented("window/showDocument")
+}
+
+func (c *Client) ApplyEdit(context.Context, *protocol.ApplyWorkspaceEditParams) (*protocol.ApplyWorkspaceEditResult, error) {
+	return nil, notImplemented("workspace/applyEdit")
+}
+
+func notImplemented(method string) error {
+	return fmt.Errorf("%w: %q not implemented by the fake client", jsonrpc2.ErrMethodNotFound, method)
 }
 
 func (c *Client) LogMessage(ctx context.Context, params *protocol.LogMessageParams) error {
@@ -112,11 +113,6 @@ func (c *Client) Configuration(_ context.Context, p *protocol.ParamConfiguration
 }
 
 func (c *Client) RegisterCapability(ctx context.Context, params *protocol.RegistrationParams) error {
-	if c.hooks.OnRegisterCapability != nil {
-		if err := c.hooks.OnRegisterCapability(ctx, params); err != nil {
-			return err
-		}
-	}
 	// Update file watching patterns.
 	//
 	// TODO(rfindley): We could verify more here, like verify that the
@@ -158,10 +154,7 @@ func (c *Client) RegisterCapability(ctx context.Context, params *protocol.Regist
 	return nil
 }
 
-func (c *Client) UnregisterCapability(ctx context.Context, params *protocol.UnregistrationParams) error {
-	if c.hooks.OnUnregisterCapability != nil {
-		return c.hooks.OnUnregisterCapability(ctx, params)
-	}
+func (c *Client) UnregisterCapability(context.Context, *protocol.UnregistrationParams) error {
 	return nil
 }
 
@@ -177,33 +170,4 @@ func (c *Client) WorkDoneProgressCreate(ctx context.Context, params *protocol.Wo
 		return c.hooks.OnWorkDoneProgressCreate(ctx, params)
 	}
 	return nil
-}
-
-func (c *Client) ShowDocument(ctx context.Context, params *protocol.ShowDocumentParams) (*protocol.ShowDocumentResult, error) {
-	if c.hooks.OnShowDocument != nil {
-		if err := c.hooks.OnShowDocument(ctx, params); err != nil {
-			return nil, err
-		}
-		return &protocol.ShowDocumentResult{Success: true}, nil
-	}
-	return nil, nil
-}
-
-func (c *Client) ApplyEdit(ctx context.Context, params *protocol.ApplyWorkspaceEditParams) (*protocol.ApplyWorkspaceEditResult, error) {
-	if len(params.Edit.Changes) != 0 {
-		return &protocol.ApplyWorkspaceEditResult{FailureReason: "Edit.Changes is unsupported"}, nil
-	}
-	if c.hooks.OnApplyEdit != nil {
-		if err := c.hooks.OnApplyEdit(ctx, params); err != nil {
-			return nil, err
-		}
-	}
-	if !c.skipApplyEdits {
-		for _, change := range params.Edit.DocumentChanges {
-			if err := c.editor.applyDocumentChange(ctx, change); err != nil {
-				return nil, err
-			}
-		}
-	}
-	return &protocol.ApplyWorkspaceEditResult{Applied: true}, nil
 }

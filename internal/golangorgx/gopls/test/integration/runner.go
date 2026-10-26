@@ -5,7 +5,6 @@
 package integration
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -39,8 +38,7 @@ import (
 // individual tests more freedom in constructing problematic execution modes.
 // For example, a test could assert on a certain behavior when running with
 // experimental options on a separate process. Moreover, we could unify 'Modes'
-// with 'Options', and use RunMultiple rather than a hard-coded loop through
-// modes.
+// with 'Options'.
 //
 // Mode            | Shared Cache? | Shared Server? | In-process?
 // ------------------------------------------------------------
@@ -161,13 +159,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 				t.Fatal(err)
 			}
 
-			files := fake.UnpackTxt(files)
-			if config.editor.WindowsLineEndings {
-				for name, data := range files {
-					files[name] = bytes.ReplaceAll(data, []byte("\n"), []byte("\r\n"))
-				}
-			}
-			config.sandbox.Files = files
+			config.sandbox.Files = fake.UnpackTxt(files)
 			config.sandbox.RootDir = rootDir
 			sandbox, err := fake.NewSandbox(&config.sandbox)
 			if err != nil {
@@ -190,8 +182,7 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 			ts := servertest.NewPipeServer(ss, framer)
 
 			awaiter := NewAwaiter(sandbox.Workdir)
-			const skipApplyEdits = false
-			editor, err := fake.NewEditor(sandbox, config.editor).Connect(ctx, ts, awaiter.Hooks(), skipApplyEdits)
+			editor, err := fake.NewEditor(sandbox, config.editor).Connect(ctx, ts, awaiter.Hooks())
 
 			// Were we expecting an error?
 			if config.initializeErrorMatches != "" {
@@ -260,7 +251,7 @@ func (r *Runner) forwardedServer(config runConfig) jsonrpc2.StreamServer {
 		}
 		ctx := context.Background()
 		ss := lsprpc.NewStreamServer(c, false)
-		r.ts = servertest.NewTCPServer(ctx, ss, nil)
+		r.ts = servertest.NewTCPServer(ctx, ss)
 	})
 	return newForwarder("tcp", r.ts.Addr)
 }

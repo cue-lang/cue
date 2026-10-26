@@ -25,39 +25,26 @@ type Connector interface {
 // connection. Once initialized, its Addr field may be used to connect a
 // jsonrpc2 client.
 type TCPServer struct {
-	*connList
-
 	Addr string
 
-	ln     net.Listener
-	framer jsonrpc2.Framer
+	ln net.Listener
 }
 
 // NewTCPServer returns a new test server listening on local tcp port and
 // serving incoming jsonrpc2 streams using the provided stream server. It
 // panics on any error.
-func NewTCPServer(ctx context.Context, server jsonrpc2.StreamServer, framer jsonrpc2.Framer) *TCPServer {
+func NewTCPServer(ctx context.Context, server jsonrpc2.StreamServer) *TCPServer {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		panic(fmt.Sprintf("servertest: failed to listen: %v", err))
 	}
-	if framer == nil {
-		framer = jsonrpc2.NewHeaderStream
-	}
 	go jsonrpc2.Serve(ctx, ln, server, 0)
-	return &TCPServer{Addr: ln.Addr().String(), ln: ln, framer: framer, connList: &connList{}}
+	return &TCPServer{Addr: ln.Addr().String(), ln: ln}
 }
 
-// Connect dials the test server and returns a jsonrpc2 Connection that is
-// ready for use.
-func (s *TCPServer) Connect(_ context.Context) jsonrpc2.Conn {
-	netConn, err := net.Dial("tcp", s.Addr)
-	if err != nil {
-		panic(fmt.Sprintf("servertest: failed to connect to test instance: %v", err))
-	}
-	conn := jsonrpc2.NewConn(s.framer(netConn))
-	s.add(conn)
-	return conn
+// Close stops the server from accepting new connections.
+func (s *TCPServer) Close() error {
+	return s.ln.Close()
 }
 
 // PipeServer is a test server that handles connections over io.Pipes.

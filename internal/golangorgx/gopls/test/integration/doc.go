@@ -105,52 +105,39 @@
 // expectations", use env.Await(...):
 //
 //	env.RegexpReplace("x/x.cue", `package x`, `package y`)
-//	env.Await(Diagnostics(env.AtRegexp("x/x.cue", `package y`)))
+//	env.Await(
+//		env.DoneWithChange(),
+//		Diagnostics(env.AtRegexp("x/x.cue", `package y`)),
+//	)
 //
 // Await evaluates the provided expectations atomically, whenever the client
-// receives a state-changing notification from the server. See expectation.go for a
-// full list of available expectations.
+// receives a state-changing notification from the server, and returns once
+// they are all met at the same time. See expectation.go for a full list of
+// available expectations.
+//
+// The server uses verbose progress notifications to inform the client about
+// ongoing work (see CompletedWork). Expectations such as DoneWithChange are
+// met once the server is done processing the notifications sent so far, so
+// awaiting them alongside other expectations ensures that those are checked
+// against up-to-date server state.
 //
 // A problem with this model is that if the server never meets the provided
 // expectations, the test runner will hang until the test timeout
-// (which defaults to 10m). There are two ways to work around this
-// poor behavior:
-//
-//  1. Use a precondition to define precisely when we expect conditions to be
-//     met. The integration package provides the
-//     OnceMet(precondition, expectations...) pattern
-//     to express ("once this precondition is met, the following expectations
-//     must all hold"). To instrument preconditions, the server uses verbose
-//     progress notifications to inform the client about ongoing work (see
-//     CompletedWork). The most common precondition is to wait for the server to be
-//     done processing all change notifications, for which the integration package
-//     provides the AfterChange helper. For example:
-//
-//     // We expect diagnostics to be cleared after the server is done
-//     // processing the didSave notification.
-//     env.SaveBuffer("a/a.cue")
-//     env.AfterChange(NoDiagnostics(ForFile("a/a.cue")))
-//
-//  2. Set a shorter timeout during development, if you expect to be breaking
-//     tests. By setting the environment variable CUELSP_INTEGRATION_TEST_TIMEOUT=5s,
-//     integration tests will time out after 5 seconds.
+// (which defaults to 10m). Await only fails early when an expectation becomes
+// unmeetable, such as NoLogMatching once a matching log message arrives.
 //
 // # Tips & Tricks
 //
 // Here are some tips and tricks for working with integration tests:
 //
-//  1. Set the environment variable CUELSP_INTEGRATION_TEST_TIMEOUT=5s during development.
+//  1. Set the environment variable CUELSP_INTEGRATION_TEST_TIMEOUT=5s during
+//     development, so that integration tests time out after 5 seconds.
 //  2. Run tests with  -short. This will only run integration tests in the
 //     default execution mode.
 //  3. Use capture groups to narrow regexp positions. All regular-expression
-//     based positions (such as DiagnosticAtRegexp) will match the position of
+//     based positions (such as AtRegexp) will match the position of
 //     the first capture group, if any are provided. This can be used to
 //     identify a specific position in the code for a pattern that may occur in
 //     multiple places. For example `(foo): int` matches the position
 //     of "foo" within the field declaration.
-//  4. Read diagnostics into a variable to implement more complicated
-//     assertions about diagnostic state in the editor. To do this, use the
-//     pattern OnceMet(precondition, ReadDiagnostics("file.cue", &d)) to capture
-//     the current diagnostics as soon as the precondition is met. This is
-//     preferable to accessing the diagnostics directly, as it avoids races.
 package integration

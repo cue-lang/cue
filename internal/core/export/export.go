@@ -188,15 +188,6 @@ func isDefinitionReference(x ast.Expr) bool {
 	return false
 }
 
-// Expr exports the given unevaluated expression (schema mode).
-// It does not resolve references that point outside the given expression.
-func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
-	e := newExporter(p, adt.NewContext(r, nil), pkgID, nil)
-	defer adt.AddStats(e.ctx)
-
-	return e.expr(nil, n), nil
-}
-
 func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	fout := &ast.File{}
 
@@ -321,7 +312,7 @@ func Value(ctx *adt.OpContext, pkgID string, n adt.Value) (ast.Expr, errors.Erro
 
 // Value exports evaluated values (data mode).
 // It does not resolve references that point outside the given Value.
-// Unlike [Profile.Def], [Profile.Expr] and [Profile.Vertex], it exports
+// Unlike [Profile.Def] and [Profile.Vertex], it exports
 // within ctx, whose stats remain the caller's to add to the totals.
 func (p *Profile) Value(ctx *adt.OpContext, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 	e := newExporter(p, ctx, pkgID, n)

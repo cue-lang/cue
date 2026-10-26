@@ -370,21 +370,6 @@ func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
 	return adt.MakeRootConjunct(env, expr)
 }
 
-// requireVersion checks if a feature is available in the current language version.
-// Returns an error if the feature requires a newer version, nil otherwise.
-//
-//lint:ignore U1000 kept for gating future language features
-func (c *compiler) requireVersion(n ast.Node, minVersion, feature string) *adt.Bottom {
-	v := c.experiments.LanguageVersion()
-	if v == "" {
-		return nil
-	}
-	if semver.Compare(minVersion, v) > 0 {
-		return c.errf(n, "%s requires language version %s or later; current version is %s", feature, minVersion, v)
-	}
-	return nil
-}
-
 // setExperiments records the experiments to compile with, assuming the
 // defaults of the current language version for source that carries none.
 // This covers the compiler's gates only; evaluation-time gates that resolve
@@ -427,11 +412,6 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 	}
 
 	v := c.experiments.LanguageVersion()
-	if v == "" {
-		// We assume "latest" if the file is not associated with a version.
-		return n
-	}
-
 	if semver.Compare(added, v) <= 0 {
 		// The feature is available in the file version.
 		return n

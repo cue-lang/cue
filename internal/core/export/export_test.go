@@ -305,13 +305,11 @@ func TestGenerated(t *testing.T) {
 				}
 
 				before := describeInput(ctx, v)
-				var n ast.Node
-				switch x := v.(type) {
-				case *adt.Vertex:
-					n, err = p.Def(ctx, "", x)
-				default:
-					n, err = p.Expr(ctx, "", v)
+				x, ok := v.(*adt.Vertex)
+				if !ok {
+					t.Fatalf("got %T, want *adt.Vertex", v)
 				}
+				n, err := p.Def(ctx, "", x)
 				if err != nil {
 					t.Fatal("failed export: ", err)
 				}

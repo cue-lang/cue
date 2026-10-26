@@ -90,13 +90,6 @@ func (it *itemAllOf) hash(h *maphash.Hash, u *uniqueItems) {
 	}
 }
 
-var _ elementsItem = (*itemAllOf)(nil)
-
-// elements implements [elementsItem].
-func (i *itemAllOf) elements() []internItem {
-	return i.elems
-}
-
 func (i *itemAllOf) generate(g *generator) ast.Expr {
 	// Because a single json schema object is essentially an allOf itself,
 	// we can merge objects that don't share keywords
@@ -214,13 +207,6 @@ func (i *itemOneOf) apply(f func(internItem, *uniqueItems) internItem, u *unique
 	return &itemOneOf{elems: elems}
 }
 
-var _ elementsItem = (*itemOneOf)(nil)
-
-// elements implements [elementsItem].
-func (i *itemOneOf) elements() []internItem {
-	return i.elems
-}
-
 // itemAnyOf represents an anyOf combinator
 type itemAnyOf struct {
 	elems []internItem
@@ -288,13 +274,6 @@ func (i *itemAnyOf) apply(f func(internItem, *uniqueItems) internItem, u *unique
 		return i
 	}
 	return &itemAnyOf{elems: elems}
-}
-
-var _ elementsItem = (*itemAnyOf)(nil)
-
-// elements implements [elementsItem].
-func (i *itemAnyOf) elements() []internItem {
-	return i.elems
 }
 
 // itemNot represents a not combinator

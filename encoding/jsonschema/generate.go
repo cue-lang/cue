@@ -433,7 +433,7 @@ func mergeAllOf(it internItem, u *uniqueItems) internItem {
 		}
 		typeIndex := -1
 		var typeKind cue.Kind
-		for e := range siblings(it1) {
+		for e := range itemConjuncts(it) {
 			e = mergeAllOf(e, u)
 			// Remove elements that are entirely redundant.
 			if slices.Contains(it2.elems, e) {
@@ -481,15 +481,9 @@ func itemConjuncts(it internItem) iter.Seq[internItem] {
 	}
 }
 
-func siblings[T elementsItem](it T) iter.Seq[internItem] {
-	return func(yield func(internItem) bool) {
-		yieldSiblings(it, yield)
-	}
-}
-
-func yieldSiblings[T elementsItem](it T, yield func(internItem) bool) bool {
-	for _, e := range it.elements() {
-		if ae, ok := e.Value().(T); ok {
+func yieldSiblings(it *itemAllOf, yield func(internItem) bool) bool {
+	for _, e := range it.elems {
+		if ae, ok := e.Value().(*itemAllOf); ok {
 			if !yieldSiblings(ae, yield) {
 				return false
 			}
@@ -566,13 +560,6 @@ type generator struct {
 	redirectFrom   *CUERef
 	redirectTo     *CUERef
 	inliningNonDef bool
-}
-
-// Note this type definition is defined further away from [siblings]
-// than it ideally would be because of https://go.dev/issue/78296
-// TODO when that issue is fixed, move it back again.
-type elementsItem interface {
-	elements() []internItem
 }
 
 func (g *generator) addError(pos cue.Value, err error) {
@@ -1472,7 +1459,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 					continue
 				}
 				if elems == nil {
-					elems = slices.Collect(siblings(allof))
+					elems = slices.Collect(itemConjuncts(propItem))
 				}
 				// We've found a pattern constraint that unifies with the field name.
 				// Its constraint will have been added to this property's constraints

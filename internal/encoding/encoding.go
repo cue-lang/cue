@@ -64,8 +64,7 @@ type Decoder struct {
 	hasValue       bool
 	valueProjected bool
 	filename       string // may change on iteration for some formats
-	index          int
-	size           int // length of the source file if known; -1 otherwise
+	size           int    // length of the source file if known; -1 otherwise
 	err            error
 }
 
@@ -78,7 +77,6 @@ func (i *Decoder) Filename() string { return i.filename }
 func (i *Decoder) Interpretation() build.Interpretation {
 	return i.interpretation
 }
-func (i *Decoder) Index() int { return i.index }
 func (i *Decoder) Done() bool { return i.err != nil }
 
 func (i *Decoder) Next() {
@@ -93,7 +91,6 @@ func (i *Decoder) Next() {
 	i.valueProjected = false
 	if i.nextValue != nil {
 		i.value, i.err = i.nextValue()
-		i.index++
 		if i.err != nil {
 			return
 		}
@@ -112,7 +109,6 @@ func (i *Decoder) Next() {
 		return
 	}
 	i.expr, i.err = i.next()
-	i.index++
 	if i.err != nil {
 		return
 	}

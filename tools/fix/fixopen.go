@@ -105,11 +105,6 @@ type closeInfo struct {
 	// rest of closeInfo, it is inherited by nested scopes (see pushScope).
 	inComprehension bool
 
-	// The scope is the value of a comprehension, not a field nested
-	// inside one. Only embeddings declared directly in a comprehension
-	// value lose the old conditional closing and get a TODO comment.
-	compValue bool
-
 	// An embedding declared directly in the struct literal being
 	// traversed is that literal's whole value: the literal has no other
 	// element, and the literal is itself the whole value of the position
@@ -245,7 +240,6 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			pushScope(closeInfo{
 				suspendReclose:  1,
 				inComprehension: true,
-				compValue:       true,
 			})
 
 		case *ast.EmbedDecl:
@@ -295,11 +289,15 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// would prevent the children from being traversed at all.
 			newExpr, exprChanged, flags := openEmbedExpr(n.Expr, info.wholeValue)
 			info.embedFlags = info.embedFlags.or(flags)
+			// An embedding declared directly in a comprehension value
+			// lost the old conditional closing when anything in it was
+			// opened, an embedding nested in a literal it embeds
+			// included.
+			if inCompValue(c) && (exprChanged || c.Modified()) {
+				ast.AddComment(newExpr, todoComment(
+					"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
+			}
 			if exprChanged {
-				if info.compValue {
-					ast.AddComment(newExpr, todoComment(
-						"the old semantics closed the enclosing struct when the comprehension fired; this is no longer the case."))
-				}
 				if flags.def && len(recloseStack) == 0 {
 					ast.AddComment(newExpr, todoComment(
 						"top-level definition embedding opened; if this is intended as a schema, remove the '...'."))
@@ -1388,6 +1386,17 @@ func soleEmbedExpr(s *ast.StructLit) (ast.Expr, bool) {
 		return nil, false
 	}
 	return e.Expr, true
+}
+
+// inCompValue reports whether the embedding at c is declared directly in
+// the value of a comprehension, rather than in a literal nested there.
+func inCompValue(c astutil.Cursor) bool {
+	lit := c.Parent()
+	if lit == nil || lit.Parent() == nil {
+		return false
+	}
+	comp, ok := lit.Parent().Node().(*ast.Comprehension)
+	return ok && comp.Value == lit.Node()
 }
 
 func addEllipsis(expr ast.Expr) *ast.PostfixExpr {

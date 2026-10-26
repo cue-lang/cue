@@ -58,6 +58,24 @@ compRef: {
 	}
 }
 
+// A hoisted close() in a comprehension value: the embedding inside its
+// argument gets a TODO of its own beside the one on the hoisted argument.
+compClose: {
+	for v in _repo {
+		close({_repo})
+		x: 1
+	}
+}
+
+// A nested literal in a comprehension value: the TODO goes on the
+// embedding inside the literal, not on the literal embedded in the value.
+compNested: {
+	for v in _repo {
+		{_repo}
+		x: 1
+	}
+}
+
 // Comprehension inside a list.
 inList: {
 	steps: [
@@ -127,6 +145,34 @@ compRef: {
 		// TODO(cue-fix): the old semantics closed the enclosing struct when the
 		// comprehension fired; this is no longer the case.
 		v...
+	}
+}
+
+// A hoisted close() in a comprehension value: the embedding inside its
+// argument gets a TODO of its own beside the one on the hoisted argument.
+compClose: {
+	for v in _repo {
+		// TODO(cue-fix): the old semantics closed the enclosing struct when the
+		// comprehension fired; this is no longer the case.
+		{
+			// TODO(cue-fix): the old semantics closed the enclosing struct when the
+			// comprehension fired; this is no longer the case.
+			_repo...
+		}
+		x: 1
+	}
+}
+
+// A nested literal in a comprehension value: the TODO goes on the
+// embedding inside the literal, not on the literal embedded in the value.
+compNested: {
+	for v in _repo {
+		{
+			// TODO(cue-fix): the old semantics closed the enclosing struct when the
+			// comprehension fired; this is no longer the case.
+			_repo...
+		}
+		x: 1
 	}
 }
 

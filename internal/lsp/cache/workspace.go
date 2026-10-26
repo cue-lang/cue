@@ -193,47 +193,24 @@ func (w *Workspace) UpdateFolderOptions(fetchFolderOptions func(folder protocol.
 // them, in order to keep the server's state up to date.
 //
 // This set includes
-//  1. all cue.mod/module.cue files in the workspace; and
-//  2. for each WorkspaceFolder, its modules (or directory for ad-hoc views). In
-//     module mode, this is the set of active modules (and for VS Code, all
-//     workspace directories within them, due to golang/go#42348).
+//  1. the CUE, JSON and YAML files under every WorkspaceFolder; and
+//  2. for each WorkspaceFolder which needs subdirectories to be watched
+//     explicitly, the active directories within it.
 //
-// The watch for workspace cue.mod/module.cue files in (1) is
-// sufficient to capture changes to the repo structure that may affect
-// the sets of modules and packages.  Whenever this set changes, we
-// reload the workspace and invalidate memoized files.
-//
-// The watch for workspace directories in (2) should keep each Package
-// up to date, as it should capture any newly added/modified/deleted
-// cue files.
-//
-// Patterns are returned as a set of protocol.RelativePatterns, since they can
-// always be later translated to glob patterns (i.e. strings) if the client
-// lacks relative pattern support. By convention, any pattern returned with
-// empty baseURI should be served as a glob pattern.
-//
-// In general, we prefer to serve relative patterns, as they work better on
-// most clients that support both, and do not have issues with Windows driver
-// letter casing:
-// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#relativePattern
-func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.RelativePattern]struct{} {
-	patterns := make(map[protocol.RelativePattern]struct{})
-
-	// from golang/go#42348:
-	//
-	// VS Code requires that we watch directories explicitly -- a
-	// deletion of a directory that contains Cue files will not give us
-	// a notification if our glob pattern only contains Cue files
-	// (e.g. "**/*.cue").
-	//
-	// We only care about deletions of directories, not about
-	// creations. We care about deletions because deleting the
-	// directory might also delete files that we care about. So, for every active file, if the dir
+// The watch for files in (1) keeps each Package up to date, and
+// captures changes to cue.mod/module.cue files which may affect the
+// sets of modules and packages. The watch for directories in (2) is
+// needed on clients such as VS Code, which do not notify the deletion
+// of a directory containing watched files; see golang/go#42348.
+func (w *Workspace) FileWatchingGlobPatterns() map[string]struct{} {
+	patterns := make(map[string]struct{})
+	if len(w.folders) > 0 {
+		patterns["**/*.{cue,json,yaml,yml}"] = struct{}{}
+	}
 
 	var wfDirs []protocol.DocumentURI
 	for _, wf := range w.folders {
-		needsSubdirs := wf.FileWatchingGlobPatterns(patterns)
-		if needsSubdirs {
+		if wf.watchSubdirs() {
 			wfDirs = append(wfDirs, wf.dir)
 		}
 	}
@@ -257,7 +234,7 @@ func (w *Workspace) FileWatchingGlobPatterns(ctx context.Context) map[protocol.R
 		for _, wfDir := range wfDirs {
 			// NB: a.Encloses(b) returns true if a == b
 			if wfDir.Encloses(activeDir) {
-				patterns[protocol.RelativePattern{Pattern: filepath.ToSlash(activeDir.FilePath())}] = struct{}{}
+				patterns[filepath.ToSlash(activeDir.FilePath())] = struct{}{}
 				break
 			}
 		}
@@ -914,11 +891,11 @@ func (w *Workspace) reloadPackages() {
 		// Once a package is marked dirty, it eventually gets
 		// reloaded. modpkgload will reload its import graph, which
 		// covers everything upstream. Nothing downstream needs to be
-		// reloaded: the [Package.resetEval] mechanism is sufficient to
-		// clear out stale state. However, if a package is deleted, then
-		// we really must mark the immediate downstream packages as
-		// dirty and reload them, so that they no longer resolve their
-		// imports and embeds to the deleted package.
+		// reloaded: the [resetEvalComponent] mechanism is sufficient
+		// to clear out stale state. However, if a package is deleted,
+		// then we really must mark the immediate downstream packages
+		// as dirty and reload them, so that they no longer resolve
+		// their imports and embeds to the deleted package.
 		//
 		// Packages are deleted at several points, both within this
 		// loop and outside it (a module that fails to reload deletes

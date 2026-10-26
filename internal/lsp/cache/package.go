@@ -208,10 +208,9 @@ func (pkg *Package) matchesUnknownEmbedding(fileUri protocol.DocumentURI) bool {
 	return false
 }
 
-// resetEval resets the package's own evaluator. If recursive is true,
-// it also resets the evaluator of every package reachable from this
-// one over the import and embed relationships, followed in both
-// directions.
+// resetEvalComponent resets the evaluators of the connected component
+// containing member: every package reachable from it over the import
+// and embed relationships, followed in both directions.
 //
 // Evaluators write into each other during evaluation: a package's
 // evaluator records usages within the evaluators of the packages it
@@ -226,18 +225,6 @@ func (pkg *Package) matchesUnknownEmbedding(fileUri protocol.DocumentURI) bool {
 // evaluator are lost, and its own memoized state prevents them from
 // ever being re-recorded, so find-references within the embedded file
 // silently misses results.
-func (pkg *Package) resetEval(recursive bool) {
-	if !recursive {
-		if pkg.eval != nil {
-			pkg.eval.Reset()
-		}
-		return
-	}
-	resetEvalComponent(pkg)
-}
-
-// resetEvalComponent resets the evaluators of the connected component
-// containing member.
 func resetEvalComponent(member evalGraphMember) {
 	seen := map[evalGraphMember]struct{}{member: {}}
 	worklist := []evalGraphMember{member}
@@ -295,7 +282,7 @@ func (pkg *Package) evalNeighbours() iter.Seq[evalGraphMember] {
 // recorded in the workspace, for [Workspace.reloadPackages] to mark
 // the package's importers and embedders dirty.
 func (pkg *Package) delete() {
-	pkg.resetEval(true)
+	resetEvalComponent(pkg)
 
 	m := pkg.module
 	delete(m.packages, pkg.importPath)
@@ -353,7 +340,7 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	oldFilesSet := pkg.files
 	pkg.isDirty = false
 
-	pkg.resetEval(true)
+	resetEvalComponent(pkg)
 
 	for _, importedPkg := range pkg.imports {
 		importedPkg.RemoveImportedBy(pkg)

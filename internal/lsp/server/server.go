@@ -105,7 +105,7 @@ type server struct {
 	// the client watch on disk. It will be updated as the set of directories
 	// that the server should watch changes.
 	// The map field may be reassigned but the map itself is immutable.
-	watchedGlobPatterns map[protocol.RelativePattern]struct{}
+	watchedGlobPatterns map[string]struct{}
 	watchingIDCounter   int
 
 	// enqueue allows for a function to be added to the incoming queue

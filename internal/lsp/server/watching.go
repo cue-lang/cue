@@ -17,39 +17,25 @@ package server
 import (
 	"context"
 	"fmt"
-	"path"
-	"path/filepath"
+	"maps"
 	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
 
-func sameKeys[K comparable, V1, V2 any](x map[K]V1, y map[K]V2) bool {
-	if len(x) != len(y) {
-		return false
-	}
-	for k := range x {
-		if _, ok := y[k]; !ok {
-			return false
-		}
-	}
-	return true
-}
-
-// UpdateWatchedFiles compares the current set of directories to watch
-// with the previously registered set of directories. If the set of directories
-// has changed, we unregister and re-register for file watching notifications.
-// updatedSnapshots is the set of snapshots that have been updated.
+// UpdateWatchedFiles compares the current set of glob patterns to watch
+// with the previously registered set. If the set has changed, we
+// unregister and re-register for file watching notifications.
 func (s *server) UpdateWatchedFiles(ctx context.Context) error {
-	patterns := s.workspace.FileWatchingGlobPatterns(ctx)
+	patterns := s.workspace.FileWatchingGlobPatterns()
 
 	options := s.Options()
 	if !options.DynamicWatchedFilesSupported {
 		return nil
 	}
 
-	// Nothing to do if the set of workspace directories is unchanged.
-	if sameKeys(s.watchedGlobPatterns, patterns) {
+	// Nothing to do if the set of patterns is unchanged.
+	if maps.Equal(s.watchedGlobPatterns, patterns) {
 		return nil
 	}
 
@@ -65,25 +51,12 @@ func (s *server) UpdateWatchedFiles(ctx context.Context) error {
 	s.watchingIDCounter++
 	curID := s.watchingIDCounter
 
-	supportsRelativePatterns := options.RelativePatternsSupported
 	kind := protocol.WatchChange | protocol.WatchDelete | protocol.WatchCreate
 	watchers := make([]protocol.FileSystemWatcher, 0, len(patterns))
 
 	for pattern := range patterns {
-		var value any
-		if supportsRelativePatterns && pattern.BaseURI != "" {
-			value = pattern
-
-		} else {
-			p := pattern.Pattern
-			if pattern.BaseURI != "" {
-				p = path.Join(filepath.ToSlash(pattern.BaseURI.FilePath()), p)
-			}
-			value = p
-		}
-
 		watchers = append(watchers, protocol.FileSystemWatcher{
-			GlobPattern: protocol.GlobPattern{Value: value},
+			GlobPattern: protocol.GlobPattern{Value: pattern},
 			Kind:        &kind,
 		})
 	}

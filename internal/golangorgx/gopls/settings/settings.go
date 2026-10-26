@@ -19,7 +19,6 @@ type Options struct {
 	ConfigurationSupported        bool
 	DynamicConfigurationSupported bool
 	DynamicWatchedFilesSupported  bool
-	RelativePatternsSupported     bool
 	CodeActionResolveOptions      []string
 
 	// DiagnosticsDelay controls the amount of time that the server waits
@@ -96,7 +95,6 @@ func (o *Options) ForClientCapabilities(clientName *protocol.ClientInfo, caps pr
 	o.ConfigurationSupported = caps.Workspace.Configuration
 	o.DynamicConfigurationSupported = caps.Workspace.DidChangeConfiguration.DynamicRegistration
 	o.DynamicWatchedFilesSupported = caps.Workspace.DidChangeWatchedFiles.DynamicRegistration
-	o.RelativePatternsSupported = caps.Workspace.DidChangeWatchedFiles.RelativePatternSupport
 
 	// Check if the client supports code actions resolving.
 	if caps.TextDocument.CodeAction.DataSupport && caps.TextDocument.CodeAction.ResolveSupport != nil {

@@ -8,13 +8,9 @@ package lsprpc
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
-	"sync"
-	"sync/atomic"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -22,9 +18,6 @@ import (
 	"cuelang.org/go/internal/lsp/cache"
 	"cuelang.org/go/internal/lsp/server"
 )
-
-// Unique identifiers for client/server.
-var serverIndex int64
 
 // The streamServer type is a jsonrpc2.streamServer that handles incoming
 // streams as a new LSP session, using a shared cache.
@@ -48,8 +41,7 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 	svrID := svr.ID()
 
 	handlers, enqueue := protocol.HandlersWithEnqueue(
-		handshaker(svrID, s.daemon,
-			svr.Handler(jsonrpc2.MethodNotFound)))
+		svr.Handler(jsonrpc2.MethodNotFound))
 	svr.SetEnqueuer(enqueue.Enqueue)
 
 	// Clients may or may not send a shutdown message. Make sure the
@@ -68,17 +60,9 @@ func (s *streamServer) ServeStream(ctx context.Context, conn jsonrpc2.Conn) erro
 // A forwarder is a jsonrpc2.StreamServer that handles an LSP stream
 // by forwarding it to a remote. This is used when the cuelsp process
 // started by the editor is in the `-remote` mode, which means it
-// finds and connects to a separate cuelsp daemon. In these cases, we
-// still want the forwarder cuelsp to in some cases hijack the
-// jsonrpc2 connection with the daemon.
+// finds and connects to a separate cuelsp daemon.
 type forwarder struct {
 	dialer *autoDialer
-
-	mu sync.Mutex
-	// Hold on to the server connection so that we can redo the handshake if any
-	// information changes.
-	serverConn jsonrpc2.Conn
-	serverID   string
 }
 
 // NewForwarder creates a new forwarder (a [jsonrpc2.StreamServer]),
@@ -114,17 +98,6 @@ func (f *forwarder) ServeStream(ctx context.Context, clientConn jsonrpc2.Conn) e
 		protocol.Handlers(
 			protocol.ClientHandler(client,
 				jsonrpc2.MethodNotFound)))
-
-	// Don't run the clientConn yet, so that we can complete the handshake before
-	// processing any client messages.
-
-	// Do a handshake with the server instance to exchange debug information.
-	index := atomic.AddInt64(&serverIndex, 1)
-	f.mu.Lock()
-	f.serverConn = serverConn
-	f.serverID = strconv.FormatInt(index, 10)
-	f.mu.Unlock()
-	f.handshake(ctx)
 	clientConn.Go(ctx,
 		protocol.Handlers(
 			protocol.ServerHandler(server, jsonrpc2.MethodNotFound)))
@@ -143,76 +116,6 @@ func (f *forwarder) ServeStream(ctx context.Context, clientConn jsonrpc2.Conn) e
 		err = fmt.Errorf("client disconnected: %v", clientConn.Err())
 	}
 	return err
-}
-
-// TODO(rfindley): remove this handshaking in favor of middleware.
-func (f *forwarder) handshake(ctx context.Context) {
-	// This call to os.Executable is redundant, and will be eliminated by the
-	// transition to the V2 API.
-	hreq := handshakeRequest{ServerID: f.serverID}
-	var hresp handshakeResponse
-	// TODO(rfindley): at some point in the future we should return an error
-	// here.  Handshakes have become functional in nature.
-	protocol.Call(ctx, f.serverConn, handshakeMethod, hreq, &hresp)
-}
-
-// A handshakeRequest identifies a client to the LSP server.
-type handshakeRequest struct {
-	// ServerID is the ID of the server on the client. This should
-	// usually be 0.
-	ServerID string `json:"serverID"`
-}
-
-// A handshakeResponse is returned by the LSP server to tell the LSP
-// client information about its server.
-type handshakeResponse struct {
-	// ServerID is the server server associated with the client.
-	ServerID string `json:"serverID"`
-}
-
-// serverState holds information about the cuelsp daemon process.
-type serverState struct {
-	CurrentServerID string `json:"currentServerID"`
-}
-
-const (
-	handshakeMethod = "cuelsp/handshake"
-	serversMethod   = "cuelsp/servers"
-)
-
-func handshaker(svrID string, logHandshakes bool, handler jsonrpc2.Handler) jsonrpc2.Handler {
-	return func(ctx context.Context, reply jsonrpc2.Replier, r jsonrpc2.Request) error {
-		switch r.Method() {
-		case handshakeMethod:
-			var req handshakeRequest
-			if err := json.Unmarshal(r.Params(), &req); err != nil {
-				if logHandshakes {
-					log.Printf("Error processing handshake for server %s: %v", svrID, err)
-				}
-				sendError(ctx, reply, err)
-				return nil
-			}
-			if logHandshakes {
-				log.Printf("Server %s: got handshake.", svrID)
-			}
-			resp := handshakeResponse{
-				ServerID: svrID,
-			}
-			return reply(ctx, resp, nil)
-
-		case serversMethod:
-			resp := serverState{
-				CurrentServerID: svrID,
-			}
-			return reply(ctx, resp, nil)
-		}
-		return handler(ctx, reply, r)
-	}
-}
-
-func sendError(ctx context.Context, reply jsonrpc2.Replier, err error) {
-	err = fmt.Errorf("%v: %w", err, jsonrpc2.ErrParse)
-	reply(ctx, nil, err)
 }
 
 // ParseAddr parses the address of a cuelsp remote.

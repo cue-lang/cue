@@ -8,7 +8,6 @@ package diff
 import (
 	"fmt"
 	"sort"
-	"strings"
 )
 
 // An Edit describes the replacement of a portion of a text file.
@@ -104,73 +103,3 @@ func (a editsSort) Less(i, j int) bool {
 	return a[i].End < a[j].End
 }
 func (a editsSort) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-
-// lineEdits expands and merges a sequence of edits so that each
-// resulting edit replaces one or more complete lines.
-// See ApplyEdits for preconditions.
-func lineEdits(src string, edits []Edit) ([]Edit, error) {
-	edits, _, err := validate(src, edits)
-	if err != nil {
-		return nil, err
-	}
-
-	// Do all deletions begin and end at the start of a line,
-	// and all insertions end with a newline?
-	// (This is merely a fast path.)
-	for _, edit := range edits {
-		if edit.Start >= len(src) || // insertion at EOF
-			edit.Start > 0 && src[edit.Start-1] != '\n' || // not at line start
-			edit.End > 0 && src[edit.End-1] != '\n' || // not at line start
-			edit.New != "" && edit.New[len(edit.New)-1] != '\n' { // partial insert
-			goto expand // slow path
-		}
-	}
-	return edits, nil // aligned
-
-expand:
-	if len(edits) == 0 {
-		return edits, nil // no edits (unreachable due to fast path)
-	}
-	expanded := make([]Edit, 0, len(edits)) // a guess
-	prev := edits[0]
-	// TODO(adonovan): opt: start from the first misaligned edit.
-	// TODO(adonovan): opt: avoid quadratic cost of string += string.
-	for _, edit := range edits[1:] {
-		between := src[prev.End:edit.Start]
-		if !strings.Contains(between, "\n") {
-			// overlapping lines: combine with previous edit.
-			prev.New += between + edit.New
-			prev.End = edit.End
-		} else {
-			// non-overlapping lines: flush previous edit.
-			expanded = append(expanded, expandEdit(prev, src))
-			prev = edit
-		}
-	}
-	return append(expanded, expandEdit(prev, src)), nil // flush final edit
-}
-
-// expandEdit returns edit expanded to complete whole lines.
-func expandEdit(edit Edit, src string) Edit {
-	// Expand start left to start of line.
-	// (delta is the zero-based column number of start.)
-	start := edit.Start
-	if delta := start - 1 - strings.LastIndex(src[:start], "\n"); delta > 0 {
-		edit.Start -= delta
-		edit.New = src[start-delta:start] + edit.New
-	}
-
-	// Expand end right to end of line.
-	end := edit.End
-	if end > 0 && src[end-1] != '\n' ||
-		edit.New != "" && edit.New[len(edit.New)-1] != '\n' {
-		if nl := strings.IndexByte(src[end:], '\n'); nl < 0 {
-			edit.End = len(src) // extend to EOF
-		} else {
-			edit.End = end + nl + 1 // extend beyond \n
-		}
-	}
-	edit.New += src[end:edit.End]
-
-	return edit
-}

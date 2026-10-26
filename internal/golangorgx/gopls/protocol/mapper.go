@@ -103,30 +103,6 @@ func (m *Mapper) initLines() {
 	})
 }
 
-// LineCol8Position converts a valid line and UTF-8 column number,
-// both 1-based, to a protocol (UTF-16) position.
-func (m *Mapper) LineCol8Position(line, col8 int) (Position, error) {
-	m.initLines()
-	line0 := line - 1 // 0-based
-	if !(0 <= line0 && line0 < len(m.lineStart)) {
-		return Position{}, fmt.Errorf("line number %d out of range (max %d)", line, len(m.lineStart))
-	}
-
-	// content[start:end] is the preceding partial line.
-	start := m.lineStart[line0]
-	end := start + col8 - 1
-
-	// Validate column.
-	if end > len(m.Content) {
-		return Position{}, fmt.Errorf("column is beyond end of file")
-	} else if line0+1 < len(m.lineStart) && end >= m.lineStart[line0+1] {
-		return Position{}, fmt.Errorf("column is beyond end of line")
-	}
-
-	char := UTF16Len(m.Content[start:end])
-	return Position{Line: uint32(line0), Character: uint32(char)}, nil
-}
-
 // -- conversions from byte offsets --
 
 // OffsetLocation converts a byte-offset interval to a protocol (UTF-16) location.
@@ -179,16 +155,6 @@ func (m *Mapper) lineCol16(offset int) (int, int) {
 		col16-- // retreat from \r at line end
 	}
 	return line, col16
-}
-
-// OffsetLineCol8 converts a valid byte offset to line and UTF-8 column numbers, both 1-based.
-func (m *Mapper) OffsetLineCol8(offset int) (int, int) {
-	line, start, cr := m.line(offset)
-	col8 := offset - start
-	if cr {
-		col8-- // retreat from \r at line end
-	}
-	return line + 1, col8 + 1
 }
 
 // line returns:

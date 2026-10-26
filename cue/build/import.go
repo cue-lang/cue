@@ -84,11 +84,6 @@ func (inst *Instance) complete() errors.Error {
 
 	if inst.loadFunc != nil {
 		for i, path := range paths {
-			// isLocal := IsLocalImport(path)
-			// if isLocal {
-			// 	path = dirToImportPath(filepath.Join(dir, path))
-			// }
-
 			imp := c.imports[path]
 			if imp == nil {
 				pos := token.NoPos
@@ -103,12 +98,7 @@ func (inst *Instance) complete() errors.Error {
 					return errors.Wrapf(imp.Err, pos, "import failed")
 				}
 				imp.ImportPath = path
-				// imp.parent = inst
 				c.imports[path] = imp
-				// imp.parent = nil
-			} else if imp.parent != nil {
-				// TODO: report a standard cycle message.
-				//       cycle is now handled explicitly in loader
 			}
 			paths[i] = imp.ImportPath
 

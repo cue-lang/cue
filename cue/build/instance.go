@@ -98,8 +98,6 @@ type Instance struct {
 	// avoid failing import loading for dependencies.
 	ResolutionErr errors.Error
 
-	parent *Instance // TODO: for cycle detection
-
 	// The following fields are for informative purposes and are not used by
 	// the cue package to create an instance.
 

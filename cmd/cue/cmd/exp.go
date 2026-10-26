@@ -283,6 +283,12 @@ func runExpWritefs(cmd *Command, args []string) error {
 			if err == nil && actualTarget == target {
 				continue
 			}
+			// Replace an existing file or symlink.
+			if _, err := os.Lstat(fp); err == nil {
+				if err := os.Remove(fp); err != nil {
+					return fmt.Errorf("failed to remove %s: %v", fp, err)
+				}
+			}
 			if err := os.Symlink(target, fp); err != nil {
 				return fmt.Errorf("failed to symlink %s -> %s: %v", fp, target, err)
 			}
@@ -318,6 +324,12 @@ func runExpWritefs(cmd *Command, args []string) error {
 			}
 			if err := enc.Close(); err != nil {
 				return fmt.Errorf("failed to encode file: %v", err)
+			}
+			// Replace an existing symlink rather than writing to its target.
+			if fi, err := os.Lstat(fp); err == nil && fi.Mode()&os.ModeSymlink != 0 {
+				if err := os.Remove(fp); err != nil {
+					return fmt.Errorf("failed to remove %s: %v", fp, err)
+				}
 			}
 			if err := os.WriteFile(fp, buf.Bytes(), 0o666); err != nil {
 				return fmt.Errorf("failed to write file %s: %v", fp, err)

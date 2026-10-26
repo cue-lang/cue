@@ -21,17 +21,13 @@ exists out/do-not-remove.md
 # Later runs replace whatever is at each path: a symlink with another
 # symlink, a regular file with a symlink, and a symlink with a regular
 # file, which must not write through the link to its target.
-# TODO: the first two fail as the existing path is not replaced,
-# and the third writes through the link to its target.
-! exec cue cmd relink
-stderr 'failed to symlink'
-cmp out/link.yaml expect-yaml
-! exec cue cmd tolink
-stderr 'failed to symlink'
-cmp out/foo.custom expect-yaml
+exec cue cmd relink
+cmp out/link.yaml expect-txt
+exec cue cmd tolink
+cmp out/foo.custom expect-txt
 exec cue cmd tofile
 cmp out/link2.yaml expect-replaced
-cmp out/foo.toml expect-replaced
+cmp out/foo.toml expect-toml
 
 -- out/to-remove.json --
 -- out/do-not-remove.md --

@@ -18,6 +18,21 @@ cmp out/sub/dir/foo.yaml expect-nested-yaml
 ! exists out/to-remove.json
 exists out/do-not-remove.md
 
+# Later runs replace whatever is at each path: a symlink with another
+# symlink, a regular file with a symlink, and a symlink with a regular
+# file, which must not write through the link to its target.
+# TODO: the first two fail as the existing path is not replaced,
+# and the third writes through the link to its target.
+! exec cue cmd relink
+stderr 'failed to symlink'
+cmp out/link.yaml expect-yaml
+! exec cue cmd tolink
+stderr 'failed to symlink'
+cmp out/foo.custom expect-yaml
+exec cue cmd tofile
+cmp out/link2.yaml expect-replaced
+cmp out/foo.toml expect-replaced
+
 -- out/to-remove.json --
 -- out/do-not-remove.md --
 -- gen_tool.cue --
@@ -41,9 +56,22 @@ command: gen: exec.Run & {
 			"out/foo-noext":        {contents: "plain text"}
 			"out/foo.custom":       {encoding: "yaml", contents: foo: "as yaml"}
 			"out/link.yaml":        {type: "symlink", contents: "foo.yaml"}
+			"out/link2.yaml":       {type: "symlink", contents: "foo.toml"}
 			"out/sub/dir/foo.yaml": {type: "file", contents: foo: "in nested dir"}
 		}
 	})
+}
+
+_rewrites: {
+	relink: "out/link.yaml": {type: "symlink", contents: "foo.txt"}
+	tolink: "out/foo.custom": {type: "symlink", contents: "foo.txt"}
+	tofile: "out/link2.yaml": {contents: foo: "replaces a link"}
+}
+for name, files in _rewrites {
+	command: (name): exec.Run & {
+		cmd: ["cue", "exp", "writefs"]
+		stdin: json.Marshal({tool: "cue cmd \(name)", create: files})
+	}
 }
 
 -- expect-yaml --
@@ -60,6 +88,10 @@ foo: as yaml
 foo = 'as toml'
 -- expect-txt --
 plain text
+-- expect-replaced --
+# Code generated cue cmd tofile; DO NOT EDIT.
+
+foo: replaces a link
 -- expect-nested-yaml --
 # Code generated cue cmd gen; DO NOT EDIT.
 

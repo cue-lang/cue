@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/module"
-	pkgpath "cuelang.org/go/pkg/path"
 )
 
 type loader struct {
@@ -58,13 +57,6 @@ func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 		modFileCache:        newModFileCache(),
 		dirCachedBuildFiles: make(map[string]cachedDirFiles),
 	}
-}
-
-func (l *loader) abs(filename string) string {
-	if !isLocalImport(filename) {
-		return filename
-	}
-	return pkgpath.Join([]string{l.cfg.Dir, filename}, l.cfg.pathOS)
 }
 
 func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {

@@ -213,10 +213,8 @@ func TestExpandPackageArgsWindows(t *testing.T) {
 	}{
 		{arg: "./pkg:x", want: "mod.test/sub/pkg@v0:x"},
 		{arg: "./pkg", want: "mod.test/sub/pkg@v0"},
-		// TODO: the parent directory is not resolved, as Dir is joined
-		// as if it used forward slashes.
-		{arg: "../other:x", wantErr: `cannot determine import path for "../other:x" \(dir outside of root\)`},
-		{arg: "../other", wantErr: `cannot determine import path for "../other" \(dir outside of root\)`},
+		{arg: "../other:x", want: "mod.test/other@v0:x"},
+		{arg: "../other", want: "mod.test/other@v0"},
 		{arg: "../../out:x", wantErr: `cannot determine import path for "../../out:x" \(dir outside of root\)`},
 	}
 	for _, test := range tests {

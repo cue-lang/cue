@@ -334,7 +334,7 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 	}
 
-	dir := pkgpath.Join([]string{l.cfg.Dir, pkgpath.FromSlash(path, l.cfg.pathOS)}, l.cfg.pathOS)
+	dir := l.cfg.absPath(path)
 	if pkgPath, e := importPathFromAbsDir(l.cfg, dir, path); e != nil {
 		// Detect later to keep error messages consistent.
 	} else {

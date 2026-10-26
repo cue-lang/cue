@@ -194,7 +194,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 
 	match := matchPattern(pattern)
 
-	root := l.abs(dir)
+	root := c.absPath(dir)
 
 	// Find new module root from here or check there are no additional
 	// cue.mod files between here and the next module.
@@ -393,8 +393,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 		if c.Module != "" {
 			// Make local import paths into absolute paths inside
 			// the module root.
-			absPath := path.Join(c.Dir, ip.Path)
-			pkgPath, err := importPathFromAbsDir(c, absPath, origp)
+			pkgPath, err := importPathFromAbsDir(c, c.absPath(ip.Path), origp)
 			if err != nil {
 				return nil, err
 			}

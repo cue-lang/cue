@@ -187,16 +187,6 @@ func HiddenKey(s, pkgPath string) string {
 	return s + "\x00" + pkgPath
 }
 
-// MakeNamedLabel creates a feature for the given name and feature type.
-func MakeNamedLabel(r StringIndexer, t FeatureType, s string) Feature {
-	i := r.StringToIndex(s)
-	f, err := MakeLabel(nil, i, t)
-	if err != nil {
-		panic("out of free string slots")
-	}
-	return f
-}
-
 // MakeLetLabel creates a label for the given let identifier s.
 //
 // A let declaration is always logically unique within its scope and will never

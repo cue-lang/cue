@@ -1412,18 +1412,6 @@ func (v *Vertex) Init(c *OpContext) {
 	v.getState(c)
 }
 
-// GetArc returns a Vertex for the outgoing arc with label f. It creates and
-// ads one if it doesn't yet exist.
-func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
-	arc = v.Lookup(f)
-	if arc != nil {
-		arc.updateArcType(t)
-		return arc, false
-	}
-
-	return nil, false
-}
-
 func (v *Vertex) Source() ast.Node {
 	if v != nil {
 		if b, ok := v.BaseValue.(Value); ok {
@@ -1439,12 +1427,6 @@ func (v *Vertex) Source() ast.Node {
 // evaluated.
 func (v *Vertex) InsertConjunct(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
-}
-
-// InsertConjunctsFrom is a low-level method to insert a conjuncts into a Vertex
-// from another Vertex.
-func (v *Vertex) InsertConjunctsFrom(w *Vertex) {
-	v.Conjuncts = append(v.Conjuncts, w.Conjuncts...)
 }
 
 // AddConjunct adds the given Conjuncts to v if it doesn't already exist.

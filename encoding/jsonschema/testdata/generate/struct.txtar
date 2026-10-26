@@ -1,5 +1,4 @@
 t13 to t15 and #S3 mix required fields and pattern constraints.
-Their generated schemas wrongly drop every object constraint.
 
 -- test.cue --
 package test
@@ -79,7 +78,13 @@ _foo: a?: int
 			additionalProperties: true
 			properties: a: type: "integer"
 		}
-		S3: type: "object"
+		S3: {
+			type:                 "object"
+			additionalProperties: false
+			patternProperties: "^b": type: "string"
+			properties: a: type:           "integer"
+			required: ["a"]
+		}
 		"_foo": {
 			type: "object"
 			properties: a: type: "integer"
@@ -168,11 +173,20 @@ _foo: a?: int
 			}
 			maxProperties: 100
 		}
-		t13: type: "object"
+		t13: {
+			type: "object"
+			patternProperties: "^b": type: "string"
+			properties: a: type:           "integer"
+			required: ["a"]
+		}
 		t14: $ref: "#/$defs/S3"
 		t15: {
-			type: "object"
-			$ref: "#/$defs/S2"
+			type:                 "object"
+			additionalProperties: true
+			patternProperties: "^b": type: "string"
+			properties: a: type:           "integer"
+			$ref:     "#/$defs/S2"
+			required: ["a"]
 		}
 	}
 }

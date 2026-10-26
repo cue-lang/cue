@@ -1513,9 +1513,10 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	}
 	props.required = slices.Sorted(maps.Keys(required))
 	hasObjectConstraints :=
-		len(props.properties) == 0 ||
-			len(props.required) == 0 ||
-			len(props.patternProperties) == 0
+		len(props.properties) > 0 ||
+			len(props.required) > 0 ||
+			len(props.patternProperties) > 0 ||
+			props.additionalProperties.Value() != nil
 	if len(allOf.elems) > 0 {
 		if !hasObjectConstraints {
 			return allOf

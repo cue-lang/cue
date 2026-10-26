@@ -84,18 +84,6 @@ func (n *Notification) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-func (n *Notification) UnmarshalJSON(data []byte) error {
-	msg := wireRequest{}
-	if err := json.Unmarshal(data, &msg); err != nil {
-		return fmt.Errorf("unmarshaling notification: %w", err)
-	}
-	n.method = msg.Method
-	if msg.Params != nil {
-		n.params = *msg.Params
-	}
-	return nil
-}
-
 // NewCall constructs a new Call message for the supplied ID, method and
 // parameters.
 func NewCall(id ID, method string, params interface{}) (*Call, error) {
@@ -116,21 +104,6 @@ func (c *Call) MarshalJSON() ([]byte, error) {
 		return data, fmt.Errorf("marshaling call: %w", err)
 	}
 	return data, nil
-}
-
-func (c *Call) UnmarshalJSON(data []byte) error {
-	msg := wireRequest{}
-	if err := json.Unmarshal(data, &msg); err != nil {
-		return fmt.Errorf("unmarshaling call: %w", err)
-	}
-	c.method = msg.Method
-	if msg.Params != nil {
-		c.params = *msg.Params
-	}
-	if msg.ID != nil {
-		c.id = *msg.ID
-	}
-	return nil
 }
 
 // NewResponse constructs a new Response message that is a reply to the
@@ -174,23 +147,6 @@ func toWireError(err error) *WireError {
 		result.Code = wrapped.Code
 	}
 	return result
-}
-
-func (r *Response) UnmarshalJSON(data []byte) error {
-	msg := wireResponse{}
-	if err := json.Unmarshal(data, &msg); err != nil {
-		return fmt.Errorf("unmarshaling jsonrpc response: %w", err)
-	}
-	if msg.Result != nil {
-		r.result = *msg.Result
-	}
-	if msg.Error != nil {
-		r.err = msg.Error
-	}
-	if msg.ID != nil {
-		r.id = *msg.ID
-	}
-	return nil
 }
 
 func DecodeMessage(data []byte) (Message, error) {

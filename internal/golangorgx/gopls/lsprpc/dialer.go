@@ -7,7 +7,6 @@ package lsprpc
 import (
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"os/exec"
@@ -18,7 +17,7 @@ import (
 // automatic discovery to resolve a remote address.
 const autoNetwork = "auto"
 
-// An autoDialer is a jsonrpc2 dialer that understands the 'auto' network.
+// An autoDialer dials a remote cuelsp, understanding the 'auto' network.
 type autoDialer struct {
 	network, addr string // the 'real' network and address
 	isAuto        bool   // whether the server is on the 'auto' network
@@ -44,14 +43,6 @@ func newAutoDialer(rawAddr string, argFunc func(network, addr string) []string) 
 	return &d, nil
 }
 
-// Dial implements the jsonrpc2.Dialer interface.
-func (d *autoDialer) Dial(ctx context.Context) (io.ReadWriteCloser, error) {
-	conn, err := d.dialNet(ctx)
-	return conn, err
-}
-
-// TODO(rFindley): remove this once we no longer need to integrate with v1 of
-// the jsonrpc2 package.
 func (d *autoDialer) dialNet(ctx context.Context) (net.Conn, error) {
 	// Attempt to verify that we own the remote. This is imperfect, but if we can
 	// determine that the remote is owned by a different user, we should fail.

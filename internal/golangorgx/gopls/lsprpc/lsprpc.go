@@ -170,12 +170,6 @@ type handshakeResponse struct {
 	ServerID string `json:"serverID"`
 }
 
-// clientServer identifies a current client LSP server on the
-// server.
-type clientServer struct {
-	ServerID string `json:"serverID"`
-}
-
 // serverState holds information about the cuelsp daemon process.
 type serverState struct {
 	CurrentServerID string `json:"currentServerID"`

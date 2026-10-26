@@ -23,25 +23,6 @@ type StreamServer interface {
 	ServeStream(context.Context, Conn) error
 }
 
-// The ServerFunc type is an adapter that implements the StreamServer interface
-// using an ordinary function.
-type ServerFunc func(context.Context, Conn) error
-
-// ServeStream calls f(ctx, s).
-func (f ServerFunc) ServeStream(ctx context.Context, c Conn) error {
-	return f(ctx, c)
-}
-
-// HandlerServer returns a StreamServer that handles incoming streams using the
-// provided handler.
-func HandlerServer(h Handler) StreamServer {
-	return ServerFunc(func(ctx context.Context, conn Conn) error {
-		conn.Go(ctx, h)
-		<-conn.Done()
-		return conn.Err()
-	})
-}
-
 // ListenAndServe starts an jsonrpc2 server on the given address.  If
 // idleTimeout is non-zero, ListenAndServe exits after there are no clients for
 // this duration, otherwise it exits only on error.

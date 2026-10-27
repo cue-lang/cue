@@ -107,6 +107,7 @@ func (n *nodeContext) dropSharing() {
 	n.noSharing = true
 	n.node.IsShared = false
 	n.node.OpenedShared = false
+	n.node.ClosedShared = false
 	n.decShared()
 
 	// TODO: the use of cycle for BaseValue is getting increasingly outdated.
@@ -152,6 +153,15 @@ func (n *nodeContext) addShared(c Conjunct, arc *Vertex, id CloseInfo) {
 	if len(n.shared) == 0 || n.shareCycleType < id.CycleType {
 		n.shareCycleType = id.CycleType
 	}
+	// A reference that does not open the vertex wins, in either order. One
+	// naming a definition, or sharing one as arc, the vertex finally shared,
+	// stops [Vertex.sharesOpened] at this node.
+	if !id.Opened && !id.ConjunctOpened {
+		n.node.OpenedShared = false
+		if namesDefinition(c.Expr(), id) || arc.Label.IsDef() {
+			n.node.ClosedShared = true
+		}
+	}
 
 	// At this point, the node may still be unshared at a later point. For this
 	// purpose we need to keep the retain count above zero until all conjuncts
@@ -179,8 +189,8 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.node.BaseValue = arc
 	n.node.IsShared = true
 	n.isShared = true
-	n.addShared(c, arc, id)
 	n.node.OpenedShared = id.Opened || id.ConjunctOpened
+	n.addShared(c, arc, id)
 
 	if arc.IsDetached() && arc.MayAttach() { // TODO: Second check necessary?
 		// This node can safely be shared. Since it is not rooted, though, it
@@ -324,6 +334,24 @@ func (v *Vertex) DerefNonDisjunct() *Vertex {
 		}
 		v = arc
 	}
+}
+
+// sharesOpened reports whether v, or a node v indirects to as in
+// [Vertex.DerefValue], shares a vertex through an opened reference,
+// stopping at a node with ClosedShared set. Sharing does not copy
+// OpenedShared, as the shared vertex may not be evaluated yet.
+func (v *Vertex) sharesOpened() bool {
+	for !v.ClosedShared {
+		if v.OpenedShared {
+			return true
+		}
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok {
+			return false
+		}
+		v = arc
+	}
+	return false
 }
 
 // DerefNonRooted indirects a node that points to a value that is not rooted.

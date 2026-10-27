@@ -266,17 +266,17 @@ recloseSame: {
 	same: {
 		c: #B... @test(permute)
 		c: #B    @test(permute, count=2)
-		m: c & {y: 3} @test(err, code=eval, contains="field not allowed") @test(todo, why="stays open when the definition comes second")
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 	}
 	field: {
 		c: #B...
 		c: X
-		m: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 	}
 	conjunction: {
 		c: (#B & #B)...
 		c: #B
-		m: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 	}
 	disjunct: {
 		c: #B...
@@ -309,7 +309,7 @@ recloseSame: {
 	forwardRead: {
 		n: c
 		c: #B...
-		m: n & {y: 3} @test(err, code=eval, contains="field not allowed", incorrect) @test(eq:todo, {x: 2, y: 3})
+		m: n & {y: 3} @test(eq, {x: 2, y: 3})
 	}
 	// A reference stays open when the only disjunct left of the field it
 	// reads shares the opened vertex.
@@ -338,12 +338,12 @@ recloseSame: {
 	def: {
 		#C: #B...
 		c: #C
-		m: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 
 		w: #B...
 		#D: w
 		d: #D
-		n: d & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		n: d & {y: 3} @test(err, code=eval, contains="field not allowed")
 
 		e: #E
 		#E: #B...
@@ -355,11 +355,11 @@ recloseSame: {
 	// reference through a regular field holding the definition does not.
 	crossing: {
 		#D: s: #B...
-		m: #D.s & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		m: #D.s & {y: 3} @test(err, code=eval, contains="field not allowed")
 		c: #D.s
-		n: c & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		n: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 		t: c
-		o: t & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		o: t & {y: 3} @test(err, code=eval, contains="field not allowed")
 		u: v
 		v: #D.s
 		p: u & {y: 3} @test(err, code=eval, contains="field not allowed")
@@ -413,6 +413,12 @@ sharedDisjunct.p.x: conflicting values 1 and 2:
     ./issues.cue:56:5
 sharedDisjunct.p.y: field not allowed:
     ./issues.cue:56:10
+[eval] recloseSame.same.m.y: field not allowed:
+    ./issues.cue:71:11
+[eval] recloseSame.field.m.y: field not allowed:
+    ./issues.cue:76:11
+[eval] recloseSame.conjunction.m.y: field not allowed:
+    ./issues.cue:81:11
 [eval] recloseSame.disjunct.m: 2 errors in empty disjunction:
 recloseSame.disjunct.m.x: conflicting values 1 and 2:
     ./issues.cue:63:10
@@ -434,12 +440,20 @@ recloseSame.readDisjunct.m.x: conflicting values 1 and 2:
     ./issues.cue:93:6
 recloseSame.readDisjunct.m.y: field not allowed:
     ./issues.cue:93:11
-[eval] recloseSame.forwardRead.m.y: field not allowed:
-    ./issues.cue:114:11
 [eval] recloseSame.otherDefs.n.q: field not allowed:
     ./issues.cue:135:11
+[eval] recloseSame.def.m.y: field not allowed:
+    ./issues.cue:143:11
+[eval] recloseSame.def.n.y: field not allowed:
+    ./issues.cue:148:11
 [eval] recloseSame.def.o.y: field not allowed:
     ./issues.cue:152:11
+[eval] recloseSame.crossing.m.y: field not allowed:
+    ./issues.cue:160:14
+[eval] recloseSame.crossing.n.y: field not allowed:
+    ./issues.cue:162:11
+[eval] recloseSame.crossing.o.y: field not allowed:
+    ./issues.cue:164:11
 [eval] recloseSame.crossing.p.y: field not allowed:
     ./issues.cue:167:11
 [eval] recloseConjunction.field.m.y: field not allowed:

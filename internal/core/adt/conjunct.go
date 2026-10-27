@@ -476,8 +476,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// supply it, as it does for #D.s. A reference from within the definition
 	// itself, such as a sibling field referring to _a, does not close.
 	x := c.Expr()
-	switch isDef, _ := IsDef(x); {
-	case isDef || arc.Label.IsDef() || closeInfo.TopDef || crossesDefinition(n.ctx, c.Env, x, arc):
+	if namesDefinition(x, closeInfo) || arc.Label.IsDef() || crossesDefinition(n.ctx, c.Env, x, arc) {
 		if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
 			// Definitions are always recursively closed, even if arc
 			// doesn't have ClosedRecursive set yet at this point.
@@ -489,7 +488,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.TopDef = false
 
 		closeInfo = n.addResolver(c.x, arc, closeInfo, false)
-	default:
+	} else {
 		closeInfo = n.addResolver(c.x, arc, closeInfo, true)
 	}
 	if closeInfo.defID != 0 && closeInfo.opID == n.ctx.opID {
@@ -978,6 +977,13 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			n.insertValueConjunct(env, u, id)
 		}
 	}
+}
+
+// namesDefinition reports whether the reference x, with CloseInfo id, names
+// a definition, which closes the node holding the reference.
+func namesDefinition(x Expr, id CloseInfo) bool {
+	isDef, _ := IsDef(x)
+	return isDef || id.TopDef
 }
 
 // crossesDefinition reports whether arc lies within a definition that does

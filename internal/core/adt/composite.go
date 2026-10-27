@@ -215,9 +215,17 @@ type Vertex struct {
 	// level only. This supports the close builtin.
 	ClosedNonRecursive bool
 
-	// Opened is set when a node that is opened with @experiment(explicitopen)
-	// is structure shared. This will override any of the above booleans.
+	// OpenedShared is set when this Vertex structure shares a vertex through
+	// a reference opened with the postfix ... operator, and overrides any of
+	// the above booleans. It stays unset if any reference to the same vertex
+	// does not open it. Use [Vertex.sharesOpened] to tell whether a
+	// reference to this Vertex is opened.
 	OpenedShared bool
+
+	// ClosedShared is set when this Vertex structure shares a vertex through
+	// a reference naming a definition, or shares a definition. It stops
+	// [Vertex.sharesOpened] here.
+	ClosedShared bool
 
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
 	// Until the Vertex is typo checked, it is set if any conjunct has an

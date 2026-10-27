@@ -30,6 +30,169 @@ variant: {
 	}
 	@test(eq, {a: "x"})
 }
+// A second disjunction added to a field which already resolved one. A clone
+// of the field inherits its resolved disjunct, which must not be reclaimed
+// when a sibling disjunct fails.
+// https://cuelang.org/issue/4055
+issue4055: definition: {
+	a: #A
+	a: {k: "x"}
+	#A: {k: string} | {j: string}
+	if a.k == "x" {
+		a: _ | error("b")
+	}
+	@test(eq, {a: {k: "x"}, #A: {k: string} | {j: string}})
+}
+-- resolved.cue --
+// A field resolves a disjunction in a struct with disjunctions of its own.
+// Each disjunct of the struct holds a clone of the field pointing to the
+// same resolved disjunct, which must outlive any one of them.
+resolved: {
+	#A: {k: string} | {j: string}
+
+	// The typo check of the last disjunction needs the resolved disjunct
+	// after the disjuncts of the earlier ones are reclaimed.
+	closedParent: {
+		#C: {x: 1, c?: int, y?: int, w?: int}
+		p: {
+			a: #A
+			a: {k: "x"}
+			if a.k == "x" {c: 1}
+		} & ({w: 1} | {w: 2}) & ({y: 1} | {y: 2}) & (#C | #C) @test(err, code=eval, contains="field not allowed", pos=[1:4, 2:4])
+	}
+
+	// As above, with the field allowed by the closed disjunction, which then
+	// must not reject it, whichever the order of the conjuncts.
+	closedParentAllowed: {
+		#C: {x: 1, a?: _, c?: int, y?: int, w?: int}
+		last: {
+			a: #A
+			a: {k: "x"}
+			if a.k == "x" {c: 1}
+		} & ({w: 1} | {w: 2}) & ({y: 1} | {y: 2}) & (#C | #C) @test(err, code=eval, contains="field not allowed", pos=[1:4, 2:4]) @test(eq:todo, {a: {k: "x"}, c: 1, x: 1, w: 1, y: 1} |
+			{a: {k: "x"}, c: 1, x: 1, w: 1, y: 2} |
+			{a: {k: "x"}, c: 1, x: 1, w: 2, y: 1} |
+			{a: {k: "x"}, c: 1, x: 1, w: 2, y: 2})
+		first: (#C | #C) & {
+			a: #A
+			a: {k: "x"}
+			if a.k == "x" {c: 1}
+		} & ({w: 1} | {w: 2}) & ({y: 1} | {y: 2}) @test(eq, {a: {k: "x"}, c: 1, x: 1, w: 1, y: 1} |
+			{a: {k: "x"}, c: 1, x: 1, w: 1, y: 2} |
+			{a: {k: "x"}, c: 1, x: 1, w: 2, y: 1} |
+			{a: {k: "x"}, c: 1, x: 1, w: 2, y: 2})
+	}
+
+	// A clone of the field is given a second disjunction.
+	cloneDisjunction: p: {
+		a: #A
+		a: {k: "x"}
+		z: _
+		if a.k == "x" {c: 1}
+		if z == 1 {a: _ | error("b")}
+	} & ({w: 1} | {w: 2}) & ({y: 1} | {y: 2}) & ({z: 1} | {z: 2}) @test(eq, {a: {k: "x"}, z: 1, c: 1, w: 1, y: 1} |
+		{a: {k: "x"}, z: 2, c: 1, w: 1, y: 1} |
+		{a: {k: "x"}, z: 1, c: 1, w: 1, y: 2} |
+		{a: {k: "x"}, z: 2, c: 1, w: 1, y: 2} |
+		{a: {k: "x"}, z: 1, c: 1, w: 2, y: 1} |
+		{a: {k: "x"}, z: 2, c: 1, w: 2, y: 1} |
+		{a: {k: "x"}, z: 1, c: 1, w: 2, y: 2} |
+		{a: {k: "x"}, z: 2, c: 1, w: 2, y: 2})
+
+	// As above, in a disjunct of the struct which then fails, leaving the
+	// field to the disjunct which must reject it.
+	cloneDisjunctionFails: {
+		#C: {z: 2, c?: int, w?: int}
+		p: {
+			a: #A
+			a: {k: "x"}
+			z: _
+			if a.k == "x" {c: 1}
+			if z == 1 {
+				a:   _ | error("b")
+				bad: 1 & 2
+			}
+		} & ({w: 1} | {w: 2}) & ({z: 1} | #C) @test(err, code=eval,
+			suberr=(path=resolved.cloneDisjunctionFails.p.a, contains="field not allowed", pos=[1:4, 2:4]),
+			suberr=(path=resolved.cloneDisjunctionFails.p.bad, contains="conflicting values", pos=[7:10, 7:14]))
+	}
+
+	// As above, with the field allowed by the closed disjunct, which then
+	// must not reject it, whichever the order of the conjuncts.
+	cloneDisjunctionFailsAllowed: {
+		#C: {z: 2, a?: _, c?: int, w?: int}
+		last: {
+			a: #A
+			a: {k: "x"}
+			z: _
+			if a.k == "x" {c: 1}
+			if z == 1 {
+				a:   _ | error("b")
+				bad: 1 & 2
+			}
+		} & ({w: 1} | {w: 2}) & ({z: 1} | #C) @test(err, code=eval,
+			suberr=(path=resolved.cloneDisjunctionFailsAllowed.last.a, contains="field not allowed"),
+			suberr=(path=resolved.cloneDisjunctionFailsAllowed.last.bad, contains="conflicting values")) @test(eq:todo, {a: {k: "x"}, z: 2, c: 1, w: 1} |
+			{a: {k: "x"}, z: 2, c: 1, w: 2})
+		first: ({z: 1} | #C) & {
+			a: #A
+			a: {k: "x"}
+			z: _
+			if a.k == "x" {c: 1}
+			if z == 1 {
+				a:   _ | error("b")
+				bad: 1 & 2
+			}
+		} & ({w: 1} | {w: 2}) @test(eq, {a: {k: "x"}, z: 2, c: 1, w: 1} |
+			{a: {k: "x"}, z: 2, c: 1, w: 2})
+	}
+
+	// A field resolving a disjunction holds a let which fails, leaving the
+	// fields of x unfinished; #E rejects its own e. Finalizing the field
+	// evaluates them only once, which decides the errors they report.
+	unfinishedLet: {
+		#D: {a: int, b?: {c: int}}
+		#E: {#D, e: {f: 1}}
+		v: ({
+			tag: "a"
+			let L = {x: #E & {a: 1, b: {c: 2, d: 3}}, y: x.b.c} & [...]
+			r: [if L != _|_ {1}, 2][0]
+		} | {tag: "b"}) & {tag: "a"} @test(debugCheck, """
+			(struct){
+			  tag: (string){ "a" }
+			  let L#1 = (_|_){
+			    // [eval] resolved.unfinishedLet.v.L: conflicting values {x:(#E & {a:1,b:{c:2,d:3}}),y:x.b.c} and [...] (mismatched types struct and list):
+			    //     resolved.cue:112:12
+			    //     resolved.cue:112:58
+			    x: (_|_){
+			      // [eval]
+			      a: (int){ 1 }
+			      b: (_|_){
+			        // [eval]
+			        c: (int){ 2 }
+			        d: (_|_){
+			          // [eval] resolved.unfinishedLet.v.L.x.b.d: field not allowed:
+			          //     resolved.cue:112:38
+			        }
+			      }
+			      e: (_|_){
+			        // [eval]
+			        f: (_|_){
+			          // [eval] resolved.unfinishedLet.v.L.x.e.f: field not allowed:
+			          //     resolved.cue:109:16
+			        }
+			      }
+			    }
+			    y: (_|_){
+			      // [eval] resolved.unfinishedLet.v.L.x.b.d: field not allowed:
+			      //     resolved.cue:112:38
+			    }
+			  }
+			  r: (int){ 2 }
+			}
+			""")
+	}
+}
 -- pending.cue --
 // Be sure to emit errors for uncompleted pending arcs.
 err: {
@@ -42,15 +205,37 @@ err: {
     ./pending.cue:4:5
     ./pending.cue:3:5
     ./pending.cue:4:9
+[eval] resolved.closedParent.p.a: field not allowed:
+    ./resolved.cue:12:4
+    ./resolved.cue:13:4
+[eval] resolved.closedParentAllowed.last.a: field not allowed:
+    ./resolved.cue:23:4
+    ./resolved.cue:24:4
+[eval] resolved.cloneDisjunctionFails.p: 2 errors in empty disjunction:
+resolved.cloneDisjunctionFails.p.a: field not allowed:
+    ./resolved.cue:61:4
+    ./resolved.cue:62:4
+resolved.cloneDisjunctionFails.p.bad: conflicting values 2 and 1:
+    ./resolved.cue:67:10
+    ./resolved.cue:67:14
+[eval] resolved.cloneDisjunctionFailsAllowed.last: 2 errors in empty disjunction:
+resolved.cloneDisjunctionFailsAllowed.last.a: field not allowed:
+    ./resolved.cue:79:4
+    ./resolved.cue:80:4
+resolved.cloneDisjunctionFailsAllowed.last.bad: conflicting values 2 and 1:
+    ./resolved.cue:85:10
+    ./resolved.cue:85:14
+[eval] resolved.unfinishedLet.#E.e: field not allowed:
+    ./resolved.cue:109:12
 -- out/eval/stats --
-Leaks:  4
-Freed:  13
-Reused: 7
-Allocs: 10
+Leaks:  102
+Freed:  553
+Reused: 489
+Allocs: 166
 Retain: 0
 
-Unifications: 11
-Conjuncts:    24
-Disjuncts:    6
+Unifications: 164
+Conjuncts:    511
+Disjuncts:    118
 
-NumCloseIDs: 8
+NumCloseIDs: 40

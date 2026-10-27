@@ -1,0 +1,22 @@
+# Tests that @test(permute) honors @test(todo) when it replays the
+# directives of a field on each ordering, as the plain run does, so that a
+# permute group can document an assertion which does not hold yet.
+-- in/test.cue --
+todoReplay: {
+	@test(permute, count=2)
+	a: 1 @test(eq, 3) @test(todo, why="a is not 3 yet")
+	b: 2
+}
+-- out/run/errors.txt --
+path todoReplay: @test(permute): ordering [b, a] fails directive checks:
+path todoReplay.a: expected 3, got 1
+got:  {b: 2, a: 1}
+want: {a: 1, b: 2}
+-- out/force/test.cue --
+todoReplay: {
+	@test(permute, count=2)
+	a: 1 @test(eq, 1) @test(todo, why="a is not 3 yet")
+	b: 2
+}
+-- out/status.txt --
+update: identical to input

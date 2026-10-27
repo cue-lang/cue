@@ -1,0 +1,21 @@
+# Errors involving a predeclared builtin such as len point at its use, like
+# errors involving a predeclared type such as int.
+-- in.cue --
+sel:    len.foo
+idx:    len[0]
+comp:   [for x in len {x}]
+unify:  len & 1
+unify2: "a" & len
+-- out/compile --
+--- in.cue
+{
+  sel: len.foo
+  idx: len[0]
+  comp: [
+    for _, x in len {
+      〈1;x〉
+    },
+  ]
+  unify: (len & 1)
+  unify2: ("a" & len)
+}

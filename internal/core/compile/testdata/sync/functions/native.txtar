@@ -653,6 +653,14 @@ partial: {
 	// A partial application does unify with itself.
 	same:    step1 & step1
 	sameOut: same(2, 3)
+
+	// Each application written out is its own binding, as arguments are
+	// compared by the identity of their expressions. Equal literals do not
+	// make two applications the same, and neither should a predeclared
+	// builtin.
+	conflictEqual:   add(1, ...) & add(1, ...)
+	apply:           func(g: _, x: _) -> _: g(x)
+	conflictBuiltin: apply(len, ...) & apply(len, ...)
 }
 
 // What is cached per environment must not carry over from one disjunct
@@ -1162,6 +1170,9 @@ admission: {
     conflictPlain: (〈0;add〉 & 〈0;add〉(1))
     same: (〈0;step1〉 & 〈0;step1〉)
     sameOut: 〈0;same〉(2, 3)
+    conflictEqual: (〈0;add〉(1) & 〈0;add〉(1))
+    apply: func(g: _, x: _) -> _: 〈0;g〉(〈0;x〉)
+    conflictBuiltin: (〈0;apply〉(len) & 〈0;apply〉(len))
   }
   disjunctEnv: {
     inc: func(n: int) -> int: (〈0;n〉 + 1)

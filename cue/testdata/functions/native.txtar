@@ -662,6 +662,14 @@ partial: {
 	// A partial application does unify with itself.
 	same:    step1 & step1
 	sameOut: same(2, 3) @test(eq, 6)
+
+	// Each application written out is its own binding, as arguments are
+	// compared by the identity of their expressions. Equal literals do not
+	// make two applications the same, and neither should a predeclared
+	// builtin.
+	conflictEqual:   add(1, ...) & add(1, ...) @test(err, code=eval, contains="conflicting values")
+	apply:           func(g: _, x: _) -> _: g(x)
+	conflictBuiltin: apply(len, ...) & apply(len, ...) @test(err:todo, p=2, code=eval, contains="conflicting values")
 }
 
 // What is cached per environment must not carry over from one disjunct
@@ -840,41 +848,43 @@ cycles.disjunct.bad: 4 errors in empty disjunction::
 [eval] partial.conflictPlain: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
     ./in.cue:606:7
     ./in.cue:659:17
+[eval] partial.conflictEqual: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
+    ./in.cue:606:7
 [eval] disjunctEnv.defaults.x: 2 errors in empty disjunction:
 disjunctEnv.defaults.x.j: conflicting values 1 and 2:
-    ./in.cue:693:16
-    ./in.cue:694:9
+    ./in.cue:701:16
+    ./in.cue:702:9
 invalid default for parameter a: invalid value 9 (out of bound <5):
-    ./in.cue:692:32
-    ./in.cue:692:27
-    ./in.cue:693:25
+    ./in.cue:700:32
+    ./in.cue:700:27
+    ./in.cue:701:25
 [eval] disjunctEnv.defaults.x: 2 errors in empty disjunction:
 disjunctEnv.defaults.x.j: conflicting values 1 and 2:
-    ./in.cue:693:16
-    ./in.cue:694:9
+    ./in.cue:701:16
+    ./in.cue:702:9
 invalid default for parameter a: invalid value 9 (out of bound <5):
-    ./in.cue:692:32
-    ./in.cue:692:27
-    ./in.cue:693:25
+    ./in.cue:700:32
+    ./in.cue:700:27
+    ./in.cue:701:25
 [eval] admission.bad: parameter b of function accepts string, but its signature requires int:
-    ./in.cue:710:12
-    ./in.cue:706:7
+    ./in.cue:718:12
+    ./in.cue:714:7
 [eval] admission.gBad: parameter n of function accepts string, but its signature requires int:
-    ./in.cue:717:13
-    ./in.cue:714:8
+    ./in.cue:725:13
+    ./in.cue:722:8
 -- out/eval/stats --
 Leaks:  90
-Freed:  1538
-Reused: 1484
+Freed:  1541
+Reused: 1487
 Allocs: 144
 Retain: 0
 
-Unifications: 1304
-Conjuncts:    3746
+Unifications: 1307
+Conjuncts:    3751
 Disjuncts:    232
 Notifications: 3
 
 NumCloseIDs: 643
 
-ConjunctInfos:       1479
+ConjunctInfos:       1482
 MaxConjunctInfos:    8

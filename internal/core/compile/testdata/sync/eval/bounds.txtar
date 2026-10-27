@@ -341,6 +341,11 @@ nonOrderable: {
 function: {
 	lss: <strings.ToUpper
 	ne:  !=strings.ToUpper
+
+	// A predeclared function has no source position of its own, so the error
+	// is reported at the bound's operand.
+	predeclaredLss: <len
+	predeclaredNe:  !=len
 }
 
 // A reference to top may still resolve to a concrete value.
@@ -719,6 +724,8 @@ topRef: {
   function: {
     lss: <〈import;strings〉.ToUpper
     ne: !=〈import;strings〉.ToUpper
+    predeclaredLss: <len
+    predeclaredNe: !=len
   }
   topRef: {
     #D: {

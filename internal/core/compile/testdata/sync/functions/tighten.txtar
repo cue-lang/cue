@@ -981,6 +981,12 @@ admission: {
 	corrDyn:   ((func(x: {a: int, b: {"\(a)": 0}}) -> int) & _ci)({a: 0})
 	corrPat:   ((func(x: {a: int, b: {[=~"\(a)"]: 0}}) -> int) & _ci)({a: 0})
 	corrSt:    ((func(x: {a: int, b: {c: 0 & a}}) -> int) & _ci)({a: 0})
+	// A reference within the operand of a selector, an index, or a postfix
+	// ... counts too.
+	corrSel:   ((func(x: {a: int, b: {c: 0 & a}.c}) -> int) & _ci)({a: 0})
+	corrIdxOp: ((func(x: {a: int, b: [0 & a][0]}) -> int) & _ci)({a: 0})
+	corrOpen:  ((func(x: {a: int, b: {c: 0 & a}...}) -> int) & _ci)({a: 0})
+	corrSelOp: ((func(x: {a: int, b: ({c: 0 & a}...).c}) -> int) & _ci)({a: 0})
 	#Corr:     {a: int, b: 0 & a}
 	corrRef:   ((func(x: #Corr) -> int) & _ci)({a: 0})
 	corrEmb:   ((func(x: {#Corr}) -> int) & _ci)({a: 0})
@@ -993,6 +999,32 @@ admission: {
 	_corrC:    #CorrC
 	_corrC:    {}
 	corrCRef:  ((func(x: _corrC) -> int) & _ci)({a: 0})
+	// The same holds for such a struct in a conjunction, an embedding, opened
+	// or not, or a disjunction.
+	corrCAnd:  ((func(x: #CorrC & {}) -> int) & _ci)({a: 0})
+	corrCEmb:  ((func(x: {#CorrC}) -> int) & _ci)({a: 0})
+	corrCOpen: ((func(x: {#CorrC...}) -> int) & _ci)({a: 0})
+	corrCOr:   ((func(x: #CorrC | #CorrC) -> int) & _ci)({a: 0})
+	#CorrCD:   {a: int, d: string, for v in [a] {b: 0 & v}}
+	corrCEBad: (func(x: {#CorrCD}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0)
+	// The same holds for a struct built in any other way: a disjunction of
+	// distinct such structs, a closed literal, a comprehension's value, or a
+	// call.
+	#CorrC2:     {a: int, for v in [a] {c: 0 & v}}
+	corrCOr2:    ((func(x: #CorrC | #CorrC2) -> int) & _ci)({a: 0})
+	#CorrCClose: close({a: int, for v in [a] {b: 0 & v}})
+	corrCClose:  ((func(x: #CorrCClose) -> int) & _ci)({a: 0})
+	corrCCloseR: ((func(x: close(#CorrC)) -> int) & _ci)({a: 0})
+	#CorrCBody:  {if true {a: int, for v in [a] {b: 0 & v}}}
+	corrCBody:   ((func(x: #CorrCBody) -> int) & _ci)({a: 0})
+	#CorrCComp:  {a: int, if true {#CorrC}}
+	corrCComp:   ((func(x: #CorrCComp) -> int) & _ci)({a: 0})
+	_corrCCall:  func() -> _: #CorrC
+	corrCCall:   ((func(x: _corrCCall()) -> int) & _ci)({a: 0})
+	// A disjunct without such a field is still compared.
+	corrCOrBad: (func(x: #CorrC | {a: int}) -> int) & _ci
+	#CorrCNo:    {a: int, for v in [1] {b: v}}
+	corrCOrNo:   ((func(x: #CorrC | #CorrCNo) -> int) & _ci)({a: 0})
 	#CorrL:    {a: int, b: [for v in [a] {0 & v}]}
 	corrL:     ((func(x: #CorrL) -> int) & _ci)({a: 0})
 	#CorrNone: {a: int, for v in [1] {b: v}}
@@ -1002,6 +1034,7 @@ admission: {
 	corrSelfN:  ((func(x: #CorrSelfN) -> int) & _ci)({a: 0})
 	// A field nothing refers to is still compared.
 	corrSBad:  (func(x: {a: int, b: {c: 0 & a}, d: string}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0)
+	corrSelBad: (func(x: {a: int, b: {c: 0 & a}.c, d: string}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0)
 	// A postfix ... adds no correlation of its own.
 	corrOpenNo: ((func(x: {a: int, b: {c: 1}...}) -> int) & _ci)({a: 0})
 	emp:     (func(x: int | <"") -> int) & (func(x: int) -> int: x)
@@ -2409,6 +2442,38 @@ admission: {
     }) -> int & 〈0;_ci〉)({
       a: 0
     })
+    corrSel: (func(x: {
+      a: int
+      b: {
+        c: (0 & 〈1;a〉)
+      }.c
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrIdxOp: (func(x: {
+      a: int
+      b: [
+        (0 & 〈1;a〉),
+      ][0]
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrOpen: (func(x: {
+      a: int
+      b: {
+        c: (0 & 〈1;a〉)
+      }...
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrSelOp: (func(x: {
+      a: int
+      b: {
+        c: (0 & 〈1;a〉)
+      }....c
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
     #Corr: {
       a: int
       b: (0 & 〈0;a〉)
@@ -2457,6 +2522,103 @@ admission: {
     corrCRef: (func(x: 〈0;_corrC〉) -> int & 〈0;_ci〉)({
       a: 0
     })
+    corrCAnd: (func(x: (〈0;#CorrC〉 & {})) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrCEmb: (func(x: {
+      〈1;#CorrC〉
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrCOpen: (func(x: {
+      〈1;#CorrC〉...
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrCOr: (func(x: (〈0;#CorrC〉|〈0;#CorrC〉)) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrCD: {
+      a: int
+      d: string
+      for _, v in [
+        〈1;a〉,
+      ] {
+        b: (0 & 〈1;v〉)
+      }
+    }
+    corrCEBad: (func(x: {
+      〈1;#CorrCD〉
+    }) -> int & func(x: {
+      a: 0
+      d: int
+      ...
+    }) -> int: 0)
+    #CorrC2: {
+      a: int
+      for _, v in [
+        〈1;a〉,
+      ] {
+        c: (0 & 〈1;v〉)
+      }
+    }
+    corrCOr2: (func(x: (〈0;#CorrC〉|〈0;#CorrC2〉)) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrCClose: close({
+      a: int
+      for _, v in [
+        〈1;a〉,
+      ] {
+        b: (0 & 〈1;v〉)
+      }
+    })
+    corrCClose: (func(x: 〈0;#CorrCClose〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrCCloseR: (func(x: close(〈0;#CorrC〉)) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrCBody: {
+      if true {
+        a: int
+        for _, v in [
+          〈1;a〉,
+        ] {
+          b: (0 & 〈1;v〉)
+        }
+      }
+    }
+    corrCBody: (func(x: 〈0;#CorrCBody〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrCComp: {
+      a: int
+      if true {
+        〈2;#CorrC〉
+      }
+    }
+    corrCComp: (func(x: 〈0;#CorrCComp〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    _corrCCall: func() -> _: 〈1;#CorrC〉
+    corrCCall: (func(x: 〈0;_corrCCall〉()) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrCOrBad: (func(x: (〈0;#CorrC〉|{
+      a: int
+    })) -> int & 〈0;_ci〉)
+    #CorrCNo: {
+      a: int
+      for _, v in [
+        1,
+      ] {
+        b: 〈1;v〉
+      }
+    }
+    corrCOrNo: (func(x: (〈0;#CorrC〉|〈0;#CorrCNo〉)) -> int & 〈0;_ci〉)({
+      a: 0
+    })
     #CorrL: {
       a: int
       b: [
@@ -2496,6 +2658,17 @@ admission: {
       b: {
         c: (0 & 〈1;a〉)
       }
+      d: string
+    }) -> int & func(x: {
+      a: 0
+      d: int
+      ...
+    }) -> int: 0)
+    corrSelBad: (func(x: {
+      a: int
+      b: {
+        c: (0 & 〈1;a〉)
+      }.c
       d: string
     }) -> int & func(x: {
       a: 0

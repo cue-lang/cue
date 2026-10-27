@@ -336,6 +336,19 @@ fixedNonConcrete: {
 	unif: <int & 3 @test(err, code=eval, contains="bound has fixed non-concrete value", pos=[0:8])
 }
 
+// A bound on top is incomplete however top is written, even where it can
+// never be filled in.
+topOperand: {
+	lss:   <_     @test(err, code=incomplete, contains="non-concrete value _ for bound <", pos=[0:10])
+	ne:    !=_    @test(err, code=incomplete, contains="non-concrete value _ for bound !=", pos=[0:11])
+	match: =~_    @test(err, code=incomplete, contains="non-concrete value _ for bound =~", pos=[0:11])
+	unif:  3 & <_ @test(err, code=incomplete, contains="non-concrete value _ for bound <", pos=[0:14])
+	paren: <(_)   @test(err, code=incomplete, contains="non-concrete value _ for bound <", pos=[0:11])
+	conj:  <(_ & _) @test(err, code=incomplete, contains="non-concrete value")
+	let T = _
+	viaLet: <T @test(err, code=incomplete, contains="non-concrete value")
+}
+
 // Ordered bounds are rejected on kinds which have no order.
 nonOrderable: {
 	struct: <{}         @test(err, code=eval, contains="cannot use struct for bound <", pos=[0:11])
@@ -600,27 +613,41 @@ topRef: {
     ./kinds.cue:9:8
 [eval] fixedNonConcrete.unif: bound has fixed non-concrete value:
     ./kinds.cue:10:8
-[eval] nonOrderable.struct: cannot use struct for bound <:
-    ./kinds.cue:15:11
-[eval] nonOrderable.list1: cannot use list for bound >=:
-    ./kinds.cue:16:12
-[eval] nonOrderable.list2: cannot use list for bound <:
+[incomplete] topOperand.lss: non-concrete value _ for bound <:
+    ./kinds.cue:16:10
+[incomplete] topOperand.ne: non-concrete value _ for bound !=:
     ./kinds.cue:17:11
+[incomplete] topOperand.match: non-concrete value _ for bound =~:
+    ./kinds.cue:18:11
+[incomplete] topOperand.unif: non-concrete value _ for bound <:
+    ./kinds.cue:19:14
+[incomplete] topOperand.paren: non-concrete value _ for bound <:
+    ./kinds.cue:20:11
+[incomplete] topOperand.conj: non-concrete value (_ & _) for bound <:
+    ./kinds.cue:21:11
+[incomplete] topOperand.viaLet: non-concrete value T for bound <:
+    ./kinds.cue:23:11
+[eval] nonOrderable.struct: cannot use struct for bound <:
+    ./kinds.cue:28:11
+[eval] nonOrderable.list1: cannot use list for bound >=:
+    ./kinds.cue:29:12
+[eval] nonOrderable.list2: cannot use list for bound <:
+    ./kinds.cue:30:11
 [eval] function.lss: invalid value strings.ToUpper (type func) for bound <:
-    ./kinds.cue:22:8
+    ./kinds.cue:35:8
 [eval] function.ne: invalid value strings.ToUpper (type func) for bound !=:
-    ./kinds.cue:23:9
+    ./kinds.cue:36:9
 [eval] function.predeclaredLss: invalid value len (type func) for bound <:
-    ./kinds.cue:27:19
+    ./kinds.cue:40:19
 [eval] function.predeclaredNe: invalid value len (type func) for bound !=:
-    ./kinds.cue:28:20
+    ./kinds.cue:41:20
 [incomplete] topRef.#D.lss: non-concrete value x for bound <:
-    ./kinds.cue:35:9
+    ./kinds.cue:48:9
 [incomplete] topRef.#D.ne: non-concrete value x for bound !=:
-    ./kinds.cue:36:10
+    ./kinds.cue:49:10
 [eval] topRef.violated.ne: invalid value 3 (out of bound !=3):
-    ./kinds.cue:36:8
-    ./kinds.cue:40:28
+    ./kinds.cue:49:8
+    ./kinds.cue:53:28
 -- out/eval/stats --
 Leaks:  0
 Freed:  252

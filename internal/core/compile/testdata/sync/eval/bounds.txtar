@@ -330,6 +330,19 @@ fixedNonConcrete: {
 	unif: <int & 3
 }
 
+// A bound on top is incomplete however top is written, even where it can
+// never be filled in.
+topOperand: {
+	lss:   <_
+	ne:    !=_
+	match: =~_
+	unif:  3 & <_
+	paren: <(_)
+	conj:  <(_ & _)
+	let T = _
+	viaLet: <T
+}
+
 // Ordered bounds are rejected on kinds which have no order.
 nonOrderable: {
 	struct: <{}
@@ -713,6 +726,16 @@ topRef: {
     geq: >=number
     ne: !=int
     unif: (<int & 3)
+  }
+  topOperand: {
+    lss: <_
+    ne: !=_
+    match: =~_
+    unif: (3 & <_)
+    paren: <_
+    conj: <(_ & _)
+    let T#1 = _
+    viaLet: <〈0;let T#1〉
   }
   nonOrderable: {
     struct: <{}

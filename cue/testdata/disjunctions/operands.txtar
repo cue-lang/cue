@@ -40,15 +40,48 @@ unaryOp: {
 	a: -num
 	@test(eq, {a: -1})
 }
+
+// Comparing lists and structs takes the defaults of their elements and
+// fields, wherever their disjunctions come from. The spec states no such rule
+// for comparisons.
+equality: {
+	let L = *1 | 2
+
+	list:       [*1 | 2] == [1]                       @test(eq, true)
+	listMulti:  [*1 | *2 | 3] == [1]                  @test(err, code=incomplete, contains="incomplete value 1 | 2", hint="the spec only says that comparing non-concrete values gives bottom, not which kind")
+	listRef:    [L] == [1]                            @test(eq, true)
+	field:      {a: *1 | 2} == {a: 1}                 @test(eq, true)
+	fieldMulti: {a: *1 | *2 | 3} == {a: 1}            @test(err, code=incomplete, contains="incomplete value 1 | 2", hint="the spec only says that comparing non-concrete values gives bottom, not which kind")
+	fieldNone:  {a: 1 | 2} == {a: 1}                  @test(err, code=incomplete, contains="incomplete value 1 | 2", hint="the spec only says that comparing non-concrete values gives bottom, not which kind")
+	fieldRef:   {a: L} == {a: 1}                      @test(eq, true)
+	embed:      {a: {*1 | 2}} == {a: 1}               @test(eq, true, hint="the spec does not say that a struct embedding only a scalar is that scalar")
+	and:        {a: (*1 | 2) & int} == {a: 1}         @test(eq, true)
+	andMulti:   {a: (*1 | *2 | 3) & int} == {a: 1}    @test(err, code=incomplete, contains="incomplete value 1 | 2", hint="the spec only says that comparing non-concrete values gives bottom, not which kind")
+	andOneSide: {a: (1 | 2 | 3) & (*1 | 3)} == {a: 1} @test(eq, true)
+	andRef:     {a: L & int} == {a: 1}                @test(eq, true)
+	pattern:    {[string]: *1 | 2, a: _} == {a: 1}    @test(eq, true)
+	patternRef: {[string]: L, a: _} == {a: 1}         @test(eq, true)
+	dynamic:    {("a"): *1 | 2} == {a: 1}             @test(eq, true)
+	dynamicRef: {("a"): L} == {a: 1}                  @test(eq, true)
+}
+-- out/errors.txt --
+[incomplete] equality.listMulti: invalid left-hand value to '==' (type list): 0: incomplete value 1 | 2:
+    ./in.cue:49:14
+[incomplete] equality.fieldMulti: invalid left-hand value to '==' (type struct): a: incomplete value 1 | 2:
+    ./in.cue:52:14
+[incomplete] equality.fieldNone: invalid left-hand value to '==' (type struct): a: incomplete value 1 | 2:
+    ./in.cue:53:14
+[incomplete] equality.andMulti: invalid left-hand value to '==' (type struct): a: incomplete value 1 | 2:
+    ./in.cue:57:14
 -- out/eval/stats --
 Leaks:  0
-Freed:  30
-Reused: 15
-Allocs: 15
+Freed:  163
+Reused: 125
+Allocs: 38
 Retain: 0
 
-Unifications: 22
-Conjuncts:    33
-Disjuncts:    8
+Unifications: 107
+Conjuncts:    174
+Disjuncts:    52
 
 NumCloseIDs: 5

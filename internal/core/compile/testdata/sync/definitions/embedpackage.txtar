@@ -1,7 +1,7 @@
 # A package which embeds a definition at its root stays closed when it is
 # reached through a reference, including from another package's root
-# embedding. Its own fields next to the embedded definition should stay
-# allowed, whichever file of the package, or further package, declares them.
+# embedding. Its own fields next to the embedded definition stay allowed,
+# whichever file of the package, or further package, declares them.
 -- cue.mod/module.cue --
 module: "foo.test/main"
 language: version: "v0.17.0"

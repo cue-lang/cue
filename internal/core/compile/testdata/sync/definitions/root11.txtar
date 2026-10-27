@@ -1,7 +1,7 @@
 # Pinned to v0.17.0: root-embedding series, covering how a closed
 # embedding constrains its siblings before explicitopen is stable.
 # A package embedding at its root an imported package, whose root embeds
-# a definition, should allow the root's own fields.
+# a definition, allows the root's own fields.
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.17.0"

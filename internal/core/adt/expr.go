@@ -53,6 +53,19 @@ func (o *StructLit) IsFile() bool {
 	return ok
 }
 
+// hasEmbed reports whether o embeds a value or a comprehension.
+//
+// TODO(perf): precompile whether struct has embedding.
+func (o *StructLit) hasEmbed() bool {
+	for _, d := range o.Decls {
+		switch d.(type) {
+		case *Comprehension, Expr:
+			return true
+		}
+	}
+	return false
+}
+
 func (x *StructLit) Source() ast.Node { return x.Src }
 
 func (x *StructLit) evaluate(c *OpContext, state Flags) Value {

@@ -1,7 +1,7 @@
 # Pinned to v0.17.0: root-embedding series, covering how a closed
 # embedding constrains its siblings before explicitopen is stable.
 # A package embedding at its root an imported package, whose root embeds
-# a definition, should allow the root's own fields.
+# a definition, allows the root's own fields.
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.17.0"
@@ -15,11 +15,6 @@ extra: 1
 
 @test(eq, {
 	name:  "test"
-	extra: _|_ @test(err, code=eval, contains="field not allowed", pos=[-2:1])
-	#Def: {name: string}
-})
-@test(eq:todo, {
-	name:  "test"
 	extra: 1
 	#Def: {name: string}
 })
@@ -31,9 +26,6 @@ package closed
 #Def & {
 	name: "test"
 }
--- out/errors.txt --
-[eval] extra: field not allowed:
-    ./in.cue:6:1
 -- out/eval/stats --
 Leaks:  1
 Freed:  5

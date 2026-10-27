@@ -243,11 +243,8 @@ func unevaluatedKind(x Expr) Kind {
 	switch x := x.(type) {
 	case *StructLit:
 		// An embedding may make the struct literal a scalar.
-		for _, d := range x.Decls {
-			switch d.(type) {
-			case *Comprehension, Expr:
-				return TopKind
-			}
+		if x.hasEmbed() {
+			return TopKind
 		}
 		return StructKind
 	case *ListLit:

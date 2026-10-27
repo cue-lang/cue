@@ -1,7 +1,7 @@
 # Pinned to v0.17.0: root-embedding series, covering how a closed
 # embedding constrains its siblings before explicitopen is stable.
 # A list validator evaluating the elements of a list from one of two
-# definitions embedded at the root should not reject them.
+# definitions embedded at the root does not reject them.
 # https://cuelang.org/issue/4522
 -- cue.mod/module.cue --
 module: "mod.test"

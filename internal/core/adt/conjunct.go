@@ -273,7 +273,6 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 		Vertex: n.node,
 	}
 
-	hasEmbed := false
 	hasEllipsis := false
 
 	n.hasStruct = true
@@ -294,15 +293,7 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 	// TODO: do we still need to AddStruct?
 	n.node.AddStruct(s, compID, ci.FromDef)
 
-	// TODO(perf): precompile whether struct has embedding.
-loop1:
-	for _, d := range s.Decls {
-		switch d.(type) {
-		case *Comprehension, Expr:
-			hasEmbed = true
-			break loop1
-		}
-	}
+	hasEmbed := s.hasEmbed()
 
 	// When inserting a replace that is a definition, flip the ignore.
 	if hasEmbed { // only if more than one decl.
@@ -336,7 +327,6 @@ loop1:
 		case *Comprehension:
 			ci := n.injectEmbedNode(x, ci)
 			n.insertComprehension(childEnv, x, ci)
-			hasEmbed = true
 
 		case *Ellipsis:
 			// Can be added unconditionally to patterns.
@@ -360,7 +350,6 @@ loop1:
 			ci := n.injectEmbedNode(x, ci)
 			ec := MakeConjunct(childEnv, x, ci)
 			n.scheduleConjunct(ec, ci)
-			hasEmbed = true
 		}
 	}
 	if hasEllipsis {
@@ -520,6 +509,8 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		return
 	}
 	n.arcMap = append(n.arcMap, arc)
+
+	closeInfo = n.splitPackage(arc, closeInfo)
 
 	if arc.Parent != nil && (!n.node.nonRooted || n.node.IsDynamic) {
 		// If the arc has a parent that for which the field conjuncts are not

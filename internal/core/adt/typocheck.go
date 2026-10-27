@@ -607,32 +607,57 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 // definition is embedded within a struct. It can be removed if we implement
 // the #A vs #A... semantics.
 func (n *nodeContext) splitStruct(s *StructLit, id CloseInfo) CloseInfo {
-	if Pos(s).Experiment().ExplicitOpen || n.ctx.OpenDef {
+	if s.IsFile() || !n.closesLiteral(s) {
+		// Files are scheduled one by one at the root of the evaluation,
+		// which stays open to fields added by other files or through
+		// the API. See splitPackage for a package reached through a
+		// reference.
 		return id
 	}
+	return n.splitLiteral(s, id)
+}
 
+// splitPackage marks a package reached through a reference, such as an
+// imported package used as the value of a field, as the boundary at which
+// closedness applies, as splitStruct does for a struct literal. The boundary
+// is established once for all files of the package, so that its own fields
+// are allowed alongside a definition embedded in any of them.
+func (n *nodeContext) splitPackage(v *Vertex, id CloseInfo) CloseInfo {
+	// Only the root of an instance holds files, so the conjuncts of any
+	// other vertex need not be inspected. A package opened with the
+	// explicitopen ... operator is not a boundary either.
+	if v.Parent != nil || id.Opened {
+		return id
+	}
+	for _, c := range v.Conjuncts {
+		// The files of a package may differ in their experiments.
+		if s, ok := c.x.(*StructLit); ok && s.IsFile() && s.hasEmbed() && n.closesLiteral(s) {
+			return n.splitLiteral(s, id)
+		}
+	}
+	return id
+}
+
+// closesLiteral reports whether closedness applies at the struct literal s,
+// which it does not under the explicitopen experiment or OpenDef.
+func (n *nodeContext) closesLiteral(s *StructLit) bool {
+	return !Pos(s).Experiment().ExplicitOpen && !n.ctx.OpenDef
+}
+
+// splitLiteral marks the struct s as the boundary at which closedness
+// applies, unless it shares the scope of an enclosing struct.
+func (n *nodeContext) splitLiteral(s *StructLit, id CloseInfo) CloseInfo {
 	if id.outerID != 0 {
-		// This is not strictly necessary, but it reduces the counters a bit.
+		// A literal nested within a struct scope shares that scope:
+		// hasEvidenceForOne looks for evidence one scope up only, so
+		// a field declared beside the nested literal in the enclosing
+		// one must count for it.
 		return id
 	}
 	if id.FromEmbed {
 		// If we already had a struct within this field we can simply use it.
 		return id
 	}
-
-	if _, ok := s.Src.(*ast.File); ok {
-		// If this is not a file, the struct indicates the scope/
-		// boundary at which closedness should apply. This is not true
-		// for files.
-		// We should also not spawn if this is a nested Comprehension,
-		// where the spawn is already done as it may lead to spurious
-		// field not allowed errors. We can detect this with a nil s.Src.
-		// TODO(evalv3): use a more principled detection mechanism.
-		// TODO: set this as a flag in StructLit so as to not have to
-		// do the somewhat dangerous cast here.
-		return id
-	}
-
 	return n.splitScope(s, id)
 }
 
@@ -814,17 +839,6 @@ outer:
 			continue outer
 		}
 
-		if a.parent == 0 {
-			// If the embedding's parent is not in the local
-			// reqSets, it originated from a different context
-			// (e.g. cross-package) and cannot provide evidence.
-			if embedScope.parent != 0 {
-				if _, ok2 := all.lookupSet(embedScope.parent); !ok2 {
-					continue outer
-				}
-			}
-			return true
-		}
 		if !ok {
 			return true
 		}

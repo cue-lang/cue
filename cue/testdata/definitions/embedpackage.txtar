@@ -1,7 +1,7 @@
 # A package which embeds a definition at its root stays closed when it is
 # reached through a reference, including from another package's root
-# embedding. Its own fields next to the embedded definition should stay
-# allowed, whichever file of the package, or further package, declares them.
+# embedding. Its own fields next to the embedded definition stay allowed,
+# whichever file of the package, or further package, declares them.
 -- cue.mod/module.cue --
 module: "foo.test/main"
 language: version: "v0.17.0"
@@ -34,10 +34,10 @@ midClosedField: extra: 1
 
 siblingsField: siblings
 siblingsField: extra: 1
-siblingsName: siblings @test(eq:todo, {name: "test", other: 1, #Def: {name: string}})
+siblingsName: siblings
 siblingsName: name: "test"
-#Siblings: siblings @test(eq:todo, {name: "test", other: 1, #Def: {name: string}})
-siblingsDef: #Siblings @test(eq:todo, {name: "test", other: 1, #Def: {name: string}})
+#Siblings: siblings
+siblingsDef: #Siblings
 siblingsDef: name: "test"
 
 defSiblingsField: defsiblings
@@ -45,34 +45,34 @@ defSiblingsField: extra: 1
 defSiblingsName: defsiblings
 defSiblingsName: name: "test"
 
-structSiblingsField: structsiblings @test(err:todo, code=eval, contains="field not allowed", at=extra)
+structSiblingsField: structsiblings
 structSiblingsField: extra: 1
 structSiblingsName: structsiblings
 structSiblingsName: name: "test"
 
-nestedSiblingsField: nestedsiblings @test(err:todo, code=eval, contains="field not allowed", at=extra)
+nestedSiblingsField: nestedsiblings
 nestedSiblingsField: extra: 1
 nestedSiblingsName: nestedsiblings
 nestedSiblingsName: name: "test"
 
-comprehensionField: comprehension @test(err:todo, code=eval, contains="field not allowed", at=extra)
+comprehensionField: comprehension
 comprehensionField: extra: 1
 comprehensionName: comprehension
 comprehensionName: name: "test"
 
 multiFileField: multifile
 multiFileField: extra: 1
-multiFileName: multifile @test(eq:todo, {name: "test", other: 1, #Def: {name: string}})
+multiFileName: multifile
 multiFileName: name: "test"
 
 extendedField: extended
 extendedField: other: 1
-extendedName: extended @test(eq:todo, {name: "test", extra: 1, #Def: {name: string}})
+extendedName: extended
 extendedName: name: "test"
 
 ellipsisClosed: ellipsis
 ellipsisClosed: f: extra: 1
-ellipsisNested: ellipsis @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+ellipsisNested: ellipsis
 ellipsisNested: h: extra: 1
 
 @test(eq, {
@@ -85,9 +85,21 @@ ellipsisNested: h: extra: 1
 	}
 
 	siblingsField: _|_ @test(err, code=eval, contains="field not allowed", at=extra, pos=[-42:16])
-	siblingsName: _|_ @test(err, code=eval, contains="field not allowed", at=other)
-	#Siblings:    _|_ @test(err, code=eval, contains="field not allowed", at=other)
-	siblingsDef:  _|_ @test(err, code=eval, contains="field not allowed", at=other)
+	siblingsName: {
+		name:  "test"
+		other: 1
+		#Def: {name: string}
+	}
+	#Siblings: {
+		name:  "test"
+		other: 1
+		#Def: {name: string}
+	}
+	siblingsDef: {
+		name:  "test"
+		other: 1
+		#Def: {name: string}
+	}
 
 	defSiblingsField: _|_ @test(err, code=eval, contains="field not allowed", at=extra, pos=[-34:19])
 	defSiblingsName: {
@@ -100,25 +112,14 @@ ellipsisNested: h: extra: 1
 		}
 	}
 
-	structSiblingsField: {
-		name:  "test"
-		other: 1
-		extra: 1
-		#Def: {name: string}
-	}
+	structSiblingsField: _|_ @test(err, code=eval, contains="field not allowed", at=extra, pos=[-29:22])
 	structSiblingsName: {
 		name:  "test"
 		other: 1
 		#Def: {name: string}
 	}
 
-	nestedSiblingsField: {
-		name:  "test"
-		mid:   1
-		other: 1
-		extra: 1
-		#Def: {name: string}
-	}
+	nestedSiblingsField: _|_ @test(err, code=eval, contains="field not allowed", at=extra, pos=[-24:22])
 	nestedSiblingsName: {
 		name:  "test"
 		mid:   1
@@ -126,12 +127,7 @@ ellipsisNested: h: extra: 1
 		#Def: {name: string}
 	}
 
-	comprehensionField: {
-		name:  "test"
-		other: 1
-		extra: 1
-		#Def: {name: string}
-	}
+	comprehensionField: _|_ @test(err, code=eval, contains="field not allowed", at=extra, pos=[-19:21])
 	comprehensionName: {
 		name:  "test"
 		other: 1
@@ -139,25 +135,24 @@ ellipsisNested: h: extra: 1
 	}
 
 	multiFileField: _|_ @test(err, code=eval, contains="field not allowed", at=extra, pos=[-14:17])
-	multiFileName: _|_ @test(err, code=eval, contains="field not allowed", at=other)
+	multiFileName: {
+		name:  "test"
+		other: 1
+		#Def: {name: string}
+	}
 
 	extendedField: _|_ @test(err, code=eval, contains="field not allowed", at=other, pos=[-9:16])
-	extendedName: _|_ @test(err, code=eval, contains="field not allowed", at=extra)
+	extendedName: {
+		name:  "test"
+		extra: 1
+		#Def: {name: string}
+	}
 
 	// An ellipsis in the embedding at the root of the package opens the
 	// package, but not the regular fields it declares, nor a field which
 	// embeds a definition.
 	ellipsisClosed: _|_ @test(err, code=eval, contains="field not allowed", at=f.extra, pos=[-4:20])
-	ellipsisNested: {
-		name: string
-		f: {a?: int}
-		h: {
-			i:     1
-			extra: 1
-		}
-		#F: {a?: int}
-		#Def: {name: string}
-	}
+	ellipsisNested: _|_ @test(err, code=eval, contains="field not allowed", at=h.extra, pos=[-2:20])
 
 	openedField: {
 		name:  "test"
@@ -323,34 +318,26 @@ other: 1
     ./in.cue:25:17
 [eval] siblingsField.extra: field not allowed:
     ./in.cue:28:16
-[eval] siblingsField.other: field not allowed:
-    ./siblings/siblings.cue:8:1
-[eval] siblingsName.other: field not allowed:
-    ./siblings/siblings.cue:8:1
-[eval] #Siblings.other: field not allowed:
-    ./siblings/siblings.cue:8:1
-[eval] siblingsDef.other: field not allowed:
-    ./siblings/siblings.cue:8:1
 [eval] defSiblingsField.extra: field not allowed:
     ./in.cue:36:19
+[eval] structSiblingsField.extra: field not allowed:
+    ./in.cue:41:22
+[eval] nestedSiblingsField.extra: field not allowed:
+    ./in.cue:46:22
+[eval] comprehensionField.extra: field not allowed:
+    ./in.cue:51:21
 [eval] multiFileField.extra: field not allowed:
     ./in.cue:56:17
-[eval] multiFileField.other: field not allowed:
-    ./multifile/b.cue:3:1
-[eval] multiFileName.other: field not allowed:
-    ./multifile/b.cue:3:1
 [eval] extendedField.other: field not allowed:
     ./in.cue:61:16
-[eval] extendedField.extra: field not allowed:
-    ./extended/extended.cue:6:1
-[eval] extendedName.extra: field not allowed:
-    ./extended/extended.cue:6:1
 [eval] ellipsisClosed.f.extra: field not allowed:
     ./in.cue:66:20
+[eval] ellipsisNested.h.extra: field not allowed:
+    ./in.cue:68:20
 [eval] sibling.b.extra: field not allowed:
-    ./in.cue:200:13
+    ./in.cue:195:13
 [eval] siblingLit.b.extra: field not allowed:
-    ./in.cue:202:16
+    ./in.cue:197:16
 -- out/eval/stats --
 Leaks:  10
 Freed:  173
@@ -363,4 +350,4 @@ Conjuncts:    386
 Disjuncts:    0
 Notifications: 27
 
-NumCloseIDs: 130
+NumCloseIDs: 146

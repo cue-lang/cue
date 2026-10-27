@@ -1,7 +1,7 @@
 # Pinned to v0.17.0: root-embedding series, covering how a closed
 # embedding constrains its siblings before explicitopen is stable.
 # A regular field embedding two definitions, itself embedded at the
-# root, should allow their fields and the root's own fields.
+# root, allows their fields and the root's own fields.
 # https://cuelang.org/issue/4523
 -- cue.mod/module.cue --
 module: "mod.test"

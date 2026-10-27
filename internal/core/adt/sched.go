@@ -1038,44 +1038,22 @@ func runTask(t *task, mode runMode) {
 		t.state = taskCANCELLED
 		return
 	}
-	// Skip tasks whose evaluation must not cross an ancestor-cycle
-	// reference on this arc (see [nodeContext.hasAncestorCycle]):
+	// Evaluating a disjunction on an arc with an ancestor-cycle reference
+	// (see [nodeContext.hasAncestorCycle]) would resolve the disjunct
+	// through the back-edge into the same disjunction's evaluation; the
+	// cross-disjunct cycle err1/err2 in
+	// [cue/testdata/disjunctions/edge.txtar] documents that this must
+	// surface as an unresolved-disjunction error per the spec. Only the
+	// kinds of the disjuncts apply here.
 	//
-	//   - Comprehensions: a comprehension inherited onto a cycle arc may
-	//     re-enter the ancestor via the cyclic reference (its for/if
-	//     clauses look up children that themselves cycle back), recursing
-	//     without bound. This only applies when the node has no non-cyclic
-	//     conjuncts of its own (see below).
-	//   - Disjunctions: evaluating a disjunction here would resolve the
-	//     disjunct through the cyclic reference back into the same
-	//     disjunction's evaluation — the cross-disjunct cycle err1/err2
-	//     in [cue/testdata/disjunctions/edge.txtar] documents that this
-	//     must surface as an unresolved-disjunction error per the spec,
-	//     not as a successful resolution via the back-edge.
-	//     The kinds of the disjuncts still apply, so that for example a
-	//     scalar conflicts with a disjunction of structs.
-	//
-	// Other task kinds (Resolver, StructLit body, Field, ListLit, etc.)
-	// contribute bounded structure or constraints that downstream lookups
-	// (e.g. `_self.foo`) need; they must still fire. The structural cycle
-	// is still reported through [nodeContext.detectCycle].
-	if t.node.hasAncestorCycle {
-		switch t.run {
-		case handleComprehension:
-			// Only skip if the node is a pure back-reference to its
-			// ancestor. If it has independent non-cyclic conjuncts (e.g. a
-			// `let X = self` whose conjuncts were copied into this vertex),
-			// the comprehension must still fire to materialize its fields
-			// here.
-			if t.node.hasOnlyCyclicConjuncts() {
-				t.state = taskSUCCESS
-				return
-			}
-		case handleDisjunctions:
-			t.node.applyDisjunctionKinds()
-			t.state = taskSUCCESS
-			return
-		}
+	// All other task kinds must still fire: they contribute structure or
+	// constraints that downstream lookups (e.g. `_self.foo`) need. Their
+	// cyclic conjuncts are marked by [nodeContext.detectCycle] and the
+	// structural cycle is reported by [assertStructuralCycle].
+	if t.node.hasAncestorCycle && t.run == handleDisjunctions {
+		t.node.applyDisjunctionKinds()
+		t.state = taskSUCCESS
+		return
 	}
 	ctx := t.node.ctx
 	if ctx.LogEval > 0 {

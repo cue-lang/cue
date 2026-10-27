@@ -168,7 +168,6 @@ patternDefaults: {
 		[*"a" | "b"]: int
 		[*"a" | "c"]: string
 	}
-	// The second pattern is merged into the first, so c matches neither.
 	d: #D
 	closed: #D & {for k in ["c"] {(k): "x"}}
 	open: {

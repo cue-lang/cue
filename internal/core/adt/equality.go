@@ -24,7 +24,7 @@ const (
 	// CheckStructural indicates that closedness information and pattern
 	// constraints, including the element constraints of lists, should be
 	// considered for equality. Equal may return false even when values are
-	// equal.
+	// equal. Defaults are not taken.
 	CheckStructural
 
 	// RegularOnly indicates that only regular fields should be considered,

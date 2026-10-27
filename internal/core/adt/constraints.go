@@ -124,7 +124,8 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	var constraint *Vertex
 	for i := range pcs.Pairs {
 		pc := &pcs.Pairs[i]
-		if Equal(ctx, pc.Pattern, pattern, 0) {
+		// Defaults play no part in which labels a pattern matches.
+		if Equal(ctx, pc.Pattern, pattern, CheckStructural) {
 			constraint = pc.Constraint
 			break
 		}

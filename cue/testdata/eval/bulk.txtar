@@ -234,20 +234,19 @@ patternDefaults: {
 		[*"a" | "b"]: int
 		[*"a" | "c"]: string
 	}
-	// The second pattern is merged into the first, so c matches neither.
-	d: #D @test(allows, b) @test(allows=false, c, incorrect)
-	closed: #D & {for k in ["c"] {(k): "x"}} @test(err, code=eval, at=c, contains="field not allowed", incorrect) @test(eq:todo, {c: "x"})
+	d: #D @test(allows, b) @test(allows, c)
+	closed: #D & {for k in ["c"] {(k): "x"}} @test(eq, {c: "x"})
 	open: {
 		[*"a" | "b"]: int
 		[*"a" | "c"]: string
 		if true {c: 1}
-		@test(eq, 1, at=c, incorrect)
-		@test(err:todo, code=eval, at=c, contains="conflicting values")
+		@test(err, code=eval, at=c, contains="conflicting values")
 	}
 }
 -- out/errors.txt --
-[eval] patternDefaults.closed.c: field not allowed:
-    ./defaults.cue:11:32
+[eval] patternDefaults.open.c: conflicting values 1 and string (mismatched types int and string):
+    ./defaults.cue:13:17
+    ./defaults.cue:14:15
 [eval] t1.c.z: field not allowed:
     ./in.cue:32:11
 [eval] t2.c.z: field not allowed:

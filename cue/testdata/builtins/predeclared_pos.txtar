@@ -1,19 +1,24 @@
 # Errors involving a predeclared builtin such as len point at its use, like
 # errors involving a predeclared type such as int.
 -- in.cue --
-sel:    len.foo         @test(err, code=eval, contains="invalid operand %!s(<nil>) (found func, want list or struct)", pos=[], incorrect) @test(err:todo, p=2, contains="invalid operand len (found func, want list or struct)", pos=[0:9])
-idx:    len[0]          @test(err, code=eval, contains="invalid operand %!s(<nil>) (found func, want list or struct)", pos=[], incorrect) @test(err:todo, p=2, contains="invalid operand len (found func, want list or struct)", pos=[0:9])
-comp:   [for x in len {x}] @test(err, code=eval, contains="cannot range over %!s(<nil>) (found func, want list or struct)", pos=[], incorrect) @test(err:todo, p=2, contains="cannot range over len (found func, want list or struct)", pos=[0:19])
-unify:  len & 1         @test(err, code=eval, contains="conflicting values len and 1", pos=[0:15], incorrect) @test(err:todo, p=2, pos=[0:9, 0:15])
-unify2: "a" & len       @test(err, code=eval, contains="conflicting values \"a\" and len", pos=[0:9], incorrect) @test(err:todo, p=2, pos=[0:9, 0:15])
+sel:    len.foo         @test(err, code=eval, contains="invalid operand len (found func, want list or struct)", pos=[0:9])
+idx:    len[0]          @test(err, code=eval, contains="invalid operand len (found func, want list or struct)", pos=[0:9])
+comp:   [for x in len {x}] @test(err, code=eval, contains="cannot range over len (found func, want list or struct)", pos=[0:19])
+unify:  len & 1         @test(err, code=eval, contains="conflicting values len and 1", pos=[0:9, 0:15])
+unify2: "a" & len       @test(err, code=eval, contains="conflicting values \"a\" and len", pos=[0:9, 0:15])
 -- out/errors.txt --
-[eval] sel: invalid operand %!s(<nil>) (found func, want list or struct)
-[eval] idx: invalid operand %!s(<nil>) (found func, want list or struct)
-[eval] comp: cannot range over %!s(<nil>) (found func, want list or struct)
+[eval] sel: invalid operand len (found func, want list or struct):
+    ./in.cue:1:9
+[eval] idx: invalid operand len (found func, want list or struct):
+    ./in.cue:2:9
+[eval] comp: cannot range over len (found func, want list or struct):
+    ./in.cue:3:19
 [eval] unify: conflicting values len and 1 (mismatched types func and int):
+    ./in.cue:4:9
     ./in.cue:4:15
 [eval] unify2: conflicting values "a" and len (mismatched types string and func):
     ./in.cue:5:9
+    ./in.cue:5:15
 -- out/eval/stats --
 Leaks:  0
 Freed:  6

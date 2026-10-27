@@ -1551,6 +1551,7 @@ meet.wr: function returns _, but its signature requires number:
     ./in.cue:506:32
 [eval] compose.builtin: conflicting values func(x: number) -> number: ... and len:
     ./in.cue:536:12
+    ./in.cue:536:44
 [eval] compose.fbBad: conflicting function implementations: the same function literal is closed over different values:
     ./try.cue:7:28
 [eval] compose.tryEq: conflicting function implementations: the same function literal is closed over different values:

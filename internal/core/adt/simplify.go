@@ -304,12 +304,12 @@ func SimplifyValidator(ctx *OpContext, v, w Conjunct) (c Conjunct, ok bool) {
 				// expressions held in Src, so Args says nothing about them.
 				// The same call in the same environment is the only safe
 				// duplicate.
-				if x.Builtin == y.Builtin && x.Src == y.Src && v.Env == w.Env {
+				if sameBuiltin(x.Builtin, y.Builtin) && x.Src == y.Src && v.Env == w.Env {
 					return v, true
 				}
 				return c, false
 			}
-			if x.Builtin != y.Builtin || len(x.Args) != len(y.Args) {
+			if !sameBuiltin(x.Builtin, y.Builtin) || len(x.Args) != len(y.Args) {
 				return c, false
 			}
 			for i, a := range x.Args {

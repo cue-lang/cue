@@ -342,7 +342,7 @@ function: {
 	lss: <strings.ToUpper
 	ne:  !=strings.ToUpper
 
-	// A predeclared function has no source position of its own, so the error
+	// A predeclared function is positioned at its use, so the error
 	// is reported at the bound's operand.
 	predeclaredLss: <len
 	predeclaredNe:  !=len

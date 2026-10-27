@@ -656,8 +656,8 @@ partial: {
 
 	// Each application written out is its own binding, as arguments are
 	// compared by the identity of their expressions. Equal literals do not
-	// make two applications the same, and neither should a predeclared
-	// builtin.
+	// make two applications the same, and neither does a predeclared
+	// builtin, which is positioned at each use.
 	conflictEqual:   add(1, ...) & add(1, ...)
 	apply:           func(g: _, x: _) -> _: g(x)
 	conflictBuiltin: apply(len, ...) & apply(len, ...)

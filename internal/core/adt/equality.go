@@ -310,9 +310,9 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 	case *BuiltinValidator:
 		if y, ok := w.(*BuiltinValidator); ok {
 			if x.Builtin.ValidatorNoSelf {
-				return x.Builtin == y.Builtin && equalCallSrc(ctx, x.Src, y.Src)
+				return sameBuiltin(x.Builtin, y.Builtin) && equalCallSrc(ctx, x.Src, y.Src)
 			}
-			if x.Builtin != y.Builtin || len(x.Args) != len(y.Args) {
+			if !sameBuiltin(x.Builtin, y.Builtin) || len(x.Args) != len(y.Args) {
 				return false
 			}
 			for i, xa := range x.Args {
@@ -330,10 +330,10 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 
 	case *Builtin:
 		// Identical builtins were already handled by the v == w comparison
-		// above; this identifies tightened clones of the same builtin
-		// carrying equal type constraints.
+		// above; this identifies clones of the same builtin, positioned at
+		// a use or tightened, carrying equal type constraints.
 		if y, ok := w.(*Builtin); ok {
-			return x.self() == y.self() && equalFuncTypes(x.Types, y.Types)
+			return sameBuiltin(x, y)
 		}
 
 	case *ExternalValidator:

@@ -3281,6 +3281,10 @@ const (
 )
 
 // A Builtin is a value representing a native function call.
+//
+// A builtin may be cloned, to position it at one of its uses or to tighten
+// its type, and its clones keep its identity: compare builtins with
+// [sameBuiltin], not ==.
 type Builtin struct {
 	// TODO:  make these values for better type checking.
 	Params []Param
@@ -3353,14 +3357,18 @@ type Builtin struct {
 	// remains identified through orig.
 	Types []FuncType
 
+	// Src is the identifier through which a predeclared builtin such as len
+	// is used; see [Builtin.WithSource]. It is nil for a shared builtin.
+	Src *ast.Ident
+
 	// orig points to the package-level builtin from which a tightened clone
-	// (a builtin carrying Types) was derived. It is nil for an original
-	// builtin. See [Builtin.self].
+	// (a builtin carrying Types) or a positioned clone (one carrying Src)
+	// was derived. It is nil for an original builtin. See [Builtin.self].
 	orig *Builtin
 }
 
 // self returns the identity of the builtin: the package-level builtin from
-// which a tightened clone was derived, or the builtin itself.
+// which a clone was derived, or the builtin itself.
 func (x *Builtin) self() *Builtin {
 	if x.orig != nil {
 		return x.orig
@@ -3373,6 +3381,20 @@ func (x *Builtin) clone() *Builtin {
 	c := *x
 	c.orig = x.self()
 	return &c
+}
+
+// WithSource returns a clone of x positioned at src, the identifier of one
+// use of a predeclared builtin, which is otherwise shared without a source.
+func (x *Builtin) WithSource(src *ast.Ident) *Builtin {
+	c := x.clone()
+	c.Src = src
+	return c
+}
+
+// sameBuiltin reports whether a and b are the same builtin, with the same
+// type constraints, regardless of where either was used.
+func sameBuiltin(a, b *Builtin) bool {
+	return a == b || (a.self() == b.self() && equalFuncTypes(a.Types, b.Types))
 }
 
 type Param struct {
@@ -3569,7 +3591,12 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 	return x.Func(call)
 }
 
-func (x *Builtin) Source() ast.Node { return nil }
+func (x *Builtin) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
 
 // ExternalValidator is a validator supplied by the program embedding the
 // evaluator rather than by a built-in package; a function supplied that way
@@ -3601,10 +3628,13 @@ type BuiltinValidator struct {
 }
 
 func (x *BuiltinValidator) Source() ast.Node {
-	if x.Src == nil {
+	if x.Src != nil {
+		return x.Src.Source()
+	}
+	if x.Builtin != nil {
 		return x.Builtin.Source()
 	}
-	return x.Src.Source()
+	return nil
 }
 
 func (x *BuiltinValidator) Kind() Kind {

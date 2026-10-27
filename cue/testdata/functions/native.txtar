@@ -665,11 +665,11 @@ partial: {
 
 	// Each application written out is its own binding, as arguments are
 	// compared by the identity of their expressions. Equal literals do not
-	// make two applications the same, and neither should a predeclared
-	// builtin.
+	// make two applications the same, and neither does a predeclared
+	// builtin, which is positioned at each use.
 	conflictEqual:   add(1, ...) & add(1, ...) @test(err, code=eval, contains="conflicting values")
 	apply:           func(g: _, x: _) -> _: g(x)
-	conflictBuiltin: apply(len, ...) & apply(len, ...) @test(err:todo, p=2, code=eval, contains="conflicting values")
+	conflictBuiltin: apply(len, ...) & apply(len, ...) @test(err, code=eval, contains="conflicting values")
 }
 
 // What is cached per environment must not carry over from one disjunct
@@ -850,6 +850,8 @@ cycles.disjunct.bad: 4 errors in empty disjunction::
     ./in.cue:659:17
 [eval] partial.conflictEqual: conflicting values func(a: int, b: int, c: int) -> int: ... and func(a: int, b: int, c: int) -> int: ...:
     ./in.cue:606:7
+[eval] partial.conflictBuiltin: conflicting values func(g: _, x: _) -> _: ... and func(g: _, x: _) -> _: ...:
+    ./in.cue:670:19
 [eval] disjunctEnv.defaults.x: 2 errors in empty disjunction:
 disjunctEnv.defaults.x.j: conflicting values 1 and 2:
     ./in.cue:701:16

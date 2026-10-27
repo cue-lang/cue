@@ -348,10 +348,10 @@ function: {
 	lss: <strings.ToUpper  @test(err, code=eval, contains="invalid value strings.ToUpper (type func) for bound <", pos=[0:8])
 	ne:  !=strings.ToUpper @test(err, code=eval, contains="invalid value strings.ToUpper (type func) for bound !=", pos=[0:9], hint="the spec does not say whether functions can be compared for equality")
 
-	// A predeclared function has no source position of its own, so the error
+	// A predeclared function is positioned at its use, so the error
 	// is reported at the bound's operand.
-	predeclaredLss: <len  @test(err, code=eval, contains="invalid value len (type func) for bound <", pos=[], incorrect) @test(err:todo, p=2, pos=[0:19])
-	predeclaredNe:  !=len @test(err, code=eval, contains="invalid value len (type func) for bound !=", pos=[], incorrect) @test(err:todo, p=2, pos=[0:20])
+	predeclaredLss: <len  @test(err, code=eval, contains="invalid value len (type func) for bound <", pos=[0:19])
+	predeclaredNe:  !=len @test(err, code=eval, contains="invalid value len (type func) for bound !=", pos=[0:20])
 }
 
 // A reference to top may still resolve to a concrete value.
@@ -610,8 +610,10 @@ topRef: {
     ./kinds.cue:22:8
 [eval] function.ne: invalid value strings.ToUpper (type func) for bound !=:
     ./kinds.cue:23:9
-[eval] function.predeclaredLss: invalid value len (type func) for bound <
-[eval] function.predeclaredNe: invalid value len (type func) for bound !=
+[eval] function.predeclaredLss: invalid value len (type func) for bound <:
+    ./kinds.cue:27:19
+[eval] function.predeclaredNe: invalid value len (type func) for bound !=:
+    ./kinds.cue:28:20
 [incomplete] topRef.#D.lss: non-concrete value x for bound <:
     ./kinds.cue:35:9
 [incomplete] topRef.#D.ne: non-concrete value x for bound !=:

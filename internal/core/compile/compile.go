@@ -139,6 +139,10 @@ type compiler struct {
 	// also be set by other comprehension-like constructs.
 	inTryContext int
 
+	// callee is the identifier being compiled as the function of a call,
+	// if any; see [compiler.usePredeclared].
+	callee *ast.Ident
+
 	fileScope map[adt.Feature]bool
 
 	num literal.NumInfo
@@ -381,6 +385,21 @@ func (c *compiler) setExperiments(exp cueexperiment.File) {
 	c.experiments = exp
 }
 
+// usePredeclared returns p, which the predeclared identifier n resolves to,
+// for this use of n. A builtin is positioned at n, as it is otherwise shared
+// between all uses and carries no source.
+//
+// A builtin which is called stays shared: nearly every use of a builtin is
+// a call, which has the position of its function, and a clone per call
+// would cost more memory than the call itself.
+func (c *compiler) usePredeclared(n *ast.Ident, p adt.Expr) adt.Expr {
+	p = c.verifyVersion(n, p)
+	if b, ok := p.(*adt.Builtin); ok && n != c.callee {
+		return b.WithSource(n)
+	}
+	return p
+}
+
 // verifyVersion checks whether n is a Builtin and then checks whether the
 // Added version is compatible with the file version registered in c.
 func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
@@ -462,7 +481,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		if p == nil {
 			return c.errf(n, "predeclared name %q not found", n.Name)
 		}
-		return c.verifyVersion(n, p)
+		return c.usePredeclared(n, p)
 	}
 
 	// Unresolved field.
@@ -509,10 +528,10 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 		// Predeclared name references created without [ast.NewPredeclared].
 		if p := predeclared(n); p != nil {
-			return c.verifyVersion(n, p)
+			return c.usePredeclared(n, p)
 		}
 		if p := c.experimentPredeclared(n); p != nil {
-			return c.verifyVersion(n, p)
+			return c.usePredeclared(n, p)
 		}
 
 		return c.errf(n, "reference %q not found", n.Name)
@@ -1421,7 +1440,10 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		return c.expr(n.X)
 
 	case *ast.CallExpr:
-		call := &adt.CallExpr{Src: n, Fun: c.expr(n.Fun), Partial: n.Ellipsis != token.NoPos}
+		call := &adt.CallExpr{Src: n, Partial: n.Ellipsis != token.NoPos}
+		c.callee, _ = n.Fun.(*ast.Ident)
+		call.Fun = c.expr(n.Fun)
+		c.callee = nil
 		seenLabel := false
 		for i, a := range n.Args {
 			call.Args = append(call.Args, c.expr(a))

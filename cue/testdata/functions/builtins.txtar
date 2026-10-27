@@ -382,18 +382,22 @@ valueArgs: {
     ./in.cue:160:12
 [eval] polymorphic.any: parameter 1 of builtin len accepts (string|bytes|list|struct), but its signature requires _:
     ./in.cue:172:9
+    ./in.cue:172:32
 [eval] polymorphic.sBad: conflicting values string and [1,2] (mismatched types string and list):
     ./in.cue:176:13
     ./in.cue:179:11
 [eval] polymorphic.bad: result of function type has kind string, conflicting with result kind int of builtin len:
     ./in.cue:182:8
+    ./in.cue:182:34
 [eval] aliases.sp3: builtin strings.Split returns list, but its signature requires {...}:
     ./in.cue:197:8
 [eval] labelOrder.ab: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
     ./in.cue:207:6
     ./in.cue:208:6
+    ./in.cue:209:7
 [eval] labelOrder.ba: parameter x of builtin len accepts (string|bytes|list|struct), but its signature requires (string|int):
     ./in.cue:207:6
+    ./in.cue:210:7
 [eval] labeled.errors.unknown: unknown argument lst in call to list.Drop:
     ./in.cue:226:12
 [eval] labeled.errors.dup: argument s provided by position and label in call to strings.Repeat:

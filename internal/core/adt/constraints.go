@@ -128,29 +128,14 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature) (result bool) {
 	if f.IsString() {
 		k = StringKind
 	}
+	// This also rejects a *Bottom pattern, as its kind is BottomKind.
+	// Its error was already added to the node by the task evaluating it.
 	if !k.IsAnyOf(pattern.Kind()) {
 		return false
 	}
 
 	// Fast track for the majority of cases.
 	switch x := pattern.(type) {
-	case *Bottom:
-		// TODO: hoist and reuse with the identical code in optional.go.
-		if x == cycle {
-			err := ctx.NewPosf(Pos(pattern), "cyclic pattern constraint")
-			for c := range ctx.vertex.LeafConjuncts() {
-				addPositions(ctx, err, c)
-			}
-			ctx.AddBottom(&Bottom{
-				Err:  err,
-				Node: ctx.vertex,
-			})
-		}
-		if ctx.errs == nil {
-			ctx.AddBottom(x)
-		}
-		return false
-
 	case *Top:
 		return true
 

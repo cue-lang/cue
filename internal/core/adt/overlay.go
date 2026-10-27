@@ -146,7 +146,11 @@ func (m vertexMap) deref(v *Vertex) *Vertex {
 // cloneRoot clones the Vertex in which disjunctions are defined to allow
 // inserting selected disjuncts into a new Vertex.
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
-	maps.Copy(ctx.vertexMap, root.vertexMap)
+	// ctx.vertexMap is still empty, and cloning is much cheaper than
+	// inserting each entry into it.
+	if len(root.vertexMap) > 0 {
+		ctx.vertexMap = maps.Clone(root.vertexMap)
+	}
 
 	// Clone all vertices that need to be cloned to support the overlay.
 	v := ctx.cloneVertex(root.node)

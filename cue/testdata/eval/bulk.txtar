@@ -225,7 +225,29 @@ issue3638: compare: {
 		#x: *{b: 2} | {a: int}
 	})
 }
+-- defaults.cue --
+// Patterns which differ only outside their defaults are distinct, as defaults
+// play no part in which labels a pattern matches. Fields added by
+// comprehensions are matched against the patterns after they were collected.
+patternDefaults: {
+	#D: {
+		[*"a" | "b"]: int
+		[*"a" | "c"]: string
+	}
+	// The second pattern is merged into the first, so c matches neither.
+	d: #D @test(allows, b) @test(allows=false, c, incorrect)
+	closed: #D & {for k in ["c"] {(k): "x"}} @test(err, code=eval, at=c, contains="field not allowed", incorrect) @test(eq:todo, {c: "x"})
+	open: {
+		[*"a" | "b"]: int
+		[*"a" | "c"]: string
+		if true {c: 1}
+		@test(eq, 1, at=c, incorrect)
+		@test(err:todo, code=eval, at=c, contains="conflicting values")
+	}
+}
 -- out/errors.txt --
+[eval] patternDefaults.closed.c: field not allowed:
+    ./defaults.cue:11:32
 [eval] t1.c.z: field not allowed:
     ./in.cue:32:11
 [eval] t2.c.z: field not allowed:
@@ -236,17 +258,17 @@ issue3638: compare: {
     ./multi.cue:14:21
 -- out/eval/stats --
 Leaks:  16
-Freed:  173
-Reused: 150
-Allocs: 39
+Freed:  200
+Reused: 176
+Allocs: 40
 Retain: 0
 
-Unifications: 140
-Conjuncts:    302
-Disjuncts:    33
+Unifications: 153
+Conjuncts:    332
+Disjuncts:    45
 Notifications: 6
 
-NumCloseIDs: 74
+NumCloseIDs: 29
 -- out/todo.txt --
 patternCycle.t1.{p1,p2,p3}: v2 had cyclic pattern constraint errors; v3 resolves correctly.
 issue3638.full.entrypoint and issue3638.full.#Kubernetes.input.res1: v3 uses structure sharing (~), v2 expands.

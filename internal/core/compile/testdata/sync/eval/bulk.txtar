@@ -159,7 +159,49 @@ issue3638: compare: {
 	}
 	#x: { a: int } | *{ b: 2 }
 }
+-- defaults.cue --
+// Patterns which differ only outside their defaults are distinct, as defaults
+// play no part in which labels a pattern matches. Fields added by
+// comprehensions are matched against the patterns after they were collected.
+patternDefaults: {
+	#D: {
+		[*"a" | "b"]: int
+		[*"a" | "c"]: string
+	}
+	// The second pattern is merged into the first, so c matches neither.
+	d: #D
+	closed: #D & {for k in ["c"] {(k): "x"}}
+	open: {
+		[*"a" | "b"]: int
+		[*"a" | "c"]: string
+		if true {c: 1}
+	}
+}
 -- out/compile --
+--- defaults.cue
+{
+  patternDefaults: {
+    #D: {
+      [(*"a"|"b")]: int
+      [(*"a"|"c")]: string
+    }
+    d: 〈0;#D〉
+    closed: (〈0;#D〉 & {
+      for _, k in [
+        "c",
+      ] {
+        〈1;k〉: "x"
+      }
+    })
+    open: {
+      [(*"a"|"b")]: int
+      [(*"a"|"c")]: string
+      if true {
+        c: 1
+      }
+    }
+  }
+}
 --- in.cue
 {
   a: {

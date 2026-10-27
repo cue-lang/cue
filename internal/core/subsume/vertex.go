@@ -256,7 +256,7 @@ func (s *subsumer) patterns(x, y *adt.Vertex, xClosed, final bool) bool {
 outerConstraint:
 	for i := range apairs {
 		for j := range bpc.Pairs {
-			if adt.Equal(s.ctx, apairs[i].Pattern, bpc.Pairs[j].Pattern, 0) {
+			if adt.Equal(s.ctx, apairs[i].Pattern, bpc.Pairs[j].Pattern, adt.CheckStructural) {
 				if !s.constraints(x, y, x.PatternConstraint(s.ctx, i), y.PatternConstraint(s.ctx, j)) {
 					return false
 				}

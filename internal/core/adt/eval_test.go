@@ -51,6 +51,11 @@ func TestEvalV3(t *testing.T) {
 		RecordStats: true,   // Ensure inline runner generates stats in eval_test
 	}
 
+	// TODO: also run with sharing disabled, as the v3-noshare entry of
+	// cuetdtest.FullMatrix does, and check that the results agree, as sharing
+	// should only affect performance. Some cycle tests do not terminate
+	// without sharing; see https://cuelang.org/issue/4527.
+
 	cuedebug.Init()
 	dbg := cuedebug.Flags
 	cueexperiment.Init()

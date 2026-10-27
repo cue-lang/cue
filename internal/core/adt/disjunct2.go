@@ -419,6 +419,9 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 	case 1:
 		d := cross[0].node
+		// TODO: keep sharing the vertex the disjunct still shares, so that a
+		// field reading n does not evaluate the disjunction again; blocked on
+		// checking that sharing does not change results, see TestEvalV3.
 		n.setBaseValue(d)
 		if n.defaultMode == maybeDefault {
 			n.defaultMode = cross[0].defaultMode

@@ -73,4 +73,24 @@ func TestBuiltFileExperiments(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	f.SetExperiments(exp)
 	qt.Assert(t, qt.IsNil(compileFile(f)))
+
+	// The same goes for the postfix ... operator, which the parser rejects
+	// before the compiler sees it in source that does not enable explicitopen.
+	buildOpen := func(exp *cueexperiment.File) *ast.File {
+		f := &ast.File{Decls: []ast.Decl{
+			&ast.Field{Label: ast.NewIdent("#A"), Value: ast.NewStruct()},
+			&ast.Field{
+				Label: ast.NewIdent("a"),
+				Value: &ast.PostfixExpr{X: ast.NewIdent("#A"), Op: token.ELLIPSIS},
+			},
+		}}
+		astutil.Resolve(f, func(token.Pos, string, ...any) {})
+		f.SetExperiments(exp)
+		return f
+	}
+	qt.Assert(t, qt.ErrorMatches(compileFile(buildOpen(oldExp)),
+		`.*postfix \.\.\. operator requires @experiment\(explicitopen\).*`))
+	openExp, err := cueexperiment.NewFile("v0.17.0", "explicitopen")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsNil(compileFile(buildOpen(openExp))))
 }

@@ -488,6 +488,21 @@ issue4100: {
 	}
 	for _ in a {}
 }
+-- selfcomprehension.cue --
+// A comprehension ranging over its own structurally cyclic node reports the
+// cycle; the fields which the node gets from its other conjuncts still land.
+selfComprehension: unified: {
+	x: {y: x & {for k, v in y.y {(k): v}}}
+}
+selfComprehension: embedded: {
+	x: {y: {x, for k, v in y.y {(k): v}}}
+}
+selfComprehension: withSibling: {
+	x: {a: 1, y: x & {for k, v in y.y {(k): v}}}
+}
+selfComprehension: siblingOnY: {
+	x: {y: x & {a: 1, for k, v in y.y {(k): v}}}
+}
 -- out/compile --
 --- in.cue
 {
@@ -1217,5 +1232,55 @@ issue4100: {
       }
     }
     for _, _ in 〈0;a〉 {}
+  }
+}
+--- selfcomprehension.cue
+{
+  selfComprehension: {
+    unified: {
+      x: {
+        y: (〈1;x〉 & {
+          for k, v in 〈1;y〉.y {
+            〈1;k〉: 〈1;v〉
+          }
+        })
+      }
+    }
+  }
+  selfComprehension: {
+    embedded: {
+      x: {
+        y: {
+          〈2;x〉
+          for k, v in 〈1;y〉.y {
+            〈1;k〉: 〈1;v〉
+          }
+        }
+      }
+    }
+  }
+  selfComprehension: {
+    withSibling: {
+      x: {
+        a: 1
+        y: (〈1;x〉 & {
+          for k, v in 〈1;y〉.y {
+            〈1;k〉: 〈1;v〉
+          }
+        })
+      }
+    }
+  }
+  selfComprehension: {
+    siblingOnY: {
+      x: {
+        y: (〈1;x〉 & {
+          a: 1
+          for k, v in 〈1;y〉.y {
+            〈1;k〉: 〈1;v〉
+          }
+        })
+      }
+    }
   }
 }

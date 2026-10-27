@@ -1,0 +1,29 @@
+# Pinned to v0.17.0: root-embedding series, covering how a closed
+# embedding constrains its siblings before explicitopen is stable.
+# A package embedding at its root an imported package, whose root embeds
+# a definition, should allow the root's own fields.
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- in.cue --
+package main
+
+import "mod.test/closed"
+
+closed
+extra: 1
+
+-- closed/closed.cue --
+package closed
+
+#Def: name: string
+
+#Def & {
+	name: "test"
+}
+-- out/compile --
+--- in.cue
+{
+  〈import;"mod.test/closed"〉
+  extra: 1
+}

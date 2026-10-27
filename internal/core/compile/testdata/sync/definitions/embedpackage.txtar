@@ -1,0 +1,345 @@
+# A package which embeds a definition at its root stays closed when it is
+# reached through a reference, including from another package's root
+# embedding. Its own fields next to the embedded definition should stay
+# allowed, whichever file of the package, or further package, declares them.
+-- cue.mod/module.cue --
+module: "foo.test/main"
+language: version: "v0.17.0"
+-- in.cue --
+package main
+
+import (
+	"foo.test/main/closed"
+	"foo.test/main/midclosed"
+	"foo.test/main/siblings"
+	"foo.test/main/defsiblings"
+	"foo.test/main/structsiblings"
+	"foo.test/main/nestedsiblings"
+	"foo.test/main/comprehension"
+	"foo.test/main/multifile"
+	"foo.test/main/extended"
+	"foo.test/main/ellipsis"
+)
+
+closedField: closed
+closedField: extra: 1
+
+closedEmbed: {
+	closed
+	extra: 1
+}
+
+midClosedField: midclosed
+midClosedField: extra: 1
+
+siblingsField: siblings
+siblingsField: extra: 1
+siblingsName: siblings
+siblingsName: name: "test"
+#Siblings: siblings
+siblingsDef: #Siblings
+siblingsDef: name: "test"
+
+defSiblingsField: defsiblings
+defSiblingsField: extra: 1
+defSiblingsName: defsiblings
+defSiblingsName: name: "test"
+
+structSiblingsField: structsiblings
+structSiblingsField: extra: 1
+structSiblingsName: structsiblings
+structSiblingsName: name: "test"
+
+nestedSiblingsField: nestedsiblings
+nestedSiblingsField: extra: 1
+nestedSiblingsName: nestedsiblings
+nestedSiblingsName: name: "test"
+
+comprehensionField: comprehension
+comprehensionField: extra: 1
+comprehensionName: comprehension
+comprehensionName: name: "test"
+
+multiFileField: multifile
+multiFileField: extra: 1
+multiFileName: multifile
+multiFileName: name: "test"
+
+extendedField: extended
+extendedField: other: 1
+extendedName: extended
+extendedName: name: "test"
+
+ellipsisClosed: ellipsis
+ellipsisClosed: f: extra: 1
+ellipsisNested: ellipsis
+ellipsisNested: h: extra: 1
+
+
+// A package embedding a definition at its root, used as the value of a
+// field in a struct with an embedding, is closed like the same struct
+// written inline: an ellipsis in a sibling embedding does not open it,
+// while a field declared beside it in the same struct is allowed.
+#E: e?: int
+sibling: {{#E, ...}, b: closed}
+sibling: b: extra: 1
+siblingLit: {{#E, ...}, b: {#Def2, name: "test"}}
+siblingLit: b: extra: 1
+siblingDecl: {#E, b: closed, b: extra: 1}
+siblingDeclLit: {#E, b: {#Def2, name: "test"}, b: extra: 1}
+#Def2: name: string
+-- opened.cue --
+@experiment(explicitopen)
+
+package main
+
+import "foo.test/main/siblings"
+
+// Opening the package with ... allows adding fields to it.
+openedField: siblings...
+openedField: extra: 1
+openedEmbed: {
+	siblings...
+	extra: 1
+}
+-- closed/closed.cue --
+package closed
+
+#Def: name: string
+
+#Def & {
+	name: "test"
+}
+-- midclosed/midclosed.cue --
+package midclosed
+
+import "foo.test/main/closed"
+
+closed
+-- siblings/siblings.cue --
+package siblings
+
+#Def: name: string
+
+#Def & {
+	name: "test"
+}
+other: 1
+-- defsiblings/defsiblings.cue --
+package defsiblings
+
+#Def: name: string
+#W: {
+	#Def & {name: "test"}
+	w: 1
+}
+
+#W
+-- structsiblings/structsiblings.cue --
+package structsiblings
+
+#Def: name: string
+
+{
+	#Def & {name: "test"}
+	other: 1
+}
+-- nestedsiblings/nestedsiblings.cue --
+package nestedsiblings
+
+#Def: name: string
+
+{
+	{
+		#Def & {name: "test"}
+		mid: 1
+	}
+	other: 1
+}
+-- comprehension/comprehension.cue --
+package comprehension
+
+#Def: name: string
+
+if true {
+	#Def & {name: "test"}
+}
+other: 1
+-- ellipsis/ellipsis.cue --
+package ellipsis
+
+#F: a?: int
+#Def: name: string
+
+{#Def, ...}
+f: {#F}
+h: {i: 1}
+-- extended/extended.cue --
+package extended
+
+import "foo.test/main/closed"
+
+closed
+extra: 1
+-- multifile/a.cue --
+package multifile
+
+#Def: name: string
+
+#Def & {
+	name: "test"
+}
+-- multifile/b.cue --
+package multifile
+
+other: 1
+-- out/compile --
+--- in.cue
+{
+  closedField: 〈import;"foo.test/main/closed"〉
+  closedField: {
+    extra: 1
+  }
+  closedEmbed: {
+    〈import;"foo.test/main/closed"〉
+    extra: 1
+  }
+  midClosedField: 〈import;"foo.test/main/midclosed"〉
+  midClosedField: {
+    extra: 1
+  }
+  siblingsField: 〈import;"foo.test/main/siblings"〉
+  siblingsField: {
+    extra: 1
+  }
+  siblingsName: 〈import;"foo.test/main/siblings"〉
+  siblingsName: {
+    name: "test"
+  }
+  #Siblings: 〈import;"foo.test/main/siblings"〉
+  siblingsDef: 〈0;#Siblings〉
+  siblingsDef: {
+    name: "test"
+  }
+  defSiblingsField: 〈import;"foo.test/main/defsiblings"〉
+  defSiblingsField: {
+    extra: 1
+  }
+  defSiblingsName: 〈import;"foo.test/main/defsiblings"〉
+  defSiblingsName: {
+    name: "test"
+  }
+  structSiblingsField: 〈import;"foo.test/main/structsiblings"〉
+  structSiblingsField: {
+    extra: 1
+  }
+  structSiblingsName: 〈import;"foo.test/main/structsiblings"〉
+  structSiblingsName: {
+    name: "test"
+  }
+  nestedSiblingsField: 〈import;"foo.test/main/nestedsiblings"〉
+  nestedSiblingsField: {
+    extra: 1
+  }
+  nestedSiblingsName: 〈import;"foo.test/main/nestedsiblings"〉
+  nestedSiblingsName: {
+    name: "test"
+  }
+  comprehensionField: 〈import;"foo.test/main/comprehension"〉
+  comprehensionField: {
+    extra: 1
+  }
+  comprehensionName: 〈import;"foo.test/main/comprehension"〉
+  comprehensionName: {
+    name: "test"
+  }
+  multiFileField: 〈import;"foo.test/main/multifile"〉
+  multiFileField: {
+    extra: 1
+  }
+  multiFileName: 〈import;"foo.test/main/multifile"〉
+  multiFileName: {
+    name: "test"
+  }
+  extendedField: 〈import;"foo.test/main/extended"〉
+  extendedField: {
+    other: 1
+  }
+  extendedName: 〈import;"foo.test/main/extended"〉
+  extendedName: {
+    name: "test"
+  }
+  ellipsisClosed: 〈import;"foo.test/main/ellipsis"〉
+  ellipsisClosed: {
+    f: {
+      extra: 1
+    }
+  }
+  ellipsisNested: 〈import;"foo.test/main/ellipsis"〉
+  ellipsisNested: {
+    h: {
+      extra: 1
+    }
+  }
+  #E: {
+    e?: int
+  }
+  sibling: {
+    {
+      〈2;#E〉
+      ...
+    }
+    b: 〈import;"foo.test/main/closed"〉
+  }
+  sibling: {
+    b: {
+      extra: 1
+    }
+  }
+  siblingLit: {
+    {
+      〈2;#E〉
+      ...
+    }
+    b: {
+      〈2;#Def2〉
+      name: "test"
+    }
+  }
+  siblingLit: {
+    b: {
+      extra: 1
+    }
+  }
+  siblingDecl: {
+    〈1;#E〉
+    b: 〈import;"foo.test/main/closed"〉
+    b: {
+      extra: 1
+    }
+  }
+  siblingDeclLit: {
+    〈1;#E〉
+    b: {
+      〈2;#Def2〉
+      name: "test"
+    }
+    b: {
+      extra: 1
+    }
+  }
+  #Def2: {
+    name: string
+  }
+}
+--- opened.cue
+{
+  openedField: 〈import;"foo.test/main/siblings"〉...
+  openedField: {
+    extra: 1
+  }
+  openedEmbed: {
+    〈import;"foo.test/main/siblings"〉...
+    extra: 1
+  }
+}

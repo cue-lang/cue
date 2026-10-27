@@ -1,0 +1,38 @@
+# Pinned to v0.17.0: root-embedding series, covering how a closed
+# embedding constrains its siblings before explicitopen is stable.
+# A regular field embedding two definitions, itself embedded at the
+# root, should allow their fields and the root's own fields.
+# https://cuelang.org/issue/4523
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- in.cue --
+#PartA: values: ["a"]
+#PartB: elsewhere: 1
+
+_whole: {
+	#PartA
+	#PartB
+}
+
+_whole
+extra: 1
+
+-- out/compile --
+--- in.cue
+{
+  #PartA: {
+    values: [
+      "a",
+    ]
+  }
+  #PartB: {
+    elsewhere: 1
+  }
+  _whole: {
+    〈1;#PartA〉
+    〈1;#PartB〉
+  }
+  〈0;_whole〉
+  extra: 1
+}

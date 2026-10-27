@@ -1,0 +1,62 @@
+# Pinned to v0.17.0: root-embedding series, covering how a closed
+# embedding constrains its siblings before explicitopen is stable.
+# A regular field embedding two definitions, itself embedded at the
+# root, should allow their fields and the root's own fields.
+# https://cuelang.org/issue/4523
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- in.cue --
+#PartA: values: ["a"]
+#PartB: elsewhere: 1
+
+_whole: {
+	#PartA
+	#PartB
+}
+
+_whole
+extra: 1
+
+@test(eq, {
+	#PartA: values: ["a"]
+	#PartB: elsewhere: 1
+	_whole: {
+		values: ["a"]
+		elsewhere: 1
+	}
+	values:    _|_ @test(err, code=eval, contains="field not allowed", pos=[-11:9])
+	elsewhere: _|_ @test(err, code=eval, contains="field not allowed", pos=[-10:9])
+	extra:     _|_ @test(err, code=eval, contains="field not allowed", pos=[-2:1])
+})
+@test(eq:todo, {
+	#PartA: values: ["a"]
+	#PartB: elsewhere: 1
+	_whole: {
+		values: ["a"]
+		elsewhere: 1
+	}
+	values: ["a"]
+	elsewhere: 1
+	extra:     1
+})
+-- out/errors.txt --
+[eval] extra: field not allowed:
+    ./in.cue:10:1
+[eval] elsewhere: field not allowed:
+    ./in.cue:2:9
+[eval] values: field not allowed:
+    ./in.cue:1:9
+-- out/eval/stats --
+Leaks:  0
+Freed:  14
+Reused: 4
+Allocs: 10
+Retain: 0
+
+Unifications: 14
+Conjuncts:    24
+Disjuncts:    0
+Notifications: 3
+
+NumCloseIDs: 11

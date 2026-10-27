@@ -1,0 +1,58 @@
+# Pinned to v0.17.0: root-embedding series, covering how a closed
+# embedding constrains its siblings before explicitopen is stable.
+# A list validator evaluating the elements of a list from one of two
+# definitions embedded at the root should not reject them.
+# https://cuelang.org/issue/4522
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- in.cue --
+import "list"
+
+#PartA: values: [...("a" | "b")] & list.UniqueItems() & ["a"]
+#PartB: elsewhere: 1
+
+#Whole: {
+	#PartA
+	#PartB
+}
+
+#Whole
+
+@test(eq, {
+	#PartA: values: ["a"]
+	#PartB: elsewhere: 1
+	#Whole: {
+		values: ["a"]
+		elsewhere: 1
+	}
+	values:    _|_ @test(err, code=eval, contains="field not allowed", pos=[-10:22, -10:58])
+	elsewhere: 1
+})
+@test(eq:todo, {
+	#PartA: values: ["a"]
+	#PartB: elsewhere: 1
+	#Whole: {
+		values: ["a"]
+		elsewhere: 1
+	}
+	values:    ["a"]
+	elsewhere: 1
+})
+-- out/errors.txt --
+[eval] values.0: field not allowed:
+    ./in.cue:3:22
+    ./in.cue:3:58
+-- out/eval/stats --
+Leaks:  3
+Freed:  16
+Reused: 7
+Allocs: 12
+Retain: 0
+
+Unifications: 13
+Conjuncts:    38
+Disjuncts:    6
+Notifications: 3
+
+NumCloseIDs: 11

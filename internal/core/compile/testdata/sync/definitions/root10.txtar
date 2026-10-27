@@ -1,0 +1,40 @@
+# Pinned to v0.17.0: root-embedding series, covering how a closed
+# embedding constrains its siblings before explicitopen is stable.
+# A list validator evaluating the elements of a list from one of two
+# definitions embedded at the root should not reject them.
+# https://cuelang.org/issue/4522
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- in.cue --
+import "list"
+
+#PartA: values: [...("a" | "b")] & list.UniqueItems() & ["a"]
+#PartB: elsewhere: 1
+
+#Whole: {
+	#PartA
+	#PartB
+}
+
+#Whole
+
+-- out/compile --
+--- in.cue
+{
+  #PartA: {
+    values: (([
+      ...("a"|"b"),
+    ] & 〈import;list〉.UniqueItems()) & [
+      "a",
+    ])
+  }
+  #PartB: {
+    elsewhere: 1
+  }
+  #Whole: {
+    〈1;#PartA〉
+    〈1;#PartB〉
+  }
+  〈0;#Whole〉
+}

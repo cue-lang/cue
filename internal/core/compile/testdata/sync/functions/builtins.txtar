@@ -56,8 +56,9 @@ static: {
 	badResult: (func(string, ...) -> int) & strings.ToUpper
 
 	// A builtin never unifies with a proper function value.
-	f:        func(a: string) -> string: a
-	conflict: f & strings.ToUpper
+	f:           func(a: string) -> string: a
+	conflict:    f & strings.ToUpper
+	conflictRev: strings.ToUpper & f
 }
 
 // Constraints that are not decidable from the signatures alone are enforced
@@ -153,6 +154,17 @@ merge: {
 	conflict:  p & q
 	p2:        (func(_~x: string, p: "unix") -> string) & path.Base
 	ambiguous: p & p2
+}
+
+// A builtin unifies with itself, and conflicts with a distinct builtin or a
+// value of another kind, in either order.
+unify: {
+	same:        strings.ToUpper & strings.ToUpper
+	sameX:       same("a")
+	distinct:    strings.ToUpper & strings.ToLower
+	distinctRev: strings.ToLower & strings.ToUpper
+	num:         strings.ToUpper & 1
+	numRev:      1 & strings.ToUpper
 }
 
 // Partial application of builtins is not supported: a call with a trailing
@@ -318,6 +330,7 @@ typeDefaults: {
     badResult: (func(string, ...) -> int & 〈import;strings〉.ToUpper)
     f: func(a: string) -> string: 〈0;a〉
     conflict: (〈0;f〉 & 〈import;strings〉.ToUpper)
+    conflictRev: (〈import;strings〉.ToUpper & 〈0;f〉)
   }
   dynamic: {
     P: func(<="m", ...) -> string
@@ -373,6 +386,14 @@ typeDefaults: {
     conflict: (〈0;p〉 & 〈0;q〉)
     p2: (func(string, p: "unix") -> string & 〈import;path〉.Base)
     ambiguous: (〈0;p〉 & 〈0;p2〉)
+  }
+  unify: {
+    same: (〈import;strings〉.ToUpper & 〈import;strings〉.ToUpper)
+    sameX: 〈0;same〉("a")
+    distinct: (〈import;strings〉.ToUpper & 〈import;strings〉.ToLower)
+    distinctRev: (〈import;strings〉.ToLower & 〈import;strings〉.ToUpper)
+    num: (〈import;strings〉.ToUpper & 1)
+    numRev: (1 & 〈import;strings〉.ToUpper)
   }
   partial: {
     contains: 〈import;strings〉.Contains("abcd")

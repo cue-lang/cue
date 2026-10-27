@@ -9,6 +9,7 @@
 # constraints restrict every call regardless of what the value accepts;
 # missing arguments surface when the function is called; two declared
 # defaults for the same parameter are unified when the signatures are.
+# try.cue holds the cases that need the try experiment.
 -- in.cue --
 @experiment(functions)
 
@@ -268,6 +269,11 @@ values: {
 	same:  f & f
 	sameX: same(1)
 
+	// A function value conflicts with a value of another kind, in either
+	// order.
+	fnNum: f & 1
+	numFn: 1 & f
+
 	// Values tightened by the same type are equal and unify; the type
 	// constraint is recorded once.
 	T:     func(a: int, ...) -> number
@@ -384,6 +390,92 @@ compose: {
 	mkpf:    func() -> _: func() -> _: {[string]: int, ("a"): 1}
 	pf:      mkpf() & mkpf()
 	pfX:     pf()
+
+	// A capture is found through any expression but a try clause: closures
+	// over equal values are the same function, and closures that differ in a
+	// single captured value are not.
+	mkLet:   func(n: int) -> _: {let m = n, f: func() -> int: m}.f
+	letOK:   mkLet(1) & mkLet(1)
+	letX:    letOK()
+	letBad:  mkLet(1) & mkLet(2)
+	mkBLet:  func(n: int) -> _: func() -> _: {let m = n, v: m}
+	bLet:    mkBLet(1) & mkBLet(1)
+	bLetX:   bLet()
+	bLetBad: mkBLet(1) & mkBLet(2)
+	mkIdx:   func(xs: _) -> _: func(i: int) -> int: xs[i]
+	idx:     mkIdx([1, 2]) & mkIdx([1, 2])
+	idxX:    idx(1)
+	idxBad:  mkIdx([1, 2]) & mkIdx([1, 3])
+	mkIdxN:  func(n: int) -> _: func(xs: [...int]) -> int: xs[n]
+	idxN:    mkIdxN(0) & mkIdxN(0)
+	idxNX:   idxN([5, 6])
+	idxNBad: mkIdxN(0) & mkIdxN(1)
+	mkSl:    func(lo: int, hi: int) -> _: func(xs: [...int]) -> _: xs[lo:hi]
+	sl:      mkSl(1, 2) & mkSl(1, 2)
+	slX:     sl([1, 2, 3])
+	slBad:   mkSl(1, 2) & mkSl(1, 3)
+	mkBd:    func(n: int) -> _: func(x: int) -> int: x & <n
+	bd:      mkBd(3) & mkBd(3)
+	bdX:     bd(2)
+	bdBad:   mkBd(3) & mkBd(4)
+	mkNeg:   func(n: int) -> _: func() -> int: -n
+	neg:     mkNeg(1) & mkNeg(1)
+	negX:    neg()
+	negBad:  mkNeg(1) & mkNeg(2)
+	mkDis:   func(n: int) -> _: func() -> int: *0 | n
+	dis:     mkDis(1) & mkDis(1)
+	disX:    dis()
+	disBad:  mkDis(1) & mkDis(2)
+	mkStr:   func(n: int) -> _: func() -> string: "v\(n)"
+	str:     mkStr(1) & mkStr(1)
+	strX:    str()
+	strBad:  mkStr(1) & mkStr(2)
+	one:     func() -> int: 1
+	two:     func() -> int: 2
+	// The design does not say when two function arguments are equal; two
+	// references to the same function are taken to be.
+	mkCall:  func(g: _) -> _: func() -> _: g()
+	call:    mkCall(one) & mkCall(one)
+	callX:   call()
+	callBad: mkCall(one) & mkCall(two)
+	mkArg:   func(n: int) -> _: func() -> string: strings.Repeat("a", n)
+	arg:     mkArg(2) & mkArg(2)
+	argX:    arg()
+	argBad:  mkArg(2) & mkArg(3)
+	mkFn:    func(n: int) -> _: func() -> _: func(x: int & <n) -> int: x
+	fn:      mkFn(3) & mkFn(3)
+	fnX:     fn()(2)
+	fnBad:   mkFn(3) & mkFn(4)
+	mkFnB:   func(n: int) -> _: func() -> _: func(x: int) -> int: x + n
+	fnB:     mkFnB(1) & mkFnB(1)
+	fnBX:    fnB()(2)
+	fnBBad:  mkFnB(1) & mkFnB(2)
+	mkEl:    func(n: int) -> _: func() -> _: [...<n]
+	el:      mkEl(3) & mkEl(3)
+	elX:     el() & [1]
+	elBad:   mkEl(3) & mkEl(4)
+	mkFor:   func(n: int) -> _: func() -> _: [for x in [n] {x}]
+	forOK:   mkFor(1) & mkFor(1)
+	forX:    forOK()
+	forBad:  mkFor(1) & mkFor(2)
+	mkLetC:  func(n: int) -> _: func() -> _: [for x in [1] let y = x + n {y}]
+	letC:    mkLetC(1) & mkLetC(1)
+	letCX:   letC()
+	letCBad: mkLetC(1) & mkLetC(2)
+	// An if clause tells closures apart by what it captures, not by what it
+	// yields.
+	mkIf:    func(n: int) -> _: func() -> _: [if n > 0 {1}]
+	ifOK:    mkIf(1) & mkIf(1)
+	ifX:     ifOK()
+	ifBad:   mkIf(1) & mkIf(2)
+	mkSIf:   func(n: int) -> _: func() -> _: {if n > 0 {a: 1}}
+	sIf:     mkSIf(1) & mkSIf(1)
+	sIfX:    sIf()
+	sIfBad:  mkSIf(1) & mkSIf(2)
+	mkOpen:  func(n: int) -> _: func() -> _: {a: n, ...}
+	open:    mkOpen(1) & mkOpen(1)
+	openX:   open()
+	openBad: mkOpen(1) & mkOpen(2)
 
 	// A function that refers to nothing outside itself is the same function
 	// wherever it is evaluated: reached through an embedding, or through an
@@ -841,6 +933,44 @@ admission: {
 	corrIf:  (func(x: {a: int, if a > 0 {b: 1}}) -> int) & (func(x: {a: 0, ...}) -> int: 0)
 	corrIfX: corrIf({a: 0})
 	corrBad: (func(x: {a: int, b: 0 & a, d: string}) -> int) & (func(x: {a: 0, b: 0, d: int}) -> int: 0)
+	// The field a that _ci narrows is compared unless another part of the
+	// signature's struct refers to it, through any expression but a try
+	// assignment, or through the literals the struct is built from.
+	_ci:       func(x: {a: 0, ...}) -> int: 0
+	corrNone:  ((func(x: {a: int, b: 0}) -> int) & _ci)({a: 0})
+	corrIdx:   ((func(x: {a: int, b: [0][a]}) -> int) & _ci)({a: 0})
+	corrSlice: ((func(x: {a: int, b: [0][a:]}) -> int) & _ci)({a: 0})
+	corrBound: ((func(x: {a: int, b: 0 & >=a}) -> int) & _ci)({a: 0})
+	corrNeg:   ((func(x: {a: int, b: 0 & -a}) -> int) & _ci)({a: 0})
+	corrStr:   ((func(x: {a: int, b: "0" & "\(a)"}) -> int) & _ci)({a: 0})
+	corrDis:   ((func(x: {a: int, b: null | 0 & a}) -> int) & _ci)({a: 0})
+	corrCall:  ((func(x: {a: int, b: "" & strings.Repeat("x", a)}) -> int) & _ci)({a: 0})
+	corrFn:    ((func(x: {a: int, b: (func() -> int: 0 & a)()}) -> int) & _ci)({a: 0})
+	corrFnP:   ((func(x: {a: int, b: func(y: 0 & a) -> int}) -> int) & _ci)({a: 0})
+	corrList:  ((func(x: {a: int, b: [0 & a]}) -> int) & _ci)({a: 0})
+	corrEll:   ((func(x: {a: int, b: [...0 & a]}) -> int) & _ci)({a: 0})
+	corrLet:   ((func(x: {a: int, let y = a, b: 0 & y}) -> int) & _ci)({a: 0})
+	corrDyn:   ((func(x: {a: int, b: {"\(a)": 0}}) -> int) & _ci)({a: 0})
+	corrPat:   ((func(x: {a: int, b: {[=~"\(a)"]: 0}}) -> int) & _ci)({a: 0})
+	corrSt:    ((func(x: {a: int, b: {c: 0 & a}}) -> int) & _ci)({a: 0})
+	#Corr:     {a: int, b: 0 & a}
+	corrRef:   ((func(x: #Corr) -> int) & _ci)({a: 0})
+	corrEmb:   ((func(x: {#Corr}) -> int) & _ci)({a: 0})
+	corrTwice: ((func(x: {p: #Corr, q: #Corr}) -> int) & (func(x: {p: {a: 0, ...}, q: {a: 0, ...}}) -> int: 0))({p: a: 0, q: a: 0})
+	// A comprehension in a literal leaves the constraint pending, but one in
+	// a struct the constraint refers to correlates fields through its
+	// clauses and its value.
+	#CorrC:    {a: int, for v in [a] if true let w = v {b: 0 & w}}
+	corrC:     ((func(x: #CorrC) -> int) & _ci)({a: 0})
+	_corrC:    #CorrC
+	_corrC:    {}
+	corrCRef:  ((func(x: _corrC) -> int) & _ci)({a: 0})
+	#CorrL:    {a: int, b: [for v in [a] {0 & v}]}
+	corrL:     ((func(x: #CorrL) -> int) & _ci)({a: 0})
+	#CorrNone: {a: int, for v in [1] {b: v}}
+	corrCNone: ((func(x: #CorrNone) -> int) & _ci)({a: 0})
+	// A field nothing refers to is still compared.
+	corrSBad:  (func(x: {a: int, b: {c: 0 & a}, d: string}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0)
 	emp:     (func(x: int | <"") -> int) & (func(x: int) -> int: x)
 	empX:    emp(1)
 	empL:    (func(x: [...<""]) -> int) & (func(x: []) -> int: 1)
@@ -1098,8 +1228,58 @@ entitlement: {
 	fslOut:   fsl(cbA)[0]
 	fcomp:    func(g: func(x: [for y in fcomp(cbA) {y}]) -> int) -> _: [1]
 	fcompOut: fcomp(cbA)[0]
+	// Constraints composed of call-free parts are compared, so the int-only
+	// clause of cbA is rejected for them; one with a call or a comprehension
+	// in any part is left to the call.
+	#Half:    1.5
+	_n:       func() -> _: number
+	cfUnary:  (func(g: func(-#Half) -> int) -> int: 7)(cbA)
+	cfInterp: (func(g: func("\(#Half)") -> int) -> int: 7)(cbA)
+	cfFunc:   (func(g: func(func(y: number = 1) -> int) -> int) -> int: 7)(cbA)
+	cfStruct: (func(g: func({a: number, let l = 1, b: l, [=~"x"]: _, ("d"): 1, {c: 1}, ...}) -> int) -> int: 7)(cbA)
+	cfList:   (func(g: func([number, ...number]) -> int) -> int: 7)(cbA)
+	cfSel:    (func(g: func(#Sel.a.b) -> int) -> int: 7)(cbA)
+	cfIdx:    (func(g: func(#Sel.l[0]) -> int) -> int: 7)(cbA)
+	#Sel: {a: b: number, l: [number]}
+	ncUnary:  (func(g: func(-_n()) -> int) -> int: 7)(cbA)
+	ncInterp: (func(g: func("\(_n())") -> int) -> int: 7)(cbA)
+	ncDisj:   (func(g: func(string | _n()) -> int) -> int: 7)(cbA)
+	ncParam:  (func(g: func(func(y: _n()) -> int) -> int) -> int: 7)(cbA)
+	ncDflt:   (func(g: func(func(y: number = _n()) -> int) -> int) -> int: 7)(cbA)
+	ncField:  (func(g: func({a: _n()}) -> int) -> int: 7)(cbA)
+	ncComp:   (func(g: func({if true {a: 1}}) -> int) -> int: 7)(cbA)
+	ncElem:   (func(g: func([_n()]) -> int) -> int: 7)(cbA)
+	ncEll:    (func(g: func([..._n()]) -> int) -> int: 7)(cbA)
+	ncLComp:  (func(g: func([for v in [1] {v}]) -> int) -> int: 7)(cbA)
+	ncIdx:    (func(g: func(#Sel.l[_n()]) -> int) -> int: 7)(cbA)
+}
+-- try.cue --
+@experiment(functions)
+@experiment(try)
+
+// Cases using the try and fallback clauses of the try experiment.
+
+compose: {
+	mkFb:  func(n: int) -> _: func(xs: [...int]) -> _: {for x in xs {a: x} fallback {a: n}}
+	fb:    mkFb(1) & mkFb(1)
+	fbX:   fb([])
+	fbBad: mkFb(1) & mkFb(2)
+	// A try clause is not modeled, so it keeps even equal closures apart.
+	mkTry: func(n: int) -> _: func() -> _: {try {a: n}}
+	tryEq: mkTry(1) & mkTry(1)
+	tryX:  tryEq()
 }
 
+admission: {
+	// Try and fallback clauses correlate fields too, but a try assignment is
+	// not walked, so the field it refers to is still compared.
+	#CorrFb:    {a: int, for v in [] {} fallback {b: 0 & a}}
+	corrFb:     ((func(x: #CorrFb) -> int) & admission._ci)({a: 0})
+	#CorrTry:   {a: int, try {b: 0 & a?}}
+	corrTry:    ((func(x: #CorrTry) -> int) & admission._ci)({a: 0})
+	#CorrTryAs: {a: int, try y = a? {b: 0 & y}}
+	corrTryAs:  ((func(x: #CorrTryAs) -> int) & admission._ci)({a: 0})
+}
 -- out/compile --
 --- in.cue
 {
@@ -1241,6 +1421,8 @@ entitlement: {
     composed: (〈0;f〉 & 〈0;g〉)
     same: (〈0;f〉 & 〈0;f〉)
     sameX: 〈0;same〉(1)
+    fnNum: (〈0;f〉 & 1)
+    numFn: (1 & 〈0;f〉)
     T: func(a: int, ...) -> number
     t1: (〈0;T〉 & 〈0;f〉)
     t2: (〈0;T〉 & 〈0;f〉)
@@ -1400,6 +1582,140 @@ entitlement: {
     }
     pf: (〈0;mkpf〉() & 〈0;mkpf〉())
     pfX: 〈0;pf〉()
+    mkLet: func(n: int) -> _: {
+      let m#2 = 〈1;n〉
+      f: func() -> int: 〈1;let m#2〉
+    }.f
+    letOK: (〈0;mkLet〉(1) & 〈0;mkLet〉(1))
+    letX: 〈0;letOK〉()
+    letBad: (〈0;mkLet〉(1) & 〈0;mkLet〉(2))
+    mkBLet: func(n: int) -> _: func() -> _: {
+      let m#3 = 〈2;n〉
+      v: 〈0;let m#3〉
+    }
+    bLet: (〈0;mkBLet〉(1) & 〈0;mkBLet〉(1))
+    bLetX: 〈0;bLet〉()
+    bLetBad: (〈0;mkBLet〉(1) & 〈0;mkBLet〉(2))
+    mkIdx: func(xs: _) -> _: func(i: int) -> int: 〈1;xs〉[〈0;i〉]
+    idx: (〈0;mkIdx〉([
+      1,
+      2,
+    ]) & 〈0;mkIdx〉([
+      1,
+      2,
+    ]))
+    idxX: 〈0;idx〉(1)
+    idxBad: (〈0;mkIdx〉([
+      1,
+      2,
+    ]) & 〈0;mkIdx〉([
+      1,
+      3,
+    ]))
+    mkIdxN: func(n: int) -> _: func(xs: [
+      ...int,
+    ]) -> int: 〈0;xs〉[〈1;n〉]
+    idxN: (〈0;mkIdxN〉(0) & 〈0;mkIdxN〉(0))
+    idxNX: 〈0;idxN〉([
+      5,
+      6,
+    ])
+    idxNBad: (〈0;mkIdxN〉(0) & 〈0;mkIdxN〉(1))
+    mkSl: func(lo: int, hi: int) -> _: func(xs: [
+      ...int,
+    ]) -> _: 〈0;xs〉[〈1;lo〉:〈1;hi〉]
+    sl: (〈0;mkSl〉(1, 2) & 〈0;mkSl〉(1, 2))
+    slX: 〈0;sl〉([
+      1,
+      2,
+      3,
+    ])
+    slBad: (〈0;mkSl〉(1, 2) & 〈0;mkSl〉(1, 3))
+    mkBd: func(n: int) -> _: func(x: int) -> int: (〈0;x〉 & <〈1;n〉)
+    bd: (〈0;mkBd〉(3) & 〈0;mkBd〉(3))
+    bdX: 〈0;bd〉(2)
+    bdBad: (〈0;mkBd〉(3) & 〈0;mkBd〉(4))
+    mkNeg: func(n: int) -> _: func() -> int: -〈1;n〉
+    neg: (〈0;mkNeg〉(1) & 〈0;mkNeg〉(1))
+    negX: 〈0;neg〉()
+    negBad: (〈0;mkNeg〉(1) & 〈0;mkNeg〉(2))
+    mkDis: func(n: int) -> _: func() -> int: (*0|〈1;n〉)
+    dis: (〈0;mkDis〉(1) & 〈0;mkDis〉(1))
+    disX: 〈0;dis〉()
+    disBad: (〈0;mkDis〉(1) & 〈0;mkDis〉(2))
+    mkStr: func(n: int) -> _: func() -> string: "v\(〈1;n〉)"
+    str: (〈0;mkStr〉(1) & 〈0;mkStr〉(1))
+    strX: 〈0;str〉()
+    strBad: (〈0;mkStr〉(1) & 〈0;mkStr〉(2))
+    one: func() -> int: 1
+    two: func() -> int: 2
+    mkCall: func(g: _) -> _: func() -> _: 〈1;g〉()
+    call: (〈0;mkCall〉(〈0;one〉) & 〈0;mkCall〉(〈0;one〉))
+    callX: 〈0;call〉()
+    callBad: (〈0;mkCall〉(〈0;one〉) & 〈0;mkCall〉(〈0;two〉))
+    mkArg: func(n: int) -> _: func() -> string: 〈import;strings〉.Repeat("a", 〈1;n〉)
+    arg: (〈0;mkArg〉(2) & 〈0;mkArg〉(2))
+    argX: 〈0;arg〉()
+    argBad: (〈0;mkArg〉(2) & 〈0;mkArg〉(3))
+    mkFn: func(n: int) -> _: func() -> _: func(x: (int & <〈1;n〉)) -> int: 〈0;x〉
+    fn: (〈0;mkFn〉(3) & 〈0;mkFn〉(3))
+    fnX: 〈0;fn〉()(2)
+    fnBad: (〈0;mkFn〉(3) & 〈0;mkFn〉(4))
+    mkFnB: func(n: int) -> _: func() -> _: func(x: int) -> int: (〈0;x〉 + 〈2;n〉)
+    fnB: (〈0;mkFnB〉(1) & 〈0;mkFnB〉(1))
+    fnBX: 〈0;fnB〉()(2)
+    fnBBad: (〈0;mkFnB〉(1) & 〈0;mkFnB〉(2))
+    mkEl: func(n: int) -> _: func() -> _: [
+      ...<〈2;n〉,
+    ]
+    el: (〈0;mkEl〉(3) & 〈0;mkEl〉(3))
+    elX: (〈0;el〉() & [
+      1,
+    ])
+    elBad: (〈0;mkEl〉(3) & 〈0;mkEl〉(4))
+    mkFor: func(n: int) -> _: func() -> _: [
+      for _, x in [
+        〈3;n〉,
+      ] {
+        〈1;x〉
+      },
+    ]
+    forOK: (〈0;mkFor〉(1) & 〈0;mkFor〉(1))
+    forX: 〈0;forOK〉()
+    forBad: (〈0;mkFor〉(1) & 〈0;mkFor〉(2))
+    mkLetC: func(n: int) -> _: func() -> _: [
+      for _, x in [
+        1,
+      ] let y = (〈0;x〉 + 〈3;n〉) {
+        〈1;y〉
+      },
+    ]
+    letC: (〈0;mkLetC〉(1) & 〈0;mkLetC〉(1))
+    letCX: 〈0;letC〉()
+    letCBad: (〈0;mkLetC〉(1) & 〈0;mkLetC〉(2))
+    mkIf: func(n: int) -> _: func() -> _: [
+      if (〈2;n〉 > 0) {
+        1
+      },
+    ]
+    ifOK: (〈0;mkIf〉(1) & 〈0;mkIf〉(1))
+    ifX: 〈0;ifOK〉()
+    ifBad: (〈0;mkIf〉(1) & 〈0;mkIf〉(2))
+    mkSIf: func(n: int) -> _: func() -> _: {
+      if (〈2;n〉 > 0) {
+        a: 1
+      }
+    }
+    sIf: (〈0;mkSIf〉(1) & 〈0;mkSIf〉(1))
+    sIfX: 〈0;sIf〉()
+    sIfBad: (〈0;mkSIf〉(1) & 〈0;mkSIf〉(2))
+    mkOpen: func(n: int) -> _: func() -> _: {
+      a: 〈2;n〉
+      ...
+    }
+    open: (〈0;mkOpen〉(1) & 〈0;mkOpen〉(1))
+    openX: 〈0;open〉()
+    openBad: (〈0;mkOpen〉(1) & 〈0;mkOpen〉(2))
     _x: {
       h: func(a: int) -> int: (〈0;a〉 + 1)
     }
@@ -1900,6 +2216,204 @@ entitlement: {
       b: 0
       d: int
     }) -> int: 0)
+    _ci: func(x: {
+      a: 0
+      ...
+    }) -> int: 0
+    corrNone: (func(x: {
+      a: int
+      b: 0
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrIdx: (func(x: {
+      a: int
+      b: [
+        0,
+      ][〈0;a〉]
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrSlice: (func(x: {
+      a: int
+      b: [
+        0,
+      ][〈0;a〉:]
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrBound: (func(x: {
+      a: int
+      b: (0 & >=〈0;a〉)
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrNeg: (func(x: {
+      a: int
+      b: (0 & -〈0;a〉)
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrStr: (func(x: {
+      a: int
+      b: ("0" & "\(〈0;a〉)")
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrDis: (func(x: {
+      a: int
+      b: (null|(0 & 〈0;a〉))
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrCall: (func(x: {
+      a: int
+      b: ("" & 〈import;strings〉.Repeat("x", 〈0;a〉))
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrFn: (func(x: {
+      a: int
+      b: func() -> int: (0 & 〈1;a〉)()
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrFnP: (func(x: {
+      a: int
+      b: func(y: (0 & 〈0;a〉)) -> int
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrList: (func(x: {
+      a: int
+      b: [
+        (0 & 〈1;a〉),
+      ]
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrEll: (func(x: {
+      a: int
+      b: [
+        ...(0 & 〈1;a〉),
+      ]
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrLet: (func(x: {
+      a: int
+      let y#4 = 〈0;a〉
+      b: (0 & 〈0;let y#4〉)
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrDyn: (func(x: {
+      a: int
+      b: {
+        "\(〈1;a〉)": 0
+      }
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrPat: (func(x: {
+      a: int
+      b: {
+        [=~"\(〈1;a〉)"]: 0
+      }
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrSt: (func(x: {
+      a: int
+      b: {
+        c: (0 & 〈1;a〉)
+      }
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #Corr: {
+      a: int
+      b: (0 & 〈0;a〉)
+    }
+    corrRef: (func(x: 〈0;#Corr〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrEmb: (func(x: {
+      〈1;#Corr〉
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrTwice: (func(x: {
+      p: 〈1;#Corr〉
+      q: 〈1;#Corr〉
+    }) -> int & func(x: {
+      p: {
+        a: 0
+        ...
+      }
+      q: {
+        a: 0
+        ...
+      }
+    }) -> int: 0)({
+      p: {
+        a: 0
+      }
+      q: {
+        a: 0
+      }
+    })
+    #CorrC: {
+      a: int
+      for _, v in [
+        〈1;a〉,
+      ] if true let w = 〈0;v〉 {
+        b: (0 & 〈1;w〉)
+      }
+    }
+    corrC: (func(x: 〈0;#CorrC〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    _corrC: 〈0;#CorrC〉
+    _corrC: {}
+    corrCRef: (func(x: 〈0;_corrC〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrL: {
+      a: int
+      b: [
+        for _, v in [
+          〈2;a〉,
+        ] {
+          (0 & 〈1;v〉)
+        },
+      ]
+    }
+    corrL: (func(x: 〈0;#CorrL〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrNone: {
+      a: int
+      for _, v in [
+        1,
+      ] {
+        b: 〈1;v〉
+      }
+    }
+    corrCNone: (func(x: 〈0;#CorrNone〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    corrSBad: (func(x: {
+      a: int
+      b: {
+        c: (0 & 〈1;a〉)
+      }
+      d: string
+    }) -> int & func(x: {
+      a: 0
+      d: int
+      ...
+    }) -> int: 0)
     emp: (func(x: (int|<"")) -> int & func(x: int) -> int: 〈0;x〉)
     empX: 〈0;emp〉(1)
     empL: (func(x: [
@@ -1950,8 +2464,8 @@ entitlement: {
     #LT: number
     lt: {
       f: (func() -> {
-        let y#2 = 〈2;#LT〉
-        v: 〈0;let y#2〉
+        let y#5 = 〈2;#LT〉
+        v: 〈0;let y#5〉
       }: {
         v: 1
       } & func() -> {
@@ -2101,5 +2615,115 @@ entitlement: {
       1,
     ]
     fcompOut: 〈0;fcomp〉(〈0;cbA〉)[0]
+    #Half: 1.5
+    _n: func() -> _: number
+    cfUnary: func(g: func(-〈0;#Half〉) -> int) -> int: 7(〈0;cbA〉)
+    cfInterp: func(g: func("\(〈0;#Half〉)") -> int) -> int: 7(〈0;cbA〉)
+    cfFunc: func(g: func(func(y: number = 1) -> int) -> int) -> int: 7(〈0;cbA〉)
+    cfStruct: func(g: func({
+      a: number
+      let l#6 = 1
+      b: 〈0;let l#6〉
+      [=~"x"]: _
+      "d": 1
+      {
+        c: 1
+      }
+      ...
+    }) -> int) -> int: 7(〈0;cbA〉)
+    cfList: func(g: func([
+      number,
+      ...number,
+    ]) -> int) -> int: 7(〈0;cbA〉)
+    cfSel: func(g: func(〈0;#Sel〉.a.b) -> int) -> int: 7(〈0;cbA〉)
+    cfIdx: func(g: func(〈0;#Sel〉.l[0]) -> int) -> int: 7(〈0;cbA〉)
+    #Sel: {
+      a: {
+        b: number
+      }
+      l: [
+        number,
+      ]
+    }
+    ncUnary: func(g: func(-〈0;_n〉()) -> int) -> int: 7(〈0;cbA〉)
+    ncInterp: func(g: func("\(〈0;_n〉())") -> int) -> int: 7(〈0;cbA〉)
+    ncDisj: func(g: func((string|〈0;_n〉())) -> int) -> int: 7(〈0;cbA〉)
+    ncParam: func(g: func(func(y: 〈0;_n〉()) -> int) -> int) -> int: 7(〈0;cbA〉)
+    ncDflt: func(g: func(func(y: number = 〈0;_n〉()) -> int) -> int) -> int: 7(〈0;cbA〉)
+    ncField: func(g: func({
+      a: 〈1;_n〉()
+    }) -> int) -> int: 7(〈0;cbA〉)
+    ncComp: func(g: func({
+      if true {
+        a: 1
+      }
+    }) -> int) -> int: 7(〈0;cbA〉)
+    ncElem: func(g: func([
+      〈1;_n〉(),
+    ]) -> int) -> int: 7(〈0;cbA〉)
+    ncEll: func(g: func([
+      ...〈1;_n〉(),
+    ]) -> int) -> int: 7(〈0;cbA〉)
+    ncLComp: func(g: func([
+      for _, v in [
+        1,
+      ] {
+        〈1;v〉
+      },
+    ]) -> int) -> int: 7(〈0;cbA〉)
+    ncIdx: func(g: func(〈0;#Sel〉.l[〈0;_n〉()]) -> int) -> int: 7(〈0;cbA〉)
+  }
+}
+--- try.cue
+{
+  compose: {
+    mkFb: func(n: int) -> _: func(xs: [
+      ...int,
+    ]) -> _: {
+      for _, x in 〈1;xs〉 {
+        a: 〈1;x〉
+      } else {
+        a: 〈3;n〉
+      }
+    }
+    fb: (〈0;mkFb〉(1) & 〈0;mkFb〉(1))
+    fbX: 〈0;fb〉([])
+    fbBad: (〈0;mkFb〉(1) & 〈0;mkFb〉(2))
+    mkTry: func(n: int) -> _: func() -> _: {
+      try {
+        a: 〈3;n〉
+      }
+    }
+    tryEq: (〈0;mkTry〉(1) & 〈0;mkTry〉(1))
+    tryX: 〈0;tryEq〉()
+  }
+  admission: {
+    #CorrFb: {
+      a: int
+      for _, v in [] {} else {
+        b: (0 & 〈1;a〉)
+      }
+    }
+    corrFb: (func(x: 〈0;#CorrFb〉) -> int & 〈1;admission〉._ci)({
+      a: 0
+    })
+    #CorrTry: {
+      a: int
+      try {
+        b: (0 & 〈1;a〉?)
+      }
+    }
+    corrTry: (func(x: 〈0;#CorrTry〉) -> int & 〈1;admission〉._ci)({
+      a: 0
+    })
+    #CorrTryAs: {
+      a: int
+      try y = 〈0;a〉? {
+        b: (0 & 〈1;y〉)
+      }
+    }
+    corrTryAs: (func(x: 〈0;#CorrTryAs〉) -> int & 〈1;admission〉._ci)({
+      a: 0
+    })
   }
 }

@@ -20,6 +20,29 @@ b: {#Base, y: int}
 c: 1...
 d: s...
 s: "foo"
+-- operand.cue --
+// The operator applied to an operand rather than embedded or unified. The
+// value it opens can be selected from, indexed, compared, interpolated, or
+// passed to a call, giving the same results as the definition itself, except
+// that what is reached through it stays open. The spec describes the operator
+// only as an embedding; as an operand, it is read as the value with its
+// closedness removed.
+
+#Op: {
+	a: 1
+	b: c: 1
+}
+
+select: (#Op...).b & {d: 1}
+selectClosed: #Op.b & {d: 1}
+selectScalar: (#Op...).a
+
+index: (#Op...)["b"] & {d: 1}
+
+call: len(#Op...)
+
+compare: (#Op...) == {a: 1, b: c: 1}
+interpolate: "a=\((#Op...).a)"
 -- out/compile --
 --- in.cue
 {
@@ -36,4 +59,31 @@ s: "foo"
   c: 1...
   d: 〈0;s〉...
   s: "foo"
+}
+--- operand.cue
+{
+  #Op: {
+    a: 1
+    b: {
+      c: 1
+    }
+  }
+  select: (〈0;#Op〉....b & {
+    d: 1
+  })
+  selectClosed: (〈0;#Op〉.b & {
+    d: 1
+  })
+  selectScalar: 〈0;#Op〉....a
+  index: (〈0;#Op〉...["b"] & {
+    d: 1
+  })
+  call: len(〈0;#Op〉...)
+  compare: (〈0;#Op〉... == {
+    a: 1
+    b: {
+      c: 1
+    }
+  })
+  interpolate: "a=\(〈0;#Op〉....a)"
 }

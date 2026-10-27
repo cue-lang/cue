@@ -943,6 +943,14 @@ func TestValues(t *testing.T) {
 			err: "value not an instance: inexact subsumption",
 		},
 		{
+			// Defaults play no part in which labels a pattern matches, so the
+			// patterns differ, and b admits a field b with any value.
+			// TODO: the patterns are compared by their defaults, so a
+			// wrongly subsumes b.
+			in:  `a: {[*"a" | "b"]: int}, b: {[*"a" | "c"]: 2}`,
+			err: "",
+		},
+		{
 			// A struct opened by an ellipsis admits labels that a closed one
 			// does not.
 			in:  `a: close({}), b: #B & {}, #B: {...}`,

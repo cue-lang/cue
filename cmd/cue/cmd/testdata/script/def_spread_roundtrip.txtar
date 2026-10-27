@@ -37,6 +37,15 @@ exec cue export --out cue x.cue
 cmp stdout $WORK/export.golden
 exec cue fmt --check --files x.cue
 
+# Below v0.18.0, a spread requires @experiment(explicitopen). cue def
+# carries it into its output, before the package clause, so that the output
+# loads in the same module.
+cd $WORK/exp
+exec cue def .
+cmp stdout $WORK/def-exp.golden
+cp stdout $WORK/exp/gen/x.cue
+exec cue vet -c ./gen
+
 -- m/cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.18.0"
@@ -115,6 +124,30 @@ package pkg
 -- rt2/cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.18.0"
+-- exp/cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- exp/x.cue --
+@experiment(explicitopen)
+
+package x
+
+#A: a: 1
+s: {
+	#A...
+	extra: 1
+}
+-- exp/gen/.keep --
+-- def-exp.golden --
+@experiment(explicitopen)
+
+package x
+
+#A: a: 1
+s: {
+	#A...
+	extra: 1
+}
 -- eval.golden --
 #A: a: 1
 #B: b: 2

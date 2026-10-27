@@ -289,9 +289,7 @@ func (r *inlineRunner) runPermuteAssertion(t testing.TB, structPath cue.Path, fi
 		prevSuppress := r.suppressWritebacks
 		r.suppressWritebacks = true
 		for _, c := range checks {
-			for _, pa := range c.directives {
-				r.runDirective(cap, c.path, o.val.LookupPath(c.path), pa)
-			}
+			r.runDirectivesForPath(cap, c.path, o.val.LookupPath(c.path), c.directives)
 		}
 		r.suppressWritebacks = prevSuppress
 		msgs := strings.TrimSpace(cap.msgs.String())

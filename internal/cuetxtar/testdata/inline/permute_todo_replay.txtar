@@ -7,11 +7,6 @@ todoReplay: {
 	a: 1 @test(eq, 3) @test(todo, why="a is not 3 yet")
 	b: 2
 }
--- out/run/errors.txt --
-path todoReplay: @test(permute): ordering [b, a] fails directive checks:
-path todoReplay.a: expected 3, got 1
-got:  {b: 2, a: 1}
-want: {a: 1, b: 2}
 -- out/force/test.cue --
 todoReplay: {
 	@test(permute, count=2)

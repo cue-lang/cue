@@ -983,10 +983,10 @@ admission: {
 	corrSt:    ((func(x: {a: int, b: {c: 0 & a}}) -> int) & _ci)({a: 0}) @test(eq, 0)
 	// A reference within the operand of a selector, an index, or a postfix
 	// ... counts too.
-	corrSel:   ((func(x: {a: int, b: {c: 0 & a}.c}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrIdxOp: ((func(x: {a: int, b: [0 & a][0]}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrOpen:  ((func(x: {a: int, b: {c: 0 & a}...}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrSelOp: ((func(x: {a: int, b: ({c: 0 & a}...).c}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrSel:   ((func(x: {a: int, b: {c: 0 & a}.c}) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrIdxOp: ((func(x: {a: int, b: [0 & a][0]}) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrOpen:  ((func(x: {a: int, b: {c: 0 & a}...}) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrSelOp: ((func(x: {a: int, b: ({c: 0 & a}...).c}) -> int) & _ci)({a: 0}) @test(eq, 0)
 	#Corr:     {a: int, b: 0 & a}
 	corrRef:   ((func(x: #Corr) -> int) & _ci)({a: 0}) @test(eq, 0)
 	corrEmb:   ((func(x: {#Corr}) -> int) & _ci)({a: 0}) @test(eq, 0)
@@ -1001,26 +1001,26 @@ admission: {
 	corrCRef:  ((func(x: _corrC) -> int) & _ci)({a: 0}) @test(eq, 0)
 	// The same holds for such a struct in a conjunction, an embedding, opened
 	// or not, or a disjunction.
-	corrCAnd:  ((func(x: #CorrC & {}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrCEmb:  ((func(x: {#CorrC}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrCOpen: ((func(x: {#CorrC...}) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrCOr:   ((func(x: #CorrC | #CorrC) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrCAnd:  ((func(x: #CorrC & {}) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrCEmb:  ((func(x: {#CorrC}) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrCOpen: ((func(x: {#CorrC...}) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrCOr:   ((func(x: #CorrC | #CorrC) -> int) & _ci)({a: 0}) @test(eq, 0)
 	#CorrCD:   {a: int, d: string, for v in [a] {b: 0 & v}}
 	corrCEBad: (func(x: {#CorrCD}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0) @test(err, code=eval, contains="parameter x of function accepts")
 	// The same holds for a struct built in any other way: a disjunction of
 	// distinct such structs, a closed literal, a comprehension's value, or a
 	// call.
 	#CorrC2:     {a: int, for v in [a] {c: 0 & v}}
-	corrCOr2:    ((func(x: #CorrC | #CorrC2) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrCOr2:    ((func(x: #CorrC | #CorrC2) -> int) & _ci)({a: 0}) @test(eq, 0)
 	#CorrCClose: close({a: int, for v in [a] {b: 0 & v}})
-	corrCClose:  ((func(x: #CorrCClose) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
-	corrCCloseR: ((func(x: close(#CorrC)) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrCClose:  ((func(x: #CorrCClose) -> int) & _ci)({a: 0}) @test(eq, 0)
+	corrCCloseR: ((func(x: close(#CorrC)) -> int) & _ci)({a: 0}) @test(eq, 0)
 	#CorrCBody:  {if true {a: int, for v in [a] {b: 0 & v}}}
-	corrCBody:   ((func(x: #CorrCBody) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrCBody:   ((func(x: #CorrCBody) -> int) & _ci)({a: 0}) @test(eq, 0)
 	#CorrCComp:  {a: int, if true {#CorrC}}
-	corrCComp:   ((func(x: #CorrCComp) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrCComp:   ((func(x: #CorrCComp) -> int) & _ci)({a: 0}) @test(eq, 0)
 	_corrCCall:  func() -> _: #CorrC
-	corrCCall:   ((func(x: _corrCCall()) -> int) & _ci)({a: 0}) @test(err, code=eval, contains="parameter x of function accepts", incorrect) @test(eq:todo, 0)
+	corrCCall:   ((func(x: _corrCCall()) -> int) & _ci)({a: 0}) @test(eq, 0)
 	// A disjunct without such a field is still compared.
 	corrCOrBad: (func(x: #CorrC | {a: int}) -> int) & _ci @test(err, code=eval, contains="parameter x of function accepts")
 	#CorrCNo:    {a: int, for v in [1] {b: v}}
@@ -1337,14 +1337,14 @@ compose: {
 }
 
 admission: {
-	// Try and fallback clauses correlate fields too, but a try assignment is
-	// not walked, so the field it refers to is still compared.
+	// Try and fallback clauses correlate fields too; a try assignment is
+	// not modeled, so every field counts as correlated.
 	#CorrFb:    {a: int, for v in [] {} fallback {b: 0 & a}}
 	corrFb:     ((func(x: #CorrFb) -> int) & admission._ci)({a: 0}) @test(eq, 0)
 	#CorrTry:   {a: int, try {b: 0 & a?}}
 	corrTry:    ((func(x: #CorrTry) -> int) & admission._ci)({a: 0}) @test(eq, 0)
 	#CorrTryAs: {a: int, try y = a? {b: 0 & y}}
-	corrTryAs:  ((func(x: #CorrTryAs) -> int) & admission._ci)({a: 0}) @test(err, code=eval, contains="but its signature requires #CorrTryAs", incorrect) @test(eq:todo, 0)
+	corrTryAs:  ((func(x: #CorrTryAs) -> int) & admission._ci)({a: 0}) @test(eq, 0)
 }
 -- out/errors.txt --
 [eval] tighten.y: missing argument b:
@@ -1712,51 +1712,9 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
 [eval] parameter x of function accepts {a:0,...}, but its signature requires {a:int,b:0}:
     ./in.cue:954:13
     ./in.cue:955:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires {a:int,b:{c:(0 & a)}.c}:
-    ./in.cue:954:13
-    ./in.cue:973:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires {a:int,b:[(0 & a)][0]}:
-    ./in.cue:954:13
-    ./in.cue:974:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires {a:int,b:{c:(0 & a)}...}:
-    ./in.cue:954:13
-    ./in.cue:975:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires {a:int,b:{c:(0 & a)}....c}:
-    ./in.cue:954:13
-    ./in.cue:976:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires (#CorrC & {}):
-    ./in.cue:954:13
-    ./in.cue:991:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires {#CorrC}:
-    ./in.cue:954:13
-    ./in.cue:992:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires {#CorrC...}:
-    ./in.cue:954:13
-    ./in.cue:993:15
-[eval] parameter x of function accepts {a:0,...}, but its signature requires (#CorrC|#CorrC):
-    ./in.cue:954:13
-    ./in.cue:994:15
 [eval] admission.corrCEBad: parameter x of function accepts {a:0,d:int,...}, but its signature requires {#CorrCD}:
     ./in.cue:996:44
     ./in.cue:996:14
-[eval] parameter x of function accepts {a:0,...}, but its signature requires (#CorrC|#CorrC2):
-    ./in.cue:954:13
-    ./in.cue:1001:17
-[eval] parameter x of function accepts {a:0,...}, but its signature requires #CorrCClose:
-    ./in.cue:954:13
-    ./in.cue:1003:17
-[eval] parameter x of function accepts {a:0,...}, but its signature requires close(#CorrC):
-    ./in.cue:954:13
-    ./in.cue:1004:17
-[eval] parameter x of function accepts {a:0,...}, but its signature requires #CorrCBody:
-    ./in.cue:954:13
-    ./in.cue:1006:17
-[eval] parameter x of function accepts {a:0,...}, but its signature requires #CorrCComp:
-    ./in.cue:954:13
-    ./in.cue:1008:17
-[eval] parameter x of function accepts {a:0,...}, but its signature requires _corrCCall():
-    ./in.cue:954:13
-    ./in.cue:1010:17
 [eval] admission.corrCOrBad: parameter x of function accepts {a:0,...}, but its signature requires (#CorrC|{a:int}):
     ./in.cue:954:13
     ./in.cue:1012:15
@@ -1787,9 +1745,6 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
 [eval] admission.early: parameter x of function accepts string, but its signature requires #Early:
     ./in.cue:1052:38
     ./in.cue:1052:11
-[eval] parameter x of function accepts {a:0,...}, but its signature requires #CorrTryAs:
-    ./in.cue:954:13
-    ./try.cue:25:16
 [eval] conflicting defaults for parameter a: conflicting values 3 and 2:
     ./in.cue:1079:19
     ./in.cue:1095:10
@@ -1900,14 +1855,14 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
     ./in.cue:1168:9
     ./in.cue:1295:21
 -- out/eval/stats --
-Leaks:  248
-Freed:  3263
-Reused: 2995
-Allocs: 516
+Leaks:  284
+Freed:  3321
+Reused: 3055
+Allocs: 550
 Retain: 0
 
-Unifications: 3274
-Conjuncts:    8614
-Disjuncts:    139
+Unifications: 3355
+Conjuncts:    9002
+Disjuncts:    143
 
-NumCloseIDs: 1337
+NumCloseIDs: 1414

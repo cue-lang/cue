@@ -939,174 +939,36 @@ func (c *OpContext) refutesFields(a, b *Vertex) bool {
 // that mentions a field may restrict it beyond its own constraint, as
 // b: 0 & a restricts a in {a: int, b: 0 & a}, so a value such a field admits
 // on its own need not extend to a value of s. References are found in the
-// values of s's fields, which are resolved in their own environments, and in
-// the literals that s was built from, whose declarations are resolved in an
-// environment holding s, following references to the structs embedded in s.
-// Expressions in nested scopes resolve in an environment with an empty
-// vertex, so that only references to s or beyond resolve; the nested
-// scopes' own correlations are found when their values are compared.
+// literals s was built from (see [Vertex.Structs]). A reference to s as a
+// whole, such as self, or a construct that [walkEscapes] does not model may
+// restrict any field, so all of them count.
 func (c *OpContext) correlatedFields(s *Vertex) map[Feature]bool {
 	if m, ok := c.admission.correlated[s]; ok {
 		return m
 	}
 	m := map[Feature]bool{}
 	c.admission.correlated[s] = m
-	mark := func(v *Vertex) {
-		for w := v; w != nil; w = w.Parent {
-			if w.Parent == s {
-				m[w.Label] = true
-				return
+	ref := func(r Node, up int32) bool {
+		switch r := r.(type) {
+		case *FieldReference:
+			if up == 0 {
+				m[r.Label] = true
 			}
+		case *ValueReference:
+			// Up 1 is s itself, as for self, and up 0 the field holding a
+			// value alias.
+			return up > 1
 		}
-	}
-	resolve := func(env *Environment, r Resolver) bool {
-		savedErrs := c.errs
-		c.errs = nil
-		v, _ := c.resolveState(MakeConjunct(env, r, c.ci), r, Flags{
-			status:    partial,
-			condition: concreteKnown,
-			mode:      yield,
-		})
-		c.errs = savedErrs
-		if v == nil {
-			return false
-		}
-		mark(v)
 		return true
 	}
-	var walk func(env *Environment, x Node)
-	var decls func(env *Environment, ds []Decl)
-	comprehension := func(env *Environment, x *Comprehension) {
-		if x.Fallback != nil {
-			walk(env, x.Fallback)
-		}
-		for _, cl := range x.Clauses {
-			switch cl := cl.(type) {
-			case *ForClause:
-				walk(env, cl.Src)
-				env = &Environment{Up: env, Vertex: &Vertex{}}
-			case *LetClause:
-				walk(env, cl.Expr)
-				env = &Environment{Up: env, Vertex: &Vertex{}}
-			case *IfClause:
-				walk(env, cl.Condition)
-			}
-		}
-		walk(env, x.Value)
-	}
-	decls = func(env *Environment, ds []Decl) {
-		for _, d := range ds {
-			switch d := d.(type) {
-			case *Field:
-				walk(env, d.Value)
-			case *LetField:
-				walk(env, d.Value)
-			case *Ellipsis:
-				walk(env, d.Value)
-			case *BulkOptionalField:
-				walk(env, d.Filter)
-				walk(env, d.Value)
-			case *DynamicField:
-				walk(env, d.Key)
-				walk(env, d.Value)
-			case *Comprehension:
-				comprehension(env, d)
-			case Expr:
-				walk(env, d)
-			}
-		}
-	}
-	walk = func(env *Environment, x Node) {
-		switch x := x.(type) {
-		case nil:
-		case *SelectorExpr:
-			if !resolve(env, x) {
-				walk(env, x.X)
-			}
-		case *IndexExpr:
-			if !resolve(env, x) {
-				walk(env, x.X)
-				walk(env, x.Index)
-			}
-		case Resolver:
-			resolve(env, x)
-		case *SliceExpr:
-			walk(env, x.X)
-			walk(env, x.Lo)
-			walk(env, x.Hi)
-			walk(env, x.Stride)
-		case *BoundExpr:
-			walk(env, x.Expr)
-		case *UnaryExpr:
-			walk(env, x.X)
-		case *BinaryExpr:
-			walk(env, x.X)
-			walk(env, x.Y)
-		case *Interpolation:
-			for _, p := range x.Parts {
-				walk(env, p)
-			}
-		case *DisjunctionExpr:
-			for _, d := range x.Values {
-				walk(env, d.Val)
-			}
-		case *CallExpr:
-			walk(env, x.Fun)
-			for _, a := range x.Args {
-				walk(env, a)
-			}
-		case *Function:
-			for _, p := range x.Params {
-				walk(env, p.Value)
-				walk(env, p.Default)
-			}
-			walk(env, x.Ret)
-			walk(&Environment{Up: env, Vertex: &Vertex{}}, x.Body)
-		case *StructLit:
-			decls(&Environment{Up: env, Vertex: &Vertex{}}, x.Decls)
-		case *ListLit:
-			inner := &Environment{Up: env, Vertex: &Vertex{}}
-			for _, e := range x.Elems {
-				switch e := e.(type) {
-				case *Ellipsis:
-					walk(inner, e.Value)
-				case *Comprehension:
-					comprehension(inner, e)
-				case Expr:
-					walk(inner, e)
+	for _, st := range s.Structs {
+		for _, d := range st.Decls {
+			if !walkEscapes(d, 0, ref) {
+				for _, a := range s.Arcs {
+					m[a.Label] = true
 				}
+				return m
 			}
-		}
-	}
-	// The literals s was built from, directly or through the references
-	// among its conjuncts, declare their fields in s.
-	seen := map[*Vertex]bool{s: true}
-	var literals func(v *Vertex)
-	literals = func(v *Vertex) {
-		for x := range v.LeafConjuncts() {
-			switch e := x.Expr().(type) {
-			case *StructLit:
-				decls(&Environment{Up: x.Env, Vertex: s}, e.Decls)
-			case Resolver:
-				savedErrs := c.errs
-				c.errs = nil
-				r, _ := c.resolveState(MakeConjunct(x.Env, e, c.ci), e, Flags{
-					status:    partial,
-					condition: concreteKnown,
-					mode:      yield,
-				})
-				c.errs = savedErrs
-				if r = r.DerefValue(); r != nil && !seen[r] {
-					seen[r] = true
-					literals(r)
-				}
-			}
-		}
-	}
-	literals(s)
-	for _, a := range s.Arcs {
-		for x := range a.LeafConjuncts() {
-			walk(x.Env, x.Expr())
 		}
 	}
 	return m
@@ -2907,9 +2769,10 @@ func walkFuncEscapes(fn *Function, f func(r Node, up int32) bool) bool {
 // it goes up at least depth levels, or one more for a value reference such as
 // self. Struct literals, list literals, function bodies, and the for and let
 // clauses of comprehensions count as scopes, as each gets an environment of
-// its own; a pattern or dynamic field is evaluated in its struct's scope. It
-// reports false if f does, or if x contains a construct that it does not
-// model, such as a try clause or an evaluated value.
+// its own; a pattern or dynamic field is evaluated in its struct's scope. x
+// may also be a declaration of a literal. It reports false if f does, or if x
+// contains a construct that it does not model, such as a try clause or an
+// evaluated value.
 func walkEscapes(x Node, depth int32, f func(r Node, up int32) bool) bool {
 	walk := func(xs ...Node) bool {
 		for _, x := range xs {
@@ -2978,55 +2841,30 @@ func walkEscapes(x Node, depth int32, f func(r Node, up int32) bool) bool {
 		return true
 	case *ListLit:
 		for _, e := range x.Elems {
-			switch e := e.(type) {
-			case *Ellipsis:
-				if !walkEscapes(e.Value, depth+1, f) {
-					return false
-				}
-			case Expr:
-				if !walkEscapes(e, depth+1, f) {
-					return false
-				}
-			case *Comprehension:
-				if !walkComprehension(e, depth+1, f) {
-					return false
-				}
-			default:
+			if !walkEscapes(e, depth+1, f) {
 				return false
 			}
 		}
 		return true
 	case *StructLit:
 		for _, d := range x.Decls {
-			var es []Expr
-			switch d := d.(type) {
-			case *Field:
-				es = []Expr{d.Value}
-			case *LetField:
-				es = []Expr{d.Value}
-			case *Ellipsis:
-				es = []Expr{d.Value}
-			case *BulkOptionalField:
-				es = []Expr{d.Filter, d.Value}
-			case *DynamicField:
-				es = []Expr{d.Key, d.Value}
-			case Expr:
-				es = []Expr{d}
-			case *Comprehension:
-				if !walkComprehension(d, depth+1, f) {
-					return false
-				}
-				continue
-			default:
+			if !walkEscapes(d, depth+1, f) {
 				return false
-			}
-			for _, e := range es {
-				if !walkEscapes(e, depth+1, f) {
-					return false
-				}
 			}
 		}
 		return true
+	case *Field:
+		return walk(x.Value)
+	case *LetField:
+		return walk(x.Value)
+	case *Ellipsis:
+		return walk(x.Value)
+	case *BulkOptionalField:
+		return walk(x.Filter, x.Value)
+	case *DynamicField:
+		return walk(x.Key, x.Value)
+	case *Comprehension:
+		return walkComprehension(x, depth, f)
 	case *Function:
 		for _, p := range x.Params {
 			if !walk(p.Value, p.Default) {

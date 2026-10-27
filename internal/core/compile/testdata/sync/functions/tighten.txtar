@@ -1337,8 +1337,8 @@ compose: {
 }
 
 admission: {
-	// Try and fallback clauses correlate fields too, but a try assignment is
-	// not walked, so the field it refers to is still compared.
+	// Try and fallback clauses correlate fields too; a try assignment is
+	// not modeled, so every field counts as correlated.
 	#CorrFb:    {a: int, for v in [] {} fallback {b: 0 & a}}
 	corrFb:     ((func(x: #CorrFb) -> int) & admission._ci)({a: 0})
 	#CorrTry:   {a: int, try {b: 0 & a?}}

@@ -188,10 +188,10 @@ out: #sub & {#p: _test.s1}
 	}
 })
 -- out/eval/stats --
-Leaks:  163
-Freed:  351
-Reused: 321
-Allocs: 193
+Leaks:  81
+Freed:  433
+Reused: 368
+Allocs: 146
 Retain: 0
 
 Unifications: 215

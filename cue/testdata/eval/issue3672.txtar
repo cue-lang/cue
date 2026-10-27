@@ -148,10 +148,10 @@ value0: Only: [{UseSectionName: true}]
     ./x.cue:116:5
     ./x.cue:114:18
 -- out/eval/stats --
-Leaks:  375
-Freed:  1706
-Reused: 1665
-Allocs: 416
+Leaks:  313
+Freed:  1768
+Reused: 1707
+Allocs: 374
 Retain: 0
 
 Unifications: 364

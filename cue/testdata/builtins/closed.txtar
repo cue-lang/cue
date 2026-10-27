@@ -443,10 +443,10 @@ issue1206: elimination: {
 }
 
 -- out/eval/stats --
-Leaks:  32
-Freed:  904
-Reused: 710
-Allocs: 226
+Leaks:  3
+Freed:  933
+Reused: 739
+Allocs: 197
 Retain: 0
 
 Unifications: 710

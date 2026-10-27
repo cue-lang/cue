@@ -595,10 +595,10 @@ twoDisjunctions.d: field not allowed:
 [eval] unifiedTwice.v.c: field not allowed:
     ./in.cue:491:10
 -- out/eval/stats --
-Leaks:  138
-Freed:  1394
-Reused: 1315
-Allocs: 217
+Leaks:  44
+Freed:  1488
+Reused: 1364
+Allocs: 168
 Retain: 0
 
 Unifications: 576

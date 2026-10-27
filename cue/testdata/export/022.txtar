@@ -18,8 +18,8 @@ noOpt: true
 	}
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  13
+Leaks:  0
+Freed:  14
 Reused: 5
 Allocs: 9
 Retain: 0

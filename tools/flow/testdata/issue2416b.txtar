@@ -44,10 +44,10 @@ graph TD
 		"""
 }
 -- out/run-v3/t1/stats --
-Leaks:  1
-Freed:  31
-Reused: 18
-Allocs: 14
+Leaks:  0
+Freed:  32
+Reused: 19
+Allocs: 13
 Retain: 0
 
 Unifications: 26
@@ -61,17 +61,16 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  33
 -Reused: 26
 -Allocs: 7
 -Retain: 1
 -
 -Unifications: 23
-+Leaks:  1
-+Freed:  31
-+Reused: 18
-+Allocs: 14
++Freed:  32
++Reused: 19
++Allocs: 13
 +Retain: 0
 +
 +Unifications: 26
@@ -100,10 +99,10 @@ MisalignedConjunct: 7
 
 NumCloseIDs: 4
 -- out/run-v3/stats/totals --
-Leaks:  1
-Freed:  31
-Reused: 18
-Allocs: 14
+Leaks:  0
+Freed:  32
+Reused: 19
+Allocs: 13
 Retain: 0
 
 Unifications: 26
@@ -117,17 +116,16 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  33
 -Reused: 26
 -Allocs: 7
 -Retain: 1
 -
 -Unifications: 23
-+Leaks:  1
-+Freed:  31
-+Reused: 18
-+Allocs: 14
++Freed:  32
++Reused: 19
++Allocs: 13
 +Retain: 0
 +
 +Unifications: 26

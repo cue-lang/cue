@@ -423,10 +423,10 @@ valueArgs: {
 [eval] typeDefaults.joinAny: parameter os of builtin path.Join accepts *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos", but its signature requires string:
     ./in.cue:272:11
 -- out/eval/stats --
-Leaks:  19
-Freed:  477
-Reused: 436
-Allocs: 60
+Leaks:  3
+Freed:  493
+Reused: 447
+Allocs: 49
 Retain: 0
 
 Unifications: 290

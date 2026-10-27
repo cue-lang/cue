@@ -18,8 +18,8 @@ eval: true
 	#Bar: string
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  22
+Leaks:  0
+Freed:  23
 Reused: 6
 Allocs: 17
 Retain: 0

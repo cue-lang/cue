@@ -164,10 +164,10 @@ union: {
 }
 unionLeaf: union.tasks.n4.deps[0].deps[0].deps[0].deps[0].cmd @test(eq, "x")
 -- out/eval/stats --
-Leaks:  222
-Freed:  2254
-Reused: 2154
-Allocs: 322
+Leaks:  31
+Freed:  2445
+Reused: 2230
+Allocs: 246
 Retain: 0
 
 Unifications: 847

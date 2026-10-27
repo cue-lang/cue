@@ -87,10 +87,10 @@ t2.d: conflicting values {a:{a:(2|1)}} and 2 (mismatched types struct and int):
     ./issue3437.cue:5:22
     ./issue3437.cue:5:2
 -- out/eval/stats --
-Leaks:  562
-Freed:  2472
-Reused: 772
-Allocs: 2262
+Leaks:  2
+Freed:  3032
+Reused: 774
+Allocs: 2260
 Retain: 0
 
 Unifications: 1120

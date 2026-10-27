@@ -416,6 +416,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 	case 1:
 		d := cross[0].node
+		// A disjunct which n already resolves to predates this call, so
+		// other nodes may point to it, such as the one n is a clone of.
+		if n.node.DerefDisjunct() != d {
+			n.disjunct = d
+		}
 		// TODO: keep sharing the vertex the disjunct still shares, so that a
 		// field reading n does not evaluate the disjunction again; blocked on
 		// checking that sharing does not change results, see TestEvalV3.
@@ -522,6 +527,9 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 		// disjunct x keeps its default like any other.
 		disjuncts := r.disjuncts
 		if x := r.node.DerefDisjunct().state; x != r {
+			// r is dropped in favor of x, which now belongs to the node
+			// the result ends up in.
+			r.disjunct = nil
 			disjuncts = []*nodeContext{x}
 		}
 		switch len(disjuncts) {

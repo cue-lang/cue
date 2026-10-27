@@ -706,10 +706,10 @@ f9: combinenew.f9.ok is in error because two f9 declarations conflict.
 f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
-Leaks:  29
-Freed:  872
-Reused: 784
-Allocs: 117
+Leaks:  0
+Freed:  901
+Reused: 813
+Allocs: 88
 Retain: 0
 
 Unifications: 806

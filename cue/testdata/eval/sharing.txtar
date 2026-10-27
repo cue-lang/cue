@@ -541,10 +541,10 @@ forwardShared.closed.c.y: field not allowed:
     ./sharecycle.cue:11:11
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
-Leaks:  26
-Freed:  408
-Reused: 381
-Allocs: 53
+Leaks:  10
+Freed:  424
+Reused: 394
+Allocs: 40
 Retain: 0
 
 Unifications: 356

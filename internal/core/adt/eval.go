@@ -264,6 +264,14 @@ type nodeContext struct {
 	// set for all Vertex values that were cloned.
 	underlying *Vertex
 
+	// disjunct is the disjunct [nodeContext.processDisjunctions] resolved
+	// node to, kept while no other node's BaseValue points to it, so that
+	// reclaiming node may reclaim it too.
+	//
+	// TODO(mem): share one ownership scheme with [Disjunction.owner], which
+	// lets the original node keep reclaiming after it is cloned.
+	disjunct *Vertex
+
 	nodeContextState
 
 	scheduler
@@ -593,6 +601,7 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 	n.node = nil
 	n.refCount = 0
 	n.containsDefIDCache = nil
+	n.disjunct = nil
 	n.scheduler.clear()
 }
 

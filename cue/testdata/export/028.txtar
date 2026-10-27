@@ -9,8 +9,8 @@ eval: true
 	a: [...string]
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  7
+Leaks:  0
+Freed:  8
 Reused: 0
 Allocs: 8
 Retain: 0

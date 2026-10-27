@@ -1385,10 +1385,10 @@ issue2685: {
 [incomplete] patternDistinct.nestedDefaultSel: unresolved disjunction {a:1} | {a:*1 | 2} (type struct):
     ./in.cue:461:20
 -- out/eval/stats --
-Leaks:  255
-Freed:  2862
-Reused: 2819
-Allocs: 298
+Leaks:  32
+Freed:  3085
+Reused: 2977
+Allocs: 140
 Retain: 0
 
 Unifications: 880

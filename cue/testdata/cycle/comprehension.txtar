@@ -801,10 +801,10 @@ selfComprehension: siblingOnY: {
 	@test(eq, {x: {y: {a: 1, y: _|_ @test(err, code=structural_cycle, contains="structural cycle", pos=[])}}})
 }
 -- out/eval/stats --
-Leaks:  82
-Freed:  811
-Reused: 782
-Allocs: 111
+Leaks:  8
+Freed:  885
+Reused: 832
+Allocs: 61
 Retain: 0
 
 Unifications: 539

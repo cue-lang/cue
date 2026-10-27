@@ -320,10 +320,10 @@ embeddedDisjunction.conjunction.t2.z: field not allowed:
 [eval] issue4535.denied.z: field not allowed:
     ./in.cue:247:21
 -- out/eval/stats --
-Leaks:  20
-Freed:  393
-Reused: 350
-Allocs: 63
+Leaks:  4
+Freed:  409
+Reused: 366
+Allocs: 47
 Retain: 0
 
 Unifications: 354

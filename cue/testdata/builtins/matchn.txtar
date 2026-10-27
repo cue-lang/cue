@@ -547,10 +547,10 @@ kindConflict: {
 	}
 }
 -- out/eval/stats --
-Leaks:  130
-Freed:  869
-Reused: 841
-Allocs: 158
+Leaks:  129
+Freed:  870
+Reused: 842
+Allocs: 157
 Retain: 0
 
 Unifications: 917

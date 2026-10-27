@@ -44,10 +44,10 @@ fields: {
 	l2: type: ["list", "string"]
 }
 -- out/eval/stats --
-Leaks:  54
-Freed:  435
-Reused: 374
-Allocs: 115
+Leaks:  0
+Freed:  489
+Reused: 428
+Allocs: 61
 Retain: 0
 
 Unifications: 119

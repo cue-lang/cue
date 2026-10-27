@@ -136,7 +136,7 @@ func (c *OpContext) reclaimTempBuffers(v *Vertex) {
 
 		if w := arc.DerefDisjunct(); arc != w {
 			// Reclaim the fields that were already added before starting the
-			// disjunction. The disjunct itself is reclaimed in [r.reclaim].
+			// disjunction, and the disjunct if this arc owns it.
 			c.reclaimRecursive(arc)
 		}
 		if n.node != nil {
@@ -180,6 +180,14 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 				goto skipRoot
 			}
 		}
+		// Only reclaim a disjunct this node owns and still points to; see
+		// [nodeContext.disjunct]. It is the node's result, so keep its nodes
+		// which are not finalized, as finalizing v still reaches them.
+		if d := n.disjunct; d != nil && v.BaseValue == d {
+			n.disjunct = nil
+			reclaimer{ctx: r.ctx, recurse: true}.reclaim(d)
+		}
+
 		// Never free a nodeContext that is still actively being processed,
 		// even when forced. The processListLit closure (and others) capture
 		// the nodeContext via Go closure and would crash on a nil n.node.
@@ -192,22 +200,6 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 			r.ctx.freeNodeContext(n)
 		}
 	}
-
-	// TODO: this is not generally true. A dereferenced disjunct may already be
-	// in use to the point it cannot be freed. Mark such disjuncts to prevent
-	// reclamation or figure out something else. For now we disable to
-	// optimization as its effect is limited.
-	//
-	// See Issue #4055:
-	// 		a: "x"
-	// 		a: _ | error("a")
-	// 		if len(a) > 0 {
-	// 			a: _ | error("b")
-	// 		}
-	//
-	// if w := v.DerefDisjunct(); v != w {
-	// 	r.ctx.reclaimRecursive(w)
-	// }
 
 skipRoot:
 	if v.PatternConstraints != nil {

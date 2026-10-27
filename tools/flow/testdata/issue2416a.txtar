@@ -77,10 +77,10 @@ graph TD
 	stdout:        "foo"
 }
 -- out/run-v3/t1/stats --
-Leaks:  3
-Freed:  46
-Reused: 28
-Allocs: 21
+Leaks:  0
+Freed:  49
+Reused: 29
+Allocs: 20
 Retain: 0
 
 Unifications: 37
@@ -94,7 +94,7 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  57
 -Reused: 48
 -Allocs: 9
@@ -107,10 +107,9 @@ diff old new
 -MisalignedConjunct: 2
 -
 -NumCloseIDs: 3
-+Leaks:  3
-+Freed:  46
-+Reused: 28
-+Allocs: 21
++Freed:  49
++Reused: 29
++Allocs: 20
 +Retain: 0
 +
 +Unifications: 37
@@ -158,10 +157,10 @@ graph TD
 	stdout: "foo"
 }
 -- out/run-v3/t2/stats --
-Leaks:  3
-Freed:  47
-Reused: 46
-Allocs: 4
+Leaks:  0
+Freed:  50
+Reused: 50
+Allocs: 0
 Retain: 0
 
 Unifications: 38
@@ -175,10 +174,12 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  58
 -Reused: 58
--Allocs: 0
++Freed:  50
++Reused: 50
+ Allocs: 0
 -Retain: 5
 -
 -Unifications: 42
@@ -188,10 +189,6 @@ diff old new
 -MisalignedConjunct: 2
 -
 -NumCloseIDs: 3
-+Leaks:  3
-+Freed:  47
-+Reused: 46
-+Allocs: 4
 +Retain: 0
 +
 +Unifications: 38
@@ -215,10 +212,10 @@ MisalignedConjunct: 2
 
 NumCloseIDs: 3
 -- out/run-v3/stats/totals --
-Leaks:  6
-Freed:  93
-Reused: 74
-Allocs: 25
+Leaks:  0
+Freed:  99
+Reused: 79
+Allocs: 20
 Retain: 0
 
 Unifications: 75
@@ -232,7 +229,7 @@ diff old new
 --- old
 +++ new
 @@ -1,13 +1,12 @@
--Leaks:  0
+ Leaks:  0
 -Freed:  115
 -Reused: 106
 -Allocs: 9
@@ -245,10 +242,9 @@ diff old new
 -MisalignedConjunct: 4
 -
 -NumCloseIDs: 6
-+Leaks:  6
-+Freed:  93
-+Reused: 74
-+Allocs: 25
++Freed:  99
++Reused: 79
++Allocs: 20
 +Retain: 0
 +
 +Unifications: 75

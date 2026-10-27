@@ -59,10 +59,10 @@ graph TD
 	text:   "5"
 }
 -- out/run-v3/t1/stats --
-Leaks:  122
-Freed:  701
-Reused: 675
-Allocs: 148
+Leaks:  2
+Freed:  821
+Reused: 774
+Allocs: 49
 Retain: 0
 
 Unifications: 521
@@ -87,10 +87,10 @@ diff old new
 -Disjuncts:    25826
 -
 -NumCloseIDs: 72
-+Leaks:  122
-+Freed:  701
-+Reused: 675
-+Allocs: 148
++Leaks:  2
++Freed:  821
++Reused: 774
++Allocs: 49
 +Retain: 0
 +
 +Unifications: 521
@@ -112,10 +112,10 @@ Disjuncts:    25826
 
 NumCloseIDs: 72
 -- out/run-v3/stats/totals --
-Leaks:  122
-Freed:  701
-Reused: 675
-Allocs: 148
+Leaks:  2
+Freed:  821
+Reused: 774
+Allocs: 49
 Retain: 0
 
 Unifications: 521
@@ -140,10 +140,10 @@ diff old new
 -Disjuncts:    25826
 -
 -NumCloseIDs: 72
-+Leaks:  122
-+Freed:  701
-+Reused: 675
-+Allocs: 148
++Leaks:  2
++Freed:  821
++Reused: 774
++Allocs: 49
 +Retain: 0
 +
 +Unifications: 521

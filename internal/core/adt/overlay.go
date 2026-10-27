@@ -289,6 +289,10 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	d.ctx = n.ctx
 	d.node = n.node
 
+	// The clone copies the BaseValue pointing to n.disjunct, and either node
+	// may outlive the other, so neither may reclaim that disjunct.
+	n.disjunct = nil
+
 	d.nodeContextState = n.nodeContextState
 
 	d.arcMap = append(d.arcMap, n.arcMap...)

@@ -233,9 +233,30 @@ reclose: {
 	y: x... & #D @test(eq, {a: 1})
 	t1: err: y & {b: 2} @test(err, code=eval, contains="field not allowed")
 }
+// A definition re-closes a conjunction it is an operand of, opened with
+// `...`, in either order, also when the conjuncts sit on a single field or
+// the definition is embedded in a struct.
+recloseConjunction: {
+	#B: {x: 2}
+	#C: {x: 2}
+	field: {
+		c: (#B & #C)... @test(permute)
+		c: #B           @test(permute, count=2)
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed") @test(todo, why="stays open when the definition comes second")
+	}
+	inline:    (#B & {})... & #B & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+	inlineRev: #B & (#B & {})... & {y: 3} @test(err, code=eval, contains="field not allowed")
+	embedded: {
+		c: (#B & #B)... @test(permute)
+		c: {#B}         @test(permute, count=2)
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed") @test(todo, why="stays open when the definition comes second")
+	}
+}
 -- out/errors.txt --
 [eval] reclose.t1.err.b: field not allowed:
     ./issues.cue:36:16
+[eval] recloseConjunction.inlineRev.y: field not allowed:
+    ./issues.cue:50:34
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:
@@ -308,13 +329,18 @@ f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
 Leaks:  0
-Freed:  435
-Reused: 353
-Allocs: 82
+Freed:  458
+Reused: 375
+Allocs: 83
 Retain: 0
 
-Unifications: 435
-Conjuncts:    1167
+Unifications: 458
+Conjuncts:    1226
 Disjuncts:    0
 
-NumCloseIDs: 498
+NumCloseIDs: 517
+
+ConjunctInfos:       808
+MaxConjunctInfos:    5
+MaxReqSets:          9
+MaxRedirect:         2

@@ -231,6 +231,25 @@ reclose: {
 	y: x... & #D
 	t1: err: y & {b: 2}
 }
+// A definition re-closes a conjunction it is an operand of, opened with
+// `...`, in either order, also when the conjuncts sit on a single field or
+// the definition is embedded in a struct.
+recloseConjunction: {
+	#B: {x: 2}
+	#C: {x: 2}
+	field: {
+		c: (#B & #C)...
+		c: #B
+		m: c & {y: 3}
+	}
+	inline:    (#B & {})... & #B & {y: 3}
+	inlineRev: #B & (#B & {})... & {y: 3}
+	embedded: {
+		c: (#B & #B)...
+		c: {#B}
+		m: c & {y: 3}
+	}
+}
 -- out/compile --
 --- issues.cue
 {
@@ -262,6 +281,36 @@ reclose: {
     t1: {
       err: (〈1;y〉 & {
         b: 2
+      })
+    }
+  }
+  recloseConjunction: {
+    #B: {
+      x: 2
+    }
+    #C: {
+      x: 2
+    }
+    field: {
+      c: (〈1;#B〉 & 〈1;#C〉)...
+      c: 〈1;#B〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
+    inline: (((〈0;#B〉 & {})... & 〈0;#B〉) & {
+      y: 3
+    })
+    inlineRev: ((〈0;#B〉 & (〈0;#B〉 & {})...) & {
+      y: 3
+    })
+    embedded: {
+      c: (〈1;#B〉 & 〈1;#B〉)...
+      c: {
+        〈2;#B〉
+      }
+      m: (〈0;c〉 & {
+        y: 3
       })
     }
   }

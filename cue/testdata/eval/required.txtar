@@ -29,6 +29,13 @@ unify: t2: {
 	@test(eq, {a!: int})
 }
 
+// A required field makes a value a struct, so it conflicts with an embedded
+// scalar even though the field is not present.
+embedScalar: t1: {
+	1
+	a!: int
+} @test(err, code=eval, contains="cannot combine regular field %q with %v", args=[a, 1], pos=[2:6, 1:2])
+
 // Required fields do not cause vet to fail with definitions: a required field
 // in one definition should block a disallowed field from another definition.
 // https://cuelang.org/issue/2306
@@ -136,20 +143,23 @@ doNotEscalateError: {
 	}
 }
 -- out/errors.txt --
+[eval] embedScalar.t1: cannot combine regular field "a" with 1:
+    ./in.cue:35:6
+    ./in.cue:34:2
 [eval] allowed.issue2306.#A.a: field not allowed:
-    ./in.cue:36:7
+    ./in.cue:43:7
 [incomplete] reference.toWithinDefinition.b: required field missing: a:
-    ./in.cue:47:11
+    ./in.cue:54:11
 [incomplete] reference.toFieldFromDefinition.c: required field missing: a:
-    ./in.cue:53:8
+    ./in.cue:60:8
 [incomplete] reference.toNonDefinition.b: required field missing: y:
-    ./in.cue:58:8
+    ./in.cue:65:8
 [incomplete] reference.toConcrete.b: required field missing: a:
-    ./in.cue:63:6
+    ./in.cue:70:6
 [incomplete] reference.issue2937.max: required field missing: min:
-    ./in.cue:70:19
+    ./in.cue:77:19
 [incomplete] reference.issue4330.b: required field missing: fn:
-    ./in.cue:78:11
+    ./in.cue:85:11
 [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
     ./issue3918.cue:10:22
 [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:

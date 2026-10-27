@@ -22,6 +22,13 @@ unify: t2: {
 	a!: int
 }
 
+// A required field makes a value a struct, so it conflicts with an embedded
+// scalar even though the field is not present.
+embedScalar: t1: {
+	1
+	a!: int
+}
+
 // Required fields do not cause vet to fail with definitions: a required field
 // in one definition should block a disallowed field from another definition.
 // https://cuelang.org/issue/2306
@@ -134,6 +141,12 @@ doNotEscalateError: {
   }
   #Def: {
     t1: {
+      a!: int
+    }
+  }
+  embedScalar: {
+    t1: {
+      1
       a!: int
     }
   }

@@ -36,9 +36,10 @@ cmp ./testdata/promoted/b_go_gen.cue ./testdata/promoted/b_go_gen.cue.golden
 exec cue vet -c=false ./testdata/promoted
 
 # Packages imported with a dot or blank name are referred to by their own name.
-# Generating fails as the dot is used as a name.
-! exec cue get go --local ./testdata/dotimport
-stderr 'invalid identifier "\."'
+exec cue get go --local ./testdata/dotimport
+cmp ./testdata/dotimport/a_go_gen.cue ./testdata/dotimport/a_go_gen.cue.golden
+cmp ./testdata/dotimport/b_go_gen.cue ./testdata/dotimport/b_go_gen.cue.golden
+exec cue vet -c=false ./testdata/dotimport
 
 # Verify dependencies did not change
 cmp go.mod go.mod.golden

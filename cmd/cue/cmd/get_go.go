@@ -865,6 +865,11 @@ outer:
 			pkgPath, _ := strconv.Unquote(spec.Path.Value)
 			name := p.Imports[pkgPath].Name
 			if spec.Name != nil {
+				switch spec.Name.Name {
+				case "_", ".":
+					// The package has no name to refer to it by.
+					continue
+				}
 				name = spec.Name.Name
 			}
 			e.pkgNames[pkgPath] = name

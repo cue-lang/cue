@@ -391,7 +391,11 @@ type nodeContextState struct {
 	origBaseValue    BaseValue  // the BaseValue that structure sharing replaces
 	shareDecremented bool       // the counters of n.shared have been decremented
 
-	depth           int32
+	depth int32
+	// scopeDepth is the number of ancestors of the node, set by getReqSets;
+	// see [reqSet.removedAt]. It differs from depth, which starts over at a
+	// parent whose state is gone when the node is initialized.
+	scopeDepth      int32
 	defaultMode     defaultMode    // cumulative default mode
 	origDefaultMode defaultMode    // default mode of the original disjunct
 	priority        layer.Priority // Priority corresponding to defaultMode

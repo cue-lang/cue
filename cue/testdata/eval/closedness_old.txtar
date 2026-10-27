@@ -513,8 +513,7 @@ openEmbed: nestedDirect: {
 	s: {{#B, ...}, h: {i: 1}}
 	s: h: extra: 1
 	#B: k?: string
-	@test(eq, {s: {h: {i: 1, extra: 1}, k?: string}, #B: {k?: string}}, incorrect)
-	@test(err:todo, code=eval, path=s.h.extra, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.h.extra, contains="field not allowed", pos=[2:8])
 }
 openEmbed: nestedReference: {
 	t: {{#B, ...}, h: {i: 1}}
@@ -582,16 +581,9 @@ openEmbed: heldBySibling: {
 	u: b: g: y: 1
 	#A: pa?: int
 	#B: pb?: int
-	@test(eq, {
-		s: {b: {g: {h: 1, y: 1}, x: 1, pb?: int}, pa?: int}
-		t: {b: {g: {h: 1, y: 1}, pb?: int}, pa?: int}
-		u: {b: {g: {h: 1, y: 1}, pb?: int}}
-		#A: {pa?: int}
-		#B: {pb?: int}
-	}, incorrect)
-	@test(err:todo, code=eval, path=s.b.g.y, contains="field not allowed", pos=[2:11])
-	@test(err:todo, code=eval, path=t.b.g.y, contains="field not allowed", pos=[5:11])
-	@test(err:todo, code=eval, path=u.b.g.y, contains="field not allowed", pos=[7:11])
+	@test(err, code=eval, path=s.b.g.y, contains="field not allowed", pos=[2:11])
+	@test(err, code=eval, path=t.b.g.y, contains="field not allowed", pos=[5:11])
+	@test(err, code=eval, path=u.b.g.y, contains="field not allowed", pos=[7:11])
 }
 
 // An ellipsis in an embedded struct opens the fields of the embedder, but
@@ -600,25 +592,25 @@ openEmbed: heldBySibling: {
 // refers to. An ellipsis which the sibling embedding declares on the field
 // itself does open it.
 openEmbed: siblingEmbedding: {
-	s: {{#B, ...}, {h: {#C, i: 1}}} @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+	s: {{#B, ...}, {h: {#C, i: 1}}} @test(err, code=eval, contains="field not allowed", at=h.extra)
 	s: h: extra: 1
 	#B: k?: string
 	#C: i: int
 }
 openEmbed: siblingComprehension: {
-	s: {{#B, ...}, if true {h: {#C, i: 1}}} @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+	s: {{#B, ...}, if true {h: {#C, i: 1}}} @test(err, code=eval, contains="field not allowed", at=h.extra)
 	s: h: extra: 1
 	#B: k?: string
 	#C: i: int
 }
 openEmbed: siblingReference: {
-	s: {{#B, ...}, {h: #C}} @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+	s: {{#B, ...}, {h: #C}} @test(err, code=eval, contains="field not allowed", at=h.extra)
 	s: h: extra: 1
 	#B: k?: string
 	#C: i: int
 }
 openEmbed: siblingDeep: {
-	s: {{#B, ...}, {h: #C}} @test(err:todo, code=eval, contains="field not allowed", at=h.sub.extra)
+	s: {{#B, ...}, {h: #C}} @test(err, code=eval, contains="field not allowed", at=h.sub.extra)
 	s: h: sub: extra: 1
 	#B: k?: string
 	#C: {i: int, sub?: j?: int}
@@ -627,7 +619,7 @@ openEmbed: siblingDeep: {
 // definition embedded beside it declares: the fields of a definition the
 // embedder is unified with are not allowed in it either.
 openEmbed: outerDefinition: {
-	s: #T & {#D, #E} @test(err:todo, code=eval, contains="field not allowed", at=f.j)
+	s: #T & {#D, #E} @test(err, code=eval, contains="field not allowed", at=f.j)
 	#D: f: i: 1
 	#E: {...}
 	#T: f: {i: int, j: int}
@@ -650,12 +642,7 @@ openEmbed: definitionDirect: {
 	s: f: extra: 1
 	#B: k?: string
 	#F: a?: int
-	@test(eq, {
-		s: {f: {a?: int, extra: 1}, k?: string}
-		#B: {k?: string}
-		#F: {a?: int}
-	}, incorrect)
-	@test(err:todo, code=eval, path=s.f.extra, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=s.f.extra, contains="field not allowed", pos=[2:8])
 }
 openEmbed: definitionReference: {
 	t: {{#B, ...}, f: {#F}}
@@ -731,16 +718,36 @@ indirect: {
     ./ellipsis.cue:77:8
 [eval] embedOpenConjunct.notEmbedded.s.a.y: field not allowed:
     ./ellipsis.cue:88:8
+[eval] openEmbed.nestedDirect.s.h.extra: field not allowed:
+    ./ellipsis.cue:138:8
 [eval] openEmbed.nestedReference.s.h.extra: field not allowed:
-    ./ellipsis.cue:146:8
+    ./ellipsis.cue:145:8
 [eval] openEmbed.inDefinition.s.h.extra: field not allowed:
-    ./ellipsis.cue:164:8
+    ./ellipsis.cue:163:8
 [eval] openEmbed.inEmbedded.s.h.extra: field not allowed:
-    ./ellipsis.cue:188:8
+    ./ellipsis.cue:187:8
 [eval] openEmbed.inEmbedded.t.h.extra: field not allowed:
-    ./ellipsis.cue:190:8
+    ./ellipsis.cue:189:8
+[eval] openEmbed.heldBySibling.s.b.g.y: field not allowed:
+    ./ellipsis.cue:200:11
+[eval] openEmbed.heldBySibling.t.b.g.y: field not allowed:
+    ./ellipsis.cue:203:11
+[eval] openEmbed.heldBySibling.u.b.g.y: field not allowed:
+    ./ellipsis.cue:205:11
+[eval] openEmbed.siblingEmbedding.s.h.extra: field not allowed:
+    ./ellipsis.cue:220:8
+[eval] openEmbed.siblingComprehension.s.h.extra: field not allowed:
+    ./ellipsis.cue:226:8
+[eval] openEmbed.siblingReference.s.h.extra: field not allowed:
+    ./ellipsis.cue:232:8
+[eval] openEmbed.siblingDeep.s.h.sub.extra: field not allowed:
+    ./ellipsis.cue:238:13
+[eval] openEmbed.outerDefinition.s.f.j: field not allowed:
+    ./ellipsis.cue:249:18
+[eval] openEmbed.definitionDirect.s.f.extra: field not allowed:
+    ./ellipsis.cue:266:8
 [eval] openEmbed.definitionReference.s.f.extra: field not allowed:
-    ./ellipsis.cue:287:8
+    ./ellipsis.cue:274:8
 [eval] patterns.shallow.single.err.j: field not allowed:
     ./embed.cue:10:8
 [eval] patterns.shallow.and.p1.err.j: field not allowed:

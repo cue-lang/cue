@@ -711,7 +711,7 @@ func (n *nodeContext) checkTypos() {
 
 		for a := range required.elemPtrs() {
 			if id, embed := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
-				n.removeSet(a, embed)
+				n.removeSet(a, embed, n.scopeDepth)
 			}
 		}
 
@@ -728,7 +728,7 @@ func (n *nodeContext) checkTypos() {
 			continue
 		}
 
-		if na.hasEvidenceForAll(required, na.conjunctInfo) {
+		if na.hasEvidenceForAll(required, na.conjunctInfo, n.scopeDepth) {
 			continue
 		}
 
@@ -751,7 +751,7 @@ func (n *nodeContext) checkTypos() {
 // hasEvidenceForAll reports whether there is evidence in a set of
 // conjuncts for each of the typo-checked structs represented by
 // the reqSets.
-func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) bool {
+func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo, ownDepth int32) bool {
 	for i, rs := range a {
 		if rs.ignored {
 			continue
@@ -760,7 +760,7 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 			continue
 		}
 
-		if !n.hasEvidenceForOne(a, uint32(i), conjuncts) {
+		if !n.hasEvidenceForOne(a, uint32(i), conjuncts, ownDepth) {
 			if n.ctx.LogEval > 0 {
 				n.Logf("DENIED BY %d", a[i].id)
 			}
@@ -772,7 +772,7 @@ func (n *nodeContext) hasEvidenceForAll(a reqSets, conjuncts []conjunctInfo) boo
 
 // hasEvidenceForOne reports whether a single typo-checked set has evidence for
 // any of its defIDs.
-func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo) bool {
+func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conjunctInfo, ownDepth int32) bool {
 	a := all[i]
 	for _, x := range conjuncts {
 		if n.containsDefID(a.id, x.id) {
@@ -801,9 +801,11 @@ func (n *nodeContext) hasEvidenceForOne(all reqSets, i uint32, conjuncts []conju
 	}
 
 	outerScope, ok := all.lookupSet(a.parent)
-	// Whether the outer struct is open, and not just within the embedding.
-	outerOpen := ok && outerScope.removed && (outerScope.removedEmbed == 0 ||
-		!n.containsDefID(embedScope.id, outerScope.removedEmbed))
+	// Whether the outer struct is opened by an ellipsis of the node whose
+	// arcs are checked, and not just within the embedding.
+	outerOpen := ok && outerScope.removed && outerScope.removedAt == ownDepth &&
+		(outerScope.removedEmbed == 0 ||
+			!n.containsDefID(embedScope.id, outerScope.removedEmbed))
 
 outer:
 	for _, c := range conjuncts {
@@ -993,6 +995,16 @@ type reqSet struct {
 	// which an ellipsis within the embedding does not open.
 	removedEmbed defID
 
+	// removedAt is the [nodeContext.scopeDepth] of the node whose conjunct
+	// holds the ellipsis which removed this reqSet. An ellipsis opens the
+	// fields of its own node only, not those they declare in turn, so it
+	// is evidence just when checking the arcs of that node; see
+	// [nodeContext.hasEvidenceForOne]. The depth names a single node only
+	// because reqSets are inherited down the [Vertex.Parent] chain alone,
+	// which scopeDepth counts as well; inheriting them along another path,
+	// such as from a shared or copied Vertex, would break this.
+	removedAt int32
+
 	// conjunctOpened indicates this requirement is from an opened conjunction
 	// operand. See [refInfo.conjunctOpened].
 	conjunctOpened bool
@@ -1066,6 +1078,15 @@ func getReqSets(n *nodeContext) reqSets {
 	a = slices.Grow(a, len(parentReqs)+len(n.reqDefIDs))
 	a = append(a, parentReqs...)
 	markIgnored(a)
+	// Walk the ancestors only when the parent's depth is not available.
+	if p := v.Parent; p != nil && p.state != nil && p.state.computedCloseInfo {
+		n.scopeDepth = p.state.scopeDepth + 1
+	} else {
+		n.scopeDepth = 0
+		for p := v.Parent; p != nil; p = p.Parent {
+			n.scopeDepth++
+		}
+	}
 
 	last := len(a) - 1
 
@@ -1150,7 +1171,11 @@ outer:
 // If there is a top or ellipsis for all supported conjuncts, we have
 // evidence that this node can be dropped.
 func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSets {
-	return filterSets(a, func(a *reqSet) bool {
+	parentDepth := n.scopeDepth - 1
+	// outside holds the scopes opened by an ellipsis of the parent in which
+	// this node has no conjuncts: it is a field the ellipsis added.
+	var outside []defID
+	a = filterSets(a, func(a *reqSet) bool {
 		var f conjunctFlags
 		hasAny := false
 
@@ -1176,7 +1201,8 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 		switch id, embed := hasParentEllipsis(n, a, parentConjuncts); {
 		case id == 0:
 		case !hasAny:
-			n.removeSet(a, embed)
+			n.removeSet(a, embed, parentDepth)
+			outside = append(outside, a.id)
 		case a.kind != defStruct:
 			// The following logic should only apply to non-structs.
 		default:
@@ -1187,12 +1213,41 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 				}
 			}
 			if !hasAny {
-				n.removeSet(a, embed)
+				n.removeSet(a, embed, parentDepth)
 			}
 		}
 
 		return true
 	})
+	if len(outside) == 0 {
+		return a
+	}
+	// A requirement within such a scope does not apply to the added field
+	// either, unless the field has conjuncts of its own within it, as the
+	// ellipsis does not reach into those.
+outer:
+	for x := range a.elemPtrs() {
+		if x.removed {
+			continue
+		}
+		for _, c := range n.conjunctInfo {
+			if n.containsDefID(x.id, c.id) {
+				continue outer
+			}
+		}
+		for p := x.parent; p != 0; {
+			ps, ok := a.lookupSet(p)
+			if !ok {
+				break
+			}
+			if slices.Contains(outside, p) {
+				n.removeSet(x, ps.removedEmbed, ps.removedAt)
+				break
+			}
+			p = ps.parent
+		}
+	}
+	return a
 }
 
 // openByEllipsis reports whether n admits fields which none of its conjuncts
@@ -1216,12 +1271,12 @@ func (n *nodeContext) openByEllipsis() bool {
 	required = append(buf[:0], required...)
 	for i := range required {
 		if id, embed := hasParentEllipsis(n, &required[i], n.conjunctInfo); id != 0 {
-			n.removeSet(&required[i], embed)
+			n.removeSet(&required[i], embed, n.scopeDepth)
 		}
 	}
 	// The zero conjunctInfo stands for a field added from outside of any
 	// definition or embedding.
-	return n.hasEvidenceForAll(required, []conjunctInfo{{}})
+	return n.hasEvidenceForAll(required, []conjunctInfo{{}}, n.scopeDepth)
 }
 
 // hasParentEllipsis reports if the parent has any conjuncts from an ellipsis
@@ -1249,13 +1304,15 @@ func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) (id,
 	return id, embed
 }
 
-// removeSet marks a as removed by an ellipsis from the embedding scope embed.
-func (n *nodeContext) removeSet(a *reqSet, embed defID) {
+// removeSet marks a as removed by an ellipsis from the embedding scope embed,
+// held by a conjunct of the node at the given depth.
+func (n *nodeContext) removeSet(a *reqSet, embed defID, depth int32) {
 	if a.removed {
 		embed = n.outerEmbed(a.removedEmbed, embed)
 	}
 	a.removed = true
 	a.removedEmbed = embed
+	a.removedAt = depth
 }
 
 // outerEmbed returns the innermost scope which contains both of the embedding

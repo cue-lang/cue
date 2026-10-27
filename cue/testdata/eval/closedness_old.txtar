@@ -445,6 +445,20 @@ embedOpenConjunct: twoNestedEmbeds: {
 	s: a: y: 1
 	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
 }
+// A nested literal closed by such a conjunction in an embedding stays
+// closed to fields added from outside the enclosing literal, while a
+// field declared beside it in that literal is allowed.
+embedOpenConjunct: nestedLiteral: {
+	s: {{#B}, a: {{...} & close({x?: _})}}
+	s: a: y: 1
+	#B: k?: string
+	@test(err, code=eval, path=s.a.y, contains="field not allowed", pos=[2:8])
+}
+embedOpenConjunct: nestedSibling: {
+	s: {{#B}, a: {{...} & close({x?: _})}, a: y: 1}
+	#B: k?: string
+	@test(eq, {s: {a: {y: 1, x?: _}, k?: string}, #B: {k?: string}})
+}
 embedOpenConjunct: notEmbedded: {
 	s: {a: {...} & close({x?: _})}
 	s: a: y: 1
@@ -487,6 +501,169 @@ embedOpenConjunct: openNested: {
 		}
 		#B: {k?: string}
 	})
+}
+
+// An ellipsis in an embedded struct opens the embedder, so that fields can
+// be added to it, but not the regular fields it declares, which the
+// definition embedded beside it closes as it does without the ellipsis.
+// This holds whether the embedder is written in place or reached through
+// a reference, and a definition which embeds the opened struct stays
+// closed.
+openEmbed: nestedDirect: {
+	s: {{#B, ...}, h: {i: 1}}
+	s: h: extra: 1
+	#B: k?: string
+	@test(eq, {s: {h: {i: 1, extra: 1}, k?: string}, #B: {k?: string}}, incorrect)
+	@test(err:todo, code=eval, path=s.h.extra, contains="field not allowed", pos=[2:8])
+}
+openEmbed: nestedReference: {
+	t: {{#B, ...}, h: {i: 1}}
+	s: t
+	s: h: extra: 1
+	#B: k?: string
+	@test(err, code=eval, path=s.h.extra, contains="field not allowed", pos=[3:8])
+}
+openEmbed: topReference: {
+	t: {{#B, ...}, h: {i: 1}}
+	s: t
+	s: extra: 1
+	#B: k?: string
+	@test(eq, {
+		t: {h: {i: 1}, k?: string}
+		s: {h: {i: 1}, extra: 1, k?: string}
+		#B: {k?: string}
+	})
+}
+openEmbed: inDefinition: {
+	#X: {{#B, ...}, h: {i: 1}}
+	s: #X
+	s: h: extra: 1
+	#B: k?: string
+	@test(err, code=eval, path=s.h.extra, contains="field not allowed", pos=[3:8])
+}
+// A field declared beside a nested literal in the embedded struct which
+// holds it, or in a literal enclosing that one, is allowed as well.
+openEmbed: besideNested: {
+	s: {{#B}, {h: {#C, i: 1}, h: {j: 1}}}
+	t: {{#B}, if true {h: {#C, i: 1}, h: j: 1}}
+	u: {{#B}, g: {{#E}, h: {#C, i: 1}}, g: h: j: 1}
+	#B: k?: string
+	#C: i: int
+	#E: e?: int
+	@test(eq, {
+		s: {h: {i: 1, j: 1}, k?: string}
+		t: {h: {i: 1, j: 1}, k?: string}
+		u: {g: {h: {i: 1, j: 1}, e?: int}, k?: string}
+		#B: {k?: string}
+		#C: {i: int}
+		#E: {e?: int}
+	})
+}
+openEmbed: inEmbedded: {
+	s: {{#B, h: {i: 1}, ...}}
+	s: h: extra: 1
+	t: {{#B, h: {i: 1}}}
+	t: h: extra: 1
+	#B: k?: string
+	@test(err, code=eval, path=s.h.extra, contains="field not allowed", pos=[2:8])
+	@test(err, code=eval, path=t.h.extra, contains="field not allowed", pos=[4:8])
+}
+// The opened struct may itself be held by an embedding or a comprehension
+// of another struct, whose own embedded definition does not close it:
+// fields can be added to the opened struct, but not to the regular fields
+// it declares.
+openEmbed: heldBySibling: {
+	s: {{#A}, {b: {{#B, ...}, g: {h: 1}}}}
+	s: b: g: y: 1
+	s: b: x: 1 @test(eq, 1)
+	t: {{#A}, if true {b: {{#B, ...}, g: {h: 1}}}}
+	t: b: g: y: 1
+	u: {{b: {{#B, ...}, g: {h: 1}}}}
+	u: b: g: y: 1
+	#A: pa?: int
+	#B: pb?: int
+	@test(eq, {
+		s: {b: {g: {h: 1, y: 1}, x: 1, pb?: int}, pa?: int}
+		t: {b: {g: {h: 1, y: 1}, pb?: int}, pa?: int}
+		u: {b: {g: {h: 1, y: 1}, pb?: int}}
+		#A: {pa?: int}
+		#B: {pb?: int}
+	}, incorrect)
+	@test(err:todo, code=eval, path=s.b.g.y, contains="field not allowed", pos=[2:11])
+	@test(err:todo, code=eval, path=t.b.g.y, contains="field not allowed", pos=[5:11])
+	@test(err:todo, code=eval, path=u.b.g.y, contains="field not allowed", pos=[7:11])
+}
+
+// An ellipsis in an embedded struct opens the fields of the embedder, but
+// not the contents of a field which a sibling embedding or a comprehension
+// declares with a definition, nor those of a definition such a field
+// refers to. An ellipsis which the sibling embedding declares on the field
+// itself does open it.
+openEmbed: siblingEmbedding: {
+	s: {{#B, ...}, {h: {#C, i: 1}}} @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+openEmbed: siblingComprehension: {
+	s: {{#B, ...}, if true {h: {#C, i: 1}}} @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+openEmbed: siblingReference: {
+	s: {{#B, ...}, {h: #C}} @test(err:todo, code=eval, contains="field not allowed", at=h.extra)
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+openEmbed: siblingDeep: {
+	s: {{#B, ...}, {h: #C}} @test(err:todo, code=eval, contains="field not allowed", at=h.sub.extra)
+	s: h: sub: extra: 1
+	#B: k?: string
+	#C: {i: int, sub?: j?: int}
+}
+// Nor does an ellipsis in an embedded definition open a field which a
+// definition embedded beside it declares: the fields of a definition the
+// embedder is unified with are not allowed in it either.
+openEmbed: outerDefinition: {
+	s: #T & {#D, #E} @test(err:todo, code=eval, contains="field not allowed", at=f.j)
+	#D: f: i: 1
+	#E: {...}
+	#T: f: {i: int, j: int}
+}
+openEmbed: siblingField: {
+	s: {{#B, h: {...}}, {h: {#C, i: 1}}}
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+	@test(eq, {
+		s: {h: {i: 1, extra: 1}, k?: string}
+		#B: {k?: string}
+		#C: {i: int}
+	})
+}
+// A field of the embedder which embeds a definition is not opened by the
+// ellipsis either, also when the embedder is reached through a reference.
+openEmbed: definitionDirect: {
+	s: {{#B, ...}, f: {#F}}
+	s: f: extra: 1
+	#B: k?: string
+	#F: a?: int
+	@test(eq, {
+		s: {f: {a?: int, extra: 1}, k?: string}
+		#B: {k?: string}
+		#F: {a?: int}
+	}, incorrect)
+	@test(err:todo, code=eval, path=s.f.extra, contains="field not allowed", pos=[2:8])
+}
+openEmbed: definitionReference: {
+	t: {{#B, ...}, f: {#F}}
+	s: t
+	s: f: extra: 1
+	#B: k?: string
+	#F: a?: int
+	@test(err, code=eval, path=s.f.extra, contains="field not allowed", pos=[3:8])
 }
 -- reroot.cue --
 // indirect tests cases where a reference indirectly crosses a node that
@@ -550,8 +727,20 @@ indirect: {
     ./ellipsis.cue:64:8
 [eval] embedOpenConjunct.twoNestedEmbeds.s.a.y: field not allowed:
     ./ellipsis.cue:69:8
+[eval] embedOpenConjunct.nestedLiteral.s.a.y: field not allowed:
+    ./ellipsis.cue:77:8
 [eval] embedOpenConjunct.notEmbedded.s.a.y: field not allowed:
-    ./ellipsis.cue:74:8
+    ./ellipsis.cue:88:8
+[eval] openEmbed.nestedReference.s.h.extra: field not allowed:
+    ./ellipsis.cue:146:8
+[eval] openEmbed.inDefinition.s.h.extra: field not allowed:
+    ./ellipsis.cue:164:8
+[eval] openEmbed.inEmbedded.s.h.extra: field not allowed:
+    ./ellipsis.cue:188:8
+[eval] openEmbed.inEmbedded.t.h.extra: field not allowed:
+    ./ellipsis.cue:190:8
+[eval] openEmbed.definitionReference.s.f.extra: field not allowed:
+    ./ellipsis.cue:287:8
 [eval] patterns.shallow.single.err.j: field not allowed:
     ./embed.cue:10:8
 [eval] patterns.shallow.and.p1.err.j: field not allowed:
@@ -620,13 +809,13 @@ indirect: {
     ./reroot.cue:24:7
 -- out/eval/stats --
 Leaks:  0
-Freed:  529
-Reused: 497
-Allocs: 32
+Freed:  752
+Reused: 716
+Allocs: 36
 Retain: 0
 
-Unifications: 499
-Conjuncts:    1432
+Unifications: 718
+Conjuncts:    1850
 Disjuncts:    0
 
-NumCloseIDs: 486
+NumCloseIDs: 641

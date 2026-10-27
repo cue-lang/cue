@@ -134,6 +134,16 @@ closedStruct: {
 	z: #{a: 1, ...} & {b: 2}      @test(eq, {a: 1, b: 2})
 }
 
+// A closed literal nested in another closes one level as well: a field
+// declared beside it in the enclosing literal does not open it.
+nestedClosedStruct: {
+	x: #{y: #{d: 1}, y: z: 1}           @test(err, contains="not allowed")
+	y: #{y: #{d: 1}, y: #{z: 1}}        @test(err, contains="not allowed")
+	z: #{y: #{d: 1}, y: close({z: 1})}  @test(err, contains="not allowed")
+	w: #{y: {v: #{d: 1}}, y: v: z: 1}   @test(err, contains="not allowed")
+	ok: #{y: #{d: 1, ...}, y: z: 1}     @test(eq, {y: {d: 1, z: 1}})
+}
+
 // Unlike the argument of close, the fields of a closed literal keep the
 // recursive closedness of an enclosing definition.
 closedLiteralsInDef: {
@@ -265,28 +275,40 @@ closeSlice: {
     ./in.cue:115:5
 [eval] closedStruct.x.b: field not allowed:
     ./in.cue:126:16
+[eval] nestedClosedStruct.x.y.z: field not allowed:
+    ./in.cue:134:22
+[eval] nestedClosedStruct.y.y.d: field not allowed:
+    ./in.cue:135:12
+[eval] nestedClosedStruct.y.y.z: field not allowed:
+    ./in.cue:135:24
+[eval] nestedClosedStruct.z.y.d: field not allowed:
+    ./in.cue:136:12
+[eval] nestedClosedStruct.z.y.z: field not allowed:
+    ./in.cue:136:29
+[eval] nestedClosedStruct.w.y.v.z: field not allowed:
+    ./in.cue:137:30
 [eval] closedLiteralsInDef.errS.a.c: field not allowed:
-    ./in.cue:136:24
+    ./in.cue:146:24
 [eval] closedLiteralsInDef.errL.0.b: field not allowed:
-    ./in.cue:137:21
+    ./in.cue:147:21
 [eval] defStructElems.err.0.b: field not allowed:
-    ./in.cue:161:20
+    ./in.cue:171:20
 [eval] defEmpty.err.0: field not allowed:
-    ./in.cue:167:13
+    ./in.cue:177:13
 [eval] defListRef.y.1: field not allowed:
-    ./in.cue:177:9
+    ./in.cue:187:9
 [eval] defListRef.z.b: field not allowed:
-    ./in.cue:179:12
+    ./in.cue:189:12
 [eval] defListRef.listVia.1: field not allowed:
-    ./in.cue:183:22
+    ./in.cue:193:22
 [eval] defListRef.structVia.b: field not allowed:
-    ./in.cue:184:25
+    ./in.cue:194:25
 [eval] defBuiltin.err.2: field not allowed:
-    ./in.cue:190:19
+    ./in.cue:200:19
 [eval] bottomEllipsis.x: incompatible list lengths (1 and 2):
-    ./in.cue:225:5
+    ./in.cue:235:5
 [eval] closeSlice.err.1: field not allowed:
-    ./in.cue:238:15
+    ./in.cue:248:15
 -- out/eval/stats --
 Leaks:  9
 Freed:  378

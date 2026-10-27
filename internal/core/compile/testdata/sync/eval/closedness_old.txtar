@@ -432,6 +432,18 @@ embedOpenConjunct: twoNestedEmbeds: {
 	s: {{a: close({x?: _}), {{a: {...}}}, {{a: {...}}}}}
 	s: a: y: 1
 }
+// A nested literal closed by such a conjunction in an embedding stays
+// closed to fields added from outside the enclosing literal, while a
+// field declared beside it in that literal is allowed.
+embedOpenConjunct: nestedLiteral: {
+	s: {{#B}, a: {{...} & close({x?: _})}}
+	s: a: y: 1
+	#B: k?: string
+}
+embedOpenConjunct: nestedSibling: {
+	s: {{#B}, a: {{...} & close({x?: _})}, a: y: 1}
+	#B: k?: string
+}
 embedOpenConjunct: notEmbedded: {
 	s: {a: {...} & close({x?: _})}
 	s: a: y: 1
@@ -460,6 +472,128 @@ embedOpenConjunct: openNested: {
 	s: v: other: [true]
 	s: v: more: z: 1
 	#B: k?: string
+}
+
+// An ellipsis in an embedded struct opens the embedder, so that fields can
+// be added to it, but not the regular fields it declares, which the
+// definition embedded beside it closes as it does without the ellipsis.
+// This holds whether the embedder is written in place or reached through
+// a reference, and a definition which embeds the opened struct stays
+// closed.
+openEmbed: nestedDirect: {
+	s: {{#B, ...}, h: {i: 1}}
+	s: h: extra: 1
+	#B: k?: string
+}
+openEmbed: nestedReference: {
+	t: {{#B, ...}, h: {i: 1}}
+	s: t
+	s: h: extra: 1
+	#B: k?: string
+}
+openEmbed: topReference: {
+	t: {{#B, ...}, h: {i: 1}}
+	s: t
+	s: extra: 1
+	#B: k?: string
+}
+openEmbed: inDefinition: {
+	#X: {{#B, ...}, h: {i: 1}}
+	s: #X
+	s: h: extra: 1
+	#B: k?: string
+}
+// A field declared beside a nested literal in the embedded struct which
+// holds it, or in a literal enclosing that one, is allowed as well.
+openEmbed: besideNested: {
+	s: {{#B}, {h: {#C, i: 1}, h: {j: 1}}}
+	t: {{#B}, if true {h: {#C, i: 1}, h: j: 1}}
+	u: {{#B}, g: {{#E}, h: {#C, i: 1}}, g: h: j: 1}
+	#B: k?: string
+	#C: i: int
+	#E: e?: int
+}
+openEmbed: inEmbedded: {
+	s: {{#B, h: {i: 1}, ...}}
+	s: h: extra: 1
+	t: {{#B, h: {i: 1}}}
+	t: h: extra: 1
+	#B: k?: string
+}
+// The opened struct may itself be held by an embedding or a comprehension
+// of another struct, whose own embedded definition does not close it:
+// fields can be added to the opened struct, but not to the regular fields
+// it declares.
+openEmbed: heldBySibling: {
+	s: {{#A}, {b: {{#B, ...}, g: {h: 1}}}}
+	s: b: g: y: 1
+	s: b: x: 1
+	t: {{#A}, if true {b: {{#B, ...}, g: {h: 1}}}}
+	t: b: g: y: 1
+	u: {{b: {{#B, ...}, g: {h: 1}}}}
+	u: b: g: y: 1
+	#A: pa?: int
+	#B: pb?: int
+}
+
+// An ellipsis in an embedded struct opens the fields of the embedder, but
+// not the contents of a field which a sibling embedding or a comprehension
+// declares with a definition, nor those of a definition such a field
+// refers to. An ellipsis which the sibling embedding declares on the field
+// itself does open it.
+openEmbed: siblingEmbedding: {
+	s: {{#B, ...}, {h: {#C, i: 1}}}
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+openEmbed: siblingComprehension: {
+	s: {{#B, ...}, if true {h: {#C, i: 1}}}
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+openEmbed: siblingReference: {
+	s: {{#B, ...}, {h: #C}}
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+openEmbed: siblingDeep: {
+	s: {{#B, ...}, {h: #C}}
+	s: h: sub: extra: 1
+	#B: k?: string
+	#C: {i: int, sub?: j?: int}
+}
+// Nor does an ellipsis in an embedded definition open a field which a
+// definition embedded beside it declares: the fields of a definition the
+// embedder is unified with are not allowed in it either.
+openEmbed: outerDefinition: {
+	s: #T & {#D, #E}
+	#D: f: i: 1
+	#E: {...}
+	#T: f: {i: int, j: int}
+}
+openEmbed: siblingField: {
+	s: {{#B, h: {...}}, {h: {#C, i: 1}}}
+	s: h: extra: 1
+	#B: k?: string
+	#C: i: int
+}
+// A field of the embedder which embeds a definition is not opened by the
+// ellipsis either, also when the embedder is reached through a reference.
+openEmbed: definitionDirect: {
+	s: {{#B, ...}, f: {#F}}
+	s: f: extra: 1
+	#B: k?: string
+	#F: a?: int
+}
+openEmbed: definitionReference: {
+	t: {{#B, ...}, f: {#F}}
+	s: t
+	s: f: extra: 1
+	#B: k?: string
+	#F: a?: int
 }
 -- reroot.cue --
 // indirect tests cases where a reference indirectly crosses a node that
@@ -772,6 +906,52 @@ indirect: {
     }
   }
   embedOpenConjunct: {
+    nestedLiteral: {
+      s: {
+        {
+          〈2;#B〉
+        }
+        a: {
+          ({
+            ...
+          } & close({
+            x?: _
+          }))
+        }
+      }
+      s: {
+        a: {
+          y: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  embedOpenConjunct: {
+    nestedSibling: {
+      s: {
+        {
+          〈2;#B〉
+        }
+        a: {
+          ({
+            ...
+          } & close({
+            x?: _
+          }))
+        }
+        a: {
+          y: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  embedOpenConjunct: {
     notEmbedded: {
       s: {
         a: ({
@@ -864,6 +1044,473 @@ indirect: {
       }
       #B: {
         k?: string
+      }
+    }
+  }
+  openEmbed: {
+    nestedDirect: {
+      s: {
+        {
+          〈2;#B〉
+          ...
+        }
+        h: {
+          i: 1
+        }
+      }
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  openEmbed: {
+    nestedReference: {
+      t: {
+        {
+          〈2;#B〉
+          ...
+        }
+        h: {
+          i: 1
+        }
+      }
+      s: 〈0;t〉
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  openEmbed: {
+    topReference: {
+      t: {
+        {
+          〈2;#B〉
+          ...
+        }
+        h: {
+          i: 1
+        }
+      }
+      s: 〈0;t〉
+      s: {
+        extra: 1
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  openEmbed: {
+    inDefinition: {
+      #X: {
+        {
+          〈2;#B〉
+          ...
+        }
+        h: {
+          i: 1
+        }
+      }
+      s: 〈0;#X〉
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  openEmbed: {
+    besideNested: {
+      s: {
+        {
+          〈2;#B〉
+        }
+        {
+          h: {
+            〈3;#C〉
+            i: 1
+          }
+          h: {
+            j: 1
+          }
+        }
+      }
+      t: {
+        {
+          〈2;#B〉
+        }
+        if true {
+          h: {
+            〈3;#C〉
+            i: 1
+          }
+          h: {
+            j: 1
+          }
+        }
+      }
+      u: {
+        {
+          〈2;#B〉
+        }
+        g: {
+          {
+            〈3;#E〉
+          }
+          h: {
+            〈3;#C〉
+            i: 1
+          }
+        }
+        g: {
+          h: {
+            j: 1
+          }
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #C: {
+        i: int
+      }
+      #E: {
+        e?: int
+      }
+    }
+  }
+  openEmbed: {
+    inEmbedded: {
+      s: {
+        {
+          〈2;#B〉
+          h: {
+            i: 1
+          }
+          ...
+        }
+      }
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      t: {
+        {
+          〈2;#B〉
+          h: {
+            i: 1
+          }
+        }
+      }
+      t: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+    }
+  }
+  openEmbed: {
+    heldBySibling: {
+      s: {
+        {
+          〈2;#A〉
+        }
+        {
+          b: {
+            {
+              〈4;#B〉
+              ...
+            }
+            g: {
+              h: 1
+            }
+          }
+        }
+      }
+      s: {
+        b: {
+          g: {
+            y: 1
+          }
+        }
+      }
+      s: {
+        b: {
+          x: 1
+        }
+      }
+      t: {
+        {
+          〈2;#A〉
+        }
+        if true {
+          b: {
+            {
+              〈4;#B〉
+              ...
+            }
+            g: {
+              h: 1
+            }
+          }
+        }
+      }
+      t: {
+        b: {
+          g: {
+            y: 1
+          }
+        }
+      }
+      u: {
+        {
+          b: {
+            {
+              〈4;#B〉
+              ...
+            }
+            g: {
+              h: 1
+            }
+          }
+        }
+      }
+      u: {
+        b: {
+          g: {
+            y: 1
+          }
+        }
+      }
+      #A: {
+        pa?: int
+      }
+      #B: {
+        pb?: int
+      }
+    }
+  }
+  openEmbed: {
+    siblingEmbedding: {
+      s: {
+        {
+          〈2;#B〉
+          ...
+        }
+        {
+          h: {
+            〈3;#C〉
+            i: 1
+          }
+        }
+      }
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #C: {
+        i: int
+      }
+    }
+  }
+  openEmbed: {
+    siblingComprehension: {
+      s: {
+        {
+          〈2;#B〉
+          ...
+        }
+        if true {
+          h: {
+            〈3;#C〉
+            i: 1
+          }
+        }
+      }
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #C: {
+        i: int
+      }
+    }
+  }
+  openEmbed: {
+    siblingReference: {
+      s: {
+        {
+          〈2;#B〉
+          ...
+        }
+        {
+          h: 〈2;#C〉
+        }
+      }
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #C: {
+        i: int
+      }
+    }
+  }
+  openEmbed: {
+    siblingDeep: {
+      s: {
+        {
+          〈2;#B〉
+          ...
+        }
+        {
+          h: 〈2;#C〉
+        }
+      }
+      s: {
+        h: {
+          sub: {
+            extra: 1
+          }
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #C: {
+        i: int
+        sub?: {
+          j?: int
+        }
+      }
+    }
+  }
+  openEmbed: {
+    outerDefinition: {
+      s: (〈0;#T〉 & {
+        〈1;#D〉
+        〈1;#E〉
+      })
+      #D: {
+        f: {
+          i: 1
+        }
+      }
+      #E: {
+        ...
+      }
+      #T: {
+        f: {
+          i: int
+          j: int
+        }
+      }
+    }
+  }
+  openEmbed: {
+    siblingField: {
+      s: {
+        {
+          〈2;#B〉
+          h: {
+            ...
+          }
+        }
+        {
+          h: {
+            〈3;#C〉
+            i: 1
+          }
+        }
+      }
+      s: {
+        h: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #C: {
+        i: int
+      }
+    }
+  }
+  openEmbed: {
+    definitionDirect: {
+      s: {
+        {
+          〈2;#B〉
+          ...
+        }
+        f: {
+          〈2;#F〉
+        }
+      }
+      s: {
+        f: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #F: {
+        a?: int
+      }
+    }
+  }
+  openEmbed: {
+    definitionReference: {
+      t: {
+        {
+          〈2;#B〉
+          ...
+        }
+        f: {
+          〈2;#F〉
+        }
+      }
+      s: 〈0;t〉
+      s: {
+        f: {
+          extra: 1
+        }
+      }
+      #B: {
+        k?: string
+      }
+      #F: {
+        a?: int
       }
     }
   }

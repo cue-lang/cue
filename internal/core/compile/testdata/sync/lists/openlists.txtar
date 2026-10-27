@@ -127,6 +127,16 @@ closedStruct: {
 	z: #{a: 1, ...} & {b: 2}
 }
 
+// A closed literal nested in another closes one level as well: a field
+// declared beside it in the enclosing literal does not open it.
+nestedClosedStruct: {
+	x: #{y: #{d: 1}, y: z: 1}
+	y: #{y: #{d: 1}, y: #{z: 1}}
+	z: #{y: #{d: 1}, y: close({z: 1})}
+	w: #{y: {v: #{d: 1}}, y: v: z: 1}
+	ok: #{y: #{d: 1, ...}, y: z: 1}
+}
+
 // Unlike the argument of close, the fields of a closed literal keep the
 // recursive closedness of an enclosing definition.
 closedLiteralsInDef: {
@@ -466,6 +476,53 @@ closeSlice: {
     } & {
       b: 2
     })
+  }
+  nestedClosedStruct: {
+    x: {
+      y: {
+        d: 1
+      }
+      y: {
+        z: 1
+      }
+    }
+    y: {
+      y: {
+        d: 1
+      }
+      y: {
+        z: 1
+      }
+    }
+    z: {
+      y: {
+        d: 1
+      }
+      y: close({
+        z: 1
+      })
+    }
+    w: {
+      y: {
+        v: {
+          d: 1
+        }
+      }
+      y: {
+        v: {
+          z: 1
+        }
+      }
+    }
+    ok: {
+      y: {
+        d: 1
+        ...
+      }
+      y: {
+        z: 1
+      }
+    }
   }
   closedLiteralsInDef: {
     #S: {

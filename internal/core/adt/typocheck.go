@@ -412,8 +412,10 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 	if i := n.reqIndex(v); i >= 0 {
 		x := &n.reqDefIDs[i]
 		dstID = x.id
-		if x.ignore && !ignore {
-			// Override settings of a vertex added by #A...
+		if !ignore && (x.ignore || (x.conjunctOpened && !id.ConjunctOpened)) {
+			// A reference that does not open the vertex overrides the
+			// settings of an entry added by #A... or by an operand of
+			// (#A & #B)..., closing it again.
 			x.ignore = false
 			x.parent = id.outerID
 			x.embed = id.enclosingEmbed

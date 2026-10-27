@@ -242,21 +242,27 @@ recloseConjunction: {
 	field: {
 		c: (#B & #C)... @test(permute)
 		c: #B           @test(permute, count=2)
-		m: c & {y: 3} @test(err, code=eval, contains="field not allowed") @test(todo, why="stays open when the definition comes second")
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 	}
-	inline:    (#B & {})... & #B & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+	inline:    (#B & {})... & #B & {y: 3} @test(err, code=eval, contains="field not allowed")
 	inlineRev: #B & (#B & {})... & {y: 3} @test(err, code=eval, contains="field not allowed")
 	embedded: {
 		c: (#B & #B)... @test(permute)
 		c: {#B}         @test(permute, count=2)
-		m: c & {y: 3} @test(err, code=eval, contains="field not allowed") @test(todo, why="stays open when the definition comes second")
+		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 	}
 }
 -- out/errors.txt --
 [eval] reclose.t1.err.b: field not allowed:
     ./issues.cue:36:16
+[eval] recloseConjunction.field.m.y: field not allowed:
+    ./issues.cue:47:11
+[eval] recloseConjunction.inline.y: field not allowed:
+    ./issues.cue:49:34
 [eval] recloseConjunction.inlineRev.y: field not allowed:
     ./issues.cue:50:34
+[eval] recloseConjunction.embedded.m.y: field not allowed:
+    ./issues.cue:54:11
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:

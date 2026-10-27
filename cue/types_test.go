@@ -2115,50 +2115,110 @@ func TestDefaults(t *testing.T) {
 	testCases := []struct {
 		value      string
 		def        string
+		syntax     string // of the default
 		op         cue.Op
 		val        string
 		ok         bool
 		firstField bool
 	}{{
-		value: `number | *1`,
-		def:   "1",
-		val:   "number",
-		ok:    true,
+		value:  `number | *1`,
+		def:    "1",
+		syntax: "1",
+		val:    "number",
+		ok:     true,
 	}, {
 		// Evaluation swaps each default to the front of the disjunction.
 		// TODO: keep the relative order of the other disjuncts.
-		value: `1 | 2 | *3`,
-		def:   "3",
-		op:    cue.OrOp,
-		val:   "3|2|1",
-		ok:    true,
+		value:  `1 | 2 | *3`,
+		def:    "3",
+		syntax: "3",
+		op:     cue.OrOp,
+		val:    "3|2|1",
+		ok:     true,
 	}, {
-		value: `*{a:1,b:2}|{a:1}|{b:2}`,
-		def:   "{a:1,b:2}",
-		op:    cue.OrOp,
-		val:   "{a:1}|{b:2}",
-		ok:    true,
+		value:  `*{a:1,b:2}|{a:1}|{b:2}`,
+		def:    "{a:1,b:2}",
+		syntax: "{a: 1, b: 2}",
+		op:     cue.OrOp,
+		val:    "{a:1}|{b:2}",
+		ok:     true,
 	}, {
-		value: `{a:1}&{b:2}`,
-		def:   `{a:1,b:2}`,
-		val:   `{a:1,b:2}`,
-		ok:    false,
+		value:  `{a:1}&{b:2}`,
+		def:    `{a:1,b:2}`,
+		syntax: "{a: 1, b: 2}",
+		val:    `{a:1,b:2}`,
+		ok:     false,
 	}, {
-		value: `*_|_ | (*"x" | string)`,
-		def:   `"x" | string`,
-		op:    cue.OrOp,
-		val:   `"x"|string`,
-		ok:    false,
+		value:  `*_|_ | (*"x" | string)`,
+		def:    `"x" | string`,
+		syntax: `"x" | string`,
+		op:     cue.OrOp,
+		val:    `"x"|string`,
+		ok:     false,
 	}, {
-		value: `{#x: {y: #y}, #y: {a: int}}.#y`,
-		def:   `{a:int}`,
-		val:   `{a:int}`,
-		ok:    false,
+		// The docs do not say how Syntax keeps a definition closed.
+		value:  `{#x: {y: #y}, #y: {a: int}}.#y`,
+		def:    `{a:int}`,
+		syntax: "{_#def, _#def: a: int}",
+		val:    `{a:int}`,
+		ok:     false,
 	}, {
 		value:      `{x?: []}`,
 		def:        `[]`,
+		syntax:     "[]",
 		val:        `[]`,
 		ok:         false,
+		firstField: true,
+	}, {
+		// With more than one default, the default is a disjunction of them.
+		value:  `*1 | *2 | 3`,
+		def:    "1 | 2",
+		syntax: "1 | 2",
+		op:     cue.OrOp,
+		val:    "1|2|3",
+		ok:     true,
+	}, {
+		value:  `(*1 | 2) & int`,
+		def:    "(1 & int)",
+		syntax: "1",
+		op:     cue.OrOp,
+		val:    "1|2",
+		ok:     true,
+	}, {
+		value:  `(*1 | *2 | 3) & int`,
+		def:    "1 | 2",
+		syntax: "1 | 2",
+		op:     cue.OrOp,
+		val:    "1|2|3",
+		ok:     true,
+	}, {
+		// The docs do not say whether Expr includes the value of a
+		// pattern constraint.
+		value:      `{[string]: *1 | 2, x: _}`,
+		def:        "_ & 1",
+		syntax:     "1",
+		op:         cue.AndOp,
+		val:        "_|(*1|2)",
+		ok:         true,
+		firstField: true,
+	}, {
+		value:      `{("x"): *1 | 2}`,
+		def:        "1",
+		syntax:     "1",
+		op:         cue.OrOp,
+		val:        "1|2",
+		ok:         true,
+		firstField: true,
+	}, {
+		// TODO: the default of a field referring to a let keeps the
+		// marked disjunction, and Expr reports the unresolved reference
+		// rather than the disjunction it refers to.
+		value:      `{let L = *1 | 2, x: L}`,
+		def:        "L",
+		syntax:     "*1 | 2",
+		op:         cue.NoOp,
+		val:        "L",
+		ok:         true,
 		firstField: true,
 	}}
 	for _, tc := range testCases {
@@ -2186,6 +2246,14 @@ func TestDefaults(t *testing.T) {
 
 			if got := compactRawStr(d); got != tc.def {
 				t.Errorf("default: got %v; want %v", got, tc.def)
+			}
+
+			b, err := format.Node(d.Syntax(), format.Compact())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got := string(b); got != tc.syntax {
+				t.Errorf("syntax: got %v; want %v", got, tc.syntax)
 			}
 
 			op, val := v.Expr()

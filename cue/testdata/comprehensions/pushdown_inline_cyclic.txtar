@@ -1,13 +1,9 @@
 # A comprehension whose iterator passes through an inline-conjunction vertex
-# (e.g. `({} & IMP).x.out`) propagated the surrounding context's cyclic
-# flag to innocent pattern-body CallExprs (such as
-# `list.Contains(["sm"], KIND)` whose only resolver argument is a
-# LabelReference). The CallExprs were deferred for cycle-break and never
-# rescheduled because no non-cyclic conjunct arrived on those leaf nodes,
-# leaving `mon` as _ and the dynamic key `(obj.n)` as _|_.
-#
-# Label-only-resolver CallExprs trapped in a cyclic deferment
-# are flushed when the node has no other path to a value.
+# (e.g. `({} & IMP).x.out`) must not mark pattern-body CallExprs as cyclic,
+# such as `list.Contains(["sm"], KIND)`, whose only resolver argument is a
+# LabelReference. A cyclic CallExpr is deferred until a non-cyclic conjunct
+# arrives, and none arrives on these leaf nodes, so `mon` would stay _ and
+# the dynamic key `(obj.n)` would be _|_.
 -- in.cue --
 import "list"
 

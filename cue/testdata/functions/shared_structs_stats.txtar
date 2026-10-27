@@ -44,13 +44,13 @@ mk: func(x: _) -> _: func() -> _: x
 captured: mk(#C6) & mk(#D6)
 -- out/eval/stats --
 Leaks:  0
-Freed:  149
-Reused: 112
-Allocs: 37
+Freed:  147
+Reused: 111
+Allocs: 36
 Retain: 0
 
-Unifications: 149
-Conjuncts:    170
+Unifications: 147
+Conjuncts:    168
 Disjuncts:    0
 
 NumCloseIDs: 2

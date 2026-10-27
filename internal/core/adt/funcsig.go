@@ -2793,9 +2793,30 @@ func (c *OpContext) sameCapture(r Node, up int32, ex, ey *Environment) bool {
 	default:
 		return false
 	}
-	vx, okx := c.evalConstraint(ex, ref)
-	vy, oky := c.evalConstraint(ey, ref)
+	vx, okx := c.evalCapture(ex, ref)
+	vy, oky := c.evalCapture(ey, ref)
 	return okx && oky && c.equalData(vx, vy)
+}
+
+// evalCapture is like [OpContext.evalConstraint], but returns the vertex that
+// r resolves to rather than a copy: closures in a copy close over the copy, so
+// comparing them would never end.
+func (c *OpContext) evalCapture(env *Environment, r Expr) (Value, bool) {
+	if c.pendingConstraint(env, r) {
+		return nil, false
+	}
+	savedErrs := c.errs
+	c.errs = nil
+	defer func() { c.errs = savedErrs }()
+	v, b := c.Resolve(MakeConjunct(env, r, c.ci), r.(Resolver))
+	if b != nil {
+		return nil, false
+	}
+	v.Finalize(c)
+	if v.Bottom() != nil {
+		return nil, false
+	}
+	return Unwrap(v), true
 }
 
 // equalData reports whether x and y are the same value or equal data:

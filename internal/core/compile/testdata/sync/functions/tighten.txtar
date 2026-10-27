@@ -359,6 +359,21 @@ compose: {
 	calls:  mk(1)
 	callsX: calls.f()
 
+	// A closure may capture the struct that holds it, whether built by a
+	// call or from a definition.
+	mkSelf:     func(n: int) -> _: {a: n, f: func(x: self.a) -> int: x}.f
+	selfCall:   mkSelf(1) & mkSelf(1)
+	selfCallX:  selfCall(1)
+	selfBad:    mkSelf(1) & mkSelf(2)
+	mkNested:   func(n: int) -> _: {s: {a: n, f: func(x: s.a) -> int: x}}.s.f
+	nested:     mkNested(1) & mkNested(1)
+	nestedX:    nested(1)
+	nestedBad:  mkNested(1) & mkNested(2)
+	#Self: {a: int, f: func(x: self.a) -> int: x}
+	selfDef:    (#Self & {a: 1}).f & (#Self & {a: 1}).f
+	selfDefX:   selfDef(1)
+	selfDefBad: (#Self & {a: 1}).f & (#Self & {a: 2}).f
+
 	// Captured values compare as data, so a number of another kind, a
 	// default, or a reference that unification evaluates again keeps two
 	// closures distinct, while a comprehension, a pattern, or a dynamic field
@@ -1515,6 +1530,37 @@ admission: {
     calls: 〈0;mk〉(1)
     calls: 〈0;mk〉(1)
     callsX: 〈0;calls〉.f()
+    mkSelf: func(n: int) -> _: {
+      a: 〈1;n〉
+      f: func(x: 〈1〉.a) -> int: 〈0;x〉
+    }.f
+    selfCall: (〈0;mkSelf〉(1) & 〈0;mkSelf〉(1))
+    selfCallX: 〈0;selfCall〉(1)
+    selfBad: (〈0;mkSelf〉(1) & 〈0;mkSelf〉(2))
+    mkNested: func(n: int) -> _: {
+      s: {
+        a: 〈2;n〉
+        f: func(x: 〈1;s〉.a) -> int: 〈0;x〉
+      }
+    }.s.f
+    nested: (〈0;mkNested〉(1) & 〈0;mkNested〉(1))
+    nestedX: 〈0;nested〉(1)
+    nestedBad: (〈0;mkNested〉(1) & 〈0;mkNested〉(2))
+    #Self: {
+      a: int
+      f: func(x: 〈1〉.a) -> int: 〈0;x〉
+    }
+    selfDef: ((〈0;#Self〉 & {
+      a: 1
+    }).f & (〈0;#Self〉 & {
+      a: 1
+    }).f)
+    selfDefX: 〈0;selfDef〉(1)
+    selfDefBad: ((〈0;#Self〉 & {
+      a: 1
+    }).f & (〈0;#Self〉 & {
+      a: 2
+    }).f)
     mkn: func(n: number) -> _: func() -> number: 〈1;n〉
     num: (〈0;mkn〉(1) & 〈0;mkn〉(1.0))
     mkd: func(x: _) -> _: func() -> _: 〈1;x〉

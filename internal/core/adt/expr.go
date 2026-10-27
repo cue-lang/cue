@@ -3373,17 +3373,11 @@ func (x *Builtin) signatureDefault(c *OpContext, pos int, flags Flags) (Value, b
 	return nil, false
 }
 
+// call calls the builtin with call.args, which must hold one argument per
+// parameter.
 func (x *Builtin) call(call BuiltinCallContext) Expr {
 	c := call.ctx
-	p := call.Pos()
 
-	fun := x // right now always x.
-	if !x.checkArgs(c, p, len(call.args)) {
-		return nil
-	}
-	for i := len(call.args); i < len(x.Params); i++ {
-		call.args = append(call.args, x.Params[i].Default())
-	}
 	for i, a := range call.args {
 		if x.Closes != NoClosing && isIncompleteVertex(a) {
 			// An incomplete vertex is closed and unified where the result
@@ -3394,26 +3388,21 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 			return b
 		}
 		if k := kind(a); x.Params[i].Kind()&k == BottomKind {
-			code := EvalError
-			b, _ := call.args[i].(*Bottom)
-			if b != nil {
-				code = b.Code
-			}
-			c.addErrf(code, Pos(a),
+			c.addErrf(EvalError, Pos(a),
 				"cannot use %s (type %s) as %s in argument %d to %v",
-				a, k, x.Params[i].Kind(), i+1, fun)
+				a, k, x.Params[i].Kind(), i+1, x)
 			return nil
 		}
 		v := x.Params[i].Value
 		if _, ok := v.(*BasicType); !ok {
 			env := c.Env(0)
-			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
-			n := c.newInlineVertex(nil, nil, Conjunct{env, x, c.ci})
+			expr := &BinaryExpr{Op: AndOp, X: v, Y: a}
+			n := c.newInlineVertex(nil, nil, Conjunct{env, expr, c.ci})
 			n.Finalize(c)
 			if n.IsErr() {
 				c.addErrf(0, Pos(a),
 					"cannot use %s as %s in argument %d to %v",
-					a, v, i+1, fun)
+					a, v, i+1, x)
 				return nil
 			}
 			call.args[i] = n

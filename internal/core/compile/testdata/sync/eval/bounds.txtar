@@ -2,7 +2,8 @@
 // simplification (incompatible bounds), simplifyExpr with non-concrete bound
 // arguments, and struct equality bounds (== / !=). Also covers issue 4142
 // (struct equality in definitions) and issue 4251 (SimplifyBounds panic on ==
-// bounds combined with other bound types).
+// bounds combined with other bound types). kinds.cue covers bounds on
+// non-concrete values and on kinds which cannot be bounds.
 //
 // Issue 4388: == / != bounds are valid on bool, ordered bounds are not. The !=
 // and ordered cases are in bool.cue; the == cases need the structcmp
@@ -312,6 +313,46 @@ boolBound: ordered: {
 	geq: >=true
 	lss: <false
 	leq: <=false
+
+	// Not even on the bool type itself.
+	type: <bool
+}
+-- kinds.cue --
+import "strings"
+
+// A bound on a non-concrete literal can never become concrete, so it is an
+// error rather than incomplete. The spec does not tell such operands apart from
+// other non-concrete ones, which leave an expression incomplete.
+fixedNonConcrete: {
+	lss:  <int
+	geq:  >=number
+	ne:   !=int
+	unif: <int & 3
+}
+
+// Ordered bounds are rejected on kinds which have no order.
+nonOrderable: {
+	struct: <{}
+	list1:  >=[]
+	list2:  <[...] & []
+}
+
+// Functions are not valid bounds, not even for equality.
+function: {
+	lss: <strings.ToUpper
+	ne:  !=strings.ToUpper
+}
+
+// A reference to top may still resolve to a concrete value.
+topRef: {
+	#D: {
+		x:   _
+		lss: <x
+		ne:  !=x
+	}
+	incomplete: #D
+	resolved: #D & {x: 3}
+	violated: #D & {x: 3, ne: 3}
 }
 -- out/compile --
 --- binary.cue
@@ -473,6 +514,7 @@ boolBound: ordered: {
       geq: >=true
       lss: <false
       leq: <=false
+      type: <bool
     }
   }
 }
@@ -657,5 +699,40 @@ boolBound: ordered: {
     fail: {
       b: ((=="b" & !="b") & "b")
     }
+  }
+}
+--- kinds.cue
+{
+  fixedNonConcrete: {
+    lss: <int
+    geq: >=number
+    ne: !=int
+    unif: (<int & 3)
+  }
+  nonOrderable: {
+    struct: <{}
+    list1: >=[]
+    list2: (<[
+      ...,
+    ] & [])
+  }
+  function: {
+    lss: <〈import;strings〉.ToUpper
+    ne: !=〈import;strings〉.ToUpper
+  }
+  topRef: {
+    #D: {
+      x: _
+      lss: <〈0;x〉
+      ne: !=〈0;x〉
+    }
+    incomplete: 〈0;#D〉
+    resolved: (〈0;#D〉 & {
+      x: 3
+    })
+    violated: (〈0;#D〉 & {
+      x: 3
+      ne: 3
+    })
   }
 }

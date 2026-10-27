@@ -2,7 +2,8 @@
 // simplification (incompatible bounds), simplifyExpr with non-concrete bound
 // arguments, and struct equality bounds (== / !=). Also covers issue 4142
 // (struct equality in definitions) and issue 4251 (SimplifyBounds panic on ==
-// bounds combined with other bound types).
+// bounds combined with other bound types). kinds.cue covers bounds on
+// non-concrete values and on kinds which cannot be bounds.
 //
 // Issue 4388: == / != bounds are valid on bool, ordered bounds are not. The !=
 // and ordered cases are in bool.cue; the == cases need the structcmp
@@ -318,6 +319,46 @@ boolBound: ordered: {
 	geq: >=true  @test(err, code=eval, contains="cannot use bool for bound >=", pos=[0:9])
 	lss: <false  @test(err, code=eval, contains="cannot use bool for bound <", pos=[0:8])
 	leq: <=false @test(err, code=eval, contains="cannot use bool for bound <=", pos=[0:9])
+
+	// Not even on the bool type itself.
+	type: <bool @test(err, code=eval, contains="cannot use bool for bound <", pos=[0:9])
+}
+-- kinds.cue --
+import "strings"
+
+// A bound on a non-concrete literal can never become concrete, so it is an
+// error rather than incomplete. The spec does not tell such operands apart from
+// other non-concrete ones, which leave an expression incomplete.
+fixedNonConcrete: {
+	lss:  <int     @test(err, code=eval, contains="bound has fixed non-concrete value", pos=[0:8])
+	geq:  >=number @test(err, code=eval, contains="bound has fixed non-concrete value", pos=[0:8])
+	ne:   !=int    @test(err, code=eval, contains="bound has fixed non-concrete value", pos=[0:8])
+	unif: <int & 3 @test(err, code=eval, contains="bound has fixed non-concrete value", pos=[0:8])
+}
+
+// Ordered bounds are rejected on kinds which have no order.
+nonOrderable: {
+	struct: <{}         @test(err, code=eval, contains="cannot use struct for bound <", pos=[0:11])
+	list1:  >=[]        @test(err, code=eval, contains="cannot use list for bound >=", pos=[0:12])
+	list2:  <[...] & [] @test(err, code=eval, contains="cannot use list for bound <", pos=[0:11])
+}
+
+// Functions are not valid bounds, not even for equality.
+function: {
+	lss: <strings.ToUpper  @test(err, code=eval, contains="invalid value strings.ToUpper (type func) for bound <", pos=[0:8])
+	ne:  !=strings.ToUpper @test(err, code=eval, contains="invalid value strings.ToUpper (type func) for bound !=", pos=[0:9], hint="the spec does not say whether functions can be compared for equality")
+}
+
+// A reference to top may still resolve to a concrete value.
+topRef: {
+	#D: {
+		x:   _
+		lss: <x
+		ne:  !=x
+	}
+	incomplete: #D @test(err, code=incomplete, at=lss, contains="non-concrete value x for bound <", pos=[-3:9])
+	resolved: #D & {x: 3} @test(eq, {x: 3, lss: <3, ne: !=3})
+	violated: #D & {x: 3, ne: 3} @test(err, code=eval, at=ne, contains="out of bound !=3", pos=[-4:8, 0:28])
 }
 -- out/errors.txt --
 [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -433,6 +474,8 @@ boolBound: ordered: {
     ./bool.cue:15:8
 [eval] boolBound.ordered.leq: cannot use bool for bound <=:
     ./bool.cue:16:9
+[eval] boolBound.ordered.type: cannot use bool for bound <:
+    ./bool.cue:19:9
 [eval] equalScalar.err1: invalid value 2 (out of bound ==1):
     ./equals.cue:10:8
     ./equals.cue:11:8
@@ -544,6 +587,31 @@ boolBound: ordered: {
     ./issue4251-panic.cue:15:13
     ./issue4251-panic.cue:15:5
     ./issue4251-panic.cue:15:21
+[eval] fixedNonConcrete.lss: bound has fixed non-concrete value:
+    ./kinds.cue:7:8
+[eval] fixedNonConcrete.geq: bound has fixed non-concrete value:
+    ./kinds.cue:8:8
+[eval] fixedNonConcrete.ne: bound has fixed non-concrete value:
+    ./kinds.cue:9:8
+[eval] fixedNonConcrete.unif: bound has fixed non-concrete value:
+    ./kinds.cue:10:8
+[eval] nonOrderable.struct: cannot use struct for bound <:
+    ./kinds.cue:15:11
+[eval] nonOrderable.list1: cannot use list for bound >=:
+    ./kinds.cue:16:12
+[eval] nonOrderable.list2: cannot use list for bound <:
+    ./kinds.cue:17:11
+[eval] function.lss: invalid value strings.ToUpper (type func) for bound <:
+    ./kinds.cue:22:8
+[eval] function.ne: invalid value strings.ToUpper (type func) for bound !=:
+    ./kinds.cue:23:9
+[incomplete] topRef.#D.lss: non-concrete value x for bound <:
+    ./kinds.cue:30:9
+[incomplete] topRef.#D.ne: non-concrete value x for bound !=:
+    ./kinds.cue:31:10
+[eval] topRef.violated.ne: invalid value 3 (out of bound !=3):
+    ./kinds.cue:31:8
+    ./kinds.cue:35:28
 -- out/eval/stats --
 Leaks:  0
 Freed:  252

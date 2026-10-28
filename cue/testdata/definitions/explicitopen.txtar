@@ -254,6 +254,43 @@ sharedDisjunct: {
 	p: o & {y: 3} @test(err, code=eval, contains="empty disjunction")
 }
 
+// A field sharing a forward reference to an opened definition stays open
+// when unshared after the reference was evaluated.
+forwardShared: {
+	#A: {x: 1}
+	#B: {x: 2}
+
+	direct: {
+		c: b @test(eq, {x: 2, y: 3}) @test(kind=struct)
+		c: F
+		c: G
+		F: *#A | {x: 2}
+		G: {y: 3}
+		b: #B...
+	}
+	indirect: {
+		c: b @test(eq, {x: 2, y: 3}) @test(kind=struct)
+		c: F
+		c: G
+		F: *#A | {x: 2}
+		G: {y: 3}
+		b: X
+		X: #B...
+	}
+	// A field already sharing a reference to an opened field queues the
+	// conjuncts of a closed forward reference instead. Only a is opened
+	// here: b closes the field as in recloseSame.field below, even when
+	// the reference is evaluated before its conjuncts run.
+	queued: {
+		c: a @test(eq, *{x: 1} | {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="empty disjunction")
+		c: b
+		c: F
+		a: b...
+		b: #B
+		F: *#A | {x: 2, y: 3}
+	}
+}
+
 // A definition re-closes a reference to itself opened with `...` in either
 // order, also when reached through another field or through the only
 // disjunct left of a disjunction. A field holding the definition does the
@@ -440,58 +477,58 @@ sharedDisjunct.p.x: conflicting values 1 and 2:
 sharedDisjunct.p.y: field not allowed:
     ./issues.cue:56:10
 [eval] recloseSame.same.m.y: field not allowed:
-    ./issues.cue:72:11
+    ./issues.cue:109:11
 [eval] recloseSame.sameField.m.y: field not allowed:
-    ./issues.cue:77:11
+    ./issues.cue:114:11
 [eval] recloseSame.field.m.y: field not allowed:
-    ./issues.cue:82:11
+    ./issues.cue:119:11
 [eval] recloseSame.conjunction.m.y: field not allowed:
-    ./issues.cue:87:11
+    ./issues.cue:124:11
 [eval] recloseSame.disjunct.m: 2 errors in empty disjunction:
 recloseSame.disjunct.m.x: conflicting values 1 and 2:
-    ./issues.cue:64:10
-    ./issues.cue:65:10
-    ./issues.cue:66:5
-    ./issues.cue:90:6
-    ./issues.cue:91:6
-    ./issues.cue:92:6
+    ./issues.cue:101:10
+    ./issues.cue:102:10
+    ./issues.cue:103:5
+    ./issues.cue:127:6
+    ./issues.cue:128:6
+    ./issues.cue:129:6
 recloseSame.disjunct.m.y: field not allowed:
-    ./issues.cue:92:11
+    ./issues.cue:129:11
 [eval] recloseSame.readDisjunct.m: 2 errors in empty disjunction:
 recloseSame.readDisjunct.m.x: conflicting values 1 and 2:
-    ./issues.cue:64:10
-    ./issues.cue:65:10
-    ./issues.cue:66:5
-    ./issues.cue:96:6
-    ./issues.cue:97:6
-    ./issues.cue:98:6
-    ./issues.cue:99:6
+    ./issues.cue:101:10
+    ./issues.cue:102:10
+    ./issues.cue:103:5
+    ./issues.cue:133:6
+    ./issues.cue:134:6
+    ./issues.cue:135:6
+    ./issues.cue:136:6
 recloseSame.readDisjunct.m.y: field not allowed:
-    ./issues.cue:99:11
+    ./issues.cue:136:11
 [eval] recloseSame.otherDefs.n.q: field not allowed:
-    ./issues.cue:141:11
+    ./issues.cue:178:11
 [eval] recloseSame.def.m.y: field not allowed:
-    ./issues.cue:149:11
+    ./issues.cue:186:11
 [eval] recloseSame.def.n.y: field not allowed:
-    ./issues.cue:154:11
+    ./issues.cue:191:11
 [eval] recloseSame.def.o.y: field not allowed:
-    ./issues.cue:158:11
+    ./issues.cue:195:11
 [eval] recloseSame.crossing.m.y: field not allowed:
-    ./issues.cue:186:14
+    ./issues.cue:223:14
 [eval] recloseSame.crossing.n.y: field not allowed:
-    ./issues.cue:188:11
+    ./issues.cue:225:11
 [eval] recloseSame.crossing.o.y: field not allowed:
-    ./issues.cue:190:11
+    ./issues.cue:227:11
 [eval] recloseSame.crossing.p.y: field not allowed:
-    ./issues.cue:193:11
+    ./issues.cue:230:11
 [eval] recloseConjunction.field.m.y: field not allowed:
-    ./issues.cue:209:11
+    ./issues.cue:246:11
 [eval] recloseConjunction.inline.y: field not allowed:
-    ./issues.cue:211:34
+    ./issues.cue:248:34
 [eval] recloseConjunction.inlineRev.y: field not allowed:
-    ./issues.cue:212:34
+    ./issues.cue:249:34
 [eval] recloseConjunction.embedded.m.y: field not allowed:
-    ./issues.cue:216:11
+    ./issues.cue:253:11
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:
@@ -563,19 +600,19 @@ f9: combinenew.f9.ok is in error because two f9 declarations conflict.
 f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
-Leaks:  23
-Freed:  692
-Reused: 607
-Allocs: 108
+Leaks:  29
+Freed:  741
+Reused: 655
+Allocs: 115
 Retain: 0
 
-Unifications: 641
-Conjuncts:    1704
-Disjuncts:    38
+Unifications: 680
+Conjuncts:    1781
+Disjuncts:    50
 
-NumCloseIDs: 633
+NumCloseIDs: 648
 
-ConjunctInfos:       1121
+ConjunctInfos:       1171
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         3

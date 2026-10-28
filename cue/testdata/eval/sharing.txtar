@@ -274,6 +274,78 @@ sharedDisjunct: struct: {
 	e: #E @test(eq, {c: {x: 2}, m: {x: 2}})
 	e: c: b
 }
+
+// A field sharing a forward reference may be unshared after the reference
+// was evaluated, such as to check whether it holds a single value for a
+// disjunction. The vertex the reference shares by then still applies to
+// the field, and is not skipped as a reference cycle.
+//
+// #B is skipped: the #A disjunct survives as the default, and closed.c
+// accepts a field #B does not allow.
+// https://cuelang.org/issue/4530
+forwardShared: {
+	#A: {x: 1}
+	#B: {x: 2}
+	#C: {x: 3}
+	D: *#A | #B
+
+	reported: {
+		#E: c: D
+		e: #E @test(eq, {c: *{x: 1} | {x: 2}}, incorrect) @test(eq:todo, {c: {x: 2}})
+		e: c: b
+		b: #B
+	}
+	field: {
+		c: b @test(eq, *{x: 1} | {x: 2}, incorrect) @test(eq:todo, {x: 2})
+		c: D
+		b: #B
+	}
+	disjunction: {
+		c: b @test(eq, *{x: 1} | {x: 2}, incorrect) @test(eq:todo, {x: 2})
+		c: D
+		b: E
+		E: #B | #C
+	}
+	closed: {
+		c: b @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="empty disjunction")
+		c: F
+		c: G
+		F: *#A | {x: 2}
+		G: {y: 3}
+		b: #B
+	}
+	// The structural cycle of the vertex the reference resolves to is
+	// reported as such, as for a direct reference.
+	cycle: {
+		c: b @test(eq, *{x: 1} | {x: 2}, incorrect) @test(err:todo, code=structural_cycle)
+		c: D
+		b: d
+		d: {x: 2, y: d}
+	}
+	// A field already sharing another reference queues the conjuncts of a
+	// forward reference instead, which are not skipped either when the
+	// reference is evaluated before they run.
+	queued: {
+		#A: {x: 1, y: int}
+		#B: {x: 2, y: int}
+		D: *#A | #B
+		c: a @test(eq, *{x: 1, y: 2} | {x: 2, y: 2}, incorrect) @test(eq:todo, {x: 2, y: 2})
+		c: b
+		c: D
+		a: {y: b.x}
+		b: #B
+	}
+	// A field that does not share evaluates the forward reference through
+	// a selection before its queued conjuncts run. Those conjuncts are then
+	// not applied in full.
+	selected: {
+		c: {} @test(eq, {x: 2}, incorrect) @test(eq:todo, {x: 2, sub: {x: 2}})
+		c: b
+		c: b.sub
+		b: #S
+		#S: {x: 2, sub: {x: 2}}
+	}
+}
 -- issue3835.cue --
 // evalv3 regression with "cycle with field" error involving a comprehension
 // with a let that references a top-level field via a pattern constraint.
@@ -407,6 +479,8 @@ issue3903: noshare: {
 	})
 }
 -- out/errors.txt --
+[structural_cycle] forwardShared.cycle.d.y: structural cycle:
+    ./acrossdisjunction.cue:100:6
 [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
     ./let.cue:24:11
     ./let.cue:23:16
@@ -424,17 +498,17 @@ issue3903: noshare: {
     ./sharecycle.cue:11:11
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
-Leaks:  18
-Freed:  283
-Reused: 260
-Allocs: 41
+Leaks:  21
+Freed:  383
+Reused: 352
+Allocs: 52
 Retain: 0
 
-Unifications: 261
-Conjuncts:    527
-Disjuncts:    30
+Unifications: 338
+Conjuncts:    678
+Disjuncts:    52
 Notifications: 1
 
-NumCloseIDs: 123
+NumCloseIDs: 162
 -- out/todo.txt --
 v3 uses structure sharing (~) extensively in issue3641, issue3546, debug, issue3849, issue3903, and pending sections where v2 expanded values inline. v3 also omits shareCycle.t2.Y.x.x structural cycle error and instead reports conflicting values for shareCycle.t2.Y.x with additional position info.

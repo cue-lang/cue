@@ -252,6 +252,43 @@ sharedDisjunct: {
 	p: o & {y: 3}
 }
 
+// A field sharing a forward reference to an opened definition stays open
+// when unshared after the reference was evaluated.
+forwardShared: {
+	#A: {x: 1}
+	#B: {x: 2}
+
+	direct: {
+		c: b
+		c: F
+		c: G
+		F: *#A | {x: 2}
+		G: {y: 3}
+		b: #B...
+	}
+	indirect: {
+		c: b
+		c: F
+		c: G
+		F: *#A | {x: 2}
+		G: {y: 3}
+		b: X
+		X: #B...
+	}
+	// A field already sharing a reference to an opened field queues the
+	// conjuncts of a closed forward reference instead. Only a is opened
+	// here: b closes the field as in recloseSame.field below, even when
+	// the reference is evaluated before its conjuncts run.
+	queued: {
+		c: a
+		c: b
+		c: F
+		a: b...
+		b: #B
+		F: *#A | {x: 2, y: 3}
+	}
+}
+
 // A definition re-closes a reference to itself opened with `...` in either
 // order, also when reached through another field or through the only
 // disjunct left of a disjunction. A field holding the definition does the
@@ -469,6 +506,50 @@ recloseConjunction: {
     p: (〈0;o〉 & {
       y: 3
     })
+  }
+  forwardShared: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      x: 2
+    }
+    direct: {
+      c: 〈0;b〉
+      c: 〈0;F〉
+      c: 〈0;G〉
+      F: (*〈1;#A〉|{
+        x: 2
+      })
+      G: {
+        y: 3
+      }
+      b: 〈1;#B〉...
+    }
+    indirect: {
+      c: 〈0;b〉
+      c: 〈0;F〉
+      c: 〈0;G〉
+      F: (*〈1;#A〉|{
+        x: 2
+      })
+      G: {
+        y: 3
+      }
+      b: 〈0;X〉
+      X: 〈1;#B〉...
+    }
+    queued: {
+      c: 〈0;a〉
+      c: 〈0;b〉
+      c: 〈0;F〉
+      a: 〈0;b〉...
+      b: 〈1;#B〉
+      F: (*〈1;#A〉|{
+        x: 2
+        y: 3
+      })
+    }
   }
   recloseSame: {
     #A: {

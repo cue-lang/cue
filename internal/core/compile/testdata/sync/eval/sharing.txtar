@@ -212,6 +212,78 @@ sharedDisjunct: struct: {
 	e: #E
 	e: c: b
 }
+
+// A field sharing a forward reference may be unshared after the reference
+// was evaluated, such as to check whether it holds a single value for a
+// disjunction. The vertex the reference shares by then still applies to
+// the field, and is not skipped as a reference cycle.
+//
+// #B is skipped: the #A disjunct survives as the default, and closed.c
+// accepts a field #B does not allow.
+// https://cuelang.org/issue/4530
+forwardShared: {
+	#A: {x: 1}
+	#B: {x: 2}
+	#C: {x: 3}
+	D: *#A | #B
+
+	reported: {
+		#E: c: D
+		e: #E
+		e: c: b
+		b: #B
+	}
+	field: {
+		c: b
+		c: D
+		b: #B
+	}
+	disjunction: {
+		c: b
+		c: D
+		b: E
+		E: #B | #C
+	}
+	closed: {
+		c: b
+		c: F
+		c: G
+		F: *#A | {x: 2}
+		G: {y: 3}
+		b: #B
+	}
+	// The structural cycle of the vertex the reference resolves to is
+	// reported as such, as for a direct reference.
+	cycle: {
+		c: b
+		c: D
+		b: d
+		d: {x: 2, y: d}
+	}
+	// A field already sharing another reference queues the conjuncts of a
+	// forward reference instead, which are not skipped either when the
+	// reference is evaluated before they run.
+	queued: {
+		#A: {x: 1, y: int}
+		#B: {x: 2, y: int}
+		D: *#A | #B
+		c: a
+		c: b
+		c: D
+		a: {y: b.x}
+		b: #B
+	}
+	// A field that does not share evaluates the forward reference through
+	// a selection before its queued conjuncts run. Those conjuncts are then
+	// not applied in full.
+	selected: {
+		c: {}
+		c: b
+		c: b.sub
+		b: #S
+		#S: {x: 2, sub: {x: 2}}
+	}
+}
 -- issue3835.cue --
 // evalv3 regression with "cycle with field" error involving a comprehension
 // with a let that references a top-level field via a pattern constraint.
@@ -368,6 +440,90 @@ issue3903: noshare: {
       e: 〈0;#E〉
       e: {
         c: 〈1;b〉
+      }
+    }
+  }
+  forwardShared: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      x: 2
+    }
+    #C: {
+      x: 3
+    }
+    D: (*〈0;#A〉|〈0;#B〉)
+    reported: {
+      #E: {
+        c: 〈2;D〉
+      }
+      e: 〈0;#E〉
+      e: {
+        c: 〈1;b〉
+      }
+      b: 〈1;#B〉
+    }
+    field: {
+      c: 〈0;b〉
+      c: 〈1;D〉
+      b: 〈1;#B〉
+    }
+    disjunction: {
+      c: 〈0;b〉
+      c: 〈1;D〉
+      b: 〈0;E〉
+      E: (〈1;#B〉|〈1;#C〉)
+    }
+    closed: {
+      c: 〈0;b〉
+      c: 〈0;F〉
+      c: 〈0;G〉
+      F: (*〈1;#A〉|{
+        x: 2
+      })
+      G: {
+        y: 3
+      }
+      b: 〈1;#B〉
+    }
+    cycle: {
+      c: 〈0;b〉
+      c: 〈1;D〉
+      b: 〈0;d〉
+      d: {
+        x: 2
+        y: 〈1;d〉
+      }
+    }
+    queued: {
+      #A: {
+        x: 1
+        y: int
+      }
+      #B: {
+        x: 2
+        y: int
+      }
+      D: (*〈0;#A〉|〈0;#B〉)
+      c: 〈0;a〉
+      c: 〈0;b〉
+      c: 〈0;D〉
+      a: {
+        y: 〈1;b〉.x
+      }
+      b: 〈0;#B〉
+    }
+    selected: {
+      c: {}
+      c: 〈0;b〉
+      c: 〈0;b〉.sub
+      b: 〈0;#S〉
+      #S: {
+        x: 2
+        sub: {
+          x: 2
+        }
       }
     }
   }

@@ -218,6 +218,10 @@ language: version: "v0.9.0"
 package lib
 
 value: "from local directory"
+-- local_dep/leaf/leaf.cue --
+package lib
+
+leaf: value
 `,
 	}, {
 		// Absolute replacement (absolute within the FS namespace), module
@@ -248,6 +252,10 @@ language: version: "v0.9.0"
 package lib
 
 value: "from local directory"
+-- local_dep/leaf/leaf.cue --
+package lib
+
+leaf: value
 `,
 	}, {
 		// Module root is a subdirectory of the FS and the relative
@@ -280,6 +288,10 @@ language: version: "v0.9.0"
 package lib
 
 value: "from local directory"
+-- local_dep/leaf/leaf.cue --
+package lib
+
+leaf: value
 `,
 	}}
 	for _, test := range tests {
@@ -294,6 +306,16 @@ value: "from local directory"
 			qt.Assert(t, qt.HasLen(insts, 1))
 			qt.Assert(t, qt.IsNil(insts[0].Err))
 			qt.Assert(t, qt.Equals(insts[0].PkgName, "main"))
+
+			// The files of a package in the replacement directory's
+			// ancestor directories are part of its instance.
+			insts = Instances([]string{"example.com/dep/leaf@v0:lib"}, cfg)
+			qt.Assert(t, qt.HasLen(insts, 1))
+			v := cuecontext.New().BuildInstance(insts[0])
+			qt.Assert(t, qt.IsNil(v.Err()))
+			leaf, err := v.LookupPath(cue.ParsePath("leaf")).String()
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(leaf, "from local directory"))
 		})
 	}
 }

@@ -1,0 +1,67 @@
+# The files of a dependency's package in ancestor directories, up to the
+# dependency's own module root, are part of the instance whatever the
+# length of the main module's root path.
+
+# Pin the module cache so that the length of the dependency's directory is
+# known.
+env CUE_CACHE_DIR=$WORK/cache
+
+cd $WORK/short
+exec cue export example.com/dep/leaf:dep
+cmp stdout $WORK/want-stdout
+
+# The main module's root path is longer than the dependency's directories,
+# both the one extracted to the module cache and the local replacement.
+# The module cache extracts the dependency under
+# cache/mod/extract/example.com/dep@v0.0.1, which is shorter than the main
+# module's directory name, so the cache layout must not grow past it.
+# TODO: the ancestor files are dropped, as the walk over ancestor
+# directories is bounded by the length of the main module's root path.
+cd $WORK/main-module-with-a-root-path-longer-than-the-dependency-dirs
+! exec cue export example.com/dep/leaf:dep
+stderr 'reference "#greeting" not found'
+! exec cue export example.com/repl/leaf:repl
+stderr 'reference "#greeting" not found'
+
+-- want-stdout --
+{
+    "msg": "hello from root"
+}
+-- short/cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": v: "v0.0.1"
+-- main-module-with-a-root-path-longer-than-the-dependency-dirs/cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.17.0"
+deps: {
+	"example.com/dep@v0": v:  "v0.0.1"
+	"example.com/repl@v0": v: "v0.0.1"
+}
+-- main-module-with-a-root-path-longer-than-the-dependency-dirs/cue.mod/local-module.cue --
+deps: {
+	"example.com/dep@v0": {}
+	"example.com/repl@v0": replaceWith: "../r"
+}
+-- r/cue.mod/module.cue --
+module: "example.com/repl@v0"
+language: version: "v0.17.0"
+-- r/root.cue --
+package repl
+
+#greeting: "hello from root"
+-- r/leaf/leaf.cue --
+package repl
+
+msg: #greeting
+-- _registry/example.com_dep_v0.0.1/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.17.0"
+-- _registry/example.com_dep_v0.0.1/root.cue --
+package dep
+
+#greeting: "hello from root"
+-- _registry/example.com_dep_v0.0.1/leaf/leaf.cue --
+package dep
+
+msg: #greeting

@@ -558,8 +558,9 @@ issue3990: {
     ./issue3940.cue:171:18
     ./issue3940.cue:170:4
     ./issue3940.cue:184:43
-[incomplete] issue3990._Deployment._names: cannot range over this.volumes (incomplete):
-    ./issue3990.cue:25:16
+[incomplete] issue3990._Deployment._names: undefined field: volumes:
+    ./issue3990.cue:25:21
+    ./issue3990.cue:22:2
 -- out/todo.txt --
 v3 uses structure sharing (~) for several fields in issue3940 and issue3990,
 showing them as shared references rather than expanded inline values.
@@ -571,13 +572,13 @@ an "undefined field: objects" error. The comprehension cycle is handled by
 dependency tracking rather than field pushdown, so the inner for-clause
 yields zero values and `objects` remains an empty struct.
 -- out/eval/stats --
-Leaks:  12
+Leaks:  11
 Freed:  400
-Reused: 342
+Reused: 341
 Allocs: 70
 Retain: 0
 
-Unifications: 369
+Unifications: 368
 Conjuncts:    693
 Disjuncts:    0
 Notifications: 5

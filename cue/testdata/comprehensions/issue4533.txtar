@@ -20,7 +20,7 @@ cycle: {
 		let L = P & {if true {p: "i"}}
 		out: {if L.sel != _|_ {}}
 	}
-	x: (w & {}).out @test(err, code=cycle, incorrect) @test(eq:todo, {})
+	x: (w & {}).out @test(eq, {})
 }
 
 dropped: {
@@ -34,7 +34,7 @@ dropped: {
 		let L = P & {if true {p: "i"}}
 		out: {if L.sel != _|_ {sel: 1}}
 	}
-	x: (w & {}).out @test(eq, {}, incorrect) @test(eq:todo, {sel: 1})
+	x: (w & {}).out @test(eq, {sel: 1})
 }
 
 // The field declared by the struct's own comprehension is optional rather
@@ -52,7 +52,7 @@ optional: {
 			let L = P & {if true {p: "i"}}
 			out: {if L.sel != _|_ {}}
 		}
-		x: (w & {}).out @test(err, code=cycle, incorrect) @test(eq:todo, {})
+		x: (w & {}).out @test(eq, {})
 	}
 	dropped: {
 		P: {
@@ -65,7 +65,7 @@ optional: {
 			let L = P & {if true {p: "i"}}
 			out: {if L.sel != _|_ {sel: 1}}
 		}
-		x: (w & {}).out @test(eq, {}, incorrect) @test(eq:todo, {sel: 1})
+		x: (w & {}).out @test(eq, {sel: 1})
 	}
 }
 
@@ -75,14 +75,12 @@ direct: {
 	field: {
 		out: {if L.sel != _|_ {}}
 		L: P & {if true {p: "i"}}
-		@test(err, at=L, code=cycle, incorrect)
-		@test(eq:todo, {out: {}, L: {p: "i", cfg: {s: 2}, u: true, sel: {}}})
+		@test(eq, {out: {}, L: {p: "i", cfg: {s: 2}, u: true, sel: {}}})
 	}
 	let: {
 		out: {if L.sel != _|_ {}}
 		let L = P & {if true {p: "i"}}
-		@test(err, at=out, code=cycle, incorrect)
-		@test(eq:todo, {out: {}})
+		@test(eq, {out: {}})
 	}
 }
 
@@ -137,24 +135,11 @@ named: {
 		}
 		out: _cfg.pod
 	}
-	x: (#Workload & {#config: {}}).out @test(eq, {affinity: true}, incorrect) @test(eq:todo, {
+	x: (#Workload & {#config: {}}).out @test(eq, {
 		affinity: true
 		selector: kind: "infrastructure"
 	})
 }
--- out/errors.txt --
-[cycle] L: cycle with field: u:
-    ./in.cue:6:5
-[cycle] L: cycle with field: u:
-    ./in.cue:40:7
-[cycle] direct.field.L: cycle with field: u:
-    ./in.cue:6:5
-[cycle] direct.field.L: cycle with field: u:
-    ./in.cue:6:5
-[cycle] direct.let.L: cycle with field: u:
-    ./in.cue:6:5
-[cycle] _placement: cycle with field: _useAffinity:
-    ./in.cue:106:6
 -- out/eval/stats --
 Leaks:  93
 Freed:  224

@@ -44,13 +44,13 @@ fields: {
 	l2: type: ["list", "string"]
 }
 -- out/eval/stats --
-Leaks:  59
+Leaks:  54
 Freed:  435
 Reused: 374
-Allocs: 120
+Allocs: 115
 Retain: 0
 
-Unifications: 124
+Unifications: 119
 Conjuncts:    425
 Disjuncts:    88
 

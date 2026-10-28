@@ -895,6 +895,26 @@ func (s *scheduler) deferFieldSetKnown(c condition) condition {
 	return c
 }
 
+// mayDeclareArcs reports whether an unfinished task of s may still declare
+// an arc it has not created. A task completing only allTasksCompleted, such
+// as a pushed-down comprehension (see [task.isPushedDownComp]) or a deferred
+// completion, contributes only to the arcs created when it was scheduled.
+func (s *scheduler) mayDeclareArcs() bool {
+	for _, t := range s.tasks {
+		if t.state < taskSUCCESS && t.completes != allTasksCompleted {
+			return true
+		}
+	}
+	return false
+}
+
+// noTaskMayDeclareArcs reports whether an arc missing from the node cannot
+// exist: all conjuncts of s are scheduled, and neither a parent task nor an
+// unfinished task of s may declare an arc it has not created.
+func (s *scheduler) noTaskMayDeclareArcs() bool {
+	return s.meets(allAncestorsProcessed) && !s.hasActiveParentTask() && !s.mayDeclareArcs()
+}
+
 // hasActiveParentTask reports whether a parent task, such as a pushed-down
 // comprehension, has not yet completed and may still add to this node.
 func (s *scheduler) hasActiveParentTask() bool {

@@ -64,13 +64,13 @@ undeclared: {
 	out: (#T & {t: "r1"}).out
 }
 -- out/eval/stats --
-Leaks:  59
+Leaks:  43
 Freed:  338
-Reused: 309
-Allocs: 88
+Reused: 308
+Allocs: 73
 Retain: 0
 
-Unifications: 153
+Unifications: 137
 Conjuncts:    378
 Disjuncts:    84
 

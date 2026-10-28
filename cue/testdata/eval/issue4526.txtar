@@ -9,7 +9,7 @@ language: version: "v0.17.0"
 -- in.cue --
 // The reported case: cfg shares input.a, a reference to the same definition.
 reported: {
-	early: out.a.items @test(err, code=incomplete, contains="cfg.flags.enabled undefined (cfg.flags is incomplete)") @test(eq:todo, {})
+	early: out.a.items @test(eq, {})
 
 	#Flags: flags: enabled: bool | *false
 
@@ -35,7 +35,7 @@ reported: {
 // Without a definition on the sharing field: a field of a definition shares a
 // regular field declared later.
 forward: {
-	early: out.a.inner.items @test(err, code=incomplete, contains="cfg.flags.enabled undefined (cfg.flags is incomplete)") @test(eq:todo, {})
+	early: out.a.inner.items @test(eq, {})
 
 	#Flags: flags: enabled: bool | *false
 
@@ -54,18 +54,8 @@ forward: {
 	late: out.a.inner.cfg.flags.enabled @test(eq, bool | *false)
 }
 -- out/errors.txt --
-[incomplete] reported.out.a.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
-    ./in.cue:12:7
 [incomplete] reported.#Inner.items: cfg.flags undefined as cfg is incomplete (type _):
     ./in.cue:12:7
-[incomplete] reported.out.a.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
-    ./in.cue:12:7
-[incomplete] reported.out.a.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
-    ./in.cue:12:7
-[incomplete] forward.#Outer.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
-    ./in.cue:40:8
-[incomplete] forward.#Outer.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
-    ./in.cue:40:8
 -- out/eval/stats --
 Leaks:  4
 Freed:  52

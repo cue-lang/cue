@@ -942,14 +942,17 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 
 			if arc.ArcType == ArcPending {
 				// In ignore mode (used for comprehension clause evaluation),
-				// always return the pending arc optimistically to avoid
-				// prematurely blocking comprehension expansion.
+				// return an existing pending arc optimistically to avoid
+				// prematurely blocking comprehension expansion. An arc
+				// created above comes back as nil, without an error, so
+				// that the caller retries once more is known.
 				if runMode == ignore {
 					return arcReturn
 				}
 
-				// In attemptOnly mode, return the pending arc if the container
-				// vertex still has work that may produce this field:
+				// In attemptOnly mode, return an existing pending arc, or nil
+				// for one created above, if the container vertex still has
+				// work that may produce this field:
 				//
 				//   - it has an active parent task (e.g., a comprehension that
 				//     may dynamically add this field), OR
@@ -1063,6 +1066,10 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 		c.AddBottom(b) // TODO: unify error mechanism.
 		return arcReturn
 	case ArcMember:
+		// The pending arc created above is the result once it is a member.
+		if arcReturn == nil {
+			arcReturn = arc
+		}
 		return arcReturn
 
 	case ArcOptional:

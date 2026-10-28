@@ -197,6 +197,40 @@ issue4510: letInDefinition: {
 	}
 	err: #Config
 }
+// A let of an inline struct is read by a guard of a comprehension in another
+// let, which yields nothing. The let is still a struct, and an error in what
+// the guard read is absorbed by the guard, as when the definition is used
+// directly. The completion of what the guard read is left on the let reading
+// the other let, where it never runs, so the empty struct is never marked as
+// one.
+issue4532: {
+	#S: {
+		let r = {role: "b" | "c"} & {role: "b"}
+		let names = {for k, v in r if v != "" {(k): v}}
+		let picked = {for k, _ in {other: 1} if names[k] != _|_ {(k): true}}
+		out: [for k, _ in picked {k}]
+		n: len(picked)
+	}
+	ok:    (#S & {}).out
+	okLen: (#S & {}).n
+
+	#E: {
+		let r = {role: "b" & !="b"}
+		let names = {for k, v in r if v != "" {(k): v}}
+		let picked = {for k, _ in {other: 1} if names[k] != _|_ {(k): true}}
+		let withZ = {z: 1, for k, _ in {other: 1} if names[k] != _|_ {(k): true}}
+		let matched = {for k, _ in {role: 1} if names[k] != _|_ {(k): true}}
+		out: [for k, _ in picked {k}]
+		n: len(picked)
+		z: withZ.z
+		m: len(matched)
+	}
+	guarded:      (#E & {}).out
+	guardedLen:   (#E & {}).n
+	guardedField: (#E & {}).z
+	guardedMatch: (#E & {}).m
+	direct:       #E
+}
 -- out/compile --
 --- in.cue
 {
@@ -483,5 +517,79 @@ issue4510: letInDefinition: {
       }
       err: 〈0;#Config〉
     }
+  }
+  issue4532: {
+    #S: {
+      let r#9 = ({
+        role: ("b"|"c")
+      } & {
+        role: "b"
+      })
+      let names#Amulti = {
+        for k, v in 〈1;let r#9〉 if (〈0;v〉 != "") {
+          〈1;k〉: 〈1;v〉
+        }
+      }
+      let picked#Bmulti = {
+        for k, _ in {
+          other: 1
+        } if (〈2;let names#A〉[〈0;k〉] != _|_(explicit error (_|_ literal) in source)) {
+          〈1;k〉: true
+        }
+      }
+      out: [
+        for k, _ in 〈1;let picked#B〉 {
+          〈1;k〉
+        },
+      ]
+      n: len(〈0;let picked#B〉)
+    }
+    ok: (〈0;#S〉 & {}).out
+    okLen: (〈0;#S〉 & {}).n
+    #E: {
+      let r#C = {
+        role: ("b" & !="b")
+      }
+      let names#Dmulti = {
+        for k, v in 〈1;let r#C〉 if (〈0;v〉 != "") {
+          〈1;k〉: 〈1;v〉
+        }
+      }
+      let picked#Emulti = {
+        for k, _ in {
+          other: 1
+        } if (〈2;let names#D〉[〈0;k〉] != _|_(explicit error (_|_ literal) in source)) {
+          〈1;k〉: true
+        }
+      }
+      let withZ#Fmulti = {
+        z: 1
+        for k, _ in {
+          other: 1
+        } if (〈2;let names#D〉[〈0;k〉] != _|_(explicit error (_|_ literal) in source)) {
+          〈1;k〉: true
+        }
+      }
+      let matched#10multi = {
+        for k, _ in {
+          role: 1
+        } if (〈2;let names#D〉[〈0;k〉] != _|_(explicit error (_|_ literal) in source)) {
+          〈1;k〉: true
+        }
+      }
+      out: [
+        for k, _ in 〈1;let picked#E〉 {
+          〈1;k〉
+        },
+      ]
+      n: len(〈0;let picked#E〉)
+      z: 〈0;let withZ#F〉.z
+      m: len(〈0;let matched#10〉)
+    }
+    guarded: (〈0;#E〉 & {}).out
+    guardedLen: (〈0;#E〉 & {}).n
+    guardedField: (〈0;#E〉 & {}).z
+    guardedMatch: (〈0;#E〉 & {}).m
+    direct: 〈0;#E〉
   }
 }

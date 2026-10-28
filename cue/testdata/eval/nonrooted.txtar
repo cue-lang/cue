@@ -204,18 +204,52 @@ issue4510: letInDefinition: {
 	}
 	err: #Config @test(err, at=patches[0].value.limits.memory, code=eval, suberr=(contains="conflicting values 2 and 1.0"), suberr=(contains="conflicting values 2 and float"))
 }
+// A let of an inline struct is read by a guard of a comprehension in another
+// let, which yields nothing. The let is still a struct, and an error in what
+// the guard read is absorbed by the guard, as when the definition is used
+// directly. The completion of what the guard read is left on the let reading
+// the other let, where it never runs, so the empty struct is never marked as
+// one.
+issue4532: {
+	#S: {
+		let r = {role: "b" | "c"} & {role: "b"}
+		let names = {for k, v in r if v != "" {(k): v}}
+		let picked = {for k, _ in {other: 1} if names[k] != _|_ {(k): true}}
+		out: [for k, _ in picked {k}]
+		n: len(picked)
+	}
+	ok:    (#S & {}).out @test(err, code=incomplete, contains="cannot range over picked") @test(eq:todo, [])
+	okLen: (#S & {}).n   @test(err, code=incomplete, contains="incomplete argument") @test(eq:todo, 0)
+
+	#E: {
+		let r = {role: "b" & !="b"}
+		let names = {for k, v in r if v != "" {(k): v}}
+		let picked = {for k, _ in {other: 1} if names[k] != _|_ {(k): true}}
+		let withZ = {z: 1, for k, _ in {other: 1} if names[k] != _|_ {(k): true}}
+		let matched = {for k, _ in {role: 1} if names[k] != _|_ {(k): true}}
+		out: [for k, _ in picked {k}]
+		n: len(picked)
+		z: withZ.z
+		m: len(matched)
+	}
+	guarded:      (#E & {}).out @test(err, code=incomplete, contains="cannot range over picked") @test(eq:todo, [])
+	guardedLen:   (#E & {}).n   @test(err, code=incomplete, contains="incomplete argument") @test(eq:todo, 0)
+	guardedField: (#E & {}).z   @test(eq, 1)
+	guardedMatch: (#E & {}).m   @test(eq, 0)
+	direct:       #E            @test(eq, {out: [], n: 0, z: 1, m: 0})
+}
 -- out/eval/stats --
-Leaks:  47
-Freed:  253
-Reused: 229
-Allocs: 71
+Leaks:  91
+Freed:  336
+Reused: 314
+Allocs: 113
 Retain: 0
 
-Unifications: 242
-Conjuncts:    472
-Disjuncts:    36
+Unifications: 332
+Conjuncts:    617
+Disjuncts:    46
 
-NumCloseIDs: 70
+NumCloseIDs: 80
 -- out/errors.txt --
 [eval] x: conflicting values 1 and 2:
     ./in.cue:4:14
@@ -354,3 +388,11 @@ x: conflicting values 1 and 2:
     ./in.cue:181:36
     ./in.cue:179:9
     ./in.cue:181:59
+[incomplete] issue4532.ok: cannot range over picked (incomplete type _):
+    ./in.cue:212:21
+[incomplete] issue4532.okLen: error in call to len: incomplete argument _ (type _):
+    ./in.cue:213:6
+[incomplete] issue4532.guarded: cannot range over picked (incomplete type _):
+    ./in.cue:224:21
+[incomplete] issue4532.guardedLen: error in call to len: incomplete argument _ (type _):
+    ./in.cue:225:6

@@ -336,6 +336,19 @@ func allTasksFinished(x *nodeContext) bool {
 	return true
 }
 
+// allNonDeferredTasksFinished is like [allTasksFinished], but ignores
+// [handleDeferred] tasks, which complete other nodes: one may add an error to
+// this node, but never a conjunct. One recorded on a let's copy may never run,
+// as ranging over the copy or taking its length asks only for its fields.
+func allNonDeferredTasksFinished(x *nodeContext) bool {
+	for _, t := range x.tasks {
+		if t.state < taskSUCCESS && t.run != handleDeferred {
+			return false
+		}
+	}
+	return true
+}
+
 // incrementCounts adds the counters for each condition.
 // See also decrementCounts.
 func (s *scheduler) incrementCounts(x condition) {

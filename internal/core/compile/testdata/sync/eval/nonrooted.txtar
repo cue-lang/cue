@@ -200,9 +200,7 @@ issue4510: letInDefinition: {
 // A let of an inline struct is read by a guard of a comprehension in another
 // let, which yields nothing. The let is still a struct, and an error in what
 // the guard read is absorbed by the guard, as when the definition is used
-// directly. The completion of what the guard read is left on the let reading
-// the other let, where it never runs, so the empty struct is never marked as
-// one.
+// directly.
 issue4532: {
 	#S: {
 		let r = {role: "b" | "c"} & {role: "b"}

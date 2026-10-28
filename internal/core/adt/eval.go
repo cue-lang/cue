@@ -164,7 +164,7 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 		// any regular fields, and not before its embeddings have completed:
 		// marking it early lets a reference cycle through an embedding, as in
 		// `a: {div(a, 2)}`, resolve to an empty struct.
-		markStruct = n.kind&StructKind != 0 && !n.hasTop && allTasksFinished(n)
+		markStruct = n.kind&StructKind != 0 && !n.hasTop && allNonDeferredTasksFinished(n)
 		for _, a := range n.node.Arcs {
 			// TODO(spec): we generally allow optional fields alongside embedded
 			// scalars. We probably should not. Either way this is not entirely

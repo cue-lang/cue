@@ -254,7 +254,8 @@ sharedDisjunct: {
 
 // A definition re-closes a reference to itself opened with `...` in either
 // order, also when reached through another field or through the only
-// disjunct left of a disjunction.
+// disjunct left of a disjunction. A field holding the definition does the
+// same.
 recloseSame: {
 	#A: {x: 1}
 	#B: {x: 2}
@@ -264,6 +265,11 @@ recloseSame: {
 	same: {
 		c: #B...
 		c: #B
+		m: c & {y: 3}
+	}
+	sameField: {
+		c: X...
+		c: X
 		m: c & {y: 3}
 	}
 	field: {
@@ -346,6 +352,26 @@ recloseSame: {
 		e: #E
 		#E: #B...
 		o: e & {y: 3}
+
+		// Also when the field embeds the opened definition in a struct, or
+		// is unified with an opened disjunction, and when a field holding
+		// such a definition is reached through another field.
+		v: {#B..., z?: int}
+		#F: v
+		f: #F
+		p: f & {y: 3}
+		f2: f
+		r: f2 & {y: 3}
+		k: s: #F
+		h: k.s & {y: 3}
+
+		u: #B...
+		u: D...
+		#G: u
+		g: #G
+		q: g & {y: 3}
+		g2: g
+		t: g2 & {y: 3}
 	}
 
 	// A reference naming a definition closes the opened field it reaches,
@@ -460,6 +486,13 @@ recloseConjunction: {
         y: 3
       })
     }
+    sameField: {
+      c: 〈1;X〉...
+      c: 〈1;X〉
+      m: (〈0;c〉 & {
+        y: 3
+      })
+    }
     field: {
       c: 〈1;#B〉...
       c: 〈1;X〉
@@ -556,6 +589,36 @@ recloseConjunction: {
       e: 〈0;#E〉
       #E: 〈1;#B〉...
       o: (〈0;e〉 & {
+        y: 3
+      })
+      v: {
+        〈2;#B〉...
+        z?: int
+      }
+      #F: 〈0;v〉
+      f: 〈0;#F〉
+      p: (〈0;f〉 & {
+        y: 3
+      })
+      f2: 〈0;f〉
+      r: (〈0;f2〉 & {
+        y: 3
+      })
+      k: {
+        s: 〈1;#F〉
+      }
+      h: (〈0;k〉.s & {
+        y: 3
+      })
+      u: 〈1;#B〉...
+      u: 〈1;D〉...
+      #G: 〈0;u〉
+      g: 〈0;#G〉
+      q: (〈0;g〉 & {
+        y: 3
+      })
+      g2: 〈0;g〉
+      t: (〈0;g2〉 & {
         y: 3
       })
     }

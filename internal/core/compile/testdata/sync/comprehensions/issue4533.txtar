@@ -1,0 +1,349 @@
+# Tests reading a field of a struct which unifies pushed-down comprehensions
+# with a comprehension of its own, before the struct is finalized: through
+# an inline unification of a let, or from a field declared before it. The
+# lookup must not force the unrelated pushed-down comprehensions, whose
+# guards re-enter fields that are still being evaluated: a guard reading
+# such a field reports a spurious cycle, and a guard reading a field of it
+# drops the field from the result.
+# https://cuelang.org/issue/4533
+-- in.cue --
+P: {
+	p:   "i"
+	cfg: [if p == "i" {{s: 2}}][0]
+	u:   cfg.s > 1
+	sel: {if !u {}}
+	if u {}
+}
+
+cycle: {
+	w: {
+		let L = P & {if true {p: "i"}}
+		out: {if L.sel != _|_ {}}
+	}
+	x: (w & {}).out
+}
+
+dropped: {
+	P: {
+		p:   "i"
+		cfg: [if p == "i" {{s: true}}][0]
+		sel: {if !cfg.s {}}
+		if cfg.s {}
+	}
+	w: {
+		let L = P & {if true {p: "i"}}
+		out: {if L.sel != _|_ {sel: 1}}
+	}
+	x: (w & {}).out
+}
+
+// The field declared by the struct's own comprehension is optional rather
+// than regular in the struct it unifies with.
+optional: {
+	cycle: {
+		P: {
+			p?:  string
+			cfg: [if p != _|_ if p == "i" {{s: 2}}, {s: 0}][0]
+			u:   cfg.s > 1
+			sel: {if !u {}}
+			if u {}
+		}
+		w: {
+			let L = P & {if true {p: "i"}}
+			out: {if L.sel != _|_ {}}
+		}
+		x: (w & {}).out
+	}
+	dropped: {
+		P: {
+			p?:  string
+			cfg: [if p != _|_ if p == "i" {{s: true}}, {s: false}][0]
+			sel: {if !cfg.s {}}
+			if cfg.s {}
+		}
+		w: {
+			let L = P & {if true {p: "i"}}
+			out: {if L.sel != _|_ {sel: 1}}
+		}
+		x: (w & {}).out
+	}
+}
+
+// No inline unification: the reader is declared before the struct it
+// reads, so the lookup still finds the struct unfinalized.
+direct: {
+	field: {
+		out: {if L.sel != _|_ {}}
+		L: P & {if true {p: "i"}}
+	}
+	let: {
+		out: {if L.sel != _|_ {}}
+		let L = P & {if true {p: "i"}}
+	}
+}
+
+// The struct's own comprehension conflicts with the field it declares; the
+// guard absorbs the error, and the lookup must still see it.
+conflict: {
+	w: {
+		let L = P & {if true {p: "j"}}
+		out: {if L.sel != _|_ {ok: true}}
+	}
+	x: (w & {}).out
+}
+
+// The shape of the original report, with the bool named in a hidden field.
+named: {
+	#Placement: {
+		purpose: "infrastructure"
+		_config: [
+			if purpose == "infrastructure" {{supported: ["a", "b"]}},
+		][0]
+		_useAffinity: len(_config.supported) > 1
+		selector: {
+			kind: purpose
+			if !_useAffinity {
+				arch: "one"
+			}
+		}
+		affinity?: _
+		if _useAffinity {
+			affinity: true
+		}
+	}
+	#Config: {
+		purpose?: string
+		pod:      _
+	}
+	#Workload: {
+		#config: #Config
+		let _placement = #Placement & {
+			if #config.purpose != _|_ {
+				purpose: #config.purpose
+			}
+		}
+		let _cfg = #config & {
+			pod: {
+				if _placement.selector != _|_ {
+					selector: _placement.selector
+				}
+				affinity: _placement.affinity
+			}
+		}
+		out: _cfg.pod
+	}
+	x: (#Workload & {#config: {}}).out
+}
+-- out/compile --
+--- in.cue
+{
+  P: {
+    p: "i"
+    cfg: [
+      if (〈1;p〉 == "i") {
+        {
+          s: 2
+        }
+      },
+    ][0]
+    u: (〈0;cfg〉.s > 1)
+    sel: {
+      if !〈1;u〉 {}
+    }
+    if 〈0;u〉 {}
+  }
+  cycle: {
+    w: {
+      let L#1 = (〈2;P〉 & {
+        if true {
+          p: "i"
+        }
+      })
+      out: {
+        if (〈1;let L#1〉.sel != _|_(explicit error (_|_ literal) in source)) {}
+      }
+    }
+    x: (〈0;w〉 & {}).out
+  }
+  dropped: {
+    P: {
+      p: "i"
+      cfg: [
+        if (〈1;p〉 == "i") {
+          {
+            s: true
+          }
+        },
+      ][0]
+      sel: {
+        if !〈1;cfg〉.s {}
+      }
+      if 〈0;cfg〉.s {}
+    }
+    w: {
+      let L#2 = (〈1;P〉 & {
+        if true {
+          p: "i"
+        }
+      })
+      out: {
+        if (〈1;let L#2〉.sel != _|_(explicit error (_|_ literal) in source)) {
+          sel: 1
+        }
+      }
+    }
+    x: (〈0;w〉 & {}).out
+  }
+  optional: {
+    cycle: {
+      P: {
+        p?: string
+        cfg: [
+          if (〈1;p〉 != _|_(explicit error (_|_ literal) in source)) if (〈1;p〉 == "i") {
+            {
+              s: 2
+            }
+          },
+          {
+            s: 0
+          },
+        ][0]
+        u: (〈0;cfg〉.s > 1)
+        sel: {
+          if !〈1;u〉 {}
+        }
+        if 〈0;u〉 {}
+      }
+      w: {
+        let L#3 = (〈1;P〉 & {
+          if true {
+            p: "i"
+          }
+        })
+        out: {
+          if (〈1;let L#3〉.sel != _|_(explicit error (_|_ literal) in source)) {}
+        }
+      }
+      x: (〈0;w〉 & {}).out
+    }
+    dropped: {
+      P: {
+        p?: string
+        cfg: [
+          if (〈1;p〉 != _|_(explicit error (_|_ literal) in source)) if (〈1;p〉 == "i") {
+            {
+              s: true
+            }
+          },
+          {
+            s: false
+          },
+        ][0]
+        sel: {
+          if !〈1;cfg〉.s {}
+        }
+        if 〈0;cfg〉.s {}
+      }
+      w: {
+        let L#4 = (〈1;P〉 & {
+          if true {
+            p: "i"
+          }
+        })
+        out: {
+          if (〈1;let L#4〉.sel != _|_(explicit error (_|_ literal) in source)) {
+            sel: 1
+          }
+        }
+      }
+      x: (〈0;w〉 & {}).out
+    }
+  }
+  direct: {
+    field: {
+      out: {
+        if (〈1;L〉.sel != _|_(explicit error (_|_ literal) in source)) {}
+      }
+      L: (〈2;P〉 & {
+        if true {
+          p: "i"
+        }
+      })
+    }
+    let: {
+      out: {
+        if (〈1;let L#5〉.sel != _|_(explicit error (_|_ literal) in source)) {}
+      }
+      let L#5 = (〈2;P〉 & {
+        if true {
+          p: "i"
+        }
+      })
+    }
+  }
+  conflict: {
+    w: {
+      let L#6 = (〈2;P〉 & {
+        if true {
+          p: "j"
+        }
+      })
+      out: {
+        if (〈1;let L#6〉.sel != _|_(explicit error (_|_ literal) in source)) {
+          ok: true
+        }
+      }
+    }
+    x: (〈0;w〉 & {}).out
+  }
+  named: {
+    #Placement: {
+      purpose: "infrastructure"
+      _config: [
+        if (〈1;purpose〉 == "infrastructure") {
+          {
+            supported: [
+              "a",
+              "b",
+            ]
+          }
+        },
+      ][0]
+      _useAffinity: (len(〈0;_config〉.supported) > 1)
+      selector: {
+        kind: 〈1;purpose〉
+        if !〈1;_useAffinity〉 {
+          arch: "one"
+        }
+      }
+      affinity?: _
+      if 〈0;_useAffinity〉 {
+        affinity: true
+      }
+    }
+    #Config: {
+      purpose?: string
+      pod: _
+    }
+    #Workload: {
+      #config: 〈1;#Config〉
+      let _placement#7 = (〈1;#Placement〉 & {
+        if (〈1;#config〉.purpose != _|_(explicit error (_|_ literal) in source)) {
+          purpose: 〈2;#config〉.purpose
+        }
+      })
+      let _cfg#8 = (〈0;#config〉 & {
+        pod: {
+          if (〈2;let _placement#7〉.selector != _|_(explicit error (_|_ literal) in source)) {
+            selector: 〈3;let _placement#7〉.selector
+          }
+          affinity: 〈2;let _placement#7〉.affinity
+        }
+      })
+      out: 〈0;let _cfg#8〉.pod
+    }
+    x: (〈0;#Workload〉 & {
+      #config: {}
+    }).out
+  }
+}

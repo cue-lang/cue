@@ -1,0 +1,169 @@
+# Tests reading a field of a struct which unifies pushed-down comprehensions
+# with a comprehension of its own, before the struct is finalized: through
+# an inline unification of a let, or from a field declared before it. The
+# lookup must not force the unrelated pushed-down comprehensions, whose
+# guards re-enter fields that are still being evaluated: a guard reading
+# such a field reports a spurious cycle, and a guard reading a field of it
+# drops the field from the result.
+# https://cuelang.org/issue/4533
+-- in.cue --
+P: {
+	p:   "i"
+	cfg: [if p == "i" {{s: 2}}][0]
+	u:   cfg.s > 1
+	sel: {if !u {}}
+	if u {}
+}
+
+cycle: {
+	w: {
+		let L = P & {if true {p: "i"}}
+		out: {if L.sel != _|_ {}}
+	}
+	x: (w & {}).out @test(err, code=cycle, incorrect) @test(eq:todo, {})
+}
+
+dropped: {
+	P: {
+		p:   "i"
+		cfg: [if p == "i" {{s: true}}][0]
+		sel: {if !cfg.s {}}
+		if cfg.s {}
+	}
+	w: {
+		let L = P & {if true {p: "i"}}
+		out: {if L.sel != _|_ {sel: 1}}
+	}
+	x: (w & {}).out @test(eq, {}, incorrect) @test(eq:todo, {sel: 1})
+}
+
+// The field declared by the struct's own comprehension is optional rather
+// than regular in the struct it unifies with.
+optional: {
+	cycle: {
+		P: {
+			p?:  string
+			cfg: [if p != _|_ if p == "i" {{s: 2}}, {s: 0}][0]
+			u:   cfg.s > 1
+			sel: {if !u {}}
+			if u {}
+		}
+		w: {
+			let L = P & {if true {p: "i"}}
+			out: {if L.sel != _|_ {}}
+		}
+		x: (w & {}).out @test(err, code=cycle, incorrect) @test(eq:todo, {})
+	}
+	dropped: {
+		P: {
+			p?:  string
+			cfg: [if p != _|_ if p == "i" {{s: true}}, {s: false}][0]
+			sel: {if !cfg.s {}}
+			if cfg.s {}
+		}
+		w: {
+			let L = P & {if true {p: "i"}}
+			out: {if L.sel != _|_ {sel: 1}}
+		}
+		x: (w & {}).out @test(eq, {}, incorrect) @test(eq:todo, {sel: 1})
+	}
+}
+
+// No inline unification: the reader is declared before the struct it
+// reads, so the lookup still finds the struct unfinalized.
+direct: {
+	field: {
+		out: {if L.sel != _|_ {}}
+		L: P & {if true {p: "i"}}
+		@test(err, at=L, code=cycle, incorrect)
+		@test(eq:todo, {out: {}, L: {p: "i", cfg: {s: 2}, u: true, sel: {}}})
+	}
+	let: {
+		out: {if L.sel != _|_ {}}
+		let L = P & {if true {p: "i"}}
+		@test(err, at=out, code=cycle, incorrect)
+		@test(eq:todo, {out: {}})
+	}
+}
+
+// The struct's own comprehension conflicts with the field it declares; the
+// guard absorbs the error, and the lookup must still see it.
+conflict: {
+	w: {
+		let L = P & {if true {p: "j"}}
+		out: {if L.sel != _|_ {ok: true}}
+		@test(eq, {out: {}})
+	}
+	x: (w & {}).out @test(eq, {})
+}
+
+// The shape of the original report, with the bool named in a hidden field.
+named: {
+	#Placement: {
+		purpose: "infrastructure"
+		_config: [
+			if purpose == "infrastructure" {{supported: ["a", "b"]}},
+		][0]
+		_useAffinity: len(_config.supported) > 1
+		selector: {
+			kind: purpose
+			if !_useAffinity {
+				arch: "one"
+			}
+		}
+		affinity?: _
+		if _useAffinity {
+			affinity: true
+		}
+	}
+	#Config: {
+		purpose?: string
+		pod:      _
+	}
+	#Workload: {
+		#config: #Config
+		let _placement = #Placement & {
+			if #config.purpose != _|_ {
+				purpose: #config.purpose
+			}
+		}
+		let _cfg = #config & {
+			pod: {
+				if _placement.selector != _|_ {
+					selector: _placement.selector
+				}
+				affinity: _placement.affinity
+			}
+		}
+		out: _cfg.pod
+	}
+	x: (#Workload & {#config: {}}).out @test(eq, {affinity: true}, incorrect) @test(eq:todo, {
+		affinity: true
+		selector: kind: "infrastructure"
+	})
+}
+-- out/errors.txt --
+[cycle] L: cycle with field: u:
+    ./in.cue:6:5
+[cycle] L: cycle with field: u:
+    ./in.cue:40:7
+[cycle] direct.field.L: cycle with field: u:
+    ./in.cue:6:5
+[cycle] direct.field.L: cycle with field: u:
+    ./in.cue:6:5
+[cycle] direct.let.L: cycle with field: u:
+    ./in.cue:6:5
+[cycle] _placement: cycle with field: _useAffinity:
+    ./in.cue:106:6
+-- out/eval/stats --
+Leaks:  93
+Freed:  224
+Reused: 194
+Allocs: 123
+Retain: 0
+
+Unifications: 260
+Conjuncts:    432
+Disjuncts:    0
+
+NumCloseIDs: 64

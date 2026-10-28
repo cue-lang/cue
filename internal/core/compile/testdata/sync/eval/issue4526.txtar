@@ -53,6 +53,37 @@ forward: {
 	}
 	late: out.a.inner.cfg.flags.enabled
 }
+// The shared chain read as the source of a for comprehension. The lookup of
+// the source does not wait for the shared vertex and reports it incomplete.
+forSource: {
+	early: [for k, _ in out.a.inner.cfg.flags {k}]
+
+	#Flags: flags: enabled: bool | *false
+
+	input: a: #Flags
+
+	out: a: #Outer
+	#Outer: {
+		cfg: input.a
+		inner: cfg: out.a.cfg
+	}
+}
+
+// The shared chain within the default disjunct of the field read early.
+disjunct: {
+	early: {if out.a.inner.cfg.flags.enabled.deep {x: 1}}
+
+	#Flags: flags: enabled: deep: bool | *false
+
+	input: a: #Flags
+
+	out: a: *#Outer | #Other
+	#Other: other: int
+	#Outer: {
+		cfg: input.a
+		inner: cfg: out.a.cfg
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -117,5 +148,58 @@ forward: {
       cfg: 〈1;input〉.a
     }
     late: 〈0;out〉.a.inner.cfg.flags.enabled
+  }
+  forSource: {
+    early: [
+      for k, _ in 〈1;out〉.a.inner.cfg.flags {
+        〈1;k〉
+      },
+    ]
+    #Flags: {
+      flags: {
+        enabled: (bool|*false)
+      }
+    }
+    input: {
+      a: 〈1;#Flags〉
+    }
+    out: {
+      a: 〈1;#Outer〉
+    }
+    #Outer: {
+      cfg: 〈1;input〉.a
+      inner: {
+        cfg: 〈2;out〉.a.cfg
+      }
+    }
+  }
+  disjunct: {
+    early: {
+      if 〈1;out〉.a.inner.cfg.flags.enabled.deep {
+        x: 1
+      }
+    }
+    #Flags: {
+      flags: {
+        enabled: {
+          deep: (bool|*false)
+        }
+      }
+    }
+    input: {
+      a: 〈1;#Flags〉
+    }
+    out: {
+      a: (*〈1;#Outer〉|〈1;#Other〉)
+    }
+    #Other: {
+      other: int
+    }
+    #Outer: {
+      cfg: 〈1;input〉.a
+      inner: {
+        cfg: 〈2;out〉.a.cfg
+      }
+    }
   }
 }

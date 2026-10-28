@@ -53,18 +53,51 @@ forward: {
 	}
 	late: out.a.inner.cfg.flags.enabled @test(eq, bool | *false)
 }
+// The shared chain read as the source of a for comprehension. The lookup of
+// the source does not wait for the shared vertex and reports it incomplete.
+forSource: {
+	early: [for k, _ in out.a.inner.cfg.flags {k}] @test(err, code=incomplete, contains="cannot range over out.a.inner.cfg.flags (incomplete)") @test(eq:todo, ["enabled"])
+
+	#Flags: flags: enabled: bool | *false
+
+	input: a: #Flags
+
+	out: a: #Outer
+	#Outer: {
+		cfg: input.a
+		inner: cfg: out.a.cfg
+	}
+}
+
+// The shared chain within the default disjunct of the field read early.
+disjunct: {
+	early: {if out.a.inner.cfg.flags.enabled.deep {x: 1}} @test(eq, {})
+
+	#Flags: flags: enabled: deep: bool | *false
+
+	input: a: #Flags
+
+	out: a: *#Outer | #Other
+	#Other: other: int
+	#Outer: {
+		cfg: input.a
+		inner: cfg: out.a.cfg
+	}
+}
 -- out/errors.txt --
 [incomplete] reported.#Inner.items: cfg.flags undefined as cfg is incomplete (type _):
     ./in.cue:12:7
+[incomplete] forSource.early: cannot range over out.a.inner.cfg.flags (incomplete):
+    ./in.cue:50:22
 -- out/eval/stats --
-Leaks:  4
-Freed:  52
-Reused: 31
-Allocs: 25
+Leaks:  9
+Freed:  91
+Reused: 69
+Allocs: 31
 Retain: 0
 
-Unifications: 48
-Conjuncts:    63
-Disjuncts:    8
+Unifications: 84
+Conjuncts:    109
+Disjuncts:    16
 
-NumCloseIDs: 17
+NumCloseIDs: 22

@@ -15,13 +15,11 @@ cmp stdout $WORK/want-stdout
 # The module cache extracts the dependency under
 # cache/mod/extract/example.com/dep@v0.0.1, which is shorter than the main
 # module's directory name, so the cache layout must not grow past it.
-# TODO: the ancestor files are dropped, as the walk over ancestor
-# directories is bounded by the length of the main module's root path.
 cd $WORK/main-module-with-a-root-path-longer-than-the-dependency-dirs
-! exec cue export example.com/dep/leaf:dep
-stderr 'reference "#greeting" not found'
-! exec cue export example.com/repl/leaf:repl
-stderr 'reference "#greeting" not found'
+exec cue export example.com/dep/leaf:dep
+cmp stdout $WORK/want-stdout
+exec cue export example.com/repl/leaf:repl
+cmp stdout $WORK/want-stdout
 
 -- want-stdout --
 {

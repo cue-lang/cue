@@ -293,6 +293,41 @@ package lib
 
 leaf: value
 `,
+	}, {
+		// The main module's root path is longer than the replacement
+		// directory's path.
+		testName: "AbsoluteOutsideLongModuleRoot",
+		dir:      "/main-module-with-a-long-root-path",
+		files: `
+-- main-module-with-a-long-root-path/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+}
+-- main-module-with-a-long-root-path/cue.mod/local-module.cue --
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replaceWith: "/local_dep"
+}
+-- main-module-with-a-long-root-path/main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+-- local_dep/leaf/leaf.cue --
+package lib
+
+leaf: value
+`,
 	}}
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {

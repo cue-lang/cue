@@ -172,6 +172,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 					added = true
 				}
 			}
+			// isModRoot stops a dependency's walk at its own module root,
+			// which is not below d[0], the main module's root.
 			if p.PkgName == "" || !inModule || l.cfg.isModRoot(dir) || dir == d[0] || (firstDir && !added) {
 				break
 			}
@@ -182,7 +184,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 
 			parent := pkgpath.Dir(dir, cfg.pathOS)
 
-			if parent == dir || len(parent) < len(d[0]) {
+			if parent == dir {
 				break
 			}
 			dir = parent

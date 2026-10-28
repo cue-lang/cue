@@ -217,9 +217,6 @@ sharedDisjunct: struct: {
 // was evaluated, such as to check whether it holds a single value for a
 // disjunction. The vertex the reference shares by then still applies to
 // the field, and is not skipped as a reference cycle.
-//
-// #B is skipped: the #A disjunct survives as the default, and closed.c
-// accepts a field #B does not allow.
 // https://cuelang.org/issue/4530
 forwardShared: {
 	#A: {x: 1}

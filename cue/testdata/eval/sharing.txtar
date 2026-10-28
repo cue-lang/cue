@@ -279,9 +279,6 @@ sharedDisjunct: struct: {
 // was evaluated, such as to check whether it holds a single value for a
 // disjunction. The vertex the reference shares by then still applies to
 // the field, and is not skipped as a reference cycle.
-//
-// #B is skipped: the #A disjunct survives as the default, and closed.c
-// accepts a field #B does not allow.
 // https://cuelang.org/issue/4530
 forwardShared: {
 	#A: {x: 1}
@@ -291,23 +288,23 @@ forwardShared: {
 
 	reported: {
 		#E: c: D
-		e: #E @test(eq, {c: *{x: 1} | {x: 2}}, incorrect) @test(eq:todo, {c: {x: 2}})
+		e: #E @test(eq, {c: {x: 2}})
 		e: c: b
 		b: #B
 	}
 	field: {
-		c: b @test(eq, *{x: 1} | {x: 2}, incorrect) @test(eq:todo, {x: 2})
+		c: b @test(eq, {x: 2})
 		c: D
 		b: #B
 	}
 	disjunction: {
-		c: b @test(eq, *{x: 1} | {x: 2}, incorrect) @test(eq:todo, {x: 2})
+		c: b @test(eq, {x: 2})
 		c: D
 		b: E
 		E: #B | #C
 	}
 	closed: {
-		c: b @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="empty disjunction")
+		c: b @test(err, code=eval, contains="empty disjunction")
 		c: F
 		c: G
 		F: *#A | {x: 2}
@@ -317,7 +314,7 @@ forwardShared: {
 	// The structural cycle of the vertex the reference resolves to is
 	// reported as such, as for a direct reference.
 	cycle: {
-		c: b @test(eq, *{x: 1} | {x: 2}, incorrect) @test(err:todo, code=structural_cycle)
+		c: b @test(err, code=structural_cycle)
 		c: D
 		b: d
 		d: {x: 2, y: d}
@@ -329,7 +326,7 @@ forwardShared: {
 		#A: {x: 1, y: int}
 		#B: {x: 2, y: int}
 		D: *#A | #B
-		c: a @test(eq, *{x: 1, y: 2} | {x: 2, y: 2}, incorrect) @test(eq:todo, {x: 2, y: 2})
+		c: a @test(eq, {x: 2, y: 2})
 		c: b
 		c: D
 		a: {y: b.x}
@@ -339,7 +336,7 @@ forwardShared: {
 	// a selection before its queued conjuncts run. Those conjuncts are then
 	// not applied in full.
 	selected: {
-		c: {} @test(eq, {x: 2}, incorrect) @test(eq:todo, {x: 2, sub: {x: 2}})
+		c: {} @test(err, code=eval, contains="field not allowed", incorrect) @test(eq:todo, {x: 2, sub: {x: 2}})
 		c: b
 		c: b.sub
 		b: #S
@@ -479,8 +476,22 @@ issue3903: noshare: {
 	})
 }
 -- out/errors.txt --
+[eval] forwardShared.closed.c: 2 errors in empty disjunction:
+forwardShared.closed.c.x: conflicting values 1 and 2:
+    ./acrossdisjunction.cue:63:10
+    ./acrossdisjunction.cue:64:10
+    ./acrossdisjunction.cue:86:6
+    ./acrossdisjunction.cue:87:6
+    ./acrossdisjunction.cue:89:7
+    ./acrossdisjunction.cue:91:6
+forwardShared.closed.c.y: field not allowed:
+    ./acrossdisjunction.cue:90:7
 [structural_cycle] forwardShared.cycle.d.y: structural cycle:
-    ./acrossdisjunction.cue:100:6
+    ./acrossdisjunction.cue:97:6
+[structural_cycle] forwardShared.cycle.d.y: structural cycle:
+    ./acrossdisjunction.cue:97:6
+[eval] forwardShared.selected.c.sub: field not allowed:
+    ./acrossdisjunction.cue:122:14
 [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
     ./let.cue:24:11
     ./let.cue:23:16
@@ -498,17 +509,17 @@ issue3903: noshare: {
     ./sharecycle.cue:11:11
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
-Leaks:  21
-Freed:  383
-Reused: 352
+Leaks:  25
+Freed:  391
+Reused: 364
 Allocs: 52
 Retain: 0
 
 Unifications: 338
-Conjuncts:    678
-Disjuncts:    52
+Conjuncts:    699
+Disjuncts:    56
 Notifications: 1
 
-NumCloseIDs: 162
+NumCloseIDs: 170
 -- out/todo.txt --
 v3 uses structure sharing (~) extensively in issue3641, issue3546, debug, issue3849, issue3903, and pending sections where v2 expanded values inline. v3 also omits shareCycle.t2.Y.x.x structural cycle error and instead reports conflicting values for shareCycle.t2.Y.x with additional position info.

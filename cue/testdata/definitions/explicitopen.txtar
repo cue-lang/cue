@@ -282,7 +282,7 @@ forwardShared: {
 	// here: b closes the field as in recloseSame.field below, even when
 	// the reference is evaluated before its conjuncts run.
 	queued: {
-		c: a @test(eq, *{x: 1} | {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="empty disjunction")
+		c: a @test(err, code=eval, contains="empty disjunction")
 		c: b
 		c: F
 		a: b...
@@ -476,6 +476,16 @@ sharedDisjunct.p.x: conflicting values 1 and 2:
     ./issues.cue:56:5
 sharedDisjunct.p.y: field not allowed:
     ./issues.cue:56:10
+[eval] forwardShared.queued.c: 2 errors in empty disjunction:
+forwardShared.queued.c.x: conflicting values 1 and 2:
+    ./issues.cue:62:10
+    ./issues.cue:63:10
+    ./issues.cue:88:6
+    ./issues.cue:89:6
+    ./issues.cue:91:6
+    ./issues.cue:92:7
+forwardShared.queued.c.y: field not allowed:
+    ./issues.cue:92:19
 [eval] recloseSame.same.m.y: field not allowed:
     ./issues.cue:109:11
 [eval] recloseSame.sameField.m.y: field not allowed:
@@ -601,18 +611,18 @@ f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
 Leaks:  29
-Freed:  741
-Reused: 655
+Freed:  743
+Reused: 657
 Allocs: 115
 Retain: 0
 
-Unifications: 680
-Conjuncts:    1781
+Unifications: 678
+Conjuncts:    1791
 Disjuncts:    50
 
-NumCloseIDs: 648
+NumCloseIDs: 653
 
-ConjunctInfos:       1171
+ConjunctInfos:       1184
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         3

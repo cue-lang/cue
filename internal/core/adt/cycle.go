@@ -556,7 +556,9 @@ func (n *nodeContext) detectCycle(arc *Vertex, env *Environment, x Resolver, ci 
 				return n.markCyclicPath(arc, env, x, ci)
 			}
 		}
-		if equalDeref(r.Arc, arc) {
+		// Compare r.Arc as recorded, already dereferenced: if it has since
+		// started sharing a vertex, its own reference to it is not a cycle.
+		if r.Arc == deref(arc) {
 			if equalDeref(r.Node, n.node) {
 				// A reference cycle: the same reference reoccurring on the
 				// same node signals equality (x: x) and is skipped as it

@@ -1,0 +1,80 @@
+# Issue #4526: a field sharing a vertex that is not evaluated yet is read
+# through a comprehension before the sharing is set up, so the lookup of the
+# shared vertex's field is what first evaluates it. The field is found and the
+# default applies, as it does when the field is read after the vertex.
+
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.17.0"
+-- in.cue --
+// The reported case: cfg shares input.a, a reference to the same definition.
+reported: {
+	early: out.a.items @test(err, code=incomplete, contains="cfg.flags.enabled undefined (cfg.flags is incomplete)") @test(eq:todo, {})
+
+	#Flags: flags: enabled: bool | *false
+
+	input: a: #Flags
+
+	#Inner: {
+		cfg: _
+		items: {
+			if cfg.flags.enabled {x: 1}
+		}
+	}
+
+	#Outer: O={
+		cfg:   #Flags
+		inner: #Inner & {cfg: O.cfg}
+		items: {for k, v in O.inner.items {(k): v}}
+	}
+
+	out: a: #Outer & {cfg: input.a}
+	late: out.a.inner.cfg.flags.enabled @test(eq, bool | *false)
+}
+
+// Without a definition on the sharing field: a field of a definition shares a
+// regular field declared later.
+forward: {
+	early: out.a.inner.items @test(err, code=incomplete, contains="cfg.flags.enabled undefined (cfg.flags is incomplete)") @test(eq:todo, {})
+
+	#Flags: flags: enabled: bool | *false
+
+	input: a: #Flags
+
+	out: a: #Outer
+	#Outer: {
+		inner: {
+			cfg: out.a.cfg
+			items: {
+				if cfg.flags.enabled {x: 1}
+			}
+		}
+		cfg: input.a
+	}
+	late: out.a.inner.cfg.flags.enabled @test(eq, bool | *false)
+}
+-- out/errors.txt --
+[incomplete] reported.out.a.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
+    ./in.cue:12:7
+[incomplete] reported.#Inner.items: cfg.flags undefined as cfg is incomplete (type _):
+    ./in.cue:12:7
+[incomplete] reported.out.a.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
+    ./in.cue:12:7
+[incomplete] reported.out.a.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
+    ./in.cue:12:7
+[incomplete] forward.#Outer.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
+    ./in.cue:40:8
+[incomplete] forward.#Outer.inner.items: cfg.flags.enabled undefined (cfg.flags is incomplete):
+    ./in.cue:40:8
+-- out/eval/stats --
+Leaks:  4
+Freed:  52
+Reused: 31
+Allocs: 25
+Retain: 0
+
+Unifications: 48
+Conjuncts:    63
+Disjuncts:    8
+
+NumCloseIDs: 17

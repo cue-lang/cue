@@ -1,0 +1,121 @@
+# Issue #4526: a field sharing a vertex that is not evaluated yet is read
+# through a comprehension before the sharing is set up, so the lookup of the
+# shared vertex's field is what first evaluates it. The field is found and the
+# default applies, as it does when the field is read after the vertex.
+
+-- cue.mod/module.cue --
+module: "test.com"
+language: version: "v0.17.0"
+-- in.cue --
+// The reported case: cfg shares input.a, a reference to the same definition.
+reported: {
+	early: out.a.items
+
+	#Flags: flags: enabled: bool | *false
+
+	input: a: #Flags
+
+	#Inner: {
+		cfg: _
+		items: {
+			if cfg.flags.enabled {x: 1}
+		}
+	}
+
+	#Outer: O={
+		cfg:   #Flags
+		inner: #Inner & {cfg: O.cfg}
+		items: {for k, v in O.inner.items {(k): v}}
+	}
+
+	out: a: #Outer & {cfg: input.a}
+	late: out.a.inner.cfg.flags.enabled
+}
+
+// Without a definition on the sharing field: a field of a definition shares a
+// regular field declared later.
+forward: {
+	early: out.a.inner.items
+
+	#Flags: flags: enabled: bool | *false
+
+	input: a: #Flags
+
+	out: a: #Outer
+	#Outer: {
+		inner: {
+			cfg: out.a.cfg
+			items: {
+				if cfg.flags.enabled {x: 1}
+			}
+		}
+		cfg: input.a
+	}
+	late: out.a.inner.cfg.flags.enabled
+}
+-- out/compile --
+--- in.cue
+{
+  reported: {
+    early: 〈0;out〉.a.items
+    #Flags: {
+      flags: {
+        enabled: (bool|*false)
+      }
+    }
+    input: {
+      a: 〈1;#Flags〉
+    }
+    #Inner: {
+      cfg: _
+      items: {
+        if 〈1;cfg〉.flags.enabled {
+          x: 1
+        }
+      }
+    }
+    #Outer: {
+      cfg: 〈1;#Flags〉
+      inner: (〈1;#Inner〉 & {
+        cfg: 〈2〉.cfg
+      })
+      items: {
+        for k, v in 〈2〉.inner.items {
+          〈1;k〉: 〈1;v〉
+        }
+      }
+    }
+    out: {
+      a: (〈1;#Outer〉 & {
+        cfg: 〈2;input〉.a
+      })
+    }
+    late: 〈0;out〉.a.inner.cfg.flags.enabled
+  }
+  forward: {
+    early: 〈0;out〉.a.inner.items
+    #Flags: {
+      flags: {
+        enabled: (bool|*false)
+      }
+    }
+    input: {
+      a: 〈1;#Flags〉
+    }
+    out: {
+      a: 〈1;#Outer〉
+    }
+    #Outer: {
+      inner: {
+        cfg: 〈2;out〉.a.cfg
+        items: {
+          if 〈1;cfg〉.flags.enabled {
+            x: 1
+          }
+        }
+      }
+      cfg: 〈1;input〉.a
+    }
+    late: 〈0;out〉.a.inner.cfg.flags.enabled
+  }
+}

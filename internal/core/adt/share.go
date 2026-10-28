@@ -364,6 +364,14 @@ func (v *Vertex) sharesOpened() bool {
 	return x.OpenedShared && !x.ClosedShared
 }
 
+// sharesClosed reports whether v, or a node v indirects to, shares a vertex
+// through a reference to a definition, stopping at a node with
+// [Vertex.OpenedShared] set.
+func (v *Vertex) sharesClosed() bool {
+	x := v.sharedMark()
+	return x.ClosedShared && !x.OpenedShared
+}
+
 // DerefNonRooted indirects a node that points to a value that is not rooted.
 // This includes structure-shared nodes that point to a let field: let fields
 // may or may not be part of a struct, and thus should be treated as non-rooted.

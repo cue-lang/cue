@@ -152,6 +152,11 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 			!crossesDefinition(ctx, t.env, x, arc))
 	if opened {
 		ci.Opened = true
+	} else if arc.sharesClosed() {
+		// Sharing resolves arc past a vertex which shares it through a
+		// reference to a definition, which must still close the node, as
+		// it does without sharing.
+		ci.TopDef = true
 	}
 	if t.id.ConjunctOpened {
 		ci.ConjunctOpened = true

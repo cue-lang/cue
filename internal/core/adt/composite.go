@@ -241,7 +241,8 @@ type Vertex struct {
 	// ClosedShared is set when this Vertex structure shares a vertex through
 	// a reference naming a definition, or shares a definition. It stops
 	// [Vertex.sharedMark] here: the definition closes what is shared,
-	// whatever the vertices beyond it record, such as [Vertex.Opened].
+	// whatever the vertices beyond it record, such as [Vertex.Opened], and
+	// a reference to this Vertex closes like one naming the definition.
 	ClosedShared bool
 
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.

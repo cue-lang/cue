@@ -1,0 +1,137 @@
+# Tests a comprehension guard selecting a field through a reference to a
+# disjunction with a default. When the disjunction is declared after the
+# field referring to it, the field structure shares its vertex before that
+# vertex is evaluated. The selection must still resolve through the default,
+# in any order.
+# https://cuelang.org/issue/4520
+-- in.cue --
+// The reported case.
+reported: {
+	thing: {
+		mode: #Mode
+		if mode.kind == "a" {
+			out: "a"
+		}
+	}
+	#Mode: *{kind: "a"} | {kind: "b"}
+}
+
+// The guard is declared before the field it reads.
+guardFirst: {
+	thing: {
+		if mode.kind == "a" {
+			out: "a"
+		}
+		mode: #Mode
+	}
+	#Mode: *{kind: "a"} | {kind: "b"}
+}
+
+// The field reaches the disjunction through a chain of references.
+chain: {
+	thing: {
+		mode: #Mode
+		if mode.kind == "a" {
+			out: "a"
+		}
+	}
+	#Mode: #M2
+	#M2:   *{kind: "a"} | {kind: "b"}
+}
+
+// The guard reads a hidden field.
+hidden: {
+	thing: {
+		mode: #Mode
+		if mode._kind == "a" {
+			out: "a"
+		}
+	}
+	#Mode: *{_kind: "a"} | {_kind: "b"}
+}
+
+// The guard reads through a field sharing a vertex that is on the
+// evaluation stack: #P is being evaluated when its field a looks up q.x.
+// The lookup counts as non-cyclic structure for p, the vertex it reads,
+// not only for the field m sharing it, or p reports a structural cycle.
+onStack: {
+	#P: {
+		v: 1
+		a: q.x
+	}
+	p: #P
+	q: {
+		m: p
+		if m.v == 1 {x: 1}
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  reported: {
+    thing: {
+      mode: 〈1;#Mode〉
+      if (〈0;mode〉.kind == "a") {
+        out: "a"
+      }
+    }
+    #Mode: (*{
+      kind: "a"
+    }|{
+      kind: "b"
+    })
+  }
+  guardFirst: {
+    thing: {
+      if (〈0;mode〉.kind == "a") {
+        out: "a"
+      }
+      mode: 〈1;#Mode〉
+    }
+    #Mode: (*{
+      kind: "a"
+    }|{
+      kind: "b"
+    })
+  }
+  chain: {
+    thing: {
+      mode: 〈1;#Mode〉
+      if (〈0;mode〉.kind == "a") {
+        out: "a"
+      }
+    }
+    #Mode: 〈0;#M2〉
+    #M2: (*{
+      kind: "a"
+    }|{
+      kind: "b"
+    })
+  }
+  hidden: {
+    thing: {
+      mode: 〈1;#Mode〉
+      if (〈0;mode〉._kind == "a") {
+        out: "a"
+      }
+    }
+    #Mode: (*{
+      _kind: "a"
+    }|{
+      _kind: "b"
+    })
+  }
+  onStack: {
+    #P: {
+      v: 1
+      a: 〈1;q〉.x
+    }
+    p: 〈0;#P〉
+    q: {
+      m: 〈1;p〉
+      if (〈0;m〉.v == 1) {
+        x: 1
+      }
+    }
+  }
+}

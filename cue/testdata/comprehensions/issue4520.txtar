@@ -1,0 +1,110 @@
+# Tests a comprehension guard selecting a field through a reference to a
+# disjunction with a default. When the disjunction is declared after the
+# field referring to it, the field structure shares its vertex before that
+# vertex is evaluated. The selection must still resolve through the default,
+# in any order.
+# https://cuelang.org/issue/4520
+-- in.cue --
+// The reported case.
+reported: {
+	@test(permute, count=2)
+	thing: {
+		mode: #Mode
+		if mode.kind == "a" {
+			out: "a"
+		}
+		@test(eq, {mode: *{kind: "a"} | {kind: "b"}, out: "a"})
+		@test(todo, why="undefined field when #Mode comes second")
+	}
+	#Mode: *{kind: "a"} | {kind: "b"}
+}
+
+// The guard is declared before the field it reads.
+guardFirst: {
+	@test(permute, count=2)
+	thing: {
+		if mode.kind == "a" {
+			out: "a"
+		}
+		mode: #Mode
+		@test(eq, {mode: *{kind: "a"} | {kind: "b"}, out: "a"})
+		@test(todo, why="undefined field when #Mode comes second")
+	}
+	#Mode: *{kind: "a"} | {kind: "b"}
+}
+
+// The field reaches the disjunction through a chain of references.
+chain: {
+	@test(permute, count=6)
+	thing: {
+		mode: #Mode
+		if mode.kind == "a" {
+			out: "a"
+		}
+		@test(eq, {mode: *{kind: "a"} | {kind: "b"}, out: "a"})
+		@test(todo, why="undefined field when the disjunction comes later")
+	}
+	#Mode: #M2
+	#M2:   *{kind: "a"} | {kind: "b"}
+}
+
+// The guard reads a hidden field.
+hidden: {
+	@test(permute, count=2)
+	thing: {
+		mode: #Mode
+		if mode._kind == "a" {
+			out: "a"
+		}
+		@test(eq, {mode: *{_kind: "a"} | {_kind: "b"}, out: "a"})
+		@test(todo, why="undefined field when #Mode comes second")
+	}
+	#Mode: *{_kind: "a"} | {_kind: "b"}
+}
+
+// The guard reads through a field sharing a vertex that is on the
+// evaluation stack: #P is being evaluated when its field a looks up q.x.
+// The lookup counts as non-cyclic structure for p, the vertex it reads,
+// not only for the field m sharing it, or p reports a structural cycle.
+onStack: {
+	@test(permute, count=6)
+	#P: {
+		v: 1
+		a: q.x
+	}
+	p: #P
+	q: {
+		m: p
+		if m.v == 1 {x: 1}
+	}
+	@test(eq, {#P: {v: 1, a: 1}, p: {v: 1, a: 1}, q: {m: {v: 1, a: 1}, x: 1}})
+	@test(todo, why="structural cycle when q is declared before p")
+}
+-- out/errors.txt --
+[incomplete] reported.thing: undefined field: kind:
+    ./in.cue:6:11
+    ./in.cue:12:2
+[incomplete] guardFirst.thing: undefined field: kind:
+    ./in.cue:19:11
+    ./in.cue:26:2
+[incomplete] chain.thing: undefined field: kind:
+    ./in.cue:34:11
+    ./in.cue:41:2
+[incomplete] hidden.thing: undefined field: _kind:
+    ./in.cue:49:11
+    ./in.cue:55:2
+[incomplete] onStack.#P.a: undefined field: x:
+    ./in.cue:66:8
+    ./in.cue:69:2
+[structural_cycle] onStack.p: structural cycle
+[structural_cycle] onStack.p: structural cycle
+-- out/eval/stats --
+Leaks:  4
+Freed:  35
+Reused: 22
+Allocs: 17
+Retain: 0
+
+Unifications: 29
+Conjuncts:    34
+Disjuncts:    8

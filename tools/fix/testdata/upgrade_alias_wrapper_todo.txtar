@@ -2,14 +2,13 @@
 
 # A regular field whose value carries an old-style alias and embeds a
 # definition keeps its wrapper: the old semantics closed the field. The
-# alias becomes "let X = self" outside the wrapper, and from inside the
-# wrapper's argument a comprehension guard that reads a field through X
-# resolves only when a conjunct outside the wrapper supplies that field:
-# the use below supplies mode and deps, so both guards fire. Declared in
-# the wrapped struct alone, as the defaults of mode and #Dep are, the
-# guard fails with "undefined field". The rewrite marks every guard that
-# reads through the alias; a field value reading the same path (y) is
-# fine and left alone.
+# alias becomes "let X = self" outside the wrapper. A wrapper unifies its
+# argument where the call appears, so a guard that reads a field through X
+# resolves there, whether a conjunct outside the wrapper supplies the field
+# or the wrapped struct alone declares it, as the defaults of mode and #Dep
+# do, under __closeAll and __reclose alike. The rewrite still marks every
+# such guard as failing when the wrapped struct alone declares the field.
+# A field value reading the same path (y) resolves the same way.
 
 -- cue.mod/module.cue --
 module: "upgrade.test"
@@ -35,8 +34,8 @@ app: X={
 	}
 }
 
-// The marker also finds a wrapper inside a disjunction and a guard that
-// reads through a let of the alias.
+// A wrapper inside a disjunction, and a guard that reads through a let of
+// the alias, resolve the same way.
 disj: X=*{#Base, mode: *"c" | string, if X.mode == "c" {o: 1}} | close({kind: string})
 viaLet: X={
 	#Base
@@ -44,10 +43,24 @@ viaLet: X={
 	let m = X.mode
 	if m == "c" {o: 1}
 }
+// Embedding a regular field takes __reclose, whose guards resolve as well.
+base: {name: string}
+other: X={
+	base
+	mode: *"c" | string
+	if X.mode == "c" {o: 1}
+}
 u1: disj & {name: "n", mode: "c"}
 u1: o: 1 @test(eq, 1)
 u2: viaLet & {name: "n", mode: "c"}
 u2: o: 1 @test(eq, 1)
+u3: other & {name: "n", mode: "c"}
+u3: o: 1 @test(eq, 1)
+
+// The guards of app and other resolve on their own through the defaults.
+aloneY:     app.y @test(eq, *"k" | string)
+aloneOther: app.other @test(eq, int)
+aloneO:     other.o @test(eq, 1)
 
 out: app & {name: "n", mode: "a", deps: default: kind: "k", extra: "e", other: 1}
 out: other: 1 @test(eq, 1)
@@ -56,7 +69,7 @@ out: y: "k" @test(eq, "k")
 err: app & {name: "n", mode: "a", deps: default: kind: "k", bogus: 1} @test(err, code=eval, contains="field not allowed")
 -- out/errors.txt --
 [eval] err.bogus: field not allowed:
-    ./a.cue:37:61
+    ./a.cue:51:61
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "upgrade.test"
@@ -92,8 +105,8 @@ app: {
 	})
 }
 
-// The marker also finds a wrapper inside a disjunction and a guard that
-// reads through a let of the alias.
+// A wrapper inside a disjunction, and a guard that reads through a let of
+// the alias, resolve the same way.
 disj: {
 	let X = self
 	*__closeAll({
@@ -124,10 +137,36 @@ viaLet: {
 		if m == "c" {o: 1}
 	})
 }
+// Embedding a regular field takes __reclose, whose guards resolve as well.
+base: {name: string}
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
+other: {
+	let X = self
+	__reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		base...
+		mode: *"c" | string
+		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
+		// outside the wrapper builtin, so it resolves only when a conjunct outside the
+		// wrapper supplies that field; declared in the wrapped struct alone, it fails
+		// with "undefined field".
+		if X.mode == "c" {o: 1}
+	})
+}
 u1: disj & {name: "n", mode: "c"}
 u1: o: 1 @test(eq, 1)
 u2: viaLet & {name: "n", mode: "c"}
 u2: o: 1 @test(eq, 1)
+u3: other & {name: "n", mode: "c"}
+u3: o: 1 @test(eq, 1)
+
+// The guards of app and other resolve on their own through the defaults.
+aloneY:     app.y     @test(eq, *"k" | string)
+aloneOther: app.other @test(eq, int)
+aloneO:     other.o   @test(eq, 1)
 
 out: app & {name: "n", mode: "a", deps: default: kind: "k", extra: "e", other: 1}
 out: other: 1   @test(eq, 1)

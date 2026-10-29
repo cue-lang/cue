@@ -956,12 +956,17 @@ nestedOpenLitPath: {
 	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 }
 
-// A wrapped struct is evaluated on its own, so a comprehension guard which
-// depends on what the struct is unified with never resolves; the rewrite
-// says so.
+// A wrapper unifies the struct where the call appears, so a comprehension
+// guard which depends on what the struct is unified with resolves inside
+// it, under __closeAll and __reclose alike. The rewrite still marks such a
+// guard as staying incomplete.
 wrapperComp: {
 	#A: {a: 1}
+	x: {b: int}
 	v: {#A, c: bool, if c {d: 1}}
+	w: {x, c: bool, if c {d: 1}}
+	t: v & {c: true} @test(eq, {a: 1, c: true, d: 1})
+	u: w & {b: 2, c: true} @test(eq, {b: 2, c: true, d: 1})
 }
 
 // A declaration beside the comprehension which admits no fields of its
@@ -1228,15 +1233,17 @@ selectorDef: {
 [eval] nestedOpenLitPath.t2.a.foo.other: field not allowed:
     ./in.cue:942:19
 [incomplete] wrapperComp.v: incomplete bool: bool:
-    ./in.cue:950:13
+    ./in.cue:952:13
+[incomplete] wrapperComp.w: incomplete bool: bool:
+    ./in.cue:953:12
 [incomplete] compAdmitsNothing.s: incomplete bool: bool:
-    ./in.cue:957:9
+    ./in.cue:962:9
 [eval] compAdmitsNothing.out.f.b: field not allowed:
-    ./in.cue:959:25
+    ./in.cue:964:25
 [eval] compExtends.t2.foo.other: field not allowed:
-    ./in.cue:974:16
+    ./in.cue:979:16
 [eval] selectorDef.t2.z: field not allowed:
-    ./in.cue:987:11
+    ./in.cue:992:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -2241,11 +2248,13 @@ nestedOpenLitPath: {
 	t2: v & {a: foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 }
 
-// A wrapped struct is evaluated on its own, so a comprehension guard which
-// depends on what the struct is unified with never resolves; the rewrite
-// says so.
+// A wrapper unifies the struct where the call appears, so a comprehension
+// guard which depends on what the struct is unified with resolves inside
+// it, under __closeAll and __reclose alike. The rewrite still marks such a
+// guard as staying incomplete.
 wrapperComp: {
 	#A: {a: 1}
+	x:  {b: int}
 	v: __closeAll({
 		#A...
 		c: bool
@@ -2254,6 +2263,21 @@ wrapperComp: {
 		// struct from elsewhere.
 		if c {d: 1}
 	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	w: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		x...
+		c: bool
+		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so the
+		// guard below stays incomplete if the field it depends on is unified into the
+		// struct from elsewhere.
+		if c {d: 1}
+	})
+	t: v & {c: true}       @test(eq, {a: 1, c: true, d: 1})
+	u: w & {b: 2, c: true} @test(eq, {b: 2, c: true, d: 1})
 }
 
 // A declaration beside the comprehension which admits no fields of its

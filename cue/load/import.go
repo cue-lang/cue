@@ -434,7 +434,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	if err1 != nil {
 		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
 	}
-	root, err1 := l.absPathForSourceLoc(modRoot, l.cfg.pathOS, mv)
+	root, err1 := l.absPathForSourceLoc(modRoot)
 	if err1 != nil {
 		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
 	} else {
@@ -506,7 +506,7 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 	if err := pkg.Error(); err != nil {
 		return failf("cannot find package %q: %v%s", unqualified, err, l.cfg.localModuleHint(string(p)))
 	}
-	if mv := pkg.Mod(); mv.IsLocal() {
+	if pkg.Mod().IsLocal() {
 		// It's a local package that's present inside one or both of the gen, usr or pkg
 		// directories. Even though modpkgload tells us exactly what those directories
 		// are, the rest of the cue/load logic expects only a single directory for now,
@@ -521,7 +521,7 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 			return failf("no location found for package %q", unqualified)
 		}
 		var err error
-		absDir, err = l.absPathForSourceLoc(locs[0], l.cfg.pathOS, mv)
+		absDir, err = l.absPathForSourceLoc(locs[0])
 		if err != nil {
 			return failf("cannot determine source directory for package %q: %v", unqualified, err)
 		}
@@ -529,21 +529,13 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 	return absDir, pkg.Mod(), pkg.ModRoot(), nil
 }
 
-func (l *loader) absPathForSourceLoc(loc module.SourceLoc, os pkgpath.OS, fromModule module.Version) (string, error) {
-	if l.cfg.FS != nil {
-		if fromModule.IsLocal() || l.cfg.modFile != nil && fromModule.Path() == l.cfg.modFile.QualifiedModule() {
-			// It's a path in the main module, or in its cue.mod/{gen,usr,pkg}
-			// directories, and files are coming from [Config.FS].
-			// Join with ModuleRoot to make the path absolute within the FS namespace.
-			// Note: FromFSPath is not applied here because this path is used for
-			// FS lookups, not for display purposes.
-			return pkgpath.Join([]string{l.cfg.ModuleRoot, loc.Dir}, os), nil
-		}
-		if repl, ok := l.cfg.replacements.Lookup(fromModule.Path()); ok && repl.Dir != "" {
-			// It's a directory replacement within [Config.FS].
-			// The replacement directory path is absolute within the FS namespace.
-			return pkgpath.Join([]string{repl.Dir, loc.Dir}, os), nil
-		}
+func (l *loader) absPathForSourceLoc(loc module.SourceLoc) (string, error) {
+	os := l.cfg.pathOS
+	if fsys, ok := loc.FS.(*fsIOFS); ok {
+		// Files from [Config.FS]; the root is absolute within its namespace.
+		// Note: FromFSPath is not applied here because this path is used for
+		// FS lookups, not for display purposes.
+		return pkgpath.Join([]string{fsys.root, loc.Dir}, os), nil
 	}
 	osfs, ok := loc.FS.(module.OSRootFS)
 	if !ok {

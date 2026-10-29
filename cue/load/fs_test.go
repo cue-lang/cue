@@ -194,9 +194,7 @@ func TestLoadFromFSWithDirectoryReplace(t *testing.T) {
 	}{{
 		// Relative replacement, module at the FS root.
 		testName: "RelativeAtRoot",
-		// TODO: the root should be "/local_dep"; it is the replacement
-		// directory as written, which is relative.
-		wantRoot: "local_dep",
+		wantRoot: "/local_dep",
 		files: `
 -- cue.mod/module.cue --
 module: "example.com/main@v0"
@@ -264,13 +262,47 @@ leaf: value
 `,
 	}, {
 		// Module root is a subdirectory of the FS and the relative
+		// replacement points inside the module root.
+		testName: "RelativeInModuleRoot",
+		dir:      "/mymod",
+		wantRoot: "/mymod/local_dep",
+		files: `
+-- mymod/cue.mod/module.cue --
+module: "example.com/main@v0"
+language: version: "v0.17.0"
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+}
+-- mymod/cue.mod/local-module.cue --
+deps: "example.com/dep@v0": {
+	v: "v0.1.0"
+	replaceWith: "./local_dep"
+}
+-- mymod/main.cue --
+package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- mymod/local_dep/cue.mod/module.cue --
+module: "example.com/dep@v0"
+language: version: "v0.9.0"
+-- mymod/local_dep/lib.cue --
+package lib
+
+value: "from local directory"
+-- mymod/local_dep/leaf/leaf.cue --
+package lib
+
+leaf: value
+`,
+	}, {
+		// Module root is a subdirectory of the FS and the relative
 		// replacement points outside the module root ("../local_dep"),
 		// resolving to "/local_dep" within the FS namespace.
 		testName: "RelativeOutsideModuleRoot",
 		dir:      "/mymod",
-		// TODO: the root should be "/local_dep"; it is the replacement
-		// directory as written, which is relative.
-		wantRoot: "../local_dep",
+		wantRoot: "/local_dep",
 		files: `
 -- mymod/cue.mod/module.cue --
 module: "example.com/main@v0"

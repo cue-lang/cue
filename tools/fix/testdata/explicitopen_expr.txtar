@@ -1012,8 +1012,7 @@ selectorDef: {
 // along that path, so it still takes both. A quoted label is a regular
 // field whatever its string, so it takes both as well. A comparison of
 // two structs declares no field either, as only a conjunction or a
-// disjunction can produce a struct; the rewrite instead takes both for
-// any operator with a struct operand.
+// disjunction can produce a struct.
 hiddenSibling: {
 	#A: {a: int, _h: {b: int}}
 	g: {a: 1}
@@ -1280,19 +1279,19 @@ hiddenSibling: {
 [eval] selectorDef.t2.z: field not allowed:
     ./in.cue:991:11
 [eval] hiddenSibling.t1.z: field not allowed:
-    ./in.cue:1014:12
+    ./in.cue:1013:12
 [eval] hiddenSibling.t3.z: field not allowed:
-    ./in.cue:1016:12
+    ./in.cue:1015:12
 [eval] hiddenSibling.t5.z: field not allowed:
-    ./in.cue:1018:12
+    ./in.cue:1017:12
 [eval] hiddenSibling.t8.z: field not allowed:
-    ./in.cue:1021:12
+    ./in.cue:1020:12
 [eval] hiddenSibling.t9.z: field not allowed:
-    ./in.cue:1022:12
+    ./in.cue:1021:12
 [eval] hiddenSibling.t11.z: field not allowed:
-    ./in.cue:1024:12
+    ./in.cue:1023:12
 [eval] hiddenSibling.t13.z: field not allowed:
-    ./in.cue:1026:12
+    ./in.cue:1025:12
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -2365,18 +2364,17 @@ selectorDef: {
 // along that path, so it still takes both. A quoted label is a regular
 // field whatever its string, so it takes both as well. A comparison of
 // two structs declares no field either, as only a conjunction or a
-// disjunction can produce a struct; the rewrite instead takes both for
-// any operator with a struct operand.
+// disjunction can produce a struct.
 hiddenSibling: {
 	#A: {a: int, _h: {b: int}}
 	g:  {a: 1}
-	v:  __closeAll({_x: _, #A...})
-	w:  __closeAll({#x: 1, #A...})
-	l:  __closeAll({let x = 1, #A..., _y: "\(x)"})
+	v:  {_x: _, #A}
+	w:  {#x: 1, #A}
+	l:  {let x = 1, #A, _y: "\(x)"}
 	n:  __closeAll({_h: c: 1, #A...})
 	q:  __closeAll({"_x": 1, #A...})
 	r:  __closeAll({"#x": 1, #A...})
-	s:  __closeAll({_c: g == g, #A...})
+	s:  {_c: g == g, #A}
 
 	t1:  v & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
 	t2:  (v & {_x: 2})._x  @test(eq, 2)

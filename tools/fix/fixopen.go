@@ -260,8 +260,9 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 		case *ast.StructLit:
 			litStack = append(litStack, info)
 			info.embedFlags = embedFlags{}
-			_, sole := soleEmbed(n)
-			info.wholeValue = info.wholeValue && sole
+			if info.wholeValue {
+				_, info.wholeValue = soleEmbed(n)
+			}
 		}
 		return true
 	}, func(c astutil.Cursor) bool {
@@ -1042,14 +1043,23 @@ func openCloseArg(expr ast.Expr, whole bool) (ast.Expr, bool, embedFlags) {
 }
 
 // soleEmbed returns the embedding which is the only declaration of s
-// contributing to its value, so that s is equivalent to it. Attributes
-// declare nothing and do not count, unlike in [singleEmbed], which the
-// rewrites dropping the braces of s use: those would drop the attribute.
+// that closedness applies to, so that s is equivalent to it for the
+// purpose of the rewrite. Attributes and lets declare nothing, and a
+// hidden or definition field is allowed whatever the closedness of s,
+// so those do not count unless the field's value declares into a nested
+// path, where it may extend a closed struct the embedding declares
+// there. A quoted label is a regular field whatever its string.
+// [singleEmbed], which the rewrites dropping the braces of s use,
+// counts every declaration: dropping the braces would drop them all.
 func soleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 	var found *ast.EmbedDecl
 	for _, d := range s.Elts {
 		switch d := d.(type) {
-		case *ast.Attribute:
+		case *ast.Attribute, *ast.LetClause:
+		case *ast.Field:
+			if internal.IsRegularField(d) || !fieldless(d.Value) {
+				return nil, false
+			}
 		case *ast.EmbedDecl:
 			if found != nil {
 				return nil, false
@@ -1060,6 +1070,31 @@ func soleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 		}
 	}
 	return found, found != nil
+}
+
+// fieldless reports whether expr can declare no field at any path: a
+// scalar or top, or an expression built from those alone.
+func fieldless(expr ast.Expr) bool {
+	switch x := expr.(type) {
+	case *ast.BasicLit, *ast.Interpolation:
+		return true
+	case *ast.Ident:
+		return isTop(x) || isScalarPredeclared(x)
+	case *ast.ParenExpr:
+		return fieldless(x.X)
+	case *ast.UnaryExpr:
+		// Only a default marker, *x, can produce a struct, from its
+		// operand.
+		return fieldless(x.X)
+	case *ast.BinaryExpr:
+		// Only a conjunction or a disjunction can produce a struct; any
+		// other operator yields a scalar, or an error.
+		if x.Op != token.AND && x.Op != token.OR {
+			return true
+		}
+		return fieldless(x.X) && fieldless(x.Y)
+	}
+	return false
 }
 
 // openNestedClosing widens the closedness which an embedded struct literal

@@ -49,6 +49,19 @@ embeddedDisjunction: {
 	t1: v & {a: 1}
 	t2: v & {d: 3}
 }
+
+// The recursive closing applies to the fields a spread brings in, whether
+// the spread value is open or closed by close. A spread of a close()d value
+// instead leaks its one-level closing into the node, which admits a field
+// below the struct it declares.
+spreadClosed: {
+	foo: close({b: {}})
+	bar: {b: {}}
+	closed: __closeAll({foo...})
+	open:   __closeAll({bar...})
+	t1: closed & {b: c: 1}
+	t2: open & {b: c: 1}
+}
 -- out/compile --
 --- in.cue
 {
@@ -103,6 +116,30 @@ embeddedDisjunction: {
     })
     t2: (〈0;v〉 & {
       d: 3
+    })
+  }
+  spreadClosed: {
+    foo: close({
+      b: {}
+    })
+    bar: {
+      b: {}
+    }
+    closed: __closeAll({
+      〈1;foo〉...
+    })
+    open: __closeAll({
+      〈1;bar〉...
+    })
+    t1: (〈0;closed〉 & {
+      b: {
+        c: 1
+      }
+    })
+    t2: (〈0;open〉 & {
+      b: {
+        c: 1
+      }
     })
   }
 }

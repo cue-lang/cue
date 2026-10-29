@@ -104,6 +104,16 @@ disjunctValue: {
 	pattern:  close({[string]: int} | *{b: int, [=~"^c"]: string}) & {b: 1, c: "x"}
 	ellipsis: close({a: 1, ...} | {b: 1}) & {c: 2}
 }
+
+// A spread opens the value it spreads, so a struct spreading a close()d
+// value admits any field. The spread instead marks the struct closed, which
+// the API reports, while every field remains allowed.
+spreadOpen: {
+	foo: close({b: {}})
+	v: {foo...}
+	t1: v
+	t2: v & {z: 1}
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -561,6 +571,18 @@ issue1206: elimination: {
       b: 1
     })) & {
       c: 2
+    })
+  }
+  spreadOpen: {
+    foo: close({
+      b: {}
+    })
+    v: {
+      〈1;foo〉...
+    }
+    t1: 〈0;v〉
+    t2: (〈0;v〉 & {
+      z: 1
     })
   }
 }

@@ -158,6 +158,16 @@ disjunctValue: {
 	pattern:  close({[string]: int} | *{b: int, [=~"^c"]: string}) & {b: 1, c: "x"} @test(eq, {b: 1, c: "x"})
 	ellipsis: close({a: 1, ...} | {b: 1}) & {c: 2} @test(eq, {a: 1, c: 2})
 }
+
+// A spread opens the value it spreads, so a struct spreading a close()d
+// value admits any field. The spread instead marks the struct closed, which
+// the API reports, while every field remains allowed.
+spreadOpen: {
+	foo: close({b: {}})
+	v: {foo...}
+	t1: v @test(closed=false) @test(allows, z) @test(todo, why="the spread marks the node closed")
+	t2: v & {z: 1} @test(eq, {b: {}, z: 1})
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -254,16 +264,16 @@ issue1206: elimination: {
 
 -- out/eval/stats --
 Leaks:  26
-Freed:  540
-Reused: 511
-Allocs: 55
+Freed:  561
+Reused: 531
+Allocs: 56
 Retain: 0
 
-Unifications: 351
-Conjuncts:    636
+Unifications: 366
+Conjuncts:    662
 Disjuncts:    76
 
-NumCloseIDs: 139
+NumCloseIDs: 145
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7

@@ -77,8 +77,14 @@ mixedClose: {
 	})
 	// Top-level extra field not allowed.
 	t1: err: a & {f: int}
-	// Allowed fields work.
+	// The definition closes the struct recursively, so the field added below
+	// the one the close()d value declares is denied, as is one below a field
+	// the definition declares. The spread of the close()d value instead leaks
+	// its one-level closing into the node, which admits both.
 	t2: ok: a & {x: y: 5, b: c: 1}
+	t3: err: a & {x: z: 1}
+	// Allowed fields work.
+	t4: ok: a & {x: y: 5}
 }
 
 // Test that __reclose can wrap a close() call and conditionally add
@@ -286,6 +292,20 @@ embeddedDisjunction: {
         }
         b: {
           c: 1
+        }
+      })
+    }
+    t3: {
+      err: (〈1;a〉 & {
+        x: {
+          z: 1
+        }
+      })
+    }
+    t4: {
+      ok: (〈1;a〉 & {
+        x: {
+          y: 5
         }
       })
     }

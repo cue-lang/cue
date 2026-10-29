@@ -82,8 +82,14 @@ mixedClose: {
 	})
 	// Top-level extra field not allowed.
 	t1: err: a & {f: int} @test(err, code=eval, path=f, contains="field not allowed", pos=[0:16])
+	// The definition closes the struct recursively, so the field added below
+	// the one the close()d value declares is denied, as is one below a field
+	// the definition declares. The spread of the close()d value instead leaks
+	// its one-level closing into the node, which admits both.
+	t2: ok: a & {x: y: 5, b: c: 1} @test(eq, {x: {y: 5}, b: {c: 1}}) @test(err:todo, at=b.c, code=eval, contains="field not allowed")
+	t3: err: a & {x: z: 1} @test(eq, {x: {y: int, z: 1}, b: {}}) @test(err:todo, at=x.z, code=eval, contains="field not allowed")
 	// Allowed fields work.
-	t2: ok: a & {x: y: 5, b: c: 1} @test(eq, {x: {y: 5}, b: {c: 1}})
+	t4: ok: a & {x: y: 5} @test(eq, {x: {y: 5}, b: {}})
 }
 
 // Test that __reclose can wrap a close() call and conditionally add
@@ -182,33 +188,33 @@ embeddedDisjunction: {
 [eval] mixedClose.t1.err.f: field not allowed:
     ./in.cue:83:16
 [eval] recloseWrapsClose.t1.err.f: field not allowed:
-    ./in.cue:97:16
+    ./in.cue:103:16
 [eval] recloseWrapsClose.t2.err.a.c: field not allowed:
-    ./in.cue:99:19
+    ./in.cue:105:19
 [eval] nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
-    ./in.cue:106:11
+    ./in.cue:112:11
 [eval] nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
-    ./in.cue:110:11
+    ./in.cue:116:11
 [eval] nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
-    ./in.cue:114:8
-    ./in.cue:123:11
-    ./in.cue:123:15
+    ./in.cue:120:8
+    ./in.cue:129:11
+    ./in.cue:129:15
 [eval] embeddedDisjunction.conjunction.t2: 3 errors in empty disjunction:
 embeddedDisjunction.conjunction.t2.a: field not allowed:
-    ./in.cue:151:7
+    ./in.cue:157:7
 embeddedDisjunction.conjunction.t2.c: field not allowed:
-    ./in.cue:166:12
+    ./in.cue:172:12
 embeddedDisjunction.conjunction.t2.z: field not allowed:
-    ./in.cue:152:7
+    ./in.cue:158:7
 -- out/eval/stats --
 Leaks:  25
-Freed:  421
-Reused: 394
+Freed:  454
+Reused: 427
 Allocs: 52
 Retain: 0
 
-Unifications: 291
-Conjuncts:    661
+Unifications: 312
+Conjuncts:    719
 Disjuncts:    32
 
-NumCloseIDs: 165
+NumCloseIDs: 181

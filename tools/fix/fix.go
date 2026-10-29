@@ -510,22 +510,6 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 			// Convert: foo: X={x: X.a, y: 1}
 			// To: foo: {let X = self; x: X.a; y: 1}
 
-			// The explicitopen rewrite may have wrapped the value in a
-			// builtin, X=__closeAll({...}). The let binds X to self outside
-			// that wrapper, and from inside the builtin's argument a
-			// comprehension guard that reads a field through X resolves
-			// only when a conjunct outside the wrapper supplies the field;
-			// a value the wrapped struct alone declares, a default
-			// included, leaves the guard with "undefined field". Binding
-			// the let inside the wrapper instead would be worse: there self
-			// sees no outside conjunct at all. Such guards are marked.
-			for _, s := range wrappedStructs(alias.Expr) {
-				for _, comp := range guardsThroughAliases(s, []*ast.Alias{alias}) {
-					ast.AddComment(comp, todoComment(
-						"the guard below reads a field through the alias, bound to self outside the wrapper builtin, so it resolves only when a conjunct outside the wrapper supplies that field; declared in the wrapped struct alone, it fails with \"undefined field\"."))
-				}
-			}
-
 			// A value that is not a StructLit, as in V=[{a?: V}], is wrapped
 			// in one: {let V = self, [{a?: V}]}. References to the enclosing
 			// field resolved against the original value node, so point them
@@ -555,31 +539,4 @@ func fixAliasV2Pass(f *ast.File) (result *ast.File, hasChanges bool) {
 	}
 
 	return result, hasChanges
-}
-
-// wrappedStructs returns the struct literals anywhere in expr that a
-// wrapper builtin (close, __closeAll, __reclose) encloses, the operands
-// of a disjunction included.
-func wrappedStructs(expr ast.Expr) []*ast.StructLit {
-	var out []*ast.StructLit
-	ast.Walk(expr, func(n ast.Node) bool {
-		call, ok := n.(*ast.CallExpr)
-		if !ok || len(call.Args) != 1 {
-			return true
-		}
-		fn, ok := call.Fun.(*ast.Ident)
-		if !ok {
-			return true
-		}
-		switch fn.Name {
-		case "close", "__closeAll", "__reclose":
-		default:
-			return true
-		}
-		if s, ok := call.Args[0].(*ast.StructLit); ok {
-			out = append(out, s)
-		}
-		return true
-	}, nil)
-	return out
 }

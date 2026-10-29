@@ -374,10 +374,6 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 					}
 				}
 
-				if comp := compReferringToStruct(n); comp != nil {
-					ast.AddComment(comp, todoComment(
-						"a wrapper builtin evaluates its argument on its own, so the guard below stays incomplete if the field it depends on is unified into the struct from elsewhere."))
-				}
 				// The wrapper takes the place of the literal being replaced,
 				// which n is the sole embedding of when its braces were
 				// dropped above.
@@ -547,33 +543,6 @@ func reaches(expr ast.Node, labels []string, s *ast.StructLit) bool {
 		}
 	}
 	return false
-}
-
-// compReferringToStruct returns a comprehension among the declarations of
-// s which refers to a field of s in one of its clauses, if any. A wrapper
-// builtin evaluates its argument on its own, so such a guard sees the field
-// without the conjuncts the struct is unified with, and does not resolve
-// when the field is concrete only through them.
-func compReferringToStruct(s *ast.StructLit) *ast.Comprehension {
-	for _, d := range s.Elts {
-		c, ok := d.(*ast.Comprehension)
-		if !ok {
-			continue
-		}
-		for _, cl := range c.Clauses {
-			found := false
-			ast.Walk(cl, func(n ast.Node) bool {
-				if id, ok := n.(*ast.Ident); ok && id.Scope == ast.Node(s) {
-					found = true
-				}
-				return !found
-			}, nil)
-			if found {
-				return c
-			}
-		}
-	}
-	return nil
 }
 
 // isCloseCall reports whether call is a call to the close builtin.

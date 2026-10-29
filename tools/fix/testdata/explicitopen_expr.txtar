@@ -957,9 +957,8 @@ nestedOpenLitPath: {
 }
 
 // A wrapper unifies the struct where the call appears, so a comprehension
-// guard which depends on what the struct is unified with resolves inside
-// it, under __closeAll and __reclose alike. The rewrite still marks such a
-// guard as staying incomplete.
+// guard which depends on what the struct is unified with resolves under
+// __closeAll and __reclose alike.
 wrapperComp: {
 	#A: {a: 1}
 	x: {b: int}
@@ -1233,17 +1232,17 @@ selectorDef: {
 [eval] nestedOpenLitPath.t2.a.foo.other: field not allowed:
     ./in.cue:942:19
 [incomplete] wrapperComp.v: incomplete bool: bool:
-    ./in.cue:952:13
+    ./in.cue:951:13
 [incomplete] wrapperComp.w: incomplete bool: bool:
-    ./in.cue:953:12
+    ./in.cue:952:12
 [incomplete] compAdmitsNothing.s: incomplete bool: bool:
-    ./in.cue:962:9
+    ./in.cue:961:9
 [eval] compAdmitsNothing.out.f.b: field not allowed:
-    ./in.cue:964:25
+    ./in.cue:963:25
 [eval] compExtends.t2.foo.other: field not allowed:
-    ./in.cue:979:16
+    ./in.cue:978:16
 [eval] selectorDef.t2.z: field not allowed:
-    ./in.cue:992:11
+    ./in.cue:991:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -2249,20 +2248,12 @@ nestedOpenLitPath: {
 }
 
 // A wrapper unifies the struct where the call appears, so a comprehension
-// guard which depends on what the struct is unified with resolves inside
-// it, under __closeAll and __reclose alike. The rewrite still marks such a
-// guard as staying incomplete.
+// guard which depends on what the struct is unified with resolves under
+// __closeAll and __reclose alike.
 wrapperComp: {
 	#A: {a: 1}
 	x:  {b: int}
-	v: __closeAll({
-		#A...
-		c: bool
-		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so the
-		// guard below stays incomplete if the field it depends on is unified into the
-		// struct from elsewhere.
-		if c {d: 1}
-	})
+	v:  __closeAll({#A..., c: bool, if c {d: 1}})
 	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
 	// the struct if one of the spread values in it is a closed struct.
 	w: __reclose({
@@ -2271,9 +2262,6 @@ wrapperComp: {
 		// the enclosing struct also declares.
 		x...
 		c: bool
-		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so the
-		// guard below stays incomplete if the field it depends on is unified into the
-		// struct from elsewhere.
 		if c {d: 1}
 	})
 	t: v & {c: true}       @test(eq, {a: 1, c: true, d: 1})

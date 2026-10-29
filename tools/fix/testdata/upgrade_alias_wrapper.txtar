@@ -6,9 +6,8 @@
 # argument where the call appears, so a guard that reads a field through X
 # resolves there, whether a conjunct outside the wrapper supplies the field
 # or the wrapped struct alone declares it, as the defaults of mode and #Dep
-# do, under __closeAll and __reclose alike. The rewrite still marks every
-# such guard as failing when the wrapped struct alone declares the field.
-# A field value reading the same path (y) resolves the same way.
+# do, under __closeAll and __reclose alike. A field value reading the same
+# path (y) resolves the same way.
 
 -- cue.mod/module.cue --
 module: "upgrade.test"
@@ -87,18 +86,9 @@ app: {
 		mode: "a" | "b" | *"c"
 		deps: default: #Dep
 		y: X.deps.default.kind
-		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
-		// outside the wrapper builtin, so it resolves only when a conjunct outside the
-		// wrapper supplies that field; declared in the wrapped struct alone, it fails
-		// with "undefined field".
 		if X.deps.default.kind == "k" {
 			other: int
 		}
-
-		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
-		// outside the wrapper builtin, so it resolves only when a conjunct outside the
-		// wrapper supplies that field; declared in the wrapped struct alone, it fails
-		// with "undefined field".
 		if X.mode == "a" {
 			extra: string
 		}
@@ -107,33 +97,13 @@ app: {
 
 // A wrapper inside a disjunction, and a guard that reads through a let of
 // the alias, resolve the same way.
-disj: {
-	let X = self
-	*__closeAll({
-		#Base...
-		mode: *"c" | string
-		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
-		// outside the wrapper builtin, so it resolves only when a conjunct outside the
-		// wrapper supplies that field; declared in the wrapped struct alone, it fails
-		// with "undefined field".
-		if X.mode == "c" {o: 1}
-	}) | close({kind: string})
-}
+disj: {let X = self, *__closeAll({#Base..., mode: *"c" | string, if X.mode == "c" {o: 1}}) | close({kind: string})}
 viaLet: {
 	let X = self
 	__closeAll({
 		#Base...
 		mode: *"c" | string
 		let m = X.mode
-
-		// TODO(cue-fix): a wrapper builtin evaluates its argument on its own, so the
-		// guard below stays incomplete if the field it depends on is unified into the
-		// struct from elsewhere.
-		//
-		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
-		// outside the wrapper builtin, so it resolves only when a conjunct outside the
-		// wrapper supplies that field; declared in the wrapped struct alone, it fails
-		// with "undefined field".
 		if m == "c" {o: 1}
 	})
 }
@@ -149,10 +119,6 @@ other: {
 		// the enclosing struct also declares.
 		base...
 		mode: *"c" | string
-		// TODO(cue-fix): the guard below reads a field through the alias, bound to self
-		// outside the wrapper builtin, so it resolves only when a conjunct outside the
-		// wrapper supplies that field; declared in the wrapped struct alone, it fails
-		// with "undefined field".
 		if X.mode == "c" {o: 1}
 	})
 }

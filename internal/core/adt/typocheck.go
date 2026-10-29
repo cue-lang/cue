@@ -247,6 +247,11 @@ type refInfo struct {
 	// isRecursive indicates this is recursively closed.
 	isRecursive bool
 
+	// reclose indicates the struct literal of a __reclose call, which is
+	// closed as the values it embeds through a spread are closed; see
+	// [nodeContext.recloseEmbedded].
+	reclose bool
+
 	// conjunctOpened indicates this resolver is from an opened conjunction
 	// operand ((A & B)...). It must not use the parent==0 shortcut in
 	// hasEvidenceForOne, so that mutual constraints between conjunction
@@ -679,14 +684,42 @@ func isClosedLiteral(s *StructLit) bool {
 // literal. Unlike the argument of close, the literal keeps the recursive
 // closedness of an enclosing definition, which id carries.
 func (n *nodeContext) closeLiteral(s *StructLit, id CloseInfo) CloseInfo {
+	closes := ClosesOnce
+	if id.FromDef {
+		closes = ClosesRecursively
+	}
+	return n.closedScope(s, id, closes, false)
+}
+
+// closedScope adds the requirement group of the struct literal s, which is
+// closed where it is written: as #{...} or by a builtin marked
+// [Builtin.Closes]. Each field of the node must be declared in s, or in
+// every struct within it when closes is recursive. A spread of s opens it
+// again. A __reclose literal, for which reclose is set, is closed only once
+// a value it embeds is, beyond any closing of a close call it wraps; see
+// [nodeContext.recloseEmbedded].
+//
+// The struct enclosing s stays the outer struct of the fields of s, as it
+// is for a reference to a closed struct, so that a field the enclosing
+// struct declares beside s counts as declared within that outer struct.
+func (n *nodeContext) closedScope(s *StructLit, id CloseInfo, closes Closing, reclose bool) CloseInfo {
 	if n.ctx.OpenDef {
 		return id
 	}
+	outer := id.outerID
 	k := len(n.reqDefIDs)
 	id = n.newReq(s, id, defStruct)
 	if len(n.reqDefIDs) > k {
-		n.reqDefIDs[k].ignore = false
+		r := &n.reqDefIDs[k]
+		r.ignore = id.Opened || closes == NoClosing
+		// Unlike the FromDef default of newReq, a close call inside a
+		// definition closes its literal at one level only.
+		r.isRecursive = closes == ClosesRecursively
+		r.parent = outer
+		r.conjunctOpened = id.ConjunctOpened
+		r.reclose = reclose && !id.Opened && !id.ConjunctOpened
 	}
+	id.outerID = outer
 	return id
 }
 

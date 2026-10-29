@@ -83,39 +83,86 @@ func (v *Vertex) IsRecursivelyClosed() bool {
 	return v.ClosedRecursive
 }
 
-// embedClosedness represents the strongest closedness level among vertices
-// embedded through a spread operator. Higher values take precedence.
-type embedClosedness uint8
-
-const (
-	embedOpen              embedClosedness = iota
-	embedNonRecursivelyClosed              // from close()
-	embedRecursivelyClosed                 // from definitions
-)
-
-// setEmbedClosedness upgrades the embed closedness level based on the
-// closedness of arc. Higher levels take precedence; never downgrades.
-func (n *nodeContext) setEmbedClosedness(arc *Vertex) {
+// closing returns how v is closed, as a builtin marked [Builtin.Closes]
+// closes its argument.
+func (v *Vertex) closing() Closing {
 	switch {
-	case arc.ClosedRecursive:
-		n.embedClosedness = embedRecursivelyClosed
-	case arc.ClosedNonRecursive && n.embedClosedness < embedNonRecursivelyClosed:
-		n.embedClosedness = embedNonRecursivelyClosed
+	case v.ClosedRecursive:
+		return ClosesRecursively
+	case v.ClosedNonRecursive:
+		return ClosesOnce
+	}
+	return NoClosing
+}
+
+// markClosed marks v as closed by a call to a builtin.
+func (v *Vertex) markClosed(closes Closing) {
+	switch closes {
+	case ClosesOnce:
+		v.ClosedNonRecursive = true
+	case ClosesRecursively:
+		v.ClosedRecursive = true
 	}
 }
 
-// ApplyEmbedClosedness sets ClosedRecursive or ClosedNonRecursive on v
-// based on the strongest closedness level among vertices embedded through
-// a spread operator. This is used by __reclose.
-func (v *Vertex) ApplyEmbedClosedness() {
-	if v.state == nil {
+// embedClosed records that a value closed as closes is embedded in the node
+// through a spread from the scope id. The node is closed as strongly as any
+// value it embeds: [Vertex.ApplyEmbedClosedness] applies that to the result
+// of the __reclose builtin, and [nodeContext.recloseEmbedded] to a __reclose
+// literal enclosing the spread.
+func (n *nodeContext) embedClosed(id CloseInfo, closes Closing) {
+	n.embedClosedness = max(n.embedClosedness, closes)
+	n.recloseEmbedded(id, closes)
+}
+
+// recloseEmbedded closes the __reclose literal enclosing the scope id, if
+// any, as a value embedded in it through a spread is closed: the literal is
+// closed as strongly as any value it embeds. A spread of a close call or of
+// another __reclose literal opens that scope and passes the closing on to
+// the __reclose literal enclosing it in turn, while a closed scope which is
+// not opened bounds the embedding.
+func (n *nodeContext) recloseEmbedded(id CloseInfo, closes Closing) {
+	if closes == NoClosing || n.ctx.OpenDef || id.opID != n.ctx.opID {
 		return
 	}
-	switch v.state.embedClosedness {
-	case embedRecursivelyClosed:
-		v.ClosedRecursive = true
-	case embedNonRecursivelyClosed:
-		v.ClosedNonRecursive = true
+	// The containment chain leads from the scope of the spread through the
+	// scopes enclosing it, the groups of values whose conjuncts are
+	// scheduled here included, so that a definition named by a value
+	// spread into the literal closes it however the value is reached: a
+	// let or a field bound to the definition is spread before its own
+	// closedness is known.
+	for p := id.defID; p != 0; p = n.ctx.containments[p].id {
+		i := n.reqIndexByID(p)
+		if i < 0 {
+			return
+		}
+		r := &n.reqDefIDs[i]
+		if r.kind != defStruct {
+			continue
+		}
+		if !r.reclose {
+			if r.ignore {
+				continue
+			}
+			return
+		}
+		if r.ignore || (closes == ClosesRecursively && !r.isRecursive) {
+			n.invalidateReqSets()
+		}
+		r.ignore = false
+		if closes == ClosesRecursively {
+			r.isRecursive = true
+		}
+		n.node.markClosed(closes)
+		return
+	}
+}
+
+// ApplyEmbedClosedness closes v as strongly as any value embedded in it
+// through a spread operator is closed. This is used by __reclose.
+func (v *Vertex) ApplyEmbedClosedness() {
+	if v.state != nil {
+		v.markClosed(v.state.embedClosedness)
 	}
 }
 

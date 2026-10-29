@@ -199,6 +199,7 @@ _#defs: "/$defs/named/properties/nested": null | bool | number | string | [...] 
 }
 -- out/decode/testerr/err-labels --
 labels.env: conflicting values 1 and string (mismatched types int and string):
+    generated.cue:3:24
     generated.cue:7:21
     test/err-labels.json:4:16
 -- out/decode/testerr/err-misspelled --

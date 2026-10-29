@@ -346,11 +346,10 @@ type nodeContextState struct {
 	// See [TryClause.yield].
 	tryBody *tryBody
 
-	// embedClosedness tracks the strongest closedness level among vertices
-	// embedded through a spread operator. It is used to determine whether
-	// __reclose or __closeAll wrapping is needed. Higher values take
-	// precedence; use setEmbedClosedness to update.
-	embedClosedness embedClosedness
+	// embedClosedness is the strongest closing among the values embedded
+	// through a spread operator, which __reclose applies to its result.
+	// Use embedClosed to update it.
+	embedClosedness Closing
 
 	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
 	// progress.

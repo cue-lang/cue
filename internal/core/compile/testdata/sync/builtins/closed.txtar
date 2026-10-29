@@ -138,8 +138,7 @@ spreadOpen: {
 
 // issue4535: a comprehension at the top level of the closed struct reads a
 // field as unified where the call appears, not as the argument evaluates on
-// its own, just as the struct does without close. The argument is instead
-// evaluated on its own, so the guard reads a non-concrete field.
+// its own, just as the struct does without close.
 // https://cuelang.org/issue/4535
 issue4535: {
 	x: {k: int, if k == 1 {y: 1}}

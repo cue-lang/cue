@@ -1024,19 +1024,19 @@ closednessSiblingError: {
 }
 -- out/eval/stats --
 Leaks:  66
-Freed:  902
-Reused: 850
+Freed:  900
+Reused: 848
 Allocs: 118
 Retain: 0
 
-Unifications: 798
-Conjuncts:    1584
+Unifications: 796
+Conjuncts:    1578
 Disjuncts:    84
 Notifications: 7
 
-NumCloseIDs: 444
+NumCloseIDs: 441
 
-ConjunctInfos:       1160
+ConjunctInfos:       1156
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2

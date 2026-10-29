@@ -227,6 +227,7 @@
 }
 -- out/decode/testerr/err-bundled --
 bundled.z: conflicting values 1 and bool (mismatched types int and bool):
+    generated.cue:3:17
     generated.cue:6:22
     generated.cue:27:6
     test/err-bundled.json:3:14
@@ -252,6 +253,7 @@ closed.x: field not allowed:
     test/err-closed.json:3:14
 -- out/decode/testerr/err-default --
 defaults.d: conflicting values "s" and int (mismatched types string and int):
+    generated.cue:3:17
     generated.cue:4:22
     generated.cue:34:6
     test/err-default.json:3:14

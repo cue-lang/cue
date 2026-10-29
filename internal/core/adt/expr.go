@@ -3142,6 +3142,26 @@ func (x *Builtin) applyResultTypes(c *OpContext, v Value) Value {
 	return w
 }
 
+// Closing is how a builtin marked with [Builtin.Closes] closes its argument.
+type Closing uint8
+
+const (
+	NoClosing Closing = iota
+
+	// ClosesOnce closes the argument at one level, as close does.
+	ClosesOnce
+
+	// ClosesRecursively closes the argument and every struct within it, as
+	// __closeAll does.
+	ClosesRecursively
+
+	// ClosesByEmbedding closes the argument as the values it embeds through
+	// the spread operator are closed, as __reclose does: recursively for a
+	// definition, at one level for a value closed by close, and not at all
+	// otherwise.
+	ClosesByEmbedding
+)
+
 // A Builtin is a value representing a native function call.
 type Builtin struct {
 	// TODO:  make these values for better type checking.
@@ -3169,6 +3189,14 @@ type Builtin struct {
 	// Its Func receives such an argument as a [Disjunction], defaults and
 	// all, where other builtins report it as ambiguous.
 	PerDisjunct bool
+
+	// Closes marks a builtin which returns its struct or list argument
+	// closed, at one level or recursively. A call which applies it to a
+	// struct literal is unified where the call appears as that literal,
+	// closed, rather than evaluating the literal on its own first, so that
+	// a comprehension in the literal reads the fields unified with it; see
+	// [nodeContext.scheduleClosedLiteral].
+	Closes Closing
 
 	Func func(call BuiltinCallContext) Expr
 

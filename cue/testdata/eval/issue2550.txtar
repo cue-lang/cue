@@ -18,13 +18,13 @@ if bar.missing == "x" {
     ./in.cue:2:1
 -- out/eval/stats --
 Leaks:  0
-Freed:  5
+Freed:  3
 Reused: 0
-Allocs: 5
+Allocs: 3
 Retain: 0
 
-Unifications: 5
-Conjuncts:    6
+Unifications: 3
+Conjuncts:    2
 Disjuncts:    0
 
-NumCloseIDs: 2
+NumCloseIDs: 1

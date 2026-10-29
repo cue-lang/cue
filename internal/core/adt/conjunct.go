@@ -204,6 +204,14 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	case Evaluator:
 		n.unshare()
 
+		call, isCall := x.(*CallExpr)
+		if isCall {
+			if lit, closes, reclose := closedLiteral(call); lit != nil {
+				n.scheduleClosedLiteral(env, lit, closes, reclose, id)
+				return
+			}
+		}
+
 		// Call expressions may end up in an infinite recursion if we do not
 		// ensure that there is non-cyclic data to propagate the evaluation.
 		// We therefore postpone call expressions until we have evidence that
@@ -216,7 +224,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		//
 		// TODO: this is rather hacky. We probably need a better solution
 		// in a future iteration of the evaluator.
-		if call, ok := x.(*CallExpr); ok && id.CycleType == IsCyclic && !n.hasNonCycle && !n.hasNonCyclic {
+		if isCall && id.CycleType == IsCyclic && !n.hasNonCycle && !n.hasNonCyclic {
 			if slices.ContainsFunc(call.Args, exprHasResolver) {
 				n.hasAncestorCycle = true
 				n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{c: c})
@@ -231,6 +239,83 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	}
 
 	n.ctx.stats.Conjuncts++
+}
+
+// closedLiteral returns the struct literal a call closes, when it applies a
+// builtin marked [Builtin.Closes] to a struct literal directly, and how.
+// For __reclose, which may wrap a close call or be wrapped in one, reclose
+// is true and closes is the closing the literal has before the values it
+// embeds are known.
+func closedLiteral(call *CallExpr) (lit *StructLit, closes Closing, reclose bool) {
+	b := closingBuiltin(call)
+	if b == nil {
+		return nil, NoClosing, false
+	}
+	closes = b.Closes
+	arg := call.Args[0]
+	if inner, ok := arg.(*CallExpr); ok {
+		// close nests with __reclose either way around, and around
+		// __closeAll, as the explicitopen rewrite emits them.
+		ib := closingBuiltin(inner)
+		if ib == nil {
+			return nil, NoClosing, false
+		}
+		switch {
+		case closes == ClosesOnce && ib.Closes == ClosesByEmbedding:
+			closes, reclose = ClosesOnce, true
+		case closes == ClosesByEmbedding && ib.Closes == ClosesOnce:
+			closes, reclose = ClosesOnce, true
+		case closes == ClosesOnce && ib.Closes == ClosesRecursively:
+			closes = ClosesRecursively
+		default:
+			return nil, NoClosing, false
+		}
+		arg = inner.Args[0]
+	} else if closes == ClosesByEmbedding {
+		closes, reclose = NoClosing, true
+	}
+	lit, ok := arg.(*StructLit)
+	if !ok {
+		return nil, NoClosing, false
+	}
+	// Outside the explicitopen experiment, __closeAll and __reclose are
+	// errors, which the builtins themselves report.
+	if (reclose || closes == ClosesRecursively) && !Pos(lit).Experiment().ExplicitOpen {
+		return nil, NoClosing, false
+	}
+	return lit, closes, reclose
+}
+
+// closingBuiltin returns the builtin marked [Builtin.Closes] which call
+// applies to a single positional argument, or nil.
+func closingBuiltin(call *CallExpr) *Builtin {
+	b, ok := call.Fun.(*Builtin)
+	if !ok || b.Closes == NoClosing || len(call.Args) != 1 || call.Partial || call.hasArgLabels() {
+		return nil
+	}
+	return b
+}
+
+// scheduleClosedLiteral unifies lit, the struct literal a call to close,
+// __closeAll or __reclose closes, as that call's result: a struct scope
+// which is checked, like a closed struct literal, #{...}, with the node
+// marked closed. The literal is not evaluated on its own first, as a
+// builtin's argument otherwise is, so a comprehension in it reads the fields
+// unified with it here, just as it does without the call.
+//
+// The literal of __reclose is closed only as the values it embeds through a
+// spread are closed, which [nodeContext.recloseEmbedded] applies as they are
+// scheduled; closes is then the closing of a close call it wraps, if any.
+func (n *nodeContext) scheduleClosedLiteral(env *Environment, lit *StructLit, closes Closing, reclose bool, id CloseInfo) {
+	// A spread of the call, close({...})..., opens the literal again, but
+	// it closes an enclosing __reclose literal as the call would.
+	if id.Opened || id.ConjunctOpened {
+		n.embedClosed(id, closes)
+	} else {
+		n.node.markClosed(closes)
+	}
+	id = n.closedScope(lit, id, closes, reclose)
+	n.scheduleStruct(env, lit, id)
 }
 
 // exprHasResolver checks if an expression contains a Resolver (reference).
@@ -413,7 +498,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.FromDef = false
 	}
 	if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
-		n.setEmbedClosedness(arc)
+		n.embedClosed(closeInfo, arc.closing())
 	}
 
 	// disjunctions, we need to dereference he underlying node.
@@ -470,10 +555,11 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	// itself, such as a sibling field referring to _a, does not close.
 	x := c.Expr()
 	if namesDefinition(x, closeInfo) || arc.Label.IsDef() || crossesDefinition(n.ctx, c.Env, x, arc) {
-		if c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened {
+		if (c.CloseInfo.Opened || c.CloseInfo.ConjunctOpened) && !arc.ClosedRecursive {
 			// Definitions are always recursively closed, even if arc
-			// doesn't have ClosedRecursive set yet at this point.
-			n.embedClosedness = embedRecursivelyClosed
+			// doesn't have ClosedRecursive set yet at this point; when it
+			// is set, the call above already recorded it.
+			n.embedClosed(closeInfo, ClosesRecursively)
 		}
 		n.isDef = true
 		// n.node.ClosedRecursive = true // TODO: should we set this here?

@@ -1308,13 +1308,13 @@ issue2685: {
     ./in.cue:461:20
 -- out/eval/stats --
 Leaks:  246
-Freed:  2800
-Reused: 2757
+Freed:  2742
+Reused: 2699
 Allocs: 289
 Retain: 0
 
-Unifications: 867
-Conjuncts:    3059
+Unifications: 843
+Conjuncts:    3011
 Disjuncts:    1333
 Notifications: 8
 

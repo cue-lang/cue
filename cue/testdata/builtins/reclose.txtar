@@ -124,7 +124,7 @@ nonStructDefinitions: {
 	// errors because of regular field + embedded scalar
 	t2: err: a & {b: 1}  @test(err, code=eval,
 		contains="conflicting values %s and %s (mismatched types %s and %s)",
-		args=[{b:1}, 1, struct, int], pos=[-9:8, 0:11, 0:15])
+		args=[{b:1}, 1, struct, int], pos=[-9:8, -7:15, -6:3, 0:11, 0:15])
 }
 
 // The vertex spread into a __reclose'd struct may elsewhere be unified
@@ -199,28 +199,25 @@ spreadClose: {
 
 // close around a __reclose literal keeps the recursive closing a spread
 // definition gives the literal, and __reclose around a close call keeps
-// its one-level closing when no spread value is closed. The nested call
-// instead closes the evaluated result of the inner call at one level, or
-// not at all.
+// its one-level closing when no spread value is closed.
 closeWrapsReclose: {
 	#D: {a: {}}
-	t1: err: close(__reclose({#D...})) & {a: z: 1} @test(eq, {a: {z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed")
-	t2: err: __reclose(close({})) & {z: 1} @test(eq, {z: 1}) @test(err:todo, at=z, code=eval, contains="field not allowed")
+	t1: err: close(__reclose({#D...})) & {a: z: 1} @test(err, code=eval, path=a.z, contains="field not allowed", pos=[0:43])
+	t2: err: __reclose(close({})) & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:35])
 }
 
 // issue4535: a comprehension at the top level of the closed struct reads a
 // field as unified where the call appears, as it does for close, and the
 // closing the spread definition gives the struct applies there as well.
-// The argument is instead evaluated on its own, so the guard reads a
-// non-concrete field. https://cuelang.org/issue/4535
+// https://cuelang.org/issue/4535
 issue4535: {
 	#D: {k: int, y?: int}
 	s: __reclose({#D..., k: _, if k == 1 {y: 1}})
-	t: s & {k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
-	denied: s & {k: 1, z: 2} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(err:todo, at=z, code=eval, contains="field not allowed")
+	t: s & {k: 1} @test(eq, {k: 1, y: 1})
+	denied: s & {k: 1, z: 2} @test(err, at=z, code=eval, contains="field not allowed", pos=[0:21])
 	// A close call wrapping the __reclose call, as the explicitopen rewrite
 	// emits for a close at field-value level, is unified the same way.
-	wrapped: close(__reclose({#D..., k: _, if k == 1 {y: 1}})) & {k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
+	wrapped: close(__reclose({#D..., k: _, if k == 1 {y: 1}})) & {k: 1} @test(eq, {k: 1, y: 1})
 }
 -- out/errors.txt --
 [eval] recursive.t1.err.extra: field not allowed:
@@ -247,6 +244,8 @@ issue4535: {
     ./in.cue:111:11
 [eval] nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
     ./in.cue:115:8
+    ./in.cue:117:15
+    ./in.cue:118:3
     ./in.cue:124:11
     ./in.cue:124:15
 [eval] embeddedDisjunction.conjunction.t2: 3 errors in empty disjunction:
@@ -264,32 +263,26 @@ embeddedDisjunction.conjunction.t2.z: field not allowed:
     ./in.cue:194:19
 [eval] spreadClose.t2.err.q: field not allowed:
     ./in.cue:195:16
-[incomplete] non-concrete value int in operand to ==:
-    ./in.cue:217:32
-    ./in.cue:216:10
-    ./in.cue:217:26
-[incomplete] non-concrete value int in operand to ==:
-    ./in.cue:217:32
-    ./in.cue:216:10
-    ./in.cue:217:26
-[incomplete] non-concrete value int in operand to ==:
-    ./in.cue:217:32
-    ./in.cue:216:10
-    ./in.cue:217:26
-[incomplete] non-concrete value int in operand to ==:
-    ./in.cue:222:44
-    ./in.cue:216:10
-    ./in.cue:222:38
+[eval] closeWrapsReclose.t1.err.a.z: field not allowed:
+    ./in.cue:204:43
+[eval] closeWrapsReclose.t2.err.z: field not allowed:
+    ./in.cue:205:35
+[incomplete] issue4535.s: non-concrete value int in operand to ==:
+    ./in.cue:214:32
+    ./in.cue:213:10
+    ./in.cue:214:26
+[eval] issue4535.denied.z: field not allowed:
+    ./in.cue:216:21
 -- out/eval/stats --
-Leaks:  31
-Freed:  622
-Reused: 581
-Allocs: 72
+Leaks:  19
+Freed:  314
+Reused: 286
+Allocs: 47
 Retain: 0
 
-Unifications: 429
-Conjuncts:    1042
-Disjuncts:    32
-Notifications: 6
+Unifications: 281
+Conjuncts:    527
+Disjuncts:    16
+Notifications: 3
 
-NumCloseIDs: 254
+NumCloseIDs: 169

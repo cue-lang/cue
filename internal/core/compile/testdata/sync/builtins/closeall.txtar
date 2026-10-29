@@ -64,8 +64,7 @@ spreadClosed: {
 // close around a __closeAll literal, as the explicitopen rewrite emits for
 // a close call around a struct embedding a definition, keeps the recursive
 // closing, and a comprehension in the literal reads the fields unified
-// with the call. The nested call instead closes the evaluated result of
-// the inner call at one level only, and evaluates the literal on its own.
+// with the call.
 closeWrapsCloseAll: {
 	#D: {x: y: int}
 	foo: close({b: {}})
@@ -77,9 +76,8 @@ closeWrapsCloseAll: {
 }
 
 // issue4535: a comprehension at the top level of the closed struct reads a
-// field as unified where the call appears, as it does for close. The
-// argument is instead evaluated on its own, so the guard reads a
-// non-concrete field. https://cuelang.org/issue/4535
+// field as unified where the call appears, as it does for close.
+// https://cuelang.org/issue/4535
 issue4535: {
 	#D: {k: int, y?: int}
 	s: __closeAll({#D, k: _, if k == 1 {y: 1}})

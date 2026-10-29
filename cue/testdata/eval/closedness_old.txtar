@@ -816,13 +816,13 @@ indirect: {
     ./reroot.cue:24:7
 -- out/eval/stats --
 Leaks:  0
-Freed:  752
-Reused: 716
-Allocs: 36
+Freed:  682
+Reused: 649
+Allocs: 33
 Retain: 0
 
-Unifications: 718
-Conjuncts:    1850
+Unifications: 682
+Conjuncts:    1776
 Disjuncts:    0
 
-NumCloseIDs: 641
+NumCloseIDs: 623

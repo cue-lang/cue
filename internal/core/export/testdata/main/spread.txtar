@@ -28,8 +28,8 @@ spread: {
 [spread i q]
 [spread i n]
 [spread j]
-[spread j s]
 [spread j r]
+[spread j s]
 -- out/value-v3 --
 == Simplified
 {

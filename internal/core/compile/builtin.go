@@ -131,6 +131,7 @@ var lenBuiltin = &adt.Builtin{
 
 var closeBuiltin = &adt.Builtin{
 	Name:        "close",
+	Closes:      adt.ClosesOnce,
 	Params:      []adt.Param{topParam},
 	Result:      adt.TopKind,
 	PerDisjunct: true,
@@ -155,6 +156,7 @@ var closeBuiltin = &adt.Builtin{
 
 var closeAllBuiltin = &adt.Builtin{
 	Name:        "__closeAll",
+	Closes:      adt.ClosesRecursively,
 	Params:      []adt.Param{topParam},
 	Result:      adt.TopKind,
 	PerDisjunct: true,
@@ -186,6 +188,7 @@ var closeAllBuiltin = &adt.Builtin{
 
 var recloseBuiltin = &adt.Builtin{
 	Name:        "__reclose",
+	Closes:      adt.ClosesByEmbedding,
 	Params:      []adt.Param{topParam},
 	Result:      adt.TopKind,
 	PerDisjunct: true,
@@ -202,7 +205,7 @@ var recloseBuiltin = &adt.Builtin{
 		case *adt.CallExpr:
 			// Allow __reclose(close(...)) so that __reclose can wrap
 			// a close() call and conditionally add recursive closing.
-			if b, ok := x.Fun.(*adt.Builtin); !ok || b.Name != "close" {
+			if b, ok := x.Fun.(*adt.Builtin); !ok || b.Closes != adt.ClosesOnce {
 				return c.NewErrf("argument must be a struct or list literal, or a close() call")
 			}
 			if src := x.Source(); src == nil || !src.Pos().Experiment().ExplicitOpen {

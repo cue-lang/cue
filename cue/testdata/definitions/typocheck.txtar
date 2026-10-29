@@ -1023,10 +1023,10 @@ closednessSiblingError: {
 	v: z: 1 @test(err, code=eval, contains="field not allowed", pos=[0:5])
 }
 -- out/eval/stats --
-Leaks:  73
-Freed:  895
-Reused: 843
-Allocs: 125
+Leaks:  66
+Freed:  902
+Reused: 850
+Allocs: 118
 Retain: 0
 
 Unifications: 798

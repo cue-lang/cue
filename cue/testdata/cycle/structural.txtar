@@ -987,10 +987,10 @@ b12: evalv3 shows a tail disjunction in the innermost list1 node; evalv2 shows n
 
 n4: field ordering differs between evalv2 and evalv3.
 -- out/eval/stats --
-Leaks:  96
-Freed:  714
-Reused: 644
-Allocs: 166
+Leaks:  95
+Freed:  715
+Reused: 645
+Allocs: 165
 Retain: 0
 
 Unifications: 541

@@ -105,10 +105,10 @@ objects: hashed: [ID=string]: {kind: "hashed", ...}
 objects: plain: a: spec: ref:        objects.hashed.b.metadata.name
 objects: hashed: b: data: foo:       "bar"
 -- out/eval/stats --
-Leaks:  77
-Freed:  157
-Reused: 137
-Allocs: 97
+Leaks:  67
+Freed:  167
+Reused: 144
+Allocs: 90
 Retain: 0
 
 Unifications: 193

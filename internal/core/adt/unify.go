@@ -676,6 +676,12 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 	// over the arcs, such as a for clause whose guard finalizes this node.
 	notPresent := func(a *Vertex) bool { return a.ArcType == ArcNotPresent }
 	if slices.ContainsFunc(n.node.Arcs, notPresent) {
+		// reclaimTempBuffers does not reach a dropped arc, so reclaim it here.
+		for _, a := range n.node.Arcs {
+			if notPresent(a) {
+				n.ctx.reclaimRecursive(a)
+			}
+		}
 		n.node.Arcs = slices.DeleteFunc(slices.Clone(n.node.Arcs), notPresent)
 	}
 

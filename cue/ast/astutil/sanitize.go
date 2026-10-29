@@ -96,6 +96,8 @@ func labelName(label ast.Label) string {
 //   - auto inserts imports associated with Idents
 //   - unshadows imports associated with idents
 //   - unshadows references for identifiers that were already resolved.
+//   - renames let clauses and postfix aliases named by a keyword, such as
+//     "in", along with their references.
 //
 // Deprecated: use [SanitizeFiles] to sanitize all files in a package together,
 // to avoid issues such as one file shadowing a builtin name in the package scope.
@@ -136,19 +138,58 @@ func sanitize(f *ast.File, names map[string]bool) error {
 	stack = stack[:0]
 	s = &scope{
 		errFn:      z.errf,
+		nameFn:     z.renameKeyword,
 		identFn:    z.handleIdent,
 		index:      make(map[string]entry),
 		scopeStack: &stack,
 	}
 	z.fileScope = s
 	ast.Walk(f, s.Before, nil)
+	// The walk has renamed the references, so the declarations must follow,
+	// even if it failed.
+	for id, name := range z.keywordAlts {
+		id.Name = name
+	}
 	if z.errs != nil {
 		return z.errs
 	}
 
 	z.cleanImports()
-
 	return z.errs
+}
+
+// declIdent returns the identifier declaring e if it is a let clause or
+// either half of a postfix alias, or nil otherwise.
+func declIdent(e entry) *ast.Ident {
+	switch x := e.link.(type) {
+	case *ast.LetClause:
+		return x.Ident
+	case *ast.PostfixAlias:
+		if e.field != nil {
+			return x.Label
+		}
+		return x.Field
+	}
+	return nil
+}
+
+// renameKeyword gives a let clause or postfix alias named by a keyword, which
+// the syntax does not accept as such a name, a new unique name. It is applied
+// to the declaration once the walk has renamed its references.
+func (z *sanitizer) renameKeyword(name string, e entry) {
+	id := declIdent(e)
+	if id == nil || !token.Lookup(name).IsKeyword() {
+		return
+	}
+	alt := z.uniqueName(name)
+	if z.keywordAlts == nil {
+		z.keywordAlts = make(map[*ast.Ident]string)
+	}
+	z.keywordAlts[id] = alt
+	if x, ok := e.link.(*ast.PostfixAlias); ok && id == x.Field {
+		// A reference to the shadowed field can use the alias too.
+		z.altMap[e.node] = alt
+	}
 }
 
 type sanitizer struct {
@@ -174,6 +215,10 @@ type sanitizer struct {
 	altMap    map[ast.Node]string
 	importMap map[string]*ast.ImportSpec
 
+	// keywordAlts holds the new names of the identifiers declaring let
+	// clauses and postfix aliases named by a keyword.
+	keywordAlts map[*ast.Ident]string
+
 	errs errors.Error
 }
 
@@ -181,7 +226,7 @@ func (z *sanitizer) errf(p token.Pos, msg string, args ...interface{}) {
 	z.errs = errors.Append(z.errs, errors.Newf(p, msg, args...))
 }
 
-func (z *sanitizer) addName(name string) {
+func (z *sanitizer) addName(name string, _ entry) {
 	z.names[name] = true
 }
 
@@ -293,6 +338,21 @@ func (z *sanitizer) bindField(x *ast.Field, y *ast.Ident, name string) {
 }
 
 func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
+	if len(z.keywordAlts) > 0 {
+		// Another declaration may shadow the one n refers to.
+		var node entry
+		if n.Node != nil {
+			_, node, _ = s.resolveScope(n.Name, n.Node)
+		} else {
+			_, _, node = s.lookup(n.Name)
+		}
+		// New names are unique, so they need no unshadowing.
+		if name, ok := z.keywordAlts[declIdent(node)]; ok {
+			n.Name = name
+			n.Scope = nil
+			return true
+		}
+	}
 	if n.Node == nil {
 		return true
 	}

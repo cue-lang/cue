@@ -593,11 +593,10 @@ a: list.Min
 			}}
 		}(),
 		// The names are left as they are, so the result does not parse.
-		// The output keeps the keywords, so it does not parse.
-		want: `let in = 1
-g~(for): 2
-in_1:    3
-a:       in + for
+		want: `let in_2 = 1
+g~(for_1): 2
+in_1:      3
+a:         in_2 + for_1
 `,
 	}, {
 		// A reference to a field shadowed where it is used, which reaches it
@@ -623,9 +622,7 @@ a:       in + for
 				},
 			}}
 		}(),
-		// The output keeps the keywords, so it does not parse.
-		want: `let for_1 = for
-a~(for): "b"
+		want: `a~(for_1): "b"
 c: {
 	a: {}
 	b: for_1
@@ -657,11 +654,9 @@ c: {
 				},
 			}}
 		}(),
-		// The output keeps the keywords, so it does not parse.
-		want: `let in_1 = in
-let in = 1
+		want: `let in_1 = 1
 a: {
-	let in = 2
+	let in_2 = 2
 	b: in_1
 }
 `,

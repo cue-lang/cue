@@ -4,8 +4,6 @@
 # the new syntax does not accept as a let or alias name. Such aliases
 # and their references are renamed, each to a name which the package
 # does not otherwise use, as a let cannot shadow a field.
-#
-# The output below keeps the keywords, so it does not parse.
 
 -- cue.mod/module.cue --
 module: "upgrade.test"
@@ -17,26 +15,26 @@ package foo
 
 f: in={
 	a: 1
-	b: in.a
+	b: in.a @test(eq, 1)
 }
 for=g: {a: 2}
-h: for.a
+h: for.a @test(eq, 2)
 p: [if=string]: {name: if}
 p: x: _
-px: p.x.name
+px: p.x.name @test(eq, "x")
 
 // Both a label alias and a value alias.
 try=q: fallback={
 	a: 1
-	b: fallback.a
-	c: try.a
+	b: fallback.a @test(eq, 1)
+	c: try.a      @test(eq, 1)
 }
 
 // A field labeled by a keyword is left alone.
 func: 5
 s: else={
-	a: func
-	b: else.a
+	a: func   @test(eq, 5)
+	b: else.a @test(eq, 5)
 }
 -- b.cue --
 package foo
@@ -45,15 +43,15 @@ package foo
 in_1: 10
 r: in={
 	a: 1
-	b: in.a
-	c: in_1
-	d: {in_1: 3, e: in.a}
+	b: in.a @test(eq, 1)
+	c: in_1 @test(eq, 10)
+	d: {in_1: 3 @test(eq, 3), e: in.a @test(eq, 1)}
 }
 
 // An alias of a value which is not a struct is bound in an embedding,
 // which then starts with a reference to it.
 t: for=for.b & {b: {c: 1}}
-tc: t.c
+tc: t.c @test(eq, 1)
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "upgrade.test"
@@ -62,30 +60,30 @@ language: version: "v0.18.0"
 package foo
 
 f: {
-	let in = self
+	let in_2 = self
 	a: 1
-	b: in.a
+	b: in_2.a @test(eq, 1)
 }
-g~(for): {a: 2}
-h:       for.a
-p: [string]~(if,_): {name: if}
-p: x:               _
-px: p.x.name
+g~(for_1): {a: 2}
+h:         for_1.a @test(eq, 2)
+p: [string]~(if_1,_): {name: if_1}
+p: x:                 _
+px: p.x.name @test(eq, "x")
 
 // Both a label alias and a value alias.
-q~(try): {
-	let fallback = self
+q~(try_1): {
+	let fallback_1 = self
 	a: 1
-	b: fallback.a
-	c: try.a
+	b: fallback_1.a @test(eq, 1)
+	c: try_1.a      @test(eq, 1)
 }
 
 // A field labeled by a keyword is left alone.
 func: 5
 s: {
-	let else = self
-	a: func
-	b: else.a
+	let else_1 = self
+	a: func     @test(eq, 5)
+	b: else_1.a @test(eq, 5)
 }
 --- b.cue
 package foo
@@ -93,14 +91,14 @@ package foo
 // The name a keyword alias would take is already used in the file.
 in_1: 10
 r: {
-	let in = self
+	let in_2 = self
 	a: 1
-	b: in.a
-	c: in_1
-	d: {in_1: 3, e: in.a}
+	b: in_2.a @test(eq, 1)
+	c: in_1   @test(eq, 10)
+	d: {in_1: 3 @test(eq, 3), e: in_2.a @test(eq, 1)}
 }
 
 // An alias of a value which is not a struct is bound in an embedding,
 // which then starts with a reference to it.
-t:  {let for = self, for.b & {b: {c: 1}}}
-tc: t.c
+t:  {let for_1 = self, for_1.b & {b: {c: 1}}}
+tc: t.c @test(eq, 1)

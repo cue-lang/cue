@@ -28,12 +28,12 @@ exec cue def --language-version v0.18.0 x.cue
 cmp stdout def-current
 
 # An old alias named by a keyword, which the current version does not accept
-# as a let or alias name, keeps its name, so the output does not parse there.
+# as a let or alias name, is renamed, so that the output parses there.
 exec cue def kw.cue
 cmp stdout expect/def-kw
 cp stdout def-kw.cue
-! exec cue export def-kw.cue
-stderr 'expected label or .:., found .in.'
+exec cue export def-kw.cue
+cmp stdout expect/export-kw
 
 # Flag expressions follow the selected version, not the file's attribute.
 ! exec cue export -e '{_y: Y={a: 1, b: Y.a}, c: _y.b}.c' x.cue
@@ -89,12 +89,12 @@ for=g: {a: 2}
 h: for.a
 -- expect/def-kw --
 f: {
-	let in = self
+	let in_1 = self
 	a: 1
-	b: in.a
+	b: in_1.a
 }
-g~(for): a: 2
-h: for.a
+g~(for_1): a: 2
+h: for_1.a
 -- expect/export-kw --
 {
     "f": {

@@ -121,7 +121,7 @@ type scope struct {
 	inField bool
 
 	identFn func(s *scope, n *ast.Ident) bool
-	nameFn  func(name string)
+	nameFn  func(name string, e entry)
 	errFn   func(p token.Pos, msg string, args ...interface{})
 
 	// unresolved collects the identifiers which [resolveIdent] cannot
@@ -309,8 +309,9 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 	if name == "" {
 		return
 	}
+	e := entry{node: n, link: link, field: f}
 	if s.nameFn != nil {
-		s.nameFn(name)
+		s.nameFn(name, e)
 	}
 	// TODO: record both positions.
 	if outer, _, existing := s.lookup(name); existing.node != nil {
@@ -336,7 +337,7 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 			// s.errFn(n.Pos(), "alias %q already declared in enclosing scope", name)
 		}
 	}
-	s.index[name] = entry{node: n, link: link, field: f}
+	s.index[name] = e
 }
 
 func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, e entry, ok bool) {

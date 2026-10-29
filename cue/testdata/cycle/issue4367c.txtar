@@ -71,14 +71,14 @@ checkCfg: OUT.IMPORTS[0].cfg @test(eq, "sub-")
 OUT: cycle with field: IN.spec:
     ./main.cue:11:14
 -- out/eval/stats --
-Leaks:  2
-Freed:  76
-Reused: 33
-Allocs: 45
+Leaks:  32
+Freed:  36
+Reused: 27
+Allocs: 41
 Retain: 0
 
-Unifications: 66
-Conjuncts:    117
-Disjuncts:    4
+Unifications: 58
+Conjuncts:    107
+Disjuncts:    2
 
 NumCloseIDs: 17

@@ -156,21 +156,17 @@ argocd.app.apps: <- invalid {namespace:string,let this#4=_|_(argocd.app.apps.thi
     ./in.cue:6:7
     ./in.cue:13:7
 -- out/eval/stats --
-Leaks:  0
-Freed:  224
-Reused: 155
-Allocs: 69
+Leaks:  37
+Freed:  187
+Reused: 134
+Allocs: 90
 Retain: 0
 
 Unifications: 120
-Conjuncts:    308
+Conjuncts:    304
 Disjuncts:    28
 
-NumCloseIDs: 76
-
-ConjunctInfos:       196
-MaxConjunctInfos:    8
-MaxReqSets:          9
+NumCloseIDs: 48
 -- out/evalalpha --
 Errors:
 _namespacedResourceKinds.app.#template.k8s.apiVersion: field not allowed:

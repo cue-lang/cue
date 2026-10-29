@@ -226,14 +226,14 @@ nestedInnerFallback: {
 	@test(eq, {inner: true})
 }
 -- out/eval/stats --
-Leaks:  16
-Freed:  114
-Reused: 77
-Allocs: 53
+Leaks:  41
+Freed:  116
+Reused: 78
+Allocs: 79
 Retain: 0
 
-Unifications: 130
-Conjuncts:    159
+Unifications: 157
+Conjuncts:    186
 Disjuncts:    0
 
-NumCloseIDs: 69
+NumCloseIDs: 8

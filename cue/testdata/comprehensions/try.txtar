@@ -1040,14 +1040,14 @@ In v2, the try mechanism does not exist and many operations that succeed in v3
 produce errors in v2 (type errors, index out of range on open lists, etc.).
 v3 adds the @experiment(try) feature that catches optional reference failures.
 -- out/eval/stats --
-Leaks:  101
-Freed:  673
-Reused: 627
-Allocs: 147
+Leaks:  128
+Freed:  683
+Reused: 633
+Allocs: 178
 Retain: 0
 
-Unifications: 735
-Conjuncts:    914
+Unifications: 772
+Conjuncts:    943
 Disjuncts:    14
 
 NumCloseIDs: 45

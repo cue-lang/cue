@@ -1570,14 +1570,14 @@ issue3729.withoutDisjunction: error in v3 has fewer position annotations than v2
 issue3729.withoutDisjunctionWithEmbed, withEmbed.incomplete: v3 leaks the embedded _ from the comprehension body into the null optional constraint, causing null to appear as an embedded value in root.
 embed.fail1/fail4: errors have different position annotations in v3 vs v2.
 -- out/eval/stats --
-Leaks:  104
-Freed:  698
-Reused: 647
-Allocs: 155
+Leaks:  129
+Freed:  673
+Reused: 622
+Allocs: 180
 Retain: 0
 
-Unifications: 693
-Conjuncts:    1081
+Unifications: 689
+Conjuncts:    1077
 Disjuncts:    44
 
-NumCloseIDs: 314
+NumCloseIDs: 65

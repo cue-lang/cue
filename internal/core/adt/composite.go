@@ -261,6 +261,11 @@ type Vertex struct {
 	// the for source of comprehensions and let fields or let clauses.
 	anonymous bool
 
+	// escapes is set on an unfinished vertex, and on its unfinished
+	// ancestors, if values which may outlive the node that allocated it can
+	// refer to it, such as the values yielded by a for clause binding it.
+	escapes bool
+
 	// IsDisjunct indicates this Vertex is a disjunct resulting from a
 	// disjunction evaluation.
 	IsDisjunct bool

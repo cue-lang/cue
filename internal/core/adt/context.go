@@ -274,6 +274,7 @@ type OpContext struct {
 	// allocating new inlined vertices. Only nodes within the current scope can
 	// refer to any values allocated within an inline node, which means it is
 	// safe to reuse the nodeContext when all values have been processed.
+	// Values yielded by comprehensions are an exception; see [Vertex.escapes].
 	//
 	// TODO(mem): we can mark Vertex nodes as being used in sharing and then
 	// free them too if they are not used.

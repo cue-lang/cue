@@ -782,10 +782,10 @@ issue4100: {
 	@test(eq, {a: [0]})
 }
 -- out/eval/stats --
-Leaks:  75
-Freed:  787
-Reused: 755
-Allocs: 107
+Leaks:  83
+Freed:  779
+Reused: 751
+Allocs: 111
 Retain: 0
 
 Unifications: 511

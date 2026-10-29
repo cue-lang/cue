@@ -424,10 +424,10 @@ issue3903: noshare: {
     ./sharecycle.cue:11:11
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
-Leaks:  14
-Freed:  287
-Reused: 262
-Allocs: 39
+Leaks:  18
+Freed:  283
+Reused: 260
+Allocs: 41
 Retain: 0
 
 Unifications: 261

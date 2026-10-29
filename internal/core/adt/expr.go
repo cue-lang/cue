@@ -3769,6 +3769,10 @@ func (x *ForClause) yield(s *compState) {
 			continue
 		}
 
+		for v := a; v != nil && !v.escapes && v.status != finalized; v = v.Parent {
+			v.escapes = true
+		}
+
 		// "for" clauses tend to yield many values;
 		// group allocations with the same lifetime here
 		// for the sake of reducing the runtime overhead.

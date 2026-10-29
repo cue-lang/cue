@@ -72,15 +72,14 @@ _Service: {
     ./in.cue:50:2
     ./in.cue:54:20
 -- out/eval/stats --
-Leaks:  15
-Freed:  115
-Reused: 76
-Allocs: 54
+Leaks:  47
+Freed:  68
+Reused: 50
+Allocs: 65
 Retain: 0
 
-Unifications: 110
-Conjuncts:    205
+Unifications: 103
+Conjuncts:    197
 Disjuncts:    0
-Notifications: 8
 
-NumCloseIDs: 85
+NumCloseIDs: 31

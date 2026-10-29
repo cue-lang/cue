@@ -326,10 +326,10 @@ out.items.items: structural cycle:
     ./review.cue:41:45
     ./review.cue:41:33
 -- out/eval/stats --
-Leaks:  180
-Freed:  769
-Reused: 730
-Allocs: 219
+Leaks:  184
+Freed:  765
+Reused: 727
+Allocs: 222
 Retain: 0
 
 Unifications: 590

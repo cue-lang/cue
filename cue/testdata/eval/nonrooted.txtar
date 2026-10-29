@@ -237,17 +237,17 @@ issue4532: {
 	direct:       #E            @test(eq, {out: [], n: 0, z: 1, m: 0})
 }
 -- out/eval/stats --
-Leaks:  91
-Freed:  336
-Reused: 314
-Allocs: 113
+Leaks:  166
+Freed:  283
+Reused: 270
+Allocs: 179
 Retain: 0
 
-Unifications: 332
-Conjuncts:    617
-Disjuncts:    46
+Unifications: 349
+Conjuncts:    631
+Disjuncts:    38
 
-NumCloseIDs: 80
+NumCloseIDs: 82
 -- out/errors.txt --
 [eval] x: conflicting values 1 and 2:
     ./in.cue:4:14

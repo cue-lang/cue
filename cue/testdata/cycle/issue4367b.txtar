@@ -79,15 +79,14 @@ checkName: OUT.IMPORTS[0].objects.plain.b.metadata.name @test(eq, "sub-HASHED")
     ./main.cue:9:17
     ./main.cue:8:5
 -- out/eval/stats --
-Leaks:  33
-Freed:  167
-Reused: 126
-Allocs: 74
+Leaks:  61
+Freed:  108
+Reused: 87
+Allocs: 82
 Retain: 0
 
-Unifications: 167
-Conjuncts:    390
+Unifications: 153
+Conjuncts:    365
 Disjuncts:    4
-Notifications: 14
 
-NumCloseIDs: 161
+NumCloseIDs: 160

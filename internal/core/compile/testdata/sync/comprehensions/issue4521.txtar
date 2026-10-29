@@ -1,0 +1,120 @@
+# Tests comprehension results which reference unfinished arcs of an
+# inline unification, copied elsewhere after their list is finalized.
+# Evaluating the copies resumes the evaluation of those arcs.
+# https://cuelang.org/issue/4521
+-- in.cue --
+import "list"
+
+#Wrap: {
+	in: global: _
+	out: in.global
+}
+
+items: global: [string]: [string]: {}
+items: global: g1: a: body: {}
+items: global: g1: b: body: {}
+items: global: g2: c: body: z: "x"
+
+concat: list.Concat([[
+	for group in (#Wrap & {in: items}).out
+	for item in group {body: item.body},
+]])
+
+reference: {
+	l: [
+		for group in (#Wrap & {in: items}).out
+		for item in group {body: item.body},
+	]
+	copy: [for x in l {x}]
+}
+
+embed: {
+	l: [
+		for group in (#Wrap & {in: items}).out
+		for item in group {item.body},
+	]
+	copy: [for x in l {x}]
+}
+-- out/compile --
+--- in.cue
+{
+  #Wrap: {
+    in: {
+      global: _
+    }
+    out: 〈0;in〉.global
+  }
+  items: {
+    global: {
+      [string]: {
+        [string]: {}
+      }
+    }
+  }
+  items: {
+    global: {
+      g1: {
+        a: {
+          body: {}
+        }
+      }
+    }
+  }
+  items: {
+    global: {
+      g1: {
+        b: {
+          body: {}
+        }
+      }
+    }
+  }
+  items: {
+    global: {
+      g2: {
+        c: {
+          body: {
+            z: "x"
+          }
+        }
+      }
+    }
+  }
+  concat: 〈import;list〉.Concat([
+    [
+      for _, group in (〈2;#Wrap〉 & {
+        in: 〈3;items〉
+      }).out for _, item in 〈0;group〉 {
+        body: 〈1;item〉.body
+      },
+    ],
+  ])
+  reference: {
+    l: [
+      for _, group in (〈2;#Wrap〉 & {
+        in: 〈3;items〉
+      }).out for _, item in 〈0;group〉 {
+        body: 〈1;item〉.body
+      },
+    ]
+    copy: [
+      for _, x in 〈1;l〉 {
+        〈1;x〉
+      },
+    ]
+  }
+  embed: {
+    l: [
+      for _, group in (〈2;#Wrap〉 & {
+        in: 〈3;items〉
+      }).out for _, item in 〈0;group〉 {
+        〈1;item〉.body
+      },
+    ]
+    copy: [
+      for _, x in 〈1;l〉 {
+        〈1;x〉
+      },
+    ]
+  }
+}

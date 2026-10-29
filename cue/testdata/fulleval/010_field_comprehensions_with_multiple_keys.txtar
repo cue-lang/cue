@@ -27,8 +27,8 @@ for x in [
 	E: F: {a: "E", b: "F"}
 })
 -- out/eval/stats --
-Leaks:  0
-Freed:  49
+Leaks:  20
+Freed:  29
 Reused: 17
 Allocs: 32
 Retain: 0
@@ -37,4 +37,4 @@ Unifications: 49
 Conjuncts:    63
 Disjuncts:    0
 
-NumCloseIDs: 8
+NumCloseIDs: 6

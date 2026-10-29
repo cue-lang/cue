@@ -1,0 +1,49 @@
+# Tests comprehension results which reference unfinished arcs of an
+# inline unification, copied elsewhere after their list is finalized.
+# Evaluating the copies resumes the evaluation of those arcs.
+# https://cuelang.org/issue/4521
+-- in.cue --
+import "list"
+
+#Wrap: {
+	in: global: _
+	out: in.global
+}
+
+items: global: [string]: [string]: {}
+items: global: g1: a: body: {}
+items: global: g1: b: body: {}
+items: global: g2: c: body: z: "x"
+
+concat: list.Concat([[
+	for group in (#Wrap & {in: items}).out
+	for item in group {body: item.body},
+]]) @test(eq, [{body: {}}, {body: {}}, {body: {z: "x"}}])
+
+reference: {
+	l: [
+		for group in (#Wrap & {in: items}).out
+		for item in group {body: item.body},
+	]
+	copy: [for x in l {x}] @test(eq, [{body: {}}, {body: {}}, {body: {z: "x"}}])
+}
+
+embed: {
+	l: [
+		for group in (#Wrap & {in: items}).out
+		for item in group {item.body},
+	]
+	copy: [for x in l {x}] @test(eq, [{}, {}, {z: "x"}])
+}
+-- out/eval/stats --
+Leaks:  24
+Freed:  74
+Reused: 62
+Allocs: 36
+Retain: 0
+
+Unifications: 82
+Conjuncts:    214
+Disjuncts:    0
+
+NumCloseIDs: 31

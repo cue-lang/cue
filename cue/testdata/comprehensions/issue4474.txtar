@@ -104,10 +104,10 @@ controls: {
 	] @test(eq, [{st: "A"}, {st: "B"}, {st: "B"}])
 }
 -- out/eval/stats --
-Leaks:  20
-Freed:  92
-Reused: 75
-Allocs: 37
+Leaks:  38
+Freed:  74
+Reused: 60
+Allocs: 52
 Retain: 0
 
 Unifications: 111
@@ -115,4 +115,4 @@ Conjuncts:    151
 Disjuncts:    0
 Notifications: 5
 
-NumCloseIDs: 60
+NumCloseIDs: 17

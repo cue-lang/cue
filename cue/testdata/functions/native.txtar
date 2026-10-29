@@ -863,10 +863,10 @@ invalid default for parameter a: invalid value 9 (out of bound <5):
     ./in.cue:717:13
     ./in.cue:714:8
 -- out/eval/stats --
-Leaks:  126
-Freed:  1502
-Reused: 1463
-Allocs: 165
+Leaks:  129
+Freed:  1499
+Reused: 1462
+Allocs: 166
 Retain: 0
 
 Unifications: 1304

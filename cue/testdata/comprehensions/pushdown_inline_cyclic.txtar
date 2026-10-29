@@ -34,14 +34,14 @@ result: export.out @test(eq, ["false"])
 [incomplete] #Foo.out: cannot range over A (incomplete type _):
     ./in.cue:12:17
 -- out/eval/stats --
-Leaks:  0
-Freed:  81
-Reused: 51
-Allocs: 30
+Leaks:  30
+Freed:  51
+Reused: 41
+Allocs: 40
 Retain: 0
 
 Unifications: 71
 Conjuncts:    136
 Disjuncts:    0
 
-NumCloseIDs: 32
+NumCloseIDs: 23

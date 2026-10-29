@@ -250,10 +250,10 @@ issue3731.expanded.root.others: v2 expanded list, v3 uses structure sharing ~(_o
 issue3731.full.#AccountConfig.workspaces: v2 expands fields, v3 uses structure sharing ~(#Workspace).
 issue3731.full.tree.env1.region1.*: siblings/workspaces field ordering differs between v2 and v3.
 -- out/eval/stats --
-Leaks:  0
-Freed:  316
-Reused: 278
-Allocs: 38
+Leaks:  32
+Freed:  284
+Reused: 246
+Allocs: 70
 Retain: 0
 
 Unifications: 248

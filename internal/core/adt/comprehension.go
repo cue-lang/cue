@@ -223,15 +223,12 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 }
 
 // pushDownDeps does a static analysis of the processed values and adjusts
-// dependencies and types.
-// Normally, a task of a current node is a requirement of that node to complete.
-// However, if we have a comprehension, we may push that dependency down to
-// the literal fields of its body and else clause. This allows for more
-// fine-grained dependency analysis and can help breaking cycles that should
-// be naturally broken to the user.
+// dependencies. Normally, a task of a current node is a requirement of that
+// node to complete. However, if we have a comprehension, we may push that
+// dependency down to the literal fields of its body and else clause. This
+// allows for more fine-grained dependency analysis and can help breaking
+// cycles that should be naturally broken to the user.
 func pushDownDeps(n *nodeContext, t *task, x Node) condition {
-	kind := allKinds
-
 	var completes condition
 
 	switch x := x.(type) {
@@ -271,19 +268,11 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 					pushDownDeps(arcState, t, x.Value)
 				}
 
-				if x.Label.IsString() {
-					kind &= StructKind
-				}
-				if x.Label.IsInt() {
-					kind &= ListKind
-				}
-
 			case *BulkOptionalField, *Ellipsis:
 				completes |= fieldConjunctsKnown
 				// TODO: does not add fields, but may add field conjuncts;
 				// confirm whether tracking dependencies here would yield
 				// any additional precision.
-				kind &= StructKind | ListKind
 
 			case *LetField:
 				completes |= fieldConjunctsKnown
@@ -296,11 +285,9 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 			case *DynamicField:
 				// Depending on arc type, may not contribute to concrete value.
 				completes |= fieldConjunctsKnown
-				kind &= StructKind | ListKind
 
 			case Value:
 				completes |= valueKnown
-				kind &= x.Kind()
 
 			default:
 				// Embeddings, other comprehensions.

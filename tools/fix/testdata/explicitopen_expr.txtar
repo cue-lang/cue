@@ -1039,6 +1039,106 @@ hiddenSibling: {
 	t13: s & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
 	t14: (s & {a: 1})._c   @test(eq, true)
 }
+
+// A let has the one value it declares, so an embedded let name is
+// classified by that value: a plain literal needs no spread and no
+// wrapper, a definition takes __closeAll, and a field keeps the guess. An
+// expression is classified as it is when embedded directly.
+// So does a literal with a field whose value may be closed: the old
+// semantics opened that value along a path the struct declares too,
+// which the rewrite widens only in a literal embedded directly.
+// Whether the let is declared before or after the embedding which uses it
+// makes no difference.
+letValue: {
+	#A: {a: 1}
+	o: {x: 1}
+	p: {
+		let l = {b: 1}
+		l
+		c: 2
+	}
+	d: {
+		let l = #A
+		l
+		c: 2
+	}
+	f: {
+		let l = o
+		l
+		c: 2
+	}
+	q: {
+		let l = {b: 1}
+		for k in ["x"] {(k): l}
+	}
+	g: {
+		let l = {a: #A}
+		l
+		a: z: 1
+	}
+	j: {
+		let l = #A | {b: 1}
+		l
+		c: 2
+	}
+	k: {
+		let l = #A & {a: 1}
+		l
+		c: 2
+	}
+	m: {
+		let l = {#A}
+		l
+		c: 2
+	}
+	n: {
+		let x = #A
+		let l = x
+		l
+		c: 2
+	}
+	r: {
+		let l = {#A, b: 1}
+		l
+		c: 2
+	}
+	u: {
+		l
+		c: 2
+		let l = {#A, b: 1}
+	}
+	s: {
+		let l = {o, b: 1}
+		l
+		c: 2
+	}
+	w: {
+		let x = {#A, b: 1}
+		let l = x
+		l
+		c: 2
+	}
+
+	t1: p & {z: 1}   @test(eq, {b: 1, c: 2, z: 1})
+	t2: d & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t3: d & {a: 1}   @test(eq, {a: 1, c: 2})
+	t4: f & {z: 1}   @test(eq, {x: 1, c: 2, z: 1})
+	t5: q.x & {z: 1} @test(eq, {b: 1, z: 1})
+	t6: g & {w: 1}   @test(eq, {a: {a: 1, z: 1}, w: 1})
+	t7:  j & {z: 1}  @test(eq, {b: 1, c: 2, z: 1})
+	t8:  k & {z: 1}  @test(err, code=eval, path=z, contains="field not allowed")
+	t9:  k & {a: 1}  @test(eq, {a: 1, c: 2})
+	t10: m & {z: 1}  @test(err, code=eval, path=z, contains="field not allowed")
+	t11: n & {z: 1}  @test(err, code=eval, path=z, contains="field not allowed")
+	t12: n & {a: 1}  @test(eq, {a: 1, c: 2})
+	t13: r & {z: 1}  @test(err, code=eval, path=z, contains="field not allowed")
+	t14: r & {a: 1}  @test(eq, {a: 1, b: 1, c: 2})
+	t15: u & {z: 1}  @test(err, code=eval, path=z, contains="field not allowed")
+	t16: u & {a: 1}  @test(eq, {a: 1, b: 1, c: 2})
+	t17: s & {z: 1}  @test(eq, {x: 1, b: 1, c: 2, z: 1})
+	t18: w & {z: 1}  @test(err, code=eval, path=z, contains="field not allowed")
+	t19: w & {a: 1}  @test(eq, {a: 1, b: 1, c: 2})
+}
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
@@ -1292,6 +1392,20 @@ hiddenSibling: {
     ./in.cue:1023:12
 [eval] hiddenSibling.t13.z: field not allowed:
     ./in.cue:1025:12
+[eval] letValue.t2.z: field not allowed:
+    ./in.cue:1109:11
+[eval] letValue.t8.z: field not allowed:
+    ./in.cue:1115:12
+[eval] letValue.t10.z: field not allowed:
+    ./in.cue:1117:12
+[eval] letValue.t11.z: field not allowed:
+    ./in.cue:1118:12
+[eval] letValue.t13.z: field not allowed:
+    ./in.cue:1120:12
+[eval] letValue.t15.z: field not allowed:
+    ./in.cue:1122:12
+[eval] letValue.t18.z: field not allowed:
+    ./in.cue:1125:12
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -2390,4 +2504,188 @@ hiddenSibling: {
 	t12: (r & {a: 1})."#x" @test(eq, 1)
 	t13: s & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
 	t14: (s & {a: 1})._c   @test(eq, true)
+}
+
+// A let has the one value it declares, so an embedded let name is
+// classified by that value: a plain literal needs no spread and no
+// wrapper, a definition takes __closeAll, and a field keeps the guess. An
+// expression is classified as it is when embedded directly.
+// So does a literal with a field whose value may be closed: the old
+// semantics opened that value along a path the struct declares too,
+// which the rewrite widens only in a literal embedded directly.
+// Whether the let is declared before or after the embedding which uses it
+// makes no difference.
+letValue: {
+	#A: {a: 1}
+	o:  {x: 1}
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	p: __reclose({
+		let l = {b: 1}
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	d: __reclose({
+		let l = #A
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	f: __reclose({
+		let l = o
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	q: {
+		let l = {b: 1}
+		for k in ["x"] {
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
+			(k): l...
+		}
+	}
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	g: __reclose({
+		let l = {a: #A}
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		a: z: 1
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	j: __reclose({
+		let l = #A | {b: 1}
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	k: __reclose({
+		let l = #A & {a: 1}
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	m: __reclose({
+		let l = {#A}
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	n: __reclose({
+		let x = #A
+		let l = x
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	r: __reclose({
+		let l = __closeAll({#A..., b: 1})
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	u: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+		let l = __closeAll({#A..., b: 1})
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	s: __reclose({
+		// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+		// the struct if one of the spread values in it is a closed struct.
+		let l = __reclose({
+			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+			// if the value is a closed struct, or closes a nested struct at a path which
+			// the enclosing struct also declares.
+			o...
+			b: 1
+		})
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	w: __reclose({
+		let x = __closeAll({#A..., b: 1})
+		let l = x
+
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		l...
+		c: 2
+	})
+
+	t1:  p & {z: 1}   @test(eq, {b: 1, c: 2, z: 1})
+	t2:  d & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t3:  d & {a: 1}   @test(eq, {a: 1, c: 2})
+	t4:  f & {z: 1}   @test(eq, {x: 1, c: 2, z: 1})
+	t5:  q.x & {z: 1} @test(eq, {b: 1, z: 1})
+	t6:  g & {w: 1}   @test(eq, {a: {a: 1, z: 1}, w: 1})
+	t7:  j & {z: 1}   @test(eq, {b: 1, c: 2, z: 1})
+	t8:  k & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t9:  k & {a: 1}   @test(eq, {a: 1, c: 2})
+	t10: m & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t11: n & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t12: n & {a: 1}   @test(eq, {a: 1, c: 2})
+	t13: r & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t14: r & {a: 1}   @test(eq, {a: 1, b: 1, c: 2})
+	t15: u & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t16: u & {a: 1}   @test(eq, {a: 1, b: 1, c: 2})
+	t17: s & {z: 1}   @test(eq, {x: 1, b: 1, c: 2, z: 1})
+	t18: w & {z: 1}   @test(err, code=eval, path=z, contains="field not allowed")
+	t19: w & {a: 1}   @test(eq, {a: 1, b: 1, c: 2})
 }

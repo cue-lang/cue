@@ -190,9 +190,13 @@ func TestLoadFromFSWithDirectoryReplace(t *testing.T) {
 		testName string
 		dir      string
 		files    string
+		wantRoot string // root of the replacement module's instance
 	}{{
 		// Relative replacement, module at the FS root.
 		testName: "RelativeAtRoot",
+		// TODO: the root should be "/local_dep"; it is the replacement
+		// directory as written, which is relative.
+		wantRoot: "local_dep",
 		files: `
 -- cue.mod/module.cue --
 module: "example.com/main@v0"
@@ -227,6 +231,7 @@ leaf: value
 		// Absolute replacement (absolute within the FS namespace), module
 		// at the FS root.
 		testName: "AbsoluteAtRoot",
+		wantRoot: "/local_dep",
 		files: `
 -- cue.mod/module.cue --
 module: "example.com/main@v0"
@@ -263,6 +268,9 @@ leaf: value
 		// resolving to "/local_dep" within the FS namespace.
 		testName: "RelativeOutsideModuleRoot",
 		dir:      "/mymod",
+		// TODO: the root should be "/local_dep"; it is the replacement
+		// directory as written, which is relative.
+		wantRoot: "../local_dep",
 		files: `
 -- mymod/cue.mod/module.cue --
 module: "example.com/main@v0"
@@ -298,6 +306,7 @@ leaf: value
 		// directory's path.
 		testName: "AbsoluteOutsideLongModuleRoot",
 		dir:      "/main-module-with-a-long-root-path",
+		wantRoot: "/local_dep",
 		files: `
 -- main-module-with-a-long-root-path/cue.mod/module.cue --
 module: "example.com/main@v0"
@@ -341,11 +350,16 @@ leaf: value
 			qt.Assert(t, qt.HasLen(insts, 1))
 			qt.Assert(t, qt.IsNil(insts[0].Err))
 			qt.Assert(t, qt.Equals(insts[0].PkgName, "main"))
+			qt.Assert(t, qt.HasLen(insts[0].Imports, 1))
+			qt.Assert(t, qt.Equals(insts[0].Imports[0].Root, test.wantRoot))
+			qt.Assert(t, qt.Equals(insts[0].Imports[0].Dir, test.wantRoot))
 
 			// The files of a package in the replacement directory's
 			// ancestor directories are part of its instance.
 			insts = Instances([]string{"example.com/dep/leaf@v0:lib"}, cfg)
 			qt.Assert(t, qt.HasLen(insts, 1))
+			qt.Assert(t, qt.Equals(insts[0].Root, test.wantRoot))
+			qt.Assert(t, qt.Equals(insts[0].Dir, path.Join(test.wantRoot, "leaf")))
 			v := cuecontext.New().BuildInstance(insts[0])
 			qt.Assert(t, qt.IsNil(v.Err()))
 			leaf, err := v.LookupPath(cue.ParsePath("leaf")).String()

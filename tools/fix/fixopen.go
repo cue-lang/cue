@@ -831,17 +831,37 @@ func isScalarPredeclared(x *ast.Ident) bool {
 // embedded expression may resolve to; [openEmbedExpr] derives its rewrites
 // from the flags it returns.
 func collectEmbedFlags(expr ast.Expr) embedFlags {
+	return embedFlagsOf(expr, nil)
+}
+
+// viaLet classifies the name x by the value of the let clause it refers to,
+// if any, with classify: a let has the one value it declares, with no
+// conjunct added elsewhere. visiting holds the lets whose values are being
+// classified up the recursion, so that a cycle of lets, which cannot
+// evaluate, does not loop; a let on it has no value here.
+func viaLet[T any](x *ast.Ident, visiting []*ast.LetClause, classify func(ast.Expr, []*ast.LetClause) T) (T, bool) {
+	l, ok := x.Node.(*ast.LetClause)
+	if !ok || slices.Contains(visiting, l) {
+		var zero T
+		return zero, false
+	}
+	return classify(l.Expr, append(visiting, l)), true
+}
+
+// embedFlagsOf is [collectEmbedFlags] with the lets being classified up
+// the recursion, see [viaLet].
+func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
 		// Already has ellipsis (e.g. rewritten by a nested pass);
 		// still collect flags from the underlying expression.
 		if x.Op == token.ELLIPSIS {
-			return collectEmbedFlags(x.X)
+			return embedFlagsOf(x.X, visiting)
 		}
 	case *ast.BinaryExpr:
 		if x.Op == token.AND || x.Op == token.OR {
-			xf := collectEmbedFlags(x.X)
-			yf := collectEmbedFlags(x.Y)
+			xf := embedFlagsOf(x.X, visiting)
+			yf := embedFlagsOf(x.Y, visiting)
 			f := xf.or(yf)
 			// A disjunction may resolve to any of its operands, so unless
 			// every operand is a definition the closing has to follow the
@@ -855,13 +875,16 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 		// Other binary ops (e.g. +, *) cannot resolve to closed structs.
 		return embedFlags{}
 	case *ast.ParenExpr:
-		return collectEmbedFlags(x.X)
+		return embedFlagsOf(x.X, visiting)
 	case *ast.Ident:
 		if isTop(x) || isScalarPredeclared(x) {
 			return embedFlags{}
 		}
 		if internal.IsDefinition(x) {
 			return embedFlags{def: true}
+		}
+		if f, ok := viaLet(x, visiting, embedFlagsOf); ok {
+			return f
 		}
 		return embedFlags{other: true}
 	case *ast.SelectorExpr:
@@ -878,7 +901,19 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 			case "close":
 				f := embedFlags{close: true}
 				if len(x.Args) == 1 {
-					f = f.or(collectEmbedFlags(x.Args[0]))
+					f = f.or(embedFlagsOf(x.Args[0], visiting))
+				}
+				return f
+			case "__closeAll", "__reclose":
+				// The wrappers the rewrite adds to a let's value stand
+				// for the closing they add: __closeAll closes like a
+				// definition, __reclose as the values spread in it do.
+				var f embedFlags
+				if id.Name == "__closeAll" {
+					f.def = true
+				}
+				if len(x.Args) == 1 {
+					f = f.or(embedFlagsOf(x.Args[0], visiting))
 				}
 				return f
 			case "and", "or":
@@ -891,7 +926,7 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 		// disjunction it marks a branch of needs a runtime check is
 		// decided by the disjunction.
 		if x.Op == token.MUL {
-			return collectEmbedFlags(x.X)
+			return embedFlagsOf(x.X, visiting)
 		}
 		return embedFlags{}
 	case *ast.StructLit:
@@ -899,8 +934,19 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 		// it may still close it.
 		var f embedFlags
 		for _, d := range x.Elts {
-			if e, ok := d.(*ast.EmbedDecl); ok {
-				f = f.or(collectEmbedFlags(e.Expr))
+			switch d := d.(type) {
+			case *ast.EmbedDecl:
+				f = f.or(embedFlagsOf(d.Expr, visiting))
+			case *ast.Field:
+				// A literal reached through a let, which is what a
+				// non-empty visiting list means, keeps the guess when
+				// a field of it may be closed: the old semantics opened
+				// that value along a path the enclosing struct declares
+				// too, which openNestedClosing widens only in a literal
+				// embedded directly.
+				if len(visiting) > 0 && !fieldlessOf(d.Value, visiting) {
+					return embedFlags{other: true}
+				}
 			}
 		}
 		return f
@@ -1073,26 +1119,39 @@ func soleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 }
 
 // fieldless reports whether expr can declare no field at any path: a
-// scalar or top, or an expression built from those alone.
+// scalar or top, a let bound to one, or an expression built from those
+// alone.
 func fieldless(expr ast.Expr) bool {
+	return fieldlessOf(expr, nil)
+}
+
+// fieldlessOf is [fieldless] with the lets being classified up the
+// recursion, see [viaLet].
+func fieldlessOf(expr ast.Expr, visiting []*ast.LetClause) bool {
 	switch x := expr.(type) {
 	case *ast.BasicLit, *ast.Interpolation:
 		return true
 	case *ast.Ident:
-		return isTop(x) || isScalarPredeclared(x)
+		if isTop(x) || isScalarPredeclared(x) {
+			return true
+		}
+		if r, ok := viaLet(x, visiting, fieldlessOf); ok {
+			return r
+		}
+		return false
 	case *ast.ParenExpr:
-		return fieldless(x.X)
+		return fieldlessOf(x.X, visiting)
 	case *ast.UnaryExpr:
 		// Only a default marker, *x, can produce a struct, from its
 		// operand.
-		return fieldless(x.X)
+		return fieldlessOf(x.X, visiting)
 	case *ast.BinaryExpr:
 		// Only a conjunction or a disjunction can produce a struct; any
 		// other operator yields a scalar, or an error.
 		if x.Op != token.AND && x.Op != token.OR {
 			return true
 		}
-		return fieldless(x.X) && fieldless(x.Y)
+		return fieldlessOf(x.X, visiting) && fieldlessOf(x.Y, visiting)
 	}
 	return false
 }

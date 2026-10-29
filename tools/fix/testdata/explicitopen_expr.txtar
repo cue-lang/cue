@@ -2518,25 +2518,13 @@ hiddenSibling: {
 letValue: {
 	#A: {a: 1}
 	o:  {x: 1}
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	p: __reclose({
+	p: {
 		let l = {b: 1}
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
-		l...
+		l
 		c: 2
-	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	d: __reclose({
+	}
+	d: __closeAll({
 		let l = #A
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})
@@ -2553,12 +2541,7 @@ letValue: {
 	})
 	q: {
 		let l = {b: 1}
-		for k in ["x"] {
-			// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-			// if the value is a closed struct, or closes a nested struct at a path which
-			// the enclosing struct also declares.
-			(k): l...
-		}
+		for k in ["x"] {(k): l}
 	}
 	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
 	// the struct if one of the spread values in it is a closed struct.
@@ -2571,68 +2554,33 @@ letValue: {
 		l...
 		a: z: 1
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
 	j: __reclose({
 		let l = #A | {b: 1}
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	k: __reclose({
+	k: __closeAll({
 		let l = #A & {a: 1}
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	m: __reclose({
+	m: __closeAll({
 		let l = {#A}
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	n: __reclose({
+	n: __closeAll({
 		let x = #A
 		let l = x
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	r: __reclose({
+	r: __closeAll({
 		let l = __closeAll({#A..., b: 1})
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	u: __reclose({
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
+	u: __closeAll({
 		l...
 		c: 2
 		let l = __closeAll({#A..., b: 1})
@@ -2656,15 +2604,9 @@ letValue: {
 		l...
 		c: 2
 	})
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	w: __reclose({
+	w: __closeAll({
 		let x = __closeAll({#A..., b: 1})
 		let l = x
-
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
 		l...
 		c: 2
 	})

@@ -1048,6 +1048,41 @@ a: 1
 		},
 
 		{
+			// A cycle of lets cannot evaluate; classifying an embedded
+			// let name through its value must still terminate, with the
+			// name kept as a value of unknown closedness.
+			name:    "cyclic lets (fixExplicitOpen)",
+			exps:    []string{"explicitopen"},
+			version: oldEmbedVersion,
+			in: `package foo
+
+x: {
+	let a = {b}
+	let b = {a}
+	a
+	c: 1
+}
+`,
+			out: `@experiment(explicitopen)
+
+package foo
+
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
+x: __reclose({
+	let a = {b}
+	let b = {a}
+
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
+	a...
+	c: 1
+})
+`,
+		},
+
+		{
 			// The whole attribute goes once every name it holds is stable,
 			// and its comments move to the declaration which follows it.
 			name: "remove stable experiment attribute",

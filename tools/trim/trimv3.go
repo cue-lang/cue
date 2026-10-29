@@ -938,9 +938,8 @@ func (t *trimmerV3) linkResolvers(c adt.Conjunct, addInverse bool) {
 
 // linkResolversOrig is like linkResolvers but uses an explicit origNm instead
 // of deriving it from c.Field(). This allows callers to supply a different
-// origin node, e.g. the comprehension body, when the conjunct only contains a
-// clause condition expression. If recordReads is set, the resolved vertices
-// are also recorded in origNm.reads.
+// origin node, such as that of a comprehension. If recordReads is set, the
+// resolved vertices are also recorded in origNm.reads.
 func (t *trimmerV3) linkResolversOrig(c adt.Conjunct, addInverse bool, origNm *nodeMeta, recordReads bool) {
 	t.resolveElemAll(c, func(resolver adt.Resolver, resolvedTo *adt.Vertex) {
 		if recordReads && !slices.Contains(origNm.reads, resolvedTo) {
@@ -1011,27 +1010,15 @@ func (t *trimmerV3) linkStructComprehension(childEnv *adt.Environment, compr *ad
 	if src := compr.Source(); src != nil {
 		comprNm = t.getNodeMeta(src)
 	}
-
-	for _, clause := range compr.Clauses {
-		var condConj adt.Conjunct
-		switch cl := clause.(type) {
-		case *adt.IfClause:
-			condConj = adt.MakeConjunct(childEnv, cl.Condition, ci)
-		case *adt.ForClause:
-			condConj = adt.MakeConjunct(childEnv, cl.Src, ci)
-		case *adt.LetClause:
-			condConj = adt.MakeConjunct(childEnv, cl.Expr, ci)
-		default:
-			continue
-		}
-		t.linkResolversOrig(condConj, false, comprNm, comprNm != nil)
-	}
+	// This links the clauses, but not the body.
+	c := adt.MakeConjunct(childEnv, compr, ci)
+	t.linkResolversOrig(c, false, comprNm, comprNm != nil)
 }
 
-// emptyFuncScope stands in for the parameter activation scope of a function
-// body when resolving its references: parameter references point into it and
-// fail to resolve, while references to outer features skip past it.
-var emptyFuncScope = func() *adt.Vertex {
+// emptyScope stands in for a scope populated only during evaluation, such as
+// function parameters or comprehension clause variables: references to its
+// names fail to resolve, while outer references skip past it.
+var emptyScope = func() *adt.Vertex {
 	v := &adt.Vertex{}
 	v.ForceDone()
 	return v
@@ -1040,16 +1027,13 @@ var emptyFuncScope = func() *adt.Vertex {
 // resolveElemAll finds the resolvers within the conjunct c and calls f for
 // each of them that resolves, together with its target vertex.
 //
-// Elements outside function literals resolve against the conjunct's own
-// environment, and struct and list literals are not descended into: their
-// fields surface as arcs of rooted vertices, whose conjuncts are linked
-// separately. Neither holds inside a function literal — nothing in a
-// literal surfaces as an arc of a rooted vertex, and its body is compiled
-// against additional scope levels — so there elements are traversed deeply,
-// with one empty scope level pushed per level of nesting, mirroring
-// compilation. References to features outside the literal thus keep
-// resolving to their targets, while parameter and other function-local
-// references point into the empty levels, fail to resolve, and are skipped.
+// Outside function literals, struct and list literals and comprehension
+// bodies are not descended into: their fields surface as arcs of rooted
+// vertices, whose conjuncts are linked separately. Nothing in a function
+// literal surfaces that way, so there elements are traversed deeply.
+//
+// Wherever compilation adds a scope level, for a comprehension clause or for
+// nesting in a function literal, an [emptyScope] is pushed.
 func (t *trimmerV3) resolveElemAll(c adt.Conjunct, f func(adt.Resolver, *adt.Vertex)) {
 	type item struct {
 		elem adt.Elem
@@ -1059,7 +1043,7 @@ func (t *trimmerV3) resolveElemAll(c adt.Conjunct, f func(adt.Resolver, *adt.Ver
 		inFunc bool
 	}
 	push := func(env *adt.Environment) *adt.Environment {
-		return &adt.Environment{Up: env, Vertex: emptyFuncScope}
+		return &adt.Environment{Up: env, Vertex: emptyScope}
 	}
 	worklist := []item{{c.Elem(), c.Env, false}}
 	for len(worklist) != 0 {
@@ -1105,41 +1089,31 @@ func (t *trimmerV3) resolveElemAll(c adt.Conjunct, f func(adt.Resolver, *adt.Ver
 				child(arg)
 			}
 		case *adt.Comprehension:
-			if !w.inFunc {
-				for _, y := range elemT.Clauses {
-					switch y := y.(type) {
-					case *adt.IfClause:
-						child(y.Condition)
-					case *adt.LetClause:
-						child(y.Expr)
-					case *adt.ForClause:
-						child(y.Src)
-					}
-				}
-				break
-			}
-			// Deep traversal: each for, let, and try clause introduces a
-			// scope level for the subsequent clauses and the body value; the
-			// fallback resolves in the scope the comprehension appears in.
+			// Each for, let, and try clause scopes the clauses after it and
+			// the body.
 			cenv := env
 			for _, y := range elemT.Clauses {
 				switch y := y.(type) {
 				case *adt.ForClause:
-					worklist = append(worklist, item{y.Src, cenv, true})
+					worklist = append(worklist, item{y.Src, cenv, w.inFunc})
 					cenv = push(cenv)
 				case *adt.LetClause:
-					worklist = append(worklist, item{y.Expr, cenv, true})
+					worklist = append(worklist, item{y.Expr, cenv, w.inFunc})
 					cenv = push(cenv)
 				case *adt.IfClause:
-					worklist = append(worklist, item{y.Condition, cenv, true})
+					worklist = append(worklist, item{y.Condition, cenv, w.inFunc})
 				case *adt.TryClause:
 					if y.Expr != nil {
-						worklist = append(worklist, item{y.Expr, cenv, true})
+						worklist = append(worklist, item{y.Expr, cenv, w.inFunc})
 						cenv = push(cenv)
 					}
 				}
 			}
+			if !w.inFunc {
+				break
+			}
 			worklist = append(worklist, item{adt.ToExpr(elemT.Value), cenv, true})
+			// The fallback is outside the clause scopes.
 			if elemT.Fallback != nil {
 				worklist = append(worklist, item{elemT.Fallback, env, true})
 			}

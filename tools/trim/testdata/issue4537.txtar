@@ -2,8 +2,18 @@
 # for, let, and try clauses before it, so it must be resolved across them.
 
 -- in.cue --
+@experiment(try)
+
+// At the root, the reference to x crosses every clause scope up to the top
+// scope.
+x: true
+for _ in [1] if x {a: 1}
+if true let y = 1 if x {b: y}
+for _ in [1] let y = 1 if x {c: y}
+for _ in [1] for _ in [2] if x {d: 1}
+try y = x? if x {e: y}
+
 // The z in the comprehension refers to m.n.z, so m.z is redundant with #D.
-// The reference is resolved one scope too far out, to m.z, which is kept.
 #D: {
 	z: true
 	...
@@ -17,14 +27,23 @@ m: #D & {
 }
 -- out/trim-v3 --
 == in.cue
+@experiment(try)
+
+// At the root, the reference to x crosses every clause scope up to the top
+// scope.
+x: true
+for _ in [1] if x {a: 1}
+if true let y = 1 if x {b: y}
+for _ in [1] let y = 1 if x {c: y}
+for _ in [1] for _ in [2] if x {d: 1}
+try y = x? if x {e: y}
+
 // The z in the comprehension refers to m.n.z, so m.z is redundant with #D.
-// The reference is resolved one scope too far out, to m.z, which is kept.
 #D: {
 	z: true
 	...
 }
 m: #D & {
-	z: true
 	n: {
 		z: true
 		for _ in [1] if z {y: 1}
@@ -32,14 +51,23 @@ m: #D & {
 }
 -- out/trim-v3-noshare --
 == in.cue
+@experiment(try)
+
+// At the root, the reference to x crosses every clause scope up to the top
+// scope.
+x: true
+for _ in [1] if x {a: 1}
+if true let y = 1 if x {b: y}
+for _ in [1] let y = 1 if x {c: y}
+for _ in [1] for _ in [2] if x {d: 1}
+try y = x? if x {e: y}
+
 // The z in the comprehension refers to m.n.z, so m.z is redundant with #D.
-// The reference is resolved one scope too far out, to m.z, which is kept.
 #D: {
 	z: true
 	...
 }
 m: #D & {
-	z: true
 	n: {
 		z: true
 		for _ in [1] if z {y: 1}

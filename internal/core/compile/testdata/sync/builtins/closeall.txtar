@@ -60,6 +60,32 @@ spreadClosed: {
 	t1: closed & {b: c: 1}
 	t2: open & {b: c: 1}
 }
+
+// close around a __closeAll literal, as the explicitopen rewrite emits for
+// a close call around a struct embedding a definition, keeps the recursive
+// closing, and a comprehension in the literal reads the fields unified
+// with the call. The nested call instead closes the evaluated result of
+// the inner call at one level only, and evaluates the literal on its own.
+closeWrapsCloseAll: {
+	#D: {x: y: int}
+	foo: close({b: {}})
+	a: close(__closeAll({#D..., foo...}))
+	t1: err: a & {x: z: 1}
+	t2: err: a & {b: c: 1}
+	t3: ok:  a & {x: y: 5}
+	guard: close(__closeAll({#D..., k: int, if k == 1 {y: 1}})) & {k: 1}
+}
+
+// issue4535: a comprehension at the top level of the closed struct reads a
+// field as unified where the call appears, as it does for close. The
+// argument is instead evaluated on its own, so the guard reads a
+// non-concrete field. https://cuelang.org/issue/4535
+issue4535: {
+	#D: {k: int, y?: int}
+	s: __closeAll({#D, k: _, if k == 1 {y: 1}})
+	t: s & {k: 1}
+	denied: s & {k: 1, z: 2}
+}
 -- out/compile --
 --- in.cue
 {
@@ -138,6 +164,70 @@ spreadClosed: {
       b: {
         c: 1
       }
+    })
+  }
+  closeWrapsCloseAll: {
+    #D: {
+      x: {
+        y: int
+      }
+    }
+    foo: close({
+      b: {}
+    })
+    a: close(__closeAll({
+      〈1;#D〉...
+      〈1;foo〉...
+    }))
+    t1: {
+      err: (〈1;a〉 & {
+        x: {
+          z: 1
+        }
+      })
+    }
+    t2: {
+      err: (〈1;a〉 & {
+        b: {
+          c: 1
+        }
+      })
+    }
+    t3: {
+      ok: (〈1;a〉 & {
+        x: {
+          y: 5
+        }
+      })
+    }
+    guard: (close(__closeAll({
+      〈1;#D〉...
+      k: int
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    })) & {
+      k: 1
+    })
+  }
+  issue4535: {
+    #D: {
+      k: int
+      y?: int
+    }
+    s: __closeAll({
+      〈1;#D〉
+      k: _
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    })
+    t: (〈0;s〉 & {
+      k: 1
+    })
+    denied: (〈0;s〉 & {
+      k: 1
+      z: 2
     })
   }
 }

@@ -135,6 +135,41 @@ spreadOpen: {
 	t1: v
 	t2: v & {z: 1}
 }
+
+// issue4535: a comprehension at the top level of the closed struct reads a
+// field as unified where the call appears, not as the argument evaluates on
+// its own, just as the struct does without close. The argument is instead
+// evaluated on its own, so the guard reads a non-concrete field.
+// https://cuelang.org/issue/4535
+issue4535: {
+	x: {k: int, if k == 1 {y: 1}}
+	#D: x
+
+	literal:    close({k: int, if k == 1 {y: 1}}) & {k: 1}
+	forClause:  close({k: int, for _, v in [1] if k == v {y: v}}) & {k: 1}
+	optional:   close({a?: string, if a == "x" {b: 1}}) & {a: "x"}
+	reference:  close(x) & {k: 1}
+	definition: close(#D) & {k: 1}
+	embedded:   close({x}) & {k: 1}
+	embedding:  {close(x), k: 1}
+	selected:   (close(x) & {k: 1}).y
+
+	// The guard does not hold, so the field it declares is absent.
+	unmet: close(x) & {k: 2}
+
+	// Closing still applies: the field the comprehension declares is
+	// allowed, one added from outside is not.
+	denied: close(x) & {k: 1, z: 2}
+
+	// Without a value for the field the guard reads, the struct stays
+	// incomplete, as it does without close.
+	alone: close(x)
+
+	// A nested close call, or an expression other than a literal or a
+	// reference, as the argument.
+	nested:     close(close({k: int, if k == 1 {y: 1}})) & {k: 1}
+	expression: close(x & {}) & {k: 1}
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -647,6 +682,78 @@ issue1206: elimination: {
     t1: 〈0;v〉
     t2: (〈0;v〉 & {
       z: 1
+    })
+  }
+  issue4535: {
+    x: {
+      k: int
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    }
+    #D: 〈0;x〉
+    literal: (close({
+      k: int
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    }) & {
+      k: 1
+    })
+    forClause: (close({
+      k: int
+      for _, v in [
+        1,
+      ] if (〈1;k〉 == 〈0;v〉) {
+        y: 〈1;v〉
+      }
+    }) & {
+      k: 1
+    })
+    optional: (close({
+      a?: string
+      if (〈0;a〉 == "x") {
+        b: 1
+      }
+    }) & {
+      a: "x"
+    })
+    reference: (close(〈0;x〉) & {
+      k: 1
+    })
+    definition: (close(〈0;#D〉) & {
+      k: 1
+    })
+    embedded: (close({
+      〈1;x〉
+    }) & {
+      k: 1
+    })
+    embedding: {
+      close(〈1;x〉)
+      k: 1
+    }
+    selected: (close(〈0;x〉) & {
+      k: 1
+    }).y
+    unmet: (close(〈0;x〉) & {
+      k: 2
+    })
+    denied: (close(〈0;x〉) & {
+      k: 1
+      z: 2
+    })
+    alone: close(〈0;x〉)
+    nested: (close(close({
+      k: int
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    })) & {
+      k: 1
+    })
+    expression: (close((〈0;x〉 & {})) & {
+      k: 1
     })
   }
 }

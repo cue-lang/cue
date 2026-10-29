@@ -161,6 +161,57 @@ embeddedDisjunction: {
 		t2: v & {c: 3}
 	}
 }
+
+// A value spread into the literal closes it as a definition it names does,
+// also when the value is a let or a field bound to the definition, which
+// is spread before its own closedness is known.
+boundSpread: {
+	#A: {a: 1}
+	f: #A
+	byLet:   __reclose({let l = #A, l..., c: 2})
+	byField: __reclose({f..., c: 2})
+	t1: byLet & {z: 1}
+	t2: byLet & {a: 1}
+	t3: byField & {z: 1}
+}
+
+// A spread of a close call opens its literal again, but passes the closing
+// of the values spread into that literal on to the enclosing __reclose
+// literal.
+spreadClose: {
+	#D: {x: y: int}
+	bar: {b: {}}
+	h: __reclose({close({#D..., a: 1})..., bar...})
+	t1: err: h & {x: z: 1}
+	t2: err: h & {q: 1}
+	t3: ok:  h & {a: 1}
+}
+
+// close around a __reclose literal keeps the recursive closing a spread
+// definition gives the literal, and __reclose around a close call keeps
+// its one-level closing when no spread value is closed. The nested call
+// instead closes the evaluated result of the inner call at one level, or
+// not at all.
+closeWrapsReclose: {
+	#D: {a: {}}
+	t1: err: close(__reclose({#D...})) & {a: z: 1}
+	t2: err: __reclose(close({})) & {z: 1}
+}
+
+// issue4535: a comprehension at the top level of the closed struct reads a
+// field as unified where the call appears, as it does for close, and the
+// closing the spread definition gives the struct applies there as well.
+// The argument is instead evaluated on its own, so the guard reads a
+// non-concrete field. https://cuelang.org/issue/4535
+issue4535: {
+	#D: {k: int, y?: int}
+	s: __reclose({#D..., k: _, if k == 1 {y: 1}})
+	t: s & {k: 1}
+	denied: s & {k: 1, z: 2}
+	// A close call wrapping the __reclose call, as the explicitopen rewrite
+	// emits for a close at field-value level, is unified the same way.
+	wrapped: close(__reclose({#D..., k: _, if k == 1 {y: 1}})) & {k: 1}
+}
 -- out/compile --
 --- in.cue
 {
@@ -419,5 +470,111 @@ embeddedDisjunction: {
         c: 3
       })
     }
+  }
+  boundSpread: {
+    #A: {
+      a: 1
+    }
+    f: 〈0;#A〉
+    byLet: __reclose({
+      let l#1 = 〈1;#A〉
+      〈0;let l#1〉...
+      c: 2
+    })
+    byField: __reclose({
+      〈1;f〉...
+      c: 2
+    })
+    t1: (〈0;byLet〉 & {
+      z: 1
+    })
+    t2: (〈0;byLet〉 & {
+      a: 1
+    })
+    t3: (〈0;byField〉 & {
+      z: 1
+    })
+  }
+  spreadClose: {
+    #D: {
+      x: {
+        y: int
+      }
+    }
+    bar: {
+      b: {}
+    }
+    h: __reclose({
+      close({
+        〈2;#D〉...
+        a: 1
+      })...
+      〈1;bar〉...
+    })
+    t1: {
+      err: (〈1;h〉 & {
+        x: {
+          z: 1
+        }
+      })
+    }
+    t2: {
+      err: (〈1;h〉 & {
+        q: 1
+      })
+    }
+    t3: {
+      ok: (〈1;h〉 & {
+        a: 1
+      })
+    }
+  }
+  closeWrapsReclose: {
+    #D: {
+      a: {}
+    }
+    t1: {
+      err: (close(__reclose({
+        〈2;#D〉...
+      })) & {
+        a: {
+          z: 1
+        }
+      })
+    }
+    t2: {
+      err: (__reclose(close({})) & {
+        z: 1
+      })
+    }
+  }
+  issue4535: {
+    #D: {
+      k: int
+      y?: int
+    }
+    s: __reclose({
+      〈1;#D〉...
+      k: _
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    })
+    t: (〈0;s〉 & {
+      k: 1
+    })
+    denied: (〈0;s〉 & {
+      k: 1
+      z: 2
+    })
+    wrapped: (close(__reclose({
+      〈1;#D〉...
+      k: _
+      if (〈0;k〉 == 1) {
+        y: 1
+      }
+    })) & {
+      k: 1
+    })
   }
 }

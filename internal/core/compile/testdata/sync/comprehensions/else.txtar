@@ -195,6 +195,68 @@ nestedOuterFallback: {
 nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 }
+
+// A guard reads a field before an else clause adds to it. The clause is not
+// pushed down to the field, so the guard sees the field incomplete.
+guardReadsElseField: {
+	x: {
+		n: string
+		if false {} else { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+}
+
+// A guard reads a field before a for-fallback clause adds to it. The clause is
+// not pushed down to the field, so the guard sees the field incomplete.
+guardReadsFallbackField: {
+	x: {
+		n: string
+		for _ in [] {} fallback { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+}
+
+// A guard reads a field declared only by an else clause. The clause is not
+// pushed down to the field, so the guard finds no such field.
+guardReadsElseOnlyField: {
+	x: {
+		if false {} else { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+}
+
+// A guard reads a field declared only by an else clause which does not run.
+guardReadsUnusedElseField: {
+	x: {
+		if true {} else { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+}
+
+// A guard reads a field declared by both the body and the else clause.
+guardReadsSharedField: {
+	x: {
+		if true { n: "a" } else { n: "b" }
+	}
+	if x.n == "a" { z: 1 }
+}
+
+// A guard reads a field declared only by its own else clause. The clause is
+// not pushed down to the field, so the guard finds no such field rather than
+// a cycle.
+guardReadsOwnElseField: {
+	x: {
+		if x.n == "b" { m: 1 } else { n: "b" }
+	}
+}
+
+// A required-field error points at the structs which do not declare the
+// field. A struct declaring it in an else clause is not one of them, but the
+// clause is not inspected, so the struct at 2:5 is listed.
+requiredDeclaredInElse: {
+	x: matchN(1, [{n!: int}])
+	x: { if true {} else { n: 1 } }
+}
 -- out/compile --
 --- in.cue
 {
@@ -521,6 +583,81 @@ nestedInnerFallback: {
       }
     } else {
       outer: true
+    }
+  }
+  guardReadsElseField: {
+    x: {
+      n: string
+      if false {} else {
+        n: "b"
+      }
+    }
+    if (〈0;x〉.n == "b") {
+      z: 1
+    }
+  }
+  guardReadsFallbackField: {
+    x: {
+      n: string
+      for _, _ in [] {} else {
+        n: "b"
+      }
+    }
+    if (〈0;x〉.n == "b") {
+      z: 1
+    }
+  }
+  guardReadsElseOnlyField: {
+    x: {
+      if false {} else {
+        n: "b"
+      }
+    }
+    if (〈0;x〉.n == "b") {
+      z: 1
+    }
+  }
+  guardReadsUnusedElseField: {
+    x: {
+      if true {} else {
+        n: "b"
+      }
+    }
+    if (〈0;x〉.n == "b") {
+      z: 1
+    }
+  }
+  guardReadsSharedField: {
+    x: {
+      if true {
+        n: "a"
+      } else {
+        n: "b"
+      }
+    }
+    if (〈0;x〉.n == "a") {
+      z: 1
+    }
+  }
+  guardReadsOwnElseField: {
+    x: {
+      if (〈1;x〉.n == "b") {
+        m: 1
+      } else {
+        n: "b"
+      }
+    }
+  }
+  requiredDeclaredInElse: {
+    x: matchN(1, [
+      {
+        n!: int
+      },
+    ])
+    x: {
+      if true {} else {
+        n: 1
+      }
     }
   }
 }

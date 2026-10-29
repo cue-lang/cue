@@ -225,6 +225,106 @@ nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 	@test(eq, {inner: true})
 }
+
+// A guard reads a field before an else clause adds to it. The clause is not
+// pushed down to the field, so the guard sees the field incomplete.
+guardReadsElseField: {
+	x: {
+		n: string
+		if false {} else { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+	@test(err, code=incomplete, contains="non-concrete value string in operand to ==")
+	@test(eq:todo, {x: {n: "b"}, z: 1})
+}
+
+// A guard reads a field before a for-fallback clause adds to it. The clause is
+// not pushed down to the field, so the guard sees the field incomplete.
+guardReadsFallbackField: {
+	x: {
+		n: string
+		for _ in [] {} fallback { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+	@test(err, code=incomplete, contains="non-concrete value string in operand to ==")
+	@test(eq:todo, {x: {n: "b"}, z: 1})
+}
+
+// A guard reads a field declared only by an else clause. The clause is not
+// pushed down to the field, so the guard finds no such field.
+guardReadsElseOnlyField: {
+	x: {
+		if false {} else { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+	@test(err, code=incomplete, contains="undefined field: n")
+	@test(eq:todo, {x: {n: "b"}, z: 1})
+}
+
+// A guard reads a field declared only by an else clause which does not run.
+guardReadsUnusedElseField: {
+	x: {
+		if true {} else { n: "b" }
+	}
+	if x.n == "b" { z: 1 }
+	@test(err, code=incomplete, contains="undefined field: n")
+}
+
+// A guard reads a field declared by both the body and the else clause.
+guardReadsSharedField: {
+	x: {
+		if true { n: "a" } else { n: "b" }
+	}
+	if x.n == "a" { z: 1 }
+	@test(eq, {x: {n: "a"}, z: 1})
+}
+
+// A guard reads a field declared only by its own else clause. The clause is
+// not pushed down to the field, so the guard finds no such field rather than
+// a cycle.
+guardReadsOwnElseField: {
+	x: {
+		if x.n == "b" { m: 1 } else { n: "b" }
+	}
+	@test(err, code=incomplete, at=x, contains="undefined field: n")
+	@test(err:todo, code=cycle, at=x, contains="cyclic reference to field n")
+}
+
+// A required-field error points at the structs which do not declare the
+// field. A struct declaring it in an else clause is not one of them, but the
+// clause is not inspected, so the struct at 2:5 is listed.
+requiredDeclaredInElse: {
+	x: matchN(1, [{n!: int}])
+	x: { if true {} else { n: 1 } }
+	@test(err, code=incomplete, at=x,
+		suberr=(code=incomplete, contains="does not satisfy matchN", pos=[1:5, 1:12, 2:5]),
+		suberr=(code=incomplete, contains="field is required but not present", pos=[1:5, 1:17, 2:5, 2:15]))
+}
+-- out/errors.txt --
+[incomplete] guardReadsElseField: non-concrete value string in operand to ==:
+    ./in.cue:235:5
+    ./in.cue:232:6
+[incomplete] guardReadsFallbackField: non-concrete value string in operand to ==:
+    ./in.cue:247:5
+    ./in.cue:244:6
+[incomplete] guardReadsElseOnlyField: undefined field: n:
+    ./in.cue:258:7
+    ./in.cue:255:2
+[incomplete] guardReadsUnusedElseField: undefined field: n:
+    ./in.cue:268:7
+    ./in.cue:265:2
+[incomplete] guardReadsOwnElseField.x: undefined field: n:
+    ./in.cue:286:8
+    ./in.cue:285:2
+[incomplete] requiredDeclaredInElse.x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:296:5
+    ./in.cue:296:12
+    ./in.cue:297:5
+requiredDeclaredInElse.x.n: field is required but not present:
+    ./in.cue:296:5
+    ./in.cue:296:17
+    ./in.cue:297:5
+    ./in.cue:297:15
 -- out/eval/stats --
 Leaks:  41
 Freed:  116

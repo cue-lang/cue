@@ -20,8 +20,8 @@ github.com/go-quicktest/qt v1.102.0 h1:HSQxCeh5YZH3EL3W39ixjtyaEhcWSXQHtHnMBzSs4
 github.com/go-quicktest/qt v1.102.0/go.mod h1:p4lGIVX+8Wa6ZPNDvqcxq36XpUDLh42FLetFU7odllI=
 github.com/goccy/go-yaml v1.19.3-0.20260407131736-edee2f91616c h1:fcmjo7ROtW1Oio6t5PwTaAuCg8zDO4havJoZD81GnFE=
 github.com/goccy/go-yaml v1.19.3-0.20260407131736-edee2f91616c/go.mod h1:XBurs7gK8ATbW4ZPGKgcbrY1Br56PdM69F7LkFRi1kA=
-github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
-github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
+github.com/google/go-cmp v0.7.1-0.20261029010250-cb6e62ef52b3 h1:b8BmdFlJdkBkH5HKG3m9sZRLW3CelnC19bIBPw63yJE=
+github.com/google/go-cmp v0.7.1-0.20261029010250-cb6e62ef52b3/go.mod h1:clbmL2GfVfcoXit5woVHfwPARdim2aNGjNAEpf3jvD4=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=

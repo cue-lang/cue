@@ -10,7 +10,7 @@ require (
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0
 	github.com/goccy/go-yaml v1.19.3-0.20260407131736-edee2f91616c
-	github.com/google/go-cmp v0.7.0
+	github.com/google/go-cmp v0.7.1-0.20261029010250-cb6e62ef52b3
 	github.com/google/uuid v1.6.0
 	github.com/opencontainers/go-digest v1.0.1-0.20261015205711-63db54280247
 	github.com/opencontainers/image-spec v1.1.1

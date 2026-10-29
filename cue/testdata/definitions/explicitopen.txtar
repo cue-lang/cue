@@ -490,6 +490,21 @@ recloseConjunction: {
 		m: c & {y: 3} @test(err, code=eval, contains="field not allowed")
 	}
 }
+// A spread opens the definition it spreads, so the struct admits any field.
+// The API instead reports it as closed and as not allowing the field, even
+// though unifying the field succeeds.
+spreadDefClosed: {
+	#D: {a: {}}
+	v: {#D...}
+	t1: v @test(closed:todo=false) @test(allows:todo, z)
+	t2: v & {z: 1} @test(eq, {a: {}, z: 1})
+	// The same holds for a spread of a __reclose literal which a definition
+	// closes.
+	w: {__reclose({#D...})...}
+	t3: w @test(closed:todo=false) @test(allows:todo, z)
+	t4: w & {z: 1} @test(eq, {a: {}, z: 1})
+}
+
 -- out/errors.txt --
 [eval] reclose.t1.err.b: field not allowed:
     ./issues.cue:36:16
@@ -656,18 +671,18 @@ f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
 Leaks:  29
-Freed:  840
-Reused: 754
-Allocs: 115
+Freed:  855
+Reused: 768
+Allocs: 116
 Retain: 0
 
-Unifications: 774
-Conjuncts:    1968
+Unifications: 789
+Conjuncts:    2001
 Disjuncts:    50
 
-NumCloseIDs: 689
+NumCloseIDs: 697
 
-ConjunctInfos:       1315
+ConjunctInfos:       1338
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         3

@@ -488,6 +488,21 @@ recloseConjunction: {
 		m: c & {y: 3}
 	}
 }
+// A spread opens the definition it spreads, so the struct admits any field.
+// The API instead reports it as closed and as not allowing the field, even
+// though unifying the field succeeds.
+spreadDefClosed: {
+	#D: {a: {}}
+	v: {#D...}
+	t1: v
+	t2: v & {z: 1}
+	// The same holds for a spread of a __reclose literal which a definition
+	// closes.
+	w: {__reclose({#D...})...}
+	t3: w
+	t4: w & {z: 1}
+}
+
 -- out/compile --
 --- issues.cue
 {
@@ -882,6 +897,27 @@ recloseConjunction: {
         y: 3
       })
     }
+  }
+  spreadDefClosed: {
+    #D: {
+      a: {}
+    }
+    v: {
+      〈1;#D〉...
+    }
+    t1: 〈0;v〉
+    t2: (〈0;v〉 & {
+      z: 1
+    })
+    w: {
+      __reclose({
+        〈2;#D〉...
+      })...
+    }
+    t3: 〈0;w〉
+    t4: (〈0;w〉 & {
+      z: 1
+    })
   }
 }
 --- new.cue

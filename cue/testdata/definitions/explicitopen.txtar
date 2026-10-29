@@ -413,9 +413,12 @@ recloseSame: {
 		t: g2 & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="empty disjunction")
 	}
 
-	// A reference naming a definition closes the opened field it reaches,
-	// also for a field reaching it through such a reference, while a
-	// reference through a regular field holding the definition does not.
+	// A definition re-closes a field it opens with `...`, so selecting the
+	// field closes it however the definition is reached: through a reference
+	// naming it, or through a regular field holding it, possibly unified with
+	// something else, or opened through a conjunction. An ellipsis in the
+	// field keeps it open, as does a spread beside the definition, whose
+	// fields the definition does not declare.
 	crossing: {
 		#D: s: #B...
 		m: #D.s & {y: 3} @test(err, code=eval, contains="field not allowed")
@@ -427,9 +430,45 @@ recloseSame: {
 		v: #D.s
 		p: u & {y: 3} @test(err, code=eval, contains="field not allowed")
 		d: #D
-		q: d.s & {y: 3} @test(eq, {x: 2, y: 3})
+		q: d.s & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
 		w: d.s
-		r: w & {y: 3} @test(eq, {x: 2, y: 3})
+		r: w & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		du: #D & {}
+		h: du.s & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+
+		#E: s: (#B & {})...
+		e: #E
+		x: e.s & {y: 3} @test(err, code=eval, contains="field not allowed")
+
+		#F: s: {#B..., ...}
+		f: #F
+		g: f.s & {y: 3} @test(eq, {x: 2, y: 3})
+
+		#Open: {...}
+		#Extra: s: t: {a: 1}
+		dx: #Open & #Extra...
+		mx: dx & {s: b: 2} @test(eq, {s: {t: {a: 1}, b: 2}})
+		nx: dx.s & {b: 2} @test(eq, {t: {a: 1}, b: 2})
+		ox: dx.s.t & {b: 2} @test(eq, {a: 1, b: 2})
+		dy: #Open & (#Extra & {})...
+		ny: dy.s & {b: 2} @test(eq, {t: {a: 1}, b: 2})
+
+		// The same holds when the selected field does not share the
+		// definition's vertex. A spread within the definition is re-closed
+		// at every level, also at the definition's own level and when the
+		// definition is unified inline.
+		#H: s: {x: 1, ...}
+		dh: #H & #Extra...
+		eh: dh.s & {}
+		ph: eh.t & {b: 2} @test(eq, {a: 1, b: 2})
+		#Z: {#Extra..., s: {x: 1}}
+		dz: #Z & {}
+		pz: dz.s.t & {b: 2} @test(eq, {a: 1, b: 2}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		#Y: {#Extra...}
+		dw: #Y & {}
+		pw: dw.s & {b: 2} @test(eq, {t: {a: 1}, b: 2}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		#K: s: {x: 1}
+		ik: (#K & #Extra...).s @test(eq, {x: 1, t: {a: 1}}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
 	}
 }
 // A definition re-closes a conjunction it is an operand of, opened with
@@ -524,21 +563,23 @@ recloseSame.readDisjunct.m.y: field not allowed:
 [eval] recloseSame.def.o.y: field not allowed:
     ./issues.cue:195:11
 [eval] recloseSame.crossing.m.y: field not allowed:
-    ./issues.cue:223:14
+    ./issues.cue:226:14
 [eval] recloseSame.crossing.n.y: field not allowed:
-    ./issues.cue:225:11
+    ./issues.cue:228:11
 [eval] recloseSame.crossing.o.y: field not allowed:
-    ./issues.cue:227:11
-[eval] recloseSame.crossing.p.y: field not allowed:
     ./issues.cue:230:11
+[eval] recloseSame.crossing.p.y: field not allowed:
+    ./issues.cue:233:11
+[eval] recloseSame.crossing.x.y: field not allowed:
+    ./issues.cue:243:13
 [eval] recloseConjunction.field.m.y: field not allowed:
-    ./issues.cue:246:11
+    ./issues.cue:285:11
 [eval] recloseConjunction.inline.y: field not allowed:
-    ./issues.cue:248:34
+    ./issues.cue:287:34
 [eval] recloseConjunction.inlineRev.y: field not allowed:
-    ./issues.cue:249:34
+    ./issues.cue:288:34
 [eval] recloseConjunction.embedded.m.y: field not allowed:
-    ./issues.cue:253:11
+    ./issues.cue:292:11
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:
@@ -611,18 +652,18 @@ f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
 Leaks:  29
-Freed:  743
-Reused: 657
+Freed:  840
+Reused: 754
 Allocs: 115
 Retain: 0
 
-Unifications: 678
-Conjuncts:    1791
+Unifications: 774
+Conjuncts:    1968
 Disjuncts:    50
 
-NumCloseIDs: 653
+NumCloseIDs: 689
 
-ConjunctInfos:       1184
+ConjunctInfos:       1315
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         3

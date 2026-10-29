@@ -411,9 +411,12 @@ recloseSame: {
 		t: g2 & {y: 3}
 	}
 
-	// A reference naming a definition closes the opened field it reaches,
-	// also for a field reaching it through such a reference, while a
-	// reference through a regular field holding the definition does not.
+	// A definition re-closes a field it opens with `...`, so selecting the
+	// field closes it however the definition is reached: through a reference
+	// naming it, or through a regular field holding it, possibly unified with
+	// something else, or opened through a conjunction. An ellipsis in the
+	// field keeps it open, as does a spread beside the definition, whose
+	// fields the definition does not declare.
 	crossing: {
 		#D: s: #B...
 		m: #D.s & {y: 3}
@@ -428,6 +431,42 @@ recloseSame: {
 		q: d.s & {y: 3}
 		w: d.s
 		r: w & {y: 3}
+		du: #D & {}
+		h: du.s & {y: 3}
+
+		#E: s: (#B & {})...
+		e: #E
+		x: e.s & {y: 3}
+
+		#F: s: {#B..., ...}
+		f: #F
+		g: f.s & {y: 3}
+
+		#Open: {...}
+		#Extra: s: t: {a: 1}
+		dx: #Open & #Extra...
+		mx: dx & {s: b: 2}
+		nx: dx.s & {b: 2}
+		ox: dx.s.t & {b: 2}
+		dy: #Open & (#Extra & {})...
+		ny: dy.s & {b: 2}
+
+		// The same holds when the selected field does not share the
+		// definition's vertex. A spread within the definition is re-closed
+		// at every level, also at the definition's own level and when the
+		// definition is unified inline.
+		#H: s: {x: 1, ...}
+		dh: #H & #Extra...
+		eh: dh.s & {}
+		ph: eh.t & {b: 2}
+		#Z: {#Extra..., s: {x: 1}}
+		dz: #Z & {}
+		pz: dz.s.t & {b: 2}
+		#Y: {#Extra...}
+		dw: #Y & {}
+		pw: dw.s & {b: 2}
+		#K: s: {x: 1}
+		ik: (#K & #Extra...).s
 	}
 }
 // A definition re-closes a conjunction it is an operand of, opened with
@@ -731,6 +770,87 @@ recloseConjunction: {
       r: (〈0;w〉 & {
         y: 3
       })
+      du: (〈0;#D〉 & {})
+      h: (〈0;du〉.s & {
+        y: 3
+      })
+      #E: {
+        s: (〈2;#B〉 & {})...
+      }
+      e: 〈0;#E〉
+      x: (〈0;e〉.s & {
+        y: 3
+      })
+      #F: {
+        s: {
+          〈3;#B〉...
+          ...
+        }
+      }
+      f: 〈0;#F〉
+      g: (〈0;f〉.s & {
+        y: 3
+      })
+      #Open: {
+        ...
+      }
+      #Extra: {
+        s: {
+          t: {
+            a: 1
+          }
+        }
+      }
+      dx: (〈0;#Open〉 & 〈0;#Extra〉...)
+      mx: (〈0;dx〉 & {
+        s: {
+          b: 2
+        }
+      })
+      nx: (〈0;dx〉.s & {
+        b: 2
+      })
+      ox: (〈0;dx〉.s.t & {
+        b: 2
+      })
+      dy: (〈0;#Open〉 & (〈0;#Extra〉 & {})...)
+      ny: (〈0;dy〉.s & {
+        b: 2
+      })
+      #H: {
+        s: {
+          x: 1
+          ...
+        }
+      }
+      dh: (〈0;#H〉 & 〈0;#Extra〉...)
+      eh: (〈0;dh〉.s & {})
+      ph: (〈0;eh〉.t & {
+        b: 2
+      })
+      #Z: {
+        〈1;#Extra〉...
+        s: {
+          x: 1
+        }
+      }
+      dz: (〈0;#Z〉 & {})
+      pz: (〈0;dz〉.s.t & {
+        b: 2
+      })
+      #Y: {
+        〈1;#Extra〉...
+      }
+      dw: (〈0;#Y〉 & {})
+      pw: (〈0;dw〉.s & {
+        b: 2
+      })
+      #K: {
+        s: {
+          x: 1
+        }
+      }
+      ik: (〈0;#K〉 & 〈0;#Extra〉...).s
     }
   }
   recloseConjunction: {

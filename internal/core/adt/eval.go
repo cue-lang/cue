@@ -96,6 +96,9 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 	switch x := v.BaseValue.(type) {
 	case *Bottom:
 		if x.IsIncomplete() {
+			if state.keepIncomplete {
+				return v
+			}
 			c.AddBottom(x)
 			return nil
 		}

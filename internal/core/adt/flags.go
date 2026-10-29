@@ -29,6 +29,10 @@ type Flags struct {
 
 	// checkTypos indicates whether to check for typos (closedness).
 	checkTypos bool
+
+	// keepIncomplete indicates that a vertex whose value is an incomplete
+	// error is returned as that vertex rather than as the error.
+	keepIncomplete bool
 }
 
 var (

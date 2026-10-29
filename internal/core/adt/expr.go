@@ -2881,9 +2881,12 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 				condition: state.condition | fieldSetKnown | concreteKnown | disjunctionTask,
 				mode:      state.mode,
 			}
-			if builtin.PerDisjunct {
+			switch {
+			case builtin.Closes != NoClosing:
+				expr = c.closedArg(a, flags)
+			case builtin.PerDisjunct:
 				expr = c.valueOrDisjunction(a, flags)
-			} else {
+			default:
 				expr = c.value(a, flags)
 			}
 		}
@@ -3195,7 +3198,9 @@ type Builtin struct {
 	// struct literal is unified where the call appears as that literal,
 	// closed, rather than evaluating the literal on its own first, so that
 	// a comprehension in the literal reads the fields unified with it; see
-	// [nodeContext.scheduleClosedLiteral].
+	// [nodeContext.scheduleClosedLiteral]. A reference passed to it is
+	// taken as the vertex it resolves to even when that vertex is
+	// incomplete, for the same reason; see [OpContext.closedArg].
 	Closes Closing
 
 	Func func(call BuiltinCallContext) Expr
@@ -3380,6 +3385,11 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 		call.args = append(call.args, x.Params[i].Default())
 	}
 	for i, a := range call.args {
+		if x.Closes != NoClosing && isIncompleteVertex(a) {
+			// An incomplete vertex is closed and unified where the result
+			// is; see [OpContext.closedArg].
+			continue
+		}
 		if b := bottom(a); b != nil {
 			return b
 		}

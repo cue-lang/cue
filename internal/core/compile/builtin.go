@@ -139,9 +139,14 @@ var closeBuiltin = &adt.Builtin{
 		c := call.OpContext()
 		v := call.Value(0)
 		s, ok := v.(*adt.Vertex)
-		if !ok || s.Kind()&(adt.StructKind|adt.ListKind) == 0 {
+		if !ok {
 			// Closing concerns the fields of a struct, so any other value
 			// is returned unchanged.
+			return v
+		}
+		// An incomplete vertex has no kind yet; it is closed and unified
+		// where the result is, see [adt.OpContext.closedArg].
+		if k := s.Kind(); k&(adt.StructKind|adt.ListKind) == 0 && k != adt.BottomKind {
 			return v
 		}
 		// TODO(evalv3) this is a rather convoluted and inefficient way to

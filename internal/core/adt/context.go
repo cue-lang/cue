@@ -799,13 +799,45 @@ func (c *OpContext) value(x Expr, state Flags) (result Value) {
 // evaluates the arguments of builtins marked [Builtin.PerDisjunct].
 func (c *OpContext) valueOrDisjunction(x Expr, state Flags) Value {
 	state.concrete = true
-	v := c.evalState(x, state)
+	return c.disjunctionOrDefault(c.evalState(x, state))
+}
 
+// closedArg evaluates an argument of a builtin marked [Builtin.Closes]. It
+// is like [OpContext.valueOrDisjunction], except that a reference to a
+// vertex whose evaluation is incomplete is returned as that vertex rather
+// than as its error: the vertex's conjuncts are evaluated again where the
+// result of the call is unified, as they are for a plain reference there.
+func (c *OpContext) closedArg(x Expr, state Flags) Value {
+	state.concrete = true
+	_, isRef := x.(Resolver)
+	state.keepIncomplete = isRef
+	v := c.evalState(x, state)
+	if isRef && isIncompleteVertex(v) {
+		return v
+	}
+	return c.disjunctionOrDefault(v)
+}
+
+// disjunctionOrDefault returns the disjunction v holds, defaults and all,
+// or otherwise its default, unwrapped.
+func (c *OpContext) disjunctionOrDefault(v Value) Value {
 	if d := disjunctionOf(v); d != nil {
 		return d
 	}
 	v, _ = c.getDefault(v)
 	return Unwrap(v)
+}
+
+// isIncompleteVertex reports whether v is a vertex whose evaluation is
+// incomplete, such as a struct with a comprehension that reads a field
+// which is not yet concrete.
+func isIncompleteVertex(v Value) bool {
+	x, ok := v.(*Vertex)
+	if !ok {
+		return false
+	}
+	b := x.Bottom()
+	return b != nil && b.IsIncomplete()
 }
 
 // disjunctionOf returns the disjunction v holds, looking through vertices

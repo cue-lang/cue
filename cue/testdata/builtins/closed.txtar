@@ -201,18 +201,18 @@ issue4535: {
 	literal:    close({k: int, if k == 1 {y: 1}}) & {k: 1} @test(eq, {k: 1, y: 1})
 	forClause:  close({k: int, for _, v in [1] if k == v {y: v}}) & {k: 1} @test(eq, {k: 1, y: 1})
 	optional:   close({a?: string, if a == "x" {b: 1}}) & {a: "x"} @test(eq, {a: "x", b: 1})
-	reference:  close(x) & {k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
-	definition: close(#D) & {k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
+	reference:  close(x) & {k: 1} @test(eq, {k: 1, y: 1})
+	definition: close(#D) & {k: 1} @test(eq, {k: 1, y: 1})
 	embedded:   close({x}) & {k: 1} @test(eq, {k: 1, y: 1})
-	embedding:  {close(x), k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
-	selected:   (close(x) & {k: 1}).y @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, 1)
+	embedding:  {close(x), k: 1} @test(eq, {k: 1, y: 1})
+	selected:   (close(x) & {k: 1}).y @test(eq, 1)
 
 	// The guard does not hold, so the field it declares is absent.
-	unmet: close(x) & {k: 2} @test(err, code=incomplete, contains="non-concrete value int in operand to ==")
+	unmet: close(x) & {k: 2} @test(eq, {k: 2}) @test(closed)
 
 	// Closing still applies: the field the comprehension declares is
 	// allowed, one added from outside is not.
-	denied: close(x) & {k: 1, z: 2} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(err:todo, at=z, code=eval, contains="field not allowed")
+	denied: close(x) & {k: 1, z: 2} @test(err, at=z, code=eval, contains="field not allowed", pos=[0:28])
 
 	// Without a value for the field the guard reads, the struct stays
 	// incomplete, as it does without close.
@@ -319,16 +319,16 @@ issue1206: elimination: {
 
 -- out/eval/stats --
 Leaks:  31
-Freed:  455
-Reused: 417
-Allocs: 69
+Freed:  482
+Reused: 442
+Allocs: 71
 Retain: 0
 
-Unifications: 332
-Conjuncts:    551
+Unifications: 347
+Conjuncts:    584
 Disjuncts:    80
 
-NumCloseIDs: 133
+NumCloseIDs: 142
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7
@@ -367,25 +367,9 @@ scalar.denied.b: field not allowed:
 [incomplete] issue4535.#D: non-concrete value int in operand to ==:
     ./in.cue:197:17
     ./in.cue:197:9
-[incomplete] issue4535.x: non-concrete value int in operand to ==:
-    ./in.cue:197:17
-    ./in.cue:197:9
-[incomplete] issue4535.#D: non-concrete value int in operand to ==:
-    ./in.cue:197:17
-    ./in.cue:197:9
-[incomplete] issue4535.x: non-concrete value int in operand to ==:
-    ./in.cue:197:17
-    ./in.cue:197:9
-[incomplete] issue4535.x: non-concrete value int in operand to ==:
-    ./in.cue:197:17
-    ./in.cue:197:9
-[incomplete] issue4535.x: non-concrete value int in operand to ==:
-    ./in.cue:197:17
-    ./in.cue:197:9
-[incomplete] issue4535.x: non-concrete value int in operand to ==:
-    ./in.cue:197:17
-    ./in.cue:197:9
-[incomplete] issue4535.x: non-concrete value int in operand to ==:
+[eval] issue4535.denied.z: field not allowed:
+    ./in.cue:214:28
+[incomplete] issue4535.alone: non-concrete value int in operand to ==:
     ./in.cue:197:17
     ./in.cue:197:9
 [incomplete] non-concrete value int in operand to ==:

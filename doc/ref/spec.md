@@ -1525,8 +1525,11 @@ to data and are never required to be concrete.
 Referencing a definition will recursively [close](#closed-structs) it.
 That is, a referenced definition will not unify with a struct
 that would add a field anywhere within the definition that it does not
-already define or explicitly allow with a pattern constraint, `...`,
-or the [spread operator](#spread-operator) (postfix `...`).
+already define or explicitly allow with a pattern constraint or `...`.
+This holds for the value of a reference naming the definition, and for
+any field selected from a value holding one.
+Fields that a [spread operator](#spread-operator) (postfix `...`) within
+the definition adds are closed like the fields it declares.
 
 If referencing a definition would always result in an error, implementations
 may report this inconsistency at the point of its declaration.
@@ -1605,8 +1608,20 @@ z: d: 3  // allowed, as nothing closes b
 
 w: #C.b
 w: d: 3  // not allowed, as referencing #C closes b
+
+c: #C
+u: c.b
+u: d: 3  // not allowed, as c holds #C, which closes b
+
+#E: b: {#A..., ...}
+
+e: #E
+t: e.b
+t: d: 3  // allowed, as the ellipsis keeps b open
 ```
 <!-- error:
+u.d: field not allowed:
+    40:4
 v.d: field not allowed:
     17:4
 w.d: field not allowed:
@@ -2397,7 +2412,9 @@ value of any other type is a no-op: `x...` evaluates to `x` unchanged.
      resolved types. -->
 
 If `x...` is used within a definition, normal closedness rules apply after the
-`x` is unified with any other fields.
+`x` is unified with any other fields: the definition closes the fields that
+`x` adds, also when they are selected from a value holding the definition.
+An ellipsis beside `x...` keeps the struct declaring it open.
 
 ```
 #Base: foo: int

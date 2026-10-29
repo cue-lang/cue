@@ -2287,12 +2287,7 @@ compExtends: {
 // so the struct embedding it takes __closeAll.
 selectorDef: {
 	d: #D: {x: int}
-	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
-	// the struct if one of the spread values in it is a closed struct.
-	v: __reclose({
-		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
-		// if the value is a closed struct, or closes a nested struct at a path which
-		// the enclosing struct also declares.
+	v: __closeAll({
 		d.#D...
 		y: int
 	})

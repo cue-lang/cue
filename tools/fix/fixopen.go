@@ -894,6 +894,14 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 			return embedFlags{def: true}
 		}
 		return embedFlags{other: true}
+	case *ast.SelectorExpr:
+		// A definition selected from a package or a struct, or a path
+		// below one, is closed recursively like a definition named
+		// directly.
+		if _, ok := definitionRef(x); ok {
+			return embedFlags{def: true}
+		}
+		return embedFlags{other: true}
 	case *ast.CallExpr:
 		if id, ok := x.Fun.(*ast.Ident); ok {
 			switch id.Name {
@@ -932,7 +940,7 @@ func collectEmbedFlags(expr ast.Expr) embedFlags {
 		return embedFlags{}
 	}
 
-	// Default: may resolve to a closed struct (SelectorExpr, IndexExpr, etc.)
+	// Default: may resolve to a closed struct (IndexExpr, etc.)
 	return embedFlags{other: true}
 }
 

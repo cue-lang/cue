@@ -141,12 +141,15 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	ci := ctx.ci
 	// A reference naming a definition, or resolving to one, closes the node,
 	// even when the definition, or a field inside it, shares a vertex through
-	// an opened reference. arc is checked before following its own sharing,
-	// as a regular field sharing an opened definition stays open. Unlike
-	// scheduleVertexConjuncts, this does not consider crossing a definition:
-	// sharing resolves d.s to #D.s for d: #D, yet d.s stays open.
+	// an opened reference. So does a reference reaching such a field from
+	// outside the definition, as d.s for #D: s: #B... and d: #D: the
+	// definition re-closes the field it opened, as in scheduleVertexConjuncts.
+	// arc is checked before following its own sharing, as a regular field
+	// sharing an opened definition stays open.
+	x := t.x.(Expr)
 	opened := t.id.Opened ||
-		(!arc.Label.IsDef() && !namesDefinition(t.x.(Expr), t.id) && arc.sharesOpened())
+		(!arc.Label.IsDef() && !namesDefinition(x, t.id) && arc.sharesOpened() &&
+			!crossesDefinition(ctx, t.env, x, arc))
 	if opened {
 		ci.Opened = true
 	}

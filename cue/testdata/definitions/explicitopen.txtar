@@ -430,9 +430,9 @@ recloseSame: {
 		v: #D.s
 		p: u & {y: 3} @test(err, code=eval, contains="field not allowed")
 		d: #D
-		q: d.s & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		q: d.s & {y: 3} @test(err, code=eval, contains="field not allowed")
 		w: d.s
-		r: w & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		r: w & {y: 3} @test(err, code=eval, contains="field not allowed")
 		du: #D & {}
 		h: du.s & {y: 3} @test(eq, {x: 2, y: 3}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
 
@@ -570,6 +570,10 @@ recloseSame.readDisjunct.m.y: field not allowed:
     ./issues.cue:230:11
 [eval] recloseSame.crossing.p.y: field not allowed:
     ./issues.cue:233:11
+[eval] recloseSame.crossing.q.y: field not allowed:
+    ./issues.cue:235:13
+[eval] recloseSame.crossing.r.y: field not allowed:
+    ./issues.cue:237:11
 [eval] recloseSame.crossing.x.y: field not allowed:
     ./issues.cue:243:13
 [eval] recloseConjunction.field.m.y: field not allowed:

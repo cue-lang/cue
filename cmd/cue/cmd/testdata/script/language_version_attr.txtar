@@ -27,6 +27,14 @@ cp stdout def-current
 exec cue def --language-version v0.18.0 x.cue
 cmp stdout def-current
 
+# An old alias named by a keyword, which the current version does not accept
+# as a let or alias name, keeps its name, so the output does not parse there.
+exec cue def kw.cue
+cmp stdout expect/def-kw
+cp stdout def-kw.cue
+! exec cue export def-kw.cue
+stderr 'expected label or .:., found .in.'
+
 # Flag expressions follow the selected version, not the file's attribute.
 ! exec cue export -e '{_y: Y={a: 1, b: Y.a}, c: _y.b}.c' x.cue
 stderr 'old-style alias syntax'
@@ -73,6 +81,31 @@ out: _alias.b
 
 _alias: X={a: 1, b: X.a}
 out:    _alias.b
+-- kw.cue --
+@version(v0.17.0)
+
+f: in={a: 1, b: in.a}
+for=g: {a: 2}
+h: for.a
+-- expect/def-kw --
+f: {
+	let in = self
+	a: 1
+	b: in.a
+}
+g~(for): a: 2
+h: for.a
+-- expect/export-kw --
+{
+    "f": {
+        "a": 1,
+        "b": 1
+    },
+    "g": {
+        "a": 2
+    },
+    "h": 2
+}
 -- y.cue --
 y: 1
 -- plain.cue --

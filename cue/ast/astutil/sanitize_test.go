@@ -562,6 +562,109 @@ import "list"
 
 a: list.Min
 `,
+	}, {
+		// A keyword cannot name a let or an alias, but a rewrite from the
+		// old prefix aliases, which allowed it, may produce one.
+		desc: "Rename lets and postfix aliases named by a keyword",
+		file: func() *ast.File {
+			let := &ast.LetClause{
+				Ident: ast.NewIdent("in"),
+				Expr:  ast.NewLit(token.INT, "1"),
+			}
+			field := &ast.Field{
+				Label: ast.NewIdent("g"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("for")},
+				Value: ast.NewLit(token.INT, "2"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				let,
+				field,
+				&ast.Field{
+					Label: ast.NewIdent("in_1"),
+					Value: ast.NewLit(token.INT, "3"),
+				},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewBinExpr(token.ADD,
+						&ast.Ident{Name: "in", Node: let},
+						&ast.Ident{Name: "for", Node: field},
+					),
+				},
+			}}
+		}(),
+		// The names are left as they are, so the result does not parse.
+		// The output keeps the keywords, so it does not parse.
+		want: `let in = 1
+g~(for): 2
+in_1:    3
+a:       in + for
+`,
+	}, {
+		// A reference to a field shadowed where it is used, which reaches it
+		// through its alias named by a keyword.
+		desc: "Reference a shadowed field through its alias named by a keyword",
+		file: func() *ast.File {
+			field := &ast.Field{
+				Label: ast.NewIdent("a"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("for")},
+				Value: ast.NewString("b"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				field,
+				&ast.Field{
+					Label: ast.NewIdent("c"),
+					Value: ast.NewStruct(
+						ast.NewIdent("a"), ast.NewStruct(),
+						ast.NewIdent("b"), &ast.Ident{
+							Name: "a",
+							Node: field.Value,
+						},
+					),
+				},
+			}}
+		}(),
+		// The output keeps the keywords, so it does not parse.
+		want: `let for_1 = for
+a~(for): "b"
+c: {
+	a: {}
+	b: for_1
+}
+`,
+	}, {
+		// A reference to a let named by a keyword, shadowed where it is used
+		// by another let of the same name.
+		desc: "Reference a shadowed let named by a keyword",
+		file: func() *ast.File {
+			outer := &ast.LetClause{
+				Ident: ast.NewIdent("in"),
+				Expr:  ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				outer,
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: &ast.StructLit{Elts: []ast.Decl{
+						&ast.LetClause{
+							Ident: ast.NewIdent("in"),
+							Expr:  ast.NewLit(token.INT, "2"),
+						},
+						&ast.Field{
+							Label: ast.NewIdent("b"),
+							Value: &ast.Ident{Name: "in", Node: outer},
+						},
+					}},
+				},
+			}}
+		}(),
+		// The output keeps the keywords, so it does not parse.
+		want: `let in_1 = in
+let in = 1
+a: {
+	let in = 2
+	b: in_1
+}
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

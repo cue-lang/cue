@@ -1,0 +1,106 @@
+#upgrade:v0.18.0
+
+# An old alias may be named by a keyword such as "in" or "for", which
+# the new syntax does not accept as a let or alias name. Such aliases
+# and their references are renamed, each to a name which the package
+# does not otherwise use, as a let cannot shadow a field.
+#
+# The output below keeps the keywords, so it does not parse.
+
+-- cue.mod/module.cue --
+module: "upgrade.test"
+
+language: { version: "v0.17.0" }
+
+-- a.cue --
+package foo
+
+f: in={
+	a: 1
+	b: in.a
+}
+for=g: {a: 2}
+h: for.a
+p: [if=string]: {name: if}
+p: x: _
+px: p.x.name
+
+// Both a label alias and a value alias.
+try=q: fallback={
+	a: 1
+	b: fallback.a
+	c: try.a
+}
+
+// A field labeled by a keyword is left alone.
+func: 5
+s: else={
+	a: func
+	b: else.a
+}
+-- b.cue --
+package foo
+
+// The name a keyword alias would take is already used in the file.
+in_1: 10
+r: in={
+	a: 1
+	b: in.a
+	c: in_1
+	d: {in_1: 3, e: in.a}
+}
+
+// An alias of a value which is not a struct is bound in an embedding,
+// which then starts with a reference to it.
+t: for=for.b & {b: {c: 1}}
+tc: t.c
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "upgrade.test"
+language: version: "v0.18.0"
+--- a.cue
+package foo
+
+f: {
+	let in = self
+	a: 1
+	b: in.a
+}
+g~(for): {a: 2}
+h:       for.a
+p: [string]~(if,_): {name: if}
+p: x:               _
+px: p.x.name
+
+// Both a label alias and a value alias.
+q~(try): {
+	let fallback = self
+	a: 1
+	b: fallback.a
+	c: try.a
+}
+
+// A field labeled by a keyword is left alone.
+func: 5
+s: {
+	let else = self
+	a: func
+	b: else.a
+}
+--- b.cue
+package foo
+
+// The name a keyword alias would take is already used in the file.
+in_1: 10
+r: {
+	let in = self
+	a: 1
+	b: in.a
+	c: in_1
+	d: {in_1: 3, e: in.a}
+}
+
+// An alias of a value which is not a struct is bound in an embedding,
+// which then starts with a reference to it.
+t:  {let for = self, for.b & {b: {c: 1}}}
+tc: t.c

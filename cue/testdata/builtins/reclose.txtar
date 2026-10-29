@@ -66,13 +66,9 @@ nonRecursiveDetect: {
 	t2: ok: a & {b: c: 1} @test(eq, {b: {c: 1}})
 }
 
-// Test that __reclose handles both recursive and non-recursive closing
-// when both are present.
-//
-// NOTE: one would expect that with the old semantics, b.c is allowed in t2.
-// But it is NOT. To mimic the old behavior, cue fix _could_ just use __closeAll
-// in this case. Users can than chose to use __reclose instead to relax the
-// condition.
+// __reclose closes the struct as strongly as any value it embeds: a
+// definition closes it recursively even when a value closed by close is
+// embedded beside it.
 mixedClose: {
 	#D: {x: y: int}
 	foo: close({b: {}})
@@ -84,10 +80,9 @@ mixedClose: {
 	t1: err: a & {f: int} @test(err, code=eval, path=f, contains="field not allowed", pos=[0:16])
 	// The definition closes the struct recursively, so the field added below
 	// the one the close()d value declares is denied, as is one below a field
-	// the definition declares. The spread of the close()d value instead leaks
-	// its one-level closing into the node, which admits both.
-	t2: ok: a & {x: y: 5, b: c: 1} @test(eq, {x: {y: 5}, b: {c: 1}}) @test(err:todo, at=b.c, code=eval, contains="field not allowed")
-	t3: err: a & {x: z: 1} @test(eq, {x: {y: int, z: 1}, b: {}}) @test(err:todo, at=x.z, code=eval, contains="field not allowed")
+	// the definition declares.
+	t2: err: a & {x: y: 5, b: c: 1} @test(err, code=eval, path=b.c, contains="field not allowed", pos=[0:28])
+	t3: err: a & {x: z: 1} @test(err, code=eval, path=x.z, contains="field not allowed", pos=[0:19])
 	// Allowed fields work.
 	t4: ok: a & {x: y: 5} @test(eq, {x: {y: 5}, b: {}})
 }
@@ -186,26 +181,30 @@ embeddedDisjunction: {
 [eval] nonRecursiveDetect.t1.err.f: field not allowed:
     ./in.cue:63:16
 [eval] mixedClose.t1.err.f: field not allowed:
-    ./in.cue:83:16
+    ./in.cue:79:16
+[eval] mixedClose.t2.err.b.c: field not allowed:
+    ./in.cue:83:28
+[eval] mixedClose.t3.err.x.z: field not allowed:
+    ./in.cue:84:19
 [eval] recloseWrapsClose.t1.err.f: field not allowed:
-    ./in.cue:103:16
+    ./in.cue:98:16
 [eval] recloseWrapsClose.t2.err.a.c: field not allowed:
-    ./in.cue:105:19
+    ./in.cue:100:19
 [eval] nonStructLiterals.t1.err: error in call to __reclose: argument must be a struct or list literal:
-    ./in.cue:112:11
+    ./in.cue:107:11
 [eval] nonStructLiterals.t4.err: error in call to __reclose: argument must be a struct or list literal:
-    ./in.cue:116:11
+    ./in.cue:111:11
 [eval] nonStructDefinitions.t2.err: conflicting values {b:1} and 1 (mismatched types struct and int):
-    ./in.cue:120:8
-    ./in.cue:129:11
-    ./in.cue:129:15
+    ./in.cue:115:8
+    ./in.cue:124:11
+    ./in.cue:124:15
 [eval] embeddedDisjunction.conjunction.t2: 3 errors in empty disjunction:
 embeddedDisjunction.conjunction.t2.a: field not allowed:
-    ./in.cue:157:7
+    ./in.cue:152:7
 embeddedDisjunction.conjunction.t2.c: field not allowed:
-    ./in.cue:172:12
+    ./in.cue:167:12
 embeddedDisjunction.conjunction.t2.z: field not allowed:
-    ./in.cue:158:7
+    ./in.cue:153:7
 -- out/eval/stats --
 Leaks:  25
 Freed:  454

@@ -106,8 +106,7 @@ disjunctValue: {
 }
 
 // A spread opens the value it spreads, so a struct spreading a close()d
-// value admits any field. The spread instead marks the struct closed, which
-// the API reports, while every field remains allowed.
+// value admits any field and is not closed.
 spreadOpen: {
 	foo: close({b: {}})
 	v: {foo...}

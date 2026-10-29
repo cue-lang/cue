@@ -88,7 +88,11 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			n.insertValueConjunct(env, x, id)
 		} else {
 			if x.ClosedNonRecursive {
-				n.node.ClosedNonRecursive = true
+				// A closed value closes the node it is unified with,
+				// unless a spread opens it.
+				if !id.Opened && !id.ConjunctOpened {
+					n.node.ClosedNonRecursive = true
+				}
 				id = n.addResolver(x, x, id, false)
 			}
 			n.scheduleVertexConjuncts(c, x, id)
@@ -579,10 +583,14 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	switch x := v.(type) {
 	case *Vertex:
-		if x.ClosedNonRecursive {
-			n.node.ClosedNonRecursive = true
-		} else if x.ClosedRecursive {
-			n.node.ClosedRecursive = true
+		// A closed value closes the node it is unified with, unless a
+		// spread opens it.
+		if !id.Opened && !id.ConjunctOpened {
+			if x.ClosedNonRecursive {
+				n.node.ClosedNonRecursive = true
+			} else if x.ClosedRecursive {
+				n.node.ClosedRecursive = true
+			}
 		}
 		// A vertex which holds a disjunction adds no resolver of its own:
 		// its disjuncts do so as they are processed, each carrying its

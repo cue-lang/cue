@@ -54,15 +54,13 @@ embeddedDisjunction: {
 }
 
 // The recursive closing applies to the fields a spread brings in, whether
-// the spread value is open or closed by close. A spread of a close()d value
-// instead leaks its one-level closing into the node, which admits a field
-// below the struct it declares.
+// the spread value is open or closed by close.
 spreadClosed: {
 	foo: close({b: {}})
 	bar: {b: {}}
 	closed: __closeAll({foo...})
 	open:   __closeAll({bar...})
-	t1: closed & {b: c: 1} @test(eq, {b: {c: 1}}) @test(err:todo, at=b.c, code=eval, contains="field not allowed")
+	t1: closed & {b: c: 1} @test(err, at=b.c, code=eval, contains="field not allowed", pos=[0:19])
 	t2: open & {b: c: 1}   @test(err, at=b.c, code=eval, contains="field not allowed", pos=[0:17])
 }
 -- out/errors.txt --
@@ -78,8 +76,10 @@ spreadClosed: {
     ./in.cue:42:7
 [eval] embeddedDisjunction.t2.d: field not allowed:
     ./in.cue:52:11
+[eval] spreadClosed.t1.b.c: field not allowed:
+    ./in.cue:62:19
 [eval] spreadClosed.t2.b.c: field not allowed:
-    ./in.cue:65:17
+    ./in.cue:63:17
 -- out/eval/stats --
 Leaks:  3
 Freed:  90

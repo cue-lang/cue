@@ -61,13 +61,9 @@ nonRecursiveDetect: {
 	t2: ok: a & {b: c: 1}
 }
 
-// Test that __reclose handles both recursive and non-recursive closing
-// when both are present.
-//
-// NOTE: one would expect that with the old semantics, b.c is allowed in t2.
-// But it is NOT. To mimic the old behavior, cue fix _could_ just use __closeAll
-// in this case. Users can than chose to use __reclose instead to relax the
-// condition.
+// __reclose closes the struct as strongly as any value it embeds: a
+// definition closes it recursively even when a value closed by close is
+// embedded beside it.
 mixedClose: {
 	#D: {x: y: int}
 	foo: close({b: {}})
@@ -79,9 +75,8 @@ mixedClose: {
 	t1: err: a & {f: int}
 	// The definition closes the struct recursively, so the field added below
 	// the one the close()d value declares is denied, as is one below a field
-	// the definition declares. The spread of the close()d value instead leaks
-	// its one-level closing into the node, which admits both.
-	t2: ok: a & {x: y: 5, b: c: 1}
+	// the definition declares.
+	t2: err: a & {x: y: 5, b: c: 1}
 	t3: err: a & {x: z: 1}
 	// Allowed fields work.
 	t4: ok: a & {x: y: 5}
@@ -286,7 +281,7 @@ embeddedDisjunction: {
       })
     }
     t2: {
-      ok: (〈1;a〉 & {
+      err: (〈1;a〉 & {
         x: {
           y: 5
         }

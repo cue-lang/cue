@@ -196,8 +196,7 @@ nestedInnerFallback: {
 	for x in [1] { for y in [] { y } fallback { inner: true } } fallback { outer: true }
 }
 
-// A guard reads a field before an else clause adds to it. The clause is not
-// pushed down to the field, so the guard sees the field incomplete.
+// A guard reads a field before an else clause adds to it.
 guardReadsElseField: {
 	x: {
 		n: string
@@ -206,8 +205,7 @@ guardReadsElseField: {
 	if x.n == "b" { z: 1 }
 }
 
-// A guard reads a field before a for-fallback clause adds to it. The clause is
-// not pushed down to the field, so the guard sees the field incomplete.
+// A guard reads a field before a for-fallback clause adds to it.
 guardReadsFallbackField: {
 	x: {
 		n: string
@@ -216,8 +214,7 @@ guardReadsFallbackField: {
 	if x.n == "b" { z: 1 }
 }
 
-// A guard reads a field declared only by an else clause. The clause is not
-// pushed down to the field, so the guard finds no such field.
+// A guard reads a field declared only by an else clause.
 guardReadsElseOnlyField: {
 	x: {
 		if false {} else { n: "b" }
@@ -241,9 +238,7 @@ guardReadsSharedField: {
 	if x.n == "a" { z: 1 }
 }
 
-// A guard reads a field declared only by its own else clause. The clause is
-// not pushed down to the field, so the guard finds no such field rather than
-// a cycle.
+// A guard reads a field declared only by its own else clause.
 guardReadsOwnElseField: {
 	x: {
 		if x.n == "b" { m: 1 } else { n: "b" }
@@ -251,8 +246,7 @@ guardReadsOwnElseField: {
 }
 
 // A required-field error points at the structs which do not declare the
-// field. A struct declaring it in an else clause is not one of them, but the
-// clause is not inspected, so the struct at 2:5 is listed.
+// field. A struct declaring it in an else clause is not one of them.
 requiredDeclaredInElse: {
 	x: matchN(1, [{n!: int}])
 	x: { if true {} else { n: 1 } }

@@ -263,8 +263,9 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex, morePositions ...Node
 	return b
 }
 
-// declaresField reports whether s declares a field with label f,
-// including within embedded struct literals and comprehension bodies.
+// declaresField reports whether s declares a field with label f, including
+// within embedded struct literals and the bodies and else clauses of
+// comprehensions.
 //
 // TODO: embedded references such as {common, name: "n"} are not resolved,
 // so a struct which declares f through one is reported as lacking it.
@@ -276,7 +277,7 @@ func declaresField(s *StructLit, f Feature) bool {
 		case *StructLit:
 			return declaresField(d, f)
 		case *Comprehension:
-			return declaresField(d.Value, f)
+			return declaresField(d.Value, f) || d.Fallback != nil && declaresField(d.Fallback, f)
 		}
 		return false
 	})

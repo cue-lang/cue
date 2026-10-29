@@ -226,9 +226,9 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 // dependencies and types.
 // Normally, a task of a current node is a requirement of that node to complete.
 // However, if we have a comprehension, we may push that dependency down to
-// the literal fields of that comprehension. This allows for more fine-grained
-// dependency analysis and can help breaking cycles that should be naturally
-// broken to the user.
+// the literal fields of its body and else clause. This allows for more
+// fine-grained dependency analysis and can help breaking cycles that should
+// be naturally broken to the user.
 func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 	kind := allKinds
 
@@ -237,6 +237,9 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 	switch x := x.(type) {
 	case *Comprehension:
 		completes = pushDownDeps(n, t, x.Value)
+		if x.Fallback != nil {
+			completes |= pushDownDeps(n, t, x.Fallback)
+		}
 
 	case *StructLit:
 		// StructLits are mostly handled when they are a value of a
@@ -316,10 +319,10 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 	return completes | allTasksCompleted
 }
 
-// isPushedDownComp reports whether t is a comprehension task whose body
-// was fully pushed down: [pushDownDeps] returns bare allTasksCompleted
-// exactly when the body consists of literal fields only. Such a task
-// contributes conjuncts solely to the arcs it pre-created at scheduling
+// isPushedDownComp reports whether t is a comprehension task whose body and
+// else clause were fully pushed down: [pushDownDeps] returns bare
+// allTasksCompleted exactly when both consist of literal fields only. Such a
+// task contributes conjuncts solely to the arcs it pre-created at scheduling
 // time, registering itself in their parentTasks.
 func (t *task) isPushedDownComp() bool {
 	return t.run == handleComprehension && t.completes == allTasksCompleted

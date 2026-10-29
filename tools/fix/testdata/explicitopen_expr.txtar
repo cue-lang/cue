@@ -1004,6 +1004,42 @@ selectorDef: {
 	t1: v & {x: 1, y: 2} @test(eq, {x: 1, y: 2})
 	t2: v & {z: 1}       @test(err, code=eval, path=z, contains="field not allowed")
 }
+
+// A hidden or definition field beside the embedding is allowed whatever
+// the closedness of the struct, as is a let, so one whose value declares
+// no fields needs neither an opening nor a wrapper. One whose value
+// declares a field extends a nested path, which the old semantics opened
+// along that path, so it still takes both. A quoted label is a regular
+// field whatever its string, so it takes both as well. A comparison of
+// two structs declares no field either, as only a conjunction or a
+// disjunction can produce a struct; the rewrite instead takes both for
+// any operator with a struct operand.
+hiddenSibling: {
+	#A: {a: int, _h: {b: int}}
+	g: {a: 1}
+	v: {_x: _, #A}
+	w: {#x: 1, #A}
+	l: {let x = 1, #A, _y: "\(x)"}
+	n: {_h: c: 1, #A}
+	q: {"_x": 1, #A}
+	r: {"#x": 1, #A}
+	s: {_c: g == g, #A}
+
+	t1:  v & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t2:  (v & {_x: 2})._x  @test(eq, 2)
+	t3:  w & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t4:  (w & {a: 1}).#x   @test(eq, 1)
+	t5:  l & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t6:  (l & {a: 1})._y   @test(eq, "1")
+	t7:  n._h              @test(eq, {b: int, c: 1})
+	t8:  n & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t9:  q & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t10: (q & {a: 1})."_x" @test(eq, 1)
+	t11: r & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t12: (r & {a: 1})."#x" @test(eq, 1)
+	t13: s & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t14: (s & {a: 1})._c   @test(eq, true)
+}
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
@@ -1243,6 +1279,20 @@ selectorDef: {
     ./in.cue:978:16
 [eval] selectorDef.t2.z: field not allowed:
     ./in.cue:991:11
+[eval] hiddenSibling.t1.z: field not allowed:
+    ./in.cue:1014:12
+[eval] hiddenSibling.t3.z: field not allowed:
+    ./in.cue:1016:12
+[eval] hiddenSibling.t5.z: field not allowed:
+    ./in.cue:1018:12
+[eval] hiddenSibling.t8.z: field not allowed:
+    ./in.cue:1021:12
+[eval] hiddenSibling.t9.z: field not allowed:
+    ./in.cue:1022:12
+[eval] hiddenSibling.t11.z: field not allowed:
+    ./in.cue:1024:12
+[eval] hiddenSibling.t13.z: field not allowed:
+    ./in.cue:1026:12
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -2306,4 +2356,40 @@ selectorDef: {
 
 	t1: v & {x: 1, y: 2} @test(eq, {x: 1, y: 2})
 	t2: v & {z: 1}       @test(err, code=eval, path=z, contains="field not allowed")
+}
+
+// A hidden or definition field beside the embedding is allowed whatever
+// the closedness of the struct, as is a let, so one whose value declares
+// no fields needs neither an opening nor a wrapper. One whose value
+// declares a field extends a nested path, which the old semantics opened
+// along that path, so it still takes both. A quoted label is a regular
+// field whatever its string, so it takes both as well. A comparison of
+// two structs declares no field either, as only a conjunction or a
+// disjunction can produce a struct; the rewrite instead takes both for
+// any operator with a struct operand.
+hiddenSibling: {
+	#A: {a: int, _h: {b: int}}
+	g:  {a: 1}
+	v:  __closeAll({_x: _, #A...})
+	w:  __closeAll({#x: 1, #A...})
+	l:  __closeAll({let x = 1, #A..., _y: "\(x)"})
+	n:  __closeAll({_h: c: 1, #A...})
+	q:  __closeAll({"_x": 1, #A...})
+	r:  __closeAll({"#x": 1, #A...})
+	s:  __closeAll({_c: g == g, #A...})
+
+	t1:  v & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t2:  (v & {_x: 2})._x  @test(eq, 2)
+	t3:  w & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t4:  (w & {a: 1}).#x   @test(eq, 1)
+	t5:  l & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t6:  (l & {a: 1})._y   @test(eq, "1")
+	t7:  n._h              @test(eq, {b: int, c: 1})
+	t8:  n & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t9:  q & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t10: (q & {a: 1})."_x" @test(eq, 1)
+	t11: r & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t12: (r & {a: 1})."#x" @test(eq, 1)
+	t13: s & {z: 1}        @test(err, code=eval, path=z, contains="field not allowed")
+	t14: (s & {a: 1})._c   @test(eq, true)
 }

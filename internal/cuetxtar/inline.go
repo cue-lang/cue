@@ -1051,10 +1051,29 @@ func (r *inlineRunner) runClosedAssertion(t testing.TB, path cue.Path, val cue.V
 	t.Helper()
 	expected := pa.value != "false"
 	got := val.IsClosed()
+	if pa.isTodo {
+		r.logTodo(t, path, pa, got == expected, fmt.Sprintf("got closed=%v, want %v", got, expected))
+		return
+	}
 	if got != expected {
 		t.Errorf("path %s: @test(closed): got closed=%v, want %v", path, got, expected)
 		logHint(t, pa.hint)
 	}
+}
+
+// logTodo reports the outcome of a @test(dir:todo, ...) directive: a
+// mismatch is logged as still failing, and a match emits a warning and,
+// under CUE_UPDATE=1, promotes the directive to its plain form, as for
+// eq:todo.
+func (r *inlineRunner) logTodo(t testing.TB, path cue.Path, pa parsedTestAttr, passes bool, mismatch string) {
+	if passes {
+		t.Logf("WARNING: path %s: TODO %s:todo now passes — consider upgrading to %s", path, pa.directive, promoteTodoAttr(pa))
+		if cuetest.UpdateOrDiffGoldenFiles() {
+			r.enqueueInlineFill(pa, promoteTodoAttr(pa))
+		}
+		return
+	}
+	t.Logf("path %s: TODO %s:todo still failing: %s", path, pa.directive, mismatch)
 }
 
 // runAllowsAssertion checks val.Allows(sel) against the expected result.
@@ -1091,6 +1110,10 @@ func (r *inlineRunner) runAllowsAssertion(t testing.TB, path cue.Path, val cue.V
 		sel = p.Selectors()[0]
 	}
 	got := val.Allows(sel)
+	if pa.isTodo {
+		r.logTodo(t, path, pa, got == expected, fmt.Sprintf("got Allows=%v, want %v", got, expected))
+		return
+	}
 	if got != expected {
 		t.Errorf("path %s: @test(allows, %s): got Allows=%v, want %v", path, rawSel, got, expected)
 		logHint(t, pa.hint)

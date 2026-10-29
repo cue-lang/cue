@@ -937,3 +937,37 @@ func TestIsInlineModeParsedError(t *testing.T) {
 		t.Error("isInlineMode returned false for archive with @test in parse-error file; want true")
 	}
 }
+
+// TestTodoQualifierOnClosedAndAllows checks that the closed and allows
+// directives take the :todo qualifier like the other assertions: a mismatch
+// is logged rather than reported as a failure.
+func TestTodoQualifierOnClosedAndAllows(t *testing.T) {
+	val := cuecontext.New().CompileString(`close({a: 1})`)
+	r := &inlineRunner{t: t}
+	for _, tc := range []struct {
+		src   string
+		fails bool
+	}{
+		{`x: 1 @test(closed=false)`, true},
+		{`x: 1 @test(closed:todo=false)`, false},
+		{`x: 1 @test(closed:todo)`, false},
+		{`x: 1 @test(allows, b)`, true},
+		{`x: 1 @test(allows:todo, b)`, false},
+		{`x: 1 @test(allows:todo, a)`, false},
+	} {
+		f, err := parser.ParseFile("test.cue", tc.src)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pa, err := parseTestAttr(f.Decls[0].(*ast.Field).Attrs[0])
+		if err != nil {
+			t.Fatalf("%s: %v", tc.src, err)
+		}
+		pa.isTodo = pa.version == "todo"
+		cap := &failCapture{TB: t}
+		r.runDirective(cap, cue.ParsePath("x"), val, pa)
+		if cap.failed != tc.fails {
+			t.Errorf("%s: failed=%v, want %v\n%s", tc.src, cap.failed, tc.fails, cap.msgs.String())
+		}
+	}
+}

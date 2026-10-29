@@ -410,8 +410,8 @@ and the expected correct behavior:
 x: 42 @test(eq, 42, incorrect) @test(err:todo, p=1, code=eval)
 ```
 
-The `:todo` qualifier is available on `eq`, `err`, `kind`, `debugCheck` and
-`shareID`.
+The `:todo` qualifier is available on `eq`, `err`, `kind`, `closed`, `allows`,
+`debugCheck` and `shareID`.
 
 ### `p=N` — fix priority
 

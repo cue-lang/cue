@@ -1,0 +1,72 @@
+#exp:explicitopen
+
+# A definition imported from another package is closed like a local one,
+# so the struct embedding it takes __closeAll.
+
+-- cue.mod/module.cue --
+module: "import.test"
+
+language: version: "v0.17.0"
+
+-- schema/schema.cue --
+package schema
+
+#Schema: {
+	name: string
+	kind: "web" | "worker"
+}
+
+-- apps.cue --
+package foo
+
+import "import.test/schema"
+
+App: [Name=_]: {
+	schema.#Schema
+	name: Name
+}
+
+App: one: kind: "web"
+
+t1: App.one             @test(eq, {name: "one", kind: "web"})
+t2: App & {two: x: 1}   @test(err, code=eval, contains="field not allowed")
+-- out/errors.txt --
+[eval] t2.two.x: field not allowed:
+    ./apps.cue:13:17
+-- out/fixmod --
+--- cue.mod/module.cue
+module: "import.test"
+language: version: "v0.17.0"
+--- apps.cue
+@experiment(explicitopen)
+
+package foo
+
+import "import.test/schema"
+
+App: {
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	[Name=_]: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		schema.#Schema...
+		name: Name
+	})
+}
+
+App: one: kind: "web"
+
+t1: App.one           @test(eq, {name: "one", kind: "web"})
+t2: App & {two: x: 1} @test(err, code=eval, contains="field not allowed")
+--- cue.mod/module.cue
+module: "import.test"
+language: version: "v0.17.0"
+--- schema/schema.cue
+package schema
+
+#Schema: {
+	name: string
+	kind: "web" | "worker"
+}

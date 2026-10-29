@@ -987,6 +987,19 @@ compExtends: {
 	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}})
 	t2: v & {foo: other: 6}   @test(err, code=eval, contains="field not allowed")
 }
+
+// A definition selected from a struct is closed like one named directly,
+// so the struct embedding it takes __closeAll.
+selectorDef: {
+	d: #D: {x: int}
+	v: {
+		d.#D
+		y: int
+	}
+
+	t1: v & {x: 1, y: 2} @test(eq, {x: 1, y: 2})
+	t2: v & {z: 1}       @test(err, code=eval, path=z, contains="field not allowed")
+}
 -- out/errors.txt --
 [eval] closeOnly.t1.c: field not allowed:
     ./in.cue:13:11
@@ -1222,6 +1235,8 @@ compExtends: {
     ./in.cue:959:25
 [eval] compExtends.t2.foo.other: field not allowed:
     ./in.cue:974:16
+[eval] selectorDef.t2.z: field not allowed:
+    ./in.cue:987:11
 -- out/fixmod --
 --- cue.mod/module.cue
 module: "builtins.test"
@@ -2266,4 +2281,22 @@ compExtends: {
 
 	t1: v & {foo: allowed: 5} @test(eq, {foo: {allowed: 5, foo?: _}})
 	t2: v & {foo: other: 6}   @test(err, code=eval, contains="field not allowed")
+}
+
+// A definition selected from a struct is closed like one named directly,
+// so the struct embedding it takes __closeAll.
+selectorDef: {
+	d: #D: {x: int}
+	// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+	// the struct if one of the spread values in it is a closed struct.
+	v: __reclose({
+		// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+		// if the value is a closed struct, or closes a nested struct at a path which
+		// the enclosing struct also declares.
+		d.#D...
+		y: int
+	})
+
+	t1: v & {x: 1, y: 2} @test(eq, {x: 1, y: 2})
+	t2: v & {z: 1}       @test(err, code=eval, path=z, contains="field not allowed")
 }

@@ -14,7 +14,6 @@ reported: {
 			out: "a"
 		}
 		@test(eq, {mode: *{kind: "a"} | {kind: "b"}, out: "a"})
-		@test(todo, why="undefined field when #Mode comes second")
 	}
 	#Mode: *{kind: "a"} | {kind: "b"}
 }
@@ -28,7 +27,6 @@ guardFirst: {
 		}
 		mode: #Mode
 		@test(eq, {mode: *{kind: "a"} | {kind: "b"}, out: "a"})
-		@test(todo, why="undefined field when #Mode comes second")
 	}
 	#Mode: *{kind: "a"} | {kind: "b"}
 }
@@ -42,7 +40,6 @@ chain: {
 			out: "a"
 		}
 		@test(eq, {mode: *{kind: "a"} | {kind: "b"}, out: "a"})
-		@test(todo, why="undefined field when the disjunction comes later")
 	}
 	#Mode: #M2
 	#M2:   *{kind: "a"} | {kind: "b"}
@@ -57,7 +54,6 @@ hidden: {
 			out: "a"
 		}
 		@test(eq, {mode: *{_kind: "a"} | {_kind: "b"}, out: "a"})
-		@test(todo, why="undefined field when #Mode comes second")
 	}
 	#Mode: *{_kind: "a"} | {_kind: "b"}
 }
@@ -78,26 +74,7 @@ onStack: {
 		if m.v == 1 {x: 1}
 	}
 	@test(eq, {#P: {v: 1, a: 1}, p: {v: 1, a: 1}, q: {m: {v: 1, a: 1}, x: 1}})
-	@test(todo, why="structural cycle when q is declared before p")
 }
--- out/errors.txt --
-[incomplete] reported.thing: undefined field: kind:
-    ./in.cue:6:11
-    ./in.cue:12:2
-[incomplete] guardFirst.thing: undefined field: kind:
-    ./in.cue:19:11
-    ./in.cue:26:2
-[incomplete] chain.thing: undefined field: kind:
-    ./in.cue:34:11
-    ./in.cue:41:2
-[incomplete] hidden.thing: undefined field: _kind:
-    ./in.cue:49:11
-    ./in.cue:55:2
-[incomplete] onStack.#P.a: undefined field: x:
-    ./in.cue:66:8
-    ./in.cue:69:2
-[structural_cycle] onStack.p: structural cycle
-[structural_cycle] onStack.p: structural cycle
 -- out/eval/stats --
 Leaks:  4
 Freed:  35

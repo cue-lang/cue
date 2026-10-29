@@ -1546,9 +1546,8 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
 [incomplete] regression1.#Primary: undefined field: spec:
     ./rework.cue:5:13
     ./rework.cue:3:3
-[incomplete] regression1.#Rollout.out: undefined field: spec:
-    ./rework.cue:5:13
-    ./rework.cue:10:3
+[incomplete] regression1.#Rollout.out: _X.spec undefined as _X is incomplete (type _):
+    ./rework.cue:5:10
 regression1.#Rollout.out: _X.patch undefined as _X is incomplete (type _):
     ./rework.cue:11:30
 [incomplete] regression2.#Primary: undefined field: spec:

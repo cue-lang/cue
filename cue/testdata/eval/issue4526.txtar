@@ -53,10 +53,9 @@ forward: {
 	}
 	late: out.a.inner.cfg.flags.enabled @test(eq, bool | *false)
 }
-// The shared chain read as the source of a for comprehension. The lookup of
-// the source does not wait for the shared vertex and reports it incomplete.
+// The shared chain read as the source of a for comprehension.
 forSource: {
-	early: [for k, _ in out.a.inner.cfg.flags {k}] @test(err, code=incomplete, contains="cannot range over out.a.inner.cfg.flags (incomplete)") @test(eq:todo, ["enabled"])
+	early: [for k, _ in out.a.inner.cfg.flags {k}] @test(eq, ["enabled"])
 
 	#Flags: flags: enabled: bool | *false
 
@@ -87,8 +86,6 @@ disjunct: {
 -- out/errors.txt --
 [incomplete] reported.#Inner.items: cfg.flags undefined as cfg is incomplete (type _):
     ./in.cue:12:7
-[incomplete] forSource.early: cannot range over out.a.inner.cfg.flags (incomplete):
-    ./in.cue:50:22
 -- out/eval/stats --
 Leaks:  9
 Freed:  91

@@ -1060,32 +1060,44 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 	if v == nil {
 		return nil
 	}
+	// Processing v may make it share a vertex not processed yet, which the
+	// lookup then reads in its place. Process that vertex too, rather than
+	// unifying v to reach it: the lookup must count as non-cyclic structure
+	// on the vertex it reads.
 	v = v.DerefValue()
-
-	// TODO: is this indirect necessary?
-	// v = v.Indirect()
-
-	if n := v.getState(c); n != nil {
-		defer n.retainProcess().releaseProcess()
-
-		// A lookup counts as new structure. See the commend in Section
-		// "Lookups in inline cycles" in cycle.go.
-		if !c.ci.IsCyclic() {
-			n.hasNonCycle = true
+	for {
+		c.processRef(v)
+		w := v.DerefValue()
+		if w == v {
+			return v
 		}
+		v = w
+	}
+}
 
-		// Always yield to not get spurious errors.
-		n.process(arcTypeKnown|fieldSetKnown, yield)
-		// It is possible that the node is only midway through
-		// evaluating a disjunction. In this case, we want to ensure
-		// that disjunctions are finalized, so that disjunction shows
-		// up in BaseValue.
-		if len(n.disjuncts) > 0 {
-			n.node.unify(c, Flags{condition: arcTypeKnown | fieldSetKnown, mode: yield, checkTypos: false})
-		}
+// processRef evaluates v far enough for a reference to it to be resolved.
+func (c *OpContext) processRef(v *Vertex) {
+	n := v.getState(c)
+	if n == nil {
+		return
+	}
+	defer n.retainProcess().releaseProcess()
+
+	// A lookup counts as new structure. See the comment in Section
+	// "Lookups in inline cycles" in cycle.go.
+	if !c.ci.IsCyclic() {
+		n.hasNonCycle = true
 	}
 
-	return v
+	// Always yield to not get spurious errors.
+	n.process(arcTypeKnown|fieldSetKnown, yield)
+	// It is possible that the node is only midway through
+	// evaluating a disjunction. In this case, we want to ensure
+	// that disjunctions are finalized, so that disjunction shows
+	// up in BaseValue.
+	if len(n.disjuncts) > 0 {
+		n.node.unify(c, Flags{condition: arcTypeKnown | fieldSetKnown, mode: yield, checkTypos: false})
+	}
 }
 
 func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags Flags) *Vertex {

@@ -53,8 +53,7 @@ forward: {
 	}
 	late: out.a.inner.cfg.flags.enabled
 }
-// The shared chain read as the source of a for comprehension. The lookup of
-// the source does not wait for the shared vertex and reports it incomplete.
+// The shared chain read as the source of a for comprehension.
 forSource: {
 	early: [for k, _ in out.a.inner.cfg.flags {k}]
 

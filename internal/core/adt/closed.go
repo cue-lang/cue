@@ -85,12 +85,21 @@ func (v *Vertex) IsRecursivelyClosed() bool {
 
 // closing returns how v is closed, as a builtin marked [Builtin.Closes]
 // closes its argument.
+//
+// A vertex which has not been processed yet does not carry the flags its
+// processing sets, so a conjunct from a definition closes it recursively
+// as well, as processing it would.
 func (v *Vertex) closing() Closing {
 	switch {
 	case v.ClosedRecursive:
 		return ClosesRecursively
 	case v.ClosedNonRecursive:
 		return ClosesOnce
+	}
+	for _, c := range v.Conjuncts {
+		if c.CloseInfo.FromDef {
+			return ClosesRecursively
+		}
 	}
 	return NoClosing
 }

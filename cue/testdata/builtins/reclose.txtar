@@ -195,7 +195,7 @@ boundSpread: {
 selectedField: {
 	#D: s: {a: 1}
 	r: __reclose({(#D & {}).s...})
-	t1: r & {z: 1} @test(eq, {a: 1, z: 1}, incorrect) @test(err:todo, p=1, code=eval, path=z, contains="field not allowed", pos=[0:11])
+	t1: r & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:11])
 	held: #D & {}
 	h: __reclose({held.s..., b: 1})
 	t2: h & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:11])
@@ -204,10 +204,10 @@ selectedField: {
 	shared: #D
 	t4: __reclose({shared.s..., b: 1}) & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:40])
 	opened: __reclose({({#D...}).s...})
-	t5: opened & {z: 1} @test(eq, {a: 1, z: 1}, incorrect) @test(err:todo, p=1, code=eval, path=z, contains="field not allowed", pos=[0:16])
+	t5: opened & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:16])
 	before: {#D...}
 	t6: __reclose({before.s...}) & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:34])
-	t7: __reclose({after.s...}) & {z: 1} @test(eq, {a: 1, z: 1}, incorrect) @test(err:todo, p=1, code=eval, path=z, contains="field not allowed", pos=[0:33])
+	t7: __reclose({after.s...}) & {z: 1} @test(err, code=eval, path=z, contains="field not allowed", pos=[0:33])
 	after: {#D...}
 	#O: {...}
 	undeclared: #O & {s: {a: 1}}
@@ -290,6 +290,8 @@ embeddedDisjunction.conjunction.t2.z: field not allowed:
     ./in.cue:182:15
 [eval] boundSpread.t3.z: field not allowed:
     ./in.cue:184:17
+[eval] selectedField.t1.z: field not allowed:
+    ./in.cue:197:11
 [eval] selectedField.t2.z: field not allowed:
     ./in.cue:200:11
 [eval] z: field not allowed:
@@ -297,8 +299,12 @@ embeddedDisjunction.conjunction.t2.z: field not allowed:
     ./in.cue:201:42
 [eval] selectedField.t4.z: field not allowed:
     ./in.cue:204:40
+[eval] selectedField.t5.z: field not allowed:
+    ./in.cue:206:16
 [eval] selectedField.t6.z: field not allowed:
     ./in.cue:208:34
+[eval] selectedField.t7.z: field not allowed:
+    ./in.cue:209:33
 [eval] spreadClose.t1.err.x.z: field not allowed:
     ./in.cue:225:19
 [eval] spreadClose.t2.err.q: field not allowed:

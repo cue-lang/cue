@@ -177,8 +177,8 @@ scoped: {
 		a: [{a: Args_4.required}]
 	}
 	listEmbed: {
-		let Args_A = _args
-		a: [Args_A.required]
+		let Args_5 = _args
+		a: [Args_5.required]
 	}
 }
 x: "foo"
@@ -202,24 +202,24 @@ incomplete: {
 	}
 	d: {
 		let A_4 = run.a
-		let A_9 = run2.a
+		let A_5 = run2.a
 		x:  "a \(A_4) z"
-		x2: "a \(A_9) z"
+		x2: "a \(A_5) z"
 		run: a:  string
 		run2: a: string
 	}
 }
 unresolvedDisjunction: {
 	#TypePrimitive: {
-		let Args_D = _args
-		{"*": {}} | {bool: #TypeBool & {_args: required: Args_D.required}}
+		let Args_6 = _args
+		{"*": {}} | {bool: #TypeBool & {_args: required: Args_6.required}}
 		_args: required: bool
 	}
 	#TypeBool: {
-		let Args_F = _args
+		let Args_7 = _args
 		_args: required: bool
 
-		if !Args_F.required {
+		if !Args_7.required {
 			// `default` sets the default value.
 			default: bool | null
 		}

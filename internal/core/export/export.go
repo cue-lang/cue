@@ -16,9 +16,8 @@ package export
 
 import (
 	"cmp"
-	"fmt"
-	"math/rand/v2"
 	"slices"
+	"strconv"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -334,7 +333,6 @@ type exporter struct {
 	ctx *adt.OpContext
 
 	index adt.StringIndexer
-	rand  *rand.Rand
 
 	// isInjectionKind reports whether an attribute name is a registered
 	// injection kind, such as "embed"; see [exporter.exportAttrs].
@@ -355,7 +353,10 @@ type exporter struct {
 	// If a used feature maps to an expression, it means it is assigned to a
 	// unique let expression.
 	usedFeature map[adt.Feature]adt.Expr
-	labelAlias  map[adt.Expr]adt.Feature
+	// names picks the names which [exporter.uniqueFeature] adds to
+	// [exporter.usedFeature].
+	names      uniqueNamer
+	labelAlias map[adt.Expr]adt.Feature
 	// valueAlias maps a source value alias to the name it is bound to in the
 	// output, where a let clause naming "self" takes its place.
 	valueAlias map[*ast.Alias]string
@@ -903,29 +904,8 @@ func (e *exporter) uniqueLetIdent(f adt.Feature, x adt.Expr) adt.Feature {
 }
 
 func (e *exporter) uniqueAlias(name string) string {
-	f := e.identFeature(name)
-
-	if _, ok := e.usedFeature[f]; !ok {
-		e.usedFeature[f] = nil
-		return name
-	}
-
-	_, name = e.uniqueFeature(f.IdentString(e.ctx))
+	_, name = e.uniqueFeature(name)
 	return name
-}
-
-// A featureSet implements a set of Features. It only supports testing
-// whether a given string is available as a Feature.
-type featureSet interface {
-	// intn returns a pseudo-random integer in [0..n).
-	intn(n int) int
-
-	// makeFeature converts s to f if it is available.
-	makeFeature(s string) (f adt.Feature, ok bool)
-}
-
-func (e *exporter) intn(n int) int {
-	return e.rand.IntN(n)
 }
 
 // identFeature returns the feature of an identifier named s, which, if hidden,
@@ -934,52 +914,44 @@ func (e *exporter) identFeature(s string) adt.Feature {
 	return adt.MakeIdentLabel(e.ctx, s, cmp.Or(e.pkgID, "_"))
 }
 
-func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
-	f = e.identFeature(s)
-	_, exists := e.usedFeature[f]
-	if !exists {
-		e.usedFeature[f] = nil
-	}
-	return f, !exists
-}
-
-// uniqueFeature returns a name for an identifier that uniquely identifies
-// the given expression. If the preferred name is already taken, a new globally
-// unique name of the form base_N ... base_NNNNNNNNNNNNNN is generated.
-//
-// It prefers short extensions over large ones, while ensuring the likelihood of
-// fast termination is high. There are at least two digits to make it visually
-// clearer this concerns a generated number.
+// uniqueFeature returns the first name from [uniqueNamer.name] which is not
+// in [exporter.usedFeature], with its feature, and marks it as used.
 func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
-	if e.rand == nil {
-		e.rand = rand.New(rand.NewPCG(123, 456)) // ensure determinism between runs
-	}
-	return findUnique(e, base)
+	name = e.names.name(base, func(name string) bool {
+		f = e.identFeature(name)
+		_, ok := e.usedFeature[f]
+		return ok
+	})
+	e.usedFeature[f] = nil
+	return f, name
 }
 
-func findUnique(set featureSet, base string) (f adt.Feature, name string) {
-	if f, ok := set.makeFeature(base); ok {
-		return f, base
-	}
+// A uniqueNamer picks names which are not taken. A name must stay taken once
+// it is, so that each search can resume where the last one for the same base
+// stopped, rather than scanning past every taken name again.
+type uniqueNamer struct {
+	next map[string]int // the suffix at which to resume the search for a base
+}
 
-	// Try the first few numbers in sequence.
-	for i := 1; i < 5; i++ {
-		name := fmt.Sprintf("%s_%01X", base, i)
-		if f, ok := set.makeFeature(name); ok {
-			return f, name
+// name returns base if it is not taken, or otherwise the first of base_1,
+// base_2, and so on which is not.
+func (u *uniqueNamer) name(base string, taken func(name string) bool) string {
+	start := u.next[base]
+	for i := start; ; i++ {
+		name := base
+		if i > 0 {
+			name += "_" + strconv.Itoa(i)
 		}
-	}
-
-	const mask = 0xff_ffff_ffff_ffff // max bits; stay clear of int64 overflow
-	const shift = 4                  // rate of growth
-	digits := 1
-	for n := int64(0x10); ; n = mask&((n<<shift)-1) + 1 {
-		num := set.intn(int(n)-1) + 1
-		name := fmt.Sprintf("%[1]s_%0[2]*[3]X", base, digits, num)
-		if f, ok := set.makeFeature(name); ok {
-			return f, name
+		if taken(name) {
+			continue
 		}
-		digits++
+		if i > start {
+			if u.next == nil {
+				u.next = make(map[string]int)
+			}
+			u.next[base] = i
+		}
+		return name
 	}
 }
 

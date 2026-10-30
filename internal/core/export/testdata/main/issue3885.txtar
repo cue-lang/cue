@@ -144,16 +144,16 @@ disjunction: *{
 	x: b_4
 } | 5
 merged: {
-	let b_A = 4
+	let b_5 = 4
 	let c = 5
-	x: b_A
+	x: b_5
 	y: c
 }
 // A let in an embedded struct literal is merged into the enclosing scope.
 embedded: {
 	let c_1 = 5
-	let b_9 = 4
-	x: b_9
+	let b_6 = 4
+	x: b_6
 	y: c_1
 }
 -- out/definition-v3-noshare --
@@ -178,16 +178,16 @@ disjunction: *{
 	x: b_4
 } | 5
 merged: {
-	let b_A = 4
+	let b_5 = 4
 	let c = 5
-	x: b_A
+	x: b_5
 	y: c
 }
 // A let in an embedded struct literal is merged into the enclosing scope.
 embedded: {
 	let c_1 = 5
-	let b_9 = 4
-	x: b_9
+	let b_6 = 4
+	x: b_6
 	y: c_1
 }
 -- out/doc-v3 --

@@ -1411,6 +1411,7 @@ closing it recursively adds `..._|_` to every nested struct as well.
 
 Syntactically, structs are closed explicitly with the `close` builtin or
 implicitly and recursively by [definitions](#definitions-and-hidden-fields).
+Applied to a value that is not a struct or list, `close` returns it unchanged.
 
 
 ```cue ! vet

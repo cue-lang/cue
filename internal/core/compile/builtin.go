@@ -131,22 +131,25 @@ var lenBuiltin = &adt.Builtin{
 
 var closeBuiltin = &adt.Builtin{
 	Name:        "close",
-	Params:      []adt.Param{{Value: &adt.BasicType{K: adt.StructKind | adt.ListKind}}},
-	Result:      adt.StructKind | adt.ListKind,
+	Params:      []adt.Param{topParam},
+	Result:      adt.TopKind,
 	PerDisjunct: true,
 	Func: func(call adt.BuiltinCallContext) adt.Expr {
 		c := call.OpContext()
-		s, ok := call.Value(0).(*adt.Vertex)
-		if !ok {
-			return c.NewErrf("struct argument must be concrete")
+		v := call.Value(0)
+		s, ok := v.(*adt.Vertex)
+		if !ok || s.Kind()&(adt.StructKind|adt.ListKind) == 0 {
+			// Closing concerns the fields of a struct, so any other value
+			// is returned unchanged.
+			return v
 		}
 		// TODO(evalv3) this is a rather convoluted and inefficient way to
 		// accomplish signaling vertex should be closed. In most cases, it
 		// would suffice to set IsClosed in the CloseInfo. However, that
 		// does not cover all code paths. Consider simplifying this.
-		v := c.Wrap(s, c.CloseInfo())
-		v.ClosedNonRecursive = true
-		return v
+		w := c.Wrap(s, c.CloseInfo())
+		w.ClosedNonRecursive = true
+		return w
 	},
 }
 

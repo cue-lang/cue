@@ -67,7 +67,7 @@ closedErr: closed & [1, 2] @test(err)
 hashIdx: #[0] @test(eq, 1)
 hashSlice: #[0:1]
 hashSliceErr: hashSlice & [1, 2] @test(err)
-hashIdxClose: close(#[0]) @test(err)
+hashIdxClose: close(#[0]) @test(eq, 1)
 hashSliceClose: close(#[0:1])
 hashSliceCloseErr: hashSliceClose & [1, 2] @test(err)
 
@@ -125,8 +125,6 @@ closedX.l: incompatible list lengths (1 and 2):
 [eval] closedErr: incompatible list lengths (1 and 2):
     ./a.cue:48:15
 [eval] hashSliceErr: incompatible list lengths (1 and 2)
-[eval] hashIdxClose: cannot use 1 (type int) as (list|struct) in argument 1 to close:
-    ./a.cue:52:5
 [eval] hashSliceCloseErr: incompatible list lengths (1 and 2)
 [eval] strSlice: cannot slice "abc" (type string):
     ./a.cue:62:11
@@ -198,7 +196,7 @@ closedErr: closed & #[1, 2] @test(err)
 hashIdx:           (#)[0]                   @test(eq, 1)
 hashSlice:         close((#)[0:1])
 hashSliceErr:      hashSlice & #[1, 2]      @test(err)
-hashIdxClose:      close((#)[0])            @test(err)
+hashIdxClose:      close((#)[0])            @test(eq, 1)
 hashSliceClose:    close((#)[0:1])
 hashSliceCloseErr: hashSliceClose & #[1, 2] @test(err)
 

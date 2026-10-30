@@ -38,9 +38,9 @@ func TestStructBuilderShadowedRef(t *testing.T) {
 	qt.Assert(t, qt.IsTrue(ok))
 	ok = b.Put(cue.ParsePath("#bar.#foo.xxx"), ref, nil)
 	qt.Assert(t, qt.IsTrue(ok))
-	assertStructBuilderSyntax(t, &b, `#bar: #foo: xxx: #foo_9.bar.baz
+	assertStructBuilderSyntax(t, &b, `#bar: #foo: xxx: #foo_1.bar.baz
 
-#foo~(#foo_9): bar: baz: "hello"
+#foo~(#foo_1): bar: baz: "hello"
 `)
 }
 
@@ -83,9 +83,9 @@ func TestStructBuilderNonIdentifierStringNode(t *testing.T) {
 	ok = b.Put(cue.ParsePath("#bar.#foo.xxx"), ref, nil)
 	qt.Assert(t, qt.IsTrue(ok))
 	assertStructBuilderSyntax(t, &b, `
-#bar: #foo: xxx: #foo_9."a b".baz
+#bar: #foo: xxx: #foo_1."a b".baz
 
-#foo~(#foo_9): "a b": baz: "hello"
+#foo~(#foo_1): "a b": baz: "hello"
 `)
 }
 

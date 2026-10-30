@@ -228,10 +228,10 @@ expected operand, found 'EOF':
 -- join.stdout --
 import (
 	"strings"
-	strings_9 "example.com/other/strings"
+	strings_1 "example.com/other/strings"
 )
 
 x: strings.ToUpper("foo")
 
 // y is a field.
-y: strings_9.Foo
+y: strings_1.Foo

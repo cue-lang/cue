@@ -17,7 +17,7 @@ import (
 	"time"
 	"googleapis.com/acme/test"
 	"googleapis.com/acme/test/test:test_test"
-	time_9 "time"
+	time_1 "time"
 )
 
 #StructWrap: {
@@ -115,13 +115,13 @@ import (
 	bools?: {[string]: bool} @protobuf(5,map[sint32]bool)
 
 	// Holds attributes of type TIMESTAMP
-	time?: {[string]: time_9.Time} @protobuf(6,map[sint32]google.protobuf.Timestamp,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
+	time?: {[string]: time_1.Time} @protobuf(6,map[sint32]google.protobuf.Timestamp,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
 
 	// Holds attributes of type DURATION
-	durations?: {[string]: time_9.Duration} @protobuf(7,map[sint32]google.protobuf.Duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
+	durations?: {[string]: time_1.Duration} @protobuf(7,map[sint32]google.protobuf.Duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	// Holds attributes of type BYTES
-	bytes?: {[string]: bytes_B} @protobuf(8,map[sint32]bytes)
+	bytes?: {[string]: bytes_1} @protobuf(8,map[sint32]bytes)
 
 	// Holds attributes of type STRING_MAP
 	stringMaps?: {[string]: #StringMap} @protobuf(9,map[sint32]StringMap,string_maps,"(gogoproto.nullable)=false")
@@ -134,4 +134,4 @@ import (
 	entries?: {[string]: int32} @protobuf(1,map[sint32]sint32)
 }
 
-let bytes_B = bytes
+let bytes_1 = bytes

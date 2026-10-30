@@ -51,10 +51,10 @@ func TestSanitize(t *testing.T) {
 		}(),
 		want: `import (
 	// will be renamed
-	list_9 "list"
+	list_1 "list"
 )
 
-{list: list_9.Min()}
+{list: list_1.Min()}
 `,
 	}, {
 		desc: "Take existing import and rename it in a field",
@@ -71,9 +71,9 @@ func TestSanitize(t *testing.T) {
 				},
 			}}
 		}(),
-		want: `import list_9 "list"
+		want: `import list_1 "list"
 
-a: {list: list_9.Min()}
+a: {list: list_1.Min()}
 `,
 	}, {
 		desc: "One import added, one removed",
@@ -122,14 +122,14 @@ package pkg
 
 import (
 	"bar"
-	bar_9 "foo/bar"
-	bar_B "foo"
+	bar_1 "foo/bar"
+	bar_2 "foo"
 )
 
 a: {
 	b: bar.A()
-	c: bar_9.A()
-	d: bar_B.A()
+	c: bar_1.A()
+	d: bar_2.A()
 }
 `,
 	}, {
@@ -158,13 +158,13 @@ a: {
 		}(),
 		want: `import (
 	bar "foo"
-	bar_9 "bar"
-	bar_B "foo/bar"
+	bar_1 "bar"
+	bar_2 "foo/bar"
 )
 
 a: {
-	b: bar_9.A()
-	c: bar_B.A()
+	b: bar_1.A()
+	c: bar_2.A()
 	d: bar.A()
 }
 `,
@@ -226,11 +226,11 @@ a: {list: bar.Min()}
 			},
 		}},
 		want: `a: {
-	b: c_9
+	b: c_1
 	c: d
 }
 
-let c_9 = c
+let c_1 = c
 `,
 	}, {
 		desc: "Add alias to shadowed field",
@@ -254,10 +254,10 @@ let c_9 = c
 				},
 			}}
 		}(),
-		want: `a~(a_9): "b"
+		want: `a~(a_1): "b"
 c: {
 	a: {}
-	b: a_9
+	b: a_1
 	c: d
 }
 `,
@@ -285,11 +285,11 @@ c: {
 				},
 			}}
 		}(),
-		want: `let X_9 = X
+		want: `let X_1 = X
 a~(X): "b"
 c: {
 	a: {}
-	b: X_9
+	b: X_1
 }
 `,
 	}, {
@@ -320,11 +320,11 @@ c: {
 				},
 			}}
 		}(),
-		want: `let X_9 = X
+		want: `let X_1 = X
 a~(X): "b"
 c: {
 	let X = "shadow"
-	b: X_9
+	b: X_1
 }
 `,
 	}, {
@@ -357,10 +357,10 @@ c: {
 				},
 			}}
 		}(),
-		want: `a~(K,a_9): "b"
+		want: `a~(K,a_1): "b"
 c: {
 	a: {}
-	b: a_9
+	b: a_1
 }
 `,
 	}, {
@@ -391,12 +391,12 @@ c: {
 				},
 			}}
 		}(),
-		want: `a~(a_9): "b"
+		want: `a~(a_1): "b"
 c: {
 	a: {}
-	b: a_9
+	b: a_1
 	c: d
-	e: a_9
+	e: a_1
 }
 `,
 	}, {
@@ -442,14 +442,14 @@ c: {
 			}}
 		}(),
 		want: `
-let X_9 = X
+let X_1 = X
 X=a: "b"
 Y=q: "b"
 c: {
 	a: {}
 	b: X
 	c: d
-	e: X_9
+	e: X_1
 	f: Y
 }
 `[1:],
@@ -482,11 +482,11 @@ c: {
 			}}
 		}(),
 		want: `b: {
-	a~(a_9): "b"
+	a~(a_1): "b"
 	b: {
 		a: "bar"
-		b: a_9
-		e: a_9
+		b: a_1
+		e: a_1
 	}
 }
 `,
@@ -522,12 +522,12 @@ c: {
 			}}
 		}(),
 		want: `b: {
-	let X_9 = X
+	let X_1 = X
 	X=a: "b"
 	b: {
 		a: "bar"
-		b: X_9
-		e: X_9
+		b: X_1
+		e: X_1
 	}
 }
 `,
@@ -844,16 +844,16 @@ c: {
 		desc:    "prefix form below the stable version",
 		parseAt: "v0.17.0",
 		outAt:   "v0.17.0",
-		want:    "a_9=a",
+		want:    "a_1=a",
 	}, {
 		desc:    "postfix form where the attribute enables the experiment",
 		attr:    "@experiment(aliasv2)\n",
 		parseAt: "v0.17.0",
 		outAt:   "v0.17.0",
-		want:    "a~(a_9)",
+		want:    "a~(a_1)",
 	}, {
 		desc: "postfix form at the current version",
-		want: "a~(a_9)",
+		want: "a~(a_1)",
 	}, {
 		// A file that was built rather than parsed carries whatever version
 		// it was told it is written for.
@@ -861,11 +861,11 @@ c: {
 		built:      true,
 		setVersion: "v0.17.0",
 		outAt:      "v0.17.0",
-		want:       "a_9=a",
+		want:       "a_1=a",
 	}, {
 		desc:  "a built file with no version targets the current one",
 		built: true,
-		want:  "a~(a_9)",
+		want:  "a~(a_1)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

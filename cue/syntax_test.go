@@ -278,18 +278,18 @@ if true {
 	p: {
 		{
 			a:     string
-			y~(Y): a_9 + INP
+			y~(Y): a_1 + INP
 			z:     "x" + Y
 		}
-		a~(a_9): "1"
+		a~(a_1): "1"
 	}
 	q: {
 		{
 			a:     string
-			y~(Y): a_B + INP
+			y~(Y): a_2 + INP
 			z:     "x" + Y
 		}
-		a~(a_B): "2"
+		a~(a_2): "2"
 	}
 
 	//cue:path: inp

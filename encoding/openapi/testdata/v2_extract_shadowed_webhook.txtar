@@ -29,7 +29,7 @@ info: {
 	version: "1"
 }
 
-paths~(paths_9): "/x": get: {
+paths~(paths_1): "/x": get: {
 	parameters: [{
 		name: "id"
 		in:   "query"
@@ -38,7 +38,7 @@ paths~(paths_9): "/x": get: {
 	responses: "200": description: "ok"
 }
 webhooks: paths: post: requestBody: content: "application/json": schema: #: {
-	item?: paths_9."/x".get.parameters[0].schema.#
+	item?: paths_1."/x".get.parameters[0].schema.#
 	...
 }
 -- out/TestExtractV2-v3-noshare/out.cue --
@@ -48,7 +48,7 @@ info: {
 	version: "1"
 }
 
-paths~(paths_9): "/x": get: {
+paths~(paths_1): "/x": get: {
 	parameters: [{
 		name: "id"
 		in:   "query"
@@ -57,6 +57,6 @@ paths~(paths_9): "/x": get: {
 	responses: "200": description: "ok"
 }
 webhooks: paths: post: requestBody: content: "application/json": schema: #: {
-	item?: paths_9."/x".get.parameters[0].schema.#
+	item?: paths_1."/x".get.parameters[0].schema.#
 	...
 }

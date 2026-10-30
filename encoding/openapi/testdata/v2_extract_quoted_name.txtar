@@ -24,9 +24,9 @@ info: {
 	version: "1"
 }
 
-#~(#_9): "some-name": close({id?: int})
+#~(#_1): "some-name": close({id?: int})
 
-paths: "/x": get: responses: "200": content: "application/json": schema: #: #_9."some-name"
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #_1."some-name"
 -- out/TestExtractV2-v3-noshare/out.cue --
 openapi: "3.0.0"
 info: {
@@ -34,6 +34,6 @@ info: {
 	version: "1"
 }
 
-#~(#_9): "some-name": close({id?: int})
+#~(#_1): "some-name": close({id?: int})
 
-paths: "/x": get: responses: "200": content: "application/json": schema: #: #_9."some-name"
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #_1."some-name"

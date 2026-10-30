@@ -16,13 +16,12 @@ package astutil
 
 import (
 	"fmt"
-	"math/rand/v2"
 	"slices"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cueexperiment"
 )
 
@@ -108,7 +107,6 @@ func sanitize(f *ast.File, names map[string]bool) error {
 	z := &sanitizer{
 		file:           f,
 		postfixAliases: requiresPostfixAliases(f),
-		rand:           rand.New(rand.NewPCG(123, 456)), // ensure determinism between runs
 
 		names:      map[string]bool{},
 		pkgNames:   names,
@@ -161,10 +159,11 @@ type sanitizer struct {
 	// be written in the postfix form to parse at the target language version.
 	postfixAliases bool
 
-	rand *rand.Rand
-
 	// names is all used names. Can be used to determine a new unique name.
 	names map[string]bool
+	// namer picks the new names which [sanitizer.uniqueName] adds to
+	// [sanitizer.names].
+	namer astinternal.UniqueNamer
 	// pkgNames holds the top-level field names of all files in the package.
 	pkgNames   map[string]bool
 	referenced map[ast.Node]bool
@@ -191,7 +190,7 @@ func (z *sanitizer) addRename(base string, n ast.Node) (alt string, new bool) {
 		return name, false
 	}
 
-	name := z.uniqueName(base, false)
+	name := z.uniqueName(base)
 	z.altMap[n] = name
 	return name, true
 }
@@ -199,7 +198,7 @@ func (z *sanitizer) addRename(base string, n ast.Node) (alt string, new bool) {
 func (z *sanitizer) unshadow(parent ast.Node, base string, link ast.Node) string {
 	name, ok := z.altMap[link]
 	if !ok {
-		name = z.uniqueName(base, false)
+		name = z.uniqueName(base)
 		z.altMap[link] = name
 
 		// Insert new let clause at top to refer to a declaration in possible
@@ -344,7 +343,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		// use a previously created one.
 		spec := z.importMap[xi.ID]
 		if spec == nil {
-			name := z.uniqueName(xi.Ident, false)
+			name := z.uniqueName(xi.Ident)
 			spec = z.addImport(&ast.ImportSpec{
 				Name: ast.NewIdent(name),
 				Path: x.Path,
@@ -449,32 +448,14 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 	return true
 }
 
-// uniqueName returns a new name globally unique name of the form
-// base_NN ... base_NNNNNNNNNNNNNN or _base or the same pattern with a '_'
-// prefix if hidden is true.
-//
-// It prefers short extensions over large ones, while ensuring the likelihood of
-// fast termination is high. There are at least two digits to make it visually
-// clearer this concerns a generated number.
-func (z *sanitizer) uniqueName(base string, hidden bool) string {
-	if hidden && !strings.HasPrefix(base, "_") {
-		base = "_" + base
-		if !z.names[base] {
-			z.names[base] = true
-			return base
-		}
-	}
-
-	const mask = 0xff_ffff_ffff_ffff // max bits; stay clear of int64 overflow
-	const shift = 4                  // rate of growth
-	for n := int64(0x10); ; n = mask&((n<<shift)-1) + 1 {
-		num := z.rand.IntN(int(n))
-		name := fmt.Sprintf("%s_%01X", base, num)
-		if !z.names[name] {
-			z.names[name] = true
-			return name
-		}
-	}
+// uniqueName returns a new name, based on base but never base itself, which
+// is unused in the file and the package's top level.
+func (z *sanitizer) uniqueName(base string) string {
+	name := z.namer.Name(base, func(name string) bool {
+		return name == base || z.names[name]
+	})
+	z.names[name] = true
+	return name
 }
 
 func (z *sanitizer) addImport(spec *ast.ImportSpec) *ast.ImportSpec {

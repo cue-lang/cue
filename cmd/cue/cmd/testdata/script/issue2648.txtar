@@ -264,13 +264,13 @@ nested_alias: {
 -- shadow-def.stdout --
 package shadow
 
-shadowed~(shadowed_9): "top"
+shadowed~(shadowed_1): "top"
 if true {
 	comprehension: true
 }
 outer: {
 	shadowed: "nested"
-	ref:      shadowed_9
+	ref:      shadowed_1
 }
 -- shadow-def-export.stdout --
 {

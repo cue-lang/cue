@@ -175,9 +175,9 @@ shadowLet: {
 }
 -- out/definition --
 shadowRef: {
-	t1: x~(x_9): x: x_9 | null
-	t2: x~(x_B): x: x: x_B | null
-	t3: x: x: x~(x_6): x: x_6 | null
+	t1: x~(x_1): x: x_1 | null
+	t2: x~(x_2): x: x: x_2 | null
+	t3: x: x: x~(x_3): x: x_3 | null
 	t4:
 		x~(X): {
 			x: X | null
@@ -185,7 +185,7 @@ shadowRef: {
 		}
 	t5:
 		x~(X): x: X | null
-	e1: x~(x_0): x: x_0
+	e1: x~(x_4): x: x_4
 }
 shadowAlias: {
 	t1: {

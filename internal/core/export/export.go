@@ -17,13 +17,13 @@ package export
 import (
 	"cmp"
 	"slices"
-	"strconv"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/walk"
 	"cuelang.org/go/internal/cueexperiment"
@@ -355,7 +355,7 @@ type exporter struct {
 	usedFeature map[adt.Feature]adt.Expr
 	// names picks the names which [exporter.uniqueFeature] adds to
 	// [exporter.usedFeature].
-	names      uniqueNamer
+	names      astinternal.UniqueNamer
 	labelAlias map[adt.Expr]adt.Feature
 	// valueAlias maps a source value alias to the name it is bound to in the
 	// output, where a let clause naming "self" takes its place.
@@ -914,45 +914,17 @@ func (e *exporter) identFeature(s string) adt.Feature {
 	return adt.MakeIdentLabel(e.ctx, s, cmp.Or(e.pkgID, "_"))
 }
 
-// uniqueFeature returns the first name from [uniqueNamer.name] which is not
-// in [exporter.usedFeature], with its feature, and marks it as used.
+// uniqueFeature returns the first name from [astinternal.UniqueNamer.Name]
+// which is not in [exporter.usedFeature], with its feature, and marks it as
+// used.
 func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
-	name = e.names.name(base, func(name string) bool {
+	name = e.names.Name(base, func(name string) bool {
 		f = e.identFeature(name)
 		_, ok := e.usedFeature[f]
 		return ok
 	})
 	e.usedFeature[f] = nil
 	return f, name
-}
-
-// A uniqueNamer picks names which are not taken. A name must stay taken once
-// it is, so that each search can resume where the last one for the same base
-// stopped, rather than scanning past every taken name again.
-type uniqueNamer struct {
-	next map[string]int // the suffix at which to resume the search for a base
-}
-
-// name returns base if it is not taken, or otherwise the first of base_1,
-// base_2, and so on which is not.
-func (u *uniqueNamer) name(base string, taken func(name string) bool) string {
-	start := u.next[base]
-	for i := start; ; i++ {
-		name := base
-		if i > 0 {
-			name += "_" + strconv.Itoa(i)
-		}
-		if taken(name) {
-			continue
-		}
-		if i > start {
-			if u.next == nil {
-				u.next = make(map[string]int)
-			}
-			u.next[base] = i
-		}
-		return name
-	}
 }
 
 type frame struct {

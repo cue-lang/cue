@@ -310,7 +310,7 @@ func TestInstancesUpgradeAliasForm(t *testing.T) {
 
 	b, ferr := format.Node(f)
 	qt.Assert(t, qt.IsNil(ferr))
-	qt.Assert(t, qt.StringContains(string(b), "a~(a_9): \"b\""))
+	qt.Assert(t, qt.StringContains(string(b), "a~(a_1): \"b\""))
 	_, perr := parser.ParseFile("out.cue", b, parser.Version("v0.18.0"))
 	qt.Assert(t, qt.IsNil(perr))
 }

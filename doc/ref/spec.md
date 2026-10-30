@@ -3171,13 +3171,15 @@ If the condition unifies successfully, the "then" schema is applied;
 otherwise, the "else" schema is applied.
 The validator succeeds if the chosen schema unifies successfully with the value.
 
-<!-- TODO: the first example is meant to validate; the "else" schema is
-     evaluated even though the condition matches. The error of the second
-     example is incomplete, so it is not recorded below. -->
+<!-- TODO: once a builtin such as must can turn a condition on the value into
+a schema, as proposed in https://cuelang.org/issue/575, the first example
+could write its "then" schema as such a condition, like len(self) > 3. -->
 
-```cue ! vet
+```cue vet
+import "strings"
+
 // If value is a string, it must have length > 3; otherwise it must be > 10
-value: "hello" & matchIf(string, len(value) > 3, value > 10) // len("hello") is >3
+value: "hello" & matchIf(string, strings.MinRunes(4), >10) // => OK
 
 // If value matches {a: int}, it must have b field; otherwise a must be a string
 x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // => error: field is required but not present
@@ -3185,12 +3187,6 @@ x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // => error: field
 // If value is >5, it must be <10; otherwise it must be <3, as 2 is
 y: 2 & matchIf(>5, <10, <3) // => OK
 ```
-<!-- error:
-value: invalid operands "hello" and 10 to '>' (type string and int):
-    2:50
-    2:8
-    2:58
--->
 
 
 ## Cycles

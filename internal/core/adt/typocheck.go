@@ -321,6 +321,12 @@ func (n *nodeContext) reqIndex(v *Vertex) int {
 	return slices.IndexFunc(n.reqDefIDs, func(x refInfo) bool { return x.v == v })
 }
 
+// reqIndexByID returns the index in n.reqDefIDs of the requirement with the
+// scope id p, or -1 if there is none.
+func (n *nodeContext) reqIndexByID(p defID) int {
+	return slices.IndexFunc(n.reqDefIDs, func(x refInfo) bool { return x.id == p })
+}
+
 func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFlags) {
 	if n.ctx.OpenDef {
 		return
@@ -479,7 +485,7 @@ func (n *nodeContext) linkCyclicResolver(v *Vertex, id CloseInfo) {
 	// always smaller than their child, so the walk terminates.
 	changed := false
 	for p := id.defID; p != 0; p = c.containments[p].id {
-		i := slices.IndexFunc(n.reqDefIDs, func(x refInfo) bool { return x.id == p })
+		i := n.reqIndexByID(p)
 		if i >= 0 && !n.reqDefIDs[i].ignore {
 			n.reqDefIDs[i].ignore = true
 			changed = true

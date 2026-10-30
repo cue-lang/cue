@@ -175,6 +175,37 @@ boundSpread: {
 	t3: byField & {z: 1}
 }
 
+// A field selected from a value holding a definition is closed by it, so
+// a spread of the field closes the literal, whether or not the field has
+// been evaluated by then, and whether or not a spread opened the
+// definition, as the literal restores the closedness which the spreads
+// it holds dropped. A field the definition does not declare is not
+// closed by it, so it leaves the literal open.
+// https://cuelang.org/issue/4501
+selectedField: {
+	#D: s: {a: 1}
+	r: __reclose({(#D & {}).s...})
+	t1: r & {z: 1}
+	held: #D & {}
+	h: __reclose({held.s..., b: 1})
+	t2: h & {z: 1}
+	sel: x: (__reclose({(#D & {}).s...}) & {z: 1}).z
+	t3: (sel & {}).x
+	shared: #D
+	t4: __reclose({shared.s..., b: 1}) & {z: 1}
+	opened: __reclose({({#D...}).s...})
+	t5: opened & {z: 1}
+	before: {#D...}
+	t6: __reclose({before.s...}) & {z: 1}
+	t7: __reclose({after.s...}) & {z: 1}
+	after: {#D...}
+	#O: {...}
+	undeclared: #O & {s: {a: 1}}
+	t8: __reclose({undeclared.s...}) & {z: 1}
+	t9: __reclose({undeclaredAfter.s...}) & {z: 1}
+	undeclaredAfter: #O & {s: {a: 1}}
+}
+
 // A spread of a close call opens its literal again, but passes the closing
 // of the values spread into that literal on to the enclosing __reclose
 // literal.
@@ -490,6 +521,89 @@ issue4535: {
     })
     t3: (〈0;byField〉 & {
       z: 1
+    })
+  }
+  selectedField: {
+    #D: {
+      s: {
+        a: 1
+      }
+    }
+    r: __reclose({
+      (〈1;#D〉 & {}).s...
+    })
+    t1: (〈0;r〉 & {
+      z: 1
+    })
+    held: (〈0;#D〉 & {})
+    h: __reclose({
+      〈1;held〉.s...
+      b: 1
+    })
+    t2: (〈0;h〉 & {
+      z: 1
+    })
+    sel: {
+      x: (__reclose({
+        (〈2;#D〉 & {}).s...
+      }) & {
+        z: 1
+      }).z
+    }
+    t3: (〈0;sel〉 & {}).x
+    shared: 〈0;#D〉
+    t4: (__reclose({
+      〈1;shared〉.s...
+      b: 1
+    }) & {
+      z: 1
+    })
+    opened: __reclose({
+      {
+        〈2;#D〉...
+      }.s...
+    })
+    t5: (〈0;opened〉 & {
+      z: 1
+    })
+    before: {
+      〈1;#D〉...
+    }
+    t6: (__reclose({
+      〈1;before〉.s...
+    }) & {
+      z: 1
+    })
+    t7: (__reclose({
+      〈1;after〉.s...
+    }) & {
+      z: 1
+    })
+    after: {
+      〈1;#D〉...
+    }
+    #O: {
+      ...
+    }
+    undeclared: (〈0;#O〉 & {
+      s: {
+        a: 1
+      }
+    })
+    t8: (__reclose({
+      〈1;undeclared〉.s...
+    }) & {
+      z: 1
+    })
+    t9: (__reclose({
+      〈1;undeclaredAfter〉.s...
+    }) & {
+      z: 1
+    })
+    undeclaredAfter: (〈0;#O〉 & {
+      s: {
+        a: 1
+      }
     })
   }
   spreadClose: {

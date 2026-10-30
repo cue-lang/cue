@@ -1763,9 +1763,10 @@ result1: X  // 4
 ```
 
 ```cue vet
-// A field alias example
-foo~(F): {
-    x: F.a
+// A value alias, written with let and self
+foo: {
+    let X = self
+    x: X.a
 }
 bar: foo & {a: 1}  // {a: 1, x: 1}
 ```
@@ -1780,7 +1781,7 @@ foo: { value: 1 } // outputs: foo: { name: "foo", value: 1, add1: 2 }
 // Dynamic field with dual form
 ("my" + "Field")~(K, V): { label: K, foo: 42 }
 value: V.foo
-// outputs: {myField: { label: "myField", value: 42 }, value: 42}
+// outputs: {myField: { label: "myField", foo: 42 }, value: 42}
 ```
 
 <!-- TODO: also allow aliases in lists -->
@@ -2196,14 +2197,14 @@ e: self // refers to top level (cyclic)
 f: [ 1, 2, self[0] ]  // refers to value of f[0]
 
 // implicit scope
-g: x: self // refers to value of g
+g: x: self // refers to value of g (cyclic)
 
 // naming using let
 let X = self
 h: a: b: c: X.f[0] // refers to the value of f[0] (1)
 
 // predeclared identifier redeclared
-i: self: x: y: z: self // refers to value of i.self (self redefined)
+i: self: x: y: z: self // refers to value of i.self (self redefined, cyclic)
 ```
 
 ### Primary expressions

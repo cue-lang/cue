@@ -2072,26 +2072,26 @@ A field associates the value of an expression to a label within a struct.
 If this label is an identifier, it binds the field to that identifier,
 so the field's value can be referenced by writing the identifier.
 String labels are not bound to fields.
-```cue ! vet
+```cue vet
 a: {
     b: 2
     "s": 3
 
-    c: b   // 2
-    d: s   // unresolved identifier "s"
-    e: a.s // 3
+    c: b   // => 2
+    e: a.s // => 3
+}
+```
+
+Referring to a field with a string label by identifier is an error:
+```cue ! vet
+a: {
+    "s": 3
+    d: s   // => error: reference "s" not found
 }
 ```
 <!-- error:
 a.d: reference "s" not found:
-    6:8
--->
-
-<!-- TODO: the annotation for e only holds because d is a compile-time error.
-If d were an evaluation error instead, such as 1 & 2, a would be bottom
-by the struct unification rule, and so would e, as selecting from bottom
-yields bottom; references such as c are unaffected.
-Consider moving d out of a so the example does not imply otherwise.
+    3:8
 -->
 
 If an expression may result in a value associated with a default value

@@ -1,6 +1,7 @@
 -- in.cue --
 Len: len(*[1, 2, 3] | 0)
 Close: close(*{} | 0)
+CloseDenied: Close & {a: 1}
 And: and(*[1, 1] | int)
 Or: or(*[1, 1] | int)
 Div: div(*5 | string, 2)
@@ -16,6 +17,9 @@ Rem: rem(*5 | string, 2)
     3,
   ]|0))
   Close: close((*{}|0))
+  CloseDenied: (〈0;Close〉 & {
+    a: 1
+  })
   And: and((*[
     1,
     1,

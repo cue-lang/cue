@@ -159,6 +159,28 @@ disjunctValue: {
 	ellipsis: close({a: 1, ...} | {b: 1}) & {c: 2} @test(eq, {a: 1, c: 2})
 }
 
+// Closing concerns the fields of a struct, so close returns any other value
+// unchanged, concrete or not, and a disjunction keeps its scalar disjuncts.
+scalar: {
+	number:    close(1) @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, 1)
+	str:       close("s") @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, "s")
+	nothing:   close(null) @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, null)
+	kind:      close(int) & 2 @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, 2)
+	bound:     close(>1) & 2 @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, 2)
+	top:       close(_) & {a: 1} @test(eq, {a: 1}) @test(closed=false)
+	reference: close(x) @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, 1)
+	x: 1
+	embedded:  close({1}) @test(err, code=eval, contains="in argument 1 to close") @test(eq:todo, 1)
+	list:      close([1]) @test(eq, [1])
+	conflict:  close(1) & {a: 1} @test(err, code=eval, contains="in argument 1 to close")
+
+	disjunct: close(*1 | {a: 2}) @test(eq, {a: 2}) @test(eq:todo, *1 | {a: 2})
+	struct:   close(1 | {a: 2}) & {a: 2} @test(eq, {a: 2})
+	denied:   close(1 | {a: 2}) & {a: 2, b: 3} @test(err, code=eval, suberr=(contains="field not allowed"))
+	chosen:   close(1 | {a: 2}) & 1 @test(err, code=eval, contains="conflicting values") @test(eq:todo, 1)
+	literal:  close({*1 | {a: 2}}) @test(eq, {a: 2}) @test(eq:todo, *1 | {a: 2})
+}
+
 // A spread opens the value it spreads, so a struct spreading a close()d
 // value admits any field and is not closed.
 spreadOpen: {
@@ -263,16 +285,16 @@ issue1206: elimination: {
 
 -- out/eval/stats --
 Leaks:  26
-Freed:  561
-Reused: 531
-Allocs: 56
+Freed:  616
+Reused: 576
+Allocs: 66
 Retain: 0
 
-Unifications: 366
-Conjuncts:    662
-Disjuncts:    76
+Unifications: 409
+Conjuncts:    726
+Disjuncts:    86
 
-NumCloseIDs: 145
+NumCloseIDs: 155
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7
@@ -296,6 +318,28 @@ NumCloseIDs: 145
     ./in.cue:141:33
 [eval] disjunctValue.t3.c: field not allowed:
     ./in.cue:154:11
+[eval] scalar.number: cannot use 1 (type int) as (list|struct) in argument 1 to close:
+    ./in.cue:164:19
+[eval] scalar.str: cannot use "s" (type string) as (list|struct) in argument 1 to close:
+    ./in.cue:165:19
+[eval] scalar.nothing: cannot use null (type null) as (list|struct) in argument 1 to close:
+    ./in.cue:166:19
+[eval] scalar.kind: cannot use int (type int) as (list|struct) in argument 1 to close:
+    ./in.cue:167:19
+[eval] scalar.bound: cannot use >1 (type number) as (list|struct) in argument 1 to close:
+    ./in.cue:168:19
+[eval] scalar.top: error in call to close: struct argument must be concrete:
+    ./in.cue:169:13
+[eval] scalar.reference: cannot use 1 (type int) as (list|struct) in argument 1 to close:
+    ./in.cue:171:5
+[eval] scalar.embedded: cannot use 1 (type int) as (list|struct) in argument 1 to close:
+    ./in.cue:172:20
+[eval] scalar.conflict: cannot use 1 (type int) as (list|struct) in argument 1 to close:
+    ./in.cue:174:19
+[eval] scalar.denied.b: field not allowed:
+    ./in.cue:178:39
+[eval] scalar.chosen: conflicting values 1 and {a:2} (mismatched types int and struct):
+    ./in.cue:179:32
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

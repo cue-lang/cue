@@ -105,6 +105,28 @@ disjunctValue: {
 	ellipsis: close({a: 1, ...} | {b: 1}) & {c: 2}
 }
 
+// Closing concerns the fields of a struct, so close returns any other value
+// unchanged, concrete or not, and a disjunction keeps its scalar disjuncts.
+scalar: {
+	number:    close(1)
+	str:       close("s")
+	nothing:   close(null)
+	kind:      close(int) & 2
+	bound:     close(>1) & 2
+	top:       close(_) & {a: 1}
+	reference: close(x)
+	x: 1
+	embedded:  close({1})
+	list:      close([1])
+	conflict:  close(1) & {a: 1}
+
+	disjunct: close(*1 | {a: 2})
+	struct:   close(1 | {a: 2}) & {a: 2}
+	denied:   close(1 | {a: 2}) & {a: 2, b: 3}
+	chosen:   close(1 | {a: 2}) & 1
+	literal:  close({*1 | {a: 2}})
+}
+
 // A spread opens the value it spreads, so a struct spreading a close()d
 // value admits any field and is not closed.
 spreadOpen: {
@@ -570,6 +592,49 @@ issue1206: elimination: {
       b: 1
     })) & {
       c: 2
+    })
+  }
+  scalar: {
+    number: close(1)
+    str: close("s")
+    nothing: close(null)
+    kind: (close(int) & 2)
+    bound: (close(>1) & 2)
+    top: (close(_) & {
+      a: 1
+    })
+    reference: close(〈0;x〉)
+    x: 1
+    embedded: close({
+      1
+    })
+    list: close([
+      1,
+    ])
+    conflict: (close(1) & {
+      a: 1
+    })
+    disjunct: close((*1|{
+      a: 2
+    }))
+    struct: (close((1|{
+      a: 2
+    })) & {
+      a: 2
+    })
+    denied: (close((1|{
+      a: 2
+    })) & {
+      a: 2
+      b: 3
+    })
+    chosen: (close((1|{
+      a: 2
+    })) & 1)
+    literal: close({
+      (*1|{
+        a: 2
+      })
     })
   }
   spreadOpen: {

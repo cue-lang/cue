@@ -1,21 +1,25 @@
 -- in.cue --
 Len: len(*[1, 2, 3] | 0) @test(eq, 3)
-Close: close(*{} | 0)    @test(eq, {}) @test(closed)
+Close: close(*{} | 0)    @test(eq, {}) @test(closed) @test(eq:todo, *{} | 0)
+CloseDenied: Close & {a: 1} @test(err, code=eval, suberr=(contains="field not allowed"))
 And: and(*[1, 1] | int)  @test(eq, 1)
 Or: or(*[1, 1] | int)    @test(eq, 1)
 Div: div(*5 | string, 2) @test(eq, 2)
 Mod: mod(*5 | string, 2) @test(eq, 1)
 Quo: quo(*5 | string, 2) @test(eq, 2)
 Rem: rem(*5 | string, 2) @test(eq, 1)
+-- out/errors.txt --
+[eval] CloseDenied.a: field not allowed:
+    ./in.cue:3:23
 -- out/eval/stats --
 Leaks:  1
-Freed:  42
-Reused: 28
-Allocs: 15
+Freed:  48
+Reused: 33
+Allocs: 16
 Retain: 0
 
-Unifications: 25
-Conjuncts:    46
-Disjuncts:    18
+Unifications: 29
+Conjuncts:    53
+Disjuncts:    20
 
-NumCloseIDs: 4
+NumCloseIDs: 7

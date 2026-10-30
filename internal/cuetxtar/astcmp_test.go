@@ -84,7 +84,7 @@ func TestAstCompare_Scalars(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -140,7 +140,7 @@ func TestAstCompare_Types(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -253,7 +253,7 @@ func TestAstCompare_Structs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -303,7 +303,7 @@ func TestAstCompare_EmbedExpr(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			checkErr(t, astCompare(expr, val), tt.wantErr)
+			checkErr(t, CompareExpr(expr, val), tt.wantErr)
 		})
 	}
 
@@ -322,10 +322,10 @@ func TestAstCompare_EmbedExpr(t *testing.T) {
 		val := v.LookupPath(cue.MakePath(cue.Str("x")))
 
 		t.Run("correct assertion passes", func(t *testing.T) {
-			checkErr(t, astCompare(parseExpr(t, `{5, _#cond: true}`), val), "")
+			checkErr(t, CompareExpr(parseExpr(t, `{5, _#cond: true}`), val), "")
 		})
 		t.Run("missing embed fails", func(t *testing.T) {
-			checkErr(t, astCompare(parseExpr(t, `{_#cond: true}`), val),
+			checkErr(t, CompareExpr(parseExpr(t, `{_#cond: true}`), val),
 				"value has embedded 5 but expected struct has no embedded expression")
 		})
 	})
@@ -344,10 +344,10 @@ func TestAstCompare_EmbedExpr(t *testing.T) {
 		val := v.LookupPath(cue.MakePath(cue.Str("x")))
 
 		t.Run("correct assertion passes", func(t *testing.T) {
-			checkErr(t, astCompare(parseExpr(t, `{5, #foo: "bar"}`), val), "")
+			checkErr(t, CompareExpr(parseExpr(t, `{5, #foo: "bar"}`), val), "")
 		})
 		t.Run("missing embed fails", func(t *testing.T) {
-			checkErr(t, astCompare(parseExpr(t, `{#foo: "bar"}`), val),
+			checkErr(t, CompareExpr(parseExpr(t, `{#foo: "bar"}`), val),
 				"value has embedded")
 		})
 	})
@@ -364,19 +364,19 @@ func TestAstCompare_ErrDirective(t *testing.T) {
 
 	t.Run("bare err on error field", func(t *testing.T) {
 		expr := parseExpr(t, "{\nb: 1\na: _|_ @test(err)\n}")
-		checkErr(t, astCompare(expr, errStruct), "")
+		checkErr(t, CompareExpr(expr, errStruct), "")
 	})
 	t.Run("err with code", func(t *testing.T) {
 		expr := parseExpr(t, "{\nb: 1\na: _|_ @test(err, code=eval)\n}")
-		checkErr(t, astCompare(expr, errStruct), "")
+		checkErr(t, CompareExpr(expr, errStruct), "")
 	})
 	t.Run("err on non-error field", func(t *testing.T) {
 		expr := parseExpr(t, "{\nb: 1 @test(err)\na: _|_ @test(err)\n}")
-		checkErr(t, astCompare(expr, errStruct), "@test(err): expected error")
+		checkErr(t, CompareExpr(expr, errStruct), "@test(err): expected error")
 	})
 	t.Run("err wrong code", func(t *testing.T) {
 		expr := parseExpr(t, "{\nb: 1\na: _|_ @test(err, code=incomplete)\n}")
-		checkErr(t, astCompare(expr, errStruct), "expected error code")
+		checkErr(t, CompareExpr(expr, errStruct), "expected error code")
 	})
 }
 
@@ -468,7 +468,7 @@ func TestAstCompare_HiddenFieldsInNonStruct(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
-			checkErr(t, astCompare(expr, tt.val), tt.wantErr)
+			checkErr(t, CompareExpr(expr, tt.val), tt.wantErr)
 		})
 	}
 }
@@ -500,7 +500,7 @@ func TestAstCompare_Lists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -570,7 +570,7 @@ func TestAstCompare_Disjunctions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -632,7 +632,7 @@ func TestAstCompare_Bounds(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -773,7 +773,7 @@ func TestAstCompare_PatternConstraints(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -813,7 +813,7 @@ func TestAstCompare_Complex(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -848,7 +848,7 @@ func TestAstCompare_CheckOrder(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -942,7 +942,7 @@ func TestAstCompare_Attributes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -951,7 +951,7 @@ func TestAstCompare_Attributes(t *testing.T) {
 func TestAstCompare_Parens(t *testing.T) {
 	expr := parseExpr(t, `(42)`)
 	val := compileVal(t, `42`)
-	if err := astCompare(expr, val); err != nil {
+	if err := CompareExpr(expr, val); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 }
@@ -1023,7 +1023,7 @@ func TestAstCompare_LetBindings(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -1068,7 +1068,7 @@ func TestAstCompare_Ignore(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			expr := parseExpr(t, tt.expr)
 			val := compileVal(t, tt.val)
-			err := astCompare(expr, val)
+			err := CompareExpr(expr, val)
 			checkErr(t, err, tt.wantErr)
 		})
 	}
@@ -1079,14 +1079,14 @@ func TestAstCompare_Ignore(t *testing.T) {
 		ctx := cuecontext.New()
 		errVal := ctx.CompileString("{\nb: 1 & 2\n}") // b has a conflict error
 		expr := parseExpr(t, "{\nb: _|_ @test(ignore) @test(err)\n}")
-		checkErr(t, astCompare(expr, errVal), "")
+		checkErr(t, CompareExpr(expr, errVal), "")
 	})
 }
 
 // TestCatchInvalidConjuncts verifies @test(eq, ...) that conjunctions are
 // valid.
 //
-// The astCompare implementation mostly assumes that literal values are
+// The CompareExpr implementation mostly assumes that literal values are
 // provided that can be checked verbatim. One exception is conjunctions, as
 // it is needed for testing validators. We can check each conjunct separately,
 // as long as their unification is valid. We do so to avoid having improper
@@ -1104,17 +1104,17 @@ func TestCatchInvalidConjuncts(t *testing.T) {
 	val := compileVal(t, srcField).LookupPath(cue.ParsePath("x"))
 	t.Run("conjunction form is invalid", func(t *testing.T) {
 		// "s" & {#a: "s"} is invalid CUE: {#a: "s"} has no embedded _ so a
-		// string literal cannot unify with it. astCompare must return an error
+		// string literal cannot unify with it. CompareExpr must return an error
 		// for such a conjunction. This cannot be tested via a txtar test file
 		// because a failing @test would also fail the outer test run.
 		expr := parseExpr(t, `"s" & {#a: "s"}`)
-		if err := astCompare(expr, val); err == nil {
+		if err := CompareExpr(expr, val); err == nil {
 			t.Error("expected error for invalid conjunction expression, got nil")
 		}
 	})
 	t.Run("struct-embed form is valid", func(t *testing.T) {
 		expr := parseExpr(t, `{"s", #a: "s"}`)
-		if err := astCompare(expr, val); err != nil {
+		if err := CompareExpr(expr, val); err != nil {
 			t.Errorf("unexpected error for struct-embed expression: %v", err)
 		}
 	})
@@ -1149,7 +1149,7 @@ func TestShareIDInEqBody(t *testing.T) {
 			b: {x: 1}  @test(shareID=A)
 		}`)
 		val := compileVal(t, `{a: {x: 1}, b: {x: 1}}`)
-		err := astCompare(expr, val.LookupPath(cue.MakePath()))
+		err := CompareExpr(expr, val.LookupPath(cue.MakePath()))
 		if err == nil {
 			t.Error("expected eq check to fail for first shareID occurrence, but it passed")
 		}
@@ -1162,7 +1162,7 @@ func TestShareIDInEqBody(t *testing.T) {
 			b: {x: 99} @test(shareID=A)
 		}`)
 		val := compileVal(t, `{a: {x: 1}, b: {x: 1}}`)
-		err := astCompare(expr, val.LookupPath(cue.MakePath()))
+		err := CompareExpr(expr, val.LookupPath(cue.MakePath()))
 		if err != nil {
 			t.Errorf("expected second shareID occurrence to skip eq check, but got: %v", err)
 		}
@@ -1175,7 +1175,7 @@ func TestShareIDInEqBody(t *testing.T) {
 			b: a       @test(shareID=A)
 		}`)
 		val := compileVal(t, `{a: {x: 1}, b: {x: 1}}`)
-		err := astCompare(expr, val.LookupPath(cue.MakePath()))
+		err := CompareExpr(expr, val.LookupPath(cue.MakePath()))
 		if err != nil {
 			t.Errorf("identifier as second shareID value should be skipped, but got: %v", err)
 		}

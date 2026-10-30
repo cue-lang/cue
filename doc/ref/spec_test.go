@@ -27,7 +27,10 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/scanner"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cuetxtar"
 	"github.com/go-quicktest/qt"
 	mdast "github.com/yuin/goldmark/v2/ast"
 	mdparser "github.com/yuin/goldmark/v2/parser"
@@ -214,6 +217,9 @@ func checkBlock(t *testing.T, ctx *cue.Context, fcb *mdast.CodeBlock, source []b
 		return blockEdit{}, false
 	}
 	src := string(fcb.Value.Bytes(source))
+	if rest[0] != "vet" && strings.Contains(src, claimPrefix) {
+		t.Errorf("%s: claims are only checked in vet blocks: ```%s", blockPos, info)
+	}
 
 	// Keep generated diagnostics relative to the example, not to spec.md.
 	var err error
@@ -227,8 +233,10 @@ func checkBlock(t *testing.T, ctx *cue.Context, fcb *mdast.CodeBlock, source []b
 			break
 		}
 		val := ctx.BuildFile(file)
+		// Validating the whole block finds errors within each field,
+		// even when the block fails to build.
 		err = val.Validate()
-		checkBottoms(t, blockPos, val, file)
+		checkClaims(t, blockPos, val, file, errors.Errors(err))
 	case "rows", "untested":
 		// TODO: parse and validate rows line by line
 		if wantError {
@@ -268,17 +276,38 @@ func checkBlock(t *testing.T, ctx *cue.Context, fcb *mdast.CodeBlock, source []b
 	}, true
 }
 
-// checkBottoms checks that every field annotated with a "_|_" line comment
-// evaluates to an error, including an incomplete one,
-// which validating the block as a whole does not report.
-func checkBottoms(t *testing.T, blockPos string, val cue.Value, file *ast.File) {
-	annotated := make(map[int]bool)
+// claimPrefix starts a line comment claiming the value of the field it follows,
+// such as "// => 4", "// => OK" or "// => error: undefined field: z",
+// which sets the claim apart from comments explaining the example.
+// A claim on a line of its own after the last declaration
+// is about the whole block.
+const claimPrefix = "// =>"
+
+// checkClaims checks that every field followed by a claim comment
+// evaluates to the claimed value.
+func checkClaims(t *testing.T, blockPos string, val cue.Value, file *ast.File, blockErrs []errors.Error) {
+	claims := make(map[int]string)
 	ast.Walk(file, func(n ast.Node) bool {
-		if c, ok := n.(*ast.Comment); ok && strings.Contains(c.Text, "_|_") {
-			annotated[c.Pos().Line()] = true
+		c, ok := n.(*ast.Comment)
+		if !ok {
+			return true
+		}
+		line := c.Pos().Line()
+		claim, ok := strings.CutPrefix(c.Text, claimPrefix)
+		if ok {
+			claims[line] = strings.TrimSpace(claim)
+		}
+		word, _, _ := strings.Cut(strings.TrimSpace(strings.TrimPrefix(c.Text, "//")), " ")
+		switch word := strings.ToLower(strings.TrimRight(word, ":;,")); {
+		case strings.Contains(c.Text, "_|_") || word == "error":
+			t.Errorf("%s: write the error at line %d as a %q claim", blockPos, line, claimPrefix+" error: message")
+		case word == "ok" || word == "okay":
+			t.Errorf("%s: write the claim at line %d as a %q claim", blockPos, line, claimPrefix+" OK")
 		}
 		return true
 	}, nil)
+	// The fields ending at each claim's line, any of which the claim may be about.
+	fields := make(map[int][]cue.Path)
 	var walk func(path []cue.Selector, decls []ast.Decl)
 	walk = func(path []cue.Selector, decls []ast.Decl) {
 		for _, decl := range decls {
@@ -291,22 +320,119 @@ func checkBottoms(t *testing.T, blockPos string, val cue.Value, file *ast.File) 
 				continue
 			}
 			path := append(slices.Clip(path), sel)
-			// The outermost field ending at an annotated line is the one meant.
-			if line := field.End().Line(); annotated[line] {
-				delete(annotated, line)
-				path := cue.MakePath(path...)
-				if v := val.LookupPath(path); v.Err() == nil && v.Validate() == nil {
-					t.Errorf("%s: %v is annotated as _|_ but has no error", blockPos, path)
-				}
+			// The outermost field ending at a claim's line is the one meant.
+			line := field.End().Line()
+			if _, ok := claims[line]; ok {
+				fields[line] = append(fields[line], cue.MakePath(path...))
 				continue
 			}
-			if lit, ok := field.Value.(*ast.StructLit); ok {
-				walk(path, lit.Elts)
+			// Struct literals unified into the field declare its fields too.
+			for _, x := range cuetxtar.FlattenConjunction(field.Value) {
+				if lit, ok := x.(*ast.StructLit); ok {
+					walk(path, lit.Elts)
+				}
 			}
 		}
 	}
 	walk(nil, file.Decls)
-	for line := range annotated {
-		t.Errorf("%s: no field for the _|_ annotation at line %d", blockPos, line)
+	lastLine := file.End().Line()
+	for line, claim := range claims {
+		switch paths := fields[line]; {
+		case len(paths) == 1:
+			checkClaim(t, blockPos, paths[0], claim, val.LookupPath(paths[0]), blockErrs)
+		case len(paths) > 1:
+			// Sibling fields on one line, as in "a: 1, b: 2 // => 2".
+			t.Errorf("%s: fields %v all end at the claim at line %d", blockPos, paths, line)
+		case line > lastLine:
+			checkClaim(t, blockPos, cue.Path{}, claim, val, blockErrs)
+		default:
+			t.Errorf("%s: no field for the claim at line %d", blockPos, line)
+		}
+	}
+}
+
+func checkClaim(t *testing.T, blockPos string, path cue.Path, claim string, v cue.Value, blockErrs []errors.Error) {
+	// The field's own error may be an incomplete one,
+	// which validating does not report.
+	errs := fieldErrors(path, slices.Concat(blockErrs, errors.Errors(v.Err())))
+	if claim == "OK" {
+		if len(errs) > 0 {
+			t.Errorf("%s: %v is claimed OK but has errors: %q", blockPos, path, errs)
+		}
+		return
+	}
+	if msg, ok := strings.CutPrefix(claim, "error:"); ok {
+		msg = strings.TrimSpace(msg)
+		if !slices.ContainsFunc(errs, func(err fieldError) bool {
+			return strings.Contains(err.msg, msg) || strings.HasPrefix(err.String(), msg)
+		}) {
+			t.Errorf("%s: %v has no error containing %q: %q", blockPos, path, msg, errs)
+		}
+		return
+	}
+	want, err := parser.ParseExpr("", claim)
+	if err != nil {
+		t.Errorf("%s: %v: invalid claim %q: %v", blockPos, path, claim, err)
+		return
+	}
+	if hasComment(claim) {
+		t.Errorf("%s: %v: comment within claim %q", blockPos, path, claim)
+	}
+	// A claim of a single value is about the field's default, if it has one.
+	if !cuetxtar.IsDisjunction(want) {
+		v, _ = v.Default()
+	}
+	if err := cuetxtar.CompareExpr(want, v); err != nil {
+		t.Errorf("%s: %v does not match its claim %s: %v", blockPos, path, claim, err)
+	}
+}
+
+// fieldError is an error at or within a field,
+// with its path relative to the field.
+type fieldError struct {
+	path, msg string
+}
+
+func (e fieldError) String() string {
+	if e.path == "" {
+		return e.msg
+	}
+	return e.path + ": " + e.msg
+}
+
+// fieldErrors returns the distinct errors at or within the field at path.
+func fieldErrors(path cue.Path, errs []errors.Error) []fieldError {
+	var prefix []string
+	for _, sel := range path.Selectors() {
+		prefix = append(prefix, sel.String())
+	}
+	var within []fieldError
+	for _, err := range errs {
+		errPath := err.Path()
+		if len(errPath) < len(prefix) || !slices.Equal(errPath[:len(prefix)], prefix) {
+			continue
+		}
+		e := fieldError{
+			path: strings.Join(errPath[len(prefix):], "."),
+			msg:  errors.StringWithConfig(err, &errors.Config{OmitPath: true}),
+		}
+		if !slices.Contains(within, e) {
+			within = append(within, e)
+		}
+	}
+	return within
+}
+
+// hasComment reports whether the CUE source src contains a comment.
+func hasComment(src string) bool {
+	var s scanner.Scanner
+	s.Init(token.NewFile("", 0, len(src)), []byte(src), nil, scanner.ScanComments)
+	for {
+		switch _, tok, _ := s.Scan(); tok {
+		case token.COMMENT:
+			return true
+		case token.EOF:
+			return false
+		}
 	}
 }

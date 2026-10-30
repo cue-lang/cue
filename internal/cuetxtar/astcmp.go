@@ -47,7 +47,7 @@ type cmpCtx struct {
 	posWriteback func(innerAttrText string, positions []token.Pos)
 }
 
-// astCompare compares a parsed CUE AST expression against an evaluated
+// CompareExpr compares a parsed CUE AST expression against an evaluated
 // cue.Value. It returns nil when they match, or a descriptive error.
 //
 // Unlike compiling the expected expression and using Value.Equal or diff.Diff,
@@ -59,7 +59,7 @@ type cmpCtx struct {
 //     default markers.
 //   - Pattern constraints ([T]: V) are checked for existence and value.
 //   - Definitions (#D) and hidden definitions (_#D) are compared.
-func astCompare(expr ast.Expr, val cue.Value) error {
+func CompareExpr(expr ast.Expr, val cue.Value) error {
 	return (&cmpCtx{}).astCmp(cue.Path{}, expr, val)
 }
 
@@ -209,13 +209,13 @@ func valuesEqual(a, b cue.Value) bool {
 	return false
 }
 
-// isASTDisjunction reports whether expr represents a disjunction (| or *).
-func isASTDisjunction(expr ast.Expr) bool {
+// IsDisjunction reports whether expr represents a disjunction (| or *).
+func IsDisjunction(expr ast.Expr) bool {
 	switch e := expr.(type) {
 	case *ast.BinaryExpr:
 		return e.Op == token.OR
 	case *ast.ParenExpr:
-		return isASTDisjunction(e.X)
+		return IsDisjunction(e.X)
 	}
 	return false
 }
@@ -245,7 +245,7 @@ func checkStructuralMatch(path cue.Path, expr ast.Expr, val cue.Value) error {
 	tv := val.Core()
 	switch tv.V.DerefValue().BaseValue.(type) {
 	case *adt.Disjunction:
-		if !isASTDisjunction(expr) {
+		if !IsDisjunction(expr) {
 			return pathErr(path, "value is a disjunction but expected expression is not; "+
 				"use a disjunction in the expected value or @test(final) on the field")
 		}
@@ -928,13 +928,13 @@ func (c *cmpCtx) matchDisjuncts(path cue.Path, opCtx *adt.OpContext, kind string
 	return nil
 }
 
-// flattenConjunction collects all conjuncts from nested & expressions.
-func flattenConjunction(expr ast.Expr) []ast.Expr {
+// FlattenConjunction collects all conjuncts from nested & expressions.
+func FlattenConjunction(expr ast.Expr) []ast.Expr {
 	if e, ok := expr.(*ast.BinaryExpr); ok && e.Op == token.AND {
-		return append(flattenConjunction(e.X), flattenConjunction(e.Y)...)
+		return append(FlattenConjunction(e.X), FlattenConjunction(e.Y)...)
 	}
 	if e, ok := expr.(*ast.ParenExpr); ok {
-		return flattenConjunction(e.X)
+		return FlattenConjunction(e.X)
 	}
 	return []ast.Expr{expr}
 }
@@ -948,7 +948,7 @@ func (c *cmpCtx) cmpConjunction(path cue.Path, e *ast.BinaryExpr, val cue.Value)
 	ctx := value.Context(val)
 	ctx.BuildExpr(e, cue.InferBuiltins(true)) //nolint:errcheck
 
-	astParts := flattenConjunction(e)
+	astParts := FlattenConjunction(e)
 	op, args := val.Eval().Expr()
 	if op != cue.AndOp && op != cue.NoOp {
 		// The conjunction may have been simplified during evaluation

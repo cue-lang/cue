@@ -57,8 +57,14 @@ so we use that to annotate CUE code blocks with intent,
 in the form ```cue [!] mode:
 
 * `cue vet` for CUE which we expect to validate OK.
-  A field followed by a `// _|_` comment must evaluate to an error,
-  which may be an incomplete one that validation does not report.
+  A comment after a field claims its outcome:
+  * `// => VALUE`: its value, or its default unless VALUE is a disjunction.
+  * `// => OK`: no errors within it, not even incomplete ones.
+  * `// => error: msg`: an error within it, even an incomplete one,
+    whose message contains msg, or which starts with msg when printed
+    with its path relative to the field, like `d: field not allowed`.
+
+  A claim after the last declaration is about the whole block.
 
 * `cue parse` for CUE which we expect to parse OK,
   but which we do not expect to validate,
@@ -1338,7 +1344,7 @@ future extensions and relaxations:
 intMap: [string]: int
 intMap: {
     t1: 43
-    t2: 2.4  // error: 2.4 is not an integer
+    t2: 2.4  // => error: conflicting values 2.4 and int
 }
 
 nameMap: [string]: {
@@ -1377,9 +1383,7 @@ S: {
     field1: string
 }
 
-S1: S & { field2: "foo" }
-
-// S1 is { field1: string, field2: "foo" }
+S1: S & { field2: "foo" }  // => { field1: string, field2: "foo" }
 
 
 A: {
@@ -1389,11 +1393,9 @@ A: {
 
 A1: A & {
     feild1: "foo"  // "field1" was accidentally misspelled
-}
+} // => { field1: string, field2: string, feild1: "foo" }
 
-// A1 is
-//    { field1: string, field2: string, feild1: "foo" }
-// not the intended
+// A1 is not the intended
 //    { field1: "foo", field2: string }
 ```
 
@@ -1422,20 +1424,21 @@ A: close({
 
 A1: A & {
     feild1: string
-} // _|_ feild1 not defined for A
+} // => error: feild1: field not allowed
 
 A2: A & {
     for k,v in { feild1: string } {
         "\(k)": v
     }
-}  // _|_ feild1 not defined for A
+} // => error: feild1: field not allowed
 
 A3: A & {
     ...
     feild1: string
-} // _|_ feild1 not defined for A
+} // => error: feild1: field not allowed
 
-A4: A & close({})  // _|_ field1 and field2 not allowed by the empty struct
+// The empty struct allows neither field1 nor field2
+A4: A & close({})  // => error: field1: field not allowed
 
 C: close({
     [_]: _
@@ -1461,7 +1464,7 @@ D: close({
 
 E1: #E & {
     e: feild1: string
-} // _|_ feild1 not defined for #E.e
+} // => error: e.feild1: field not allowed
 ```
 <!-- error:
 A1.feild1: field not allowed:
@@ -1475,7 +1478,7 @@ A4.field1: field not allowed:
 A4.field2: field not allowed:
     3:5
 E1.e.feild1: field not allowed:
-    46:8
+    47:8
 -->
 
 <!-- (jba) Somewhere it should be said that optional fields are only
@@ -1509,8 +1512,7 @@ Meta: {
 Guzzler: {
     Meta...
     volume: number
-}
-// Guzzler is { kind: string, name: string, volume: number }
+} // => { kind: string, name: string, volume: number }
 ```
 
 
@@ -1545,8 +1547,8 @@ may report this inconsistency at the point of its declaration.
 }
 
 myValue: #MyStruct & {
-    sub: feild:   2     // error, feild not defined in #MyStruct
-    sub: enabled: true  // okay
+    sub: feild:   2     // => error: feild: field not allowed
+    sub: enabled: true
 }
 
 #D: {
@@ -1558,15 +1560,16 @@ myValue: #MyStruct & {
 #OneOf: { a: int } | { b: int }
 
 
-D1: #D & { a: 12, c: 22 }  // { a: 12, c: 22 }
-D2: #D & { a: 12, b: 33 }  // _|_ // cannot define both `a` and `b`
+D1: #D & { a: 12, c: 22 }  // => { a: 12, c: 22 }
+// Cannot define both a and b
+D2: #D & { a: 12, b: 33 }  // => error: empty disjunction
 ```
 <!-- error:
 D2: 2 errors in empty disjunction:
 D2.a: field not allowed:
-    24:12
+    25:12
 D2.b: field not allowed:
-    24:19
+    25:19
 myValue.sub.feild: field not allowed:
     10:10
 -->
@@ -1581,7 +1584,8 @@ B: {
 }
 
 x: B
-x: d: 3  // not allowed, as closed by embedded #A
+// Not allowed, as closed by embedded #A
+x: d: 3  // => error: d: field not allowed
 
 D: {
     #A
@@ -1589,7 +1593,8 @@ D: {
 }
 
 v: D
-v: d: 3  // not allowed, as still closed by embedded #A
+// Not allowed, as still closed by embedded #A
+v: d: 3  // => error: d: field not allowed
 
 C: {
     #A...
@@ -1597,10 +1602,12 @@ C: {
 }
 
 y: C
-y: d: 3  // allowed, as the spread operator does not close C
+// Allowed, as the spread operator does not close C
+y: d: 3  // => OK
 
 z: C.b
-z: d: 3  // allowed, as nothing closes b
+// Allowed, as nothing closes b
+z: d: 3  // => OK
 
 #C: {
     #A...
@@ -1608,27 +1615,30 @@ z: d: 3  // allowed, as nothing closes b
 }
 
 w: #C.b
-w: d: 3  // not allowed, as referencing #C closes b
+// Not allowed, as referencing #C closes b
+w: d: 3  // => error: d: field not allowed
 
 c: #C
 u: c.b
-u: d: 3  // not allowed, as c holds #C, which closes b
+// Not allowed, as c holds #C, which closes b
+u: d: 3  // => error: d: field not allowed
 
 #E: b: {#A..., ...}
 
 e: #E
 t: e.b
-t: d: 3  // allowed, as the ellipsis keeps b open
+// Allowed, as the ellipsis keeps b open
+t: d: 3  // => OK
 ```
 <!-- error:
 u.d: field not allowed:
-    40:4
+    46:4
 v.d: field not allowed:
-    17:4
+    19:4
 w.d: field not allowed:
-    36:4
+    41:4
 x.d: field not allowed:
-    9:4
+    10:4
 -->
 
 
@@ -1759,7 +1769,7 @@ foo: {
 
 ```cue vet
 // A field alias
-result1: X  // 4
+result1: X  // => 4
 "not an identifier"~(X): 4
 ```
 
@@ -1769,20 +1779,20 @@ foo: {
     let X = self
     x: X.a
 }
-bar: foo & {a: 1}  // {a: 1, x: 1}
+bar: foo & {a: 1}  // => {a: 1, x: 1}
 ```
 
 ```cue vet
 // A label alias with dual form
 [string]~(K, V): { name: K, add1: V.value+1 }
-foo: { value: 1 } // outputs: foo: { name: "foo", value: 1, add1: 2 }
+foo: { value: 1 } // => { name: "foo", value: 1, add1: 2 }
 ```
 
 ```cue vet
 // Dynamic field with dual form
 ("my" + "Field")~(K, V): { label: K, foo: 42 }
-value: V.foo
-// outputs: {myField: { label: "myField", foo: 42 }, value: 42}
+value: V.foo  // => 42
+// => {myField: { label: "myField", foo: 42 }, value: 42}
 ```
 
 <!-- TODO: also allow aliases in lists -->
@@ -2068,7 +2078,7 @@ a: {
     "s": 3
 
     c: b   // 2
-    d: s   // _|_ unresolved identifier "s"
+    d: s   // unresolved identifier "s"
     e: a.s // 3
 }
 ```
@@ -2175,8 +2185,8 @@ a: {
 b: a & { place: "world" }
 c: a & { place: "you" }
 
-d: b.greeting  // "Hello, world!"
-e: c.greeting  // "Hello, you!"
+d: b.greeting  // => "Hello, world!"
+e: c.greeting  // => "Hello, you!"
 ```
 
 #### `self` (from v0.15.0)
@@ -2318,13 +2328,14 @@ T: {
     "x-y": 4
 }
 
-a: T.x     // int
-b: T.y     // 3
-c: T.z     // _|_ // field 'z' not found in T
-d: T."x-y" // 4
+a: T.x     // => int
+b: T.y     // => 3
+c: T.z     // => error: undefined field: z
+d: T."x-y" // => 4
 
+// Defaults are selected for both operand and field:
 e: {a: 1|*2} | *{a: 3|*4}
-f: e.a  // 4 (default value)
+f: e.a  // => 4
 ```
 
 <!--
@@ -2375,14 +2386,14 @@ for `a` of struct type:
 
 
 ```cue ! vet
-a: [ 1, 2 ][1]     // 2
-b: [ 1, 2 ][2]     // _|_
-c: [ 1, 2, ...][2] // _|_
+a: [ 1, 2 ][1]     // => 2
+b: [ 1, 2 ][2]     // => error: index out of range
+c: [ 1, 2, ...][2] // => error: index out of range
 
 // Defaults are selected for both operand and index:
 x: [1, 2] | *[3, 4]
 y: int | *1
-z: x[y]  // 4
+z: x[y]  // => 4
 ```
 <!-- error:
 b: index out of range [2] with length 2:
@@ -2565,7 +2576,7 @@ String addition creates a new string by concatenating the operands.
 A string can be repeated by multiplying it:
 
 ```cue vet
-s: "etc. "*3  // "etc. etc. etc. "
+s: "etc. "*3  // => "etc. etc. etc. "
 ```
 
 <!-- jba: Do these work for byte sequences? If not, why not? -->
@@ -2888,7 +2899,7 @@ ElseClause          = "else" StructLit .
 
 ```cue vet
 a: [1, 2, 3, 4]
-b: [for x in a if x > 1 { x+1 }]  // [3, 4, 5]
+b: [for x in a if x > 1 { x+1 }]  // => [3, 4, 5]
 
 c: {
     for x in a
@@ -2926,7 +2937,7 @@ The result of the expression is substituted as follows:
 
 ```cue vet
 a: "World"
-b: "Hello \( a )!" // Hello World!
+b: "Hello \( a )!" // => "Hello World!"
 ```
 
 
@@ -2961,7 +2972,7 @@ To refer to the value being validated, enclose the validator in braces and use
 ```cue ! vet
 #Option: {"one" | "two" | "three" | error("invalid option \(self)")}
 
-a: #Option & "four" // error: invalid option four
+a: #Option & "four" // => error: invalid option four
 ```
 <!-- error:
 a: invalid option four:
@@ -3129,14 +3140,14 @@ The validator succeeds if the count satisfies the numeric constraint provided
 as the first argument.
 
 ```cue vet
-// Exactly 2 schemas must match
-value1: "foo" & matchN(2, [string, !="bar", <4])  // true: string and !="bar" match
+// Exactly 2 schemas must match, as string and !="bar" do
+value1: "foo" & matchN(2, [string, !="bar", <4])  // => OK
 
-// At least 1 schema must match
-value2: 5 & matchN(>=1, [int, >10])  // true: int matches
+// At least 1 schema must match, as int does
+value2: 5 & matchN(>=1, [int, >10])  // => OK
 
-// Exactly 0 schemas must match (none should match)
-value3: "test" & matchN(0, [int, >100])  // true: neither matches
+// Exactly 0 schemas must match, as neither int nor >100 does
+value3: "test" & matchN(0, [int, >100])  // => OK
 ```
 
 If the numeric constraint cannot be satisfied even with incomplete information,
@@ -3166,13 +3177,13 @@ The validator succeeds if the chosen schema unifies successfully with the value.
 
 ```cue ! vet
 // If value is a string, it must have length > 3; otherwise it must be > 10
-value: "hello" & matchIf(string, len(value) > 3, value > 10) // OK; len("hello") is >3
+value: "hello" & matchIf(string, len(value) > 3, value > 10) // len("hello") is >3
 
 // If value matches {a: int}, it must have b field; otherwise a must be a string
-x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // error; missing field b
+x: {a: 1} & matchIf({a: int}, {a: int, b!: int}, {a: string}) // => error: field is required but not present
 
-// If value is >5, it must be <10; otherwise it must be <3
-y: 2 & matchIf(>5, <10, <3) // OK; 2 is <3
+// If value is >5, it must be <10; otherwise it must be <3, as 2 is
+y: 2 & matchIf(>5, <10, <3) // => OK
 ```
 <!-- error:
 value: invalid operands "hello" and 10 to '>' (type string and int):
@@ -3249,9 +3260,9 @@ can detect such cycles at near-zero cost. -->
 //     ↙︎   ↖         to the fixed point of unifying their
 //    a  →  b        values ad infinitum.
 
-a: b & { x: 1 }      // a: { x: 1, y: 2, z: 3 }
-b: c & { y: 2 }      // b: { x: 1, y: 2, z: 3 }
-c: a & { z: 3 }      // c: { x: 1, y: 2, z: 3 }
+a: b & { x: 1 }      // => { x: 1, y: 2, z: 3 }
+b: c & { y: 2 }      // => { x: 1, y: 2, z: 3 }
+c: a & { z: 3 }      // => { x: 1, y: 2, z: 3 }
 
 // resolve a             b & {x:1}
 // substitute b          c & {y:2} & {x:1}
@@ -3264,9 +3275,9 @@ This rule also applies to field values that are disjunctions of unification
 operations of the above form.
 
 ```cue vet
-a: b&{x:1} | {y:1}  // {x:1,y:3,z:2} | {y:1}
-b: {x:2} | c&{z:2}  // {x:2} | {x:1,y:3,z:2}
-c: a&{y:3} | {z:3}  // {x:1,y:3,z:2} | {z:3}
+a: b&{x:1} | {y:1}  // => {x:1,y:3,z:2} | {y:1}
+b: {x:2} | c&{z:2}  // => {x:2} | {x:1,y:3,z:2}
+c: a&{y:3} | {z:3}  // => {x:1,y:3,z:2} | {z:3}
 
 
 // resolving a           b&{x:1} | {y:1}

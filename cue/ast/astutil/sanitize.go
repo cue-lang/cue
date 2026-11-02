@@ -292,6 +292,16 @@ func (z *sanitizer) unshadow(parent ast.Node, base string, link ast.Node) string
 	return name
 }
 
+// aliasName returns a name by which a reference in s refers to the value
+// bound by link, which is named name: name itself where it is visible, or else
+// a new name bound to it by a let clause.
+func (z *sanitizer) aliasName(s *scope, parent ast.Node, name string, link ast.Node) string {
+	if _, _, e := s.lookup(name); e.link == link {
+		return name
+	}
+	return z.unshadow(parent, name, link)
+}
+
 func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 	if n.Node != nil {
 		return false
@@ -464,17 +474,16 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		if ok {
 			break
 		}
-		// If this field already binds its value to a name, unshadow that name.
-		// Otherwise introduce an alias with a unique name. There is a
-		// possibility that an existing alias can be used, but it is easier to
-		// just assign a new name, assuming this case is rather rare.
+		// If this field already binds its value to a name, use that name,
+		// unshadowing it where needed. Otherwise introduce an alias with a
+		// unique name.
 		if a := x.Alias; a != nil && a.Field != nil && a.Field.Name != "_" {
-			name = z.unshadow(parent, a.Field.Name, a)
+			name = z.aliasName(s, parent, a.Field.Name, a)
 			break
 		}
 		switch y := x.Label.(type) {
 		case *ast.Alias:
-			name = z.unshadow(parent, y.Ident.Name, y)
+			name = z.aliasName(s, parent, y.Ident.Name, y)
 
 		case *ast.Ident:
 			var isNew bool

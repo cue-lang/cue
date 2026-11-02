@@ -262,8 +262,8 @@ c: {
 }
 `,
 	}, {
-		// The field already binds a name, so that name is reused through a
-		// let clause rather than a second alias being introduced.
+		// The field already binds a name, so that name is reused rather than
+		// a second alias being introduced.
 		desc: "Reuse the postfix field alias of a shadowed field",
 		file: func() *ast.File {
 			field := &ast.Field{
@@ -285,11 +285,10 @@ c: {
 				},
 			}}
 		}(),
-		want: `let X_1 = X
-a~(X): "b"
+		want: `a~(X): "b"
 c: {
 	a: {}
-	b: X_1
+	b: X
 }
 `,
 	}, {
@@ -400,7 +399,7 @@ c: {
 }
 `,
 	}, {
-		desc: "Add let clause to shadowed aliased field",
+		desc: "Reuse the label alias of a shadowed field",
 		// Resolve both identifiers to same clause.
 		file: func() *ast.File {
 			fieldX := &ast.Field{
@@ -442,14 +441,13 @@ c: {
 			}}
 		}(),
 		want: `
-let X_1 = X
 X=a: "b"
 Y=q: "b"
 c: {
 	a: {}
 	b: X
 	c: d
-	e: X_1
+	e: X
 	f: Y
 }
 `[1:],
@@ -491,7 +489,51 @@ c: {
 }
 `,
 	}, {
-		desc: "Add let clause to nested shadowed field with alias",
+		desc: "Add let clause to nested shadowed field with shadowed alias",
+		// Resolve both identifiers to same clause.
+		file: func() *ast.File {
+			field := &ast.Field{
+				Label: ast.NewIdent("a"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewString("b"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("b"),
+					Value: ast.NewStruct(
+						field,
+						ast.NewIdent("b"), ast.NewStruct(
+							ast.NewIdent("a"), ast.NewString("bar"),
+							&ast.LetClause{
+								Ident: ast.NewIdent("X"),
+								Expr:  ast.NewString("baz"),
+							},
+							ast.NewIdent("b"), &ast.Ident{
+								Name: "a",
+								Node: field.Value,
+							},
+							ast.NewIdent("e"), &ast.Ident{
+								Name: "a",
+								Node: field.Value,
+							},
+						),
+					),
+				},
+			}}
+		}(),
+		want: `b: {
+	let X_1 = X
+	a~(X): "b"
+	b: {
+		a: "bar"
+		let X = "baz"
+		b: X_1
+		e: X_1
+	}
+}
+`,
+	}, {
+		desc: "Add let clause to nested shadowed field with shadowed label alias",
 		// Resolve both identifiers to same clause.
 		file: func() *ast.File {
 			field := &ast.Field{
@@ -508,6 +550,10 @@ c: {
 						field,
 						ast.NewIdent("b"), ast.NewStruct(
 							ast.NewIdent("a"), ast.NewString("bar"),
+							&ast.LetClause{
+								Ident: ast.NewIdent("X"),
+								Expr:  ast.NewString("baz"),
+							},
 							ast.NewIdent("b"), &ast.Ident{
 								Name: "a",
 								Node: field.Value,
@@ -526,6 +572,7 @@ c: {
 	X=a: "b"
 	b: {
 		a: "bar"
+		let X = "baz"
 		b: X_1
 		e: X_1
 	}

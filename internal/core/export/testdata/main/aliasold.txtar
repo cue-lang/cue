@@ -72,18 +72,16 @@ shadowedAlias: {
 	// x refers to the aliased field, which the quoted label does not shadow
 	// until it is exported unquoted.
 	t1: {
-		let X_1 = X
-		X=x: x: X_1 | null
+		X=x: x: X | null
 		r: X
 	}
 
 	// c refers to the x declared beside a, which the quoted label does not shadow
 	// until it is exported unquoted.
 	t2: {
-		let Y_1 = Y
 		Y=x: 1
 		r:   Y
-		a: x: c: Y_1
+		a: x: c: Y
 	}
 }
 -- out/definition-v3-noshare --
@@ -111,18 +109,16 @@ shadowedAlias: {
 	// x refers to the aliased field, which the quoted label does not shadow
 	// until it is exported unquoted.
 	t1: {
-		let X_1 = X
-		X=x: x: X_1 | null
+		X=x: x: X | null
 		r: X
 	}
 
 	// c refers to the x declared beside a, which the quoted label does not shadow
 	// until it is exported unquoted.
 	t2: {
-		let Y_1 = Y
 		Y=x: 1
 		r:   Y
-		a: x: c: Y_1
+		a: x: c: Y
 	}
 }
 -- out/doc-v3 --

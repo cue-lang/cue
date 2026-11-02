@@ -347,16 +347,14 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 	s.index[name] = e
 }
 
+// resolveScope returns the node of the scope declaring name as node, and its
+// entry. The node is a File or StructLit, or the Field declaring a pattern
+// constraint's label alias or a value alias.
 func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, e entry, ok bool) {
-	last := s
-	for s != nil {
-		if n, ok := s.index[name]; ok && node == n.node {
-			if last.node == n.node {
-				return nil, n, true
-			}
-			return s.node, n, true
+	for ; s != nil; s = s.outer {
+		if e, ok := s.index[name]; ok && e.node == node {
+			return s.node, e, true
 		}
-		s, last = s.outer, s
 	}
 	return nil, entry{}, false
 }

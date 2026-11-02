@@ -32,6 +32,13 @@ valueStruct: {
 valueList: {
 	l: L=[1, 2, L[0]]
 }
+
+// x refers to the aliased field, which the quoted label does not shadow
+// until it is exported unquoted.
+shadowedAlias: t1: {
+	X=x: "x": x | null
+	r: X
+}
 -- out/definition-v3 --
 labelAlias: {
 	X="a-b": 4
@@ -52,6 +59,16 @@ valueStruct: v: V_1={
 	b: V_1.a
 }
 valueList: l: L_1=[1, 2, L_1[0]]
+shadowedAlias: {
+
+	// x refers to the aliased field, which the quoted label does not shadow
+	// until it is exported unquoted.
+	t1: {
+		let X_1 = X
+		X=x: x: X_1 | null
+		r: X
+	}
+}
 -- out/definition-v3-noshare --
 labelAlias: {
 	X="a-b": 4
@@ -72,6 +89,16 @@ valueStruct: v: V_1={
 	b: V_1.a
 }
 valueList: l: L_1=[1, 2, L_1[0]]
+shadowedAlias: {
+
+	// x refers to the aliased field, which the quoted label does not shadow
+	// until it is exported unquoted.
+	t1: {
+		let X_1 = X
+		X=x: x: X_1 | null
+		r: X
+	}
+}
 -- out/doc-v3 --
 []
 [labelAlias]
@@ -92,6 +119,15 @@ valueList: l: L_1=[1, 2, L_1[0]]
 [valueList l 0]
 [valueList l 1]
 [valueList l 2]
+[shadowedAlias]
+[shadowedAlias t1]
+- x refers to the aliased field, which the quoted label does not shadow
+until it is exported unquoted.
+
+[shadowedAlias t1 x]
+[shadowedAlias t1 x x]
+[shadowedAlias t1 r]
+[shadowedAlias t1 r x]
 -- out/value-v3 --
 == Simplified
 {
@@ -111,6 +147,15 @@ valueList: l: L_1=[1, 2, L_1[0]]
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
+	shadowedAlias: {
+
+		// x refers to the aliased field, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t1: {
+			x: x: null
+			r: x: null
+		}
+	}
 }
 == Raw
 {
@@ -130,6 +175,15 @@ valueList: l: L_1=[1, 2, L_1[0]]
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
+	shadowedAlias: {
+
+		// x refers to the aliased field, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t1: {
+			x: x: null
+			r: x: null
+		}
+	}
 }
 == Final
 {
@@ -149,6 +203,10 @@ valueList: l: L_1=[1, 2, L_1[0]]
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
+	shadowedAlias: t1: {
+		x: x: null
+		r: x: null
+	}
 }
 == All
 {
@@ -168,6 +226,15 @@ valueList: l: L_1=[1, 2, L_1[0]]
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
+	shadowedAlias: {
+
+		// x refers to the aliased field, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t1: {
+			x: x: null
+			r: x: null
+		}
+	}
 }
 == Eval
 {
@@ -187,4 +254,8 @@ valueList: l: L_1=[1, 2, L_1[0]]
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
+	shadowedAlias: t1: {
+		x: x: null
+		r: x: null
+	}
 }

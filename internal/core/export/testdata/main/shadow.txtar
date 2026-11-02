@@ -26,6 +26,13 @@ shadowRef: t5: {
 	x~(X): x: X | null
 }
 
+// x refers to the aliased field, which the quoted label does not shadow
+// until it is exported unquoted.
+shadowRef: t6: {
+	x~(X): "x": x | null
+	r: X
+}
+
 shadowRef: e1: {
 	x: "x": x // structural error, but should still print ok.
 	x: {}
@@ -185,6 +192,14 @@ shadowRef: {
 		}
 	t5:
 		x~(X): x: X | null
+
+	// x refers to the aliased field, which the quoted label does not shadow
+	// until it is exported unquoted.
+	t6: {
+		let X_2 = X
+		x~(X): x: X_2 | null
+		r: X
+	}
 	e1: x~(x_4): x: x_4
 }
 shadowAlias: {
@@ -334,6 +349,14 @@ shadowLet: {
 [shadowRef t5]
 [shadowRef t5 x]
 [shadowRef t5 x x]
+[shadowRef t6]
+- x refers to the aliased field, which the quoted label does not shadow
+until it is exported unquoted.
+
+[shadowRef t6 x]
+[shadowRef t6 x x]
+[shadowRef t6 r]
+[shadowRef t6 r x]
 [shadowRef e1]
 [shadowRef e1 x]
 [shadowRef e1 x x]
@@ -456,6 +479,13 @@ _|_ // shadowRef.e1.x.x: structural cycle
 			y: null
 		}
 		t5: x: x: null
+
+		// x refers to the aliased field, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t6: {
+			x: x: null
+			r: x: null
+		}
 		e1: x: x: _|_ // shadowRef.e1.x.x: structural cycle
 	}
 	shadowAlias: {
@@ -601,7 +631,7 @@ _|_ // shadowRef.e1.x.x: structural cycle
 diff old new
 --- old
 +++ new
-@@ -1,49 +1,21 @@
+@@ -1,49 +1,28 @@
  == Simplified
 -_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 +_|_ // shadowRef.e1.x.x: structural cycle
@@ -659,11 +689,18 @@ diff old new
 +			y: null
 +		}
 +		t5: x: x: null
++
++		// x refers to the aliased field, which the quoted label does not shadow
++		// until it is exported unquoted.
++		t6: {
++			x: x: null
++			r: x: null
++		}
 +		e1: x: x: _|_ // shadowRef.e1.x.x: structural cycle
  	}
  	shadowAlias: {
  		t1: {
-@@ -74,44 +46,34 @@
+@@ -74,44 +53,34 @@
  		}
  	}
  	shadowField: {
@@ -736,7 +773,7 @@ diff old new
  			}
  		}
  
-@@ -121,22 +83,76 @@
+@@ -121,22 +90,76 @@
  		// or even
  		// 		b: 0
  		//  	c: b

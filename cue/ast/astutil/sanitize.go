@@ -261,6 +261,10 @@ func (z *sanitizer) unshadow(parent ast.Node, base string, link ast.Node) string
 		case *ast.StructLit:
 			decls = &x.Elts
 		default:
+			// A Field scope declares a pattern constraint's label alias or a
+			// value alias. The exporter links a reference past a value
+			// alias, and names a label alias so that no field in its value
+			// shadows it, so no reference is unshadowed within a Field.
 			panic(fmt.Sprintf("impossible scope type %T", parent))
 		}
 

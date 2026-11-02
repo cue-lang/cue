@@ -219,7 +219,16 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			if len(e.conjuncts) == 1 {
 				x = e.conjuncts[0]
 			} else {
+				// The embedded struct becomes the output of this frame, so
+				// its declarations are in scope of the references recorded
+				// in this frame.
 				x = e.embed[0]
+				top := e.top()
+				for l, en := range e.embedFields {
+					if en.field != nil && top.fields[l].field == nil {
+						e.addField(l, en.field)
+					}
+				}
 			}
 			if len(e.attrs) == 0 && !hasAlias {
 				return x
@@ -256,16 +265,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 		d := &ast.Field{Label: label}
 
-		top := e.frame(0, false)
-		if fr, ok := top.fields[f]; ok && fr.alias != "" {
-			e.setValueAlias(d, fr.alias)
-			fr.node = d
-			top.fields[f] = fr
-		}
+		e.addField(f, d)
 
 		d.Value = e.mergeValues(f, field.arc, c, a...)
-
-		e.linkField(field.arc, d)
 
 		if f.IsDef() {
 			x.inDefinition--
@@ -328,6 +330,10 @@ type conjuncts struct {
 	// spliced into the result rather than embedded, as files share the
 	// package scope.
 	decls []ast.Decl
+
+	// embedFields holds the fields of the frame of the last struct in embed,
+	// for when it is the only one.
+	embedFields map[adt.Feature]entry
 }
 
 func (c *conjuncts) getField(label adt.Feature) field {
@@ -388,12 +394,17 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			// Embedding would hide the file's fields from the other files of
 			// the package; see https://cuelang.org/issue/2648.
 			_, isFile := x.Src.(*ast.File)
-			e.top().spliced = isFile
+			if isFile {
+				top := e.top()
+				top.spliced = true
+				top.fields = top.parent.fields
+			}
 			s := e.adt(env, x)
 			if isFile {
 				e.decls = append(e.decls, s.(*ast.StructLit).Elts...)
 			} else {
 				e.embed = append(e.embed, s)
+				e.embedFields = e.top().fields
 			}
 			e.top().upCount-- // not necessary, but for proper form
 			e.popFrame(saved)
@@ -402,7 +413,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 		// Used for sorting.
 		e.structs = append(e.structs, adt.StructInfo{StructLit: x})
 
-		env = &adt.Environment{Up: env, Vertex: e.node()}
+		env = e.newEnv(env)
 
 		for _, d := range x.Decls {
 			var label adt.Feature

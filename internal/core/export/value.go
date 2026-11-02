@@ -674,7 +674,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 
 		f := &ast.Field{Label: e.stringLabel(label)}
 
-		e.addField(label, f, f.Value)
+		e.addField(label, f)
 
 		arc := v.LookupRaw(label)
 		if arc == nil {

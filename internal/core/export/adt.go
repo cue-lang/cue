@@ -55,10 +55,7 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		// defer e.popFrame(saved)
 		// s := e.frame(0, false).scope
 		s := &ast.StructLit{}
-		// TODO: ensure e.node() is set in more cases. Right now it is not
-		// always set in mergeValues, even in cases where it could be. Better
-		// to be conservative for now, though.
-		env := &adt.Environment{Up: env, Vertex: e.node()}
+		env := e.newEnv(env)
 
 		for _, d := range x.Decls {
 			var aliasName string
@@ -413,28 +410,7 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 			}
 		}
 
-		ident, _ := e.newIdentForField(x.Src, x.Label, x.UpCount)
-
-		// Use low-level lookup to bypass structural cycle detection. This is
-		// fine as we do not recurse on the result and it is necessary to detect
-		// shadowing even when a configuration has a structural cycle.
-		for i := 0; i < int(x.UpCount); i++ {
-			env = env.Up
-		}
-
-		// Exclude comprehensions and other temporary/ inlined Vertices, which
-		// cannot be properly resolved, throwing off the sanitize. Also,
-		// comprehensions originate from a single source and do not need to be
-		// handled.
-		if env != nil { // for generated stuff
-			// TODO: note that env.Vertex should never be nil; investigate and replace the nil check below.
-			if v := env.Vertex; v != nil && !v.IsDynamic {
-				if v = v.Lookup(x.Label); v != nil {
-					e.linkIdentifier(v, ident)
-				}
-			}
-		}
-
+		ident := e.newIdentForField(x.Src, x.Label, e.fieldsOf(env, x.UpCount))
 		return wrapIfOptional(ident, x.Optional)
 
 	case *adt.ValueReference:
@@ -521,12 +497,14 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 	panic("unreachable")
 }
 
+// newIdentForField returns an identifier referring to label among fields,
+// the fields of the frame declaring it, or nil for no frame. The identifier
+// is linked to the declaration when that frame is popped.
 func (e *exporter) newIdentForField(
 	orig *ast.Ident,
 	label adt.Feature,
-	upCount int32) (ident *ast.Ident, ok bool) {
-	f := e.frame(upCount, false)
-	entry := f.fields[label]
+	fields map[adt.Feature]entry) *ast.Ident {
+	entry := fields[label]
 
 	name := e.identString(label)
 	switch {
@@ -542,15 +520,14 @@ func (e *exporter) newIdentForField(
 		entry.alias = name
 	}
 
-	ident = ast.NewIdent(name)
+	ident := ast.NewIdent(name)
 	entry.references = append(entry.references, ident)
 
-	if f.fields != nil {
-		f.fields[label] = entry
-		ok = true
+	if fields != nil {
+		fields[label] = entry
 	}
 
-	return ident, ok
+	return ident
 }
 
 func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
@@ -562,29 +539,22 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		e.setDocs(x)
 		f := e.getFixedField(x)
 		f.Constraint = x.ArcType.Token()
-		e.setField(x.Label, f)
+		e.addField(x.Label, f)
 
 		f.Attrs = e.exportAttrs(extractFieldAttrs(nil, x))
 
-		// Fields spliced into the enclosing struct are referenced from its
-		// scope, so Sanitize must know of them to detect shadowing.
-		st, isStruct := x.Value.(*adt.StructLit)
-		var src *adt.Vertex
-		if isStruct || e.top().spliced {
-			if top := e.frame(0, false); top.node != nil {
-				src = top.node.Lookup(x.Label)
-			}
-		}
-
-		if isStruct {
+		if st, ok := x.Value.(*adt.StructLit); ok {
 			// Instead of calling e.expr directly, we inline the case for
 			// *adt.StructLit, so that we can pass src.
+			var src *adt.Vertex
+			if top := e.top(); top.node != nil {
+				src = top.node.Lookup(x.Label)
+			}
 			c := adt.MakeRootConjunct(env, st)
 			f.Value = e.mergeValues(adt.InvalidLabel, src, []conjunct{{c: c, up: 0}}, c)
 		} else {
 			f.Value = e.expr(env, x.Value)
 		}
-		e.linkField(src, f)
 		return f
 
 	case *adt.LetField:
@@ -637,7 +607,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		// case ok && ast.IsValidIdent(s.Str):
 		// 	label := e.ctx.StringLabel(s.Str)
 		// 	f.Label = ast.NewIdent(s.Str)
-		// 	e.setField(label, f)
+		// 	e.addField(label, f)
 
 		case ok:
 			srcKey = s
@@ -677,17 +647,6 @@ func (e *exporter) copyMeta(dst, src ast.Node) {
 		ast.SetComments(dst, leadingDocComments(ast.Comments(src)))
 	}
 	astutil.CopyPosition(dst, src)
-}
-
-func (e *exporter) setField(label adt.Feature, f *ast.Field) {
-	frame := e.frame(0, false)
-	entry := frame.fields[label]
-	entry.field = f
-	entry.node = f.Value
-	// This can happen when evaluation is "pivoted".
-	if frame.fields != nil {
-		frame.fields[label] = entry
-	}
 }
 
 func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {
@@ -733,11 +692,8 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 
 			if x.Key != adt.InvalidLabel ||
 				(x.Syntax != nil && x.Syntax.Key != nil) {
-				key := e.ident(x.Key)
-				clause.Key = key
-				e.addField(x.Key, nil, clause)
+				clause.Key = e.ident(x.Key)
 			}
-			e.addField(x.Value, nil, clause)
 
 		case *adt.IfClause:
 			cond := e.innerExpr(env, x.Condition)
@@ -758,8 +714,6 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			_, saved := e.pushFrame(empty, nil)
 			defer e.popFrame(saved)
 
-			e.addField(x.Label, nil, clause)
-
 		case *adt.TryClause:
 			clause := &ast.TryClause{}
 			if x.Label != adt.InvalidLabel {
@@ -770,8 +724,6 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 
 				_, saved := e.pushFrame(empty, nil)
 				defer e.popFrame(saved)
-
-				e.addField(x.Label, nil, clause)
 			}
 			// Struct form has no Ident/Expr - body is in Comprehension.Value
 			e.copyMeta(clause, x.Src)

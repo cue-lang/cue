@@ -116,9 +116,7 @@ _alias: X_1={
 	a: 1
 	b: X_1.a
 }
-out: _alias_1.b
-
-let _alias_1 = _alias
+out: _alias.b
 -- pkg.cue --
 @version(v0.17.0)
 
@@ -133,9 +131,7 @@ _alias: X_1={
 	a: 1
 	b: X_1.a
 }
-out: _alias_1.b
-
-let _alias_1 = _alias
+out: _alias.b
 -- expect/x --
 @version(v0.17.0)
 

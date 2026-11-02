@@ -339,7 +339,7 @@ type exporter struct {
 	isInjectionKind func(name string) bool
 
 	// For resolving references.
-	stack []frame
+	stack []*frame
 
 	inDefinition int // for close() wrapping.
 	inExpression int // for inlining decisions.
@@ -367,54 +367,47 @@ type exporter struct {
 	experiments    *cueexperiment.File
 	experimentsErr error
 	postfixAliases bool
-	references     map[*adt.Vertex]*referenceInfo
+
+	// envFrame maps each environment created by the exporter for a struct
+	// literal to the frame exporting it, so that a reference can be linked
+	// to the field it refers to; see [exporter.fieldsOf].
+	envFrame map[*adt.Environment]*frame
 
 	pivotter *pivotter
 }
 
-// referenceInfo is used to track which Field.Value fields should be linked
-// to Ident.Node fields. The Node field is used by astutil.Resolve to mark
-// the value in the AST to which the respective identifier points.
-// astutil.Sanitize, in turn, uses this information to determine whether
-// a reference is shadowed  and apply fixes accordingly.
-type referenceInfo struct {
-	field      *ast.Field
-	references []*ast.Ident
+// fieldsOf returns the fields of the frame exporting the struct literal which
+// is upCount environments up from env, or nil if the exporter did not create
+// that environment, as for the conjuncts of a vertex exported from its arcs.
+func (e *exporter) fieldsOf(env *adt.Environment, upCount int32) map[adt.Feature]entry {
+	for ; upCount > 0 && env != nil; upCount-- {
+		env = env.Up
+	}
+	if env == nil {
+		return nil
+	}
+	// A frame is off the stack while a let clause is exported in the scope
+	// declaring it; see [exporter.resolveLet]. Its struct literal is then
+	// embedded in the nearest frame on the stack, whose declarations are the
+	// ones in scope of the let clause.
+	for f := e.envFrame[env]; f != nil; f = f.parent {
+		if slices.Contains(e.stack, f) {
+			return f.fields
+		}
+	}
+	return nil
 }
 
-// linkField reports the Field that represents certain Vertex in the generated
-// output. The Node fields for any references (*ast.Ident) that were already
-// recorded as pointed to this vertex are updated accordingly.
-func (e *exporter) linkField(v *adt.Vertex, f *ast.Field) {
-	if v == nil {
-		return
-	}
-	refs := e.references[v]
-	if refs == nil {
-		// TODO(perf): do a first sweep to only mark referenced arcs or keep
-		// track of that information elsewhere.
-		e.references[v] = &referenceInfo{field: f}
-		return
-	}
-	for _, r := range refs.references {
-		r.Node = f.Value
-	}
-	refs.references = refs.references[:0]
-}
-
-// linkIdentifier reports the Vertex to which indent points. Once the ast.Field
-// for a corresponding Vertex is known, it is linked to ident.
-func (e *exporter) linkIdentifier(v *adt.Vertex, ident *ast.Ident) {
-	refs := e.references[v]
-	if refs == nil {
-		refs = &referenceInfo{}
-		e.references[v] = refs
-	}
-	if refs.field == nil {
-		refs.references = append(refs.references, ident)
-		return
-	}
-	ident.Node = refs.field.Value
+// newEnv returns an environment for a struct literal exported in the top
+// frame, and records it for [exporter.fieldsOf].
+//
+// TODO: ensure e.node() is set in more cases. Right now it is not always set
+// in mergeValues, even in cases where it could be. Better to be conservative
+// for now, though.
+func (e *exporter) newEnv(env *adt.Environment) *adt.Environment {
+	env = &adt.Environment{Up: env, Vertex: e.node()}
+	e.envFrame[env] = e.top()
+	return env
 }
 
 // newExporter creates and initializes an exporter.
@@ -441,8 +434,7 @@ func newExporter(p *Profile, ctx *adt.OpContext, pkgID string, v adt.Value) *exp
 		experiments:    exp,
 		experimentsErr: err,
 		postfixAliases: exp != nil && exp.AliasV2,
-
-		references: map[*adt.Vertex]*referenceInfo{},
+		envFrame:       map[*adt.Environment]*frame{},
 	}
 
 	if r, ok := ctx.Runtime.(interface{ IsInjectionKind(string) bool }); ok {
@@ -943,8 +935,12 @@ type frame struct {
 	// for off-by-one handling
 	upCount int32
 
-	// labeled fields
+	// labeled fields, shared with the enclosing frame if spliced
 	fields map[adt.Feature]entry
+
+	// parent is the frame below this one on the stack, for while this one is
+	// off it; see [exporter.fieldsOf].
+	parent *frame
 
 	// letAlias maps the source let clauses declared in this scope to the
 	// ones in the output.
@@ -966,18 +962,21 @@ type frame struct {
 	mergesFiles bool
 }
 
+// entry records the field declaring a label in the output of a frame, and
+// the references to it in that output, which are linked to the field's value
+// as the frame is popped, or to the field when it has a value alias, for
+// [astutil.Sanitize] to see which references are shadowed.
 type entry struct {
 	alias      string
 	field      *ast.Field
-	node       ast.Node // How to reference. See astutil.Resolve
 	references []*ast.Ident
 }
 
-func (e *exporter) addField(label adt.Feature, f *ast.Field, n ast.Node) {
+// addField records f as declaring label in the top frame.
+func (e *exporter) addField(label adt.Feature, f *ast.Field) {
 	frame := e.top()
 	entry := frame.fields[label]
 	entry.field = f
-	entry.node = n
 	frame.fields[label] = entry
 }
 
@@ -986,32 +985,47 @@ func (e *exporter) addEmbed(x ast.Expr) {
 	frame.scope.Elts = append(frame.scope.Elts, x)
 }
 
-func (e *exporter) pushFrame(src *adt.Vertex, conjuncts []adt.Conjunct) (s *ast.StructLit, saved []frame) {
+func (e *exporter) pushFrame(src *adt.Vertex, conjuncts []adt.Conjunct) (s *ast.StructLit, saved []*frame) {
 	saved = e.stack
 	s = &ast.StructLit{}
-	e.stack = append(e.stack, frame{
+	f := &frame{
 		node:       src,
 		scope:      s,
 		mapped:     map[adt.Node]ast.Node{},
 		fields:     map[adt.Feature]entry{},
 		docSources: conjuncts,
-	})
+	}
+	if len(saved) > 0 {
+		f.parent = saved[len(saved)-1]
+	}
+	e.stack = append(e.stack, f)
 	return s, saved
 }
 
-func (e *exporter) popFrame(saved []frame) {
-	top := e.stack[len(e.stack)-1]
+func (e *exporter) popFrame(saved []*frame) {
+	top := e.top()
 
+	// The fields of a spliced frame are linked by the enclosing frame.
+	if top.spliced {
+		e.stack = saved
+		return
+	}
 	for _, f := range top.fields {
-		node := f.node
-		if f.alias != "" && f.field != nil {
-			e.setValueAlias(f.field, f.alias)
-			node = f.field
+		if f.field == nil {
+			continue
 		}
-		if node != nil {
-			for _, r := range f.references {
-				r.Node = node
+		var node ast.Node = f.field
+		if f.alias != "" {
+			e.setValueAlias(f.field, f.alias)
+		} else {
+			// Link past a value alias, as Resolve does.
+			node = f.field.Value
+			if a, ok := node.(*ast.Alias); ok {
+				node = a.Expr
 			}
+		}
+		for _, r := range f.references {
+			r.Node = node
 		}
 	}
 
@@ -1019,7 +1033,7 @@ func (e *exporter) popFrame(saved []frame) {
 }
 
 func (e *exporter) top() *frame {
-	return &(e.stack[len(e.stack)-1])
+	return e.stack[len(e.stack)-1]
 }
 
 func (e *exporter) node() *adt.Vertex {
@@ -1038,7 +1052,7 @@ func (e *exporter) node() *adt.Vertex {
 // past intermediate frames created by nested field processing.
 func (e *exporter) frame(upCount int32, needField bool) *frame {
 	for i := len(e.stack) - 1; i >= 0; i-- {
-		f := &(e.stack[i])
+		f := e.stack[i]
 		if upCount <= (f.upCount-1) && (!needField || f.field != nil) {
 			return f
 		}
@@ -1055,7 +1069,5 @@ func (e *exporter) frame(upCount int32, needField bool) *frame {
 }
 
 func (e *exporter) setDocs(x adt.Node) {
-	f := e.stack[len(e.stack)-1]
-	f.docSources = []adt.Conjunct{adt.MakeRootConjunct(nil, x)}
-	e.stack[len(e.stack)-1] = f
+	e.top().docSources = []adt.Conjunct{adt.MakeRootConjunct(nil, x)}
 }

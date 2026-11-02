@@ -80,9 +80,10 @@ shadowedAlias: {
 	// c refers to the x declared beside a, which the quoted label does not shadow
 	// until it is exported unquoted.
 	t2: {
+		let Y_1 = Y
 		Y=x: 1
 		r:   Y
-		a: x: c: x
+		a: x: c: Y_1
 	}
 }
 -- out/definition-v3-noshare --
@@ -118,9 +119,10 @@ shadowedAlias: {
 	// c refers to the x declared beside a, which the quoted label does not shadow
 	// until it is exported unquoted.
 	t2: {
+		let Y_1 = Y
 		Y=x: 1
 		r:   Y
-		a: x: c: x
+		a: x: c: Y_1
 	}
 }
 -- out/doc-v3 --

@@ -39,6 +39,14 @@ shadowedAlias: t1: {
 	X=x: "x": x | null
 	r: X
 }
+
+// c refers to the x declared beside a, which the quoted label does not shadow
+// until it is exported unquoted.
+shadowedAlias: t2: {
+	Y=x: 1
+	r: Y
+	a: "x": c: x
+}
 -- out/definition-v3 --
 labelAlias: {
 	X="a-b": 4
@@ -67,6 +75,14 @@ shadowedAlias: {
 		let X_1 = X
 		X=x: x: X_1 | null
 		r: X
+	}
+
+	// c refers to the x declared beside a, which the quoted label does not shadow
+	// until it is exported unquoted.
+	t2: {
+		Y=x: 1
+		r:   Y
+		a: x: c: x
 	}
 }
 -- out/definition-v3-noshare --
@@ -98,6 +114,14 @@ shadowedAlias: {
 		X=x: x: X_1 | null
 		r: X
 	}
+
+	// c refers to the x declared beside a, which the quoted label does not shadow
+	// until it is exported unquoted.
+	t2: {
+		Y=x: 1
+		r:   Y
+		a: x: c: x
+	}
 }
 -- out/doc-v3 --
 []
@@ -128,6 +152,15 @@ until it is exported unquoted.
 [shadowedAlias t1 x x]
 [shadowedAlias t1 r]
 [shadowedAlias t1 r x]
+[shadowedAlias t2]
+- c refers to the x declared beside a, which the quoted label does not shadow
+until it is exported unquoted.
+
+[shadowedAlias t2 x]
+[shadowedAlias t2 r]
+[shadowedAlias t2 a]
+[shadowedAlias t2 a x]
+[shadowedAlias t2 a x c]
 -- out/value-v3 --
 == Simplified
 {
@@ -154,6 +187,14 @@ until it is exported unquoted.
 		t1: {
 			x: x: null
 			r: x: null
+		}
+
+		// c refers to the x declared beside a, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t2: {
+			x: 1
+			r: 1
+			a: x: c: 1
 		}
 	}
 }
@@ -183,6 +224,14 @@ until it is exported unquoted.
 			x: x: null
 			r: x: null
 		}
+
+		// c refers to the x declared beside a, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t2: {
+			x: 1
+			r: 1
+			a: x: c: 1
+		}
 	}
 }
 == Final
@@ -203,9 +252,16 @@ until it is exported unquoted.
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
-	shadowedAlias: t1: {
-		x: x: null
-		r: x: null
+	shadowedAlias: {
+		t1: {
+			x: x: null
+			r: x: null
+		}
+		t2: {
+			x: 1
+			r: 1
+			a: x: c: 1
+		}
 	}
 }
 == All
@@ -234,6 +290,14 @@ until it is exported unquoted.
 			x: x: null
 			r: x: null
 		}
+
+		// c refers to the x declared beside a, which the quoted label does not shadow
+		// until it is exported unquoted.
+		t2: {
+			x: 1
+			r: 1
+			a: x: c: 1
+		}
 	}
 }
 == Eval
@@ -254,8 +318,15 @@ until it is exported unquoted.
 		b: 1
 	}
 	valueList: l: [1, 2, 1]
-	shadowedAlias: t1: {
-		x: x: null
-		r: x: null
+	shadowedAlias: {
+		t1: {
+			x: x: null
+			r: x: null
+		}
+		t2: {
+			x: 1
+			r: 1
+			a: x: c: 1
+		}
 	}
 }

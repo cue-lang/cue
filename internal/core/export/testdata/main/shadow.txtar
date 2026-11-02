@@ -168,6 +168,100 @@ shadowField: recursive: {
 	v: T & {n: {}}
 }
 
+// Each struct is exported from its declarations, as it holds an aliased
+// field or a comprehension. c refers to the x declared beside a, which the
+// quoted label does not shadow until it is exported unquoted.
+shadowField: declAlias: {
+	x~(Y): 1
+	r: Y
+	a: "x": c: x
+}
+
+shadowField: declComprehension: {
+	x: 1
+	a: "x": c: x
+	if true {}
+}
+
+// a.x is declared in two struct literals, and only the second one is in
+// scope at b, which refers to a.x rather than to the x beside a.
+shadowField: declTwice: {
+	x: 99
+	a: {x: 1, if true {}}
+	a: {x: 1, b: x}
+}
+
+shadowField: declTwiceStruct: {
+	x: 99
+	a: {x: y: 1, if true {}}
+	a: {x: y: 1, b: x}
+}
+
+// a.b is declared in two struct literals, as the values of two declarations
+// of a, and only the second one is in scope at y.
+shadowField: declTwiceNested: {
+	x: 99
+	a: {b: {x: 1}, if true {}}
+	a: {b: {x: 1, y: x}}
+}
+
+// Both struct literals declaring a.x are embedded, and d is in scope of the
+// second one only, where the quoted label shadows a.x.
+shadowField: declTwiceEmbedded: {
+	x: 99
+	a: {x: 1, if true {}, b: x}
+	a: {x: 1, if true {}, c: "x": d: x}
+}
+
+// The let clause is exported in a, where its quoted label shadows a.x.
+shadowField: declLet: {
+	x: 99
+	a: {x: 1, let M = {"x": {d: x}}, b: M, if true {}}
+}
+
+// The let clause is exported in a, beside the struct literals declaring a.x
+// rather than within either of them, so d is not linked to a.x and refers to
+// the x within N instead, a structural cycle.
+shadowField: declLetEmbedded: {
+	x: 99
+	a: {x: 1, let N = {"x": {d: x}}, b: N, if true {}}
+	a: {x: 1, if true {}}
+}
+
+// b refers to x before it is declared, which must not stop the later
+// reference in c from being linked to it too.
+shadowField: forwardRef: {
+	b: x
+	x: 1
+	a: "x": c: x
+}
+
+// a.r shares its value with x, yet a reference to r refers to a.r.
+shadowField: sharedArc: {
+	x: p: 1
+	a: {
+		r: x
+		b: {"r": 2, c: r}
+	}
+}
+
+// The struct literals declaring x are the value of no field: a disjunct, a
+// list element, and a literal embedded in a struct with a comprehension.
+shadowField: declDisjunct: {
+	t: *{x: 1, b: "x": {c: x}} | {y: 2}
+}
+
+shadowField: declListElem: {
+	l: [{x: 1, b: "x": {c: x}}]
+}
+
+shadowField: declEmbeddedLet: {
+	a: {
+		{x: 1, let N = {"x": {d: x}}, b: N}
+		if true {}
+	}
+}
+
 // The let clause is first used, and thus exported, where b is shadowed.
 shadowLet: {
 	b: 1
@@ -180,6 +274,289 @@ shadowLet: {
 		}
 	}
 }
+-- out/definition-v3-noshare --
+shadowRef: {
+	t1: x~(x_1): x: x_1 | null
+	t2: x~(x_2): x: x: x_2 | null
+	t3: x: x: x~(x_3): x: x_3 | null
+	t4:
+		x~(X): {
+			x: X | null
+			y: x
+		}
+	t5:
+		x~(X): x: X | null
+
+	// x refers to the aliased field, which the quoted label does not shadow
+	// until it is exported unquoted.
+	t6: {
+		let X_2 = X
+		x~(X): x: X_2 | null
+		r: X
+	}
+	e1: x~(x_4): x: x_4
+}
+shadowAlias: {
+	t1: {
+		y: "outer"
+		a: {
+			key:       "y"
+			(key)~(X): "inner"
+			refs: {
+				"y"~(Z): 1
+				outer:   y
+				mid:     X
+				inner:   Z
+			}
+		}
+	}
+	t2: {
+		a: {
+			key:         "y"
+			(key)~(X_1): "inner"
+			refs: {
+				"y"~(Z): 1
+				outer:   y
+				mid:     X_1
+				inner:   Z
+			}
+		}
+		y: "outer"
+	}
+}
+shadowField: {
+	t1: z: {
+		b~(A): 0
+		d: {
+			b: 1
+			c: A
+		}
+	}
+	t2: z: {
+		{
+			b~(A): 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+		d: A: 1
+	}
+	t4: merge: z: {
+		{
+			b~(A): 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+		{
+			b~(A): 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+		d: A: 1
+	}
+	t5: merge: {
+		{
+			b~(A): 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+		b: 0
+		d: b: 1
+	}
+
+	// TODO: could be simplified to:
+	// 		A=b: 0
+	//  	c:   A
+	// or even
+	// 		b: 0
+	//  	c: b
+	t6: x: {
+		{
+			b~(A): 0
+			c:     A
+		}
+		b: 0
+	}
+	issue2378: a: {
+		b~(A): 0
+		d: {
+			b: 1
+			c: A & a.z
+		}
+	}
+
+	// The structs declaring the alias of a are exported from their arcs,
+	// so y must not reference the label a, which b.a shadows.
+	recursive: {
+		T: {
+			a~(A): int
+			n?: {
+				T
+				b: {
+					a: string
+					y: A
+				}
+			}
+		}
+		v: T & {n: {}}
+	}
+
+	// Each struct is exported from its declarations, as it holds an aliased
+	// field or a comprehension. c refers to the x declared beside a, which the
+	// quoted label does not shadow until it is exported unquoted.
+	declAlias: {
+		x~(Y): 1
+		r:     Y
+		a: x: c: x
+	}
+	declComprehension: {
+		x: 1
+		a: x: c: x
+		if true {}
+	}
+
+	// a.x is declared in two struct literals, and only the second one is in
+	// scope at b, which refers to a.x rather than to the x beside a.
+	declTwice: {
+		x: 99
+		a: {
+			{x: 1, if true {}}
+			x: 1
+			b: x
+		}
+	}
+	declTwiceStruct: {
+		x: 99
+		a: {
+			{x: y: 1, if true {}}
+			x: y: 1
+			b: x_5
+		}
+	}
+
+	// a.b is declared in two struct literals, as the values of two declarations
+	// of a, and only the second one is in scope at y.
+	declTwiceNested: {
+		x: 99
+		a: {
+			{b: x: 1, if true {}}
+			b: {
+				x: 1
+				y: x_6
+			}
+		}
+	}
+
+	// Both struct literals declaring a.x are embedded, and d is in scope of the
+	// second one only, where the quoted label shadows a.x.
+	declTwiceEmbedded: {
+		x: 99
+		a: {
+			{x: 1, if true {}, b: x}
+			{x: 1, if true {}, c: x: d: x}
+		}
+	}
+
+	// The let clause is exported in a, where its quoted label shadows a.x.
+	declLet: {
+		x: 99
+		a: {let M = {x: d: x}, x: 1, b: M, if true {}}
+	}
+
+	// The let clause is exported in a, beside the struct literals declaring a.x
+	// rather than within either of them, so d is not linked to a.x and refers to
+	// the x within N instead, a structural cycle.
+	declLetEmbedded: {
+		x: 99
+		a: {
+			let N = {x: d: x}
+			{x: 1, b: N, if true {}}
+			{x: 1, if true {}}
+		}
+	}
+
+	// b refers to x before it is declared, which must not stop the later
+	// reference in c from being linked to it too.
+	forwardRef: {
+		b: x
+		x: 1
+		a: x: c: x
+	}
+
+	// a.r shares its value with x, yet a reference to r refers to a.r.
+	sharedArc: {
+		x: p: 1
+		a: {
+			r~(r_1): x
+			b: {
+				r: 2
+				c: r_1
+			}
+		}
+	}
+
+	// The struct literals declaring x are the value of no field: a disjunct, a
+	// list element, and a literal embedded in a struct with a comprehension.
+	declDisjunct: t: *{
+		x: 1
+		b: x: c: x
+	} | {y: 2}
+	declListElem: l: [{
+		x: 1
+		b: x: c: x
+	}]
+	declEmbeddedLet: a: {
+		{
+			let N_1 = {x: d: x}
+			x: 1
+			b: N_1
+		}
+		if true {}
+	}
+}
+
+// The let clause is first used, and thus exported, where b is shadowed.
+shadowLet: {
+	b: 1
+	a: {
+		let L = b
+		b: 10
+		c: {
+			b: 20
+			d: L
+		}
+	}
+}
+
+let x_5 = x
+
+let x_6 = x
+-- diff/-out/definition-v3-noshare<==>+out/definition --
+diff old new
+--- old
++++ new
+@@ -217,7 +217,7 @@
+ 	sharedArc: {
+ 		x: p: 1
+ 		a: {
+-			r: x
++			r~(r_1): x
+ 			b: {
+ 				r: 2
+ 				c: r_1
+@@ -261,5 +261,3 @@
+ let x_5 = x
+ 
+ let x_6 = x
+-
+-let r_1 = r
 -- out/definition --
 shadowRef: {
 	t1: x~(x_1): x: x_1 | null
@@ -313,6 +690,119 @@ shadowField: {
 		}
 		v: T & {n: {}}
 	}
+
+	// Each struct is exported from its declarations, as it holds an aliased
+	// field or a comprehension. c refers to the x declared beside a, which the
+	// quoted label does not shadow until it is exported unquoted.
+	declAlias: {
+		x~(Y): 1
+		r:     Y
+		a: x: c: x
+	}
+	declComprehension: {
+		x: 1
+		a: x: c: x
+		if true {}
+	}
+
+	// a.x is declared in two struct literals, and only the second one is in
+	// scope at b, which refers to a.x rather than to the x beside a.
+	declTwice: {
+		x: 99
+		a: {
+			{x: 1, if true {}}
+			x: 1
+			b: x
+		}
+	}
+	declTwiceStruct: {
+		x: 99
+		a: {
+			{x: y: 1, if true {}}
+			x: y: 1
+			b: x_5
+		}
+	}
+
+	// a.b is declared in two struct literals, as the values of two declarations
+	// of a, and only the second one is in scope at y.
+	declTwiceNested: {
+		x: 99
+		a: {
+			{b: x: 1, if true {}}
+			b: {
+				x: 1
+				y: x_6
+			}
+		}
+	}
+
+	// Both struct literals declaring a.x are embedded, and d is in scope of the
+	// second one only, where the quoted label shadows a.x.
+	declTwiceEmbedded: {
+		x: 99
+		a: {
+			{x: 1, if true {}, b: x}
+			{x: 1, if true {}, c: x: d: x}
+		}
+	}
+
+	// The let clause is exported in a, where its quoted label shadows a.x.
+	declLet: {
+		x: 99
+		a: {let M = {x: d: x}, x: 1, b: M, if true {}}
+	}
+
+	// The let clause is exported in a, beside the struct literals declaring a.x
+	// rather than within either of them, so d is not linked to a.x and refers to
+	// the x within N instead, a structural cycle.
+	declLetEmbedded: {
+		x: 99
+		a: {
+			let N = {x: d: x}
+			{x: 1, b: N, if true {}}
+			{x: 1, if true {}}
+		}
+	}
+
+	// b refers to x before it is declared, which must not stop the later
+	// reference in c from being linked to it too.
+	forwardRef: {
+		b: x
+		x: 1
+		a: x: c: x
+	}
+
+	// a.r shares its value with x, yet a reference to r refers to a.r.
+	sharedArc: {
+		x: p: 1
+		a: {
+			r: x
+			b: {
+				r: 2
+				c: r_1
+			}
+		}
+	}
+
+	// The struct literals declaring x are the value of no field: a disjunct, a
+	// list element, and a literal embedded in a struct with a comprehension.
+	declDisjunct: t: *{
+		x: 1
+		b: x: c: x
+	} | {y: 2}
+	declListElem: l: [{
+		x: 1
+		b: x: c: x
+	}]
+	declEmbeddedLet: a: {
+		{
+			let N_1 = {x: d: x}
+			x: 1
+			b: N_1
+		}
+		if true {}
+	}
 }
 
 // The let clause is first used, and thus exported, where b is shadowed.
@@ -327,6 +817,12 @@ shadowLet: {
 		}
 	}
 }
+
+let x_5 = x
+
+let x_6 = x
+
+let r_1 = r
 -- out/doc --
 []
 [shadowRef]
@@ -451,6 +947,124 @@ so y must not reference the label a, which b.a shadows.
 [shadowField recursive v n n a]
 [shadowField recursive v n n n]
 [shadowField recursive v a]
+[shadowField declAlias]
+- Each struct is exported from its declarations, as it holds an aliased
+field or a comprehension. c refers to the x declared beside a, which the
+quoted label does not shadow until it is exported unquoted.
+
+[shadowField declAlias x]
+[shadowField declAlias r]
+[shadowField declAlias a]
+[shadowField declAlias a x]
+[shadowField declAlias a x c]
+[shadowField declComprehension]
+[shadowField declComprehension x]
+[shadowField declComprehension a]
+[shadowField declComprehension a x]
+[shadowField declComprehension a x c]
+[shadowField declTwice]
+- a.x is declared in two struct literals, and only the second one is in
+scope at b, which refers to a.x rather than to the x beside a.
+
+[shadowField declTwice x]
+[shadowField declTwice a]
+[shadowField declTwice a x]
+[shadowField declTwice a b]
+[shadowField declTwiceStruct]
+[shadowField declTwiceStruct x]
+[shadowField declTwiceStruct a]
+[shadowField declTwiceStruct a x]
+[shadowField declTwiceStruct a x y]
+[shadowField declTwiceStruct a b]
+[shadowField declTwiceStruct a b y]
+[shadowField declTwiceNested]
+- a.b is declared in two struct literals, as the values of two declarations
+of a, and only the second one is in scope at y.
+
+[shadowField declTwiceNested x]
+[shadowField declTwiceNested a]
+[shadowField declTwiceNested a b]
+[shadowField declTwiceNested a b x]
+[shadowField declTwiceNested a b y]
+[shadowField declTwiceEmbedded]
+- Both struct literals declaring a.x are embedded, and d is in scope of the
+second one only, where the quoted label shadows a.x.
+
+[shadowField declTwiceEmbedded x]
+[shadowField declTwiceEmbedded a]
+[shadowField declTwiceEmbedded a x]
+[shadowField declTwiceEmbedded a b]
+[shadowField declTwiceEmbedded a c]
+[shadowField declTwiceEmbedded a c x]
+[shadowField declTwiceEmbedded a c x d]
+[shadowField declLet]
+- The let clause is exported in a, where its quoted label shadows a.x.
+
+[shadowField declLet x]
+[shadowField declLet a]
+[shadowField declLet a x]
+[shadowField declLet a M]
+[shadowField declLet a M x]
+[shadowField declLet a M x d]
+[shadowField declLet a b]
+[shadowField declLet a b x]
+[shadowField declLet a b x d]
+[shadowField declLetEmbedded]
+- The let clause is exported in a, beside the struct literals declaring a.x
+rather than within either of them, so d is not linked to a.x and refers to
+the x within N instead, a structural cycle.
+
+[shadowField declLetEmbedded x]
+[shadowField declLetEmbedded a]
+[shadowField declLetEmbedded a x]
+[shadowField declLetEmbedded a N]
+[shadowField declLetEmbedded a N x]
+[shadowField declLetEmbedded a N x d]
+[shadowField declLetEmbedded a b]
+[shadowField declLetEmbedded a b x]
+[shadowField declLetEmbedded a b x d]
+[shadowField forwardRef]
+- b refers to x before it is declared, which must not stop the later
+reference in c from being linked to it too.
+
+[shadowField forwardRef b]
+[shadowField forwardRef x]
+[shadowField forwardRef a]
+[shadowField forwardRef a x]
+[shadowField forwardRef a x c]
+[shadowField sharedArc]
+- a.r shares its value with x, yet a reference to r refers to a.r.
+
+[shadowField sharedArc x]
+[shadowField sharedArc x p]
+[shadowField sharedArc a]
+[shadowField sharedArc a r]
+[shadowField sharedArc a r p]
+[shadowField sharedArc a b]
+[shadowField sharedArc a b r]
+[shadowField sharedArc a b c]
+[shadowField sharedArc a b c p]
+[shadowField declDisjunct]
+- The struct literals declaring x are the value of no field: a disjunct, a
+list element, and a literal embedded in a struct with a comprehension.
+
+[shadowField declDisjunct t]
+[shadowField declListElem]
+[shadowField declListElem l]
+[shadowField declListElem l 0]
+[shadowField declListElem l 0 x]
+[shadowField declListElem l 0 b]
+[shadowField declListElem l 0 b x]
+[shadowField declListElem l 0 b x c]
+[shadowField declEmbeddedLet]
+[shadowField declEmbeddedLet a]
+[shadowField declEmbeddedLet a x]
+[shadowField declEmbeddedLet a N]
+[shadowField declEmbeddedLet a N x]
+[shadowField declEmbeddedLet a N x d]
+[shadowField declEmbeddedLet a b]
+[shadowField declEmbeddedLet a b x]
+[shadowField declEmbeddedLet a b x d]
 [shadowLet]
 - The let clause is first used, and thus exported, where b is shadowed.
 
@@ -610,6 +1224,112 @@ _|_ // shadowRef.e1.x.x: structural cycle
 					}
 				}
 			}
+		}
+
+		// Each struct is exported from its declarations, as it holds an aliased
+		// field or a comprehension. c refers to the x declared beside a, which the
+		// quoted label does not shadow until it is exported unquoted.
+		declAlias: {
+			x: 1
+			r: 1
+			a: x: c: 1
+		}
+		declComprehension: {
+			x: 1
+			a: x: c: 1
+		}
+
+		// a.x is declared in two struct literals, and only the second one is in
+		// scope at b, which refers to a.x rather than to the x beside a.
+		declTwice: {
+			x: 99
+			a: {
+				x: 1
+				b: 1
+			}
+		}
+		declTwiceStruct: {
+			x: 99
+			a: {
+				x: y: 1
+				b: y: 1
+			}
+		}
+
+		// a.b is declared in two struct literals, as the values of two declarations
+		// of a, and only the second one is in scope at y.
+		declTwiceNested: {
+			x: 99
+			a: b: {
+				x: 1
+				y: 1
+			}
+		}
+
+		// Both struct literals declaring a.x are embedded, and d is in scope of the
+		// second one only, where the quoted label shadows a.x.
+		declTwiceEmbedded: {
+			x: 99
+			a: {
+				x: 1
+				b: 1
+				c: x: d: 1
+			}
+		}
+
+		// The let clause is exported in a, where its quoted label shadows a.x.
+		declLet: {
+			x: 99
+			a: {
+				x: 1
+				b: x: d: 1
+			}
+		}
+
+		// The let clause is exported in a, beside the struct literals declaring a.x
+		// rather than within either of them, so d is not linked to a.x and refers to
+		// the x within N instead, a structural cycle.
+		declLetEmbedded: {
+			x: 99
+			a: {
+				x: 1
+				b: x: d: 1
+			}
+		}
+
+		// b refers to x before it is declared, which must not stop the later
+		// reference in c from being linked to it too.
+		forwardRef: {
+			b: 1
+			x: 1
+			a: x: c: 1
+		}
+
+		// a.r shares its value with x, yet a reference to r refers to a.r.
+		sharedArc: {
+			x: p: 1
+			a: {
+				r: p: 1
+				b: {
+					r: 2
+					c: p: 1
+				}
+			}
+		}
+
+		// The struct literals declaring x are the value of no field: a disjunct, a
+		// list element, and a literal embedded in a struct with a comprehension.
+		declDisjunct: t: *{
+			x: 1
+			b: x: c: 1
+		} | {y: 2}
+		declListElem: l: [{
+			x: 1
+			b: x: c: 1
+		}]
+		declEmbeddedLet: a: {
+			x: 1
+			b: x: d: 1
 		}
 	}
 
@@ -773,7 +1493,7 @@ diff old new
  			}
  		}
  
-@@ -121,22 +90,76 @@
+@@ -121,22 +90,182 @@
  		// or even
  		// 		b: 0
  		//  	c: b
@@ -846,6 +1566,112 @@ diff old new
 +					}
 +				}
 +			}
++		}
++
++		// Each struct is exported from its declarations, as it holds an aliased
++		// field or a comprehension. c refers to the x declared beside a, which the
++		// quoted label does not shadow until it is exported unquoted.
++		declAlias: {
++			x: 1
++			r: 1
++			a: x: c: 1
++		}
++		declComprehension: {
++			x: 1
++			a: x: c: 1
++		}
++
++		// a.x is declared in two struct literals, and only the second one is in
++		// scope at b, which refers to a.x rather than to the x beside a.
++		declTwice: {
++			x: 99
++			a: {
++				x: 1
++				b: 1
++			}
++		}
++		declTwiceStruct: {
++			x: 99
++			a: {
++				x: y: 1
++				b: y: 1
++			}
++		}
++
++		// a.b is declared in two struct literals, as the values of two declarations
++		// of a, and only the second one is in scope at y.
++		declTwiceNested: {
++			x: 99
++			a: b: {
++				x: 1
++				y: 1
++			}
++		}
++
++		// Both struct literals declaring a.x are embedded, and d is in scope of the
++		// second one only, where the quoted label shadows a.x.
++		declTwiceEmbedded: {
++			x: 99
++			a: {
++				x: 1
++				b: 1
++				c: x: d: 1
++			}
++		}
++
++		// The let clause is exported in a, where its quoted label shadows a.x.
++		declLet: {
++			x: 99
++			a: {
++				x: 1
++				b: x: d: 1
++			}
++		}
++
++		// The let clause is exported in a, beside the struct literals declaring a.x
++		// rather than within either of them, so d is not linked to a.x and refers to
++		// the x within N instead, a structural cycle.
++		declLetEmbedded: {
++			x: 99
++			a: {
++				x: 1
++				b: x: d: 1
++			}
++		}
++
++		// b refers to x before it is declared, which must not stop the later
++		// reference in c from being linked to it too.
++		forwardRef: {
++			b: 1
++			x: 1
++			a: x: c: 1
++		}
++
++		// a.r shares its value with x, yet a reference to r refers to a.r.
++		sharedArc: {
++			x: p: 1
++			a: {
++				r: p: 1
++				b: {
++					r: 2
++					c: p: 1
++				}
++			}
++		}
++
++		// The struct literals declaring x are the value of no field: a disjunct, a
++		// list element, and a literal embedded in a struct with a comprehension.
++		declDisjunct: t: *{
++			x: 1
++			b: x: c: 1
++		} | {y: 2}
++		declListElem: l: [{
++			x: 1
++			b: x: c: 1
++		}]
++		declEmbeddedLet: a: {
++			x: 1
++			b: x: d: 1
 +		}
 +	}
 +

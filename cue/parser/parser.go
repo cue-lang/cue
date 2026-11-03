@@ -112,7 +112,7 @@ func (p *parser) init(filename string, src []byte, opts []Option) {
 		if p.inLookahead {
 			return
 		}
-		p.errors = errors.Append(p.errors, errors.Newf(pos, msg, args...))
+		p.errf(pos, msg, args...)
 	}
 	p.scanner.Init(p.file, src, eh, m)
 
@@ -2367,8 +2367,7 @@ L:
 				// Consume the token and give a clear error
 				pos := p.pos
 				p.next()
-				err := errors.Newf(pos, "postfix ... operator requires @experiment(explicitopen)")
-				p.errors = errors.Append(p.errors, err)
+				p.errf(pos, "postfix ... operator requires @experiment(explicitopen)")
 				// Return a BadExpr to continue parsing
 				x = &ast.BadExpr{From: pos, To: p.pos}
 			}

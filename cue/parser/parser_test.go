@@ -2201,6 +2201,14 @@ func TestParseExpr(t *testing.T) {
 	if _, err := parseExprString(src); err == nil {
 		t.Errorf("ParseExpr(%q): got no error for invalid UTF-8", src)
 	}
+
+	// Scanner errors count towards the same bail-out as parser errors,
+	// so a long run of garbage does not collect an error per line.
+	src = strings.Repeat("\x01\n", 1000)
+	_, err = parseExprString(src)
+	if n := len(cueerrors.Errors(err)); n == 0 || n > 11 {
+		t.Errorf("ParseExpr(1000 lines of garbage): got %d errors, want 1 to 11", n)
+	}
 }
 
 // TestNestingDepthLimit checks that input nested far more deeply than any

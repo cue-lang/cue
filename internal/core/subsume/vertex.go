@@ -58,7 +58,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			s.errf("list does not subsume %v (type %s)", y, y.Kind())
 			return false
 		}
-		if !s.listVertices(x, y) {
+		if !s.listVertices(x, y, final) {
 			return false
 		}
 		// TODO: allow other arcs alongside list arc.
@@ -276,10 +276,13 @@ outerConstraint:
 	return true
 }
 
-func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
+func (s *subsumer) listVertices(x, y *adt.Vertex, final bool) bool {
 	ctx := s.ctx
 
-	if !y.IsData() && x.IsClosedList() && !y.IsClosedList() {
+	// A list without an ellipsis is open under the OpenLists experiment,
+	// but as data, such as in Final mode, it admits no further elements.
+	yClosed := final || y.IsClosedList()
+	if x.IsClosedList() && !yClosed {
 		return false
 	}
 
@@ -311,7 +314,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 		}
 	}
 
-	if y.IsClosedList() {
+	if yClosed {
 		// y admits no elements beyond those compared.
 		return true
 	}

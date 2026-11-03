@@ -1298,37 +1298,30 @@ func TestValues(t *testing.T) {
 			mode: subFinal,
 			err:  "",
 		},
-		// TODO: as data, b is an instance of a in the next five cases.
 		{
 			in:   openlists + `a: [...string], b: []`,
 			mode: subFinal,
-			err:  "value not an instance",
+			err:  "",
 		},
 		{
 			in:   openlists + `a: [...string], b: ["a"]`,
 			mode: subFinal,
-			err:  "value not an instance",
+			err:  "",
 		},
 		{
 			in:   openlists + `a: #["a"], b: ["a"]`,
 			mode: subFinal,
-			err:  "value not an instance",
+			err:  "",
 		},
 		{
 			in:   openlists + `a: {l: [...string]}, b: {l: ["a"]}`,
 			mode: subFinal,
-			err: `
-				field l not present in {l:["a"]}:
-				    subsume:2:25
-				missing field "l"`,
+			err:  "",
 		},
 		{
 			in:   openlists + `a: {l: #["a"]}, b: {l: ["a"]}`,
 			mode: subFinal,
-			err: `
-				field l not present in {l:["a"]}:
-				    subsume:2:20
-				missing field "l"`,
+			err:  "",
 		},
 		{
 			in:   openlists + `a: [...string], b: ["a", 1]`,

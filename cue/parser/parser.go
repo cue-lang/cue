@@ -2246,8 +2246,10 @@ func (p *parser) parsePostfixAliasAllowed(allowFunctions bool) *ast.PostfixAlias
 }
 
 // checkExpr checks that x is an expression (and not a type).
+// A [ast.ParenExpr] is accepted as is: its inner expression was already
+// checked when it was parsed.
 func (p *parser) checkExpr(x ast.Expr) ast.Expr {
-	switch unparen(x).(type) {
+	switch x.(type) {
 	case *ast.BadExpr:
 	case *ast.BottomLit:
 	case *ast.Ident:
@@ -2257,7 +2259,6 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 	case *ast.StructLit:
 	case *ast.ListLit:
 	case *ast.ParenExpr:
-		panic("unreachable")
 	case *ast.SelectorExpr:
 	case *ast.IndexExpr:
 	case *ast.SliceExpr:
@@ -2271,14 +2272,6 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 		x = &ast.BadExpr{
 			From: x.Pos(), To: x.End(),
 		}
-	}
-	return x
-}
-
-// If x is of the form (T), unparen returns unparen(T), otherwise it returns x.
-func unparen(x ast.Expr) ast.Expr {
-	if p, isParen := x.(*ast.ParenExpr); isParen {
-		x = unparen(p.X)
 	}
 	return x
 }

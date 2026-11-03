@@ -2214,6 +2214,7 @@ func TestNestingDepthLimit(t *testing.T) {
 		{"unary", "!", "", maxNestLevel + 1, true},
 		{"calls", "len(", ")", maxNestLevel + 1, true},
 		{"calls_within", "len(", ")", maxNestLevel - 100, false},
+		{"parens_within", "(", ")", maxNestLevel - 100, false},
 
 		// Syntax built iteratively may nest further, up to maxChainLevel.
 		{"fields_within", "a: ", "", maxNestLevel + 1, false},

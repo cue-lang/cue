@@ -1652,6 +1652,23 @@ bar: 2
 			out: "x: func(3), y: func()",
 		},
 		{
+			// The lookahead for the outer "func" decides the nested ones too.
+			desc: "nested func identifier calls without experiment",
+			in: `
+			x: func(func(1))
+			y: func(func + 1)
+			z: func("\(func(1))")
+			`,
+			out: `x: func(func(1)), y: func(func+1), z: func("\(func(1))")`,
+		},
+		{
+			desc: "func literal nested in a func identifier call without experiment",
+			in: `
+			x: func(func(a: int) -> int: a)
+			`,
+			out: "x: func(func(a: int) -> int: a)\nfunction syntax requires @experiment(functions)",
+		},
+		{
 			desc: "func identifier call with interpolation argument without experiment",
 			in: `
 			a: 1
@@ -2235,6 +2252,7 @@ func TestNestingDepthLimit(t *testing.T) {
 		{"calls", "len(", ")", maxNestLevel + 1, true},
 		{"calls_within", "len(", ")", maxNestLevel - 100, false},
 		{"parens_within", "(", ")", maxNestLevel - 100, false},
+		{"func_calls_within", "func(", ")", maxNestLevel - 100, false},
 
 		// Syntax built iteratively may nest further, up to maxChainLevel.
 		{"fields_within", "a: ", "", maxNestLevel + 1, false},

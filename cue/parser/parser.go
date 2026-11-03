@@ -87,6 +87,13 @@ type parser struct {
 	// parse re-scans the same tokens and reports any errors.
 	inLookahead bool
 
+	// noFuncSyntaxBefore is the offset of the ")" closing the last "func"
+	// call that [parser.disabledFuncSyntaxAhead] scanned without finding a
+	// ")" followed by "->" or ":", so no "func" before it starts function
+	// syntax either. It keeps nested calls from scanning the same tokens
+	// once per level.
+	noFuncSyntaxBefore int
+
 	// nestLevel tracks and limits the expression nesting depth during
 	// parsing. See [maxNestLevel].
 	nestLevel int
@@ -1642,6 +1649,9 @@ func (p *parser) scannerExperiments(forceFunctions bool) *cueexperiment.File {
 // slightly worse errors for older language versions, where "func" can be a
 // regular identifier, become acceptable.
 func (p *parser) disabledFuncSyntaxAhead() bool {
+	if p.pos.Offset() < p.noFuncSyntaxBefore {
+		return false
+	}
 	s := p.scanner
 	// Recognize "->" during the lookahead: it is precisely the token that
 	// distinguishes function syntax.
@@ -1657,9 +1667,12 @@ func (p *parser) disabledFuncSyntaxAhead() bool {
 	// ResumeInterpolation continues the enclosing string literal.
 	depth := 0
 	var interp []int // parenthesis depths of open interpolation expressions
+	var rparen token.Pos
+	afterRParen := false // the previous token was an RPAREN
+	decider := false     // a "->" or ":" followed an RPAREN
 	next := func() token.Token {
 		for {
-			_, tok, _ := s.Scan()
+			pos, tok, _ := s.Scan()
 			switch tok {
 			case token.COMMENT:
 				continue
@@ -1686,6 +1699,13 @@ func (p *parser) disabledFuncSyntaxAhead() bool {
 				}
 				depth--
 			}
+			if afterRParen && (tok == token.RARROW || tok == token.COLON) {
+				decider = true
+			}
+			afterRParen = tok == token.RPAREN
+			if afterRParen {
+				rparen = pos
+			}
 			return tok
 		}
 	}
@@ -1702,6 +1722,9 @@ func (p *parser) disabledFuncSyntaxAhead() bool {
 	case token.RARROW, token.COLON:
 		return true
 	default:
+		if !decider {
+			p.noFuncSyntaxBefore = rparen.Offset()
+		}
 		return false
 	}
 }

@@ -1129,7 +1129,7 @@ func (c *OpContext) refutesElems(a, b *Vertex) bool {
 	}
 	var tb Value // b's element constraint beyond its elements, if any
 	if !b.IsClosedList() {
-		if tb = c.listTail(b); !c.admitsAny(tb) {
+		if tb = c.ListTail(b); !c.admitsAny(tb) {
 			tb = nil // no further element is admitted
 		}
 	}
@@ -1141,7 +1141,7 @@ func (c *OpContext) refutesElems(a, b *Vertex) bool {
 			return true
 		}
 	default:
-		ta := c.listTail(a)
+		ta := c.ListTail(a)
 		for _, y := range ys[min(len(xs), len(ys)):] {
 			if c.refutes(ta, Unwrap(y)) {
 				return true
@@ -1159,9 +1159,9 @@ func (c *OpContext) refutesElems(a, b *Vertex) bool {
 	return false
 }
 
-// listTail returns the constraint that the open list v places on elements
+// ListTail returns the constraint that the open list v places on elements
 // beyond its own: top if it places none, and bottom if it admits none.
-func (c *OpContext) listTail(v *Vertex) Value {
+func (c *OpContext) ListTail(v *Vertex) Value {
 	w := &Vertex{Label: AnyIndex}
 	v.MatchAndInsert(c, w)
 	if !w.HasConjuncts() {

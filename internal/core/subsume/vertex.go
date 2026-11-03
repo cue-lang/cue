@@ -276,48 +276,45 @@ outerConstraint:
 	return true
 }
 
+// listVertices reports whether the list x subsumes the list y. A list is
+// its listed elements followed by a tail: the constraint it places on any
+// further elements, which for a closed list admits none. x subsumes y when
+// x admits each element that y lists, by the element at the same position
+// or by its tail once y lists more, and when x's tail admits y's tail.
 func (s *subsumer) listVertices(x, y *adt.Vertex, final bool) bool {
-	ctx := s.ctx
-
 	// A list without an ellipsis is open under the OpenLists experiment,
 	// but as data, such as in Final mode, it admits no further elements.
 	yClosed := final || y.IsClosedList()
-	if x.IsClosedList() && !yClosed {
-		return false
-	}
 
 	xElems := slices.Collect(x.Elems())
 	yElems := slices.Collect(y.Elems())
 
-	switch {
-	case len(xElems) == len(yElems):
-	case len(xElems) > len(yElems):
+	// Every element x lists must be matched by one that y lists.
+	if len(xElems) > len(yElems) {
 		return false
-	case x.IsClosedList():
-		return false
-	default:
-		a := &adt.Vertex{Label: adt.AnyIndex}
-		x.MatchAndInsert(ctx, a)
-		a.Finalize(ctx)
-
-		// x must be open
-		for _, b := range yElems[len(xElems):] {
-			if !s.vertices(a, b) {
-				return false
-			}
-		}
 	}
-
 	for i, a := range xElems {
 		if !s.vertices(a, yElems[i]) {
 			return false
 		}
 	}
 
-	if yClosed {
-		// y admits no elements beyond those compared.
+	// Beyond the elements x lists, y has nothing when it is closed and
+	// lists no more, and x admits nothing when it is closed.
+	extra := yElems[len(xElems):]
+	if yClosed && len(extra) == 0 {
 		return true
 	}
-	// x is open here, as a closed x against an open y was rejected above.
-	return s.patterns(x, y, false, false)
+	if x.IsClosedList() {
+		return false
+	}
+
+	// x's tail must admit the further elements y lists, and then y's tail.
+	tail := s.ctx.ListTail(x)
+	for _, b := range extra {
+		if !s.values(tail, b) {
+			return false
+		}
+	}
+	return yClosed || s.values(tail, s.ctx.ListTail(y))
 }

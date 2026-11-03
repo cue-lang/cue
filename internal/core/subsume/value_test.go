@@ -1283,16 +1283,12 @@ func TestValues(t *testing.T) {
 			err: "value not an instance",
 		},
 		{
-			// TODO: should be "".
-			// See https://cuelang.org/issue/1654.
 			in:  `a: [...int], b: [2, ...int]`,
-			err: "value not an instance: inexact subsumption",
+			err: "",
 		},
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:  `a: [...int], b: [2, ...string]`,
-			err: "value not an instance: inexact subsumption",
+			err: "value not an instance",
 		},
 		{
 			in:  `a: [...string] | [...int], b: [...int]`,

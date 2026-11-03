@@ -19,6 +19,17 @@ exec cue export -e hostname --out text -T hostname.cue
 stdout '^[^"]+$'
 [exec:hostname] cmp stdout hostname.stdout
 
+# The environment is injected as a struct of strings.
+env CUE_TEST_VAR=foo
+env CUE_TEST_EMPTY=
+env CUE-TEST-QUOTED=bar
+exec cue export -T env.cue
+cmp stdout env.stdout
+
+# Selecting a variable which is not set is an error.
+! exec cue export -T -e _env.CUE_TEST_UNSET env.cue
+stderr 'undefined field: CUE_TEST_UNSET'
+
 # A random number is not deterministic by nature,
 # but we can validate that two consecutive runs with a random 128-bit integer
 # are extremely unlikely to result in the same random number.
@@ -56,6 +67,18 @@ username: string @tag(username,var=username)
 -- hostname.cue --
 hostname: string @tag(hostname,var=hostname)
 
+-- env.cue --
+_env: {[string]: string} @tag(env,var=env)
+test:   _env.CUE_TEST_VAR
+empty:  _env.CUE_TEST_EMPTY
+quoted: _env."CUE-TEST-QUOTED"
+
+-- env.stdout --
+{
+    "test": "foo",
+    "empty": "",
+    "quoted": "bar"
+}
 -- rand.cue --
 rand: int @tag(rand,var=rand)
 

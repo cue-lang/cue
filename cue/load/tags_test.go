@@ -37,6 +37,15 @@ var testTagVars = map[string]TagVar{
 	"cwd":      stringVar("home"),
 	"username": stringVar("cueser"),
 	"hostname": stringVar("cuebe"),
+	"env": {Func: func() (ast.Expr, error) {
+		return envStruct([]string{
+			"HOME=/home/cueser", "_X=a=b", "#Y=", "=C:=C:\\cue", "BAD",
+			"HOME=/second", "HOME=\xff", // the first entry wins
+		})
+	}},
+	"badenv": {Func: func() (ast.Expr, error) {
+		return envStruct([]string{"BAD=a\xffb"})
+	}},
 	"rand": {Func: func() (ast.Expr, error) {
 		return ast.NewLit(token.INT, "112950970371208119678246559335704039641"), nil
 	}},
@@ -85,6 +94,22 @@ func TestTags(t *testing.T) {
 			u1: "cueser"
             u2: string // not filled
         }`,
+	}, {
+		in: `
+		env: {[string]: string} @tag(bar,var=env)
+		`,
+		out: `{
+			env: {
+				"#Y": ""
+				HOME: "/home/cueser"
+				"_X": "a=b"
+			}
+		}`,
+	}, {
+		in: `
+		env: _ @tag(bar,var=badenv)
+		`,
+		err: `error getting tag variable 'badenv': environment variable "BAD" is not valid UTF-8`,
 	}, {
 		in: `
 		u1: string @tag(bar,var=user)
@@ -252,6 +277,28 @@ package x
 b: a
 -- a refers to string & "bar" & "m1"
 `,
+	}, {
+		// Each field gets its own copy of the struct, sorted by name.
+		name: "EnvTwice",
+		overlay: map[string]string{
+			"x.cue": "package x\n\na: _ @tag(foo) @tag(v,var=env)\nb: _ @tag(w,var=env)\n",
+		},
+		fromString: true,
+		args:       []string{"."},
+		want: `== x.cue
+package x
+
+a: _ & "bar" & {
+	"#Y":   ""
+	"HOME": "/home/cueser"
+	"_X":   "a=b"
+} @tag(foo) @tag(v,var=env)
+b: _ & {
+	"#Y":   ""
+	"HOME": "/home/cueser"
+	"_X":   "a=b"
+} @tag(w,var=env)
+`,
 	}}
 	for _, tc := range syntaxCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -281,7 +328,12 @@ b: a
 					b, err := format.Node(f)
 					qt.Assert(t, qt.IsNil(err))
 					fmt.Fprintf(&buf, "== %s\n%s", filepath.Base(f.Filename), b)
+					seen := make(map[ast.Node]bool)
 					ast.Walk(f, func(n ast.Node) bool {
+						if seen[n] {
+							t.Fatalf("node %T shared within %s", n, f.Filename)
+						}
+						seen[n] = true
 						if id, ok := n.(*ast.Ident); ok && id.Node != nil {
 							b, err := format.Node(id.Node)
 							qt.Assert(t, qt.IsNil(err))

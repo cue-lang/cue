@@ -798,6 +798,8 @@ The following variables are supported:
    cwd        working directory
    username   current username
    hostname   current hostname
+   env        environment variables as a {[string]: string};
+              use a hidden field to not export sensitive values
    rand       a random 128-bit integer
 `,
 }

@@ -17,12 +17,16 @@ package load
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
+	"maps"
 	"os"
 	"os/user"
 	"runtime"
+	"slices"
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -121,6 +125,11 @@ func DefaultTagVars() map[string]TagVar {
 				return varToString(os.Hostname())
 			},
 		},
+		"env": {
+			Func: func() (ast.Expr, error) {
+				return envStruct(os.Environ())
+			},
+		},
 		"rand": {
 			Func: func() (ast.Expr, error) {
 				var b [16]byte
@@ -133,6 +142,35 @@ func DefaultTagVars() map[string]TagVar {
 			},
 		},
 	}
+}
+
+// envStruct returns a struct literal of the "key=value" entries in env,
+// as returned by [os.Environ], sorted by name.
+// Like [os.Getenv], the first entry for a name wins.
+func envStruct(env []string) (ast.Expr, error) {
+	vals := make(map[string]string, len(env))
+	for _, kv := range env {
+		// Skip entries with an empty name, such as Windows' per-drive "=C:=C:\dir".
+		name, val, ok := strings.Cut(kv, "=")
+		if !ok || name == "" {
+			continue
+		}
+		if _, ok := vals[name]; ok {
+			continue
+		}
+		// CUE strings must be valid UTF-8.
+		if !utf8.ValidString(kv) {
+			return nil, fmt.Errorf("environment variable %q is not valid UTF-8", name)
+		}
+		vals[name] = val
+	}
+	fields := make([]any, 0, 2*len(vals))
+	for _, name := range slices.Sorted(maps.Keys(vals)) {
+		// String labels are always quoted, so names such as "_X" or "#X"
+		// do not declare hidden fields or definitions.
+		fields = append(fields, name, ast.NewString(vals[name]))
+	}
+	return ast.NewStruct(fields...), nil
 }
 
 func varToString(s string, err error) (ast.Expr, error) {
@@ -342,7 +380,8 @@ func (tg *tagger) injectTags(tags []string) errors.Error {
 				vars[t.vars] = tag
 			}
 			if x != nil {
-				t.injectValue(x, tg)
+				// Tagged fields must not share nodes.
+				t.injectValue(ast.Clone(x), tg)
 			}
 		}
 	}

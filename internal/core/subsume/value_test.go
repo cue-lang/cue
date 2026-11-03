@@ -42,6 +42,7 @@ func TestValues(t *testing.T) {
 		in   string
 		mode int
 	}
+	const openlists = "@experiment(openlists)\n"
 	testCases := []subsumeTest{
 		// Top subsumes everything
 		{
@@ -1296,6 +1297,76 @@ func TestValues(t *testing.T) {
 			in:   `a: [2], b: [2, ...int]`,
 			mode: subFinal,
 			err:  "",
+		},
+		// TODO: as data, b is an instance of a in the next five cases.
+		{
+			in:   openlists + `a: [...string], b: []`,
+			mode: subFinal,
+			err:  "value not an instance",
+		},
+		{
+			in:   openlists + `a: [...string], b: ["a"]`,
+			mode: subFinal,
+			err:  "value not an instance",
+		},
+		{
+			in:   openlists + `a: #["a"], b: ["a"]`,
+			mode: subFinal,
+			err:  "value not an instance",
+		},
+		{
+			in:   openlists + `a: {l: [...string]}, b: {l: ["a"]}`,
+			mode: subFinal,
+			err: `
+				field l not present in {l:["a"]}:
+				    subsume:2:25
+				missing field "l"`,
+		},
+		{
+			in:   openlists + `a: {l: #["a"]}, b: {l: ["a"]}`,
+			mode: subFinal,
+			err: `
+				field l not present in {l:["a"]}:
+				    subsume:2:20
+				missing field "l"`,
+		},
+		{
+			in:   openlists + `a: [...string], b: ["a", 1]`,
+			mode: subFinal,
+			err:  "value not an instance",
+		},
+		// Outside Final mode, a list without an ellipsis is not data, so it
+		// still admits further elements under openlists and is not an
+		// instance of a list that does not.
+		{
+			in:  openlists + `a: [...string], b: []`,
+			err: "value not an instance",
+		},
+		{
+			in:  openlists + `a: [...string], b: ["a"]`,
+			err: "value not an instance",
+		},
+		{
+			in:  openlists + `a: #["a"], b: ["a"]`,
+			err: "value not an instance",
+		},
+		{
+			in: openlists + `a: {l: [...string]}, b: {l: ["a"]}`,
+			err: `
+				field l not present in {l:["a"]}:
+				    subsume:2:25
+				missing field "l"`,
+		},
+		{
+			in: openlists + `a: {l: #["a"]}, b: {l: ["a"]}`,
+			err: `
+				field l not present in {l:["a"]}:
+				    subsume:2:20
+				missing field "l"`,
+		},
+		{
+			in:  openlists + `a: [...string], b: ["a", 1]`,
+			err: "value not an instance",
 		},
 
 		// Structural

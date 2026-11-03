@@ -1320,6 +1320,18 @@ expected ')' for string interpolation, found ','`,
 			out: `<[l5// Comment 1] a: 1>`,
 		},
 		{
+			desc: "several comments on one node",
+			in: `a: 1
+
+		// c1
+
+		// c2
+
+		// c3
+		`,
+			out: "<[5// c1] [5// c2] [5// c3] a: 1>",
+		},
+		{
 			desc: "emit comments",
 			in: `// a comment at the beginning of the file
 

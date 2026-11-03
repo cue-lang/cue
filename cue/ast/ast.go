@@ -189,9 +189,7 @@ func (c *comments) AddComment(cg *CommentGroup) {
 		return
 	}
 
-	// Other nodes may share the slice via [SetComments] and reordering
-	// writes into it, so clip it to make append copy.
-	a := append(slices.Clip(*c.syntacticGroups), cg)
+	a := append(*c.syntacticGroups, cg)
 	*c.syntacticGroups = a
 	for i := len(a) - 2; i >= 0 && a[i].Position > cg.Position; i-- {
 		a[i], a[i+1] = a[i+1], a[i]
@@ -204,15 +202,13 @@ func (c *comments) SetComments(cgs []*CommentGroup) {
 		if cgs == nil {
 			// Replacing no comments with a nil slice is a no-op.
 			// Avoid allocating below.
-			// Note that we continue for other zero-length slices,
-			// as the caller may want to reuse memory.
 			return
 		}
-		a := cgs
+		a := slices.Clone(cgs)
 		c.syntacticGroups = &a
 		return
 	}
-	*c.syntacticGroups = cgs
+	*c.syntacticGroups = slices.Clone(cgs)
 }
 
 // A Comment node represents a single //-style comment.

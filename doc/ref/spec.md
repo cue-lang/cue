@@ -1812,7 +1812,7 @@ a: x + 1
 b: x + 2
 ```
 
-Let declarations are commonly used with the [`self`](#self-from-v0150) keyword
+Let declarations are commonly used with the [`self`](#self-from-v0180) keyword
 to create value aliases:
 
 ```
@@ -2189,7 +2189,7 @@ d: b.greeting  // => "Hello, world!"
 e: c.greeting  // => "Hello, you!"
 ```
 
-#### `self` (from v0.15.0)
+#### `self` (from v0.18.0)
 
 The [predeclared identifier](#predeclared-identifiers) `self` and `__self` refer
 to the innermost struct or list, or the top level if none exist.
@@ -2967,7 +2967,7 @@ a: infinity and beyond!: (1 / 0):
 -->
 
 To refer to the value being validated, enclose the validator in braces and use
-[`self`](#self-from-v0150):
+[`self`](#self-from-v0180):
 
 ```cue ! vet
 #Option: {"one" | "two" | "three" | error("invalid option \(self)")}

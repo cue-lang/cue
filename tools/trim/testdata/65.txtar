@@ -1,0 +1,17 @@
+A disjunction which other declarations resolve to one of its branches.
+Trimming must keep the result the same.
+
+-- a.cue --
+a: {x: 1, k: "a"} | {y: 2, k: "b"}
+a: k: "a"
+a: x: 1
+-- out/trim-v3 --
+== a.cue
+a: {x: 1, k: "a"} | {y: 2, k: "b"}
+a: k: "a"
+a: x: 1
+-- out/trim-v3-noshare --
+== a.cue
+a: {x: 1, k: "a"} | {y: 2, k: "b"}
+a: k: "a"
+a: x: 1

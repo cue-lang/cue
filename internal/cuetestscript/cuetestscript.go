@@ -29,10 +29,14 @@
 package cuetestscript
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -161,7 +165,9 @@ func setupModuleRoot(e Env) error {
 //
 // A _registry<id>_prefix file holds a path prefix for the registry, and a
 // _registry<id>_proxy file holding a boolean fronts it with an OCI proxy
-// server, mirroring the way that the Central Registry works.
+// server, mirroring the way that the Central Registry works. A
+// _registry<id>_gzip file fronts it with a proxy which compresses responses;
+// see [startGzipProxy].
 func setupRegistries(e Env) error {
 	workDir := e.WorkDir()
 	entries, err := os.ReadDir(workDir)
@@ -191,6 +197,9 @@ func setupRegistries(e Env) error {
 		regHost, err := startRegistry(e, os.DirFS(filepath.Join(workDir, entry.Name())), prefix, useProxy)
 		if err != nil {
 			return err
+		}
+		if _, err := os.Stat(filepath.Join(workDir, "_registry"+regID+"_gzip")); err == nil {
+			regHost = startGzipProxy(e, regHost)
 		}
 		regPrefix := ""
 		if prefix != "" {
@@ -227,4 +236,31 @@ func startRegistry(e Env, fsys fs.FS, prefix string, useProxy bool) (string, err
 	e.Defer(proxy.Close)
 	proxyURL, _ := url.Parse(proxy.URL)
 	return proxyURL.Host, nil
+}
+
+// startGzipProxy fronts the registry at host with a reverse proxy which, like
+// nginx with "gzip on", compresses responses whenever the request accepts gzip,
+// dropping their Content-Length. It returns the proxy's host.
+func startGzipProxy(e Env, host string) string {
+	rp := httputil.NewSingleHostReverseProxy(&url.URL{Scheme: "http", Host: host})
+	rp.ModifyResponse = func(resp *http.Response) error {
+		if !strings.Contains(resp.Request.Header.Get("Accept-Encoding"), "gzip") {
+			return nil
+		}
+		var buf bytes.Buffer
+		zw := gzip.NewWriter(&buf)
+		if _, err := io.Copy(zw, resp.Body); err != nil {
+			return err
+		}
+		zw.Close()
+		resp.Body.Close()
+		resp.Body = io.NopCloser(&buf)
+		resp.Header.Del("Content-Length")
+		resp.Header.Set("Content-Encoding", "gzip")
+		resp.ContentLength = -1
+		return nil
+	}
+	srv := httptest.NewServer(rp)
+	e.Defer(srv.Close)
+	return strings.TrimPrefix(srv.URL, "http://")
 }

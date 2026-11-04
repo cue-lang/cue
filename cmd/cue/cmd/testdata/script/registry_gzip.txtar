@@ -1,0 +1,30 @@
+# A registry, or a reverse proxy in front of one, may compress responses
+# with gzip whenever the client accepts that encoding, which drops their
+# Content-Length. Fetching modules must still work.
+
+# TODO: this should succeed and print want-stdout.
+! exec cue export
+stderr 'invalid descriptor in response: unknown content length'
+
+-- want-stdout --
+{
+    "out": "hello"
+}
+-- cue.mod/module.cue --
+module: "cue.example@v0"
+language: version: "v0.9.2"
+deps: "test.example/foo@v0": v: "v0.0.1"
+-- main.cue --
+package main
+
+import "test.example/foo"
+
+out: foo.msg
+-- _registry_gzip --
+-- _registry/test.example_foo_v0.0.1/cue.mod/module.cue --
+module: "test.example/foo@v0"
+language: version: "v0.9.2"
+-- _registry/test.example_foo_v0.0.1/foo.cue --
+package foo
+
+msg: "hello"

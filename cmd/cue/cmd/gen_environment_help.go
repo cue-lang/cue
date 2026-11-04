@@ -28,6 +28,7 @@ import (
 	"go/token"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"cuelang.org/go/internal/copyright"
@@ -120,13 +121,19 @@ var cueDebugHelp = `, copyright.String("2026"))
 
 	for _, flag := range flags {
 		fmt.Fprintf(&sb, "\t\t%s\n", flag.Name)
-		for line := range strings.SplitSeq(flag.Comment, "\n") {
+		// The flag name is already printed above, so drop it from the
+		// start of a doc comment like "HTTP enables ...".
+		comment, ok := strings.CutPrefix(flag.Comment, flag.FieldName+" ")
+		if ok {
+			comment = strings.ToUpper(comment[:1]) + comment[1:]
+		}
+		// Doc links like [cuelang.org/go/tools/flow] mean nothing to users.
+		comment = docLink.ReplaceAllString(comment, "$1")
+		for line := range strings.SplitSeq(comment, "\n") {
 			line = strings.TrimSpace(line)
 			if line == "" {
 				continue
 			}
-			// Use the flag name rather than the Go field name.
-			line = strings.Replace(line, flag.FieldName, flag.Name, 1)
 			// Escape backticks to keep the raw string literal valid.
 			line = strings.ReplaceAll(line, "`", "`+\"`\"+`")
 			fmt.Fprintf(&sb, "\t\t\t%s\n", line)
@@ -136,6 +143,8 @@ var cueDebugHelp = `, copyright.String("2026"))
 	sb.WriteString("`[1:]\n")
 	return sb.Bytes()
 }
+
+var docLink = regexp.MustCompile(`\[([^\]]+)\]`)
 
 func extractComment(group *ast.CommentGroup) string {
 	if group == nil {

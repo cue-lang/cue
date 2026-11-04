@@ -19,24 +19,24 @@ package cmd
 // cueDebugHelp lists the CUE_DEBUG flags for "cue help environment".
 var cueDebugHelp = `
 		http
-			http enables JSON logging per HTTP request and response made
+			Enables JSON logging per HTTP request and response made
 			when interacting with module registries.
 		strict
-			strict sets whether extra aggressive checking should be done.
+			Sets whether extra aggressive checking should be done.
 		logeval
-			logeval sets the log level for the evaluator.
+			Sets the log level for the evaluator.
 			There are currently only two levels:
 			0: no logging
 			1: logging
 		sharing
-			sharing enables structure sharing.
+			Enables structure sharing.
 		sortfields
-			sortfields forces fields in a struct to be sorted
+			Forces fields in a struct to be sorted
 			lexicographically.
 		opendef
-			opendef disables the check for closedness of definitions.
+			Disables the check for closedness of definitions.
 		toolsflow
-			toolsflow causes [cuelang.org/go/tools/flow] to print a task dependency mermaid graph.
+			Causes cuelang.org/go/tools/flow to print a task dependency mermaid graph.
 		parsertrace
-			parsertrace causes [cuelang.org/go/cue/parser] to print a trace of parsed productions.
+			Causes cuelang.org/go/cue/parser to print a trace of parsed productions.
 `[1:]

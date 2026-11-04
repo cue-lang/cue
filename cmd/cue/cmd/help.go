@@ -819,9 +819,8 @@ Tasks are found as regular fields underneath the top-level "command" field,
 excluding hidden fields and definitions. Note that regular fields
 may be produced by comprehensions or from the result of other tasks,
 which can result in discovering more tasks.
-To avoid this, set the CUE_EXPERIMENT=cmdreferencepkg experiment flag.
 
-Inputs of tasks my refer to outputs of other tasks. The cue tool
+Inputs of tasks may refer to outputs of other tasks. The cue tool
 does a static analysis of the configuration and only starts tasks
 that are fully specified. Upon completion of each task, cue
 rewrites the instance, filling in the completed task, and
@@ -943,7 +942,7 @@ cuelang.org/go/pkg/tool/tool.cue.
 	// Tasks defines a hierarchy of tasks. A command completes if all
 	// tasks have run to completion.
 	Tasks: Task | {
-		[name=Name]: Tasks
+		[Name]: Tasks
 	}
 
 	// Name defines a valid task or command name.

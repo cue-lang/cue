@@ -84,6 +84,9 @@ fix, as files use it without an attribute, and asking for one is an error.
 The special value --exp=all enables all experimental features that apply to the
 current version.
 
+To move a module to a newer language version, including the rewrites for the
+experiments which are stable at that version, run "cue mod upgrade" instead.
+
 ` + fixCommentsHelp,
 		RunE: mkRunE(c, runFixAll),
 	}

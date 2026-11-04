@@ -296,7 +296,7 @@ There are two types of experiments:
 
 Experiments are enabled in CUE files using file-level attributes:
 
-	@experiment(structcmp)
+	@experiment(try)
 
 	package mypackage
 
@@ -304,8 +304,8 @@ Experiments are enabled in CUE files using file-level attributes:
 
 Multiple experiments can be enabled:
 
-	@experiment(structcmp,aliasv2)
-	@experiment(explicitopen)
+	@experiment(try,shortcircuit)
+	@experiment(functions)
 
 The behavior of per-file experiments tracks the language version declared in their module,
 or if none exists, the language version reported by "cue version".
@@ -353,8 +353,11 @@ Available per-file experiments:
 
 Global experiments are enabled via the CUE_EXPERIMENT environment variable:
 
-	export CUE_EXPERIMENT=cmdreferencepkg,keepvalidators
+	export CUE_EXPERIMENT=openapiv2,formatv2=0
 	cue export myfile.cue
+
+An experiment which is on by default can be turned off with a value of 0,
+as with formatv2=0 above.
 
 The behavior of global experiments tracks the language version reported by "cue version".
 

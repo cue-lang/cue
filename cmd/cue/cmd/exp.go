@@ -196,7 +196,7 @@ writefs takes JSON via stdin in the form of
 	remove?: [...string]
 
 	// create is the set of files to create, keyed by Unix file paths.
-	create?: [filepath=string]: {
+	create?: [string]: {
 		type!:     "symlink"
 		contents!: string
 	} | *{

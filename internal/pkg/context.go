@@ -388,7 +388,6 @@ func (c *CallCtxt) NumList(i int) (a []*adt.Num) {
 
 	j := 0
 	for w := range v.Elems() {
-		w.Finalize(c.ctx) // defensive
 		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.Num:
 			a = append(a, x)
@@ -428,7 +427,6 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 
 	j := 0
 	for w := range v.Elems() {
-		w.Finalize(c.ctx) // defensive
 		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.String:
 			a = append(a, x.Str)

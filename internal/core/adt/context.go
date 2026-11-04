@@ -1540,6 +1540,5 @@ func (c *OpContext) NewList(values ...Value) *Vertex {
 	for _, x := range values {
 		list.Elems = append(list.Elems, x)
 	}
-	v.Finalize(c)
 	return v
 }

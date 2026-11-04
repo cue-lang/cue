@@ -111,7 +111,6 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 	}
 
 	// We could compile lazily, but this is easier for debugging.
-	obj.Finalize(ctx)
 	if err := obj.Err(ctx); err != nil {
 		panic(err.Err)
 	}

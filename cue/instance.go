@@ -175,7 +175,6 @@ func (inst *Instance) languageVersion() string {
 // top-level values.
 func (inst *Instance) Value() Value {
 	ctx := newContext(inst.index)
-	inst.root.Finalize(ctx)
 	// TODO: consider including these statistics as well. Right now, this only
 	// seems to be used in cue cmd for "auxiliary" evaluations, like filetypes.
 	// These arguably skew the actual statistics for the cue command line, so

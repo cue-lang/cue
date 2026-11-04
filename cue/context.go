@@ -388,9 +388,7 @@ func (c *Context) Encode(x any, option ...EncodeOption) Value {
 	ctx := c.ctx()
 	// TODO: is true the right default?
 	val := convert.FromGoValue(ctx, x, options.nilIsTop)
-	n := adt.ToVertex(val) // we know val is finalized
-	n.Finalize(ctx)
-	return c.make(n)
+	return c.make(adt.ToVertex(val))
 }
 
 // EncodeType converts a Go type to a CUE [Value].

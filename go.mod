@@ -3,14 +3,14 @@ module cuelang.org/go
 go 1.26.0
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20261008151123-94f4aa6e0087
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20261026160121-545c0455168d
 	github.com/bufbuild/protocompile v0.14.2-0.20260824170637-a01cc8856977
-	github.com/cockroachdb/apd/v3 v3.2.4-0.20261021202135-0e59bffd422b
+	github.com/cockroachdb/apd/v3 v3.2.4-0.20261022180432-e9c7a71a8579
 	github.com/coder/websocket v1.8.15
 	github.com/emicklei/proto v1.14.3
 	github.com/go-quicktest/qt v1.102.0
 	github.com/goccy/go-yaml v1.19.3-0.20260407131736-edee2f91616c
-	github.com/google/go-cmp v0.7.1-0.20261029010250-cb6e62ef52b3
+	github.com/google/go-cmp v0.7.1-0.20261029223239-5deca1c7dab7
 	github.com/google/uuid v1.6.0
 	github.com/opencontainers/go-digest v1.0.1-0.20261015205711-63db54280247
 	github.com/opencontainers/image-spec v1.1.1
@@ -18,16 +18,16 @@ require (
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20261013103202-7c8a61a7a736
 	github.com/rogpeppe/go-internal v1.16.1-0.20261005065351-38c169d642f5
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.11-0.20261019083819-70f284b93daa
+	github.com/spf13/pflag v1.0.11-0.20261029222656-f8a990678a6d
 	github.com/tetratelabs/wazero v1.12.0
-	github.com/yuin/goldmark/v2 v2.1.6
-	go.yaml.in/yaml/v3 v3.0.5
+	github.com/yuin/goldmark/v2 v2.1.15
+	go.yaml.in/yaml/v3 v3.0.6
 	golang.org/x/mod v0.42.0
-	golang.org/x/net v0.61.0
+	golang.org/x/net v0.62.0
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sync v0.24.0
 	golang.org/x/text v0.43.0
-	golang.org/x/tools v0.52.1-0.20261019204153-5fe18dca7371
+	golang.org/x/tools v0.52.1-0.20261104145755-968e7a090852
 	google.golang.org/protobuf v1.36.12
 )
 

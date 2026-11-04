@@ -2,9 +2,8 @@
 # with gzip whenever the client accepts that encoding, which drops their
 # Content-Length. Fetching modules must still work.
 
-# TODO: this should succeed and print want-stdout.
-! exec cue export
-stderr 'invalid descriptor in response: unknown content length'
+exec cue export
+cmp stdout want-stdout
 
 -- want-stdout --
 {

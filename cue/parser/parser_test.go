@@ -1777,7 +1777,7 @@ bar: 2
 			in: `
 		x: y...
 		`,
-			out: "x: <*ast.BadExpr>\npostfix ... operator requires @experiment(explicitopen)",
+			out: "x: <*ast.BadExpr>\npostfix ... operator requires language version v0.18.0 or @experiment(explicitopen)",
 		},
 		{
 			desc:    "postfix ... operator unsupported version",
@@ -1807,7 +1807,8 @@ bar: 2
 			out: "@experiment(aliasv2), a~X: {foo: 1}, b: X.foo",
 		},
 		{
-			desc: "postfix alias disallows old syntax",
+			desc:    "postfix alias disallows old syntax",
+			version: oldAliasVersion,
 			in: `@experiment(aliasv2)
 	X=a: {foo: 1}`,
 			out: "@experiment(aliasv2), X: {foo: 1}\nold-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V))",
@@ -1820,17 +1821,25 @@ bar: 2
 			out: "X=a: {foo: 1}, b: X",
 		},
 		{
-			desc: "old alias syntax once aliasv2 is stable",
+			desc:    "old alias syntax once aliasv2 is stable",
+			version: "v0.18.0",
 			in: `X=a: {foo: 1}
 	b: X`,
-			out: "X: {foo: 1}, b: X\nold-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V))",
+			out: "X: {foo: 1}, b: X\nold-style alias syntax (=) is not allowed as of language version v0.18.0; use postfix syntax (~X or ~(K,V))",
+		},
+		{
+			desc:    "old alias syntax with a redundant aliasv2 attribute",
+			version: "v0.18.0",
+			in: `@experiment(aliasv2)
+	X=a: {foo: 1}`,
+			out: "@experiment(aliasv2), X: {foo: 1}\nold-style alias syntax (=) is not allowed as of language version v0.18.0; use postfix syntax (~X or ~(K,V))",
 		},
 		{
 			desc:    "postfix alias without experiment",
 			version: oldAliasVersion,
 			in: `a~X: {foo: 1}
 	b: X.foo`,
-			out: "a~X: {foo: 1}, b: X.foo\npostfix alias syntax requires @experiment(aliasv2)",
+			out: "a~X: {foo: 1}, b: X.foo\npostfix alias syntax requires language version v0.18.0 or @experiment(aliasv2)",
 		},
 		{
 			desc: "postfix alias once aliasv2 is stable",

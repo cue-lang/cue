@@ -27,5 +27,5 @@ X=a: 1
 b:   X
 -- expect/stderr --
 fix: experiment "aliasv2" is already stable as of language version v0.18.0; files at this version use it without an attribute
-old-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V)):
+old-style alias syntax (=) is not allowed as of language version v0.18.0; use postfix syntax (~X or ~(K,V)):
     ./a.cue:3:2

@@ -87,7 +87,7 @@ obj2: obj
 -- issue2542/stdout.golden --
 "enabled"
 -- issue4442/expect-stderr --
-old-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V)):
+old-style alias syntax (=) is not allowed as of language version v0.18.0; use postfix syntax (~X or ~(K,V)):
     --expression:1:3
 -- issue4297/expect-stdout --
 {
@@ -112,7 +112,7 @@ language: version: "v0.17.0"
 -- oldmodule/input.cue --
 x: 1
 -- oldmodule/expect-stderr --
-predeclared identifier "self" requires @experiment(aliasv2):
+predeclared identifier "self" requires language version v0.18.0 or @experiment(aliasv2):
     --expression:1:1
 -- newmodule/cue.mod/module.cue --
 module: "mod.test/new"

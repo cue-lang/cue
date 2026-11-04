@@ -126,7 +126,7 @@ func TestBuildExprExperiments(t *testing.T) {
 	expr, err = parser.ParseExpr("test", "self & {y: 2}", parser.Version("v0.17.0"))
 	qt.Assert(t, qt.IsNil(err))
 	_, err = build(expr)
-	qt.Assert(t, qt.ErrorMatches(err, `predeclared identifier "self" requires @experiment\(aliasv2\)`))
+	qt.Assert(t, qt.ErrorMatches(err, `predeclared identifier "self" requires language version v0\.18\.0 or @experiment\(aliasv2\)`))
 }
 
 func TestBuildExprSelfWithoutScope(t *testing.T) {

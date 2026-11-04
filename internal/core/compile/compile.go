@@ -405,7 +405,7 @@ func (c *compiler) verifyVersion(src ast.Node, n adt.Expr) adt.Expr {
 		name = x.Src.Name
 		// Check if Self experiment is enabled
 		if !c.experiments.AliasV2 {
-			return c.errf(src, "%s %q requires @experiment(aliasv2)", kind, name)
+			return c.errf(src, "%s %q requires language version v0.18.0 or @experiment(aliasv2)", kind, name)
 		}
 		x.Label = adt.MakeStringLabel(c.index, name)
 		return n
@@ -1492,7 +1492,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		case token.ELLIPSIS:
 			if !c.experiments.ExplicitOpen {
 				// TODO: consider not returning.
-				return c.errf(n, "postfix ... operator requires @experiment(explicitopen)")
+				return c.errf(n, "postfix ... operator requires language version v0.18.0 or @experiment(explicitopen)")
 			}
 
 			// TODO(explicitopen): applying ... to a non-struct, non-list

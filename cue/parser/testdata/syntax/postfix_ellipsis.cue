@@ -1,4 +1,4 @@
-// versions: v0.8.0..v0.17.0; outcome: error 4:6: postfix ... operator requires @experiment(explicitopen)
+// versions: v0.8.0..v0.17.0; outcome: error 4:6: postfix ... operator requires language version v0.18.0 or @experiment(explicitopen)
 // versions: v0.18.0..; outcome: ok
 #A: {a: int}
 b: #A...

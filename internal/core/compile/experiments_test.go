@@ -65,7 +65,7 @@ func TestBuiltFileExperiments(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	old.SetExperiments(oldExp)
 	qt.Assert(t, qt.ErrorMatches(compileFile(old),
-		`.*predeclared identifier "self" requires @experiment\(aliasv2\).*`))
+		`.*predeclared identifier "self" requires language version v0\.18\.0 or @experiment\(aliasv2\).*`))
 
 	// Carrying the current language version's experiments is enough.
 	f := build()
@@ -89,7 +89,7 @@ func TestBuiltFileExperiments(t *testing.T) {
 		return f
 	}
 	qt.Assert(t, qt.ErrorMatches(compileFile(buildOpen(oldExp)),
-		`.*postfix \.\.\. operator requires @experiment\(explicitopen\).*`))
+		`.*postfix \.\.\. operator requires language version v0\.18\.0 or @experiment\(explicitopen\).*`))
 	openExp, err := cueexperiment.NewFile("v0.17.0", "explicitopen")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsNil(compileFile(buildOpen(openExp))))

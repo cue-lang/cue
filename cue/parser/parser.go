@@ -2147,7 +2147,12 @@ func (p *parser) parseAlias(lhs ast.Expr) (expr ast.Expr) {
 
 	// Check if old-style aliases are disallowed
 	if p.experiments != nil && p.experiments.AliasV2 {
-		p.errf(pos, "old-style alias syntax (=) is not allowed with @experiment(aliasv2); use postfix syntax (~X or ~(K,V))")
+		// Blame the language version once aliasv2 is stable there, else the attribute.
+		cause := "with @experiment(aliasv2)"
+		if cueexperiment.IsStable("aliasv2", p.experiments.LanguageVersion()) {
+			cause = "as of language version v0.18.0"
+		}
+		p.errf(pos, "old-style alias syntax (=) is not allowed %s; use postfix syntax (~X or ~(K,V))", cause)
 		p.next()
 		expr = p.parseRHS()
 		return expr
@@ -2192,7 +2197,7 @@ func (p *parser) parsePostfixAliasAllowed(allowFunctions bool) *ast.PostfixAlias
 	aliasEnabled := p.experiments != nil && p.experiments.AliasV2
 	functionAliasEnabled := allowFunctions && p.functionsExperimentEnabled()
 	if !aliasEnabled && !functionAliasEnabled {
-		p.errf(pos, "postfix alias syntax requires @experiment(aliasv2)")
+		p.errf(pos, "postfix alias syntax requires language version v0.18.0 or @experiment(aliasv2)")
 	}
 
 	p.next()
@@ -2390,7 +2395,7 @@ L:
 				// Consume the token and give a clear error
 				pos := p.pos
 				p.next()
-				p.errf(pos, "postfix ... operator requires @experiment(explicitopen)")
+				p.errf(pos, "postfix ... operator requires language version v0.18.0 or @experiment(explicitopen)")
 				// Return a BadExpr to continue parsing
 				x = &ast.BadExpr{From: pos, To: p.pos}
 			}

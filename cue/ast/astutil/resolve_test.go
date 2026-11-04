@@ -17,6 +17,7 @@ package astutil_test
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 	"text/tabwriter"
 
@@ -150,6 +151,15 @@ f: func(x: int) -> (func(a: int, b: a) -> int): 1
 `,
 		wantErr: []string{
 			`cannot refer to parameter "a" in a parameter constraint or return type`,
+		},
+	}, {
+		desc: "reserved reference through a chain of nested signatures is reported once",
+		src: `
+@experiment(functions)
+f: func(x: int) -> ` + strings.Repeat("func(a: int) -> ", 50) + `x: 1
+`,
+		wantErr: []string{
+			`cannot refer to parameter "x" in a parameter constraint or return type`,
 		},
 	}, {
 		desc: "nested function in outer signature cannot refer to outer parameter",

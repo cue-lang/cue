@@ -120,6 +120,11 @@ type scope struct {
 	index   map[string]entry
 	inField bool
 
+	// signature is the scope holding the parameters of the function whose
+	// signature is being resolved, set on that scope and inherited by those
+	// within it, and nil elsewhere. See [scope.reservedParam].
+	signature *scope
+
 	identFn func(s *scope, n *ast.Ident) bool
 	nameFn  func(name string, e entry)
 	errFn   func(p token.Pos, msg string, args ...interface{})
@@ -177,6 +182,7 @@ func newScope(outer *scope, node ast.Node, decls []ast.Decl) *scope {
 	s.outer = outer
 	s.node = node
 	s.inField = false
+	s.signature = outer.signature
 	s.identFn = outer.identFn
 	s.nameFn = outer.nameFn
 	s.errFn = outer.errFn
@@ -241,6 +247,7 @@ func newFuncScope(outer *scope, fn *ast.Func) *scope {
 	s.outer = outer
 	s.node = fn
 	s.inField = false
+	s.signature = outer.signature
 	s.identFn = outer.identFn
 	s.nameFn = outer.nameFn
 	s.errFn = outer.errFn
@@ -437,7 +444,7 @@ func (s *scope) Before(n ast.Node) bool {
 		// field of an enclosing scope.
 		if params := x.Parameters(); len(params) > 0 {
 			cs := newFuncScope(s, x)
-			cs.identFn = paramConstraintIdentFn(cs, cs.identFn)
+			cs.signature = cs
 			for _, p := range params {
 				if p == nil {
 					continue
@@ -590,6 +597,9 @@ func (s *scope) Before(n ast.Node) bool {
 		return false
 
 	case *ast.Ident:
+		if s.signature != nil && s.reservedParam(x) {
+			return false
+		}
 		if s.identFn(s, x) {
 			return false
 		}
@@ -597,30 +607,22 @@ func (s *scope) Before(n ast.Node) bool {
 	return true
 }
 
-// paramConstraintIdentFn returns an identFn for identifiers that appear in a
-// parameter constraint or in the return type of the function whose parameters
-// are declared in cs. These resolve in the scope enclosing the function, but a
-// reference that resolves to one of the function's own parameters is reserved
-// for a possible future dependent-parameter feature and is reported as an
-// error. A closer binding (for example a let clause inside the constraint, or
-// a parameter of a nested function literal) shadows the parameter as usual and
-// is resolved normally. All other identifiers are delegated to base, the
-// identFn inherited from the enclosing scope, so that the check composes with
-// custom identFn implementations such as those used by Sanitize, and so that
-// the rule applies one signature at a time when function literals nest.
-func paramConstraintIdentFn(cs *scope, base func(*scope, *ast.Ident) bool) func(*scope, *ast.Ident) bool {
-	return func(s *scope, x *ast.Ident) bool {
-		if name, ok, _ := ast.LabelName(x); ok {
-			if p, _, node := s.lookup(name); node.node != nil {
-				if _, isParam := node.node.(*ast.FuncParam); isParam && p == cs {
-					s.errFn(x.Pos(),
-						"cannot refer to parameter %q in a parameter constraint or return type", name)
-					return true
-				}
-			}
-		}
-		return base(s, x)
+// reservedParam reports whether x, inside a function signature, refers to a
+// parameter of that or an enclosing function's signature, reporting the
+// reference as an error. A closer binding shadows the parameter as usual.
+// The check precedes identFn so as to compose with those of Sanitize.
+func (s *scope) reservedParam(x *ast.Ident) bool {
+	name, ok, _ := ast.LabelName(x)
+	if !ok {
+		return false
 	}
+	p, _, node := s.lookup(name)
+	if _, isParam := node.node.(*ast.FuncParam); isParam && p.signature == p {
+		s.errFn(x.Pos(),
+			"cannot refer to parameter %q in a parameter constraint or return type", name)
+		return true
+	}
+	return false
 }
 
 func resolveIdent(s *scope, x *ast.Ident) bool {

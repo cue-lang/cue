@@ -30,8 +30,6 @@ import (
 	"cuelang.org/go/internal/tdtest"
 )
 
-const debug = false
-
 func TestFiles(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "./testdata",
@@ -45,11 +43,6 @@ func TestFiles(t *testing.T) {
 		if version, ok := t.Value("version"); ok {
 			opts = append(opts, format.Version(version))
 		}
-		// TODO(mvdan): note that this option is not exposed in the API,
-		// nor does it seem to be actually tested in any of the txtar testdata files.
-		// if t.HasTag("sort-imports") {
-		// 	opts = append(opts, format.sortImportsOption())
-		// }
 
 		for _, f := range t.Archive.Files {
 			if !strings.HasSuffix(f.Name, ".input") {
@@ -456,9 +449,7 @@ func init() {
 	if err != nil {
 		panic(err) // error in test
 	}
-	// in debug mode, the result contains additional information;
-	// ignore it
-	if s := string(b); !debug && s != name {
+	if s := string(b); s != name {
 		panic("got " + s + ", want " + name)
 	}
 }
@@ -666,6 +657,79 @@ func TestBadNodes(t *testing.T) {
 		t.Errorf("got %q, expected %q", string(b), res)
 	}
 }
+
+// TestInvalidAST verifies behavior for various invalid AST inputs. In some
+// cases it is okay to be permissive, as long as the output is correct.
+func TestInvalidAST(t *testing.T) {
+	ident := func(s string) *ast.Ident {
+		return &ast.Ident{NamePos: token.NoSpace.Pos(), Name: s}
+	}
+	testCases := []struct {
+		desc string
+		node ast.Node
+		out  string
+	}{{
+		desc: "label sequence for definition",
+		node: &ast.Field{Label: ident("foo"), Value: ast.NewStruct(
+			ident("#bar"), token.COLON, &ast.StructLit{},
+		)},
+		// Force a new struct.
+		out: `foo: {#bar: {}}`,
+	}, {
+		desc: "label with invalid identifier",
+		node: &ast.Field{Label: &ast.Ident{}, Value: ast.NewString("foo")},
+		out:  `"": "foo"`,
+	}, {
+		desc: "ImportDecl without parens, but imports with comments",
+		node: func() ast.Node {
+			n := ast.NewImport(nil, "time")
+			ast.AddComment(n, internal.NewComment(true, "hello"))
+			return &ast.ImportDecl{Specs: []*ast.ImportSpec{n}}
+		}(),
+		out: `import (
+	// hello
+	"time"
+)`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			b, err := format.Node(tc.node)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := string(b)
+			want := tc.out
+			if got != want {
+				t.Errorf("\ngot  %v;\nwant %v", got, want)
+			}
+		})
+	}
+}
+
+func TestErrors(t *testing.T) {
+	testCases := []struct {
+		desc string
+		node ast.Node
+		err  string
+	}{{
+		desc: "empty identifier",
+		node: ast.NewIdent(""),
+		err:  "invalid identifier",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			b, err := format.Node(tc.node)
+			if err == nil {
+				t.Fatalf("expected error, found %q", b)
+			}
+			got := err.Error()
+			if !strings.Contains(got, tc.err) {
+				t.Errorf("\ngot  %v;\nwant %v", got, tc.err)
+			}
+		})
+	}
+}
+
 func TestPackage(t *testing.T) {
 	f := &ast.File{
 		Decls: []ast.Decl{
@@ -713,14 +777,12 @@ func identCount(f *ast.File) int {
 	return n
 }
 
-// Verify that the SourcePos mode emits correct //line comments
-// by testing that position information for matching identifiers
-// is maintained.
+// TestSourcePos checks that formatting a file which is already formatted
+// keeps every identifier on its line.
 func TestSourcePos(t *testing.T) {
 	const src = `package p
 
 import (
-	"go/printer"
 	"math"
 	"regexp"
 )
@@ -754,7 +816,6 @@ e2: c*t.z
 	}
 
 	// parse pretty printed original
-	// (//line comments must be interpreted even w/o parser.ParseComments set)
 	f2, err := parser.ParseFile("", b, parser.AllErrors, parser.ParseComments)
 	if err != nil {
 		t.Fatalf("%s\n%s", err, b)
@@ -882,8 +943,8 @@ func TestSourceOptions(t *testing.T) {
 			options: []format.Option{format.Simplify()},
 			want:    "foo: {\n	a:         1\n	longField: 2\n}\n",
 		},
-		// TabIndent(false) makes the indentation use a tabWidth number of spaces.
-		// Note that this exposes the default tabWidth value of 4.
+		// TabIndent(false) indents with as many spaces as the indent width,
+		// which defaults to 4.
 		{
 			name:    "TabIndent=false",
 			options: []format.Option{format.TabIndent(false)},
@@ -1236,7 +1297,7 @@ func parseCleared(t *testing.T, src string) *ast.File {
 	return f
 }
 
-// TextX is a skeleton test that can be filled in for debugging one-off cases.
+// TestX is a skeleton test that can be filled in for debugging one-off cases.
 // Do not remove.
 func TestX(t *testing.T) {
 	t.Skip()

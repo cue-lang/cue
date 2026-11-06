@@ -80,7 +80,7 @@ func TestWasm(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		got, err := format.Node(file, format.IndentWidth(4), format.TabIndent(false))
+		got, err := format.Node(file, format.Indent("    "))
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -159,11 +159,6 @@ func formatNode(node ast.Node, opt []Option, canMutate bool) ([]byte, error) {
 // (I/O or syntax) error. src is expected to be a syntactically correct CUE
 // source file, or a list of CUE declarations or statements.
 //
-// If src is a partial source file, the leading and trailing space of src is
-// applied to the result (such that it has the same leading and trailing space
-// as src), and the result is indented by the same amount as the first line of
-// src containing code.
-//
 // Caution: Tools relying on consistent formatting based on the installed
 // version of cue (for instance, such as for presubmit checks) should execute
 // that cue binary instead of calling Source.
@@ -223,15 +218,6 @@ func newConfig(opt []Option) *config {
 	return cfg
 }
 
-// indentWidthOr returns the configured indentation width, or def if it
-// was left unset.
-func (cfg *config) indentWidthOr(def int) int {
-	if cfg.indentWidth == 0 {
-		return def
-	}
-	return cfg.indentWidth
-}
-
 func (cfg *config) pretty() *pretty.Config {
 	pcfg := &pretty.Config{
 		IndentWidth: cfg.indentWidth,
@@ -241,7 +227,11 @@ func (cfg *config) pretty() *pretty.Config {
 	case cfg.indent != nil:
 		pcfg.Indent = *cfg.indent
 	case cfg.spaceIndent:
-		pcfg.Indent = strings.Repeat(" ", cfg.indentWidthOr(4))
+		width := cfg.indentWidth
+		if width == 0 {
+			width = 4
+		}
+		pcfg.Indent = strings.Repeat(" ", width)
 	default:
 		pcfg.Indent = "\t"
 	}

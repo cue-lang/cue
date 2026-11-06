@@ -1,5 +1,3 @@
-#sort-imports
-
 -- pkgonly.input --
 package foo
 -- out/format/pkgonly.golden --

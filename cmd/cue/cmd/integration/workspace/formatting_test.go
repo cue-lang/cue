@@ -100,7 +100,7 @@ x: 4
 		})
 	})
 
-	t.Run("format with fixed formatter", func(t *testing.T) {
+	t.Run("format disjunction with trailing comments", func(t *testing.T) {
 		I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
 			env.Await(

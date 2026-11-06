@@ -52,9 +52,9 @@ import (
 //
 // Indentation can be controlled as follows:
 //
-//	width      indent the cue block by <width> tab stops (e.g. %2v)
-//	precision  convert tabs to <precision> spaces (e.g. %.2v), where
-//	           a value of 0 means no indentation or newlines (TODO).
+//	width      indent the cue block by <width> levels (e.g. %2v)
+//	precision  indent with <precision> spaces instead of tabs (e.g. %.2v),
+//	           where a value of 0 means no indentation or newlines (TODO).
 //
 // If the value kind corresponds to one of the following Go types, the
 // usual Go formatting verbs for that type can be used:

@@ -95,7 +95,7 @@ func initExperimentFlags() error {
 // it was a top level init function.
 //
 // TODO: only the cue command reports the error; Go API users such as
-// [cuelang.org/go/cue/cuecontext.New] and [cuelang.org/go/cue/format] ignore it.
+// [cuelang.org/go/cue/cuecontext.New] ignore it.
 func Init() error {
 	// Read CUE_EXPERIMENT on every call so go test records it as a cache
 	// input. go test only notices an env var read via os.Getenv while a test

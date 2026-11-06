@@ -84,7 +84,10 @@ func Indent(s string) Option {
 // number of characters otherwise. The pre-v2 formatter defaults to
 // eight.
 func IndentWidth(n int) Option {
-	return func(c *config) { c.indentWidth = n }
+	return func(c *config) {
+		c.indentWidth = n
+		c.indentWidthSet = true
+	}
 }
 
 // IndentPrefix specifies a number of indentation levels to emit at
@@ -264,7 +267,7 @@ type config struct {
 	// is nil, one level of indentation is indentWidth spaces rather
 	// than a tab.
 	spaceIndent  bool
-	indentWidth  int // 0 means unset; the v1 formatter defaults to 8, v2 to 4
+	indentWidth  int // unless set, the v1 formatter defaults to 8, v2 to 4
 	indentPrefix int // default: 0
 	lineWidth    int // 0 means unset; the v2 formatter defaults to 120
 
@@ -272,6 +275,10 @@ type config struct {
 	// was used, which selects that formatter for this call even when
 	// the formatv2 experiment is explicitly disabled.
 	forceV2 bool
+
+	// indentWidthSet records that [IndentWidth] was used, so that an
+	// explicit width of zero is kept rather than replaced by a default.
+	indentWidthSet bool
 }
 
 // style builds the [ASTStyle] that drives the v2 pre-pass.
@@ -307,7 +314,7 @@ func newConfig(opt []Option) *config {
 // defaults so that the v1 formatter stays consistent with
 // release-branch.v0.17 (8) without changing the formatv2 default (4).
 func (cfg *config) indentWidthOr(def int) int {
-	if cfg.indentWidth == 0 {
+	if !cfg.indentWidthSet {
 		return def
 	}
 	return cfg.indentWidth

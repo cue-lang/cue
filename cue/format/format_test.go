@@ -887,6 +887,7 @@ func TestSourceOptions(t *testing.T) {
 	type testCase struct {
 		name    string
 		options []format.Option
+		v1      bool // use the pre-v2 formatter
 		want    string
 	}
 	testCases := []testCase{
@@ -928,6 +929,19 @@ func TestSourceOptions(t *testing.T) {
 			options: []format.Option{format.TabIndent(false), format.UseSpaces(2)},
 			want:    "\"foo\": {\n  a:         1\n  longField: 2\n}\n",
 		},
+		// TabIndent(false) with zero spaces means no indentation,
+		// with either formatter.
+		{
+			name:    "TabIndent=false,UseSpaces=0",
+			options: []format.Option{format.TabIndent(false), format.UseSpaces(0)},
+			want:    "\"foo\": {\na:         1\nlongField: 2\n}\n",
+		},
+		{
+			name:    "TabIndent=false,UseSpaces=0,v1",
+			options: []format.Option{format.TabIndent(false), format.UseSpaces(0)},
+			v1:      true,
+			want:    "\"foo\": {\na:         1\nlongField: 2\n}\n",
+		},
 		// IndentPrefix indents every line as a prefix.
 		{
 			name:    "IndentPrefix(3)",
@@ -948,6 +962,9 @@ func TestSourceOptions(t *testing.T) {
 `},
 	}
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		if tc.v1 {
+			withoutFormatV2(t.T)
+		}
 		got, err := format.Source([]byte(src), tc.options...)
 		qt.Assert(t, qt.IsNil(err))
 		t.Equal(string(got), tc.want)

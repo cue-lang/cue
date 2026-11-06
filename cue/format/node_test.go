@@ -15,6 +15,7 @@
 package format_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -82,16 +83,27 @@ func TestErrors(t *testing.T) {
 		desc: "empty identifier",
 		node: ast.NewIdent(""),
 		err:  "invalid identifier",
+	}, {
+		// TODO: an unsupported node type should be an error rather than empty output.
+		desc: "nil node",
+		node: nil,
+		err:  "<nil>",
+	}, {
+		// TODO: an unsupported node type should be an error rather than empty output.
+		desc: "import spec",
+		node: ast.NewImport(nil, "time"),
+		err:  "<nil>",
+	}, {
+		// TODO: an unsupported node type should be an error rather than empty output.
+		desc: "for clause",
+		node: &ast.ForClause{Value: ast.NewIdent("x"), Source: ast.NewIdent("y")},
+		err:  "<nil>",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			b, err := format.Node(tc.node)
-			if err == nil {
-				t.Fatalf("expected error, found %q", b)
-			}
-			got := err.Error()
-			if !strings.Contains(got, tc.err) {
-				t.Errorf("\ngot  %v;\nwant %v", got, tc.err)
+			if got := fmt.Sprint(err); !strings.Contains(got, tc.err) {
+				t.Errorf("\ngot  %v (output %q);\nwant %v", got, b, tc.err)
 			}
 		})
 	}

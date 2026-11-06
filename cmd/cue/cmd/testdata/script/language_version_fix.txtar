@@ -89,7 +89,7 @@ X: {
 #L: [int, int]
 a: #L & [1, 2]
 -- expect/o --
-@version(v0.18.0)
+@version(v0.19.0)
 @experiment(openlists)
 
 #L: #[int, int]

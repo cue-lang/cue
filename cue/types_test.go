@@ -2911,16 +2911,6 @@ y: [1]
 			}
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
 			y := v.LookupPath(cue.ParsePath(tc.pathB))
-			// Issue #4549: with sharing, the unification below panics.
-			defer func() {
-				if r := recover(); r != nil {
-					got := fmt.Sprintf("%s: %v", m.Name(), r)
-					want := "v3: runtime error: index out of range [6] with length 5"
-					if got != want {
-						t.Fatalf("got panic %q, want %q", got, want)
-					}
-				}
-			}()
 			x = x.Unify(y)
 			if tc.pathV != "" {
 				val := v.LookupPath(cue.ParsePath(tc.pathV))

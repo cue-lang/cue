@@ -1,0 +1,23 @@
+# cue add must fail and restore the original files
+# when the result does not validate.
+
+stdin stdin.cue
+# TODO: the conflict is not reported, and x.cue is left with the added field.
+exec cue add x.cue
+! stderr .
+cmp x.cue x.cue-want
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.16.0"
+-- stdin.cue --
+a: 2
+-- x.cue --
+package x
+
+a: 1
+-- x.cue-want --
+package x
+
+a: 1
+a: 2

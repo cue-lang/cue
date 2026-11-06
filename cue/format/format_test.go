@@ -717,20 +717,17 @@ func TestErrors(t *testing.T) {
 		node: ast.NewIdent(""),
 		err:  "invalid identifier",
 	}, {
-		// TODO: an unsupported node type should be an error rather than empty output.
 		desc: "nil node",
 		node: nil,
-		err:  "<nil>",
+		err:  "unsupported node type",
 	}, {
-		// TODO: an unsupported node type should be an error rather than empty output.
 		desc: "import spec",
 		node: ast.NewImport(nil, "time"),
-		err:  "<nil>",
+		err:  "unsupported node type",
 	}, {
-		// TODO: an unsupported node type should be an error rather than empty output.
 		desc: "for clause",
 		node: &ast.ForClause{Value: ast.NewIdent("x"), Source: ast.NewIdent("y")},
-		err:  "<nil>",
+		err:  "unsupported node type",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

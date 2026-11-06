@@ -127,8 +127,7 @@ func TabIndent(indent bool) Option {
 
 // Node formats node in canonical cue fmt style and returns the result.
 //
-// The node type must be [*ast.File], [ast.Expr], [ast.Decl],
-// or [ast.Spec].
+// The node type must be [*ast.File], [ast.Expr], or [ast.Decl].
 //
 // The AST is never mutated; see [NodeInPlace] for a variant that may.
 //

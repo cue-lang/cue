@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/pkg"
+	"cuelang.org/go/internal/value"
 	"github.com/tetratelabs/wazero/api"
 )
 
@@ -32,7 +33,7 @@ func encBool(b bool) uint64 {
 // encNumber returns the Wasm/System V ABI representation of the number
 // wrapped into val, which must conform to the type of typ.
 func encNumber(typ cue.Value, val cue.Value) (r uint64) {
-	ctx := val.Context()
+	ctx := value.Context(val)
 
 	_int32 := ctx.CompileString("int32")
 	if _int32.Subsume(typ) == nil {
@@ -80,7 +81,7 @@ func decBool(v uint64) bool {
 // decNumber decodes the Wasm/System V ABI encoding of the
 // val number of type typ into a Go value.
 func decNumber(typ cue.Value, val uint64) (r any) {
-	ctx := typ.Context()
+	ctx := value.Context(typ)
 
 	_int32 := ctx.CompileString("int32")
 	if _int32.Subsume(typ) == nil {

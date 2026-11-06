@@ -37,7 +37,7 @@ func TestWasm(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		ctx := cuecontext.New(cuecontext.Interpreter(wasm.New()))
+		ctx := cuecontext.New(cuecontext.WithInjection(wasm.New()))
 		if version, _ := t.Runtime().Settings(); version == internal.EvalV3 {
 			t.Skip("TODO: fix these tests on evalv3")
 		}

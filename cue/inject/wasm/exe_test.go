@@ -102,7 +102,7 @@ func copyFile(dst, src string) error {
 }
 
 func loadDir(t *testing.T, name string) cue.Value {
-	ctx := cuecontext.New(cuecontext.Interpreter(wasm.New()))
+	ctx := cuecontext.New(cuecontext.WithInjection(wasm.New()))
 	bi := dirInstance(t, name)
 	return ctx.BuildInstance(bi)
 }

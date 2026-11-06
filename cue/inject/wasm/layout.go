@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/value"
 )
 
 // typ is the type (or kind) of an external type.
@@ -287,7 +288,7 @@ func typVal(v cue.Value) typ {
 }
 
 func typNum(t cue.Value) typ {
-	ctx := t.Context()
+	ctx := value.Context(t)
 
 	_int8 := ctx.CompileString("int8")
 	if _int8.Subsume(t) == nil {

@@ -34,7 +34,7 @@ type injection struct{}
 
 // New returns a new Wasm injection as a [cuecontext.Injection]
 // suitable for passing to [cuecontext.WithInjection].
-func New() cuecontext.ExternInterpreter {
+func New() cuecontext.Injection {
 	return &injection{}
 }
 

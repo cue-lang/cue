@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/value"
 )
 
 // argList returns the types of a function's arguments and result
@@ -53,6 +54,9 @@ func sig(a *internal.Attr) (string, error) {
 }
 
 func parseFunc(sig string) (*ast.Func, error) {
+	// The documented sig grammar ends in ": type", which the functions
+	// experiment would parse as a function body rather than a result type.
+	//lint:ignore SA1019 keep the legacy signature syntax
 	expr, err := parser.ParseExpr("", sig, parser.ParseFuncs)
 	if err != nil {
 		return nil, err
@@ -105,9 +109,10 @@ func args(f *ast.Func) []string {
 // compileStringsInScope takes a list of strings, compiles them using
 // the provided scope, and returns the compiled values.
 func compileStringsInScope(strs []string, scope cue.Value) []cue.Value {
+	ctx := value.Context(scope)
 	var vals []cue.Value
 	for _, typ := range strs {
-		val := scope.Context().CompileString(typ, cue.Scope(scope))
+		val := ctx.CompileString(typ, cue.Scope(scope))
 		vals = append(vals, val)
 	}
 	return vals

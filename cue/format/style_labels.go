@@ -28,9 +28,7 @@ import (
 // parents. Single-string pattern constraints are rewritten as optional
 // fields first; see [labelSimplifier.simplifyPatternLabel].
 //
-// This backs both the [ASTStyle] Labels flag and the [Simplify] option
-// of the pre-v2 formatter, which drives it from [printNode] through a
-// walker that allows every change.
+// This backs the [ASTStyle] Labels flag.
 func (w *walker) simplifyLabels(n ast.Node) {
 	ls := &labelSimplifier{scope: map[string]bool{}, walker: w}
 	ls.markReferences(n)
@@ -50,13 +48,6 @@ type labelSimplifier struct {
 	// walker is shared by every scope of one simplification run; it
 	// holds the permission to rewrite a label.
 	walker *walker
-}
-
-// newLabelSimplifier returns the root scope of a simplification run
-// that may make every rewrite it finds. The pre-v2 formatter drives the
-// simplifier this way, outside of any [ASTStyle] pass.
-func newLabelSimplifier() *labelSimplifier {
-	return &labelSimplifier{scope: map[string]bool{}, walker: &walker{allowChanges: true}}
 }
 
 // markReferences is the [ast.Walk]-compatible reference visitor, and

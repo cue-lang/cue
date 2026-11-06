@@ -293,8 +293,7 @@ func TestASTStyleRelPos(t *testing.T) {
 	})
 
 	t.Run("A3_BlankAfterCommentGroup", func(t *testing.T) {
-		// A standalone CommentGroup decl gets a blank line after it,
-		// matching what the old formatter did.
+		// A standalone CommentGroup decl gets a blank line after it.
 		cg := &ast.CommentGroup{List: []*ast.Comment{{Text: "// header"}}}
 		f := &ast.File{Decls: []ast.Decl{
 			cg,

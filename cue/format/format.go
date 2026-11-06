@@ -18,24 +18,13 @@
 // To rewrite an AST in that style without printing it, see [ASTStyle].
 package format
 
-// TODO: this package is in need of a rewrite. When doing so, the API should
-// allow for reformatting an AST, without actually writing bytes.
-//
-// In essence, formatting determines the relative spacing to tokens. It should
-// be possible to have an abstract implementation providing such information
-// that can be used to either format or update an AST in a single walk.
-
 import (
-	"bytes"
 	"fmt"
 	"math"
 	"strings"
-	"text/tabwriter"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/pretty"
 )
 
@@ -136,15 +125,6 @@ func TabIndent(indent bool) Option {
 	return func(c *config) { c.spaceIndent = !indent }
 }
 
-// TODO: other options:
-//
-// const (
-// 	RawFormat Mode = 1 << iota // do not use a tabwriter; if set, UseSpaces is ignored
-// 	TabIndent                  // use tabs for indentation independent of UseSpaces
-// 	UseSpaces                  // use spaces instead of tabs for alignment
-// 	SourcePos                  // emit //line comments to preserve original source positions
-// )
-
 // Node formats node in canonical cue fmt style and returns the result.
 //
 // The node type must be [*ast.File], [ast.Expr], [ast.Decl],
@@ -166,16 +146,7 @@ func NodeInPlace(n ast.Node, opt ...Option) ([]byte, error) {
 }
 
 func formatNode(node ast.Node, opt []Option, canMutate bool) ([]byte, error) {
-	cueexperiment.Init()
-
 	cfg := newConfig(opt)
-	if !cfg.formatV2() {
-		if cfg.simplify && !canMutate {
-			node = ast.Clone(node) // Ensure immutability of the AST.
-		}
-		return cfg.fprint(node)
-	}
-
 	scfg := cfg.style()
 	if !canMutate && scfg.WouldMutate(node) {
 		node = ast.Clone(node) // Ensure immutability of the AST.
@@ -197,8 +168,6 @@ func formatNode(node ast.Node, opt []Option, canMutate bool) ([]byte, error) {
 // version of cue (for instance, such as for presubmit checks) should execute
 // that cue binary instead of calling Source.
 func Source(b []byte, opt ...Option) ([]byte, error) {
-	cueexperiment.Init()
-
 	cfg := newConfig(opt)
 
 	// Parse at the configured language version, so that syntax which only
@@ -207,10 +176,6 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 	f, err := parser.ParseFile("", b, parseOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %s", err)
-	}
-
-	if !cfg.formatV2() {
-		return cfg.fprint(f)
 	}
 
 	// The AST is our own, so there is no need to preserve it.
@@ -250,12 +215,6 @@ func (cfg *config) style() ASTStyle {
 	}
 }
 
-// formatV2 reports whether this call uses the v2 formatter,
-// which it always does now that the formatv2 experiment is stable.
-func (cfg *config) formatV2() bool {
-	return cueexperiment.Flags.FormatV2
-}
-
 func newConfig(opt []Option) *config {
 	cfg := &config{}
 	for _, o := range opt {
@@ -288,191 +247,4 @@ func (cfg *config) pretty() *pretty.Config {
 	}
 	pcfg.Prefix = strings.Repeat(pcfg.Indent, cfg.indentPrefix)
 	return pcfg
-}
-
-// Config defines the output of Fprint.
-func (cfg *config) fprint(node any) (out []byte, err error) {
-	var p printer
-	p.init(cfg)
-	if err = printNode(node, &p); err != nil {
-		return p.output, err
-	}
-
-	twmode := tabwriter.StripEscape | tabwriter.TabIndent | tabwriter.DiscardEmptyColumns
-
-	tabWidth := cfg.indentWidthOr(8)
-	buf := &bytes.Buffer{}
-	tw := tabwriter.NewWriter(buf, 0, tabWidth, 1, ' ', twmode)
-
-	// write printer result via tabwriter/trimmer to output
-	if _, err = tw.Write(p.output); err != nil {
-		return
-	}
-
-	err = tw.Flush()
-	if err != nil {
-		return buf.Bytes(), err
-	}
-
-	b := buf.Bytes()
-	if cfg.spaceIndent {
-		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, tabWidth))
-	}
-	return b, nil
-}
-
-// A formatter walks an [ast.Node], interspersed with comments and spacing
-// directives, in the order that they would occur in printed form.
-type formatter struct {
-	*printer
-
-	stack    []frame
-	current  frame
-	nestExpr int
-}
-
-func newFormatter(p *printer) *formatter {
-	f := &formatter{
-		printer: p,
-		current: frame{
-			settings: settings{
-				nodeSep:   newline,
-				parentSep: newline,
-			},
-		},
-	}
-	return f
-}
-
-type whiteSpace int
-
-const (
-	_ whiteSpace = 0
-
-	// write a space, or disallow it
-	blank whiteSpace = 1 << iota
-	vtab             // column marker
-	noblank
-
-	nooverride
-
-	comma      // print a comma, unless trailcomma overrides it
-	trailcomma // print a trailing comma unless closed on same line
-	declcomma  // write a comma when not at the end of line (same as struct field separator)
-
-	newline    // write a line in a table
-	formfeed   // next line is not part of the table
-	newsection // add two newlines
-
-	indent   // request indent an extra level after the next newline
-	unindent // unindent a level after the next newline
-	indented // element was indented.
-)
-
-type frame struct {
-	cg  []*ast.CommentGroup
-	pos int8
-
-	settings
-}
-
-type settings struct {
-	// separator is blank if the current node spans a single line and newline
-	// otherwise.
-	nodeSep   whiteSpace
-	parentSep whiteSpace
-	override  whiteSpace
-}
-
-// suppress spurious linter warning: field is actually used.
-func init() {
-	s := settings{}
-	_ = s.override
-}
-
-func (f *formatter) print(a ...any) {
-	for _, x := range a {
-		f.Print(x)
-		switch x.(type) {
-		case string, token.Token: // , *ast.BasicLit, *ast.Ident:
-			f.current.pos++
-		}
-	}
-}
-
-func (f *formatter) formfeed() whiteSpace {
-	if f.current.nodeSep == blank {
-		return blank
-	}
-	return formfeed
-}
-
-func (f *formatter) onOneLine(node ast.Node) bool {
-	a := node.Pos()
-	b := node.End()
-	if a.IsValid() && b.IsValid() {
-		return f.lineFor(a) == f.lineFor(b)
-	}
-	// TODO: walk and look at relative positions to determine the same?
-	return false
-}
-
-func (f *formatter) before(node ast.Node) bool {
-	f.stack = append(f.stack, f.current)
-	f.current = frame{settings: f.current.settings}
-	f.current.parentSep = f.current.nodeSep
-
-	if node != nil {
-		s, ok := node.(*ast.StructLit)
-		if ok && len(s.Elts) <= 1 && f.current.nodeSep != blank && f.onOneLine(node) {
-			f.current.nodeSep = blank
-		}
-		f.current.cg = ast.Comments(node)
-		f.visitComments(f.current.pos)
-		return true
-	}
-	return false
-}
-
-func (f *formatter) after(node ast.Node) {
-	f.visitComments(127)
-	p := len(f.stack) - 1
-	f.current = f.stack[p]
-	f.stack = f.stack[:p]
-	f.current.pos++
-	f.visitComments(f.current.pos)
-}
-
-func (f *formatter) visitComments(until int8) {
-	c := &f.current
-
-	printed := false
-	for ; len(c.cg) > 0 && c.cg[0].Position <= until; c.cg = c.cg[1:] {
-		if printed {
-			f.Print(newsection)
-		}
-		printed = true
-		f.printComment(c.cg[0])
-	}
-}
-
-func (f *formatter) printComment(cg *ast.CommentGroup) {
-	f.Print(cg)
-
-	if cg.Doc && len(f.output) > 0 {
-		f.Print(newline)
-	}
-	for _, c := range cg.List {
-		if f.pos.Column > 1 {
-			// Vertically align inline comments.
-			f.Print(vtab)
-		}
-		f.Print(c.Slash)
-		f.Print(c)
-		f.printingComment = true
-		f.Print(newline)
-		if cg.Doc {
-			f.Print(nooverride)
-		}
-	}
 }

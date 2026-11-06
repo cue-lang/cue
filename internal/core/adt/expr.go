@@ -3852,7 +3852,7 @@ func (x *ForClause) yield(s *compState) {
 				key = num
 			}
 			v.AddConjunct(MakeRootConjunct(env, key))
-			v.SetValue(c, key)
+			v.SetValue(key)
 			n.Arcs = append(n.Arcs, v)
 		}
 

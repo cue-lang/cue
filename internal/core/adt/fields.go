@@ -530,7 +530,7 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
 	err := ctx.NewErrf("field not allowed")
 	err.CloseCheck = true
-	arc.SetValue(ctx, err)
+	arc.SetValue(err)
 	if arc.state != nil {
 		arc.state.kind = 0
 	}

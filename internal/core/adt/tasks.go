@@ -310,7 +310,7 @@ func processComprehension(ctx *OpContext, t *task, mode runMode) {
 		id:   t.id,
 	}
 
-	err := n.processComprehension(y, 0)
+	err := n.processComprehension(y)
 	t.err = CombineErrors(nil, t.err, err)
 }
 

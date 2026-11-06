@@ -286,9 +286,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	if !n.isShared {
 		// TODO(sharewithval): allow structure sharing if we only have validator
 		// and references.
-		// TODO: rewrite to use mode when we get rid of old evaluator.
-		state := finalized
-		n.validateValue(state)
+		n.validateValue()
 	}
 
 	if v, ok := n.node.BaseValue.(*Vertex); ok && n.shareCycleType == NoCycle {
@@ -478,7 +476,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	// 	c.CloseInfo.outerID = 0
 	// }
 
-	v.updateStatus(finalized)
+	v.status = finalized
 
 	return n.meets(needs)
 }
@@ -714,7 +712,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		switch _, isError := v.(*Bottom); {
 		case isError == c.expectError:
 		default:
-			n.node.AddErr(ctx, &Bottom{
+			n.node.AddErr(&Bottom{
 				Src:  c.expr.Source(),
 				Code: CycleError,
 				Node: n.node,
@@ -739,7 +737,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 			continue
 		}
 		if chk.holder != nil && chk.holder != n.node {
-			chk.holder.AddErr(n.ctx, b)
+			chk.holder.AddErr(b)
 		}
 		n.AddChildError(b)
 	}

@@ -635,26 +635,12 @@ func (v *Vertex) Status() vertexStatus {
 
 // ForceDone prevents v from being evaluated.
 func (v *Vertex) ForceDone() {
-	v.updateStatus(finalized)
+	v.status = finalized
 }
 
 // IsUnprocessed reports whether v is unprocessed.
 func (v *Vertex) IsUnprocessed() bool {
 	return v.Status() == unprocessed
-}
-
-func (v *Vertex) updateStatus(s vertexStatus) {
-	if !isCyclePlaceholder(v.BaseValue) {
-		if !v.IsErr() && v.state != nil {
-			Assertf(v.state.ctx, v.Status() <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
-		}
-	}
-
-	if s == finalized && v.BaseValue == nil {
-		// TODO: for debugging.
-		// panic("not finalized")
-	}
-	v.status = s
 }
 
 // setParentDone signals v that the conjuncts of all ancestors have been
@@ -1110,20 +1096,14 @@ func (v *Vertex) CompleteArcsShallow(c *OpContext) {
 	}
 }
 
-func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
-	v.SetValue(ctx, CombineErrors(nil, v.Value(), b))
+func (v *Vertex) AddErr(b *Bottom) {
+	v.SetValue(CombineErrors(nil, v.Value(), b))
 }
 
-// SetValue sets the value of a node.
-func (v *Vertex) SetValue(ctx *OpContext, value BaseValue) *Bottom {
-	return v.setValue(ctx, finalized, value)
-}
-
-func (v *Vertex) setValue(ctx *OpContext, state vertexStatus, value BaseValue) *Bottom {
+// SetValue sets the value of a node and marks it as finalized.
+func (v *Vertex) SetValue(value BaseValue) {
 	v.BaseValue = value
-	// TODO: should not set status here for new evaluator.
-	v.updateStatus(state)
-	return nil
+	v.status = finalized
 }
 
 func (n *nodeContext) setBaseValue(value BaseValue) {

@@ -179,14 +179,13 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // processComprehension processes a single Comprehension conjunct.
 // It returns an incomplete error if there was one. Fatal errors are
 // processed as a "successfully" completed computation.
-func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
+func (n *nodeContext) processComprehension(d *envYield) *Bottom {
 	ctx := n.ctx
 
 	// Compute environments via d.addEnv (a method bound to d, so no closure
 	// is allocated for each call).
 	d.envs = d.envs[:0]
 	if err := ctx.yield(n.node, d.env, d.comp, Flags{
-		status:    state,
 		condition: allKnown,
 		mode:      ignore,
 	}, d.addEnv); err != nil {

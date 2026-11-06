@@ -497,8 +497,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 
 		// There is no closedness or cycle info for Go structs, so we pass an empty CloseInfo.
 		v.AddStruct(sl, 0, false)
-		v.SetValue(ctx, &adt.StructMarker{})
-		v.ForceDone()
+		v.SetValue(&adt.StructMarker{})
 		return v
 
 	case reflect.Map:
@@ -541,8 +540,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		}
 
 		v.AddStruct(obj, 0, false)
-		v.SetValue(ctx, structMarker)
-		v.ForceDone()
+		v.SetValue(structMarker)
 		return v
 
 	case reflect.Slice:
@@ -589,8 +587,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		}
 
 		v.AddConjunct(adt.MakeRootConjunct(env, list))
-		v.SetValue(ctx, adt.ListMarkerAt(pos))
-		v.ForceDone()
+		v.SetValue(adt.ListMarkerAt(pos))
 		return v
 	}
 	return nil
@@ -634,8 +631,7 @@ func ensureArcVertex(ctx *adt.OpContext, env *adt.Environment, x adt.Value, l ad
 
 	arc.Label = l
 	arc.AddConjunct(adt.MakeRootConjunct(env, x))
-	arc.SetValue(ctx, x)
-	arc.ForceDone()
+	arc.SetValue(x)
 	return arc
 }
 

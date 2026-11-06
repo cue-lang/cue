@@ -68,7 +68,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 					Err:  err,
 					Node: v,
 				}
-				v.setValue(c, v.status, b)
+				v.BaseValue = b
 				return b
 				// TODO: use this instead, as is usual for incomplete errors,
 				// and also move this block one scope up to also apply to
@@ -106,7 +106,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 
 	case nil:
 		if v.state != nil {
-			switch x := v.state.getValidators(finalized).(type) {
+			switch x := v.state.getValidators().(type) {
 			case Value:
 				return x
 			default:
@@ -139,7 +139,7 @@ func (c *OpContext) unify(v *Vertex, flags Flags) {
 // Before it does this, it also checks whether n is of another incompatible
 // type, like struct. This prevents validators from being inadvertently set.
 // TODO(evalv3): optimize this function for new implementation.
-func (n *nodeContext) validateValue(state vertexStatus) {
+func (n *nodeContext) validateValue() {
 	ctx := n.ctx
 
 	// Either set to Conjunction or error.
@@ -209,8 +209,8 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 			}
 		}
 
-	} else if state == finalized {
-		n.node.BaseValue = n.getValidators(finalized)
+	} else {
+		n.node.BaseValue = n.getValidators()
 	}
 }
 
@@ -456,11 +456,9 @@ type nodeContextState struct {
 
 	// Value info
 
-	kind           Kind
-	constraintKind Kind
-	defaultKind    Kind
-	kindExpr       Expr    // expr that adjust last value (for error reporting)
-	kindID         posInfo // for error tracing
+	kind     Kind
+	kindExpr Expr    // expr that adjust last value (for error reporting)
+	kindID   posInfo // for error tracing
 
 	// Current value (may be under construction)
 	scalar   Value // TODO: use Value in node.
@@ -504,9 +502,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			scheduler: n.scheduler,
 			node:      node,
 			nodeContextState: nodeContextState{
-				kind:           TopKind,
-				constraintKind: TopKind,
-				defaultKind:    TopKind,
+				kind: TopKind,
 			},
 			toFree:            reuse(n.toFree),
 			arcMap:            reuse(n.arcMap),
@@ -537,9 +533,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			node: node,
 
 			nodeContextState: nodeContextState{
-				kind:           TopKind,
-				constraintKind: TopKind,
-				defaultKind:    TopKind,
+				kind: TopKind,
 			},
 		}
 	}
@@ -713,8 +707,9 @@ func (n *nodeContext) getErr() *Bottom {
 	return n.errs
 }
 
-// getValidators sets the vertex' Value in case there was no concrete value.
-func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
+// getValidators returns the validators collected for the vertex, to be used
+// as its value in case there was no concrete value.
+func (n *nodeContext) getValidators() BaseValue {
 	n.assertInitialized()
 
 	ctx := n.ctx
@@ -757,24 +752,19 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 		})
 	}
 
-	var v BaseValue
 	switch len(a) {
 	case 0:
 		// Src is the combined input.
-		if state >= conjuncts || n.kind&^CompositeKind == 0 {
-			v = &BasicType{K: n.kind}
-		}
+		return &BasicType{K: n.kind}
 
 	case 1:
-		v = a[0]
+		return a[0]
 
 	default:
 		// With multiple elements, the slice escapes so it must allocate.
 		// Make a copy here, so that the len(a)==1 case stays in the stack.
-		v = &Conjunction{Values: slices.Clone(a)}
+		return &Conjunction{Values: slices.Clone(a)}
 	}
-
-	return v
 }
 
 type envCheck struct {

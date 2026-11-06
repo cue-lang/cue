@@ -269,7 +269,7 @@ func TestGenerated(t *testing.T) {
 		}, {
 			in: func(r *adt.OpContext) (adt.Expr, error) {
 				v := &adt.Vertex{}
-				v.SetValue(r, &adt.StructMarker{})
+				v.SetValue(&adt.StructMarker{})
 				return v, nil
 			},
 			out: ``, // empty file

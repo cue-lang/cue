@@ -798,7 +798,7 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 	nv := x.node.DerefValue()
 	nx := nv.BaseValue
 	if nx == nil || isCyclePlaceholder(nx) {
-		nx = x.getValidators(finalized)
+		nx = x.getValidators()
 	}
 
 	// check uniqueness
@@ -821,7 +821,7 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 			vx, okx := nx.(Value)
 			ny := xv.BaseValue
 			if ny == nil || isCyclePlaceholder(ny) {
-				ny = x.getValidators(finalized)
+				ny = x.getValidators()
 			}
 			vy, oky := ny.(Value)
 			if okx && oky && !Equal(ctx, vx, vy, CheckStructural) {

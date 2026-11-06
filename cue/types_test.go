@@ -26,6 +26,7 @@ import (
 	"testing/fstest"
 
 	"github.com/go-quicktest/qt"
+	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -38,6 +39,7 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/tdtest"
 	"cuelang.org/go/internal/value"
 )
@@ -2697,6 +2699,9 @@ func TestUnify(t *testing.T) {
 		`
 	type testCase struct {
 		value string
+		// files, if set, is a txtar archive holding a module whose root
+		// package is used instead of value, so that it can import others.
+		files string
 		pathA string
 		pathB string
 		pathC string
@@ -2856,6 +2861,38 @@ func TestUnify(t *testing.T) {
 		pathV: "vIf",
 		pathC: "cDef",
 		want:  `cue: marshal error: x.#def: conflicting values 5 and 6`,
+	}, {
+		// Issue #4549: the parent of a field in an imported definition
+		// keeps its evaluation state from the context which evaluated it,
+		// and the unification must not use its stale closedness info.
+		files: `
+-- cue.mod/module.cue --
+module: "x.example"
+language: version: "v0.17.0"
+-- t/t.cue --
+package t
+
+#Base: #D: {...}
+#Base
+
+#D: l: [...]
+
+if true {}
+-- x.cue --
+package x
+
+import "x.example/t"
+
+#S: #D: {...}
+a: #S & {#D: b}
+b: c & t.#D
+c: {}
+out: t.#D
+y: [1]
+`,
+		pathA: "out.l",
+		pathB: "y",
+		want:  `[1]`,
 	}}
 
 	matrix := cuetdtest.FullMatrix
@@ -2865,9 +2902,25 @@ func TestUnify(t *testing.T) {
 	// TODO(tdtest): use cuetest.Run when supported.
 	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-			v := getValue(m, tc.value)
+			var v cue.Value
+			if tc.files != "" {
+				inst := cuetxtar.Load(txtar.Parse([]byte(tc.files)), t.TempDir())[0]
+				v = m.CueContext().BuildInstance(inst)
+			} else {
+				v = getValue(m, tc.value)
+			}
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
 			y := v.LookupPath(cue.ParsePath(tc.pathB))
+			// Issue #4549: with sharing, the unification below panics.
+			defer func() {
+				if r := recover(); r != nil {
+					got := fmt.Sprintf("%s: %v", m.Name(), r)
+					want := "v3: runtime error: index out of range [6] with length 5"
+					if got != want {
+						t.Fatalf("got panic %q, want %q", got, want)
+					}
+				}
+			}()
 			x = x.Unify(y)
 			if tc.pathV != "" {
 				val := v.LookupPath(cue.ParsePath(tc.pathV))

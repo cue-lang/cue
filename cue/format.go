@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
@@ -189,16 +190,11 @@ func formatExpr(state fmt.State, n ast.Node) {
 	// TODO: consider this: should tabs or spaces be the default?
 	if tabwidth, ok := state.Precision(); ok {
 		// TODO: 0 means no newlines.
-		opts = append(opts,
-			format.IndentWidth(tabwidth),
-			//lint:ignore SA1019 unlike Indent, it does not force formatv2
-			format.TabIndent(false))
+		opts = append(opts, format.Indent(strings.Repeat(" ", tabwidth)))
 	}
 	// TODO: consider this.
 	//  else if state.Flag(' ') {
-	// 	opts = append(opts,
-	// 		format.IndentWidth(4),
-	// 		format.TabIndent(false))
+	// 	opts = append(opts, format.Indent("    "))
 	// }
 
 	b, _ := format.Node(n, opts...)

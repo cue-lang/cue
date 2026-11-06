@@ -17,10 +17,6 @@ type Config struct {
 	// The flags in this first section describe active experiments.
 	// Sort from oldest to newest based on when they were introduced as a `preview`.
 
-	// FormatV2 selects the Wadler-Lindig pretty-printer as the
-	// implementation behind "cue fmt" and "cue/format".
-	FormatV2 bool `experiment:"preview:v0.18.0,default:v0.18.0"`
-
 	// OpenAPIV2 selects the new whole-document OpenAPI implementation behind
 	// the openapi encoding used by "cue import" and "cue export", extracting
 	// and generating a complete OpenAPI document rather than only its schemas.
@@ -72,6 +68,10 @@ type Config struct {
 	// CmdReferencePkg requires referencing an imported tool package to declare tasks.
 	// Otherwise, declaring tasks via "$id" or "kind" string fields is allowed.
 	CmdReferencePkg bool `experiment:"preview:v0.13.0,default:v0.14.0,stable:v0.16.0"`
+
+	// FormatV2 selects the Wadler-Lindig pretty-printer as the
+	// implementation behind "cue fmt" and "cue/format".
+	FormatV2 bool `experiment:"preview:v0.18.0,default:v0.18.0,stable:v0.19.0"`
 }
 
 // initExperimentFlags initializes the experiment flags by processing both

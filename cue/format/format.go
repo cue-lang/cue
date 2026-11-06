@@ -43,7 +43,7 @@ import (
 type Option func(c *config)
 
 // Simplify allows the formatter to simplify output, such as removing
-// unnecessary quotes. The formatv2 formatter applies the [ASTStyle.Labels],
+// unnecessary quotes. It applies the [ASTStyle.Labels],
 // [ASTStyle.InlineStructs], and [ASTStyle.Ellipsis] rewrites before printing.
 func Simplify() Option {
 	return func(c *config) { c.simplify = true }
@@ -63,26 +63,16 @@ func Version(v string) Option {
 // The empty string disables indentation entirely; common choices are
 // "\t" for tabs and a fixed run of spaces for space-based indentation.
 // The default is "\t".
-//
-// This option is only honored by the formatv2 formatter, so using it
-// selects that formatter even when the formatv2 experiment is disabled.
 func Indent(s string) Option {
-	return func(c *config) {
-		c.forceV2 = true
-		c.indent = &s
-	}
+	return func(c *config) { c.indent = &s }
 }
 
 // IndentWidth specifies the visual column width of one level of
-// indentation. The formatv2 formatter uses it for its line-breaking
-// heuristics; the pre-v2 formatter uses it as the tab width for
-// aligning columns and, with [TabIndent] set to false, as the number
-// of spaces in one level of indentation.
+// indentation, which the line-breaking heuristics use.
 //
 // When it is left unset, the width is derived from the indentation
-// string: zero when there is no indentation, four for a tab, and the
-// number of characters otherwise. The pre-v2 formatter defaults to
-// eight.
+// string set by [Indent]: zero when there is no indentation, four for
+// a tab, and the number of characters otherwise.
 func IndentWidth(n int) Option {
 	return func(c *config) { c.indentWidth = n }
 }
@@ -90,25 +80,14 @@ func IndentWidth(n int) Option {
 // IndentPrefix specifies a number of indentation levels to emit at
 // the start of every line, in addition to the indentation of the
 // code itself.
-//
-// This option is only honored by the formatv2 formatter. Unlike the
-// options that formatv2 introduced, it does not select that formatter,
-// because it predates it: the pre-v2 formatter ignores it, as it
-// always has.
 func IndentPrefix(n int) Option {
 	return func(c *config) { c.indentPrefix = n }
 }
 
 // LineWidth specifies the target line width that the line-breaking
 // heuristics aim to stay within. It defaults to 120.
-//
-// This option is only honored by the formatv2 formatter, so using it
-// selects that formatter even when the formatv2 experiment is disabled.
 func LineWidth(n int) Option {
-	return func(c *config) {
-		c.forceV2 = true
-		c.lineWidth = n
-	}
+	return func(c *config) { c.lineWidth = n }
 }
 
 // KeepRelPos specifies that the relative positions of nodes, comments
@@ -117,14 +96,8 @@ func LineWidth(n int) Option {
 // [ASTStyle.RelPos]. The simplifications implied by [Simplify] are
 // still applied when that option is given; without it, the AST is
 // formatted entirely unchanged.
-//
-// This option is only honored by the formatv2 formatter, so using it
-// selects that formatter even when the formatv2 experiment is disabled.
 func KeepRelPos() Option {
-	return func(c *config) {
-		c.forceV2 = true
-		c.keepRelPos = true
-	}
+	return func(c *config) { c.keepRelPos = true }
 }
 
 // Compact formats the node as compact CUE: the authored line layout and
@@ -137,12 +110,8 @@ func KeepRelPos() Option {
 //
 // It applies the [ASTStyle.ClearPositions] and [ASTStyle.ClearComments]
 // rewrites before printing.
-//
-// This option is only honored by the formatv2 formatter, so using it
-// selects that formatter even when the formatv2 experiment is disabled.
 func Compact() Option {
 	return func(c *config) {
-		c.forceV2 = true
 		c.compact = true
 		c.lineWidth = math.MaxInt
 	}
@@ -176,12 +145,10 @@ func TabIndent(indent bool) Option {
 // 	SourcePos                  // emit //line comments to preserve original source positions
 // )
 
-// Node formats node in canonical cue fmt style and writes the result to dst.
+// Node formats node in canonical cue fmt style and returns the result.
 //
-// The node type must be [*ast.File], [][ast.Decl], [ast.Expr],
-// [ast.Decl], or [ast.Spec]. Imports are not sorted for nodes
-// representing partial source files (for instance, if the node is not
-// an *ast.File).
+// The node type must be [*ast.File], [ast.Expr], [ast.Decl],
+// or [ast.Spec].
 //
 // The AST is never mutated; see [NodeInPlace] for a variant that may.
 //
@@ -214,7 +181,7 @@ func formatNode(node ast.Node, opt []Option, canMutate bool) ([]byte, error) {
 		node = ast.Clone(node) // Ensure immutability of the AST.
 	}
 	scfg.Apply(node)
-	return cfg.v2().Node(node)
+	return cfg.pretty().Node(node)
 }
 
 // Source formats src in canonical cue fmt style and returns the result or an
@@ -224,7 +191,7 @@ func formatNode(node ast.Node, opt []Option, canMutate bool) ([]byte, error) {
 // If src is a partial source file, the leading and trailing space of src is
 // applied to the result (such that it has the same leading and trailing space
 // as src), and the result is indented by the same amount as the first line of
-// src containing code. Imports are not sorted for partial source files.
+// src containing code.
 //
 // Caution: Tools relying on consistent formatting based on the installed
 // version of cue (for instance, such as for presubmit checks) should execute
@@ -248,7 +215,7 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 
 	// The AST is our own, so there is no need to preserve it.
 	cfg.style().Apply(f)
-	return cfg.v2().Node(f)
+	return cfg.pretty().Node(f)
 }
 
 type config struct {
@@ -264,17 +231,12 @@ type config struct {
 	// is nil, one level of indentation is indentWidth spaces rather
 	// than a tab.
 	spaceIndent  bool
-	indentWidth  int // 0 means unset; the v1 formatter defaults to 8, v2 to 4
+	indentWidth  int // 0 means unset; derived from the indentation string
 	indentPrefix int // default: 0
-	lineWidth    int // 0 means unset; the v2 formatter defaults to 120
-
-	// forceV2 records that an option only the v2 formatter implements
-	// was used, which selects that formatter for this call even when
-	// the formatv2 experiment is explicitly disabled.
-	forceV2 bool
+	lineWidth    int // 0 means unset; the default is 120
 }
 
-// style builds the [ASTStyle] that drives the v2 pre-pass.
+// style builds the [ASTStyle] that is applied before printing.
 func (cfg *config) style() ASTStyle {
 	return ASTStyle{
 		// The house-style layout hints would undo the compaction, so
@@ -288,10 +250,10 @@ func (cfg *config) style() ASTStyle {
 	}
 }
 
-// formatV2 reports whether this call uses the v2 formatter.
-// The pre-v2 formatter is no longer maintained.
+// formatV2 reports whether this call uses the v2 formatter,
+// which it always does now that the formatv2 experiment is stable.
 func (cfg *config) formatV2() bool {
-	return cueexperiment.Flags.FormatV2 || cfg.forceV2
+	return cueexperiment.Flags.FormatV2
 }
 
 func newConfig(opt []Option) *config {
@@ -303,9 +265,7 @@ func newConfig(opt []Option) *config {
 }
 
 // indentWidthOr returns the configured indentation width, or def if it
-// was left unset. The pre-v2 and v2 formatters resolve different
-// defaults so that the v1 formatter stays consistent with
-// release-branch.v0.17 (8) without changing the formatv2 default (4).
+// was left unset.
 func (cfg *config) indentWidthOr(def int) int {
 	if cfg.indentWidth == 0 {
 		return def
@@ -313,21 +273,21 @@ func (cfg *config) indentWidthOr(def int) int {
 	return cfg.indentWidth
 }
 
-func (cfg *config) v2() *pretty.Config {
-	cfgV2 := &pretty.Config{
+func (cfg *config) pretty() *pretty.Config {
+	pcfg := &pretty.Config{
 		IndentWidth: cfg.indentWidth,
 		Width:       cfg.lineWidth,
 	}
 	switch {
 	case cfg.indent != nil:
-		cfgV2.Indent = *cfg.indent
+		pcfg.Indent = *cfg.indent
 	case cfg.spaceIndent:
-		cfgV2.Indent = strings.Repeat(" ", cfg.indentWidthOr(4))
+		pcfg.Indent = strings.Repeat(" ", cfg.indentWidthOr(4))
 	default:
-		cfgV2.Indent = "\t"
+		pcfg.Indent = "\t"
 	}
-	cfgV2.Prefix = strings.Repeat(cfgV2.Indent, cfg.indentPrefix)
-	return cfgV2
+	pcfg.Prefix = strings.Repeat(pcfg.Indent, cfg.indentPrefix)
+	return pcfg
 }
 
 // Config defines the output of Fprint.

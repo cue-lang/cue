@@ -14,10 +14,7 @@
 
 package format_test
 
-// TODO: port more of the tests of go/printer
-
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -28,7 +25,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/tdtest"
@@ -79,14 +75,13 @@ func TestFiles(t *testing.T) {
 	})
 }
 
-// TestPostfixSpread checks that both formatters keep the postfix ...
+// TestPostfixSpread checks that the formatter keeps the postfix ...
 // operator after every primary expression form the parser accepts, and
 // that a comment beside the operator survives. The archive
-// testdata/spread.txtar covers the same forms in context, but only for the
-// formatter which the formatv2 experiment selects.
+// testdata/spread.txtar covers the same forms in context.
 func TestPostfixSpread(t *testing.T) {
 	// Each source is already in canonical form, so formatting it must be a
-	// no-op for either formatter.
+	// no-op.
 	sources := []string{
 		"a: {b...}\n",
 		"a: {b.c...}\n",
@@ -102,26 +97,16 @@ func TestPostfixSpread(t *testing.T) {
 		"a: {b... // note\n}\n",
 	}
 
-	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
-	// Init is guarded by sync.Once, so overriding Flags directly here is not
-	// undone by the format functions calling cueexperiment.Init again.
-	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
-
-	for _, v2 := range []bool{false, true} {
-		t.Run(fmt.Sprintf("formatv2=%v", v2), func(t *testing.T) {
-			cueexperiment.Flags.FormatV2 = v2
-			for _, src := range sources {
-				t.Run(strings.TrimSuffix(src, "\n"), func(t *testing.T) {
-					got, err := format.Source([]byte(src))
-					qt.Assert(t, qt.IsNil(err))
-					qt.Check(t, qt.Equals(string(got), src))
-				})
-			}
+	for _, src := range sources {
+		t.Run(strings.TrimSuffix(src, "\n"), func(t *testing.T) {
+			got, err := format.Source([]byte(src))
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(got), src))
 		})
 	}
 }
 
-// TestFuncParamComments checks that both formatters keep a comment placed
+// TestFuncParamComments checks that the formatter keeps a comment placed
 // after a parameter's "=" or ":", or on its own line before the default or
 // the constraint, and that the result parses back and is stable. The
 // parser attaches the own-line comments to the expression that follows,
@@ -146,27 +131,17 @@ func TestFuncParamComments(t *testing.T) {
 		comment: "// after the first parameter",
 	}}
 
-	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
-	// Init is guarded by sync.Once, so overriding Flags directly here is not
-	// undone by the format functions calling cueexperiment.Init again.
-	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
+	for _, tc := range sources {
+		t.Run(tc.comment, func(t *testing.T) {
+			got, err := format.Source([]byte(tc.src))
+			qt.Assert(t, qt.IsNil(err))
+			_, err = parser.ParseFile("", got, parser.AllErrors)
+			qt.Assert(t, qt.IsNil(err), qt.Commentf("output:\n%s", got))
+			qt.Check(t, qt.StringContains(string(got), tc.comment))
 
-	for _, v2 := range []bool{false, true} {
-		t.Run(fmt.Sprintf("formatv2=%v", v2), func(t *testing.T) {
-			cueexperiment.Flags.FormatV2 = v2
-			for _, tc := range sources {
-				t.Run(tc.comment, func(t *testing.T) {
-					got, err := format.Source([]byte(tc.src))
-					qt.Assert(t, qt.IsNil(err))
-					_, err = parser.ParseFile("", got, parser.AllErrors)
-					qt.Assert(t, qt.IsNil(err), qt.Commentf("output:\n%s", got))
-					qt.Check(t, qt.StringContains(string(got), tc.comment))
-
-					again, err := format.Source(got)
-					qt.Assert(t, qt.IsNil(err))
-					qt.Check(t, qt.Equals(string(again), string(got)))
-				})
-			}
+			again, err := format.Source(got)
+			qt.Assert(t, qt.IsNil(err))
+			qt.Check(t, qt.Equals(string(again), string(got)))
 		})
 	}
 }
@@ -444,7 +419,7 @@ func TestCommentPlacement(t *testing.T) {
 	}
 }
 
-// TestClosedLiterals checks that both formatters keep the "#" of closed
+// TestClosedLiterals checks that the formatter keeps the "#" of closed
 // literals, which the openlists experiment enables, for parsed and for
 // constructed nodes.
 func TestClosedLiterals(t *testing.T) {
@@ -460,27 +435,18 @@ func TestClosedLiterals(t *testing.T) {
 		&ast.Field{Label: ast.NewIdent("a"), Value: ast.NewLit(token.INT, "1")},
 	}}
 
-	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
-	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
+	got, err := format.Source([]byte(src))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Check(t, qt.Equals(string(got), src))
 
-	for _, v2 := range []bool{false, true} {
-		t.Run(fmt.Sprintf("formatv2=%v", v2), func(t *testing.T) {
-			cueexperiment.Flags.FormatV2 = v2
+	b, err := format.Node(list)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Check(t, qt.Equals(string(b), "#[1]"))
 
-			got, err := format.Source([]byte(src))
-			qt.Assert(t, qt.IsNil(err))
-			qt.Check(t, qt.Equals(string(got), src))
-
-			b, err := format.Node(list)
-			qt.Assert(t, qt.IsNil(err))
-			qt.Check(t, qt.Equals(string(b), "#[1]"))
-
-			b, err = format.Node(strct)
-			qt.Assert(t, qt.IsNil(err))
-			qt.Check(t, qt.StringContains(string(b), "#{"))
-			qt.Check(t, qt.StringContains(string(b), "a: 1"))
-		})
-	}
+	b, err = format.Node(strct)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Check(t, qt.StringContains(string(b), "#{"))
+	qt.Check(t, qt.StringContains(string(b), "a: 1"))
 }
 
 // Verify that the printer can be invoked during initialization.
@@ -782,7 +748,7 @@ e2: c*t.z
 	}
 
 	// pretty-print original
-	b, err := format.Node(f1, format.IndentWidth(8))
+	b, err := format.Node(f1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -899,10 +865,11 @@ func TestSourceOptions(t *testing.T) {
 		// Setting options to their default values is also a no-op.
 		{
 			name:    "DefaultValues",
-			options: []format.Option{format.TabIndent(true), format.UseSpaces(8)},
+			options: []format.Option{format.TabIndent(true), format.UseSpaces(4)},
 			want:    src,
 		},
-		// UseSpaces setting a different tabWidth makes no difference unless we indent with spaces.
+		// A different width only steers the line-breaking heuristics when
+		// indenting with tabs, which this short input does not reach.
 		{
 			name:    "UseSpaces=2",
 			options: []format.Option{format.UseSpaces(2)},
@@ -954,42 +921,9 @@ func TestSourceOptions(t *testing.T) {
 	})
 }
 
-// TestFormatV2Smoke sanity-checks that the formatv2 experiment is on by
-// default, and that the pre-v2 formatter remains reachable by disabling it.
-//
-// The input formats differently between the two: v2 aligns the field values
-// even though one of them is a list, whereas v1 does not align in that case.
-func TestFormatV2Smoke(t *testing.T) {
-	const src = "a: 1\nbbbb: [1, 2, 3]\n"
-	const wantV2 = "a:    1\nbbbb: [1, 2, 3]\n"
-	const wantV1 = "a: 1\nbbbb: [1, 2, 3]\n"
-
-	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
-
-	// The experiment is on by default.
-	qt.Assert(t, qt.IsTrue(cueexperiment.Flags.FormatV2))
-
-	// Init is guarded by sync.Once, so overriding Flags directly here is not
-	// undone by the format functions calling cueexperiment.Init again.
-	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
-
-	cueexperiment.Flags.FormatV2 = true
-	got, err := format.Source([]byte(src))
-	qt.Assert(t, qt.IsNil(err))
-	qt.Check(t, qt.Equals(string(got), wantV2))
-
-	cueexperiment.Flags.FormatV2 = false
-	got, err = format.Source([]byte(src))
-	qt.Assert(t, qt.IsNil(err))
-	qt.Check(t, qt.Equals(string(got), wantV1))
-}
-
-// TestV2Options exercises the options that only the formatv2 formatter
-// implements. Each of them selects that formatter, so we run the whole
-// test with the formatv2 experiment disabled: the layouts below are out
-// of reach of the pre-v2 formatter, which has no notion of a target
-// width and indents with tabs only.
-func TestV2Options(t *testing.T) {
+// TestLayoutOptions exercises the options which steer the line-breaking
+// heuristics: the target width and the indentation.
+func TestLayoutOptions(t *testing.T) {
 	// Clearing the authored positions leaves the layout entirely to the
 	// width-driven heuristics, which is what these options steer.
 	const src = "a: {x: 1, b: [1, 2, 3, 4, 5, 6]}\n"
@@ -1021,12 +955,6 @@ func TestV2Options(t *testing.T) {
 		opts: []format.Option{format.LineWidth(25), format.IndentWidth(10)},
 		want: "a: {\n	x: 1\n	b: [\n		1,\n		2,\n		3,\n		4,\n		5,\n		6,\n	]\n}\n",
 	}}
-
-	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
-	// Init is guarded by sync.Once, so overriding Flags directly here is not
-	// undone by the format functions calling cueexperiment.Init again.
-	defer func(orig bool) { cueexperiment.Flags.FormatV2 = orig }(cueexperiment.Flags.FormatV2)
-	cueexperiment.Flags.FormatV2 = false
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -1063,8 +991,6 @@ func TestKeepRelPos(t *testing.T) {
 		want: "a: {x: 1, b: [1, 2, 3]}, c: \"str\"\n",
 	}}
 
-	withoutFormatV2(t)
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			f := parseCleared(t, src)
@@ -1078,8 +1004,6 @@ func TestKeepRelPos(t *testing.T) {
 // TestKeepRelPosSimplify checks that KeepRelPos does not hold back the
 // rewrites that Simplify asks for.
 func TestKeepRelPosSimplify(t *testing.T) {
-	withoutFormatV2(t)
-
 	f, err := parser.ParseFile("in", "\"a\": {\n	b: 1\n}\n", parser.ParseComments)
 	qt.Assert(t, qt.IsNil(err))
 	got, err := format.Node(f, format.KeepRelPos(), format.Simplify())
@@ -1121,34 +1045,29 @@ func TestNodeInPlace(t *testing.T) {
 	})
 
 	// The rewrites that Simplify asks for are just as much off limits
-	// to Node, whichever formatter is in use.
-	for _, v2 := range []bool{true, false} {
-		t.Run(fmt.Sprintf("simplify-v2=%v", v2), func(t *testing.T) {
-			if !v2 {
-				withoutFormatV2(t)
-			}
-			const src = "\"a\": 1\n"
-			f, err := parser.ParseFile("in", src, parser.ParseComments)
-			qt.Assert(t, qt.IsNil(err))
-			got, err := format.Node(f, format.Simplify())
-			qt.Assert(t, qt.IsNil(err))
-			qt.Assert(t, qt.Equals(string(got), "a: 1\n"))
-			qt.Assert(t, qt.Satisfies(f.Decls[0].(*ast.Field).Label, func(l ast.Label) bool {
-				_, ok := l.(*ast.BasicLit)
-				return ok
-			}))
+	// to Node.
+	t.Run("simplify", func(t *testing.T) {
+		const src = "\"a\": 1\n"
+		f, err := parser.ParseFile("in", src, parser.ParseComments)
+		qt.Assert(t, qt.IsNil(err))
+		got, err := format.Node(f, format.Simplify())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(string(got), "a: 1\n"))
+		qt.Assert(t, qt.Satisfies(f.Decls[0].(*ast.Field).Label, func(l ast.Label) bool {
+			_, ok := l.(*ast.BasicLit)
+			return ok
+		}))
 
-			f, err = parser.ParseFile("in", src, parser.ParseComments)
-			qt.Assert(t, qt.IsNil(err))
-			got, err = format.NodeInPlace(f, format.Simplify())
-			qt.Assert(t, qt.IsNil(err))
-			qt.Assert(t, qt.Equals(string(got), "a: 1\n"))
-			qt.Assert(t, qt.Satisfies(f.Decls[0].(*ast.Field).Label, func(l ast.Label) bool {
-				_, ok := l.(*ast.Ident)
-				return ok
-			}))
-		})
-	}
+		f, err = parser.ParseFile("in", src, parser.ParseComments)
+		qt.Assert(t, qt.IsNil(err))
+		got, err = format.NodeInPlace(f, format.Simplify())
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(string(got), "a: 1\n"))
+		qt.Assert(t, qt.Satisfies(f.Decls[0].(*ast.Field).Label, func(l ast.Label) bool {
+			_, ok := l.(*ast.Ident)
+			return ok
+		}))
+	})
 }
 
 // TestCompact checks that Compact discards the authored layout and the
@@ -1256,8 +1175,6 @@ c: """
 `,
 	}}
 
-	withoutFormatV2(t)
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			f, err := parser.ParseFile("in", src, parser.ParseComments)
@@ -1317,19 +1234,6 @@ func parseCleared(t *testing.T, src string) *ast.File {
 	qt.Assert(t, qt.IsNil(err))
 	format.ASTStyle{ClearPositions: true}.Apply(f)
 	return f
-}
-
-// withoutFormatV2 disables the formatv2 experiment for the duration of
-// the test, so that a formatter selected by an option is selected by
-// that option alone.
-func withoutFormatV2(t *testing.T) {
-	t.Helper()
-	qt.Assert(t, qt.IsNil(cueexperiment.Init()))
-	// Init is guarded by sync.Once, so overriding Flags directly here is not
-	// undone by the format functions calling cueexperiment.Init again.
-	orig := cueexperiment.Flags.FormatV2
-	t.Cleanup(func() { cueexperiment.Flags.FormatV2 = orig })
-	cueexperiment.Flags.FormatV2 = false
 }
 
 // TextX is a skeleton test that can be filled in for debugging one-off cases.

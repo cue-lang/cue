@@ -108,11 +108,11 @@ Available per-file experiments:
 
 Global experiments are enabled via the CUE_EXPERIMENT environment variable:
 
-	export CUE_EXPERIMENT=openapiv2,formatv2=0
+	export CUE_EXPERIMENT=openapiv2,yamlgoccy=0
 	cue export myfile.cue
 
 An experiment which is on by default can be turned off with a value of 0,
-as with formatv2=0 above.
+as with yamlgoccy=0 above.
 
 The behavior of global experiments tracks the language version reported by "cue version".
 
@@ -152,7 +152,7 @@ Available global experiments:
     even if their concrete value could be derived, such as '>=1 & <=1' to '1'.
     Proposal: https://cuelang.org/discussion/3775.
 
-  formatv2 (preview: v0.18.0, default: v0.18.0)
+  formatv2 (preview: v0.18.0, default: v0.18.0, stable: v0.19.0)
     formatv2 selects the Wadler-Lindig pretty-printer as the
     implementation behind "cue fmt" and "cue/format".
 

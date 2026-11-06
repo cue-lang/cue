@@ -260,6 +260,16 @@ a: {
   c: int
  }
 }`,
+			// A precision of zero means no indentation.
+			"%.0v", `{
+a: {
+b: """
+foo
+bar
+"""
+c: int
+}
+}`,
 			"%3.1v", `   {
     a: {
      b: """

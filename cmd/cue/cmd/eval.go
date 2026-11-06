@@ -105,13 +105,7 @@ func runEval(cmd *Command, args []string) error {
 
 	// Keep for legacy reasons. Note that `cue eval` is to be deprecated by
 	// `cue` eventually.
-	// TODO use format.Indent("    ") once formatv2 is the only formatter;
-	// unlike these options, it would select formatv2 for this call.
-	opts := []format.Option{
-		format.IndentWidth(4),
-		//lint:ignore SA1019 unlike Indent, it does not force formatv2
-		format.TabIndent(false),
-	}
+	opts := []format.Option{format.Indent("    ")}
 	if flagSimplify.Bool(cmd) {
 		opts = append(opts, format.Simplify())
 	}

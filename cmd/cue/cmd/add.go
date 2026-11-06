@@ -26,7 +26,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
@@ -189,14 +188,15 @@ func doAdd(cmd *Command, args []string) (err error) {
 		if b.Err != nil {
 			return b.Err
 		}
-		i := cue.Build([]*build.Instance{b})[0]
-		if i.Err != nil {
-			return i.Err
+		// BuildInstance records any build errors in b.Err.
+		v := cmd.ctx.BuildInstance(b)
+		if b.Err != nil {
+			return b.Err
 		}
-		if err := i.Value().Validate(); err != nil {
-			// TODO: i.Err is nil here, so a validation failure is not
+		if err := v.Validate(); err != nil {
+			// TODO: b.Err is nil here, so a validation failure is not
 			// reported and the files are not restored; return err instead.
-			return i.Err
+			return b.Err
 		}
 	}
 

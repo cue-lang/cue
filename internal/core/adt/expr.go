@@ -1093,17 +1093,6 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		// nc.hasNonCycle = true
 		// Allow a first cycle to be skipped.
 		// nc.free()
-
-		// Parents cannot add more conjuncts to a let expression, so set of
-		// conjuncts is always complete.
-		//
-		// NOTE(let finalization): as this let expression is not recorded as
-		// a subfield within its parent arc, setParentDone will not be called
-		// as part of normal processing. The same is true for finalization.
-		// The use of setParentDone has the additional effect that the arc
-		// will be finalized where it is needed. See the namesake NOTE for the
-		// location where this is triggered.
-		n.setParentDone()
 	}
 	return entry.v
 }

@@ -639,26 +639,6 @@ func (v *Vertex) IsUnprocessed() bool {
 	return v.Status() == unprocessed
 }
 
-// setParentDone signals v that the conjuncts of all ancestors have been
-// processed.
-// If all conjuncts of this node have been set, all arcs will be notified
-// of this parent being done.
-//
-// Note: once a vertex has started evaluation (state != nil), insertField will
-// cause all conjuncts to be immediately processed. This means that if all
-// ancestors of this node processed their conjuncts, and if this node has
-// processed all its conjuncts as well, all nodes that it embedded will have
-// received all their conjuncts as well, after which this node will have been
-// notified of these conjuncts.
-func (v *Vertex) setParentDone() {
-	// Could set "Conjuncts" flag of arc at this point.
-	if n := v.state; n != nil {
-		for _, a := range v.Arcs {
-			a.setParentDone()
-		}
-	}
-}
-
 // LeafConjuncts iterates over all conjuncts that are leaves of the [ConjunctGroup] tree.
 func (v *Vertex) LeafConjuncts() iter.Seq[Conjunct] {
 	return func(yield func(Conjunct) bool) {

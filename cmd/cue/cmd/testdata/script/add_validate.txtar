@@ -2,9 +2,8 @@
 # when the result does not validate.
 
 stdin stdin.cue
-# TODO: the conflict is not reported, and x.cue is left with the added field.
-exec cue add x.cue
-! stderr .
+! exec cue add x.cue
+stderr 'a: conflicting values 2 and 1'
 cmp x.cue x.cue-want
 
 -- cue.mod/module.cue --
@@ -20,4 +19,3 @@ a: 1
 package x
 
 a: 1
-a: 2

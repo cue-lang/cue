@@ -188,15 +188,9 @@ func doAdd(cmd *Command, args []string) (err error) {
 		if b.Err != nil {
 			return b.Err
 		}
-		// BuildInstance records any build errors in b.Err.
-		v := cmd.ctx.BuildInstance(b)
-		if b.Err != nil {
-			return b.Err
-		}
-		if err := v.Validate(); err != nil {
-			// TODO: b.Err is nil here, so a validation failure is not
-			// reported and the files are not restored; return err instead.
-			return b.Err
+		// Validate also reports any build errors.
+		if err := cmd.ctx.BuildInstance(b).Validate(); err != nil {
+			return err
 		}
 	}
 

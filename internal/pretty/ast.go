@@ -204,6 +204,11 @@ func (c *converter) node(n ast.Node) doc {
 	case ast.Decl:
 		return c.decl(n)
 	default:
+		var pos token.Pos
+		if n != nil {
+			pos = n.Pos()
+		}
+		c.errf(pos, "unsupported node type %T", n)
 		return nil
 	}
 }

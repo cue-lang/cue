@@ -181,10 +181,9 @@ func TabIndent(indent bool) Option {
 
 // Node formats node in canonical cue fmt style and writes the result to dst.
 //
-// The node type must be [*ast.File], [][ast.Decl], [ast.Expr],
-// [ast.Decl], or [ast.Spec]. Imports are not sorted for nodes
-// representing partial source files (for instance, if the node is not
-// an *ast.File).
+// The node type must be [*ast.File], [ast.Expr], or [ast.Decl].
+// Imports are not sorted for nodes representing partial source files
+// (for instance, if the node is not an *ast.File).
 //
 // The AST is never mutated; see [NodeInPlace] for a variant that may.
 //

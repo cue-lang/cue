@@ -188,9 +188,7 @@ type runMode uint8
 // See the stringer directive in doc.go for the generated String method.
 
 const (
-	// ignore indicates that the new evaluator should not do any processing.
-	// This is mostly used in the transition from old to new evaluator and
-	// should probably eventually be removed.
+	// ignore indicates that evaluation should not do any processing.
 	ignore runMode = 1 + iota
 
 	// attemptOnly indicates that execution should continue even if the
@@ -1141,7 +1139,7 @@ func runTask(t *task, mode runMode) {
 
 	defer ctx.PopArc(ctx.PushArc(t.node.node))
 
-	// TODO: merge these two mechanisms once we get rid of the old evaluator.
+	// TODO: merge these two mechanisms.
 	ctx.pushTask(t)
 	defer ctx.popTask()
 	if t.env != nil {

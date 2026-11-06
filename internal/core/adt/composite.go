@@ -230,7 +230,6 @@ type Vertex struct {
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
 	// Until the Vertex is typo checked, it is set if any conjunct has an
 	// ellipsis, even if another conjunct closes the Vertex regardless.
-	// TODO: combine this field with Closed once we removed the old evaluator.
 	HasEllipsis bool
 
 	// MultiLet indicates whether multiple let fields were added from
@@ -625,9 +624,6 @@ func (c *OpContext) Wrap(v *Vertex, id CloseInfo) *Vertex {
 
 // Status returns the status of the current node. When reading the status, one
 // should always use this method over directly reading status field.
-//
-// NOTE: this only matters for EvalV3 and beyonds, so a lot of the old code
-// might still access it directly.
 func (v *Vertex) Status() vertexStatus {
 	v = v.DerefValue()
 	return v.status
@@ -788,8 +784,6 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	// Create a map to track processed vertices to avoid duplicate processing
 	processed := make(map[*Vertex]*Vertex)
 
-	// TODO(evalv3): for EvalV3 we could call finalize only here.
-
 	return v.toDataAllRec(ctx, processed)
 }
 
@@ -799,7 +793,8 @@ func (v *Vertex) toDataAllRec(ctx *OpContext, processed map[*Vertex]*Vertex) *Ve
 		return result
 	}
 
-	v.Finalize(ctx) // Needed recursively for eval v2.
+	// Vertices reached through conjuncts or BaseValue may not be finalized.
+	v.Finalize(ctx)
 
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
@@ -1141,9 +1136,8 @@ func Unwrap(v Value) Value {
 		return v
 	}
 	// TODO(deref): BaseValue is currently overloaded to track cycles as well
-	// as the actual or dereferenced value. Once the old evaluator can be
-	// removed, we should use the new cycle tracking mechanism for cycle
-	// detection and keep BaseValue clean.
+	// as the actual or dereferenced value. We should use the new cycle
+	// tracking mechanism for cycle detection and keep BaseValue clean.
 	x = x.DerefValue()
 	if n := x.state; n != nil && isCyclePlaceholder(x.BaseValue) {
 		if n.errs != nil && !n.errs.IsIncomplete() {

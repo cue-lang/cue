@@ -125,9 +125,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state Flags) Value {
 
 // unify unifies values of a Vertex to and stores the result in the Vertex. If
 // unify was called on v before it returns the cached results.
-// state can be used to indicate to which extent processing should continue.
-// state == finalized means it is evaluated to completion. See vertexStatus
-// for more details.
+// flags indicates to which extent processing should continue.
 func (c *OpContext) unify(v *Vertex, flags Flags) {
 	v.unify(c, flags)
 }
@@ -138,7 +136,6 @@ func (c *OpContext) unify(v *Vertex, flags Flags) {
 //
 // Before it does this, it also checks whether n is of another incompatible
 // type, like struct. This prevents validators from being inadvertently set.
-// TODO(evalv3): optimize this function for new implementation.
 func (n *nodeContext) validateValue() {
 	ctx := n.ctx
 

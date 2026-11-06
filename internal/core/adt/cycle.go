@@ -760,8 +760,7 @@ func (c *OpContext) combineCycleInfo(ci CloseInfo) CloseInfo {
 }
 
 // hasDepthCycle uses depth counters to keep track of cycles:
-//   - it allows detecting reference cycles as well (state evaluating is
-//     no longer used in v3)
+//   - it allows detecting reference cycles as well
 //   - it can capture cycles across inline structs, which do not have
 //     Parent set.
 //

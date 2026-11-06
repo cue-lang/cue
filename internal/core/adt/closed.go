@@ -221,13 +221,11 @@ type CloseInfo struct {
 	// FromEmbed indicates whether this conjunct was inserted because of an
 	// embedding.  This flag is sticky: it will be set for conjuncts created
 	// from fields defined by this conjunct.
-	// NOTE: only used when using closeContext.
 	FromEmbed bool
 
 	// FromDef indicates whether this conjunct was inserted because of a
 	// definition. This flag is sticky: it will be set for conjuncts created
 	// from fields defined by this conjunct.
-	// NOTE: only used when using closeContext.
 	FromDef bool
 
 	// Like FromDef, but used by APIs to force FromDef to be true.

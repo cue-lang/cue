@@ -111,7 +111,7 @@ func (n *nodeContext) dropSharing() {
 	n.decShared()
 
 	// TODO: the use of cycle for BaseValue is getting increasingly outdated.
-	// Find another mechanism once we get rid of the old evaluator.
+	// Find another mechanism.
 	n.node.BaseValue = n.origBaseValue
 }
 

@@ -296,7 +296,6 @@ func pushDownDeps(n *nodeContext, t *task, x Node) condition {
 
 		// TODO: handle lists? Theoretically we could iterate over fixed,
 		// non-comprehension elements and adjust those dependencies as well.
-		// Note that this was not done for evalv3.
 
 	default:
 		completes |= valueKnown | fieldConjunctsKnown

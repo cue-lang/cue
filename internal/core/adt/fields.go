@@ -507,7 +507,7 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) *Bottom {
 		ctx.addPositions(c)
 	}
 	// TODO(0.7): Find another way to get this provenance information. Not
-	// currently stored in new evaluator.
+	// currently stored.
 	// for _, s := range x.Structs {
 	//  s.AddPositions(ctx)
 	// }

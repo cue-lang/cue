@@ -53,8 +53,8 @@ func (v *Vertex) getBareState(c *OpContext) *nodeContext {
 		v.state.initBare()
 	}
 
-	// TODO: see if we can get rid of ref counting after new evaluator is done:
-	// the recursive nature of the new evaluator should make this unnecessary.
+	// TODO: see if we can get rid of ref counting: the recursive nature of
+	// the evaluator should make this unnecessary.
 
 	return v.state
 }
@@ -583,21 +583,6 @@ func (n *nodeContext) runChecks(c *OpContext) {
 }
 
 func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos bool) bool {
-	if n.underlying != nil {
-		// References within the disjunct may end up referencing the layer that
-		// this node overlays. Also for these nodes we want to be able to detect
-		// structural cycles early. For this reason, we also set the
-		// evaluatingArcs status in the underlying layer.
-		//
-		// TODO: for now, this seems not necessary. Moreover, this will cause
-		// benchmarks/cycle to display a spurious structural cycle. But it
-		// shortens some of the structural cycle depths. So consider using this.
-		//
-		// status := n.underlying.status
-		// n.underlying.updateStatus(evaluatingArcs) defer func() {
-		// n.underlying.status = status }()
-	}
-
 	// Ensure remaining tasks (e.g., comprehensions that add arcs) run before
 	// visiting arcs. Without this, arcs from comprehensions may be missing
 	// when completeAllArcs iterates over them.
@@ -638,8 +623,6 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 
 		if a.ArcType == ArcPending {
 			// TODO: cancel tasks?
-			// TODO: is this ever run? Investigate once new evaluator work is
-			// complete.
 			a.updateArcType(ArcNotPresent)
 			continue
 		}

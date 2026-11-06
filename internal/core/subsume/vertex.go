@@ -122,7 +122,6 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			// TODO: what to do with required fields. Logically they should be
 			// ignored if subsuming at the value level. OTOH, they represent an
 			// (incomplete) error at the value level.
-			// Mimic the old evaluator for now.
 			if s.IgnoreOptional {
 				continue
 			}

@@ -1012,7 +1012,6 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	//     In other words, a Vertex is not necessarily erroneous when a let
 	//     field contained in that Vertex is erroneous.
 
-	// NOTE: eval v2 used to finalize here.
 	// We should only partly finalize the result here as it is not safe to
 	// finalize any references made by the let.
 
@@ -1088,12 +1087,9 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		e.cache[key] = entry
 		// TODO(mem): enable again once we implement memory management.
 		// nc := n.getState(ctx)
-		// TODO: unlike with the old evaluator, we do not allow the first
-		// cycle to be skipped. Doing so can lead to hanging evaluation.
-		// As the cycle detection works slightly differently in the new
-		// evaluator (and is not entirely completed), this can happen. We
-		// should revisit this once we have completed the structural cycle
-		// detection.
+		// TODO: we do not allow the first cycle to be skipped. Doing so can
+		// lead to hanging evaluation, as the structural cycle detection is
+		// not entirely complete. We should revisit this once it is.
 		// nc.hasNonCycle = true
 		// Allow a first cycle to be skipped.
 		// nc.free()
@@ -3699,7 +3695,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 		// TODO: this seems a bit fragile. At some point we need to make this
 		// more robust by moving to a pure call-by-need mechanism, for instance.
 		// TODO: using attemptOnly here will remove the cyclic reference error
-		// of comprehension.t1.ok (which also errors in V2),
+		// of comprehension.t1.ok.
 		mode := finalize
 		if s := node.state; s != nil && s.frozen&fieldSetKnown == 0 &&
 			s.hasRunningSiblingParentTask() {
@@ -3715,7 +3711,6 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 		return emptyNode
 	}
 
-	// TODO: skip in new evaluator? Check once we introduce disjunctions.
 	if w := Unwrap(v); !isCyclePlaceholder(w) {
 		v = w
 	}

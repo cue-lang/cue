@@ -546,7 +546,6 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 
 	c.numRefs++
 
-	// Note: we did not finalize in V2.
 	v.Unify(c.ctxt, adt.FinalizeWithoutTypoCheck)
 
 	d := Dependency{

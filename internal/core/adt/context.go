@@ -628,9 +628,8 @@ func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 	// TODO: use a position stack to push both values.
 
-	// TODO(evalv3): move to PushConjunct once the migration is complete.
-	// Using PushConjunct also saves and restores the error, which may be
-	// impactful, so we want to do this in a separate commit.
+	// TODO: move to PushConjunct. Note that PushConjunct also saves and
+	// restores the error, which may change how errors are reported.
 	// saved := c.PushConjunct(check)
 
 	src := c.src

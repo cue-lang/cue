@@ -796,10 +796,6 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 	}
 
 	nv := x.node.DerefValue()
-	nx := nv.BaseValue
-	if nx == nil || isCyclePlaceholder(nx) {
-		nx = x.getValidators()
-	}
 
 	// check uniqueness
 	// TODO: if a node is not finalized, we could check that the parent
@@ -816,17 +812,6 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 
 			if !equalPartialNode(xn.ctx, x.node, xn.node) {
 				continue
-			}
-
-			vx, okx := nx.(Value)
-			ny := xv.BaseValue
-			if ny == nil || isCyclePlaceholder(ny) {
-				ny = x.getValidators()
-			}
-			vy, oky := ny.(Value)
-			if okx && oky && !Equal(ctx, vx, vy, CheckStructural) {
-				continue
-
 			}
 		} else {
 			// Complete nodes. Disjuncts that are equal apart from their

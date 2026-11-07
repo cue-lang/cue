@@ -327,7 +327,7 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 		mu       sync.Mutex // guards mg.g and hasError during loading
 		hasError bool
 		mg       = &ModuleGraph{
-			g: mvs.NewGraph(module.Versions{}, cmpVersion, []module.Version{rs.mainModuleVersion}),
+			g: mvs.NewGraph(versionOps{}, cmpVersion, []module.Version{rs.mainModuleVersion}),
 		}
 	)
 
@@ -424,11 +424,18 @@ func (mg *ModuleGraph) findError(loadCache *par.ErrCache[module.Version, *modFil
 		if len(errStack) > 1 && errors.As(err, new(*modregistry.ModuleError)) {
 			errStack = errStack[:len(errStack)-1]
 		}
-		return mvs.NewBuildListError(err, errStack, module.Versions{})
+		return mvs.NewBuildListError(err, errStack, versionOps{})
 	}
 
 	return nil
 }
+
+// versionOps implements [mvs.Versions] for [module.Version].
+type versionOps struct{}
+
+func (versionOps) New(p, v string) (module.Version, error) { return module.NewVersion(p, v) }
+func (versionOps) Path(v module.Version) string            { return v.Path() }
+func (versionOps) Version(v module.Version) string         { return v.Version() }
 
 // cmpVersion implements the comparison for versions in the module loader.
 //

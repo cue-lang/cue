@@ -7,9 +7,7 @@
 //
 // TODO: internal/mod/modrequirements is the only user, always with
 // [cuelang.org/go/mod/module.Version]. Consider folding this package
-// into it, dropping the type parameters and the [Versions] interface;
-// note that the public [cuelang.org/go/mod/module.Versions] type
-// would then be unused.
+// into it, dropping the type parameters and the [Versions] interface.
 package mvs
 
 import (

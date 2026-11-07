@@ -49,12 +49,23 @@ type File struct {
 	// not contain a major version suffix.
 	// Use the [File.QualifiedModule] method to obtain a module
 	// path that's always qualified. See also the
-	// [File.ModulePath] and [File.MajorVersion] methods.
-	Module          string                    `json:"module"`
-	Language        *Language                 `json:"language,omitempty"`
-	Source          *Source                   `json:"source,omitempty"`
-	Deps            map[string]*Dep           `json:"deps,omitempty"`
-	Custom          map[string]map[string]any `json:"custom,omitempty"`
+	// [File.ModuleRootPath] and [File.MajorVersion] methods.
+	Module string `json:"module"`
+
+	// Language holds the language section, which is required
+	// by all parse functions except [cuelang.org/go/mod/modfile.ParseLegacy].
+	Language *Language `json:"language,omitempty"`
+
+	// Source holds the source section, if present.
+	Source *Source `json:"source,omitempty"`
+
+	// Deps holds the module's dependencies, keyed by module path.
+	Deps map[string]*Dep `json:"deps,omitempty"`
+
+	// Custom holds arbitrary data for third-party tools, keyed by
+	// tooling namespace, such as a module path or "legacy".
+	Custom map[string]map[string]any `json:"custom,omitempty"`
+
 	versions        []module.Version
 	versionByModule map[string]module.Version
 
@@ -109,18 +120,36 @@ func (src *Source) Validate() error {
 	return fmt.Errorf("unrecognized source kind %q", src.Kind)
 }
 
+// Language holds the language section of a module file.
 type Language struct {
+	// Version holds the CUE language version that the module
+	// is written for, as a canonical semantic version.
 	Version string `json:"version,omitempty"`
 }
 
+// Dep holds a dependency entry in a module file,
+// keyed by module path in [File.Deps].
 type Dep struct {
-	Version     string `json:"v"`
-	Default     bool   `json:"default,omitempty"`
+	// Version holds the minimum required version of the module.
+	// It is empty for a dependency which is only present
+	// to be replaced.
+	Version string `json:"v"`
+
+	// Default marks this major version as the default for imports
+	// of the module path which do not specify a major version.
+	Default bool `json:"default,omitempty"`
+
+	// ReplaceWith holds a replacement for this dependency:
+	// either a directory path or a module path.
 	ReplaceWith string `json:"replaceWith,omitempty"`
 }
 
-// Init initializes the private dependency-related fields of f from
-// the public fields.
+// Init checks f and computes the dependency information used by
+// [File.DepVersions], [File.DefaultMajorVersions] and
+// [File.ModuleForImportPath].
+//
+// The parse functions in [cuelang.org/go/mod/modfile] call it already;
+// a File built in any other way must call Init before using those methods.
 func (f *File) Init() error {
 	return f.init(true)
 }
@@ -214,8 +243,8 @@ func (f *File) MajorVersion() string {
 // DepVersions returns the versions of all the modules depended on by the
 // file. The caller should not modify the returned slice.
 //
-// This always returns the same value, even if the contents
-// of f are changed. If f was not created with [Parse], it returns nil.
+// The result is computed by [File.Init], so it does not reflect changes
+// made to f since. It is empty if Init has not been called.
 func (f *File) DepVersions() []module.Version {
 	return slices.Clip(f.versions)
 }

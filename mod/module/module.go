@@ -114,6 +114,11 @@ func (m Version) Equal(m1 Version) bool {
 	return m.path == m1.path && m.version == m1.version
 }
 
+// Compare returns -1, 0, or +1 depending on whether m sorts before,
+// the same as, or after m1. Versions are ordered by path, then by
+// semantic version, then by any suffix after a slash in the version,
+// as in "v0.0.1/module.cue".
+// It is suitable for use with [slices.SortFunc].
 func (m Version) Compare(m1 Version) int {
 	if c := cmp.Compare(m.path, m1.path); c != 0 {
 		return c
@@ -158,6 +163,8 @@ func (m Version) IsCanonical() bool {
 	return m.IsValid() && m.version != "" && m.version != "none"
 }
 
+// IsLocal reports whether m is the special "local" module,
+// as described in [NewVersion].
 func (m Version) IsLocal() bool {
 	return m.path == "local"
 }
@@ -171,6 +178,7 @@ func (m Version) String() string {
 	return m.BasePath() + "@" + m.version
 }
 
+// MustParseVersion is like [ParseVersion] but panics on error.
 func MustParseVersion(s string) Version {
 	v, err := ParseVersion(s)
 	if err != nil {
@@ -194,6 +202,7 @@ func ParseVersion(s string) (Version, error) {
 	return Version{basePath + "@" + semver.Major(vers), vers}, nil
 }
 
+// MustNewVersion is like [NewVersion] but panics on error.
 func MustNewVersion(path string, version string) Version {
 	v, err := NewVersion(path, version)
 	if err != nil {

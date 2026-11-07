@@ -652,8 +652,8 @@ The --out flag specifies the output type using a qualifier
 (without the ':'). The -o flag specifies an output file
 possibly prefixed with a qualifier.
 
-Note that jsonschema is currently experimental as an output type: the
-form of generated schemas may change from release to release.
+Note that the jsonschema output type may produce different schemas from
+release to release as generation improves.
 
 Note that ini is currently experimental: its flavors, the CUE it
 decodes to, and the INI it encodes to may change from release to

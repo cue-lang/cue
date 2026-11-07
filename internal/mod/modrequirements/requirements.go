@@ -71,7 +71,7 @@ type cachedGraph struct {
 // The dependencies of the roots will be loaded lazily from the given
 // Registry value at the first call to the Graph method.
 //
-// The rootModules slice must be sorted according to [module.Sort].
+// The rootModules slice must be sorted according to [module.Version.Compare].
 //
 // The defaultMajorVersions slice holds the default major version for (major-version-less)
 // mdule paths, if any have been specified. For example {"foo.com/bar": "v0"} specifies

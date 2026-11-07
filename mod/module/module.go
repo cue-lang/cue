@@ -82,7 +82,6 @@ package module
 import (
 	"cmp"
 	"fmt"
-	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -265,16 +264,4 @@ func NewVersion(path string, version string) (Version, error) {
 		path:    path,
 		version: version,
 	}, nil
-}
-
-// Sort sorts the list by Path, breaking ties by comparing Version fields.
-// The Version fields are interpreted as semantic versions (using semver.Compare)
-// optionally followed by a tie-breaking suffix introduced by a slash character,
-// like in "v0.0.1/module.cue".
-//
-// Deprecated: use [slices.SortFunc] with [Version.Compare].
-//
-//go:fix inline
-func Sort(list []Version) {
-	slices.SortFunc(list, Version.Compare)
 }

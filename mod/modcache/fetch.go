@@ -54,17 +54,6 @@ type Cache struct {
 	fetchCache       par.ErrCache[module.Version, module.SourceLoc]
 }
 
-// Deprecated: use [Cache.ModFile] instead.
-//
-//go:fix inline
-func (c *Cache) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
-	mf, err := c.ModFile(ctx, mv)
-	if err != nil {
-		return nil, err
-	}
-	return mf.DepVersions(), nil
-}
-
 // ModFile returns the parsed module file for the given module version,
 // downloading it if necessary. Results are cached.
 func (c *Cache) ModFile(ctx context.Context, mv module.Version) (*modfile.File, error) {

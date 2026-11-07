@@ -90,14 +90,6 @@ func (f *File) QualifiedModule() string {
 	return f.Module + "@v0"
 }
 
-// Deprecated: this method is misnamed; use [File.ModuleRootPath]
-// instead.
-//
-//go:fix inline
-func (f *File) ModulePath() string {
-	return f.ModuleRootPath()
-}
-
 // ModuleRootPath returns the path part of the module without
 // its major version suffix.
 func (f *File) ModuleRootPath() string {

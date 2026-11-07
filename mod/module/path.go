@@ -378,46 +378,6 @@ var badWindowsNames = []string{
 	"LPT9",
 }
 
-// SplitPathVersion returns a prefix and version suffix such that
-// prefix+"@"+version == path.
-//
-// SplitPathVersion returns (path, "", false) when there is no `@`
-// character splitting the path or if the version is empty.
-//
-// It does not check that the version is valid in any way other than
-// checking that it is not empty.
-//
-// For example:
-//
-// SplitPathVersion("foo.com/bar@v0.1") returns ("foo.com/bar", "v0.1", true).
-// SplitPathVersion("foo.com/bar@badvers") returns ("foo.com/bar", "badvers", true).
-// SplitPathVersion("foo.com/bar") returns ("foo.com/bar", "", false).
-// SplitPathVersion("foo.com/bar@") returns ("foo.com/bar@", "", false).
-//
-// Deprecated: use [ast.SplitPackageVersion] instead.
-//
-//go:fix inline
-func SplitPathVersion(path string) (prefix, version string, ok bool) {
-	return ast.SplitPackageVersion(path)
-}
-
-// ImportPath holds the various components of an import path.
-//
-// Deprecated: use [ast.ImportPath] instead.
-//
-//go:fix inline
-type ImportPath = ast.ImportPath
-
-// ParseImportPath returns the various components of an import path.
-// It does not check the result for validity.
-//
-// Deprecated: use [ast.ParseImportPath] instead.
-//
-//go:fix inline
-func ParseImportPath(p string) ast.ImportPath {
-	return ast.ParseImportPath(p)
-}
-
 // CheckPathMajor returns a non-nil error if the semantic version v
 // does not match the path major version pathMajor.
 func CheckPathMajor(v, pathMajor string) error {

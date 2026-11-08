@@ -1839,18 +1839,17 @@ bar: 2
 		@version(v0.18.0)
 		package p
 		`,
-			out: "@experiment(functions), @version(v0.18.0), package p\n@version must be the first file attribute, before the package clause, any @experiment attribute, and any declaration (and 1 more errors)",
+			out: "@experiment(functions), @version(v0.18.0), package p\nparsing experiments for version \"v0.16.0\": cannot set experiment \"functions\" before version v0.18.0 (and 1 more errors)",
 		},
 		{
 			// Each attribute which cannot be set is reported on its own.
-			// TODO: a single error is reported for both.
 			desc:    "unsupported experiments in two attributes",
 			version: "v0.15.0",
 			in: `@experiment(try)
 		@experiment(functions)
 		package p
 		`,
-			out: "@experiment(try), @experiment(functions), package p\nparsing experiments for version \"v0.15.0\": cannot set experiment \"try\" before version v0.16.0\ncannot set experiment \"functions\" before version v0.18.0",
+			out: "@experiment(try), @experiment(functions), package p\nparsing experiments for version \"v0.15.0\": cannot set experiment \"try\" before version v0.16.0 (and 1 more errors)",
 		},
 		{
 			desc:    "pre-v0.2 alias at top level",

@@ -38,7 +38,7 @@ type parser struct {
 	errors  errors.Error
 	scanner scanner.Scanner
 
-	expList     []string           // list of experiments to enable
+	expAttrs    []*ast.Attribute   // @experiment file attributes
 	experiments cueexperiment.File // none until setExperiments succeeds
 
 	// versionAttr is the file's @version attribute, if it has one in the
@@ -1227,8 +1227,7 @@ func (p *parser) addFileAttribute(a *ast.Attribute, beforePackage bool) {
 	defer func() { p.fileAttrs++ }()
 	switch a.Name() {
 	case "experiment":
-		_, body := a.Split()
-		p.expList = append(p.expList, body)
+		p.expAttrs = append(p.expAttrs, a)
 	case "version":
 		if p.fileAttrs > 0 || !beforePackage {
 			return
@@ -1610,14 +1609,32 @@ func (p *parser) functionsExperimentEnabled() bool {
 	return p.experiments.Functions
 }
 
-// setExperiments sets up the experiments for the given language version and
-// experiment names, reporting whether it succeeded. On failure, the error is
-// recorded and the parser must not proceed past the preamble.
-func (p *parser) setExperiments(version string, names ...string) bool {
+// setExperiments sets up the experiments of the file's attributes for the
+// given language version, reporting whether it succeeded. On failure, the
+// error is recorded and the parser must not proceed past the preamble.
+func (p *parser) setExperiments(version string) bool {
+	names := make([]string, len(p.expAttrs))
+	for i, a := range p.expAttrs {
+		_, names[i] = a.Split()
+	}
 	exp, err := cueexperiment.NewFile(version, names...)
 	if err != nil {
-		e := errors.Wrapf(err, p.pos, "parsing experiments for version %q", version)
-		p.errors = errors.Append(p.errors, e)
+		report := func(err error, pos token.Pos) {
+			e := errors.Wrapf(err, pos, "parsing experiments for version %q", version)
+			p.errors = errors.Append(p.errors, e)
+		}
+		// Report each attribute which fails on its own at its position,
+		// and the combined error only if none does.
+		failed := false
+		for i, a := range p.expAttrs {
+			if _, aerr := cueexperiment.NewFile(version, names[i]); aerr != nil {
+				report(aerr, a.At)
+				failed = true
+			}
+		}
+		if !failed {
+			report(err, p.pos)
+		}
 		return false
 	}
 	p.experiments = *exp
@@ -2744,7 +2761,7 @@ func (p *parser) parseFile() *ast.File {
 	// version, which is the default for files without one. On failure, stop
 	// after the preamble, which does not depend on experiments and is what
 	// loaders need.
-	expOK := p.setExperiments(cmp.Or(p.fileVersion, p.cfg.Version), p.expList...)
+	expOK := p.setExperiments(cmp.Or(p.fileVersion, p.cfg.Version))
 	if p.cfg.Mode&PackageClauseOnly == 0 {
 		// import decls
 		for p.tok == token.IDENT && p.lit == "import" {

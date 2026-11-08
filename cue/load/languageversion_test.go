@@ -165,16 +165,15 @@ func TestLanguageVersion(t *testing.T) {
 	}, {
 		// The module's version allows one experiment but not the other,
 		// whether their package is loaded directly or through an import.
-		// TODO: the error points at the import rather than the attribute.
 		name:    "ExperimentTooEarly",
 		dir:     "mod",
 		args:    []string{"./exp"},
-		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:6:1"},
+		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:2:1"},
 	}, {
 		name:    "ExperimentTooEarlyImported",
 		dir:     "mod",
 		args:    []string{"./imp"},
-		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:6:1"},
+		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:2:1"},
 	}, {
 		name:    "NotCanonical",
 		dir:     "loose",

@@ -383,7 +383,7 @@
 			{
 				"description": "ZERO WIDTH JOINER not preceded by Virama",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.2 https://www.unicode.org/review/pr-37.pdf",
-				"data": "क‍ष",
+				"data": "क\u200dष",
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success",
@@ -393,7 +393,7 @@
 			{
 				"description": "ZERO WIDTH JOINER not preceded by anything",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.2 https://www.unicode.org/review/pr-37.pdf",
-				"data": "‍ष",
+				"data": "\u200dष",
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success",
@@ -403,19 +403,19 @@
 			{
 				"description": "ZERO WIDTH JOINER preceded by Virama",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.2 https://www.unicode.org/review/pr-37.pdf",
-				"data": "क्‍ष",
+				"data": "क्\u200dष",
 				"valid": true
 			},
 			{
 				"description": "ZERO WIDTH NON-JOINER preceded by Virama",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.1",
-				"data": "क्‌ष",
+				"data": "क्\u200cष",
 				"valid": true
 			},
 			{
 				"description": "ZERO WIDTH NON-JOINER not preceded by Virama but matches regexp",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.1 https://www.w3.org/TR/alreq/#h_disjoining_enforcement",
-				"data": "بي‌بي",
+				"data": "بي\u200cبي",
 				"valid": true
 			},
 			{

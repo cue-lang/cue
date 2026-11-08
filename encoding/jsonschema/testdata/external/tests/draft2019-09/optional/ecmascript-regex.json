@@ -299,7 +299,7 @@
 			},
 			{
 				"description": "latin-1 non-breaking-space matches",
-				"data": " ",
+				"data": "\u00a0",
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
@@ -334,7 +334,7 @@
 			},
 			{
 				"description": "EM SPACE matches (Space_Separator)",
-				"data": " ",
+				"data": "\u2003",
 				"valid": true,
 				"skip": {
 					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
@@ -405,7 +405,7 @@
 			},
 			{
 				"description": "latin-1 non-breaking-space does not match",
-				"data": " ",
+				"data": "\u00a0",
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success",
@@ -440,7 +440,7 @@
 			},
 			{
 				"description": "EM SPACE does not match (Space_Separator)",
-				"data": " ",
+				"data": "\u2003",
 				"valid": false,
 				"skip": {
 					"v3": "unexpected success",

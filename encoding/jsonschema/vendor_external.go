@@ -35,7 +35,10 @@ import (
 	"path"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
+	"unicode/utf16"
+	"unicode/utf8"
 
 	"golang.org/x/mod/sumdb/dirhash"
 	"golang.org/x/sync/errgroup"
@@ -245,8 +248,24 @@ func normalizeJSON(ctx *cue.Context, data stdjson.RawMessage) (stdjson.RawMessag
 	if err != nil {
 		return nil, err
 	}
-	// See https://github.com/cue-lang/cue/issues/3398
-	return bytes.ReplaceAll(data, []byte("\ufeff"), []byte(`\ufeff`)), nil
+	return escapeNonPrintable(data), nil
+}
+
+// escapeNonPrintable escapes the characters that [strconv.IsPrint] rejects,
+// such as byte order marks, so they stand out in the vendored files.
+// MarshalJSON writes them only inside strings, where the escape is valid.
+func escapeNonPrintable(data []byte) []byte {
+	var buf []byte
+	for _, r := range string(data) {
+		if strconv.IsPrint(r) {
+			buf = utf8.AppendRune(buf, r)
+			continue
+		}
+		for _, u := range utf16.AppendRune(nil, r) {
+			buf = fmt.Appendf(buf, `\u%04x`, u)
+		}
+	}
+	return buf
 }
 
 // upToDate reports whether [stampFile] already describes the vendored test

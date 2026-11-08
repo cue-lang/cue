@@ -72,6 +72,18 @@ issue3042: {
 		}
 	}
 }
+-- skipped.cue --
+// The disjunction of a node with a reference to an ancestor is not evaluated,
+// and the node's value is only known once its structural cycle is reported.
+// A reference to the node sees the cycle, not the kind of the disjuncts.
+skippedDisjunction: ref: {
+	r: x.y + 1
+	x: {y: x & (*1 | 2)}
+}
+skippedDisjunction: guard: {
+	if x.y == 1 {s: true}
+	x: {y: x & (*1 | 2)}
+}
 -- out/compile --
 --- in.cue
 {
@@ -138,5 +150,26 @@ issue3042: {
         ]
       }
     })
+  }
+}
+--- skipped.cue
+{
+  skippedDisjunction: {
+    ref: {
+      r: (〈0;x〉.y + 1)
+      x: {
+        y: (〈1;x〉 & (*1|2))
+      }
+    }
+  }
+  skippedDisjunction: {
+    guard: {
+      if (〈0;x〉.y == 1) {
+        s: true
+      }
+      x: {
+        y: (〈1;x〉 & (*1|2))
+      }
+    }
   }
 }

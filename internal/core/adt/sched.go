@@ -1042,7 +1042,10 @@ func runTask(t *task, mode runMode) {
 	// cross-disjunct cycle err1/err2 in
 	// [cue/testdata/disjunctions/edge.txtar] documents that this must
 	// surface as an unresolved-disjunction error per the spec. Only the
-	// kinds of the disjuncts apply here.
+	// kinds of the disjuncts apply here. The early return leaves the
+	// conditions of the task unmet on purpose: the value of the node is
+	// only known once [assertStructuralCycle] has run, and a lookup
+	// seeing the kinds alone would read them in place of the cycle error.
 	//
 	// All other task kinds must still fire: they contribute structure or
 	// constraints that downstream lookups (e.g. `_self.foo`) need. Their

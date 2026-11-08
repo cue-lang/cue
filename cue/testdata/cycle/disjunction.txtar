@@ -86,6 +86,21 @@ issue3042: {
 		suberr=(code=eval, path=data, contains="conflicting values %s and %s (mismatched types %s and %s)", args=[{secret:{infra:[{name:"bar1"}]}}, string, struct, string], pos=[4:12, 6:8, 6:19]),
 	)
 }
+-- skipped.cue --
+// The disjunction of a node with a reference to an ancestor is not evaluated,
+// and the node's value is only known once its structural cycle is reported.
+// A reference to the node sees the cycle, not the kind of the disjuncts.
+skippedDisjunction: ref: {
+	r: x.y + 1
+	x: {y: x & (*1 | 2)}
+	@test(err, code=structural_cycle, at=r, contains="structural cycle", pos=[1:5])
+	@test(err, code=structural_cycle, at=x.y, contains="structural cycle", pos=[1:5])
+}
+skippedDisjunction: guard: {
+	if x.y == 1 {s: true}
+	x: {y: x & (*1 | 2)}
+	@test(err, code=structural_cycle, contains="structural cycle", pos=[1:5])
+}
 -- out/errors.txt --
 [structural_cycle] cycle.a: structural cycle
 [eval] issue3042.data: 2 errors in empty disjunction:
@@ -97,6 +112,12 @@ issue3042.data: conflicting values {secret:{infra:[{name:"bar1"}]}} and string (
     ./issue3042.cue:8:12
     ./issue3042.cue:10:8
     ./issue3042.cue:10:19
+[structural_cycle] skippedDisjunction.ref.x.y: structural cycle:
+    ./skipped.cue:5:5
+[structural_cycle] skippedDisjunction.ref.x.y: structural cycle:
+    ./skipped.cue:5:5
+[structural_cycle] skippedDisjunction.guard.x.y: structural cycle:
+    ./skipped.cue:11:5
 -- out/eval/stats --
 Leaks:  24
 Freed:  114

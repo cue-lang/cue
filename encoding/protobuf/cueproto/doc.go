@@ -19,7 +19,7 @@
 // extensions.
 package cueproto
 
-// The cue.pb.go files here and in the sibling cue package are generated
-// without needing protoc; see [cuelang.org/go/internal/cmd/genproto].
+// The cue.pb.go file is generated without needing protoc;
+// see [cuelang.org/go/internal/cmd/genproto].
 
 //go:generate go run cuelang.org/go/internal/cmd/genproto

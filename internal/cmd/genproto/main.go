@@ -45,7 +45,7 @@ import (
 // working directory.
 const root = ".."
 
-var protoFiles = []string{"cueproto/cue.proto", "cue/cue.proto"}
+var protoFiles = []string{"cueproto/cue.proto"}
 
 // protocVersion is the protoc release whose behavior the generated
 // output mimics, recorded in the generated headers. protoc uses major

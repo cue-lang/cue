@@ -21,8 +21,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 
-	//lint:ignore SA1019 TestCompatPackage covers the deprecated package
-	"cuelang.org/go/encoding/protobuf/cue"
 	"cuelang.org/go/encoding/protobuf/cueproto"
 )
 
@@ -40,12 +38,4 @@ func TestExtensions(t *testing.T) {
 
 	qt.Assert(t, qt.Equals(proto.GetExtension(got, cueproto.E_Val).(string), `=~"^[A-Z]"`))
 	qt.Assert(t, qt.IsTrue(proto.GetExtension(got, cueproto.E_Opt).(*cueproto.FieldOptions).GetRequired()))
-}
-
-// TestCompatPackage checks that the deprecated cue package, generated from
-// the cue/cue.proto shim, forwards to the same extensions.
-func TestCompatPackage(t *testing.T) {
-	qt.Assert(t, qt.Equals(cue.E_Val, cueproto.E_Val))
-	qt.Assert(t, qt.Equals(cue.E_Opt, cueproto.E_Opt))
-	qt.Assert(t, qt.IsNotNil(cue.File_cue_cue_proto))
 }

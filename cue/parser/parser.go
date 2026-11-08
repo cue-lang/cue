@@ -1612,7 +1612,7 @@ func (p *parser) functionsExperimentEnabled() bool {
 
 // setExperiments sets up the experiments for the given language version and
 // experiment names, reporting whether it succeeded. On failure, the error is
-// recorded and the parser must not proceed.
+// recorded and the parser must not proceed past the preamble.
 func (p *parser) setExperiments(version string, names ...string) bool {
 	exp, err := cueexperiment.NewFile(version, names...)
 	if err != nil {
@@ -2741,18 +2741,17 @@ func (p *parser) parseFile() *ast.File {
 	}
 
 	// A file's own @version attribute takes precedence over the configured
-	// version, which is the default for files without one.
-	if !p.setExperiments(cmp.Or(p.fileVersion, p.cfg.Version), p.expList...) {
-		return nil
-	}
-
+	// version, which is the default for files without one. On failure, stop
+	// after the preamble, which does not depend on experiments and is what
+	// loaders need.
+	expOK := p.setExperiments(cmp.Or(p.fileVersion, p.cfg.Version), p.expList...)
 	if p.cfg.Mode&PackageClauseOnly == 0 {
 		// import decls
 		for p.tok == token.IDENT && p.lit == "import" {
 			decls = append(decls, p.parseImports())
 		}
 
-		if p.cfg.Mode&ImportsOnly == 0 {
+		if expOK && p.cfg.Mode&ImportsOnly == 0 {
 			// rest of package decls
 			// TODO: loop and allow multiple expressions.
 			decls = append(decls, p.parseFieldList()...)

@@ -1805,12 +1805,11 @@ bar: 2
 			in: `@experiment(explicitopen)
 		x: y...
 		`,
-			out: "\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0",
+			out: "@experiment(explicitopen)\nparsing experiments for version \"v0.14.0\": cannot set experiment \"explicitopen\" before version v0.15.0",
 		},
 		{
-			// The preamble should be kept, so that loaders still see the
-			// file's package and imports, and report the error.
-			// TODO: the whole file is dropped.
+			// The preamble is kept, so that loaders still see the file's
+			// package and imports, and report the error.
 			desc:    "unsupported experiment keeps the preamble",
 			version: "v0.16.0",
 			in: `@experiment(functions)
@@ -1818,19 +1817,29 @@ bar: 2
 		import "strings"
 		x: strings.ToUpper("x")
 		`,
-			out: "\nparsing experiments for version \"v0.16.0\": cannot set experiment \"functions\" before version v0.18.0",
+			out: "@experiment(functions), package p, import \"strings\"\nparsing experiments for version \"v0.16.0\": cannot set experiment \"functions\" before version v0.18.0",
+		},
+		{
+			// Errors in the imports are reported without any experiments.
+			desc:    "unsupported experiment with an erroneous import",
+			version: "v0.16.0",
+			in: `@experiment(functions)
+		package p
+		import "\(==1)"
+		import "\(x...)"
+		`,
+			out: "@experiment(functions), package p, import \nparsing experiments for version \"v0.16.0\": cannot set experiment \"functions\" before version v0.18.0 (and 6 more errors)",
 		},
 		{
 			// A misplaced @version attribute is not the file's version,
 			// which is why the experiment cannot be set.
-			// TODO: only the experiment error is reported.
 			desc:    "unsupported experiment before a misplaced version",
 			version: "v0.16.0",
 			in: `@experiment(functions)
 		@version(v0.18.0)
 		package p
 		`,
-			out: "\nparsing experiments for version \"v0.16.0\": cannot set experiment \"functions\" before version v0.18.0",
+			out: "@experiment(functions), @version(v0.18.0), package p\n@version must be the first file attribute, before the package clause, any @experiment attribute, and any declaration (and 1 more errors)",
 		},
 		{
 			// Each attribute which cannot be set is reported on its own.
@@ -1841,7 +1850,7 @@ bar: 2
 		@experiment(functions)
 		package p
 		`,
-			out: "\nparsing experiments for version \"v0.15.0\": cannot set experiment \"try\" before version v0.16.0\ncannot set experiment \"functions\" before version v0.18.0",
+			out: "@experiment(try), @experiment(functions), package p\nparsing experiments for version \"v0.15.0\": cannot set experiment \"try\" before version v0.16.0\ncannot set experiment \"functions\" before version v0.18.0",
 		},
 		{
 			desc:    "pre-v0.2 alias at top level",

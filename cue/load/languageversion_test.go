@@ -171,11 +171,10 @@ func TestLanguageVersion(t *testing.T) {
 		args:    []string{"./exp"},
 		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:6:1"},
 	}, {
-		// TODO: the import skips the file as if it named no package.
 		name:    "ExperimentTooEarlyImported",
 		dir:     "mod",
 		args:    []string{"./imp"},
-		wantErr: []string{`no files in package directory with package name "exp"`},
+		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:6:1"},
 	}, {
 		name:    "NotCanonical",
 		dir:     "loose",

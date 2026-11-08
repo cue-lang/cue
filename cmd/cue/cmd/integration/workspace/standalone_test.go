@@ -120,7 +120,7 @@ y: x
 			env.CreateBuffer("z.cue", "@experiment(unknown)")
 			env.Await(
 				env.DoneWithOpen(),
-				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Error when reloading: parsing experiments", rootURI),
+				I.LogExactf(protocol.Debug, 1, false, "StandaloneFile %v/z.cue Reloaded", rootURI),
 				// The file is kept, with its error published as a
 				// diagnostic.
 				I.Diagnostics(I.ForFile("z.cue")),

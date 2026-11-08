@@ -16,7 +16,9 @@ package cuetxtar
 
 import (
 	"cmp"
+	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -602,24 +604,53 @@ func (c *cmpCtx) cmpStruct(path cue.Path, s *ast.StructLit, val cue.Value) error
 				len(patterns), len(valPatterns))
 		}
 
-		// Match patterns positionally (both ordered by source).
-		for _, ep := range patterns {
-			patPath := path.Append(cue.Str(fmt.Sprintf("[%s]", toStr(ep.pattern))))
-			found := false
-			var vp valPat
-			for _, p := range valPatterns {
-				if err := c.astCmp(patPath, ep.pattern, p.sel.Pattern()); err == nil {
-					found = true
-					vp = p
-					break
+		// Match each expected pattern constraint with a distinct one of the
+		// value, independently of their order. An expected one may compare
+		// equal to several of the value's, as [] does with both [...int] and
+		// [...string], so find a complete matching by augmenting paths rather
+		// than taking the first match.
+		patPaths := make([]cue.Path, len(patterns))
+		candidates := make([][]int, len(patterns))
+		for i, ep := range patterns {
+			patPaths[i] = path.Append(cue.Str(fmt.Sprintf("[%s]", toStr(ep.pattern))))
+			var valueErrs []error
+			for j, vp := range valPatterns {
+				if c.astCmp(patPaths[i], ep.pattern, vp.sel.Pattern()) != nil {
+					continue
+				}
+				if err := c.astCmp(patPaths[i], ep.value, vp.value); err != nil {
+					valueErrs = append(valueErrs, err)
+					continue
+				}
+				candidates[i] = append(candidates[i], j)
+			}
+			if len(candidates[i]) == 0 {
+				if len(valueErrs) > 0 {
+					return pathErr(patPaths[i], "incompatible pattern value: %w", errors.Join(valueErrs...))
+				}
+				return pathErr(patPaths[i], "pattern constraint %v not found in value", toStr(ep.pattern))
+			}
+		}
+		owner := slices.Repeat([]int{-1}, len(valPatterns)) // index into patterns
+		seen := make([]bool, len(valPatterns))
+		var augment func(i int) bool
+		augment = func(i int) bool {
+			for _, j := range candidates[i] {
+				if seen[j] {
+					continue
+				}
+				seen[j] = true
+				if owner[j] < 0 || augment(owner[j]) {
+					owner[j] = i
+					return true
 				}
 			}
-			if !found {
-				return pathErr(patPath, "pattern constraint %v not found in value", toStr(ep.pattern))
-			}
-
-			if err := c.astCmp(patPath, ep.value, vp.value); err != nil {
-				return pathErr(patPath, "incompatible pattern value: %w", err)
+			return false
+		}
+		for i, ep := range patterns {
+			clear(seen)
+			if !augment(i) {
+				return pathErr(patPaths[i], "pattern constraint %v already matched by another expected one", toStr(ep.pattern))
 			}
 		}
 	}

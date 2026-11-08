@@ -750,30 +750,40 @@ func TestAstCompare_PatternConstraints(t *testing.T) {
 		},
 
 		{
-			// Each pattern in the value should be matched at most once.
-			// TODO: the second expected [string] matches the value's first
-			// pattern again, so [=~"b"] is never checked.
+			// Each pattern in the value is matched at most once, so a second
+			// expected [string] cannot match the value's first pattern again.
 			name:    "two expected patterns match one value pattern",
 			expr:    `{[string]: int, [string]: int}`,
 			val:     `{[string]: int, [=~"b"]: string}`,
-			wantErr: ``,
+			wantErr: `pattern constraint string already matched by another expected one`,
 		},
 		{
-			// Both patterns of the value are =~"a". Each expected one should
-			// be matched with the one whose value compares equal.
-			// TODO: the first pattern with an equal label is taken.
+			// Both patterns of the value are =~"a". Each expected one is
+			// matched with the one whose value compares equal.
 			name:    "pattern matches by label and value",
 			expr:    `{[=~"a"]: string, [=~"a"]: int}`,
 			val:     `{[=~"a" & string]: int, [=~"a"]: string}`,
-			wantErr: "expected string, got int",
+			wantErr: "",
 		},
 		{
-			// Every value mismatch should be reported.
-			// TODO: only the first one is.
+			// [] compares equal to both patterns of the value, as it does not
+			// check their element constraints, so it must leave [...int] to
+			// the other expected pattern regardless of their order.
+			name: "partial pattern value before a full one",
+			expr: `{[=~"a"]: [], [=~"a"]: [...int]}`,
+			val:  `{[=~"a" & string]: [...int], [=~"a"]: [...string]}`,
+		},
+		{
+			name: "partial pattern value after a full one",
+			expr: `{[=~"a"]: [...int], [=~"a"]: []}`,
+			val:  `{[=~"a" & string]: [...int], [=~"a"]: [...string]}`,
+		},
+		{
+			// Every value mismatch is reported.
 			name:    "pattern value matches none of the patterns with its label",
 			expr:    `{[=~"a"]: bool, [=~"a"]: bool}`,
 			val:     `{[=~"a" & string]: int, [=~"a"]: string}`,
-			wantErr: "incompatible pattern value: " + `"[=~\"a\"]": expected bool, got int`,
+			wantErr: "incompatible pattern value: " + `"[=~\"a\"]": expected bool, got int` + "\n" + `"[=~\"a\"]": expected bool, got string`,
 		},
 
 		// ── positive: duplicate pattern labels unify in the evaluated value ──

@@ -1,0 +1,14 @@
+#path: a.shared
+
+-- in.cue --
+a: shared: (x & {}).a
+x: y
+y: a: msg
+msg: string
+-- out/self-v3/default --
+MSG
+
+//cue:path: msg
+let MSG = string
+-- out/self-v3-noshare/default --
+string

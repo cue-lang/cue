@@ -42,13 +42,7 @@ func TestVisit(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		flags := cuedebug.Config{
-			Sharing: true,
-			// LogEval: 1,
-		}
 		ctx := t.CueContext()
-		r := (*runtime.Runtime)(ctx)
-		r.SetDebugOptions(&flags)
 
 		val := ctx.BuildInstance(t.Instance())
 		if val.Err() != nil {

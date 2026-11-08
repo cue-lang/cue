@@ -1,0 +1,17 @@
+#path: a.env
+
+-- in.cue --
+a: env: (extIf & {}).env
+extIf: {
+	if true {
+		env: msg
+	}
+}
+msg: string
+-- out/self-v3/default --
+MSG
+
+//cue:path: msg
+let MSG = string
+-- out/self-v3-noshare/default --
+string

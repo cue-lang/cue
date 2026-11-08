@@ -24,6 +24,7 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cueversion"
 )
@@ -38,6 +39,21 @@ language: version: "v0.16.0"
 package x
 
 a: 1
+-- mod/exp/exp.cue --
+@experiment(try)
+@experiment(functions)
+
+package exp
+
+import "strings"
+
+f: func(s: string) -> string: strings.ToUpper(s)
+-- mod/imp/imp.cue --
+package imp
+
+import "mod.example/exp"
+
+out: exp.f("x")
 -- mod/nested/cue.mod/module.cue --
 module: "nested.example@v0"
 language: version: "v0.15.0"
@@ -147,6 +163,20 @@ func TestLanguageVersion(t *testing.T) {
 		args: []string{"."},
 		want: []string{"v0.16.0"},
 	}, {
+		// The module's version allows one experiment but not the other,
+		// whether their package is loaded directly or through an import.
+		// TODO: the error points at the import rather than the attribute.
+		name:    "ExperimentTooEarly",
+		dir:     "mod",
+		args:    []string{"./exp"},
+		wantErr: []string{`cannot set experiment "functions" before version v0.18.0`, "exp.cue:6:1"},
+	}, {
+		// TODO: the import skips the file as if it named no package.
+		name:    "ExperimentTooEarlyImported",
+		dir:     "mod",
+		args:    []string{"./imp"},
+		wantErr: []string{`no files in package directory with package name "exp"`},
+	}, {
 		name:    "NotCanonical",
 		dir:     "loose",
 		args:    []string{"y.cue"},
@@ -248,7 +278,7 @@ func TestLanguageVersion(t *testing.T) {
 			inst := insts[0]
 			if test.wantErr != nil {
 				qt.Assert(t, qt.IsNotNil(inst.Err))
-				msg := inst.Err.Error()
+				msg := errors.Details(inst.Err, nil)
 				for _, want := range test.wantErr {
 					qt.Check(t, qt.StringContains(msg, want))
 				}

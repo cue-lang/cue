@@ -38,8 +38,8 @@ type parser struct {
 	errors  errors.Error
 	scanner scanner.Scanner
 
-	expList     []string // list of experiments to enable
-	experiments *cueexperiment.File
+	expList     []string           // list of experiments to enable
+	experiments cueexperiment.File // none until setExperiments succeeds
 
 	// versionAttr is the file's @version attribute, if it has one in the
 	// right place, and fileVersion the language version it declares.
@@ -135,10 +135,7 @@ func (p *parser) init(filename string, src []byte, opts []Option) {
 // versionAtLeast reports whether the file's language version is at least v.
 // An absent version (empty string) is treated as the latest version.
 func (p *parser) versionAtLeast(v string) bool {
-	fv := ""
-	if p.experiments != nil {
-		fv = p.experiments.LanguageVersion()
-	}
+	fv := p.experiments.LanguageVersion()
 	return fv == "" || semver.Compare(fv, v) >= 0
 }
 
@@ -1507,7 +1504,7 @@ func (p *parser) parseFallbackClause(clauses []ast.Clause) *ast.FallbackClause {
 	}
 	c := p.openComments()
 
-	if p.experiments == nil || !p.experiments.Try {
+	if !p.experiments.Try {
 		p.errf(p.pos, "%s requires @experiment(try)", p.tok)
 	}
 
@@ -1569,7 +1566,7 @@ func (p *parser) parseClosedLiteral() ast.Expr {
 	}
 	next := p.peekToken
 	adjacent := next.pos.Offset() == p.pos.Offset()+1
-	enabled := p.experiments != nil && p.experiments.OpenLists
+	enabled := p.experiments.OpenLists
 
 	switch {
 	case next.tok == token.LBRACE && adjacent:
@@ -1606,17 +1603,16 @@ func (p *parser) parseClosedLiteral() ast.Expr {
 }
 
 func (p *parser) functionsEnabled() bool {
-	return p.cfg.Mode&ParseFuncs != 0 ||
-		(p.experiments != nil && p.experiments.Functions)
+	return p.cfg.Mode&ParseFuncs != 0 || p.experiments.Functions
 }
 
 func (p *parser) functionsExperimentEnabled() bool {
-	return p.experiments != nil && p.experiments.Functions
+	return p.experiments.Functions
 }
 
 // setExperiments sets up the experiments for the given language version and
 // experiment names, reporting whether it succeeded. On failure, the error is
-// recorded and the parser must not proceed, as p.experiments is unset.
+// recorded and the parser must not proceed.
 func (p *parser) setExperiments(version string, names ...string) bool {
 	exp, err := cueexperiment.NewFile(version, names...)
 	if err != nil {
@@ -1624,7 +1620,7 @@ func (p *parser) setExperiments(version string, names ...string) bool {
 		p.errors = errors.Append(p.errors, e)
 		return false
 	}
-	p.experiments = exp
+	p.experiments = *exp
 	p.file.SetExperiments(exp)
 	p.scanner.SetExperiments(p.scannerExperiments(false))
 	return true
@@ -1634,10 +1630,7 @@ func (p *parser) setExperiments(version string, names ...string) bool {
 // ParseFuncs compatibility mode and error recovery can force function tokens
 // on without changing the experiment state recorded on the parsed file.
 func (p *parser) scannerExperiments(forceFunctions bool) *cueexperiment.File {
-	experiments := cueexperiment.File{}
-	if p.experiments != nil {
-		experiments = *p.experiments
-	}
+	experiments := p.experiments
 	if forceFunctions || p.cfg.Mode&ParseFuncs != 0 {
 		experiments.Functions = true
 	}
@@ -2155,7 +2148,7 @@ func (p *parser) parseAlias(lhs ast.Expr) (expr ast.Expr) {
 	pos := p.pos
 
 	// Check if old-style aliases are disallowed
-	if p.experiments != nil && p.experiments.AliasV2 {
+	if p.experiments.AliasV2 {
 		// Blame the language version once aliasv2 is stable there, else the attribute.
 		cause := "with @experiment(aliasv2)"
 		if cueexperiment.IsStable("aliasv2", p.experiments.LanguageVersion()) {
@@ -2203,7 +2196,7 @@ func (p *parser) parsePostfixAliasAllowed(allowFunctions bool) *ast.PostfixAlias
 	pos := p.pos
 
 	// Check if postfix alias syntax requires experiment
-	aliasEnabled := p.experiments != nil && p.experiments.AliasV2
+	aliasEnabled := p.experiments.AliasV2
 	functionAliasEnabled := allowFunctions && p.functionsExperimentEnabled()
 	if !aliasEnabled && !functionAliasEnabled {
 		p.errf(pos, "postfix alias syntax requires language version v0.18.0 or @experiment(aliasv2)")

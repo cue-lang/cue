@@ -95,7 +95,7 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	hasToolFile := false
 	for c := range w.LeafConjuncts() {
 		src := c.Source()
-		if src != nil && strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
+		if src != nil && isToolFile(src.Pos().Filename()) {
 			hasToolFile = true
 			break
 		}

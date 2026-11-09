@@ -53,6 +53,7 @@ func newHelpCmd(c *Command) *cobra.Command {
 				cmd, found = nil, false
 			}
 			isCmd := len(args) > 0 && args[0] == "cmd"
+			loaded := true // whether the workflow commands could be loaded
 			if isCmd {
 				// args is one of:
 				//
@@ -68,15 +69,17 @@ func newHelpCmd(c *Command) *cobra.Command {
 					args = args[:2]
 				}
 
-				tools, err := buildTools(c, pkgArgs)
-				if err == nil {
-					addCustomCommands(c, cmd, commandSection, tools)
+				// Plain `cue help cmd` is left to the help func of `cue cmd`.
+				if len(args) > 1 {
+					loaded = addHelpCommands(c, pkgArgs)
 					// For the sake of `cue help cmd mycmd`, find the command again.
 					cmd, found = findCmd()
 				}
 			}
 			if !found {
-				if isCmd {
+				if !loaded {
+					// The error was printed already; mycmd may well exist.
+				} else if isCmd {
 					// Note that for args ["cmd", "mycmd", "./mypkg"] we only want "mycmd".
 					fmt.Fprintf(c.Stderr(), "Unknown cmd command: %s\n", args[1])
 				} else {

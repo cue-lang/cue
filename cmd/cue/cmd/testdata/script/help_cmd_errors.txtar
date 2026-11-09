@@ -2,69 +2,62 @@
 # can be listed otherwise.
 
 # Tool files from multiple packages.
-# TODO: the error is dropped, so no commands are listed with no error.
 cd $WORK/mod/multi
-exec cue help cmd
+! exec cue help cmd
 stdout '^Usage:'
-! stderr .
-exec cue cmd --help
+cmp stderr $WORK/multi.stderr
+! exec cue cmd --help
 stdout '^Usage:'
-! stderr .
+cmp stderr $WORK/multi.stderr
 
 # Package arguments are loaded rather than the current directory.
-# TODO: `cue cmd --help` loads the current directory.
 exec cue help cmd hello ../ok
 stdout '^say hello$'
 ! stderr .
 exec cue cmd hello ../ok --help
-! stdout 'say hello'
+stdout '^  hello +say hello$'
 ! stderr .
 
 # An import which cannot be resolved.
-# TODO: the error is dropped, so no commands are listed with no error.
 cd $WORK/mod/badimport
-exec cue help cmd
+! exec cue help cmd
 stdout '^Usage:'
-! stderr .
-exec cue cmd --help
+cmp stderr $WORK/badimport.stderr
+! exec cue cmd --help
 stdout '^Usage:'
-! stderr .
+cmp stderr $WORK/badimport.stderr
 
 # A command which could not be loaded is not reported as unknown.
-# TODO: the error is dropped, and the command is reported as unknown.
 ! exec cue help cmd foo
 ! stdout .
-! stderr 'import failed'
+stderr -count=1 'import failed'
 stderr -count=1 '^Usage:'
-stderr -count=1 'Unknown cmd command'
+! stderr 'Unknown cmd command'
 
 # A syntax error in a file in an ancestor directory.
-# TODO: the error is dropped, so no commands are listed with no error.
 cd $WORK/mod/badancestor/a
-exec cue help cmd
+! exec cue help cmd
 stdout '^Usage:'
-! stderr .
-exec cue cmd --help
+cmp stderr $WORK/badancestor.stderr
+! exec cue cmd --help
 stdout '^Usage:'
-! stderr .
+cmp stderr $WORK/badancestor.stderr
 
 # Tool files in an ancestor directory, and an import which cannot be
 # resolved in the current directory.
-# TODO: the error is dropped, so no commands are listed with no error.
 cd $WORK/mod/toolancestor/a
-exec cue help cmd
+! exec cue help cmd
 stdout '^Usage:'
-! stderr .
-exec cue cmd --help
+cmp stderr $WORK/toolancestor.stderr
+! exec cue cmd --help
 stdout '^Usage:'
-! stderr .
+cmp stderr $WORK/toolancestor.stderr
 
 # An invalid flag is reported even without any tool files.
-# TODO: the error is dropped.
 cd $WORK/mod/empty
-exec cue cmd --language-version=bogus --help
+! exec cue cmd --language-version=bogus --help
 stdout '^Usage:'
-! stderr .
+stderr -count=1 'language version "bogus" is not canonical'
 
 # Without any tool files in the package, there are no commands to list,
 # so the help text is shown without any errors from loading.
@@ -127,6 +120,8 @@ command: foo: {}
 package b
 
 command: bar: {}
+-- multi.stderr --
+found packages "a" (a_tool.cue) and "b" (b_tool.cue) in "multi"
 -- mod/ok/a_tool.cue --
 package a
 
@@ -140,6 +135,9 @@ import "missing.example/foo"
 command: foo: {}
 
 x: foo.x
+-- badimport.stderr --
+test.example/badimport@v0: import failed: cannot find package "missing.example/foo": cannot find module providing package missing.example/foo:
+    ./a_tool.cue:3:8
 -- mod/badancestor/invalid.cue --
 package data
 
@@ -148,6 +146,9 @@ x: "no closing quote
 package a
 
 command: foo: {}
+-- badancestor.stderr --
+string literal not terminated:
+    ../invalid.cue:3:4
 -- mod/toolancestor/a_tool.cue --
 package a
 
@@ -158,6 +159,9 @@ package a
 import "missing.example/foo"
 
 x: foo.x
+-- toolancestor.stderr --
+test.example/toolancestor/a@v0: import failed: cannot find package "missing.example/foo": cannot find module providing package missing.example/foo:
+    ./a.cue:3:8
 -- mod/empty/README.md --
 No CUE files.
 -- mod/pkg/p.cue --

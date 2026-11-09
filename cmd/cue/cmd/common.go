@@ -842,6 +842,16 @@ func mergeToolData(cmd *Command, binst []*build.Instance) ([]*build.Instance, er
 }
 
 func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
+	binst, err := loadTools(cmd, args)
+	if err != nil {
+		return nil, err
+	}
+	return buildLoadedTools(cmd, binst)
+}
+
+// loadTools loads the packages in args along with their tool files.
+// Errors in the packages themselves are left for [buildLoadedTools].
+func loadTools(cmd *Command, args []string) ([]*build.Instance, error) {
 	cfg, err := defaultConfig()
 	if err != nil {
 		return nil, err
@@ -857,9 +867,14 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	if len(binst) == 0 {
 		return nil, nil
 	}
-	binst, err = mergeToolData(cmd, binst)
-	if err != nil {
-		return nil, err
+	return mergeToolData(cmd, binst)
+}
+
+// buildLoadedTools builds the packages from [loadTools] into a single
+// instance holding their tool files.
+func buildLoadedTools(cmd *Command, binst []*build.Instance) (*cue.Instance, error) {
+	if len(binst) == 0 {
+		return nil, nil
 	}
 	included := map[string]bool{}
 
@@ -873,7 +888,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 
 	for _, inst := range binst {
 		inst.Files = slices.DeleteFunc(inst.Files, func(f *ast.File) bool {
-			if strings.HasSuffix(f.Filename, "_tool.cue") {
+			if isToolFile(f.Filename) {
 				if !included[f.Filename] {
 					_ = ti.AddSyntax(f)
 					included[f.Filename] = true

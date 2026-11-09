@@ -746,19 +746,22 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 	e.copyMeta(c, comp.Syntax)
 
 	// TODO: consider using adt.EnvExpr.
-	v := e.expr(env, adt.ToExpr(comp.Value))
-	if _, ok := v.(*ast.StructLit); !ok {
-		v = ast.NewStruct(ast.Embed(v))
-	}
-	c.Value = v
+	c.Value = e.clauseBody(env, comp.Value)
 
 	// Export fallback clause using outer environment.
 	if comp.Fallback != nil {
-		fallbackBody := e.expr(outerEnv, comp.Fallback)
-		if body, ok := fallbackBody.(*ast.StructLit); ok {
-			c.Fallback = &ast.FallbackClause{Body: body}
-		}
+		c.Fallback = &ast.FallbackClause{Body: e.clauseBody(outerEnv, comp.Fallback)}
 	}
 
 	return c
+}
+
+// clauseBody exports the body of a comprehension or its fallback clause,
+// which must be a struct literal even when the body only embeds a value.
+func (e *exporter) clauseBody(env *adt.Environment, x adt.Expr) *ast.StructLit {
+	v := e.expr(env, x)
+	if s, ok := v.(*ast.StructLit); ok {
+		return s
+	}
+	return ast.NewStruct(ast.Embed(v))
 }

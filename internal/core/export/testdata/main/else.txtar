@@ -73,22 +73,30 @@ embedded: z: 1
 ifElseEmbed: {
 	if false {
 		a: 1
+	} else {
+		embedded
 	}
 }
 forFallbackEmbed: {
 	for x in [] {
 		"\(x)": x
+	} otherwise {
+		embedded
 	}
 }
 tryElseEmbed: {
 	try {
 		a: embedded.missing?
+	} else {
+		embedded
 	}
 }
 
 // The fallback refers to the outer field, not the shadowing for variable.
 forFallbackShadow: {
 	for embedded in [] {
+		embedded
+	} otherwise {
 		embedded
 	}
 }
@@ -105,7 +113,7 @@ diff old new
  // if-else
  ifElse: {
  	if false {
-@@ -8,21 +11,46 @@
+@@ -8,21 +11,54 @@
  	}
  }
  
@@ -142,22 +150,30 @@ diff old new
 +ifElseEmbed: {
 +	if false {
 +		a: 1
++	} else {
++		embedded
 +	}
 +}
 +forFallbackEmbed: {
 +	for x in [] {
 +		"\(x)": x
++	} otherwise {
++		embedded
 +	}
 +}
 +tryElseEmbed: {
 +	try {
 +		a: embedded.missing?
++	} else {
++		embedded
 +	}
 +}
 +
 +// The fallback refers to the outer field, not the shadowing for variable.
 +forFallbackShadow: {
 +	for embedded in [] {
++		embedded
++	} otherwise {
 +		embedded
  	}
  }
@@ -199,22 +215,30 @@ embedded: z: 1
 ifElseEmbed: {
 	if false {
 		a: 1
+	} else {
+		embedded
 	}
 }
 forFallbackEmbed: {
 	for x in [] {
 		"\(x)": x
+	} otherwise {
+		embedded
 	}
 }
 tryElseEmbed: {
 	try {
 		a: embedded.missing?
+	} else {
+		embedded
 	}
 }
 
 // The fallback refers to the outer field, not the shadowing for variable.
 forFallbackShadow: {
 	for embedded in [] {
+		embedded
+	} otherwise {
 		embedded
 	}
 }
@@ -231,7 +255,7 @@ diff old new
  // if-else
  ifElse: {
  	if false {
-@@ -8,21 +11,46 @@
+@@ -8,21 +11,54 @@
  	}
  }
  
@@ -268,22 +292,30 @@ diff old new
 +ifElseEmbed: {
 +	if false {
 +		a: 1
++	} else {
++		embedded
 +	}
 +}
 +forFallbackEmbed: {
 +	for x in [] {
 +		"\(x)": x
++	} otherwise {
++		embedded
 +	}
 +}
 +tryElseEmbed: {
 +	try {
 +		a: embedded.missing?
++	} else {
++		embedded
 +	}
 +}
 +
 +// The fallback refers to the outer field, not the shadowing for variable.
 +forFallbackShadow: {
 +	for embedded in [] {
++		embedded
++	} otherwise {
 +		embedded
  	}
  }

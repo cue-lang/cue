@@ -12,15 +12,19 @@ refs: [
 	q,
 ]
 
-// A reference to an import in a top-level pattern is rejected as a
-// reference to a field the pattern is matched against.
+// A reference to an import in a top-level pattern is not a reference
+// to a field the pattern is matched against.
 [bar.Pattern]: string
 -- out/resolve/in --
-7[refs]: Scope: 0[<nil>] Node: 0[]
-8[bar]:  Scope: 0[<nil>] Node: 2["foo.com/bar"]
-9[baz]:  Scope: 0[<nil>] Node: 3["foo.com/bar:baz"]
-10[p]:   Scope: 0[<nil>] Node: 4["other.org/p@v1"]
-11[q]:   Scope: 0[<nil>] Node: 5["other.org/p@v2:q"]
+7[refs]:     Scope: 0[<nil>] Node: 0[]
+8[bar]:      Scope: 0[<nil>] Node: 2["foo.com/bar"]
+9[baz]:      Scope: 0[<nil>] Node: 3["foo.com/bar:baz"]
+10[p]:       Scope: 0[<nil>] Node: 4["other.org/p@v1"]
+11[q]:       Scope: 0[<nil>] Node: 5["other.org/p@v2:q"]
+13[bar]:     Scope: 0[<nil>] Node: 2["foo.com/bar"]
+14[Pattern]: Scope: 0[<nil>] Node: 0[]
+15[string]:  Scope: 0[<nil>] Node: 0[]
+Unresolved: 15[string]
 -- out/resolve/errors --
-reference "bar" in label expression refers to field against which it would be matched:
-    ./in.cue:16:2
+import failed: imports are unavailable because there is no cue.mod/module.cue file:
+    ./in.cue:2:2

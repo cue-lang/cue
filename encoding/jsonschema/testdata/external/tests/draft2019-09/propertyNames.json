@@ -8,8 +8,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot sanitize jsonschema resulting syntax: reference \"strings\" in label expression refers to field against which it would be matched",
-			"v3-roundtrip": "inital extract failed"
+			"v3-roundtrip": "generation only supported in version https://json-schema.org/draft/2020-12/schema"
 		},
 		"tests": [
 			{
@@ -20,7 +19,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "could not extract schema",
 					"v3-roundtrip": "could not extract schema"
 				}
 			},
@@ -32,7 +30,7 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
+					"v3": "unexpected success",
 					"v3-roundtrip": "could not extract schema"
 				}
 			},
@@ -41,7 +39,6 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v3": "could not extract schema",
 					"v3-roundtrip": "could not extract schema"
 				}
 			},
@@ -55,7 +52,6 @@
 				],
 				"valid": true,
 				"skip": {
-					"v3": "could not extract schema",
 					"v3-roundtrip": "could not extract schema"
 				}
 			},
@@ -64,7 +60,6 @@
 				"data": "foobar",
 				"valid": true,
 				"skip": {
-					"v3": "could not extract schema",
 					"v3-roundtrip": "could not extract schema"
 				}
 			},
@@ -73,7 +68,6 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v3": "could not extract schema",
 					"v3-roundtrip": "could not extract schema"
 				}
 			}

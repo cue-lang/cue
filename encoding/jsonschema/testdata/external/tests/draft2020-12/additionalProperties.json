@@ -228,21 +228,13 @@
 				"type": "number"
 			}
 		},
-		"skip": {
-			"v3": "extract error: cannot sanitize jsonschema resulting syntax: reference \"strings\" in label expression refers to field against which it would be matched",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "Valid against both keywords",
 				"data": {
 					"apple": 4
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Valid against propertyNames, but not additionalProperties",
@@ -250,11 +242,7 @@
 					"fig": 2,
 					"pear": "available"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},

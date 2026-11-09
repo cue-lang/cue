@@ -2065,32 +2065,20 @@
 				"type": "number"
 			}
 		},
-		"skip": {
-			"v3": "extract error: cannot sanitize jsonschema resulting syntax: reference \"strings\" in label expression refers to field against which it would be matched",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "allows only number properties",
 				"data": {
 					"a": 1
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "string property is invalid",
 				"data": {
 					"a": "b"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": false
 			}
 		]
 	},

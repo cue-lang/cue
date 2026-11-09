@@ -593,7 +593,9 @@ func (s *scope) Before(n ast.Node) bool {
 			ast.Walk(expr, nil, func(n ast.Node) {
 				if x, ok := n.(*ast.Ident); ok {
 					for s := s; s != nil && !s.inField; s = s.outer {
-						if _, ok := s.index[x.Name]; ok {
+						e, ok := s.index[x.Name]
+						// An import is not a field to match against.
+						if _, isImport := e.node.(*ast.ImportSpec); ok && !isImport {
 							s.errFn(n.Pos(),
 								"reference %q in label expression refers to field against which it would be matched", x.Name)
 						}

@@ -7,10 +7,6 @@
 				"maxLength": 3
 			}
 		},
-		"skip": {
-			"v3": "extract error: cannot sanitize jsonschema resulting syntax: reference \"strings\" in label expression refers to field against which it would be matched",
-			"v3-roundtrip": "inital extract failed"
-		},
 		"tests": [
 			{
 				"description": "all property names valid",
@@ -18,11 +14,7 @@
 					"f": {},
 					"foo": {}
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "some property names invalid",
@@ -32,18 +24,14 @@
 				},
 				"valid": false,
 				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
+					"v3": "unexpected success",
+					"v3-roundtrip": "unexpected success"
 				}
 			},
 			{
 				"description": "object without properties is valid",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores arrays",
@@ -53,29 +41,17 @@
 					3,
 					4
 				],
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores strings",
 				"data": "foobar",
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ignores other non-objects",
 				"data": 12,
-				"valid": true,
-				"skip": {
-					"v3": "could not extract schema",
-					"v3-roundtrip": "could not extract schema"
-				}
+				"valid": true
 			}
 		]
 	},

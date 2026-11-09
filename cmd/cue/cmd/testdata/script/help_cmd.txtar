@@ -21,6 +21,18 @@ stderr -count=1 'Unknown cmd command: missing'
 stderr -count=1 '^Available Commands:$'
 stderr -count=1 'hello *say hello to someone'
 
+# A tool file may import a package which uses @embed.
+cd embed
+exec cue cmd show
+stdout '^some text$'
+# TODO: help text does not support @embed, so loading the tool files fails.
+! exec cue help cmd
+! stdout '^  show +show some embedded text$'
+stderr 'no injection defined for "embed"'
+! exec cue cmd --help
+! stdout '^  show +show some embedded text$'
+stderr 'no injection defined for "embed"'
+
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.9.0"
@@ -49,6 +61,24 @@ command: echo: {
     }
 }
 
+-- embed/show_tool.cue --
+package show
+
+import (
+	"tool/cli"
+	"test.example/embed/data"
+)
+
+// show some embedded text
+command: show: cli.Print & {text: data.text}
+-- embed/data/data.cue --
+@extern(embed)
+
+package data
+
+text: _ @embed(file=text.txt, type=text)
+-- embed/data/text.txt --
+some text
 -- cue-cmd.stderr --
 cmd must be run as one of its subcommands
 Run 'cue help cmd' for known subcommands.

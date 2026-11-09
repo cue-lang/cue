@@ -27,6 +27,16 @@ package x
 
 y: a.b
 a: b: z: 3
+-- _registry/example.com_qux_v0.0.1/cue.mod/module.cue --
+module: "example.com/qux@v0"
+language: version: "v0.11.0"
+deps: "example.com/foo@v0": v: "v0.0.1"
+-- _registry/example.com_qux_v0.0.1/q/q.cue --
+package q
+
+import "example.com/foo/x"
+
+#Q: x.a.b
 `)))
 
 	qt.Assert(t, qt.IsNil(err))
@@ -38,6 +48,9 @@ module: "example.com/bar"
 language: version: "v0.11.0"
 deps: {
 	"example.com/foo@v0": {
+		v: "v0.0.1"
+	}
+	"example.com/qux@v0": {
 		v: "v0.0.1"
 	}
 }
@@ -57,6 +70,13 @@ import "example.com/bar/doesnotexist" // unknown package
 package c
 
 import "
+-- d/d.cue --
+package d
+
+import "example.com/qux/q"
+
+v: q.#Q & {z: 3}
+w: q.#Q & {}
 `
 
 	t.Run("open", func(t *testing.T) {
@@ -158,6 +178,120 @@ import "
 					},
 				},
 			}))
+		})
+	})
+
+	// The definition of z is found through an import in another
+	// dependency module, which resolves it with its own module.cue.
+	t.Run("jump to definition - transitive inter module", func(t *testing.T) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("d/d.cue")
+			env.Await(
+				env.DoneWithOpen(),
+			)
+			locs := env.Definition(protocol.Location{
+				URI: rootURI + "/d/d.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 4, Character: 11},
+				},
+			})
+			// TODO: z in foo's x/y.cue is missing.
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{
+				{
+					URI: rootURI + "/d/d.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 4, Character: 11},
+						End:   protocol.Position{Line: 4, Character: 12},
+					},
+				},
+			}))
+		})
+	})
+
+	// References to z are found through an import in another
+	// dependency module, both from its use and from its declaration.
+	t.Run("references - transitive inter module", func(t *testing.T) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
+			env.Await(
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("d/d.cue")
+			env.Await(
+				env.DoneWithOpen(),
+			)
+			decl := protocol.Location{
+				URI: cacheURI + "/example.com/foo@v0.0.1/x/y.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 3, Character: 6},
+					End:   protocol.Position{Line: 3, Character: 7},
+				},
+			}
+			useA := protocol.Location{
+				URI: rootURI + "/a/a.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 5, Character: 7},
+					End:   protocol.Position{Line: 5, Character: 8},
+				},
+			}
+			useD := protocol.Location{
+				URI: rootURI + "/d/d.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 4, Character: 11},
+					End:   protocol.Position{Line: 4, Character: 12},
+				},
+			}
+			// TODO: the declaration in foo's x/y.cue and its use in a/a.cue are missing.
+			qt.Assert(t, qt.DeepEquals(env.References(useD), []protocol.Location{useD}))
+
+			// The editor only opens files in its workdir, so ask the
+			// server directly about the declaration in the module cache.
+			locs, err := env.Editor.Server.References(env.Ctx, &protocol.ReferenceParams{
+				TextDocumentPositionParams: protocol.LocationTextDocumentPositionParams(decl),
+				Context:                    protocol.ReferenceContext{IncludeDeclaration: true},
+			})
+			qt.Assert(t, qt.IsNil(err))
+			// TODO: the use in d/d.cue is missing.
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{decl, useA}))
+		})
+	})
+
+	// The fields of a definition from another dependency module's
+	// import are offered as completions.
+	t.Run("completion - transitive inter module", func(t *testing.T) {
+		I.WithOptions(
+			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
+		).Run(t, files, func(t *testing.T, env *I.Env) {
+			rootURI := env.Sandbox.Workdir.RootURI()
+			env.Await(
+				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
+			)
+			env.OpenFile("d/d.cue")
+			env.Await(
+				env.DoneWithOpen(),
+			)
+			completions := env.Completion(protocol.Location{
+				URI: rootURI + "/d/d.cue",
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 5, Character: 11},
+				},
+			})
+			qt.Assert(t, qt.IsNotNil(completions))
+			labels := make(map[string]bool, len(completions.Items))
+			for _, item := range completions.Items {
+				labels[item.Label] = true
+			}
+			// TODO: z in foo's x/y.cue is missing.
+			qt.Assert(t, qt.IsFalse(labels["z"]), qt.Commentf("unexpected z in %v", completions.Items))
 		})
 	})
 }

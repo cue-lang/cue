@@ -22,13 +22,16 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"testing/fstest"
 
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/value"
 	"cuelang.org/go/tools/fix"
 )
 
@@ -307,4 +310,31 @@ func runPolicyFixture(t *testing.T, path string) {
 	}
 	exit, stderr = run(false)
 	check("expect2", 0, exit, stderr)
+}
+
+// TestBuildToolsImportsUnevaluated checks that buildTools only compiles the
+// packages imported by tool files, leaving their evaluation to the tasks,
+// which evaluate copies of them.
+func TestBuildToolsImportsUnevaluated(t *testing.T) {
+	dir := t.TempDir()
+	qt.Assert(t, qt.IsNil(os.CopyFS(dir, fstest.MapFS{
+		"cue.mod/module.cue": {Data: []byte(`module: "mod.test/test", language: version: "v0.9.0"`)},
+		"p/p.cue":            {Data: []byte("package p\ngood: \"good\"")},
+		"use/use_tool.cue": {Data: []byte(`package use
+import "mod.test/test/p"
+command: unused: text: "test \(p.good)"`)},
+	})))
+	t.Chdir(dir)
+
+	c, err := New(nil)
+	qt.Assert(t, qt.IsNil(err))
+	c.ctx = cuecontext.New()
+	tools, err := buildTools(c, []string{"./use"})
+	qt.Assert(t, qt.IsNil(err))
+
+	r, _ := value.ToInternal(tools.Value())
+	imports := tools.Value().BuildInstance().Imports
+	qt.Assert(t, qt.HasLen(imports, 1))
+	// TODO: every imported package is evaluated in full before running a command.
+	qt.Assert(t, qt.IsFalse(r.LoadInstance(imports[0]).IsUnprocessed()))
 }

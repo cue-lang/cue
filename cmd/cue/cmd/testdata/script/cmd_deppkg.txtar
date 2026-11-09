@@ -1,6 +1,28 @@
 exec cue cmd foo
 cmp stdout cue_cmd_foo_both.golden
 
+# An imported package is only evaluated as far as the command needs it,
+# so an error in a part of it which the command does not use is not reported.
+# TODO: every imported package is evaluated in full before running a command.
+! exec cue cmd unused ./usebad
+stderr 'conflicting values "b" and "a"'
+
+# An error in a part of an imported package which the command uses is reported.
+! exec cue cmd used ./usebad
+cmp stderr cue_cmd_used.stderr
+
+# When the reference into the imported package depends on another task's output,
+# the error is reported once that output is in, after the tasks before it.
+# TODO: the error is reported before any task runs.
+! exec cue cmd later ./usebad
+! stdout .
+cmp stderr cue_cmd_later.stderr
+
+# A build error in an imported package, such as an unresolved reference,
+# is reported even when the command does not use that part of it.
+! exec cue cmd unused ./useundef
+cmp stderr cue_cmd_undef.stderr
+
 -- cue.mod/module.cue --
 module: "mod.test/test"
 language: version: "v0.9.0"
@@ -24,3 +46,60 @@ command: foo: cli.Print & {
 x: "sub"
 -- cue_cmd_foo_both.golden --
 test sub
+-- bad/bad.cue --
+package bad
+
+good: "good"
+bad:  "a" & "b"
+-- usebad/usebad_tool.cue --
+package usebad
+
+import (
+	"strings"
+	"tool/cli"
+	"tool/file"
+
+	"mod.test/test/bad"
+)
+
+command: unused: cli.Print & {
+	text: "test \(bad.good)"
+}
+command: used: cli.Print & {
+	text: "test \(bad.bad)"
+}
+command: later: {
+	before: cli.Print & {text: "before"}
+	key: file.Read & {$after: before, filename: "key.txt", contents: string}
+	use: cli.Print & {text: "test \(bad[strings.TrimSpace(key.contents)])"}
+}
+-- key.txt --
+bad
+-- cue_cmd_used.stderr --
+bad: conflicting values "b" and "a":
+    ./bad/bad.cue:4:7
+    ./bad/bad.cue:4:13
+-- cue_cmd_later.stderr --
+bad: conflicting values "b" and "a":
+    ./bad/bad.cue:4:7
+    ./bad/bad.cue:4:13
+-- undef/undef.cue --
+package undef
+
+good: "good"
+bad:  nosuch
+-- useundef/useundef_tool.cue --
+package useundef
+
+import (
+	"tool/cli"
+
+	"mod.test/test/undef"
+)
+
+command: unused: cli.Print & {
+	text: "test \(undef.good)"
+}
+-- cue_cmd_undef.stderr --
+bad: reference "nosuch" not found:
+    ./undef/undef.cue:4:7

@@ -1052,6 +1052,138 @@ func TestASTStyleLabels(t *testing.T) {
 			t.Errorf("label changed under zero Config: %T", fld.Label)
 		}
 	})
+
+	// An alias or let clause may not be named like a field in the same
+	// scope, an enclosing one, or a nested one, so a label stays quoted
+	// where unquoting it would name one, whether or not a reference to the
+	// name is in scope. The aliases of a pattern constraint and value
+	// aliases are in a scope of their field's own, so a label within
+	// another field's value may be named like them. A comprehension clause
+	// variable is not an alias: a field may be named like it, as long as no
+	// reference to the variable resolves past the field.
+	//
+	// The labels named like an alias in another scope are unquoted; the
+	// output of those cases, other than the Sibling ones, does not parse.
+	t.Run("Aliases", func(t *testing.T) {
+		testCases := []struct {
+			name string
+			// version is the language version src is written in; the
+			// alias forms written with = are not allowed as of v0.18.0.
+			version string
+			src     string
+			out     string
+		}{{
+			name:    "LabelAlias",
+			version: "v0.17.0",
+			src:     "\"X\": 2\na: {X=x: 1, c: X}\n",
+			out:     "X: 2\na: {X=x: 1, c: X}\n",
+		}, {
+			name:    "LabelAliasOuter",
+			version: "v0.17.0",
+			src:     "K=x: 1\ny: K\na: {\"K\": int}\n",
+			out:     "K=x: 1\ny:   K\na:   {K: int}\n",
+		}, {
+			name:    "PatternAlias",
+			version: "v0.17.0",
+			src:     "\"X\": 2\na: {[X=string]: int}\n",
+			out:     "\"X\": 2\na:   {[X=string]: int}\n",
+		}, {
+			name:    "PatternAliasSameScope",
+			version: "v0.17.0",
+			src:     "[X=string]: int\n\"X\": 2\n",
+			out:     "[X=string]: int\n\"X\":        2\n",
+		}, {
+			name:    "PatternAliasValue",
+			version: "v0.17.0",
+			src:     "[X=string]: {\"X\": 2}\n",
+			out:     "[X=string]: {X: 2}\n",
+		}, {
+			name:    "PatternLabelAliasValue",
+			version: "v0.17.0",
+			src:     "X=[string]: {\"X\": 2}\n",
+			out:     "X=[string]: {X: 2}\n",
+		}, {
+			name:    "PatternAliasSibling",
+			version: "v0.17.0",
+			src:     "X=[string]: int\na: {\"X\": 2}\n",
+			out:     "X=[string]: int\na:          {X: 2}\n",
+		}, {
+			name:    "ValueAlias",
+			version: "v0.17.0",
+			src:     "\"X\": 2\na: {x: X={}}\n",
+			out:     "\"X\": 2\na:   {x: X={}}\n",
+		}, {
+			name:    "ValueAliasValue",
+			version: "v0.17.0",
+			src:     "x: X={\"X\": 2}\n",
+			out:     "x: X={X: 2}\n",
+		}, {
+			name:    "ValueAliasSibling",
+			version: "v0.17.0",
+			src:     "x: X={}\na: {\"X\": 2}\n",
+			out:     "x: X={}\na: {X: 2}\n",
+		}, {
+			name: "PostfixAlias",
+			src:  "\"X\": 2\na: {x~X: 1}\n",
+			out:  "X: 2\na: {x~(X): 1}\n",
+		}, {
+			name: "PostfixAliasOuter",
+			src:  "x~X: 1\ny: X\na: {\"X\": int}\n",
+			out:  "x~(X): 1\ny:     X\na:     {X: int}\n",
+		}, {
+			name: "PostfixAliasDual",
+			src:  "\"K\": 2\n\"V\": 3\na: {x~(K, V): 1}\n",
+			out:  "K: 2\nV: 3\na: {x~(K,V): 1}\n",
+		}, {
+			name: "PostfixPatternAlias",
+			src:  "\"X\": 2\na: {[string]~X: int}\n",
+			out:  "X: 2\na: {[string]~(X): int}\n",
+		}, {
+			name: "PostfixPatternAliasValue",
+			src:  "[string]~X: {\"X\": 2}\n",
+			out:  "[string]~(X): {X: 2}\n",
+		}, {
+			name: "PostfixPatternAliasSibling",
+			src:  "[string]~X: int\na: {\"X\": 2}\n",
+			out:  "[string]~(X): int\na:            {X: 2}\n",
+		}, {
+			name: "LetClause",
+			src:  "\"X\": 2\na: {let X = 1}\n",
+			out:  "\"X\": 2\na:   {let X = 1}\n",
+		}, {
+			name: "LetClauseOuter",
+			src:  "let X = 1\ny: X\na: {b: {\"X\": 2}}\n",
+			out:  "let X = 1\ny: X\na: {b: {X: 2}}\n",
+		}, {
+			name: "LetClauseSameScope",
+			src:  "\"X\": 2\nlet X = 1\n",
+			out:  "\"X\": 2\nlet X = 1\n",
+		}, {
+			name: "ClauseVars",
+			src:  "for X in [1] let Y = X try Z = Y? {\n\t\"X\": 1\n\t\"Y\": 1\n\t\"Z\": 1\n}\n",
+			out:  "for X in [1] let Y = X try Z = Y? {\n\tX: 1\n\tY: 1\n\tZ: 1\n}\n",
+		}, {
+			name: "Sibling",
+			src:  "a: {x~X: 1}\nb: {\"X\": 2}\n",
+			out:  "a: {x~(X): 1}\nb: {X: 2}\n",
+		}}
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				f, err := parser.ParseFile("in", tc.src, parser.ParseComments, parser.Version(tc.version))
+				if err != nil {
+					t.Fatal(err)
+				}
+				annotate(t, cfg, f)
+				got, err := format.Node(f)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if string(got) != tc.out {
+					t.Errorf("got:\n%s\nwant:\n%s", got, tc.out)
+				}
+			})
+		}
+	})
 }
 
 func TestASTStyleClearPositions(t *testing.T) {

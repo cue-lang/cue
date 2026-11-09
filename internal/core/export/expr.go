@@ -157,9 +157,6 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		e.addExpr(c.c.Env, src, x, false)
 	}
 
-	// Only the let clauses of the merged structs are declared so far.
-	hasLets := len(s.Elts) > 0
-
 	if src != nil {
 		for _, a := range src.Arcs {
 			if x, ok := e.fields[a.Label]; ok {
@@ -221,7 +218,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			} else {
 				x = e.embed[0]
 			}
-			if len(e.attrs) == 0 && !hasLets {
+			// Drop the unused lets of the merged structs first, so that
+			// x is unwrapped if none remain.
+			if hasLets := filterUnusedLets(s); len(e.attrs) == 0 && !hasLets {
 				return x
 			}
 			if st, ok := x.(*ast.StructLit); ok {

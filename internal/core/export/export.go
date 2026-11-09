@@ -812,12 +812,17 @@ func (e *exporter) markLetAlias(x *ast.LetClause) {
 	top.scope.Elts = append(top.scope.Elts, let)
 }
 
-// In value mode, lets are only used if there wasn't an error.
-func filterUnusedLets(s *ast.StructLit) {
+// filterUnusedLets drops the unused let clauses in s, and reports whether
+// any remain. In value mode, lets are only used if there wasn't an error.
+func filterUnusedLets(s *ast.StructLit) (hasLets bool) {
 	s.Elts = slices.DeleteFunc(s.Elts, func(d ast.Decl) bool {
 		let, ok := d.(*ast.LetClause)
+		if ok && let.Expr != nil {
+			hasLets = true
+		}
 		return ok && let.Expr == nil
 	})
+	return hasLets
 }
 
 // lookupLetAlias returns the let clause added for the source let clause x by

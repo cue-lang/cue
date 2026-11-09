@@ -140,8 +140,7 @@ embedded: {
 	a: {x: 1, if true {}}
 }
 // The lets of the struct literals of an embedded conjunction are exported
-// within them, but declared in the enclosing scope too, which the
-// conjunction is wrapped in a struct of its own for.
+// within them, so the conjunction is not wrapped in a struct of its own.
 conjunction: {
 	x: 99
 	a: {{x: 1, let N = {y: x}, b: N} & {x: 1, if true {}}}
@@ -208,15 +207,14 @@ scoped: {
 }
 x: "foo"
 // The lets of the struct literals of an embedded conjunction are exported
-// within them, but declared in the enclosing scope too, which the
-// conjunction is wrapped in a struct of its own for.
+// within them, so the conjunction is not wrapped in a struct of its own.
 conjunction: {
 	x: 99
-	a: {{
+	a: {
 		let N_1 = {y: x}
 		x: 1
 		b: N_1
-	} & {x: 1, if true {}}}
+	} & {x: 1, if true {}}
 }
 incomplete: {
 	a: {
@@ -277,8 +275,7 @@ as it holds a comprehension, so N is exported within it, where x is a.x.
 [embedded a b y]
 [conjunction]
 - The lets of the struct literals of an embedded conjunction are exported
-within them, but declared in the enclosing scope too, which the
-conjunction is wrapped in a struct of its own for.
+within them, so the conjunction is not wrapped in a struct of its own.
 
 [conjunction x]
 [conjunction a]
@@ -384,7 +381,7 @@ conjunction is wrapped in a struct of its own for.
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,27 @@
+@@ -1,4 +1,26 @@
  []
 +[embedded]
 +- The let clause is declared in the first struct literal, which is embedded
@@ -399,8 +396,7 @@ diff old new
 +[embedded a b y]
 +[conjunction]
 +- The lets of the struct literals of an embedded conjunction are exported
-+within them, but declared in the enclosing scope too, which the
-+conjunction is wrapped in a struct of its own for.
++within them, so the conjunction is not wrapped in a struct of its own.
 +
 +[conjunction x]
 +[conjunction a]
@@ -412,7 +408,7 @@ diff old new
  [comprehension]
  [comprehension filepath]
  [X]
-@@ -55,7 +78,6 @@
+@@ -55,7 +77,6 @@
  [cfgs 1]
  [cfgs 1 metadata]
  [cfgs 1 metadata name]
@@ -420,7 +416,7 @@ diff old new
  [files]
  [scoped]
  [scoped _args]
-@@ -92,3 +114,4 @@
+@@ -92,3 +113,4 @@
  [Y]
  [y]
  [Y]
@@ -544,8 +540,7 @@ diff old new
 		}
 	}
 	// The lets of the struct literals of an embedded conjunction are exported
-	// within them, but declared in the enclosing scope too, which the
-	// conjunction is wrapped in a struct of its own for.
+	// within them, so the conjunction is not wrapped in a struct of its own.
 	conjunction: {
 		x: 99
 		a: {
@@ -617,8 +612,7 @@ diff old new
 		}
 	}
 	// The lets of the struct literals of an embedded conjunction are exported
-	// within them, but declared in the enclosing scope too, which the
-	// conjunction is wrapped in a struct of its own for.
+	// within them, so the conjunction is not wrapped in a struct of its own.
 	conjunction: {
 		x: 99
 		a: {
@@ -762,8 +756,7 @@ diff old new
 		}
 	}
 	// The lets of the struct literals of an embedded conjunction are exported
-	// within them, but declared in the enclosing scope too, which the
-	// conjunction is wrapped in a struct of its own for.
+	// within them, so the conjunction is not wrapped in a struct of its own.
 	conjunction: {
 		x: 99
 		a: {
@@ -908,7 +901,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,209 +1,153 @@
+@@ -1,209 +1,151 @@
  == Simplified
  {
 -	cfgs: [{
@@ -1026,8 +1019,7 @@ diff old new
 +		}
 +	}
 +	// The lets of the struct literals of an embedded conjunction are exported
-+	// within them, but declared in the enclosing scope too, which the
-+	// conjunction is wrapped in a struct of its own for.
++	// within them, so the conjunction is not wrapped in a struct of its own.
 +	conjunction: {
 +		x: 99
 +		a: {
@@ -1205,8 +1197,7 @@ diff old new
 +		}
 +	}
 +	// The lets of the struct literals of an embedded conjunction are exported
-+	// within them, but declared in the enclosing scope too, which the
-+	// conjunction is wrapped in a struct of its own for.
++	// within them, so the conjunction is not wrapped in a struct of its own.
 +	conjunction: {
 +		x: 99
 +		a: {
@@ -1262,7 +1253,7 @@ diff old new
  
  			if !Args.required {
  				// `default` sets the default value.
-@@ -216,192 +160,139 @@
+@@ -216,192 +158,138 @@
  }
  == Final
  {
@@ -1513,8 +1504,7 @@ diff old new
 +		}
 +	}
 +	// The lets of the struct literals of an embedded conjunction are exported
-+	// within them, but declared in the enclosing scope too, which the
-+	// conjunction is wrapped in a struct of its own for.
++	// within them, so the conjunction is not wrapped in a struct of its own.
 +	conjunction: {
 +		x: 99
 +		a: {
@@ -1570,7 +1560,7 @@ diff old new
  
  			if !Args.required {
  				// `default` sets the default value.
-@@ -415,106 +306,72 @@
+@@ -415,106 +303,72 @@
  == Eval
  {
  	#Foo: 2

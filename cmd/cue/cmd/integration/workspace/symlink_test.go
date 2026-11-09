@@ -2,7 +2,9 @@ package workspace
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -175,4 +177,105 @@ x: _
 		})
 		qt.Assert(t, qt.IsNil(got))
 	})
+}
+
+// TestNonCUEEntries checks that an entry of a package directory which
+// cannot be a CUE file does not stop the package from loading.
+func TestNonCUEEntries(t *testing.T) {
+	t.Parallel()
+	const files = `
+-- mod/cue.mod/module.cue --
+module: "mod.example/x"
+language: version: "v0.16.0"
+-- mod/a.cue --
+@extern(embed)
+package a
+
+data: _ @embed(glob=link/*.json)
+
+x: 1
+y: x
+-- real/data.json --
+{"field": true}
+`
+	symlink := func(target string) func(t *testing.T, path string) {
+		return func(t *testing.T, path string) {
+			err := os.Symlink(target, path)
+			qt.Assert(t, qt.IsNil(err))
+		}
+	}
+	// Reading a FIFO blocks until something opens it to write.
+	fifo := func(t *testing.T, path string) {
+		if runtime.GOOS == "windows" {
+			// Git Bash has a mkfifo, but it makes no FIFO that Go can see.
+			t.Skip("no FIFOs on Windows")
+		}
+		if _, err := exec.LookPath("mkfifo"); err != nil {
+			t.Skip(err)
+		}
+		err := exec.Command("mkfifo", path).Run()
+		qt.Assert(t, qt.IsNil(err))
+	}
+	tests := []struct {
+		entry  string
+		create func(t *testing.T, path string)
+	}{
+		// The embed reaches outside the module through the link.
+		{"link", symlink(filepath.Join("..", "real"))},
+		{"missing", symlink("nonexistent")},
+		{"loop", symlink("loop")},
+		{"pipe", fifo},
+		// Only on the command line does "-" stand for standard input.
+		{"-", fifo},
+		{"secret", func(t *testing.T, path string) {
+			if runtime.GOOS == "windows" || os.Geteuid() == 0 {
+				t.Skip("cannot make a file unreadable")
+			}
+			err := os.WriteFile(path, []byte("secret"), 0)
+			qt.Assert(t, qt.IsNil(err))
+		}},
+	}
+	for _, test := range tests {
+		t.Run(test.entry, func(t *testing.T) {
+			t.Parallel()
+			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
+				rootURI := env.Sandbox.Workdir.RootURI()
+				path := filepath.Join(rootURI.FilePath(), "mod", test.entry)
+				test.create(t, path)
+
+				env.OpenFile("mod/a.cue")
+				if fi, err := os.Lstat(path); err == nil && fi.Mode()&os.ModeNamedPipe != 0 {
+					// The load opens the FIFO to read it and blocks. Opening
+					// it to write releases the load, which reads it as empty.
+					opened := make(chan error, 1)
+					go func() {
+						f, err := os.OpenFile(path, os.O_WRONLY, 0)
+						if err == nil {
+							err = f.Close()
+						}
+						opened <- err
+					}()
+					select {
+					case err := <-opened:
+						qt.Assert(t, qt.IsNil(err))
+					case <-time.After(5 * time.Second):
+						t.Fatal("the load did not open the FIFO")
+					}
+					return
+				}
+				env.Await(env.DoneWithOpen())
+				got := env.Definition(protocol.Location{
+					URI:   rootURI + "/mod/a.cue",
+					Range: protocol.Range{Start: protocol.Position{Line: 6, Character: 3}},
+				})
+				// The entry fails the load, so the package is not loaded.
+				qt.Assert(t, qt.IsNil(got))
+				if test.entry == "link" {
+					env.Await(
+						I.LogMatching(protocol.Debug, 0, false, `Package dirs=\[%v/mod/link\] importPath=mod\.example/x/link@v0:_.+ Reloaded`, rootURI),
+					)
+				}
+			})
+		})
+	}
 }

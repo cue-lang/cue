@@ -18,6 +18,23 @@ forFallbackOuter: {
 	let val = 10
 	for x in [] { x } fallback { fallbackField: val }
 }
+
+// Fallback clauses which only embed a reference.
+embedded: {z: 1}
+ifElseEmbed: {
+	if false { a: 1 } else { embedded }
+}
+forFallbackEmbed: {
+	for x in [] { "\(x)": x } fallback { embedded }
+}
+tryElseEmbed: {
+	try { a: embedded.missing? } else { embedded }
+}
+
+// The fallback refers to the outer field, not the shadowing for variable.
+forFallbackShadow: {
+	for embedded in [] { embedded } otherwise { embedded }
+}
 -- out/definition-v3-noshare --
 @experiment(try)
 
@@ -50,6 +67,31 @@ forFallbackOuter: {
 		fallbackField: val
 	}
 }
+
+// Fallback clauses which only embed a reference.
+embedded: z: 1
+ifElseEmbed: {
+	if false {
+		a: 1
+	}
+}
+forFallbackEmbed: {
+	for x in [] {
+		"\(x)": x
+	}
+}
+tryElseEmbed: {
+	try {
+		a: embedded.missing?
+	}
+}
+
+// The fallback refers to the outer field, not the shadowing for variable.
+forFallbackShadow: {
+	for embedded in [] {
+		embedded
+	}
+}
 -- diff/-out/definition-v3-noshare<==>+out/definition --
 diff old new
 --- old
@@ -63,17 +105,19 @@ diff old new
  // if-else
  ifElse: {
  	if false {
-@@ -8,21 +11,21 @@
+@@ -8,21 +11,46 @@
  	}
  }
  
 -// for-else with empty list
 -forElse: {
+-	for x in [] {
+-		"\(x)": x
+-	} else {
 +// for-fallback with empty list
 +forFallback: {
- 	for x in [] {
- 		"\(x)": x
--	} else {
++	for x in [] {
++		"\(x)": x
 +	} otherwise {
  		empty: true
  	}
@@ -90,6 +134,31 @@ diff old new
 -		fallback: val
 +	} otherwise {
 +		fallbackField: val
++	}
++}
++
++// Fallback clauses which only embed a reference.
++embedded: z: 1
++ifElseEmbed: {
++	if false {
++		a: 1
++	}
++}
++forFallbackEmbed: {
++	for x in [] {
++		"\(x)": x
++	}
++}
++tryElseEmbed: {
++	try {
++		a: embedded.missing?
++	}
++}
++
++// The fallback refers to the outer field, not the shadowing for variable.
++forFallbackShadow: {
++	for embedded in [] {
++		embedded
  	}
  }
 -- out/definition-v3 --
@@ -124,6 +193,31 @@ forFallbackOuter: {
 		fallbackField: val
 	}
 }
+
+// Fallback clauses which only embed a reference.
+embedded: z: 1
+ifElseEmbed: {
+	if false {
+		a: 1
+	}
+}
+forFallbackEmbed: {
+	for x in [] {
+		"\(x)": x
+	}
+}
+tryElseEmbed: {
+	try {
+		a: embedded.missing?
+	}
+}
+
+// The fallback refers to the outer field, not the shadowing for variable.
+forFallbackShadow: {
+	for embedded in [] {
+		embedded
+	}
+}
 -- diff/-out/definition-v3<==>+out/definition --
 diff old new
 --- old
@@ -137,17 +231,19 @@ diff old new
  // if-else
  ifElse: {
  	if false {
-@@ -8,21 +11,21 @@
+@@ -8,21 +11,46 @@
  	}
  }
  
 -// for-else with empty list
 -forElse: {
+-	for x in [] {
+-		"\(x)": x
+-	} else {
 +// for-fallback with empty list
 +forFallback: {
- 	for x in [] {
- 		"\(x)": x
--	} else {
++	for x in [] {
++		"\(x)": x
 +	} otherwise {
  		empty: true
  	}
@@ -164,6 +260,31 @@ diff old new
 -		fallback: val
 +	} otherwise {
 +		fallbackField: val
++	}
++}
++
++// Fallback clauses which only embed a reference.
++embedded: z: 1
++ifElseEmbed: {
++	if false {
++		a: 1
++	}
++}
++forFallbackEmbed: {
++	for x in [] {
++		"\(x)": x
++	}
++}
++tryElseEmbed: {
++	try {
++		a: embedded.missing?
++	}
++}
++
++// The fallback refers to the outer field, not the shadowing for variable.
++forFallbackShadow: {
++	for embedded in [] {
++		embedded
  	}
  }
 -- out/definition --
@@ -210,11 +331,25 @@ forElseOuter: {
 
 [forFallbackOuter val]
 [forFallbackOuter fallbackField]
+[embedded]
+- Fallback clauses which only embed a reference.
+
+[embedded z]
+[ifElseEmbed]
+[ifElseEmbed z]
+[forFallbackEmbed]
+[forFallbackEmbed z]
+[tryElseEmbed]
+[tryElseEmbed z]
+[forFallbackShadow]
+- The fallback refers to the outer field, not the shadowing for variable.
+
+[forFallbackShadow z]
 -- diff/-out/doc-v3<==>+out/doc --
 diff old new
 --- old
 +++ new
-@@ -1,16 +1,14 @@
+@@ -1,16 +1,28 @@
  []
 -- Test export of else clause in comprehensions
 -
@@ -240,6 +375,20 @@ diff old new
 +
 +[forFallbackOuter val]
 +[forFallbackOuter fallbackField]
++[embedded]
++- Fallback clauses which only embed a reference.
++
++[embedded z]
++[ifElseEmbed]
++[ifElseEmbed z]
++[forFallbackEmbed]
++[forFallbackEmbed z]
++[tryElseEmbed]
++[tryElseEmbed z]
++[forFallbackShadow]
++- The fallback refers to the outer field, not the shadowing for variable.
++
++[forFallbackShadow z]
 -- out/doc --
 []
 - Test export of else clause in comprehensions
@@ -269,6 +418,15 @@ diff old new
 
 	// for-fallback with outer scope reference
 	forFallbackOuter: fallbackField: 10
+
+	// Fallback clauses which only embed a reference.
+	embedded: z:         1
+	ifElseEmbed: z:      1
+	forFallbackEmbed: z: 1
+	tryElseEmbed: z:     1
+
+	// The fallback refers to the outer field, not the shadowing for variable.
+	forFallbackShadow: z: 1
 }
 == Raw
 {
@@ -281,12 +439,26 @@ diff old new
 
 	// for-fallback with outer scope reference
 	forFallbackOuter: fallbackField: 10
+
+	// Fallback clauses which only embed a reference.
+	embedded: z:         1
+	ifElseEmbed: z:      1
+	forFallbackEmbed: z: 1
+	tryElseEmbed: z:     1
+
+	// The fallback refers to the outer field, not the shadowing for variable.
+	forFallbackShadow: z: 1
 }
 == Final
 {
 	ifElse: b:                       2
 	forFallback: empty:              true
 	forFallbackOuter: fallbackField: 10
+	embedded: z:                     1
+	ifElseEmbed: z:                  1
+	forFallbackEmbed: z:             1
+	tryElseEmbed: z:                 1
+	forFallbackShadow: z:            1
 }
 == All
 {
@@ -302,6 +474,15 @@ diff old new
 
 	// for-fallback with outer scope reference
 	forFallbackOuter: fallbackField: 10
+
+	// Fallback clauses which only embed a reference.
+	embedded: z:         1
+	ifElseEmbed: z:      1
+	forFallbackEmbed: z: 1
+	tryElseEmbed: z:     1
+
+	// The fallback refers to the outer field, not the shadowing for variable.
+	forFallbackShadow: z: 1
 }
 == Eval
 {
@@ -311,4 +492,9 @@ diff old new
 	ifElse: b:                       2
 	forFallback: empty:              true
 	forFallbackOuter: fallbackField: 10
+	embedded: z:                     1
+	ifElseEmbed: z:                  1
+	forFallbackEmbed: z:             1
+	tryElseEmbed: z:                 1
+	forFallbackShadow: z:            1
 }

@@ -131,6 +131,15 @@ unresolvedDisjunction: {
 		}
 	}
 }
+-- embedded.cue --
+// The let clause is declared in the first struct literal, which is embedded
+// as it holds a comprehension, so N is exported beside the embedded structs
+// rather than within the first, where x is a.x.
+embedded: {
+	x: 99
+	a: {x: 1, let N = {y: x}, b: N, if true {}}
+	a: {x: 1, if true {}}
+}
 -- out/definition --
 let X = 1 + 1
 let Y = x
@@ -141,6 +150,18 @@ cfgs: [for crd in ["one", "two"] {
 for cfg in cfgs {
 	let filepath = "kind-\(cfg.name)"
 	files: "\(filepath)": patches: cfg
+}
+
+// The let clause is declared in the first struct literal, which is embedded
+// as it holds a comprehension, so N is exported beside the embedded structs
+// rather than within the first, where x is a.x.
+embedded: {
+	x: 99
+	a: {
+		let N = {y: x}
+		{x: 1, b: N, if true {}}
+		{x: 1, if true {}}
+	}
 }
 comprehension: {
 	for cfg in [{a: "one"}] {
@@ -228,6 +249,18 @@ unresolvedDisjunction: {
 y: Y & Y_1
 -- out/doc-v3 --
 []
+[embedded]
+- The let clause is declared in the first struct literal, which is embedded
+as it holds a comprehension, so N is exported beside the embedded structs
+rather than within the first, where x is a.x.
+
+[embedded x]
+[embedded a]
+[embedded a x]
+[embedded a N]
+[embedded a N y]
+[embedded a b]
+[embedded a b y]
 [comprehension]
 [comprehension filepath]
 [X]
@@ -325,7 +358,24 @@ y: Y & Y_1
 diff old new
 --- old
 +++ new
-@@ -55,7 +55,6 @@
+@@ -1,4 +1,16 @@
+ []
++[embedded]
++- The let clause is declared in the first struct literal, which is embedded
++as it holds a comprehension, so N is exported beside the embedded structs
++rather than within the first, where x is a.x.
++
++[embedded x]
++[embedded a]
++[embedded a x]
++[embedded a N]
++[embedded a N y]
++[embedded a b]
++[embedded a b y]
+ [comprehension]
+ [comprehension filepath]
+ [X]
+@@ -55,7 +67,6 @@
  [cfgs 1]
  [cfgs 1 metadata]
  [cfgs 1 metadata name]
@@ -333,7 +383,7 @@ diff old new
  [files]
  [scoped]
  [scoped _args]
-@@ -92,3 +91,4 @@
+@@ -92,3 +103,4 @@
  [Y]
  [y]
  [Y]
@@ -447,6 +497,16 @@ diff old new
 			"\(filepath)": patches: cfg
 		}
 	}
+	// The let clause is declared in the first struct literal, which is embedded
+	// as it holds a comprehension, so N is exported beside the embedded structs
+	// rather than within the first, where x is a.x.
+	embedded: {
+		x: 99
+		a: {
+			x: 1
+			b: y: 1
+		}
+	}
 	files: "\("kind-\(cfg.name)")": patches: cfg
 	incomplete: {
 		a: {
@@ -499,6 +559,16 @@ diff old new
 		for cfg in [{a: "one"}] {
 			let filepath = "kind-\(cfg.name)"
 			"\(filepath)": patches: cfg
+		}
+	}
+	// The let clause is declared in the first struct literal, which is embedded
+	// as it holds a comprehension, so N is exported beside the embedded structs
+	// rather than within the first, where x is a.x.
+	embedded: {
+		x: 99
+		a: {
+			x: 1
+			b: y: 1
 		}
 	}
 	files: "\("kind-\(cfg.name)")": patches: cfg
@@ -564,7 +634,14 @@ diff old new
 		run: a: "foo"
 	}
 	comprehension: _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name
-	files:         _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)
+	embedded: {
+		x: 99
+		a: {
+			x: 1
+			b: y: 1
+		}
+	}
+	files: _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)
 	incomplete: {
 		a: {
 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -611,6 +688,16 @@ diff old new
 		for cfg in [{a: "one"}] {
 			let filepath = "kind-\(cfg.name)"
 			"\(filepath)": patches: cfg
+		}
+	}
+	// The let clause is declared in the first struct literal, which is embedded
+	// as it holds a comprehension, so N is exported beside the embedded structs
+	// rather than within the first, where x is a.x.
+	embedded: {
+		x: 99
+		a: {
+			x: 1
+			b: y: 1
 		}
 	}
 	files: "\("kind-\(cfg.name)")": patches: cfg
@@ -682,6 +769,13 @@ diff old new
 			"\(filepath)": patches: cfg
 		}
 	}
+	embedded: {
+		x: 99
+		a: {
+			x: 1
+			b: y: 1
+		}
+	}
 	files: "\("kind-\(cfg.name)")": patches: cfg
 	incomplete: {
 		a: {
@@ -736,7 +830,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,209 +1,115 @@
+@@ -1,209 +1,135 @@
  == Simplified
  {
 -	cfgs: [{
@@ -842,6 +936,16 @@ diff old new
 +		for cfg in [{a: "one"}] {
 +			let filepath = "kind-\(cfg.name)"
 +			"\(filepath)": patches: cfg
++		}
++	}
++	// The let clause is declared in the first struct literal, which is embedded
++	// as it holds a comprehension, so N is exported beside the embedded structs
++	// rather than within the first, where x is a.x.
++	embedded: {
++		x: 99
++		a: {
++			x: 1
++			b: y: 1
 +		}
 +	}
 +	files: "\("kind-\(cfg.name)")": patches: cfg
@@ -1004,6 +1108,16 @@ diff old new
 +			"\(filepath)": patches: cfg
 +		}
 +	}
++	// The let clause is declared in the first struct literal, which is embedded
++	// as it holds a comprehension, so N is exported beside the embedded structs
++	// rather than within the first, where x is a.x.
++	embedded: {
++		x: 99
++		a: {
++			x: 1
++			b: y: 1
++		}
++	}
 +	files: "\("kind-\(cfg.name)")": patches: cfg
 +	incomplete: {
 +		a: {
@@ -1052,7 +1166,7 @@ diff old new
  
  			if !Args.required {
  				// `default` sets the default value.
-@@ -216,192 +122,106 @@
+@@ -216,192 +142,123 @@
  }
  == Final
  {
@@ -1079,7 +1193,14 @@ diff old new
 +		run: a: "foo"
 +	}
 +	comprehension: _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name
-+	files:         _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)
++	embedded: {
++		x: 99
++		a: {
++			x: 1
++			b: y: 1
++		}
++	}
++	files: _|_ // invalid dynamic field key: invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)
  	incomplete: {
  		a: {
  			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -1279,6 +1400,16 @@ diff old new
 +			"\(filepath)": patches: cfg
 +		}
 +	}
++	// The let clause is declared in the first struct literal, which is embedded
++	// as it holds a comprehension, so N is exported beside the embedded structs
++	// rather than within the first, where x is a.x.
++	embedded: {
++		x: 99
++		a: {
++			x: 1
++			b: y: 1
++		}
++	}
 +	files: "\("kind-\(cfg.name)")": patches: cfg
 +	incomplete: {
 +		a: {
@@ -1327,7 +1458,7 @@ diff old new
  
  			if !Args.required {
  				// `default` sets the default value.
-@@ -415,106 +235,58 @@
+@@ -415,106 +272,65 @@
  == Eval
  {
  	#Foo: 2
@@ -1440,6 +1571,13 @@ diff old new
 +		for cfg in [{a: "one"}] {
 +			let filepath = "kind-\(cfg.name)"
 +			"\(filepath)": patches: cfg
++		}
++	}
++	embedded: {
++		x: 99
++		a: {
++			x: 1
++			b: y: 1
 +		}
 +	}
 +	files: "\("kind-\(cfg.name)")": patches: cfg

@@ -220,8 +220,8 @@ shadowField: declLet: {
 }
 
 // The let clause is exported in a, beside the struct literals declaring a.x
-// rather than within either of them, so d is not linked to a.x and refers to
-// the x within N instead, a structural cycle.
+// rather than within the first, so d is not linked to a.x and refers to the x
+// within N instead, a structural cycle.
 shadowField: declLetEmbedded: {
 	x: 99
 	a: {x: 1, let N = {"x": {d: x}}, b: N, if true {}}
@@ -470,8 +470,8 @@ shadowField: {
 	}
 
 	// The let clause is exported in a, beside the struct literals declaring a.x
-	// rather than within either of them, so d is not linked to a.x and refers to
-	// the x within N instead, a structural cycle.
+	// rather than within the first, so d is not linked to a.x and refers to the x
+	// within N instead, a structural cycle.
 	declLetEmbedded: {
 		x: 99
 		a: {
@@ -721,8 +721,8 @@ second one only, where the quoted label shadows a.x.
 [shadowField declLet a b x d]
 [shadowField declLetEmbedded]
 - The let clause is exported in a, beside the struct literals declaring a.x
-rather than within either of them, so d is not linked to a.x and refers to
-the x within N instead, a structural cycle.
+rather than within the first, so d is not linked to a.x and refers to the x
+within N instead, a structural cycle.
 
 [shadowField declLetEmbedded x]
 [shadowField declLetEmbedded a]
@@ -997,8 +997,8 @@ _|_ // shadowRef.e1.x.x: structural cycle
 		}
 
 		// The let clause is exported in a, beside the struct literals declaring a.x
-		// rather than within either of them, so d is not linked to a.x and refers to
-		// the x within N instead, a structural cycle.
+		// rather than within the first, so d is not linked to a.x and refers to the x
+		// within N instead, a structural cycle.
 		declLetEmbedded: {
 			x: 99
 			a: {
@@ -1339,8 +1339,8 @@ diff old new
 +		}
 +
 +		// The let clause is exported in a, beside the struct literals declaring a.x
-+		// rather than within either of them, so d is not linked to a.x and refers to
-+		// the x within N instead, a structural cycle.
++		// rather than within the first, so d is not linked to a.x and refers to the x
++		// within N instead, a structural cycle.
 +		declLetEmbedded: {
 +			x: 99
 +			a: {

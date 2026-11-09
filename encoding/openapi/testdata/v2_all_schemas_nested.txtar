@@ -1,8 +1,6 @@
 # Tests that AllSchemas emits each top-level schema once when the document is
 # nested within another value: references to #Node carry the root value and
 # the path bundle.#Node, and must be recognized as the top-level #Node.
-# They are not, so #Node is emitted twice, as Node and bundle.Node, and
-# Node.next refers to the duplicate.
 #v2
 #Version: 3.0
 #AllSchemas
@@ -31,7 +29,7 @@ bundle: {
             "additionalProperties": false,
             "properties": {
                "next": {
-                  "$ref": "#/components/schemas/bundle.Node"
+                  "$ref": "#/components/schemas/Node"
                }
             }
          },
@@ -46,15 +44,6 @@ bundle: {
             "required": [
                "a"
             ]
-         },
-         "bundle.Node": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-               "next": {
-                  "$ref": "#/components/schemas/bundle.Node"
-               }
-            }
          }
       }
    }
@@ -74,7 +63,7 @@ bundle: {
             "additionalProperties": false,
             "properties": {
                "next": {
-                  "$ref": "#/components/schemas/bundle.Node"
+                  "$ref": "#/components/schemas/Node"
                }
             }
          },
@@ -89,15 +78,6 @@ bundle: {
             "required": [
                "a"
             ]
-         },
-         "bundle.Node": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-               "next": {
-                  "$ref": "#/components/schemas/bundle.Node"
-               }
-            }
          }
       }
    }

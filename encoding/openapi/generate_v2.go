@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/internal/core/runtime"
+	internalvalue "cuelang.org/go/internal/value"
 )
 
 // Version defines the version of an OpenAPI document.
@@ -216,45 +217,46 @@ func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 		g.schemaValues = append(g.schemaValues, vals...)
 	}
 
-	// Wrap the naming function so that, with AllSchemas, the top-level
-	// schemas are named in the same NamesFunc invocation as the references
-	// collected by the generator. A referenced top-level schema arrives as
-	// one of those references, recognized by its root and path; a synthetic
-	// reference is added for each unreferenced one. This makes the names
-	// consistent whatever the NamesFunc, and guarantees they cannot clash.
+	// With AllSchemas, wrap the naming function so that the top-level schemas
+	// are named in the same NamesFunc call as the references the generator
+	// collected: a referenced one arrives as such a reference, recognized by
+	// its root and path, and a synthetic reference is added for each
+	// unreferenced one. referencedNames and unreferencedNames record the
+	// names assigned, keyed by path from root.
 	namesFunc := cfg.NamesFunc
-	if namesFunc == nil {
-		namesFunc = jsonschema.DefaultNamesFunc
-	}
-	// referencedNames and unreferencedNames record the name assigned to each
-	// top-level schema, keyed by its path within doc, according to whether
-	// the schema is referenced from the document (and hence already present
-	// in the shared definitions) or not.
 	referencedNames := make(map[string]string)
 	unreferencedNames := make(map[string]string)
 	namesFuncCalled := false
-	wrappedNamesFunc := func(refs []*jsonschema.CUERef) {
-		namesFuncCalled = true
-		isRef := make(map[string]bool, len(refs))
-		for _, r := range refs {
-			if r.Inst == doc {
-				isRef[r.Path.String()] = true
-			}
+	if len(defPaths) > 0 {
+		inner := namesFunc
+		if inner == nil {
+			inner = jsonschema.DefaultNamesFunc
 		}
-		var synthetic []*jsonschema.CUERef
-		for _, p := range defPaths {
-			if !isRef[p.String()] {
-				synthetic = append(synthetic, &jsonschema.CUERef{Inst: doc, Path: p})
+		root := rootValue(doc)
+		rootVertex := internalvalue.Vertex(root)
+		namesFunc = func(refs []*jsonschema.CUERef) {
+			namesFuncCalled = true
+			isRef := make(map[string]bool, len(refs))
+			for _, r := range refs {
+				if internalvalue.Vertex(r.Inst) == rootVertex {
+					isRef[r.Path.String()] = true
+				}
 			}
-		}
-		namesFunc(append(refs, synthetic...))
-		for _, r := range refs {
-			if r.Inst == doc {
-				referencedNames[r.Path.String()] = r.Name
+			var synthetic []*jsonschema.CUERef
+			for _, p := range defPaths {
+				if !isRef[p.String()] {
+					synthetic = append(synthetic, &jsonschema.CUERef{Inst: root, Path: p})
+				}
 			}
-		}
-		for _, r := range synthetic {
-			unreferencedNames[r.Path.String()] = r.Name
+			inner(append(refs, synthetic...))
+			for _, r := range refs {
+				if internalvalue.Vertex(r.Inst) == rootVertex {
+					referencedNames[r.Path.String()] = r.Name
+				}
+			}
+			for _, r := range synthetic {
+				unreferencedNames[r.Path.String()] = r.Name
+			}
 		}
 	}
 
@@ -262,7 +264,7 @@ func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	// into components.schemas.
 	exprs, shared, err := jsonschema.GenerateMany(g.schemaValues, sharedSchemaRoot, &jsonschema.GenerateConfig{
 		Version:         jsVersion,
-		NamesFunc:       wrappedNamesFunc,
+		NamesFunc:       namesFunc,
 		DescriptionFunc: cfg.DescriptionFunc,
 	})
 	if err != nil {
@@ -275,7 +277,7 @@ func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	// GenerateMany invokes the naming function only when the schemas contain
 	// references; make sure the top-level schemas are always named.
 	if !namesFuncCalled && len(defPaths) > 0 {
-		wrappedNamesFunc(nil)
+		namesFunc(nil)
 	}
 	// Fold the unreferenced AllSchemas top-level schemas into the shared set;
 	// the referenced ones are already there under their assigned names.
@@ -425,7 +427,7 @@ func (g *genV2) build(v cue.Value) (ast.Expr, error) {
 }
 
 // topLevelSchemas returns the top-level definitions of the document as schemas
-// to be generated, along with the path of each within the document.
+// to be generated, along with the path of each from its root value.
 func topLevelSchemas(doc cue.Value) (paths []cue.Path, values []cue.Value) {
 	it, err := doc.Fields(cue.Definitions(true))
 	if err != nil {
@@ -436,10 +438,20 @@ func topLevelSchemas(doc cue.Value) (paths []cue.Path, values []cue.Value) {
 		if sel.LabelType() != cue.DefinitionLabel {
 			continue
 		}
-		paths = append(paths, cue.MakePath(sel))
+		paths = append(paths, it.Value().Path())
 		values = append(values, it.Value())
 	}
 	return paths, values
+}
+
+// rootValue returns the root of the value v is in, which is not v when it is
+// nested within another value, as [cue.Value.ReferencePath] gives it.
+func rootValue(v cue.Value) cue.Value {
+	x := internalvalue.Vertex(v)
+	for x.Parent != nil {
+		x = x.Parent
+	}
+	return internalvalue.Context(v).Encode(x)
 }
 
 // mergeComponentsSchemas adds the shared schemas to the document's

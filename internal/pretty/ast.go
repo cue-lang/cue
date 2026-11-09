@@ -309,8 +309,10 @@ func (c *converter) analyse(root ast.Node) {
 				parent.lastChildTrailingCommentLine = trailingCommentLine
 			}
 
+			// CUE has only `//` line comments, so any comment rendered
+			// after n runs to the end of its line.
 			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) ||
-				c.nodeEndsWithLineComment(n, slots) ||
+				len(c.afterComments(n, slots)) > 0 ||
 				(f.anyChildEndsLineComment && c.liftsChildComment(n))
 			if endsLineComment {
 				flags |= endsWithLineComment
@@ -663,7 +665,7 @@ func (c *converter) declSep(d ast.Decl, prev ast.Decl) doc {
 		}
 	}
 
-	if rel < token.Newline && c.nodeFlags[prev]&endsWithLineComment != 0 {
+	if rel < token.Newline && c.endsWithLineComment(prev) {
 		rel = token.Newline
 	}
 
@@ -689,7 +691,7 @@ func (c *converter) shouldHug(child ast.Node) bool {
 	return child != nil &&
 		!child.Pos().IsNewline() &&
 		len(ast.Comments(child)) == 0 &&
-		c.nodeFlags[child]&endsWithLineComment == 0 &&
+		!c.endsWithLineComment(child) &&
 		c.hasNewlineInSubtree(child)
 }
 
@@ -890,34 +892,31 @@ func (c *converter) withCommentsSlots(n ast.Node, body doc, slots commentSlots) 
 	if !slots.any() {
 		return body
 	}
-	// Non-bracketed nodes don't have a natural "inside the brackets"
-	// area, so prefix/suffix slots are treated as trailing content.
-	// Ordering: prefix first (nearest the opening), then suffix
-	// (nearest the closing), then trailing (after the whole node).
-	//
-	// Bracketed nodes (StructLit/ListLit) - those whose exprCore
-	// already places interior comments inside the body - skip the
-	// prefix/suffix slots here so the same comments aren't rendered
-	// both inside and outside the brackets.
-	var trailing []*ast.CommentGroup
-	if flags := c.nodeFlags[n]; flags&afterCommentsLifted == 0 {
-		skipInterior := nodeManagesInteriorComments(n)
-		trailing = make([]*ast.CommentGroup, 0,
-			len(slots.prefix)+len(slots.suffix)+len(slots.trailing))
-		if !skipInterior {
-			trailing = append(trailing, slots.prefix...)
-			trailing = append(trailing, slots.suffix...)
-		} else {
-			// Interior-managing nodes render prefix/suffix comments inside the
-			// node, except a prefix comment that is really trailing; emit that
-			// one here with the trailing comments. See [trailingPrefixComments].
-			if flags&interiorPrefix == 0 {
-				trailing = append(trailing, trailingPrefixComments(n)...)
-			}
-		}
-		trailing = append(trailing, slots.trailing...)
+	return cats(c.docCommentBlock(slots.doc, n.Pos().RelPos()), body, c.trailingComments(c.afterComments(n, slots)))
+}
+
+// afterComments returns the comments in n's slots which
+// [converter.withCommentsSlots] renders after n's body, or none if they
+// are lifted already: the prefix and suffix slots, unless n renders them
+// inside itself (see [trailingPrefixComments]), then the trailing slot.
+func (c *converter) afterComments(n ast.Node, slots commentSlots) []*ast.CommentGroup {
+	if len(slots.prefix)+len(slots.suffix)+len(slots.trailing) == 0 {
+		return nil
 	}
-	return cats(c.docCommentBlock(slots.doc, n.Pos().RelPos()), body, c.trailingComments(trailing))
+	flags := c.nodeFlags[n]
+	if flags&afterCommentsLifted != 0 {
+		return nil
+	}
+	if !nodeManagesInteriorComments(n) {
+		if slots.hasInterior() {
+			return slots.nonDoc()
+		}
+	} else if len(slots.prefix) > 0 && flags&interiorPrefix == 0 {
+		if tp := trailingPrefixComments(n); len(tp) > 0 {
+			return append(tp, slots.trailing...)
+		}
+	}
+	return slices.Clip(slots.trailing)
 }
 
 // trailingComments renders cgs as comments trailing the preceding
@@ -1017,11 +1016,19 @@ func (c *converter) expr(x ast.Expr) doc {
 	return c.withComments(x, c.exprCore(x))
 }
 
-// exprCore converts an expression without handling comments on it.
+// exprCore converts an expression without handling comments on it,
+// except for those ending its [liftedOperands], which go at the end.
 func (c *converter) exprCore(x ast.Expr) doc {
 	if x == nil {
 		return nil
 	}
+	tail := c.liftOperandTails(x)
+	return cat(c.exprBody(x), c.trailingComments(tail))
+}
+
+// exprBody implements [converter.exprCore], except for the comments
+// ending the operands.
+func (c *converter) exprBody(x ast.Expr) doc {
 	switch x := x.(type) {
 	case *ast.Ident:
 		// An identifier in expression position must be a valid
@@ -1131,7 +1138,7 @@ func (c *converter) label(l ast.Label) doc {
 			elt := x.Elts[0]
 			// A `//` comment ending the element would swallow the `]`.
 			closer := rBracketLit
-			if c.nodeFlags[elt]&endsWithLineComment != 0 {
+			if c.endsWithLineComment(elt) {
 				closer = cat(lineBreakHard, rBracketLit)
 			}
 			return cats(listOpener(x), c.exprAfter(nil, nil, elt), closer)
@@ -1372,7 +1379,7 @@ func (c *converter) structLit(x *ast.StructLit) doc {
 	// body broken, as a synthesized struct has no layout to keep.
 	closerRel := x.Rbrace.RelPos()
 	forceOpenBreak := false
-	if lastElem != nil && closerRel < token.Newline && c.nodeFlags[lastElem]&endsWithLineComment != 0 {
+	if closerRel < token.Newline && c.endsWithLineComment(lastElem) {
 		forceOpenBreak = closerRel == token.NoRelPos
 		closerRel = token.Newline
 	}
@@ -1439,7 +1446,7 @@ func (c *converter) listLit(x *ast.ListLit) doc {
 
 	// A comment ending the last row would swallow the closer.
 	closerRel := x.Rbrack.RelPos()
-	if lastElem != nil && closerRel < token.Newline && c.rowEndsWithComment(lastElem) {
+	if closerRel < token.Newline && c.endsWithLineComment(lastElem) {
 		closerRel = token.Newline
 	}
 
@@ -1728,7 +1735,7 @@ func (c *converter) elementRows(elems []ast.Expr, trailingComma, wrapLinked, omi
 			}
 		}
 		prevLackRelPos = curLackRelPos
-		prevHasComment = row.hasComment || len(postCgs) > 0 || c.rowEndsWithComment(e)
+		prevHasComment = row.hasComment || len(postCgs) > 0 || c.endsWithLineComment(e)
 		rows = append(rows, row)
 		rows = append(rows, c.postCommentRows(postCgs)...)
 	}
@@ -1804,7 +1811,7 @@ func (c *converter) listElemRow(label ast.Label, e ast.Expr, last, trailing, omi
 	// comma. The comments ending T's operands are lifted above.
 	if inner != e {
 		if ts := classifyComments(inner); len(ts.doc)+len(ts.prefix)+len(ts.suffix)+len(ts.trailing) > 0 {
-			core = cat(ellipsisLit, c.exprCore(inner))
+			core = cat(ellipsisLit, c.exprBody(inner))
 			slots.doc = append(slots.doc, ts.doc...)
 			slots.prefix = append(slots.prefix, ts.prefix...)
 			slots.suffix = append(slots.suffix, ts.suffix...)
@@ -1812,7 +1819,7 @@ func (c *converter) listElemRow(label ast.Label, e ast.Expr, last, trailing, omi
 		}
 	}
 	if core == nil {
-		core = c.exprCore(e)
+		core = c.exprBody(e)
 	}
 	skipInterior := nodeManagesInteriorComments(e)
 	var trailingComment doc
@@ -1922,8 +1929,8 @@ func (c *converter) unaryExpr(x *ast.UnaryExpr) doc {
 		parts := make([]doc, 0, 2*len(inner)+2)
 		for i, cg := range inner {
 			sep := doc(lineBreakHard)
-			if i == 0 && isLineComment(cg) {
-				sep = spaceLit
+			if i == 0 {
+				sep = commentLead(cg)
 			}
 			parts = append(parts, sep, c.commentGroup(cg))
 		}
@@ -2062,7 +2069,7 @@ func (c *converter) binaryChainArms(x *ast.BinaryExpr) (arms []chainArm, hasTrai
 	for i := range len(arms) - 1 {
 		arm := &arms[i]
 		if tail := c.tailComments(arm.expr); len(tail) > 0 {
-			arm.trailing = append(tail, arm.trailing...)
+			arm.trailing = slices.Concat(tail, arm.trailing)
 			hasTrailing = true
 		}
 	}
@@ -2086,20 +2093,13 @@ func (c *converter) liftTailComments(e ast.Expr) []*ast.CommentGroup {
 // liftOperandTails lifts the comments ending the [liftedOperands] of
 // n, for n's renderer to place at the end of its output.
 func (c *converter) liftOperandTails(n ast.Node) []*ast.CommentGroup {
-	var tail []*ast.CommentGroup
-	for _, x := range liftedOperands(n) {
-		if x != nil {
-			tail = append(tail, c.liftTailComments(x)...)
-		}
-	}
-	return tail
+	return c.operandTails(n, true)
 }
 
 // tails implements [converter.tailComments], marking the nodes whose
 // comments it returns with [afterCommentsLifted] if lift is set.
 func (c *converter) tails(n ast.Node, lift bool) []*ast.CommentGroup {
-	flags := c.nodeFlags[n]
-	if flags&endsWithLineComment == 0 {
+	if !c.endsWithLineComment(n) {
 		return nil
 	}
 	var out []*ast.CommentGroup
@@ -2111,29 +2111,28 @@ func (c *converter) tails(n ast.Node, lift bool) []*ast.CommentGroup {
 	case *ast.PostfixExpr:
 		out = c.tails(n.X, lift)
 	default:
-		for _, x := range liftedOperands(n) {
-			if x != nil {
-				out = append(out, c.tails(x, lift)...)
-			}
-		}
+		out = c.operandTails(n, lift)
 	}
-	if flags&afterCommentsLifted != 0 {
+	if c.nodeFlags[n]&afterCommentsLifted != 0 {
 		return out // they render elsewhere
 	}
-	own := len(out)
-	slots := classifyComments(n)
-	if nodeManagesInteriorComments(n) {
-		if flags&interiorPrefix == 0 {
-			out = append(out, trailingPrefixComments(n)...)
-		}
-	} else {
-		out = append(out, slots.prefix...)
-		out = append(out, slots.suffix...)
-	}
-	out = append(out, slots.trailing...)
-	if lift && len(out) > own {
+	own := c.afterComments(n, classifyComments(n))
+	if lift && len(own) > 0 {
 		// n has an entry already, so this does not grow the map.
 		c.nodeFlags[n] |= afterCommentsLifted
+	}
+	if len(out) == 0 {
+		return own
+	}
+	return append(out, own...)
+}
+
+// operandTails returns the [converter.tails] of the [liftedOperands]
+// of n.
+func (c *converter) operandTails(n ast.Node, lift bool) []*ast.CommentGroup {
+	var out []*ast.CommentGroup
+	for _, x := range liftedOperands(n) {
+		out = append(out, c.tails(x, lift)...)
 	}
 	return out
 }
@@ -2734,13 +2733,6 @@ func (c *converter) selectorTableExpr(arms []selArm, fieldTrailing doc) doc {
 // and a trailing comma before ')' is emitted on the same terms as
 // lists.
 func (c *converter) callExpr(x *ast.CallExpr) doc {
-	tail := c.liftOperandTails(x)
-	return cat(c.callExprBody(x), c.trailingComments(tail))
-}
-
-// callExprBody renders x for [converter.callExpr], except for the
-// comments ending the callee.
-func (c *converter) callExprBody(x *ast.CallExpr) doc {
 	// The callee is a primary expression: `(...)` binds tighter than
 	// any binary operator, so a binary callee needs parens (`(a &
 	// b)(x)`).
@@ -2762,7 +2754,7 @@ func (c *converter) callExprBody(x *ast.CallExpr) doc {
 	closerRel := x.Rparen.RelPos()
 	var sameLineOpen, noElemNewline bool
 	// A comment ending the last argument's row would swallow the closer.
-	lastEndsWithComment := c.rowEndsWithComment(x.Args[len(x.Args)-1])
+	lastEndsWithComment := c.endsWithLineComment(x.Args[len(x.Args)-1])
 	if len(x.ArgLabels) == 0 {
 		sameLineOpen = hasSameLineOpener(c, x.Args, x.Args)
 		noElemNewline = noElemHasNewline(x.Args)
@@ -2774,7 +2766,7 @@ func (c *converter) callExprBody(x *ast.CallExpr) doc {
 		for i := range x.Args {
 			leads[i] = callArgLead(x, i)
 			l := callArgLabel(x, i)
-			lastMovesComment = l != nil && c.nodeFlags[l]&endsWithLineComment != 0
+			lastMovesComment = c.endsWithLineComment(l)
 			movesComment = movesComment || lastMovesComment
 		}
 		anyDoc = anyDoc || anyHasDocComment(leads)
@@ -2898,7 +2890,7 @@ func (c *converter) callArgRows(x *ast.CallExpr, trailingComma, wrapLinked bool)
 			}
 		}
 		prevLackRelPos = curLackRelPos
-		prevHasComment = row.hasComment || len(postCgs) > 0 || c.rowEndsWithComment(e)
+		prevHasComment = row.hasComment || len(postCgs) > 0 || c.endsWithLineComment(e)
 		soft = lineBreakOrSpace
 		if prevHasComment {
 			soft = lineBreakHard
@@ -2948,18 +2940,16 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	// The receiver is a primary expression: `[i]` binds tighter than
 	// any binary operator, so a binary receiver needs parens (`(a &
 	// b)[i]`).
-	tail := c.liftOperandTails(x)
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
 	index := c.expr(x.Index)
 	// The receiver stays out of the group, so that a receiver spanning
 	// lines does not break the line after the opening bracket.
-	d := cats(recv, c.maybeGroup(x, cats(
+	return cats(recv, c.maybeGroup(x, cats(
 		lBracketLit,
 		nest(cats(cats(afterOpen...), openBreak, index, cats(beforeClose...))),
 		closeBreak,
 		rBracketLit,
 	)))
-	return cat(d, c.trailingComments(tail))
 }
 
 // sliceExpr converts a SliceExpr.
@@ -2975,11 +2965,10 @@ func (c *converter) sliceExpr(x *ast.SliceExpr) doc {
 	// The receiver is a primary expression: the slice `[lo:hi]` binds
 	// tighter than any binary operator, so a binary receiver needs
 	// parens.
-	tail := c.liftOperandTails(x)
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
 	low := c.exprAfter(nil, nil, x.Low)
 	high := c.exprAfter(nil, nil, x.High)
-	return cats(recv, lBracketLit, low, colon, high, rBracketLit, c.trailingComments(tail))
+	return cats(recv, lBracketLit, low, colon, high, rBracketLit)
 }
 
 // operatorsWouldMerge reports whether printing binary operator op
@@ -3025,14 +3014,13 @@ func (c *converter) parenExpr(x *ast.ParenExpr) doc {
 	if x, ok := x.X.(*ast.ParenExpr); ok && len(ast.Comments(x)) == 0 {
 		return c.parenExpr(x)
 	}
-	tail := c.liftOperandTails(x)
 	var inner doc
 	if LeadingRelPos(x.X) >= token.Newline {
 		inner = nest(cat(lineBreakHard, c.expr(x.X)))
 	} else {
 		inner = c.exprAfter(nil, nil, x.X)
 	}
-	return cats(lParenLit, inner, rParenLit, c.trailingComments(tail))
+	return cats(lParenLit, inner, rParenLit)
 }
 
 // interpolation converts an Interpolation node. Its elements alternate
@@ -3059,10 +3047,9 @@ func (c *converter) interpolation(x *ast.Interpolation) doc {
 	// A comment beside a `\(` or `)` delimiter, or before an
 	// interpolated expression, forces line breaks within the string,
 	// which the multi-line path knows how to place.
-	hasComments := slices.ContainsFunc(x.Elts, func(e ast.Expr) bool {
+	if !multiLine && !slices.ContainsFunc(x.Elts, func(e ast.Expr) bool {
 		return len(ast.Comments(e)) > 0
-	})
-	if !multiLine && !hasComments {
+	}) {
 		parts := make([]doc, len(x.Elts))
 		for i, e := range x.Elts {
 			if lit, ok := e.(*ast.BasicLit); ok && lit.Kind == token.STRING {
@@ -3552,18 +3539,14 @@ func (c *converter) comprehension(x *ast.Comprehension) doc {
 	after := comprehensionClauseComments(x)
 	for i, clause := range x.Clauses {
 		var extra []*ast.CommentGroup
-		if after != nil {
+		if len(after) > 0 {
 			extra = after[i]
 		}
 		clauseDoc := c.withComments(clause, c.clause(clause))
 		// A comment between clauses either shares the clause's line or
 		// sits on its own line, whatever its RelPos.
 		for _, cg := range extra {
-			var cgSep doc = lineBreakHard
-			if isLineComment(cg) {
-				cgSep = spaceLit
-			}
-			clauseDoc = cats(clauseDoc, cgSep, c.commentGroup(cg))
+			clauseDoc = cats(clauseDoc, commentLead(cg), c.commentGroup(cg))
 		}
 		if i > 0 {
 			// LeadingRelPos gives the RelPos of the first visible token
@@ -3577,13 +3560,13 @@ func (c *converter) comprehension(x *ast.Comprehension) doc {
 			clauseDoc = cat(clauseSep, clauseDoc)
 		}
 		parts = append(parts, clauseDoc)
-		prevEndsLineComment = c.nodeFlags[clause]&endsWithLineComment != 0 || len(extra) > 0
+		prevEndsLineComment = c.endsWithLineComment(clause) || len(extra) > 0
 	}
 
 	if x.Value != nil {
 		forced := LeadingRelPos(x.Value) >= token.Newline
 		parts = append(parts, sep(forced, spaceLit), c.expr(x.Value))
-		prevEndsLineComment = c.nodeFlags[x.Value]&endsWithLineComment != 0
+		prevEndsLineComment = c.endsWithLineComment(x.Value)
 	}
 
 	if x.Fallback != nil {
@@ -3593,8 +3576,16 @@ func (c *converter) comprehension(x *ast.Comprehension) doc {
 	return cats(parts...)
 }
 
-// clause converts a single clause.
+// clause converts a single clause. The comments ending its
+// [liftedOperands] go at the end.
 func (c *converter) clause(cl ast.Clause) doc {
+	tail := c.liftOperandTails(cl)
+	return cat(c.clauseBody(cl), c.trailingComments(tail))
+}
+
+// clauseBody implements [converter.clause], except for the comments
+// ending the operands.
+func (c *converter) clauseBody(cl ast.Clause) doc {
 	switch x := cl.(type) {
 	case *ast.ForClause:
 		return c.forClause(x)
@@ -3617,7 +3608,6 @@ func (c *converter) letClause(x *ast.LetClause) doc {
 // forClause converts a ForClause. The comments trailing the key or the
 // value go after the source; see [liftedOperands].
 func (c *converter) forClause(x *ast.ForClause) doc {
-	tail := c.liftOperandTails(x)
 	var key doc
 	tok, tokSep := forLit, forSpaceLit
 	if x.Key != nil {
@@ -3625,8 +3615,7 @@ func (c *converter) forClause(x *ast.ForClause) doc {
 		key = c.exprAfter(tok, tokSep, x.Key)
 		tok, tokSep = commaLit, commaSpaceLit
 	}
-	d := cats(key, c.exprAfter(tok, tokSep, x.Value), inSpaceLit, c.expr(x.Source))
-	return cat(d, c.trailingComments(tail))
+	return cats(key, c.exprAfter(tok, tokSep, x.Value), inSpaceLit, c.expr(x.Source))
 }
 
 // exprAfter renders x after the token tok, and tokSep is tok followed
@@ -3642,11 +3631,17 @@ func (c *converter) exprAfter(tok, tokSep doc, x ast.Expr) doc {
 	if cg == nil {
 		return cat(tokSep, d)
 	}
-	var br doc = lineBreakHard
-	if cg.Line {
-		br = spaceLit
+	return cat(tok, nest(cat(commentLead(cg), d)))
+}
+
+// commentLead returns the separator before cg where it follows a
+// token: a space when it shares the token's line, a line break
+// otherwise, whatever its RelPos.
+func commentLead(cg *ast.CommentGroup) doc {
+	if isLineComment(cg) {
+		return spaceLit
 	}
-	return cat(tok, nest(cat(br, d)))
+	return lineBreakHard
 }
 
 // tryClause converts a TryClause.
@@ -3855,11 +3850,13 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	//
 	// The comments trailing the value go after its attributes, which
 	// they would otherwise swallow.
-	var tail []*ast.CommentGroup
+	trailing := slots.trailing
 	if len(leaf.Attrs) > 0 {
-		tail = c.liftTailComments(leaf.Value)
+		if tail := c.liftTailComments(leaf.Value); len(tail) > 0 {
+			trailing = slices.Concat(tail, trailing)
+		}
 	}
-	for _, cg := range slices.Concat(tail, slots.trailing) {
+	for _, cg := range trailing {
 		hasComment = true
 		cd := c.commentGroup(cg)
 		rel := cg.Pos().RelPos()
@@ -3945,15 +3942,16 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	// cannot join the chain's comments in that case.
 	var valDoc doc
 	attrsDoc := attrsSpaced(leaf.Attrs)
+	chainable := len(trailingCommentDocs) > 0 && len(leaf.Attrs) == 0
 	bin, isBinChain := leaf.Value.(*ast.BinaryExpr)
-	isBinChain = isBinChain && len(trailingCommentDocs) > 0 && len(leaf.Attrs) == 0
+	isBinChain = isBinChain && chainable
 	var binArms []chainArm
 	binHasTrailing := false
 	if isBinChain {
 		binArms, binHasTrailing = c.binaryChainArms(bin)
 	}
 	sel, isSelChain := leaf.Value.(*ast.SelectorExpr)
-	isSelChain = isSelChain && len(trailingCommentDocs) > 0 && len(leaf.Attrs) == 0
+	isSelChain = isSelChain && chainable
 	var selArms []selArm
 	selHasTrailing := false
 	if isSelChain {
@@ -4388,45 +4386,27 @@ func hasTrailingCommentLine(s commentSlots) bool {
 	return false
 }
 
-// nodeEndsWithLineComment reports whether the comments that
-// [converter.withCommentsSlots] renders after n, whose comment slots
-// are s, leave a `//` comment at the tail of n's output. The slot
-// selection mirrors withCommentsSlots: trailing comments (Position >=
-// PosTrailingMin) always render after the body, and for nodes that
-// don't manage their own interior comments the prefix/suffix slots are
-// emitted as trailing content too, as is a prefix comment which
-// [trailingPrefixComments] lifts out of a node managing its interior
-// comments. CUE has only `//` line comments, so any such tail comment
-// runs to end-of-line.
-func (c *converter) nodeEndsWithLineComment(n ast.Node, s commentSlots) bool {
-	if len(s.trailing) > 0 {
-		return true
-	}
-	if !nodeManagesInteriorComments(n) {
-		return len(s.prefix) > 0 || len(s.suffix) > 0
-	}
-	// trailingPrefixComments only returns comments from s.prefix.
-	return len(s.prefix) > 0 && c.nodeFlags[n]&interiorPrefix == 0 && len(trailingPrefixComments(n)) > 0
-}
-
 // liftsChildComment reports whether n's renderer moves the comment
 // ending one of its children, which is not rendered last, to the end of
 // n's output, as it would otherwise swallow the tokens which follow.
 func (c *converter) liftsChildComment(n ast.Node) bool {
-	ends := func(x ast.Node) bool { return x != nil && c.nodeFlags[x]&endsWithLineComment != 0 }
 	if f, ok := n.(*ast.Field); ok {
 		// A field's attributes go before its value's comments.
-		return len(f.Attrs) > 0 && ends(f.Value)
+		return len(f.Attrs) > 0 && c.endsWithLineComment(f.Value)
 	}
-	ops := liftedOperands(n)
-	return ends(ops[0]) || ends(ops[1]) || ends(ops[2])
+	for _, x := range liftedOperands(n) {
+		if c.endsWithLineComment(x) {
+			return true
+		}
+	}
+	return false
 }
 
 // liftedOperands returns the operands of n followed by a token which
 // cannot start a line, such as a closing paren, an index, or the `in`
-// of a for clause. n's renderer moves the comments ending them to the
-// end of its output; see [converter.liftOperandTails]. Missing operands
-// are nil.
+// of a for clause. [converter.exprCore] and [converter.clause] move the
+// comments ending them to the end of n's output. Missing operands are
+// nil.
 func liftedOperands(n ast.Node) (ops [3]ast.Expr) {
 	switch n := n.(type) {
 	case *ast.ParenExpr:
@@ -4467,11 +4447,10 @@ func lastOperand(e ast.Expr) ast.Expr {
 	return nil
 }
 
-// rowEndsWithComment reports whether the row [converter.listElemRow]
-// builds for e ends in a `//` comment, including one which moves there
-// from inside e, such as from after a unary operator or an operand.
-func (c *converter) rowEndsWithComment(e ast.Node) bool {
-	return c.nodeFlags[e]&endsWithLineComment != 0
+// endsWithLineComment reports whether n's output ends in a `//` comment,
+// including one moved there from inside n. A nil n ends in none.
+func (c *converter) endsWithLineComment(n ast.Node) bool {
+	return n != nil && c.nodeFlags[n]&endsWithLineComment != 0
 }
 
 // isBracketed reports whether n's rendered output ends with a closing
@@ -4709,7 +4688,7 @@ func classifyComments(n ast.Node) commentSlots {
 
 // comprehensionClauseComments returns, for each clause of x, the
 // comments attached to x which follow that clause and precede the next
-// clause or the body.
+// clause or the body, or nil if there are none.
 //
 // The parser attaches these to the comprehension, numbering their
 // Position by counting the clauses and the body as one position each,
@@ -5015,11 +4994,13 @@ func anyHasPostComment[T ast.Node](nodes []T) bool {
 // hasPostComment reports whether n carries a post-element comment.
 // (See anyHasPostComment for the classification.)
 func hasPostComment(n ast.Node) bool {
-	// Most comments are doc or same-line comments, which do not qualify
-	// below, so we skip classifying the comments when they all are.
-	if !slices.ContainsFunc(ast.Comments(n), func(cg *ast.CommentGroup) bool {
+	// Doc comments and same-line comments are not post-element
+	// comments. Most comments are one or the other, so we skip
+	// classifying the comments when they all are.
+	isCandidate := func(cg *ast.CommentGroup) bool {
 		return cg.Position != PosDoc && !isLineComment(cg)
-	}) {
+	}
+	if !slices.ContainsFunc(ast.Comments(n), isCandidate) {
 		return false
 	}
 	nManagesInteriorComments := nodeManagesInteriorComments(n)
@@ -5028,8 +5009,7 @@ func hasPostComment(n ast.Node) bool {
 		lifted = trailingPrefixComments(n)
 	}
 	for _, cg := range classifyComments(n).nonDoc() {
-		// Same-line comments are not post-element comments.
-		if isLineComment(cg) {
+		if !isCandidate(cg) {
 			continue
 		}
 		// Bracketed nodes (StructLit/ListLit/BinaryExpr) handle their

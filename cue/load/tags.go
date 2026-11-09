@@ -297,10 +297,28 @@ func findTags(f *ast.File) (tags []*tag, errs errors.Error) {
 			return false
 
 		case *ast.Field:
+			if _, _, err := ast.LabelName(x.Label); err != nil {
+				label := x.Label
+				if a, ok := label.(*ast.Alias); ok {
+					label, _ = a.Expr.(ast.Label)
+				}
+				switch label.(type) {
+				case *ast.ListLit:
+					findInvalidTags(n, "@tag not allowed within pattern constraint")
+				case *ast.ParenExpr, *ast.Interpolation:
+					findInvalidTags(n, "@tag not allowed within dynamic field")
+				default:
+					findInvalidTags(n, "@tag not allowed within field with unsupported label")
+				}
+				return false
+			}
 			// TODO: allow optional fields?
-			_, _, err := ast.LabelName(x.Label)
-			if err != nil || x.Constraint != token.ILLEGAL {
-				findInvalidTags(n, "@tag not allowed within field constraint")
+			if x.Constraint == token.OPTION {
+				findInvalidTags(n, "@tag not allowed within optional field")
+				return false
+			}
+			if x.Constraint == token.NOT {
+				findInvalidTags(n, "@tag not allowed within required field")
 				return false
 			}
 

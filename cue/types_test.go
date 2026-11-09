@@ -957,6 +957,12 @@ func TestFields(t *testing.T) {
 		value: `{[1, 2, ...int], [string]: int}`,
 		res:   `{[>=2]:int,[string]:int,0:1,1:2,}`,
 	}, {
+		// The constraint refers back to itself through a disjunction.
+		opts:  []cue.Option{cue.Patterns(true)},
+		value: `#A: [string]: {x: #A} | {x: #B}, #B: [string]: {x: #A} | {x: #B}`,
+		path:  "#A",
+		res:   `{[string]:{x: #A} | {x: #B},}`,
+	}, {
 		// Unification distributes over disjunction, so a struct embedding
 		// a disjunction is a disjunction of structs. Iterating over it,
 		// much like a for comprehension, needs it to resolve to one struct.

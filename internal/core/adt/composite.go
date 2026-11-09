@@ -243,7 +243,8 @@ type Vertex struct {
 	IsDynamic bool
 
 	// IsPatternConstraint indicates that this Vertex is an entry in
-	// Vertex.PatternConstraints.
+	// Vertex.PatternConstraints, or a copy of one made by
+	// [Vertex.PatternConstraint].
 	IsPatternConstraint bool
 
 	// nonRooted indicates that this Vertex originates within the context of

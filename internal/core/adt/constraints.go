@@ -14,6 +14,11 @@
 
 package adt
 
+import (
+	"slices"
+	"sync/atomic"
+)
+
 // This file contains functionality for pattern constraints.
 
 // Constraints keeps track of pattern constraints and the set of allowed
@@ -41,6 +46,62 @@ type Constraints struct {
 type PatternConstraint struct {
 	Pattern    Value
 	Constraint *Vertex
+
+	// finalized caches the copy made by [Vertex.PatternConstraint].
+	finalized atomic.Pointer[Vertex]
+}
+
+// PatternConstraint returns the finalized constraint of the i-th pair of
+// v.PatternConstraints, which must not be nil.
+//
+// A constraint is not necessarily finalized along with v, which may be
+// shared between goroutines once finalized. Such a constraint is not
+// mutated: a copy of it is evaluated on first use and cached.
+func (v *Vertex) PatternConstraint(c *OpContext, i int) *Vertex {
+	pc := &v.PatternConstraints.Pairs[i]
+	orig := pc.Constraint
+	// Each vertex's own status matters here, not [Vertex.Status]: a sharing
+	// vertex left evaluating is still mutated by Finalize.
+	if v.status != finalized {
+		// v is still being evaluated by c.
+		orig.Finalize(c)
+		return orig
+	}
+	if orig.status == finalized {
+		return orig
+	}
+	if w := pc.finalized.Load(); w != nil {
+		return w
+	}
+	if w := c.pendingConstraints[orig]; w != nil {
+		// Reached again while evaluating the copy, as in a recursive schema.
+		// Like any vertex being evaluated, it is returned as it stands.
+		return w
+	}
+	w := &Vertex{
+		IsPatternConstraint: true,
+		Conjuncts:           slices.Clip(orig.Conjuncts),
+	}
+	if c.pendingConstraints == nil {
+		c.pendingConstraints = make(map[*Vertex]*Vertex)
+	}
+	c.pendingConstraints[orig] = w
+	w.Finalize(c)
+	delete(c.pendingConstraints, orig)
+	if w.Status() != finalized {
+		// Left unfinished, so a later call would mutate it; do not share it.
+		return w
+	}
+	if w.status != finalized {
+		// A sharing vertex keeps the status its target had before it was
+		// unified. Mark it done and release its state, as unify would have.
+		w.ForceDone()
+		c.reclaimTempBuffers(w)
+	}
+	if !pc.finalized.CompareAndSwap(nil, w) {
+		w = pc.finalized.Load()
+	}
+	return w
 }
 
 // insertConstraint ensures a given pattern constraint is present in the

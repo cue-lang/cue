@@ -257,9 +257,7 @@ outerConstraint:
 	for i := range apairs {
 		for j := range bpc.Pairs {
 			if adt.Equal(s.ctx, apairs[i].Pattern, bpc.Pairs[j].Pattern, 0) {
-				apairs[i].Constraint.Finalize(s.ctx)
-				bpc.Pairs[j].Constraint.Finalize(s.ctx)
-				if !s.constraints(x, y, apairs[i].Constraint, bpc.Pairs[j].Constraint) {
+				if !s.constraints(x, y, x.PatternConstraint(s.ctx, i), y.PatternConstraint(s.ctx, j)) {
 					return false
 				}
 				continue outerConstraint

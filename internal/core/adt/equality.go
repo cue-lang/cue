@@ -210,9 +210,7 @@ func equalPatterns(ctx *OpContext, x, y *Vertex, flags Flag) bool {
 		if !Equal(ctx, px[i].Pattern, py[i].Pattern, flags) {
 			return false
 		}
-		px[i].Constraint.Finalize(ctx)
-		py[i].Constraint.Finalize(ctx)
-		if !Equal(ctx, px[i].Constraint, py[i].Constraint, flags) {
+		if !Equal(ctx, x.PatternConstraint(ctx, i), y.PatternConstraint(ctx, i), flags) {
 			return false
 		}
 	}

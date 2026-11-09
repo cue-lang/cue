@@ -217,6 +217,7 @@ type Iterator struct {
 	idx       *runtime.Runtime
 	ctx       *adt.OpContext
 	arcs      []*adt.Vertex
+	obj       *adt.Vertex // holds patterns; val.v or its default
 	patterns  []adt.PatternConstraint
 	p         int
 	cur       Value
@@ -241,10 +242,9 @@ func (i *Iterator) Next() bool {
 	case i.p < len(i.patterns):
 		i.isPattern = true
 		i.arcType = adt.ArcNotPresent
-		pattern := i.patterns[i.p]
-		pattern.Constraint.Finalize(i.ctx)
-		i.cur = makeValue(i.val.idx, pattern.Constraint,
-			linkParent(i.val.parent_, i.val.v, pattern.Constraint),
+		constraint := i.obj.PatternConstraint(i.ctx, i.p)
+		i.cur = makeValue(i.val.idx, constraint,
+			linkParent(i.val.parent_, i.val.v, constraint),
 		)
 		i.p++
 		return true
@@ -1549,6 +1549,7 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 		ctx:      ctx,
 		val:      v,
 		arcs:     obj.arcs,
+		obj:      obj.obj,
 		patterns: obj.patterns,
 		isList:   v.Kind() == ListKind,
 	}, nil

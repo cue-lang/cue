@@ -166,6 +166,10 @@ type OpContext struct {
 	stats        stats.Counts
 	freeListNode *nodeContext
 
+	// pendingConstraints maps the pattern constraints whose copies are
+	// being evaluated by [Vertex.PatternConstraint] to those copies.
+	pendingConstraints map[*Vertex]*Vertex
+
 	e  *Environment
 	ci CloseInfo
 

@@ -539,6 +539,78 @@ func TestConcurrentFields(t *testing.T) {
 
 }
 
+// TestConcurrentPatterns tests concurrent use of pattern constraints,
+// which are evaluated on demand when iterating, subsuming,
+// or comparing disjuncts.
+func TestConcurrentPatterns(t *testing.T) {
+	ctx := cuecontext.New()
+	root := ctx.CompileString(`
+		#S: [string]: *"a" | "b"
+		#S: [#K]: string
+		#K: =~"^x" | =~"^y"
+		a: [string]: *"a" | "b"
+		b: [string]: *"a" | "b"
+
+		#R: [string]: #R | int
+		r1: #R
+		r2: #R
+
+		// Comparing these disjuncts reaches the constraints of #A and #B,
+		// or of #C and #D once filled into p and q.
+		#A: [string]: *"a" | "b"
+		#B: [string]: *"a" | "b"
+		d: [string]: {x: #A} | {x: #B}
+		#C: [string]: *"a" | "b"
+		#D: [string]: *"a" | "b"
+		f: {x: p} | {x: q}
+		p: _
+		q: _
+	`)
+	if err := root.Err(); err != nil {
+		t.Fatal(err)
+	}
+	v := root.LookupPath(cue.ParsePath("#S"))
+	a := root.LookupPath(cue.ParsePath("a"))
+	b := root.LookupPath(cue.ParsePath("b"))
+	r1 := root.LookupPath(cue.ParsePath("r1"))
+	r2 := root.LookupPath(cue.ParsePath("r2"))
+	d := root.LookupPath(cue.ParsePath("d"))
+	defC := root.LookupPath(cue.ParsePath("#C"))
+	defD := root.LookupPath(cue.ParsePath("#D"))
+
+	iterate := func(v cue.Value) {
+		iter, err := v.Fields(cue.Patterns(true))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		for iter.Next() {
+			_ = iter.Selector().Pattern().IncompleteKind()
+			_ = iter.Value().IncompleteKind()
+		}
+	}
+
+	// Each phase starts with the first use of the constraints it races on.
+	runConcurrent(t, func() {
+		iterate(d)
+	})
+	runConcurrent(t, func() {
+		f := root.FillPath(cue.ParsePath("p"), defC).
+			FillPath(cue.ParsePath("q"), defD).
+			LookupPath(cue.ParsePath("f"))
+		if err := f.Validate(); err != nil {
+			t.Error(err)
+		}
+	})
+	runConcurrent(t, func() {
+		iterate(v)
+		if err := a.Subsume(b); err != nil {
+			t.Error(err)
+		}
+		_ = r1.Subsume(r2)
+	})
+}
+
 // TestConcurrentList tests concurrent iteration over list elements.
 func TestConcurrentList(t *testing.T) {
 	ctx := cuecontext.New()

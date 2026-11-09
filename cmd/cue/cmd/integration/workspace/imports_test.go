@@ -188,6 +188,7 @@ w: q.#Q & {}
 			I.RootURIAsDefaultFolder(), I.Registry(reg), I.Modes(I.DefaultModes()&^I.Forwarded),
 		).Run(t, files, func(t *testing.T, env *I.Env) {
 			rootURI := env.Sandbox.Workdir.RootURI()
+			cacheURI := protocol.URIFromPath(cacheDir) + "/mod/extract"
 			env.Await(
 				I.LogExactf(protocol.Debug, 1, false, "Workspace folder added: %v", rootURI),
 			)
@@ -201,13 +202,19 @@ w: q.#Q & {}
 					Start: protocol.Position{Line: 4, Character: 11},
 				},
 			})
-			// TODO: z in foo's x/y.cue is missing.
 			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{
 				{
 					URI: rootURI + "/d/d.cue",
 					Range: protocol.Range{
 						Start: protocol.Position{Line: 4, Character: 11},
 						End:   protocol.Position{Line: 4, Character: 12},
+					},
+				},
+				{
+					URI: cacheURI + "/example.com/foo@v0.0.1/x/y.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 3, Character: 6},
+						End:   protocol.Position{Line: 3, Character: 7},
 					},
 				},
 			}))
@@ -250,8 +257,7 @@ w: q.#Q & {}
 					End:   protocol.Position{Line: 4, Character: 12},
 				},
 			}
-			// TODO: the declaration in foo's x/y.cue and its use in a/a.cue are missing.
-			qt.Assert(t, qt.DeepEquals(env.References(useD), []protocol.Location{useD}))
+			qt.Assert(t, qt.DeepEquals(env.References(useD), []protocol.Location{useD, decl, useA}))
 
 			// The editor only opens files in its workdir, so ask the
 			// server directly about the declaration in the module cache.
@@ -260,8 +266,7 @@ w: q.#Q & {}
 				Context:                    protocol.ReferenceContext{IncludeDeclaration: true},
 			})
 			qt.Assert(t, qt.IsNil(err))
-			// TODO: the use in d/d.cue is missing.
-			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{decl, useA}))
+			qt.Assert(t, qt.DeepEquals(locs, []protocol.Location{decl, useA, useD}))
 		})
 	})
 
@@ -290,8 +295,7 @@ w: q.#Q & {}
 			for _, item := range completions.Items {
 				labels[item.Label] = true
 			}
-			// TODO: z in foo's x/y.cue is missing.
-			qt.Assert(t, qt.IsFalse(labels["z"]), qt.Commentf("unexpected z in %v", completions.Items))
+			qt.Assert(t, qt.IsTrue(labels["z"]), qt.Commentf("missing z in %v", completions.Items))
 		})
 	})
 }

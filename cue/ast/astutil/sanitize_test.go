@@ -707,6 +707,53 @@ a: {
 	b: in_1
 }
 `,
+	}, {
+		// The name of an import added for a reference is taken, so no new
+		// name may be picked as that name.
+		//
+		// The let clause is renamed to the name of the import, and the output
+		// does not compile.
+		desc: "Rename a let clause past the name of an added import",
+		file: func() *ast.File {
+			spec := &ast.ImportSpec{Name: ast.NewIdent("in_1"), Path: ast.NewString("strings")}
+			let := &ast.LetClause{Ident: ast.NewIdent("in"), Expr: ast.NewLit(token.INT, "1")}
+			return &ast.File{Decls: []ast.Decl{
+				let,
+				&ast.Field{Label: ast.NewIdent("y"), Value: &ast.Ident{Name: "in", Node: let}},
+				&ast.Field{Label: ast.NewIdent("z"), Value: ast.NewSel(&ast.Ident{Name: "in_1", Node: spec}, "ToUpper")},
+			}}
+		}(),
+		want: `import in_1 "strings"
+
+let in_1 = 1
+y: in_1
+z: in_1.ToUpper
+`,
+	}, {
+		// The alias is named like the import, and the output does not
+		// compile.
+		desc: "Alias a shadowed field past the name of an added import",
+		file: func() *ast.File {
+			spec := &ast.ImportSpec{Name: ast.NewIdent("a_1"), Path: ast.NewString("strings")}
+			outer := &ast.Field{Label: ast.NewIdent("a"), Value: ast.NewLit(token.INT, "1")}
+			return &ast.File{Decls: []ast.Decl{
+				outer,
+				&ast.Field{Label: ast.NewIdent("b"), Value: ast.NewStruct(
+					ast.NewIdent("a"), ast.NewLit(token.INT, "2"),
+					ast.NewIdent("c"), &ast.Ident{Name: "a", Node: outer.Value},
+				)},
+				&ast.Field{Label: ast.NewIdent("z"), Value: ast.NewSel(&ast.Ident{Name: "a_1", Node: spec}, "ToUpper")},
+			}}
+		}(),
+		want: `import a_1 "strings"
+
+a~(a_1): 1
+b: {
+	a: 2
+	c: a_1
+}
+z: a_1.ToUpper
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

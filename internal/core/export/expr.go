@@ -131,7 +131,6 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				e.valueAlias[a] = valueAlias
 			}
 		}
-		x.markLets(c.c.Expr().Source())
 	}
 
 	defer filterUnusedLets(s)
@@ -141,8 +140,6 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			expr = e.bindValueAlias(valueAlias, expr)
 		}
 	}()
-
-	hasAlias := len(s.Elts) > 0
 
 	// Dedup conjuncts that share the same body AST. Pushdown lands a
 	// `for x in xs { … }` over N items as N body conjuncts on the target,
@@ -159,6 +156,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		seen[x] = true
 		e.addExpr(c.c.Env, src, x, false)
 	}
+
+	// Only the let clauses of the merged structs are declared so far.
+	hasLets := len(s.Elts) > 0
 
 	if src != nil {
 		for _, a := range src.Arcs {
@@ -219,18 +219,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			if len(e.conjuncts) == 1 {
 				x = e.conjuncts[0]
 			} else {
-				// The embedded struct becomes the output of this frame, so
-				// its declarations are in scope of the references recorded
-				// in this frame.
 				x = e.embed[0]
-				top := e.top()
-				for l, en := range e.embedFields {
-					if en.field != nil && top.fields[l].field == nil {
-						e.addField(l, en.field)
-					}
-				}
 			}
-			if len(e.attrs) == 0 && !hasAlias {
+			if len(e.attrs) == 0 && !hasLets {
 				return x
 			}
 			if st, ok := x.(*ast.StructLit); ok {
@@ -330,10 +321,6 @@ type conjuncts struct {
 	// spliced into the result rather than embedded, as files share the
 	// package scope.
 	decls []ast.Decl
-
-	// embedFields holds the fields of the frame of the last struct in embed,
-	// for when it is the only one.
-	embedFields map[adt.Feature]entry
 }
 
 func (c *conjuncts) getField(label adt.Feature) field {
@@ -397,19 +384,24 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			if isFile {
 				top := e.top()
 				top.spliced = true
-				top.fields = top.parent.fields
+				top.fields = saved[len(saved)-1].fields
 			}
-			s := e.adt(env, x)
+			// Declare the lets in the struct's own scope, with its fields
+			// in scope; e.adt places them where their source does.
+			e.markLets(x.Src)
+			s := e.adt(env, x).(*ast.StructLit)
+			filterUnusedLets(s)
 			if isFile {
-				e.decls = append(e.decls, s.(*ast.StructLit).Elts...)
+				e.decls = append(e.decls, s.Elts...)
 			} else {
 				e.embed = append(e.embed, s)
-				e.embedFields = e.top().fields
 			}
 			e.top().upCount-- // not necessary, but for proper form
 			e.popFrame(saved)
 			return
 		}
+		// Merged into the top frame, which declares its lets.
+		e.markLets(x.Src)
 		// Used for sorting.
 		e.structs = append(e.structs, adt.StructInfo{StructLit: x})
 

@@ -45,8 +45,7 @@ x: "s"
 	x: "s"
 }
 -- out/definition --
-let N = x
-
 // Must be at root to cause problem
 (N): [{f1: f2: N}]
-x:   "s"
+let N = x
+x: "s"

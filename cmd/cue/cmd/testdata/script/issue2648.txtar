@@ -54,7 +54,6 @@ cmp stdout hidden-def-export.stdout
 -- def.stdout --
 package p
 
-let L_1 = true
 let L_2 = false
 crossfile_alias: "referenced from sibling file"
 "non ident"~(A): true
@@ -74,6 +73,7 @@ alias3_mark_used:           [A_2, A_1_1]
 "field non ident"~(crossfile_simple_1): "alias"
 alias4_mark_used:                       [L, crossfile_simple_1]
 crossfile_let:                          "referenced from sibling file"
+let L_1 = true
 if L_1 {
 	let1_used: true
 }

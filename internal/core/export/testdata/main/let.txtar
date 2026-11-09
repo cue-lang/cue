@@ -133,8 +133,7 @@ unresolvedDisjunction: {
 }
 -- embedded.cue --
 // The let clause is declared in the first struct literal, which is embedded
-// as it holds a comprehension, so N is exported beside the embedded structs
-// rather than within the first, where x is a.x.
+// as it holds a comprehension, so N is exported within it, where x is a.x.
 embedded: {
 	x: 99
 	a: {x: 1, let N = {y: x}, b: N, if true {}}
@@ -153,13 +152,11 @@ for cfg in cfgs {
 }
 
 // The let clause is declared in the first struct literal, which is embedded
-// as it holds a comprehension, so N is exported beside the embedded structs
-// rather than within the first, where x is a.x.
+// as it holds a comprehension, so N is exported within it, where x is a.x.
 embedded: {
 	x: 99
 	a: {
-		let N = {y: x}
-		{x: 1, b: N, if true {}}
+		{x: 1, let N = {y: x}, b: N, if true {}}
 		{x: 1, if true {}}
 	}
 }
@@ -237,8 +234,8 @@ unresolvedDisjunction: {
 		_args: required: bool
 	}
 	#TypeBool: {
-		let Args_7 = _args
 		_args: required: bool
+		let Args_7 = _args
 
 		if !Args_7.required {
 			// `default` sets the default value.
@@ -251,8 +248,7 @@ y: Y & Y_1
 []
 [embedded]
 - The let clause is declared in the first struct literal, which is embedded
-as it holds a comprehension, so N is exported beside the embedded structs
-rather than within the first, where x is a.x.
+as it holds a comprehension, so N is exported within it, where x is a.x.
 
 [embedded x]
 [embedded a]
@@ -358,12 +354,11 @@ rather than within the first, where x is a.x.
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,16 @@
+@@ -1,4 +1,15 @@
  []
 +[embedded]
 +- The let clause is declared in the first struct literal, which is embedded
-+as it holds a comprehension, so N is exported beside the embedded structs
-+rather than within the first, where x is a.x.
++as it holds a comprehension, so N is exported within it, where x is a.x.
 +
 +[embedded x]
 +[embedded a]
@@ -375,7 +370,7 @@ diff old new
  [comprehension]
  [comprehension filepath]
  [X]
-@@ -55,7 +67,6 @@
+@@ -55,7 +66,6 @@
  [cfgs 1]
  [cfgs 1 metadata]
  [cfgs 1 metadata name]
@@ -383,7 +378,7 @@ diff old new
  [files]
  [scoped]
  [scoped _args]
-@@ -92,3 +103,4 @@
+@@ -92,3 +102,4 @@
  [Y]
  [y]
  [Y]
@@ -498,8 +493,7 @@ diff old new
 		}
 	}
 	// The let clause is declared in the first struct literal, which is embedded
-	// as it holds a comprehension, so N is exported beside the embedded structs
-	// rather than within the first, where x is a.x.
+	// as it holds a comprehension, so N is exported within it, where x is a.x.
 	embedded: {
 		x: 99
 		a: {
@@ -562,8 +556,7 @@ diff old new
 		}
 	}
 	// The let clause is declared in the first struct literal, which is embedded
-	// as it holds a comprehension, so N is exported beside the embedded structs
-	// rather than within the first, where x is a.x.
+	// as it holds a comprehension, so N is exported within it, where x is a.x.
 	embedded: {
 		x: 99
 		a: {
@@ -614,8 +607,8 @@ diff old new
 			"*": {}
 		}
 		#TypeBool: {
-			let Args = _args
 			_args: required: bool
+			let Args = _args
 
 			if !Args.required {
 				// `default` sets the default value.
@@ -691,8 +684,7 @@ diff old new
 		}
 	}
 	// The let clause is declared in the first struct literal, which is embedded
-	// as it holds a comprehension, so N is exported beside the embedded structs
-	// rather than within the first, where x is a.x.
+	// as it holds a comprehension, so N is exported within it, where x is a.x.
 	embedded: {
 		x: 99
 		a: {
@@ -743,8 +735,8 @@ diff old new
 			"*": {}
 		}
 		#TypeBool: {
-			let Args = _args
 			_args: required: bool
+			let Args = _args
 
 			if !Args.required {
 				// `default` sets the default value.
@@ -815,8 +807,8 @@ diff old new
 	unresolvedDisjunction: {
 		#TypePrimitive: "*": {}
 		#TypeBool: {
-			let Args = _args
 			_args: required: bool
+			let Args = _args
 
 			if !Args.required {
 				default: bool | null
@@ -830,7 +822,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,209 +1,135 @@
+@@ -1,209 +1,133 @@
  == Simplified
  {
 -	cfgs: [{
@@ -939,8 +931,7 @@ diff old new
 +		}
 +	}
 +	// The let clause is declared in the first struct literal, which is embedded
-+	// as it holds a comprehension, so N is exported beside the embedded structs
-+	// rather than within the first, where x is a.x.
++	// as it holds a comprehension, so N is exported within it, where x is a.x.
 +	embedded: {
 +		x: 99
 +		a: {
@@ -1109,8 +1100,7 @@ diff old new
 +		}
 +	}
 +	// The let clause is declared in the first struct literal, which is embedded
-+	// as it holds a comprehension, so N is exported beside the embedded structs
-+	// rather than within the first, where x is a.x.
++	// as it holds a comprehension, so N is exported within it, where x is a.x.
 +	embedded: {
 +		x: 99
 +		a: {
@@ -1161,12 +1151,12 @@ diff old new
 +			"*": {}
 +		}
 +		#TypeBool: {
-+			let Args = _args
 +			_args: required: bool
++			let Args = _args
  
  			if !Args.required {
  				// `default` sets the default value.
-@@ -216,192 +142,123 @@
+@@ -216,192 +140,122 @@
  }
  == Final
  {
@@ -1401,8 +1391,7 @@ diff old new
 +		}
 +	}
 +	// The let clause is declared in the first struct literal, which is embedded
-+	// as it holds a comprehension, so N is exported beside the embedded structs
-+	// rather than within the first, where x is a.x.
++	// as it holds a comprehension, so N is exported within it, where x is a.x.
 +	embedded: {
 +		x: 99
 +		a: {
@@ -1453,12 +1442,12 @@ diff old new
 +			"*": {}
 +		}
 +		#TypeBool: {
-+			let Args = _args
 +			_args: required: bool
++			let Args = _args
  
  			if !Args.required {
  				// `default` sets the default value.
-@@ -415,106 +272,65 @@
+@@ -415,106 +269,65 @@
  == Eval
  {
  	#Foo: 2
@@ -1619,8 +1608,8 @@ diff old new
 +	unresolvedDisjunction: {
 +		#TypePrimitive: "*": {}
 +		#TypeBool: {
-+			let Args = _args
 +			_args: required: bool
++			let Args = _args
  
  			if !Args.required {
  				default: bool | null

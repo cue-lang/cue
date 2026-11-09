@@ -383,17 +383,8 @@ func (e *exporter) fieldsOf(env *adt.Environment, upCount int32) map[adt.Feature
 	for ; upCount > 0 && env != nil; upCount-- {
 		env = env.Up
 	}
-	if env == nil {
-		return nil
-	}
-	// A frame is off the stack while a let clause is exported in the scope
-	// declaring it; see [exporter.resolveLet]. Its struct literal is then
-	// embedded in the nearest frame on the stack, whose declarations are the
-	// ones in scope of the let clause.
-	for f := e.envFrame[env]; f != nil; f = f.parent {
-		if slices.Contains(e.stack, f) {
-			return f.fields
-		}
+	if f := e.envFrame[env]; f != nil {
+		return f.fields
 	}
 	return nil
 }
@@ -805,11 +796,14 @@ func (e *exporter) getFixedField(f *adt.Field) *ast.Field {
 // markLetAlias inserts an uninitialized let clause into the current scope.
 // It gets initialized upon first usage.
 func (e *exporter) markLetAlias(x *ast.LetClause) {
+	top := e.top()
+	if _, ok := top.letAlias[x]; ok {
+		return
+	}
 	// The created let clause is initialized upon first usage, and removed
 	// later if never referenced.
 	let := &ast.LetClause{}
 
-	top := e.top()
 	if top.letAlias == nil {
 		top.letAlias = make(map[*ast.LetClause]*ast.LetClause)
 	}
@@ -938,10 +932,6 @@ type frame struct {
 	// labeled fields, shared with the enclosing frame if spliced
 	fields map[adt.Feature]entry
 
-	// parent is the frame below this one on the stack, for while this one is
-	// off it; see [exporter.fieldsOf].
-	parent *frame
-
 	// letAlias maps the source let clauses declared in this scope to the
 	// ones in the output.
 	letAlias map[*ast.LetClause]*ast.LetClause
@@ -994,9 +984,6 @@ func (e *exporter) pushFrame(src *adt.Vertex, conjuncts []adt.Conjunct) (s *ast.
 		mapped:     map[adt.Node]ast.Node{},
 		fields:     map[adt.Feature]entry{},
 		docSources: conjuncts,
-	}
-	if len(saved) > 0 {
-		f.parent = saved[len(saved)-1]
 	}
 	e.stack = append(e.stack, f)
 	return s, saved

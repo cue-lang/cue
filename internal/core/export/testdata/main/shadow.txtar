@@ -219,9 +219,8 @@ shadowField: declLet: {
 	a: {x: 1, let M = {"x": {d: x}}, b: M, if true {}}
 }
 
-// The let clause is exported in a, beside the struct literals declaring a.x
-// rather than within the first, so d is not linked to a.x and refers to the x
-// within N instead, a structural cycle.
+// The let clause is exported in the first struct literal declaring a.x, which
+// is embedded, and where its quoted label shadows a.x.
 shadowField: declLetEmbedded: {
 	x: 99
 	a: {x: 1, let N = {"x": {d: x}}, b: N, if true {}}
@@ -466,17 +465,15 @@ shadowField: {
 	// The let clause is exported in a, where its quoted label shadows a.x.
 	declLet: {
 		x: 99
-		a: {let M = {x: d: x_7}, x~(x_7): 1, b: M, if true {}}
+		a: {x~(x_7): 1, let M = {x: d: x_7}, b: M, if true {}}
 	}
 
-	// The let clause is exported in a, beside the struct literals declaring a.x
-	// rather than within the first, so d is not linked to a.x and refers to the x
-	// within N instead, a structural cycle.
+	// The let clause is exported in the first struct literal declaring a.x, which
+	// is embedded, and where its quoted label shadows a.x.
 	declLetEmbedded: {
 		x: 99
 		a: {
-			let N = {x: d: x}
-			{x: 1, b: N, if true {}}
+			{x~(x_8): 1, let N = {x: d: x_8}, b: N, if true {}}
 			{x: 1, if true {}}
 		}
 	}
@@ -485,8 +482,8 @@ shadowField: {
 	// reference in c from being linked to it too.
 	forwardRef: {
 		b:       x
-		x~(x_8): 1
-		a: x: c: x_8
+		x~(x_9): 1
+		a: x: c: x_9
 	}
 
 	// a.r shares its value with x, yet a reference to r refers to a.r.
@@ -504,17 +501,17 @@ shadowField: {
 	// The struct literals declaring x are the value of no field: a disjunct, a
 	// list element, and a literal embedded in a struct with a comprehension.
 	declDisjunct: t: *{
-		x~(x_9): 1
-		b: x: c: x_9
-	} | {y: 2}
-	declListElem: l: [{
 		x~(x_10): 1
 		b: x: c: x_10
+	} | {y: 2}
+	declListElem: l: [{
+		x~(x_11): 1
+		b: x: c: x_11
 	}]
 	declEmbeddedLet: a: {
 		{
-			let N_1 = {x: d: x_11}
-			x~(x_11): 1
+			let N_1 = {x: d: x_12}
+			x~(x_12): 1
 			b:        N_1
 		}
 		if true {}
@@ -720,9 +717,8 @@ second one only, where the quoted label shadows a.x.
 [shadowField declLet a b x]
 [shadowField declLet a b x d]
 [shadowField declLetEmbedded]
-- The let clause is exported in a, beside the struct literals declaring a.x
-rather than within the first, so d is not linked to a.x and refers to the x
-within N instead, a structural cycle.
+- The let clause is exported in the first struct literal declaring a.x, which
+is embedded, and where its quoted label shadows a.x.
 
 [shadowField declLetEmbedded x]
 [shadowField declLetEmbedded a]
@@ -996,9 +992,8 @@ _|_ // shadowRef.e1.x.x: structural cycle
 			}
 		}
 
-		// The let clause is exported in a, beside the struct literals declaring a.x
-		// rather than within the first, so d is not linked to a.x and refers to the x
-		// within N instead, a structural cycle.
+		// The let clause is exported in the first struct literal declaring a.x, which
+		// is embedded, and where its quoted label shadows a.x.
 		declLetEmbedded: {
 			x: 99
 			a: {
@@ -1203,7 +1198,7 @@ diff old new
  			}
  		}
  
-@@ -121,22 +90,182 @@
+@@ -121,22 +90,181 @@
  		// or even
  		// 		b: 0
  		//  	c: b
@@ -1338,9 +1333,8 @@ diff old new
 +			}
 +		}
 +
-+		// The let clause is exported in a, beside the struct literals declaring a.x
-+		// rather than within the first, so d is not linked to a.x and refers to the x
-+		// within N instead, a structural cycle.
++		// The let clause is exported in the first struct literal declaring a.x, which
++		// is embedded, and where its quoted label shadows a.x.
 +		declLetEmbedded: {
 +			x: 99
 +			a: {

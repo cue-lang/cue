@@ -54,11 +54,11 @@ r1:     "r1"
 // The alias of a dynamic field may be reused in a nested struct. The let
 // clause is first used, and thus exported, within the nested struct.
 nested: {
-	let L = K
 	k:       "p"
 	k2:      "q"
 	(k)~(K): 1
 	outer:   K
+	let L = K
 	inner: {
 		(k2)~(K_1): 2
 		ref:        K_1
@@ -167,11 +167,11 @@ bogus field for a failed dynamic field.
 	// The alias of a dynamic field may be reused in a nested struct. The let
 	// clause is first used, and thus exported, within the nested struct.
 	nested: {
-		let L = K
 		k:       "p"
 		k2:      "q"
 		(k)~(K): 1
 		outer:   K
+		let L = K
 		inner: {
 			(k2)~(K_1): 2
 			ref:        K_1
@@ -202,11 +202,11 @@ bogus field for a failed dynamic field.
 	// The alias of a dynamic field may be reused in a nested struct. The let
 	// clause is first used, and thus exported, within the nested struct.
 	nested: {
-		let L = K
 		k:       "p"
 		k2:      "q"
 		(k)~(K): 1
 		outer:   K
+		let L = K
 		inner: {
 			(k2)~(K_1): 2
 			ref:        K_1
@@ -239,11 +239,11 @@ _|_ // key value of dynamic field must be concrete, found string (and 2 more err
 	// The alias of a dynamic field may be reused in a nested struct. The let
 	// clause is first used, and thus exported, within the nested struct.
 	nested: {
-		let L = K
 		k:       "p"
 		k2:      "q"
 		(k)~(K): 1
 		outer:   K
+		let L = K
 		inner: {
 			(k2)~(K_1): 2
 			ref:        K_1
@@ -271,11 +271,11 @@ _|_ // key value of dynamic field must be concrete, found string (and 2 more err
 	("s-" + r)!: 2
 	("s-" + q1)?: (r1)!: 3
 	nested: {
-		let L = K
 		k:       "p"
 		k2:      "q"
 		(k)~(K): 1
 		outer:   K
+		let L = K
 		inner: {
 			(k2)~(K_1): 2
 			ref:        K_1
@@ -312,11 +312,11 @@ diff old new
 +	// The alias of a dynamic field may be reused in a nested struct. The let
 +	// clause is first used, and thus exported, within the nested struct.
 +	nested: {
-+		let L = K
 +		k:       "p"
 +		k2:      "q"
 +		(k)~(K): 1
 +		outer:   K
++		let L = K
 +		inner: {
 +			(k2)~(K_1): 2
 +			ref:        K_1
@@ -348,11 +348,11 @@ diff old new
 +	// The alias of a dynamic field may be reused in a nested struct. The let
 +	// clause is first used, and thus exported, within the nested struct.
 +	nested: {
-+		let L = K
 +		k:       "p"
 +		k2:      "q"
 +		(k)~(K): 1
 +		outer:   K
++		let L = K
 +		inner: {
 +			(k2)~(K_1): 2
 +			ref:        K_1
@@ -387,11 +387,11 @@ diff old new
 +	// The alias of a dynamic field may be reused in a nested struct. The let
 +	// clause is first used, and thus exported, within the nested struct.
 +	nested: {
-+		let L = K
 +		k:       "p"
 +		k2:      "q"
 +		(k)~(K): 1
 +		outer:   K
++		let L = K
 +		inner: {
 +			(k2)~(K_1): 2
 +			ref:        K_1
@@ -420,11 +420,11 @@ diff old new
 +	("s-" + r)!: 2
 +	("s-" + q1)?: (r1)!: 3
 +	nested: {
-+		let L = K
 +		k:       "p"
 +		k2:      "q"
 +		(k)~(K): 1
 +		outer:   K
++		let L = K
 +		inner: {
 +			(k2)~(K_1): 2
 +			ref:        K_1

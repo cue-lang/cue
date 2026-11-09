@@ -70,8 +70,8 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 			}
 			decl := e.decl(env, d)
 
-			// decl may be nil if it represents a let. Lets are added later, and
-			// only when they are still used.
+			// decl is nil for a let not marked in this scope. A marked one
+			// is removed later if it is never used.
 			if decl == nil {
 				continue
 			}
@@ -558,7 +558,10 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		return f
 
 	case *adt.LetField:
-		// Handled elsewhere
+		// Declared where its source is if marked in this scope.
+		if let, ok := e.top().letAlias[x.Src]; ok {
+			return let
+		}
 		return nil
 
 	case *adt.BulkOptionalField:

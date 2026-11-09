@@ -1,0 +1,31 @@
+# Tests that bare schemas without any definitions still generate a whole
+# document, with an empty components.schemas.
+#v2
+-- in.cue --
+// Some title.
+
+$version: "v1"
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Some title.",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {}
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Some title.",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {}
+   }
+}

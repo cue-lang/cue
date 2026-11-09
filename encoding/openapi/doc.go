@@ -16,8 +16,9 @@
 //
 // [Generate] and [Gen] translate a CUE value into the schema components of an
 // OpenAPI v3.0 document. [GenerateV2] translates a CUE value shaped like a
-// whole OpenAPI document (v3.0 or v3.1) into that document; the rest of this
-// package documentation concerns [GenerateV2] only.
+// whole OpenAPI document (v3.0 or v3.1) into that document, or, like
+// [Generate], bare schema definitions into a document holding them. The rest
+// of this package documentation concerns [GenerateV2] only.
 //
 // # Schema positions and the "#" convention
 //

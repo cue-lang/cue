@@ -1,0 +1,6 @@
+# Tests that a value which is a disjunction of structs is reported as such,
+# rather than as missing its openapi field.
+#v2
+#ExpectError: non-concrete value struct
+-- in.cue --
+{info: {title: "t"}, #A: int} | {paths: {}}

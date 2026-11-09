@@ -1,0 +1,10 @@
+# Tests that the error for a top-level field requiring an openapi field names
+# the field as its @openapi(name) attribute does.
+#v2
+#ExpectError: top-level field "paths" requires an openapi field; without one, only info and $version can be declared beside schema definitions
+-- in.cue --
+info: {title: "t", version: "1"}
+
+p: {} @openapi(paths)
+
+#A: int

@@ -72,8 +72,12 @@ func ExtractV2(data cue.Value, cfg *ExtractConfig) (*ast.File, error) {
 	}
 	version := cfg.Version
 	if version == VersionUnknown {
+		openapi := data.LookupPath(openapiPath)
+		if !openapi.Exists() {
+			return nil, fmt.Errorf("openapi field is required but not found")
+		}
 		var err error
-		version, err = detectVersion(data)
+		version, err = detectVersion(openapi)
 		if err != nil {
 			return nil, err
 		}

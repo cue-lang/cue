@@ -1,0 +1,8 @@
+# Tests that bare schemas whose info field is not a struct are rejected, as
+# Generate does, before any schema is generated.
+#v2
+#ExpectError: info must be a struct
+-- in.cue --
+info: "t"
+
+#A: int

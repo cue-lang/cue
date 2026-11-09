@@ -1,8 +1,11 @@
-# Tests that when GenerateConfig.Version is left unset and the document has
-# no "openapi" field, version auto-detection fails with an error.
+# Tests that when GenerateConfig.Version is left unset and the value has no
+# "openapi" field, a top-level field other than info and $version is reported,
+# as the value then does not declare bare schemas.
 #v2
-#ExpectError: openapi field is required but not found
+#ExpectError: top-level field "paths" requires an openapi field; without one, only info and $version can be declared beside schema definitions
 -- in.cue --
 info: {title: "t", version: "1"}
 
 paths: {}
+
+#A: int

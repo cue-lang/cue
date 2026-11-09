@@ -1,0 +1,86 @@
+# Tests that a value without an "openapi" field generates a whole OpenAPI 3.0
+# document from its definitions, as Generate does: the info title comes from
+# the doc comment, its version from $version, and every definition is emitted
+# under components.schemas.
+#v2
+-- in.cue --
+// Some title.
+
+$version: "v1"
+
+#Foo: {a: int}
+#Bar: {foo: #Foo}
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Some title.",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Bar": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "foo": {
+                  "$ref": "#/components/schemas/Foo"
+               }
+            },
+            "required": [
+               "foo"
+            ]
+         },
+         "Foo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "a"
+            ]
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "Some title.",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Bar": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "foo": {
+                  "$ref": "#/components/schemas/Foo"
+               }
+            },
+            "required": [
+               "foo"
+            ]
+         },
+         "Foo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "a"
+            ]
+         }
+      }
+   }
+}

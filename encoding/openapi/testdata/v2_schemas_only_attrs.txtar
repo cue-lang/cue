@@ -1,0 +1,48 @@
+# Tests that bare schemas honor @openapi(name) attributes on top-level fields
+# as Generate does: a field renamed to "-", or named "-", is ignored, and a
+# field renamed to info is taken as info. Ignored fields are left alone: they
+# may be non-concrete, or clash with the OpenAPI document meta-schema.
+#v2
+-- in.cue --
+// Doc title.
+
+config: {debug: true} | {verbose: true} @openapi(-)
+paths:  "not a struct" @openapi(-)
+"-": 1
+myinfo: {title: "T", "x-a": 1} @openapi(info)
+
+#A: int
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "T",
+      "x-a": 1,
+      "version": "no version"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "A": {
+            "type": "integer"
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "T",
+      "x-a": 1,
+      "version": "no version"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "A": {
+            "type": "integer"
+         }
+      }
+   }
+}

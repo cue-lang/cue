@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/internal/core/runtime"
@@ -59,24 +60,82 @@ func (v Version) jsonschemaVersion() (jsonschema.Version, error) {
 	return jsonschema.VersionUnknown, fmt.Errorf("unsupported OpenAPI version %d", int(v))
 }
 
-// detectVersion returns the OpenAPI version of the document as declared by
-// its "openapi" field.
-func detectVersion(v cue.Value) (Version, error) {
-	vv := v.LookupPath(cue.MakePath(cue.Str("openapi")))
-	if !vv.Exists() {
-		return VersionUnknown, fmt.Errorf("openapi field is required but not found")
+// bareSchemas checks whether v holds bare schemas, as [Generate] expects:
+// regular fields other than info, $version, and "-" are not allowed.
+// Otherwise other is the first such field and otherLabel its [openapiLabel].
+func bareSchemas(v cue.Value) (info, other cue.Value, otherLabel string, err error) {
+	it, err := v.Fields()
+	if err != nil {
+		return cue.Value{}, cue.Value{}, "", err
 	}
-	s, err := vv.String()
+	for it.Next() {
+		switch label := openapiLabel(it.Selector(), it.Value()); label {
+		case "info":
+			info = it.Value()
+		case "$version", "-":
+		default:
+			return cue.Value{}, it.Value(), label, nil
+		}
+	}
+	if info.Exists() && info.IncompleteKind() != cue.StructKind {
+		return cue.Value{}, cue.Value{}, "", errors.Newf(info.Pos(), "info must be a struct")
+	}
+	return info, cue.Value{}, "", nil
+}
+
+// bareSchemasDocument returns the document for the bare schemas v,
+// with empty components.schemas.
+func (g *genV2) bareSchemasDocument(v, info cue.Value, version Version) (*ast.StructLit, error) {
+	var infoLit *ast.StructLit
+	if info.Exists() {
+		e, err := g.build(info)
+		if err != nil {
+			return nil, err
+		}
+		infoLit = e.(*ast.StructLit) // bareSchemas checked that info is a struct
+	}
+	infoLit = setInfoTitleVersion(infoLit, v, info)
+	openapi, err := version.openapiField()
+	if err != nil {
+		return nil, err
+	}
+	return documentStruct(openapi, infoLit, ast.NewStruct()), nil
+}
+
+// openapiPath is the path of the top-level field declaring a document's
+// OpenAPI version.
+var openapiPath = cue.MakePath(cue.Str("openapi"))
+
+// openapiVersions maps each supported version to the prefix of its openapi
+// field value; the specification says to disregard the patch version.
+var openapiVersions = []struct {
+	version Version
+	prefix  string
+}{
+	{Version3_0, "3.0."},
+	{Version3_1, "3.1."},
+}
+
+// openapiField returns the openapi field value for version v.
+func (v Version) openapiField() (string, error) {
+	for _, ov := range openapiVersions {
+		if ov.version == v {
+			return ov.prefix + "0", nil
+		}
+	}
+	return "", fmt.Errorf("no openapi field value for version %d", int(v))
+}
+
+// detectVersion parses a document's openapi field.
+func detectVersion(openapi cue.Value) (Version, error) {
+	s, err := openapi.String()
 	if err != nil {
 		return VersionUnknown, fmt.Errorf("invalid openapi field (must be string): %v", err)
 	}
-	// The specification says the patch version should be disregarded, so a
-	// simple prefix match is sufficient; see https://swagger.io/specification/v3/.
-	switch {
-	case strings.HasPrefix(s, "3.0."):
-		return Version3_0, nil
-	case strings.HasPrefix(s, "3.1."):
-		return Version3_1, nil
+	for _, ov := range openapiVersions {
+		if strings.HasPrefix(s, ov.prefix) {
+			return ov.version, nil
+		}
 	}
 	return VersionUnknown, fmt.Errorf("unknown OpenAPI version %q", s)
 }
@@ -136,9 +195,10 @@ var (
 type GenerateConfig struct {
 	// NamesFunc determines how to name the shared schemas generated within
 	// components.schemas. It is passed all the distinct references made by the
-	// schemas in the document and, when AllSchemas is set, a reference to each
-	// top-level schema; it must set a distinct [jsonschema.CUERef.Name] for
-	// each. If nil, a default naming scheme is used.
+	// schemas in the document and, with AllSchemas or bare schemas, a
+	// reference to each top-level schema; it must set a distinct
+	// [jsonschema.CUERef.Name] for each. If nil, a default naming scheme is
+	// used.
 	NamesFunc func(refs []*jsonschema.CUERef)
 
 	// DescriptionFunc returns the description for the given field. A typical
@@ -154,7 +214,8 @@ type GenerateConfig struct {
 	AllSchemas bool
 
 	// Version is the OpenAPI version to use. When [VersionUnknown] (the
-	// default), it is auto-detected from the document's "openapi" field.
+	// default), it is auto-detected from the document's "openapi" field,
+	// or 3.0 for bare schemas.
 	Version Version
 }
 
@@ -169,6 +230,12 @@ type GenerateConfig struct {
 // Schemas referenced from more than one position are emitted once, under
 // components.schemas, and referenced with a $ref.
 //
+// A value whose only regular fields are info and $version, besides ignored
+// "-" fields, holds bare schema definitions as [Generate] expects, with its
+// @openapi(name) attributes. The result is then a document like [Generate]'s,
+// with every definition under components.schemas as if cfg.AllSchemas were
+// set. Bare schemas are not recognized with [VersionKubernetesCRD].
+//
 // THIS IS EXPERIMENTAL. API MIGHT CHANGE.
 func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if cfg == nil {
@@ -177,10 +244,30 @@ func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if err := v.Validate(); err != nil {
 		return nil, err
 	}
+	if k := v.IncompleteKind(); k != cue.StructKind {
+		return nil, errors.Newf(v.Pos(), "an OpenAPI document must be a struct, found %v", k)
+	}
 	version := cfg.Version
-	if version == VersionUnknown {
+	var bare bool
+	var info, other cue.Value
+	var otherLabel string
+	if version != VersionKubernetesCRD {
 		var err error
-		version, err = detectVersion(v)
+		if info, other, otherLabel, err = bareSchemas(v); err != nil {
+			return nil, err
+		}
+		bare = !other.Exists()
+	}
+	openapi := v.LookupPath(openapiPath)
+	switch {
+	case version != VersionUnknown:
+	case bare:
+		version = Version3_0
+	case !openapi.Exists():
+		return nil, errors.Newf(other.Pos(), "top-level field %q requires an openapi field; without one, only info and $version can be declared beside schema definitions", otherLabel)
+	default:
+		var err error
+		version, err = detectVersion(openapi)
 		if err != nil {
 			return nil, err
 		}
@@ -189,39 +276,44 @@ func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	meta, err := metaSchema(version)
-	if err != nil {
-		return nil, err
-	}
-
-	// Unify with the meta-schema so that Schema Object positions are marked
-	// (and any meta-schema defaults are applied).
-	doc := v.Unify(meta)
-	if err := doc.Err(); err != nil {
-		return nil, fmt.Errorf("value does not conform to the OpenAPI document structure: %v", err)
-	}
-
 	g := &genV2{cfg: cfg}
 
-	// Pass 1: collect every # value to convert.
-	if err := g.collect(doc); err != nil {
-		return nil, err
+	// Bare schemas are not a document, so they are not unified with the
+	// meta-schema; only their definitions and info field are read.
+	doc := v
+	if !bare {
+		meta, err := metaSchema(version)
+		if err != nil {
+			return nil, err
+		}
+
+		// Unify with the meta-schema so that Schema Object positions are
+		// marked (and any meta-schema defaults are applied).
+		doc = v.Unify(meta)
+		if err := doc.Err(); err != nil {
+			return nil, fmt.Errorf("value does not conform to the OpenAPI document structure: %v", err)
+		}
+
+		// Pass 1: collect every # value to convert.
+		if err := g.collect(doc); err != nil {
+			return nil, err
+		}
 	}
-	// With AllSchemas, also convert every top-level definition so it appears in
-	// components.schemas even when unreferenced.
+	// With AllSchemas or bare schemas, also convert every top-level definition
+	// so it appears in components.schemas even when unreferenced.
 	nPositions := len(g.schemaValues)
 	var defPaths []cue.Path
-	if cfg.AllSchemas {
+	if cfg.AllSchemas || bare {
 		paths, vals := topLevelSchemas(doc)
 		defPaths = paths
 		g.schemaValues = append(g.schemaValues, vals...)
 	}
 
-	// With AllSchemas, wrap the naming function so that the top-level schemas
-	// are named in the same NamesFunc call as the references the generator
-	// collected: a referenced one arrives as such a reference, recognized by
-	// its root and path, and a synthetic reference is added for each
-	// unreferenced one. referencedNames and unreferencedNames record the
+	// With AllSchemas or bare schemas, wrap the naming function so that the
+	// top-level schemas are named in the same NamesFunc call as the references
+	// the generator collected: a referenced one arrives as such a reference,
+	// recognized by its root and path, and a synthetic reference is added for
+	// each unreferenced one. referencedNames and unreferencedNames record the
 	// names assigned, keyed by path from root.
 	namesFunc := cfg.NamesFunc
 	referencedNames := make(map[string]string)
@@ -297,13 +389,20 @@ func GenerateV2(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 	}
 
 	// Pass 2: rebuild the document, substituting the generated schemas.
-	out, err := g.build(doc)
-	if err != nil {
-		return nil, err
-	}
-	st, ok := out.(*ast.StructLit)
-	if !ok {
-		return nil, fmt.Errorf("OpenAPI document must be a struct, found %T", out)
+	var st *ast.StructLit
+	if bare {
+		if st, err = g.bareSchemasDocument(v, info, version); err != nil {
+			return nil, err
+		}
+	} else {
+		out, err := g.build(doc)
+		if err != nil {
+			return nil, err
+		}
+		var ok bool
+		if st, ok = out.(*ast.StructLit); !ok {
+			return nil, fmt.Errorf("OpenAPI document must be a struct, found %T", out)
+		}
 	}
 	if err := mergeComponentsSchemas(st, shared); err != nil {
 		return nil, err
@@ -316,8 +415,8 @@ type genV2 struct {
 	cfg *GenerateConfig
 
 	// schemaValues holds the schema values to convert, in collection order:
-	// first the values found at document positions, then (for AllSchemas) the
-	// top-level definitions.
+	// first the values found at document positions, then (for AllSchemas or
+	// bare schemas) the top-level definitions.
 	schemaValues []cue.Value
 
 	// schemaPaths[i] is the document path of the position holding

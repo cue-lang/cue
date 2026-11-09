@@ -1,0 +1,50 @@
+# Tests that bare schemas keep the info field they declare, taking the info
+# title and version from it, including defaults as produced by Extract, in
+# preference to the doc comment and $version.
+#v2
+-- in.cue --
+// Doc title.
+
+$version: "v1"
+
+info: {
+	title:      *"t" | string
+	version:    *"1.0" | string
+	"x-vendor": "keep"
+}
+
+#A: int
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1.0",
+      "x-vendor": "keep"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "A": {
+            "type": "integer"
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1.0",
+      "x-vendor": "keep"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "A": {
+            "type": "integer"
+         }
+      }
+   }
+}

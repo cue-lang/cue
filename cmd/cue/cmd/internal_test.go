@@ -335,6 +335,5 @@ command: unused: text: "test \(p.good)"`)},
 	r, _ := value.ToInternal(tools.Value())
 	imports := tools.Value().BuildInstance().Imports
 	qt.Assert(t, qt.HasLen(imports, 1))
-	// TODO: every imported package is evaluated in full before running a command.
-	qt.Assert(t, qt.IsFalse(r.LoadInstance(imports[0]).IsUnprocessed()))
+	qt.Assert(t, qt.IsTrue(r.LoadInstance(imports[0]).IsUnprocessed()))
 }

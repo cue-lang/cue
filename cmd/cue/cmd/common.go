@@ -894,11 +894,13 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		inst = cue.Merge(insts...) //lint:ignore SA1019 see buildToolInstances
 	}
 
-	ctx := value.Context(inst.Value())
+	// Compile the imports so that the tool files can resolve them,
+	// leaving their evaluation to the tasks which reference them.
+	// [cue.Context.BuildInstance] would evaluate each of them in full.
+	r, _ := value.ToInternal(inst.Value())
 	for _, b := range binst {
 		for _, i := range b.Imports {
-			val := ctx.BuildInstance(i)
-			if err := val.Err(); err != nil {
+			if _, err := r.Build(nil, i); err != nil {
 				return nil, err
 			}
 		}

@@ -3,9 +3,9 @@ cmp stdout cue_cmd_foo_both.golden
 
 # An imported package is only evaluated as far as the command needs it,
 # so an error in a part of it which the command does not use is not reported.
-# TODO: every imported package is evaluated in full before running a command.
-! exec cue cmd unused ./usebad
-stderr 'conflicting values "b" and "a"'
+exec cue cmd unused ./usebad
+stdout '^test good$'
+! stderr .
 
 # An error in a part of an imported package which the command uses is reported.
 ! exec cue cmd used ./usebad
@@ -13,9 +13,8 @@ cmp stderr cue_cmd_used.stderr
 
 # When the reference into the imported package depends on another task's output,
 # the error is reported once that output is in, after the tasks before it.
-# TODO: the error is reported before any task runs.
 ! exec cue cmd later ./usebad
-! stdout .
+stdout '^before$'
 cmp stderr cue_cmd_later.stderr
 
 # A build error in an imported package, such as an unresolved reference,
@@ -76,11 +75,13 @@ command: later: {
 -- key.txt --
 bad
 -- cue_cmd_used.stderr --
-bad: conflicting values "b" and "a":
+bad: invalid interpolation: conflicting values "b" and "a":
+    ./usebad/usebad_tool.cue:15:8
     ./bad/bad.cue:4:7
     ./bad/bad.cue:4:13
 -- cue_cmd_later.stderr --
-bad: conflicting values "b" and "a":
+bad: invalid interpolation: conflicting values "b" and "a":
+    ./usebad/usebad_tool.cue:20:26
     ./bad/bad.cue:4:7
     ./bad/bad.cue:4:13
 -- undef/undef.cue --

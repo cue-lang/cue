@@ -571,8 +571,6 @@ x: 1 // on-field
 			// A same-line comment on the rightmost operand of a field's
 			// value, as the exporter attaches to error sentinels, must
 			// not swallow the field's attributes.
-			//
-			// The comments swallow the attributes.
 			name: "field_attr_after_value_line_comment",
 			node: func() *ast.File {
 				field := func(name string, rel token.RelPos, val, leaf ast.Expr) *ast.Field {
@@ -615,13 +613,13 @@ x: 1 // on-field
 			}(),
 			cfg: &pretty.Config{Width: 80, Indent: "\t"},
 			want: `
-x: a != _|_ // boom @foo(bar)
+x: a != _|_ @foo(bar) // boom
 
-y: !_|_ // boom @foo(bar)
+y: !_|_ @foo(bar) // boom
 
 z:
 	// doc
-	a != _|_ // boom @foo(bar)`[1:],
+	a != _|_ @foo(bar) // boom`[1:],
 		},
 		{
 			// A bare expression in a Decl slot, as the evaluator's

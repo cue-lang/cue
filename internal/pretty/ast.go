@@ -156,7 +156,7 @@ const (
 	// [trailingPrefixComments]), such a comment is interior.
 	interiorPrefix
 	// afterCommentsLifted marks a node whose comments rendered after it
-	// were moved after a following operator by
+	// were moved after a following operator or a field's attributes by
 	// [converter.liftTailComments], so that
 	// [converter.withCommentsSlots] leaves them out.
 	afterCommentsLifted
@@ -911,30 +911,22 @@ func (c *converter) withCommentsSlots(n ast.Node, body doc, slots commentSlots) 
 		}
 		trailing = append(trailing, slots.trailing...)
 	}
+	return cats(c.docCommentBlock(slots.doc, n.Pos().RelPos()), body, c.trailingComments(trailing))
+}
 
-	var after []doc
-	if len(trailing) > 0 {
-		after = make([]doc, 0, len(trailing)+1)
-		// Trailing // comment: place it, then force the enclosing group
-		// to break so the comment doesn't swallow closing
-		// brackets/braces in flat-mode.
-		for _, cg := range trailing {
-			cgDoc := c.commentGroup(cg)
-			sep := c.commentSep(cg, cgDoc)
-			after = append(after, sep)
-		}
-		// switchMode(nil, lineBreakHard) is invisible in broken-mode and
-		// prevents flat rendering.
-		after = append(after, switchMode(nil, lineBreakHard))
+// trailingComments renders cgs as comments trailing the preceding
+// content, each separated as its RelPos asks, or nil if there are none.
+func (c *converter) trailingComments(cgs []*ast.CommentGroup) doc {
+	if len(cgs) == 0 {
+		return nil
 	}
-
-	parts := make([]doc, 0, 2+len(after))
-	if doc := c.docCommentBlock(slots.doc, n.Pos().RelPos()); doc != nil {
-		parts = append(parts, doc)
+	after := make([]doc, 0, len(cgs)+1)
+	for _, cg := range cgs {
+		after = append(after, c.commentSep(cg, c.commentGroup(cg)))
 	}
-	parts = append(parts, body)
-	parts = append(parts, after...)
-	return cats(parts...)
+	// Break the enclosing group, so that the comments do not swallow a
+	// closer in flat mode; switchMode is invisible in broken mode.
+	return cats(append(after, switchMode(nil, lineBreakHard))...)
 }
 
 // commentGroup converts a CommentGroup to a Doc.
@@ -2059,10 +2051,10 @@ func (c *converter) tailComments(n ast.Node) []*ast.CommentGroup {
 	return c.tails(n, false)
 }
 
-// liftTailComments returns the [converter.tailComments] of operand e,
-// which would swallow an operator following e on the same line, and
-// lifts them out of e's rendering; the caller renders them after the
-// operator.
+// liftTailComments returns the [converter.tailComments] of e, which
+// would swallow a token following e on the same line, such as an
+// operator or a field's attributes, and lifts them out of e's
+// rendering; the caller renders them after that token.
 func (c *converter) liftTailComments(e ast.Expr) []*ast.CommentGroup {
 	return c.tails(e, true)
 }
@@ -3819,7 +3811,14 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	// slots.suffix (Position 2): between colon and value. valDoc isn't
 	// computed yet (we need leaf.Value's type to know whether
 	// attrs/trailing align in a chain table), so defer until later.
-	for _, cg := range slots.trailing {
+	//
+	// The comments trailing the value go after its attributes, which
+	// they would otherwise swallow.
+	var tail []*ast.CommentGroup
+	if len(leaf.Attrs) > 0 {
+		tail = c.liftTailComments(leaf.Value)
+	}
+	for _, cg := range slices.Concat(tail, slots.trailing) {
 		hasComment = true
 		cd := c.commentGroup(cg)
 		rel := cg.Pos().RelPos()
@@ -3849,10 +3848,11 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	// leaf-token expression types: composite expressions (BinaryExpr,
 	// UnaryExpr, CallExpr, ...) attach internal-layout comments at
 	// Position=2 with Line=true that belong inside the expression's
-	// rendering, not at the field's trailing cell.
+	// rendering, not at the field's trailing cell. With attributes,
+	// all of the value's comments are lifted above instead.
 	var leafValueSlots commentSlots
 	leafValueSlotsFiltered := false
-	if isLeafLitValue(leaf.Value) {
+	if len(leaf.Attrs) == 0 && isLeafLitValue(leaf.Value) {
 		leafValueSlots = classifyComments(leaf.Value)
 		lifted, kept := partitionLineComments(leafValueSlots)
 		if lifted.any() {
@@ -3898,22 +3898,21 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	// chain's arm comments. Otherwise keep it as a separate cell in the
 	// field row (so it aligns with simple fields' trailing comments).
 	//
-	// Attributes: for the plain (non-chain) path, attrs get their own
-	// table cell (column 2) so they column-align across rows just like
-	// trailing comments do. For the chain path the valDoc cell is itself
-	// a multi-line table, so attrs are appended inline instead - there
-	// is no well-defined column position for them in that case.
+	// Attributes get their own table cell (column 2) so they
+	// column-align across rows just like trailing comments do. The
+	// field's trailing comments must follow its attributes, so they
+	// cannot join the chain's comments in that case.
 	var valDoc doc
-	var attrsDoc doc
+	attrsDoc := attrsSpaced(leaf.Attrs)
 	bin, isBinChain := leaf.Value.(*ast.BinaryExpr)
-	isBinChain = isBinChain && len(trailingCommentDocs) > 0
+	isBinChain = isBinChain && len(trailingCommentDocs) > 0 && len(leaf.Attrs) == 0
 	var binArms []chainArm
 	binHasTrailing := false
 	if isBinChain {
 		binArms, binHasTrailing = c.binaryChainArms(bin)
 	}
 	sel, isSelChain := leaf.Value.(*ast.SelectorExpr)
-	isSelChain = isSelChain && len(trailingCommentDocs) > 0
+	isSelChain = isSelChain && len(trailingCommentDocs) > 0 && len(leaf.Attrs) == 0
 	var selArms []selArm
 	selHasTrailing := false
 	if isSelChain {
@@ -3933,15 +3932,13 @@ func (c *converter) fieldRow(chain []*ast.Field) ([]row, []*ast.CommentGroup) {
 	}
 	switch {
 	case isBinChain && binHasTrailing && c.chainAligns(bin, binArms):
-		valDoc = appendAttrs(c.binaryChainTable(bin, binArms, joinTrailing()), leaf.Attrs)
+		valDoc = c.binaryChainTable(bin, binArms, joinTrailing())
 	case isSelChain && selHasTrailing:
-		valDoc = appendAttrs(c.selectorTableExpr(selArms, joinTrailing()), leaf.Attrs)
+		valDoc = c.selectorTableExpr(selArms, joinTrailing())
 	case leafValueSlotsFiltered:
 		valDoc = c.withCommentsSlots(leaf.Value, c.exprCore(leaf.Value), leafValueSlots)
-		attrsDoc = attrsSpaced(leaf.Attrs)
 	default:
 		valDoc = c.expr(leaf.Value)
-		attrsDoc = attrsSpaced(leaf.Attrs)
 	}
 
 	// Now process Position=2 comments (between colon and value);
@@ -4061,11 +4058,15 @@ func (c *converter) fieldValDoc(f *ast.Field, preVal doc) doc {
 	// to the leaf, changing semantics. Take the regular c.expr path
 	// instead, which goes through structLit and keeps the synthesised
 	// braces so the trailing attr attaches to f.
-	valExprFun := c.fieldValExpr
+	var val doc
 	if len(f.Attrs) > 0 {
-		valExprFun = c.expr
+		// The comments trailing the value go after the attributes,
+		// which they would otherwise swallow.
+		tail := c.liftTailComments(f.Value)
+		val = cat(appendAttrs(c.expr(f.Value), f.Attrs), c.trailingComments(tail))
+	} else {
+		val = c.fieldValExpr(f.Value)
 	}
-	val := appendAttrs(valExprFun(f.Value), f.Attrs)
 	if preVal != nil {
 		// A chain value continues the outer field, so its
 		// continuation only indents when the chain itself was
@@ -4373,6 +4374,9 @@ func liftsChildComment(n ast.Node, flags map[ast.Node]nodeFlag) bool {
 	switch n := n.(type) {
 	case *ast.ForClause:
 		return (n.Key != nil && ends(n.Key)) || ends(n.Value)
+	case *ast.Field:
+		// A field's attributes go before its value's comments.
+		return len(n.Attrs) > 0 && n.Value != nil && ends(n.Value)
 	}
 	return false
 }

@@ -659,8 +659,6 @@ func TestNodes(t *testing.T) {
 	}, {
 		// The comment ending a field's value goes after the field's
 		// attributes, and the struct's closer after the comment.
-		//
-		// The comment swallows the attributes and the closer.
 		name: "field attributes after a value comment in a struct",
 		in: func() ast.Node {
 			y := ast.NewIdent("y")
@@ -669,7 +667,7 @@ func TestNodes(t *testing.T) {
 			f.Attrs = []*ast.Attribute{{Text: "@x()"}}
 			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewStruct(f)}
 		}(),
-		out: "o: {a: x + y // c @x()}",
+		out: "o: {\n\ta: x + y @x() // c\n}",
 	}, {
 		// As above, for a comment of a leaf value which is not on its line.
 		name: "field attributes after a leaf value comment in a struct",
@@ -680,7 +678,7 @@ func TestNodes(t *testing.T) {
 			f.Attrs = []*ast.Attribute{{Text: "@x()"}}
 			return &ast.Field{Label: ast.NewIdent("o"), Value: ast.NewStruct(f, ast.NewIdent("b"), ast.NewIdent("z"))}
 		}(),
-		out: "o: {\n\ta: 1\n\n\t// c @x()\n\tb: z\n}",
+		out: "o: {\n\ta: 1 @x() // c\n\tb: z\n}",
 	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the

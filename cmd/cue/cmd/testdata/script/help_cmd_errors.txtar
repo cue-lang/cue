@@ -1,0 +1,174 @@
+# Errors loading the tool files are reported, as no workflow commands
+# can be listed otherwise.
+
+# Tool files from multiple packages.
+# TODO: the error is dropped, so no commands are listed with no error.
+cd $WORK/mod/multi
+exec cue help cmd
+stdout '^Usage:'
+! stderr .
+exec cue cmd --help
+stdout '^Usage:'
+! stderr .
+
+# Package arguments are loaded rather than the current directory.
+# TODO: `cue cmd --help` loads the current directory.
+exec cue help cmd hello ../ok
+stdout '^say hello$'
+! stderr .
+exec cue cmd hello ../ok --help
+! stdout 'say hello'
+! stderr .
+
+# An import which cannot be resolved.
+# TODO: the error is dropped, so no commands are listed with no error.
+cd $WORK/mod/badimport
+exec cue help cmd
+stdout '^Usage:'
+! stderr .
+exec cue cmd --help
+stdout '^Usage:'
+! stderr .
+
+# A command which could not be loaded is not reported as unknown.
+# TODO: the error is dropped, and the command is reported as unknown.
+! exec cue help cmd foo
+! stdout .
+! stderr 'import failed'
+stderr -count=1 '^Usage:'
+stderr -count=1 'Unknown cmd command'
+
+# A syntax error in a file in an ancestor directory.
+# TODO: the error is dropped, so no commands are listed with no error.
+cd $WORK/mod/badancestor/a
+exec cue help cmd
+stdout '^Usage:'
+! stderr .
+exec cue cmd --help
+stdout '^Usage:'
+! stderr .
+
+# Tool files in an ancestor directory, and an import which cannot be
+# resolved in the current directory.
+# TODO: the error is dropped, so no commands are listed with no error.
+cd $WORK/mod/toolancestor/a
+exec cue help cmd
+stdout '^Usage:'
+! stderr .
+exec cue cmd --help
+stdout '^Usage:'
+! stderr .
+
+# An invalid flag is reported even without any tool files.
+# TODO: the error is dropped.
+cd $WORK/mod/empty
+exec cue cmd --language-version=bogus --help
+stdout '^Usage:'
+! stderr .
+
+# Without any tool files in the package, there are no commands to list,
+# so the help text is shown without any errors from loading.
+
+# A directory without any CUE files.
+cd $WORK/mod/empty
+exec cue help cmd
+! stderr .
+! stdout 'Available Commands'
+exec cue cmd --help
+! stderr .
+! stdout 'Available Commands'
+
+# An empty directory below a package.
+mkdir $WORK/mod/pkg/sub
+cd $WORK/mod/pkg/sub
+exec cue help cmd
+! stderr .
+! stdout 'Available Commands'
+exec cue cmd --help
+! stderr .
+! stdout 'Available Commands'
+
+# An empty directory outside a module.
+mkdir $WORK/nomod
+cd $WORK/nomod
+exec cue help cmd
+! stderr .
+! stdout 'Available Commands'
+exec cue cmd --help
+! stderr .
+! stdout 'Available Commands'
+
+# Multiple packages without any tool files.
+cd $WORK/mod/multinotool
+exec cue help cmd
+! stderr .
+! stdout 'Available Commands'
+exec cue cmd --help
+! stderr .
+! stdout 'Available Commands'
+
+# Multiple packages, where the only tool file is ignored by the loader.
+cd $WORK/mod/multiignored
+exec cue help cmd
+! stderr .
+! stdout 'Available Commands'
+exec cue cmd --help
+! stderr .
+! stdout 'Available Commands'
+
+-- mod/cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+-- mod/multi/a_tool.cue --
+package a
+
+command: foo: {}
+-- mod/multi/b_tool.cue --
+package b
+
+command: bar: {}
+-- mod/ok/a_tool.cue --
+package a
+
+// say hello
+command: hello: {}
+-- mod/badimport/a_tool.cue --
+package a
+
+import "missing.example/foo"
+
+command: foo: {}
+
+x: foo.x
+-- mod/badancestor/invalid.cue --
+package data
+
+x: "no closing quote
+-- mod/badancestor/a/a_tool.cue --
+package a
+
+command: foo: {}
+-- mod/toolancestor/a_tool.cue --
+package a
+
+command: foo: {}
+-- mod/toolancestor/a/a.cue --
+package a
+
+import "missing.example/foo"
+
+x: foo.x
+-- mod/empty/README.md --
+No CUE files.
+-- mod/pkg/p.cue --
+package p
+-- mod/multinotool/a.cue --
+package a
+-- mod/multinotool/b.cue --
+package b
+-- mod/multiignored/_wip_tool.cue --
+package a
+-- mod/multiignored/a.cue --
+package a
+-- mod/multiignored/b.cue --
+package b

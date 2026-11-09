@@ -15,6 +15,7 @@
 package astutil_test
 
 import (
+	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
@@ -1041,6 +1042,56 @@ a: {
 }
 `,
 	}, {
+		// A clause declares no struct to insert a let clause in, so a variable
+		// shadowed where it is referred to is renamed, with every reference.
+		desc: "Rename a comprehension variable shadowed by a field",
+		file: func() *ast.File {
+			v := ast.NewIdent("v")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Comprehension{
+					Clauses: []ast.Clause{&ast.ForClause{
+						Value:  v,
+						Source: ast.NewList(ast.NewLit(token.INT, "1")),
+					}},
+					Value: ast.NewStruct(
+						ast.NewIdent("v"), ast.NewStruct(
+							ast.NewIdent("c"), &ast.Ident{Name: "v", Node: v},
+						),
+						ast.NewIdent("d"), &ast.Ident{Name: "v", Node: v},
+					),
+				},
+			}}
+		}(),
+		want: `unexpected link type *ast.ForClause`,
+	}, {
+		desc: "Rename a comprehension key and let variable shadowed by a field",
+		file: func() *ast.File {
+			k := ast.NewIdent("k")
+			v := ast.NewIdent("v")
+			w := ast.NewIdent("w")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Comprehension{
+					Clauses: []ast.Clause{
+						&ast.ForClause{
+							Key:    k,
+							Value:  v,
+							Source: ast.NewStruct(ast.NewIdent("a"), ast.NewLit(token.INT, "1")),
+						},
+						&ast.LetClause{
+							Ident: w,
+							Expr:  &ast.Ident{Name: "v", Node: v},
+						},
+					},
+					Value: ast.NewStruct(
+						ast.NewIdent("k"), &ast.Ident{Name: "k", Node: k},
+						ast.NewIdent("w"), &ast.Ident{Name: "w", Node: w},
+						ast.NewIdent("v"), &ast.Ident{Name: "v", Node: v},
+					),
+				},
+			}}
+		}(),
+		want: `unexpected link type *ast.ForClause`,
+	}, {
 		// The field keeps the name in the scope, so a reference to it in
 		// the value of the let clause renamed for it still refers to it.
 		desc: "Refer to a field from a let clause renamed for its name",
@@ -1109,22 +1160,30 @@ b: {for X in [1] {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			err := astutil.Sanitize(tc.file)
-			if err != nil {
-				t.Fatal(err)
-			}
+			var got string
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						got = fmt.Sprint(r)
+					}
+				}()
+				err := astutil.Sanitize(tc.file)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-			b, errs := format.Node(tc.file)
-			if errs != nil {
-				t.Fatal(errs)
-			}
+				b, errs := format.Node(tc.file)
+				if errs != nil {
+					t.Fatal(errs)
+				}
 
-			got := string(b)
+				got = string(b)
+
+				// The output must be well-formed, as Sanitize promises.
+				_, err = parser.ParseFile("out.cue", b, parser.Version(tc.version))
+				qt.Assert(t, qt.IsNil(err))
+			}()
 			qt.Assert(t, qt.Equals(got, tc.want))
-
-			// The output must be well-formed, as Sanitize promises.
-			_, err = parser.ParseFile("out.cue", b, parser.Version(tc.version))
-			qt.Assert(t, qt.IsNil(err))
 		})
 	}
 }

@@ -261,6 +261,23 @@ shadowField: declEmbeddedLet: {
 	}
 }
 
+// The quoted label is written unquoted, where it shadows the clause variable
+// of the same name, which is not renamed, so c and d refer to the new field.
+shadowClause: t1: {
+	for v in [1] {"v": {c: v, d: v}}
+}
+
+// The source of the clause refers to x, which the quoted label shadows.
+shadowClause: t2: {
+	x: 1
+	b: "x": {for v in [x] {y: v}}
+}
+
+// The key and the let variable are shadowed.
+shadowClause: t3: {
+	for k, v in {a: 1} let w = v {"k": k, "w": w, "v": v}
+}
+
 // The let clause is first used, and thus exported, where b is shadowed.
 shadowLet: {
 	b: 1
@@ -517,6 +534,36 @@ shadowField: {
 		if true {}
 	}
 }
+shadowClause: {
+
+	// The quoted label is written unquoted, where it shadows the clause variable
+	// of the same name, which is not renamed, so c and d refer to the new field.
+	t1: {
+		for v in [1] {
+			v: {
+				c: v
+				d: v
+			}
+		}
+	}
+
+	// The source of the clause refers to x, which the quoted label shadows.
+	t2: {
+		x: 1
+		b: x: {for v in [x] {
+			y: v
+		}}
+	}
+
+	// The key and the let variable are shadowed.
+	t3: {
+		for k, v in {a: 1} let w = v {
+			k: k
+			w: w
+			v: v
+		}
+	}
+}
 
 // The let clause is first used, and thus exported, where b is shadowed.
 shadowLet: {
@@ -771,6 +818,27 @@ list element, and a literal embedded in a struct with a comprehension.
 [shadowField declEmbeddedLet a b]
 [shadowField declEmbeddedLet a b x]
 [shadowField declEmbeddedLet a b x d]
+[shadowClause]
+[shadowClause t1]
+- The quoted label is written unquoted, where it shadows the clause variable
+of the same name, which is not renamed, so c and d refer to the new field.
+
+[shadowClause t1 v]
+[shadowClause t1 v c]
+[shadowClause t1 v d]
+[shadowClause t2]
+- The source of the clause refers to x, which the quoted label shadows.
+
+[shadowClause t2 x]
+[shadowClause t2 b]
+[shadowClause t2 b x]
+[shadowClause t2 b x y]
+[shadowClause t3]
+- The key and the let variable are shadowed.
+
+[shadowClause t3 k]
+[shadowClause t3 w]
+[shadowClause t3 v]
 [shadowLet]
 - The let clause is first used, and thus exported, where b is shadowed.
 
@@ -1037,6 +1105,28 @@ _|_ // shadowRef.e1.x.x: structural cycle
 			b: x: d: 1
 		}
 	}
+	shadowClause: {
+
+		// The quoted label is written unquoted, where it shadows the clause variable
+		// of the same name, which is not renamed, so c and d refer to the new field.
+		t1: v: {
+			c: 1
+			d: 1
+		}
+
+		// The source of the clause refers to x, which the quoted label shadows.
+		t2: {
+			x: 1
+			b: x: y: 1
+		}
+
+		// The key and the let variable are shadowed.
+		t3: {
+			k: "a"
+			w: 1
+			v: 1
+		}
+	}
 
 	// The let clause is first used, and thus exported, where b is shadowed.
 	shadowLet: {
@@ -1198,7 +1288,7 @@ diff old new
  			}
  		}
  
-@@ -121,22 +90,181 @@
+@@ -121,22 +90,203 @@
  		// or even
  		// 		b: 0
  		//  	c: b
@@ -1376,6 +1466,28 @@ diff old new
 +		declEmbeddedLet: a: {
 +			x: 1
 +			b: x: d: 1
++		}
++	}
++	shadowClause: {
++
++		// The quoted label is written unquoted, where it shadows the clause variable
++		// of the same name, which is not renamed, so c and d refer to the new field.
++		t1: v: {
++			c: 1
++			d: 1
++		}
++
++		// The source of the clause refers to x, which the quoted label shadows.
++		t2: {
++			x: 1
++			b: x: y: 1
++		}
++
++		// The key and the let variable are shadowed.
++		t3: {
++			k: "a"
++			w: 1
++			v: 1
 +		}
 +	}
 +

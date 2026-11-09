@@ -1,0 +1,83 @@
+# The experiments enabled by the files of a package are set by file attributes
+# before its package clause, so the output sets them before its own.
+-- a.cue --
+@experiment(try)
+
+// Package p uses syntax which needs experiments.
+package p
+
+x: {
+	if false { a: 1 } else { b: 2 }
+}
+-- b.cue --
+@experiment(try,functions)
+
+package p
+
+f: func(a: int) -> int: a
+y: f(3)
+-- out/doc-v3 --
+[]
+- Package p uses syntax which needs experiments.
+
+[x]
+[x b]
+[f]
+[y]
+-- out/definition-v3 --
+// Package p uses syntax which needs experiments.
+package p
+
+x: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+f: func(a: int) -> int: a
+y: f(3)
+-- out/definition-v3-noshare --
+// Package p uses syntax which needs experiments.
+package p
+
+x: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+f: func(a: int) -> int: a
+y: f(3)
+-- out/value-v3 --
+== Simplified
+{
+	f: func(a: int) -> int: a
+	x: b: 2
+	y: 3
+}
+== Raw
+{
+	f: func(a: int) -> int: a
+	x: b: 2
+	y: 3
+}
+== Final
+{
+	f: func(a: int) -> int: a
+	x: b: 2
+	y: 3
+}
+== All
+{
+	f: func(a: int) -> int: a
+	x: b: 2
+	y: 3
+}
+== Eval
+{
+	f: func(a: int) -> int: a
+	x: b: 2
+	y: 3
+}

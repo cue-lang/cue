@@ -1,0 +1,85 @@
+# The output of cue def enables the experiments of the input's files, as it
+# may use syntax which has no spelling without them, such as an else clause.
+# The attributes of a package's files precede its package clause, so they are
+# not part of its value; the output writes them before its own clause, or at
+# the top when it has none, as for package _ or a value within the package.
+
+mkdir gen genx genblank
+
+# The output lacks the attributes, so it fails to parse.
+exec cue def ./p
+cmp stdout out-def
+cp stdout gen/p.cue
+! exec cue vet gen/p.cue
+stderr 'requires @experiment\(try\)'
+
+exec cue def -e x ./p
+cmp stdout out-def-x
+cp stdout genx/x.cue
+! exec cue vet genx/x.cue
+stderr 'requires @experiment\(try\)'
+
+exec cue def blank.cue
+cmp stdout out-def-blank
+cp stdout genblank/blank.cue
+! exec cue vet genblank/blank.cue
+stderr 'requires @experiment\(try\)'
+
+# cue eval -A shows the attributes too, as its output may use experimental
+# syntax as well, such as a function literal. It lacks them as well.
+exec cue eval -A ./p
+cmp stdout out-eval
+
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.18.0"
+-- p/a.cue --
+@experiment(try)
+
+package p
+
+x: {
+	if false {a: 1} else {b: 2}
+}
+-- p/b.cue --
+@experiment(try,functions)
+
+package p
+
+f: func(a: int) -> int: a
+-- blank.cue --
+@experiment(try)
+
+package _
+
+y: {
+	if false {a: 1} else {b: 2}
+}
+-- out-def --
+package p
+
+x: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+f: func(a: int) -> int: a
+-- out-def-x --
+if false {
+	a: 1
+} else {
+	b: 2
+}
+-- out-def-blank --
+y: {
+	if false {
+		a: 1
+	} else {
+		b: 2
+	}
+}
+-- out-eval --
+f: func(a: int) -> int: a
+x: b: 2

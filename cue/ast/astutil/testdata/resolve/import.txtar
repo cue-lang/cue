@@ -11,6 +11,10 @@ refs: [
 	p,
 	q,
 ]
+
+// A reference to an import in a top-level pattern is rejected as a
+// reference to a field the pattern is matched against.
+[bar.Pattern]: string
 -- out/resolve/in --
 7[refs]: Scope: 0[<nil>] Node: 0[]
 8[bar]:  Scope: 0[<nil>] Node: 2["foo.com/bar"]
@@ -18,5 +22,5 @@ refs: [
 10[p]:   Scope: 0[<nil>] Node: 4["other.org/p@v1"]
 11[q]:   Scope: 0[<nil>] Node: 5["other.org/p@v2:q"]
 -- out/resolve/errors --
-import failed: imports are unavailable because there is no cue.mod/module.cue file:
-    ./in.cue:2:2
+reference "bar" in label expression refers to field against which it would be matched:
+    ./in.cue:16:2

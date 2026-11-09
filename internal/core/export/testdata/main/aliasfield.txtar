@@ -1,0 +1,192 @@
+A field written unquoted in the output may be named like an alias in scope,
+which the syntax does not allow, as a quoted label never shadows anything.
+
+-- in.cue --
+// The quoted label is written unquoted, named like the alias of x, and a
+// field may not be named like an alias in scope, so the alias is renamed.
+t1: {
+	x~(X): 1
+	r:     X
+	a: "X": c: X
+}
+
+t2: {
+	x~(X): 1
+	r:     X
+	a: "X": 2
+}
+
+// The field is in the same scope as the alias, declared after it, so it takes
+// the alias's place in that scope; the reference in c reaches x through the
+// alias as the field written unquoted shadows x.
+t3: {
+	x~(X): 1
+	"X":   2
+	r:     X
+	a: "x": c: x
+}
+-- out/definition --
+cannot have both alias and field with name "X" in same scope
+// The quoted label is written unquoted, named like the alias of x, and a
+// field may not be named like an alias in scope, so the alias is renamed.
+t1: {
+	x~(X): 1
+	r:     X
+	a: X: c: X
+}
+t2: {
+	x~(X): 1
+	r:     X
+	a: X: 2
+}
+
+// The field is in the same scope as the alias, declared after it, so it takes
+// the alias's place in that scope; the reference in c reaches x through the
+// alias as the field written unquoted shadows x.
+t3: {
+	x~(X): 1
+	X:     2
+	r:     X
+	a: x: c: x
+}
+-- out/doc --
+[]
+[t1]
+- The quoted label is written unquoted, named like the alias of x, and a
+field may not be named like an alias in scope, so the alias is renamed.
+
+[t1 x]
+[t1 r]
+[t1 a]
+[t1 a X]
+[t1 a X c]
+[t2]
+[t2 x]
+[t2 r]
+[t2 a]
+[t2 a X]
+[t3]
+- The field is in the same scope as the alias, declared after it, so it takes
+the alias's place in that scope; the reference in c reaches x through the
+alias as the field written unquoted shadows x.
+
+[t3 x]
+[t3 X]
+[t3 r]
+[t3 a]
+[t3 a x]
+[t3 a x c]
+-- out/value --
+== Simplified
+{
+	// The quoted label is written unquoted, named like the alias of x, and a
+	// field may not be named like an alias in scope, so the alias is renamed.
+	t1: {
+		x: 1
+		r: 1
+		a: X: c: 1
+	}
+	t2: {
+		x: 1
+		r: 1
+		a: X: 2
+	}
+
+	// The field is in the same scope as the alias, declared after it, so it takes
+	// the alias's place in that scope; the reference in c reaches x through the
+	// alias as the field written unquoted shadows x.
+	t3: {
+		x: 1
+		X: 2
+		r: 1
+		a: x: c: 1
+	}
+}
+== Raw
+{
+	// The quoted label is written unquoted, named like the alias of x, and a
+	// field may not be named like an alias in scope, so the alias is renamed.
+	t1: {
+		x: 1
+		r: 1
+		a: X: c: 1
+	}
+	t2: {
+		x: 1
+		r: 1
+		a: X: 2
+	}
+
+	// The field is in the same scope as the alias, declared after it, so it takes
+	// the alias's place in that scope; the reference in c reaches x through the
+	// alias as the field written unquoted shadows x.
+	t3: {
+		x: 1
+		X: 2
+		r: 1
+		a: x: c: 1
+	}
+}
+== Final
+{
+	t1: {
+		x: 1
+		r: 1
+		a: X: c: 1
+	}
+	t2: {
+		x: 1
+		r: 1
+		a: X: 2
+	}
+	t3: {
+		x: 1
+		X: 2
+		r: 1
+		a: x: c: 1
+	}
+}
+== All
+{
+	// The quoted label is written unquoted, named like the alias of x, and a
+	// field may not be named like an alias in scope, so the alias is renamed.
+	t1: {
+		x: 1
+		r: 1
+		a: X: c: 1
+	}
+	t2: {
+		x: 1
+		r: 1
+		a: X: 2
+	}
+
+	// The field is in the same scope as the alias, declared after it, so it takes
+	// the alias's place in that scope; the reference in c reaches x through the
+	// alias as the field written unquoted shadows x.
+	t3: {
+		x: 1
+		X: 2
+		r: 1
+		a: x: c: 1
+	}
+}
+== Eval
+{
+	t1: {
+		x: 1
+		r: 1
+		a: X: c: 1
+	}
+	t2: {
+		x: 1
+		r: 1
+		a: X: 2
+	}
+	t3: {
+		x: 1
+		X: 2
+		r: 1
+		a: x: c: 1
+	}
+}

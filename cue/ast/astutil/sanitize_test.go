@@ -749,20 +749,146 @@ b: {
 }
 z: a_1.ToUpper
 `,
+	}, {
+		// A field may not be named like an alias in scope, so the alias is
+		// renamed, with its references.
+		desc: "Rename an alias named like a nested field",
+		file: func() *ast.File {
+			field := &ast.Field{
+				Label: ast.NewIdent("x"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				field,
+				&ast.Field{
+					Label: ast.NewIdent("r"),
+					Value: &ast.Ident{Name: "X", Node: field},
+				},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						ast.NewIdent("X"), ast.NewStruct(
+							ast.NewIdent("c"), &ast.Ident{Name: "X", Node: field},
+						),
+					),
+				},
+			}}
+		}(),
+		want: `cannot have both alias and field with name "X" in same scope`,
+	}, {
+		desc: "Rename a let clause named like a nested field",
+		file: func() *ast.File {
+			let := &ast.LetClause{
+				Ident: ast.NewIdent("X"),
+				Expr:  ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						ast.NewIdent("X"), ast.NewLit(token.INT, "2"),
+						ast.NewIdent("c"), &ast.Ident{Name: "X", Node: let},
+					),
+				},
+				let,
+			}}
+		}(),
+		want: `cannot have both alias and field with name "X" in same scope`,
+	}, {
+		// The field takes the alias's place in the scope, so references to the
+		// alias must be renamed by the declaration they are linked to, and one
+		// to the field is unshadowed through the alias's new name.
+		desc: "Rename an alias named like a later field in the same scope",
+		file: func() *ast.File {
+			field := &ast.Field{
+				Label: ast.NewIdent("x"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				field,
+				&ast.Field{
+					Label: ast.NewIdent("X"),
+					Value: ast.NewLit(token.INT, "2"),
+				},
+				&ast.Field{
+					Label: ast.NewIdent("r"),
+					Value: &ast.Ident{Name: "X", Node: field},
+				},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						ast.NewIdent("x"), ast.NewStruct(
+							ast.NewIdent("c"), &ast.Ident{Name: "x", Node: field.Value},
+						),
+					),
+				},
+			}}
+		}(),
+		want: `cannot have both alias and field with name "X" in same scope`,
+	}, {
+		desc: "Rename an alias named like an earlier field in the same scope",
+		file: func() *ast.File {
+			field := &ast.Field{
+				Label: ast.NewIdent("x"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			shadowing := &ast.Field{
+				Label: ast.NewIdent("X"),
+				Value: ast.NewLit(token.INT, "2"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				shadowing,
+				field,
+				&ast.Field{
+					Label: ast.NewIdent("r"),
+					Value: &ast.Ident{Name: "X", Node: field},
+				},
+				&ast.Field{
+					Label: ast.NewIdent("s"),
+					Value: &ast.Ident{Name: "X", Node: shadowing.Value},
+				},
+			}}
+		}(),
+		want: `cannot have both alias and field with name "X" in same scope`,
+	}, {
+		// An alias shadowing an alias of its name is in scope of a field of
+		// that name declared past the aliases all the same.
+		desc: "Rename an alias shadowing an alias named like a field",
+		file: func() *ast.File {
+			outer := &ast.LetClause{Ident: ast.NewIdent("X"), Expr: ast.NewLit(token.INT, "2")}
+			inner := &ast.LetClause{Ident: ast.NewIdent("X"), Expr: ast.NewLit(token.INT, "3")}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{Label: ast.NewIdent("X"), Value: ast.NewLit(token.INT, "1")},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						outer,
+						ast.NewIdent("r1"), &ast.Ident{Name: "X", Node: outer},
+						ast.NewIdent("b"), ast.NewStruct(
+							inner,
+							ast.NewIdent("r2"), &ast.Ident{Name: "X", Node: inner},
+						),
+					),
+				},
+			}}
+		}(),
+		want: `cannot have both alias and field with name "X" in same scope`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			err := astutil.Sanitize(tc.file)
-			if err != nil {
-				t.Fatal(err)
+			var got string
+			if err := astutil.Sanitize(tc.file); err != nil {
+				got = err.Error()
+			} else {
+				b, errs := format.Node(tc.file)
+				if errs != nil {
+					t.Fatal(errs)
+				}
+				got = string(b)
 			}
-
-			b, errs := format.Node(tc.file)
-			if errs != nil {
-				t.Fatal(errs)
-			}
-
-			got := string(b)
 			qt.Assert(t, qt.Equals(got, tc.want))
 		})
 	}

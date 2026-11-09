@@ -453,8 +453,14 @@ func (fs *rootedCUECacheFS) ReadCUEFile(name string, config parser.Config) (*ast
 	if err != nil {
 		return nil, &iofs.PathError{Op: "ReadCUEFile", Path: name, Err: err}
 	}
+	name = filepath.Join(fs.root, name)
+	// Reading anything else, such as a symbolic link to a directory,
+	// might fail or block, and would be for nothing.
+	if !hasCUESyntaxName(name) {
+		return nil, nil
+	}
 
-	uri := protocol.URIFromPath(filepath.Join(fs.root, name))
+	uri := protocol.URIFromPath(name)
 	fh, err := fs.cuecachefs.ReadFile(uri)
 	if err != nil {
 		return nil, err
@@ -483,22 +489,14 @@ func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
 	}
 
 	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		bf, err := filetypes.ParseFileAndType(e.Name(), "", filetypes.Input)
-		if err != nil {
-			continue
-		}
-		switch bf.Encoding {
-		case build.CUE, build.JSON, build.YAML:
-		default:
+		entryPath := filepath.Join(path, e.Name())
+		if e.IsDir() || !hasCUESyntaxName(entryPath) {
 			continue
 		}
 
 		ftype := e.Type()
 		if ftype&iofs.ModeSymlink != 0 {
-			finfo, err := os.Stat(filepath.Join(path, e.Name()))
+			finfo, err := os.Stat(entryPath)
 			if err != nil {
 				continue // Ignore broken symlinks.
 			}
@@ -510,6 +508,23 @@ func (fs *rootedCUECacheFS) IsDirWithCUEFiles(path string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+// hasCUESyntaxName reports whether the file at filePath gets a
+// [build.File] which [hasCUESyntax] accepts.
+func hasCUESyntaxName(filePath string) bool {
+	bf, err := filetypes.ParseFileAndType(filePath, "", filetypes.Input)
+	return err == nil && hasCUESyntax(bf)
+}
+
+// hasCUESyntax reports whether bf has an encoding which
+// [FileHandle.ReadCUE] converts to CUE syntax.
+func hasCUESyntax(bf *build.File) bool {
+	switch bf.Encoding {
+	case build.CUE, build.JSON, build.YAML:
+		return true
+	}
+	return false
 }
 
 // isNotDir reports whether err means that there is no directory at a

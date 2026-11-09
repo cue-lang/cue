@@ -1,0 +1,104 @@
+# Tests that AllSchemas emits each top-level schema once when the document is
+# nested within another value: references to #Node carry the root value and
+# the path bundle.#Node, and must be recognized as the top-level #Node.
+# They are not, so #Node is emitted twice, as Node and bundle.Node, and
+# Node.next refers to the duplicate.
+#v2
+#Version: 3.0
+#AllSchemas
+#Path: bundle
+-- in.cue --
+bundle: {
+	openapi: "3.0.0"
+	info: {title: "t", version: "1"}
+	paths: {}
+
+	#Node: {next?: #Node}
+	#Unused: {a: int}
+}
+-- out/TestGenerateOpenAPI-v3/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Node": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "next": {
+                  "$ref": "#/components/schemas/bundle.Node"
+               }
+            }
+         },
+         "Unused": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "a"
+            ]
+         },
+         "bundle.Node": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "next": {
+                  "$ref": "#/components/schemas/bundle.Node"
+               }
+            }
+         }
+      }
+   }
+}
+-- out/TestGenerateOpenAPI-v3-noshare/out.json --
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "t",
+      "version": "1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Node": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "next": {
+                  "$ref": "#/components/schemas/bundle.Node"
+               }
+            }
+         },
+         "Unused": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "a"
+            ]
+         },
+         "bundle.Node": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+               "next": {
+                  "$ref": "#/components/schemas/bundle.Node"
+               }
+            }
+         }
+      }
+   }
+}

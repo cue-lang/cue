@@ -36,6 +36,7 @@ import (
 //	#v2                        selects this runner
 //	#Version: 3.0|3.1|crd      OpenAPI version (default 3.0)
 //	#AllSchemas                set GenerateConfig.AllSchemas
+//	#Path: <path>              generate from the value at this path
 //	#NamesFunc: <name>         a named func from v2NamesFuncs
 //	#DescriptionFunc: <name>   a named func from v2DescriptionFuncs
 //	#ExpectError: <substring>  expect generation to fail with this message
@@ -44,6 +45,9 @@ func generateV2Test(t *cuetxtar.Test) {
 	v := ctx.BuildInstance(t.Instance())
 	if err := v.Err(); err != nil {
 		t.Fatal(errors.Details(err, nil))
+	}
+	if s, ok := t.Value("Path"); ok {
+		v = v.LookupPath(cue.ParsePath(s))
 	}
 
 	cfg := openapi.GenerateConfig{

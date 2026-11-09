@@ -240,39 +240,24 @@ y: x
 			t.Parallel()
 			I.WithOptions(I.RootURIAsDefaultFolder()).Run(t, files, func(t *testing.T, env *I.Env) {
 				rootURI := env.Sandbox.Workdir.RootURI()
-				path := filepath.Join(rootURI.FilePath(), "mod", test.entry)
-				test.create(t, path)
+				test.create(t, filepath.Join(rootURI.FilePath(), "mod", test.entry))
 
 				env.OpenFile("mod/a.cue")
-				if fi, err := os.Lstat(path); err == nil && fi.Mode()&os.ModeNamedPipe != 0 {
-					// The load opens the FIFO to read it and blocks. Opening
-					// it to write releases the load, which reads it as empty.
-					opened := make(chan error, 1)
-					go func() {
-						f, err := os.OpenFile(path, os.O_WRONLY, 0)
-						if err == nil {
-							err = f.Close()
-						}
-						opened <- err
-					}()
-					select {
-					case err := <-opened:
-						qt.Assert(t, qt.IsNil(err))
-					case <-time.After(5 * time.Second):
-						t.Fatal("the load did not open the FIFO")
-					}
-					return
-				}
 				env.Await(env.DoneWithOpen())
 				got := env.Definition(protocol.Location{
 					URI:   rootURI + "/mod/a.cue",
 					Range: protocol.Range{Start: protocol.Position{Line: 6, Character: 3}},
 				})
-				// The entry fails the load, so the package is not loaded.
-				qt.Assert(t, qt.IsNil(got))
+				qt.Assert(t, qt.DeepEquals(got, []protocol.Location{{
+					URI: rootURI + "/mod/a.cue",
+					Range: protocol.Range{
+						Start: protocol.Position{Line: 5, Character: 0},
+						End:   protocol.Position{Line: 5, Character: 1},
+					},
+				}}))
 				if test.entry == "link" {
 					env.Await(
-						I.LogMatching(protocol.Debug, 0, false, `Package dirs=\[%v/mod/link\] importPath=mod\.example/x/link@v0:_.+ Reloaded`, rootURI),
+						I.LogMatching(protocol.Debug, 1, false, `Package dirs=\[%v/mod/link\] importPath=mod\.example/x/link@v0:_.+ Reloaded`, rootURI),
 					)
 				}
 			})

@@ -643,16 +643,8 @@ func (fs *rootedOverlayFS) IsDirWithCUEFiles(path string) (bool, error) {
 	}
 
 	for _, entry := range overlayEntries {
-		file, isFile := entry.(*overlayFileEntry)
-		if !isFile {
-			continue
-		}
-
-		switch file.buildFile.Encoding {
-		case build.CUE, build.JSON, build.YAML:
+		if file, isFile := entry.(*overlayFileEntry); isFile && hasCUESyntax(file.buildFile) {
 			return true, nil
-		default:
-			continue
 		}
 	}
 

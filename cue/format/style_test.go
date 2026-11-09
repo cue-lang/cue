@@ -1061,9 +1061,6 @@ func TestASTStyleLabels(t *testing.T) {
 	// another field's value may be named like them. A comprehension clause
 	// variable is not an alias: a field may be named like it, as long as no
 	// reference to the variable resolves past the field.
-	//
-	// The labels named like an alias in another scope are unquoted; the
-	// output of those cases, other than the Sibling ones, does not parse.
 	t.Run("Aliases", func(t *testing.T) {
 		testCases := []struct {
 			name string
@@ -1076,12 +1073,12 @@ func TestASTStyleLabels(t *testing.T) {
 			name:    "LabelAlias",
 			version: "v0.17.0",
 			src:     "\"X\": 2\na: {X=x: 1, c: X}\n",
-			out:     "X: 2\na: {X=x: 1, c: X}\n",
+			out:     "\"X\": 2\na:   {X=x: 1, c: X}\n",
 		}, {
 			name:    "LabelAliasOuter",
 			version: "v0.17.0",
 			src:     "K=x: 1\ny: K\na: {\"K\": int}\n",
-			out:     "K=x: 1\ny:   K\na:   {K: int}\n",
+			out:     "K=x: 1\ny:   K\na:   {\"K\": int}\n",
 		}, {
 			name:    "PatternAlias",
 			version: "v0.17.0",
@@ -1096,12 +1093,12 @@ func TestASTStyleLabels(t *testing.T) {
 			name:    "PatternAliasValue",
 			version: "v0.17.0",
 			src:     "[X=string]: {\"X\": 2}\n",
-			out:     "[X=string]: {X: 2}\n",
+			out:     "[X=string]: {\"X\": 2}\n",
 		}, {
 			name:    "PatternLabelAliasValue",
 			version: "v0.17.0",
 			src:     "X=[string]: {\"X\": 2}\n",
-			out:     "X=[string]: {X: 2}\n",
+			out:     "X=[string]: {\"X\": 2}\n",
 		}, {
 			name:    "PatternAliasSibling",
 			version: "v0.17.0",
@@ -1116,7 +1113,7 @@ func TestASTStyleLabels(t *testing.T) {
 			name:    "ValueAliasValue",
 			version: "v0.17.0",
 			src:     "x: X={\"X\": 2}\n",
-			out:     "x: X={X: 2}\n",
+			out:     "x: X={\"X\": 2}\n",
 		}, {
 			name:    "ValueAliasSibling",
 			version: "v0.17.0",
@@ -1125,23 +1122,23 @@ func TestASTStyleLabels(t *testing.T) {
 		}, {
 			name: "PostfixAlias",
 			src:  "\"X\": 2\na: {x~X: 1}\n",
-			out:  "X: 2\na: {x~(X): 1}\n",
+			out:  "\"X\": 2\na:   {x~(X): 1}\n",
 		}, {
 			name: "PostfixAliasOuter",
 			src:  "x~X: 1\ny: X\na: {\"X\": int}\n",
-			out:  "x~(X): 1\ny:     X\na:     {X: int}\n",
+			out:  "x~(X): 1\ny:     X\na:     {\"X\": int}\n",
 		}, {
 			name: "PostfixAliasDual",
 			src:  "\"K\": 2\n\"V\": 3\na: {x~(K, V): 1}\n",
-			out:  "K: 2\nV: 3\na: {x~(K,V): 1}\n",
+			out:  "\"K\": 2\n\"V\": 3\na:   {x~(K,V): 1}\n",
 		}, {
 			name: "PostfixPatternAlias",
 			src:  "\"X\": 2\na: {[string]~X: int}\n",
-			out:  "X: 2\na: {[string]~(X): int}\n",
+			out:  "\"X\": 2\na:   {[string]~(X): int}\n",
 		}, {
 			name: "PostfixPatternAliasValue",
 			src:  "[string]~X: {\"X\": 2}\n",
-			out:  "[string]~(X): {X: 2}\n",
+			out:  "[string]~(X): {\"X\": 2}\n",
 		}, {
 			name: "PostfixPatternAliasSibling",
 			src:  "[string]~X: int\na: {\"X\": 2}\n",
@@ -1153,7 +1150,7 @@ func TestASTStyleLabels(t *testing.T) {
 		}, {
 			name: "LetClauseOuter",
 			src:  "let X = 1\ny: X\na: {b: {\"X\": 2}}\n",
-			out:  "let X = 1\ny: X\na: {b: {X: 2}}\n",
+			out:  "let X = 1\ny: X\na: {b: {\"X\": 2}}\n",
 		}, {
 			name: "LetClauseSameScope",
 			src:  "\"X\": 2\nlet X = 1\n",

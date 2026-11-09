@@ -45,6 +45,10 @@ type labelSimplifier struct {
 	// Quoted labels do not bind references.
 	bound map[string]bool
 
+	// aliases holds the alias and let clause names declared in this scope,
+	// which no field here, in an enclosing scope, or a nested one may take.
+	aliases map[string]bool
+
 	// walker is shared by every scope of one simplification run; it
 	// holds the permission to rewrite a label.
 	walker *walker
@@ -114,13 +118,68 @@ func (s *labelSimplifier) markReference(x *ast.Ident) {
 	}
 }
 
+// markAlias records an alias or let clause declared in this scope, and
+// invalidates the candidates of its name here and in enclosing scopes.
+func (s *labelSimplifier) markAlias(name string) {
+	if s.aliases == nil {
+		s.aliases = map[string]bool{}
+	}
+	s.aliases[name] = true
+	for c := s; c != nil; c = c.parent {
+		if _, ok := c.scope[name]; ok {
+			c.scope[name] = false
+		}
+	}
+}
+
+// aliased reports whether name is an alias or let clause in scope.
+func (s *labelSimplifier) aliased(name string) bool {
+	for c := s; c != nil; c = c.parent {
+		if c.aliases[name] {
+			return true
+		}
+	}
+	return false
+}
+
+// fieldAliases returns the names of a field's aliases. Those of a pattern
+// constraint and a value alias are in a scope of the field's own, and
+// returned as own.
+func fieldAliases(f *ast.Field) (names, own []string) {
+	var label ast.Node = f.Label
+	if a, ok := label.(*ast.Alias); ok {
+		names = append(names, a.Ident.Name)
+		label = a.Expr
+	}
+	l, isPattern := label.(*ast.ListLit)
+	if isPattern && len(l.Elts) == 1 {
+		if a, ok := l.Elts[0].(*ast.Alias); ok {
+			names = append(names, a.Ident.Name)
+		}
+	}
+	if a := f.Alias; a != nil {
+		if a.Label != nil {
+			names = append(names, a.Label.Name)
+		}
+		names = append(names, a.Field.Name)
+	}
+	if isPattern {
+		names, own = nil, names
+	}
+	if a, ok := f.Value.(*ast.Alias); ok {
+		own = append(own, a.Ident.Name)
+	}
+	return names, own
+}
+
 // processDecls runs the three sub-passes we apply to one body.
 // file is set when decls are a file's top-level declarations.
 func (s *labelSimplifier) processDecls(decls []ast.Decl, file bool) {
 	sc := &labelSimplifier{parent: s, scope: map[string]bool{}, bound: map[string]bool{}, walker: s.walker}
 
 	// Sub-pass 1: collect candidates and bound names from labels, after
-	// rewriting single-string pattern constraints as optional fields.
+	// rewriting single-string pattern constraints as optional fields,
+	// and the names of the aliases and let clauses.
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
@@ -128,6 +187,14 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl, file bool) {
 				return
 			}
 			ast.Walk(x.Label, sc.markStrings, nil)
+			names, _ := fieldAliases(x)
+			for _, name := range names {
+				sc.markAlias(name)
+			}
+		case *ast.LetClause:
+			sc.markAlias(x.Ident.Name)
+		case *ast.Alias:
+			sc.markAlias(x.Ident.Name)
 		}
 	}
 
@@ -143,7 +210,15 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl, file bool) {
 			if _, ok := label.(*ast.Ident); !ok {
 				ast.Walk(label, sc.markLabelReferences, nil)
 			}
-			ast.Walk(x.Value, sc.markReferences, nil)
+			// Aliases in a scope of the field's own enclose only its value.
+			vs := sc
+			if _, own := fieldAliases(x); len(own) > 0 {
+				vs = &labelSimplifier{parent: sc, walker: s.walker}
+				for _, name := range own {
+					vs.markAlias(name)
+				}
+			}
+			ast.Walk(x.Value, vs.markReferences, nil)
 		default:
 			ast.Walk(x, sc.markReferences, nil)
 		}
@@ -213,15 +288,16 @@ func (s *labelSimplifier) simplifyPatternLabel(f *ast.Field) bool {
 }
 
 // markStrings walks a label subtree, recording every unquotable string
-// as a candidate for the current scope, and every identifier as a name
-// bound by it. ListLit, Interpolation, and ParenExpr labels (pattern
-// constraints, interpolated strings, dynamic labels) are not candidates,
-// and the identifiers in them are references, so we stop the walk there.
+// not named like an alias in scope as a candidate for the current scope,
+// and every identifier as a name bound by it. ListLit, Interpolation, and
+// ParenExpr labels (pattern constraints, interpolated strings, dynamic
+// labels) are not candidates, and the identifiers in them are references,
+// so we stop the walk there.
 func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.BasicLit:
 		str, err := strconv.Unquote(x.Value)
-		if err != nil || ast.StringLabelNeedsQuoting(str) {
+		if err != nil || ast.StringLabelNeedsQuoting(str) || s.aliased(str) {
 			return false
 		}
 		s.scope[str] = true

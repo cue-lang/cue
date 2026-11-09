@@ -304,6 +304,12 @@ func (z *sanitizer) aliasName(s *scope, parent ast.Node, name string, link ast.N
 
 func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 	if n.Node != nil {
+		// The import may only be declared as the second walk reaches the
+		// reference, while it picks new names; see [sanitizer.handleIdent].
+		if spec, ok := n.Node.(*ast.ImportSpec); ok {
+			info, _ := ParseImportSpec(spec)
+			z.names[info.Ident] = true
+		}
 		return false
 	}
 	_, _, entry := s.lookup(n.String())

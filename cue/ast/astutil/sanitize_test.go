@@ -710,9 +710,6 @@ a: {
 	}, {
 		// The name of an import added for a reference is taken, so no new
 		// name may be picked as that name.
-		//
-		// The let clause is renamed to the name of the import, and the output
-		// does not compile.
 		desc: "Rename a let clause past the name of an added import",
 		file: func() *ast.File {
 			spec := &ast.ImportSpec{Name: ast.NewIdent("in_1"), Path: ast.NewString("strings")}
@@ -725,13 +722,11 @@ a: {
 		}(),
 		want: `import in_1 "strings"
 
-let in_1 = 1
-y: in_1
+let in_2 = 1
+y: in_2
 z: in_1.ToUpper
 `,
 	}, {
-		// The alias is named like the import, and the output does not
-		// compile.
 		desc: "Alias a shadowed field past the name of an added import",
 		file: func() *ast.File {
 			spec := &ast.ImportSpec{Name: ast.NewIdent("a_1"), Path: ast.NewString("strings")}
@@ -747,10 +742,10 @@ z: in_1.ToUpper
 		}(),
 		want: `import a_1 "strings"
 
-a~(a_1): 1
+a~(a_2): 1
 b: {
 	a: 2
-	c: a_1
+	c: a_2
 }
 z: a_1.ToUpper
 `,

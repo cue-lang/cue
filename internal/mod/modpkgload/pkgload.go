@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"iter"
 	"maps"
 	"path/filepath"
 	"runtime"
@@ -186,6 +187,13 @@ func (pkg *Package) CanonicalImportPath(rawPath string) string {
 		return p
 	}
 	return path
+}
+
+// ResolvedImports yields each canonical import path written in the
+// package's files which [Package.CanonicalImportPath] rewrites,
+// along with the canonical versioned import path it resolves to.
+func (pkg *Package) ResolvedImports() iter.Seq2[string, string] {
+	return maps.All(pkg.resolvedImports)
 }
 
 func (pkg *Package) ModRoot() module.SourceLoc {

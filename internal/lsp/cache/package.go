@@ -395,6 +395,15 @@ func (pkg *Package) update(modpkg *modpkgload.Package) error {
 	}
 	pkg.imports = slices.Clip(pkg.imports)
 
+	// The imports of a package from a dependency module are resolved
+	// with that module's default major versions, so the import paths
+	// above may carry a version which the import specs omit.
+	for path, resolved := range modpkg.ResolvedImports() {
+		if ip, ok := importCanonicalisation[resolved]; ok {
+			importCanonicalisation[path] = ip
+		}
+	}
+
 	modpkgFiles := modpkg.Files()
 	evalASTs := make([]*ast.File, 0, len(modpkgFiles))
 	filesSet := make(map[protocol.DocumentURI]*File, len(modpkgFiles))

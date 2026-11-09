@@ -673,6 +673,14 @@ func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {
 	}
 }
 
+// clauseVar declares the clause variable label in the top frame, and returns
+// the identifier its references are linked to.
+func (e *exporter) clauseVar(label adt.Feature) *ast.Ident {
+	id := e.ident(label)
+	e.top().fields[label] = entry{ident: id}
+	return id
+}
+
 func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) *ast.Comprehension {
 	c := &ast.Comprehension{}
 
@@ -680,23 +688,24 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 	// comprehension-internal bindings).
 	outerEnv := env
 
+	// A clause's expression is in the enclosing scope, and its variable
+	// in a new scope for the clauses after it and the body.
 	for _, y := range comp.Clauses {
 		switch x := y.(type) {
 		case *adt.ForClause:
-			env = &adt.Environment{Up: env, Vertex: empty}
-			value := e.ident(x.Value)
 			src := e.innerExpr(env, x.Src)
-			clause := &ast.ForClause{Value: value, Source: src}
-			e.copyMeta(clause, x.Syntax)
-			c.Clauses = append(c.Clauses, clause)
-
 			_, saved := e.pushFrame(empty, nil)
 			defer e.popFrame(saved)
-
-			if x.Key != adt.InvalidLabel ||
-				(x.Syntax != nil && x.Syntax.Key != nil) {
+			env = e.newEnv(env)
+			clause := &ast.ForClause{Value: e.clauseVar(x.Value), Source: src}
+			if x.Key != adt.InvalidLabel {
+				clause.Key = e.clauseVar(x.Key)
+			} else if x.Syntax != nil && x.Syntax.Key != nil {
+				// A blank key declares no variable.
 				clause.Key = e.ident(x.Key)
 			}
+			e.copyMeta(clause, x.Syntax)
+			c.Clauses = append(c.Clauses, clause)
 
 		case *adt.IfClause:
 			cond := e.innerExpr(env, x.Condition)
@@ -705,28 +714,26 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			c.Clauses = append(c.Clauses, clause)
 
 		case *adt.LetClause:
-			env = &adt.Environment{Up: env, Vertex: empty}
 			expr := e.innerExpr(env, x.Expr)
+			_, saved := e.pushFrame(empty, nil)
+			defer e.popFrame(saved)
+			env = e.newEnv(env)
 			clause := &ast.LetClause{
-				Ident: e.ident(x.Label),
+				Ident: e.clauseVar(x.Label),
 				Expr:  expr,
 			}
 			e.copyMeta(clause, x.Src)
 			c.Clauses = append(c.Clauses, clause)
 
-			_, saved := e.pushFrame(empty, nil)
-			defer e.popFrame(saved)
-
 		case *adt.TryClause:
 			clause := &ast.TryClause{}
 			if x.Label != adt.InvalidLabel {
 				// Assignment form: try x = expr
-				env = &adt.Environment{Up: env, Vertex: empty}
-				clause.Ident = e.ident(x.Label)
 				clause.Expr = e.innerExpr(env, x.Expr)
-
 				_, saved := e.pushFrame(empty, nil)
 				defer e.popFrame(saved)
+				env = e.newEnv(env)
+				clause.Ident = e.clauseVar(x.Label)
 			}
 			// Struct form has no Ident/Expr - body is in Comprehension.Value
 			e.copyMeta(clause, x.Src)

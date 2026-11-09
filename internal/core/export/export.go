@@ -389,8 +389,8 @@ func (e *exporter) fieldsOf(env *adt.Environment, upCount int32) map[adt.Feature
 	return nil
 }
 
-// newEnv returns an environment for a struct literal exported in the top
-// frame, and records it for [exporter.fieldsOf].
+// newEnv returns an environment for a struct literal or comprehension clause
+// exported in the top frame, and records it for [exporter.fieldsOf].
 //
 // TODO: ensure e.node() is set in more cases. Right now it is not always set
 // in mergeValues, even in cases where it could be. Better to be conservative
@@ -952,13 +952,14 @@ type frame struct {
 	mergesFiles bool
 }
 
-// entry records the field declaring a label in the output of a frame, and
-// the references to it in that output, which are linked to the field's value
-// as the frame is popped, or to the field when it has a value alias, for
-// [astutil.Sanitize] to see which references are shadowed.
+// entry records a field or clause variable declared in the output of a frame,
+// and the references to it there, which are linked to it as the frame is
+// popped for [astutil.Sanitize] to see which ones are shadowed.
 type entry struct {
-	alias      string
-	field      *ast.Field
+	alias string
+	field *ast.Field
+	// ident declares a clause variable, when field is nil.
+	ident      *ast.Ident
 	references []*ast.Ident
 }
 
@@ -998,13 +999,16 @@ func (e *exporter) popFrame(saved []*frame) {
 		return
 	}
 	for _, f := range top.fields {
-		if f.field == nil {
+		var node ast.Node
+		switch {
+		case f.field == nil && f.ident == nil:
 			continue
-		}
-		var node ast.Node = f.field
-		if f.alias != "" {
+		case f.field == nil:
+			node = f.ident
+		case f.alias != "":
 			e.setValueAlias(f.field, f.alias)
-		} else {
+			node = f.field
+		default:
 			// Link past a value alias, as Resolve does.
 			node = f.field.Value
 			if a, ok := node.(*ast.Alias); ok {

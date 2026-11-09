@@ -262,7 +262,7 @@ shadowField: declEmbeddedLet: {
 }
 
 // The quoted label is written unquoted, where it shadows the clause variable
-// of the same name, which is not renamed, so c and d refer to the new field.
+// of the same name, which is renamed along with its references.
 shadowClause: t1: {
 	for v in [1] {"v": {c: v, d: v}}
 }
@@ -537,30 +537,30 @@ shadowField: {
 shadowClause: {
 
 	// The quoted label is written unquoted, where it shadows the clause variable
-	// of the same name, which is not renamed, so c and d refer to the new field.
+	// of the same name, which is renamed along with its references.
 	t1: {
-		for v in [1] {
+		for v_1 in [1] {
 			v: {
-				c: v
-				d: v
+				c: v_1
+				d: v_1
 			}
 		}
 	}
 
 	// The source of the clause refers to x, which the quoted label shadows.
 	t2: {
-		x: 1
-		b: x: {for v in [x] {
+		x~(x_13): 1
+		b: x: {for v in [x_13] {
 			y: v
 		}}
 	}
 
 	// The key and the let variable are shadowed.
 	t3: {
-		for k, v in {a: 1} let w = v {
-			k: k
-			w: w
-			v: v
+		for k_1, v_2 in {a: 1} let w_1 = v_2 {
+			k: k_1
+			w: w_1
+			v: v_2
 		}
 	}
 }
@@ -821,7 +821,7 @@ list element, and a literal embedded in a struct with a comprehension.
 [shadowClause]
 [shadowClause t1]
 - The quoted label is written unquoted, where it shadows the clause variable
-of the same name, which is not renamed, so c and d refer to the new field.
+of the same name, which is renamed along with its references.
 
 [shadowClause t1 v]
 [shadowClause t1 v c]
@@ -1108,7 +1108,7 @@ _|_ // shadowRef.e1.x.x: structural cycle
 	shadowClause: {
 
 		// The quoted label is written unquoted, where it shadows the clause variable
-		// of the same name, which is not renamed, so c and d refer to the new field.
+		// of the same name, which is renamed along with its references.
 		t1: v: {
 			c: 1
 			d: 1
@@ -1471,7 +1471,7 @@ diff old new
 +	shadowClause: {
 +
 +		// The quoted label is written unquoted, where it shadows the clause variable
-+		// of the same name, which is not renamed, so c and d refer to the new field.
++		// of the same name, which is renamed along with its references.
 +		t1: v: {
 +			c: 1
 +			d: 1

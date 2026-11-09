@@ -15,7 +15,6 @@
 package astutil_test
 
 import (
-	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
@@ -1062,7 +1061,11 @@ a: {
 				},
 			}}
 		}(),
-		want: `unexpected link type *ast.ForClause`,
+		want: `for v_1 in [1] {
+	v: {c: v_1}
+	d: v_1
+}
+`,
 	}, {
 		desc: "Rename a comprehension key and let variable shadowed by a field",
 		file: func() *ast.File {
@@ -1090,7 +1093,62 @@ a: {
 				},
 			}}
 		}(),
-		want: `unexpected link type *ast.ForClause`,
+		want: `for k_1, v_1 in {a: 1} let w_1 = v_1 {
+	k: k_1
+	w: w_1
+	v: v_1
+}
+`,
+	}, {
+		desc: "Rename a comprehension variable past the name of an added import",
+		file: func() *ast.File {
+			spec := &ast.ImportSpec{Name: ast.NewIdent("v_1"), Path: ast.NewString("strings")}
+			v := ast.NewIdent("v")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Comprehension{
+					Clauses: []ast.Clause{&ast.ForClause{
+						Value:  v,
+						Source: ast.NewList(ast.NewLit(token.INT, "1")),
+					}},
+					Value: ast.NewStruct(
+						ast.NewIdent("v"), ast.NewStruct(
+							ast.NewIdent("c"), &ast.Ident{Name: "v", Node: v},
+						),
+						ast.NewIdent("z"), ast.NewSel(&ast.Ident{Name: "v_1", Node: spec}, "ToUpper"),
+					),
+				},
+			}}
+		}(),
+		want: `import v_1 "strings"
+
+for v_2 in [1] {
+	v: {c: v_2}
+	z: v_1.ToUpper
+}
+`,
+	}, {
+		// The label half of a postfix alias is declared by an identifier like
+		// a clause variable, but is an alias, unshadowed through a let clause.
+		desc: "Unshadow the label half of a postfix alias shadowed by a let clause",
+		file: func() *ast.File {
+			l := ast.NewIdent("L")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("x"),
+					Alias: &ast.PostfixAlias{Label: l, Field: ast.NewIdent("_")},
+					Value: ast.NewStruct(
+						&ast.LetClause{Ident: ast.NewIdent("L"), Expr: ast.NewLit(token.INT, "1")},
+						ast.NewIdent("z"), &ast.Ident{Name: "L", Node: l},
+					),
+				},
+			}}
+		}(),
+		want: `let L_1 = L
+x~(L,_): {
+	let L = 1
+	z: L_1
+}
+`,
 	}, {
 		// The field keeps the name in the scope, so a reference to it in
 		// the value of the let clause renamed for it still refers to it.
@@ -1160,30 +1218,22 @@ b: {for X in [1] {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			var got string
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						got = fmt.Sprint(r)
-					}
-				}()
-				err := astutil.Sanitize(tc.file)
-				if err != nil {
-					t.Fatal(err)
-				}
+			err := astutil.Sanitize(tc.file)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-				b, errs := format.Node(tc.file)
-				if errs != nil {
-					t.Fatal(errs)
-				}
+			b, errs := format.Node(tc.file)
+			if errs != nil {
+				t.Fatal(errs)
+			}
 
-				got = string(b)
-
-				// The output must be well-formed, as Sanitize promises.
-				_, err = parser.ParseFile("out.cue", b, parser.Version(tc.version))
-				qt.Assert(t, qt.IsNil(err))
-			}()
+			got := string(b)
 			qt.Assert(t, qt.Equals(got, tc.want))
+
+			// The output must be well-formed, as Sanitize promises.
+			_, err = parser.ParseFile("out.cue", b, parser.Version(tc.version))
+			qt.Assert(t, qt.IsNil(err))
 		})
 	}
 }

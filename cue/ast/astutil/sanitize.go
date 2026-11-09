@@ -26,7 +26,6 @@ import (
 )
 
 // TODO:
-// - handle comprehensions
 // - change field from foo to "foo" if it isn't referenced, rather than
 //   relying on introducing a unique alias.
 
@@ -97,7 +96,8 @@ func labelName(label ast.Label) string {
 //   - unshadows imports associated with idents
 //   - unshadows references for identifiers that were already resolved.
 //   - renames, with their references, let clauses and aliases named by a
-//     keyword such as "in", and aliases named like a field in scope.
+//     keyword such as "in", aliases named like a field in scope, and
+//     comprehension clause variables shadowed where they are referred to.
 //
 // Deprecated: use [SanitizeFiles] to sanitize all files in a package together,
 // to avoid issues such as one file shadowing a builtin name in the package scope.
@@ -171,7 +171,7 @@ func sanitize(f *ast.File, names map[string]bool) error {
 }
 
 // declIdent returns the identifier declaring e if it may be renamed:
-// a let clause or an alias.
+// a let clause, an alias, or a comprehension clause variable.
 func declIdent(e entry) *ast.Ident {
 	switch x := e.link.(type) {
 	case *ast.LetClause:
@@ -183,6 +183,9 @@ func declIdent(e entry) *ast.Ident {
 			return x.Label
 		}
 		return x.Field
+	case *ast.ForClause, *ast.TryClause:
+		id, _ := e.node.(*ast.Ident)
+		return id
 	case *ast.Field:
 		// A value alias.
 		if a, ok := e.node.(*ast.Alias); ok {
@@ -246,9 +249,9 @@ type sanitizer struct {
 	// them; see [sanitizer.markUsed].
 	imports map[string]*ast.ImportSpec
 
-	// toRename holds the identifiers declaring the lets and aliases to
-	// rename with their references. Their new names are picked in the
-	// second walk, and recorded in newNames.
+	// toRename holds the identifiers declaring the lets, aliases, and
+	// clause variables to rename with their references. Their new names
+	// are picked in the second walk, and recorded in newNames.
 	toRename map[*ast.Ident]bool
 	newNames map[*ast.Ident]string
 	// nodeNames holds the new names by declaration node.
@@ -263,7 +266,11 @@ func (z *sanitizer) errf(p token.Pos, msg string, args ...interface{}) {
 
 func (z *sanitizer) addName(name string, e entry) {
 	z.names[name] = true
-	if id := declIdent(e); id != nil && token.Lookup(name).IsKeyword() {
+	id := declIdent(e)
+	if id == nil {
+		return
+	}
+	if token.Lookup(name).IsKeyword() {
 		z.toRename[id] = true
 	}
 }
@@ -356,11 +363,29 @@ func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 				}
 			}
 		}
+		z.markShadowedClauseVar(s, n)
 		return false
 	}
 	_, _, entry := s.lookup(n.String())
 	z.referenced[entry.link] = true
 	return true
+}
+
+// markShadowedClauseVar marks the clause variable n refers to for renaming
+// if another declaration shadows it at n: a clause has no struct to insert
+// a let clause in, so renaming is the only way to reach the variable.
+func (z *sanitizer) markShadowedClauseVar(s *scope, n *ast.Ident) {
+	id, ok := n.Node.(*ast.Ident)
+	if !ok {
+		return
+	}
+	if _, _, cur := s.lookup(n.Name); cur.node == n.Node {
+		return
+	}
+	switch node, _, _ := s.resolveScope(n.Name, n.Node); node.(type) {
+	case *ast.ForClause, *ast.LetClause, *ast.TryClause:
+		z.toRename[id] = true
+	}
 }
 
 func (z *sanitizer) cleanImports() {

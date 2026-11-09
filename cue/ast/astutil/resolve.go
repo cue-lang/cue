@@ -128,6 +128,9 @@ type scope struct {
 	identFn func(s *scope, n *ast.Ident) bool
 	nameFn  func(name string, e entry)
 	errFn   func(p token.Pos, msg string, args ...interface{})
+	// conflictFn, if set, renames an alias named like a field in scope,
+	// and reports whether it did.
+	conflictFn func(alias entry) bool
 
 	// unresolved collects the identifiers which [resolveIdent] cannot
 	// resolve. The pointer is shared between the root scope and all its
@@ -143,6 +146,10 @@ type entry struct {
 	node  ast.Node
 	link  ast.Node   // Alias, LetClause, or Field
 	field *ast.Field // Used for LabelAliases
+
+	// ambiguous reports that a renamed alias shared this name in the same
+	// scope, so a reference by name alone may have meant either.
+	ambiguous bool
 }
 
 func (s *scope) allocScope() *scope {
@@ -186,6 +193,7 @@ func newScope(outer *scope, node ast.Node, decls []ast.Decl) *scope {
 	s.identFn = outer.identFn
 	s.nameFn = outer.nameFn
 	s.errFn = outer.errFn
+	s.conflictFn = outer.conflictFn
 	s.unresolved = outer.unresolved
 
 	for _, d := range decls {
@@ -251,6 +259,7 @@ func newFuncScope(outer *scope, fn *ast.Func) *scope {
 	s.identFn = outer.identFn
 	s.nameFn = outer.nameFn
 	s.errFn = outer.errFn
+	s.conflictFn = outer.conflictFn
 	s.unresolved = outer.unresolved
 
 	insertParam := func(name string, p *ast.FuncParam) {
@@ -317,14 +326,43 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 		return
 	}
 	e := entry{node: n, link: link, field: f}
-	if s.nameFn != nil {
-		s.nameFn(name, e)
-	}
+	// kept is the entry the name refers to in s: e, or a field
+	// taking the place of a renamed alias.
+	kept := e
 	// TODO: record both positions.
 	if outer, _, existing := s.lookup(name); existing.node != nil {
-		if s.isLet(n, link) != outer.isLet(existing.node, existing.link) {
-			s.errFn(n.Pos(), "cannot have both alias and field with name %q in same scope", name)
-			return
+		isAlias := s.isLet(n, link)
+		conflict := isAlias != outer.isLet(existing.node, existing.link)
+		if !conflict && isAlias && outer != s {
+			// A field past the shadowed aliases conflicts too.
+			_, conflict = outer.aliasesPast(name)
+		}
+		if conflict {
+			alias := e
+			if !isAlias {
+				alias = existing
+			}
+			ok := s.conflictFn != nil && s.conflictFn(alias)
+			if ok && !isAlias {
+				// The aliases the renamed one shadowed conflict too.
+				aliases, _ := outer.aliasesPast(name)
+				for _, alias := range aliases {
+					if ok = s.conflictFn(alias); !ok {
+						break
+					}
+				}
+			}
+			if !ok {
+				s.errFn(n.Pos(), "cannot have both alias and field with name %q in same scope", name)
+				return
+			}
+			// In the same scope, the name refers to the field.
+			if outer == s {
+				if isAlias {
+					kept = existing
+				}
+				kept.ambiguous = true
+			}
 		} else if s.mustBeUnique(n, link) || outer.mustBeUnique(existing.node, existing.link) {
 			if outer == s {
 				if _, ok := existing.node.(*ast.ImportSpec); ok {
@@ -343,8 +381,32 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 			// square brackets. The spec says allow it.
 			// s.errFn(n.Pos(), "alias %q already declared in enclosing scope", name)
 		}
+		// A repeated declaration keeps the ambiguity of the one it replaces.
+		if outer == s && existing.ambiguous {
+			kept.ambiguous = true
+		}
 	}
-	s.index[name] = e
+	// nameFn runs after conflictFn, which may mark e for renaming.
+	if s.nameFn != nil {
+		s.nameFn(name, e)
+	}
+	s.index[name] = kept
+}
+
+// aliasesPast returns the aliases of name in the scopes enclosing s,
+// innermost first, and whether a field of that name is past them.
+func (s *scope) aliasesPast(name string) (aliases []entry, field bool) {
+	for o := s; ; {
+		var e entry
+		o, _, e = o.outer.lookup(name)
+		if e.node == nil {
+			return aliases, false
+		}
+		if !o.isLet(e.node, e.link) {
+			return aliases, true
+		}
+		aliases = append(aliases, e)
+	}
 }
 
 // resolveScope returns the node of the scope declaring name as node, and its
@@ -559,10 +621,13 @@ func (s *scope) Before(n ast.Node) bool {
 		return false
 
 	case *ast.LetClause:
-		// Disallow referring to the current LHS name.
+		// Disallow referring to the current LHS name, unless a field took
+		// its place; see [scope.conflictFn].
 		name := x.Ident.Name
 		saved := s.index[name]
-		delete(s.index, name) // The same name may still appear in another scope
+		if saved.node == x {
+			delete(s.index, name) // The same name may still appear in another scope
+		}
 
 		// Set inField so that the label expression check in pattern constraints
 		// does not walk beyond the let clause's value. A let clause's value is
@@ -574,10 +639,12 @@ func (s *scope) Before(n ast.Node) bool {
 		return false
 
 	case *ast.Alias:
-		// Disallow referring to the current LHS name.
+		// Disallow referring to the current LHS name, as for a let clause.
 		name := x.Ident.Name
 		saved := s.index[name]
-		delete(s.index, name) // The same name may still appear in another scope
+		if saved.node == x {
+			delete(s.index, name) // The same name may still appear in another scope
+		}
 
 		ast.Walk(x.Expr, s.Before, nil)
 		s.index[name] = saved

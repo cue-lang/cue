@@ -246,12 +246,12 @@ func buildPostFixArchive(orig *txtar.Archive, fixedFiles map[string][]byte) *txt
 	return result
 }
 
-// conflictFile builds a file a let clause and a field of one name, which
-// cannot be sanitized. The parser rejects the same text, so it is built.
+// conflictFile builds a file with two let clauses of one name, which cannot
+// be sanitized. The parser rejects the same text, so it is built.
 func conflictFile(name string) *ast.File {
 	return &ast.File{Decls: []ast.Decl{
 		&ast.LetClause{Ident: ast.NewIdent(name), Expr: ast.NewLit(token.INT, "1")},
-		&ast.Field{Label: ast.NewIdent(name), Value: ast.NewLit(token.INT, "2")},
+		&ast.LetClause{Ident: ast.NewIdent(name), Expr: ast.NewLit(token.INT, "2")},
 	}}
 }
 

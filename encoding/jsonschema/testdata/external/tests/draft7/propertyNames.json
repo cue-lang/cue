@@ -7,7 +7,7 @@
 			}
 		},
 		"skip": {
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:3:43\n",
+			"v3": "extract error: cannot sanitize jsonschema resulting syntax: reference \"strings\" in label expression refers to field against which it would be matched",
 			"v3-roundtrip": "inital extract failed"
 		},
 		"tests": [

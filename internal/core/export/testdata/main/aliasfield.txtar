@@ -25,18 +25,24 @@ t3: {
 	r:     X
 	a: "x": c: x
 }
+
+t4: {
+	"X":   2
+	x~(X): 1
+	r:     X
+	a: "x": c: x
+}
 -- out/definition --
-cannot have both alias and field with name "X" in same scope
 // The quoted label is written unquoted, named like the alias of x, and a
 // field may not be named like an alias in scope, so the alias is renamed.
 t1: {
-	x~(X): 1
-	r:     X
-	a: X: c: X
+	x~(X_1): 1
+	r:       X_1
+	a: X: c: X_1
 }
 t2: {
-	x~(X): 1
-	r:     X
+	x~(X_2): 1
+	r:       X_2
 	a: X: 2
 }
 
@@ -44,10 +50,16 @@ t2: {
 // the alias's place in that scope; the reference in c reaches x through the
 // alias as the field written unquoted shadows x.
 t3: {
-	x~(X): 1
-	X:     2
-	r:     X
-	a: x: c: x
+	x~(X_3): 1
+	X:       2
+	r:       X_3
+	a: x: c: X_3
+}
+t4: {
+	X:       2
+	x~(X_4): 1
+	r:       X_4
+	a: x: c: X_4
 }
 -- out/doc --
 []
@@ -76,6 +88,13 @@ alias as the field written unquoted shadows x.
 [t3 a]
 [t3 a x]
 [t3 a x c]
+[t4]
+[t4 X]
+[t4 x]
+[t4 r]
+[t4 a]
+[t4 a x]
+[t4 a x c]
 -- out/value --
 == Simplified
 {
@@ -98,6 +117,12 @@ alias as the field written unquoted shadows x.
 	t3: {
 		x: 1
 		X: 2
+		r: 1
+		a: x: c: 1
+	}
+	t4: {
+		X: 2
+		x: 1
 		r: 1
 		a: x: c: 1
 	}
@@ -126,6 +151,12 @@ alias as the field written unquoted shadows x.
 		r: 1
 		a: x: c: 1
 	}
+	t4: {
+		X: 2
+		x: 1
+		r: 1
+		a: x: c: 1
+	}
 }
 == Final
 {
@@ -142,6 +173,12 @@ alias as the field written unquoted shadows x.
 	t3: {
 		x: 1
 		X: 2
+		r: 1
+		a: x: c: 1
+	}
+	t4: {
+		X: 2
+		x: 1
 		r: 1
 		a: x: c: 1
 	}
@@ -170,6 +207,12 @@ alias as the field written unquoted shadows x.
 		r: 1
 		a: x: c: 1
 	}
+	t4: {
+		X: 2
+		x: 1
+		r: 1
+		a: x: c: 1
+	}
 }
 == Eval
 {
@@ -186,6 +229,12 @@ alias as the field written unquoted shadows x.
 	t3: {
 		x: 1
 		X: 2
+		r: 1
+		a: x: c: 1
+	}
+	t4: {
+		X: 2
+		x: 1
 		r: 1
 		a: x: c: 1
 	}

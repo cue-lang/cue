@@ -96,8 +96,8 @@ func labelName(label ast.Label) string {
 //   - auto inserts imports associated with Idents
 //   - unshadows imports associated with idents
 //   - unshadows references for identifiers that were already resolved.
-//   - renames let clauses and postfix aliases named by a keyword, such as
-//     "in", along with their references.
+//   - renames, with their references, let clauses and aliases named by a
+//     keyword such as "in", and aliases named like a field in scope.
 //
 // Deprecated: use [SanitizeFiles] to sanitize all files in a package together,
 // to avoid issues such as one file shadowing a builtin name in the package scope.
@@ -115,18 +115,23 @@ func sanitize(f *ast.File, names map[string]bool) error {
 		importMap:  map[string]*ast.ImportSpec{},
 		referenced: map[ast.Node]bool{},
 		altMap:     map[ast.Node]string{},
+		toRename:   map[*ast.Ident]bool{},
+		imports:    map[string]*ast.ImportSpec{},
+		newNames:   map[*ast.Ident]string{},
+		nodeNames:  map[ast.Node]string{},
 	}
 
 	for name := range names {
 		z.names[name] = true
 	}
 
-	// Gather all names.
+	// Gather all names, and the declarations to rename.
 	stack := make([]*scope, 0, 8)
 	s := &scope{
 		errFn:      z.errf,
 		nameFn:     z.addName,
 		identFn:    z.markUsed,
+		conflictFn: z.renameAlias,
 		scopeStack: &stack,
 	}
 	ast.Walk(f, s.Before, nil)
@@ -138,16 +143,23 @@ func sanitize(f *ast.File, names map[string]bool) error {
 	stack = stack[:0]
 	s = &scope{
 		errFn:      z.errf,
-		nameFn:     z.renameKeyword,
+		nameFn:     z.newName,
 		identFn:    z.handleIdent,
+		conflictFn: z.renameAlias,
 		index:      make(map[string]entry),
 		scopeStack: &stack,
 	}
 	z.fileScope = s
+	// Put the referenced imports in scope from the start, so that a let
+	// clause or alias of the same name is renamed wherever it is declared.
+	// They are added to the file as their references are reached.
+	for name, spec := range z.imports {
+		s.insert(name, spec, spec, nil)
+	}
 	ast.Walk(f, s.Before, nil)
 	// The walk has renamed the references, so the declarations must follow,
 	// even if it failed.
-	for id, name := range z.keywordAlts {
+	for id, name := range z.newNames {
 		id.Name = name
 	}
 	if z.errs != nil {
@@ -158,38 +170,54 @@ func sanitize(f *ast.File, names map[string]bool) error {
 	return z.errs
 }
 
-// declIdent returns the identifier declaring e if it is a let clause or
-// either half of a postfix alias, or nil otherwise.
+// declIdent returns the identifier declaring e if it may be renamed:
+// a let clause or an alias.
 func declIdent(e entry) *ast.Ident {
 	switch x := e.link.(type) {
 	case *ast.LetClause:
+		return x.Ident
+	case *ast.Alias:
 		return x.Ident
 	case *ast.PostfixAlias:
 		if e.field != nil {
 			return x.Label
 		}
 		return x.Field
+	case *ast.Field:
+		// A value alias.
+		if a, ok := e.node.(*ast.Alias); ok {
+			return a.Ident
+		}
 	}
 	return nil
 }
 
-// renameKeyword gives a let clause or postfix alias named by a keyword, which
-// the syntax does not accept as such a name, a new unique name. It is applied
-// to the declaration once the walk has renamed its references.
-func (z *sanitizer) renameKeyword(name string, e entry) {
+// renameAlias marks an alias named like a field in scope for renaming,
+// and reports whether it could.
+func (z *sanitizer) renameAlias(alias entry) bool {
+	id := declIdent(alias)
+	if id == nil {
+		return false
+	}
+	z.toRename[id] = true
+	return true
+}
+
+// newName picks a new name for a declaration marked for renaming, which
+// the walk gives its references, and the declaration once it is done.
+func (z *sanitizer) newName(name string, e entry) {
 	id := declIdent(e)
-	if id == nil || !token.Lookup(name).IsKeyword() {
+	if id == nil || !z.toRename[id] {
+		return
+	}
+	if _, ok := z.newNames[id]; ok {
 		return
 	}
 	alt := z.uniqueName(name)
-	if z.keywordAlts == nil {
-		z.keywordAlts = make(map[*ast.Ident]string)
-	}
-	z.keywordAlts[id] = alt
-	if x, ok := e.link.(*ast.PostfixAlias); ok && id == x.Field {
-		// A reference to the shadowed field can use the alias too.
-		z.altMap[e.node] = alt
-	}
+	z.newNames[id] = alt
+	// Linked references look up the name by node, as a field may have
+	// taken the declaration's place in the index.
+	z.nodeNames[e.node] = alt
 }
 
 type sanitizer struct {
@@ -214,10 +242,17 @@ type sanitizer struct {
 	// safely reused for any unshadowing.
 	altMap    map[ast.Node]string
 	importMap map[string]*ast.ImportSpec
+	// imports holds, by name, the imports referenced where nothing shadows
+	// them; see [sanitizer.markUsed].
+	imports map[string]*ast.ImportSpec
 
-	// keywordAlts holds the new names of the identifiers declaring let
-	// clauses and postfix aliases named by a keyword.
-	keywordAlts map[*ast.Ident]string
+	// toRename holds the identifiers declaring the lets and aliases to
+	// rename with their references. Their new names are picked in the
+	// second walk, and recorded in newNames.
+	toRename map[*ast.Ident]bool
+	newNames map[*ast.Ident]string
+	// nodeNames holds the new names by declaration node.
+	nodeNames map[ast.Node]string
 
 	errs errors.Error
 }
@@ -226,8 +261,11 @@ func (z *sanitizer) errf(p token.Pos, msg string, args ...interface{}) {
 	z.errs = errors.Append(z.errs, errors.Newf(p, msg, args...))
 }
 
-func (z *sanitizer) addName(name string, _ entry) {
+func (z *sanitizer) addName(name string, e entry) {
 	z.names[name] = true
+	if id := declIdent(e); id != nil && token.Lookup(name).IsKeyword() {
+		z.toRename[id] = true
+	}
 }
 
 func (z *sanitizer) addRename(base string, n ast.Node) (alt string, new bool) {
@@ -293,22 +331,30 @@ func (z *sanitizer) unshadow(parent ast.Node, base string, link ast.Node) string
 }
 
 // aliasName returns a name by which a reference in s refers to the value
-// bound by link, which is named name: name itself where it is visible, or else
-// a new name bound to it by a let clause.
-func (z *sanitizer) aliasName(s *scope, parent ast.Node, name string, link ast.Node) string {
-	if _, _, e := s.lookup(name); e.link == link {
+// bound by link and named by id: its new name if renamed, its name if
+// visible, or else a new name bound to it by a let clause.
+func (z *sanitizer) aliasName(s *scope, parent ast.Node, id *ast.Ident, link ast.Node) string {
+	if name, ok := z.newNames[id]; ok {
 		return name
 	}
-	return z.unshadow(parent, name, link)
+	if _, _, e := s.lookup(id.Name); e.link == link {
+		return id.Name
+	}
+	return z.unshadow(parent, id.Name, link)
 }
 
 func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 	if n.Node != nil {
-		// The import may only be declared as the second walk reaches the
-		// reference, while it picks new names; see [sanitizer.handleIdent].
 		if spec, ok := n.Node.(*ast.ImportSpec); ok {
+			// The import is only added as the second walk reaches n,
+			// so reserve its name, and put it in scope before then.
 			info, _ := ParseImportSpec(spec)
 			z.names[info.Ident] = true
+			if _, ok := z.imports[info.Ident]; !ok {
+				if _, _, e := s.lookup(info.Ident); e.node == nil {
+					z.imports[info.Ident] = spec
+				}
+			}
 		}
 		return false
 	}
@@ -358,16 +404,21 @@ func (z *sanitizer) bindField(x *ast.Field, y *ast.Ident, name string) {
 }
 
 func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
-	if len(z.keywordAlts) > 0 {
-		// Another declaration may shadow the one n refers to.
-		var node entry
-		if n.Node != nil {
-			_, node, _ = s.resolveScope(n.Name, n.Node)
-		} else {
-			_, _, node = s.lookup(n.Name)
-		}
+	if len(z.newNames) > 0 {
 		// New names are unique, so they need no unshadowing.
-		if name, ok := z.keywordAlts[declIdent(node)]; ok {
+		var name string
+		var ok bool
+		if n.Node != nil {
+			name, ok = z.nodeNames[n.Node]
+		} else {
+			_, _, node := s.lookup(n.Name)
+			name, ok = z.newNames[declIdent(node)]
+			if !ok && node.ambiguous {
+				z.errf(n.Pos(), "reference %q is ambiguous: a declaration of that name was renamed", n.Name)
+				return true
+			}
+		}
+		if ok {
 			n.Name = name
 			n.Scope = nil
 			return true
@@ -409,7 +460,8 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		if y, ok := node.node.(*ast.ImportSpec); ok {
 			yi, _ := ParseImportSpec(y)
 			if xi.ID == yi.ID { // name must be identical as a result of lookup.
-				z.referenced[y] = true
+				// The import may be in scope before it is declared.
+				z.addImport(y)
 				n.Node = x
 				n.Scope = nil
 				return false
@@ -484,12 +536,12 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		// unshadowing it where needed. Otherwise introduce an alias with a
 		// unique name.
 		if a := x.Alias; a != nil && a.Field != nil && a.Field.Name != "_" {
-			name = z.aliasName(s, parent, a.Field.Name, a)
+			name = z.aliasName(s, parent, a.Field, a)
 			break
 		}
 		switch y := x.Label.(type) {
 		case *ast.Alias:
-			name = z.aliasName(s, parent, y.Ident.Name, y)
+			name = z.aliasName(s, parent, y.Ident, y)
 
 		case *ast.Ident:
 			var isNew bool

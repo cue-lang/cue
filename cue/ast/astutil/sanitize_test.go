@@ -34,6 +34,9 @@ func TestSanitize(t *testing.T) {
 		desc string
 		file *ast.File
 		want string
+		// version is the language version want is written in, if not the
+		// current one.
+		version string
 	}{{
 		desc: "Take existing import and rename it",
 		file: func() *ast.File {
@@ -399,7 +402,8 @@ c: {
 }
 `,
 	}, {
-		desc: "Reuse the label alias of a shadowed field",
+		desc:    "Reuse the label alias of a shadowed field",
+		version: "v0.17.0",
 		// Resolve both identifiers to same clause.
 		file: func() *ast.File {
 			fieldX := &ast.Field{
@@ -533,7 +537,8 @@ c: {
 }
 `,
 	}, {
-		desc: "Add let clause to nested shadowed field with shadowed label alias",
+		desc:    "Add let clause to nested shadowed field with shadowed label alias",
+		version: "v0.17.0",
 		// Resolve both identifiers to same clause.
 		file: func() *ast.File {
 			field := &ast.Field{
@@ -775,7 +780,10 @@ z: a_1.ToUpper
 				},
 			}}
 		}(),
-		want: `cannot have both alias and field with name "X" in same scope`,
+		want: `x~(X_1): 1
+r:       X_1
+a:       {X: {c: X_1}}
+`,
 	}, {
 		desc: "Rename a let clause named like a nested field",
 		file: func() *ast.File {
@@ -794,7 +802,12 @@ z: a_1.ToUpper
 				let,
 			}}
 		}(),
-		want: `cannot have both alias and field with name "X" in same scope`,
+		want: `a: {
+	X: 2
+	c: X_1
+}
+let X_1 = 1
+`,
 	}, {
 		// The field takes the alias's place in the scope, so references to the
 		// alias must be renamed by the declaration they are linked to, and one
@@ -826,7 +839,11 @@ z: a_1.ToUpper
 				},
 			}}
 		}(),
-		want: `cannot have both alias and field with name "X" in same scope`,
+		want: `x~(X_1): 1
+X:       2
+r:       X_1
+a:       {x: {c: X_1}}
+`,
 	}, {
 		desc: "Rename an alias named like an earlier field in the same scope",
 		file: func() *ast.File {
@@ -852,7 +869,11 @@ z: a_1.ToUpper
 				},
 			}}
 		}(),
-		want: `cannot have both alias and field with name "X" in same scope`,
+		want: `X:       2
+x~(X_1): 1
+r:       X_1
+s:       X
+`,
 	}, {
 		// An alias shadowing an alias of its name is in scope of a field of
 		// that name declared past the aliases all the same.
@@ -875,22 +896,265 @@ z: a_1.ToUpper
 				},
 			}}
 		}(),
-		want: `cannot have both alias and field with name "X" in same scope`,
+		want: `X: 1
+a: {
+	let X_1 = 2
+	r1: X_1
+	b: {
+		let X_2 = 3
+		r2: X_2
+	}
+}
+`,
+	}, {
+		// The import is only declared as the reference to it is reached, so
+		// the conflict with the let clause is found once the names of the file
+		// are gathered.
+		desc: "Rename a let clause named like an import added for a reference",
+		file: func() *ast.File {
+			spec := &ast.ImportSpec{Path: ast.NewString("strings")}
+			let := &ast.LetClause{
+				Ident: ast.NewIdent("strings"),
+				Expr:  ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("c"),
+					Value: ast.NewSel(&ast.Ident{Name: "strings", Node: spec}, "ToUpper"),
+				},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: &ast.StructLit{Elts: []ast.Decl{
+						let,
+						&ast.Field{
+							Label: ast.NewIdent("b"),
+							Value: &ast.Ident{Name: "strings", Node: let},
+						},
+					}},
+				},
+			}}
+		}(),
+		want: `import "strings"
+
+c: strings.ToUpper
+a: {
+	let strings_1 = 1
+	b: strings_1
+}
+`,
+	}, {
+		// The import is in scope once the names of the file are gathered, so
+		// the let clause is renamed even where it is declared before the
+		// reference the import is added for.
+		desc: "Rename a let clause declared before the reference an import is added for",
+		file: func() *ast.File {
+			spec := &ast.ImportSpec{Path: ast.NewString("strings")}
+			let := &ast.LetClause{
+				Ident: ast.NewIdent("strings"),
+				Expr:  ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: &ast.StructLit{Elts: []ast.Decl{
+						let,
+						&ast.Field{
+							Label: ast.NewIdent("b"),
+							Value: &ast.Ident{Name: "strings", Node: let},
+						},
+					}},
+				},
+				&ast.Field{
+					Label: ast.NewIdent("c"),
+					Value: ast.NewSel(&ast.Ident{Name: "strings", Node: spec}, "ToUpper"),
+				},
+			}}
+		}(),
+		want: `import "strings"
+
+a: {
+	let strings_1 = 1
+	b: strings_1
+}
+c: strings.ToUpper
+`,
+	}, {
+		desc: "Rename an alias named like a field past the name of an added import",
+		file: func() *ast.File {
+			spec := &ast.ImportSpec{Name: ast.NewIdent("X_1"), Path: ast.NewString("strings")}
+			field := &ast.Field{
+				Label: ast.NewIdent("x"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				field,
+				&ast.Field{Label: ast.NewIdent("X"), Value: ast.NewLit(token.INT, "2")},
+				&ast.Field{Label: ast.NewIdent("y"), Value: &ast.Ident{Name: "X", Node: field}},
+				&ast.Field{Label: ast.NewIdent("z"), Value: ast.NewSel(&ast.Ident{Name: "X_1", Node: spec}, "ToUpper")},
+			}}
+		}(),
+		want: `import X_1 "strings"
+
+x~(X_2): 1
+X:       2
+y:       X_2
+z:       X_1.ToUpper
+`,
+	}, {
+		// A field is in scope of every alias of its name, so an alias
+		// shadowed by the one in conflict with the field is renamed too.
+		desc: "Rename every alias in scope named like a nested field",
+		file: func() *ast.File {
+			outer := &ast.Field{
+				Label: ast.NewIdent("x"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			inner := &ast.Field{
+				Label: ast.NewIdent("y"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "2"),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				outer,
+				&ast.Field{
+					Label: ast.NewIdent("r1"),
+					Value: &ast.Ident{Name: "X", Node: outer},
+				},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						inner,
+						ast.NewIdent("r2"), &ast.Ident{Name: "X", Node: inner},
+						ast.NewIdent("X"), ast.NewLit(token.INT, "3"),
+					),
+				},
+			}}
+		}(),
+		want: `x~(X_1): 1
+r1:      X_1
+a: {
+	y~(X_2): 2
+	r2:      X_2
+	X:       3
+}
+`,
+	}, {
+		// The field keeps the name in the scope, so a reference to it in
+		// the value of the let clause renamed for it still refers to it.
+		desc: "Refer to a field from a let clause renamed for its name",
+		file: func() *ast.File {
+			inner := &ast.Field{
+				Label: ast.NewIdent("X"),
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			let := &ast.LetClause{
+				Ident: ast.NewIdent("X"),
+				Expr:  ast.NewList(&ast.Ident{Name: "X", Node: inner.Value}),
+			}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{Label: ast.NewIdent("X"), Value: ast.NewLit(token.INT, "0")},
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						inner,
+						let,
+						ast.NewIdent("r"), &ast.Ident{Name: "X", Node: let},
+					),
+				},
+			}}
+		}(),
+		want: `X: 0
+a: {
+	X: 1
+	let X_1 = [X]
+	r: X_1
+}
+`,
+	}, {
+		// A field may be named like a comprehension variable, but not like
+		// an alias, so the alias is renamed in a conflict between the two.
+		desc: "Rename an alias rather than a comprehension variable of its name",
+		file: func() *ast.File {
+			field := &ast.Field{
+				Label: ast.NewIdent("a"),
+				Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+				Value: ast.NewLit(token.INT, "1"),
+			}
+			v := ast.NewIdent("X")
+			return &ast.File{Decls: []ast.Decl{
+				field,
+				&ast.Field{
+					Label: ast.NewIdent("b"),
+					Value: &ast.StructLit{Elts: []ast.Decl{&ast.Comprehension{
+						Clauses: []ast.Clause{&ast.ForClause{
+							Value:  v,
+							Source: ast.NewList(ast.NewLit(token.INT, "1")),
+						}},
+						Value: ast.NewStruct(
+							ast.NewIdent("X"), ast.NewLit(token.INT, "2"),
+							ast.NewIdent("r"), &ast.Ident{Name: "X", Node: field},
+						),
+					}}},
+				},
+			}}
+		}(),
+		want: `a~(X_1): 1
+b: {for X in [1] {
+	X: 2
+	r: X_1
+}}
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			var got string
-			if err := astutil.Sanitize(tc.file); err != nil {
-				got = err.Error()
-			} else {
-				b, errs := format.Node(tc.file)
-				if errs != nil {
-					t.Fatal(errs)
-				}
-				got = string(b)
+			err := astutil.Sanitize(tc.file)
+			if err != nil {
+				t.Fatal(err)
 			}
+
+			b, errs := format.Node(tc.file)
+			if errs != nil {
+				t.Fatal(errs)
+			}
+
+			got := string(b)
 			qt.Assert(t, qt.Equals(got, tc.want))
+
+			// The output must be well-formed, as Sanitize promises.
+			_, err = parser.ParseFile("out.cue", b, parser.Version(tc.version))
+			qt.Assert(t, qt.IsNil(err))
 		})
+	}
+}
+
+// TestSanitizeAmbiguousReference checks that a reference by name alone to a
+// name which an alias and a field shared in one scope is an error, rather
+// than silently referring to the field once the alias is renamed.
+func TestSanitizeAmbiguousReference(t *testing.T) {
+	// The field is declared once or twice, with the alias anywhere among
+	// its declarations: a repeated declaration of the field must keep
+	// the ambiguity of the one it replaces.
+	for _, fields := range []int{1, 2} {
+		for pos := 0; pos <= fields; pos++ {
+			var decls []ast.Decl
+			for i := 0; i <= fields; i++ {
+				if i == pos {
+					decls = append(decls, &ast.Field{
+						Label: ast.NewIdent("x"),
+						Alias: &ast.PostfixAlias{Field: ast.NewIdent("X")},
+						Value: ast.NewLit(token.INT, "1"),
+					})
+				} else {
+					decls = append(decls, &ast.Field{Label: ast.NewIdent("X"), Value: ast.NewLit(token.INT, "2")})
+				}
+			}
+			decls = append(decls, &ast.Field{Label: ast.NewIdent("r"), Value: ast.NewIdent("X")})
+			err := astutil.Sanitize(&ast.File{Decls: decls})
+			qt.Assert(t, qt.ErrorMatches(err, `reference "X" is ambiguous: a declaration of that name was renamed`),
+				qt.Commentf("%d fields, alias at %d", fields, pos))
+		}
 	}
 }
 
@@ -1209,12 +1473,12 @@ c: {
 // that fails to sanitize and still sanitizes the files that can be, rather
 // than stopping at the first failure and leaving the rest untouched.
 func TestSanitizeFilesAccumulates(t *testing.T) {
-	// A let clause and a field of the same name in one scope cannot be
-	// sanitized; the parser rejects this too, so the files are built.
+	// Two let clauses of the same name in one scope cannot be sanitized;
+	// the parser rejects this too, so the files are built.
 	conflict := func(name string) *ast.File {
 		return &ast.File{Decls: []ast.Decl{
 			&ast.LetClause{Ident: ast.NewIdent(name), Expr: ast.NewLit(token.INT, "1")},
-			&ast.Field{Label: ast.NewIdent(name), Value: ast.NewLit(token.INT, "2")},
+			&ast.LetClause{Ident: ast.NewIdent(name), Expr: ast.NewLit(token.INT, "2")},
 		}}
 	}
 	spec := ast.NewImport(nil, "list")

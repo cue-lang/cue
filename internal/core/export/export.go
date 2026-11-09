@@ -189,9 +189,23 @@ func isDefinitionReference(x ast.Expr) bool {
 
 func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	fout := &ast.File{}
+	var pkgName string
+	if e.cfg.AddPackage {
+		pkgName = packageName(v)
+	}
+
+	// Experiment attributes go before the package clause, or at the top of a
+	// struct whose declarations become the file's. A bare expression gets
+	// none, as wrapping it in a struct would change its form.
+	_, isStruct := x.(*ast.StructLit)
+	if isStruct || pkgName != "" {
+		for _, exp := range e.fileExperiments {
+			fout.Decls = append(fout.Decls, &ast.Attribute{Text: "@experiment(" + exp + ")"})
+		}
+	}
+	attrsEnd := len(fout.Decls)
 
 	if e.cfg.AddPackage {
-		pkgName := packageName(v)
 		pkg := &ast.Package{
 			// prevent the file comment from attaching to pkg when there is no pkg comment
 			PackagePos: token.NoPos.WithRel(token.NewSection),
@@ -240,6 +254,11 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 
 	default:
 		fout.Decls = append(fout.Decls, &ast.EmbedDecl{Expr: x})
+	}
+
+	// A blank line sets the attributes apart from what follows.
+	if attrsEnd > 0 && len(fout.Decls) > attrsEnd {
+		ast.SetRelPos(fout.Decls[attrsEnd], token.NewSection)
 	}
 
 	return fout
@@ -317,7 +336,9 @@ func (p *Profile) Value(ctx *adt.OpContext, pkgID string, n adt.Value) (ast.Expr
 	e := newExporter(p, ctx, pkgID, n)
 	v := e.value(n)
 	// finalize runs astutil.Sanitize, which edits v in place via the shared
-	// StructLit Elts.
+	// StructLit Elts, so leave out the attributes of the discarded file,
+	// which would set the first element of v apart from them.
+	e.fileExperiments = nil
 	if vx, ok := n.(*adt.Vertex); ok {
 		if _, err := e.finalize(vx, v); err != nil {
 			return v, errors.Append(e.errs, err)
@@ -367,6 +388,9 @@ type exporter struct {
 	experiments    *cueexperiment.File
 	experimentsErr error
 	postfixAliases bool
+	// fileExperiments are the [carriedExperiments] which the exported value
+	// does not declare itself, for [exporter.toFile] to write.
+	fileExperiments []string
 
 	// envFrame maps each environment created by the exporter for a struct
 	// literal to the frame exporting it, so that a reference can be linked
@@ -411,11 +435,12 @@ func newExporter(p *Profile, ctx *adt.OpContext, pkgID string, v adt.Value) *exp
 	// One invalid at the target language version is left out, so that the
 	// others still apply; its attribute is copied regardless, and the output
 	// reports it just like the source would at that version.
-	carried := slices.DeleteFunc(carriedExperiments(p, n), func(exp string) bool {
+	carried, own := carriedExperiments(p, n)
+	valid := slices.DeleteFunc(slices.Clone(carried), func(exp string) bool {
 		_, err := cueexperiment.NewFile(p.TargetLanguageVersion, exp)
 		return err != nil
 	})
-	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion, carried...)
+	exp, err := cueexperiment.NewFile(p.TargetLanguageVersion, valid...)
 	e := &exporter{
 		cfg:   p,
 		ctx:   ctx,
@@ -427,6 +452,9 @@ func newExporter(p *Profile, ctx *adt.OpContext, pkgID string, v adt.Value) *exp
 		postfixAliases: exp != nil && exp.AliasV2,
 		envFrame:       map[*adt.Environment]*frame{},
 	}
+	if !own {
+		e.fileExperiments = carried
+	}
 
 	if r, ok := ctx.Runtime.(interface{ IsInjectionKind(string) bool }); ok {
 		e.isInjectionKind = r.IsInjectionKind
@@ -437,24 +465,31 @@ func newExporter(p *Profile, ctx *adt.OpContext, pkgID string, v adt.Value) *exp
 	return e
 }
 
-// carriedExperiments returns the experiments enabled by the files of n that
-// exporting n copies into an output without a package clause, such as for a
-// file without one. [exporter.finalize] moves their attributes to the front
-// of the output, where they are file attributes. The attributes of a struct
-// are not carried, as they may stay nested in the output, such as within
-// _#def.
-func carriedExperiments(p *Profile, n *adt.Vertex) []string {
-	if !p.ShowAttributes || n == nil || p.AddPackage && packageName(n) != "" {
-		return nil
+// carriedExperiments returns the sorted, deduplicated experiments enabled by
+// the files of the root of n, which an export of n carries into its output.
+// own reports whether n declares their attributes itself, as only the root of
+// a file without a package clause does. The attributes of a struct are not
+// carried, as they may stay nested in the output, such as within _#def.
+func carriedExperiments(p *Profile, n *adt.Vertex) (experiments []string, own bool) {
+	if !p.ShowAttributes || n == nil {
+		return nil, false
 	}
-	var experiments []string
-	for c := range n.LeafConjuncts() {
+	root := n
+	for root.Parent != nil {
+		root = root.Parent
+	}
+	hasPkg := false
+	for c := range root.LeafConjuncts() {
 		if f, _ := c.Source().(*ast.File); f != nil {
 			exp := f.Experiment()
 			experiments = append(experiments, exp.Experiments()...)
+			if pkg, _ := internal.Package(f); pkg != nil {
+				hasPkg = true
+			}
 		}
 	}
-	return experiments
+	slices.Sort(experiments)
+	return slices.Compact(experiments), n == root && !hasPkg
 }
 
 // initPivot initializes the pivotter to allow aligning a configuration around

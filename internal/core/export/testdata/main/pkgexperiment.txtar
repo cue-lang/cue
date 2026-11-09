@@ -25,6 +25,9 @@ y: f(3)
 [f]
 [y]
 -- out/definition-v3 --
+@experiment(functions)
+@experiment(try)
+
 // Package p uses syntax which needs experiments.
 package p
 
@@ -38,6 +41,9 @@ x: {
 f: func(a: int) -> int: a
 y: f(3)
 -- out/definition-v3-noshare --
+@experiment(functions)
+@experiment(try)
+
 // Package p uses syntax which needs experiments.
 package p
 

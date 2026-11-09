@@ -70,8 +70,8 @@ cmp stdout out-def-nested
 cp stdout gen/nested.cue
 exec cue vet gen/nested.cue
 
-# With a package clause, the file attributes are not part of the output,
-# which takes the form of the module's language version.
+# With a package clause, the file attributes go before the package clause in the
+# output, so aliasv2 enables the postfix form there too.
 exec cue def ./x
 cmp stdout out-def
 cp stdout genpkg/gen.cue
@@ -247,9 +247,11 @@ y: #x & {foo: {}}
 #x: {}
 y: foo: name: "foo"
 -- exp/out-def --
+@experiment(aliasv2)
+
 package x
 
-X=a: b: 1
+a~(X): b: 1
 c: X.b
 -- exp/out-def-let --
 @experiment(aliasv2)

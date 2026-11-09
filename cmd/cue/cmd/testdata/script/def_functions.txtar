@@ -10,9 +10,8 @@ cp stdout gen/out.cue
 
 exec cue eval -e out
 cmp stdout expect-out
-# The output lacks the file's @experiment attribute, so it fails to parse.
-! exec cue eval -e out gen/out.cue
-stderr 'requires @experiment\(functions\)'
+exec cue eval -e out gen/out.cue
+cmp stdout expect-out
 
 -- cue.mod/module.cue --
 module: "mod.test"
@@ -27,6 +26,8 @@ opt: func(_~n: int = 0, int = 2, c: {x: int} = {x: 1}, a!: int = 1) -> int: a
 T:   func(a: int = 2, ...) -> int
 out: add(1)
 -- expect-stdout --
+@experiment(functions)
+
 package p
 
 add: func(a: int, b: int = 10) -> int: a + b

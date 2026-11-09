@@ -22,6 +22,8 @@ d: {
 	}
 }
 -- out/self-v3/default --
+@experiment(aliasv2)
+
 for k, v in MATRIX {
 	(k): v
 }
@@ -39,6 +41,8 @@ let T = {GOOS: string}
 //cue:path: flags.goos
 let GOOS_1 = string | *"darwin"
 -- out/self-v3-noshare/default --
+@experiment(aliasv2)
+
 for k, v in MATRIX {
 	(k): v
 }

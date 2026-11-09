@@ -6,27 +6,23 @@
 
 mkdir gen genx genblank
 
-# The output lacks the attributes, so it fails to parse.
 exec cue def ./p
 cmp stdout out-def
 cp stdout gen/p.cue
-! exec cue vet gen/p.cue
-stderr 'requires @experiment\(try\)'
+exec cue vet gen/p.cue
 
 exec cue def -e x ./p
 cmp stdout out-def-x
 cp stdout genx/x.cue
-! exec cue vet genx/x.cue
-stderr 'requires @experiment\(try\)'
+exec cue vet genx/x.cue
 
 exec cue def blank.cue
 cmp stdout out-def-blank
 cp stdout genblank/blank.cue
-! exec cue vet genblank/blank.cue
-stderr 'requires @experiment\(try\)'
+exec cue vet genblank/blank.cue
 
 # cue eval -A shows the attributes too, as its output may use experimental
-# syntax as well, such as a function literal. It lacks them as well.
+# syntax as well, such as a function literal.
 exec cue eval -A ./p
 cmp stdout out-eval
 
@@ -56,6 +52,9 @@ y: {
 	if false {a: 1} else {b: 2}
 }
 -- out-def --
+@experiment(functions)
+@experiment(try)
+
 package p
 
 x: {
@@ -67,12 +66,17 @@ x: {
 }
 f: func(a: int) -> int: a
 -- out-def-x --
+@experiment(functions)
+@experiment(try)
+
 if false {
 	a: 1
 } else {
 	b: 2
 }
 -- out-def-blank --
+@experiment(try)
+
 y: {
 	if false {
 		a: 1
@@ -81,5 +85,8 @@ y: {
 	}
 }
 -- out-eval --
+@experiment(functions)
+@experiment(try)
+
 f: func(a: int) -> int: a
 x: b: 2

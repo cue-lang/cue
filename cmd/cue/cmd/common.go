@@ -773,12 +773,11 @@ func buildInstances(cmd *Command, binst []*build.Instance) ([]*instance, error) 
 // Merge keeps only the regular fields of each package, and Build compiles the
 // tool files in the scope of the package before unifying the two.
 func buildToolInstances(ctx *cue.Context, binst []*build.Instance) ([]*cue.Instance, error) {
-	// Reuse the same context, if there is one, so that the @embed injection can be used.
-	// Note that ctx may be nil when we do `cue help cmd`.
-	r := new(cue.Runtime) //lint:ignore SA1019 see above
-	if ctx != nil {
-		r = (*cue.Runtime)(ctx) //lint:ignore SA1019 see above
+	// Note that ctx is nil for help text such as `cue help cmd`.
+	if ctx == nil {
+		ctx = newContext()
 	}
+	r := (*cue.Runtime)(ctx)                //lint:ignore SA1019 see above
 	instances, _ := r.BuildInstances(binst) //lint:ignore SA1019 see above
 	for _, inst := range instances {
 		if inst.Err != nil {

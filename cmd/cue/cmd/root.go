@@ -184,11 +184,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cuedebug.Init(); err != nil {
 			return err
 		}
-		var opts []cuecontext.Option
-		if wasmInterp != nil {
-			opts = append(opts, cuecontext.WithInjection(wasmInterp))
-		}
-		c.ctx = cuecontext.New(opts...)
+		c.ctx = newContext()
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.
 		// We don't want that work to count towards $CUE_STATS.
 		adt.ResetStats()
@@ -227,6 +223,16 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		}
 		return err
 	}
+}
+
+// newContext returns a new [cue.Context] with the injections cmd/cue
+// supports: @embed, which [cuecontext.New] includes, and Wasm.
+func newContext() *cue.Context {
+	var opts []cuecontext.Option
+	if wasmInterp != nil {
+		opts = append(opts, cuecontext.WithInjection(wasmInterp))
+	}
+	return cuecontext.New(opts...)
 }
 
 // rootWorkingDir avoids repeated calls to [os.Getwd] in cmd/cue.

@@ -25,13 +25,12 @@ stderr -count=1 'hello *say hello to someone'
 cd embed
 exec cue cmd show
 stdout '^some text$'
-# TODO: help text does not support @embed, so loading the tool files fails.
-! exec cue help cmd
-! stdout '^  show +show some embedded text$'
-stderr 'no injection defined for "embed"'
-! exec cue cmd --help
-! stdout '^  show +show some embedded text$'
-stderr 'no injection defined for "embed"'
+exec cue help cmd
+stdout '^  show +show some embedded text$'
+! stderr .
+exec cue cmd --help
+stdout '^  show +show some embedded text$'
+! stderr .
 
 -- cue.mod/module.cue --
 module: "test.example"

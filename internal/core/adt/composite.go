@@ -1070,7 +1070,7 @@ func (v *Vertex) Finalize(c *OpContext) {
 // built without being evaluated, may already be shared.
 //
 // The operands of a validator are not covered, as finalizing those in place
-// changes how the validator is exported.
+// changes how the validator is exported; see [Vertex.FinalizedCopy].
 func (c *OpContext) finalizeDeep(v *Vertex) {
 	v = v.DerefValue()
 	if v.finalizedBy != c.finalizeID {
@@ -1101,6 +1101,53 @@ func (c *OpContext) finalizeDeep(v *Vertex) {
 
 // finalizeGeneration hands out the values of [OpContext.finalizeID].
 var finalizeGeneration atomic.Uint64
+
+// FinalizedCopy returns v if it is finalized, and otherwise the result of
+// evaluating a copy of it with a new context for r.
+//
+// The operand of a validator, such as the list given to matchN, is not
+// finalized along with the value holding the validator, and
+// [OpContext.finalizeDeep] leaves it alone, after which it may be shared
+// between goroutines. Such a vertex is never mutated: a copy of it is
+// evaluated on each call.
+func (v *Vertex) FinalizedCopy(r Runtime) *Vertex {
+	if v.isFinal() {
+		return v
+	}
+	return v.evaluatedCopy(NewContext(r, nil))
+}
+
+// evaluatedCopy evaluates a copy of the unfinished vertex v.
+func (v *Vertex) evaluatedCopy(c *OpContext) *Vertex {
+	parent := v.Parent
+	if parent != nil && !parent.isFinal() {
+		// Evaluating v reaches into its unfinished parent, such as the inline
+		// struct an argument is selected from, so use the arc of an evaluated
+		// copy of the parent.
+		parent = parent.evaluatedCopy(c)
+		if w := parent.DerefValue().LookupRaw(v.Label); w != nil && w.isFinal() {
+			return w
+		}
+		// Not expected: the arc is missing from the copy or left unfinished.
+		// Evaluate a copy of v below the parent's copy instead.
+	}
+	w := &Vertex{
+		Parent:    parent,
+		Label:     v.Label,
+		ArcType:   v.ArcType,
+		Conjuncts: slices.Clip(v.Conjuncts),
+
+		// What kind of vertex v is does not follow from its conjuncts.
+		isData:              v.isData,
+		MultiLet:            v.MultiLet,
+		IsDynamic:           v.IsDynamic,
+		IsPatternConstraint: v.IsPatternConstraint,
+		nonRooted:           v.nonRooted,
+		anonymous:           v.anonymous,
+	}
+	w.Finalize(c)
+	return w
+}
 
 func (v *Vertex) Unify(c *OpContext, flags Flags) {
 	// Saving and restoring the error context prevents v from panicking in

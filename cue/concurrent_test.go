@@ -759,6 +759,38 @@ func TestConcurrentExpr(t *testing.T) {
 		_ = vals
 	})
 
+	// The list argument is not finalized along with the call.
+	v = ctx.CompileString(`a: matchN(1, [_, int])`)
+	_, args := v.LookupPath(aPath).Eval().Expr()
+	if len(args) != 3 {
+		t.Fatalf("unexpected args: %v", args)
+	}
+	list := args[2]
+	runConcurrent(t, func() {
+		_ = list.LookupPath(cue.MakePath(cue.Index(0))).IncompleteKind()
+		iter, err := list.List()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		for iter.Next() {
+			_ = iter.Value().IncompleteKind()
+		}
+	})
+
+	// The argument may also be selected from an unfinished inline struct
+	// or comprehension.
+	for _, src := range []string{
+		`a: matchN(1, [_, int])`,
+		`a: matchN(1, {b: [_, c], c: {d: int}}.b)`,
+		`for _, x in [[_, int]] {a: matchN(1, x)}`,
+	} {
+		v := ctx.CompileString(src)
+		runConcurrent(t, func() {
+			_, args := v.LookupPath(aPath).Eval().Expr()
+			_ = args[2].LookupPath(cue.MakePath(cue.Index(1))).IncompleteKind()
+		})
+	}
 }
 
 // TestConcurrentReferencePath tests concurrent reference resolution.

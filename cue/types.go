@@ -748,7 +748,7 @@ func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 	// TODO: right now this is necessary because disjunctions do not have
 	// populated conjuncts.
 	if v, ok := v.(*adt.Vertex); ok && !v.IsUnprocessed() {
-		return Value{base.idx, v, nil}
+		return Value{base.idx, v.FinalizedCopy(base.idx), nil}
 	}
 	n := &adt.Vertex{Label: base.v.Label}
 	n.AddConjunct(adt.MakeRootConjunct(env, v))

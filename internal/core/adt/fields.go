@@ -371,7 +371,8 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 		// new conjunct was successfully added, still apply pattern constraints:
 		// the arc may have been created before the pattern constraint task ran.
 		if pcs := n.node.PatternConstraints; pcs != nil {
-			for _, pc := range pcs.Pairs {
+			for i := range pcs.Pairs {
+				pc := &pcs.Pairs[i]
 				if matchPattern(n.ctx, pc.Pattern, f) {
 					for _, c := range pc.Constraint.Conjuncts {
 						n.addConstraint(v, mode, c, check)
@@ -384,7 +385,8 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 
 	// Match and insert patterns.
 	if pcs := n.node.PatternConstraints; pcs != nil {
-		for _, pc := range pcs.Pairs {
+		for i := range pcs.Pairs {
+			pc := &pcs.Pairs[i]
 			if matchPattern(n.ctx, pc.Pattern, f) {
 				for _, c := range pc.Constraint.Conjuncts {
 					n.addConstraint(v, mode, c, check)

@@ -254,12 +254,12 @@ func (s *subsumer) patterns(x, y *adt.Vertex, xClosed, final bool) bool {
 	}
 
 outerConstraint:
-	for _, p := range apairs {
-		for _, q := range bpc.Pairs {
-			if adt.Equal(s.ctx, p.Pattern, q.Pattern, 0) {
-				p.Constraint.Finalize(s.ctx)
-				q.Constraint.Finalize(s.ctx)
-				if !s.constraints(x, y, p.Constraint, q.Constraint) {
+	for i := range apairs {
+		for j := range bpc.Pairs {
+			if adt.Equal(s.ctx, apairs[i].Pattern, bpc.Pairs[j].Pattern, 0) {
+				apairs[i].Constraint.Finalize(s.ctx)
+				bpc.Pairs[j].Constraint.Finalize(s.ctx)
+				if !s.constraints(x, y, apairs[i].Constraint, bpc.Pairs[j].Constraint) {
 					return false
 				}
 				continue outerConstraint

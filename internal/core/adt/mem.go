@@ -211,7 +211,8 @@ func (r reclaimer) reclaim(v *Vertex) bool {
 
 skipRoot:
 	if v.PatternConstraints != nil {
-		for _, p := range v.PatternConstraints.Pairs {
+		for i := range v.PatternConstraints.Pairs {
+			p := &v.PatternConstraints.Pairs[i]
 			if n := p.Constraint.state; n != nil {
 				r.reclaim(p.Constraint)
 			}

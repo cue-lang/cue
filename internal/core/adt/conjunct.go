@@ -731,7 +731,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				return
 			}
 			if pcs := x.PatternConstraints; pcs != nil {
-				for _, pc := range pcs.Pairs {
+				for i := range pcs.Pairs {
+					pc := &pcs.Pairs[i]
 					for c := range pc.Constraint.LeafConjuncts() {
 						c.CloseInfo = id
 						n.insertPattern(pc.Pattern, c)

@@ -1118,7 +1118,8 @@ func (v *Vertex) accept(ctx *OpContext, f Feature) bool {
 	}
 
 	// TODO: fall back for now to just matching any pattern.
-	for _, c := range pc.Pairs {
+	for i := range pc.Pairs {
+		c := &pc.Pairs[i]
 		if matchPattern(ctx, c.Pattern, f) {
 			return true
 		}

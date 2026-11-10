@@ -20,6 +20,7 @@ package adt
 // fields.
 type Constraints struct {
 	// Pairs lists Pattern-Constraint pairs.
+	// Use a pair by index or by pointer; it must not be copied.
 	Pairs []PatternConstraint // TODO(perf): move to Arcs?
 
 	// Allowed is a Value that defines the set of all allowed fields.
@@ -60,7 +61,8 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	}
 
 	var constraint *Vertex
-	for _, pc := range pcs.Pairs {
+	for i := range pcs.Pairs {
+		pc := &pcs.Pairs[i]
 		if Equal(ctx, pc.Pattern, pattern, 0) {
 			constraint = pc.Constraint
 			break

@@ -206,14 +206,13 @@ func equalPatterns(ctx *OpContext, x, y *Vertex, flags Flag) bool {
 		return false
 	}
 	flags |= sharedByIdentity
-	for i, p := range px {
-		q := py[i]
-		if !Equal(ctx, p.Pattern, q.Pattern, flags) {
+	for i := range px {
+		if !Equal(ctx, px[i].Pattern, py[i].Pattern, flags) {
 			return false
 		}
-		p.Constraint.Finalize(ctx)
-		q.Constraint.Finalize(ctx)
-		if !Equal(ctx, p.Constraint, q.Constraint, flags) {
+		px[i].Constraint.Finalize(ctx)
+		py[i].Constraint.Finalize(ctx)
+		if !Equal(ctx, px[i].Constraint, py[i].Constraint, flags) {
 			return false
 		}
 	}

@@ -545,7 +545,8 @@ func (t *trimmerV3) findPatterns(v *adt.Vertex) {
 		t.inc()
 
 		if patterns := v.PatternConstraints; patterns != nil {
-			for i, pair := range patterns.Pairs {
+			for i := range patterns.Pairs {
+				pair := &patterns.Pairs[i]
 				t.logf("pattern %d %p::%T", i, pair.Constraint, pair.Constraint)
 				t.inc()
 				for c := range pair.Constraint.LeafConjuncts() {
@@ -761,10 +762,11 @@ func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 	}
 
 	if patterns := v.PatternConstraints; patterns != nil {
-		for i, pair := range patterns.Pairs {
-			pair.Constraint.Finalize(t.ctx)
-			t.logf("pattern %d %p::%T", i, pair.Constraint, pair.Constraint)
-			t.findRedundancies(pair.Constraint, keepAll)
+		for i := range patterns.Pairs {
+			constraint := patterns.Pairs[i].Constraint
+			constraint.Finalize(t.ctx)
+			t.logf("pattern %d %p::%T", i, constraint, constraint)
+			t.findRedundancies(constraint, keepAll)
 		}
 	}
 

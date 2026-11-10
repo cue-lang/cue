@@ -248,7 +248,8 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 		v.PatternConstraints = npc
 
 		npc.Pairs = make([]PatternConstraint, len(pc.Pairs))
-		for i, p := range pc.Pairs {
+		for i := range pc.Pairs {
+			p := &pc.Pairs[i]
 			npc.Pairs[i] = PatternConstraint{
 				Pattern:    p.Pattern,
 				Constraint: ctx.cloneVertex(p.Constraint),

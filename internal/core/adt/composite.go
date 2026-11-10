@@ -1304,7 +1304,8 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 
 	// This is the equivalent for the new implementation.
 	if pcs := v.PatternConstraints; pcs != nil {
-		for _, pc := range pcs.Pairs {
+		for i := range pcs.Pairs {
+			pc := &pcs.Pairs[i]
 			if matchPattern(ctx, pc.Pattern, arc.Label) {
 				for _, c := range pc.Constraint.Conjuncts {
 					env := *(c.Env)

@@ -9,6 +9,16 @@ t2: a: {
 
 	foo?: int
 }
+
+inline: {
+	// A sibling conjunct or comprehension can make an optional field of an
+	// inline struct regular.
+	conjunct: {x: y?: z?: int, x: y: z: 2}.x.y.z                       @test(eq, 2)
+	forComp:  {x: y?: z?: int, x: {for k, v in src {(k): z: v}}}.x.y.z @test(eq, 3)
+	src: y: 3
+	ifComp:       {x: y?: z?: int, x: {if true {y: z: 4}}}.x.y.z @test(eq, 4)
+	ifInConjunct: {y?: {if true {z: 4}}, y: {}}.y.z              @test(eq, 4)
+}
 -- out/errors.txt --
 [incomplete] t1.a.b: cannot reference optional field: foo:
     ./in.cue:4:5

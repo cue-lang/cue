@@ -9,6 +9,16 @@ t2: a: {
 
 	foo?: int
 }
+
+inline: {
+	// A sibling conjunct or comprehension can make an optional field of an
+	// inline struct regular.
+	conjunct: {x: y?: z?: int, x: y: z: 2}.x.y.z
+	forComp:  {x: y?: z?: int, x: {for k, v in src {(k): z: v}}}.x.y.z
+	src: y: 3
+	ifComp:       {x: y?: z?: int, x: {if true {y: z: 4}}}.x.y.z
+	ifInConjunct: {y?: {if true {z: 4}}, y: {}}.y.z
+}
 -- out/compile --
 --- in.cue
 {
@@ -23,5 +33,58 @@ t2: a: {
       b: 〈0;foo〉
       foo?: int
     }
+  }
+  inline: {
+    conjunct: {
+      x: {
+        y?: {
+          z?: int
+        }
+      }
+      x: {
+        y: {
+          z: 2
+        }
+      }
+    }.x.y.z
+    forComp: {
+      x: {
+        y?: {
+          z?: int
+        }
+      }
+      x: {
+        for k, v in 〈2;src〉 {
+          〈1;k〉: {
+            z: 〈2;v〉
+          }
+        }
+      }
+    }.x.y.z
+    src: {
+      y: 3
+    }
+    ifComp: {
+      x: {
+        y?: {
+          z?: int
+        }
+      }
+      x: {
+        if true {
+          y: {
+            z: 4
+          }
+        }
+      }
+    }.x.y.z
+    ifInConjunct: {
+      y?: {
+        if true {
+          z: 4
+        }
+      }
+      y: {}
+    }.y.z
   }
 }

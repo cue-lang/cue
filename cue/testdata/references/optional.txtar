@@ -10,7 +10,31 @@ t2: a: {
 	foo?: int
 }
 
+// Selecting through optional fields of an inline struct, whose arcs are
+// never unified as part of the tree, still finds them to be optional.
 inline: {
+	opt:      {x: y?: z?: int}.x.y.z       @test(err, code=incomplete, contains="optional field: y")
+	optReg:   {x: y?: z: int}.x.y.z        @test(err, code=incomplete, contains="optional field: y")
+	required: {x: y!: z?: int}.x.y.z       @test(err, code=incomplete, contains="required field missing: y")
+	deeper:   {x: y?: z?: w?: int}.x.y.z.w @test(err, code=incomplete, contains="optional field: y")
+	ref:      {x: y?: c}.x.y.z             @test(err, code=incomplete, contains="optional field: y")
+	c: z: 1
+	comprehension: {x: {if true {y?: z?: int}}}.x.y.z      @test(err, code=incomplete, contains="optional field: y")
+	disjunction:   {x: y?: {z?: int} | {z?: string}}.x.y.z @test(err, code=incomplete, contains="optional field: y")
+	builtinArg:    matchIf({#C: y?: z?: #C}.#C.y.z, _, _)  @test(err, code=incomplete, contains="optional field: y")
+	listElem:      [{y?: z?: int}][0].y.z                  @test(err, code=incomplete, contains="optional field: y")
+	pattern:       {x: [string]: z: 1, x: y?: _}.x.y.z     @test(err, code=incomplete, contains="optional field: y")
+	selfRef:       {x: y?: z?: selfRef}.x.y.z              @test(err, code=incomplete, contains="optional field: y")
+	requiredLeaf:  {x: y?: z!: int}.x.y.z                  @test(err, code=incomplete, contains="optional field: y")
+
+	// The field may itself hold a comprehension.
+	ifIn:           {y?: {if true {z: 4}}}.y.z          @test(err, code=incomplete, contains="optional field: y")
+	ifInRequired:   {y!: {if true {z: 4}}}.y.z          @test(err, code=incomplete, contains="required field missing: y")
+	forIn:          {y?: {for v in [1] {z: v}}}.y.z     @test(err, code=incomplete, contains="optional field: y")
+	ifInEmpty:      {y?: {z?: 1, if true {}}}.y.z       @test(err, code=incomplete, contains="optional field: y")
+	ifInDef:        {#x: {y?: {if true {z: 4}}}}.#x.y.z @test(err, code=incomplete, contains="optional field: y")
+	ifInIncomplete: {y?: {if cond {z: 4}}}.y.z          @test(err, code=incomplete, contains="optional field: y")
+
 	// A sibling conjunct or comprehension can make an optional field of an
 	// inline struct regular.
 	conjunct: {x: y?: z?: int, x: y: z: 2}.x.y.z                       @test(eq, 2)
@@ -18,19 +42,59 @@ inline: {
 	src: y: 3
 	ifComp:       {x: y?: z?: int, x: {if true {y: z: 4}}}.x.y.z @test(eq, 4)
 	ifInConjunct: {y?: {if true {z: 4}}, y: {}}.y.z              @test(eq, 4)
+	ifIncomplete: {x: y?: z?: int, x: {if cond {y: z: 5}}}.x.y.z @test(err, code=incomplete)
+	cond:         bool
 }
 -- out/errors.txt --
 [incomplete] t1.a.b: cannot reference optional field: foo:
     ./in.cue:4:5
 [incomplete] t2.a.b: cannot reference optional field: foo:
     ./in.cue:7:5
+[incomplete] inline.opt: cannot reference optional field: y:
+    ./in.cue:15:31
+[incomplete] inline.optReg: cannot reference optional field: y:
+    ./in.cue:16:30
+[incomplete] inline.required: required field missing: y:
+    ./in.cue:17:31
+[incomplete] inline.deeper: cannot reference optional field: y:
+    ./in.cue:18:35
+[incomplete] inline.ref: cannot reference optional field: y:
+    ./in.cue:19:25
+[incomplete] inline.comprehension: cannot reference optional field: y:
+    ./in.cue:21:48
+[incomplete] inline.disjunction: cannot reference optional field: y:
+    ./in.cue:22:53
+[incomplete] inline.builtinArg: cannot reference optional field: y:
+    ./in.cue:23:45
+[incomplete] inline.listElem: cannot reference optional field: y:
+    ./in.cue:24:36
+[incomplete] inline.pattern: cannot reference optional field: y:
+    ./in.cue:25:49
+[incomplete] inline.selfRef: cannot reference optional field: y:
+    ./in.cue:26:40
+[incomplete] inline.requiredLeaf: cannot reference optional field: y:
+    ./in.cue:27:36
+[incomplete] inline.ifIn: cannot reference optional field: y:
+    ./in.cue:30:41
+[incomplete] inline.ifInRequired: required field missing: y:
+    ./in.cue:31:41
+[incomplete] inline.forIn: cannot reference optional field: y:
+    ./in.cue:32:46
+[incomplete] inline.ifInEmpty: cannot reference optional field: y:
+    ./in.cue:33:44
+[incomplete] inline.ifInDef: cannot reference optional field: y:
+    ./in.cue:34:50
+[incomplete] inline.ifInIncomplete: cannot reference optional field: y:
+    ./in.cue:35:41
+[incomplete] inline.ifIncomplete: cannot reference optional field: y:
+    ./in.cue:44:59
 -- out/eval/stats --
 Leaks:  0
-Freed:  9
-Reused: 3
-Allocs: 6
+Freed:  54
+Reused: 34
+Allocs: 20
 Retain: 0
 
-Unifications: 9
-Conjuncts:    9
-Disjuncts:    0
+Unifications: 46
+Conjuncts:    49
+Disjuncts:    2

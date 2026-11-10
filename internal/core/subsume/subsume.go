@@ -98,6 +98,14 @@ type subsumer struct {
 	missing adt.Feature
 	gt      adt.Value
 	lt      adt.Value
+
+	// active holds the pairs of vertices whose constraints are being
+	// compared by [subsumer.constraints].
+	active [][2]*adt.Vertex
+
+	// defaults holds the defaults of the vertices which are not their own
+	// default, as returned by [subsumer.defaultOf].
+	defaults map[*adt.Vertex]*adt.Vertex
 }
 
 func (s *subsumer) errf(msg string, args ...interface{}) {

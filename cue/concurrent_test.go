@@ -1285,6 +1285,41 @@ func TestConcurrentHiddenAndOptionalFields(t *testing.T) {
 		}
 	})
 
+	// The optional fields share the definitions they refer to.
+	shared := ctx.CompileString(`
+		#Foo: bar?: #Bar
+		#Bar: foo?: #Foo
+		y: #Foo
+
+		#Baz: qux?: #Qux
+		#Qux: baz?: #Baz
+		z: #Baz
+	`)
+	if err := shared.Err(); err != nil {
+		t.Fatal(err)
+	}
+	y := shared.LookupPath(cue.ParsePath("y"))
+	z := shared.LookupPath(cue.ParsePath("z"))
+	iterate := func(v cue.Value) {
+		iter, err := v.Fields(cue.Optional(true))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		for iter.Next() {
+			_ = iter.Value().IncompleteKind()
+		}
+	}
+	runConcurrent(t, func() {
+		iterate(y)
+	})
+	runConcurrent(t, func() {
+		qux := z.LookupPath(cue.MakePath(cue.Str("qux").Optional()))
+		if err := qux.Err(); err != nil {
+			t.Error(err)
+		}
+		_ = qux.IncompleteKind()
+	})
 }
 
 // TestConcurrentDefinitions tests concurrent access to definitions.
@@ -1775,6 +1810,34 @@ func TestConcurrentScopeOption(t *testing.T) {
 		}
 	})
 
+	// The field modes.def.e.a shares forms.a, and the comprehension ranges
+	// over its parent once that is finalized.
+	scope = ctx.CompileString(`
+		#Info: x?: string
+		modes: [string]: e!: [_]: #Info
+		modes: def: e: a: forms.a
+		all: {
+			for m in modes {
+				for name, _ in m.e {
+					e: (name): true
+				}
+			}
+			for name, _ in forms {
+				f: (name): true
+			}
+		}
+		forms: [string]: #Info
+		forms: a: {}
+	`)
+	if err := scope.Err(); err != nil {
+		t.Fatal(err)
+	}
+	runConcurrent(t, func() {
+		v := ctx.CompileString(`z: modes.def.e.a`, cue.Scope(scope))
+		if err := v.Err(); err != nil {
+			t.Error(err)
+		}
+	})
 }
 
 // TestConcurrentUnifyImportedSchema is a regression test for

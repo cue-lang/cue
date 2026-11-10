@@ -3476,6 +3476,28 @@ func TestValidate(t *testing.T) {
 			"variables"?: #variables
 		}
 		`,
+	}, {
+		// Ranging over the finalized struct m.e must leave its field a,
+		// which shares forms.a, as it is.
+		desc: "comprehension over a field sharing another value",
+		in: `
+		#Info: x?: string
+		modes: [string]: e!: [_]: #Info
+		modes: def: e: a: forms.a
+		all: {
+			for m in modes {
+				for name, _ in m.e {
+					e: (name): true
+				}
+			}
+			for name, _ in forms {
+				f: (name): true
+			}
+		}
+		forms: [string]: #Info
+		forms: a: {}
+		`,
+		opts: []cue.Option{cue.Concrete(true)},
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {

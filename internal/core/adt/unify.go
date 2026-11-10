@@ -49,6 +49,12 @@ func (v *Vertex) getBareState(c *OpContext) *nodeContext {
 		return nil
 	}
 	if v.state == nil {
+		if v.isFinal() {
+			// A sharing vertex keeps the status its target had before it was
+			// unified. Its target is done, so there is nothing left to do,
+			// and v may be shared between goroutines, so do not mutate it.
+			return nil
+		}
 		v.state = c.newNodeContext(v)
 		v.state.initBare()
 	}

@@ -54,20 +54,23 @@ type Struct struct {
 	node *adt.Vertex
 }
 
-// Arcs returns all arcs of s.
-func (s *Struct) Arcs() []*adt.Vertex {
-	return s.node.Arcs
-}
-
-// Len reports the number of regular string fields of s.
-func (s *Struct) Len() int {
-	count := 0
-	for _, a := range s.Arcs() {
-		if a.Label.IsString() && !s.node.IsOptional(a.Label) {
-			count++
+// NumFields reports the number of string fields of s which are present,
+// required but not yet present, and optional, excluding pattern constraints.
+func (s *Struct) NumFields() (present, required, optional int) {
+	for _, a := range s.node.Arcs {
+		if !a.Label.IsString() {
+			continue
+		}
+		switch a.ArcType {
+		case adt.ArcRequired:
+			required++
+		case adt.ArcOptional:
+			optional++
+		default:
+			present++
 		}
 	}
-	return count
+	return present, required, optional
 }
 
 // IsOpen reports whether s is open or has pattern constraints.
@@ -81,18 +84,6 @@ func (s *Struct) IsOpen() bool {
 	}
 	// After removing OptionalTypes, we rely on other checks for openness.
 	return false
-}
-
-// NumConstraintFields reports the number of explicit optional and required
-// fields, excluding pattern constraints.
-func (s Struct) NumConstraintFields() (count int) {
-	// If we have any optional arcs, we allow more fields.
-	for _, a := range s.node.Arcs {
-		if a.ArcType != adt.ArcMember && a.Label.IsRegular() {
-			count++
-		}
-	}
-	return count
 }
 
 // A ValidationError indicates an error that is only valid if a builtin is used

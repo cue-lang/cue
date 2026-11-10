@@ -30,12 +30,12 @@ import (
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
 func MinFields(object pkg.Struct, n int) (pkg.Validator, error) {
-	count := object.Len()
-	code := adt.EvalError
-	if object.IsOpen() || count+object.NumConstraintFields() >= n {
-		code = adt.IncompleteError
-	}
+	count, required, optional := object.NumFields()
 	if count < n {
+		code := adt.EvalError
+		if object.IsOpen() || count+required+optional >= n {
+			code = adt.IncompleteError
+		}
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: code,
 			Err:  errors.Newf(token.NoPos, "len(fields) < MinFields(%[2]d) (%[1]d < %[2]d)", count, n),
@@ -50,7 +50,7 @@ func MinFields(object pkg.Struct, n int) (pkg.Validator, error) {
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
 func MaxFields(object pkg.Struct, n int) (pkg.Validator, error) {
-	count := object.Len()
+	count, _, _ := object.NumFields()
 	if count > n {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,

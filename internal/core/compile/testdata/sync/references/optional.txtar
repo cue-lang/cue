@@ -10,7 +10,31 @@ t2: a: {
 	foo?: int
 }
 
+// Selecting through optional fields of an inline struct, whose arcs are
+// never unified as part of the tree, still finds them to be optional.
 inline: {
+	opt:      {x: y?: z?: int}.x.y.z
+	optReg:   {x: y?: z: int}.x.y.z
+	required: {x: y!: z?: int}.x.y.z
+	deeper:   {x: y?: z?: w?: int}.x.y.z.w
+	ref:      {x: y?: c}.x.y.z
+	c: z: 1
+	comprehension: {x: {if true {y?: z?: int}}}.x.y.z
+	disjunction:   {x: y?: {z?: int} | {z?: string}}.x.y.z
+	builtinArg:    matchIf({#C: y?: z?: #C}.#C.y.z, _, _)
+	listElem:      [{y?: z?: int}][0].y.z
+	pattern:       {x: [string]: z: 1, x: y?: _}.x.y.z
+	selfRef:       {x: y?: z?: selfRef}.x.y.z
+	requiredLeaf:  {x: y?: z!: int}.x.y.z
+
+	// The field may itself hold a comprehension.
+	ifIn:           {y?: {if true {z: 4}}}.y.z
+	ifInRequired:   {y!: {if true {z: 4}}}.y.z
+	forIn:          {y?: {for v in [1] {z: v}}}.y.z
+	ifInEmpty:      {y?: {z?: 1, if true {}}}.y.z
+	ifInDef:        {#x: {y?: {if true {z: 4}}}}.#x.y.z
+	ifInIncomplete: {y?: {if cond {z: 4}}}.y.z
+
 	// A sibling conjunct or comprehension can make an optional field of an
 	// inline struct regular.
 	conjunct: {x: y?: z?: int, x: y: z: 2}.x.y.z
@@ -18,6 +42,8 @@ inline: {
 	src: y: 3
 	ifComp:       {x: y?: z?: int, x: {if true {y: z: 4}}}.x.y.z
 	ifInConjunct: {y?: {if true {z: 4}}, y: {}}.y.z
+	ifIncomplete: {x: y?: z?: int, x: {if cond {y: z: 5}}}.x.y.z
+	cond:         bool
 }
 -- out/compile --
 --- in.cue
@@ -35,6 +61,145 @@ inline: {
     }
   }
   inline: {
+    opt: {
+      x: {
+        y?: {
+          z?: int
+        }
+      }
+    }.x.y.z
+    optReg: {
+      x: {
+        y?: {
+          z: int
+        }
+      }
+    }.x.y.z
+    required: {
+      x: {
+        y!: {
+          z?: int
+        }
+      }
+    }.x.y.z
+    deeper: {
+      x: {
+        y?: {
+          z?: {
+            w?: int
+          }
+        }
+      }
+    }.x.y.z.w
+    ref: {
+      x: {
+        y?: 〈2;c〉
+      }
+    }.x.y.z
+    c: {
+      z: 1
+    }
+    comprehension: {
+      x: {
+        if true {
+          y?: {
+            z?: int
+          }
+        }
+      }
+    }.x.y.z
+    disjunction: {
+      x: {
+        y?: ({
+          z?: int
+        }|{
+          z?: string
+        })
+      }
+    }.x.y.z
+    builtinArg: matchIf({
+      #C: {
+        y?: {
+          z?: 〈2;#C〉
+        }
+      }
+    }.#C.y.z, _, _)
+    listElem: [
+      {
+        y?: {
+          z?: int
+        }
+      },
+    ][0].y.z
+    pattern: {
+      x: {
+        [string]: {
+          z: 1
+        }
+      }
+      x: {
+        y?: _
+      }
+    }.x.y.z
+    selfRef: {
+      x: {
+        y?: {
+          z?: 〈3;selfRef〉
+        }
+      }
+    }.x.y.z
+    requiredLeaf: {
+      x: {
+        y?: {
+          z!: int
+        }
+      }
+    }.x.y.z
+    ifIn: {
+      y?: {
+        if true {
+          z: 4
+        }
+      }
+    }.y.z
+    ifInRequired: {
+      y!: {
+        if true {
+          z: 4
+        }
+      }
+    }.y.z
+    forIn: {
+      y?: {
+        for _, v in [
+          1,
+        ] {
+          z: 〈1;v〉
+        }
+      }
+    }.y.z
+    ifInEmpty: {
+      y?: {
+        z?: 1
+        if true {}
+      }
+    }.y.z
+    ifInDef: {
+      #x: {
+        y?: {
+          if true {
+            z: 4
+          }
+        }
+      }
+    }.#x.y.z
+    ifInIncomplete: {
+      y?: {
+        if 〈2;cond〉 {
+          z: 4
+        }
+      }
+    }.y.z
     conjunct: {
       x: {
         y?: {
@@ -86,5 +251,20 @@ inline: {
       }
       y: {}
     }.y.z
+    ifIncomplete: {
+      x: {
+        y?: {
+          z?: int
+        }
+      }
+      x: {
+        if 〈2;cond〉 {
+          y: {
+            z: 5
+          }
+        }
+      }
+    }.x.y.z
+    cond: bool
   }
 }

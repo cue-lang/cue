@@ -956,7 +956,12 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags Flags) *Ve
 			}
 
 		case yield:
-			arcState.process(needs, yield)
+			// Nothing else unifies an arc which is not rooted, such as one of
+			// an inline struct, so the lookup would yield forever. Ask for all
+			// tasks, as a pushed-down comprehension does not otherwise run.
+			if arc.Rooted() || !arc.unify(c, Flags{condition: needs | allTasksCompleted, mode: attemptOnly, checkTypos: false}) {
+				arcState.process(needs, yield)
+			}
 			// continue processing, as successful processing may still result
 			// in an invalid field.
 

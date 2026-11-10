@@ -267,6 +267,14 @@ type OpContext struct {
 	// run other resolver tasks.
 	lookupPendingParent bool
 
+	// finalizeDepth counts the evaluations in progress which were started
+	// via [Vertex.Finalize], [Vertex.Unify], or the CompleteArcs methods.
+	finalizeDepth int
+
+	// finalizeID identifies the outermost [Vertex.Finalize] call while it
+	// evaluates a vertex, and is zero otherwise. See [Vertex.finalizedBy].
+	finalizeID uint64
+
 	// list of vertices that need to be finalized.
 	// TODO: remove this again once we have a proper way of detecting references
 	// across optional boundaries in hasAncestorV3. We can probably do this

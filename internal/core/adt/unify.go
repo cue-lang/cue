@@ -483,6 +483,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	// }
 
 	v.status = finalized
+	v.finalizedBy = c.finalizeID
 
 	return n.meets(needs)
 }

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"iter"
 	"slices"
+	"sync/atomic"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -192,6 +193,12 @@ type Vertex struct {
 	// created by [OpContext.importInstance], links back to the shared package
 	// root that the runtime registers. It is nil for all other vertices.
 	importTemplate *Vertex
+
+	// finalizedBy is the [OpContext.finalizeID] of the [Vertex.Finalize]
+	// call whose evaluation finalized this vertex, cleared once
+	// [OpContext.finalizeDeep] walks it. A vertex stamped by the running
+	// call was made by it, and is not shared yet.
+	finalizedBy uint64
 
 	// Label is the feature leading to this vertex.
 	Label Feature
@@ -1023,20 +1030,86 @@ func (v *Vertex) Finalize(c *OpContext) {
 	// case the caller did not handle existing errors in the context.
 	err := c.errs
 	c.errs = nil
+	c.finalizeDepth++
+	outermost := c.finalizeDepth == 1 && c.evalDepth == 0
+	if outermost && v.status != finalized {
+		c.finalizeID = finalizeGeneration.Add(1)
+	}
+	// Deferred, so that a panic unwinding through this call, such as a task
+	// yielding, cannot leave a later call looking nested.
+	defer func() {
+		if outermost {
+			c.finalizeID = 0
+		}
+		c.finalizeDepth--
+	}()
 	c.unify(v, Flags{
 		status:     finalized,
 		condition:  allKnown,
 		mode:       finalize,
 		checkTypos: true,
 	})
+	// Complete the fields once the evaluation is done, and no earlier:
+	// the depth stays raised, as finishing a field may finalize others.
+	if outermost && c.finalizeID != 0 {
+		c.finalizeDeep(v)
+	}
 	c.errs = err
 }
+
+// finalizeDeep finalizes every field reachable from the finalized vertex v,
+// including via the disjuncts of a disjunction, which the evaluation of v
+// left unfinished: a field cut off by a structural cycle, a field whose own
+// status is stale as it shares a finalized vertex, and the fields of a struct
+// which evaluated to an error. It runs once an evaluation is complete, before
+// its result can be shared between goroutines, so that no later reader needs
+// to finalize a field it reaches.
+//
+// Only the vertices which this evaluation finalized are walked or written to.
+// Any other vertex, such as one of a value this evaluation refers to or one
+// built without being evaluated, may already be shared.
+//
+// The operands of a validator are not covered, as finalizing those in place
+// changes how the validator is exported.
+func (c *OpContext) finalizeDeep(v *Vertex) {
+	v = v.DerefValue()
+	if v.finalizedBy != c.finalizeID {
+		return
+	}
+	v.finalizedBy = 0
+	// Use an index, as finalizing an arc may add to the arcs.
+	for i := 0; i < len(v.Arcs); i++ {
+		a := v.Arcs[i]
+		switch {
+		case a.status == finalized:
+		case a.state == nil && a.isFinal():
+			// a shares a finalized vertex, but its own status is stale.
+			a.status = finalized
+		default:
+			a.Finalize(c)
+		}
+		c.finalizeDeep(a)
+	}
+	if d, ok := v.BaseValue.(*Disjunction); ok {
+		for _, x := range d.Values {
+			if a, ok := x.(*Vertex); ok {
+				c.finalizeDeep(a)
+			}
+		}
+	}
+}
+
+// finalizeGeneration hands out the values of [OpContext.finalizeID].
+var finalizeGeneration atomic.Uint64
 
 func (v *Vertex) Unify(c *OpContext, flags Flags) {
 	// Saving and restoring the error context prevents v from panicking in
 	// case the caller did not handle existing errors in the context.
 	err := c.errs
 	c.errs = nil
+	// A [Vertex.Finalize] call made by this evaluation is not the outermost.
+	c.finalizeDepth++
+	defer func() { c.finalizeDepth-- }()
 	c.unify(v, flags)
 	c.errs = err
 }
@@ -1046,6 +1119,8 @@ func (v *Vertex) Unify(c *OpContext, flags Flags) {
 // each arc as well, including typo checking. It does everything [Vertex.Finalize]
 // does short of marking v as finalized.
 func (v *Vertex) CompleteArcsRecursive(c *OpContext) {
+	c.finalizeDepth++
+	defer func() { c.finalizeDepth-- }()
 	c.unify(v, Flags{
 		status:     conjuncts,
 		condition:  allKnown,
@@ -1061,6 +1136,8 @@ func (v *Vertex) CompleteArcsRecursive(c *OpContext) {
 //
 // If v is itself still a pending arc, it reports an incomplete error.
 func (v *Vertex) CompleteArcsShallow(c *OpContext) {
+	c.finalizeDepth++
+	defer func() { c.finalizeDepth-- }()
 	c.unify(v, Flags{
 		status:     conjuncts,
 		condition:  allKnown &^ subFieldsProcessed,

@@ -1294,6 +1294,11 @@ func TestConcurrentHiddenAndOptionalFields(t *testing.T) {
 		#Baz: qux?: #Qux
 		#Qux: baz?: #Baz
 		z: #Baz
+
+		// A structural cycle leaves #Cyc.a unfinished.
+		#Cyc: {a?: #Cyc, [string]: _}
+		c1: #Cyc
+		c2: #Cyc
 	`)
 	if err := shared.Err(); err != nil {
 		t.Fatal(err)
@@ -1320,6 +1325,30 @@ func TestConcurrentHiddenAndOptionalFields(t *testing.T) {
 		}
 		_ = qux.IncompleteKind()
 	})
+	c1 := shared.LookupPath(cue.ParsePath("c1"))
+	c2 := shared.LookupPath(cue.ParsePath("c2"))
+	runConcurrent(t, func() {
+		iterate(c1)
+		a := c2.LookupPath(cue.MakePath(cue.Str("a").Optional()))
+		_ = a.IncompleteKind()
+	})
+
+	// The fields below an erroneous struct are never evaluated.
+	for _, src := range []string{
+		`a: {x: {y: int}}, a: 2`,
+		`a: [a], a: c: a`,
+	} {
+		v := ctx.CompileString(src)
+		a := v.LookupPath(cue.ParsePath("a"))
+		runConcurrent(t, func() {
+			_ = a.LookupPath(cue.ParsePath("x")).IncompleteKind()
+			_ = a.LookupPath(cue.ParsePath("c")).Err()
+			iter, _ := a.Fields()
+			for iter != nil && iter.Next() {
+				_ = iter.Value().IncompleteKind()
+			}
+		})
+	}
 }
 
 // TestConcurrentDefinitions tests concurrent access to definitions.
@@ -1837,6 +1866,59 @@ func TestConcurrentScopeOption(t *testing.T) {
 		if err := v.Err(); err != nil {
 			t.Error(err)
 		}
+	})
+
+	// The comprehension is the first to range over the parent of the
+	// sharing field.
+	scope = ctx.CompileString(`
+		#Info: x?: string
+		modes: [string]: e!: [_]: #Info
+		modes: [string]: e: {a: forms.a, b: forms.a, c: forms.a, d: forms.a}
+		modes: {m1: _, m2: _, m3: _, m4: _}
+		forms: [string]: #Info
+		forms: a: {}
+	`)
+	if err := scope.Err(); err != nil {
+		t.Fatal(err)
+	}
+	runConcurrent(t, func() {
+		v := ctx.CompileString(`z: {for m in modes for k, v in m.e {(k): v}}`, cue.Scope(scope))
+		if err := v.LookupPath(cue.ParsePath("z")).Err(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	// A structural cycle leaves #Cyc.a unfinished.
+	scope = ctx.CompileString(`
+		#Cyc: {a?: #Cyc, [string]: _}
+		c1: #Cyc
+		c2: #Cyc
+		c3: #Cyc
+		c4: #Cyc
+	`)
+	if err := scope.Err(); err != nil {
+		t.Fatal(err)
+	}
+	runConcurrent(t, func() {
+		v := ctx.CompileString(`
+			y: [c1.a, c2.a, c3.a]
+			z: {for k, v in c4 {(k): v}}
+		`, cue.Scope(scope))
+		_ = v.LookupPath(cue.ParsePath("y")).IncompleteKind()
+		if err := v.LookupPath(cue.ParsePath("z")).Err(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	// An encoded Go value is finalized without being evaluated, and the
+	// values compiled in its scope share its fields.
+	scope = ctx.Encode(map[string]any{"a": 1, "b": map[string]any{"c": []int{1, 2}}})
+	runConcurrent(t, func() {
+		v := ctx.CompileString(`x: a, y: b, z: b.c`, cue.Scope(scope))
+		if err := v.Err(); err != nil {
+			t.Error(err)
+		}
+		_ = v.LookupPath(cue.ParsePath("y.c")).IncompleteKind()
 	})
 }
 

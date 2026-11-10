@@ -547,14 +547,14 @@ kindConflict: {
 	}
 }
 -- out/eval/stats --
-Leaks:  129
+Leaks:  130
 Freed:  869
-Reused: 840
+Reused: 841
 Allocs: 158
 Retain: 0
 
-Unifications: 916
-Conjuncts:    1508
+Unifications: 917
+Conjuncts:    1509
 Disjuncts:    22
 
 NumCloseIDs: 460

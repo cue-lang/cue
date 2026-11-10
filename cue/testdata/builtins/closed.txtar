@@ -318,14 +318,14 @@ issue1206: elimination: {
 }
 
 -- out/eval/stats --
-Leaks:  31
+Leaks:  32
 Freed:  482
-Reused: 442
+Reused: 443
 Allocs: 71
 Retain: 0
 
-Unifications: 347
-Conjuncts:    584
+Unifications: 348
+Conjuncts:    585
 Disjuncts:    80
 
 NumCloseIDs: 142

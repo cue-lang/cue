@@ -33,6 +33,7 @@ const (
 	subNoOptional
 	subSchema
 	subDefaults
+	subSimplify
 )
 
 func TestValues(t *testing.T) {
@@ -1349,56 +1350,64 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:   `a: [...string], b: [...int]`,
 			mode: subDefaults,
-			err:  "",
+			err:  "value not an instance",
 		},
 
 		// Defaults:
-		// TODO: for the purpose of v0.2 compatibility these
-		// evaluate to true. Reconsider before making this package
-		// public.
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:   `a: [], b: [...int]`,
 			mode: subDefaults,
-			err:  "",
+			err:  "value not an instance",
 		},
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:   `a: [2], b: [2, ...int]`,
 			mode: subDefaults,
-			err:  "",
+			err:  "value not an instance",
 		},
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:   `a: [...int], b: c, c: [1, ...string]`,
 			mode: subDefaults,
-			err:  "",
+			err:  "value not an instance",
 		},
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:   `a: [...int], b: *[1, ...string] | [...int]`,
 			mode: subDefaults,
-			err:  "",
+			err:  "value not an instance",
 		},
 		{
-			// TODO: should be "value not an instance".
-			// See https://cuelang.org/issue/1654.
 			in:   `a: [], b: *[...int] | [...string]`,
 			mode: subDefaults,
-			err:  "",
+			err:  "value not an instance",
 		},
 		{
 			in:   `a: [...int], b: *[...int] | [...string]`,
 			mode: subDefaults,
 			err:  "",
+		},
+
+		// Simplify takes the default of the subsuming value, leaving an
+		// open list open.
+		{
+			in:   `a: *[...int] | [...string], b: [1]`,
+			mode: subSimplify,
+			err:  "",
+		},
+		{
+			in:   `a: *[1, ...int] | [...string], b: [1, 2]`,
+			mode: subSimplify,
+			err:  "",
+		},
+		{
+			in:   `a: *[...int] | [...string], b: *[1] | [2]`,
+			mode: subSimplify,
+			err:  "",
+		},
+		{
+			in:   `a: *[...int] | [...string], b: ["x"]`,
+			mode: subSimplify,
+			err:  "value not an instance",
 		},
 
 		// Final
@@ -1715,6 +1724,8 @@ func TestValues(t *testing.T) {
 			err = p.Value(ctx, a, b)
 		case subFinal:
 			err = subsume.Final.Value(ctx, a, b)
+		case subSimplify:
+			err = subsume.Simplify.Value(ctx, a, b)
 		}
 
 		var gotErr string

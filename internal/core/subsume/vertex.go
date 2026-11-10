@@ -288,8 +288,13 @@ func (s *subsumer) listVertices(x, y *adt.Vertex, final bool) bool {
 	xElems := slices.Collect(x.Elems())
 	yElems := slices.Collect(y.Elems())
 
-	// Every element x lists must be matched by one that y lists.
+	// Every element x lists must be matched by one that y lists, and a
+	// closed x admits nothing beyond them.
 	if len(xElems) > len(yElems) {
+		return false
+	}
+	extra := yElems[len(xElems):]
+	if x.IsClosedList() && (!yClosed || len(extra) > 0) {
 		return false
 	}
 	for i, a := range xElems {
@@ -297,15 +302,8 @@ func (s *subsumer) listVertices(x, y *adt.Vertex, final bool) bool {
 			return false
 		}
 	}
-
-	// Beyond the elements x lists, y has nothing when it is closed and
-	// lists no more, and x admits nothing when it is closed.
-	extra := yElems[len(xElems):]
 	if yClosed && len(extra) == 0 {
 		return true
-	}
-	if x.IsClosedList() {
-		return false
 	}
 
 	// x's tail must admit the further elements y lists, and then y's tail.
@@ -334,7 +332,8 @@ func (s *subsumer) constraints(x, y *adt.Vertex, a, b adt.Value) bool {
 	return s.values(a, b)
 }
 
-// defaultOf returns the default of v.
+// defaultOf returns the default of v, leaving an open list open, as closing
+// it would make [...string] subsume [...int].
 //
 // A default may be a new vertex, so each one is kept: a vertex reached
 // again, as a recursive definition is, must give the same default for
@@ -344,7 +343,7 @@ func (s *subsumer) defaultOf(v *adt.Vertex) *adt.Vertex {
 	if d, ok := s.defaults[v]; ok {
 		return d
 	}
-	d := v.ConcreteDefault()
+	d := v.DefaultDisjunct()
 	if d != v {
 		if s.defaults == nil {
 			s.defaults = make(map[*adt.Vertex]*adt.Vertex)

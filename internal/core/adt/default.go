@@ -18,15 +18,21 @@ import (
 	"slices"
 )
 
-// ConcreteDefault returns the value that v takes where a concrete value is
-// needed: its default, or v itself if there is no default.
-//
-// Like [Vertex.ConcreteDefault], it closes an open list, but it returns
-// the default disjunct of a bare [Disjunction] as is.
+// ConcreteDefault returns the default of v, closing an open list only if v
+// is a [Vertex], as [Vertex.ConcreteDefault] does.
 func ConcreteDefault(v Value) Value {
+	if x, ok := v.(*Vertex); ok {
+		return x.ConcreteDefault()
+	}
+	return DefaultDisjunct(v)
+}
+
+// DefaultDisjunct returns the default of v, or v itself if there is no
+// default. An open list stays open.
+func DefaultDisjunct(v Value) Value {
 	switch x := v.(type) {
 	case *Vertex:
-		return x.ConcreteDefault()
+		return x.DefaultDisjunct()
 	case *Disjunction:
 		return x.Default()
 	default:
@@ -50,10 +56,30 @@ func (d *Disjunction) Default() Value {
 }
 
 // ConcreteDefault returns the value that v takes where a concrete value is
-// needed: its default, or v itself if there is no default.
-//
-// It also closes an open list, as [] is the default of [...int].
+// needed: [Vertex.DefaultDisjunct] with an open list closed, as [] is the
+// default of [...int].
 func (v *Vertex) ConcreteDefault() *Vertex {
+	v = v.DefaultDisjunct()
+	d, ok := v.BaseValue.(*ListMarker)
+	if !ok || !d.IsOpen || d.NoEllipsis {
+		// A closed list is its own default, and so is a list without an
+		// ellipsis: under the OpenLists experiment such a list may grow,
+		// but its default is the list as it is, not a closed copy.
+		return v
+	}
+	m := *d
+	m.IsOpen = false
+
+	w := *v
+	w.BaseValue = &m
+	w.state = nil
+	w.arcMap = nil
+	return &w
+}
+
+// DefaultDisjunct returns the default of v, or v itself if there is no
+// default. An open list stays open.
+func (v *Vertex) DefaultDisjunct() *Vertex {
 	v = v.DerefValue()
 	switch d := v.BaseValue.(type) {
 	default:
@@ -66,7 +92,7 @@ func (v *Vertex) ConcreteDefault() *Vertex {
 		case 0:
 			return v
 		case 1:
-			w = ToVertex(ConcreteDefault(d.Values[0]))
+			w = ToVertex(DefaultDisjunct(d.Values[0]))
 			// If w already has conjuncts, return as-is to avoid race.
 			if w.Conjuncts != nil {
 				return w
@@ -95,22 +121,6 @@ func (v *Vertex) ConcreteDefault() *Vertex {
 			w.Conjuncts = append(w.Conjuncts, MakeRootConjunct(c.Env, node))
 		}
 		return w
-
-	case *ListMarker:
-		if !d.IsOpen || d.NoEllipsis {
-			// A closed list is its own default, and so is a list without an
-			// ellipsis: under the OpenLists experiment such a list may grow,
-			// but its default is the list as it is, not a closed copy.
-			return v
-		}
-		m := *d
-		m.IsOpen = false
-
-		w := *v
-		w.BaseValue = &m
-		w.state = nil
-		w.arcMap = nil
-		return &w
 	}
 }
 

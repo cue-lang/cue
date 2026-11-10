@@ -37,7 +37,7 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 		if y, ok := b.(*adt.Vertex); ok {
 			b = s.defaultOf(y)
 		} else {
-			b = adt.ConcreteDefault(b)
+			b = adt.DefaultDisjunct(b)
 		}
 	}
 
@@ -192,7 +192,7 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	case *adt.Disjunction:
 
 		if s.LeftDefault {
-			a = adt.ConcreteDefault(a)
+			a = adt.DefaultDisjunct(a)
 			var ok bool
 			x, ok = a.(*adt.Disjunction)
 			if !ok {

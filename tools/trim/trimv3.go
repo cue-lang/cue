@@ -1218,15 +1218,6 @@ func (t *trimmerV3) equallySpecific(v *adt.Vertex, cs ...adt.Conjunct) bool {
 		conjVertex.InsertConjunct(c)
 	}
 	conjVertex.Finalize(t.ctx)
-	if v.IsClosedList() && !conjVertex.IsClosedList() {
-		// Subsumption with defaults ignores closedness, but removing
-		// the conjuncts that close a list would reopen it. Structs do
-		// not need this: their closedness comes from references to
-		// definitions, which linkResolvers keeps alive.
-		t.logf(" does not close list")
-		t.dec()
-		return false
-	}
 	err := subsumeProfile.Value(t.ctx, v, conjVertex)
 	if err != nil {
 		t.logf(" not equallySpecific")

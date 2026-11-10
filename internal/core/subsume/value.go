@@ -34,7 +34,7 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	}
 
 	if s.Defaults {
-		b = adt.Default(b)
+		b = adt.ConcreteDefault(b)
 	}
 
 	switch b := b.(type) {
@@ -188,7 +188,7 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	case *adt.Disjunction:
 
 		if s.LeftDefault {
-			a = adt.Default(a)
+			a = adt.ConcreteDefault(a)
 			var ok bool
 			x, ok = a.(*adt.Disjunction)
 			if !ok {

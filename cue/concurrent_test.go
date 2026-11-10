@@ -154,7 +154,7 @@ func TestConcurrentEncodeType(t *testing.T) {
 
 // TestConcurrentDefault tests that Default() is safe for concurrent use.
 // This was one of the primary race conditions reported in #2733:
-// Vertex.Default() modifies the Conjuncts slice without synchronization.
+// Vertex.ConcreteDefault() modifies the Conjuncts slice without synchronization.
 func TestConcurrentDefault(t *testing.T) {
 	ctx := cuecontext.New()
 	v := ctx.CompileString(`

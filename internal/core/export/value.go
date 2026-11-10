@@ -110,8 +110,8 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	case adt.Value:
 		// Check the default value directly, as the default vertex may be
 		// a copy. The error is positioned at the arc pushed by the caller.
-		if e.cfg.Concrete && e.inDefinition == 0 && !adt.IsConcrete(adt.Default(x)) {
-			result = e.bottom(adt.NewIncompleteValueError(e.ctx, n.Default()))
+		if e.cfg.Concrete && e.inDefinition == 0 && !adt.IsConcrete(adt.ConcreteDefault(x)) {
+			result = e.bottom(adt.NewIncompleteValueError(e.ctx, n.ConcreteDefault()))
 			break
 		}
 		if e.showArcs(n) || attrs != nil {
@@ -162,7 +162,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 
 func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 	if e.cfg.TakeDefaults {
-		n = adt.Default(n)
+		n = adt.ConcreteDefault(n)
 	}
 	// Evaluate arc if needed?
 

@@ -18,11 +18,15 @@ import (
 	"slices"
 )
 
-// Default returns the default value or itself if there is no default.
-func Default(v Value) Value {
+// ConcreteDefault returns the value that v takes where a concrete value is
+// needed: its default, or v itself if there is no default.
+//
+// Like [Vertex.ConcreteDefault], it closes an open list, but it returns
+// the default disjunct of a bare [Disjunction] as is.
+func ConcreteDefault(v Value) Value {
 	switch x := v.(type) {
 	case *Vertex:
-		return x.Default()
+		return x.ConcreteDefault()
 	case *Disjunction:
 		return x.Default()
 	default:
@@ -45,10 +49,11 @@ func (d *Disjunction) Default() Value {
 	}
 }
 
-// Default returns the default value or itself if there is no default.
+// ConcreteDefault returns the value that v takes where a concrete value is
+// needed: its default, or v itself if there is no default.
 //
-// It also closes a list, representing its default value.
-func (v *Vertex) Default() *Vertex {
+// It also closes an open list, as [] is the default of [...int].
+func (v *Vertex) ConcreteDefault() *Vertex {
 	v = v.DerefValue()
 	switch d := v.BaseValue.(type) {
 	default:
@@ -61,7 +66,7 @@ func (v *Vertex) Default() *Vertex {
 		case 0:
 			return v
 		case 1:
-			w = ToVertex(Default(d.Values[0]))
+			w = ToVertex(ConcreteDefault(d.Values[0]))
 			// If w already has conjuncts, return as-is to avoid race.
 			if w.Conjuncts != nil {
 				return w

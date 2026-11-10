@@ -36,7 +36,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	}
 
 	if s.Defaults {
-		y = y.Default()
+		y = y.ConcreteDefault()
 	}
 
 	if b := y.Bottom(); b != nil {

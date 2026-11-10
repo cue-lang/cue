@@ -189,7 +189,7 @@ func (v *validator) validate(x *Vertex) {
 		}
 
 	} else if v.checkConcrete() {
-		x = x.Default()
+		x = x.ConcreteDefault()
 		if !IsConcrete(x) {
 			v.add(NewIncompleteValueError(v.ctx, x, v.sharedPositions...))
 		}

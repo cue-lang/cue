@@ -76,7 +76,7 @@ func (c *CallCtxt) Value(i int) cue.Value {
 func (c *CallCtxt) Struct(i int) Struct {
 	x := c.BuiltinCallContext.Value(i)
 	if c.builtin.NonConcrete {
-		x = adt.Default(x)
+		x = adt.ConcreteDefault(x)
 	}
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && !v.IsList():
@@ -349,7 +349,7 @@ func (c *CallCtxt) CueList(i int) List {
 func (c *CallCtxt) getList(i int) *adt.Vertex {
 	x := c.BuiltinCallContext.Value(i)
 	if c.builtin.NonConcrete {
-		x = adt.Default(x)
+		x = adt.ConcreteDefault(x)
 	}
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && v.IsList():
@@ -388,7 +388,7 @@ func (c *CallCtxt) NumList(i int) (a []*adt.Num) {
 
 	j := 0
 	for w := range v.Elems() {
-		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
+		switch x := adt.Unwrap(adt.ConcreteDefault(w.Value())).(type) {
 		case *adt.Num:
 			a = append(a, x)
 
@@ -427,7 +427,7 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 
 	j := 0
 	for w := range v.Elems() {
-		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
+		switch x := adt.Unwrap(adt.ConcreteDefault(w.Value())).(type) {
 		case *adt.String:
 			a = append(a, x.Str)
 

@@ -789,7 +789,7 @@ func (v Value) Default() (Value, bool) {
 	}
 
 	x := v.v.DerefValue()
-	d := x.Default()
+	d := x.ConcreteDefault()
 	isDefault := d != x
 	if d == v.v {
 		return v, false

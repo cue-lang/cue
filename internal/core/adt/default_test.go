@@ -33,7 +33,7 @@ func TestDefaultConcurrent(t *testing.T) {
 	ctx := cuecontext.New()
 
 	// Create a value with a disjunction that has exactly 1 default.
-	// This triggers the NumDefaults == 1 case in Vertex.Default().
+	// This triggers the NumDefaults == 1 case in Vertex.ConcreteDefault().
 	v := ctx.CompileString(`a: *"default" | "other"`)
 	if err := v.Err(); err != nil {
 		t.Fatal(err)

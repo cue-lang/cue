@@ -548,8 +548,8 @@ kindConflict: {
 }
 -- out/eval/stats --
 Leaks:  129
-Freed:  872
-Reused: 843
+Freed:  869
+Reused: 840
 Allocs: 158
 Retain: 0
 

@@ -36,7 +36,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	}
 
 	if s.Defaults {
-		y = y.ConcreteDefault()
+		y = s.defaultOf(y)
 	}
 
 	if b := y.Bottom(); b != nil {
@@ -260,7 +260,7 @@ outerConstraint:
 			if adt.Equal(s.ctx, p.Pattern, q.Pattern, 0) {
 				p.Constraint.Finalize(s.ctx)
 				q.Constraint.Finalize(s.ctx)
-				if !s.values(p.Constraint, q.Constraint) {
+				if !s.constraints(x, y, p.Constraint, q.Constraint) {
 					return false
 				}
 				continue outerConstraint
@@ -316,5 +316,41 @@ func (s *subsumer) listVertices(x, y *adt.Vertex, final bool) bool {
 			return false
 		}
 	}
-	return yClosed || s.values(tail, s.ctx.ListTail(y))
+	return yClosed || s.constraints(x, y, tail, s.ctx.ListTail(y))
+}
+
+// constraints reports whether a, a constraint of x, subsumes b, the matching
+// constraint of y, such as two pattern constraints or list tails.
+//
+// The constraints of a recursive definition lead back to x and y, so they
+// are taken to hold when reached again while being compared. The pair is
+// that of x and y, as a list tail is a new vertex each time it is computed.
+func (s *subsumer) constraints(x, y *adt.Vertex, a, b adt.Value) bool {
+	pair := [2]*adt.Vertex{x.DerefValue(), y.DerefValue()}
+	if slices.Contains(s.active, pair) {
+		return true
+	}
+	s.active = append(s.active, pair)
+	defer func() { s.active = s.active[:len(s.active)-1] }()
+	return s.values(a, b)
+}
+
+// defaultOf returns the default of v.
+//
+// A default may be a new vertex, so each one is kept: a vertex reached
+// again, as a recursive definition is, must give the same default for
+// [subsumer.constraints] to recognize it.
+func (s *subsumer) defaultOf(v *adt.Vertex) *adt.Vertex {
+	v = v.DerefValue()
+	if d, ok := s.defaults[v]; ok {
+		return d
+	}
+	d := v.ConcreteDefault()
+	if d != v {
+		if s.defaults == nil {
+			s.defaults = make(map[*adt.Vertex]*adt.Vertex)
+		}
+		s.defaults[v] = d
+	}
+	return d
 }

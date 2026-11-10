@@ -34,7 +34,11 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	}
 
 	if s.Defaults {
-		b = adt.ConcreteDefault(b)
+		if y, ok := b.(*adt.Vertex); ok {
+			b = s.defaultOf(y)
+		} else {
+			b = adt.ConcreteDefault(b)
+		}
 	}
 
 	switch b := b.(type) {

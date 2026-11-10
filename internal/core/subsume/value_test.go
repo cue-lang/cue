@@ -1272,6 +1272,60 @@ func TestValues(t *testing.T) {
 			err: "value not an instance",
 		},
 
+		// Recursive definitions reach the same list tails or pattern
+		// constraints again.
+		{
+			in:  `a: #A, b: #B, #A: [...#A], #B: [...#B]`,
+			err: "",
+		},
+		{
+			in:   `a: #A, b: #B, #A: [...#A], #B: [...#B]`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			in: `a: #A, b: #B, #A: [...#A], #B: [...#B | int]`,
+			err: `
+				list does not subsume int (type int):
+				    subsume:1:41
+				value not an instance`,
+		},
+		{
+			in:  `a: #A, b: #B, #A: [...{x: #A}], #B: [...{x: #B}]`,
+			err: "",
+		},
+		{
+			in:   `a: #A, b: #B, #A: [...{x: #A}], #B: [...{x: #B}]`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			in:  `a: #A, b: #B, #A: [...{x: #A}], #B: [...{x: #B} | int]`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: #A, b: #B, #A: *[...{x: #A}] | int, #B: *[...{x: #B}] | int`,
+			err: "",
+		},
+		{
+			in:   `a: #A, b: #B, #A: *[...{x: #A}] | int, #B: *[...{x: #B}] | int`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			in:  `a: #A, b: #B, #A: {[string]: #A}, #B: {[string]: #B}`,
+			err: "",
+		},
+		{
+			in:   `a: #A, b: #B, #A: *{[string]: #A} | int, #B: *{[string]: #B} | int`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			in:  `a: #A, b: #B, #A: {[string]: #A}, #B: {[string]: #B | int}`,
+			err: "value not an instance",
+		},
+
 		// The value of an ellipsis is part of the list value.
 		// See https://cuelang.org/issue/1654.
 		{

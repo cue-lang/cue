@@ -49,7 +49,9 @@ func TestFlow(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		v := t.CueContext().BuildInstance(t.Instance())
+		ctx := t.CueContext()
+		evals := t.CountEvals(ctx)
+		v := ctx.BuildInstance(t.Instance())
 		if err := v.Err(); err != nil {
 			t.Fatal(errors.Details(err, nil))
 		}
@@ -62,6 +64,8 @@ func TestFlow(t *testing.T) {
 			fmt.Fprintln(t.Writer(step), str)
 
 			if task != nil {
+				// Do not count the evaluations caused by this export.
+				defer evals.Pause()()
 				n := task.Value().Syntax(cue.Final())
 				b, err := format.Node(n)
 				if err != nil {
@@ -103,6 +107,8 @@ func TestFlow(t *testing.T) {
 		if !t.M.IsDefault() {
 			return
 		}
+
+		evals.Write("evals")
 
 		// Sum the stats of all tasks, including those which never completed,
 		// such as tasks terminated by an aborted dependency.

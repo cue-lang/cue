@@ -1,0 +1,167 @@
+# A task which only needs the field names of an imported struct
+# should not cause the values of those fields to be evaluated.
+# The stats below count the evaluation of every one of those values,
+# and out/evals counts the evaluations of the fields marked with @count(),
+# where only "used" should be evaluated.
+
+-- cue.mod/module.cue --
+module: "mod.test/test"
+language: version: "v0.9.0"
+-- data/data.cue --
+@extern(count)
+
+package data
+
+items: {
+	used:   _ @count()
+	unused: _ @count()
+	for i in [1, 2, 3] {
+		"item\(i)": {
+			id: i
+			deep: {x: i + 1, y: z: i * 2}
+		}
+	}
+}
+-- in.cue --
+import "mod.test/test/data"
+
+root: {
+	keys: {
+		$id: "valToOut"
+		val: "\(len([for k, _ in data.items {k}]))"
+		out: string
+	}
+	count: {
+		$after: keys
+		$id: "valToOut"
+		val: "\(len(data.items))"
+		out: string
+	}
+	used: {
+		$after: count
+		$id: "valToOut"
+		val: "\(data.items.used)"
+		out: string
+	}
+}
+-- out/run-v3/errors --
+-- out/run-v3/t0 --
+graph TD
+  t0("root.keys [Ready]")
+  t1("root.count [Waiting]")
+  t1-->t0
+  t2("root.used [Waiting]")
+  t2-->t1
+
+-- out/run-v3/t1 --
+graph TD
+  t0("root.keys [Terminated]")
+  t1("root.count [Ready]")
+  t1-->t0
+  t2("root.used [Waiting]")
+  t2-->t1
+
+-- out/run-v3/t1/value --
+{
+	$id: "valToOut"
+	val: "5"
+	out: "5"
+}
+-- out/run-v3/t1/stats --
+Leaks:  6
+Freed:  42
+Reused: 28
+Allocs: 20
+Retain: 0
+
+Unifications: 43
+Conjuncts:    56
+Disjuncts:    0
+ResolveDep:   6
+
+NumCloseIDs: 6
+-- out/run-v3/t2 --
+graph TD
+  t0("root.keys [Terminated]")
+  t1("root.count [Terminated]")
+  t1-->t0
+  t2("root.used [Ready]")
+  t2-->t1
+
+-- out/run-v3/t2/value --
+{
+	$after: {
+		$id: "valToOut"
+		val: "5"
+		out: "5"
+	}
+	$id: "valToOut"
+	val: "5"
+	out: "5"
+}
+-- out/run-v3/t2/stats --
+Leaks:  0
+Freed:  22
+Reused: 22
+Allocs: 0
+Retain: 0
+
+Unifications: 17
+Conjuncts:    27
+Disjuncts:    0
+ResolveDep:   4
+
+NumCloseIDs: 2
+-- out/run-v3/t3 --
+graph TD
+  t0("root.keys [Terminated]")
+  t1("root.count [Terminated]")
+  t1-->t0
+  t2("root.used [Terminated]")
+  t2-->t1
+
+-- out/run-v3/t3/value --
+{
+	$after: {
+		$after: {
+			$id: "valToOut"
+			val: "5"
+			out: "5"
+		}
+		$id: "valToOut"
+		val: "5"
+		out: "5"
+	}
+	$id: "valToOut"
+	val: "1"
+	out: "1"
+}
+-- out/run-v3/t3/stats --
+Leaks:  0
+Freed:  22
+Reused: 22
+Allocs: 0
+Retain: 0
+
+Unifications: 17
+Conjuncts:    32
+Disjuncts:    0
+ResolveDep:   2
+
+NumCloseIDs: 3
+-- out/run-v3/evals --
+unused: 1
+used: 2
+-- out/run-v3/stats/totals --
+Leaks:  6
+Freed:  86
+Reused: 72
+Allocs: 20
+Retain: 0
+
+Unifications: 77
+Conjuncts:    115
+Disjuncts:    0
+ResolveDep:   12
+
+NumCloseIDs: 11

@@ -248,28 +248,13 @@ func (c *Controller) tagChildren(n *adt.Vertex, t *Task) {
 // What should be done if a subtasks is referenced that is embedded in another
 // task. Should the surrounding tasks be added as well?
 func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
-	// Ignore references into packages. Fill will fundamentally not work for
-	// packages, and packages cannot point back to the main package as cycles
-	// are not allowed.
-	if d.Import() != nil {
-		return nil
-	}
-
 	n := d.Node
 
-	// This Finalize should not be necessary, as the input to dep is already
-	// finalized. However, cue cmd uses some legacy instance stitching code
-	// where some of the backlink Environments are not properly initialized.
-	// Finalizing should patch those up at the expense of doing some duplicate
-	// work. The plan is to replace `cue cmd` with a much more clean
-	// implementation (probably a separate tool called `cuerun`) where this
-	// issue is fixed. For now we leave this patch.
-	//
-	// Note that this issue predates package flow, but that it just surfaced in
-	// flow and having a different evaluation order.
-	//
-	// Note: this call is cheap if n is already Finalized.
-	n.Finalize(c.opCtx)
+	// The dependency analysis reports nodes as they are, so evaluate n,
+	// skipping the typo check as Recurse does. This also patches up the
+	// backlink Environments which the legacy instance stitching code in
+	// cue cmd leaves uninitialized.
+	n.Unify(c.opCtx, adt.FinalizeWithoutTypoCheck)
 
 	for ; n != nil; n = n.Parent {
 		if c.cfg.IgnoreConcrete && n.IsConcrete() {
@@ -316,6 +301,13 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 		Dynamic: true,
 	}
 	dep.Visit(cfg, c.opCtx, n, func(d dep.Dependency) error {
+		// Ignore references into packages, without evaluating them. Fill will
+		// fundamentally not work for packages, and packages cannot point back
+		// to the main package as cycles are not allowed.
+		if d.Import() != nil {
+			return nil
+		}
+
 		depTask := c.findImpliedTask(d)
 		if depTask != nil {
 			if depTask != cycleMarker {
@@ -329,14 +321,12 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 		// Handling this allows for dynamic references. For instance, such a
 		// value may reference the result value of a task, or even create
 		// new tasks based on the result of another task.
-		if d.Import() == nil {
-			if c.nodes[d.Node] == cycleMarker {
-				return nil
-			}
-			c.nodes[d.Node] = cycleMarker
-			d.Recurse()
-			c.nodes[d.Node] = nil
+		if c.nodes[d.Node] == cycleMarker {
+			return nil
 		}
+		c.nodes[d.Node] = cycleMarker
+		d.Recurse()
+		c.nodes[d.Node] = nil
 		return nil
 	})
 }

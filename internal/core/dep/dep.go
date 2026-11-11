@@ -113,6 +113,9 @@ type Config struct {
 type Dependency struct {
 	// Node is the referenced node. It may be a structure-shared arc, whose
 	// value is reached through [adt.Vertex.DerefValue].
+	//
+	// Node is reported as is, so it may not be evaluated in full yet;
+	// evaluating a large value which the caller ignores can be costly.
 	Node *adt.Vertex
 
 	// Reference is the expression that referenced the node.
@@ -126,8 +129,10 @@ type Dependency struct {
 }
 
 // Recurse visits the dependencies of d.Node, using the same visit function as
-// the original.
+// the original. It evaluates d.Node first.
 func (d *Dependency) Recurse() {
+	d.Node.Unify(d.visitor.ctxt, adt.FinalizeWithoutTypoCheck)
+
 	savedAll := d.visitor.all
 	savedTop := d.visitor.top
 	savedMarked := d.visitor.marked
@@ -546,8 +551,6 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 	}
 
 	c.numRefs++
-
-	v.Unify(c.ctxt, adt.FinalizeWithoutTypoCheck)
 
 	d := Dependency{
 		Node:      v,

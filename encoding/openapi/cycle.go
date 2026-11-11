@@ -41,6 +41,9 @@ func (b *builder) checkCycle(v cue.Value) bool {
 	ctx := adt.NewContext(r, n)
 
 	err := dep.Visit(nil, ctx, n, func(d dep.Dependency) error {
+		// The dependency analysis reports nodes as they are.
+		d.Node.Unify(ctx, adt.FinalizeWithoutTypoCheck)
+
 		if slices.Contains(b.ctx.cycleNodes, d.Node) {
 			err := errors.Newf(adt.Pos(d.Node),
 				"cycle in reference at %v: cyclic structures not allowed when reference expansion is requested", v.Path())

@@ -15,6 +15,7 @@
 package koala_test
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -475,6 +476,64 @@ func TestElementDecoding(t *testing.T) {
 			wantCUE: `root: "$xml:lang": "en"
 `,
 		},
+		// Only a namespace declaration binds a prefix, not any attribute
+		// with the namespace as its value. The prefix c is used instead of a.
+		{
+			name:     "Ancestor attribute with a namespace value",
+			inputXML: `<root xmlns:a="urn:a"><b c="urn:a"><a:d/></b></root>`,
+			wantCUE: `root: {
+	"$xmlns:a": "urn:a"
+	b: {
+		$c:    "urn:a"
+		"c:d": {}
+	}
+}
+`,
+		},
+		{
+			name:     "Attribute with a namespace value",
+			inputXML: `<a:root c="urn:a" xmlns:a="urn:a" a:d="1"/>`,
+			wantCUE: `"c:root": {
+	$c:         "urn:a"
+	"$xmlns:a": "urn:a"
+	"$c:d":     "1"
+}
+`,
+		},
+		// Names keep the prefix they are written with,
+		// even when another prefix is bound to the same namespace.
+		// The prefix a is used instead of b.
+		{
+			name:     "Element prefixes sharing a namespace",
+			inputXML: `<r xmlns:a="urn:u" xmlns:b="urn:u"><b:c/></r>`,
+			wantCUE: `r: {
+	"$xmlns:a": "urn:u"
+	"$xmlns:b": "urn:u"
+	"a:c":      {}
+}
+`,
+		},
+		{
+			name:     "Attribute prefixes sharing a namespace",
+			inputXML: `<r xmlns:a="urn:u" xmlns:b="urn:u" b:c="1"/>`,
+			wantCUE: `r: {
+	"$xmlns:a": "urn:u"
+	"$xmlns:b": "urn:u"
+	"$a:c":     "1"
+}
+`,
+		},
+		{
+			// The prefix is dropped as the default namespace is the same.
+			name:     "Prefix sharing the default namespace",
+			inputXML: `<r xmlns="urn:u" xmlns:p="urn:u"><p:c/></r>`,
+			wantCUE: `r: {
+	$xmlns:     "urn:u"
+	"$xmlns:p": "urn:u"
+	c:          {}
+}
+`,
+		},
 	}
 
 	for _, test := range tests {
@@ -586,6 +645,33 @@ func TestErrors(t *testing.T) {
 			inputXML:      `<root xmlns:b="urn:b"><b:c><a:d/></b:c></root>`,
 			expectedError: `undeclared XML namespace prefix "a"`,
 		},
+		{
+			// The prefix d is resolved as r, which is bound to the namespace "d".
+			name:          "Undeclared prefix named like a declared namespace",
+			inputXML:      `<d:x xmlns:r="d"/>`,
+			expectedError: `unexpected result: "r:x": "\$xmlns:r": "d"`,
+		},
+		// Start and end elements must match.
+		{
+			name:          "Mismatched end element",
+			inputXML:      "<a>\n<b>\n</c>",
+			expectedError: `XML syntax error on line 3: element <b> closed by </c>`,
+		},
+		{
+			name:          "Mismatched end element prefix",
+			inputXML:      `<p:a xmlns:p="urn:p"></q:a>`,
+			expectedError: `XML syntax error on line 1: element <a> in space p closed by </a> in space q`,
+		},
+		{
+			name:          "Unexpected end element",
+			inputXML:      `</a>`,
+			expectedError: `XML syntax error on line 1: unexpected end element </a>`,
+		},
+		{
+			name:          "Unclosed element",
+			inputXML:      "<a>\n<b></b>\n",
+			expectedError: `XML syntax error on line 3: unexpected EOF`,
+		},
 	}
 
 	for _, test := range tests {
@@ -595,7 +681,11 @@ func TestErrors(t *testing.T) {
 			dec := koala.NewDecoder("input.xml", strings.NewReader(test.inputXML))
 			expr, err := dec.Decode()
 			if err == nil {
-				err = fmt.Errorf("unexpected result %#v", expr)
+				f, ferr := astutil.ToFile(expr)
+				qt.Assert(t, qt.IsNil(ferr))
+				out, ferr := format.Node(f)
+				qt.Assert(t, qt.IsNil(ferr))
+				err = fmt.Errorf("unexpected result: %s", bytes.TrimSpace(out))
 			}
 
 			qt.Assert(t, qt.ErrorMatches(err, test.expectedError))

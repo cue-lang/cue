@@ -1,0 +1,8 @@
+# Trimming a recursive schema overflows the stack. The file should be
+# left as it is.
+
+! exec cue trim -o - x.cue
+stderr 'fatal error: stack overflow'
+
+-- x.cue --
+#F: [string]: #F

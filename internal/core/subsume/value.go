@@ -261,7 +261,7 @@ func (s *subsumer) bound(x *adt.BoundValue, v adt.Value) bool {
 
 		kx := x.Kind()
 		ky := y.Kind()
-		if (kx&ky)&^kx != 0 {
+		if ky&^kx != 0 {
 			return false
 		}
 		// x subsumes y if
@@ -274,11 +274,19 @@ func (s *subsumer) bound(x *adt.BoundValue, v adt.Value) bool {
 		//
 		// x: != a, y: != b ==> a != b
 		//
+		// x: op a, y: == b ==> b op a
+		// x: == a, y: op b ==> false, as y allows values other than a
+		//
 		// false if types or op direction doesn't match
 
 		xv := x.Value
 		yv := y.Value
+		if y.Op == adt.EqualOp {
+			return adt.BinOpBool(ctx, x, x.Op, yv, xv)
+		}
 		switch x.Op {
+		case adt.EqualOp:
+			return false
 		case adt.GreaterThanOp:
 			if y.Op == adt.GreaterEqualOp {
 				return adt.BinOpBool(ctx, x, adt.LessThanOp, xv, yv)
@@ -318,7 +326,6 @@ func (s *subsumer) bound(x *adt.BoundValue, v adt.Value) bool {
 			}
 
 		default:
-			// adt.NotEqualOp already handled above.
 			panic("cue: undefined bound mode")
 		}
 

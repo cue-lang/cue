@@ -39,8 +39,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 	switch {
 	case xCat == yCat:
 		switch x.Op {
-		// NOTE: EqualOp should not happen, but include it defensively.
-		// Maybe an API would use it, for instance.
+		// EqualOp comes from unary == bounds such as ==0.
 		case EqualOp, NotEqualOp, MatchOp, NotMatchOp:
 			if BinOpBool(ctx, nil, EqualOp, xv, yv) {
 				return x

@@ -1,0 +1,26 @@
+# Fields constrained by == bounds are compared via subsumption.
+# See https://cuelang.org/issue/4568
+
+-- in.cue --
+#D: a: ==0
+x: #D & {a: ==0}
+
+// A wider bound is implied by an == bound which satisfies it.
+#E: a: ==1
+z: #E & {a: >=0}
+
+// A narrower == bound is not implied by a wider bound.
+#F: a: >=0
+w: #F & {a: ==0}
+-- out/trim --
+== in.cue
+#D: a: ==0
+x: #D & _
+
+// A wider bound is implied by an == bound which satisfies it.
+#E: a: ==1
+z: #E & _
+
+// A narrower == bound is not implied by a wider bound.
+#F: a: >=0
+w: #F & {a: ==0}

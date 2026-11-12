@@ -23,10 +23,10 @@ cd ../gopkgattr
 exec cue exp gengotypes gopkgattr.cue
 cmp cue_types_gen.go cue_types_gen.go.want
 
-# A conjunction with an == bound is checked via subsumption, which panics.
+# A conjunction with an == bound is checked via subsumption.
 cd ../equalbound
-! exec cue exp gengotypes equalbound.cue
-stderr '^panic: cue: undefined bound mode'
+exec cue exp gengotypes equalbound.cue
+cmp cue_types_gen.go cue_types_gen.go.want
 -- nomod/pkg1/pkg1.cue --
 package pkg1
 

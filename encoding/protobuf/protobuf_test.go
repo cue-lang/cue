@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -47,7 +48,9 @@ func TestExtractDefinitions(t *testing.T) {
 	for _, file := range testCases {
 		t.Run(file, func(t *testing.T) {
 			root := "testdata/istio.io/api"
-			filename := filepath.Join(root, filepath.FromSlash(file))
+			// Keep forward slashes so that error positions
+			// are the same on every OS.
+			filename := path.Join(root, file)
 			c := &Config{
 				Paths: []string{"testdata", root},
 			}

@@ -1,6 +1,1 @@
-package nonumbervalue
-
-// No well-known file declares a type named NumberValue, yet it resolves.
-#Types: {
-	numberValue?: number @protobuf(1,google.protobuf.NumberValue,name=number_value)
-}
+protobuf: testdata/istio.io/api/other/no_number_value.proto:9:5:Types.number_value: name "google.protobuf.NumberValue" not found

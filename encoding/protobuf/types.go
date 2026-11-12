@@ -106,18 +106,6 @@ func (p *protoConverter) mapBuiltinPackage(file string) (found bool) {
 			return ast.NewList(&ast.Ellipsis{})
 		}, nil)
 
-		p.setBuiltin("google.protobuf.StringValue", func() ast.Expr {
-			return predeclared("string")
-		}, nil)
-
-		p.setBuiltin("google.protobuf.BoolValue", func() ast.Expr {
-			return predeclared("bool")
-		}, nil)
-
-		p.setBuiltin("google.protobuf.NumberValue", func() ast.Expr {
-			return predeclared("number")
-		}, nil)
-
 		return true
 
 	case "google/protobuf/empty.proto":

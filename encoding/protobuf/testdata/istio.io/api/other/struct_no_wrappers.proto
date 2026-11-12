@@ -4,7 +4,7 @@ package structnowrappers;
 
 import "google/protobuf/struct.proto";
 
-// struct.proto does not declare the wrapper types, yet they resolve.
+// struct.proto does not declare the wrapper types.
 message Types {
     google.protobuf.BoolValue bool_value = 1;
 }

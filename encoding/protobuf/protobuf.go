@@ -58,13 +58,14 @@
 //	Value          _                See struct.proto.
 //	ListValue      [...]            See struct.proto.
 //	NullValue      null             See struct.proto.
-//	BoolValue      bool             See struct.proto.
-//	StringValue    string           See struct.proto.
-//	NumberValue    number           See struct.proto.
-//	StringValue    string           See struct.proto.
-//	Empty          close({})
-//	Timestamp      time.Time        See struct.proto.
-//	Duration       time.Duration    See struct.proto.
+//	BoolValue      null | bool      See wrappers.proto. Its integer, string,
+//	                                and bytes types map likewise, while
+//	                                DoubleValue and FloatValue map to
+//	                                null | float.
+//	Empty          struct.MaxFields(0)
+//	                                See empty.proto.
+//	Timestamp      time.Time        See timestamp.proto.
+//	Duration       time.Duration    See duration.proto.
 //
 // # Annotations
 //

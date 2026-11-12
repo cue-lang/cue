@@ -4,7 +4,7 @@ package nonumbervalue;
 
 import "google/protobuf/struct.proto";
 
-// No well-known file declares a type named NumberValue, yet it resolves.
+// No well-known file declares a type named NumberValue.
 message Types {
     google.protobuf.NumberValue number_value = 1;
 }

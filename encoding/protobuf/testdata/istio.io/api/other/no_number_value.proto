@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package nonumbervalue;
+
+import "google/protobuf/struct.proto";
+
+// No well-known file declares a type named NumberValue, yet it resolves.
+message Types {
+    google.protobuf.NumberValue number_value = 1;
+}

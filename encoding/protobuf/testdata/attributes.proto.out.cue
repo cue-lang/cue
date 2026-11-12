@@ -21,12 +21,11 @@ import (
 )
 
 #StructWrap: {
-	struct?:    {...}  @protobuf(1,google.protobuf.Struct)
-	any?:       _      @protobuf(2,google.protobuf.Value)
-	listVal?:   [...]  @protobuf(3,google.protobuf.ListValue)
-	boolVal?:   bool   @protobuf(4,google.protobuf.BoolValue)
-	stringVal?: string @protobuf(5,google.protobuf.StringValue)
-	numberVal?: number @protobuf(6,google.protobuf.NumberValue)
+	struct?:    {...}         @protobuf(1,google.protobuf.Struct)
+	any?:       _             @protobuf(2,google.protobuf.Value)
+	listVal?:   [...]         @protobuf(3,google.protobuf.ListValue)
+	boolVal?:   null | bool   @protobuf(4,google.protobuf.BoolValue)
+	stringVal?: null | string @protobuf(5,google.protobuf.StringValue)
 }
 
 // Attributes represents a set of typed name/value pairs. Many of Mixer's

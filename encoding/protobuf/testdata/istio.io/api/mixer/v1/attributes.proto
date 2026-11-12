@@ -22,6 +22,7 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 import "acme/test.proto";
 import "acme/test/test.proto";
 
@@ -38,7 +39,6 @@ message StructWrap {
   google.protobuf.ListValue listVal = 3;
   google.protobuf.BoolValue boolVal = 4;
   google.protobuf.StringValue stringVal = 5;
-  google.protobuf.NumberValue numberVal = 6;
 }
 
 // Attributes represents a set of typed name/value pairs. Many of Mixer's

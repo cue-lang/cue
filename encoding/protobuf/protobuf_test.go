@@ -40,6 +40,9 @@ func TestExtractDefinitions(t *testing.T) {
 		"other/full_references.proto",
 		"other/package_less_import.proto",
 		"other/labels.proto",
+		"other/well_known_types.proto",
+		"other/struct_no_wrappers.proto",
+		"other/no_number_value.proto",
 	}
 	for _, file := range testCases {
 		t.Run(file, func(t *testing.T) {

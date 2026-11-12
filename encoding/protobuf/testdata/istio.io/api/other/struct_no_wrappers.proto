@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package structnowrappers;
+
+import "google/protobuf/struct.proto";
+
+// struct.proto does not declare the wrapper types, yet they resolve.
+message Types {
+    google.protobuf.BoolValue bool_value = 1;
+}

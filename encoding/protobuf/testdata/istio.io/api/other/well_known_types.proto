@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package wellknown;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+
+// Each well-known type maps as defined by the file declaring it,
+// even when another well-known file is imported after it.
+message Types {
+    // Declared in wrappers.proto, yet mapped as non-nullable
+    // by struct.proto, which is imported last.
+    google.protobuf.BoolValue bool_value = 1;
+    google.protobuf.StringValue string_value = 2;
+    google.protobuf.DoubleValue double_value = 3;
+
+    // Declared in struct.proto.
+    google.protobuf.Struct struct = 4;
+    google.protobuf.Value value = 5;
+    google.protobuf.ListValue list_value = 6;
+    google.protobuf.NullValue null_value = 7;
+}

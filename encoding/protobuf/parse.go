@@ -680,9 +680,6 @@ func (p *protoConverter) enum(x *proto.Enum) {
 	d := &ast.Field{Label: valueName, Value: valueMap}
 	// addComments(valueMap, 1, x.Comment, nil)
 
-	if strings.Contains(name.Name, "google") {
-		panic(name.Name)
-	}
 	p.addDecl(enum)
 
 	lastSingle := false

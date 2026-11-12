@@ -25,7 +25,6 @@ import (
 
 	"github.com/go-quicktest/qt"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetest"
@@ -52,16 +51,7 @@ func TestExtractDefinitions(t *testing.T) {
 
 			out := &bytes.Buffer{}
 
-			// The panic is recorded in the golden output.
-			f, err := func() (_ *ast.File, err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				return Extract(filename, nil, c)
-			}()
-			if err != nil {
+			if f, err := Extract(filename, nil, c); err != nil {
 				fmt.Fprintln(out, err)
 			} else {
 				b, err := format.Node(f)

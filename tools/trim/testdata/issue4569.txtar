@@ -1,0 +1,36 @@
+# Trimming terminates on recursive schemas, where a pattern constraint or
+# list element reaches the schema being trimmed again.
+
+-- in.cue --
+package p
+
+#F: [string]: #F
+
+#A: [...#A]
+#B: [...#B]
+x: #A & #B
+
+#C: [string]: #C
+c: #C
+
+#D: [string]: #D
+d: #D
+d: b: c: {}
+d: b: {}
+-- out/trim --
+== in.cue
+package p
+
+#F: [string]: #F
+
+#A: [...#A]
+#B: [...#B]
+x:  #A & #B
+
+#C: [string]: #C
+c: #C
+
+#D: [string]: #D
+d: #D
+d: b: c: {}
+d: _

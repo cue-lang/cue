@@ -184,10 +184,11 @@ func filesV3(files []*ast.File, val cue.Value, cfg *Config) error {
 	r, v := value.ToInternal(val)
 	ctx := adt.NewContext(r, v)
 	t := &trimmerV3{
-		r:     r,
-		ctx:   ctx,
-		nodes: make(map[ast.Node]*nodeMeta),
-		trace: cfg.TraceWriter,
+		r:        r,
+		ctx:      ctx,
+		nodes:    make(map[ast.Node]*nodeMeta),
+		explored: make(map[*adt.Vertex]bool),
+		trace:    cfg.TraceWriter,
 	}
 
 	t.logf("\nStarting trim in dir %q with files:", dir)
@@ -399,6 +400,10 @@ type trimmerV3 struct {
 
 	pending   []pendingVertex
 	undecided []nodeMetas
+
+	// explored records the vertices walked by [trimmerV3.findRedundancies],
+	// and whether the walk kept all of their conjuncts.
+	explored map[*adt.Vertex]bool
 
 	// depth is purely for debugging trace indentation level.
 	depth int
@@ -712,6 +717,15 @@ func (t *trimmerV3) findConjunctForStruct(v *adt.Vertex, s *adt.StructLit) (adt.
 // redundant conjuncts.
 func (t *trimmerV3) findRedundancies(v *adt.Vertex, keepAll bool) {
 	v = v.DerefDisjunct()
+	// A vertex can be reached many times, such as via a recursive schema.
+	// One walk records all of its conjuncts; walk it again only if this
+	// time it must keep all of them.
+	if keptAll, ok := t.explored[v]; ok && (keptAll || !keepAll) {
+		t.logf("vertex %p was already explored", v)
+		return
+	}
+	t.explored[v] = keepAll
+
 	t.logf("vertex %p (parent %p); kind %v; value %p::%T",
 		v, v.Parent, v.Kind(), v.BaseValue, v.BaseValue)
 	t.inc()

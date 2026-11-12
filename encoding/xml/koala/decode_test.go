@@ -22,6 +22,7 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -468,6 +469,13 @@ func TestElementDecoding(t *testing.T) {
 }
 `,
 		},
+		{
+			// The xml prefix is bound by definition, so it needs no declaration.
+			// Decoding it panics.
+			name:     "Predefined xml namespace prefix",
+			inputXML: `<root xml:lang="en"/>`,
+			wantCUE:  `panic: could not find prefix for namespace http://www.w3.org/XML/1998/namespace`,
+		},
 	}
 
 	for _, test := range tests {
@@ -475,7 +483,20 @@ func TestElementDecoding(t *testing.T) {
 			t.Parallel()
 
 			dec := koala.NewDecoder("input.xml", strings.NewReader(test.inputXML))
-			cueExpr, err := dec.Decode()
+			var cueExpr ast.Expr
+			var err error
+			if msg := func() (msg string) {
+				defer func() {
+					if r := recover(); r != nil {
+						msg = fmt.Sprintf("panic: %v", r)
+					}
+				}()
+				cueExpr, err = dec.Decode()
+				return ""
+			}(); msg != "" {
+				qt.Assert(t, qt.Equals(msg, test.wantCUE))
+				return
+			}
 
 			qt.Assert(t, qt.IsNil(err))
 

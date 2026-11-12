@@ -660,11 +660,6 @@ func (p *protoConverter) enum(x *proto.Enum) {
 
 	p.addNames(x.Elements)
 
-	if len(p.path) == 0 {
-		defer func() { p.path = p.path[:0] }()
-		p.path = append(p.path, x.Name)
-	}
-
 	// The enum entry.
 	enum := &ast.Field{Label: name}
 	addComments(enum, 1, x.Comment, nil)

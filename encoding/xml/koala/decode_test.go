@@ -523,6 +523,18 @@ func TestElementDecoding(t *testing.T) {
 `,
 		},
 		{
+			// Only a prefixed attribute is in a namespace.
+			name:     "Attributes with the same local name",
+			inputXML: `<r xmlns="urn:u" xmlns:a="urn:u" c="1" a:c="2"/>`,
+			wantCUE: `r: {
+	$xmlns:     "urn:u"
+	"$xmlns:a": "urn:u"
+	$c:         "1"
+	"$a:c":     "2"
+}
+`,
+		},
+		{
 			name:     "Prefix sharing the default namespace",
 			inputXML: `<r xmlns="urn:u" xmlns:p="urn:u"><p:c/></r>`,
 			wantCUE: `r: {
@@ -647,6 +659,62 @@ func TestErrors(t *testing.T) {
 			name:          "Undeclared prefix named like a declared namespace",
 			inputXML:      `<d:x xmlns:r="d"/>`,
 			expectedError: `undeclared XML namespace prefix "d"`,
+		},
+		// Element names cannot use the xmlns prefix,
+		// and a prefix cannot be bound to an empty namespace.
+		// These are accepted.
+		{
+			name:          "Element name with the xmlns prefix",
+			inputXML:      `<root><xmlns:foo/></root>`,
+			expectedError: `unexpected result: root: "xmlns:foo": \{\}`,
+		},
+		{
+			name:     "Prefix bound to an empty namespace",
+			inputXML: `<r xmlns:a=""><a:b/></r>`,
+			expectedError: `unexpected result: r: \{
+	"\$xmlns:a": ""
+	"a:b":      \{\}
+\}`,
+		},
+		{
+			name:     "Prefix rebound to an empty namespace",
+			inputXML: `<r xmlns:a="urn:a"><s xmlns:a=""><a:b/></s></r>`,
+			expectedError: `unexpected result: r: \{
+	"\$xmlns:a": "urn:a"
+	s: \{
+		"\$xmlns:a": ""
+		"a:b":      \{\}
+	\}
+\}`,
+		},
+		// Attributes must be unique by namespace and local name.
+		// These are accepted as separate fields.
+		{
+			name:     "Duplicate attribute",
+			inputXML: `<r a="1" a="2"/>`,
+			expectedError: `unexpected result: r: \{
+	\$a: "1"
+	\$a: "2"
+\}`,
+		},
+		{
+			name:     "Duplicate prefixed attribute",
+			inputXML: `<r xmlns:a="urn:u" a:c="1" a:c="2"/>`,
+			expectedError: `unexpected result: r: \{
+	"\$xmlns:a": "urn:u"
+	"\$a:c":     "1"
+	"\$a:c":     "2"
+\}`,
+		},
+		{
+			name:     "Attributes sharing a namespace and local name",
+			inputXML: `<r xmlns:a="urn:u" xmlns:b="urn:u" a:c="1" b:c="2"/>`,
+			expectedError: `unexpected result: r: \{
+	"\$xmlns:a": "urn:u"
+	"\$xmlns:b": "urn:u"
+	"\$a:c":     "1"
+	"\$b:c":     "2"
+\}`,
 		},
 		// Start and end elements must match.
 		{

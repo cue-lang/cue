@@ -626,22 +626,21 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 // enum converts a proto enum definition to CUE.
 //
-// An enum will generate two top-level definitions:
+// An enum generates two definitions in the scope where it is declared,
+// so an enum nested in a message is defined within that message's
+// definition:
 //
-//	Enum:
-//	  "Value1" |
-//	  "Value2" |
-//	  "Value3"
+//	#Enum: {"Value1", #enumValue: 0} |
+//		{"Value2", #enumValue: 1}
 //
-// and
-//
-//	Enum_value: {
-//	    "Value1": 0
-//	    "Value2": 1
+//	#Enum_value: {
+//		Value1: 0
+//		Value2: 1
 //	}
 //
-// Enums are always defined at the top level. The name of a nested enum
-// will be prefixed with the name of its parent and an underscore.
+// With the "int" [Config.EnumMode], #Enum is instead a disjunction of
+// references to definitions #Value1 and #Value2, which are declared
+// alongside it and hold the integer values.
 func (p *protoConverter) enum(x *proto.Enum) {
 
 	numEnums := 0
@@ -666,14 +665,14 @@ func (p *protoConverter) enum(x *proto.Enum) {
 		p.path = append(p.path, x.Name)
 	}
 
-	// Top-level enum entry.
+	// The enum entry.
 	enum := &ast.Field{Label: name}
 	addComments(enum, 1, x.Comment, nil)
 	if p.current != nil && len(p.current.Elts) > 0 {
 		ast.SetRelPos(enum, token.NewSection)
 	}
 
-	// Top-level enum values entry.
+	// The enum values entry.
 	valueName := ast.NewIdent(name.Name + "_value")
 	valueName.NamePos = newSection
 	valueMap := &ast.StructLit{}

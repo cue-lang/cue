@@ -39,7 +39,9 @@
 //	Proto type     CUE type/def     Comments
 //	message        struct           Message fields become CUE fields, whereby
 //	                                names are mapped to lowerCamelCase.
-//	enum           e1 | e2 | ...    Where ex are strings. A separate mapping is
+//	enum           e1 | e2 | ...    Where ex are strings, each carrying its
+//	                                number as #enumValue, or integers with
+//	                                EnumMode "int". A separate mapping is
 //	                                generated to obtain the numeric values.
 //	map<K, V>      { <>: V }        All keys are converted to strings.
 //	repeated V     [...V]           null is accepted as the empty list [].

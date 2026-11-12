@@ -15,6 +15,7 @@
 package subsume_test
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"testing"
@@ -511,6 +512,86 @@ func TestValues(t *testing.T) {
 		{
 			in:  `a: <=2, b: !=2`,
 			err: "value not an instance",
+		},
+
+		// == bounds on either side. Checking whether an == bound subsumes
+		// another bound panics, and an == bound is never found to be an
+		// instance of another kind of bound.
+		{
+			in:  `a: ==1, b: ==1`,
+			err: "panic: cue: undefined bound mode",
+		},
+		{
+			in:  `a: ==1, b: ==1.0`,
+			err: "panic: cue: undefined bound mode",
+		},
+		{
+			in:  `a: ==1, b: ==2`,
+			err: "panic: cue: undefined bound mode",
+		},
+		{
+			in:  `a: ==1, b: <=1`,
+			err: "panic: cue: undefined bound mode",
+		},
+		{
+			in:  `a: ==1, b: !=2`,
+			err: "panic: cue: undefined bound mode",
+		},
+		{
+			in:  `a: ==1, b: ==1 & <2`,
+			err: "panic: cue: undefined bound mode",
+		},
+		{
+			in:  `a: ==1, b: 1`,
+			err: "",
+		},
+		{
+			in:  `a: ==1, b: 2`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: >=1, b: ==1`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: >1, b: ==1`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: !=1, b: ==2`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: !=1, b: ==1`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: <2, b: ==1 & <2`,
+			err: "",
+		},
+		{
+			in:  `a: =~"a", b: =="abc"`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: =~"a", b: =="xyz"`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: =~"a", b: ==1`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: !="a", b: ==1`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: !=null, b: ==1`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: ==1, b: !=null`,
+			err: "panic: cue: undefined bound mode",
 		},
 
 		{
@@ -1710,6 +1791,13 @@ func TestValues(t *testing.T) {
 				b = arc
 			}
 		}
+
+		defer func() {
+			// Some cases panic; their expected error is the panic value.
+			if r := recover(); r != nil {
+				t.Equal(fmt.Sprint("panic: ", r), tc.err)
+			}
+		}()
 
 		switch tc.mode {
 		case subNone:

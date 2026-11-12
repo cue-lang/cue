@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package googleenum;
+
+// Enum names may contain "google", both at the top level and nested.
+enum googleFoo { A = 0; }
+
+message M {
+    enum googleE { C = 0; }
+}

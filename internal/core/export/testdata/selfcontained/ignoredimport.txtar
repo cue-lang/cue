@@ -32,13 +32,13 @@ import "mod.test/a/data"
 n: len(data.items)
 m: data.items.used
 -- out/self-v3/evals --
-unused: 1
-used: 2
+unused: 0
+used: 1
 -- out/self-v3-noshare/default --
 import "mod.test/a/data"
 
 n: len(data.items)
 m: data.items.used
 -- out/self-v3-noshare/evals --
-unused: 1
-used: 2
+unused: 0
+used: 1

@@ -188,8 +188,6 @@ func (p *pivotter) markDeps(v *adt.Vertex, pkg *adt.ImportReference) {
 	}
 	dep.Visit(cfg, p.x.ctx, v, func(d dep.Dependency) error {
 		node := d.Node
-		// The dependency analysis reports nodes as they are.
-		node.Unify(p.x.ctx, adt.FinalizeWithoutTypoCheck)
 
 		switch {
 		case p.refMap[d.Reference] != nil:
@@ -215,8 +213,11 @@ func (p *pivotter) markDeps(v *adt.Vertex, pkg *adt.ImportReference) {
 			if !strings.ContainsRune(path, '.') {
 				return nil
 			}
+		}
 
-		case node.IsUnprocessed():
+		// The dependency analysis reports nodes as they are.
+		node.Unify(p.x.ctx, adt.FinalizeWithoutTypoCheck)
+		if node.IsUnprocessed() {
 			// This may happen for DynamicReferences.
 			return nil
 		}

@@ -299,19 +299,36 @@ func newXmlElement(elem xml.StartElement, parent *xmlElement, pos token.Pos) (*x
 		if a.Name.Space != "xmlns" {
 			continue
 		}
+		if a.Value == "" {
+			return nil, errors.Newf(pos, "empty XML namespace for prefix %q", a.Name.Local)
+		}
 		if !cloned {
 			xmlNode.ns = maps.Clone(xmlNode.ns)
 			cloned = true
 		}
 		xmlNode.ns[a.Name.Local] = a.Value
 	}
+	if elem.Name.Space == "xmlns" {
+		return nil, errors.Newf(pos, "XML element name with the reserved prefix \"xmlns\"")
+	}
 	if _, err := xmlNode.resolve(elem.Name); err != nil {
 		return nil, err
 	}
+	// Attribute names must be unique by namespace and local name.
+	seenAttrs := make(map[xml.Name]string, len(elem.Attr))
 	for _, a := range elem.Attr {
-		if _, err := xmlNode.resolve(a.Name); err != nil {
+		expanded, err := xmlNode.resolve(a.Name)
+		if err != nil {
 			return nil, err
 		}
+		attrName := rawName(a.Name)
+		if seen, ok := seenAttrs[expanded]; ok {
+			if seen == attrName {
+				return nil, errors.Newf(pos, "duplicate XML attribute %q", attrName)
+			}
+			return nil, errors.Newf(pos, "XML attributes %q and %q have the same namespace and name", seen, attrName)
+		}
+		seenAttrs[expanded] = attrName
 	}
 	return xmlNode, nil
 }

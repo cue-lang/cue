@@ -32,6 +32,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"maps"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -73,10 +74,21 @@ type currFieldInfo struct {
 // xmlElement models an XML Element hierarchy.
 // It is used for tracking namespace prefixes.
 type xmlElement struct {
-	xmlName  xml.Name
-	attr     []xml.Attr
+	xmlName xml.Name
+	// Position of the element's start tag.
+	pos token.Pos
+	// ns maps each namespace prefix in scope to its namespace.
+	// It is shared with the parent element if this one declares no prefixes.
+	ns       map[string]string
 	parent   *xmlElement
 	children []*xmlElement
+}
+
+// predefinedNamespaces maps the prefixes which are bound by definition
+// to their namespaces.
+var predefinedNamespaces = map[string]string{
+	"xml":   "http://www.w3.org/XML/1998/namespace",
+	"xmlns": "http://www.w3.org/2000/xmlns/",
 }
 
 // The prefix used to model the inner text content within an XML element.
@@ -115,8 +127,13 @@ func (dec *Decoder) Decode() (ast.Expr, error) {
 
 	for {
 		startOffset := xmlDec.InputOffset()
-		t, err := xmlDec.Token()
+		// Use RawToken to keep the prefixes as written,
+		// as Token gives the namespace of each prefix instead.
+		t, err := xmlDec.RawToken()
 		if err == io.EOF {
+			if elem := dec.currXmlElement; elem != nil {
+				return nil, errors.Newf(elem.pos, "unclosed XML element <%s>", rawName(elem.xmlName))
+			}
 			break
 		}
 		if err != nil {
@@ -128,7 +145,7 @@ func (dec *Decoder) Decode() (ast.Expr, error) {
 		case xml.CharData:
 			err = dec.decoderInnerText(xmlToken, startOffset)
 		case xml.EndElement:
-			err = dec.decodeEndElement()
+			err = dec.decodeEndElement(xmlToken, startOffset)
 		}
 		if err != nil {
 			return nil, err
@@ -188,14 +205,21 @@ func (dec *Decoder) endInnerText(hasChildren bool) error {
 	return nil
 }
 
-func (dec *Decoder) decodeEndElement() error {
-	// For the xmlElement hierarchy: step back up the XML hierarchy.
-	if dec.currXmlElement != nil {
-		if err := dec.endInnerText(len(dec.currXmlElement.children) > 0); err != nil {
-			return err
-		}
-		dec.currXmlElement = dec.currXmlElement.parent
+func (dec *Decoder) decodeEndElement(xmlToken xml.EndElement, endOffset int64) error {
+	// [xml.Decoder.RawToken] does not check that end elements match start elements.
+	start := dec.currXmlElement
+	pos := dec.tokenFile.Pos(int(endOffset), token.NoRelPos)
+	if start == nil {
+		return errors.Newf(pos, "unexpected XML end element </%s>", rawName(xmlToken.Name))
 	}
+	if start.xmlName != xmlToken.Name {
+		return errors.Newf(pos, "XML element <%s> closed by </%s>", rawName(start.xmlName), rawName(xmlToken.Name))
+	}
+	// For the xmlElement hierarchy: step back up the XML hierarchy.
+	if err := dec.endInnerText(len(start.children) > 0); err != nil {
+		return err
+	}
+	dec.currXmlElement = start.parent
 	// For the CUE ast: end current element, and step back up the XML hierarchy.
 	if len(dec.ancestors) > 0 {
 		dec.currField = dec.ancestors[len(dec.ancestors)-1]
@@ -205,32 +229,32 @@ func (dec *Decoder) decodeEndElement() error {
 }
 
 func (dec *Decoder) decodeStartElement(xmlToken xml.StartElement, startOffset int64) error {
-	// Covers the root node.
-	if dec.currField.field == nil {
-		dec.currXmlElement = &xmlElement{xmlName: xmlToken.Name, attr: xmlToken.Attr}
-		cueElement, _, err := dec.cueFieldFromXmlElement(xmlToken, dec.currXmlElement, startOffset)
-		if err != nil {
+	parentXmlNode := dec.currXmlElement
+	// If this is not the root node, any text content so far must be whitespace.
+	if parentXmlNode != nil {
+		if err := dec.endInnerText(true); err != nil {
 			return err
 		}
-		dec.currField.assignNewCurrField(cueElement)
+	}
+	// For xmlElement hierarchy: step down the XML hierarchy.
+	pos := dec.tokenFile.Pos(int(startOffset), token.NoRelPos)
+	xmlNode, err := newXmlElement(xmlToken, parentXmlNode, pos)
+	if err != nil {
+		return err
+	}
+	dec.currXmlElement = xmlNode
+	newElement := dec.cueFieldFromXmlElement(xmlToken, pos)
+	// Covers the root node.
+	if parentXmlNode == nil {
+		dec.currField.assignNewCurrField(newElement)
 		dec.astRoot = ast.NewStruct(dec.currField.field)
 		ast.SetPos(dec.astRoot, dec.tokenFile.Pos(0, token.NoRelPos))
 		return nil
 	}
-	// If this is not the root node, any text content so far must be whitespace.
-	if err := dec.endInnerText(true); err != nil {
-		return err
-	}
-	// For xmlElement hierarchy: step down the XML hierarchy.
-	parentXmlNode := dec.currXmlElement
-	dec.currXmlElement = &xmlElement{xmlName: xmlToken.Name, attr: xmlToken.Attr, parent: parentXmlNode}
-	parentXmlNode.children = append(parentXmlNode.children, dec.currXmlElement)
+	parentXmlNode.children = append(parentXmlNode.children, xmlNode)
 	// For the CUE ast: step down the CUE hierarchy.
 	dec.ancestors = append(dec.ancestors, dec.currField)
-	newElement, prefixedXmlElementName, err := dec.cueFieldFromXmlElement(xmlToken, dec.currXmlElement, startOffset)
-	if err != nil {
-		return err
-	}
+	prefixedXmlElementName := rawName(xmlToken.Name)
 	// Check if this new XML element has a name that's been seen before at the current level.
 	sameNameElements := dec.currField.currFieldChildren[prefixedXmlElementName]
 	if sameNameElements != nil {
@@ -263,21 +287,54 @@ func isWhiteSpace(b []byte) bool {
 	return len(bytes.TrimSpace(b)) == 0
 }
 
-// cueFieldFromXmlElement creates a new [ast.Field] to model the given xml element information
-// in [xml.StartElement] and [xmlElement]. The startOffset represents the offset
-// for the beginning of the start tag of the given XML element.
-// It also returns the element's full name, as given by [prefixedElementName].
-func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlElement, startOffset int64) (*ast.Field, string, error) {
-	pos := dec.tokenFile.Pos(int(startOffset), token.NoRelPos)
-	undeclaredPrefix := func(nameSpace string) error {
-		// [xml.Decoder] leaves an undeclared prefix as the name's namespace.
-		return errors.Newf(pos, "undeclared XML namespace prefix %q", nameSpace)
+// newXmlElement returns the [xmlElement] for a start element at the given position,
+// checking its namespace declarations and prefixes.
+func newXmlElement(elem xml.StartElement, parent *xmlElement, pos token.Pos) (*xmlElement, error) {
+	xmlNode := &xmlElement{xmlName: elem.Name, pos: pos, parent: parent, ns: predefinedNamespaces}
+	if parent != nil {
+		xmlNode.ns = parent.ns
 	}
-	elementName, ok := prefixedElementName(elem, xmlNode)
+	cloned := false
+	for _, a := range elem.Attr {
+		if a.Name.Space != "xmlns" {
+			continue
+		}
+		if !cloned {
+			xmlNode.ns = maps.Clone(xmlNode.ns)
+			cloned = true
+		}
+		xmlNode.ns[a.Name.Local] = a.Value
+	}
+	if _, err := xmlNode.resolve(elem.Name); err != nil {
+		return nil, err
+	}
+	for _, a := range elem.Attr {
+		if _, err := xmlNode.resolve(a.Name); err != nil {
+			return nil, err
+		}
+	}
+	return xmlNode, nil
+}
+
+// resolve returns a name with its namespace prefix replaced by its namespace,
+// or an error if the prefix is not in scope. Names without a prefix are returned as is,
+// which is only their full namespace and name for attributes.
+func (xmlNode *xmlElement) resolve(name xml.Name) (xml.Name, error) {
+	if name.Space == "" {
+		return name, nil
+	}
+	ns, ok := xmlNode.ns[name.Space]
 	if !ok {
-		return nil, "", undeclaredPrefix(elem.Name.Space)
+		return xml.Name{}, errors.Newf(xmlNode.pos, "undeclared XML namespace prefix %q", name.Space)
 	}
-	resLabel := ast.NewStringLabel(elementName)
+	return xml.Name{Space: ns, Local: name.Local}, nil
+}
+
+// cueFieldFromXmlElement creates a new [ast.Field] to model the given xml element information
+// in [xml.StartElement]. The pos represents the position
+// of the beginning of the start tag of the given XML element.
+func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, pos token.Pos) *ast.Field {
+	resLabel := ast.NewStringLabel(rawName(elem.Name))
 	ast.SetPos(resLabel, pos)
 	resultValue := &ast.StructLit{}
 	result := &ast.Field{
@@ -287,11 +344,7 @@ func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlEl
 	}
 	// Extract attributes as children.
 	for _, a := range elem.Attr {
-		attrName, ok := prefixedAttrName(a, elem, xmlNode)
-		if !ok {
-			return nil, "", undeclaredPrefix(a.Name.Space)
-		}
-		label := ast.NewStringLabel(attributeSymbol + attrName)
+		label := ast.NewStringLabel(attributeSymbol + rawName(a.Name))
 		value := toBasicLit(a.Value)
 		ast.SetPos(label, pos)
 		ast.SetPos(value, pos)
@@ -302,70 +355,22 @@ func (dec *Decoder) cueFieldFromXmlElement(elem xml.StartElement, xmlNode *xmlEl
 		}
 		resultValue.Elts = append(resultValue.Elts, attrExpr)
 	}
-	return result, elementName, nil
+	return result
 }
 
-// prefixedElementName returns the full name of an element,
-// including its namespace prefix if it has one; but without namespace prefix if it is "xmlns".
-// It reports false if the namespace has no prefix, as with [nsPrefix].
-func prefixedElementName(elem xml.StartElement, xmlNode *xmlElement) (string, bool) {
-	elementName := elem.Name.Local
-	if elem.Name.Space != "" {
-		prefixNS, ok := nsPrefix(elem.Name.Space, elem.Attr, xmlNode)
-		if !ok {
-			return "", false
-		}
-		if prefixNS != "xmlns" {
-			elementName = prefixNS + ":" + elem.Name.Local
-		}
+// rawName returns the full name of an element or attribute,
+// including its namespace prefix as written if it has one.
+func rawName(name xml.Name) string {
+	if name.Space == "" {
+		return name.Local
 	}
-	return elementName, true
-}
-
-// prefixedAttrName returns the full name of an attribute, including its namespace prefix if it has one.
-// It reports false if the namespace has no prefix, as with [nsPrefix].
-func prefixedAttrName(a xml.Attr, elem xml.StartElement, xmlNode *xmlElement) (string, bool) {
-	attrName := a.Name.Local
-	if a.Name.Space != "" {
-		prefix, ok := nsPrefix(a.Name.Space, elem.Attr, xmlNode)
-		if !ok {
-			return "", false
-		}
-		attrName = prefix + ":" + a.Name.Local
-	}
-	return attrName, true
+	return name.Space + ":" + name.Local
 }
 
 func toBasicLit(s string) *ast.BasicLit {
 	s = strings.ReplaceAll(s, "\r", "")
 	return ast.NewString(s)
 }
-
-// nsPrefix finds the prefix label for a given namespace by looking at the current node's
-// attributes and then walking up the hierarchy of XML nodes.
-// It reports false if no prefix is declared for the namespace.
-func nsPrefix(nameSpace string, attributes []xml.Attr, xmlNode *xmlElement) (string, bool) {
-	// When the prefix is xmlns, then the namespace is xmlns according to the golang XML parser.
-	if nameSpace == "xmlns" {
-		return "xmlns", true
-	}
-	// The xml prefix is bound to its namespace by definition.
-	if nameSpace == xmlNamespace {
-		return "xml", true
-	}
-	for _, attr := range attributes {
-		if attr.Value == nameSpace {
-			return attr.Name.Local, true
-		}
-	}
-	if xmlNode.parent != nil {
-		return nsPrefix(nameSpace, xmlNode.parent.attr, xmlNode.parent)
-	}
-	return "", false
-}
-
-// xmlNamespace is the namespace which [xml.Decoder] gives the xml prefix.
-const xmlNamespace = "http://www.w3.org/XML/1998/namespace"
 
 func (cf *currFieldInfo) assignNewCurrField(field *ast.Field) {
 	cf.field = field

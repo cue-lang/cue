@@ -477,7 +477,7 @@ func TestElementDecoding(t *testing.T) {
 `,
 		},
 		// Only a namespace declaration binds a prefix, not any attribute
-		// with the namespace as its value. The prefix c is used instead of a.
+		// with the namespace as its value.
 		{
 			name:     "Ancestor attribute with a namespace value",
 			inputXML: `<root xmlns:a="urn:a"><b c="urn:a"><a:d/></b></root>`,
@@ -485,7 +485,7 @@ func TestElementDecoding(t *testing.T) {
 	"$xmlns:a": "urn:a"
 	b: {
 		$c:    "urn:a"
-		"c:d": {}
+		"a:d": {}
 	}
 }
 `,
@@ -493,23 +493,22 @@ func TestElementDecoding(t *testing.T) {
 		{
 			name:     "Attribute with a namespace value",
 			inputXML: `<a:root c="urn:a" xmlns:a="urn:a" a:d="1"/>`,
-			wantCUE: `"c:root": {
+			wantCUE: `"a:root": {
 	$c:         "urn:a"
 	"$xmlns:a": "urn:a"
-	"$c:d":     "1"
+	"$a:d":     "1"
 }
 `,
 		},
 		// Names keep the prefix they are written with,
 		// even when another prefix is bound to the same namespace.
-		// The prefix a is used instead of b.
 		{
 			name:     "Element prefixes sharing a namespace",
 			inputXML: `<r xmlns:a="urn:u" xmlns:b="urn:u"><b:c/></r>`,
 			wantCUE: `r: {
 	"$xmlns:a": "urn:u"
 	"$xmlns:b": "urn:u"
-	"a:c":      {}
+	"b:c":      {}
 }
 `,
 		},
@@ -519,18 +518,17 @@ func TestElementDecoding(t *testing.T) {
 			wantCUE: `r: {
 	"$xmlns:a": "urn:u"
 	"$xmlns:b": "urn:u"
-	"$a:c":     "1"
+	"$b:c":     "1"
 }
 `,
 		},
 		{
-			// The prefix is dropped as the default namespace is the same.
 			name:     "Prefix sharing the default namespace",
 			inputXML: `<r xmlns="urn:u" xmlns:p="urn:u"><p:c/></r>`,
 			wantCUE: `r: {
 	$xmlns:     "urn:u"
 	"$xmlns:p": "urn:u"
-	c:          {}
+	"p:c":      {}
 }
 `,
 		},
@@ -646,31 +644,30 @@ func TestErrors(t *testing.T) {
 			expectedError: `undeclared XML namespace prefix "a"`,
 		},
 		{
-			// The prefix d is resolved as r, which is bound to the namespace "d".
 			name:          "Undeclared prefix named like a declared namespace",
 			inputXML:      `<d:x xmlns:r="d"/>`,
-			expectedError: `unexpected result: "r:x": "\$xmlns:r": "d"`,
+			expectedError: `undeclared XML namespace prefix "d"`,
 		},
 		// Start and end elements must match.
 		{
 			name:          "Mismatched end element",
 			inputXML:      "<a>\n<b>\n</c>",
-			expectedError: `XML syntax error on line 3: element <b> closed by </c>`,
+			expectedError: `XML element <b> closed by </c>`,
 		},
 		{
 			name:          "Mismatched end element prefix",
 			inputXML:      `<p:a xmlns:p="urn:p"></q:a>`,
-			expectedError: `XML syntax error on line 1: element <a> in space p closed by </a> in space q`,
+			expectedError: `XML element <p:a> closed by </q:a>`,
 		},
 		{
 			name:          "Unexpected end element",
 			inputXML:      `</a>`,
-			expectedError: `XML syntax error on line 1: unexpected end element </a>`,
+			expectedError: `unexpected XML end element </a>`,
 		},
 		{
 			name:          "Unclosed element",
 			inputXML:      "<a>\n<b></b>\n",
-			expectedError: `XML syntax error on line 3: unexpected EOF`,
+			expectedError: `unclosed XML element <a>`,
 		},
 	}
 

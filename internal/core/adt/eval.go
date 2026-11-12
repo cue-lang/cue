@@ -193,6 +193,16 @@ func (n *nodeContext) validateValue() {
 			if bound == nil {
 				continue
 			}
+			if v == n.node {
+				// The node is a struct or list, which no bound admits.
+				// Validating the node against one would also finalize it
+				// while it is still being evaluated.
+				if n.kind != BottomKind {
+					n.reportConflict(v, bound, v.Kind(), bound.Kind())
+					n.kind = BottomKind
+				}
+				break
+			}
 			c := MakeRootConjunct(nil, bound)
 			if b := ctx.Validate(c, v); b != nil {
 				// TODO(errors): make Validate return boolean and generate

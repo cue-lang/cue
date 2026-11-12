@@ -51,11 +51,52 @@ embedScalar: t5: {
 	if false {a!: int}
 }
 
+// No struct satisfies an ordered bound such as `<0`, so a required field next
+// to an embedded one is a conflict.
 embedBound: {
+	lessThan: {
+		<0
+		a!: int
+	}
+	viaReference: {
+		B: <0
+		x: {
+			B
+			a!: int
+		}
+	}
+	// https://cuelang.org/issue/4570
+	selfReference: {
+		A
+		A!: >0 & <10
+	}
+	twoSided: {
+		>0 & <10
+		a!: int
+	}
+	dependsOnSelf: {
+		<len(dependsOnSelf)
+		a!: int
+	}
+	dependsOnSelfTwoSided: {
+		>len(dependsOnSelfTwoSided) & <10
+		a!: int
+	}
 	// As in embedScalar.t3, for a `!=` bound which depends on the struct.
 	dependsOnSelfNotEqual: {
 		!=len(dependsOnSelfNotEqual)
 		a!: int
+	}
+
+	// As in embedScalar.t4, the comprehension makes the value a struct, which
+	// the bound rejects.
+	comprehension: {
+		<0
+		if false {a!: int}
+	}
+	comprehensionDependsOnSelf: {
+		<len(comprehensionDependsOnSelf)
+		if false {a!: int}
 	}
 
 	// As in embedScalar.t4, so a bound which depends on the struct is computed
@@ -88,6 +129,14 @@ comprehensionOnly: {
 	basicType: {
 		x: {if false {a!: int}}
 		x: string
+	}
+	bound: {
+		x: {if false {a!: int}}
+		x: <5
+	}
+	boundDependsOnSelf: {
+		x: {if false {a!: int}}
+		x: <len(x)
 	}
 	disjunction: {
 		#S: spec: {...} | string
@@ -245,9 +294,48 @@ doNotEscalateError: {
     }
   }
   embedBound: {
+    lessThan: {
+      <0
+      a!: int
+    }
+    viaReference: {
+      B: <0
+      x: {
+        〈1;B〉
+        a!: int
+      }
+    }
+    selfReference: {
+      〈0;A〉
+      A!: (>0 & <10)
+    }
+    twoSided: {
+      (>0 & <10)
+      a!: int
+    }
+    dependsOnSelf: {
+      <len(〈1;dependsOnSelf〉)
+      a!: int
+    }
+    dependsOnSelfTwoSided: {
+      (>len(〈1;dependsOnSelfTwoSided〉) & <10)
+      a!: int
+    }
     dependsOnSelfNotEqual: {
       !=len(〈1;dependsOnSelfNotEqual〉)
       a!: int
+    }
+    comprehension: {
+      <0
+      if false {
+        a!: int
+      }
+    }
+    comprehensionDependsOnSelf: {
+      <len(〈1;comprehensionDependsOnSelf〉)
+      if false {
+        a!: int
+      }
     }
     comprehensionNotEqual: {
       !=len(〈1;comprehensionNotEqual〉)
@@ -280,6 +368,22 @@ doNotEscalateError: {
         }
       }
       x: string
+    }
+    bound: {
+      x: {
+        if false {
+          a!: int
+        }
+      }
+      x: <5
+    }
+    boundDependsOnSelf: {
+      x: {
+        if false {
+          a!: int
+        }
+      }
+      x: <len(〈0;x〉)
     }
     disjunction: {
       #S: {

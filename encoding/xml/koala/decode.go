@@ -79,9 +79,8 @@ type xmlElement struct {
 	pos token.Pos
 	// ns maps each namespace prefix in scope to its namespace.
 	// It is shared with the parent element if this one declares no prefixes.
-	ns       map[string]string
-	parent   *xmlElement
-	children []*xmlElement
+	ns     map[string]string
+	parent *xmlElement
 }
 
 // predefinedNamespaces maps the prefixes which are bound by definition
@@ -216,7 +215,7 @@ func (dec *Decoder) decodeEndElement(xmlToken xml.EndElement, endOffset int64) e
 		return errors.Newf(pos, "XML element <%s> closed by </%s>", rawName(start.xmlName), rawName(xmlToken.Name))
 	}
 	// For the xmlElement hierarchy: step back up the XML hierarchy.
-	if err := dec.endInnerText(len(start.children) > 0); err != nil {
+	if err := dec.endInnerText(len(dec.currField.currFieldChildren) > 0); err != nil {
 		return err
 	}
 	dec.currXmlElement = start.parent
@@ -251,7 +250,6 @@ func (dec *Decoder) decodeStartElement(xmlToken xml.StartElement, startOffset in
 		ast.SetPos(dec.astRoot, dec.tokenFile.Pos(0, token.NoRelPos))
 		return nil
 	}
-	parentXmlNode.children = append(parentXmlNode.children, xmlNode)
 	// For the CUE ast: step down the CUE hierarchy.
 	dec.ancestors = append(dec.ancestors, dec.currField)
 	prefixedXmlElementName := rawName(xmlToken.Name)

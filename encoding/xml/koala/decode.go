@@ -323,6 +323,10 @@ func nsPrefix(nameSpace string, attributes []xml.Attr, xmlNode *xmlElement) stri
 	if nameSpace == "xmlns" {
 		return "xmlns"
 	}
+	// The xml prefix is bound to its namespace by definition.
+	if nameSpace == xmlNamespace {
+		return "xml"
+	}
 	for _, attr := range attributes {
 		if attr.Value == nameSpace {
 			return attr.Name.Local
@@ -333,6 +337,9 @@ func nsPrefix(nameSpace string, attributes []xml.Attr, xmlNode *xmlElement) stri
 	}
 	panic("could not find prefix for namespace " + nameSpace)
 }
+
+// xmlNamespace is the namespace which [xml.Decoder] gives the xml prefix.
+const xmlNamespace = "http://www.w3.org/XML/1998/namespace"
 
 func (cf *currFieldInfo) assignNewCurrField(field *ast.Field) {
 	cf.field = field

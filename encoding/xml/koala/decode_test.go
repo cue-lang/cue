@@ -22,7 +22,6 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -571,21 +570,21 @@ func TestErrors(t *testing.T) {
 			inputXML:      `<!-- comment -->`,
 			expectedError: `XML document has no root element`,
 		},
-		// A namespace prefix must be declared; decoding an undeclared one panics.
+		// A namespace prefix must be declared.
 		{
 			name:          "Undeclared element namespace prefix",
 			inputXML:      `<a:b/>`,
-			expectedError: `panic: could not find prefix for namespace a`,
+			expectedError: `undeclared XML namespace prefix "a"`,
 		},
 		{
 			name:          "Undeclared attribute namespace prefix",
 			inputXML:      `<b a:c="1"/>`,
-			expectedError: `panic: could not find prefix for namespace a`,
+			expectedError: `undeclared XML namespace prefix "a"`,
 		},
 		{
 			name:          "Undeclared nested element namespace prefix",
 			inputXML:      `<root xmlns:b="urn:b"><b:c><a:d/></b:c></root>`,
-			expectedError: `panic: could not find prefix for namespace a`,
+			expectedError: `undeclared XML namespace prefix "a"`,
 		},
 	}
 
@@ -594,14 +593,7 @@ func TestErrors(t *testing.T) {
 			t.Parallel()
 
 			dec := koala.NewDecoder("input.xml", strings.NewReader(test.inputXML))
-			expr, err := func() (_ ast.Expr, err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				return dec.Decode()
-			}()
+			expr, err := dec.Decode()
 			if err == nil {
 				err = fmt.Errorf("unexpected result %#v", expr)
 			}

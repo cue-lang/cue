@@ -59,6 +59,7 @@ func TestSelfContained(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		t.Parallel()
 		r := t.CueContext()
+		evals := t.CountEvals(r)
 
 		a := t.Instances()
 
@@ -78,6 +79,8 @@ func TestSelfContained(t *testing.T) {
 
 		test := func() {
 			file, errs := self.Def(tValue.R, "", tValue.V)
+			// Only count the evaluations up to the first export.
+			evals.Pause()
 
 			errors.Print(w, errs, nil)
 			_, _ = w.Write(formatNode(t.T, file))
@@ -89,6 +92,7 @@ func TestSelfContained(t *testing.T) {
 			doDiff(t.T, v, vf)
 		}
 		test()
+		evals.Write("evals")
 
 		if _, ok := t.Value("inlineImports"); ok {
 			w = t.Writer("expand_imports")

@@ -34,20 +34,53 @@ func TestToFile(t *testing.T) {
 	mat.Node = ast.NewImport(nil, "math")
 	pi := ast.NewSel(mat, "Pi")
 
+	var longList []ast.Expr
+	for c := 'a'; c <= 'k'; c++ {
+		longList = append(longList, ast.NewString(strings.Repeat(string(c), 8)))
+	}
+
 	testCases := []struct {
 		desc string
 		expr ast.Expr
-		want string
+		file string // ToFile's result, formatted
+		want string // the evaluated result, formatted
 	}{{
 		desc: "add import",
 		expr: ast.NewBinExpr(token.ADD, ast.NewLit(token.INT, "1"), pi),
+		file: `import "math"
+
+1 + math.Pi
+`,
 		want: "4.141592653589793238462643383279503",
+	}, {
+		desc: "long list",
+		expr: ast.NewList(longList...),
+		// TODO: the list should wrap like any other long list, but ToFile
+		// marks its first token as authored, which keeps it on one line.
+		file: `["aaaaaaaa", "bbbbbbbb", "cccccccc", "dddddddd", "eeeeeeee", "ffffffff", "gggggggg", "hhhhhhhh", "iiiiiiii", "jjjjjjjj", "kkkkkkkk"]
+`,
+		want: `[
+	"aaaaaaaa",
+	"bbbbbbbb",
+	"cccccccc",
+	"dddddddd",
+	"eeeeeeee",
+	"ffffffff",
+	"gggggggg",
+	"hhhhhhhh",
+	"iiiiiiii",
+	"jjjjjjjj",
+	"kkkkkkkk",
+]`,
 	}, {
 		desc: "resolve unresolved within struct",
 		expr: ast.NewStruct(
 			ast.NewIdent("a"), ast.NewString("foo"),
 			ast.NewIdent("b"), ast.NewIdent("a"),
 		),
+		file: `a: "foo"
+b: a
+`,
 		want: `{
 	a: "foo"
 	b: "foo"
@@ -66,6 +99,14 @@ func TestToFile(t *testing.T) {
 					ast.NewIdent("b"), ref, // refers to outer `a`.
 				))
 		}(),
+		file: `a: "bar"
+c: {
+	a: "foo"
+	b: a_1
+}
+
+let a_1 = a
+`,
 		want: `{
 	a: "bar"
 	c: {
@@ -80,13 +121,18 @@ func TestToFile(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			b, err := format.Node(f)
+			if err != nil {
+				t.Fatal(err)
+			}
+			qt.Assert(t, qt.Equals(string(b), tc.file))
 
 			v := cuecontext.New().BuildFile(f)
 			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
 
-			b, err := format.Node(v.Syntax(cue.Concrete(true)))
+			b, err = format.Node(v.Syntax(cue.Concrete(true)))
 			if err != nil {
 				t.Fatal(err)
 			}

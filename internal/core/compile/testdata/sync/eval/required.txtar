@@ -28,6 +28,72 @@ embedScalar: t1: {
 	1
 	a!: int
 }
+// The struct, rather than the embedded scalar, is reported as conflicting
+// with the field.
+embedScalar: t2: {
+	int
+	a!: int
+}
+// `!=0` admits any struct, as a struct never equals 0, so the field is allowed.
+embedScalar: t3: {
+	!=0
+	a!: int
+}
+// A comprehension which may add a field marks the value as a struct, so the
+// embedded scalar is lost.
+// https://cuelang.org/issue/4577
+embedScalar: t4: {
+	int
+	if false {a!: int}
+}
+embedScalar: t5: {
+	!=0
+	if false {a!: int}
+}
+
+embedBound: {
+	// As in embedScalar.t3, for a `!=` bound which depends on the struct.
+	dependsOnSelfNotEqual: {
+		!=len(dependsOnSelfNotEqual)
+		a!: int
+	}
+
+	// As in embedScalar.t4, so a bound which depends on the struct is computed
+	// against the empty struct, although the reference cycle could resolve to
+	// `_` instead.
+	comprehensionNotEqual: {
+		!=len(comprehensionNotEqual)
+		if false {a: int}
+	}
+
+	// A regular field conflicts with the bound as a mismatched type, and an
+	// optional field leaves the bound as the value.
+	regularField: {
+		<0
+		a: int
+	}
+	optionalField: {
+		<0
+		a?: int
+	}
+}
+
+// A struct whose only declaration is a comprehension is a struct even when no
+// field is added, so it conflicts with a scalar that it is unified with.
+comprehensionOnly: {
+	validator: {
+		x: {if false {a!: int}}
+		x: =~"a"
+	}
+	basicType: {
+		x: {if false {a!: int}}
+		x: string
+	}
+	disjunction: {
+		#S: spec: {...} | string
+		x: #S & {spec: {if false {a!: int}}}
+	}
+}
 
 // Required fields do not cause vet to fail with definitions: a required field
 // in one definition should block a disallowed field from another definition.
@@ -148,6 +214,86 @@ doNotEscalateError: {
     t1: {
       1
       a!: int
+    }
+  }
+  embedScalar: {
+    t2: {
+      int
+      a!: int
+    }
+  }
+  embedScalar: {
+    t3: {
+      !=0
+      a!: int
+    }
+  }
+  embedScalar: {
+    t4: {
+      int
+      if false {
+        a!: int
+      }
+    }
+  }
+  embedScalar: {
+    t5: {
+      !=0
+      if false {
+        a!: int
+      }
+    }
+  }
+  embedBound: {
+    dependsOnSelfNotEqual: {
+      !=len(〈1;dependsOnSelfNotEqual〉)
+      a!: int
+    }
+    comprehensionNotEqual: {
+      !=len(〈1;comprehensionNotEqual〉)
+      if false {
+        a: int
+      }
+    }
+    regularField: {
+      <0
+      a: int
+    }
+    optionalField: {
+      <0
+      a?: int
+    }
+  }
+  comprehensionOnly: {
+    validator: {
+      x: {
+        if false {
+          a!: int
+        }
+      }
+      x: =~"a"
+    }
+    basicType: {
+      x: {
+        if false {
+          a!: int
+        }
+      }
+      x: string
+    }
+    disjunction: {
+      #S: {
+        spec: ({
+          ...
+        }|string)
+      }
+      x: (〈0;#S〉 & {
+        spec: {
+          if false {
+            a!: int
+          }
+        }
+      })
     }
   }
   allowed: {

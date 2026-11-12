@@ -35,6 +35,72 @@ embedScalar: t1: {
 	1
 	a!: int
 } @test(err, code=eval, contains="cannot combine regular field %q with %v", args=[a, 1], pos=[2:6, 1:2])
+// The struct, rather than the embedded scalar, is reported as conflicting
+// with the field.
+embedScalar: t2: {
+	int
+	a!: int
+} @test(err, code=eval, contains="with {a!:int}", pos=[2:6, 0:18])
+// `!=0` admits any struct, as a struct never equals 0, so the field is allowed.
+embedScalar: t3: {
+	!=0
+	a!: int
+} @test(err, code=eval, contains="with {a!:int}", pos=[2:6, 0:18], incorrect, hint="`!=0` should admit the struct, leaving the required field unset")
+// A comprehension which may add a field marks the value as a struct, so the
+// embedded scalar is lost.
+// https://cuelang.org/issue/4577
+embedScalar: t4: {
+	int
+	if false {a!: int}
+} @test(eq, {}, incorrect) @test(eq:todo, int)
+embedScalar: t5: {
+	!=0
+	if false {a!: int}
+} @test(eq, {}, incorrect) @test(eq:todo, !=0)
+
+embedBound: {
+	// As in embedScalar.t3, for a `!=` bound which depends on the struct.
+	dependsOnSelfNotEqual: {
+		!=len(dependsOnSelfNotEqual)
+		a!: int
+	} @test(err, code=eval, contains="with {a!:int}", pos=[2:7, 0:25], incorrect, hint="`!=0` should admit the struct, leaving the required field unset")
+
+	// As in embedScalar.t4, so a bound which depends on the struct is computed
+	// against the empty struct, although the reference cycle could resolve to
+	// `_` instead.
+	comprehensionNotEqual: {
+		!=len(comprehensionNotEqual)
+		if false {a: int}
+	} @test(eq, {})
+
+	// A regular field conflicts with the bound as a mismatched type, and an
+	// optional field leaves the bound as the value.
+	regularField: {
+		<0
+		a: int
+	} @test(err, code=eval, contains="mismatched types", pos=[0:16, 1:3])
+	optionalField: {
+		<0
+		a?: int
+	} @test(eq, <0)
+}
+
+// A struct whose only declaration is a comprehension is a struct even when no
+// field is added, so it conflicts with a scalar that it is unified with.
+comprehensionOnly: {
+	validator: {
+		x: {if false {a!: int}}
+		x: =~"a" @test(err, code=eval, contains="cannot use {} (type struct) as type string", pos=[0:6, -1:6])
+	}
+	basicType: {
+		x: {if false {a!: int}}
+		x: string @test(eq, {}, incorrect, hint="the struct should conflict with the string; see https://cuelang.org/issue/4577") @test(err:todo, code=eval)
+	}
+	disjunction: {
+		#S: spec: {...} | string
+		x: #S & {spec: {if false {a!: int}}} @test(eq, {spec: {}})
+	}
+}
 
 // Required fields do not cause vet to fail with definitions: a required field
 // in one definition should block a disallowed field from another definition.
@@ -146,20 +212,39 @@ doNotEscalateError: {
 [eval] embedScalar.t1: cannot combine regular field "a" with 1:
     ./in.cue:35:6
     ./in.cue:34:2
+[eval] embedScalar.t2: cannot combine regular field "a" with {a!:int}:
+    ./in.cue:41:6
+    ./in.cue:39:18
+[eval] embedScalar.t3: invalid left-hand value to '!=' (type struct): embedScalar.t3: cannot combine regular field "a" with {a!:int}:
+    ./in.cue:45:2
+embedScalar.t3: cannot combine regular field "a" with {a!:int}:
+    ./in.cue:46:6
+    ./in.cue:44:18
+[eval] embedBound.dependsOnSelfNotEqual: invalid left-hand value to '!=' (type struct): embedBound.dependsOnSelfNotEqual: cannot combine regular field "a" with {a!:int}:
+    ./in.cue:63:3
+embedBound.dependsOnSelfNotEqual: cannot combine regular field "a" with {a!:int}:
+    ./in.cue:64:7
+    ./in.cue:62:25
+[eval] embedBound.regularField: conflicting values {<0,a:int} and <0 (mismatched types struct and number):
+    ./in.cue:77:16
+    ./in.cue:78:3
+[eval] comprehensionOnly.validator.x: cannot use {} (type struct) as type string in =~:
+    ./in.cue:92:6
+    ./in.cue:91:6
 [eval] allowed.issue2306.#A.a: field not allowed:
-    ./in.cue:43:7
+    ./in.cue:109:7
 [incomplete] reference.toWithinDefinition.b: required field missing: a:
-    ./in.cue:54:11
+    ./in.cue:120:11
 [incomplete] reference.toFieldFromDefinition.c: required field missing: a:
-    ./in.cue:60:8
+    ./in.cue:126:8
 [incomplete] reference.toNonDefinition.b: required field missing: y:
-    ./in.cue:65:8
+    ./in.cue:131:8
 [incomplete] reference.toConcrete.b: required field missing: a:
-    ./in.cue:70:6
+    ./in.cue:136:6
 [incomplete] reference.issue2937.max: required field missing: min:
-    ./in.cue:77:19
+    ./in.cue:143:19
 [incomplete] reference.issue4330.b: required field missing: fn:
-    ./in.cue:85:11
+    ./in.cue:151:11
 [incomplete] issue3918.reduced.#disjuncts.out: required field missing: in:
     ./issue3918.cue:10:22
 [incomplete] issue3918.noFunction.#disjuncts.out: required field missing: in:
@@ -175,17 +260,17 @@ doNotEscalateError: {
     ./issue3918.cue:48:3
     ./issue3918.cue:53:18
 -- out/eval/stats --
-Leaks:  0
-Freed:  70
-Reused: 53
-Allocs: 17
+Leaks:  2
+Freed:  112
+Reused: 92
+Allocs: 22
 Retain: 0
 
-Unifications: 68
-Conjuncts:    96
-Disjuncts:    0
+Unifications: 105
+Conjuncts:    149
+Disjuncts:    4
 
-NumCloseIDs: 12
+NumCloseIDs: 13
 -- out/todo.txt --
 v3 reports incomplete errors for reference.toWithinDefinition, toFieldFromDefinition, toNonDefinition, toConcrete sub-fields (required field missing), whereas v2 resolved those fields to concrete values. v3 also shows structure sharing (~) for reference.toFieldFromDefinition.p1.b and p2.b.
 issue3918.noFunction.x: v3 evaluates x as a structure-shared reference to _foo.in (formatted as a bare identifier "in" that cannot be compiled standalone); the expected struct only asserts on #disjuncts and _foo.

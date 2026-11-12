@@ -32,6 +32,10 @@ cmp stdout export.json
 exec cue import -o - xml+koala: export.xml
 cmp stdout import.cue
 
+# An undeclared namespace prefix is a decode error; the decoder panics.
+! exec cue import -o - koala: undeclared.xml
+stderr '^panic: could not find prefix for namespace a'
+
 -- encode-xml.stderr --
 unsupported encoding "xml"
 -- encode-xml-koala.stderr --
@@ -66,6 +70,10 @@ xml requires a variant, such as: xml+koala
         }
     }
 }
+-- undeclared.xml --
+<root>
+    <a:b/>
+</root>
 -- import.cue --
 root: {
 	message: $$: "Hello World!"

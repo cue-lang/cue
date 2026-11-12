@@ -16,19 +16,19 @@ package astutil
 
 import (
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 // ToFile converts an expression to a File. It will create an import section for
 // any of the identifiers in x that refer to an import and will unshadow
 // references as appropriate.
+//
+// The returned File reuses the nodes in x, which is rewritten in place
+// as documented in [Sanitize].
 func ToFile(x ast.Expr) (*ast.File, error) {
 	var f *ast.File
-	// TODO(mvdan): SetRelPos modifies the input argument; if it's really needed, make a copy
 	if st, ok := x.(*ast.StructLit); ok {
 		f = &ast.File{Decls: st.Elts}
 	} else {
-		ast.SetRelPos(x, token.NoSpace)
 		f = &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
 	}
 

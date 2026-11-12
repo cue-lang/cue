@@ -29,7 +29,6 @@ import (
 	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 // A Decimal is an arbitrary-precision binary-coded decimal number.
@@ -268,8 +267,6 @@ func ToExpr(n ast.Node) ast.Expr {
 
 // ToFile converts an expression to a file.
 //
-// Adjusts the spacing of x when needed.
-//
 // If preserveStructLit is true and n is a [*ast.StructLit], then n
 // will be embedded within the returned [*ast.File] rather than only
 // its elements being included in the returned File. This ensures that
@@ -278,21 +275,14 @@ func ToFile(n ast.Node, preserveStructLit bool) *ast.File {
 	if n == nil {
 		return nil
 	}
-	// TODO(mvdan): SetRelPos modifies the input argument; if it's really needed, make a copy
+	if st, ok := n.(*ast.StructLit); ok && !preserveStructLit {
+		f := &ast.File{Decls: st.Elts}
+		// Ensure that the comments attached to the struct literal are not lost.
+		ast.SetComments(f, ast.Comments(st))
+		return f
+	}
 	switch n := n.(type) {
-	case *ast.StructLit:
-		if preserveStructLit {
-			ast.SetRelPos(n, token.NoSpace)
-			return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: n}}}
-
-		} else {
-			f := &ast.File{Decls: n.Elts}
-			// Ensure that the comments attached to the struct literal are not lost.
-			ast.SetComments(f, ast.Comments(n))
-			return f
-		}
 	case ast.Expr:
-		ast.SetRelPos(n, token.NoSpace)
 		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: n}}}
 	case *ast.File:
 		return n

@@ -1,9 +1,6 @@
-# A value printed at the top level of the output should be laid out like
-# any other value: a list too long for one line should wrap as it does in
-# a field, and both disjuncts of a disjunction of structs should be laid
-# out alike.
-# TODO: the top-level value's first token is marked as authored, so the
-# list stays on one line and only the first disjunct is kept compact.
+# A value printed at the top level of the output is laid out like any
+# other value: a list too long for one line wraps as it does in a field,
+# and both disjuncts of a disjunction of structs are laid out alike.
 
 exec cue eval list.cue
 cmp stdout eval-list.golden
@@ -19,11 +16,38 @@ cmp stdout eval-disj.golden
 #D: int
 #D | string
 -- eval-list.golden --
-["aaaaaaaa", "bbbbbbbb", "cccccccc", "dddddddd", "eeeeeeee", "ffffffff", "gggggggg", "hhhhhhhh", "iiiiiiii", "jjjjjjjj", "kkkkkkkk"]
+[
+    "aaaaaaaa",
+    "bbbbbbbb",
+    "cccccccc",
+    "dddddddd",
+    "eeeeeeee",
+    "ffffffff",
+    "gggggggg",
+    "hhhhhhhh",
+    "iiiiiiii",
+    "jjjjjjjj",
+    "kkkkkkkk",
+]
 -- export-list.golden --
-["aaaaaaaa", "bbbbbbbb", "cccccccc", "dddddddd", "eeeeeeee", "ffffffff", "gggggggg", "hhhhhhhh", "iiiiiiii", "jjjjjjjj", "kkkkkkkk"]
+[
+	"aaaaaaaa",
+	"bbbbbbbb",
+	"cccccccc",
+	"dddddddd",
+	"eeeeeeee",
+	"ffffffff",
+	"gggggggg",
+	"hhhhhhhh",
+	"iiiiiiii",
+	"jjjjjjjj",
+	"kkkkkkkk",
+]
 -- eval-disj.golden --
-{int, #D: int} | {
+{
+    int
+    #D: int
+} | {
     string
     #D: int
 }

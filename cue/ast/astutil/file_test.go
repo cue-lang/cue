@@ -55,9 +55,19 @@ func TestToFile(t *testing.T) {
 	}, {
 		desc: "long list",
 		expr: ast.NewList(longList...),
-		// TODO: the list should wrap like any other long list, but ToFile
-		// marks its first token as authored, which keeps it on one line.
-		file: `["aaaaaaaa", "bbbbbbbb", "cccccccc", "dddddddd", "eeeeeeee", "ffffffff", "gggggggg", "hhhhhhhh", "iiiiiiii", "jjjjjjjj", "kkkkkkkk"]
+		file: `[
+	"aaaaaaaa",
+	"bbbbbbbb",
+	"cccccccc",
+	"dddddddd",
+	"eeeeeeee",
+	"ffffffff",
+	"gggggggg",
+	"hhhhhhhh",
+	"iiiiiiii",
+	"jjjjjjjj",
+	"kkkkkkkk",
+]
 `,
 		want: `[
 	"aaaaaaaa",

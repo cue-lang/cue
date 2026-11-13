@@ -18,5 +18,7 @@ Disjuncts:    0
   b: (_|_){
     // [incomplete] b: invalid interpolation: non-concrete value >=0 & <=10 (type number):
     //     ./in.cue:1:20
+    //     ./in.cue:1:5
+    //     ./in.cue:1:11
   }
 }

@@ -465,9 +465,14 @@ func appendNodePositions(a []token.Pos, n Node) []token.Pos {
 	if p := Pos(n); p.IsValid() {
 		a = append(a, p)
 	}
-	if v, ok := n.(*Vertex); ok {
-		for c := range v.LeafConjuncts() {
+	switch x := n.(type) {
+	case *Vertex:
+		for c := range x.LeafConjuncts() {
 			a = appendNodePositions(a, c.Elem())
+		}
+	case *Conjunction:
+		for _, v := range x.Values {
+			a = appendNodePositions(a, v)
 		}
 	}
 	return a

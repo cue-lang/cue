@@ -9,12 +9,12 @@ e: "\([])"   @test(err, code=eval, contains="invalid interpolation: cannot use [
 
 // The error names each value of a non-concrete conjunction.
 bounds: >=0 & <=10
-f: "\(bounds)" @test(err, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4], incorrect) @test(err:todo, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4, -1:9, -1:15])
+f: "\(bounds)" @test(err, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4, -1:9, -1:15])
 #D: >=0
 split: #D & <=10
-g: "\(split)" @test(err, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4], incorrect) @test(err:todo, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4, -2:5, -1:13])
+g: "\(split)" @test(err, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4, -2:5, -1:13])
 fromAnd: and([>=0, <=10])
-h: "\(fromAnd)" @test(err, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4], incorrect) @test(err:todo, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4, -1:15, -1:20])
+h: "\(fromAnd)" @test(err, code=incomplete, contains="non-concrete value >=0 & <=10", pos=[0:4, -1:15, -1:20])
 -- out/errors.txt --
 [incomplete] d: invalid interpolation: non-concrete value _ (type _):
     ./in.cue:4:4
@@ -26,10 +26,16 @@ h: "\(fromAnd)" @test(err, code=incomplete, contains="non-concrete value >=0 & <
     ./in.cue:7:7
 [incomplete] f: invalid interpolation: non-concrete value >=0 & <=10 (type number):
     ./in.cue:11:4
+    ./in.cue:10:9
+    ./in.cue:10:15
 [incomplete] g: invalid interpolation: non-concrete value >=0 & <=10 (type number):
     ./in.cue:14:4
+    ./in.cue:12:5
+    ./in.cue:13:13
 [incomplete] h: invalid interpolation: non-concrete value >=0 & <=10 (type number):
     ./in.cue:16:4
+    ./in.cue:15:15
+    ./in.cue:15:20
 -- out/eval/stats --
 Leaks:  0
 Freed:  9

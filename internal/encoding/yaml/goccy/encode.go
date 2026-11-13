@@ -805,7 +805,7 @@ func isNumberTokenType(t ytoken.Type) bool {
 // with a document marker, or contain a tab, which YAML 1.1 does not
 // allow in a plain scalar.
 func shouldQuote(str string) bool {
-	if str == "" || legacyStrings[str] {
+	if str == "" || IsYAML11NonString(str) || goYAMLNumber(str) {
 		return true
 	}
 	// Document markers start a line in keys and top-level values, and
@@ -813,13 +813,20 @@ func shouldQuote(str string) bool {
 	if strings.HasPrefix(str, "...") || strings.HasPrefix(str, "---") {
 		return true
 	}
-	// These checks can only match strings starting with one of these
-	// bytes; skip them otherwise.
-	if strings.IndexByte("-+0123456789:. \t", str[0]) >= 0 &&
-		(useQuote().MatchString(str) || rxYAML11Number().MatchString(str) || goYAMLNumber(str)) {
+	return decodesAsNonString(str) || strings.ContainsRune(str, '\t')
+}
+
+// IsYAML11NonString reports whether YAML 1.1 decoders read the plain
+// scalar str as a value other than a string, such as a boolean, a
+// number, or a timestamp, or fail to decode it.
+func IsYAML11NonString(str string) bool {
+	if legacyStrings[str] {
 		return true
 	}
-	return decodesAsNonString(str) || strings.ContainsRune(str, '\t')
+	// The regular expressions can only match strings starting with one
+	// of these bytes; skip them otherwise.
+	return str != "" && strings.IndexByte("-+0123456789:. \t", str[0]) >= 0 &&
+		(useQuote().MatchString(str) || rxYAML11Number().MatchString(str))
 }
 
 // yamlUnprintable reports whether the string contains characters that

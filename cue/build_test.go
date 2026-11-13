@@ -71,16 +71,29 @@ func TestFromExpr(t *testing.T) {
 	}, {
 		expr: ast.NewIdent("__nosuchbuiltin"),
 		err:  `reference "__nosuchbuiltin" not found`,
+	}, {
+		// Issue #4573: a closed struct rejects the fields of another operand.
+		// TODO: this should fail, as b is not allowed.
+		expr: ast.NewBinExpr(
+			token.AND,
+			ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
+			ast.NewStruct("b", ast.NewLit(token.INT, "2")),
+		),
+		out: `{b: 2}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			r := cuecontext.New()
-			v := r.BuildExpr(tc.expr)
-			err := v.Err()
-			if !checkErr(t, err, tc.err, "init") {
-			} else if got := fmt.Sprint(v); got != tc.out {
-				t.Errorf("\n got: %v; want %v", got, tc.out)
+			check := func(name string, v cue.Value) {
+				if !checkErr(t, v.Err(), tc.err, name) {
+				} else if got := fmt.Sprint(v); got != tc.out {
+					t.Errorf("%s:\n got: %v; want %v", name, got, tc.out)
+				}
 			}
+			// Encode builds an expression just like BuildExpr. It goes first,
+			// as BuildExpr resolves the identifiers of the syntax tree in place.
+			check("Encode", r.Encode(tc.expr))
+			check("BuildExpr", r.BuildExpr(tc.expr))
 		})
 	}
 }

@@ -27,6 +27,12 @@ cmp stdout expect/issue4202/stdout
 cmp stdout expect/shared/stdout
 cmp stderr expect/shared/stderr
 
+# Issue #4573: closedness applies to an expression as to any other value.
+# TODO: this should fail, as b is not allowed.
+exec cue eval -e '#D & {b: "bad"}' closed/x.cue
+cmp stdout expect/closed/stdout
+cmp stderr expect/closed/stderr
+
 -- expect/nonExist/stdout --
 -- expect/nonExist/stderr --
 reference "nonExist" not found:
@@ -113,3 +119,8 @@ x.a: conflicting values "bad" and int (mismatched types string and int):
     ./shared/x.cue:1:9
     ./shared/x.cue:2:4
     ./shared/x.cue:2:13
+-- closed/x.cue --
+#D: {a?: string}
+-- expect/closed/stdout --
+b: "bad"
+-- expect/closed/stderr --

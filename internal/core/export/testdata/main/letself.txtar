@@ -1,0 +1,134 @@
+# A let bound to self denotes the struct declaring it. Where such a let is
+# expanded outside that struct, the expansion keeps all of its conjuncts,
+# whether there is one, as for y, or more, as for x.
+#
+# TODO: the expansion of T in x drops the first conjunct of #M.
+
+-- cue.mod/module.cue --
+module: "mod.test/a"
+language: version: "v0.18.0"
+-- in.cue --
+s: string
+#M: {
+	let T = self
+	a: 1
+	p: T[s]
+}
+#M: b: 2
+x: #M.p
+
+#N: {
+	let U = self
+	a: 1
+	p: U[s]
+}
+y: #N.p
+-- out/doc --
+[]
+[s]
+[#M]
+[#M T]
+[#M a]
+[#M p]
+[#M b]
+[x]
+[#N]
+[#N U]
+[#N a]
+[#N p]
+[y]
+-- out/value --
+== Simplified
+{
+	s: string
+	x: {b: 2}[s]
+	y: {
+		let U = self
+		a: 1
+		p: U[s]
+	}[s]
+}
+== Raw
+{
+	s: string
+	#M: {
+		let T = self
+		a: 1
+		p: T[s]
+		b: 2
+	}
+	x: {b: 2}[s]
+	#N: {
+		let U = self
+		a: 1
+		p: U[s]
+	}
+	y: {
+		let U_1 = self
+		a: 1
+		p: U_1[s]
+	}[s]
+}
+== Final
+{
+	s: string
+	x: _|_ // #M.p: invalid non-ground value string (must be concrete string)
+	y: _|_ // #N.p: invalid non-ground value string (must be concrete string)
+}
+== All
+{
+	s: string
+	#M: {
+		let T = self
+		a: 1
+		p: T[s]
+		b: 2
+	}
+	x: {b: 2}[s]
+	#N: {
+		let U = self
+		a: 1
+		p: U[s]
+	}
+	y: {
+		let U_1 = self
+		a: 1
+		p: U_1[s]
+	}[s]
+}
+== Eval
+{
+	s: string
+	#M: {
+		let T = self
+		a: 1
+		p: T[s]
+		b: 2
+	}
+	x: {b: 2}[s]
+	#N: {
+		let U = self
+		a: 1
+		p: U[s]
+	}
+	y: {
+		let U_1 = self
+		a: 1
+		p: U_1[s]
+	}[s]
+}
+-- out/definition --
+s: string
+#M: {
+	let T = self
+	a: 1
+	b: 2
+	p: T[s]
+}
+x: #M.p
+#N: {
+	let U = self
+	a: 1
+	p: U[s]
+}
+y: #N.p

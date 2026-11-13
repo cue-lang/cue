@@ -786,13 +786,47 @@ var rxAnyOctalYaml11 = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`^[-+]?0[0-9_]+$`)
 })
 
+// isBigInt reports whether yaml.v3 would resolve the plain scalar s as
+// an integer if it had no 64-bit limit: s starts with a sign or a digit,
+// and without underscores, it is an integer as [strconv.ParseInt] with
+// base 0 accepts.
+func isBigInt(s string) bool {
+	if s == "" || strings.IndexByte("+-0123456789", s[0]) < 0 {
+		return false
+	}
+	s = strings.ReplaceAll(s, "_", "")
+	if s[0] == '+' || s[0] == '-' {
+		s = s[1:]
+	}
+	digits := "0123456789"
+	if len(s) > 1 && s[0] == '0' {
+		switch s[1] {
+		case 'x', 'X':
+			digits, s = "0123456789abcdefABCDEF", s[2:]
+		case 'b', 'B':
+			digits, s = "01", s[2:]
+		case 'o', 'O':
+			digits, s = "01234567", s[2:]
+		default:
+			digits = "01234567"
+		}
+	}
+	return s != "" && strings.Trim(s, digits) == ""
+}
+
 func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 	tag := yn.ShortTag()
-	// If the YAML scalar has no explicit tag, yaml.v3 infers a float tag,
-	// and the value looks like a YAML 1.1 octal literal,
-	// that means the input value was like `01289` and not a valid octal integer.
-	// The safest thing to do, and what most YAML decoders do, is to interpret as a string.
-	if yn.Style&yaml.TaggedStyle == 0 && tag == floatTag && rxAnyOctalYaml11().MatchString(yn.Value) {
+	tagged := yn.Style&yaml.TaggedStyle != 0
+	// A zero style means an untagged plain scalar.
+	if yn.Style == 0 && (tag == floatTag || tag == strTag) && isBigInt(yn.Value) {
+		// yaml.v3 resolves integers which do not fit in 64 bits as floats
+		// or strings, but YAML and CUE integers have no size limit.
+		tag = intTag
+	} else if !tagged && tag == floatTag && rxAnyOctalYaml11().MatchString(yn.Value) {
+		// If the value looks like a YAML 1.1 octal literal, the input
+		// was like `01289` and not a valid octal integer. The safest
+		// thing to do, and what most YAML decoders do, is to interpret
+		// it as a string.
 		tag = strTag
 	}
 	pos := d.pos(d.yamlOffset(yn))
@@ -844,7 +878,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		if num, ok := goccy.SpecialFloats[yn.Value]; ok {
 			return goccy.MakeNum(pos, num, token.FLOAT), nil
 		}
-		expr, err := goccy.FloatExpr(pos, yn.Value, yn.Tag != "")
+		expr, err := goccy.FloatExpr(pos, yn.Value, tagged)
 		if err != nil {
 			return nil, d.posErrorf(yn, "%v", err)
 		}

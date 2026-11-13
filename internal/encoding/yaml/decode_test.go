@@ -382,7 +382,7 @@ null:   1
 	},
 	{
 		"float32_maxuint64+1: 18446744073709551616",
-		`"float32_maxuint64+1": number & 18446744073709551616`,
+		`"float32_maxuint64+1": 18446744073709551616`,
 	},
 
 	// float64
@@ -398,13 +398,9 @@ null:   1
 		"float64_maxuint64: 18446744073709551615",
 		"float64_maxuint64: 18446744073709551615",
 	},
-	// TODO(mvdan): yaml.v3 uses strconv APIs like ParseUint to try to detect
-	// whether a scalar should be considered a YAML integer or a float.
-	// Integers in CUE aren't limited to 64 bits, so we should arguably not decode
-	// large integers that don't fit in 64 bits as floats via `number &`.
 	{
 		"float64_maxuint64+1: 18446744073709551616",
-		`"float64_maxuint64+1": number & 18446744073709551616`,
+		`"float64_maxuint64+1": 18446744073709551616`,
 	},
 
 	// Overflow cases.
@@ -414,21 +410,21 @@ null:   1
 	}, {
 		"v: 128",
 		"v: 128",
-	},
-	// TODO: integers which do not fit in 64 bits decode as strings
-	// when written in hex, binary, or octal.
-	{
+	}, {
 		"v: 0x1ffffffffffffffffff",
-		`v: "0x1ffffffffffffffffff"`,
+		"v: 0x1ffffffffffffffffff",
 	}, {
 		"v: -0b11111111111111111111111111111111111111111111111111111111111111111",
-		`v: "-0b11111111111111111111111111111111111111111111111111111111111111111"`,
+		"v: -0b11111111111111111111111111111111111111111111111111111111111111111",
 	}, {
 		"v: 0o7777777777777777777777777",
-		`v: "0o7777777777777777777777777"`,
+		"v: 0o7777777777777777777777777",
 	}, {
 		"v: 07777777777777777777777777",
-		`v: "07777777777777777777777777"`,
+		"v: 0o7777777777777777777777777",
+	}, {
+		"v: _1",
+		`v: "_1"`,
 	},
 
 	// Quoted values.

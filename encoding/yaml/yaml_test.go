@@ -102,51 +102,54 @@ null
 		isStream: true,
 	}}
 	ctx := cuecontext.New()
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			f, err := yaml.Extract(tc.name, tc.yaml)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, _ := format.Node(f)
-			if got := strings.TrimSpace(string(b)); got != tc.want {
-				t.Errorf("Extract:\ngot  %q\nwant %q", got, tc.want)
-			}
-
-			yamlOut := tc.yaml
-			if tc.yamlOut != "" {
-				yamlOut = tc.yamlOut
-			}
-
-			wantVal := ctx.CompileString(tc.want)
-			if !tc.isStream {
-				b, err = yaml.Encode(wantVal)
+	forEachImpl(t, func(t *testing.T, goccy bool) {
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				f, err := yaml.Extract(tc.name, tc.yaml)
 				if err != nil {
-					t.Error(err)
+					t.Fatal(err)
 				}
-				if got := strings.TrimSpace(string(b)); got != yamlOut {
-					t.Errorf("Encode:\ngot  %q\nwant %q", got, yamlOut)
+				b, _ := format.Node(f)
+				if got := strings.TrimSpace(string(b)); got != tc.want {
+					t.Errorf("Extract:\ngot  %q\nwant %q", got, tc.want)
 				}
-			} else {
-				iter, _ := wantVal.List()
-				b, err := yaml.EncodeStream(iter)
-				if err != nil {
-					t.Error(err)
+
+				yamlOut := tc.yaml
+				if tc.yamlOut != "" {
+					yamlOut = tc.yamlOut
 				}
-				if got := string(b); got != yamlOut {
-					t.Errorf("EncodeStream:\ngot  %q\nwant %q", got, yamlOut)
+
+				wantVal := ctx.CompileString(tc.want)
+				if !tc.isStream {
+					b, err = yaml.Encode(wantVal)
+					if err != nil {
+						t.Error(err)
+					}
+					if got := strings.TrimSpace(string(b)); got != yamlOut {
+						t.Errorf("Encode:\ngot  %q\nwant %q", got, yamlOut)
+					}
+				} else {
+					iter, _ := wantVal.List()
+					b, err := yaml.EncodeStream(iter)
+					if err != nil {
+						t.Error(err)
+					}
+					if got := string(b); got != yamlOut {
+						t.Errorf("EncodeStream:\ngot  %q\nwant %q", got, yamlOut)
+					}
 				}
-			}
-		})
-	}
+			})
+		}
+	})
 }
 
 func TestDecoder(t *testing.T) {
 	testCases := []struct {
-		name    string
-		yaml    string
-		want    []string
-		wantErr bool
+		name string
+		yaml string
+		want []string
+
+		goccyErr bool // goccy rejects the input
 	}{{
 		name: "empty document",
 		yaml: ``,
@@ -271,21 +274,33 @@ list:
 }`,
 		},
 	}, {
-		// TODO: the valid input below is rejected;
+		// TODO: goccy rejects the valid input below;
 		// see https://github.com/goccy/go-yaml/issues/950.
-		name:    "quoted explicit key with a block scalar value",
-		yaml:    "? \"k\"\n: |\n  v\n",
-		wantErr: true,
+		name: "quoted explicit key with a block scalar value",
+		yaml: "? \"k\"\n: |\n  v\n",
+		want: []string{`{
+	k:
+		"""
+			v
+
+			"""
+}`},
+		goccyErr: true,
 	}, {
-		// TODO: the two valid inputs below are rejected;
+		// TODO: goccy rejects the two valid inputs below;
 		// see https://github.com/goccy/go-yaml/issues/951.
-		name:    "multi-line plain scalar in a nested flow mapping",
-		yaml:    "k: [{a: x, b: y-\n    z}]\n",
-		wantErr: true,
+		name:     "multi-line plain scalar in a nested flow mapping",
+		yaml:     "k: [{a: x, b: y-\n    z}]\n",
+		want:     []string{`{k: [{a: "x", b: "y- z"}]}`},
+		goccyErr: true,
 	}, {
-		name:    "multi-line plain scalar with a blank line in a nested flow mapping",
-		yaml:    "k: {a: x\n\n  y}\n",
-		wantErr: true,
+		name: "multi-line plain scalar with a blank line in a nested flow mapping",
+		yaml: "k: {a: x\n\n  y}\n",
+		want: []string{`{k: {a: """
+	x
+	y
+	"""}}`},
+		goccyErr: true,
 	}, {
 		name: "empty entry at the end of an unindented sequence",
 		yaml: "a:\n- x\n-\nb: 1\n",
@@ -297,51 +312,54 @@ list:
 }`},
 	}}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			d := yaml.NewDecoder(tc.name, strings.NewReader(tc.yaml))
+	forEachImpl(t, func(t *testing.T, goccy bool) {
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				d := yaml.NewDecoder(tc.name, strings.NewReader(tc.yaml))
+				wantErr := goccy && tc.goccyErr
 
-			var results []string
-			for {
-				expr, err := d.Extract()
-				if err == io.EOF {
-					break
-				}
-				if tc.wantErr {
-					if err == nil {
-						t.Fatal("expected error but got none")
+				var results []string
+				for {
+					expr, err := d.Extract()
+					if err == io.EOF {
+						break
 					}
-					return
-				}
-				if err != nil {
-					t.Fatalf("unexpected error: %v", err)
+					if wantErr {
+						if err == nil {
+							t.Fatal("expected error but got none")
+						}
+						return
+					}
+					if err != nil {
+						t.Fatalf("unexpected error: %v", err)
+					}
+
+					b, err := format.Node(expr)
+					if err != nil {
+						t.Fatalf("format error: %v", err)
+					}
+					results = append(results, strings.TrimSpace(string(b)))
 				}
 
-				b, err := format.Node(expr)
-				if err != nil {
-					t.Fatalf("format error: %v", err)
+				if len(results) != len(tc.want) {
+					t.Fatalf("got %d documents, want %d\nresults: %v\nwant: %v",
+						len(results), len(tc.want), results, tc.want)
 				}
-				results = append(results, strings.TrimSpace(string(b)))
-			}
 
-			if len(results) != len(tc.want) {
-				t.Fatalf("got %d documents, want %d\nresults: %v\nwant: %v",
-					len(results), len(tc.want), results, tc.want)
-			}
-
-			for i, got := range results {
-				if got != tc.want[i] {
-					t.Errorf("document %d:\ngot  %q\nwant %q", i, got, tc.want[i])
+				for i, got := range results {
+					if got != tc.want[i] {
+						t.Errorf("document %d:\ngot  %q\nwant %q", i, got, tc.want[i])
+					}
 				}
-			}
 
-			// Verify that calling Extract again returns EOF
-			_, err := d.Extract()
-			if err != io.EOF {
-				t.Errorf("expected io.EOF on subsequent Extract, got %v", err)
-			}
-		})
-	}
+				// Verify that calling Extract again returns EOF
+				_, err := d.Extract()
+				if err != io.EOF {
+					t.Errorf("expected io.EOF on subsequent Extract, got %v", err)
+				}
+			})
+		}
+	})
 }
 
 func TestYAMLValues(t *testing.T) {
@@ -420,45 +438,43 @@ func TestYAMLValues(t *testing.T) {
 		{`"a\rb"`, `"a\rb"`},
 		// Characters which need escaping are double quoted, even when
 		// the string would otherwise be single quoted.
-		{`"? \u0080"`, `"? \u0080"`},
+		{`"? \u0080"`, `"? \x80"`},
 		{`"? a\rb"`, `"? a\rb"`},
-		{`{"? \u0085x": 1}`, `"? \u0085x": 1`},
+		{`{"? \u0085x": 1}`, `? "? \Nx"` + "\n: 1"},
 		// Strings quoted for any other reason are single quoted as they
 		// are: a single quoted scalar cannot carry escapes.
 		{`"Price: 10\u00a0€"`, "'Price: 10\u00a0€'"},
-		{`"# 👨\u200d👩\u200d👧"`, "'# 👨\u200d👩\u200d👧'"},
 		{`{" lead\u200b": "key: \u00ad"}`, "' lead\u200b': 'key: \u00ad'"},
+		// Characters outside the Basic Multilingual Plane are escaped.
+		{`"# 👨\u200d👩\u200d👧"`, "\"# \\U0001F468\u200d\\U0001F469\u200d\\U0001F467\""},
 		// Document markers at the start of a line end or start a
 		// document, so strings starting with them are quoted.
-		{`"..."`, `"..."`},
-		{`"... x"`, `"... x"`},
-		{`{"...x": 1, "--- x": 2}`, `"...x": 1` + "\n" + `"--- x": 2`},
+		{`"..."`, `'...'`},
+		{`"... x"`, `'... x'`},
+		{`{"...x": 1, "--- x": 2}`, `'...x': 1` + "\n" + `'--- x': 2`},
 		// A key longer than 1024 characters must be explicit.
 		{`{` + longKey + `: 1, b: [{` + longKey + `: 2}]}`,
 			"? " + longKey + "\n: 1\nb:\n  - ? " + longKey + "\n    : 2"},
-		// goccy's decoder misreads a block literal after a quoted
-		// explicit key, so such a value is double quoted.
-		{`{"#` + longKey + `": "a\nb"}`, "? '#" + longKey + "'\n" + `: "a\nb"`},
-		// A key containing a newline is double quoted, even when it
-		// would otherwise be single quoted.
-		{`{"? x\ny": 1}`, `"? x\ny": 1`},
+		{`{"#` + longKey + `": "a\nb"}`, "? '#" + longKey + "'\n: |-\n  a\n  b"},
+		// A key containing a newline is explicit.
+		{`{"? x\ny": 1}`, "? |-\n  ? x\n  y\n: 1"},
 		// C1 control characters and the byte order mark cannot appear
 		// unescaped in YAML; a leading byte order mark would be dropped
-		// as an encoding mark.
-		{`"x\u0080y"`, `"x\u0080y"`},
-		{`"\ufeffa"`, `"\ufeffa"`},
-		{`{"\ufeffk": "x\ufeffy"}`, `"\ufeffk": "x\ufeffy"`},
+		// as an encoding mark. The character after a leading byte order
+		// mark is escaped as well.
+		{`"x\u0080y"`, `"x\x80y"`},
+		{`"\ufeffa"`, `"\uFEFF\x61"`},
+		{`{"\ufeffk": "x\ufeffy"}`, `"\uFEFF\x6B": "x\uFEFFy"`},
 
-		// A literal block cannot carry a string of only newlines, which
-		// the block's chomping would drop, nor an indented first line
-		// after leading newlines, as the indentation of the first
-		// non-empty line sets the block's indentation.
-		{`"\n"`, `"\n"`},
-		{`"\n\n"`, `"\n\n"`},
-		{`"\n  indented"`, `"\n  indented"`},
-		{`"\n  a\nb"`, `"\n  a\nb"`},
-		{`"\n\tx"`, `"\n\tx"`},
-		{`{a: "\n\n", b: 1}`, `a: "\n\n"` + "\nb: 1"},
+		// A literal block carries a string of only newlines with keep
+		// chomping, and an indented first line after leading newlines
+		// with an indentation indicator.
+		{`"\n"`, `|2+`},
+		{`"\n\n"`, `|2+`},
+		{`"\n  indented"`, "|2-\n\n    indented"},
+		{`"\n  a\nb"`, "|2-\n\n    a\n  b"},
+		{`"\n\tx"`, "|2-\n\n  \tx"},
+		{`{a: "\n\n", b: 1}`, "a: |2+\n\n\nb: 1"},
 
 		// Blank lines within a literal block stay truly empty, with no
 		// trailing whitespace padding.
@@ -517,8 +533,8 @@ func TestYAMLValues(t *testing.T) {
 		// A tag on a list element is a declaration attribute by an embedding.
 		{`["first", {"second", @yaml(,tag="!Env")}]`, "- first\n- !Env second"},
 
-		// Empty bytes are an empty quoted string with a binary tag.
-		{`a: ''`, `a: !!binary ""`},
+		// Empty bytes are an empty scalar with a binary tag.
+		{`a: ''`, `a: !!binary`},
 
 		// A tagged empty collection stays on the line of its tag.
 		{`{d: {} @yaml(,tag="!Empty"), l: [{[], @yaml(,tag="!L")}]}`, "d: !Empty {}\nl:\n  - !L []"},
@@ -527,33 +543,81 @@ func TestYAMLValues(t *testing.T) {
 		{`a: string`, `error: a: incomplete value string`},
 		{`a: 1 & 2`, `error: a: conflicting values 2 and 1`},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.cue, func(t *testing.T) {
-			c := cuecontext.New()
-			v := c.CompileString(tc.cue)
+	// goccyYAML holds the encodings by the goccy implementation which
+	// differ from those above, keyed by their CUE input.
+	goccyYAML := map[string]string{
+		`"? \u0080"`:              `"? \u0080"`,
+		`{"? \u0085x": 1}`:        `"? \u0085x": 1`,
+		`"x\u0080y"`:              `"x\u0080y"`,
+		`"\ufeffa"`:               `"\ufeffa"`,
+		`{"\ufeffk": "x\ufeffy"}`: `"\ufeffk": "x\ufeffy"`,
+		`"# 👨\u200d👩\u200d👧"`:     "'# 👨\u200d👩\u200d👧'",
 
-			b, err := yaml.Encode(v)
-			got := strings.TrimSpace(string(b))
-			if err != nil {
-				got = "error: " + err.Error()
-			}
-			if got != tc.yaml {
-				t.Errorf("Encode:\ngot  %q\nwant %q", got, tc.yaml)
-			}
-			if err != nil {
-				return
-			}
-			// The encoding decodes back to the same value.
-			f, err := yaml.Extract("x.yaml", b)
-			if err != nil && strings.Contains(tc.cue, "@yaml") {
-				return // decoding does not support custom tags on scalars
-			} else if err != nil {
-				t.Fatalf("Extract: %v", err)
-			}
-			dec := c.BuildFile(f)
-			if dec.Subsume(v, cue.Final()) != nil || v.Subsume(dec, cue.Final()) != nil {
-				t.Errorf("Extract:\ngot  %v\nwant %v", dec, v)
-			}
-		})
+		`"..."`:                   `"..."`,
+		`"... x"`:                 `"... x"`,
+		`{"...x": 1, "--- x": 2}`: `"...x": 1` + "\n" + `"--- x": 2`,
+
+		// goccy's decoder misreads a block literal after a quoted
+		// explicit key, so such a value is double quoted.
+		`{"#` + longKey + `": "a\nb"}`: "? '#" + longKey + "'\n" + `: "a\nb"`,
+		// goccy double quotes a key containing a newline.
+		`{"? x\ny": 1}`: `"? x\ny": 1`,
+		// goccy writes no indentation indicator, and its literal blocks
+		// cannot carry a string of only newlines, which the block's
+		// chomping would drop, nor an indented first line after leading
+		// newlines, as the indentation of the first non-empty line sets
+		// the block's indentation; such strings are double quoted.
+		`"\n"`:              `"\n"`,
+		`"\n\n"`:            `"\n\n"`,
+		`"\n  indented"`:    `"\n  indented"`,
+		`"\n  a\nb"`:        `"\n  a\nb"`,
+		`"\n\tx"`:           `"\n\tx"`,
+		`{a: "\n\n", b: 1}`: `a: "\n\n"` + "\nb: 1",
+
+		`a: ''`: `a: !!binary ""`,
 	}
+	inputs := make(map[string]bool)
+	for _, tc := range testCases {
+		inputs[tc.cue] = true
+	}
+	for in := range goccyYAML {
+		if !inputs[in] {
+			t.Errorf("goccyYAML has no test case for %q", in)
+		}
+	}
+	forEachImpl(t, func(t *testing.T, goccy bool) {
+		for _, tc := range testCases {
+			t.Run(tc.cue, func(t *testing.T) {
+				c := cuecontext.New()
+				v := c.CompileString(tc.cue)
+
+				b, err := yaml.Encode(v)
+				got := strings.TrimSpace(string(b))
+				if err != nil {
+					got = "error: " + err.Error()
+				}
+				want := tc.yaml
+				if y, ok := goccyYAML[tc.cue]; ok && goccy {
+					want = y
+				}
+				if got != want {
+					t.Errorf("Encode:\ngot  %q\nwant %q", got, want)
+				}
+				if err != nil {
+					return
+				}
+				// The encoding decodes back to the same value.
+				f, err := yaml.Extract("x.yaml", b)
+				if err != nil && strings.Contains(tc.cue, "@yaml") {
+					return // decoding does not support custom tags on scalars
+				} else if err != nil {
+					t.Fatalf("Extract: %v", err)
+				}
+				dec := c.BuildFile(f)
+				if dec.Subsume(v, cue.Final()) != nil || v.Subsume(dec, cue.Final()) != nil {
+					t.Errorf("Extract:\ngot  %v\nwant %v", dec, v)
+				}
+			})
+		}
+	})
 }

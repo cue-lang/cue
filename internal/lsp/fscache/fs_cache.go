@@ -124,6 +124,9 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, bf *bui
 		json.PatchExpr(syntax, nil)
 
 	case build.YAML:
+		// Use the goccy decoder whether or not the yamlgoccy experiment
+		// is enabled, as go.yaml.in/yaml/v3 cannot produce partial syntax
+		// trees for incomplete YAML, such as a file being edited.
 		syntax, err = goccy.ExtractLenient(filename, content)
 
 	default:

@@ -14,9 +14,9 @@ cmp stdout expect-export
 exec cue import -o - -f ./in.yaml
 cmp stdout expect-import
 
-# Disabling the yamlgoccy experiment selects the older yaml.v3 based
-# decoder, which decodes these the same way.
-env CUE_EXPERIMENT=yamlgoccy=0
+# The yamlgoccy experiment selects the goccy based decoder, which decodes
+# these the same way.
+env CUE_EXPERIMENT=yamlgoccy
 exec cue export ./in.yaml
 cmp stdout expect-export
 

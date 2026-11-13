@@ -24,8 +24,7 @@ import (
 // TestMain pins the tests in this package to the go.yaml.in/yaml/v3
 // based implementation it contains. The exported API steers to
 // [cuelang.org/go/internal/encoding/yaml/goccy] when the yamlgoccy
-// experiment is enabled, which is the default; that package carries
-// its own tests.
+// experiment is enabled; that package carries its own tests.
 func TestMain(m *testing.M) {
 	if err := cueexperiment.Init(); err != nil {
 		panic(err)

@@ -62,6 +62,8 @@ func Extract(filename string, src any) (*ast.File, error) {
 //
 // The encoding is valid YAML 1.2, and decodes back to v both with this
 // package and with any decoder following YAML 1.2's core schema.
+// The decoder selected by CUE_EXPERIMENT=yamlgoccy is an exception, as it
+// rejects some valid YAML, such as literal blocks of only newlines.
 // Strings are also quoted wherever YAML 1.1 decoders, or the widely used
 // go-yaml decoders, would read them as values of other types, such as
 // "yes", "0755", or "0X1F".

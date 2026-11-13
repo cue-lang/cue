@@ -127,8 +127,6 @@ s: ?x
 		// Strings that YAML 1.1 decoders resolve as numbers or values:
 		// its integers and floats allow underscores, including in
 		// sexagesimal numbers, and "=" is the default value key.
-		// TODO: quote these, as the YAML 1.1 decoders read them as
-		// numbers or fail to decode them.
 		name: "yaml11Values",
 		in: `
 		a: "1_:0"
@@ -139,12 +137,12 @@ s: ?x
 		"0x_": 1
 		`,
 		out: `
-a: 1_:0
-b: 190_0:20
-c: 0x_
-d: 0b_
-e: =
-0x_: 1
+a: "1_:0"
+b: "190_0:20"
+c: "0x_"
+d: "0b_"
+e: "="
+"0x_": 1
 `,
 	}, {
 		name: "comments",

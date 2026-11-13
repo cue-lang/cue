@@ -18,9 +18,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"math/big"
-	"regexp"
 	"strings"
-	"sync"
 
 	"go.yaml.in/yaml/v3"
 
@@ -176,7 +174,7 @@ func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 			n.Style = yaml.LiteralStyle
 
 		default:
-			if shouldQuote(str) {
+			if goccy.IsYAML11NonString(str) {
 				n.Style = yaml.DoubleQuotedStyle
 			}
 		}
@@ -185,56 +183,6 @@ func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 		return nil, errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
 	}
 	return n, nil
-}
-
-// shouldQuote indicates that a string may be a YAML 1.1. legacy value and that
-// the string should be quoted.
-func shouldQuote(str string) bool {
-	return legacyStrings[str] || useQuote().MatchString(str)
-}
-
-// This regular expression conservatively matches any date, time string,
-// or base60 float.
-var useQuote = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[\-+0-9:\. \t]+([-:]|[tT])[\-+0-9:\. \t]+[zZ]?$|^0x[a-fA-F0-9]+$`)
-})
-
-// legacyStrings contains a map of fixed strings with special meaning for any
-// type in the YAML Tag registry (https://yaml.org/type/index.html) as used
-// in YAML 1.1.
-//
-// These strings are always quoted upon export to allow for backward
-// compatibility with YAML 1.1 parsers.
-var legacyStrings = map[string]bool{
-	"y":     true,
-	"Y":     true,
-	"yes":   true,
-	"Yes":   true,
-	"YES":   true,
-	"n":     true,
-	"N":     true,
-	"t":     true,
-	"T":     true,
-	"f":     true,
-	"F":     true,
-	"no":    true,
-	"No":    true,
-	"NO":    true,
-	"true":  true,
-	"True":  true,
-	"TRUE":  true,
-	"false": true,
-	"False": true,
-	"FALSE": true,
-	"on":    true,
-	"On":    true,
-	"ON":    true,
-	"off":   true,
-	"Off":   true,
-	"OFF":   true,
-
-	// Non-standard.
-	".Nan": true,
 }
 
 func setNum(n *yaml.Node, s string, x interface{}) error {
@@ -346,7 +294,7 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			label := &yaml.Node{}
 			addDocs(x.Label, label, label)
 			label.SetString(name)
-			if shouldQuote(name) {
+			if goccy.IsYAML11NonString(name) {
 				label.Style = yaml.DoubleQuotedStyle
 			}
 

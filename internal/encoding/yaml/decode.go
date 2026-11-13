@@ -834,62 +834,21 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		return lit, nil
 
 	case intTag:
-		// Convert YAML octal to CUE octal. If YAML accepted an invalid
-		// integer, just convert it as well to ensure CUE will fail.
-		value := yn.Value
-		if len(value) > 1 && value[0] == '0' && value[1] <= '9' {
-			value = "0o" + value[1:]
+		expr, err := goccy.IntExpr(pos, yn.Value)
+		if err != nil {
+			return nil, d.posErrorf(yn, "%v", err)
 		}
-		var info literal.NumInfo
-		// We make the assumption that any valid YAML integer literal will be a valid
-		// CUE integer literal as well, with the only exception of octal numbers above.
-		// Note that `!!int 123.456` is not allowed.
-		if err := literal.ParseNum(value, &info); err != nil {
-			return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)
-		} else if !info.IsInt() {
-			return nil, d.posErrorf(yn, "cannot decode %q as %s: not a literal number", value, tag)
-		}
-		return d.makeNum(pos, value, token.INT), nil
+		return expr, nil
 
 	case floatTag:
-		value := yn.Value
-		// TODO(mvdan): The strings below are from yaml.v3; should we be relying on upstream somehow?
-		switch value {
-		case ".inf", ".Inf", ".INF", "+.inf", "+.Inf", "+.INF":
-			value = "+Inf"
-		case "-.inf", "-.Inf", "-.INF":
-			value = "-Inf"
-		case ".nan", ".NaN", ".NAN":
-			value = "NaN"
-		default:
-			// Convert YAML 1.1 octal to CUE octal, like with !!int above.
-			if len(value) > 1 && value[0] == '0' && value[1] >= '0' && value[1] <= '9' {
-				value = "0o" + value[1:]
-			}
-			var info literal.NumInfo
-			// We make the assumption that any valid YAML float literal will be a valid
-			// CUE float literal as well, with the only exception of Inf/NaN and octal above.
-			// Note that `!!float 123` is allowed.
-			if err := literal.ParseNum(value, &info); err != nil {
-				return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)
-			}
-			// If the decoded YAML scalar was explicitly or implicitly a float,
-			// and the scalar literal looks like an integer,
-			// unify it with "number" to record the fact that it was represented as a float.
-			// Don't unify with float, as `float & 123` is invalid, and there's no need
-			// to forbid representing the number as an integer either.
-			if yn.Tag != "" {
-				if p := strings.IndexAny(value, ".eEiInN"); p == -1 {
-					// TODO: number(v) when we have conversions
-					// TODO(mvdan): don't shove the unification inside a BasicLit.Value string
-					//
-					// TODO(mvdan): would it be better to do turn `!!float 123` into `123.0`
-					// rather than `number & 123`? Note that `float & 123` is an error.
-					value = fmt.Sprintf("number & %s", value)
-				}
-			}
+		if num, ok := goccy.SpecialFloats[yn.Value]; ok {
+			return goccy.MakeNum(pos, num, token.FLOAT), nil
 		}
-		return d.makeNum(pos, value, token.FLOAT), nil
+		expr, err := goccy.FloatExpr(pos, yn.Value, yn.Tag != "")
+		if err != nil {
+			return nil, d.posErrorf(yn, "%v", err)
+		}
+		return expr, nil
 
 	case nullTag:
 		return &ast.BasicLit{
@@ -900,23 +859,6 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 	default:
 		return nil, d.posErrorf(yn, "cannot unmarshal tag %q", tag)
 	}
-}
-
-func (d *decoder) makeNum(pos token.Pos, val string, kind token.Token) (expr ast.Expr) {
-	val, negative := strings.CutPrefix(val, "-")
-	expr = &ast.BasicLit{
-		ValuePos: pos,
-		Kind:     kind,
-		Value:    val,
-	}
-	if negative {
-		expr = &ast.UnaryExpr{
-			OpPos: pos,
-			Op:    token.SUB,
-			X:     expr,
-		}
-	}
-	return expr
 }
 
 // maxAliasNodes bounds the nodes produced by alias expansion. Each alias

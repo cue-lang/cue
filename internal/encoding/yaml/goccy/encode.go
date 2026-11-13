@@ -890,7 +890,7 @@ func decodesAsNonString(s string) bool {
 		// Mirror the decoder's handling of plain string scalars, which
 		// resolves more numbers than goccy's lexer; see
 		// [decoder.scalarString].
-		if _, ok := specialFloats[s]; ok {
+		if _, ok := SpecialFloats[s]; ok {
 			return true
 		}
 		return numberKind(s) != token.ILLEGAL

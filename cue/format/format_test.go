@@ -660,18 +660,16 @@ func TestNodes(t *testing.T) {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the
 		// receiver's last line.
-		// TODO: a receiver spanning lines also breaks the line after the
-		// opening bracket, here and in the call below.
 		name: "index into a receiver spanning lines",
 		in: &ast.IndexExpr{
 			X:     multiLineConjunction(),
 			Index: ast.NewIdent("s"),
 		},
-		out: "(a & {\n\tb: c\n\td: e\n})[\n\ts]",
+		out: "(a & {\n\tb: c\n\td: e\n})[s]",
 	}, {
 		name: "call of a callee spanning lines",
 		in:   ast.NewCall(multiLineConjunction(), ast.NewIdent("s"), ast.NewIdent("t")),
-		out:  "(a & {\n\tb: c\n\td: e\n})(\n\ts,\n\tt,\n)",
+		out:  "(a & {\n\tb: c\n\td: e\n})(s, t)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

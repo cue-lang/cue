@@ -1244,7 +1244,7 @@ func normaliseNumericLit(kind token.Token, data string) string {
 // the final Doc.
 type bracketedLayout struct {
 	node       ast.Node     // for maybeGroup + isAuthored lookup
-	openPrefix doc          // emitted before open (e.g. CallExpr's fun); nil otherwise
+	openPrefix doc          // emitted before open (e.g. CallExpr's fun), outside its group; nil otherwise
 	open       doc          // bracket open token (lBrace / lBracket / lParen)
 	close      doc          // bracket close token
 	openerRel  token.RelPos // RelPos of the opening token (used for openBreak when body is empty)
@@ -1619,8 +1619,8 @@ func (c *converter) applyBracketed(b bracketedLayout, p bracketedPolicy) doc {
 		if b.allowsTrailingComma {
 			trailingComma = commaLit
 		}
-		return c.maybeGroup(b.node,
-			cats(b.openPrefix, b.open, bodyShape(b.inner, trailingComma), b.close))
+		return cats(b.openPrefix, c.maybeGroup(b.node,
+			cats(b.open, bodyShape(b.inner, trailingComma), b.close)))
 	}
 	var inner doc
 	switch {
@@ -1645,8 +1645,8 @@ func (c *converter) applyBracketed(b bracketedLayout, p bracketedPolicy) doc {
 	if p.hugLast {
 		closeBreak = nil
 	}
-	return c.maybeGroup(b.node,
-		cats(b.openPrefix, b.open, inner, closeBreak, b.close))
+	return cats(b.openPrefix, c.maybeGroup(b.node,
+		cats(b.open, inner, closeBreak, b.close)))
 }
 
 // elementRows builds the per-element Rows for a list literal or
@@ -2909,13 +2909,14 @@ func (c *converter) indexExpr(x *ast.IndexExpr) doc {
 	// b)[i]`).
 	recv := wrapForPrecedence(c.expr(x.X), x.X, token.HighestPrec)
 	index := c.expr(x.Index)
-	return c.maybeGroup(x, cats(
-		recv,
+	// The receiver stays out of the group, so that a receiver spanning
+	// lines does not break the line after the opening bracket.
+	return cats(recv, c.maybeGroup(x, cats(
 		lBracketLit,
 		nest(cats(cats(afterOpen...), openBreak, index, cats(beforeClose...))),
 		closeBreak,
 		rBracketLit,
-	))
+	)))
 }
 
 // sliceExpr converts a SliceExpr.

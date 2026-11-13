@@ -28,6 +28,4 @@ d: b.c[
 f: b[
 	c
 	// own line before the close
-].d(
-	1,
-)
+].d(1)

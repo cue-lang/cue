@@ -970,6 +970,16 @@ func (x *LetReference) Source() ast.Node {
 	return x.Src
 }
 
+// ValueBinding returns the reference to an enclosing vertex which x is bound
+// to, like `self` in `let X = self`, or nil if x is bound to any other
+// expression. Such a let resolves to that vertex rather than to a let vertex.
+func (x *LetReference) ValueBinding() *ValueReference {
+	if vr, ok := x.X.(*ValueReference); ok && vr.UpCount > 0 {
+		return vr
+	}
+	return nil
+}
+
 func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	e := ctx.Env(x.UpCount)
 
@@ -983,7 +993,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 	// (inline) vertices sharing is disabled and the synthetic vertex
 	// becomes a lazily populated mirror of its own parent, rebinding self
 	// to the mirror and misresolving nested references through the let.
-	if vr, ok := x.X.(*ValueReference); ok && vr.UpCount > 0 {
+	if vr := x.ValueBinding(); vr != nil {
 		return ctx.derefNode(e.up(ctx, vr.UpCount-1))
 	}
 

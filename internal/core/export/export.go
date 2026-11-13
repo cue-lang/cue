@@ -883,9 +883,12 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 	switch {
 	case let == nil:
 		ref, _ := e.ctx.Lookup(env, x)
-		if ref == nil {
-			// This can happen if x.X does not resolve to a valid value. At this
-			// point we will not get a valid configuration.
+		c, n := ref.SingleConjunct()
+		if n == 0 {
+			// This can happen if x.X does not resolve to a valid value, or if
+			// a let bound to self resolves to a placeholder vertex, as used by
+			// dependency analysis for struct literals. At this point we will
+			// not get a valid configuration.
 
 			// TODO: get rid of the use of x.X.
 			// str := x.Label.IdentString(e.ctx)
@@ -894,7 +897,10 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 
 			return e.expr(env, x.X)
 		}
-		c, _ := ref.SingleConjunct()
+		if x.ValueBinding() != nil {
+			// The vertex it denotes may have many conjuncts.
+			return e.expr(nil, ref)
+		}
 		return e.expr(c.EnvExpr())
 
 	case let.Expr == nil:

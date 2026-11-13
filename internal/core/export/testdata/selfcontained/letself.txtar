@@ -1,0 +1,71 @@
+#path: x
+
+# Dependency analysis evaluates #Game & {c: T.c} in a struct literal that it
+# visits without its vertex, so the let bound to self resolves to a placeholder
+# vertex there. Exporting the values hoisted from it must not panic.
+#
+# TODO: c of that unrooted vertex should not be hoisted, and the expression of
+# T in its conjunct is exported as self, which refers to the let C instead.
+
+-- cue.mod/module.cue --
+module: "mod.test/a"
+language: version: "v0.18.0"
+-- in.cue --
+import "mod.test/a/app"
+
+raw: bool
+s:   app.code
+x: y: [if raw {s.screens}]
+-- app/app.cue --
+package app
+
+#Game: {
+	let G = self
+	c:   string
+	out: "\(G.c)\(G.c)"
+}
+#Team: {
+	let T = self
+	c: string
+	p: bool
+	out: [if T.p {(#Game & {c: T.c}).out}, ""][0]
+}
+_cells: (#Team & {c: "p"}).out
+code: screens: a: _cells
+-- out/self/default --
+y: [if RAW {
+	a: CELLS.#x
+}]
+
+//cue:path: raw
+let RAW = bool
+
+//cue:path: _cells
+let CELLS = {#x: (TEAM.#x & {c: "p"}).out}
+
+//cue:path: #Team
+let TEAM = {
+	#x: {
+		let T = self
+		c: string
+		p: bool
+		out: [
+			if T.p {
+				(GAME.#x & {c: T.c}).out
+			},
+			""
+		][0]
+	}
+}
+
+//cue:path: #Game
+let GAME = {
+	#x: {
+		let G = self
+		c:   string
+		out: "\(G.c)\(C.#x)"
+	}
+}
+
+//cue:path: c
+let C = {#x: self.c & {string}}

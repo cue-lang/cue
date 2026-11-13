@@ -1,0 +1,29 @@
+#path: x
+
+# A field named self shadows the predeclared identifier of that name. The
+# fields of x are declared at the top of the output, which is also where the
+# value of #G is hoisted to.
+#
+# TODO: self in #G.out refers to the field x.self in the output, rather than
+# to #G. The output only evaluates like the input because both have the same c.
+
+-- in.cue --
+#G: {
+	c:   string
+	out: self.c
+}
+x: {
+	self: c: "mine"
+	y: #G & {c: "mine"}
+}
+-- out/self/default --
+self: c: "mine"
+y: G.#x & {c: "mine"}
+
+//cue:path: #G
+let G = {
+	#x: {
+		c:   string
+		out: self.c
+	}
+}

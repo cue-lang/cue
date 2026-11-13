@@ -634,9 +634,9 @@ func (d *decoder) extract(yn yast.Node) (ast.Expr, error) {
 	case *yast.NullNode:
 		expr = d.nullLit(d.pos(d.nodeOffset(n)))
 	case *yast.InfinityNode:
-		expr = d.makeNum(d.pos(d.nodeOffset(n)), infString(n), token.FLOAT)
+		expr = MakeNum(d.pos(d.nodeOffset(n)), infString(n), token.FLOAT)
 	case *yast.NanNode:
-		expr = d.makeNum(d.pos(d.nodeOffset(n)), "NaN", token.FLOAT)
+		expr = MakeNum(d.pos(d.nodeOffset(n)), "NaN", token.FLOAT)
 	case *yast.AliasNode:
 		expr, err = d.alias(n)
 	default:
@@ -1570,9 +1570,9 @@ var rxYamlFloat = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`^[-+]?((\.[0-9]+|[0-9]+\.[0-9]*)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+)$`)
 })
 
-// specialFloats maps the plain scalar spellings of infinities and NaN
+// SpecialFloats maps the plain scalar spellings of infinities and NaN
 // to their decoded forms.
-var specialFloats = map[string]string{
+var SpecialFloats = map[string]string{
 	".inf": "+Inf", ".Inf": "+Inf", ".INF": "+Inf",
 	"+.inf": "+Inf", "+.Inf": "+Inf", "+.INF": "+Inf",
 	"-.inf": "-Inf", "-.Inf": "-Inf", "-.INF": "-Inf",
@@ -1583,7 +1583,7 @@ var specialFloats = map[string]string{
 // as a number, returning token.INT, token.FLOAT, or token.ILLEGAL when
 // s is not a number. The accepted forms are those of [rxYamlInt] and
 // [rxYamlFloat], with no limit on the size of integers. Infinities and
-// NaN are handled separately via [specialFloats]. Note that we cannot
+// NaN are handled separately via [SpecialFloats]. Note that we cannot
 // use CUE's own number syntax to decide, as it is a superset of
 // YAML's: for example, `1Gi` is a valid CUE literal but a string in
 // YAML.
@@ -1614,14 +1614,14 @@ func (d *decoder) scalarString(n *yast.StringNode) (ast.Expr, error) {
 	pos := d.pos(d.nodeOffset(n))
 	value := n.Value
 	if n.GetToken().Type == ytoken.StringType { // a plain, unquoted scalar
-		if num, ok := specialFloats[value]; ok {
-			return d.makeNum(pos, num, token.FLOAT), nil
+		if num, ok := SpecialFloats[value]; ok {
+			return MakeNum(pos, num, token.FLOAT), nil
 		}
 		switch numberKind(value) {
 		case token.INT:
-			return d.intExpr(pos, value)
+			return IntExpr(pos, value)
 		case token.FLOAT:
-			return d.floatExpr(pos, value, true)
+			return FloatExpr(pos, value, true)
 		}
 	}
 	return d.quotedString(pos, value), nil
@@ -1649,17 +1649,17 @@ func yaml11OctalToCUE(value string) string {
 
 func (d *decoder) integer(n *yast.IntegerNode) (ast.Expr, error) {
 	pos := d.pos(d.nodeOffset(n))
-	expr, err := d.intExpr(pos, n.GetToken().Value)
+	expr, err := IntExpr(pos, n.GetToken().Value)
 	if err != nil {
 		return nil, d.posErrorf(n, "%v", err)
 	}
 	return expr, nil
 }
 
-// intExpr converts a YAML integer literal to a CUE expression.
+// IntExpr converts a YAML integer literal to a CUE expression.
 // If YAML accepted an invalid integer, we pass it along to ensure
 // CUE will fail.
-func (d *decoder) intExpr(pos token.Pos, value string) (ast.Expr, error) {
+func IntExpr(pos token.Pos, value string) (ast.Expr, error) {
 	value = yaml11OctalToCUE(value)
 	var info literal.NumInfo
 	// We make the assumption that any valid YAML integer literal will be a valid
@@ -1669,25 +1669,25 @@ func (d *decoder) intExpr(pos token.Pos, value string) (ast.Expr, error) {
 	} else if !info.IsInt() {
 		return nil, fmt.Errorf("cannot decode %q as %s: not a literal number", value, "!!int")
 	}
-	return d.makeNum(pos, value, token.INT), nil
+	return MakeNum(pos, value, token.INT), nil
 }
 
 func (d *decoder) float(n *yast.FloatNode) (ast.Expr, error) {
 	pos := d.pos(d.nodeOffset(n))
-	expr, err := d.floatExpr(pos, n.GetToken().Value, false)
+	expr, err := FloatExpr(pos, n.GetToken().Value, false)
 	if err != nil {
 		return nil, d.posErrorf(n, "%v", err)
 	}
 	return expr, nil
 }
 
-// floatExpr converts a YAML float literal to a CUE expression. When the
+// FloatExpr converts a YAML float literal to a CUE expression. When the
 // literal has an explicit or implied !!float tag but looks like an
 // integer, it is unified with "number" to record the fact that it was
 // represented as a float. Don't unify with float, as `float & 123` is
 // invalid, and there's no need to forbid representing the number as an
 // integer either.
-func (d *decoder) floatExpr(pos token.Pos, value string, explicitTag bool) (ast.Expr, error) {
+func FloatExpr(pos token.Pos, value string, explicitTag bool) (ast.Expr, error) {
 	// Convert YAML 1.1 octal, like with integers.
 	value = yaml11OctalToCUE(value)
 	var info literal.NumInfo
@@ -1699,17 +1699,22 @@ func (d *decoder) floatExpr(pos token.Pos, value string, explicitTag bool) (ast.
 	}
 	if explicitTag && !strings.ContainsAny(value, ".eEiInN") {
 		// TODO: number(v) when we have conversions
+		//
+		// TODO(mvdan): would it be better to do turn `!!float 123` into `123.0`
+		// rather than `number & 123`? Note that `float & 123` is an error.
 		return &ast.BinaryExpr{
 			X:     &ast.Ident{NamePos: pos, Name: "number"},
 			OpPos: pos.WithRel(token.Blank),
 			Op:    token.AND,
-			Y:     d.makeNum(pos.WithRel(token.Blank), value, token.INT),
+			Y:     MakeNum(pos.WithRel(token.Blank), value, token.INT),
 		}, nil
 	}
-	return d.makeNum(pos, value, token.FLOAT), nil
+	return MakeNum(pos, value, token.FLOAT), nil
 }
 
-func (d *decoder) makeNum(pos token.Pos, val string, kind token.Token) (expr ast.Expr) {
+// MakeNum returns a CUE number literal of the given kind for val,
+// wrapped in a unary minus if val is negative.
+func MakeNum(pos token.Pos, val string, kind token.Token) (expr ast.Expr) {
 	val, negative := strings.CutPrefix(val, "-")
 	expr = &ast.BasicLit{
 		ValuePos: pos,
@@ -1819,7 +1824,7 @@ func (d *decoder) tagged(n *yast.TagNode) (ast.Expr, error) {
 
 	case "!!int":
 		pos := d.pos(d.nodeOffset(inner))
-		expr, err := d.intExpr(pos, nodeStringValue(inner))
+		expr, err := IntExpr(pos, nodeStringValue(inner))
 		if err != nil {
 			return nil, d.posErrorf(n, "%v", err)
 		}
@@ -1832,7 +1837,7 @@ func (d *decoder) tagged(n *yast.TagNode) (ast.Expr, error) {
 			return d.extract(inner)
 		}
 		pos := d.pos(d.nodeOffset(inner))
-		expr, err := d.floatExpr(pos, nodeStringValue(inner), true)
+		expr, err := FloatExpr(pos, nodeStringValue(inner), true)
 		if err != nil {
 			return nil, d.posErrorf(n, "%v", err)
 		}

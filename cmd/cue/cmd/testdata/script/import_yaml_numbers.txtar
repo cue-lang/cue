@@ -15,17 +15,14 @@ exec cue import -o - -f ./in.yaml
 cmp stdout expect-import
 
 # Disabling the yamlgoccy experiment selects the older yaml.v3 based
-# decoder, which fails on signed YAML 1.1 octals and on floats with a
-# leading zero digit. Once past those, it decodes numbers that the YAML
-# lexer does not resolve, such as integers beyond 64 bits, into invalid
-# CUE literals.
-# TODO: decode these as the goccy based decoder does.
+# decoder, which decodes integers beyond 64 bits as floats rather than
+# as integers.
 env CUE_EXPERIMENT=yamlgoccy=0
-! exec cue export ./in.yaml
-stderr 'in.yaml:8: cannot decode "-0123" as !!int: illegal integer number "-0123"'
+exec cue export ./in.yaml
+cmp stdout expect-export
 
-! exec cue import -o - -f ./in.yaml
-stderr 'in.yaml:8: cannot decode "-0123" as !!int: illegal integer number "-0123"'
+exec cue import -o - -f ./in.yaml
+cmp stdout expect-import-yamlv3
 
 -- in.yaml --
 memory: 1Gi
@@ -58,6 +55,18 @@ memory:           "1Gi"
 cpu:              "100m"
 frac:             "1.5Gi"
 huge:             18446744073709551616
+exp:              123456e1
+float:            number & 123
+octal:            0o123
+signedOctal:      -0o123
+floatOctal:       number & 0o123
+leadingZeroFloat: 01289.5
+leadingZeroExp:   012e3
+-- expect-import-yamlv3 --
+memory:           "1Gi"
+cpu:              "100m"
+frac:             "1.5Gi"
+huge:             number & 18446744073709551616
 exp:              123456e1
 float:            number & 123
 octal:            0o123

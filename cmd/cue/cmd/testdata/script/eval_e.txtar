@@ -28,8 +28,7 @@ cmp stdout expect/shared/stdout
 cmp stderr expect/shared/stderr
 
 # Issue #4573: closedness applies to an expression as to any other value.
-# TODO: this should fail, as b is not allowed.
-exec cue eval -e '#D & {b: "bad"}' closed/x.cue
+! exec cue eval -e '#D & {b: "bad"}' closed/x.cue
 cmp stdout expect/closed/stdout
 cmp stderr expect/closed/stderr
 
@@ -122,5 +121,6 @@ x.a: conflicting values "bad" and int (mismatched types string and int):
 -- closed/x.cue --
 #D: {a?: string}
 -- expect/closed/stdout --
-b: "bad"
 -- expect/closed/stderr --
+b: field not allowed:
+    --expression:1:7

@@ -73,13 +73,12 @@ func TestFromExpr(t *testing.T) {
 		err:  `reference "__nosuchbuiltin" not found`,
 	}, {
 		// Issue #4573: a closed struct rejects the fields of another operand.
-		// TODO: this should fail, as b is not allowed.
 		expr: ast.NewBinExpr(
 			token.AND,
 			ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
 			ast.NewStruct("b", ast.NewLit(token.INT, "2")),
 		),
-		out: `{b: 2}`,
+		err: `b: field not allowed`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

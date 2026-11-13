@@ -1,0 +1,67 @@
+#path: x
+
+# The values hoisted for _cells include #Game and #Team, whose fields refer to
+# each other. Dependency analysis also reports those fields as they are found
+# in the inline vertices of #Game & {...} and #Team & {...}, which are not
+# rooted. Within the hoisted values, those references resolve as written,
+# whether they name a field, a let, self, or the alias of a dynamic field.
+
+-- cue.mod/module.cue --
+module: "mod.test/a"
+language: version: "v0.18.0"
+-- in.cue --
+import "mod.test/a/app"
+
+raw: bool
+s:   app.code
+x: y: [if raw {s.screens}]
+-- app/app.cue --
+package app
+
+#Game: {
+	let L = c
+	c:       string
+	("d")~D: c
+	out:     "\(c)\(self.c)\(D)\(L)"
+}
+#Team: {
+	c: string
+	p: bool
+	out: [if p {(#Game & {"c": c}).out}, ""][0]
+}
+_cells: (#Team & {c: "p"}).out
+code: screens: a: _cells
+-- out/self/default --
+y: [if RAW {
+	a: CELLS.#x
+}]
+
+//cue:path: raw
+let RAW = bool
+
+//cue:path: _cells
+let CELLS = {#x: (TEAM.#x & {c: "p"}).out}
+
+//cue:path: #Team
+let TEAM = {
+	#x: {
+		c~(c_1): string
+		p:       bool
+		out: [
+			if p {
+				(GAME.#x & {c: c_1}).out
+			},
+			""
+		][0]
+	}
+}
+
+//cue:path: #Game
+let GAME = {
+	#x: {
+		let L = c
+		c:       string
+		"d"~(D): c
+		out:     "\(c)\(self.c)\(D)\(L)"
+	}
+}

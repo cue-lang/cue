@@ -1,0 +1,23 @@
+#path: x
+
+# The value of other.out is inlined into x, which exports the struct literal
+# of #T as written. The let reference S.v refers to x.v where that literal is
+# exported, and to other.v in the inlined value.
+
+-- in.cue --
+#T: {
+	let S = self
+	v:     string
+	out:   "\(S.v)"
+	twice: other.out
+}
+other: #T & {v: "o"}
+x:     #T & {v: "x"}
+-- out/self/default --
+_#def
+_#def: {
+	let S = self
+	v:     string
+	out:   "\(S.v)"
+	twice: "\("o")"
+} & {v: "x"}

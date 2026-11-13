@@ -1,7 +1,5 @@
 #inlineImports: true
 
-# TODO: slightly more correct is for _hidden_567475F3.a to be `b` and not resolve.
-
 -- cue.mod/module.cue --
 module: "mod.test/a"
 language: version: "v0.9.0"
@@ -113,7 +111,7 @@ let F = {#x: g: int}
 //cue:path: "mod.test/a/pkg".w
 let W = {
 	a: _hidden_567475F3
-	_hidden_567475F3: a: 1
+	_hidden_567475F3: a: b
 	b: 1
 	x: {
 		_hidden2_567475F3: _hidden_567475F3

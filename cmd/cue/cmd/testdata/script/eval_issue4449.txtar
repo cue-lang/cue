@@ -24,6 +24,6 @@ _ &
 let OBJECTS = ({
     in: _
     out: p: {
-        for x in OBJECTS.deployment {}
+        for x in in.deployment {}
     }
 } & {in: OBJECTS}).out & {{[string]: _}}

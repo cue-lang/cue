@@ -1,11 +1,8 @@
 #path: x
 
-# Dependency analysis evaluates #Game & {c: T.c} in a struct literal that it
-# visits without its vertex, so the let bound to self resolves to a placeholder
-# vertex there. Exporting the values hoisted from it must not panic.
-#
-# TODO: c of that unrooted vertex should not be hoisted, and the expression of
-# T in its conjunct is exported as self, which refers to the let C instead.
+# Dependency analysis also finds G.c in the inline vertex of #Game & {c: T.c},
+# which is not rooted. Within the hoisted value of #Game, the let bound to self
+# still refers to #Game.
 
 -- cue.mod/module.cue --
 module: "mod.test/a"
@@ -63,9 +60,6 @@ let GAME = {
 	#x: {
 		let G = self
 		c:   string
-		out: "\(G.c)\(C.#x)"
+		out: "\(G.c)\(G.c)"
 	}
 }
-
-//cue:path: c
-let C = {#x: self.c & {string}}

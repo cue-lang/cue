@@ -383,7 +383,7 @@ func wrapIfOptional(expr ast.Expr, isOptional bool) ast.Expr {
 
 func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 	if c := e.pivotter; c != nil {
-		if alt := c.refExpr(r); alt != nil {
+		if alt := c.refExpr(env, r); alt != nil {
 			return alt
 		}
 	}

@@ -400,46 +400,68 @@ func (d *depData) stepsToParent() int {
 	return count
 }
 
-func relPathLength(r adt.Resolver) (length int, newRoot bool) {
-	for {
-		var expr adt.Expr
+// rootRef returns the reference which r is rooted at, and the number of
+// selectors and index expressions leading to it. The root is nil if it is any
+// other kind of expression, such as a struct literal.
+func rootRef(r adt.Resolver) (root adt.Resolver, steps int) {
+	for ; ; steps++ {
 		switch x := r.(type) {
-		case *adt.FieldReference,
-			*adt.DynamicReference,
-			*adt.LetReference,
-			*adt.ValueReference:
-			length++
-		case *adt.ImportReference:
-			// This reference indicates a different vertex as root, but doesn't
-			// increase the path length.
-			return length, true
 		case *adt.SelectorExpr:
-			length++
-			expr = x.X
+			r, _ = x.X.(adt.Resolver)
 		case *adt.IndexExpr:
-			length++
-			expr = x.X
-		}
-
-		switch x := expr.(type) {
-		case nil:
-			return length, false
-		case adt.Resolver:
-			r = x
+			r, _ = x.X.(adt.Resolver)
 		default:
-			// A non-Resolver expression (e.g. BinaryExpr) is a valid
-			// end-of-chain; we simply cannot walk any further.
-			return length, false
+			return r, steps
 		}
 	}
 }
 
-// refExpr returns a substituted expression for a given reference, or nil if
-// there are no changes. This function implements most of the policy to decide
-// when an expression can be inlined.
-func (p *pivotter) refExpr(r adt.Resolver) ast.Expr {
+func relPathLength(r adt.Resolver) (length int, newRoot bool) {
+	root, length := rootRef(r)
+	switch root.(type) {
+	case *adt.FieldReference,
+		*adt.DynamicReference,
+		*adt.LetReference,
+		*adt.ValueReference:
+		length++
+	case *adt.ImportReference:
+		// This reference indicates a different vertex as root, but doesn't
+		// increase the path length.
+		return length, true
+	}
+	return length, false
+}
+
+// isLocal reports whether r, a reference in env, is rooted at a struct literal
+// or comprehension which is being exported as written. Such a reference
+// resolves as written too, whichever node dependency analysis found it to
+// refer to where the same literal is unified elsewhere.
+func (p *pivotter) isLocal(env *adt.Environment, r adt.Resolver) bool {
+	var up int32
+	root, _ := rootRef(r)
+	switch x := root.(type) {
+	case *adt.FieldReference:
+		up = x.UpCount
+	case *adt.LetReference:
+		up = x.UpCount
+	case *adt.DynamicReference:
+		up = x.UpCount
+	case *adt.ValueReference:
+		// Unlike the others, it denotes the vertex of an environment rather
+		// than a declaration in it.
+		up = max(x.UpCount-1, 0)
+	default:
+		return false
+	}
+	return p.x.fieldsOf(env, up) != nil
+}
+
+// refExpr returns a substituted expression for a given reference in env, or
+// nil if there are no changes. This function implements most of the policy to
+// decide when an expression can be inlined.
+func (p *pivotter) refExpr(env *adt.Environment, r adt.Resolver) ast.Expr {
 	ref, ok := p.refMap[r]
-	if !ok {
+	if !ok || p.isLocal(env, r) {
 		return nil
 	}
 

@@ -656,6 +656,22 @@ func TestNodes(t *testing.T) {
 			}}}}
 		}(),
 		out: "f: {for k, v in src // c\n{\n\t\"a\": v\n}}",
+	}, {
+		// An index or call after a receiver spanning lines, as the
+		// exporter builds for an index into a unification, stays on the
+		// receiver's last line.
+		// TODO: a receiver spanning lines also breaks the line after the
+		// opening bracket, here and in the call below.
+		name: "index into a receiver spanning lines",
+		in: &ast.IndexExpr{
+			X:     multiLineConjunction(),
+			Index: ast.NewIdent("s"),
+		},
+		out: "(a & {\n\tb: c\n\td: e\n})[\n\ts]",
+	}, {
+		name: "call of a callee spanning lines",
+		in:   ast.NewCall(multiLineConjunction(), ast.NewIdent("s"), ast.NewIdent("t")),
+		out:  "(a & {\n\tb: c\n\td: e\n})(\n\ts,\n\tt,\n)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -669,6 +685,13 @@ func TestNodes(t *testing.T) {
 		})
 	}
 
+}
+
+// multiLineConjunction returns `(a & {b: c, d: e})` without positions, which
+// formats over several lines.
+func multiLineConjunction() ast.Expr {
+	st := ast.NewStruct(ast.NewIdent("b"), ast.NewIdent("c"), ast.NewIdent("d"), ast.NewIdent("e"))
+	return &ast.ParenExpr{X: ast.NewBinExpr(token.AND, ast.NewIdent("a"), st)}
 }
 
 // Verify that the printer doesn't crash if the AST contains Bad... nodes.

@@ -6,6 +6,15 @@ d: "\(r)"
 u: "\(_)" // literal _ can never resolve.
 r: _
 e: "\([])"
+
+// The error names each value of a non-concrete conjunction.
+bounds: >=0 & <=10
+f: "\(bounds)"
+#D: >=0
+split: #D & <=10
+g: "\(split)"
+fromAnd: and([>=0, <=10])
+h: "\(fromAnd)"
 -- out/compile --
 --- in.cue
 {
@@ -16,4 +25,14 @@ e: "\([])"
   u: "\(_)"
   r: _
   e: "\([])"
+  bounds: (>=0 & <=10)
+  f: "\(〈0;bounds〉)"
+  #D: >=0
+  split: (〈0;#D〉 & <=10)
+  g: "\(〈0;split〉)"
+  fromAnd: and([
+    >=0,
+    <=10,
+  ])
+  h: "\(〈0;fromAnd〉)"
 }

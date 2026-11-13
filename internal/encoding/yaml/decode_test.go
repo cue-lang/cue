@@ -1012,6 +1012,8 @@ var unmarshalErrorTests = []struct {
 	{"{{.}}", `test.yaml:1: invalid map key: !!map`},
 	{"b: *a\na: &a {c: 1}", `test.yaml: unknown anchor 'a' referenced`},
 	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml: did not find expected whitespace"},
+	// TODO: documents with a YAML 1.2 directive should be accepted.
+	{"%YAML 1.2\n---\nv: 1", "test.yaml: found incompatible YAML document"},
 	// An alias node cannot carry a tag.
 	{"a: &x hi\nv: !!str *x", "test.yaml:1: did not find expected key"},
 	// TODO: a custom tag on a scalar is an error, and one on a mapping

@@ -115,11 +115,8 @@ Available per-file experiments:
 
 Global experiments are enabled via the CUE_EXPERIMENT environment variable:
 
-	export CUE_EXPERIMENT=openapiv2,yamlgoccy=0
+	export CUE_EXPERIMENT=openapiv2,yamlgoccy
 	cue export myfile.cue
-
-An experiment which is on by default can be turned off with a value of 0,
-as with yamlgoccy=0 above.
 
 The behavior of global experiments tracks the language version reported by "cue version".
 
@@ -168,11 +165,11 @@ Available global experiments:
     the openapi encoding used by "cue import" and "cue export", extracting
     and generating a complete OpenAPI document rather than only its schemas.
 
-  yamlgoccy (preview: v0.18.0, default: v0.18.0)
+  yamlgoccy (preview: v0.18.0)
     yamlgoccy selects the github.com/goccy/go-yaml based YAML decoder
     and encoder. The new decoder retains more precise position and
-    comment information than the older github.com/go-yaml/yaml based
-    implementation it replaces.
+    comment information than the default go.yaml.in/yaml/v3 based
+    implementation.
 
 Each experiment's lifecycle tracks language versions as follows:
 - preview:   experimental feature that can be enabled

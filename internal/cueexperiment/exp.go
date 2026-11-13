@@ -24,9 +24,9 @@ type Config struct {
 
 	// YAMLGoccy selects the github.com/goccy/go-yaml based YAML decoder
 	// and encoder. The new decoder retains more precise position and
-	// comment information than the older github.com/go-yaml/yaml based
-	// implementation it replaces.
-	YAMLGoccy bool `experiment:"preview:v0.18.0,default:v0.18.0"`
+	// comment information than the default go.yaml.in/yaml/v3 based
+	// implementation.
+	YAMLGoccy bool `experiment:"preview:v0.18.0"`
 
 	// The flags in this second section describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.

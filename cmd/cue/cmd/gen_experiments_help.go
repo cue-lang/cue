@@ -353,11 +353,8 @@ Available per-file experiments:
 
 Global experiments are enabled via the CUE_EXPERIMENT environment variable:
 
-	export CUE_EXPERIMENT=openapiv2,yamlgoccy=0
+	export CUE_EXPERIMENT=openapiv2,yamlgoccy
 	cue export myfile.cue
-
-An experiment which is on by default can be turned off with a value of 0,
-as with yamlgoccy=0 above.
 
 The behavior of global experiments tracks the language version reported by "cue version".
 

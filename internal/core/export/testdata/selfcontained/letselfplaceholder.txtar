@@ -1,0 +1,41 @@
+#path: x
+
+# Dependency analysis visits the struct literal of #Team without its vertex,
+# so the let bound to self resolves to a placeholder vertex in {c: T.c}, a
+# conjunct of the value which it finds for c in #Game.out. Exporting that value
+# where T is not in scope must not panic.
+#
+# TODO: neither reference should be replaced. #Team.out no longer sets c, and
+# the self exported for T refers to the let C instead.
+
+-- in.cue --
+#Game: {
+	c:   string
+	out: "\(c)"
+}
+#Team: {
+	let T = self
+	c: string
+	out: {v: (#Game & {c: T.c}).out}
+}
+x: {
+	a: #Team
+	b: #Game.out
+}
+-- out/self/default --
+a: TEAM.#x
+b: OUT.#x
+
+//cue:path: #Team
+let TEAM = {
+	#x: {
+		c: string
+		out: v: OUT.#x
+	}
+}
+
+//cue:path: #Game.out
+let OUT = {#x: "\(C.#x)"}
+
+//cue:path: c
+let C = {#x: self.c & {string}}

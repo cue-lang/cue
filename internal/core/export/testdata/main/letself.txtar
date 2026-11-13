@@ -1,8 +1,6 @@
 # A let bound to self denotes the struct declaring it. Where such a let is
 # expanded outside that struct, the expansion keeps all of its conjuncts,
 # whether there is one, as for y, or more, as for x.
-#
-# TODO: the expansion of T in x drops the first conjunct of #M.
 
 -- cue.mod/module.cue --
 module: "mod.test/a"
@@ -41,7 +39,12 @@ y: #N.p
 == Simplified
 {
 	s: string
-	x: {b: 2}[s]
+	x: {
+		let T = self
+		a: 1
+		b: 2
+		p: T[s]
+	}[s]
 	y: {
 		let U = self
 		a: 1
@@ -57,7 +60,12 @@ y: #N.p
 		p: T[s]
 		b: 2
 	}
-	x: {b: 2}[s]
+	x: {
+		let T_1 = self
+		a: 1
+		b: 2
+		p: T_1[s]
+	}[s]
 	#N: {
 		let U = self
 		a: 1
@@ -84,7 +92,12 @@ y: #N.p
 		p: T[s]
 		b: 2
 	}
-	x: {b: 2}[s]
+	x: {
+		let T_1 = self
+		a: 1
+		b: 2
+		p: T_1[s]
+	}[s]
 	#N: {
 		let U = self
 		a: 1
@@ -105,7 +118,12 @@ y: #N.p
 		p: T[s]
 		b: 2
 	}
-	x: {b: 2}[s]
+	x: {
+		let T_1 = self
+		a: 1
+		b: 2
+		p: T_1[s]
+	}[s]
 	#N: {
 		let U = self
 		a: 1

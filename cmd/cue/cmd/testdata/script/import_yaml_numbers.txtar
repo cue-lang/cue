@@ -15,14 +15,13 @@ exec cue import -o - -f ./in.yaml
 cmp stdout expect-import
 
 # Disabling the yamlgoccy experiment selects the older yaml.v3 based
-# decoder, which decodes integers beyond 64 bits as floats rather than
-# as integers.
+# decoder, which decodes these the same way.
 env CUE_EXPERIMENT=yamlgoccy=0
 exec cue export ./in.yaml
 cmp stdout expect-export
 
 exec cue import -o - -f ./in.yaml
-cmp stdout expect-import-yamlv3
+cmp stdout expect-import
 
 -- in.yaml --
 memory: 1Gi
@@ -55,18 +54,6 @@ memory:           "1Gi"
 cpu:              "100m"
 frac:             "1.5Gi"
 huge:             18446744073709551616
-exp:              123456e1
-float:            number & 123
-octal:            0o123
-signedOctal:      -0o123
-floatOctal:       number & 0o123
-leadingZeroFloat: 01289.5
-leadingZeroExp:   012e3
--- expect-import-yamlv3 --
-memory:           "1Gi"
-cpu:              "100m"
-frac:             "1.5Gi"
-huge:             number & 18446744073709551616
 exp:              123456e1
 float:            number & 123
 octal:            0o123

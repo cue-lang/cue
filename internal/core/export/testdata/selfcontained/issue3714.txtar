@@ -4,6 +4,9 @@ Self-contained export across package boundaries with nested
 (Def & {...}).field patterns that include conditionals which used to
 lose dependencies due to incomplete fixpoint iteration.
 
+TODO: within the hoisted #Extract, req.features is replaced by the value it
+has in #Module, hoisted as FEATURES, so #Extract no longer depends on its req.
+
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.9.0"

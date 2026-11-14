@@ -666,6 +666,56 @@ wrongKindLabel: {
 	index:     exists(l[0])
 }
 
+// A subject that unifies with a definition is closed, also if an ellipsis
+// comes with it: an ellipsis only opens the struct it is part of. So d
+// below stays closed, while #H, which has an ellipsis of its own, is open.
+//
+// TODO: the answer is only right for d declared before the call. Declared
+// after it, or with the call within d itself, d is still in progress when
+// the call is evaluated. It is then not marked as closed yet, and whether
+// its ellipsis opens it is only settled when it is finalized. The answer
+// must not depend on where the call is.
+closedSubjectInProgress: {
+	before: {
+		d: #D & {...}
+		#D: {a: 1}
+		z: exists(d.zz)
+	}
+	after: {
+		z: exists(d.zz)
+		d: #D & {...}
+		#D: {a: 1}
+	}
+	// The call is within the subject. This does not take an ellipsis.
+	within: {
+		d: #D
+		d: z: exists(d.zz)
+		#D: {a: 1, z?: _}
+	}
+	withinEllipsis: {
+		d: #D & {...}
+		d: z: exists(d.zz)
+		#D: {a: 1, z?: _}
+	}
+	withinNested: {
+		d: #D & {...}
+		d: y: {
+			z: exists(d.zz)
+		}
+		#D: {a: 1, y?: _}
+	}
+	// A subject that is open stays false wherever the call is.
+	opened: {
+		z: exists(#H.zz)
+		#H: {a: 1, ...}
+	}
+	withinOpened: {
+		d: #H
+		d: z: exists(d.zz)
+		#H: {a: 1, z?: _, ...}
+	}
+}
+
 -- cycle.cue --
 @experiment(predicates)
 
@@ -1564,5 +1614,79 @@ minimal: {
     noDef: exists(〈0;l〉.#Nope)
     regular: exists(〈0;l〉["a"])
     index: exists(〈0;l〉[0])
+  }
+  closedSubjectInProgress: {
+    before: {
+      d: (〈0;#D〉 & {
+        ...
+      })
+      #D: {
+        a: 1
+      }
+      z: exists(〈0;d〉.zz)
+    }
+    after: {
+      z: exists(〈0;d〉.zz)
+      d: (〈0;#D〉 & {
+        ...
+      })
+      #D: {
+        a: 1
+      }
+    }
+    within: {
+      d: 〈0;#D〉
+      d: {
+        z: exists(〈1;d〉.zz)
+      }
+      #D: {
+        a: 1
+        z?: _
+      }
+    }
+    withinEllipsis: {
+      d: (〈0;#D〉 & {
+        ...
+      })
+      d: {
+        z: exists(〈1;d〉.zz)
+      }
+      #D: {
+        a: 1
+        z?: _
+      }
+    }
+    withinNested: {
+      d: (〈0;#D〉 & {
+        ...
+      })
+      d: {
+        y: {
+          z: exists(〈2;d〉.zz)
+        }
+      }
+      #D: {
+        a: 1
+        y?: _
+      }
+    }
+    opened: {
+      z: exists(〈0;#H〉.zz)
+      #H: {
+        a: 1
+        ...
+      }
+    }
+    withinOpened: {
+      d: 〈0;#H〉
+      d: {
+        z: exists(〈1;d〉.zz)
+      }
+      #H: {
+        a: 1
+        z?: _
+        ...
+      }
+    }
   }
 }

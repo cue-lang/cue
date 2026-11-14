@@ -722,6 +722,57 @@ wrongKindLabel: {
 	index:     exists(l[0])      @test(eq, true)
 }
 
+// A subject that unifies with a definition is closed, also if an ellipsis
+// comes with it: an ellipsis only opens the struct it is part of. So d
+// below stays closed, while #H, which has an ellipsis of its own, is open.
+//
+// TODO: the answer is only right for d declared before the call. Declared
+// after it, or with the call within d itself, d is still in progress when
+// the call is evaluated. It is then not marked as closed yet, and whether
+// its ellipsis opens it is only settled when it is finalized. The answer
+// must not depend on where the call is.
+closedSubjectInProgress: {
+	before: {
+		d: #D & {...}
+		#D: {a: 1}
+		z: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+	}
+	after: {
+		z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		d: #D & {...}
+		#D: {a: 1}
+	}
+	// The call is within the subject. This does not take an ellipsis.
+	within: {
+		d: #D
+		d: z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		#D: {a: 1, z?: _}
+	}
+	withinEllipsis: {
+		d: #D & {...}
+		d: z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		#D: {a: 1, z?: _}
+	}
+	withinNested: {
+		d: #D & {...}
+		d: y: {
+			z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		}
+		#D: {a: 1, y?: _}
+	}
+	// A subject that is open stays false wherever the call is.
+	opened: {
+		@test(permute, count=2)
+		z: exists(#H.zz)   @test(eq, false)
+		#H: {a: 1, ...}
+	}
+	withinOpened: {
+		d: #H
+		d: z: exists(d.zz)   @test(eq, false)
+		#H: {a: 1, z?: _, ...}
+	}
+}
+
 -- cycle.cue --
 @experiment(predicates)
 
@@ -925,6 +976,8 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./review.cue:293:5
 [eval] wrongKindLabel.regular: exists: invalid field a (found list, want struct):
     ./review.cue:302:13
+[eval] closedSubjectInProgress.before.z: exists: field zz not allowed by closed struct:
+    ./review.cue:319:6
 -- out/eval/stats --
 Leaks:  75
 Freed:  740

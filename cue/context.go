@@ -259,7 +259,7 @@ func (c *Context) make(v *adt.Vertex) Value {
 }
 
 // makeWith is like [Context.make], but finalizes v with the context which
-// started evaluating it rather than with a new one.
+// built it or started evaluating it rather than with a new one.
 func (c *Context) makeWith(opCtx *adt.OpContext, v *adt.Vertex) Value {
 	// TODO: this is currently needed to ensure that node is properly recognized
 	// as evaluated. Not dereferencing nodes, however, will have the benefit of
@@ -411,7 +411,7 @@ func (c *Context) EncodeType(x any, option ...EncodeOption) Value {
 	if err != nil {
 		return c.makeError(err)
 	}
-	return c.make(v)
+	return c.makeWith(ctx, v)
 }
 
 // NewList creates a Value that is a list of the given values.
@@ -422,7 +422,8 @@ func (c *Context) NewList(v ...Value) Value {
 	for i, x := range v {
 		a[i] = x.v
 	}
-	return c.make(c.ctx().NewList(a...))
+	ctx := c.ctx()
+	return c.makeWith(ctx, ctx.NewList(a...))
 }
 
 // TODO:

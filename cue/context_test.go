@@ -493,21 +493,19 @@ func TestContextStats(t *testing.T) {
 		},
 		unifications: 6,
 	}, {
-		// TODO: the evaluation of the converted type is not counted.
 		name: "EncodeType",
 		value: func(t *testing.T, ctx *cue.Context) cue.Value {
 			return ctx.EncodeType(goType{})
 		},
-		unifications: 0,
+		unifications: 6,
 	}, {
 		// A type which was converted before is not evaluated again.
-		// TODO: the first evaluation is not counted.
 		name: "EncodeTypeTwice",
 		value: func(t *testing.T, ctx *cue.Context) cue.Value {
 			ctx.EncodeType(goType{})
 			return ctx.EncodeType(goType{})
 		},
-		unifications: 0,
+		unifications: 6,
 	}, {
 		// The two elements count as one unification each.
 		name: "NewList",

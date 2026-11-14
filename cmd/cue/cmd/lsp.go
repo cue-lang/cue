@@ -20,6 +20,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -79,6 +80,24 @@ serve runs a CUE language server. This is the default command of
 	})
 
 	return cmd
+}
+
+// lspLegacyArgs rewrites the Go-style flags which cue lsp took before it
+// used cobra, such as -listen or -listen.timeout, into their current forms.
+// Shorthand flags such as -E are left alone, as are the args of other commands.
+func lspLegacyArgs(rootCmd, lspCmd *cobra.Command, args []string) []string {
+	if found, _, _ := rootCmd.Find(args); found != lspCmd && found.Parent() != lspCmd {
+		return args
+	}
+	args = slices.Clone(args)
+	for i, arg := range args {
+		name, _, _ := strings.Cut(arg, "=")
+		flag := strings.ReplaceAll(strings.TrimLeft(name, "-"), ".", "-")
+		if strings.HasPrefix(arg, "-") && lspCmd.PersistentFlags().Lookup(flag) != nil {
+			args[i] = "--" + flag + arg[len(name):]
+		}
+	}
+	return args
 }
 
 func runLSPServe(cmd *Command, args []string) error {

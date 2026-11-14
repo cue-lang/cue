@@ -337,6 +337,7 @@ func New(args []string) (*Command, error) {
 	cmd.SetHelpCommand(helpCmd)
 	cmd.SetHelpTemplate(helpTemplate)
 
+	lspCmd := newLSPCmd(c)
 	for _, sub := range []*cobra.Command{
 		c.cmdCmd,
 		newCompletionCmd(c),
@@ -357,12 +358,12 @@ func New(args []string) (*Command, error) {
 		// Hidden
 		newExpCmd(c),
 		newAddCmd(c),
-		newLSPCmd(c),
+		lspCmd,
 	} {
 		cmd.AddCommand(sub)
 	}
 
-	cmd.SetArgs(args)
+	cmd.SetArgs(lspLegacyArgs(cmd, lspCmd, args))
 	return c, nil
 }
 

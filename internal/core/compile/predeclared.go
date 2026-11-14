@@ -34,18 +34,30 @@ func (c *compiler) experimentPredeclared(n *ast.Ident) adt.Expr {
 		}
 	}
 	if c.experiments.Predicates {
-		switch n.Name {
-		case "exists", "__exists":
-			return exists
-		case "existsN", "__existsN":
-			return existsN
-		case "isValid", "__isValid":
-			return isValid
-		case "isConcrete", "__isConcrete":
-			return isConcrete
-		case "countN", "__countN":
-			return countN
-		}
+		return PredicateBuiltin(n.Name)
+	}
+	return nil
+}
+
+// PredicateBuiltin returns the expression for the predicate builtin of the
+// given name, such as "exists" or "countN", or nil if there is none.
+//
+// The predicate builtins are predeclared only in a file that enables the
+// predicates experiment, so [Predeclared] does not return them. Like
+// Predeclared, this is used to reconstruct references to builtins that were
+// resolved at compile time, when the experiment was checked.
+func PredicateBuiltin(name string) adt.Expr {
+	switch name {
+	case "exists", "__exists":
+		return exists
+	case "existsN", "__existsN":
+		return existsN
+	case "isValid", "__isValid":
+		return isValid
+	case "isConcrete", "__isConcrete":
+		return isConcrete
+	case "countN", "__countN":
+		return countN
 	}
 	return nil
 }

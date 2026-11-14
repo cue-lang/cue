@@ -22,7 +22,9 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/token"
 )
 
 type Sum struct {
@@ -223,9 +225,18 @@ func TestDecode(t *testing.T) {
 	testCases := []struct {
 		in   interface{}
 		want string
+		err  string
 	}{{
 		in:   "str",
 		want: `"str"`,
+	}, {
+		// TODO: this should fail, as the closed struct does not allow b.
+		in: ast.NewBinExpr(
+			token.AND,
+			ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
+			ast.NewStruct("b", ast.NewLit(token.INT, "2")),
+		),
+		want: `{b: 2}`,
 	}, {
 		in: func() interface{} {
 			type T struct {
@@ -262,9 +273,11 @@ func TestDecode(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			v, err := c.Decode(tc.in)
-			if err != nil {
-				t.Fatal(err)
+			if tc.err != "" {
+				qt.Assert(t, qt.ErrorMatches(err, tc.err))
+				return
 			}
+			qt.Assert(t, qt.IsNil(err))
 
 			got := fmt.Sprint(v)
 			if got != tc.want {

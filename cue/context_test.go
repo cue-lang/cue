@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/tdtest"
@@ -455,6 +456,73 @@ language: version: "v0.14.0"
 				}
 				qt.Assert(t, qt.Equals(got, want), qt.Commentf("package scope %q", pkg))
 			}
+		})
+	}
+}
+
+// TestContextStats checks that each [cue.Context] method which evaluates
+// a value adds that evaluation to the global stats.
+//
+// The stats are global, so this test and its subtests cannot run in parallel.
+func TestContextStats(t *testing.T) {
+	const src = `{a: 1, b: a + 1, c: [a, b]}`
+	type goType struct {
+		A int    `json:"a" cue:">0"`
+		B string `json:"b"`
+	}
+	tests := []struct {
+		name         string
+		value        func(t *testing.T, ctx *cue.Context) cue.Value
+		unifications int64
+	}{{
+		name: "CompileString",
+		value: func(t *testing.T, ctx *cue.Context) cue.Value {
+			return ctx.CompileString(src)
+		},
+		unifications: 6,
+	}, {
+		name: "BuildExpr",
+		value: func(t *testing.T, ctx *cue.Context) cue.Value {
+			return ctx.BuildExpr(parseExpr(t, src))
+		},
+		unifications: 6,
+	}, {
+		name: "EncodeExpr",
+		value: func(t *testing.T, ctx *cue.Context) cue.Value {
+			return ctx.Encode(parseExpr(t, src))
+		},
+		unifications: 6,
+	}, {
+		// TODO: the evaluation of the converted type is not counted.
+		name: "EncodeType",
+		value: func(t *testing.T, ctx *cue.Context) cue.Value {
+			return ctx.EncodeType(goType{})
+		},
+		unifications: 0,
+	}, {
+		// A type which was converted before is not evaluated again.
+		// TODO: the first evaluation is not counted.
+		name: "EncodeTypeTwice",
+		value: func(t *testing.T, ctx *cue.Context) cue.Value {
+			ctx.EncodeType(goType{})
+			return ctx.EncodeType(goType{})
+		},
+		unifications: 0,
+	}, {
+		// The two elements count as one unification each.
+		name: "NewList",
+		value: func(t *testing.T, ctx *cue.Context) cue.Value {
+			return ctx.NewList(ctx.CompileString(`1`), ctx.CompileString(`"x"`))
+		},
+		unifications: 5,
+	}}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := cuecontext.New()
+			adt.ResetStats()
+			v := tc.value(t, ctx)
+			qt.Assert(t, qt.IsNil(v.Err()))
+			qt.Assert(t, qt.Equals(adt.TotalStats().Unifications, tc.unifications))
 		})
 	}
 }

@@ -23,9 +23,11 @@ import (
 	"time"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
@@ -277,11 +279,24 @@ func TestEncodeType(t *testing.T) {
 	})
 }
 
+func parseExpr(t testing.TB, src string) ast.Expr {
+	t.Helper()
+	x, err := parser.ParseExpr("test", src)
+	qt.Assert(t, qt.IsNil(err))
+	return x
+}
+
 func TestEncodeSyntax(t *testing.T) {
 	type testCase struct {
 		name string
 		x    any
 		out  string
+		err  string
+	}
+	file := func(src string) *ast.File {
+		f, err := parser.ParseFile("", src)
+		qt.Assert(t, qt.IsNil(err))
+		return f
 	}
 	testCases := []testCase{{
 		// A string with newlines formats as a multiline literal.
@@ -323,12 +338,32 @@ func TestEncodeSyntax(t *testing.T) {
 	c: "2019-04-01T00:00:00Z"
 	d: ""
 }`,
+	}, {
+		// TODO: CUE syntax nested in a Go value is not evaluated in full,
+		// so each of these three should fail to validate.
+		name: "ExprInMap",
+		x:    map[string]any{"a": parseExpr(t, `close({}) & {b: 2}`)},
+		out:  `{a: b: 2}`,
+	}, {
+		name: "ExprInSlice",
+		x:    []any{parseExpr(t, `{x: 1} & {x: 2}`)},
+		out: `[{
+	x: _|_ // conflicting values 2 and 1
+}]`,
+	}, {
+		name: "FileInMap",
+		x:    map[string]any{"f": file(`x: close({}) & {b: 2}`)},
+		out:  `{f: x: close({}) & {b: 2}}`,
 	}}
 	ctx := cuecontext.New()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			v := ctx.Encode(tc.x)
-			qt.Assert(t, qt.IsNil(v.Err()))
+			if tc.err != "" {
+				qt.Assert(t, qt.ErrorMatches(v.Validate(), tc.err))
+				return
+			}
+			qt.Assert(t, qt.IsNil(v.Validate()))
 			b, err := format.Node(v.Syntax())
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Equals(string(b), tc.out))

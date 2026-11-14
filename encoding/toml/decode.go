@@ -166,29 +166,27 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	}
 	if err := d.parser.Error(); err != nil {
 		if err, ok := err.(*toml.ParserError); ok {
-			shape := d.parser.Shape(d.parser.Range(err.Highlight))
-			return nil, d.posErrf(shape.Start, "%s", err.Message)
+			offset := int(d.parser.Range(err.Highlight).Offset)
+			return nil, errors.Newf(d.tokenFile.Pos(offset, token.NoRelPos), "%s", err.Message)
 		}
 		return nil, err
 	}
 	return d.topFile, nil
 }
 
-func (d *Decoder) shape(tnode *toml.Node) toml.Shape {
+// nodePos returns the position at which a node starts in the input.
+// We avoid [toml.Parser.Shape], which scans the input from its start.
+func (d *Decoder) nodePos(tnode *toml.Node) token.Pos {
 	if tnode.Raw.Length == 0 {
-		// Otherwise the Shape method call below happily returns a position like 1:1,
+		// Otherwise we would return offset 0, i.e. 1:1,
 		// which is worse than no position information as it confuses the user.
 		panic("Decoder.nodePos was given an empty toml.Node as position")
 	}
-	return d.parser.Shape(tnode.Raw)
+	return d.tokenFile.Pos(int(tnode.Raw.Offset), token.NoRelPos)
 }
 
 func (d *Decoder) nodeErrf(tnode *toml.Node, format string, args ...any) error {
-	return d.posErrf(d.shape(tnode).Start, format, args...)
-}
-
-func (d *Decoder) posErrf(pos toml.Position, format string, args ...any) error {
-	return errors.Newf(d.tokenFile.Pos(pos.Offset, token.NoRelPos), format, args...)
+	return errors.Newf(d.nodePos(tnode), format, args...)
 }
 
 // nextRootNode is called for every top-level expression from the TOML parser.
@@ -387,8 +385,8 @@ func (d *Decoder) findArrayPrefix(rkey rootedKey) *openTableArray {
 // tomlKey represents a name with a position which forms part of a TOML dotted key,
 // such as "foo" from "[foo.bar.baz]".
 type tomlKey struct {
-	name  string
-	shape toml.Shape
+	name string
+	pos  token.Pos
 }
 
 // decodeKey returns the unquoted string elements of a TOML node key iterator.
@@ -396,7 +394,7 @@ func (d *Decoder) decodeKey(iter toml.Iterator) []tomlKey {
 	var elems []tomlKey
 	for iter.Next() {
 		node := iter.Node()
-		elems = append(elems, tomlKey{string(node.Data), d.shape(node)})
+		elems = append(elems, tomlKey{string(node.Data), d.nodePos(node)})
 	}
 	return elems
 }
@@ -480,9 +478,8 @@ func quoteLabelIfNeeded(name string) string {
 // as well as for any keys beginning with an underscore, as we don't want to hide any fields.
 // cue/format knows how to quote any other identifiers correctly.
 func (d *Decoder) label(tkey tomlKey, relPos token.RelPos) ast.Label {
-	pos := d.tokenFile.Pos(tkey.shape.Start.Offset, relPos)
 	label := ast.NewStringLabel(tkey.name)
-	ast.SetPos(label, pos)
+	ast.SetPos(label, tkey.pos.WithRel(relPos))
 	return label
 }
 
@@ -568,7 +565,7 @@ func (d *Decoder) decodeExpr(rkey rootedKey, tnode *toml.Node) (ast.Expr, error)
 	// TODO(mvdan): go-toml nodes of Kind=toml.Array do not have a Raw Range
 	// which would let us grab their position information; fix this upstream.
 	if tnode.Raw.Length > 0 {
-		ast.SetPos(expr, d.tokenFile.Pos(d.shape(tnode).Start.Offset, token.NoRelPos))
+		ast.SetPos(expr, d.nodePos(tnode))
 	}
 	return expr, nil
 }

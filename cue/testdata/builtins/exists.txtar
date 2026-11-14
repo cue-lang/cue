@@ -726,11 +726,11 @@ wrongKindLabel: {
 // comes with it: an ellipsis only opens the struct it is part of. So d
 // below stays closed, while #H, which has an ellipsis of its own, is open.
 //
-// TODO: the answer is only right for d declared before the call. Declared
-// after it, or with the call within d itself, d is still in progress when
-// the call is evaluated. It is then not marked as closed yet, and whether
-// its ellipsis opens it is only settled when it is finalized. The answer
-// must not depend on where the call is.
+// This holds wherever the call is. With d declared after the call, or with
+// the call within d itself, d is still in progress when the call is
+// evaluated. It is then not marked as closed yet, and whether its ellipsis
+// opens it is only settled when it is finalized, so exists judges d as it
+// will be then.
 closedSubjectInProgress: {
 	before: {
 		d: #D & {...}
@@ -738,25 +738,25 @@ closedSubjectInProgress: {
 		z: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
 	}
 	after: {
-		z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		z: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
 		d: #D & {...}
 		#D: {a: 1}
 	}
 	// The call is within the subject. This does not take an ellipsis.
 	within: {
 		d: #D
-		d: z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		d: z: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
 		#D: {a: 1, z?: _}
 	}
 	withinEllipsis: {
 		d: #D & {...}
-		d: z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+		d: z: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
 		#D: {a: 1, z?: _}
 	}
 	withinNested: {
 		d: #D & {...}
 		d: y: {
-			z: exists(d.zz)   @test(eq, false, incorrect) @test(err:todo, p=1, code=eval, contains="exists: field zz not allowed by closed struct")
+			z: exists(d.zz)   @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
 		}
 		#D: {a: 1, y?: _}
 	}
@@ -978,6 +978,14 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./review.cue:302:13
 [eval] closedSubjectInProgress.before.z: exists: field zz not allowed by closed struct:
     ./review.cue:319:6
+[eval] closedSubjectInProgress.after.z: exists: field zz not allowed by closed struct:
+    ./review.cue:322:6
+[eval] closedSubjectInProgress.within.d.z: exists: field zz not allowed by closed struct:
+    ./review.cue:329:9
+[eval] closedSubjectInProgress.withinEllipsis.d.z: exists: field zz not allowed by closed struct:
+    ./review.cue:334:9
+[eval] closedSubjectInProgress.withinNested.d.y.z: exists: field zz not allowed by closed struct:
+    ./review.cue:340:7
 -- out/eval/stats --
 Leaks:  75
 Freed:  740

@@ -670,11 +670,11 @@ wrongKindLabel: {
 // comes with it: an ellipsis only opens the struct it is part of. So d
 // below stays closed, while #H, which has an ellipsis of its own, is open.
 //
-// TODO: the answer is only right for d declared before the call. Declared
-// after it, or with the call within d itself, d is still in progress when
-// the call is evaluated. It is then not marked as closed yet, and whether
-// its ellipsis opens it is only settled when it is finalized. The answer
-// must not depend on where the call is.
+// This holds wherever the call is. With d declared after the call, or with
+// the call within d itself, d is still in progress when the call is
+// evaluated. It is then not marked as closed yet, and whether its ellipsis
+// opens it is only settled when it is finalized, so exists judges d as it
+// will be then.
 closedSubjectInProgress: {
 	before: {
 		d: #D & {...}

@@ -670,35 +670,50 @@ func (c *OpContext) existsPossible(parent *Vertex, inlineClose bool, sel Feature
 	if !parent.Accept(c, sel) {
 		return false
 	}
-	if inlineClose && sel.IsString() {
+	if !sel.IsString() {
+		return true
+	}
+	if inlineClose {
 		// An inline close() admits the declared fields of its argument and
 		// those matching its patterns only.
 		return parent.Lookup(sel) != nil || parent.accept(c, sel)
 	}
-	// Accept reads the closedness of a struct from its base value, which
-	// says nothing in two cases. A struct that is still in progress, as when
-	// it is declared after the call, holds a placeholder, and is not marked
-	// as closed yet if it unifies with a definition: that is recorded when it
-	// is finalized. A struct that holds a broken member holds that error.
-	// Both read as open. Judge them by what closes them instead, so that the
-	// answer depends neither on the order of evaluation nor on the health of
-	// other members.
-	b, _ := parent.BaseValue.(*Bottom)
-	if b == nil || !sel.IsString() {
-		return true
-	}
+	// Accept reads whether a struct is closed from what is recorded on it,
+	// which says nothing in two cases. Both read as open. Judge them by what
+	// closes them instead, so that the answer depends neither on the order
+	// of evaluation nor on the health of other members.
 	n := parent.state
 	closed := parent.ClosedRecursive || parent.ClosedNonRecursive
-	switch {
-	case isCyclePlaceholder(b):
-		if n == nil || parent.Kind() != StructKind {
+	open := parent.HasEllipsis
+	switch b, _ := parent.BaseValue.(*Bottom); {
+	case b != nil && !isCyclePlaceholder(b):
+		// A struct that holds a broken member holds that error as its base
+		// value. What closes it is recorded on it as for any struct.
+		if !b.ChildError {
+			return true
+		}
+
+	case n != nil && parent.status != finalized:
+		// A struct that is still in progress: one declared after the call,
+		// or one that the call is evaluated within. A struct is marked as
+		// closed, if it unifies with a definition, and its ellipsis is
+		// cleared, if it does not open it, when it is finalized. Judge the
+		// struct as it will be then.
+		if parent.Kind() != StructKind {
 			return true
 		}
 		closed = closed || (n.isDef && (n.hasStruct || !n.hasTop))
-	case !b.ChildError:
+		if closed && open {
+			// An ellipsis only opens the struct it is part of, so it need
+			// not open a struct that something else closes, as in
+			// #D & {...}.
+			open = n.peekOpenByEllipsis()
+		}
+
+	default:
 		return true
 	}
-	if !closed || parent.HasEllipsis || parent.Lookup(sel) != nil {
+	if !closed || open || parent.Lookup(sel) != nil {
 		return true
 	}
 	if n != nil {

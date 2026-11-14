@@ -1310,6 +1310,12 @@ func (n *nodeContext) openByEllipsis() bool {
 	if v := n.node; n.ctx.OpenDef || !(v.ClosedRecursive || v.ClosedNonRecursive) {
 		return true
 	}
+	return n.ellipsisOpensAll()
+}
+
+// ellipsisOpensAll reports whether an ellipsis opens each typo-checked
+// struct of n. It is [nodeContext.openByEllipsis] for a node that is closed.
+func (n *nodeContext) ellipsisOpensAll() bool {
 	required := getReqSets(n)
 	if !slices.ContainsFunc(required, func(a reqSet) bool {
 		return !a.ignored && !a.removed
@@ -1329,6 +1335,57 @@ func (n *nodeContext) openByEllipsis() bool {
 	// The zero conjunctInfo stands for a field added from outside of any
 	// definition or embedding.
 	return n.hasEvidenceForAll(required, []conjunctInfo{{}}, n.scopeDepth)
+}
+
+// peekOpenByEllipsis reports what [nodeContext.openByEllipsis] will report
+// for n once n is finalized. It is for a node that is still in progress, but
+// whose conjuncts, and those that its ancestors add to it, are all known,
+// and which the caller knows will be closed: a node in progress is not
+// marked as closed yet.
+//
+// The typo check memoizes three things: the requirement sets and the
+// replacement lists of the nodes it visits, and, shared by all nodes, the
+// results of [nodeContext.containsDefID]. Here they are computed from a
+// state that may still change, as replacements may still be added. So the
+// first two are discarded again, and the shared cache is set aside for the
+// duration: the peek leaves no trace for the typo check proper to trip over.
+func (n *nodeContext) peekOpenByEllipsis() bool {
+	c := n.ctx
+	if c.OpenDef {
+		return true
+	}
+	type saved struct {
+		n          *nodeContext
+		closeInfo  bool
+		flat       bool
+		scopeDepth int32
+	}
+	var states []saved
+	for p := n; p.opID == n.opID; {
+		states = append(states, saved{p, p.computedCloseInfo, p.computedFlatReplaceIDs, p.scopeDepth})
+		parent := p.node.Parent
+		if parent == nil || parent.state == nil {
+			break
+		}
+		p = parent.state
+	}
+	cache := c.containsDefIDCache
+	c.containsDefIDCache = nil
+	defer func() {
+		c.containsDefIDCache = cache
+		for _, s := range states {
+			if !s.closeInfo {
+				s.n.invalidateReqSets()
+				s.n.scopeDepth = s.scopeDepth
+			}
+			if !s.flat {
+				s.n.computedFlatReplaceIDs = false
+				s.n.flatReplaceIDs = s.n.flatReplaceIDs[:0]
+				s.n.minFlatReplaceIDTo = 0
+			}
+		}
+	}()
+	return n.ellipsisOpensAll()
 }
 
 // hasParentEllipsis reports if the parent has any conjuncts from an ellipsis

@@ -93,10 +93,7 @@ func UnifyBuiltin(v cue.Value, kind string) cue.Value {
 func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
 	rt := (*runtime.Runtime)(r)
 	rt.Init()
-	ctx := adt.NewContext(rt, nil)
-	v := convert.FromGoValue(ctx, x, nilIsTop)
-	n := adt.ToVertex(v)
-	return r.Encode(n)
+	return r.Encode(x, cue.NilIsAny(nilIsTop))
 }
 
 func FromGoType(r *cue.Context, x interface{}) cue.Value {

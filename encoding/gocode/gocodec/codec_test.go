@@ -230,13 +230,13 @@ func TestDecode(t *testing.T) {
 		in:   "str",
 		want: `"str"`,
 	}, {
-		// TODO: this should fail, as the closed struct does not allow b.
+		// A closed struct rejects the fields of another operand.
 		in: ast.NewBinExpr(
 			token.AND,
 			ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
 			ast.NewStruct("b", ast.NewLit(token.INT, "2")),
 		),
-		want: `{b: 2}`,
+		err: `b: field not allowed`,
 	}, {
 		in: func() interface{} {
 			type T struct {

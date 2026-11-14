@@ -339,21 +339,18 @@ func TestEncodeSyntax(t *testing.T) {
 	d: ""
 }`,
 	}, {
-		// TODO: CUE syntax nested in a Go value is not evaluated in full,
-		// so each of these three should fail to validate.
+		// CUE syntax nested in a Go value is evaluated in full.
 		name: "ExprInMap",
 		x:    map[string]any{"a": parseExpr(t, `close({}) & {b: 2}`)},
-		out:  `{a: b: 2}`,
+		err:  `b: field not allowed`,
 	}, {
 		name: "ExprInSlice",
 		x:    []any{parseExpr(t, `{x: 1} & {x: 2}`)},
-		out: `[{
-	x: _|_ // conflicting values 2 and 1
-}]`,
+		err:  `x: conflicting values 2 and 1`,
 	}, {
 		name: "FileInMap",
 		x:    map[string]any{"f": file(`x: close({}) & {b: 2}`)},
-		out:  `{f: x: close({}) & {b: 2}}`,
+		err:  `x.b: field not allowed`,
 	}}
 	ctx := cuecontext.New()
 	for _, tc := range testCases {

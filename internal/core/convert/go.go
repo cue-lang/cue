@@ -55,7 +55,9 @@ var astTypeCache sync.Map // map[reflect.Type]ast.Expr
 // TODO(mvdan): swap order of parameters in the recursive methods to match the top-level API order
 
 // FromGoValue converts a Go value to an internal CUE value.
-// The returned CUE value is finalized and concrete.
+// The returned CUE value is finalized and concrete, with two exceptions
+// which are left unfinished: CUE syntax such as an [ast.Expr] when x itself
+// is the syntax, and the output of a [json.Marshaler] wherever it appears.
 func FromGoValue(ctx *adt.OpContext, x any, nilIsTop bool) adt.Value {
 	val := reflect.ValueOf(x)
 	v := fromGoValue(ctx, nilIsTop, val, 0)
@@ -102,6 +104,16 @@ func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
 		return &adt.Bottom{Err: errors.Promote(err, "compile")}
 	}
 	return adt.Resolve(ctx, c)
+}
+
+// finishNested finalizes x, which was built from CUE syntax, unless it is the
+// top-level value, which the caller finalizes. A Go map, slice, or struct
+// converts to a value marked as finalized, so nothing else would evaluate x.
+func finishNested(ctx *adt.OpContext, x adt.Value, depth int) adt.Value {
+	if v, ok := x.(*adt.Vertex); ok && depth > 0 {
+		v.Finalize(ctx)
+	}
+	return x
 }
 
 // parseTag parses a CUE expression from a cue tag.
@@ -301,7 +313,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		if _, n := x.SingleConjunct(); n != 1 {
 			panic("unexpected length")
 		}
-		return x
+		return finishNested(ctx, x, depth)
 
 	case adtNum:
 		// A number computed by a builtin, which carries its own kind; see
@@ -366,7 +378,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		return t.V
 	}
 	if v, ok := typeAssert[ast.Expr](val); ok {
-		return compileExpr(ctx, v)
+		return finishNested(ctx, compileExpr(ctx, v), depth)
 	}
 	if v, ok := typeAssert[json.Marshaler](val); ok {
 		b, err := v.MarshalJSON()

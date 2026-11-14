@@ -119,6 +119,14 @@ func (w *printer) compactNode(n adt.Node) {
 			}
 
 		case adt.Value:
+			// An error's arguments may lead back to this vertex.
+			// TODO: a struct holding a field's error prints as that error, or
+			// as `_|_` if the error holds the struct in turn, as in `x: 1 & !=y`
+			// with `y: {a: x}`; print its fields or conjuncts instead.
+			if !w.pushVertex(x) {
+				return
+			}
+			defer w.popVertex()
 			w.node(v)
 		}
 

@@ -8,6 +8,46 @@ bar: !=foo
 
 bar: 0 @test(eq, 0)
 foo: 1 @test(eq, 1)
+-- error.cue --
+// An error's message holds a bound referring to a value which holds the
+// error itself; printing the message must not recurse forever.
+errorBound: {
+	x: 1 & !=y @test(err, code=eval, contains="conflicting values 1 and !=_|_ (mismatched types int and struct)", incorrect) @test(err:todo, contains="conflicting values 1 and !={a:x} (mismatched")
+	y: {a: x} @test(err, code=eval, contains="conflicting values 1 and !=_|_ (mismatched types int and struct)", incorrect) @test(err:todo, contains="conflicting values 1 and !={a:x} (mismatched")
+	@test(debugCheck, """
+		(_|_){
+		  // [eval]
+		  x: (_|_){
+		    // [eval] errorBound.x: conflicting values 1 and !=_|_ (mismatched types int and struct):
+		    //     error.cue:4:5
+		    //     error.cue:4:9
+		  }
+		  y: (_|_){
+		    // [eval]
+		    a: (_|_){
+		      // [eval] errorBound.x: conflicting values 1 and !=_|_ (mismatched types int and struct):
+		      //     error.cue:4:5
+		      //     error.cue:4:9
+		    }
+		  }
+		}
+		""")
+}
+errorBoundList: l: [1 & !=l] @test(err, code=eval, contains="conflicting values 1 and !=_|_ (mismatched types int and list)", incorrect) @test(err:todo, contains="conflicting values 1 and !=[(1 & !=l)] (mismatched")
+errorBoundSelect: ({x: 1 & !=errorBoundSelect, out: {a: b: x + 0}}).out @test(err, code=eval, contains="conflicting values 1 and !=_|_ (mismatched types int and struct)", incorrect) @test(err:todo, contains="conflicting values 1 and !={x:(1 & !=errorBoundSelect),out:{a:{b:(x + 0)}}}.out (mismatched")
+-- out/errors.txt --
+[eval] errorBound.x: conflicting values 1 and !=_|_ (mismatched types int and struct):
+    ./error.cue:4:5
+    ./error.cue:4:9
+[eval] errorBound.x: conflicting values 1 and !=_|_ (mismatched types int and struct):
+    ./error.cue:4:5
+    ./error.cue:4:9
+[eval] errorBoundList.l.0: conflicting values 1 and !=_|_ (mismatched types int and list):
+    ./error.cue:25:21
+    ./error.cue:25:25
+[eval] x: conflicting values 1 and !=_|_ (mismatched types int and struct):
+    ./error.cue:26:24
+    ./error.cue:26:28
 -- out/eval/stats --
 Leaks:  0
 Freed:  4

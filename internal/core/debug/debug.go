@@ -114,45 +114,37 @@ type printer struct {
 	// - auto
 }
 
-// ReplaceArg implements [errors.Config.Printer]. It wraps Vertex arguments
-// with a formatter value, that holds a pointer to w. This allows the stack
-// of processed vertices to be passed down, which in turn is used for cycle
-// detection.
+// ReplaceArg implements [errors.Config.Printer]. It wraps each node argument
+// in a formatter holding w, passing down its stack of vertices for cycle
+// detection, as any node may reach a vertex being printed.
 func (w *printer) ReplaceArg(arg any) (replacement any, replaced bool) {
 	var x adt.Node
-	var r adt.Runtime
 	switch v := arg.(type) {
 	case adt.Node:
 		x = v
 	case adt.Formatter:
 		x = v.X
-		r = v.R
 	case errors.Error:
 		// Wrap errors to ensure they are formatted with our printer,
 		// which enables cycle detection in nested error formatting.
 		return errorFormatter{p: w, err: v}, true
 	}
 
-	switch x := x.(type) {
-	default:
+	if x == nil {
 		return arg, false
-	case *adt.Vertex:
-		// We replace the formatter (or node) with our own formatter that is
-		// capable of detecting cycles.
-		return formatter{p: w, x: x, r: r}, true
 	}
+	return formatter{p: w, x: x}, true
 }
 
 type formatter struct {
 	p *printer
 	x adt.Node
-	r adt.Runtime ``
 }
 
 func (f formatter) String() string {
 	p := printer{
 		dst:             make([]byte, 0, 128),
-		index:           f.r,
+		index:           f.p.index,
 		cfg:             f.p.cfg,
 		compact:         true, // Always compact for error arguments.
 		compactBuiltins: true,
@@ -271,8 +263,18 @@ func (w *printer) shortError(errs errors.Error, omitPath bool) {
 		Cwd:      w.cfg.Cwd,
 		ToSlash:  true,
 		OmitPath: omitPath,
-		Printer:  w,
+		Printer:  w.errPrinter(),
 	}))
+}
+
+// errPrinter returns the printer whose stack an error message's arguments
+// are printed with. A message in the non-compact tree gets its own stack,
+// so that it prints the same anywhere in the tree.
+func (w *printer) errPrinter() *printer {
+	if w.compact {
+		return w
+	}
+	return &printer{index: w.index, cfg: w.cfg}
 }
 
 func (w *printer) interpolation(x *adt.Interpolation) {
@@ -426,7 +428,7 @@ func (w *printer) node(n adt.Node) {
 				msg := errors.Details(v.Err, &errors.Config{
 					Cwd:     w.cfg.Cwd,
 					ToSlash: true,
-					Printer: w,
+					Printer: w.errPrinter(),
 				})
 				msg = strings.TrimSpace(msg)
 				if msg != "" {

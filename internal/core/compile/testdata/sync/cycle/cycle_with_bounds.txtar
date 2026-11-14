@@ -8,7 +8,38 @@ bar: !=foo
 
 bar: 0
 foo: 1
+-- error.cue --
+// An error's message holds a bound referring to a value which holds the
+// error itself; printing the message must not recurse forever.
+errorBound: {
+	x: 1 & !=y
+	y: {a: x}
+}
+errorBoundList: l: [1 & !=l]
+errorBoundSelect: ({x: 1 & !=errorBoundSelect, out: {a: b: x + 0}}).out
 -- out/compile --
+--- error.cue
+{
+  errorBound: {
+    x: (1 & !=〈0;y〉)
+    y: {
+      a: 〈1;x〉
+    }
+  }
+  errorBoundList: {
+    l: [
+      (1 & !=〈1;l〉),
+    ]
+  }
+  errorBoundSelect: {
+    x: (1 & !=〈1;errorBoundSelect〉)
+    out: {
+      a: {
+        b: (〈2;x〉 + 0)
+      }
+    }
+  }.out
+}
 --- in.cue
 {
   #Value: int

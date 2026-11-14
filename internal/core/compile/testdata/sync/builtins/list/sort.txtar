@@ -2,6 +2,37 @@
 import "list"
 
 a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
+
+// The comparator evaluates the elements anew, where the closedness of each
+// disjunct must still eliminate the disjunct that does not match.
+closeDisjunction: {
+	#R: close({p?: int, x?: string}) | close({p?: int, y?: string})
+	#D: {
+		a: #R
+		b: #R
+		s: list.Sort([a, b], {x: {}, y: {}, less: x.p < y.p})
+	}
+	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s
+}
+defDisjunction: {
+	#A: {p?: int, x?: string}
+	#B: {p?: int, y?: string}
+	#D: {
+		a: #A | #B
+		b: #A | #B
+		s: list.Sort([a, b], {x: {}, y: {}, less: x.p < y.p})
+	}
+	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s
+}
+
+// Elements which are open data must stay open.
+openInput: {
+	#D: {
+		in: [string]: _
+		s: list.Sort([for v in in {v & {p: *0 | int}}], {x: {}, y: {}, less: x.p < y.p})
+	}
+	out: (#D & {in: {a: {p: 2, z: "a"}, b: {p: 1, z: "b"}}}).s
+}
 -- out/compile --
 --- in.cue
 {
@@ -15,4 +46,97 @@ a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
     y: _
     less: (〈0;x〉 < 〈0;y〉)
   })
+  closeDisjunction: {
+    #R: (close({
+      p?: int
+      x?: string
+    })|close({
+      p?: int
+      y?: string
+    }))
+    #D: {
+      a: 〈1;#R〉
+      b: 〈1;#R〉
+      s: 〈import;list〉.Sort([
+        〈1;a〉,
+        〈1;b〉,
+      ], {
+        x: {}
+        y: {}
+        less: (〈0;x〉.p < 〈0;y〉.p)
+      })
+    }
+    out: (〈0;#D〉 & {
+      a: {
+        p: 1
+        x: "one"
+      }
+      b: {
+        p: 0
+        y: "two"
+      }
+    }).s
+  }
+  defDisjunction: {
+    #A: {
+      p?: int
+      x?: string
+    }
+    #B: {
+      p?: int
+      y?: string
+    }
+    #D: {
+      a: (〈1;#A〉|〈1;#B〉)
+      b: (〈1;#A〉|〈1;#B〉)
+      s: 〈import;list〉.Sort([
+        〈1;a〉,
+        〈1;b〉,
+      ], {
+        x: {}
+        y: {}
+        less: (〈0;x〉.p < 〈0;y〉.p)
+      })
+    }
+    out: (〈0;#D〉 & {
+      a: {
+        p: 1
+        x: "one"
+      }
+      b: {
+        p: 0
+        y: "two"
+      }
+    }).s
+  }
+  openInput: {
+    #D: {
+      in: {
+        [string]: _
+      }
+      s: 〈import;list〉.Sort([
+        for _, v in 〈1;in〉 {
+          (〈1;v〉 & {
+            p: (*0|int)
+          })
+        },
+      ], {
+        x: {}
+        y: {}
+        less: (〈0;x〉.p < 〈0;y〉.p)
+      })
+    }
+    out: (〈0;#D〉 & {
+      in: {
+        a: {
+          p: 2
+          z: "a"
+        }
+        b: {
+          p: 1
+          z: "b"
+        }
+      }
+    }).s
+  }
 }

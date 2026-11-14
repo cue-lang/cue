@@ -2,15 +2,65 @@
 import "list"
 
 a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y}) @test(eq, [1, 2, 3, 4])
+
+// The comparator evaluates the elements anew, where the closedness of each
+// disjunct must still eliminate the disjunct that does not match.
+closeDisjunction: {
+	#R: close({p?: int, x?: string}) | close({p?: int, y?: string})
+	#D: {
+		a: #R
+		b: #R
+		s: list.Sort([a, b], {x: {}, y: {}, less: x.p < y.p})
+	}
+	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s @test(err, code=incomplete, contains="unresolved disjunction", incorrect) @test(eq:todo, [{p: 0, y: "two"}, {p: 1, x: "one"}], p=1)
+}
+defDisjunction: {
+	#A: {p?: int, x?: string}
+	#B: {p?: int, y?: string}
+	#D: {
+		a: #A | #B
+		b: #A | #B
+		s: list.Sort([a, b], {x: {}, y: {}, less: x.p < y.p})
+	}
+	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s @test(err, code=incomplete, contains="unresolved disjunction", incorrect) @test(eq:todo, [{p: 0, y: "two"}, {p: 1, x: "one"}], p=1)
+}
+
+// Elements which are open data must stay open.
+openInput: {
+	#D: {
+		in: [string]: _
+		s: list.Sort([for v in in {v & {p: *0 | int}}], {x: {}, y: {}, less: x.p < y.p})
+	}
+	out: (#D & {in: {a: {p: 2, z: "a"}, b: {p: 1, z: "b"}}}).s @test(eq, [{p: 1, z: "b"}, {p: 2, z: "a"}])
+}
+-- out/errors.txt --
+[incomplete] closeDisjunction.#D.s: error in call to list.Sort: unresolved disjunction {p?:int,x?:string} | {p?:int,y?:string} (type struct):
+    ./in.cue:12:6
+    ./in.cue:12:45
+[incomplete] closeDisjunction.out: error in call to list.Sort: unresolved disjunction {p:0,y:"two",x?:string} | {p:0,y:"two"} (type struct):
+    ./in.cue:12:6
+    ./in.cue:12:45
+closeDisjunction.out: error in call to list.Sort: unresolved disjunction {p:1,x:"one"} | {p:1,x:"one",y?:string} (type struct):
+    ./in.cue:12:6
+    ./in.cue:12:51
+[incomplete] defDisjunction.#D.s: error in call to list.Sort: unresolved disjunction {p?:int,x?:string} | {p?:int,y?:string} (type struct):
+    ./in.cue:22:6
+    ./in.cue:22:45
+[incomplete] defDisjunction.out: error in call to list.Sort: unresolved disjunction {p:0,y:"two",x?:string} | {p:0,y:"two"} (type struct):
+    ./in.cue:22:6
+    ./in.cue:22:45
+defDisjunction.out: error in call to list.Sort: unresolved disjunction {p:1,x:"one"} | {p:1,x:"one",y?:string} (type struct):
+    ./in.cue:22:6
+    ./in.cue:22:51
 -- out/eval/stats --
-Leaks:  0
-Freed:  15
-Reused: 4
-Allocs: 11
+Leaks:  25
+Freed:  143
+Reused: 129
+Allocs: 39
 Retain: 0
 
-Unifications: 15
-Conjuncts:    20
-Disjuncts:    0
+Unifications: 119
+Conjuncts:    206
+Disjuncts:    22
 
-NumCloseIDs: 5
+NumCloseIDs: 39

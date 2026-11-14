@@ -370,6 +370,26 @@ issue3903: noshare: {
 		result: "result-\(input.name)"
 	}
 }
+-- errmsg.cue --
+// A shared value in an error message prints as a reference if it has fields,
+// and in full otherwise; it is not a cycle.
+errMsg: {
+	emptyStruct: {
+		a: {}
+		b: {c: a}
+		x: b + 1
+	}
+	emptyList: {
+		a: []
+		b: {c: a}
+		x: b + 1
+	}
+	nonEmpty: {
+		a: {d: 1}
+		b: {c: a}
+		x: b + 1
+	}
+}
 -- out/compile --
 --- acrossdisjunction.cue
 {
@@ -642,6 +662,34 @@ issue3903: noshare: {
       }
       out: 〈0;#Network〉
       out: 〈0;val〉
+    }
+  }
+}
+--- errmsg.cue
+{
+  errMsg: {
+    emptyStruct: {
+      a: {}
+      b: {
+        c: 〈1;a〉
+      }
+      x: (〈0;b〉 + 1)
+    }
+    emptyList: {
+      a: []
+      b: {
+        c: 〈1;a〉
+      }
+      x: (〈0;b〉 + 1)
+    }
+    nonEmpty: {
+      a: {
+        d: 1
+      }
+      b: {
+        c: 〈1;a〉
+      }
+      x: (〈0;b〉 + 1)
     }
   }
 }

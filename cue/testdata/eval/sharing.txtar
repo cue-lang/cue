@@ -475,6 +475,26 @@ issue3903: noshare: {
 		}
 	})
 }
+-- errmsg.cue --
+// A shared value in an error message prints as a reference if it has fields,
+// and in full otherwise; it is not a cycle.
+errMsg: {
+	emptyStruct: {
+		a: {}
+		b: {c: a}
+		x: b + 1 @test(err, code=eval, contains="invalid operands {c:value at path 'errMsg.emptyStruct.a'} and 1", incorrect) @test(err:todo, contains="invalid operands {c:{}} and 1")
+	}
+	emptyList: {
+		a: []
+		b: {c: a}
+		x: b + 1 @test(err, code=eval, contains="invalid operands {c:value at path 'errMsg.emptyList.a'} and 1", incorrect) @test(err:todo, contains="invalid operands {c:[]} and 1")
+	}
+	nonEmpty: {
+		a: {d: 1}
+		b: {c: a}
+		x: b + 1 @test(err, code=eval, contains="invalid operands {c:~(errMsg.nonEmpty.a)} and 1")
+	}
+}
 -- out/errors.txt --
 [eval] forwardShared.closed.c: 2 errors in empty disjunction:
 forwardShared.closed.c.x: conflicting values 1 and 2:
@@ -492,6 +512,18 @@ forwardShared.closed.c.y: field not allowed:
     ./acrossdisjunction.cue:97:6
 [eval] forwardShared.selected.c.sub: field not allowed:
     ./acrossdisjunction.cue:122:14
+[eval] errMsg.emptyStruct.x: invalid operands {c:value at path 'errMsg.emptyStruct.a'} and 1 to '+' (type struct and int):
+    ./errmsg.cue:7:6
+    ./errmsg.cue:6:6
+    ./errmsg.cue:7:10
+[eval] errMsg.emptyList.x: invalid operands {c:value at path 'errMsg.emptyList.a'} and 1 to '+' (type struct and int):
+    ./errmsg.cue:12:6
+    ./errmsg.cue:11:6
+    ./errmsg.cue:12:10
+[eval] errMsg.nonEmpty.x: invalid operands {c:~(errMsg.nonEmpty.a)} and 1 to '+' (type struct and int):
+    ./errmsg.cue:17:6
+    ./errmsg.cue:16:6
+    ./errmsg.cue:17:10
 [incomplete] issue3903.full._template.result: invalid interpolation: non-concrete value string (type string):
     ./let.cue:24:11
     ./let.cue:23:16
@@ -510,13 +542,13 @@ forwardShared.closed.c.y: field not allowed:
 [structural_cycle] shareCycle.t3.Y.x.x: structural cycle
 -- out/eval/stats --
 Leaks:  26
-Freed:  391
-Reused: 365
-Allocs: 52
+Freed:  408
+Reused: 381
+Allocs: 53
 Retain: 0
 
-Unifications: 339
-Conjuncts:    702
+Unifications: 356
+Conjuncts:    720
 Disjuncts:    56
 Notifications: 1
 

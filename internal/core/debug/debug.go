@@ -229,27 +229,19 @@ func (w *printer) shared(v *adt.Vertex) {
 // of v, if it is a shared node. It reports the dereferenced node and whether
 // the node was printed.
 func (w *printer) printShared(v0 *adt.Vertex) (x *adt.Vertex, ok bool) {
-	// Handle cyclic shared nodes differently.  If a shared node was part of
-	// a disjunction, it will still be wrapped in a disjunct Vertex.
+	// If a shared node was part of a disjunction, it will still be wrapped
+	// in a disjunct Vertex.
 	// Similarly, a shared node should never point to a disjunct directly,
 	// but rather to the original arc that subsequently points to a
 	// disjunct.
 	v0 = v0.DerefDisjunct()
-	s, ok := v0.BaseValue.(*adt.Vertex)
+	_, ok = v0.BaseValue.(*adt.Vertex)
 	v1 := v0.DerefValue()
 	useReference := v0.IsShared && !v1.Internal()
 	// NOTE(debug): use this line instead of the following to expand shared
 	// cases where it is safe to do so.
 	// if useReference && isCyclic && ok && len(v.Arcs) > 0 {
 	if useReference && ok && len(v1.Arcs) > 0 {
-		w.shared(v1)
-		return v1, true
-	}
-	if !w.pushVertex(v1) {
-		if s != nil {
-			w.shared(s)
-			w.string(" =>")
-		}
 		w.shared(v1)
 		return v1, true
 	}
@@ -397,7 +389,7 @@ func (w *printer) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
 		x, ok := w.printShared(x)
-		if ok {
+		if ok || !w.pushVertex(x) {
 			return
 		}
 		defer w.popVertex()

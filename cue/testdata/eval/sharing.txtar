@@ -482,12 +482,12 @@ errMsg: {
 	emptyStruct: {
 		a: {}
 		b: {c: a}
-		x: b + 1 @test(err, code=eval, contains="invalid operands {c:value at path 'errMsg.emptyStruct.a'} and 1", incorrect) @test(err:todo, contains="invalid operands {c:{}} and 1")
+		x: b + 1 @test(err, code=eval, contains="invalid operands {c:{}} and 1")
 	}
 	emptyList: {
 		a: []
 		b: {c: a}
-		x: b + 1 @test(err, code=eval, contains="invalid operands {c:value at path 'errMsg.emptyList.a'} and 1", incorrect) @test(err:todo, contains="invalid operands {c:[]} and 1")
+		x: b + 1 @test(err, code=eval, contains="invalid operands {c:[]} and 1")
 	}
 	nonEmpty: {
 		a: {d: 1}
@@ -512,11 +512,11 @@ forwardShared.closed.c.y: field not allowed:
     ./acrossdisjunction.cue:97:6
 [eval] forwardShared.selected.c.sub: field not allowed:
     ./acrossdisjunction.cue:122:14
-[eval] errMsg.emptyStruct.x: invalid operands {c:value at path 'errMsg.emptyStruct.a'} and 1 to '+' (type struct and int):
+[eval] errMsg.emptyStruct.x: invalid operands {c:{}} and 1 to '+' (type struct and int):
     ./errmsg.cue:7:6
     ./errmsg.cue:6:6
     ./errmsg.cue:7:10
-[eval] errMsg.emptyList.x: invalid operands {c:value at path 'errMsg.emptyList.a'} and 1 to '+' (type struct and int):
+[eval] errMsg.emptyList.x: invalid operands {c:[]} and 1 to '+' (type struct and int):
     ./errmsg.cue:12:6
     ./errmsg.cue:11:6
     ./errmsg.cue:12:10

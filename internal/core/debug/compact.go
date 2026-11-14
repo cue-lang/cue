@@ -116,7 +116,6 @@ func (w *printer) compactNode(n adt.Node) {
 
 			if v, ok := w.printShared(x); !ok {
 				w.node(v)
-				w.popVertex()
 			}
 
 		case adt.Value:

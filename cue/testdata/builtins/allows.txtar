@@ -115,6 +115,9 @@ inlineCloseDefault: {
 	a: reflect.Allows(close(*{a: 1} | {b: 2}), "a")   @test(eq, true)
 	b: reflect.Allows(close(*{a: 1} | {b: 2}), "b")   @test(eq, false)
 }
+
+// A broken argument is reported as what is wrong with it.
+brokenArg: reflect.Allows({a: 1, b: 1 & 2}, "a")   @test(err, code=eval, contains="conflicting values")
 -- shortcircuit.cue --
 // The && spelling of the escape hatch, which is how the composition reads
 // in practice. It needs the shortcircuit experiment beside predicates: with
@@ -149,6 +152,10 @@ sc: {
 -- out/errors.txt --
 [incomplete] disjunction.noDefault: unresolved disjunction {a:int} | {b:int} (type struct):
     ./in.cue:58:13
+[eval] brokenArg: error in call to reflect.Allows: conflicting values 2 and 1:
+    ./in.cue:115:12
+    ./in.cue:115:37
+    ./in.cue:115:41
 -- out/eval/stats --
 Leaks:  3
 Freed:  159

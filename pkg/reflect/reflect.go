@@ -39,6 +39,10 @@ import (
 // call stays incomplete, even when every disjunct would give the same
 // answer.
 func Allows(s cue.Value, label cue.Value) (bool, error) {
+	if err := s.Err(); err != nil {
+		// A broken value has no kind to report: say what is wrong with it.
+		return false, err
+	}
 	if k := s.IncompleteKind(); k&(cue.StructKind|cue.ListKind) == 0 {
 		return false, fmt.Errorf("first argument must be a struct or list, found %s", k)
 	}
@@ -89,6 +93,10 @@ func Allows(s cue.Value, label cue.Value) (bool, error) {
 // distinguish an absent field from a present one whose value is _; combine
 // it with exists or allows to disambiguate.
 func Field(s cue.Value, name string) (cue.Value, error) {
+	if err := s.Err(); err != nil {
+		// A broken value has no kind to report: say what is wrong with it.
+		return cue.Value{}, err
+	}
 	if k := s.IncompleteKind(); k&cue.StructKind == 0 {
 		return cue.Value{}, fmt.Errorf("first argument must be a struct, found %s", k)
 	}

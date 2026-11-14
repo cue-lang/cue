@@ -32,9 +32,16 @@ u3: isValid(reflect.Field(z, "other") & "s") @test(eq, true)
 // disjunction too: a field its default cannot have is an error.
 d1: reflect.Field(close(*{a: 1} | {b: 2}), "a")   @test(eq, 1)
 d2: reflect.Field(close(*{a: 1} | {b: 2}), "b")   @test(err, code=eval, contains="field not allowed")
+
+// A broken argument is reported as what is wrong with it.
+b1: reflect.Field({a: 1, b: 1 & 2}, "a")   @test(err, code=eval, contains="conflicting values")
 -- out/errors.txt --
 [eval] d2: error in call to reflect.Field: field not allowed:
     ./in.cue:29:5
+[eval] b1: error in call to reflect.Field: conflicting values 2 and 1:
+    ./in.cue:32:5
+    ./in.cue:32:29
+    ./in.cue:32:33
 -- out/eval/stats --
 Leaks:  1
 Freed:  35

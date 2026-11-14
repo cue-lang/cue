@@ -32,6 +32,9 @@ u3: isValid(reflect.Field(z, "other") & "s")
 // disjunction too: a field its default cannot have is an error.
 d1: reflect.Field(close(*{a: 1} | {b: 2}), "a")
 d2: reflect.Field(close(*{a: 1} | {b: 2}), "b")
+
+// A broken argument is reported as what is wrong with it.
+b1: reflect.Field({a: 1, b: 1 & 2}, "a")
 -- out/compile --
 --- in.cue
 {
@@ -61,4 +64,8 @@ d2: reflect.Field(close(*{a: 1} | {b: 2}), "b")
   }|{
     b: 2
   })), "b")
+  b1: 〈import;reflect〉.Field({
+    a: 1
+    b: (1 & 2)
+  }, "a")
 }

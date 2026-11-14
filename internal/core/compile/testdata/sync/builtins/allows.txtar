@@ -114,6 +114,9 @@ inlineCloseDefault: {
 	a: reflect.Allows(close(*{a: 1} | {b: 2}), "a")
 	b: reflect.Allows(close(*{a: 1} | {b: 2}), "b")
 }
+
+// A broken argument is reported as what is wrong with it.
+brokenArg: reflect.Allows({a: 1, b: 1 & 2}, "a")
 -- shortcircuit.cue --
 // The && spelling of the escape hatch, which is how the composition reads
 // in practice. It needs the shortcircuit experiment beside predicates: with
@@ -276,6 +279,10 @@ sc: {
       b: 2
     })), "b")
   }
+  brokenArg: 〈import;reflect〉.Allows({
+    a: 1
+    b: (1 & 2)
+  }, "a")
 }
 --- shortcircuit.cue
 {

@@ -1,0 +1,20 @@
+# The predicates rewrite is applied only when the experiment is named: the
+# all shorthand leaves it out, as the rewrite can change what a configuration
+# means.
+exec cue fix --exp=all ./...
+! grep isValid in.cue
+! grep predicates in.cue
+grep '!= _\|_' in.cue
+
+exec cue fix --exp=predicates ./...
+grep 'isValid\(d\.x\)' in.cue
+grep '@experiment\(predicates\)' in.cue
+
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.19.0"
+-- in.cue --
+package foo
+
+d: {x: 1}
+y: d.x != _|_

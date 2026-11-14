@@ -82,7 +82,10 @@ complete. An experiment which is already stable for that version needs no
 fix, as files use it without an attribute, and asking for one is an error.
 
 The special value --exp=all enables all experimental features that apply to the
-current version.
+current version, except those whose rewrite can change what a configuration
+means. Such an experiment is applied only when it is named. This holds for
+predicates: its rewrite turns ` + "`x != _|_`" + ` into ` + "`isValid(x)`" + `, which is true
+for a value that is declared but not concrete, where the comparison is false.
 
 To move a module to a newer language version, including the rewrites for the
 experiments which are stable at that version, run "cue mod upgrade" instead.

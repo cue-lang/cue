@@ -77,10 +77,21 @@ func UpgradeVersion(version string) Option {
 	}
 }
 
+// namedOnly lists the experiments whose rewrite is applied only when the
+// experiment is asked for by name: neither the "all" shorthand nor an upgrade
+// implies them. Such a rewrite can change what a configuration means in a
+// way that cannot be told from the syntax, so applying it is left as a
+// deliberate step.
+//
+// The predicates rewrite turns x != _|_ into isValid(x). The two differ for
+// a value that is declared but not concrete; see [fixPredicates].
+var namedOnly = []string{"predicates"}
+
 // resolveExperiments returns the experiments to apply to a file whose language
 // version is version, together with the version to rewrite it for: the
 // experiments requested by [Experiments], plus those which [UpgradeVersion]
-// implies, with the "all" shorthand expanded. It fails when any of them cannot
+// implies, with the "all" shorthand expanded. Neither of the latter two
+// includes the experiments in [namedOnly]. It fails when any of them cannot
 // be applied at version.
 func (o options) resolveExperiments(version string) ([]string, string, errors.Error) {
 	targetVersion := version
@@ -91,7 +102,7 @@ func (o options) resolveExperiments(version string) ([]string, string, errors.Er
 		// Add accepted experiments for the target version to the experiment list
 		for _, exp := range cueexperiment.GetUpgradable(version, targetVersion) {
 			// Only add if not already in the list
-			if !slices.Contains(exps, exp) {
+			if !slices.Contains(exps, exp) && !slices.Contains(namedOnly, exp) {
 				exps = append(exps, exp)
 			}
 		}
@@ -99,7 +110,9 @@ func (o options) resolveExperiments(version string) ([]string, string, errors.Er
 
 	// Handle --exp=all (only valid as a lone argument)
 	if slices.Equal(exps, []string{"all"}) {
-		exps = cueexperiment.GetActive(version, targetVersion)
+		exps = slices.DeleteFunc(cueexperiment.GetActive(version, targetVersion), func(exp string) bool {
+			return slices.Contains(namedOnly, exp)
+		})
 	}
 
 	for _, exp := range exps {

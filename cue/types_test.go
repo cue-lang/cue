@@ -3349,11 +3349,22 @@ func TestEquals(t *testing.T) {
 
 // TODO: options: disallow cycles.
 func TestValidate(t *testing.T) {
+	type valueFunc = func(ctx *cue.Context, v cue.Value) cue.Value
+	at := func(path string) valueFunc {
+		return func(_ *cue.Context, v cue.Value) cue.Value {
+			return v.LookupPath(cue.ParsePath(path))
+		}
+	}
 	testCases := []struct {
 		desc string
 		in   string
 		err  bool
 		opts []cue.Option
+
+		// value, if set, derives the value to validate from the compiled one.
+		value valueFunc
+		// count, if set, is the number of errors to expect.
+		count int
 	}{{
 		desc: "issue #51",
 		in: `
@@ -3498,14 +3509,86 @@ func TestValidate(t *testing.T) {
 		forms: a: {}
 		`,
 		opts: []cue.Option{cue.Concrete(true)},
+	}, {
+		desc: "reference to a structural cycle",
+		in: `
+		in: {a: b: a}
+		ref: in
+		`,
+		value: at("ref"),
+		err:   false, // the cycle is not reported
+	}, {
+		desc: "dereferenced structural cycle",
+		in: `
+		in: {a: b: a}
+		ref: in
+		`,
+		value: func(_ *cue.Context, v cue.Value) cue.Value {
+			return cue.Dereference(v.LookupPath(cue.ParsePath("ref")))
+		},
+		err: false, // the cycle is not reported
+	}, {
+		desc: "reference to a structural cycle with more fields",
+		in: `
+		in: {a: b: a}
+		ref: in & {c: 1}
+		`,
+		value: at("ref"),
+		err:   false, // the cycle is not reported
+	}, {
+		desc: "reference to a structural cycle with an error of its own",
+		in: `
+		#D: {a: b: a}
+		#E: {c?: int}
+		ref: #D & #E & {typo: 1}
+		`,
+		value: at("ref"),
+		err:   true,
+		count: 1, // the cycle is not reported
+	}, {
+		desc: "structural cycle referenced more than once",
+		in: `
+		in: {a: b: a}
+		ref: [in, in]
+		`,
+		err:   true,
+		count: 1,
+	}, {
+		desc: "comprehension with an error in a struct",
+		in: `
+		s: {a: 1 & 2}
+		x: {if s {y: 1}}
+		`,
+		value: at("x"),
+		err:   false, // the conflict is not reported
+	}, {
+		desc: "expression with an error in a struct",
+		in:   `s: {a: 1 & 2}`,
+		value: func(ctx *cue.Context, v cue.Value) cue.Value {
+			return ctx.BuildExpr(ast.NewCall(ast.NewIdent("s")), cue.Scope(v))
+		},
+		err: false, // the conflict is not reported
+	}, {
+		desc: "evaluated struct with errors in its fields",
+		in:   `{a: 1 & 2, b: 3 & 4}`,
+		value: func(ctx *cue.Context, v cue.Value) cue.Value {
+			return ctx.CompileString("{}").FillPath(cue.ParsePath("f"), v.Eval())
+		},
+		err: false, // the conflicts are not reported
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
 			val := ctx.CompileString(tc.in, cue.Filename("validate"))
+			if tc.value != nil {
+				val = tc.value(ctx, val)
+			}
 			err := val.Validate(tc.opts...)
 			if gotErr := err != nil; gotErr != tc.err {
 				t.Errorf("got %v; want %v", err, tc.err)
+			}
+			if got := len(errors.Errors(err)); tc.count != 0 && got != tc.count {
+				t.Errorf("got %d errors; want %d:\n%v", got, tc.count, errors.Details(err, nil))
 			}
 		})
 	}

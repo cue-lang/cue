@@ -646,6 +646,26 @@ clauseVariables: {
 	}
 }
 
+// A label of the wrong kind for its parent can never exist either. The
+// error names the mismatch, as the error of an index expression outside a
+// call does.
+wrongKindLabel: {
+	xs: [1, 2]
+	s: {a: 1}
+	a: exists(xs["a"])
+	b: exists(s[3])
+
+	// The mismatch is about regular labels. A list may carry hidden fields
+	// and definitions, and those are members of it like any other.
+	l: {[1, 2], _h: 1, #D: 2}
+	hidden:    exists(l._h)
+	def:       exists(l.#D)
+	noHidden:  exists(l._nope)
+	noDef:     exists(l.#Nope)
+	regular:   exists(l["a"])
+	index:     exists(l[0])
+}
+
 -- cycle.cue --
 @experiment(predicates)
 
@@ -1519,5 +1539,30 @@ minimal: {
       x: exists(〈0;let L#1〉)
       y: exists(〈0;let L#1〉.a)
     }
+  }
+  wrongKindLabel: {
+    xs: [
+      1,
+      2,
+    ]
+    s: {
+      a: 1
+    }
+    a: exists(〈0;xs〉["a"])
+    b: exists(〈0;s〉[3])
+    l: {
+      [
+        1,
+        2,
+      ]
+      _h: 1
+      #D: 2
+    }
+    hidden: exists(〈0;l〉._h)
+    def: exists(〈0;l〉.#D)
+    noHidden: exists(〈0;l〉._nope)
+    noDef: exists(〈0;l〉.#Nope)
+    regular: exists(〈0;l〉["a"])
+    index: exists(〈0;l〉[0])
   }
 }

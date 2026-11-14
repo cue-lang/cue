@@ -797,10 +797,18 @@ func (c *OpContext) existsMember(env *Environment, x Expr, parent *Vertex, close
 	// fields, pattern-admitted labels, and open parents all yield false.
 	// Hidden fields and definitions are always accepted.
 	if !c.existsPossible(parent, closed, sel) {
-		if k := parent.Kind(); k != BottomKind && k&(StructKind|ListKind) == 0 {
-			// The kind of a parent that was still in progress when the
-			// subject was resolved is known by now.
+		// Say what is wrong with the question where the kind of the parent
+		// tells: a parent that was still in progress when the subject was
+		// resolved has its kind by now. The kind of a parent that holds a
+		// broken member reads as bottom, and tells nothing.
+		switch k := parent.Kind(); {
+		case k == BottomKind:
+		case k&(StructKind|ListKind) == 0:
 			return false, c.NewErrf("%s: value of type %s can never have members", name, k)
+		case sel.IsInt() && k&ListKind == 0:
+			return false, c.NewErrf("%s: invalid index %d (found %s, want list)", name, sel.Index(), k)
+		case sel.IsString() && k&StructKind == 0:
+			return false, c.NewErrf("%s: invalid field %v (found %s, want struct)", name, sel, k)
 		}
 		if sel.IsInt() {
 			return false, c.NewErrf("%s: index %d out of range", name, sel.Index())

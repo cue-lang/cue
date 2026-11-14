@@ -702,6 +702,26 @@ clauseVariables: {
 	}
 }
 
+// A label of the wrong kind for its parent can never exist either. The
+// error names the mismatch, as the error of an index expression outside a
+// call does.
+wrongKindLabel: {
+	xs: [1, 2]
+	s: {a: 1}
+	a: exists(xs["a"])   @test(err, code=eval, contains="%s: invalid field %v (found %s, want struct)", args=[exists, a, list])
+	b: exists(s[3])      @test(err, code=eval, contains="%s: invalid index %d (found %s, want list)", args=[exists, 3, struct])
+
+	// The mismatch is about regular labels. A list may carry hidden fields
+	// and definitions, and those are members of it like any other.
+	l: {[1, 2], _h: 1, #D: 2}
+	hidden:    exists(l._h)      @test(eq, true)
+	def:       exists(l.#D)      @test(eq, true)
+	noHidden:  exists(l._nope)   @test(eq, false)
+	noDef:     exists(l.#Nope)   @test(eq, false)
+	regular:   exists(l["a"])    @test(err, code=eval, contains="%s: invalid field %v (found %s, want struct)", args=[exists, a, list])
+	index:     exists(l[0])      @test(eq, true)
+}
+
 -- cycle.cue --
 @experiment(predicates)
 
@@ -899,6 +919,12 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./review.cue:276:26
 [eval] clauseVariables.letVar.x: exists: argument must be a field reference, selector, or index expression:
     ./review.cue:281:6
+[eval] wrongKindLabel.a: exists: invalid field a (found list, want struct):
+    ./review.cue:292:5
+[eval] wrongKindLabel.b: exists: invalid index 3 (found struct, want list):
+    ./review.cue:293:5
+[eval] wrongKindLabel.regular: exists: invalid field a (found list, want struct):
+    ./review.cue:302:13
 -- out/eval/stats --
 Leaks:  75
 Freed:  740

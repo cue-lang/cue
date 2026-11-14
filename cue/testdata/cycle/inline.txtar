@@ -327,10 +327,10 @@ issue3731: fullB: {
 -- out/errors.txt --
 [structural_cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
 [structural_cycle] issue3731.expandedA.root._others.input._others.input: structural cycle
-[eval] issue3731.expandedB.root._others.output: exists: field show not allowed by closed struct:
+[eval] issue3731.expandedB.root._others.output: exists: invalid field show (found list, want struct):
     ./inlineexpand.cue:99:25
 [structural_cycle] issue3731.expandedB.root._others.input._others.input: structural cycle
-[eval] issue3731.expandedB.root._others.output: exists: field show not allowed by closed struct:
+[eval] issue3731.expandedB.root._others.output: exists: invalid field show (found list, want struct):
     ./inlineexpand.cue:99:25
 [structural_cycle] structural cycle:
     ./x.cue:6:9

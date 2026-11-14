@@ -12,7 +12,7 @@ closeDisjunction: {
 		b: #R
 		s: list.Sort([a, b], {x: {}, y: {}, less: x.p < y.p})
 	}
-	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s @test(err, code=incomplete, contains="unresolved disjunction", incorrect) @test(eq:todo, [{p: 0, y: "two"}, {p: 1, x: "one"}], p=1)
+	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s @test(eq, [{p: 0, y: "two"}, {p: 1, x: "one"}])
 }
 defDisjunction: {
 	#A: {p?: int, x?: string}
@@ -22,7 +22,7 @@ defDisjunction: {
 		b: #A | #B
 		s: list.Sort([a, b], {x: {}, y: {}, less: x.p < y.p})
 	}
-	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s @test(err, code=incomplete, contains="unresolved disjunction", incorrect) @test(eq:todo, [{p: 0, y: "two"}, {p: 1, x: "one"}], p=1)
+	out: (#D & {a: {p: 1, x: "one"}, b: {p: 0, y: "two"}}).s @test(eq, [{p: 0, y: "two"}, {p: 1, x: "one"}])
 }
 
 // Elements which are open data must stay open.
@@ -37,30 +37,18 @@ openInput: {
 [incomplete] closeDisjunction.#D.s: error in call to list.Sort: unresolved disjunction {p?:int,x?:string} | {p?:int,y?:string} (type struct):
     ./in.cue:12:6
     ./in.cue:12:45
-[incomplete] closeDisjunction.out: error in call to list.Sort: unresolved disjunction {p:0,y:"two",x?:string} | {p:0,y:"two"} (type struct):
-    ./in.cue:12:6
-    ./in.cue:12:45
-closeDisjunction.out: error in call to list.Sort: unresolved disjunction {p:1,x:"one"} | {p:1,x:"one",y?:string} (type struct):
-    ./in.cue:12:6
-    ./in.cue:12:51
 [incomplete] defDisjunction.#D.s: error in call to list.Sort: unresolved disjunction {p?:int,x?:string} | {p?:int,y?:string} (type struct):
     ./in.cue:22:6
     ./in.cue:22:45
-[incomplete] defDisjunction.out: error in call to list.Sort: unresolved disjunction {p:0,y:"two",x?:string} | {p:0,y:"two"} (type struct):
-    ./in.cue:22:6
-    ./in.cue:22:45
-defDisjunction.out: error in call to list.Sort: unresolved disjunction {p:1,x:"one"} | {p:1,x:"one",y?:string} (type struct):
-    ./in.cue:22:6
-    ./in.cue:22:51
 -- out/eval/stats --
-Leaks:  25
-Freed:  143
-Reused: 129
-Allocs: 39
+Leaks:  37
+Freed:  171
+Reused: 157
+Allocs: 51
 Retain: 0
 
-Unifications: 119
-Conjuncts:    206
-Disjuncts:    22
+Unifications: 135
+Conjuncts:    258
+Disjuncts:    30
 
-NumCloseIDs: 39
+NumCloseIDs: 59

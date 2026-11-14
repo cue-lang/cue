@@ -117,6 +117,12 @@ func (n *nodeContext) scheduleConjuncts() {
 	for i, c := range v.Conjuncts {
 		_ = i // for debugging purposes
 		ci := c.CloseInfo
+		// A conjunct evaluated anew in another OpContext, such as by a
+		// builtin like list.Sort, carries IDs which mean nothing here.
+		// Drop them so that its closedness is tracked afresh.
+		if ci.opID != ctx.opID {
+			ci = ci.clearCloseCheck()
+		}
 		ci = ctx.combineCycleInfo(ci)
 		n.scheduleConjunct(c, ci)
 	}

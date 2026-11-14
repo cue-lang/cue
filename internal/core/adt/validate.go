@@ -94,7 +94,7 @@ type validator struct {
 
 	sharedPositions []Node
 
-	// visited records how each structure-shared vertex has been validated.
+	// visited records how each vertex passed to visit has been validated.
 	// TODO: we could also keep track of the number of references to a
 	// shared vertex. This would allow us to report more than a single error
 	// per shared vertex.
@@ -134,6 +134,36 @@ func (v *validator) add(b *Bottom) {
 	}
 }
 
+// visit reports whether x, a node not reached as an arc of its parent, still
+// needs validating. Each is processed once per kind of visit, which bounds
+// the work and prevents cycles. It may not be reachable in any other way,
+// such as a let or an imported package referenced by a hidden field.
+func (v *validator) visit(x *Vertex) bool {
+	visit := partialVisit
+	if v.checkFinal() {
+		visit = fullVisit
+	}
+	if v.visited[x] >= visit {
+		return false
+	}
+	if v.visited == nil {
+		v.visited = make(map[*Vertex]sharedVisit)
+	}
+	v.visited[x] = visit
+	return true
+}
+
+// validateChildError reports the errors below b.Node for another node which
+// holds b without those fields, such as a reference to a struct with a
+// structural cycle. Only errors are reported, as in a definition.
+func (v *validator) validateChildError(b *Bottom) {
+	v.inDefinition++ // before visit, which then records a partial visit
+	if v.visit(b.Node) {
+		v.validate(b.Node)
+	}
+	v.inDefinition--
+}
+
 func (v *validator) validate(x *Vertex) {
 	defer v.ctx.PopArcAndLabel(v.ctx.PushArcAndLabel(x))
 
@@ -151,25 +181,15 @@ func (v *validator) validate(x *Vertex) {
 		defer func() { v.sharedPositions = saved }()
 	}
 	x = x.DerefValue()
-	if y != x {
-		// Process each dereferenced node at most once per kind of visit,
-		// which bounds the work and prevents cycles. The node may not be
-		// reachable in any other way, such as a let or an imported package
-		// referenced by a hidden field.
-		visit := partialVisit
-		if v.checkFinal() {
-			visit = fullVisit
-		}
-		if v.visited[x] >= visit {
-			return
-		}
-		if v.visited == nil {
-			v.visited = make(map[*Vertex]sharedVisit)
-		}
-		v.visited[x] = visit
+	if y != x && !v.visit(x) {
+		return
 	}
 
 	if b := x.Bottom(); b != nil {
+		// Without all, add reports the child error itself.
+		if v.all && b.ChildError && b.Node != x {
+			v.validateChildError(b)
+		}
 		switch b.Code {
 		case CycleError:
 			if v.checkFinal() || v.DisallowCycles {

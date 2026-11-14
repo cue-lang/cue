@@ -85,7 +85,7 @@ type Bottom struct {
 
 	Code         ErrorCode
 	HasRecursive bool
-	ChildError   bool // Err is the error of the child
+	ChildError   bool // Err is the error of a child of Node
 	NotExists    bool // This error originated from a failed lookup.
 	CloseCheck   bool // This error resulted from a close check.
 	// Value holds the computed value so far in case

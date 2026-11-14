@@ -3516,7 +3516,7 @@ func TestValidate(t *testing.T) {
 		ref: in
 		`,
 		value: at("ref"),
-		err:   false, // the cycle is not reported
+		err:   true,
 	}, {
 		desc: "dereferenced structural cycle",
 		in: `
@@ -3526,7 +3526,7 @@ func TestValidate(t *testing.T) {
 		value: func(_ *cue.Context, v cue.Value) cue.Value {
 			return cue.Dereference(v.LookupPath(cue.ParsePath("ref")))
 		},
-		err: false, // the cycle is not reported
+		err: true,
 	}, {
 		desc: "reference to a structural cycle with more fields",
 		in: `
@@ -3534,7 +3534,7 @@ func TestValidate(t *testing.T) {
 		ref: in & {c: 1}
 		`,
 		value: at("ref"),
-		err:   false, // the cycle is not reported
+		err:   true,
 	}, {
 		desc: "reference to a structural cycle with an error of its own",
 		in: `
@@ -3544,7 +3544,7 @@ func TestValidate(t *testing.T) {
 		`,
 		value: at("ref"),
 		err:   true,
-		count: 1, // the cycle is not reported
+		count: 2,
 	}, {
 		desc: "structural cycle referenced more than once",
 		in: `
@@ -3560,21 +3560,22 @@ func TestValidate(t *testing.T) {
 		x: {if s {y: 1}}
 		`,
 		value: at("x"),
-		err:   false, // the conflict is not reported
+		err:   true,
 	}, {
 		desc: "expression with an error in a struct",
 		in:   `s: {a: 1 & 2}`,
 		value: func(ctx *cue.Context, v cue.Value) cue.Value {
 			return ctx.BuildExpr(ast.NewCall(ast.NewIdent("s")), cue.Scope(v))
 		},
-		err: false, // the conflict is not reported
+		err: true,
 	}, {
 		desc: "evaluated struct with errors in its fields",
 		in:   `{a: 1 & 2, b: 3 & 4}`,
 		value: func(ctx *cue.Context, v cue.Value) cue.Value {
 			return ctx.CompileString("{}").FillPath(cue.ParsePath("f"), v.Eval())
 		},
-		err: false, // the conflicts are not reported
+		err:   true,
+		count: 2,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {

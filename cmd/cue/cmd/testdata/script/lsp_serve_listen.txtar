@@ -10,6 +10,18 @@ stderr 'cuelsp daemon: exiting'
 exec cue lsp --listen localhost:0 --listen-timeout 20ms
 stderr 'cuelsp daemon: exiting'
 
+# The Go-style flags of older versions should still be accepted, such
+# as single-dash long flags and the old dotted names, as editor
+# configurations may still use them. They are currently rejected.
+! exec cue lsp serve -listen=localhost:0 --listen.timeout 20ms -remote.listen.timeout=1m
+stderr 'unknown shorthand flag'
+! exec cue -E lsp -i -listen localhost:0 -listen-timeout 20ms
+stderr 'unknown shorthand flag'
+
+# Single-dash long flags are only accepted for cue lsp.
+! exec cue version -listen=localhost:0
+stderr 'unknown shorthand flag'
+
 # Positional arguments are rejected.
 ! exec cue lsp bogus
 stderr 'unknown command "bogus" for "cue lsp"'

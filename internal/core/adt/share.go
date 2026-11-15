@@ -190,6 +190,9 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.node.IsShared = true
 	n.isShared = true
 	n.node.OpenedShared = id.Opened || id.ConjunctOpened
+	if n.node.OpenedShared {
+		n.ctx.sawOpened = true
+	}
 	n.addShared(c, arc, id)
 
 	if arc.IsDetached() && arc.MayAttach() { // TODO: Second check necessary?

@@ -137,6 +137,9 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	needs := flags.condition
 	mode := flags.mode
 	checkTypos := flags.checkTypos
+	// foreign is set if an OpContext other than the one that started
+	// evaluating v is finalizing it.
+	foreign := false
 
 	if c.LogEval > 0 {
 		defer c.Un(c.Indentf(v, "UNIFY(%x, %v)", needs, mode))
@@ -182,6 +185,7 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		// Arc conjunctInfo defIDs belong to the original context, so
 		// the typo check would falsely reject sanctioned fields here.
 		checkTypos = false
+		foreign = true
 	}
 
 	// Note that the state of a node can be removed before the node is.
@@ -470,11 +474,14 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		n.node.ClosedRecursive = true
 	}
 
-	if checkTypos {
+	switch {
+	case checkTypos:
 		n.checkTypos()
-		if n.node.HasEllipsis && !n.openByEllipsis() {
-			n.node.HasEllipsis = false
-		}
+		n.settleOpenness(false)
+	case foreign:
+		// The typo check does not run, but the vertex is final all the
+		// same: whoever asks next gets no other answer.
+		n.settleOpenness(true)
 	}
 
 	// After this we no longer need the defIDs of the conjuncts. By clearing

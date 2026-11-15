@@ -2732,6 +2732,19 @@ func wrappedDefault(v Value) Value {
 	}
 }
 
+// openedArg returns the value of x, an argument opened with the postfix ...
+// operator, as a field declared as x has it: a vertex that records that it
+// is open. Evaluating x as an expression gives the value of its operand,
+// which does not.
+//
+// As for a conjunction, the vertex is not finalized here; see
+// [BinaryExpr.evaluate].
+func (c *OpContext) openedArg(x *OpenExpr) *Vertex {
+	v := c.newInlineVertex(nil, nil, makeAnonymousConjunct(c.Env(0), x, c.ci.Refs))
+	v.CompleteArcsShallow(c)
+	return v
+}
+
 // A CallExpr represents a call to a builtin.
 //
 //	len(x)
@@ -2950,10 +2963,41 @@ func (builtin *Builtin) rawCall(c *OpContext, call *CallExpr, state Flags) Value
 				// unwrapping, which [BuiltinCallContext.RawValue] exposes only
 				// when it is a wrapper of expr itself.
 				f.concrete = true
-				raw = c.evalState(a, f)
+				var ref *Vertex
+				raw, _, ref = c.evalStateRef(a, f)
 				expr, _ = c.getDefault(raw)
 				expr = Unwrap(expr)
 				raw = wrappedDefault(raw)
+				// A reference to a field that shares an opened definition
+				// evaluates to the definition, which is closed. The vertex
+				// it resolved to records that it is open, as a close()
+				// wrapper records that its result is closed. In turn, a
+				// field within a definition that shares an opened struct
+				// evaluates to that struct, which the definition closes
+				// again. [Vertex.Accept] tells from the vertex.
+				if refOpened(ref) || refReclosed(ref) {
+					raw = ref
+				}
+				// The same holds for an argument that is itself opened with
+				// the postfix ... operator.
+				if o, ok := a.(*OpenExpr); ok {
+					if v, ok := expr.(*Vertex); ok {
+						w := c.openedArg(o)
+						if w.DerefValue() == v {
+							// The opened value shares that of a reference.
+							raw = w
+						} else if x, _ := c.getDefault(w); x != nil {
+							// Anything else is a value of its own. It may
+							// not be one yet if it refers to a value that
+							// is still in progress, as within the value
+							// itself. The argument is then taken as is.
+							if x, ok := Unwrap(x).(*Vertex); ok {
+								expr = x
+								raw = wrappedDefault(w)
+							}
+						}
+					}
+				}
 			}
 		}
 

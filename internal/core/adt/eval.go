@@ -394,6 +394,10 @@ type nodeContextState struct {
 	hasStruct bool // this node has a struct conjunct
 	isDef     bool // this node is a definition
 
+	// opened is set if a reference opened with the postfix ... operator
+	// was added to this node; see [nodeContext.underOpened].
+	opened bool
+
 	dropParentRequirements bool // used for typo checking
 	computedFlatReplaceIDs bool // whether [nodeContext.flatReplaceIDs] has been computed
 

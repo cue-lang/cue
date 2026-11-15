@@ -496,25 +496,25 @@ recloseConjunction: {
 spreadDefClosed: {
 	#D: {a: {}}
 	v: {#D...}
-	t1: v @test(closed:todo=false) @test(allows:todo, z)
+	t1: v @test(closed:todo=false) @test(allows, z)
 	t2: v & {z: 1} @test(eq, {a: {}, z: 1})
 	// The same holds for a spread of a __reclose literal which a definition
 	// closes.
 	w: {__reclose({#D...})...}
-	t3: w @test(closed:todo=false) @test(allows:todo, z)
+	t3: w @test(closed:todo=false) @test(allows, z)
 	t4: w & {z: 1} @test(eq, {a: {}, z: 1})
 }
 // Selecting a field that a struct does not have is an incomplete error if
 // the field may still be added, and a permanent one otherwise. A spread
 // opens the definition, so the field may still be added.
 //
-// TODO: selecting from a spread definition reports a field that can never
-// be added.
+// TODO: a field that shares the spread definition, rather than unifying it
+// with a struct, still reports a field that can never be added.
 spreadSelectMissing: {
 	#D: {a: {}}
 	unified: {
 		v: #D... & {b: 1}
-		x: v.z @test(err, code=eval, contains="undefined field: z", incorrect) @test(err:todo, code=incomplete, contains="undefined field: z", p=1)
+		x: v.z @test(err, code=incomplete, contains="undefined field: z")
 	}
 	shared: {
 		v: #D...
@@ -623,7 +623,7 @@ recloseSame.readDisjunct.m.y: field not allowed:
     ./issues.cue:288:34
 [eval] recloseConjunction.embedded.m.y: field not allowed:
     ./issues.cue:292:11
-[eval] spreadSelectMissing.unified.x: undefined field: z:
+[incomplete] spreadSelectMissing.unified.x: undefined field: z:
     ./issues.cue:319:8
     ./issues.cue:318:3
 [eval] spreadSelectMissing.shared.x: undefined field: z:

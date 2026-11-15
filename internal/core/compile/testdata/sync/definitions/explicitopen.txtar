@@ -506,8 +506,8 @@ spreadDefClosed: {
 // the field may still be added, and a permanent one otherwise. A spread
 // opens the definition, so the field may still be added.
 //
-// TODO: selecting from a spread definition reports a field that can never
-// be added.
+// TODO: a field that shares the spread definition, rather than unifying it
+// with a struct, still reports a field that can never be added.
 spreadSelectMissing: {
 	#D: {a: {}}
 	unified: {

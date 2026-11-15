@@ -55,12 +55,10 @@ func TestOpenedInScope(t *testing.T) {
 		path string
 		want string
 	}{
-		// TODO: both structs admit zz. The answers should be true for
-		// Allows and false for exists.
-		{"sharedAllows", "false"},
-		{"sharedExists", "error"},
-		{"unifiedAllows", "false"},
-		{"unifiedExists", "error"},
+		{"sharedAllows", "true"},
+		{"sharedExists", "false"},
+		{"unifiedAllows", "true"},
+		{"unifiedExists", "false"},
 	} {
 		x := v.LookupPath(cue.ParsePath(tc.path))
 		got := fmt.Sprint(x)

@@ -229,6 +229,15 @@ type Vertex struct {
 	// reference to this Vertex is opened.
 	OpenedShared bool
 
+	// Opened is set when this Vertex admits fields that none of its conjuncts
+	// declare although it is marked as closed: it, or an ancestor, unifies
+	// with a reference opened with the postfix ... operator. The mark keeps
+	// what that reference brings in closed for nodes that are not opened. It
+	// is set when the Vertex is finalized, and overrides ClosedRecursive and
+	// ClosedNonRecursive for [Vertex.Accept]. A Vertex that shares an opened
+	// vertex has OpenedShared set instead.
+	Opened bool
+
 	// ClosedShared is set when this Vertex structure shares a vertex through
 	// a reference naming a definition, or shares a definition. It stops
 	// [Vertex.sharesOpened] here.
@@ -1357,7 +1366,16 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	// wrapper vertex (see closeBuiltin); capture it before dereferencing,
 	// which would otherwise discard it.
 	closed := v.ClosedNonRecursive
+	// Likewise, a vertex that shares another through a reference opened with
+	// the postfix ... operator records that on itself, and one that the
+	// operator opened without sharing has Opened set. A definition closes
+	// again what is opened within it for a reference from outside of it,
+	// which is the view taken here. So neither mark counts for a vertex
+	// within a definition, nor does the mark of a vertex that it shares.
+	inDef := enclosingDef(v) != nil
+	opened := !inDef && v.sharesOpened()
 	v = v.DerefValue()
+	opened = opened || (!inDef && v.Opened)
 	// While v still has unexpanded disjunctions, its final field set is not
 	// yet known: allow f if any pending disjunct may declare it, mirroring
 	// the expanded case below.
@@ -1401,7 +1419,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		}
 	}
 
-	if (!closed && v.IsOpenStruct()) || v.Lookup(f) != nil {
+	if opened || (!closed && v.IsOpenStruct()) || v.Lookup(f) != nil {
 		return true
 	}
 

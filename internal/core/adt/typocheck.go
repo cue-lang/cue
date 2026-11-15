@@ -373,6 +373,11 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore b
 		return id
 	}
 
+	if id.Opened || id.ConjunctOpened {
+		n.opened = true
+		n.ctx.sawOpened = true
+	}
+
 	// This can only be true when not using the @experiment(explicitopen).
 	closeOuter := id.FromDef && id.FromEmbed && !id.Opened && !id.ConjunctOpened
 
@@ -1342,6 +1347,68 @@ func (n *nodeContext) ellipsisOpensAll() bool {
 	// The zero conjunctInfo stands for a field added from outside of any
 	// definition or embedding.
 	return n.hasEvidenceForAll(required, []conjunctInfo{{}}, n.scopeDepth)
+}
+
+// settleOpenness records on the vertex of n, which is being finalized, whether
+// it admits fields that none of its conjuncts declare, where the marks set
+// so far say otherwise. [Vertex.Accept] relies on it.
+//
+// An ellipsis only opens the struct it is part of: HasEllipsis is cleared
+// for a vertex that something else closes regardless. The postfix ...
+// operator, in turn, opens a vertex that is marked as closed: that mark
+// keeps what the opened reference brings in closed. Opened is set for it.
+//
+// peek is set if the typo check did not run because another OpContext
+// finalizes the vertex, as when a builtin implemented in Go inspects an
+// argument before the evaluation that owns it gets to it. The ancestors may
+// then still be in progress, so that the question is asked without leaving
+// a trace; see [nodeContext.peekOpenByEllipsis]. Without this, the answer
+// would depend on who finalizes the vertex first.
+func (n *nodeContext) settleOpenness(peek bool) {
+	v := n.node
+	closed := v.ClosedRecursive || v.ClosedNonRecursive
+	if !closed || (!v.HasEllipsis && !n.underOpened()) {
+		return
+	}
+	var open bool
+	if peek {
+		open = n.peekOpenByEllipsis()
+	} else {
+		open = n.openByEllipsis()
+	}
+	switch {
+	case v.HasEllipsis:
+		v.HasEllipsis = open
+	case open:
+		v.Opened = true
+	}
+}
+
+// underOpened reports whether a reference opened with the postfix ...
+// operator was added to n or to one of its ancestors, outside of any
+// definition. Such a node can admit fields that none of its conjuncts
+// declare although it is marked as closed: the mark keeps what the reference
+// brings in closed, while the typo check ignores the requirement that the
+// opened reference would otherwise add.
+//
+// A definition closes its value recursively, and so closes again what an
+// opened reference within it opened. That is not for the node within the
+// definition to tell: a reference to the definition, or into it, adds the
+// requirement to the node that refers to it.
+func (n *nodeContext) underOpened() bool {
+	if !n.ctx.sawOpened {
+		return false
+	}
+	opened := false
+	for v := n.node; v != nil; v = v.Parent {
+		if v.Label.IsDef() {
+			return false
+		}
+		if s := v.state; s != nil && s.opID == n.opID && s.opened {
+			opened = true
+		}
+	}
+	return opened
 }
 
 // peekOpenByEllipsis reports what [nodeContext.openByEllipsis] will report

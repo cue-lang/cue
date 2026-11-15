@@ -142,6 +142,10 @@ type OpContext struct {
 	containments       []containment   // parent relations
 	containsDefIDCache map[uint64]bool // cache for containsDefID results
 
+	// sawOpened is set once a reference opened with the postfix ... operator
+	// was added to any node; see [nodeContext.underOpened].
+	sawOpened bool
+
 	// containsDefIDVisited is scratch space for [nodeContext.containsDefIDRec]:
 	// the replacement sources it has already explored within a single
 	// [nodeContext.containsDefID] call. The buffer is reused across calls.
@@ -455,6 +459,7 @@ func (c *OpContext) ResolveExists(x Expr, name string) (bool, *Bottom) {
 	env := c.Env(0)
 	var parent *Vertex
 	var closed bool // parent is the argument of an inline close()
+	var opened bool // parent is reached through an opened reference
 	var sel Feature
 	var pos token.Pos
 
@@ -486,7 +491,7 @@ func (c *OpContext) ResolveExists(x Expr, name string) (bool, *Bottom) {
 			pos = r.Src.Sel.Pos()
 		}
 		var err *Bottom
-		if parent, closed, err = c.existsSubject(env, x, r.X, pos, name); err != nil {
+		if parent, closed, opened, err = c.existsSubject(env, x, r.X, pos, name); err != nil {
 			return false, err
 		}
 
@@ -514,7 +519,7 @@ func (c *OpContext) ResolveExists(x Expr, name string) (bool, *Bottom) {
 			return false, c.Err()
 		}
 		var err *Bottom
-		if parent, closed, err = c.existsSubject(env, x, r.X, pos, name); err != nil {
+		if parent, closed, opened, err = c.existsSubject(env, x, r.X, pos, name); err != nil {
 			return false, err
 		}
 
@@ -522,15 +527,17 @@ func (c *OpContext) ResolveExists(x Expr, name string) (bool, *Bottom) {
 		return false, c.NewErrf("%s: argument must be a field reference, selector, or index expression", name)
 	}
 
-	return c.existsMember(env, x, parent, closed, sel, pos, name)
+	return c.existsMember(env, x, parent, closed, opened, sel, pos, name)
 }
 
 // existsSubject resolves the subject value of the selector or index
 // expression x for [OpContext.ResolveExists]: the vertex whose members are
-// asked about. It also reports whether the subject is the result of an inline
-// close(): that records its closedness on a wrapper vertex, which is not the
-// vertex returned.
-func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos, name string) (_ *Vertex, closed bool, _ *Bottom) {
+// asked about. It also reports two things that are recorded on a vertex
+// which is not the one returned: whether the subject is the result of an
+// inline close(), which records its closedness on a wrapper vertex, and
+// whether it shares a vertex through a reference opened with the postfix ...
+// operator.
+func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos, name string) (_ *Vertex, closed, opened bool, _ *Bottom) {
 	// Resolve the peer cooperatively, the way regular selector resolution
 	// does (see [SelectorExpr.resolve] and [OpContext.node]): only the peer's
 	// field set is needed to answer an existence question, and mode yield
@@ -541,7 +548,7 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	// with a spurious cycle error whenever evaluation merely entered the
 	// graph through a not-yet-computed node.
 	s := c.PushState(env, x.Source())
-	peerV := c.unifyNode(value, Flags{
+	peerV, arc := c.unifyNodeRef(value, Flags{
 		status:    partial,
 		condition: needFieldSetKnown,
 		mode:      yield,
@@ -553,13 +560,25 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	// always propagate, as the answer would be order-dependent.
 	peerErr := c.PopState(s)
 	if peerErr != nil && peerErr.Code == CycleError {
-		return nil, false, peerErr
+		return nil, false, false, peerErr
 	}
 	// An inline close() records its closedness on a wrapper vertex, which
-	// resolving the default and unwrapping below discard.
+	// resolving the default and unwrapping below discard. A vertex that
+	// shares another through an opened reference records that it is open,
+	// and resolving the peer above has dereferenced it already. A subject
+	// that is itself an opened expression, as in (#D...).a, is open.
+	if _, ok := value.(*OpenExpr); ok {
+		opened = true
+	} else {
+		opened = refOpened(arc)
+	}
 	for w, _ := peerV.(*Vertex); w != nil; w, _ = w.BaseValue.(*Vertex) {
 		closed = closed || w.ClosedNonRecursive
 	}
+	// A definition closes again what a field within it shares. Like an
+	// inline close(), it then admits the declared fields and those that
+	// match a pattern only.
+	closed = closed || refReclosed(arc)
 	// A disjunction with a default is navigated through its default, which
 	// finalization selects. Without a default the subject's field set is
 	// genuinely undetermined, so a presence question about it is unformed:
@@ -567,7 +586,7 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	// have (CP-E8).
 	w, unresolved := resolveDefault(peerV)
 	if unresolved != nil {
-		return nil, false, c.unresolvedExistsSubject(peerV, pos, name)
+		return nil, false, false, c.unresolvedExistsSubject(peerV, pos, name)
 	}
 	peerV = w
 	if w := Unwrap(peerV); !isCyclePlaceholder(w) {
@@ -595,7 +614,7 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	if b, isErr := peerV.(*Bottom); isErr {
 		vtx, ok := b.Value.(*Vertex)
 		if !b.ChildError || !ok {
-			return nil, false, b
+			return nil, false, false, b
 		}
 		// A member's broken value surfaces as its container's own bottom,
 		// but the container's field set is intact. Presence is independent
@@ -605,9 +624,9 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	parent, ok := peerV.(*Vertex)
 	if !ok {
 		if peerErr != nil {
-			return nil, false, peerErr
+			return nil, false, false, peerErr
 		}
-		return nil, false, c.NewErrf("%s: cannot index non-struct/list value", name)
+		return nil, false, false, c.NewErrf("%s: cannot index non-struct/list value", name)
 	}
 
 	// Follow defaults: a selection on a disjunction with a default picks the
@@ -622,7 +641,7 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	}
 	if _, isDisjunction := parent.BaseValue.(*Disjunction); isDisjunction {
 		// Unresolved even after applying defaults.
-		return nil, false, c.unresolvedExistsSubject(parent, pos, name)
+		return nil, false, false, c.unresolvedExistsSubject(parent, pos, name)
 	}
 	parent = parent.DerefValue()
 
@@ -634,7 +653,7 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	// order of evaluation.
 	inProgress := isCyclePlaceholder(parent.BaseValue)
 	if n := parent.state; inProgress && n != nil && n.errs != nil && !n.errs.IsIncomplete() {
-		return nil, false, n.errs
+		return nil, false, false, n.errs
 	}
 	if _, isBottom := parent.BaseValue.(*Bottom); !isBottom || inProgress {
 		if k := parent.Kind(); k&(StructKind|ListKind) == 0 {
@@ -644,10 +663,33 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 			// container is a composite whose kind reads as bottom. The
 			// placeholder of a subject in progress is not such a container:
 			// its kind is read from its state.
-			return nil, false, c.NewErrf("%s: value of type %s can never have members", name, k)
+			return nil, false, false, c.NewErrf("%s: value of type %s can never have members", name, k)
 		}
 	}
-	return parent, closed, nil
+	return parent, closed, opened, nil
+}
+
+// refOpened reports whether arc, the vertex that a reference resolved to
+// before it is dereferenced, stands for a struct opened with the postfix ...
+// operator: it shares another vertex through an opened reference. Such a
+// vertex records that it is open, as the vertex it shares is not: see
+// [Vertex.OpenedShared]. Evaluating the reference dereferences the vertex,
+// so that this is lost.
+//
+// A definition closes again what is opened within it; see [Vertex.Accept].
+//
+// This reads what the vertices record, whichever OpContext evaluated them.
+func refOpened(arc *Vertex) bool {
+	return arc != nil && arc.sharesOpened() && enclosingDef(arc) == nil
+}
+
+// refReclosed reports whether arc, the vertex that a reference resolved to
+// before it is dereferenced, shares another vertex from within a definition.
+// The definition closes the shared vertex again, whatever that vertex
+// records about itself, such as [Vertex.Opened]. Evaluating the reference
+// dereferences arc, so that this is lost as well.
+func refReclosed(arc *Vertex) bool {
+	return arc != nil && arc.DerefValue() != arc && enclosingDef(arc) != nil
 }
 
 // unresolvedExistsSubject reports that the subject v of an existence question
@@ -667,9 +709,14 @@ func (c *OpContext) unresolvedExistsSubject(v Value, pos token.Pos, name string)
 
 // existsPossible reports whether the absent member sel of parent could still
 // be added by a legal configuration, for [OpContext.ResolveExists].
-// inlineClose reports whether parent is the argument of an inline close();
-// see [OpContext.existsSubject].
-func (c *OpContext) existsPossible(parent *Vertex, inlineClose bool, sel Feature) bool {
+// inlineClose reports whether parent is the argument of an inline close(),
+// and opened whether it is reached through an opened reference; see
+// [OpContext.existsSubject].
+func (c *OpContext) existsPossible(parent *Vertex, inlineClose, opened bool, sel Feature) bool {
+	if opened && sel.IsString() && parent.Kind()&StructKind != 0 {
+		// The postfix ... operator opens the struct it is applied to.
+		return true
+	}
 	if !parent.Accept(c, sel) {
 		return false
 	}
@@ -706,10 +753,11 @@ func (c *OpContext) existsPossible(parent *Vertex, inlineClose bool, sel Feature
 			return true
 		}
 		closed = closed || (n.isDef && (n.hasStruct || !n.hasTop))
-		if closed && open {
+		if closed && (open || n.underOpened()) {
 			// An ellipsis only opens the struct it is part of, so it need
 			// not open a struct that something else closes, as in
-			// #D & {...}.
+			// #D & {...}. The postfix ... operator, in turn, opens a
+			// struct that is marked as closed.
 			open = n.peekOpenByEllipsis()
 		}
 
@@ -733,7 +781,7 @@ func (c *OpContext) existsPossible(parent *Vertex, inlineClose bool, sel Feature
 
 // existsMember reports whether sel is a regular member of parent that is
 // present, for [OpContext.ResolveExists].
-func (c *OpContext) existsMember(env *Environment, x Expr, parent *Vertex, closed bool, sel Feature, pos token.Pos, name string) (bool, *Bottom) {
+func (c *OpContext) existsMember(env *Environment, x Expr, parent *Vertex, closed, opened bool, sel Feature, pos token.Pos, name string) (bool, *Bottom) {
 	s := c.PushState(env, x.Source())
 
 	c.inValidator++
@@ -814,7 +862,7 @@ func (c *OpContext) existsMember(env *Environment, x Expr, parent *Vertex, close
 	// Possibility is judged structurally: declared optional and required
 	// fields, pattern-admitted labels, and open parents all yield false.
 	// Hidden fields and definitions are always accepted.
-	if !c.existsPossible(parent, closed, sel) {
+	if !c.existsPossible(parent, closed, opened, sel) {
 		// Say what is wrong with the question where the kind of the parent
 		// tells: a parent that was still in progress when the subject was
 		// resolved has its kind by now. The kind of a parent that holds a
@@ -1523,6 +1571,15 @@ func (c *OpContext) evalState(v Expr, state Flags) (result Value) {
 }
 
 func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo) {
+	result, ci, _ = c.evalStateRef(v, state)
+	return result, ci
+}
+
+// evalStateRef is like [OpContext.evalStateCI]. If v is a reference, it also
+// returns the vertex that the reference resolved to, before it is
+// dereferenced: what is recorded on a vertex that shares another, such as
+// [Vertex.OpenedShared], is otherwise lost.
+func (c *OpContext) evalStateRef(v Expr, state Flags) (result Value, ci CloseInfo, ref *Vertex) {
 	savedSrc := c.src
 	c.src = v.Source()
 	err := c.errs
@@ -1567,26 +1624,27 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 
 	switch x := v.(type) {
 	case Value:
-		return x, c.ci
+		return x, c.ci, ref
 
 	case *OpenExpr:
 		v, ci := c.evalStateCI(x.X, state)
 		ci.Opened = true
-		return v, ci
+		return v, ci, nil
 
 	case Evaluator:
 		v := x.evaluate(c, state)
-		return v, c.ci
+		return v, c.ci, ref
 
 	case Resolver:
 		arc := x.resolve(c, state)
 		if c.HasErr() {
-			return nil, c.ci
+			return nil, c.ci, ref
 		}
 		if arc == nil {
-			return nil, c.ci
+			return nil, c.ci, ref
 		}
 		orig := arc
+		ref = arc
 		// TODO(deref): what is the right level of dereferencing here?
 		// DerefValue seems to work too.
 		arc = arc.DerefNonShared()
@@ -1629,7 +1687,7 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 					}
 					err := c.Newf("unresolved disjunction: %v", x)
 					b := &Bottom{Code: CycleError, Err: err}
-					return b, c.ci
+					return b, c.ci, ref
 				}
 
 				hasCycleBreakingValue := s.hasFieldValue ||
@@ -1668,13 +1726,13 @@ func (c *OpContext) evalStateCI(v Expr, state Flags) (result Value, ci CloseInfo
 					}
 				}
 
-				return v, c.ci
+				return v, c.ci, ref
 			}
 		}
 		arc = arc.DerefValue()
 		v := c.evaluate(arc, x, state)
 
-		return v, c.ci
+		return v, c.ci, ref
 
 	default:
 		// This can only happen, really, if v == nil, which is not allowed.
@@ -1699,6 +1757,14 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 //
 // TODO: maybe return *Vertex, *Bottom
 func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
+	result, _ = c.unifyNodeRef(expr, state)
+	return result
+}
+
+// unifyNodeRef is like [OpContext.unifyNode]. If expr is a reference, it also
+// returns the vertex that the reference resolved to, before it is
+// dereferenced; see [OpContext.evalStateRef].
+func (c *OpContext) unifyNodeRef(expr Expr, state Flags) (result Value, ref *Vertex) {
 	savedSrc := c.src
 	c.src = expr.Source()
 	err := c.errs
@@ -1739,13 +1805,14 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 
 	switch x := expr.(type) {
 	case Value:
-		return x
+		return x, ref
 
 	case Evaluator:
-		return x.evaluate(c, state)
+		return x.evaluate(c, state), ref
 
 	case Resolver:
 		v = x.resolve(c, state)
+		ref = v
 
 	default:
 		// This can only happen, really, if v == nil, which is not allowed.
@@ -1753,10 +1820,10 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 	}
 
 	if c.HasErr() {
-		return nil
+		return nil, ref
 	}
 	if v == nil {
-		return nil
+		return nil, ref
 	}
 	// Processing v may make it share a vertex not processed yet, which the
 	// lookup then reads in its place. Process that vertex too, rather than
@@ -1767,7 +1834,7 @@ func (c *OpContext) unifyNode(expr Expr, state Flags) (result Value) {
 		c.processRef(v)
 		w := v.DerefValue()
 		if w == v {
-			return v
+			return v, ref
 		}
 		v = w
 	}

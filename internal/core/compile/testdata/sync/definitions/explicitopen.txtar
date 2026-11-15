@@ -502,6 +502,30 @@ spreadDefClosed: {
 	t3: w
 	t4: w & {z: 1}
 }
+// Selecting a field that a struct does not have is an incomplete error if
+// the field may still be added, and a permanent one otherwise. A spread
+// opens the definition, so the field may still be added.
+//
+// TODO: selecting from a spread definition reports a field that can never
+// be added.
+spreadSelectMissing: {
+	#D: {a: {}}
+	unified: {
+		v: #D... & {b: 1}
+		x: v.z
+	}
+	shared: {
+		v: #D...
+		x: v.z
+	}
+	open: {
+		v: {b: 1}
+		x: v.z
+	}
+	closed: {
+		x: #D.z
+	}
+}
 
 -- out/compile --
 --- issues.cue
@@ -918,6 +942,30 @@ spreadDefClosed: {
     t4: (〈0;w〉 & {
       z: 1
     })
+  }
+  spreadSelectMissing: {
+    #D: {
+      a: {}
+    }
+    unified: {
+      v: (〈1;#D〉... & {
+        b: 1
+      })
+      x: 〈0;v〉.z
+    }
+    shared: {
+      v: 〈1;#D〉...
+      x: 〈0;v〉.z
+    }
+    open: {
+      v: {
+        b: 1
+      }
+      x: 〈0;v〉.z
+    }
+    closed: {
+      x: 〈1;#D〉.z
+    }
   }
 }
 --- new.cue

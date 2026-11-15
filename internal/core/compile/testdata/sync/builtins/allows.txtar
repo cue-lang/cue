@@ -117,6 +117,118 @@ inlineCloseDefault: {
 
 // A broken argument is reported as what is wrong with it.
 brokenArg: reflect.Allows({a: 1, b: 1 & 2}, "a")
+
+// The postfix ... operator opens the definition it is applied to. The result
+// admits any field, as unifying one in shows. A definition closes again what
+// is opened within it, and so does close.
+//
+// TODO: Allows and exists take a struct that the operator opened to be
+// closed.
+openedByOperator: {
+	#N: {x: {a: 1}}
+	#M: {x: {a: int}}
+
+	shared: {
+		d: #N...
+		u: d & {zz: 1}
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	// Unified with a struct, the result does not share the definition, and
+	// the structs within it are open as well.
+	unified: {
+		d: #N... & {b: 1}
+		u: d & {zz: 1, x: zz: 1}
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+		g: reflect.Allows(d.x, "zz")
+		h: exists(d.x.zz)
+	}
+	embedded: {
+		d: {#N..., b: 1}
+		u: d & {zz: 1}
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	conjunction: {
+		d: (#N & #M)...
+		u: d & {zz: 1}
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	viaReference: {
+		o: #N...
+		d: o
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	// A reference to an opened field whose value is a conjunction.
+	viaConjunction: {
+		o: #N & #M
+		d: o...
+		u: d & {zz: 1}
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	// The operator applied where the value is used.
+	inline: {
+		o: #N & #M
+		f: reflect.Allows(#N..., "zz")
+		e: exists((#N...).zz)
+		g: reflect.Allows((#N & #M)..., "zz")
+		h: exists(((#N & #M)...).zz)
+		i: reflect.Allows(o..., "zz")
+		j: exists((o...).zz)
+		k: reflect.Field(#N..., "zz")
+	}
+	// The order of the declarations does not matter. With the calls first,
+	// Allows, which is implemented in Go, finalizes the subject before the
+	// evaluation that owns it gets to it.
+	after: {
+		u: d & {zz: 1}
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+		d: #N... & {b: 1}
+	}
+	// An ellipsis opens only the struct it is part of, also if Allows gets
+	// to the subject first.
+	ellipsis: {
+		before: {
+			f: reflect.Allows(d, "zz")
+			d: #N & {...}
+		}
+		after: {
+			d: #N & {...}
+			f: reflect.Allows(d, "zz")
+		}
+	}
+
+	// A definition closes again what is opened within it.
+	reclosed: {
+		#E: {#N..., b: int}
+		d: #E
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	closedAgain: {
+		o: #N...
+		d: close(o)
+		f: reflect.Allows(d, "zz")
+		e: exists(d.zz)
+	}
+	// A field of a definition that refers to an opened struct: a reference
+	// into the definition finds the struct closed again.
+	intoDefinition: {
+		x: #N... & {b: 1}
+		#Z: {d: x}
+		y: #Z
+		u: #Z.d & {zz: 1}
+		f: reflect.Allows(#Z.d, "zz")
+		e: exists(#Z.d.zz)
+		g: reflect.Allows(y.d, "zz")
+		h: exists(y.d.zz)
+	}
+}
 -- shortcircuit.cue --
 // The && spelling of the escape hatch, which is how the composition reads
 // in practice. It needs the shortcircuit experiment beside predicates: with
@@ -283,6 +395,140 @@ sc: {
     a: 1
     b: (1 & 2)
   }, "a")
+  openedByOperator: {
+    #N: {
+      x: {
+        a: 1
+      }
+    }
+    #M: {
+      x: {
+        a: int
+      }
+    }
+    shared: {
+      d: 〈1;#N〉...
+      u: (〈0;d〉 & {
+        zz: 1
+      })
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    unified: {
+      d: (〈1;#N〉... & {
+        b: 1
+      })
+      u: (〈0;d〉 & {
+        zz: 1
+        x: {
+          zz: 1
+        }
+      })
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+      g: 〈import;reflect〉.Allows(〈0;d〉.x, "zz")
+      h: exists(〈0;d〉.x.zz)
+    }
+    embedded: {
+      d: {
+        〈2;#N〉...
+        b: 1
+      }
+      u: (〈0;d〉 & {
+        zz: 1
+      })
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    conjunction: {
+      d: (〈1;#N〉 & 〈1;#M〉)...
+      u: (〈0;d〉 & {
+        zz: 1
+      })
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    viaReference: {
+      o: 〈1;#N〉...
+      d: 〈0;o〉
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    viaConjunction: {
+      o: (〈1;#N〉 & 〈1;#M〉)
+      d: 〈0;o〉...
+      u: (〈0;d〉 & {
+        zz: 1
+      })
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    inline: {
+      o: (〈1;#N〉 & 〈1;#M〉)
+      f: 〈import;reflect〉.Allows(〈1;#N〉..., "zz")
+      e: exists(〈1;#N〉....zz)
+      g: 〈import;reflect〉.Allows((〈1;#N〉 & 〈1;#M〉)..., "zz")
+      h: exists((〈1;#N〉 & 〈1;#M〉)....zz)
+      i: 〈import;reflect〉.Allows(〈0;o〉..., "zz")
+      j: exists(〈0;o〉....zz)
+      k: 〈import;reflect〉.Field(〈1;#N〉..., "zz")
+    }
+    after: {
+      u: (〈0;d〉 & {
+        zz: 1
+      })
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+      d: (〈1;#N〉... & {
+        b: 1
+      })
+    }
+    ellipsis: {
+      before: {
+        f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+        d: (〈2;#N〉 & {
+          ...
+        })
+      }
+      after: {
+        d: (〈2;#N〉 & {
+          ...
+        })
+        f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      }
+    }
+    reclosed: {
+      #E: {
+        〈2;#N〉...
+        b: int
+      }
+      d: 〈0;#E〉
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    closedAgain: {
+      o: 〈1;#N〉...
+      d: close(〈0;o〉)
+      f: 〈import;reflect〉.Allows(〈0;d〉, "zz")
+      e: exists(〈0;d〉.zz)
+    }
+    intoDefinition: {
+      x: (〈1;#N〉... & {
+        b: 1
+      })
+      #Z: {
+        d: 〈1;x〉
+      }
+      y: 〈0;#Z〉
+      u: (〈0;#Z〉.d & {
+        zz: 1
+      })
+      f: 〈import;reflect〉.Allows(〈0;#Z〉.d, "zz")
+      e: exists(〈0;#Z〉.d.zz)
+      g: 〈import;reflect〉.Allows(〈0;y〉.d, "zz")
+      h: exists(〈0;y〉.d.zz)
+    }
+  }
 }
 --- shortcircuit.cue
 {

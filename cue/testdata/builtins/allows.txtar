@@ -118,6 +118,119 @@ inlineCloseDefault: {
 
 // A broken argument is reported as what is wrong with it.
 brokenArg: reflect.Allows({a: 1, b: 1 & 2}, "a")   @test(err, code=eval, contains="conflicting values")
+
+// The postfix ... operator opens the definition it is applied to. The result
+// admits any field, as unifying one in shows. A definition closes again what
+// is opened within it, and so does close.
+//
+// TODO: Allows and exists take a struct that the operator opened to be
+// closed.
+openedByOperator: {
+	#N: {x: {a: 1}}
+	#M: {x: {a: int}}
+
+	shared: {
+		d: #N...
+		u: d & {zz: 1}               @test(eq, {x: {a: 1}, zz: 1})
+		f: reflect.Allows(d, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+	}
+	// Unified with a struct, the result does not share the definition, and
+	// the structs within it are open as well.
+	unified: {
+		d: #N... & {b: 1}
+		u: d & {zz: 1, x: zz: 1}       @test(eq, {x: {a: 1, zz: 1}, b: 1, zz: 1})
+		f: reflect.Allows(d, "zz")     @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)                @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+		g: reflect.Allows(d.x, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		h: exists(d.x.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+	}
+	embedded: {
+		d: {#N..., b: 1}
+		u: d & {zz: 1}               @test(eq, {x: {a: 1}, b: 1, zz: 1})
+		f: reflect.Allows(d, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+	}
+	conjunction: {
+		d: (#N & #M)...
+		u: d & {zz: 1}               @test(eq, {x: {a: 1}, zz: 1})
+		f: reflect.Allows(d, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+	}
+	viaReference: {
+		o: #N...
+		d: o
+		f: reflect.Allows(d, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+	}
+	// A reference to an opened field whose value is a conjunction.
+	viaConjunction: {
+		o: #N & #M
+		d: o...
+		u: d & {zz: 1}               @test(eq, {x: {a: 1}, zz: 1})
+		f: reflect.Allows(d, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+	}
+	// The operator applied where the value is used.
+	inline: {
+		o: #N & #M
+		f: reflect.Allows(#N..., "zz")          @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists((#N...).zz)                   @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+		g: reflect.Allows((#N & #M)..., "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		h: exists(((#N & #M)...).zz)            @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+		i: reflect.Allows(o..., "zz")           @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		j: exists((o...).zz)                    @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+		k: reflect.Field(#N..., "zz")           @test(err, code=eval, contains="field not allowed", incorrect) @test(eq:todo, _, p=1)
+	}
+	// The order of the declarations does not matter. With the calls first,
+	// Allows, which is implemented in Go, finalizes the subject before the
+	// evaluation that owns it gets to it.
+	after: {
+		@test(permute, count=24)
+		u: d & {zz: 1}               @test(eq, {x: {a: 1}, b: 1, zz: 1})
+		f: reflect.Allows(d, "zz")   @test(eq, false, incorrect) @test(eq:todo, true, p=1)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct", incorrect) @test(eq:todo, false, p=1)
+		d: #N... & {b: 1}
+	}
+	// An ellipsis opens only the struct it is part of, also if Allows gets
+	// to the subject first.
+	ellipsis: {
+		before: {
+			f: reflect.Allows(d, "zz")   @test(eq, true, incorrect) @test(eq:todo, false, p=1)
+			d: #N & {...}
+		}
+		after: {
+			d: #N & {...}
+			f: reflect.Allows(d, "zz")   @test(eq, false)
+		}
+	}
+
+	// A definition closes again what is opened within it.
+	reclosed: {
+		#E: {#N..., b: int}
+		d: #E
+		f: reflect.Allows(d, "zz")   @test(eq, false)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+	}
+	closedAgain: {
+		o: #N...
+		d: close(o)
+		f: reflect.Allows(d, "zz")   @test(eq, false)
+		e: exists(d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+	}
+	// A field of a definition that refers to an opened struct: a reference
+	// into the definition finds the struct closed again.
+	intoDefinition: {
+		x: #N... & {b: 1}
+		#Z: {d: x}
+		y: #Z
+		u: #Z.d & {zz: 1}               @test(err, at=zz, code=eval, contains="field not allowed")
+		f: reflect.Allows(#Z.d, "zz")   @test(eq, false)
+		e: exists(#Z.d.zz)              @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+		g: reflect.Allows(y.d, "zz")    @test(eq, false)
+		h: exists(y.d.zz)               @test(err, code=eval, contains="exists: field zz not allowed by closed struct")
+	}
+}
 -- shortcircuit.cue --
 // The && spelling of the escape hatch, which is how the composition reads
 // in practice. It needs the shortcircuit experiment beside predicates: with
@@ -156,6 +269,40 @@ sc: {
     ./in.cue:115:12
     ./in.cue:115:37
     ./in.cue:115:41
+[eval] openedByOperator.shared.e: exists: field zz not allowed by closed struct:
+    ./in.cue:131:6
+[eval] openedByOperator.unified.e: exists: field zz not allowed by closed struct:
+    ./in.cue:139:6
+[eval] openedByOperator.unified.h: exists: field zz not allowed by closed struct:
+    ./in.cue:141:6
+[eval] openedByOperator.embedded.e: exists: field zz not allowed by closed struct:
+    ./in.cue:147:6
+[eval] openedByOperator.conjunction.e: exists: field zz not allowed by closed struct:
+    ./in.cue:153:6
+[eval] openedByOperator.viaReference.e: exists: field zz not allowed by closed struct:
+    ./in.cue:159:6
+[eval] openedByOperator.viaConjunction.e: exists: field zz not allowed by closed struct:
+    ./in.cue:167:6
+[eval] openedByOperator.inline.e: exists: field zz not allowed by closed struct:
+    ./in.cue:173:6
+[eval] openedByOperator.inline.h: exists: field zz not allowed by closed struct:
+    ./in.cue:175:6
+[eval] openedByOperator.inline.j: exists: field zz not allowed by closed struct:
+    ./in.cue:177:6
+[eval] openedByOperator.inline.k: error in call to reflect.Field: field not allowed:
+    ./in.cue:178:6
+[eval] openedByOperator.after.e: exists: field zz not allowed by closed struct:
+    ./in.cue:187:6
+[eval] openedByOperator.reclosed.e: exists: field zz not allowed by closed struct:
+    ./in.cue:208:6
+[eval] openedByOperator.closedAgain.e: exists: field zz not allowed by closed struct:
+    ./in.cue:214:6
+[eval] openedByOperator.intoDefinition.u.zz: field not allowed:
+    ./in.cue:222:14
+[eval] openedByOperator.intoDefinition.e: exists: field zz not allowed by closed struct:
+    ./in.cue:224:6
+[eval] openedByOperator.intoDefinition.h: exists: field zz not allowed by closed struct:
+    ./in.cue:226:6
 -- out/eval/stats --
 Leaks:  3
 Freed:  159

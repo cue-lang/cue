@@ -773,6 +773,22 @@ closedSubjectInProgress: {
 	}
 }
 
+// A list that is the default of a disjunction is navigated like any other:
+// an index beyond an open list is absent but possible, and one beyond a
+// closed list can never exist.
+//
+// TODO: the default is taken with its open list closed, so that an index
+// beyond it reads as one that can never exist.
+defaultedList: {
+	open: *[1, ...] | [2]
+	a: exists(open[0])     @test(eq, true)
+	b: exists(open[5])     @test(err, code=eval, contains="%s: index %d out of range", args=[exists, 5], incorrect) @test(eq:todo, false, p=1)
+	closed: *[1] | [2, ...]
+	c: exists(closed[5])   @test(err, code=eval, contains="%s: index %d out of range", args=[exists, 5])
+	plain: [1, ...]
+	d: exists(plain[5])    @test(eq, false)
+}
+
 -- cycle.cue --
 @experiment(predicates)
 
@@ -986,15 +1002,19 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./review.cue:334:9
 [eval] closedSubjectInProgress.withinNested.d.y.z: exists: field zz not allowed by closed struct:
     ./review.cue:340:7
+[eval] defaultedList.b: exists: index 5 out of range:
+    ./review.cue:366:5
+[eval] defaultedList.c: exists: index 5 out of range:
+    ./review.cue:368:5
 -- out/eval/stats --
-Leaks:  75
-Freed:  740
-Reused: 673
-Allocs: 142
+Leaks:  76
+Freed:  872
+Reused: 802
+Allocs: 146
 Retain: 0
 
-Unifications: 773
-Conjuncts:    1104
-Disjuncts:    36
+Unifications: 902
+Conjuncts:    1300
+Disjuncts:    40
 
-NumCloseIDs: 26
+NumCloseIDs: 37

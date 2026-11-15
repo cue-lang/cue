@@ -716,6 +716,22 @@ closedSubjectInProgress: {
 	}
 }
 
+// A list that is the default of a disjunction is navigated like any other:
+// an index beyond an open list is absent but possible, and one beyond a
+// closed list can never exist.
+//
+// TODO: the default is taken with its open list closed, so that an index
+// beyond it reads as one that can never exist.
+defaultedList: {
+	open: *[1, ...] | [2]
+	a: exists(open[0])
+	b: exists(open[5])
+	closed: *[1] | [2, ...]
+	c: exists(closed[5])
+	plain: [1, ...]
+	d: exists(plain[5])
+}
+
 -- cycle.cue --
 @experiment(predicates)
 
@@ -1688,5 +1704,27 @@ minimal: {
         ...
       }
     }
+  }
+  defaultedList: {
+    open: (*[
+      1,
+      ...,
+    ]|[
+      2,
+    ])
+    a: exists(〈0;open〉[0])
+    b: exists(〈0;open〉[5])
+    closed: (*[
+      1,
+    ]|[
+      2,
+      ...,
+    ])
+    c: exists(〈0;closed〉[5])
+    plain: [
+      1,
+      ...,
+    ]
+    d: exists(〈0;plain〉[5])
   }
 }

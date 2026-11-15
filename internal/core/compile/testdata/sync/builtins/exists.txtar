@@ -720,8 +720,7 @@ closedSubjectInProgress: {
 // an index beyond an open list is absent but possible, and one beyond a
 // closed list can never exist.
 //
-// TODO: the default is taken with its open list closed, so that an index
-// beyond it reads as one that can never exist.
+// The default is taken as it is for that: its open list stays open.
 defaultedList: {
 	open: *[1, ...] | [2]
 	a: exists(open[0])

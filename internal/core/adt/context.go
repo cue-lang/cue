@@ -613,9 +613,12 @@ func (c *OpContext) existsSubject(env *Environment, x, value Expr, pos token.Pos
 	// Follow defaults: a selection on a disjunction with a default picks the
 	// default disjunct, as the old `!= _|_` validator did via
 	// [OpContext.getDefault]. Only descend when the value is actually a
-	// disjunction; otherwise ConcreteDefault() can produce a stale copy.
+	// disjunction; otherwise DefaultDisjunct() can produce a stale copy.
+	// The default is taken as it is: an open list stays open, so that an
+	// index beyond it is absent but possible, as for a list that is not
+	// the default of a disjunction.
 	if _, isDisjunction := parent.BaseValue.(*Disjunction); isDisjunction {
-		parent = parent.ConcreteDefault()
+		parent = parent.DefaultDisjunct()
 	}
 	if _, isDisjunction := parent.BaseValue.(*Disjunction); isDisjunction {
 		// Unresolved even after applying defaults.

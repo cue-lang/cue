@@ -384,10 +384,10 @@ compose: {
 	// So may a let in that struct, which is not part of the struct's value.
 	mkLetSelf:  func(n: int) -> _: {let s = self, a: n, f: func(x: s.a) -> int: x}.f
 	letSelf:    mkLetSelf(1) & mkLetSelf(1)
-	letSelfX:   letSelf(1) @test(err, code=eval, contains="the same function literal is closed over different values", incorrect) @test(eq:todo, 1)
+	letSelfX:   letSelf(1) @test(eq, 1)
 	letSelfBad: mkLetSelf(1) & mkLetSelf(2) @test(err, code=eval, contains="the same function literal is closed over different values")
 	#LetSelf:   {let s = self, a: int, f: func(x: s.a) -> int: x}
-	letSelfDef: ((#LetSelf & {a: 1}).f & (#LetSelf & {a: 1}).f)(1) @test(err, code=eval, contains="the same function literal is closed over different values", incorrect) @test(eq:todo, 1)
+	letSelfDef: ((#LetSelf & {a: 1}).f & (#LetSelf & {a: 1}).f)(1) @test(eq, 1)
 
 	// Captured values compare as data, so a number of another kind, a
 	// default, or a reference that unification evaluates again keeps two
@@ -398,7 +398,7 @@ compose: {
 	mkd:     func(x: _) -> _: func() -> _: x
 	dflt:    mkd(*1 | 2) & mkd(1 | 2) @test(err, code=eval, contains="the same function literal is closed over different values")
 	// Lets are not part of a captured value.
-	letD:    (mkd({let y = 1, a: y}) & mkd({let y = 1, a: y}))() @test(err, code=eval, contains="the same function literal is closed over different values", incorrect) @test(eq:todo, {a: 1})
+	letD:    (mkd({let y = 1, a: y}) & mkd({let y = 1, a: y}))() @test(eq, {a: 1})
 	letDBad: mkd({let y = 1, a: y}) & mkd({let y = 2, a: y}) @test(err, code=eval, contains="the same function literal is closed over different values")
 	// self in a function's body refers to its own scope, so it captures nothing.
 	mkBody:   func(n: int) -> _: func(a: int) -> int: self.a + n
@@ -1485,24 +1485,12 @@ meet.wr: function returns _, but its signature requires number:
 [eval] compose.selfTwoBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:367:43
     ./in.cue:367:33
-[eval] compose.letSelf: conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:372:57
-    ./in.cue:372:33
-[eval] compose.letSelf: conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:372:57
-    ./in.cue:372:33
 [eval] compose.letSelfBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:372:57
     ./in.cue:372:33
-[eval] conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:376:40
-    ./in.cue:377:15
-    ./in.cue:377:39
 [eval] compose.num: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:383:33
 [eval] compose.dflt: conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:385:28
-[eval] conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:385:28
 [eval] compose.letDBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:385:28
@@ -1890,14 +1878,14 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
     ./in.cue:1183:9
     ./in.cue:1310:21
 -- out/eval/stats --
-Leaks:  305
-Freed:  3457
-Reused: 3191
-Allocs: 571
+Leaks:  306
+Freed:  3468
+Reused: 3202
+Allocs: 572
 Retain: 0
 
-Unifications: 3488
-Conjuncts:    9255
+Unifications: 3500
+Conjuncts:    9317
 Disjuncts:    143
 
-NumCloseIDs: 1467
+NumCloseIDs: 1487

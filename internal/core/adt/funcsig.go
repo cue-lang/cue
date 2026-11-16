@@ -2734,10 +2734,23 @@ func (c *OpContext) equalDataVertices(x, y *Vertex) bool {
 			return false
 		}
 	}
-	if len(x.Arcs) != len(y.Arcs) {
+	// Lets are not part of a value.
+	fields := func(v *Vertex) int {
+		n := 0
+		for _, a := range v.Arcs {
+			if !a.Label.IsLet() {
+				n++
+			}
+		}
+		return n
+	}
+	if fields(x) != fields(y) {
 		return false
 	}
 	for _, a := range x.Arcs {
+		if a.Label.IsLet() {
+			continue
+		}
 		b := y.LookupRaw(a.Label)
 		if a.ArcType != ArcMember || !a.Label.IsRegular() || b == nil || b.ArcType != ArcMember || !c.equalData(Unwrap(a), Unwrap(b)) {
 			return false

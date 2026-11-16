@@ -40,13 +40,13 @@ lit: schema & {Type: "Lit", Value: "foo"}
 litType: lit.Type @test(eq, "Lit")
 -- out/eval/stats --
 Leaks:  54
-Freed:  585
-Reused: 281
-Allocs: 358
+Freed:  513
+Reused: 210
+Allocs: 357
 Retain: 0
 
-Unifications: 237
-Conjuncts:    471
+Unifications: 165
+Conjuncts:    399
 Disjuncts:    84
 Notifications: 84
 

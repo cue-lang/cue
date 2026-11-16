@@ -128,23 +128,31 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 	skipRegular := flags&RegularOnly != 0
 	ignoreVacuous := flags&CheckStructural != 0 && flags&IgnoreVacuous != 0
 
-loop1:
-	for _, a := range x.Arcs {
-		if (skipRegular && !a.Label.IsRegular()) || a.ArcType > maxArcType {
-			continue
+	// Compare regular fields first: values which differ, such as the
+	// disjuncts of a discriminated union, tend to differ there, whereas
+	// definitions and hidden fields are often large and identical.
+	for _, regular := range [2]bool{true, false} {
+		if skipRegular && !regular {
+			break
 		}
-		for _, b := range y.Arcs {
-			if a.Label == b.Label {
-				if a.ArcType != b.ArcType || !Equal(ctx, a, b, flags) {
-					return false
-				}
-				continue loop1
+	loop1:
+		for _, a := range x.Arcs {
+			if a.Label.IsRegular() != regular || a.ArcType > maxArcType {
+				continue
 			}
+			for _, b := range y.Arcs {
+				if a.Label == b.Label {
+					if a.ArcType != b.ArcType || !Equal(ctx, a, b, flags) {
+						return false
+					}
+					continue loop1
+				}
+			}
+			if ignoreVacuous && isVacuousArc(ctx, a, y) {
+				continue
+			}
+			return false
 		}
-		if ignoreVacuous && isVacuousArc(ctx, a, y) {
-			continue
-		}
-		return false
 	}
 
 loop2:

@@ -3,19 +3,17 @@ cmp stdout stdout.want
 
 # Tool files share the hidden fields of their package
 # however the package argument is spelled.
-# The spellings with a redundant package qualifier fail,
-# as the tool files are scoped by the import path rather than the package ID.
 cd mod
 exec cue cmd show ./hello
 stdout '^secret$'
 exec cue cmd show mod.test/hello
 stdout '^secret$'
-! exec cue cmd show mod.test/hello:hello
-stderr 'reference "_hidden" not found'
+exec cue cmd show mod.test/hello:hello
+stdout '^secret$'
 exec cue cmd show mod.test/hello@v0
 stdout '^secret$'
-! exec cue cmd show mod.test/hello@v0:hello
-stderr 'reference "_hidden" not found'
+exec cue cmd show mod.test/hello@v0:hello
+stdout '^secret$'
 
 -- stdout.want --
 hello world

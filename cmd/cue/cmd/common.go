@@ -920,8 +920,10 @@ func buildLoadedTools(cmd *Command, binst []*build.Instance) (*cue.Instance, err
 		}
 	}
 
-	// Set path equal to the package from which it is loading.
+	// Set the path and ID equal to those of the package from which it is
+	// loading, so that the tool files share its hidden fields.
 	ti.ImportPath = binst[0].ImportPath
+	ti.CanonicalID = binst[0].ID()
 
 	inst = inst.Build(ti) //lint:ignore SA1019 see buildToolInstances
 	return inst, inst.Err

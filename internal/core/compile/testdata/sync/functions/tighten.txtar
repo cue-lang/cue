@@ -13,7 +13,10 @@
 -- in.cue --
 @experiment(functions)
 
-import "strings"
+import (
+	"list"
+	"strings"
+)
 
 tighten: {
 	T: func(a: int, ...) -> number
@@ -382,6 +385,12 @@ compose: {
 	num:     mkn(1) & mkn(1.0)
 	mkd:     func(x: _) -> _: func() -> _: x
 	dflt:    mkd(*1 | 2) & mkd(1 | 2)
+	// self in a function's body refers to its own scope, so it captures nothing.
+	mkBody:   func(n: int) -> _: func(a: int) -> int: self.a + n
+	bodyX:    (mkBody(1) & mkBody(1))(2)
+	bodyBad:  mkBody(1) & mkBody(2)
+	bodyIn:   list.Contains([mkBody(1)], mkBody(1))
+	bodyOut:  list.Contains([mkBody(1)], mkBody(2))
 	mkr:     func(x: _) -> _: func(n: int) -> _: (x & {y: n}).a
 	refs:    mkr({y: _, a: y}) & mkr({y: _, a: _})
 	mkc:     func(n: int) -> _: func(xs: [...int]) -> [...int]: [for v in xs let w = v * 2 if w > 0 {w + n}]
@@ -984,6 +993,9 @@ admission: {
 	corrL:     ((func(x: #CorrL) -> int) & _ci)({a: 0})
 	#CorrNone: {a: int, for v in [1] {b: v}}
 	corrCNone: ((func(x: #CorrNone) -> int) & _ci)({a: 0})
+	// self within a nested struct refers to that struct.
+	#CorrSelfN: {a: int, b: {c: self.d, d: 1}}
+	corrSelfN:  ((func(x: #CorrSelfN) -> int) & _ci)({a: 0})
 	// A field nothing refers to is still compared.
 	corrSBad:  (func(x: {a: int, b: {c: 0 & a}, d: string}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0)
 	emp:     (func(x: int | <"") -> int) & (func(x: int) -> int: x)
@@ -1565,6 +1577,15 @@ admission: {
     num: (〈0;mkn〉(1) & 〈0;mkn〉(1.0))
     mkd: func(x: _) -> _: func() -> _: 〈1;x〉
     dflt: (〈0;mkd〉((*1|2)) & 〈0;mkd〉((1|2)))
+    mkBody: func(n: int) -> _: func(a: int) -> int: (〈1〉.a + 〈1;n〉)
+    bodyX: (〈0;mkBody〉(1) & 〈0;mkBody〉(1))(2)
+    bodyBad: (〈0;mkBody〉(1) & 〈0;mkBody〉(2))
+    bodyIn: 〈import;list〉.Contains([
+      〈1;mkBody〉(1),
+    ], 〈0;mkBody〉(1))
+    bodyOut: 〈import;list〉.Contains([
+      〈1;mkBody〉(1),
+    ], 〈0;mkBody〉(2))
     mkr: func(x: _) -> _: func(n: int) -> _: (〈1;x〉 & {
       y: 〈1;n〉
     }).a
@@ -2447,6 +2468,16 @@ admission: {
       }
     }
     corrCNone: (func(x: 〈0;#CorrNone〉) -> int & 〈0;_ci〉)({
+      a: 0
+    })
+    #CorrSelfN: {
+      a: int
+      b: {
+        c: 〈1〉.d
+        d: 1
+      }
+    }
+    corrSelfN: (func(x: 〈0;#CorrSelfN〉) -> int & 〈0;_ci〉)({
       a: 0
     })
     corrSBad: (func(x: {

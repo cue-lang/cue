@@ -868,8 +868,7 @@ compatible way later if really desirable, as long as we require that
 disjunction literals be normalized).
 -->
 
-<!-- TODO: check this table. Some of its results are wrong. -->
-```cue untested
+```cue rows
 Expression                        Resolves to
 "tcp" | "udp"                     "tcp" | "udp"
 *"tcp" | "udp"                    "tcp"
@@ -880,7 +879,7 @@ float | *1                        1
 (*1|2|3) | (1|*2|3)               1|2
 (*1|2|3) & (1|*2|3)               1|2|3 // default is _|_
 
-(* >=5 | int) & (* <=5 | int)     5
+(* >=5 | int) & (* <=5 | int)     >=5 & <=5
 
 (*"tcp"|"udp") & ("udp"|*"tcp")   "tcp"
 (*"tcp"|"udp") & ("udp"|"tcp")    "tcp"
@@ -1154,15 +1153,14 @@ for any given `x`.
 Implementations may error upon encountering a required field constraint
 when manifesting CUE as data.
 
-<!-- TODO: check this table. Some of its results are wrong. -->
-```cue untested
+```cue rows
 Expression                             Result
 {foo?: 3} & {foo: 3}                   {foo: 3}
 {foo!: 3} & {foo: 3}                   {foo: 3}
 
 {foo!: int} & {foo: int}               {foo:  int}
-{foo!: int} & {foo?: <1}               {foo!: <1}
-{foo!: int} & {foo: <=3}               {foo:  <=3}
+{foo!: int} & {foo?: <1}               {foo!: int & <1}
+{foo!: int} & {foo: <=3}               {foo:  int & <=3}
 {foo!: int} & {foo: 3}                 {foo:  3}
 
 {foo!: 3} & {foo: int}                 {foo: 3}

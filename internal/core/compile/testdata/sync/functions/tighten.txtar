@@ -376,6 +376,11 @@ compose: {
 	selfDef:    (#Self & {a: 1}).f & (#Self & {a: 1}).f
 	selfDefX:   selfDef(1)
 	selfDefBad: (#Self & {a: 1}).f & (#Self & {a: 2}).f
+	// So may two closures in that struct.
+	mkTwo:      func(n: int) -> _: {a: n, f: func(x: self.a) -> int: x, g: func(x: self.a) -> int: x}.f
+	selfTwo:    mkTwo(1) & mkTwo(1)
+	selfTwoX:   selfTwo(1)
+	selfTwoBad: mkTwo(1) & mkTwo(2)
 
 	// Captured values compare as data, so a number of another kind, a
 	// default, or a reference that unification evaluates again keeps two
@@ -1612,6 +1617,14 @@ admission: {
     }).f & (〈0;#Self〉 & {
       a: 2
     }).f)
+    mkTwo: func(n: int) -> _: {
+      a: 〈1;n〉
+      f: func(x: 〈1〉.a) -> int: 〈0;x〉
+      g: func(x: 〈1〉.a) -> int: 〈0;x〉
+    }.f
+    selfTwo: (〈0;mkTwo〉(1) & 〈0;mkTwo〉(1))
+    selfTwoX: 〈0;selfTwo〉(1)
+    selfTwoBad: (〈0;mkTwo〉(1) & 〈0;mkTwo〉(2))
     mkn: func(n: number) -> _: func() -> number: 〈1;n〉
     num: (〈0;mkn〉(1) & 〈0;mkn〉(1.0))
     mkd: func(x: _) -> _: func() -> _: 〈1;x〉

@@ -799,7 +799,60 @@ dir:    $CWD/testdata/testmod/testdir.cue
 display:.
 files:
     $CWD/testdata/testmod/testdir.cue/test.cue`,
-	}}
+	}, {
+		// A package loaded as a root and imported with and without a major
+		// version must have one ID, which scopes its hidden fields.
+		// The import without a major version has an ID without it,
+		// unlike the root instance and the import with a major version.
+		name: "MainModulePackageIDs",
+		cfg:  dirCfg,
+		args: []string{"./sub", "./spellings"},
+		want: `path:   mod.test/test/sub@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/sub
+display:./sub
+files:
+    $CWD/testdata/testmod/sub/sub.cue
+
+path:   mod.test/test/spellings@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/spellings
+display:./spellings
+files:
+    $CWD/testdata/testmod/spellings/spellings.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue
+    mod.test/test/sub@v0: $CWD/testdata/testmod/sub/sub.cue`,
+	}, {
+		// A package in cue.mod is found regardless of the major version,
+		// so its one ID has none, even when loaded as a root with one.
+		// The root instance has an ID with the major version it was loaded
+		// by, unlike the import.
+		name: "LocalPackageIDs",
+		cfg:  dirCfg,
+		args: []string{"mod.test/catch@v0", "./imports"},
+		want: `path:   mod.test/catch@v0
+module: local
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/cue.mod/gen/mod.test/catch
+display:mod.test/catch@v0
+files:
+    $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
+imports:
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue
+
+path:   mod.test/test/imports@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/imports
+display:./imports
+files:
+    $CWD/testdata/testmod/imports/imports.cue
+imports:
+    mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 
@@ -831,6 +884,8 @@ var pkgInfo = template.Must(template.New("pkg").Funcs(template.FuncMap{
 {{- range . -}}
 {{- if .Err}}err:    {{errordetails .Err}}{{end}}
 path:   {{if .ImportPath}}{{.ImportPath}}{{else}}""{{end}}
+{{if and .ImportPath (ne .ID .ImportPath)}}id:     {{.ID}}
+{{end -}}
 module: {{with .Module}}{{.}}{{else}}""{{end}}
 root:   {{with .Root}}{{.}}{{else}}""{{end}}
 dir:    {{with .Dir}}{{.}}{{else}}""{{end}}
@@ -844,7 +899,7 @@ files:
 {{if .Imports -}}
 imports:
 {{- range .Dependencies}}
-    {{.ImportPath}}:{{range .Files}} {{.Filename}}{{end}}
+    {{.ImportPath}}{{if ne .ID .ImportPath}} (id {{.ID}}){{end}}:{{range .Files}} {{.Filename}}{{end}}
 {{- end}}
 {{end -}}
 {{- end -}}

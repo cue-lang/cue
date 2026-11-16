@@ -2025,6 +2025,8 @@ func (v Value) ReferencePath() (root Value, p Path) {
 			// The value is at the top level and it has a single
 			// conjunct which is a StructLit representing the file
 			// holding a single embedding that may be a reference.
+			// The embedding is resolved in the scope of the file.
+			env = &adt.Environment{Up: env, Vertex: v.v}
 			expr = e
 		}
 	}

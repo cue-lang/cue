@@ -4335,13 +4335,6 @@ func TestReferencePath(t *testing.T) {
 			}
 			v := val.LookupPath(cue.ParsePath(tc.path))
 
-			if tc.scope != "" {
-				// ReferencePath goes past the scope to an environment
-				// with no vertex, and panics.
-				defer func() {
-					qt.Assert(t, qt.IsNotNil(recover()))
-				}()
-			}
 			root, path := v.ReferencePath()
 			if got := path.String(); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)

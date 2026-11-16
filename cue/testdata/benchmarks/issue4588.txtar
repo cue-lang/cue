@@ -1,0 +1,53 @@
+# A struct which embeds a disjunction of its own recursive definitions is a
+# disjunction whose disjuncts each copy all of those definitions. The stats
+# track the cost of evaluating and deduplicating them.
+#
+# https://cuelang.org/issue/4588
+-- in.cue --
+schema: {
+	#Node
+
+	#Node: {Type!: _} & (#File | #Stmt | #Call | #Word | #Lit | #Block)
+
+	#File: {
+		Type?:  "File"
+		Name?:  string
+		Stmts?: [...#Stmt]
+	}
+	#Stmt: {
+		Type?: "Stmt"
+		Cmd?:  #Call | #Block
+	}
+	#Call: {
+		Type?: "Call"
+		Args?: [...#Word]
+	}
+	#Word: {
+		Type?:  "Word"
+		Parts?: [...#Lit]
+	}
+	#Lit: {
+		Type?:  "Lit"
+		Value?: string
+	}
+	#Block: {
+		Type?:  "Block"
+		Stmts?: [...#Stmt]
+	}
+}
+
+lit: schema & {Type: "Lit", Value: "foo"}
+litType: lit.Type @test(eq, "Lit")
+-- out/eval/stats --
+Leaks:  54
+Freed:  585
+Reused: 281
+Allocs: 358
+Retain: 0
+
+Unifications: 237
+Conjuncts:    471
+Disjuncts:    84
+Notifications: 84
+
+NumCloseIDs: 87

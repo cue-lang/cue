@@ -1,0 +1,88 @@
+# A struct which embeds a disjunction of its own recursive definitions is a
+# disjunction whose disjuncts each copy all of those definitions. The stats
+# track the cost of evaluating and deduplicating them.
+#
+# https://cuelang.org/issue/4588
+-- in.cue --
+schema: {
+	#Node
+
+	#Node: {Type!: _} & (#File | #Stmt | #Call | #Word | #Lit | #Block)
+
+	#File: {
+		Type?:  "File"
+		Name?:  string
+		Stmts?: [...#Stmt]
+	}
+	#Stmt: {
+		Type?: "Stmt"
+		Cmd?:  #Call | #Block
+	}
+	#Call: {
+		Type?: "Call"
+		Args?: [...#Word]
+	}
+	#Word: {
+		Type?:  "Word"
+		Parts?: [...#Lit]
+	}
+	#Lit: {
+		Type?:  "Lit"
+		Value?: string
+	}
+	#Block: {
+		Type?:  "Block"
+		Stmts?: [...#Stmt]
+	}
+}
+
+lit: schema & {Type: "Lit", Value: "foo"}
+litType: lit.Type
+-- out/compile --
+--- in.cue
+{
+  schema: {
+    〈0;#Node〉
+    #Node: ({
+      Type!: _
+    } & (〈0;#File〉|〈0;#Stmt〉|〈0;#Call〉|〈0;#Word〉|〈0;#Lit〉|〈0;#Block〉))
+    #File: {
+      Type?: "File"
+      Name?: string
+      Stmts?: [
+        ...〈2;#Stmt〉,
+      ]
+    }
+    #Stmt: {
+      Type?: "Stmt"
+      Cmd?: (〈1;#Call〉|〈1;#Block〉)
+    }
+    #Call: {
+      Type?: "Call"
+      Args?: [
+        ...〈2;#Word〉,
+      ]
+    }
+    #Word: {
+      Type?: "Word"
+      Parts?: [
+        ...〈2;#Lit〉,
+      ]
+    }
+    #Lit: {
+      Type?: "Lit"
+      Value?: string
+    }
+    #Block: {
+      Type?: "Block"
+      Stmts?: [
+        ...〈2;#Stmt〉,
+      ]
+    }
+  }
+  lit: (〈0;schema〉 & {
+    Type: "Lit"
+    Value: "foo"
+  })
+  litType: 〈0;lit〉.Type
+}

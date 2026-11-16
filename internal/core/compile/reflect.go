@@ -137,9 +137,10 @@ var countN = &adt.Builtin{
 			return b
 		}
 		// An open list reads as the list of its elements so far once its
-		// default is taken below, so note that it is open first.
+		// default is taken below, so note that it is open first. For a
+		// disjunction that is its default, which keeps an open list open.
 		open := false
-		if v, ok := list.(*adt.Vertex); ok {
+		if v, ok := adt.DefaultDisjunct(list).(*adt.Vertex); ok {
 			m, _ := v.DerefValue().BaseValue.(*adt.ListMarker)
 			open = m != nil && m.IsOpen && !m.NoEllipsis
 		}

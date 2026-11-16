@@ -556,8 +556,6 @@ countNDefaultedList: {
 	}
 	// An open list that is the default stays open: it may still gain
 	// conditions, as an open list that is not a default may.
-	//
-	// TODO: the shortfall is reported as a permanent error.
 	zs: *[true, ...bool] | [false]
 	w: {
 		countN(>=2, zs)

@@ -1,6 +1,5 @@
 # References to a comprehension's loop variables are generated in place,
 # while references to definitions still become $refs.
-# TODO: Generate fails to name the loop variables.
 # See https://cuelang.org/issue/4586
 -- test.cue --
 package test
@@ -30,5 +29,50 @@ fail2: {
 	}
 	error: true
 }
--- out/generate-v3/error --
-NamesFunc did not set Name field in all *CUERef values
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: A: {
+		type:                 "object"
+		additionalProperties: true
+		properties: Type: const: "A"
+	}
+	type: "object"
+	properties: {
+		byKey: {
+			if: {
+				type: "object"
+				properties: Type: const: "A"
+				required: ["Type"]
+			}
+			then: $ref: "#/$defs/A"
+		}
+		byKeyValue: {
+			if: {
+				type: "object"
+				properties: Type: const: "A"
+				required: ["Type"]
+			}
+			then: {
+				type:                 "object"
+				additionalProperties: true
+				properties: Name: const: "a"
+				required: ["Name"]
+			}
+		}
+	}
+}
+-- out/generate-v3/fail1 --
+fail1.data.byKeyValue: invalid value {Type:"A"} (does not satisfy matchIf): field is required but not present:
+    1:302
+    ./datatest/tests.cue:10:20
+    1:447
+-- out/generate-v3/fail2 --
+fail2.data.byKeyValue: invalid value {Type:"A",Name:"b"} (does not satisfy matchIf): conflicting values "a" and "b":
+    1:302
+    ./datatest/tests.cue:14:20
+    ./datatest/tests.cue:16:9
+    1:469
+-- out/generate-v3/ok1 --
+-- out/generate-v3/ok2 --
+-- out/generate-v3/ok3 --

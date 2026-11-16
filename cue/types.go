@@ -2000,6 +2000,9 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 // subsumes, such as "*1 | a", reports the reference to a, whose value lacks
 // the default.
 //
+// A reference into a let field or to a comprehension's variable reports no
+// path either.
+//
 // The path is absolute from root and reflects where the reference resolves,
 // not its syntax: scope-relative and absolute references may report the same
 // path despite unifying differently. To tell them apart, inspect the conjunct
@@ -2040,8 +2043,9 @@ func (v Value) ReferencePath() (root Value, p Path) {
 		return Value{}, Path{}
 	}
 	// NOTE: due to structure sharing, the path of the referred node may end
-	// up different from the one explicitly pointed to. The value will be the
-	// same, but the scope may differ.
+	// up different from the one explicitly pointed to, or be missing if the
+	// node is shared from a let field. The value will be the same, but the
+	// scope may differ.
 	// TODO(structureshare): see if we can construct the original path. This
 	// only has to be done if structures are being shared.
 	return makeValue(v.idx, x, nil), Path{path: path}
@@ -2057,20 +2061,20 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 
 	case *adt.NodeLink:
 		// TODO: consider getting rid of NodeLink.
-		inst, path = mkPath(rt, nil, x.Node)
+		inst, path = mkPath(rt, x.Node)
 
 	case *adt.FieldReference:
 		env := ctx.Env(x.UpCount)
-		inst, path = mkPath(rt, nil, env.Vertex)
+		inst, path = mkPath(rt, env.Vertex)
 		path = appendSelector(path, featureToSel(x.Label, rt))
 
 	case *adt.LabelReference:
 		env := ctx.Env(x.UpCount)
-		return mkPath(rt, nil, env.Vertex)
+		return mkPath(rt, env.Vertex)
 
 	case *adt.DynamicReference:
 		env := ctx.Env(x.UpCount)
-		inst, path = mkPath(rt, nil, env.Vertex)
+		inst, path = mkPath(rt, env.Vertex)
 		v, _ := ctx.Evaluate(env, x.Label)
 		path = appendSelector(path, valueToSel(v))
 
@@ -2097,11 +2101,20 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 	return inst, path
 }
 
-func mkPath(r *runtime.Runtime, a []Selector, v *adt.Vertex) (root *adt.Vertex, path []Selector) {
-	if v.Parent == nil {
-		return v, a
+// mkPath returns the root of v and the path from it to v, or nothing if v
+// lies within a let field or an anonymous vertex, such as a comprehension's
+// scope, which no path can address.
+func mkPath(r *runtime.Runtime, v *adt.Vertex) (root *adt.Vertex, path []Selector) {
+	if !v.MayAttach() {
+		return nil, nil
 	}
-	root, path = mkPath(r, a, v.Parent)
+	if v.Parent == nil {
+		return v, nil
+	}
+	root, path = mkPath(r, v.Parent)
+	if root == nil {
+		return nil, nil
+	}
 	path = appendSelector(path, featureToSel(v.Label, r))
 	return root, path
 }

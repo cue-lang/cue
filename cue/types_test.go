@@ -4227,6 +4227,9 @@ func TestReferencePath(t *testing.T) {
 		want           string
 		wantImportPath string
 		alt            string
+
+		// wantNoShare, if set, is the expected path without sharing.
+		wantNoShare string
 	}{{
 		input: "v: w: x: _|_",
 		path:  "v.w.x",
@@ -4302,6 +4305,37 @@ func TestReferencePath(t *testing.T) {
 		path: "v.w.x",
 		want: "a",
 	}, {
+		// No path from the root addresses a comprehension's variables.
+		input: `for k, _ in ["A"] { v: w: x: k }`,
+		path:  "v.w.x",
+		want:  "",
+	}, {
+		input: `for _, e in ["A"] { v: w: x: e }`,
+		path:  "v.w.x",
+		want:  "",
+	}, {
+		input: `if true let z = 1 { v: w: x: z }`,
+		path:  "v.w.x",
+		want:  "",
+	}, {
+		input: `
+		@experiment(try)
+		a: 1
+		try z = a? { v: w: x: z }
+		`,
+		path: "v.w.x",
+		want: "",
+	}, {
+		// Nor a value within a let field.
+		// TODO(structureshare): the reference is lost when v.w shares X.a.
+		input: `
+		let X = {a: {b: 1, x: b}}
+		v: w: X.a
+		`,
+		path:        "v.w.x",
+		want:        "",
+		wantNoShare: "v.w.b",
+	}, {
 		input: `
 		v: w: close({x: a})
 		a: 1
@@ -4376,6 +4410,10 @@ package x
 	}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			tc := tc // each matrix entry may adjust its own copy
+			if !m.Flags.Sharing && tc.wantNoShare != "" {
+				tc.want = tc.wantNoShare
+			}
 			ctx := m.CueContext()
 
 			var val cue.Value

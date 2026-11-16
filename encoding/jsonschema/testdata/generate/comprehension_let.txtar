@@ -1,5 +1,4 @@
 # A reference to a comprehension's let variable is generated in place.
-# TODO: Generate fails, naming each iteration's variable z.
 # See https://cuelang.org/issue/4586
 -- test.cue --
 package test
@@ -20,5 +19,20 @@ fail1: {
 	data: byLet: a: "x-b"
 	error: true
 }
--- out/generate-v3/error --
-NamesFunc returned non-unique name "z"
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: byLet: {
+		type: "object"
+		properties: {
+			a: const: "x-a"
+			b: const: "x-b"
+		}
+	}
+}
+-- out/generate-v3/fail1 --
+fail1.data.byLet.a: conflicting values "x-a" and "x-b":
+    ./datatest/tests.cue:8:18
+    1:133
+-- out/generate-v3/ok1 --

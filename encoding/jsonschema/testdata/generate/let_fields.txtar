@@ -1,5 +1,4 @@
 # A reference to a value within a let field is generated in place.
-# TODO: Generate fails to name the reference.
 # See https://cuelang.org/issue/4586
 -- test.cue --
 package test
@@ -21,5 +20,21 @@ fail1: {
 	}
 	error: true
 }
--- out/generate-v3/error --
-NamesFunc did not set Name field in all *CUERef values
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: viaLet: {
+		type: "object"
+		properties: {
+			c: type: "string"
+			d: type: "string"
+		}
+		required: ["c", "d"]
+	}
+	required: ["viaLet"]
+}
+-- out/generate-v3/fail1 --
+fail1.data.viaLet.d: conflicting values 1 and string (mismatched types int and string):
+    ./datatest/tests.cue:10:6
+-- out/generate-v3/ok1 --

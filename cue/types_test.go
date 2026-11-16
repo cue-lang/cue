@@ -4207,6 +4207,7 @@ func TestWalk(t *testing.T) {
 func TestReferencePath(t *testing.T) {
 	testCases := []struct {
 		input          string
+		scope          string // compile input with this as its scope
 		path           string
 		want           string
 		wantImportPath string
@@ -4312,15 +4313,35 @@ func TestReferencePath(t *testing.T) {
 		want:           "RFC3339",
 		wantImportPath: "time",
 		alt:            `"2006-01-02T15:04:05Z07:00"`,
+	}, {
+		// A file embedding a reference to its scope.
+		input: "x",
+		scope: "x: 1",
+		path:  "",
+		want:  "x",
 	},
 	}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
 
-			val := ctx.CompileString(tc.input, cue.Filename("in"))
+			var val cue.Value
+			switch {
+			case tc.scope != "":
+				scope := ctx.CompileString(tc.scope)
+				val = ctx.CompileString(tc.input, cue.Filename("in"), cue.Scope(scope))
+			default:
+				val = ctx.CompileString(tc.input, cue.Filename("in"))
+			}
 			v := val.LookupPath(cue.ParsePath(tc.path))
 
+			if tc.scope != "" {
+				// ReferencePath goes past the scope to an environment
+				// with no vertex, and panics.
+				defer func() {
+					qt.Assert(t, qt.IsNotNil(recover()))
+				}()
+			}
 			root, path := v.ReferencePath()
 			if got := path.String(); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)

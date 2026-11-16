@@ -1,6 +1,22 @@
 exec cue cmd test
 cmp stdout stdout.want
 
+# Tool files share the hidden fields of their package
+# however the package argument is spelled.
+# The spellings with a redundant package qualifier fail,
+# as the tool files are scoped by the import path rather than the package ID.
+cd mod
+exec cue cmd show ./hello
+stdout '^secret$'
+exec cue cmd show mod.test/hello
+stdout '^secret$'
+! exec cue cmd show mod.test/hello:hello
+stderr 'reference "_hidden" not found'
+exec cue cmd show mod.test/hello@v0
+stdout '^secret$'
+! exec cue cmd show mod.test/hello@v0:hello
+stderr 'reference "_hidden" not found'
+
 -- stdout.want --
 hello world
 
@@ -42,3 +58,16 @@ let letName = file.Read & {filename: "read.txt"}
 _hid: file.Read & {filename: "read.txt"}
 #def: file.Read & {filename: "read.txt"}
 _#hidDef: file.Read & {filename: "read.txt"}
+-- mod/cue.mod/module.cue --
+module: "mod.test@v0"
+language: version: "v0.17.0"
+-- mod/hello/hello.cue --
+package hello
+
+_hidden: "secret"
+-- mod/hello/hello_tool.cue --
+package hello
+
+import "tool/cli"
+
+command: show: cli.Print & {text: _hidden}

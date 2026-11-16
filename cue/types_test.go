@@ -48,6 +48,20 @@ func getValue(m *cuetdtest.M, body string) cue.Value {
 	return m.CueContext().CompileString(body, cue.Filename("test"))
 }
 
+// loadFiles builds the package held by the txtar archive files.
+func loadFiles(t *testing.T, m *cuetdtest.M, files string) cue.Value {
+	t.Helper()
+	inst := cuetxtar.Load(txtar.Parse([]byte(files)), t.TempDir())[0]
+	if inst.Err != nil {
+		t.Fatal(inst.Err)
+	}
+	v := m.CueContext().BuildInstance(inst)
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	return v
+}
+
 func mustCompile(t testing.TB, ctx *cue.Context, body string) cue.Value {
 	t.Helper()
 
@@ -4208,6 +4222,7 @@ func TestReferencePath(t *testing.T) {
 	testCases := []struct {
 		input          string
 		scope          string // compile input with this as its scope
+		files          string // txtar archive of a package to use instead of input
 		path           string
 		want           string
 		wantImportPath string
@@ -4319,6 +4334,44 @@ func TestReferencePath(t *testing.T) {
 		scope: "x: 1",
 		path:  "",
 		want:  "x",
+	}, {
+		// Files which together only embed a reference are one.
+		files: `
+-- cue.mod/module.cue --
+module: "example.com"
+language: version: "v0.9.0"
+-- doc.cue --
+// Package x is documented here.
+package x
+-- root.cue --
+package x
+
+import "example.com/lib"
+
+lib.X
+-- lib/lib.cue --
+package lib
+
+X: {}
+`,
+		path:           "",
+		want:           "", // ReferencePath only looks through a single file.
+		wantImportPath: "example.com/lib",
+		alt:            "{}",
+	}, {
+		// An embedding next to another file's declaration is not a reference.
+		files: `
+-- a.cue --
+package x
+
+#A: {c?: string}
+-- root.cue --
+package x
+
+#A
+`,
+		path: "",
+		want: "",
 	},
 	}
 	for _, tc := range testCases {
@@ -4327,6 +4380,8 @@ func TestReferencePath(t *testing.T) {
 
 			var val cue.Value
 			switch {
+			case tc.files != "":
+				val = loadFiles(t, m, tc.files)
 			case tc.scope != "":
 				scope := ctx.CompileString(tc.scope)
 				val = ctx.CompileString(tc.input, cue.Filename("in"), cue.Scope(scope))
@@ -4863,11 +4918,77 @@ func checkFailed(t *testing.T, err error, str, name string) bool {
 func TestExpr(t *testing.T) {
 	testCases := []struct {
 		input string
-		path  string // path to lookup, defaults to "v"
+		files string // txtar archive of a package to use instead of input
+		path  string // path to lookup, defaults to "v" for input
 		want  string
 	}{{
 		input: "v: 3",
 		want:  "3",
+	}, {
+		// The files of a package are described together, as one file.
+		files: `
+-- a.cue --
+package x
+
+#A: {c?: string}
+-- root.cue --
+package x
+
+#A
+`,
+		// Each file is described out of the package's scope.
+		want: `&({#A:{c?:string}} .(〈〉 "#A")); undefined field: #A`,
+	}, {
+		files: `
+-- a.cue --
+package x
+
+a: 1
+-- b.cue --
+package x
+
+b: a
+`,
+		// Each file is described out of the package's scope.
+		want: `&({a:1} {b:a}); b: undefined field: a`,
+	}, {
+		// Fields next to an embedding may refer to other files.
+		files: `
+-- a.cue --
+package x
+
+_A: {c?: string}
+_B: 1
+-- root.cue --
+package x
+
+_A
+b: _B
+`,
+		// Each file is described out of the package's scope.
+		want: `&({_A(:x):{c?:string},_B(:x):1} &(.(〈〉 "_A") {b:_B(:x)})); undefined field: _A`,
+	}, {
+		// A file declaring nothing leaves a single embedding.
+		files: `
+-- cue.mod/module.cue --
+module: "example.com"
+language: version: "v0.9.0"
+-- doc.cue --
+// Package x is documented here.
+package x
+-- root.cue --
+package x
+
+import "example.com/lib"
+
+lib.#S
+-- lib/lib.cue --
+package lib
+
+#S: {c?: string}
+`,
+		// Each file is described out of the package's scope.
+		want: `&({} .("example.com/lib" "#S"))`,
 	}, {
 		input: "v: 3 + 4",
 		want:  "+(3 4)",
@@ -5056,12 +5177,26 @@ func TestExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
-			path := tc.path
-			if path == "" {
-				path = "v"
+			var v cue.Value
+			if tc.files != "" {
+				v = loadFiles(t, m, tc.files).LookupPath(cue.ParsePath(tc.path))
+			} else {
+				path := tc.path
+				if path == "" {
+					path = "v"
+				}
+				v = getValue(m, tc.input).LookupPath(cue.ParsePath(path))
 			}
-			v := getValue(m, tc.input).LookupPath(cue.ParsePath(path))
 			got := exprStr(v)
+			if tc.files != "" {
+				// Each operand must evaluate in the scope of the package.
+				_, operands := v.Expr()
+				for _, o := range operands {
+					if err := o.Validate(cue.Concrete(true)); err != nil {
+						got += "; " + err.Error()
+					}
+				}
+			}
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}

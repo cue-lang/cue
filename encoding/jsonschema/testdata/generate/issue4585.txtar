@@ -1,0 +1,12 @@
+# One file embeds a definition declared in another.
+# See https://cuelang.org/issue/4585
+-- a.cue --
+package test
+
+#A: {c?: string}
+-- root.cue --
+package test
+
+#A
+-- out/generate-v3/schema --
+error: reference #A not found

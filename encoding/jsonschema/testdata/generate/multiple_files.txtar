@@ -1,0 +1,11 @@
+# A field in one file refers to a definition declared in another.
+-- a.cue --
+package test
+
+#A: {c?: string}
+-- root.cue --
+package test
+
+x?: #A
+-- out/generate-v3/schema --
+error: reference #A not found

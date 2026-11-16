@@ -1,0 +1,29 @@
+# Files which together only embed an imported definition refer to it.
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.9.0"
+-- doc.cue --
+// Package test is documented here.
+package test
+-- root.cue --
+package test
+
+import "test.example/lib"
+
+lib.#S
+-- lib/lib.cue --
+package lib
+
+#S: {c?: string}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: S: {
+		type:                 "object"
+		additionalProperties: false
+		properties: c: type: "string"
+	}
+	type:        "object"
+	description: "Package test is documented here."
+	$ref:        "#/$defs/S"
+}

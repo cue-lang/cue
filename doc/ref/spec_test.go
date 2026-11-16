@@ -21,6 +21,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"unicode"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -29,8 +30,10 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/value"
 	"github.com/go-quicktest/qt"
 	mdast "github.com/yuin/goldmark/v2/ast"
 	mdparser "github.com/yuin/goldmark/v2/parser"
@@ -237,8 +240,15 @@ func checkBlock(t *testing.T, ctx *cue.Context, fcb *mdast.CodeBlock, source []b
 		// even when the block fails to build.
 		err = val.Validate()
 		checkClaims(t, blockPos, val, file, errors.Errors(err))
-	case "rows", "untested":
-		// TODO: parse and validate rows line by line
+	case "rows":
+		// Rows are validated one at a time against their result column; an
+		// expected error is marked _|_ on the row itself (see checkRows).
+		checkRows(t, fcb, source, blockPos)
+		if wantError {
+			t.Errorf("%s: %q blocks mark expected errors per row, not per block: ```%s", blockPos, mode, info)
+		}
+		return blockEdit{}, false
+	case "untested":
 		if wantError {
 			t.Errorf("%s: %q blocks are not checked: ```%s", blockPos, mode, info)
 		}
@@ -434,5 +444,165 @@ func hasComment(src string) bool {
 		case token.EOF:
 			return false
 		}
+	}
+}
+
+// checkRows validates a ```cue rows block. Each row holds an expression (or
+// field declaration) in the first column and its expected result in the second,
+// separated by two or more spaces. An expected error is written as `_|_` for a
+// permanent error, or as `_|_ (incomplete)` for an incomplete one, which more
+// information could still resolve. A row with an empty result column is
+// treated as shared context (a field declaration) and accumulated for the
+// rows that follow it, but is not itself checked. A first row of plain words,
+// such as "Expression  Result", is a header.
+//
+// Every rows block is checked. A table that cannot be checked this way, such
+// as one whose rows refer to free names, is marked ```cue untested instead.
+func checkRows(t *testing.T, fcb *mdast.CodeBlock, source []byte, blockPos string) {
+	cc := cuecontext.New()
+	var context strings.Builder
+
+	first := true
+	for _, seg := range fcb.Value.Segments() {
+		line := strings.TrimRight(string(seg.Bytes(source)), "\r\n")
+		if t := strings.TrimSpace(line); t == "" || strings.HasPrefix(t, "//") {
+			continue // blank lines and pure-comment lines are ignored.
+		}
+		left, right := splitRow(line)
+		if first {
+			first = false
+			if isHeader(left, right) {
+				continue
+			}
+		}
+
+		isField, label, err := rowKind(left)
+		if err != nil {
+			t.Errorf("%s: row %q failed to parse: %v", blockPos, left, err)
+			continue
+		}
+
+		if right == "" {
+			// Shared context: accumulate the declaration for later rows.
+			if !isField {
+				t.Errorf("%s: context row %q must be a field declaration", blockPos, left)
+				continue
+			}
+			context.WriteString(left)
+			context.WriteByte('\n')
+			continue
+		}
+
+		src := context.String()
+		path := cue.ParsePath(label)
+		if isField {
+			src += left
+		} else {
+			src += "out: (" + left + ")"
+			path = cue.ParsePath("out")
+		}
+		// A compilation error, such as a reference to an undeclared name,
+		// would otherwise pass for an expected error.
+		if _, p := (*runtime.Runtime)(cc).Compile(nil, src); p.Err != nil {
+			t.Errorf("%s: row %q failed to compile: %v", blockPos, left, p.Err)
+			continue
+		}
+		v := cc.CompileString(src)
+		checkRowResult(t, cc, blockPos, left, right, v.LookupPath(path))
+	}
+}
+
+// isHeader reports whether a row is a table header such as
+// "Expression  Result", consisting of plain words only.
+func isHeader(left, right string) bool {
+	if left == "" {
+		return false
+	}
+	for _, r := range left + right {
+		if !unicode.IsLetter(r) && r != ' ' && r != ':' {
+			return false
+		}
+	}
+	return unicode.IsUpper([]rune(left)[0])
+}
+
+// splitRow splits a rows line into its expression and result columns at the
+// first run of two or more spaces. A trailing `// comment` on the result is
+// dropped.
+func splitRow(line string) (left, right string) {
+	for i := 0; i+1 < len(line); i++ {
+		if line[i] == ' ' && line[i+1] == ' ' {
+			left = strings.TrimSpace(line[:i])
+			right = strings.TrimSpace(line[i:])
+			if ci := strings.Index(right, "//"); ci >= 0 {
+				right = strings.TrimSpace(right[:ci])
+			}
+			return left, right
+		}
+	}
+	return strings.TrimSpace(line), ""
+}
+
+// rowKind reports whether left is a field declaration (returning its label) or a
+// bare expression.
+func rowKind(left string) (isField bool, label string, err error) {
+	f, err := parser.ParseFile("row", left)
+	if err != nil {
+		return false, "", err
+	}
+	if len(f.Decls) != 1 {
+		return false, "", fmt.Errorf("expected a single declaration")
+	}
+	if field, ok := f.Decls[0].(*ast.Field); ok {
+		return true, labelName(field.Label), nil
+	}
+	return false, "", nil
+}
+
+func labelName(l ast.Label) string {
+	switch x := l.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.BasicLit:
+		return strings.Trim(x.Value, `"`)
+	}
+	return ""
+}
+
+const (
+	permanentResult  = "_|_"
+	incompleteResult = "_|_ (incomplete)"
+)
+
+// checkRowResult compares the evaluated value against the expected result
+// column. `_|_` expects a permanent error and `_|_ (incomplete)` an incomplete
+// one; otherwise their defaults must be equivalent (mutually subsuming).
+func checkRowResult(t *testing.T, cc *cue.Context, blockPos, left, right string, got cue.Value) {
+	if right == permanentResult || right == incompleteResult {
+		b := value.Vertex(got).Bottom()
+		switch {
+		case b == nil:
+			t.Errorf("%s: %s => got %v, want error (%s)", blockPos, left, got, right)
+		case b.IsIncomplete() && right == permanentResult:
+			t.Errorf("%s: %s => got incomplete error %v, want permanent error (%s)", blockPos, left, got.Err(), right)
+		case !b.IsIncomplete() && right == incompleteResult:
+			t.Errorf("%s: %s => got permanent error %v, want incomplete error (%s)", blockPos, left, got.Err(), right)
+		}
+		return
+	}
+	if err := got.Err(); err != nil {
+		t.Errorf("%s: %s => got error %v, want %s", blockPos, left, err, right)
+		return
+	}
+	want := cc.CompileString("out: (" + right + ")").LookupPath(cue.ParsePath("out"))
+	if err := want.Err(); err != nil {
+		t.Errorf("%s: result %q failed to compile: %v", blockPos, right, err)
+		return
+	}
+	// Rows show what an expression resolves to: compare defaults, if any.
+	got, _ = got.Default()
+	want, _ = want.Default()
+	if got.Subsume(want) != nil || want.Subsume(got) != nil {
+		t.Errorf("%s: %s => got %v, want %s", blockPos, left, got, right)
 	}
 }

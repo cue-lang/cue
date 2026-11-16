@@ -70,11 +70,17 @@ in the form ```cue [!] mode:
   but which we do not expect to validate,
   such as when it refers to names declared in another code block.
 
-* `cue untested` for syntax that is CUE-like but invalid.
+* `cue untested` for syntax that is CUE-like but invalid,
+  and for tables that `cue rows` cannot check,
+  such as those whose rows refer to undeclared names.
 
-* `cue rows` for tables of input-output rows.
-  We do not yet mark what to do with them,
-  but the output column is generally the expected outcome.
+* `cue rows` for tables of input-output rows, each checked on its own.
+  The first column is an expression or a field,
+  and the second, after two or more spaces, is what it evaluates to:
+  `_|_` for a permanent error,
+  or `_|_ (incomplete)` for an incomplete one.
+  A field without a second column declares a name for the rows after it.
+  A first row of plain words, like `Expression  Result`, is a header.
 
 A `!` before `parse` or `vet` expects that step to fail instead,
 such as `cue ! vet`, and the resulting error is recorded
@@ -862,32 +868,33 @@ compatible way later if really desirable, as long as we require that
 disjunction literals be normalized).
 -->
 
-```cue rows
-Expression                       Resolves to
-"tcp" | "udp"                    "tcp" | "udp"
-*"tcp" | "udp"                   "tcp"
-float | *1                       1
-*string | 1.0                    string
-(*1|2) + (2|*3)                  4
+<!-- TODO: check this table. Some of its results are wrong. -->
+```cue untested
+Expression                        Resolves to
+"tcp" | "udp"                     "tcp" | "udp"
+*"tcp" | "udp"                    "tcp"
+float | *1                        1
+*string | 1.0                     string
+(*1|2) + (2|*3)                   4
 
-(*1|2|3) | (1|*2|3)              1|2
-(*1|2|3) & (1|*2|3)              1|2|3 // default is _|_
+(*1|2|3) | (1|*2|3)               1|2
+(*1|2|3) & (1|*2|3)               1|2|3 // default is _|_
 
-(* >=5 | int) & (* <=5 | int)    5
+(* >=5 | int) & (* <=5 | int)     5
 
-(*"tcp"|"udp") & ("udp"|*"tcp")  "tcp"
-(*"tcp"|"udp") & ("udp"|"tcp")   "tcp"
-(*"tcp"|"udp") & "tcp"           "tcp"
-(*"tcp"|"udp") & (*"udp"|"tcp")  "tcp" | "udp" // default is _|_
+(*"tcp"|"udp") & ("udp"|*"tcp")   "tcp"
+(*"tcp"|"udp") & ("udp"|"tcp")    "tcp"
+(*"tcp"|"udp") & "tcp"            "tcp"
+(*"tcp"|"udp") & (*"udp"|"tcp")   "tcp" | "udp" // default is _|_
 
-(*true | false) & bool           true
-(*true | false) & (true | false) true
+(*true | false) & bool            true
+(*true | false) & (true | false)  true
 
-{a: 1} | {b: 1}                  {a: 1} | {b: 1}
-{a: 1} | *{b: 1}                 {b:1}
-*{a: 1} | *{b: 1}                {a: 1} | {b: 1}
-({a: 1} | {b: 1}) & {a:1}        {a:1}  | {a: 1, b: 1}
-({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1}
+{a: 1} | {b: 1}                   {a: 1} | {b: 1}
+{a: 1} | *{b: 1}                  {b:1}
+*{a: 1} | *{b: 1}                 {a: 1} | {b: 1}
+({a: 1} | {b: 1}) & {a:1}         {a:1}  | {a: 1, b: 1}
+({a:1}|*{b:1}) & ({a:1}|*{b:1})   {b:1}
 ```
 
 
@@ -913,10 +920,10 @@ Unifying any value `v` with top results in `v` itself.
 
 ```cue rows
 Expr        Result
-_ &  5        5
-_ &  _        _
-_ & _|_      _|_
-_ | _|_       _
+_ & 5       5
+_ & _       _
+_ & _|_     _|_
+_ | _|_     _
 ```
 
 
@@ -1147,7 +1154,8 @@ for any given `x`.
 Implementations may error upon encountering a required field constraint
 when manifesting CUE as data.
 
-```cue rows
+<!-- TODO: check this table. Some of its results are wrong. -->
+```cue untested
 Expression                             Result
 {foo?: 3} & {foo: 3}                   {foo: 3}
 {foo!: 3} & {foo: 3}                   {foo: 3}
@@ -1208,7 +1216,7 @@ A _dynamic field_ is a field whose label is determined by
 an expression wrapped in parentheses.
 A dynamic field may be marked as optional or required.
 
-```cue rows
+```cue untested
 Expression                             Result
 a:   "foo"                             a:   "foo"
 b:   "bar"                             b:   "bar"
@@ -3043,7 +3051,7 @@ The builtin function `and` takes a list and returns the result of applying
 the `&` operator to all elements in the list.
 It returns top for the empty list.
 
-```cue rows
+```cue untested
 Expression:          Result
 and([a, b])          a & b
 and([a])             a
@@ -3056,7 +3064,7 @@ The builtin function `or` takes a list and returns the result of applying
 the `|` operator to all elements in the list.
 It returns bottom for the empty list.
 
-```cue rows
+```cue untested
 Expression:          Result
 or([a, b])           a | b
 or([a])              a
@@ -3222,7 +3230,7 @@ As it does not matter how we fail, we can assume the result to be `a`
 and postpone validating `a == e` until after all references
 in `e` have been resolved.
 
-```cue rows
+```cue untested
 // Config            Evaluates to (requiring concrete values)
 x: {                  x: {
     a: b + 100            a: _|_ // cycle detected

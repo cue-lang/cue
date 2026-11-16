@@ -219,7 +219,8 @@ type OpContext struct {
 	// capturesCompared records the comparisons of the values that two
 	// closures of one literal capture that are in progress, and dataPairs the
 	// outcome of comparing each pair of captured vertices as data. See
-	// [OpContext.sameCaptures].
+	// [OpContext.sameCaptures]. Both count a comparison in progress as equal,
+	// so their outcomes only hold within the outermost comparison.
 	capturesCompared map[captureKey]bool
 	dataPairs        map[[2]*Vertex]bool
 

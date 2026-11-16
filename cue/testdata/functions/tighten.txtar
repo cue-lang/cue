@@ -379,7 +379,7 @@ compose: {
 	// So may two closures in that struct.
 	mkTwo:      func(n: int) -> _: {a: n, f: func(x: self.a) -> int: x, g: func(x: self.a) -> int: x}.f
 	selfTwo:    mkTwo(1) & mkTwo(1)
-	selfTwoX:   selfTwo(1) @test(err, code=eval, contains="the same function literal is closed over different values", incorrect) @test(eq:todo, 1)
+	selfTwoX:   selfTwo(1) @test(eq, 1)
 	selfTwoBad: mkTwo(1) & mkTwo(2) @test(err, code=eval, contains="the same function literal is closed over different values")
 
 	// Captured values compare as data, so a number of another kind, a
@@ -1472,12 +1472,6 @@ meet.wr: function returns _, but its signature requires number:
     ./in.cue:362:21
     ./in.cue:365:14
     ./in.cue:365:35
-[eval] compose.selfTwo: conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:367:43
-    ./in.cue:367:33
-[eval] compose.selfTwo: conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:367:43
-    ./in.cue:367:33
 [eval] compose.selfTwoBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:367:43
     ./in.cue:367:33
@@ -1869,14 +1863,14 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
     ./in.cue:1173:9
     ./in.cue:1300:21
 -- out/eval/stats --
-Leaks:  296
-Freed:  3369
-Reused: 3103
-Allocs: 562
+Leaks:  297
+Freed:  3372
+Reused: 3106
+Allocs: 563
 Retain: 0
 
-Unifications: 3403
-Conjuncts:    9080
+Unifications: 3407
+Conjuncts:    9105
 Disjuncts:    143
 
-NumCloseIDs: 1430
+NumCloseIDs: 1439

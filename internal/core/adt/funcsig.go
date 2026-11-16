@@ -2689,7 +2689,7 @@ func (c *OpContext) evalCapture(env *Environment, r Expr) (Value, bool) {
 // constraints left need not, even when their evaluations are equal now. Each
 // pair of vertices is compared once per comparison of captures (see
 // [OpContext.sameCaptures]), so that data shared along many paths is
-// traversed once.
+// traversed once. A pair already being compared counts as equal.
 func (c *OpContext) equalData(x, y Value) bool {
 	if x == y {
 		return true
@@ -2708,7 +2708,7 @@ func (c *OpContext) equalData(x, y Value) bool {
 		if r, seen := c.dataPairs[key]; seen {
 			return r
 		}
-		c.dataPairs[key] = false
+		c.dataPairs[key] = true
 		r := c.equalDataVertices(x, yv)
 		c.dataPairs[key] = r
 		return r

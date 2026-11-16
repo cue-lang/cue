@@ -500,6 +500,10 @@ compose: {
 	open:    mkOpen(1) & mkOpen(1)
 	openX:   open()
 	openBad: mkOpen(1) & mkOpen(2)
+	// Nor is a postfix ... on a struct.
+	mkOpened:  func(n: int) -> _: func() -> _: {a: n}...
+	openedX:   (mkOpened(1) & mkOpened(1))()
+	openedBad: mkOpened(1) & mkOpened(2)
 
 	// A function that refers to nothing outside itself is the same function
 	// wherever it is evaluated: reached through an embedding, or through an
@@ -998,6 +1002,8 @@ admission: {
 	corrSelfN:  ((func(x: #CorrSelfN) -> int) & _ci)({a: 0})
 	// A field nothing refers to is still compared.
 	corrSBad:  (func(x: {a: int, b: {c: 0 & a}, d: string}) -> int) & (func(x: {a: 0, d: int, ...}) -> int: 0)
+	// A postfix ... adds no correlation of its own.
+	corrOpenNo: ((func(x: {a: int, b: {c: 1}...}) -> int) & _ci)({a: 0})
 	emp:     (func(x: int | <"") -> int) & (func(x: int) -> int: x)
 	empX:    emp(1)
 	empL:    (func(x: [...<""]) -> int) & (func(x: []) -> int: 1)
@@ -1783,6 +1789,11 @@ admission: {
     open: (〈0;mkOpen〉(1) & 〈0;mkOpen〉(1))
     openX: 〈0;open〉()
     openBad: (〈0;mkOpen〉(1) & 〈0;mkOpen〉(2))
+    mkOpened: func(n: int) -> _: func() -> _: {
+      a: 〈2;n〉
+    }...
+    openedX: (〈0;mkOpened〉(1) & 〈0;mkOpened〉(1))()
+    openedBad: (〈0;mkOpened〉(1) & 〈0;mkOpened〉(2))
     _x: {
       h: func(a: int) -> int: (〈0;a〉 + 1)
     }
@@ -2491,6 +2502,14 @@ admission: {
       d: int
       ...
     }) -> int: 0)
+    corrOpenNo: (func(x: {
+      a: int
+      b: {
+        c: 1
+      }...
+    }) -> int & 〈0;_ci〉)({
+      a: 0
+    })
     emp: (func(x: (int|<"")) -> int & func(x: int) -> int: 〈0;x〉)
     empX: 〈0;emp〉(1)
     empL: (func(x: [

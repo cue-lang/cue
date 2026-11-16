@@ -381,6 +381,13 @@ compose: {
 	selfTwo:    mkTwo(1) & mkTwo(1)
 	selfTwoX:   selfTwo(1)
 	selfTwoBad: mkTwo(1) & mkTwo(2)
+	// So may a let in that struct, which is not part of the struct's value.
+	mkLetSelf:  func(n: int) -> _: {let s = self, a: n, f: func(x: s.a) -> int: x}.f
+	letSelf:    mkLetSelf(1) & mkLetSelf(1)
+	letSelfX:   letSelf(1)
+	letSelfBad: mkLetSelf(1) & mkLetSelf(2)
+	#LetSelf:   {let s = self, a: int, f: func(x: s.a) -> int: x}
+	letSelfDef: ((#LetSelf & {a: 1}).f & (#LetSelf & {a: 1}).f)(1)
 
 	// Captured values compare as data, so a number of another kind, a
 	// default, or a reference that unification evaluates again keeps two
@@ -390,6 +397,9 @@ compose: {
 	num:     mkn(1) & mkn(1.0)
 	mkd:     func(x: _) -> _: func() -> _: x
 	dflt:    mkd(*1 | 2) & mkd(1 | 2)
+	// Lets are not part of a captured value.
+	letD:    (mkd({let y = 1, a: y}) & mkd({let y = 1, a: y}))()
+	letDBad: mkd({let y = 1, a: y}) & mkd({let y = 2, a: y})
 	// self in a function's body refers to its own scope, so it captures nothing.
 	mkBody:   func(n: int) -> _: func(a: int) -> int: self.a + n
 	bodyX:    (mkBody(1) & mkBody(1))(2)
@@ -1625,10 +1635,42 @@ admission: {
     selfTwo: (〈0;mkTwo〉(1) & 〈0;mkTwo〉(1))
     selfTwoX: 〈0;selfTwo〉(1)
     selfTwoBad: (〈0;mkTwo〉(1) & 〈0;mkTwo〉(2))
+    mkLetSelf: func(n: int) -> _: {
+      let s#2 = 〈1〉
+      a: 〈1;n〉
+      f: func(x: 〈0;let s#2〉.a) -> int: 〈0;x〉
+    }.f
+    letSelf: (〈0;mkLetSelf〉(1) & 〈0;mkLetSelf〉(1))
+    letSelfX: 〈0;letSelf〉(1)
+    letSelfBad: (〈0;mkLetSelf〉(1) & 〈0;mkLetSelf〉(2))
+    #LetSelf: {
+      let s#3 = 〈1〉
+      a: int
+      f: func(x: 〈0;let s#3〉.a) -> int: 〈0;x〉
+    }
+    letSelfDef: ((〈0;#LetSelf〉 & {
+      a: 1
+    }).f & (〈0;#LetSelf〉 & {
+      a: 1
+    }).f)(1)
     mkn: func(n: number) -> _: func() -> number: 〈1;n〉
     num: (〈0;mkn〉(1) & 〈0;mkn〉(1.0))
     mkd: func(x: _) -> _: func() -> _: 〈1;x〉
     dflt: (〈0;mkd〉((*1|2)) & 〈0;mkd〉((1|2)))
+    letD: (〈0;mkd〉({
+      let y#4 = 1
+      a: 〈0;let y#4〉
+    }) & 〈0;mkd〉({
+      let y#5 = 1
+      a: 〈0;let y#5〉
+    }))()
+    letDBad: (〈0;mkd〉({
+      let y#6 = 1
+      a: 〈0;let y#6〉
+    }) & 〈0;mkd〉({
+      let y#7 = 2
+      a: 〈0;let y#7〉
+    }))
     mkBody: func(n: int) -> _: func(a: int) -> int: (〈1〉.a + 〈1;n〉)
     bodyX: (〈0;mkBody〉(1) & 〈0;mkBody〉(1))(2)
     bodyBad: (〈0;mkBody〉(1) & 〈0;mkBody〉(2))
@@ -1702,15 +1744,15 @@ admission: {
     pf: (〈0;mkpf〉() & 〈0;mkpf〉())
     pfX: 〈0;pf〉()
     mkLet: func(n: int) -> _: {
-      let m#2 = 〈1;n〉
-      f: func() -> int: 〈1;let m#2〉
+      let m#8 = 〈1;n〉
+      f: func() -> int: 〈1;let m#8〉
     }.f
     letOK: (〈0;mkLet〉(1) & 〈0;mkLet〉(1))
     letX: 〈0;letOK〉()
     letBad: (〈0;mkLet〉(1) & 〈0;mkLet〉(2))
     mkBLet: func(n: int) -> _: func() -> _: {
-      let m#3 = 〈2;n〉
-      v: 〈0;let m#3〉
+      let m#9 = 〈2;n〉
+      v: 〈0;let m#9〉
     }
     bLet: (〈0;mkBLet〉(1) & 〈0;mkBLet〉(1))
     bLetX: 〈0;bLet〉()
@@ -2426,8 +2468,8 @@ admission: {
     })
     corrLet: (func(x: {
       a: int
-      let y#4 = 〈0;a〉
-      b: (0 & 〈0;let y#4〉)
+      let y#A = 〈0;a〉
+      b: (0 & 〈0;let y#A〉)
     }) -> int & 〈0;_ci〉)({
       a: 0
     })
@@ -2746,8 +2788,8 @@ admission: {
     #LT: number
     lt: {
       f: (func() -> {
-        let y#5 = 〈2;#LT〉
-        v: 〈0;let y#5〉
+        let y#B = 〈2;#LT〉
+        v: 〈0;let y#B〉
       }: {
         v: 1
       } & func() -> {
@@ -2904,8 +2946,8 @@ admission: {
     cfFunc: func(g: func(func(y: number = 1) -> int) -> int) -> int: 7(〈0;cbA〉)
     cfStruct: func(g: func({
       a: number
-      let l#6 = 1
-      b: 〈0;let l#6〉
+      let l#C = 1
+      b: 〈0;let l#C〉
       [=~"x"]: _
       "d": 1
       {

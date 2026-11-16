@@ -1,0 +1,24 @@
+# A reference to a comprehension's let variable is generated in place.
+# TODO: Generate fails, naming each iteration's variable z.
+# See https://cuelang.org/issue/4586
+-- test.cue --
+package test
+
+byLet?: {
+	for k in ["a", "b"] let z = "x-\(k)" {
+		(k)?: z
+	}
+}
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: byLet: {
+	a: "x-a"
+	b: "x-b"
+}
+fail1: {
+	data: byLet: a: "x-b"
+	error: true
+}
+-- out/generate-v3/error --
+NamesFunc returned non-unique name "z"

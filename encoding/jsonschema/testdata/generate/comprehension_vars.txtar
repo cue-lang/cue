@@ -1,0 +1,34 @@
+# References to a comprehension's loop variables are generated in place,
+# while references to definitions still become $refs.
+# TODO: Generate fails to name the loop variables.
+# See https://cuelang.org/issue/4586
+-- test.cue --
+package test
+
+byKey?: and([for k in ["A"] {matchIf({Type!: k}, #A, _)}])
+
+byKeyValue?: and([for k, v in {A: "a"} {matchIf({Type!: k}, {Name!: v, ...}, _)}])
+
+#A: {Type?: "A", ...}
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: byKey: Type: "A"
+ok2: data: byKey: Type: "B"
+ok3: data: byKeyValue: {
+	Type: "A"
+	Name: "a"
+}
+fail1: {
+	data: byKeyValue: Type: "A"
+	error: true
+}
+fail2: {
+	data: byKeyValue: {
+		Type: "A"
+		Name: "b"
+	}
+	error: true
+}
+-- out/generate-v3/error --
+NamesFunc did not set Name field in all *CUERef values

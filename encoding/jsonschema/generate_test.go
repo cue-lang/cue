@@ -62,7 +62,10 @@ func TestGenerate(t *testing.T) {
 			Version:      version,
 			ExplicitOpen: t.HasTag("explicitOpen"),
 		})
-		qt.Assert(t, qt.IsNil(err))
+		if err != nil {
+			fmt.Fprintln(t.Writer("error"), err)
+			return
+		}
 		data, err := format.Node(r)
 		qt.Assert(t, qt.IsNil(err))
 		t.Writer("schema").Write(data)

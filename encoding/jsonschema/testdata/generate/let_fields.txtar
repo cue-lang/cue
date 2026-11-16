@@ -1,0 +1,25 @@
+# A reference to a value within a let field is generated in place.
+# TODO: Generate fails to name the reference.
+# See https://cuelang.org/issue/4586
+-- test.cue --
+package test
+
+let X = {a: {c: string, d: c}}
+
+viaLet: X.a
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: viaLet: {
+	c: "x"
+	d: "x"
+}
+fail1: {
+	data: viaLet: {
+		c: "x"
+		d: 1
+	}
+	error: true
+}
+-- out/generate-v3/error --
+NamesFunc did not set Name field in all *CUERef values

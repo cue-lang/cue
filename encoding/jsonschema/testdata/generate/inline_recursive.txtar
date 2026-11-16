@@ -1,0 +1,63 @@
+# A recursive definition within a struct which is only selected from
+# is still referenced by name, so that the schema stays recursive.
+-- test.cue --
+package test
+
+#Make: {
+	#Node: {
+		value: int
+		children?: [...#Node]
+	}
+	out: #Node
+}
+
+tree?: (#Make & {}).out
+-- datatest/tests.cue --
+package datatest
+
+ok1: data: tree: {
+	value: 1
+	children: [{value: 2, children: [{value: 3, children: [{value: 4}]}]}]
+}
+fail1: {
+	data: tree: {
+		value: 1
+		children: [{value: 2, children: [{value: 3, children: [{value: "x"}]}]}]
+	}
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: Node: {
+		type:                 "object"
+		additionalProperties: false
+		properties: {
+			children: {
+				type: "array"
+				items: $ref: "#/$defs/Node"
+			}
+			value: type: "integer"
+		}
+		required: ["value"]
+	}
+	type: "object"
+	properties: tree: {
+		type: "object"
+		properties: {
+			children: {
+				type: "array"
+				items: $ref: "#/$defs/Node"
+			}
+			value: type: "integer"
+		}
+		required: ["value"]
+	}
+}
+-- out/generate-v3/fail1 --
+fail1.data.tree.children.0.children.0.children.0.value: conflicting values "x" and int (mismatched types string and int):
+    ./datatest/tests.cue:10:66
+    1:171
+    1:204
+    1:350
+-- out/generate-v3/ok1 --

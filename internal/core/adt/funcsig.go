@@ -2942,6 +2942,8 @@ func walkEscapes(x Node, depth int32, f func(r Node, up int32) bool) bool {
 		return walk(x.X)
 	case *IndexExpr:
 		return walk(x.X, x.Index)
+	case *OpenExpr:
+		return walk(x.X)
 	case *SliceExpr:
 		return walk(x.X, x.Lo, x.Hi, x.Stride)
 	case *BoundExpr:

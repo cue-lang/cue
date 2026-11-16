@@ -502,7 +502,7 @@ compose: {
 	openBad: mkOpen(1) & mkOpen(2) @test(err, code=eval, contains="the same function literal is closed over different values")
 	// Nor is a postfix ... on a struct.
 	mkOpened:  func(n: int) -> _: func() -> _: {a: n}...
-	openedX:   (mkOpened(1) & mkOpened(1))() @test(err, code=eval, contains="the same function literal is closed over different values", incorrect) @test(eq:todo, {a: 1})
+	openedX:   (mkOpened(1) & mkOpened(1))() @test(eq, {a: 1})
 	openedBad: mkOpened(1) & mkOpened(2) @test(err, code=eval, contains="the same function literal is closed over different values")
 
 	// A function that refers to nothing outside itself is the same function
@@ -1491,8 +1491,6 @@ meet.wr: function returns _, but its signature requires number:
     ./in.cue:482:30
 [eval] compose.openBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:486:30
-[eval] conflicting function implementations: the same function literal is closed over different values:
-    ./in.cue:491:32
 [eval] compose.openedBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:491:32
 [eval] compose.builtin: conflicting values func(x: number) -> number: ... and len:
@@ -1816,13 +1814,13 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
     ./in.cue:1262:21
 -- out/eval/stats --
 Leaks:  179
-Freed:  3066
-Reused: 2824
+Freed:  3073
+Reused: 2831
 Allocs: 421
 Retain: 0
 
-Unifications: 3045
-Conjuncts:    8225
+Unifications: 3052
+Conjuncts:    8241
 Disjuncts:    131
 
-NumCloseIDs: 1243
+NumCloseIDs: 1246

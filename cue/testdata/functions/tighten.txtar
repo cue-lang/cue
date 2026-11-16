@@ -389,8 +389,8 @@ compose: {
 	mkBody:   func(n: int) -> _: func(a: int) -> int: self.a + n
 	bodyX:    (mkBody(1) & mkBody(1))(2) @test(eq, 3)
 	bodyBad:  mkBody(1) & mkBody(2) @test(err, code=eval, contains="the same function literal is closed over different values")
-	bodyIn:   list.Contains([mkBody(1)], mkBody(1)) @test(err, code=eval, contains="nil pointer dereference", incorrect) @test(eq:todo, true)
-	bodyOut:  list.Contains([mkBody(1)], mkBody(2)) @test(err, code=eval, contains="nil pointer dereference", incorrect) @test(eq:todo, false)
+	bodyIn:   list.Contains([mkBody(1)], mkBody(1)) @test(eq, true)
+	bodyOut:  list.Contains([mkBody(1)], mkBody(2)) @test(eq, false)
 	mkr:     func(x: _) -> _: func(n: int) -> _: (x & {y: n}).a
 	refs:    mkr({y: _, a: y}) & mkr({y: _, a: _}) @test(err, code=eval, contains="the same function literal is closed over different values")
 	mkc:     func(n: int) -> _: func(xs: [...int]) -> [...int]: [for v in xs let w = v * 2 if w > 0 {w + n}]
@@ -1434,10 +1434,6 @@ meet.wr: function returns _, but its signature requires number:
     ./in.cue:373:28
 [eval] compose.bodyBad: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:376:31
-[eval] compose.bodyIn: error in call to list.Contains: runtime error: invalid memory address or nil pointer dereference:
-    ./in.cue:379:12
-[eval] compose.bodyOut: error in call to list.Contains: runtime error: invalid memory address or nil pointer dereference:
-    ./in.cue:380:12
 [eval] compose.refs: conflicting function implementations: the same function literal is closed over different values:
     ./in.cue:381:28
 [eval] compose.compBad: conflicting function implementations: the same function literal is closed over different values:
@@ -1806,13 +1802,13 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
     ./in.cue:1129:9
     ./in.cue:1256:21
 -- out/eval/stats --
-Leaks:  180
+Leaks:  179
 Freed:  3046
 Reused: 2805
-Allocs: 421
+Allocs: 420
 Retain: 0
 
-Unifications: 3026
+Unifications: 3025
 Conjuncts:    8176
 Disjuncts:    131
 

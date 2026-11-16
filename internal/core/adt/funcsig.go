@@ -2904,12 +2904,12 @@ func walkFuncEscapes(fn *Function, f func(r Node, up int32) bool) bool {
 // walkEscapes calls f for each reference in x, located inside depth scopes of
 // the function being walked, that refers to a scope outside that function. A
 // reference counts its levels from the scope it occurs in, so it escapes when
-// it goes up at least depth levels. Struct literals, list literals, function
-// bodies, and the for and let clauses of comprehensions count as scopes, as
-// each gets an environment of its own; a pattern or dynamic field is
-// evaluated in its struct's scope. It reports false if f does, or if x
-// contains a construct that it does not model, such as a try clause or an
-// evaluated value.
+// it goes up at least depth levels, or one more for a value reference such as
+// self. Struct literals, list literals, function bodies, and the for and let
+// clauses of comprehensions count as scopes, as each gets an environment of
+// its own; a pattern or dynamic field is evaluated in its struct's scope. It
+// reports false if f does, or if x contains a construct that it does not
+// model, such as a try clause or an evaluated value.
 func walkEscapes(x Node, depth int32, f func(r Node, up int32) bool) bool {
 	walk := func(xs ...Node) bool {
 		for _, x := range xs {
@@ -2932,6 +2932,11 @@ func walkEscapes(x Node, depth int32, f func(r Node, up int32) bool) bool {
 	case *LabelReference:
 		return ref(x.UpCount)
 	case *ValueReference:
+		// A count of zero is the vertex being evaluated, outside only at
+		// depth zero.
+		if depth > 0 && x.UpCount <= depth {
+			return true
+		}
 		return ref(x.UpCount)
 	case *SelectorExpr:
 		return walk(x.X)

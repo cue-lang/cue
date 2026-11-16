@@ -23,7 +23,6 @@ package lib
 		additionalProperties: false
 		properties: c: type: "string"
 	}
-	type:        "object"
 	description: "Package test is documented here."
 	$ref:        "#/$defs/S"
 }

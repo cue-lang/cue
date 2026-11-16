@@ -62,11 +62,7 @@ func TestGenerate(t *testing.T) {
 			Version:      version,
 			ExplicitOpen: t.HasTag("explicitOpen"),
 		})
-		if err != nil {
-			// TODO: packages of multiple files fail to generate.
-			fmt.Fprintf(t.Writer("schema"), "error: %v\n", err)
-			return
-		}
+		qt.Assert(t, qt.IsNil(err))
 		data, err := format.Node(r)
 		qt.Assert(t, qt.IsNil(err))
 		t.Writer("schema").Write(data)

@@ -2012,24 +2012,27 @@ func (v Value) ReferencePath() (root Value, p Path) {
 		// value regardless of whether structure sharing is enabled.
 		return Value{}, Path{}
 	}
-	c, count := v.v.SingleConjunct()
-	if count != 1 {
-		return Value{}, Path{}
+	var env *adt.Environment
+	var expr adt.Expr
+	if e, decls, ok := mergeFiles(v.v); ok {
+		// Files which only embed a reference, resolved in their scope.
+		if len(decls) != 1 {
+			return Value{}, Path{}
+		}
+		x, ok := decls[0].(adt.Expr)
+		if !ok {
+			return Value{}, Path{}
+		}
+		env = &adt.Environment{Up: e, Vertex: v.v}
+		expr = x
+	} else {
+		c, count := v.v.SingleConjunct()
+		if count != 1 {
+			return Value{}, Path{}
+		}
+		env, expr = c.EnvExpr()
 	}
 	ctx := v.ctx()
-
-	env, expr := c.EnvExpr()
-
-	if sl, ok := expr.(*adt.StructLit); ok && sl.IsFile() && len(sl.Decls) == 1 {
-		if e, ok := sl.Decls[0].(adt.Expr); ok {
-			// The value is at the top level and it has a single
-			// conjunct which is a StructLit representing the file
-			// holding a single embedding that may be a reference.
-			// The embedding is resolved in the scope of the file.
-			env = &adt.Environment{Up: env, Vertex: v.v}
-			expr = e
-		}
-	}
 
 	expr = v.unwrapDisjunction(env, expr)
 	x, path := reference(v.idx, ctx, env, expr)
@@ -2395,6 +2398,9 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 // reports. Values that are not expressions, such as a
 // struct literal without embeddings, report [NoOp] and the value itself, or
 // the surviving disjunct when it is such a value.
+//
+// The files of a package are reported as a single file would be;
+// use [Value.BuildInstance] to get each file.
 func (v Value) Expr() (Op, []Value) {
 	// TODO: return v if this is complete? Yes for now
 	if v.v == nil {
@@ -2425,6 +2431,10 @@ func (v Value) Expr() (Op, []Value) {
 		}
 
 	default:
+		if e, decls, ok := mergeFiles(v.v); ok {
+			env, expr = e, &adt.StructLit{Decls: decls}
+			break
+		}
 		a := []Value{}
 		ctx := v.ctx()
 		for c := range v.v.LeafConjuncts() {
@@ -2666,6 +2676,28 @@ process:
 		a = append(a, v)
 	}
 	return op, a
+}
+
+// mergeFiles returns the declarations and shared environment of the files
+// making up v, or false unless every conjunct is a file in one environment.
+// Files share the scope of v, so they cannot be described apart.
+func mergeFiles(v *adt.Vertex) (env *adt.Environment, decls []adt.Decl, ok bool) {
+	n := 0
+	for c := range v.LeafConjuncts() {
+		e, x := c.EnvExpr()
+		sl, ok := x.(*adt.StructLit)
+		if !ok || !sl.IsFile() || (n > 0 && e != env) {
+			return nil, nil, false
+		}
+		if n == 0 {
+			// Clip so that appending never writes to the file's declarations.
+			env, decls = e, slices.Clip(sl.Decls)
+		} else {
+			decls = append(decls, sl.Decls...)
+		}
+		n++
+	}
+	return env, decls, n > 0
 }
 
 // survivingDisjuncts returns the disjuncts of x that remain once the default

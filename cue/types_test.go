@@ -4355,7 +4355,7 @@ package lib
 X: {}
 `,
 		path:           "",
-		want:           "", // ReferencePath only looks through a single file.
+		want:           "X",
 		wantImportPath: "example.com/lib",
 		alt:            "{}",
 	}, {
@@ -4936,8 +4936,7 @@ package x
 
 #A
 `,
-		// Each file is described out of the package's scope.
-		want: `&({#A:{c?:string}} .(〈〉 "#A")); undefined field: #A`,
+		want: `&(.(〈〉 "#A") {#A:{c?:string}})`,
 	}, {
 		files: `
 -- a.cue --
@@ -4949,8 +4948,7 @@ package x
 
 b: a
 `,
-		// Each file is described out of the package's scope.
-		want: `&({a:1} {b:a}); b: undefined field: a`,
+		want: `{a:1} & {b:a}`,
 	}, {
 		// Fields next to an embedding may refer to other files.
 		files: `
@@ -4965,8 +4963,7 @@ package x
 _A
 b: _B
 `,
-		// Each file is described out of the package's scope.
-		want: `&({_A(:x):{c?:string},_B(:x):1} &(.(〈〉 "_A") {b:_B(:x)})); undefined field: _A`,
+		want: `&(.(〈〉 "_A") {_A(:x):{c?:string},_B(:x):1,b:_B(:x)})`,
 	}, {
 		// A file declaring nothing leaves a single embedding.
 		files: `
@@ -4987,8 +4984,7 @@ package lib
 
 #S: {c?: string}
 `,
-		// Each file is described out of the package's scope.
-		want: `&({} .("example.com/lib" "#S"))`,
+		want: `.("example.com/lib" "#S")`,
 	}, {
 		input: "v: 3 + 4",
 		want:  "+(3 4)",

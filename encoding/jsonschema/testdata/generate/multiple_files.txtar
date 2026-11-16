@@ -8,4 +8,13 @@ package test
 
 x?: #A
 -- out/generate-v3/schema --
-error: reference #A not found
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: A: {
+		type:                 "object"
+		additionalProperties: false
+		properties: c: type: "string"
+	}
+	type: "object"
+	properties: x: $ref: "#/$defs/A"
+}

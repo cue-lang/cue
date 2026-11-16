@@ -227,6 +227,14 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 
 	v.Conjuncts = slices.Clip(v.Conjuncts)
 
+	// A list marker is updated in place as conjuncts are added; see
+	// [nodeContext.updateListType]. A clone needs its own, or a disjunct
+	// that closes the list closes it for the other disjuncts as well.
+	if m, ok := v.BaseValue.(*ListMarker); ok {
+		c := *m
+		v.BaseValue = &c
+	}
+
 	if a := x.Arcs; len(a) > 0 {
 		// TODO(perf): reuse buffer.
 		v.Arcs = make([]*Vertex, len(a))

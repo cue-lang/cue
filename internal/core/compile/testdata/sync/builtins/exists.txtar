@@ -738,9 +738,6 @@ defaultedList: {
 	d: exists(plain[5])
 
 	// A disjunct that closes the list does not close it for the others.
-	//
-	// TODO: the open list reads as closed once the disjunction is unified
-	// with a list.
 	unified: (*[1, ...] | [2]) & [...]
 	e: exists(unified[5])
 	pruned: ([1, ...] | [2]) & [1, ...]

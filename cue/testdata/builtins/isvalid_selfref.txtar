@@ -1,11 +1,6 @@
 # isValid applied, within a definition, to a copy of that definition, where
 # a builtin implemented in Go finalizes the definition from within its own
 # evaluation.
-#
-# TODO: this overflows the stack, so it is not run. Once it runs, drop the
-# two tags and turn the expected values into @test assertions.
-#skip
-#inlinetest:exclude skip: overflows the stack.
 
 -- in.cue --
 @experiment(predicates)
@@ -13,23 +8,47 @@
 import "reflect"
 
 // The copy holds the call to isValid as well, and so does the copy that its
-// post-check evaluates. Allows finalizes #A, and with it the copy, from
-// within the evaluation of #A.
+// post-check evaluates. The check is replayed in the cycle context of the
+// call, which recognizes this as a cycle. Allows finalizes #A, and with it
+// the copy, from within the evaluation of #A.
 selfReference: {
-	// zz is not allowed in #A, so the copy is not valid.
+	// zz is not allowed in #A, so the copy is not valid. That is not how the
+	// answer comes about, though: a copy of #A within #A reads as a
+	// structural cycle, whatever it is unified with.
 	invalid: {
 		#A: {
 			b: 1
-			c: reflect.Allows(#A, "zz")   // false
-			u: isValid(#A & {zz: 1})      // false
+			c: reflect.Allows(#A, "zz")
+			u: isValid(#A & {zz: 1})
+			@test(eq, {b: 1, c: false, u: false})
 		}
 	}
-	// The copy is valid.
+	// So a copy that is valid is not reported as such, and the post-check
+	// then finds that the answer changed.
+	//
+	// TODO: u should be true.
 	valid: {
 		#A: {
 			b: 1
-			c: reflect.Allows(#A, "zz")   // false
-			u: isValid(#A & {b: 1})       // true
+			c: reflect.Allows(#A, "zz")
+			u: isValid(#A & {b: 1})
+			@test(err, code=cycle, contains="circular dependency in evaluation of conditionals", incorrect)
+			@test(eq:todo, {b: 1, c: false, u: true}, p=1)
 		}
 	}
 }
+-- out/errors.txt --
+[cycle] selfReference.valid.#A: circular dependency in evaluation of conditionals: (#A & {b:1}) changed after evaluation:
+    ./in.cue:29:15
+-- out/eval/stats --
+Leaks:  0
+Freed:  57
+Reused: 41
+Allocs: 16
+Retain: 0
+
+Unifications: 57
+Conjuncts:    66
+Disjuncts:    0
+
+NumCloseIDs: 10

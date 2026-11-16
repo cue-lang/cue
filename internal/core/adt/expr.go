@@ -2697,6 +2697,10 @@ func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectErr
 // report whether it still holds. If it reports false, a cycle error is
 // added, as the committed result was order-dependent.
 //
+// The check is replayed in the cycle context of the call, which is recorded
+// with it: a check that evaluates a copy of the node it is registered on is
+// otherwise not recognized as cyclic, and expands without bound.
+//
 // verify must not register further post-checks: checks added while the
 // post-checks for a node run are not executed.
 func (c *OpContext) RegisterPostCheck(x Expr, verify func(c *OpContext, env *Environment) bool) {
@@ -2704,6 +2708,7 @@ func (c *OpContext) RegisterPostCheck(x Expr, verify func(c *OpContext, env *Env
 	if n := env.DerefVertex(c).state; n != nil {
 		n.postChecks = append(n.postChecks, envCheck{
 			env:    env,
+			ci:     c.ci,
 			expr:   x,
 			verify: verify,
 		})

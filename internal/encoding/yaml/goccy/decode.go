@@ -5,6 +5,7 @@
 package goccy
 
 import (
+	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -149,15 +150,38 @@ func NewDecoder(filename string, b []byte) *decoder {
 	// may point just past the end of the input in edge cases.
 	tokFile := token.NewFile(filename, 0, len(b)+1)
 	tokFile.SetLinesForContent(b)
-	tokens := normalizeMergeKeys(ylexer.Tokenize(string(b)))
+	lines := append(tokFile.Lines(), len(b))
+	tokens := normalizeMergeKeys(fixCommentCRLFLines(ylexer.Tokenize(string(b)), b, lines))
 	return &decoder{
 		src:        b,
 		tokFile:    tokFile,
-		tokLines:   append(tokFile.Lines(), len(b)),
+		tokLines:   lines,
 		segments:   splitDocuments(tokens),
 		lastOffset: -1,
 		scopeEnd:   len(b),
 	}
+}
+
+// fixCommentCRLFLines corrects the line numbers of the tokens following
+// a comment which ends in a CRLF line break. goccy's lexer ends such a
+// comment at the CR and then counts the LF as a line break of its own.
+// lines holds the start offset of each line in src, followed by len(src).
+//
+// TODO: drop this once https://github.com/goccy/go-yaml/issues/560 is fixed.
+func fixCommentCRLFLines(tokens ytoken.Tokens, src []byte, lines []int) ytoken.Tokens {
+	extra := 0
+	for _, tk := range tokens {
+		if tk.Position == nil {
+			continue
+		}
+		tk.Position.Line -= extra
+		// Line n, counting from 1, ends just before lines[n].
+		if n := tk.Position.Line; tk.Type == ytoken.CommentType && strings.HasSuffix(tk.Origin, "\r") &&
+			n < len(lines) && bytes.HasSuffix(src[:lines[n]], []byte("\r\n")) {
+			extra++
+		}
+	}
+	return tokens
 }
 
 // normalizeMergeKeys rewrites explicitly tagged merge keys such as

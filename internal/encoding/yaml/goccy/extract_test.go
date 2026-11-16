@@ -15,11 +15,9 @@
 package goccy_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/encoding/yaml/goccy"
 )
@@ -95,22 +93,11 @@ b: "two"`,
 		// line breaks.
 		name: "CRLF after comment",
 		yaml: "a: 1 # c\r\n# d\r\nb: 2\r\n",
-		// TODO: the decoder panics on the resulting line numbers.
-		want: "",
-		errs: []string{"panic: runtime error: index out of range"},
+		want: "a: 1 // c\n// d\nb: 2",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var f *ast.File
-			var err error
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						f, err = &ast.File{}, fmt.Errorf("panic: %v", r)
-					}
-				}()
-				f, err = goccy.ExtractLenient("t.yaml", []byte(tc.yaml))
-			}()
+			f, err := goccy.ExtractLenient("t.yaml", []byte(tc.yaml))
 			if f == nil {
 				t.Fatal("ExtractLenient returned a nil file")
 			}

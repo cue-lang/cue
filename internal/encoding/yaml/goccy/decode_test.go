@@ -835,15 +835,20 @@ a:
 	},
 
 	// CRLF line breaks.
-	// TODO: with CRLF line breaks, goccy counts lines wrongly after a
-	// comment, which misplaces the comment, and folds a multi-line
-	// quoted scalar as if its line breaks were literal. An input such as
-	// "a: 1 # c\r\n# d\r\nb: 2\r\n" even panics with an index out of
-	// range, so it is left out. See https://github.com/goccy/go-yaml/issues/560.
 	{
 		"a: 1\r\n# c\r\nb: 2\r\n",
-		"// c\na: 1\nb: 2",
+		"a: 1\n// c\nb: 2",
 	},
+	{
+		"a: 1 # c\r\n# d\r\nb: 2\r\n",
+		"a: 1 // c\n// d\nb: 2",
+	},
+	{
+		"? a # c\r\n: b\r\n\r\n# d\r\nx: 1\r\n",
+		"a:\n\t\"b\"\n\n// d\nx: 1",
+	},
+	// TODO: with CRLF line breaks, goccy folds a multi-line quoted scalar
+	// as if its line breaks were literal.
 	{
 		"a: \"x\r\n  y\"\r\n",
 		"a: \"\"\"\n\tx\n\ty\n\t\"\"\"",

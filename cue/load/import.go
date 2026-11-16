@@ -445,9 +445,10 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.ModuleFile = mf
 	setFSLoc(l.cfg, i)
 
-	if parts.Version == "" && !mv.IsLocal() {
-		parts.Version = semver.Major(mv.Version())
-	}
+	// Take the major version from the module path, as the main module has
+	// no version. Local packages in cue.mod are found regardless of the
+	// major version, so they have none.
+	_, parts.Version, _ = ast.SplitPackageVersion(mv.Path())
 	i.CanonicalID = parts.Canonical().String()
 
 	return i

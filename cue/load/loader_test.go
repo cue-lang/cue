@@ -96,7 +96,7 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "ExplicitPackageWithNonCUEDirectories",
 		cfg: &Config{
@@ -151,7 +151,7 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "RelativeImportPathWildcard",
 		cfg:  dirCfg,
@@ -212,12 +212,13 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "ExplicitPackageIdentifier",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:test"},
 		want: `path:   mod.test/test/hello:test
+id:     mod.test/test/hello@v0:test
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
@@ -226,7 +227,7 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		// A trailing slash may come before a package qualifier or version.
 		name: "RelativePathTrailingSlashQualifier",
@@ -241,12 +242,13 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "ExplicitPackageIdentifierTrailingSlash",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello/:test"},
 		want: `path:   mod.test/test/hello:test
+id:     mod.test/test/hello@v0:test
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
@@ -255,7 +257,7 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "ExplicitPackageIdentifierTrailingSlashVersion",
 		cfg:  dirCfg,
@@ -269,7 +271,7 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "NoPackageName",
 		cfg:  dirCfg,
@@ -589,7 +591,7 @@ display:.
 files:
     $CWD/testdata/testmod/multi2/other.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		name: "ExplicitPackageWithUnqualifiedImportPath#3",
 		cfg: &Config{
@@ -605,7 +607,7 @@ display:.
 files:
     $CWD/testdata/testmod/multi3/other.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		// Test that we can explicitly ask for non-package
 		// CUE files by setting Config.Package to "_".
@@ -656,8 +658,8 @@ display:.
 files:
     $CWD/testdata/testmod/tagswithimports/prod.cue
 imports:
-    mod.test/test/hello:test: $CWD/testdata/testmod/test.cue $CWD/testdata/testmod/hello/test.cue
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/hello:test (id mod.test/test/hello@v0:test): $CWD/testdata/testmod/test.cue $CWD/testdata/testmod/hello/test.cue
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		// Check that imports are only considered from files
 		// that match the build paths. When we don't have the prod
@@ -770,7 +772,7 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue`}, {
 		// This test checks that we can use a :pkg selector
 		// to select named packages from multi-package directories.
 		name: "Issue4110",
@@ -802,8 +804,6 @@ files:
 	}, {
 		// A package loaded as a root and imported with and without a major
 		// version must have one ID, which scopes its hidden fields.
-		// The import without a major version has an ID without it,
-		// unlike the root instance and the import with a major version.
 		name: "MainModulePackageIDs",
 		cfg:  dirCfg,
 		args: []string{"./sub", "./spellings"},
@@ -823,17 +823,16 @@ display:./spellings
 files:
     $CWD/testdata/testmod/spellings/spellings.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue
+    mod.test/test/sub (id mod.test/test/sub@v0): $CWD/testdata/testmod/sub/sub.cue
     mod.test/test/sub@v0: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
 		// A package in cue.mod is found regardless of the major version,
 		// so its one ID has none, even when loaded as a root with one.
-		// The root instance has an ID with the major version it was loaded
-		// by, unlike the import.
 		name: "LocalPackageIDs",
 		cfg:  dirCfg,
 		args: []string{"mod.test/catch@v0", "./imports"},
 		want: `path:   mod.test/catch@v0
+id:     mod.test/catch
 module: local
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cue.mod/gen/mod.test/catch

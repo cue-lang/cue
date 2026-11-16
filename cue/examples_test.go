@@ -58,7 +58,7 @@ bar: _foo
 
 	v := load(file).Value()
 
-	v = v.FillPath(cue.MakePath(cue.Hid("_foo", "mod.test/foo:bar")), 1)
+	v = v.FillPath(cue.MakePath(cue.Hid("_foo", "mod.test/foo@v0:bar")), 1)
 	v = v.FillPath(cue.MakePath(cue.Hid("_foo", "_")), 2)
 	fmt.Println(v.LookupPath(cue.ParsePath("bar")).Int64())
 	fmt.Println(v.LookupPath(cue.ParsePath("baz")).Int64())

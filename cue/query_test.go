@@ -408,7 +408,7 @@ _d: 3
 		pkg  string
 	}{{
 		path: cue.ParsePath("a"),
-		pkg:  "mod.test/foo",
+		pkg:  "mod.test/foo@v0",
 	}, {
 		path: cue.ParsePath("b"),
 		pkg:  "_",

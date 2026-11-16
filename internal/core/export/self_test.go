@@ -44,7 +44,7 @@ func TestSelfContained(t *testing.T) {
 		Matrix: cuetdtest.FullMatrix,
 
 		ToDo: map[string]string{
-			"self-v3/selfcontained/import": `wa: reference "_hidden_567475F3" not found:`,
+			"self-v3/selfcontained/import": `wa: reference "_hidden_5C58A63B" not found:`,
 
 			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
 			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,

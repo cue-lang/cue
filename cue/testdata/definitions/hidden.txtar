@@ -27,7 +27,7 @@ f: pkg.#D & {_val: f: 4} @test(debugCheck, """
 	  _val(mod.test@v0:foo): (struct){
 	    f: (int){ 4 }
 	  }
-	  _val(mod.test/pkg): (#struct){
+	  _val(mod.test/pkg@v0): (#struct){
 	    f: (int){ 3 }
 	  }
 	}

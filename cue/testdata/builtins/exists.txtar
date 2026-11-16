@@ -600,6 +600,17 @@ countNDefaultedList: {
 		z: 1
 		@test(err, code=incomplete, contains="countN: second argument is not a resolved list")
 	}
+	// An open list that is the default stays open: it may still gain
+	// conditions, as an open list that is not a default may.
+	//
+	// TODO: the shortfall is reported as a permanent error.
+	zs: *[true, ...bool] | [false]
+	w: {
+		countN(>=2, zs)
+		z: 1
+		@test(err, code=eval, contains="%s: %d matched, expected %v", args=[countN, 1, >=2], incorrect)
+		@test(err:todo, code=incomplete, contains="%s: %d matched, expected %v", args=[countN, 1, >=2], p=1)
+	}
 }
 
 // An open list may still gain conditions, so a shortfall in one is incomplete:
@@ -997,74 +1008,77 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./review.cue:155:5
 [incomplete] countNDefaultedList.y: countN: second argument is not a resolved list:
     ./review.cue:180:3
+[eval] countNDefaultedList.w: countN: 1 matched, expected >=2:
+    ./review.cue:190:3
+    ./review.cue:190:10
 [incomplete] countNOpenList.#AtLeastOne: countN: 0 matched, expected >=1:
-    ./review.cue:193:3
-    ./review.cue:193:10
+    ./review.cue:204:3
+    ./review.cue:204:10
 [eval] countNOpenList.two: countN: 2 matched, expected <=1:
-    ./review.cue:201:3
-    ./review.cue:201:10
+    ./review.cue:212:3
+    ./review.cue:212:10
 [eval] countNOpenList.over: countN: 2 matched, expected <=1:
-    ./review.cue:213:3
-    ./review.cue:213:10
+    ./review.cue:224:3
+    ./review.cue:224:10
 [eval] 1: conflicting values 2 and 1:
-    ./review.cue:223:20
-    ./review.cue:223:24
+    ./review.cue:234:20
+    ./review.cue:234:24
 [eval] 0: conflicting values 2 and 1:
-    ./review.cue:228:14
-    ./review.cue:228:18
+    ./review.cue:239:14
+    ./review.cue:239:18
 [eval] countNElementOrder.c: countN: element must be a boolean, found int:
-    ./review.cue:233:3
+    ./review.cue:244:3
 [incomplete] compoundBound.tooFew: existsN: 2 matched, expected >=3 & <=4:
-    ./review.cue:252:3
-    ./review.cue:252:11
-    ./review.cue:252:17
+    ./review.cue:263:3
+    ./review.cue:263:11
+    ./review.cue:263:17
 [eval] compoundBound.never: existsN: 2 matched, expected >=5 & <=6:
-    ./review.cue:257:3
-    ./review.cue:257:11
-    ./review.cue:257:17
+    ./review.cue:268:3
+    ./review.cue:268:11
+    ./review.cue:268:17
 [eval] compoundBound.tooMany: countN: 3 matched, expected 1 | 2:
-    ./review.cue:262:3
+    ./review.cue:273:3
 [eval] clauseVariables.key.0: exists: argument must be a field reference, selector, or index expression:
-    ./review.cue:274:26
+    ./review.cue:285:26
 [eval] clauseVariables.key.1: exists: argument must be a field reference, selector, or index expression:
-    ./review.cue:274:26
+    ./review.cue:285:26
 [eval] clauseVariables.value.0: exists: argument must be a field reference, selector, or index expression:
-    ./review.cue:275:26
+    ./review.cue:286:26
 [eval] clauseVariables.value.1: exists: argument must be a field reference, selector, or index expression:
-    ./review.cue:275:26
+    ./review.cue:286:26
 [eval] clauseVariables.count.0: existsN: argument must be a field reference, selector, or index expression:
-    ./review.cue:276:26
+    ./review.cue:287:26
 [eval] clauseVariables.count.1: existsN: argument must be a field reference, selector, or index expression:
-    ./review.cue:276:26
+    ./review.cue:287:26
 [eval] clauseVariables.letVar.x: exists: argument must be a field reference, selector, or index expression:
-    ./review.cue:281:6
+    ./review.cue:292:6
 [eval] wrongKindLabel.a: exists: invalid field a (found list, want struct):
-    ./review.cue:292:5
+    ./review.cue:303:5
 [eval] wrongKindLabel.b: exists: invalid index 3 (found struct, want list):
-    ./review.cue:293:5
+    ./review.cue:304:5
 [eval] wrongKindLabel.regular: exists: invalid field a (found list, want struct):
-    ./review.cue:302:13
+    ./review.cue:313:13
 [eval] closedSubjectInProgress.before.z: exists: field zz not allowed by closed struct:
-    ./review.cue:319:6
+    ./review.cue:330:6
 [eval] closedSubjectInProgress.after.z: exists: field zz not allowed by closed struct:
-    ./review.cue:322:6
+    ./review.cue:333:6
 [eval] closedSubjectInProgress.within.d.z: exists: field zz not allowed by closed struct:
-    ./review.cue:329:9
+    ./review.cue:340:9
 [eval] closedSubjectInProgress.withinEllipsis.d.z: exists: field zz not allowed by closed struct:
-    ./review.cue:334:9
+    ./review.cue:345:9
 [eval] closedSubjectInProgress.withinNested.d.y.z: exists: field zz not allowed by closed struct:
-    ./review.cue:340:7
+    ./review.cue:351:7
 [eval] defaultedList.c: exists: index 5 out of range:
-    ./review.cue:367:5
+    ./review.cue:378:5
 -- out/eval/stats --
 Leaks:  91
-Freed:  966
-Reused: 895
+Freed:  975
+Reused: 904
 Allocs: 162
 Retain: 0
 
-Unifications: 953
-Conjuncts:    1395
-Disjuncts:    66
+Unifications: 960
+Conjuncts:    1408
+Disjuncts:    68
 
 NumCloseIDs: 37

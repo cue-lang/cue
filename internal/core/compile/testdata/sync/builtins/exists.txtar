@@ -554,6 +554,15 @@ countNDefaultedList: {
 		countN(1, ys)
 		z: 1
 	}
+	// An open list that is the default stays open: it may still gain
+	// conditions, as an open list that is not a default may.
+	//
+	// TODO: the shortfall is reported as a permanent error.
+	zs: *[true, ...bool] | [false]
+	w: {
+		countN(>=2, zs)
+		z: 1
+	}
 }
 
 // An open list may still gain conditions, so a shortfall in one is incomplete:
@@ -1607,6 +1616,16 @@ guardedDisjunct: {
     ])
     y: {
       countN(1, 〈1;ys〉)
+      z: 1
+    }
+    zs: (*[
+      true,
+      ...bool,
+    ]|[
+      false,
+    ])
+    w: {
+      countN(>=2, 〈1;zs〉)
       z: 1
     }
   }

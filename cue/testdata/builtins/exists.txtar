@@ -794,6 +794,15 @@ defaultedList: {
 	c: exists(closed[5])   @test(err, code=eval, contains="%s: index %d out of range", args=[exists, 5])
 	plain: [1, ...]
 	d: exists(plain[5])    @test(eq, false)
+
+	// A disjunct that closes the list does not close it for the others.
+	//
+	// TODO: the open list reads as closed once the disjunction is unified
+	// with a list.
+	unified: (*[1, ...] | [2]) & [...]
+	e: exists(unified[5])  @test(err, code=eval, contains="%s: index %d out of range", args=[exists, 5], incorrect) @test(eq:todo, false, p=1)
+	pruned: ([1, ...] | [2]) & [1, ...]
+	f: exists(pruned[5])   @test(err, code=eval, contains="%s: index %d out of range", args=[exists, 5], incorrect) @test(eq:todo, false, p=1)
 }
 
 -- cycle.cue --
@@ -1067,15 +1076,19 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./review.cue:348:7
 [eval] defaultedList.c: exists: index 5 out of range:
     ./review.cue:375:5
+[eval] defaultedList.e: exists: index 5 out of range:
+    ./review.cue:384:5
+[eval] defaultedList.f: exists: index 5 out of range:
+    ./review.cue:386:5
 -- out/eval/stats --
-Leaks:  91
-Freed:  975
-Reused: 904
-Allocs: 162
+Leaks:  93
+Freed:  988
+Reused: 918
+Allocs: 163
 Retain: 0
 
-Unifications: 960
-Conjuncts:    1408
-Disjuncts:    68
+Unifications: 969
+Conjuncts:    1430
+Disjuncts:    72
 
 NumCloseIDs: 37

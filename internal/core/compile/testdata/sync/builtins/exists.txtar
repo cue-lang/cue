@@ -736,6 +736,15 @@ defaultedList: {
 	c: exists(closed[5])
 	plain: [1, ...]
 	d: exists(plain[5])
+
+	// A disjunct that closes the list does not close it for the others.
+	//
+	// TODO: the open list reads as closed once the disjunction is unified
+	// with a list.
+	unified: (*[1, ...] | [2]) & [...]
+	e: exists(unified[5])
+	pruned: ([1, ...] | [2]) & [1, ...]
+	f: exists(pruned[5])
 }
 
 -- cycle.cue --
@@ -1885,5 +1894,24 @@ guardedDisjunct: {
       ...,
     ]
     d: exists(〈0;plain〉[5])
+    unified: ((*[
+      1,
+      ...,
+    ]|[
+      2,
+    ]) & [
+      ...,
+    ])
+    e: exists(〈0;unified〉[5])
+    pruned: (([
+      1,
+      ...,
+    ]|[
+      2,
+    ]) & [
+      1,
+      ...,
+    ])
+    f: exists(〈0;pruned〉[5])
   }
 }

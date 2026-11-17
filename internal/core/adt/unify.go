@@ -590,6 +590,16 @@ func (n *nodeContext) runChecks(c *OpContext) {
 	}
 }
 
+// failsDisjunct reports whether arc a of n holds a permanent error, which
+// eliminates the disjunct n is part of whatever its other arcs hold.
+func (n *nodeContext) failsDisjunct(a *Vertex) bool {
+	if !n.isDisjunct || !a.faultsParent() {
+		return false
+	}
+	b := a.Bottom()
+	return b != nil && !b.IsIncomplete()
+}
+
 func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos bool) bool {
 	if n.underlying != nil {
 		// References within the disjunct may end up referencing the layer that
@@ -631,14 +641,10 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 			success = false
 		}
 
-		// A failing field eliminates the disjunct this node is part of;
-		// its remaining arcs cannot change that, so skip their work.
 		// TODO: leave the skipped arcs out of the error message, which now
 		// prints them as cycle errors.
-		if n.isDisjunct && a.faultsParent() {
-			if b := a.Bottom(); b != nil && !b.IsIncomplete() {
-				break
-			}
+		if n.failsDisjunct(a) {
+			break
 		}
 
 		// At this point we need to ensure that all notification cycles

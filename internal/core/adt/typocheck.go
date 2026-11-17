@@ -751,8 +751,15 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
+	// The arcs after one which fails the disjunct were not evaluated: they
+	// lack evidence of being allowed, and their errors would replace its own.
+	arcs := v.Arcs
+	if i := slices.IndexFunc(arcs, n.failsDisjunct); i >= 0 {
+		arcs = arcs[:i+1]
+	}
+
 	var err *Bottom
-	for _, a := range v.Arcs {
+	for _, a := range arcs {
 		f := a.Label
 
 		// TODO(mem): child states of uncompleted nodes must have a state.

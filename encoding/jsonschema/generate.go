@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/internal/anyhash"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/value"
 )
 
@@ -341,6 +342,8 @@ func newGenerator(cfg *GenerateConfig) (*generator, error) {
 		dialect: d,
 		defs:    anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
 		unique:  newUniqueItems(),
+
+		describing: make(map[adt.Expr]bool),
 	}, nil
 }
 
@@ -559,6 +562,10 @@ type generator struct {
 	redirectFrom   *CUERef
 	redirectTo     *CUERef
 	inliningNonDef bool
+
+	// describing holds the references in [generator.makeEvaluatedItem],
+	// to end cycles through them.
+	describing map[adt.Expr]bool
 }
 
 func (g *generator) addError(pos cue.Value, err error) {
@@ -826,6 +833,11 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		// This allows for gradual implementation of more function types.
 		return &itemTrue{}
 	}
+	if ref := unfollowedRef(v); (ref != nil || op == cue.SelectorOp || op == cue.IndexOp) && !value.Vertex(v).IsData() {
+		// An index, a let or an embedding like `{#A}` may hide a disjunction
+		// or a validator. IsData skips its evaluated copy.
+		return g.makeEvaluatedItem(v, ref, mode)
+	}
 	if !v.IsNull() {
 		// We want to encode null as {type: "null"} not {const: null}
 		// so then there's a possibility of collapsing it together in
@@ -875,6 +887,33 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	return &itemAllOf{
 		elems: elems,
 	}
+}
+
+// makeEvaluatedItem describes v by its evaluated value, or as any value when
+// v refers back to itself through ref, keeping a defer out of makeItem0.
+func (g *generator) makeEvaluatedItem(v cue.Value, ref adt.Expr, mode closedMode) item {
+	if ref != nil {
+		if g.describing[ref] {
+			return &itemTrue{}
+		}
+		g.describing[ref] = true
+		defer delete(g.describing, ref)
+	}
+	return g.makeItem0(v.Eval(), mode)
+}
+
+// unfollowedRef returns the single reference which v is defined by,
+// such as an index or a let, or nil.
+func unfollowedRef(v cue.Value) adt.Expr {
+	c, n := value.Vertex(v).SingleConjunct()
+	if n != 1 {
+		return nil
+	}
+	e := c.Expr()
+	if _, ok := e.(adt.Resolver); !ok {
+		return nil
+	}
+	return e
 }
 
 // constExpr returns the "constant" value of a given

@@ -1,0 +1,107 @@
+# Cycles through references which the generator does not follow.
+# See https://cuelang.org/issue/4590
+-- test.cue --
+package test
+
+lists: [[...lists[0]]]
+listCycle: lists[0]
+
+// The fields of a struct within a let may refer to one another.
+
+let FieldCycle = {a: {b: c, c: b}}
+fieldCycle: FieldCycle.a
+
+let EmbeddedFieldCycle = {a: {b: {c}, c: {b}}}
+embeddedFieldCycle: EmbeddedFieldCycle.a
+
+let ConjunctionFieldCycle = {a: {b: c & {}, c: b & {}}}
+conjunctionFieldCycle: ConjunctionFieldCycle.a
+
+// An optional field may refer back to its own list element.
+
+#T: {a: int} | {n?: elems[0]}
+elems: [#T]
+disjunctionCycle: elems[0]
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: T: anyOf: [{
+		type:                 "object"
+		additionalProperties: false
+		properties: a: type: "integer"
+		required: ["a"]
+	}, {
+		type:                 "object"
+		additionalProperties: false
+		properties: n: anyOf: [{
+			type:                 "object"
+			additionalProperties: false
+			properties: a: type: "integer"
+			required: ["a"]
+		}, {
+			type:                 "object"
+			additionalProperties: false
+			properties: n: true
+		}]
+	}]
+	type: "object"
+	properties: {
+		conjunctionFieldCycle: {
+			type: "object"
+			properties: {
+				b: type: "object"
+				c: type: "object"
+			}
+		}
+		disjunctionCycle: anyOf: [{
+			type: "object"
+			properties: a: type: "integer"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: n: anyOf: [{
+				type: "object"
+				properties: a: type: "integer"
+				required: ["a"]
+			}, {
+				type: "object"
+				properties: n: true
+			}]
+		}]
+		elems: {
+			type:        "array"
+			prefixItems: [{$ref: "#/$defs/T"}]
+			maxItems:    1
+			minItems:    1
+		}
+		embeddedFieldCycle: {
+			type: "object"
+			properties: {
+				b: type: "object"
+				c: type: "object"
+			}
+		}
+		fieldCycle: {
+			type: "object"
+			properties: {
+				b: true
+				c: true
+			}
+			required: ["b", "c"]
+		}
+		listCycle: {
+			type: "array"
+			items: type: "array"
+		}
+		lists: {
+			type: "array"
+			prefixItems: [{
+				type: "array"
+				items: type: "array"
+			}]
+			maxItems: 1
+			minItems: 1
+		}
+	}
+	required: ["disjunctionCycle", "elems", "fieldCycle"]
+}

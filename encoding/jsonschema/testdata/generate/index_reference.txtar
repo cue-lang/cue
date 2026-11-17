@@ -1,0 +1,235 @@
+# Indexes into lists.
+# See https://cuelang.org/issue/4590
+-- test.cue --
+package test
+
+import "struct"
+
+#A: {a: string}
+#Choice: {a: string} | {b: string}
+B: {b: string}
+
+disjunctions: [{a: string} | {b: string}]
+indexDisjunction: disjunctions[0]
+
+structs: [{a: string}]
+index: structs[0]
+embeddedIndex: {structs[0]}
+
+definitions: [#A]
+indexDefinition: definitions[0]
+
+let Definitions = [#A]
+letIndexDefinition: Definitions[0]
+
+// Only the arm from a definition is closed.
+
+mixed: [#A | B]
+indexMixedDisjunction: mixed[0]
+
+// The index selects from the default list.
+
+defaulted: *[#A] | [string]
+indexDefaultedList: defaulted[0]
+
+// Embedding is strict, so c is not allowed.
+
+embeddings: [{#Choice, c?: int}]
+indexEmbeddedDisjunction: embeddings[0]
+
+// A validator does not close a struct, even within a definition.
+
+validators: [struct.MinFields(1)]
+#D: x: validators[0]
+indexValidator: #D
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		A: {
+			type:                 "object"
+			additionalProperties: false
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		B: {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}
+		Choice: anyOf: [{
+			type:                 "object"
+			additionalProperties: false
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type:                 "object"
+			additionalProperties: false
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		D: {
+			type:                 "object"
+			additionalProperties: false
+			properties: x: {
+				type:          "object"
+				minProperties: 1
+			}
+			required: ["x"]
+		}
+	}
+	type: "object"
+	properties: {
+		B: {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}
+		defaulted: anyOf: [{
+			type:        "array"
+			prefixItems: [{$ref: "#/$defs/A"}]
+			maxItems:    1
+			minItems:    1
+		}, {
+			type:        "array"
+			prefixItems: [{type: "string"}]
+			maxItems:    1
+			minItems:    1
+		}]
+		definitions: {
+			type:        "array"
+			prefixItems: [{$ref: "#/$defs/A"}]
+			maxItems:    1
+			minItems:    1
+		}
+		disjunctions: {
+			type: "array"
+			prefixItems: [{
+				anyOf: [{
+					type: "object"
+					properties: a: type: "string"
+					required: ["a"]
+				}, {
+					type: "object"
+					properties: b: type: "string"
+					required: ["b"]
+				}]
+			}]
+			maxItems: 1
+			minItems: 1
+		}
+		embeddedIndex: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		embeddings: {
+			type: "array"
+			prefixItems: [{
+				type: "object"
+				properties: c: type: "integer"
+				$ref: "#/$defs/Choice"
+			}]
+			maxItems: 1
+			minItems: 1
+		}
+		index: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		indexDefaultedList: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		indexDefinition: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		indexDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		indexEmbeddedDisjunction: anyOf: [{
+			type: "object"
+			properties: {
+				a: type: "string"
+				c: true
+			}
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: {
+				b: type: "string"
+				c: true
+			}
+			required: ["b"]
+		}]
+		indexMixedDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		indexValidator: $ref: "#/$defs/D"
+		letIndexDefinition: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		mixed: {
+			type:        "array"
+			prefixItems: [{anyOf: [{$ref: "#/$defs/A"}, {$ref: "#/$defs/B"}]}]
+			maxItems:    1
+			minItems:    1
+		}
+		structs: {
+			type: "array"
+			prefixItems: [{
+				type: "object"
+				properties: a: type: "string"
+				required: ["a"]
+			}]
+			maxItems: 1
+			minItems: 1
+		}
+		validators: {
+			type: "array"
+			prefixItems: [{
+				type:          "object"
+				minProperties: 1
+			}]
+			maxItems: 1
+			minItems: 1
+		}
+	}
+	required: [
+		"B",
+		"defaulted",
+		"definitions",
+		"disjunctions",
+		"embeddedIndex",
+		"embeddings",
+		"index",
+		"indexDefaultedList",
+		"indexDefinition",
+		"indexDisjunction",
+		"indexEmbeddedDisjunction",
+		"indexMixedDisjunction",
+		"indexValidator",
+		"letIndexDefinition",
+		"mixed",
+		"structs",
+		"validators",
+	]
+}

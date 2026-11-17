@@ -1,0 +1,151 @@
+# References to lets and comprehension variables.
+# See https://cuelang.org/issue/4590
+-- test.cue --
+package test
+
+import "struct"
+
+#A: {a: string}
+#Choice: {a: string} | {b: string}
+
+let C = {a: string} | {b: string}
+letDisjunction: C
+embeddedLetDisjunction: {C}
+
+let L = #A
+letDefinition: L
+
+let M = close({a: string})
+letClose: M
+
+let D = #Choice
+letDefinitionDisjunction: D
+
+let S = {c: #Choice}
+letSelectionDisjunction: S.c
+
+for x in [{a: string} | {b: string}] {
+	comprehensionDisjunction: x
+}
+
+holder: b: #Choice
+for _, e in [holder] {
+	comprehensionSelectionDisjunction: e.b
+}
+
+// A validator does not close a struct, even within a definition.
+
+let Limits = {obj: struct.MaxFields(3)}
+#Config: labels: Limits.obj
+letValidator: #Config
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		Choice: anyOf: [{
+			type:                 "object"
+			additionalProperties: false
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type:                 "object"
+			additionalProperties: false
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		Config: {
+			type:                 "object"
+			additionalProperties: false
+			properties: labels: {
+				type:          "object"
+				maxProperties: 3
+			}
+			required: ["labels"]
+		}
+	}
+	type: "object"
+	properties: {
+		comprehensionDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		comprehensionSelectionDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		embeddedLetDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		holder: {
+			type: "object"
+			properties: b: $ref: "#/$defs/Choice"
+			required: ["b"]
+		}
+		letClose: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		letDefinition: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		letDefinitionDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		letDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		letSelectionDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		letValidator: $ref: "#/$defs/Config"
+	}
+	required: [
+		"comprehensionDisjunction",
+		"comprehensionSelectionDisjunction",
+		"embeddedLetDisjunction",
+		"holder",
+		"letClose",
+		"letDefinition",
+		"letDefinitionDisjunction",
+		"letDisjunction",
+		"letSelectionDisjunction",
+		"letValidator",
+	]
+}

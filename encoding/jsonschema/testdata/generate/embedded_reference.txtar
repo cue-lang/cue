@@ -1,0 +1,64 @@
+# Embedded references, and a disjunction whose default another arm
+# subsumes, whose expressions hide their values.
+# See https://cuelang.org/issue/4590
+-- test.cue --
+package test
+
+#Choice: {a: string} | {b: string}
+#A: {a: string}
+B: {b: int}
+
+embeddedDisjunction: {#Choice}
+nestedEmbeddedDisjunction: {{#Choice}}
+embeddedDefinition: {#A}
+
+// The default is subsumed by the other arm.
+
+defaultedStruct: *{port: 1} | {port: int}
+defaultedEmbedding: *{b: 1} | {B}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		B: {
+			type: "object"
+			properties: b: type: "integer"
+			required: ["b"]
+		}
+		defaultedEmbedding: {
+			type: "object"
+			properties: b: type: "integer"
+			required: ["b"]
+		}
+		defaultedStruct: {
+			type: "object"
+			properties: port: type: "integer"
+			required: ["port"]
+		}
+		embeddedDefinition: {
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}
+		embeddedDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+		nestedEmbeddedDisjunction: anyOf: [{
+			type: "object"
+			properties: a: type: "string"
+			required: ["a"]
+		}, {
+			type: "object"
+			properties: b: type: "string"
+			required: ["b"]
+		}]
+	}
+	required: ["B", "embeddedDefinition", "embeddedDisjunction", "nestedEmbeddedDisjunction"]
+}

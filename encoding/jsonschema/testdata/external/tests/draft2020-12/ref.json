@@ -639,10 +639,7 @@
 					},
 					"bar": "a"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid on outer field",
@@ -652,10 +649,7 @@
 					},
 					"bar": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid on both fields",
@@ -700,10 +694,7 @@
 					},
 					"bar": "a"
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid on outer field",
@@ -713,10 +704,7 @@
 					},
 					"bar": 1
 				},
-				"valid": false,
-				"skip": {
-					"v3-roundtrip": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid on both fields",

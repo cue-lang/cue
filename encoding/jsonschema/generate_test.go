@@ -15,17 +15,13 @@
 package jsonschema_test
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/fs"
 	"maps"
-	"os"
-	"os/exec"
 	"slices"
 	"strings"
 	"testing"
-	"time"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -151,26 +147,6 @@ func TestGenerate(t *testing.T) {
 			})
 		}
 	})
-}
-
-// TestGenerateDefaultedStructDisjunction generates a schema for a struct
-// disjunction whose default the other arm subsumes. It runs in a subprocess
-// with a short timeout, as the failure mode here is unbounded recursion,
-// which overflows the stack instead of failing.
-func TestGenerateDefaultedStructDisjunction(t *testing.T) {
-	const env = "CUE_TEST_GENERATE_DEFAULTED_STRUCT"
-	if os.Getenv(env) != "" {
-		v := cuecontext.New().CompileString(`x: *{port: 1} | {port: int}`)
-		_, err := jsonschema.Generate(v, nil)
-		qt.Assert(t, qt.IsNil(err))
-		return
-	}
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
-	defer cancel()
-	cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=^"+t.Name()+"$")
-	cmd.Env = append(os.Environ(), env+"=1")
-	out, err := cmd.CombinedOutput()
-	qt.Assert(t, qt.IsNil(err), qt.Commentf("%s", out))
 }
 
 func TestGenerateMany(t *testing.T) {

@@ -51,24 +51,61 @@ guardBeforeDisjunction: {
 		}
 	} @test(eq, {a: 1, b: {x: 1}})
 }
+// A definition which the comprehension embeds adds a requirement, which the
+// fields of the struct are checked against as well.
+guardBeforeRequirement: {
+	#B: {
+		b?: _
+		c?: int
+	}
+	notAllowed: {
+		b: {x: 1}
+		if b != _|_ {
+			#B
+		}
+	} & {typo: 1} @test(eq, {b: {x: 1}, c?: int, typo: 1}, incorrect) @test(err:todo, at=typo, code=eval, contains="field not allowed", pos=[5:7],
+		hint="the requirements are computed when the guard finalizes b, before #B is embedded")
+	allowed: {
+		b: {x: 1}
+		if b != _|_ {
+			#B
+		}
+	} & {c: 1} @test(eq, {b: {x: 1}, c: 1})
+	// The requirement eliminates a disjunct.
+	inDisjunct: ({
+		b: {x: 1}
+		if b != _|_ {
+			#B
+		}
+	} | {zzz: 1}) & {typo: 1} @test(eq, {b: {x: 1}, c?: int, typo: 1} | {zzz: 1, typo: 1}, incorrect) @test(eq:todo, {zzz: 1, typo: 1})
+	// Without the comparison, no field is finalized before embedding.
+	noGuard: {
+		b: {x: 1}
+		if true {
+			#B
+		}
+	} & {typo: 1} @test(err, at=typo, code=eval, contains="field not allowed", pos=[5:7])
+}
 -- out/errors.txt --
 [eval] guardBeforeDisjunction.noneAllowed: 2 errors in empty disjunction:
 guardBeforeDisjunction.noneAllowed.typo1: field not allowed:
     ./guard.cue:19:5
 guardBeforeDisjunction.noneAllowed.typo2: field not allowed:
     ./guard.cue:19:18
+[eval] guardBeforeRequirement.noGuard.typo: field not allowed:
+    ./guard.cue:70:7
 [eval] issue595.files: undefined field: nam:
     ./in.cue:12:14
     ./in.cue:7:10
 -- out/eval/stats --
-Leaks:  5
-Freed:  65
-Reused: 44
-Allocs: 26
+Leaks:  12
+Freed:  86
+Reused: 68
+Allocs: 30
 Retain: 0
 
-Unifications: 34
-Conjuncts:    73
-Disjuncts:    10
+Unifications: 58
+Conjuncts:    117
+Disjuncts:    12
 
-NumCloseIDs: 4
+NumCloseIDs: 8

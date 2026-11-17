@@ -50,6 +50,40 @@ guardBeforeDisjunction: {
 		}
 	}
 }
+// A definition which the comprehension embeds adds a requirement, which the
+// fields of the struct are checked against as well.
+guardBeforeRequirement: {
+	#B: {
+		b?: _
+		c?: int
+	}
+	notAllowed: {
+		b: {x: 1}
+		if b != _|_ {
+			#B
+		}
+	} & {typo: 1}
+	allowed: {
+		b: {x: 1}
+		if b != _|_ {
+			#B
+		}
+	} & {c: 1}
+	// The requirement eliminates a disjunct.
+	inDisjunct: ({
+		b: {x: 1}
+		if b != _|_ {
+			#B
+		}
+	} | {zzz: 1}) & {typo: 1}
+	// Without the comparison, no field is finalized before embedding.
+	noGuard: {
+		b: {x: 1}
+		if true {
+			#B
+		}
+	} & {typo: 1}
+}
 -- out/compile --
 --- guard.cue
 {
@@ -109,6 +143,54 @@ guardBeforeDisjunction: {
           typo: 2
         })
       }
+    })
+  }
+  guardBeforeRequirement: {
+    #B: {
+      b?: _
+      c?: int
+    }
+    notAllowed: ({
+      b: {
+        x: 1
+      }
+      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈2;#B〉
+      }
+    } & {
+      typo: 1
+    })
+    allowed: ({
+      b: {
+        x: 1
+      }
+      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈2;#B〉
+      }
+    } & {
+      c: 1
+    })
+    inDisjunct: (({
+      b: {
+        x: 1
+      }
+      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈2;#B〉
+      }
+    }|{
+      zzz: 1
+    }) & {
+      typo: 1
+    })
+    noGuard: ({
+      b: {
+        x: 1
+      }
+      if true {
+        〈2;#B〉
+      }
+    } & {
+      typo: 1
     })
   }
 }

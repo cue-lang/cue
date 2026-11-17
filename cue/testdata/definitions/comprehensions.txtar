@@ -15,8 +15,10 @@ issue595: {
 	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14, 3:10])
 }
 -- guard.cue --
-// A comparison with bottom in a guard finalizes the field it tests, which
-// computes the closedness requirements of the enclosing struct early.
+@experiment(predicates)
+
+// A guard which calls isValid finalizes the field it tests, which computes
+// the closedness requirements of the enclosing struct early.
 
 // The fields a disjunct declares beside the tested field are still checked.
 guardBeforeDisjunction: {
@@ -26,24 +28,24 @@ guardBeforeDisjunction: {
 	}
 	oneAllowed: #A & {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			{a: 1} | {typo: 2}
 		}
 	} @test(eq, {a: 1, b: {x: 1}})
 	noneAllowed: #A & {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			{typo1: 1} | {typo2: 2}
 		}
 	} @test(err, code=eval, suberr=(contains="field not allowed", pos=[3:5]), suberr=(contains="field not allowed", pos=[3:18]))
 	// A disjunct of an outer disjunction forks again within the guard.
 	nested: #A & ({
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			{a: 1} | {typo: 2}
 		}
 	} | {typo: 3}) @test(eq, {a: 1, b: {x: 1}})
-	// Without the comparison, no field is finalized before forking.
+	// Without the call, no field is finalized before forking.
 	noGuard: #A & {
 		b: {x: 1}
 		if true {
@@ -60,25 +62,25 @@ guardBeforeRequirement: {
 	}
 	notAllowed: {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			#B
 		}
 	} & {typo: 1} @test(eq, {b: {x: 1}, c?: int, typo: 1}, incorrect) @test(err:todo, at=typo, code=eval, contains="field not allowed", pos=[5:7],
 		hint="the requirements are computed when the guard finalizes b, before #B is embedded")
 	allowed: {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			#B
 		}
 	} & {c: 1} @test(eq, {b: {x: 1}, c: 1})
 	// The requirement eliminates a disjunct.
 	inDisjunct: ({
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			#B
 		}
 	} | {zzz: 1}) & {typo: 1} @test(eq, {b: {x: 1}, c?: int, typo: 1} | {zzz: 1, typo: 1}, incorrect) @test(eq:todo, {zzz: 1, typo: 1})
-	// Without the comparison, no field is finalized before embedding.
+	// Without the call, no field is finalized before embedding.
 	noGuard: {
 		b: {x: 1}
 		if true {
@@ -89,11 +91,11 @@ guardBeforeRequirement: {
 -- out/errors.txt --
 [eval] guardBeforeDisjunction.noneAllowed: 2 errors in empty disjunction:
 guardBeforeDisjunction.noneAllowed.typo1: field not allowed:
-    ./guard.cue:19:5
+    ./guard.cue:21:5
 guardBeforeDisjunction.noneAllowed.typo2: field not allowed:
-    ./guard.cue:19:18
+    ./guard.cue:21:18
 [eval] guardBeforeRequirement.noGuard.typo: field not allowed:
-    ./guard.cue:70:7
+    ./guard.cue:72:7
 [eval] issue595.files: undefined field: nam:
     ./in.cue:12:14
     ./in.cue:7:10

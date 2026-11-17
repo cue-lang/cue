@@ -14,8 +14,10 @@ issue595: {
 	}
 }
 -- guard.cue --
-// A comparison with bottom in a guard finalizes the field it tests, which
-// computes the closedness requirements of the enclosing struct early.
+@experiment(predicates)
+
+// A guard which calls isValid finalizes the field it tests, which computes
+// the closedness requirements of the enclosing struct early.
 
 // The fields a disjunct declares beside the tested field are still checked.
 guardBeforeDisjunction: {
@@ -25,24 +27,24 @@ guardBeforeDisjunction: {
 	}
 	oneAllowed: #A & {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			{a: 1} | {typo: 2}
 		}
 	}
 	noneAllowed: #A & {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			{typo1: 1} | {typo2: 2}
 		}
 	}
 	// A disjunct of an outer disjunction forks again within the guard.
 	nested: #A & ({
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			{a: 1} | {typo: 2}
 		}
 	} | {typo: 3})
-	// Without the comparison, no field is finalized before forking.
+	// Without the call, no field is finalized before forking.
 	noGuard: #A & {
 		b: {x: 1}
 		if true {
@@ -59,24 +61,24 @@ guardBeforeRequirement: {
 	}
 	notAllowed: {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			#B
 		}
 	} & {typo: 1}
 	allowed: {
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			#B
 		}
 	} & {c: 1}
 	// The requirement eliminates a disjunct.
 	inDisjunct: ({
 		b: {x: 1}
-		if b != _|_ {
+		if isValid(b) {
 			#B
 		}
 	} | {zzz: 1}) & {typo: 1}
-	// Without the comparison, no field is finalized before embedding.
+	// Without the call, no field is finalized before embedding.
 	noGuard: {
 		b: {x: 1}
 		if true {
@@ -98,7 +100,7 @@ guardBeforeRequirement: {
       b: {
         x: 1
       }
-      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+      if isValid(〈0;b〉) {
         ({
           a: 1
         }|{
@@ -110,7 +112,7 @@ guardBeforeRequirement: {
       b: {
         x: 1
       }
-      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+      if isValid(〈0;b〉) {
         ({
           typo1: 1
         }|{
@@ -122,7 +124,7 @@ guardBeforeRequirement: {
       b: {
         x: 1
       }
-      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+      if isValid(〈0;b〉) {
         ({
           a: 1
         }|{
@@ -154,7 +156,7 @@ guardBeforeRequirement: {
       b: {
         x: 1
       }
-      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+      if isValid(〈0;b〉) {
         〈2;#B〉
       }
     } & {
@@ -164,7 +166,7 @@ guardBeforeRequirement: {
       b: {
         x: 1
       }
-      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+      if isValid(〈0;b〉) {
         〈2;#B〉
       }
     } & {
@@ -174,7 +176,7 @@ guardBeforeRequirement: {
       b: {
         x: 1
       }
-      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+      if isValid(〈0;b〉) {
         〈2;#B〉
       }
     }|{

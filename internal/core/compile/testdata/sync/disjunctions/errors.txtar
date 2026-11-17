@@ -231,7 +231,88 @@ issue4022: full: {
 		apiVersion: "v1"
 	}
 }
+-- failedfield.cue --
+// Within a disjunct, a field with an error stops the evaluation of the fields
+// after it, which thus lack the evidence that they are allowed. Each disjunct
+// reports the error of the failed field rather than these other fields.
+reportFailedField: {
+	// The fields after #B are reported as not allowed instead.
+	def: {
+		#A: {a: int}
+		#B: #A & {b: 1}
+		#C: {c: 1}
+		#D: {d: 1}
+		#C | #D
+	}
+	// The fields after _B are reported as not allowed instead.
+	hidden: {
+		#A: {a: int}
+		_B: #A & {b: 1}
+		#C: {c: 1}
+		#D: {d: 1}
+		#C | #D
+	}
+	// The failed field was evaluated, so it is still checked.
+	// The fields after B are reported as not allowed as well.
+	regular: {
+		#A: {a: int}
+		B: #A & {b: 1}
+		#C: {c: 1}
+		#D: {d: 1}
+		#C | #D
+	}
+}
 -- out/compile --
+--- failedfield.cue
+{
+  reportFailedField: {
+    def: {
+      #A: {
+        a: int
+      }
+      #B: (〈0;#A〉 & {
+        b: 1
+      })
+      #C: {
+        c: 1
+      }
+      #D: {
+        d: 1
+      }
+      (〈0;#C〉|〈0;#D〉)
+    }
+    hidden: {
+      #A: {
+        a: int
+      }
+      _B: (〈0;#A〉 & {
+        b: 1
+      })
+      #C: {
+        c: 1
+      }
+      #D: {
+        d: 1
+      }
+      (〈0;#C〉|〈0;#D〉)
+    }
+    regular: {
+      #A: {
+        a: int
+      }
+      B: (〈0;#A〉 & {
+        b: 1
+      })
+      #C: {
+        c: 1
+      }
+      #D: {
+        d: 1
+      }
+      (〈0;#C〉|〈0;#D〉)
+    }
+  }
+}
 --- in.cue
 {
   issue570: {

@@ -328,7 +328,61 @@ issue4022: full: {
 		}
 	})
 }
+-- failedfield.cue --
+// Within a disjunct, a field with an error stops the evaluation of the fields
+// after it, which thus lack the evidence that they are allowed. Each disjunct
+// reports the error of the failed field rather than these other fields.
+reportFailedField: {
+	// The fields after #B are reported as not allowed instead.
+	def: {
+		#A: {a: int}
+		#B: #A & {b: 1}
+		#C: {c: 1}
+		#D: {d: 1}
+		#C | #D
+		@test(err, code=eval, contains="errors in empty disjunction", pos=[], incorrect)
+		@test(err:todo, code=eval, contains="field not allowed", pos=[2:13])
+	}
+	// The fields after _B are reported as not allowed instead.
+	hidden: {
+		#A: {a: int}
+		_B: #A & {b: 1}
+		#C: {c: 1}
+		#D: {d: 1}
+		#C | #D
+		@test(err, code=eval, contains="errors in empty disjunction", pos=[], incorrect)
+		@test(err:todo, code=eval, contains="field not allowed", pos=[2:13])
+	}
+	// The failed field was evaluated, so it is still checked.
+	// The fields after B are reported as not allowed as well.
+	regular: {
+		#A: {a: int}
+		B: #A & {b: 1}
+		#C: {c: 1}
+		#D: {d: 1}
+		#C | #D
+		@test(err, code=eval, contains="errors in empty disjunction", pos=[], incorrect)
+		@test(err:todo, code=eval, contains="field not allowed", pos=[2:3])
+	}
+}
 -- out/errors.txt --
+[eval] reportFailedField.def: 2 errors in empty disjunction:
+reportFailedField.def.c: field not allowed:
+    ./failedfield.cue:9:8
+reportFailedField.def.d: field not allowed:
+    ./failedfield.cue:10:8
+[eval] reportFailedField.hidden: 2 errors in empty disjunction:
+reportFailedField.hidden.c: field not allowed:
+    ./failedfield.cue:19:8
+reportFailedField.hidden.d: field not allowed:
+    ./failedfield.cue:20:8
+[eval] reportFailedField.regular: 3 errors in empty disjunction:
+reportFailedField.regular.B: field not allowed:
+    ./failedfield.cue:29:3
+reportFailedField.regular.c: field not allowed:
+    ./failedfield.cue:30:8
+reportFailedField.regular.d: field not allowed:
+    ./failedfield.cue:31:8
 [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
     ./in.cue:5:11
     ./in.cue:6:19
@@ -398,17 +452,17 @@ issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
 [user] explicit error (_|_ literal) in source:
     ./optionalerror.cue:30:16
 -- out/eval/stats --
-Leaks:  41
-Freed:  288
-Reused: 263
+Leaks:  40
+Freed:  383
+Reused: 357
 Allocs: 66
 Retain: 0
 
-Unifications: 171
-Conjuncts:    381
-Disjuncts:    96
-Notifications: 2
+Unifications: 201
+Conjuncts:    432
+Disjuncts:    102
+Notifications: 8
 
-NumCloseIDs: 36
+NumCloseIDs: 48
 -- out/todo.txt --
 issue4022: only evaluated by v3 evaluator.

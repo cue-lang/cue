@@ -43,7 +43,8 @@ fail1: {
 	}
 	type: "object"
 	properties: tree: {
-		type: "object"
+		type:                 "object"
+		additionalProperties: false
 		properties: {
 			children: {
 				type: "array"
@@ -59,5 +60,5 @@ fail1.data.tree.children.0.children.0.children.0.value: conflicting values "x" a
     ./datatest/tests.cue:10:66
     1:171
     1:204
-    1:350
+    1:379
 -- out/generate-v3/ok1 --

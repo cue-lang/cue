@@ -139,12 +139,14 @@ indexValidator: #D
 			required: ["a"]
 		}
 		indexDefaultedList: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}
 		indexDefinition: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}
@@ -158,22 +160,25 @@ indexValidator: #D
 			required: ["b"]
 		}]
 		indexEmbeddedDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: {
 				a: type: "string"
-				c: true
+				c: false
 			}
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: {
 				b: type: "string"
-				c: true
+				c: false
 			}
 			required: ["b"]
 		}]
 		indexMixedDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}, {
@@ -183,7 +188,8 @@ indexValidator: #D
 		}]
 		indexValidator: $ref: "#/$defs/D"
 		letIndexDefinition: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}

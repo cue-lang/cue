@@ -54,17 +54,21 @@ disjunctionCycle: elems[0]
 			}
 		}
 		disjunctionCycle: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "integer"
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: n: anyOf: [{
-				type: "object"
+				type:                 "object"
+				additionalProperties: false
 				properties: a: type: "integer"
 				required: ["a"]
 			}, {
-				type: "object"
+				type:                 "object"
+				additionalProperties: false
 				properties: n: true
 			}]
 		}]

@@ -75,11 +75,13 @@ letValidator: #Config
 			required: ["b"]
 		}]
 		comprehensionSelectionDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: b: type: "string"
 			required: ["b"]
 		}]
@@ -98,21 +100,25 @@ letValidator: #Config
 			required: ["b"]
 		}
 		letClose: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}
 		letDefinition: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}
 		letDefinitionDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: b: type: "string"
 			required: ["b"]
 		}]
@@ -126,11 +132,13 @@ letValidator: #Config
 			required: ["b"]
 		}]
 		letSelectionDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: b: type: "string"
 			required: ["b"]
 		}]

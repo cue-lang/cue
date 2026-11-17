@@ -37,25 +37,30 @@ defaultedEmbedding: *{b: 1} | {B}
 			required: ["port"]
 		}
 		embeddedDefinition: {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}
 		embeddedDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: b: type: "string"
 			required: ["b"]
 		}]
 		nestedEmbeddedDisjunction: anyOf: [{
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: a: type: "string"
 			required: ["a"]
 		}, {
-			type: "object"
+			type:                 "object"
+			additionalProperties: false
 			properties: b: type: "string"
 			required: ["b"]
 		}]

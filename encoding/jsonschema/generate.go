@@ -102,6 +102,17 @@ func (m closedMode) descend() closedMode {
 	return open
 }
 
+// valueClosedMode returns the closed mode of v, or m if that is more closed.
+func valueClosedMode(v cue.Value, m closedMode) closedMode {
+	switch {
+	case v.IsClosedRecursively():
+		return closedRecursively
+	case v.IsClosed():
+		return max(m, closed)
+	}
+	return m
+}
+
 // tupleStyle describes how a dialect renders heterogeneous (tuple) lists.
 type tupleStyle int
 
@@ -351,14 +362,7 @@ func newGenerator(cfg *GenerateConfig) (*generator, error) {
 // references into g.defs. It is phase 1 of generation and may be called more
 // than once (by [GenerateMany]) to share a single definitions pool.
 func (g *generator) buildRoot(v cue.Value) internItem {
-	mode := open
-	switch {
-	case v.IsClosedRecursively():
-		mode = closedRecursively
-	case v.IsClosed():
-		mode = closed
-	}
-	return g.makeItem(v, mode)
+	return g.makeItem(v, valueClosedMode(v, open))
 }
 
 // assignNames names every reference collected in g.defs, returning the
@@ -600,6 +604,11 @@ func (g *generator) makeItem(v cue.Value, mode closedMode) internItem {
 }
 
 func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
+	if b := value.Vertex(v).Bottom(); b != nil && b.CloseCheck {
+		// A field which closedness forbids, such as in an evaluated
+		// disjunction arm, allows no value.
+		return &itemFalse{}
+	}
 	op, args := v.Expr()
 	switch op {
 	case cue.NoOp:
@@ -720,8 +729,16 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, open) }),
 		}
 	case cue.OrOp:
+		evaluated := value.Vertex(v).IsData()
 		return &itemAnyOf{
-			elems: mapSlice(args, func(v cue.Value) internItem { return g.makeItem(v, mode) }),
+			elems: mapSlice(args, func(v cue.Value) internItem {
+				if evaluated {
+					// Arms from makeEvaluatedItem have lost the
+					// definitions which closed them.
+					return g.makeItem(v, valueClosedMode(v, mode))
+				}
+				return g.makeItem(v, mode)
+			}),
 		}
 	case cue.SpreadOp:
 		// SpreadOp opens its operand (e.g. #T...). The struct processing
@@ -834,9 +851,9 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		return &itemTrue{}
 	}
 	if ref := unfollowedRef(v); (ref != nil || op == cue.SelectorOp || op == cue.IndexOp) && !value.Vertex(v).IsData() {
-		// An index, a let or an embedding like `{#A}` may hide a disjunction
-		// or a validator. IsData skips its evaluated copy.
-		return g.makeEvaluatedItem(v, ref, mode)
+		// An index, a let or an embedding like `{#A}` may hide a disjunction,
+		// a validator or closedness. IsData skips its evaluated copy.
+		return g.makeEvaluatedItem(v, ref, valueClosedMode(v, mode))
 	}
 	if !v.IsNull() {
 		// We want to encode null as {type: "null"} not {const: null}

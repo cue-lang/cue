@@ -808,12 +808,65 @@ minimal: {
 	}
 }
 
+// A disjunct which the body of a comprehension adds may make the guard false,
+// as with minimal. Such a disjunct is eliminated.
+guardedDisjunct: {
+	oneFails: {
+		b: {}
+		if !exists(b.c) {
+			{b: c: 1} | {d: 1}
+		}
+	} @test(eq, {b: {c: 1}} | {b: {}, d: 1}, incorrect) @test(eq:todo, {b: {}, d: 1})
+	allFail: {
+		b: {}
+		if !exists(b.c) {
+			{b: c: 1} | {b: c: 2}
+		}
+	} @test(eq, {b: {c: 1}} | {b: {c: 2}}, incorrect) @test(err:todo, code=cycle, contains="changed after evaluation", pos=[2:14])
+	// No disjunct affects the guard.
+	noneFail: {
+		b: {}
+		if !exists(b.c) {
+			{d: 1} | {d: 2}
+		}
+	} @test(eq, {b: {}, d: 1} | {b: {}, d: 2})
+	// A disjunct of an outer disjunction forks again within the guard.
+	nested: {
+		b: {}
+		if !exists(b.c) {
+			{b: c: 1} | {d: 1}
+		}
+	} | {zzz: 1} @test(eq, {b: {c: 1}} | {b: {}, d: 1} | {zzz: 1}, incorrect) @test(eq:todo, {b: {}, d: 1} | {zzz: 1})
+	// A disjunction beside the guard combines with the one in its body.
+	beside: {
+		b: {}
+		{p: 1} | {p: 2}
+		if !exists(b.c) {
+			{d: 1} | {d: 2}
+		}
+	} @test(eq, {b: {}, p: 1, d: 1} | {b: {}, p: 1, d: 2} | {b: {}, p: 2, d: 1} | {b: {}, p: 2, d: 2} | {b: {}, d: 1} | {b: {}, d: 2}, incorrect) @test(eq:todo, {b: {}, p: 1, d: 1} | {b: {}, p: 1, d: 2} | {b: {}, p: 2, d: 1} | {b: {}, p: 2, d: 2})
+	besideOneFails: {
+		b: {}
+		{p: 1} | {p: 2}
+		if !exists(b.c) {
+			{b: c: 1} | {d: 1}
+		}
+	} @test(eq, {b: {c: 1}, p: 1} | {b: {}, p: 1, d: 1} | {b: {c: 1}, p: 2} | {b: {}, p: 2, d: 1} | {b: {c: 1}} | {b: {}, d: 1}, incorrect) @test(eq:todo, {b: {}, p: 1, d: 1} | {b: {}, p: 2, d: 1})
+	// Without a disjunction, the struct itself is the error.
+	noDisjunction: {
+		b: {}
+		if !exists(b.c) {b: c: 1}
+	} @test(err, code=cycle, contains="cyclic reference", pos=[2:16])
+}
+
 -- out/errors.txt --
 [cycle] minimal.a: cyclic reference to field port:
     ./cycle.cue:5:16
 [cycle] minimal.b: undefined field: port:
     ./cycle.cue:12:16
     ./cycle.cue:4:2
+[cycle] guardedDisjunct.noDisjunction: cyclic reference to field c:
+    ./cycle.cue:66:16
 [eval] selector.existsDefNE: exists: field ne not allowed by closed struct:
     ./in.cue:24:16
 [eval] selector.existsRefNE: exists: field ne not allowed by closed struct:
@@ -1007,14 +1060,14 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
 [eval] defaultedList.c: exists: index 5 out of range:
     ./review.cue:368:5
 -- out/eval/stats --
-Leaks:  76
-Freed:  872
-Reused: 802
-Allocs: 146
+Leaks:  91
+Freed:  966
+Reused: 895
+Allocs: 162
 Retain: 0
 
-Unifications: 902
-Conjuncts:    1300
-Disjuncts:    40
+Unifications: 953
+Conjuncts:    1395
+Disjuncts:    66
 
 NumCloseIDs: 37

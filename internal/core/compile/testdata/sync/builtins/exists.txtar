@@ -749,6 +749,57 @@ minimal: {
 	}
 }
 
+// A disjunct which the body of a comprehension adds may make the guard false,
+// as with minimal. Such a disjunct is eliminated.
+guardedDisjunct: {
+	oneFails: {
+		b: {}
+		if !exists(b.c) {
+			{b: c: 1} | {d: 1}
+		}
+	}
+	allFail: {
+		b: {}
+		if !exists(b.c) {
+			{b: c: 1} | {b: c: 2}
+		}
+	}
+	// No disjunct affects the guard.
+	noneFail: {
+		b: {}
+		if !exists(b.c) {
+			{d: 1} | {d: 2}
+		}
+	}
+	// A disjunct of an outer disjunction forks again within the guard.
+	nested: {
+		b: {}
+		if !exists(b.c) {
+			{b: c: 1} | {d: 1}
+		}
+	} | {zzz: 1}
+	// A disjunction beside the guard combines with the one in its body.
+	beside: {
+		b: {}
+		{p: 1} | {p: 2}
+		if !exists(b.c) {
+			{d: 1} | {d: 2}
+		}
+	}
+	besideOneFails: {
+		b: {}
+		{p: 1} | {p: 2}
+		if !exists(b.c) {
+			{b: c: 1} | {d: 1}
+		}
+	}
+	// Without a disjunction, the struct itself is the error.
+	noDisjunction: {
+		b: {}
+		if !exists(b.c) {b: c: 1}
+	}
+}
+
 -- out/compile --
 --- cycle.cue
 {
@@ -761,6 +812,98 @@ minimal: {
     b: {
       if !exists(〈1;a〉.port) {
         port: ""
+      }
+    }
+  }
+  guardedDisjunct: {
+    oneFails: {
+      b: {}
+      if !exists(〈0;b〉.c) {
+        ({
+          b: {
+            c: 1
+          }
+        }|{
+          d: 1
+        })
+      }
+    }
+    allFail: {
+      b: {}
+      if !exists(〈0;b〉.c) {
+        ({
+          b: {
+            c: 1
+          }
+        }|{
+          b: {
+            c: 2
+          }
+        })
+      }
+    }
+    noneFail: {
+      b: {}
+      if !exists(〈0;b〉.c) {
+        ({
+          d: 1
+        }|{
+          d: 2
+        })
+      }
+    }
+    nested: ({
+      b: {}
+      if !exists(〈0;b〉.c) {
+        ({
+          b: {
+            c: 1
+          }
+        }|{
+          d: 1
+        })
+      }
+    }|{
+      zzz: 1
+    })
+    beside: {
+      b: {}
+      ({
+        p: 1
+      }|{
+        p: 2
+      })
+      if !exists(〈0;b〉.c) {
+        ({
+          d: 1
+        }|{
+          d: 2
+        })
+      }
+    }
+    besideOneFails: {
+      b: {}
+      ({
+        p: 1
+      }|{
+        p: 2
+      })
+      if !exists(〈0;b〉.c) {
+        ({
+          b: {
+            c: 1
+          }
+        }|{
+          d: 1
+        })
+      }
+    }
+    noDisjunction: {
+      b: {}
+      if !exists(〈0;b〉.c) {
+        b: {
+          c: 1
+        }
       }
     }
   }

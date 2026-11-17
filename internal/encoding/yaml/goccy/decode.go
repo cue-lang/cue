@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/encoding/yaml/yamlbase"
 )
 
 // TODO(mvdan): we should sanity check that the decoder always produces valid CUE,
@@ -105,7 +106,7 @@ type decoder struct {
 	// only count the nodes it produces towards [decoder.aliasNodes].
 	aliasDepth int
 
-	// aliasNodes counts the nodes produced by alias expansion. See [maxAliasNodes].
+	// aliasNodes counts the nodes produced by alias expansion. See [yamlbase.MaxAliasNodes].
 	aliasNodes int
 
 	// lastOffset is byte offset from the last yaml node position that
@@ -617,8 +618,8 @@ func (d *decoder) extract(yn yast.Node) (ast.Expr, error) {
 	// outside an alias map one-to-one to the input, so are not counted.
 	if d.aliasDepth > 0 {
 		d.aliasNodes++
-		if d.aliasNodes > maxAliasNodes {
-			return nil, d.posErrorf(yn, "aliases expand to more than %d nodes", maxAliasNodes)
+		if d.aliasNodes > yamlbase.MaxAliasNodes {
+			return nil, d.posErrorf(yn, "aliases expand to more than %d nodes", yamlbase.MaxAliasNodes)
 		}
 	}
 	switch n := yn.(type) {
@@ -658,9 +659,9 @@ func (d *decoder) extract(yn yast.Node) (ast.Expr, error) {
 	case *yast.NullNode:
 		expr = d.nullLit(d.pos(d.nodeOffset(n)))
 	case *yast.InfinityNode:
-		expr = MakeNum(d.pos(d.nodeOffset(n)), infString(n), token.FLOAT)
+		expr = yamlbase.MakeNum(d.pos(d.nodeOffset(n)), infString(n), token.FLOAT)
 	case *yast.NanNode:
-		expr = MakeNum(d.pos(d.nodeOffset(n)), "NaN", token.FLOAT)
+		expr = yamlbase.MakeNum(d.pos(d.nodeOffset(n)), "NaN", token.FLOAT)
 	case *yast.AliasNode:
 		expr, err = d.alias(n)
 	default:
@@ -1193,7 +1194,7 @@ outer:
 		if err != nil {
 			return err
 		}
-		key := labelStr(label)
+		key := yamlbase.LabelStr(label)
 		if merging && ownKeys[key] {
 			// This key is defined directly by the mapping being merged
 			// into, whose own value wins; drop the merged value.
@@ -1353,7 +1354,7 @@ func (d *decoder) label(yn yast.MapKeyNode) (ast.Label, error) {
 	case *yast.BoolNode:
 		value = strconv.FormatBool(n.Value)
 	case *yast.IntegerNode:
-		value, numeric = yaml11OctalToCUE(n.GetToken().Value), true
+		value, numeric = yamlbase.YAML11OctalToCUE(n.GetToken().Value), true
 	case *yast.FloatNode:
 		value, numeric = n.GetToken().Value, true
 	case *yast.InfinityNode:
@@ -1594,20 +1595,11 @@ var rxYamlFloat = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`^[-+]?((\.[0-9]+|[0-9]+\.[0-9]*)([eE][-+]?[0-9]+)?|[0-9]+[eE][-+]?[0-9]+)$`)
 })
 
-// SpecialFloats maps the plain scalar spellings of infinities and NaN
-// to their decoded forms.
-var SpecialFloats = map[string]string{
-	".inf": "+Inf", ".Inf": "+Inf", ".INF": "+Inf",
-	"+.inf": "+Inf", "+.Inf": "+Inf", "+.INF": "+Inf",
-	"-.inf": "-Inf", "-.Inf": "-Inf", "-.INF": "-Inf",
-	".nan": "NaN", ".NaN": "NaN", ".NAN": "NaN",
-}
-
 // numberKind reports whether this package resolves the plain scalar s
 // as a number, returning token.INT, token.FLOAT, or token.ILLEGAL when
 // s is not a number. The accepted forms are those of [rxYamlInt] and
 // [rxYamlFloat], with no limit on the size of integers. Infinities and
-// NaN are handled separately via [SpecialFloats]. Note that we cannot
+// NaN are handled separately via [yamlbase.SpecialFloats]. Note that we cannot
 // use CUE's own number syntax to decide, as it is a superset of
 // YAML's: for example, `1Gi` is a valid CUE literal but a string in
 // YAML.
@@ -1638,121 +1630,35 @@ func (d *decoder) scalarString(n *yast.StringNode) (ast.Expr, error) {
 	pos := d.pos(d.nodeOffset(n))
 	value := n.Value
 	if n.GetToken().Type == ytoken.StringType { // a plain, unquoted scalar
-		if num, ok := SpecialFloats[value]; ok {
-			return MakeNum(pos, num, token.FLOAT), nil
+		if num, ok := yamlbase.SpecialFloats[value]; ok {
+			return yamlbase.MakeNum(pos, num, token.FLOAT), nil
 		}
 		switch numberKind(value) {
 		case token.INT:
-			return IntExpr(pos, value)
+			return yamlbase.IntExpr(pos, value)
 		case token.FLOAT:
-			return FloatExpr(pos, value, true)
+			return yamlbase.FloatExpr(pos, value, true)
 		}
 	}
 	return d.quotedString(pos, value), nil
 }
 
-// yaml11OctalToCUE converts a YAML 1.1 octal literal like 0777 or
-// -0777 to CUE form. Other values, such as floats with a leading zero
-// digit like 01289.5, are returned unchanged.
-func yaml11OctalToCUE(value string) string {
-	sign, digits := "", value
-	if len(digits) > 0 && (digits[0] == '+' || digits[0] == '-') {
-		sign, digits = digits[:1], digits[1:]
-	}
-	rest, ok := strings.CutPrefix(digits, "0")
-	if !ok || rest == "" {
-		return value
-	}
-	for _, c := range rest {
-		if (c < '0' || c > '7') && c != '_' {
-			return value
-		}
-	}
-	return sign + "0o" + rest
-}
-
 func (d *decoder) integer(n *yast.IntegerNode) (ast.Expr, error) {
 	pos := d.pos(d.nodeOffset(n))
-	expr, err := IntExpr(pos, n.GetToken().Value)
+	expr, err := yamlbase.IntExpr(pos, n.GetToken().Value)
 	if err != nil {
 		return nil, d.posErrorf(n, "%v", err)
 	}
 	return expr, nil
-}
-
-// IntExpr converts a YAML integer literal to a CUE expression.
-// If YAML accepted an invalid integer, we pass it along to ensure
-// CUE will fail.
-func IntExpr(pos token.Pos, value string) (ast.Expr, error) {
-	value = yaml11OctalToCUE(value)
-	var info literal.NumInfo
-	// We make the assumption that any valid YAML integer literal will be a valid
-	// CUE integer literal as well, with the only exception of octal numbers above.
-	if err := literal.ParseNum(value, &info); err != nil {
-		return nil, fmt.Errorf("cannot decode %q as %s: %v", value, "!!int", err)
-	} else if !info.IsInt() {
-		return nil, fmt.Errorf("cannot decode %q as %s: not a literal number", value, "!!int")
-	}
-	return MakeNum(pos, value, token.INT), nil
 }
 
 func (d *decoder) float(n *yast.FloatNode) (ast.Expr, error) {
 	pos := d.pos(d.nodeOffset(n))
-	expr, err := FloatExpr(pos, n.GetToken().Value, false)
+	expr, err := yamlbase.FloatExpr(pos, n.GetToken().Value, false)
 	if err != nil {
 		return nil, d.posErrorf(n, "%v", err)
 	}
 	return expr, nil
-}
-
-// FloatExpr converts a YAML float literal to a CUE expression. When the
-// literal has an explicit or implied !!float tag but looks like an
-// integer, it is unified with "number" to record the fact that it was
-// represented as a float. Don't unify with float, as `float & 123` is
-// invalid, and there's no need to forbid representing the number as an
-// integer either.
-func FloatExpr(pos token.Pos, value string, explicitTag bool) (ast.Expr, error) {
-	// Convert YAML 1.1 octal, like with integers.
-	value = yaml11OctalToCUE(value)
-	var info literal.NumInfo
-	// We make the assumption that any valid YAML float literal will be a valid
-	// CUE float literal as well, with the only exception of Inf/NaN and octal above.
-	// Note that `!!float 123` is allowed.
-	if err := literal.ParseNum(value, &info); err != nil {
-		return nil, fmt.Errorf("cannot decode %q as %s: %v", value, "!!float", err)
-	}
-	if explicitTag && !strings.ContainsAny(value, ".eEiInN") {
-		// TODO: number(v) when we have conversions
-		//
-		// TODO(mvdan): would it be better to do turn `!!float 123` into `123.0`
-		// rather than `number & 123`? Note that `float & 123` is an error.
-		return &ast.BinaryExpr{
-			X:     &ast.Ident{NamePos: pos, Name: "number"},
-			OpPos: pos.WithRel(token.Blank),
-			Op:    token.AND,
-			Y:     MakeNum(pos.WithRel(token.Blank), value, token.INT),
-		}, nil
-	}
-	return MakeNum(pos, value, token.FLOAT), nil
-}
-
-// MakeNum returns a CUE number literal of the given kind for val,
-// wrapped in a unary minus if val is negative.
-func MakeNum(pos token.Pos, val string, kind token.Token) (expr ast.Expr) {
-	val, negative := strings.CutPrefix(val, "-")
-	expr = &ast.BasicLit{
-		ValuePos: pos,
-		Kind:     kind,
-		Value:    val,
-	}
-	if negative {
-		expr = &ast.UnaryExpr{
-			OpPos: pos,
-			Op:    token.SUB,
-			X:     expr,
-		}
-	}
-	return expr
 }
 
 // resolveTag expands a tag through any %TAG directive handles, and
@@ -1848,7 +1754,7 @@ func (d *decoder) tagged(n *yast.TagNode) (ast.Expr, error) {
 
 	case "!!int":
 		pos := d.pos(d.nodeOffset(inner))
-		expr, err := IntExpr(pos, nodeStringValue(inner))
+		expr, err := yamlbase.IntExpr(pos, nodeStringValue(inner))
 		if err != nil {
 			return nil, d.posErrorf(n, "%v", err)
 		}
@@ -1861,7 +1767,7 @@ func (d *decoder) tagged(n *yast.TagNode) (ast.Expr, error) {
 			return d.extract(inner)
 		}
 		pos := d.pos(d.nodeOffset(inner))
-		expr, err := FloatExpr(pos, nodeStringValue(inner), true)
+		expr, err := yamlbase.FloatExpr(pos, nodeStringValue(inner), true)
 		if err != nil {
 			return nil, d.posErrorf(n, "%v", err)
 		}
@@ -1903,12 +1809,6 @@ func nodeStringValue(yn yast.Node) string {
 		return ""
 	}
 }
-
-// maxAliasNodes bounds the nodes produced by alias expansion. Each alias
-// reference expands into a fresh subtree, so wide fan-out can produce a
-// tree far larger than the input. Realistic documents use little or no
-// aliasing, so this limit is generous.
-const maxAliasNodes = 50_000
 
 func (d *decoder) alias(yn *yast.AliasNode) (ast.Expr, error) {
 	target, err := d.aliasTarget(yn)
@@ -1957,15 +1857,4 @@ func (d *decoder) alias(yn *yast.AliasNode) (ast.Expr, error) {
 		n.Rbrack = d.tokFile.Pos(aliasEnd, token.Blank)
 	}
 	return node, nil
-}
-
-func labelStr(l ast.Label) string {
-	switch l := l.(type) {
-	case *ast.Ident:
-		return l.Name
-	case *ast.BasicLit:
-		s, _ := literal.Unquote(l.Value)
-		return s
-	}
-	return ""
 }

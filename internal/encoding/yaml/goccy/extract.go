@@ -19,28 +19,8 @@ import (
 	"io"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/encoding/yaml/yamlbase"
 )
-
-// ComposeFile assembles decoded YAML document expressions into a CUE
-// file: the fields of a single mapping document become the file's
-// declarations, any other single document is embedded, and a document
-// stream becomes an embedded list.
-func ComposeFile(filename string, docs []ast.Expr) *ast.File {
-	f := &ast.File{Filename: filename}
-	switch len(docs) {
-	case 0:
-	case 1:
-		switch x := docs[0].(type) {
-		case *ast.StructLit:
-			f.Decls = x.Elts
-		default:
-			f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: x}}
-		}
-	default:
-		f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: &ast.ListLit{Elts: docs}}}
-	}
-	return f
-}
 
 // ExtractLenient converts YAML in b to an equivalent CUE file while
 // tolerating invalid YAML. Like [cuelang.org/go/cue/parser.ParseFile]
@@ -67,5 +47,5 @@ func ExtractLenient(filename string, b []byte) (*ast.File, error) {
 		}
 		a = append(a, expr)
 	}
-	return ComposeFile(filename, a), errors.Join(d.errs...)
+	return yamlbase.ComposeFile(filename, a), errors.Join(d.errs...)
 }

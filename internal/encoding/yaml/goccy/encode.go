@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/encoding/yaml/yamlbase"
 )
 
 // The encoder is built on goccy/go-yaml's Encoder: the CUE syntax tree
@@ -805,7 +806,7 @@ func isNumberTokenType(t ytoken.Type) bool {
 // with a document marker, or contain a tab, which YAML 1.1 does not
 // allow in a plain scalar.
 func shouldQuote(str string) bool {
-	if str == "" || IsYAML11NonString(str) || goYAMLNumber(str) {
+	if str == "" || yamlbase.IsYAML11NonString(str) || goYAMLNumber(str) {
 		return true
 	}
 	// Document markers start a line in keys and top-level values, and
@@ -814,19 +815,6 @@ func shouldQuote(str string) bool {
 		return true
 	}
 	return decodesAsNonString(str) || strings.ContainsRune(str, '\t')
-}
-
-// IsYAML11NonString reports whether YAML 1.1 decoders read the plain
-// scalar str as a value other than a string, such as a boolean, a
-// number, or a timestamp, or fail to decode it.
-func IsYAML11NonString(str string) bool {
-	if legacyStrings[str] {
-		return true
-	}
-	// The regular expressions can only match strings starting with one
-	// of these bytes; skip them otherwise.
-	return str != "" && strings.IndexByte("-+0123456789:. \t", str[0]) >= 0 &&
-		(useQuote().MatchString(str) || rxYAML11Number().MatchString(str))
 }
 
 // yamlUnprintable reports whether the string contains characters that
@@ -871,7 +859,8 @@ func blockLiteralSafe(s string) bool {
 // nonStringStarts holds the bytes that can start a plain scalar which
 // resolves as a non-string value: numbers, infinities and NaN, nulls,
 // the true/false booleans (YAML 1.1 words such as "yes" are handled by
-// legacyStrings before this function is consulted), and merge keys.
+// [yamlbase.IsYAML11NonString] before this function is consulted), and
+// merge keys.
 const nonStringStarts = "0123456789+-.~<tTfFnN"
 
 // decodesAsNonString reports whether a plain (unquoted) scalar with the
@@ -897,7 +886,7 @@ func decodesAsNonString(s string) bool {
 		// Mirror the decoder's handling of plain string scalars, which
 		// resolves more numbers than goccy's lexer; see
 		// [decoder.scalarString].
-		if _, ok := SpecialFloats[s]; ok {
+		if _, ok := yamlbase.SpecialFloats[s]; ok {
 			return true
 		}
 		return numberKind(s) != token.ILLEGAL
@@ -949,66 +938,6 @@ func goYAMLNumber(s string) bool {
 var rxGoYAMLFloat = sync.OnceValue(func() *regexp.Regexp {
 	return regexp.MustCompile(`^` + coreFloat + `$`)
 })
-
-// rxYAML11Number matches the integers and floats of YAML 1.1, using the
-// regular expressions of PyYAML, its reference implementation.
-var rxYAML11Number = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^(?:` +
-		// Integers.
-		`[-+]?0b[0-1_]+|[-+]?0[0-7_]+|[-+]?(?:0|[1-9][0-9_]*)|[-+]?0x[0-9a-fA-F_]+|` +
-		`[-+]?[1-9][0-9_]*(?::[0-5]?[0-9])+|` +
-		// Floats.
-		`[-+]?[0-9][0-9_]*\.[0-9_]*(?:[eE][-+][0-9]+)?|\.[0-9_]+(?:[eE][-+][0-9]+)?|` +
-		`[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*|[-+]?\.(?:inf|Inf|INF)|\.(?:nan|NaN|NAN)` +
-		`)$`)
-})
-
-// This regular expression conservatively matches any date, time string,
-// or base60 float.
-var useQuote = sync.OnceValue(func() *regexp.Regexp {
-	return regexp.MustCompile(`^[\-+0-9:\. \t]+([-:]|[tT])[\-+0-9:\. \t]+[zZ]?$`)
-})
-
-// legacyStrings contains a map of fixed strings with special meaning for any
-// type in the YAML Tag registry (https://yaml.org/type/index.html) as used
-// in YAML 1.1.
-//
-// These strings are always double quoted upon export to allow for
-// backward compatibility with YAML 1.1 parsers.
-var legacyStrings = map[string]bool{
-	"y":     true,
-	"Y":     true,
-	"yes":   true,
-	"Yes":   true,
-	"YES":   true,
-	"n":     true,
-	"N":     true,
-	"t":     true,
-	"T":     true,
-	"f":     true,
-	"F":     true,
-	"no":    true,
-	"No":    true,
-	"NO":    true,
-	"true":  true,
-	"True":  true,
-	"TRUE":  true,
-	"false": true,
-	"False": true,
-	"FALSE": true,
-	"on":    true,
-	"On":    true,
-	"ON":    true,
-	"off":   true,
-	"Off":   true,
-	"OFF":   true,
-
-	// The default value key, which PyYAML fails to decode.
-	"=": true,
-
-	// Non-standard.
-	".Nan": true,
-}
 
 func encodeExprs(exprs []ast.Expr) ([]any, *encInfo, error) {
 	info := &encInfo{entries: make([]*encInfo, 0, len(exprs))}

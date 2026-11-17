@@ -114,10 +114,17 @@ type compState struct {
 	state  vertexStatus
 }
 
-// spawn creates a fresh Environment for the next clause in this firing,
-// tagged with the firing's CompID.
-func (s *compState) spawn(n *Vertex) *Environment {
-	e := s.ctx.spawn(n)
+// bind creates a fresh Environment for the next clause in this firing,
+// tagged with the firing's CompID, whose scope binds label to x.
+func (s *compState) bind(label Feature, x Expr) *Environment {
+	c := s.ctx
+	n := &Vertex{Arcs: []*Vertex{{
+		Label:     label,
+		IsDynamic: true,
+		anonymous: true,
+		Conjuncts: []Conjunct{{c.Env(0), x, c.ci}},
+	}}}
+	e := c.spawn(n)
 	e.CompID = s.compID
 	return e
 }

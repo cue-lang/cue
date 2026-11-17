@@ -4031,17 +4031,7 @@ func (x *LetClause) Source() ast.Node {
 }
 
 func (x *LetClause) yield(s *compState) {
-	c := s.ctx
-	n := &Vertex{Arcs: []*Vertex{
-		{
-			Label:     x.Label,
-			IsDynamic: true,
-			anonymous: true,
-			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
-		},
-	}}
-
-	s.yield(s.spawn(n))
+	s.yield(s.bind(x.Label, x.Expr))
 }
 
 // A TryClause represents a try clause in a comprehension.
@@ -4128,13 +4118,7 @@ func (x *TryClause) yield(s *compState) {
 
 	// Success - yield with fresh conjuncts (will be re-evaluated).
 	if x.Expr != nil {
-		n := &Vertex{Arcs: []*Vertex{{
-			Label:     x.Label,
-			IsDynamic: true,
-			anonymous: true,
-			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
-		}}}
-		s.yield(s.spawn(n))
+		s.yield(s.bind(x.Label, x.Expr))
 	} else {
 		s.yield(env)
 	}

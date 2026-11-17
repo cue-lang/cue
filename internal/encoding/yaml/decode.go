@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding/yaml/goccy"
+	"cuelang.org/go/internal/encoding/yaml/yamlbase"
 )
 
 // TODO(mvdan): we should sanity check that the decoder always produces valid CUE,
@@ -64,7 +65,7 @@ type decoder struct {
 	// only count the nodes it produces towards [decoder.aliasNodes].
 	aliasDepth int
 
-	// aliasNodes counts the nodes produced by alias expansion. See [maxAliasNodes].
+	// aliasNodes counts the nodes produced by alias expansion. See [yamlbase.MaxAliasNodes].
 	aliasNodes int
 
 	// lastOffset is byte offset from the last yaml.Node position that
@@ -219,8 +220,8 @@ func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
 	// outside an alias map one-to-one to the input, so are not counted.
 	if d.aliasDepth > 0 {
 		d.aliasNodes++
-		if d.aliasNodes > maxAliasNodes {
-			return nil, d.posErrorf(yn, "aliases expand to more than %d nodes", maxAliasNodes)
+		if d.aliasNodes > yamlbase.MaxAliasNodes {
+			return nil, d.posErrorf(yn, "aliases expand to more than %d nodes", yamlbase.MaxAliasNodes)
 		}
 	}
 	d.addHeadCommentsToPending(yn)
@@ -685,7 +686,7 @@ outer:
 		}
 
 		if mergeValues {
-			key := labelStr(label)
+			key := yamlbase.LabelStr(label)
 			for _, decl := range m.Elts {
 				f := decl.(*ast.Field)
 				name, _, err := ast.LabelName(f.Label)
@@ -868,17 +869,17 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		return lit, nil
 
 	case intTag:
-		expr, err := goccy.IntExpr(pos, yn.Value)
+		expr, err := yamlbase.IntExpr(pos, yn.Value)
 		if err != nil {
 			return nil, d.posErrorf(yn, "%v", err)
 		}
 		return expr, nil
 
 	case floatTag:
-		if num, ok := goccy.SpecialFloats[yn.Value]; ok {
-			return goccy.MakeNum(pos, num, token.FLOAT), nil
+		if num, ok := yamlbase.SpecialFloats[yn.Value]; ok {
+			return yamlbase.MakeNum(pos, num, token.FLOAT), nil
 		}
-		expr, err := goccy.FloatExpr(pos, yn.Value, tagged)
+		expr, err := yamlbase.FloatExpr(pos, yn.Value, tagged)
 		if err != nil {
 			return nil, d.posErrorf(yn, "%v", err)
 		}
@@ -894,12 +895,6 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		return nil, d.posErrorf(yn, "cannot unmarshal tag %q", tag)
 	}
 }
-
-// maxAliasNodes bounds the nodes produced by alias expansion. Each alias
-// reference expands into a fresh subtree, so wide fan-out can produce a
-// tree far larger than the input. Realistic documents use little or no
-// aliasing, so this limit is generous.
-const maxAliasNodes = 50_000
 
 func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	if d.extractingAliases[yn] {
@@ -948,17 +943,6 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 		n.Rbrack = d.tokFile.Pos(aliasEnd, token.Blank)
 	}
 	return node, nil
-}
-
-func labelStr(l ast.Label) string {
-	switch l := l.(type) {
-	case *ast.Ident:
-		return l.Name
-	case *ast.BasicLit:
-		s, _ := literal.Unquote(l.Value)
-		return s
-	}
-	return ""
 }
 
 func isMerge(yn *yaml.Node) bool {

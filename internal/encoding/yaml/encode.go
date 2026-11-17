@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding/yaml/goccy"
+	"cuelang.org/go/internal/encoding/yaml/yamlbase"
 )
 
 // Encode converts a CUE AST to YAML.
@@ -174,7 +175,7 @@ func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 			n.Style = yaml.LiteralStyle
 
 		default:
-			if goccy.IsYAML11NonString(str) {
+			if yamlbase.IsYAML11NonString(str) {
 				n.Style = yaml.DoubleQuotedStyle
 			}
 		}
@@ -294,7 +295,7 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			label := &yaml.Node{}
 			addDocs(x.Label, label, label)
 			label.SetString(name)
-			if goccy.IsYAML11NonString(name) {
+			if yamlbase.IsYAML11NonString(name) {
 				label.Style = yaml.DoubleQuotedStyle
 			}
 

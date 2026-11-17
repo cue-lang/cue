@@ -19,6 +19,71 @@ b: {
     leaf_ref: leaf
 
 }
+-- sibling.cue --
+// A struct which embeds a definition is closed by it, recursively, so a field
+// added from outside the struct is not allowed, even within a definition which
+// the struct declares. Embedding the definition through a disjunction makes no
+// difference. The spec does not describe embedding before v0.18.0, so these
+// cases follow the rule as the evaluator has it.
+sibling: {
+	direct: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A
+		}
+		out: #A: z: 3
+	}
+	other: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#B
+		}
+		out: #A: z: 3
+	}
+	regular: {
+		out: {
+			a: {x: 1}
+			#C
+		}
+		#C: {}
+		out: a: z: 3
+	}
+	disjunction: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A | #B
+		}
+		out: #A: z: 3
+	}
+	comprehension: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A | #B
+		}
+		if true {out: #A: z: 3}
+	}
+	reference: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A | #B
+		}
+		out: extra
+		extra: #A: z: 3
+	}
+	pattern: {
+		[string]: {#A: z: 1}
+		out: {
+			#A: {x: int}
+			#B: {y: 2}
+			#A | #B
+		}
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -36,5 +101,123 @@ b: {
     leaf: "leaf value"
     interpolation: "more \(〈0;leaf_ref〉)"
     leaf_ref: 〈0;leaf〉
+  }
+}
+--- sibling.cue
+{
+  sibling: {
+    direct: {
+      out: {
+        #A: {
+          x: 1
+        }
+        #B: {
+          y: 2
+        }
+        〈0;#A〉
+      }
+      out: {
+        #A: {
+          z: 3
+        }
+      }
+    }
+    other: {
+      out: {
+        #A: {
+          x: 1
+        }
+        #B: {
+          y: 2
+        }
+        〈0;#B〉
+      }
+      out: {
+        #A: {
+          z: 3
+        }
+      }
+    }
+    regular: {
+      out: {
+        a: {
+          x: 1
+        }
+        〈1;#C〉
+      }
+      #C: {}
+      out: {
+        a: {
+          z: 3
+        }
+      }
+    }
+    disjunction: {
+      out: {
+        #A: {
+          x: 1
+        }
+        #B: {
+          y: 2
+        }
+        (〈0;#A〉|〈0;#B〉)
+      }
+      out: {
+        #A: {
+          z: 3
+        }
+      }
+    }
+    comprehension: {
+      out: {
+        #A: {
+          x: 1
+        }
+        #B: {
+          y: 2
+        }
+        (〈0;#A〉|〈0;#B〉)
+      }
+      if true {
+        out: {
+          #A: {
+            z: 3
+          }
+        }
+      }
+    }
+    reference: {
+      out: {
+        #A: {
+          x: 1
+        }
+        #B: {
+          y: 2
+        }
+        (〈0;#A〉|〈0;#B〉)
+      }
+      out: 〈0;extra〉
+      extra: {
+        #A: {
+          z: 3
+        }
+      }
+    }
+    pattern: {
+      [string]: {
+        #A: {
+          z: 1
+        }
+      }
+      out: {
+        #A: {
+          x: int
+        }
+        #B: {
+          y: 2
+        }
+        (〈0;#A〉|〈0;#B〉)
+      }
+    }
   }
 }

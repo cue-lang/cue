@@ -1,0 +1,1324 @@
+# A struct which embeds a disjunction is copied for each disjunct, along with
+# the definitions and hidden fields which it declares. These cases cover how a
+# disjunct may affect them.
+#
+# A struct closed by an embedded definition may still declare definitions of
+# its own, which every case here relies on. The spec excludes only hidden
+# fields from closedness; see definitionsBesideEmbedding and
+# https://cuelang.org/issue/543.
+-- in.cue --
+// Definitions which only refer to each other.
+recursive: {
+	value: {
+		#T: {Type?: "T", kids?: [...#U]}
+		#U: {Type?: "U", t?: #T}
+		#N: {Type!: _} & (#T | #U)
+		#N
+		Type: "T"
+		kids: [{Type: "U", t: {Type: "T"}}]
+	}
+	type: value.kids[0].t.Type
+}
+recursiveExtra: {
+	#T: {Type?: "T", kids?: [...#U]}
+	#U: {Type?: "U", t?: #T}
+	#N: {Type!: _} & (#T | #U)
+	#N
+	Type: "T"
+	kids: [{Type: "U", t: {Type: "T", extra: 1}}]
+}
+
+// A disjunct declares a definition, directly or through a comprehension.
+disjunctDeclares: {
+	#A: {x: int}
+	#C: {#A: y: 1, t: "c"}
+	{#A: {y: 1}, t: "a"} | #C | {t: "b"}
+	out: #A
+}
+comprehensionDeclares: {
+	#A: {a: int}
+	{if true {#A: b: 1}, k: 1} | {k: 2}
+}
+dynamicDeclares: {
+	#A: {a: 1}
+	#B: {b: 1}
+	{for k in ["#A"] {(k): x: 1}} | #B
+}
+selectorDeclares: {
+	s: {#X: {#A: q: 1}}
+	#A: {a: int}
+	s.#X | {z: 1}
+}
+hiddenDeclared: {
+	_h: {a: int}
+	#A: {v: _h}
+	{_h: a: 1} | {_h: a: 2}
+}
+onlyInDisjunct: {
+	#A: {v: #Z}
+	#Z: int
+	{#Z: 1} | {#Z: 2}
+}
+
+// A disjunct declares a definition through a field which it also adds to, so
+// the declaration only shows once the field is evaluated.
+fieldDeclares: {
+	#A: {x: 1}
+	foo: {}
+	({foo: #A: z: 1} & foo) | {k: 1}
+}
+fieldDeclaresLater: {
+	#A: {x: 1}
+	foo: {}
+	{foo: #A: z: 1} | {k: 1}
+	foo | {j: 1}
+}
+definitionDeclares: {
+	#A: {x: 1}
+	#D: {}
+	({#D: #A: z: 1} & #D) | {k: 1}
+}
+hiddenDeclares: {
+	#A: {x: 1}
+	_d: {}
+	({_d: #A: z: 1} & _d) | {k: 1}
+}
+patternDeclares: {
+	#A: {x: 1}
+	foo: {}
+	{[string]: #A: z: 1} | {k: 1}
+	foo | {j: 1}
+}
+aliasDeclares: {
+	#A: {x: 1}
+	bar: {}
+	foo: bar
+	({bar: #A: z: 1} & foo) | {k: 1}
+}
+// Fields and definitions which refer to the definition see the declaration
+// too, in the disjunct which makes it and in no other.
+fieldDeclaresRead: {
+	#A: {x: 1}
+	#B: {b: #A}
+	foo: {}
+	u: #B
+	({v: #A, foo: #A: z: 1} & foo) | {k: #B.b}
+}
+fieldDeclaresSelected: {
+	#A: {x: int, y: x}
+	foo: {}
+	u: #A.x
+	({v: #A.y, foo: #A: x: 1} & foo) | {k: #A.y}
+}
+fieldDeclaresConflict: {
+	#A: {x: 1}
+	foo: {}
+	({foo: #A: x: 2} & foo) | {k: 1}
+}
+fieldDeclaresDefault: {
+	#A: {x: 1}
+	foo: {}
+	*({foo: #A: z: 1} & foo) | {k: 1}
+	o: #A
+}
+fieldDeclaresLast: {
+	#A: {x: 1}
+	#B: {y: #A}
+	foo: {}
+	{a: #B} | {b: #B} | ({foo: #A: z: 1} & foo)
+	{p: #B.y} | {q: 1}
+}
+fieldDeclaresEqual: {
+	#A: {x: 1}
+	foo: {}
+	({foo: #A: x: 1} & foo) | {foo: #A: x: 1}
+}
+fieldDeclaresEqualNested: {
+	#A: {x: 1}
+	#B: {y: 1}
+	foo: {}
+	{k: 1} | ({foo: #A: x: 1} | ({foo: #A: x: 1} & foo) | {foo: #A: x: 1, #B: y: 1})
+}
+
+// A definition refers to a field which the disjuncts set.
+refersRegular: {
+	#A: {v: x}
+	#B: #A
+	x: int
+	{x: 1} | {x: 2}
+}
+refersNested: {
+	#A: {s: {t: x}}
+	x: string
+	{x: "a"} | {x: "b"}
+}
+refersHidden: {
+	_h: int
+	#A: {v: _h}
+	{_h: 1} | {_h: 2}
+}
+refersAlias: {
+	out~X: {
+		#A: {v: X.y}
+		y: int
+		{y: 1} | {y: 2}
+	}
+}
+refersLet: {
+	let L = x
+	#A: {v: L}
+	x: int
+	{x: 1} | {x: 2}
+}
+refersDefault: {
+	#A: {v: 1 | x}
+	x: 3
+	{x: 3} | {y: 1}
+}
+refersOutside: {
+	out: {
+		#A: {v: other}
+		t: int
+		{t: 1} | {t: 2}
+	}
+	other: out.t
+}
+refersOuterScope: {
+	p: {
+		q: int
+		out: {
+			#A: {v: q}
+			#B: {w: 1}
+			#A | #B
+		}
+		out: #A: v: 2
+	}
+}
+comprehensionOverRoot: {
+	out: {
+		#A: {for k, v in out if k != "#A" {(k): v}}
+		{a: 1} | {b: 2}
+	}
+}
+
+// A definition gains a conjunct from outside the struct which embeds the
+// disjunction.
+lateConjunct: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	out: #A: z: 3
+}
+lateComprehension: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	if true {out: #A: z: 3}
+}
+lateReference: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	out: extra
+	extra: #A: z: 3
+}
+lateLookup: {
+	v: out.#A.x
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	out: #A: z: 3
+}
+latePattern: {
+	[string]: {#A: z: 1}
+	out: {
+		#A: {x: int}
+		#B: {y: 2}
+		#A | #B
+	}
+}
+lateGuarded: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		{t: 1} | *{t: 2}
+		u: #A
+	}
+	if out.t == 2 {out: #A: z: 3}
+}
+
+// Errors within definitions.
+conflictInDef: {
+	#A: {x: 1 & 2}
+	#B: {y: 2}
+	#A | #B
+}
+typoInDef: {
+	#A: {a: int}
+	#B: #A & {b: 1}
+	#C: {c: 1}
+	#C | #B
+}
+typoThroughEmbedding: {
+	#A: {a: int}
+	#B: {#A, b: 1}
+	#C: {#A & {c: 1}}
+	#B | #C
+}
+errorInUnusedDef: {
+	#A: {a: 1}
+	#B: {b: 1}
+	#Bad: {x: 1} & {x: 2}
+	#A | #B
+}
+incompleteDef: {
+	#A: {a: int, s: a + 1}
+	#B: {b: 1}
+	#A | #B
+}
+cycleDef: {
+	#A: #A & {a: 1}
+	#B: {b: 1}
+	#A | #B
+}
+structuralCycleDef: {
+	#A: {a: #A}
+	#B: {b: 1}
+	#A | #B
+}
+
+// Closedness of the struct which embeds the disjunction.
+definitionsBesideEmbedding: {
+	#A: {a: 1}
+	#B: {b: 1}
+	#A
+}
+closeRoot: close({
+	#A: {a: 1}
+	#B: {b: 1}
+	#A | #B
+})
+closedExtra: {
+	r: {
+		#A: {a: int}
+		#B: {b: int}
+		#A | #B
+	}
+	r: {a: 1, c: 2}
+}
+closeInDef: {
+	#A: close({a: int})
+	#B: {b: #A & {a: 1}}
+	#B | #A
+}
+patternsInDef: {
+	#A: {[string]: int}
+	#B: {[=~"^b"]: string}
+	#A | #B
+	foo: 1
+}
+dataExtraNested: {
+	#A: {Type?: "A", s?: #S}
+	#S: {n?: int}
+	#B: {Type?: "B"}
+	{Type!: _} & (#A | #B)
+	Type: "A"
+	s: {n: 1, m: 2}
+}
+listOfDef: {
+	#A: {l: [...#E]}
+	#E: {e: int}
+	#B: {b: 1}
+	#A | #B
+	l: [{e: 1}, {e: 2, f: 3}]
+}
+
+// Other shapes of disjunctions.
+nestedDisjunction: {
+	#A: {a: 1}
+	#B: {b: 1}
+	#C: {c: 1}
+	#X: #A | #B
+	#X | #C
+}
+twoDisjunctions: {
+	#A: {a: 1, #In: {p: int}}
+	#B: {b: 1}
+	#C: {c: #A.#In}
+	#D: {d: 1}
+	#A | #B
+	#C | #D
+}
+defaults: {
+	#A: {a: 1}
+	#B: {b: *2 | int}
+	*#A | #B
+}
+defaultSelected: {
+	#A: {a: *1 | 2}
+	#B: {b: 1}
+	*#A | #B
+	x: #A.a
+}
+inListElement: {
+	l: [{#A: {x: int}, #B: {y: 1}, #A | #B}]
+}
+unifiedTwice: {
+	s: {
+		#A: {a: int}
+		#B: {b: string}
+		#A | #B
+	}
+	t: s & {a: 1}
+	u: s & {b: "x"}
+	v: s & {c: 1}
+}
+twoLevels: {
+	#T: {
+		#A: {a: #In}
+		#In: {p: int}
+		#B: {b: 1}
+		#A | #B
+	}
+	v: #T & {a: p: 1}
+	w: #T & {b: 1}
+}
+selectedFirst: {
+	x: s.a.p
+	s: {
+		a: {p: 1}
+		#A: {a: {p: int}}
+		#B: {a: {q: int}}
+		#A | #B
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  recursive: {
+    value: {
+      #T: {
+        Type?: "T"
+        kids?: [
+          ...〈2;#U〉,
+        ]
+      }
+      #U: {
+        Type?: "U"
+        t?: 〈1;#T〉
+      }
+      #N: ({
+        Type!: _
+      } & (〈0;#T〉|〈0;#U〉))
+      〈0;#N〉
+      Type: "T"
+      kids: [
+        {
+          Type: "U"
+          t: {
+            Type: "T"
+          }
+        },
+      ]
+    }
+    type: 〈0;value〉.kids[0].t.Type
+  }
+  recursiveExtra: {
+    #T: {
+      Type?: "T"
+      kids?: [
+        ...〈2;#U〉,
+      ]
+    }
+    #U: {
+      Type?: "U"
+      t?: 〈1;#T〉
+    }
+    #N: ({
+      Type!: _
+    } & (〈0;#T〉|〈0;#U〉))
+    〈0;#N〉
+    Type: "T"
+    kids: [
+      {
+        Type: "U"
+        t: {
+          Type: "T"
+          extra: 1
+        }
+      },
+    ]
+  }
+  disjunctDeclares: {
+    #A: {
+      x: int
+    }
+    #C: {
+      #A: {
+        y: 1
+      }
+      t: "c"
+    }
+    ({
+      #A: {
+        y: 1
+      }
+      t: "a"
+    }|〈0;#C〉|{
+      t: "b"
+    })
+    out: 〈0;#A〉
+  }
+  comprehensionDeclares: {
+    #A: {
+      a: int
+    }
+    ({
+      if true {
+        #A: {
+          b: 1
+        }
+      }
+      k: 1
+    }|{
+      k: 2
+    })
+  }
+  dynamicDeclares: {
+    #A: {
+      a: 1
+    }
+    #B: {
+      b: 1
+    }
+    ({
+      for _, k in [
+        "#A",
+      ] {
+        〈1;k〉: {
+          x: 1
+        }
+      }
+    }|〈0;#B〉)
+  }
+  selectorDeclares: {
+    s: {
+      #X: {
+        #A: {
+          q: 1
+        }
+      }
+    }
+    #A: {
+      a: int
+    }
+    (〈0;s〉.#X|{
+      z: 1
+    })
+  }
+  hiddenDeclared: {
+    _h: {
+      a: int
+    }
+    #A: {
+      v: 〈1;_h〉
+    }
+    ({
+      _h: {
+        a: 1
+      }
+    }|{
+      _h: {
+        a: 2
+      }
+    })
+  }
+  onlyInDisjunct: {
+    #A: {
+      v: 〈1;#Z〉
+    }
+    #Z: int
+    ({
+      #Z: 1
+    }|{
+      #Z: 2
+    })
+  }
+  fieldDeclares: {
+    #A: {
+      x: 1
+    }
+    foo: {}
+    (({
+      foo: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      k: 1
+    })
+  }
+  fieldDeclaresLater: {
+    #A: {
+      x: 1
+    }
+    foo: {}
+    ({
+      foo: {
+        #A: {
+          z: 1
+        }
+      }
+    }|{
+      k: 1
+    })
+    (〈0;foo〉|{
+      j: 1
+    })
+  }
+  definitionDeclares: {
+    #A: {
+      x: 1
+    }
+    #D: {}
+    (({
+      #D: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;#D〉)|{
+      k: 1
+    })
+  }
+  hiddenDeclares: {
+    #A: {
+      x: 1
+    }
+    _d: {}
+    (({
+      _d: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;_d〉)|{
+      k: 1
+    })
+  }
+  patternDeclares: {
+    #A: {
+      x: 1
+    }
+    foo: {}
+    ({
+      [string]: {
+        #A: {
+          z: 1
+        }
+      }
+    }|{
+      k: 1
+    })
+    (〈0;foo〉|{
+      j: 1
+    })
+  }
+  aliasDeclares: {
+    #A: {
+      x: 1
+    }
+    bar: {}
+    foo: 〈0;bar〉
+    (({
+      bar: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      k: 1
+    })
+  }
+  fieldDeclaresRead: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      b: 〈1;#A〉
+    }
+    foo: {}
+    u: 〈0;#B〉
+    (({
+      v: 〈1;#A〉
+      foo: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      k: 〈1;#B〉.b
+    })
+  }
+  fieldDeclaresSelected: {
+    #A: {
+      x: int
+      y: 〈0;x〉
+    }
+    foo: {}
+    u: 〈0;#A〉.x
+    (({
+      v: 〈1;#A〉.y
+      foo: {
+        #A: {
+          x: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      k: 〈1;#A〉.y
+    })
+  }
+  fieldDeclaresConflict: {
+    #A: {
+      x: 1
+    }
+    foo: {}
+    (({
+      foo: {
+        #A: {
+          x: 2
+        }
+      }
+    } & 〈0;foo〉)|{
+      k: 1
+    })
+  }
+  fieldDeclaresDefault: {
+    #A: {
+      x: 1
+    }
+    foo: {}
+    (*({
+      foo: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      k: 1
+    })
+    o: 〈0;#A〉
+  }
+  fieldDeclaresLast: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      y: 〈1;#A〉
+    }
+    foo: {}
+    ({
+      a: 〈1;#B〉
+    }|{
+      b: 〈1;#B〉
+    }|({
+      foo: {
+        #A: {
+          z: 1
+        }
+      }
+    } & 〈0;foo〉))
+    ({
+      p: 〈1;#B〉.y
+    }|{
+      q: 1
+    })
+  }
+  fieldDeclaresEqual: {
+    #A: {
+      x: 1
+    }
+    foo: {}
+    (({
+      foo: {
+        #A: {
+          x: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      foo: {
+        #A: {
+          x: 1
+        }
+      }
+    })
+  }
+  fieldDeclaresEqualNested: {
+    #A: {
+      x: 1
+    }
+    #B: {
+      y: 1
+    }
+    foo: {}
+    ({
+      k: 1
+    }|({
+      foo: {
+        #A: {
+          x: 1
+        }
+      }
+    }|({
+      foo: {
+        #A: {
+          x: 1
+        }
+      }
+    } & 〈0;foo〉)|{
+      foo: {
+        #A: {
+          x: 1
+        }
+      }
+      #B: {
+        y: 1
+      }
+    }))
+  }
+  refersRegular: {
+    #A: {
+      v: 〈1;x〉
+    }
+    #B: 〈0;#A〉
+    x: int
+    ({
+      x: 1
+    }|{
+      x: 2
+    })
+  }
+  refersNested: {
+    #A: {
+      s: {
+        t: 〈2;x〉
+      }
+    }
+    x: string
+    ({
+      x: "a"
+    }|{
+      x: "b"
+    })
+  }
+  refersHidden: {
+    _h: int
+    #A: {
+      v: 〈1;_h〉
+    }
+    ({
+      _h: 1
+    }|{
+      _h: 2
+    })
+  }
+  refersAlias: {
+    out: {
+      #A: {
+        v: 〈2;out〉.y
+      }
+      y: int
+      ({
+        y: 1
+      }|{
+        y: 2
+      })
+    }
+  }
+  refersLet: {
+    let L#1 = 〈0;x〉
+    #A: {
+      v: 〈1;let L#1〉
+    }
+    x: int
+    ({
+      x: 1
+    }|{
+      x: 2
+    })
+  }
+  refersDefault: {
+    #A: {
+      v: (1|〈1;x〉)
+    }
+    x: 3
+    ({
+      x: 3
+    }|{
+      y: 1
+    })
+  }
+  refersOutside: {
+    out: {
+      #A: {
+        v: 〈2;other〉
+      }
+      t: int
+      ({
+        t: 1
+      }|{
+        t: 2
+      })
+    }
+    other: 〈0;out〉.t
+  }
+  refersOuterScope: {
+    p: {
+      q: int
+      out: {
+        #A: {
+          v: 〈2;q〉
+        }
+        #B: {
+          w: 1
+        }
+        (〈0;#A〉|〈0;#B〉)
+      }
+      out: {
+        #A: {
+          v: 2
+        }
+      }
+    }
+  }
+  comprehensionOverRoot: {
+    out: {
+      #A: {
+        for k, v in 〈2;out〉 if (〈0;k〉 != "#A") {
+          〈1;k〉: 〈1;v〉
+        }
+      }
+      ({
+        a: 1
+      }|{
+        b: 2
+      })
+    }
+  }
+  lateConjunct: {
+    out: {
+      #A: {
+        x: 1
+      }
+      #B: {
+        y: 2
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    out: {
+      #A: {
+        z: 3
+      }
+    }
+  }
+  lateComprehension: {
+    out: {
+      #A: {
+        x: 1
+      }
+      #B: {
+        y: 2
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    if true {
+      out: {
+        #A: {
+          z: 3
+        }
+      }
+    }
+  }
+  lateReference: {
+    out: {
+      #A: {
+        x: 1
+      }
+      #B: {
+        y: 2
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    out: 〈0;extra〉
+    extra: {
+      #A: {
+        z: 3
+      }
+    }
+  }
+  lateLookup: {
+    v: 〈0;out〉.#A.x
+    out: {
+      #A: {
+        x: 1
+      }
+      #B: {
+        y: 2
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    out: {
+      #A: {
+        z: 3
+      }
+    }
+  }
+  latePattern: {
+    [string]: {
+      #A: {
+        z: 1
+      }
+    }
+    out: {
+      #A: {
+        x: int
+      }
+      #B: {
+        y: 2
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+  }
+  lateGuarded: {
+    out: {
+      #A: {
+        x: 1
+      }
+      #B: {
+        y: 2
+      }
+      ({
+        t: 1
+      }|*{
+        t: 2
+      })
+      u: 〈0;#A〉
+    }
+    if (〈0;out〉.t == 2) {
+      out: {
+        #A: {
+          z: 3
+        }
+      }
+    }
+  }
+  conflictInDef: {
+    #A: {
+      x: (1 & 2)
+    }
+    #B: {
+      y: 2
+    }
+    (〈0;#A〉|〈0;#B〉)
+  }
+  typoInDef: {
+    #A: {
+      a: int
+    }
+    #B: (〈0;#A〉 & {
+      b: 1
+    })
+    #C: {
+      c: 1
+    }
+    (〈0;#C〉|〈0;#B〉)
+  }
+  typoThroughEmbedding: {
+    #A: {
+      a: int
+    }
+    #B: {
+      〈1;#A〉
+      b: 1
+    }
+    #C: {
+      (〈1;#A〉 & {
+        c: 1
+      })
+    }
+    (〈0;#B〉|〈0;#C〉)
+  }
+  errorInUnusedDef: {
+    #A: {
+      a: 1
+    }
+    #B: {
+      b: 1
+    }
+    #Bad: ({
+      x: 1
+    } & {
+      x: 2
+    })
+    (〈0;#A〉|〈0;#B〉)
+  }
+  incompleteDef: {
+    #A: {
+      a: int
+      s: (〈0;a〉 + 1)
+    }
+    #B: {
+      b: 1
+    }
+    (〈0;#A〉|〈0;#B〉)
+  }
+  cycleDef: {
+    #A: (〈0;#A〉 & {
+      a: 1
+    })
+    #B: {
+      b: 1
+    }
+    (〈0;#A〉|〈0;#B〉)
+  }
+  structuralCycleDef: {
+    #A: {
+      a: 〈1;#A〉
+    }
+    #B: {
+      b: 1
+    }
+    (〈0;#A〉|〈0;#B〉)
+  }
+  definitionsBesideEmbedding: {
+    #A: {
+      a: 1
+    }
+    #B: {
+      b: 1
+    }
+    〈0;#A〉
+  }
+  closeRoot: close({
+    #A: {
+      a: 1
+    }
+    #B: {
+      b: 1
+    }
+    (〈0;#A〉|〈0;#B〉)
+  })
+  closedExtra: {
+    r: {
+      #A: {
+        a: int
+      }
+      #B: {
+        b: int
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    r: {
+      a: 1
+      c: 2
+    }
+  }
+  closeInDef: {
+    #A: close({
+      a: int
+    })
+    #B: {
+      b: (〈1;#A〉 & {
+        a: 1
+      })
+    }
+    (〈0;#B〉|〈0;#A〉)
+  }
+  patternsInDef: {
+    #A: {
+      [string]: int
+    }
+    #B: {
+      [=~"^b"]: string
+    }
+    (〈0;#A〉|〈0;#B〉)
+    foo: 1
+  }
+  dataExtraNested: {
+    #A: {
+      Type?: "A"
+      s?: 〈1;#S〉
+    }
+    #S: {
+      n?: int
+    }
+    #B: {
+      Type?: "B"
+    }
+    ({
+      Type!: _
+    } & (〈0;#A〉|〈0;#B〉))
+    Type: "A"
+    s: {
+      n: 1
+      m: 2
+    }
+  }
+  listOfDef: {
+    #A: {
+      l: [
+        ...〈2;#E〉,
+      ]
+    }
+    #E: {
+      e: int
+    }
+    #B: {
+      b: 1
+    }
+    (〈0;#A〉|〈0;#B〉)
+    l: [
+      {
+        e: 1
+      },
+      {
+        e: 2
+        f: 3
+      },
+    ]
+  }
+  nestedDisjunction: {
+    #A: {
+      a: 1
+    }
+    #B: {
+      b: 1
+    }
+    #C: {
+      c: 1
+    }
+    #X: (〈0;#A〉|〈0;#B〉)
+    (〈0;#X〉|〈0;#C〉)
+  }
+  twoDisjunctions: {
+    #A: {
+      a: 1
+      #In: {
+        p: int
+      }
+    }
+    #B: {
+      b: 1
+    }
+    #C: {
+      c: 〈1;#A〉.#In
+    }
+    #D: {
+      d: 1
+    }
+    (〈0;#A〉|〈0;#B〉)
+    (〈0;#C〉|〈0;#D〉)
+  }
+  defaults: {
+    #A: {
+      a: 1
+    }
+    #B: {
+      b: (*2|int)
+    }
+    (*〈0;#A〉|〈0;#B〉)
+  }
+  defaultSelected: {
+    #A: {
+      a: (*1|2)
+    }
+    #B: {
+      b: 1
+    }
+    (*〈0;#A〉|〈0;#B〉)
+    x: 〈0;#A〉.a
+  }
+  inListElement: {
+    l: [
+      {
+        #A: {
+          x: int
+        }
+        #B: {
+          y: 1
+        }
+        (〈0;#A〉|〈0;#B〉)
+      },
+    ]
+  }
+  unifiedTwice: {
+    s: {
+      #A: {
+        a: int
+      }
+      #B: {
+        b: string
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    t: (〈0;s〉 & {
+      a: 1
+    })
+    u: (〈0;s〉 & {
+      b: "x"
+    })
+    v: (〈0;s〉 & {
+      c: 1
+    })
+  }
+  twoLevels: {
+    #T: {
+      #A: {
+        a: 〈1;#In〉
+      }
+      #In: {
+        p: int
+      }
+      #B: {
+        b: 1
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+    v: (〈0;#T〉 & {
+      a: {
+        p: 1
+      }
+    })
+    w: (〈0;#T〉 & {
+      b: 1
+    })
+  }
+  selectedFirst: {
+    x: 〈0;s〉.a.p
+    s: {
+      a: {
+        p: 1
+      }
+      #A: {
+        a: {
+          p: int
+        }
+      }
+      #B: {
+        a: {
+          q: int
+        }
+      }
+      (〈0;#A〉|〈0;#B〉)
+    }
+  }
+}

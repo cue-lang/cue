@@ -1,0 +1,609 @@
+# A struct which embeds a disjunction is copied for each disjunct, along with
+# the definitions and hidden fields which it declares. These cases cover how a
+# disjunct may affect them.
+#
+# A struct closed by an embedded definition may still declare definitions of
+# its own, which every case here relies on. The spec excludes only hidden
+# fields from closedness; see definitionsBesideEmbedding and
+# https://cuelang.org/issue/543.
+-- in.cue --
+// Definitions which only refer to each other.
+recursive: {
+	value: {
+		#T: {Type?: "T", kids?: [...#U]}
+		#U: {Type?: "U", t?: #T}
+		#N: {Type!: _} & (#T | #U)
+		#N
+		Type: "T"
+		kids: [{Type: "U", t: {Type: "T"}}]
+	}
+	type: value.kids[0].t.Type @test(eq, "T")
+}
+recursiveExtra: {
+	#T: {Type?: "T", kids?: [...#U]}
+	#U: {Type?: "U", t?: #T}
+	#N: {Type!: _} & (#T | #U)
+	#N
+	Type: "T"
+	kids: [{Type: "U", t: {Type: "T", extra: 1}}]
+	@test(err, code=eval,
+		suberr=(code=eval, path=Type, contains="conflicting values %s and %s", args=["U", "T"], pos=[2:14, 3:25, 4:2, 5:8]),
+		suberr=(code=eval, path=kids.0.t.extra, contains="field not allowed", pos=[6:36]))
+}
+
+// A disjunct declares a definition, directly or through a comprehension.
+disjunctDeclares: {
+	#A: {x: int}
+	#C: {#A: y: 1, t: "c"}
+	{#A: {y: 1}, t: "a"} | #C | {t: "b"}
+	out: #A
+	@test(eq, {#A: {x: int, y: 1}, #C: {#A: {y: 1}, t: "c"}, out: {x: int, y: 1}, t: "a"} | {#A: {x: int}, #C: {#A: {y: 1}, t: "c"}, out: {x: int}, t: "b"})
+}
+comprehensionDeclares: {
+	#A: {a: int}
+	{if true {#A: b: 1}, k: 1} | {k: 2}
+	@test(eq, {#A: {a: int, b: 1}, k: 1} | {#A: {a: int}, k: 2})
+}
+dynamicDeclares: {
+	#A: {a: 1}
+	#B: {b: 1}
+	{for k in ["#A"] {(k): x: 1}} | #B
+	@test(eq, {#A: {a: 1}, #B: {b: 1}, "#A": {x: 1}} | {#A: {a: 1}, #B: {b: 1}, b: 1})
+}
+selectorDeclares: {
+	s: {#X: {#A: q: 1}}
+	#A: {a: int}
+	s.#X | {z: 1}
+	@test(eq, {
+		s: {#X: {#A: {q: 1}}}
+		#A: {a: int}
+		z: 1
+	})
+}
+hiddenDeclared: {
+	_h: {a: int}
+	#A: {v: _h}
+	{_h: a: 1} | {_h: a: 2}
+	@test(eq, {_h: {a: 1}, #A: {v: {a: 1}}} | {_h: {a: 2}, #A: {v: {a: 2}}})
+}
+onlyInDisjunct: {
+	#A: {v: #Z}
+	#Z: int
+	{#Z: 1} | {#Z: 2}
+	@test(eq, {#A: {v: 1}, #Z: 1} | {#A: {v: 2}, #Z: 2})
+}
+
+// A disjunct declares a definition through a field which it also adds to, so
+// the declaration only shows once the field is evaluated.
+fieldDeclares: {
+	#A: {x: 1}
+	foo: {}
+	({foo: #A: z: 1} & foo) | {k: 1}
+	@test(eq, {#A: {x: 1, z: 1}, foo: {#A: {z: 1}}} | {#A: {x: 1}, foo: {}, k: 1})
+}
+fieldDeclaresLater: {
+	#A: {x: 1}
+	foo: {}
+	{foo: #A: z: 1} | {k: 1}
+	foo | {j: 1}
+	@test(eq, {#A: {x: 1, z: 1}, foo: {#A: {z: 1}}} | {#A: {x: 1}, foo: {#A: {z: 1}}, j: 1} | {#A: {x: 1}, foo: {}, k: 1} | {#A: {x: 1}, foo: {}, k: 1, j: 1})
+}
+definitionDeclares: {
+	#A: {x: 1}
+	#D: {}
+	({#D: #A: z: 1} & #D) | {k: 1}
+	@test(eq, {#A: {x: 1}, #D: {}, k: 1})
+}
+hiddenDeclares: {
+	#A: {x: 1}
+	_d: {}
+	({_d: #A: z: 1} & _d) | {k: 1}
+	@test(eq, {#A: {x: 1, z: 1}, _d: {#A: {z: 1}}} | {#A: {x: 1}, _d: {}, k: 1})
+}
+patternDeclares: {
+	#A: {x: 1}
+	foo: {}
+	{[string]: #A: z: 1} | {k: 1}
+	foo | {j: 1}
+	@test(eq, {#A: {x: 1, z: 1}, foo: {#A: {z: 1}}} | {#A: {x: 1}, foo: {}, k: 1} | {#A: {x: 1}, foo: {}, k: 1, j: 1})
+}
+aliasDeclares: {
+	#A: {x: 1}
+	bar: {}
+	foo: bar
+	({bar: #A: z: 1} & foo) | {k: 1}
+	@test(eq, {#A: {x: 1, z: 1}, bar: {#A: {z: 1}}, foo: {#A: {z: 1}}} | {#A: {x: 1}, bar: {}, foo: {}, k: 1})
+}
+// Fields and definitions which refer to the definition see the declaration
+// too, in the disjunct which makes it and in no other.
+fieldDeclaresRead: {
+	#A: {x: 1}
+	#B: {b: #A}
+	foo: {}
+	u: #B
+	({v: #A, foo: #A: z: 1} & foo) | {k: #B.b}
+	@test(eq, {#A: {x: 1, z: 1}, #B: {b: {x: 1, z: 1}}, foo: {#A: {z: 1}}, u: {b: {x: 1, z: 1}}, v: {x: 1, z: 1}} | {#A: {x: 1}, #B: {b: {x: 1}}, foo: {}, u: {b: {x: 1}}, k: {x: 1}})
+}
+fieldDeclaresSelected: {
+	#A: {x: int, y: x}
+	foo: {}
+	u: #A.x
+	({v: #A.y, foo: #A: x: 1} & foo) | {k: #A.y}
+	@test(eq, {#A: {x: 1, y: 1}, foo: {#A: {x: 1}}, u: 1, v: 1} | {#A: {x: int, y: int}, foo: {}, u: int, k: int})
+}
+fieldDeclaresConflict: {
+	#A: {x: 1}
+	foo: {}
+	({foo: #A: x: 2} & foo) | {k: 1}
+	@test(eq, {#A: {x: 1}, foo: {}, k: 1})
+}
+fieldDeclaresDefault: {
+	#A: {x: 1}
+	foo: {}
+	*({foo: #A: z: 1} & foo) | {k: 1}
+	o: #A
+	@test(eq, *{#A: {x: 1, z: 1}, foo: {#A: {z: 1}}, o: {x: 1, z: 1}} | {#A: {x: 1}, foo: {}, o: {x: 1}, k: 1})
+}
+fieldDeclaresLast: {
+	#A: {x: 1}
+	#B: {y: #A}
+	foo: {}
+	{a: #B} | {b: #B} | ({foo: #A: z: 1} & foo)
+	{p: #B.y} | {q: 1}
+	@test(eq, {#A: {x: 1}, #B: {y: {x: 1}}, foo: {}, a: {y: {x: 1}}, p: {x: 1}} | {#A: {x: 1}, #B: {y: {x: 1}}, foo: {}, a: {y: {x: 1}}, q: 1} | {#A: {x: 1}, #B: {y: {x: 1}}, foo: {}, b: {y: {x: 1}}, p: {x: 1}} | {#A: {x: 1}, #B: {y: {x: 1}}, foo: {}, b: {y: {x: 1}}, q: 1} | {#A: {x: 1, z: 1}, #B: {y: {x: 1, z: 1}}, foo: {#A: {z: 1}}, p: {x: 1, z: 1}} | {#A: {x: 1, z: 1}, #B: {y: {x: 1, z: 1}}, foo: {#A: {z: 1}}, q: 1})
+}
+fieldDeclaresEqual: {
+	#A: {x: 1}
+	foo: {}
+	({foo: #A: x: 1} & foo) | {foo: #A: x: 1}
+	@test(eq, {#A: {x: 1}, foo: {#A: {x: 1}}})
+}
+fieldDeclaresEqualNested: {
+	#A: {x: 1}
+	#B: {y: 1}
+	foo: {}
+	{k: 1} | ({foo: #A: x: 1} | ({foo: #A: x: 1} & foo) | {foo: #A: x: 1, #B: y: 1})
+	@test(eq, {#A: {x: 1}, #B: {y: 1}, foo: {}, k: 1} | {#A: {x: 1}, #B: {y: 1}, foo: {#A: {x: 1}}})
+}
+
+// A definition refers to a field which the disjuncts set.
+refersRegular: {
+	#A: {v: x}
+	#B: #A
+	x: int
+	{x: 1} | {x: 2}
+	@test(eq, {#A: {v: 1}, #B: {v: 1}, x: 1} | {#A: {v: 2}, #B: {v: 2}, x: 2})
+}
+refersNested: {
+	#A: {s: {t: x}}
+	x: string
+	{x: "a"} | {x: "b"}
+	@test(eq, {#A: {s: {t: "a"}}, x: "a"} | {#A: {s: {t: "b"}}, x: "b"})
+}
+refersHidden: {
+	_h: int
+	#A: {v: _h}
+	{_h: 1} | {_h: 2}
+	@test(eq, {_h: 1, #A: {v: 1}} | {_h: 2, #A: {v: 2}})
+}
+refersAlias: {
+	out~X: {
+		#A: {v: X.y}
+		y: int
+		{y: 1} | {y: 2}
+	}
+	@test(eq, {
+		out: {#A: {v: 1}, y: 1} | {#A: {v: 2}, y: 2}
+	}, incorrect, hint="by the spec X is the field out, whose value is the unresolved disjunction, so v is incomplete in each disjunct")
+	@test(eq:todo, {
+		out: {#A: {v: out.y}, y: 1} | {#A: {v: out.y}, y: 2}
+	})
+}
+refersLet: {
+	let L = x
+	#A: {v: L}
+	x: int
+	{x: 1} | {x: 2}
+	@test(eq, {#A: {v: 1}, x: 1} | {#A: {v: 2}, x: 2})
+}
+refersDefault: {
+	#A: {v: 1 | x}
+	x: 3
+	{x: 3} | {y: 1}
+	@test(eq, {#A: {v: 1 | 3}, x: 3} | {#A: {v: 1 | 3}, x: 3, y: 1})
+}
+refersOutside: {
+	out: {
+		#A: {v: other}
+		t: int
+		{t: 1} | {t: 2}
+	}
+	other: out.t
+	@test(eq, {
+		out: {#A: {v: 1}, t: 1} | {#A: {v: 2}, t: 2}
+		other: _|_ @test(err, code=incomplete, contains="refersOutside.other: unresolved disjunction {#A:{v:1},t:1} | {#A:{v:2},t:2} (type struct)", pos=[6:9])
+	}, incorrect, hint="other is one field outside the struct, so v holds the same incomplete value in each disjunct")
+	@test(eq:todo, {
+		out: {#A: {v: out.t}, t: 1} | {#A: {v: out.t}, t: 2}
+		other: out.t
+	})
+}
+refersOuterScope: {
+	p: {
+		q: int
+		out: {
+			#A: {v: q}
+			#B: {w: 1}
+			#A | #B
+		}
+		out: #A: v: 2
+	}
+	@test(eq, {
+		p: {
+			q: int
+			out: {#A: {v: 2}, #B: {w: 1}, v: 2} | {#A: {v: 2}, #B: {w: 1}, w: 1}
+		}
+	})
+}
+comprehensionOverRoot: {
+	out: {
+		#A: {for k, v in out if k != "#A" {(k): v}}
+		{a: 1} | {b: 2}
+	}
+	@test(eq, {
+		out: {#A: {a: 1}, a: 1} | {#A: {b: 2}, b: 2}
+	}, incorrect, hint="by the spec out is the unresolved disjunction, so the comprehension is incomplete in each disjunct")
+	@test(eq:todo, {
+		out: {#A: {for k, v in out if k != "#A" {(k): v}}, a: 1} | {#A: {for k, v in out if k != "#A" {(k): v}}, b: 2}
+	})
+}
+
+// A definition gains a conjunct from outside the struct which embeds the
+// disjunction.
+lateConjunct: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	out: #A: z: 3
+	@test(eq, {
+		out: {#A: {x: 1, z: 3}, #B: {y: 2}, x: 1, z: 3} | {#A: {x: 1, z: 3}, #B: {y: 2}, y: 2}
+	})
+}
+lateComprehension: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	if true {out: #A: z: 3}
+	@test(eq, {
+		out: {#A: {z: 3, x: 1}, #B: {y: 2}, x: 1, z: 3} | {#A: {z: 3, x: 1}, #B: {y: 2}, y: 2}
+	})
+}
+lateReference: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	out: extra
+	extra: #A: z: 3
+	@test(eq, {
+		out: {#A: {x: 1, z: 3}, #B: {y: 2}, x: 1, z: 3} | {#A: {x: 1, z: 3}, #B: {y: 2}, y: 2}
+		extra: {#A: {z: 3}}
+	})
+}
+lateLookup: {
+	v: out.#A.x
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		#A | #B
+	}
+	out: #A: z: 3
+	@test(eq, {
+		v: _|_ @test(err, code=incomplete, contains="lateLookup.v: unresolved disjunction {#A:{x:1,z:3},#B:{y:2},x:1,z:3} | {#A:{x:1,z:3},#B:{y:2},y:2} (type struct)", pos=[1:5])
+		out: {#A: {x: 1, z: 3}, #B: {y: 2}, x: 1, z: 3} | {#A: {x: 1, z: 3}, #B: {y: 2}, y: 2}
+	})
+}
+latePattern: {
+	[string]: {#A: z: 1}
+	out: {
+		#A: {x: int}
+		#B: {y: 2}
+		#A | #B
+	}
+	@test(eq, {
+		out: {#A: {x: int, z: 1}, #B: {y: 2}, x: int, z: 1} | {#A: {x: int, z: 1}, #B: {y: 2}, y: 2}
+	})
+}
+lateGuarded: {
+	out: {
+		#A: {x: 1}
+		#B: {y: 2}
+		{t: 1} | *{t: 2}
+		u: #A
+	}
+	if out.t == 2 {out: #A: z: 3}
+	@test(eq, {
+		out: *{#A: {x: 1}, #B: {y: 2}, u: {x: 1}, t: 2} | {#A: {x: 1}, #B: {y: 2}, u: {x: 1}, t: 1}
+	}, incorrect, hint="the conjunct which the comprehension adds is lost")
+	@test(eq:todo, {
+		out: *{#A: {x: 1, z: 3}, #B: {y: 2}, u: {x: 1, z: 3}, t: 2} | {#A: {x: 1, z: 3}, #B: {y: 2}, u: {x: 1, z: 3}, t: 1}
+	})
+}
+
+// Errors within definitions.
+conflictInDef: {
+	#A: {x: 1 & 2}
+	#B: {y: 2}
+	#A | #B
+	@test(err, code=eval, path=#A.x, contains="conflicting values %s and %s", args=[2, 1], pos=[1:10, 1:14])
+}
+typoInDef: {
+	#A: {a: int}
+	#B: #A & {b: 1}
+	#C: {c: 1}
+	#C | #B
+	@test(err, code=eval, path=#B.b, contains="field not allowed", pos=[2:12])
+}
+typoThroughEmbedding: {
+	#A: {a: int}
+	#B: {#A, b: 1}
+	#C: {#A & {c: 1}}
+	#B | #C
+	@test(err, code=eval, path=#B.b, contains="field not allowed", pos=[2:11])
+}
+errorInUnusedDef: {
+	#A: {a: 1}
+	#B: {b: 1}
+	#Bad: {x: 1} & {x: 2}
+	#A | #B
+	@test(err, code=eval, path=#Bad.x, contains="conflicting values %s and %s", args=[2, 1], pos=[3:12, 3:21])
+}
+incompleteDef: {
+	#A: {a: int, s: a + 1}
+	#B: {b: 1}
+	#A | #B
+	@test(eq, {
+		#A: {
+			a: int
+			s: _|_ @test(err, code=incomplete, contains="incompleteDef.#A.s: non-concrete value int in operand to +", pos=[1:18, 1:10])
+		}
+		#B: {b: 1}
+		b: 1
+	}, incorrect, hint="the disjunct of #A is incomplete rather than failed, so it is to be kept")
+	@test(eq:todo, {#A: {a: int, s: a + 1}, #B: {b: 1}, a: int, s: a + 1} | {#A: {a: int, s: a + 1}, #B: {b: 1}, b: 1})
+}
+cycleDef: {
+	#A: #A & {a: 1}
+	#B: {b: 1}
+	#A | #B
+	@test(eq, {#A: {a: 1}, #B: {b: 1}, a: 1} | {#A: {a: 1}, #B: {b: 1}, b: 1})
+}
+structuralCycleDef: {
+	#A: {a: #A}
+	#B: {b: 1}
+	#A | #B
+	@test(err, code=structural_cycle, path=#A.a, contains="structural cycle", pos=[])
+}
+
+// Closedness of the struct which embeds the disjunction.
+definitionsBesideEmbedding: {
+	#A: {a: 1}
+	#B: {b: 1}
+	#A
+	@test(eq, {#A: {a: 1}, #B: {b: 1}, a: 1}, incorrect, hint="by the spec only hidden fields are excluded from closedness, so #A does not allow the definitions declared beside it")
+	@test(err:todo, code=eval, contains="field not allowed")
+}
+closeRoot: close({
+	#A: {a: 1}
+	#B: {b: 1}
+	#A | #B
+}) @test(eq, {#A: {a: 1}, #B: {b: 1}, a: 1} | {#A: {a: 1}, #B: {b: 1}, b: 1})
+closedExtra: {
+	r: {
+		#A: {a: int}
+		#B: {b: int}
+		#A | #B
+	}
+	r: {a: 1, c: 2}
+	@test(err, code=eval,
+		suberr=(code=eval, path=r.a, contains="field not allowed", pos=[6:6]),
+		suberr=(code=eval, path=r.c, contains="field not allowed", pos=[6:12]))
+}
+closeInDef: {
+	#A: close({a: int})
+	#B: {b: #A & {a: 1}}
+	#B | #A
+	@test(eq, {#A: {a: int}, #B: {b: {a: 1}}, b: {a: 1}} | {#A: {a: int}, #B: {b: {a: 1}}, a: int})
+}
+patternsInDef: {
+	#A: {[string]: int}
+	#B: {[=~"^b"]: string}
+	#A | #B
+	foo: 1
+	@test(eq, {#A: {}, #B: {}, foo: 1})
+}
+dataExtraNested: {
+	#A: {Type?: "A", s?: #S}
+	#S: {n?: int}
+	#B: {Type?: "B"}
+	{Type!: _} & (#A | #B)
+	Type: "A"
+	s: {n: 1, m: 2}
+	@test(err, code=eval,
+		suberr=(code=eval, path=Type, contains="conflicting values %s and %s", args=["B", "A"], pos=[3:14, 4:21, 5:8]),
+		suberr=(code=eval, path=s.m, contains="field not allowed", pos=[6:12]))
+}
+listOfDef: {
+	#A: {l: [...#E]}
+	#E: {e: int}
+	#B: {b: 1}
+	#A | #B
+	l: [{e: 1}, {e: 2, f: 3}]
+	@test(err, code=eval,
+		suberr=(code=eval, path=l, contains="field not allowed", pos=[5:2]),
+		suberr=(code=eval, path=l.1.f, contains="field not allowed", pos=[5:21]))
+}
+
+// Other shapes of disjunctions.
+nestedDisjunction: {
+	#A: {a: 1}
+	#B: {b: 1}
+	#C: {c: 1}
+	#X: #A | #B
+	#X | #C
+	@test(eq, {#A: {a: 1}, #B: {b: 1}, #C: {c: 1}, #X: {a: 1} | {b: 1}, a: 1} | {#A: {a: 1}, #B: {b: 1}, #C: {c: 1}, #X: {a: 1} | {b: 1}, b: 1} | {#A: {a: 1}, #B: {b: 1}, #C: {c: 1}, #X: {a: 1} | {b: 1}, c: 1})
+}
+twoDisjunctions: {
+	#A: {a: 1, #In: {p: int}}
+	#B: {b: 1}
+	#C: {c: #A.#In}
+	#D: {d: 1}
+	#A | #B
+	#C | #D
+	@test(err, code=eval,
+		suberr=(code=eval, path=b, contains="field not allowed", pos=[2:7]),
+		suberr=(code=eval, path=c, contains="field not allowed", pos=[3:7]),
+		suberr=(code=eval, path=d, contains="field not allowed", pos=[4:7]))
+}
+defaults: {
+	#A: {a: 1}
+	#B: {b: *2 | int}
+	*#A | #B
+	@test(eq, *{#A: {a: 1}, #B: {b: *2 | int}, a: 1} | {#A: {a: 1}, #B: {b: *2 | int}, b: *2 | int})
+}
+defaultSelected: {
+	#A: {a: *1 | 2}
+	#B: {b: 1}
+	*#A | #B
+	x: #A.a
+	@test(err, code=eval, path=x, contains="field not allowed", pos=[4:2])
+}
+inListElement: {
+	l: [{#A: {x: int}, #B: {y: 1}, #A | #B}]
+	@test(eq, {
+		l: [{#A: {x: int}, #B: {y: 1}, x: int} | {#A: {x: int}, #B: {y: 1}, y: 1}]
+	})
+}
+unifiedTwice: {
+	s: {
+		#A: {a: int}
+		#B: {b: string}
+		#A | #B
+	}
+	t: s & {a: 1}
+	u: s & {b: "x"}
+	v: s & {c: 1}
+	@test(err, code=eval, path=v.c, contains="field not allowed", pos=[8:10])
+}
+twoLevels: {
+	#T: {
+		#A: {a: #In}
+		#In: {p: int}
+		#B: {b: 1}
+		#A | #B
+	}
+	v: #T & {a: p: 1}
+	w: #T & {b: 1}
+	@test(eq, {
+		#T: {#A: {a: {p: int}}, #In: {p: int}, #B: {b: 1}, a: {p: int}} | {#A: {a: {p: int}}, #In: {p: int}, #B: {b: 1}, b: 1}
+		v: {
+			a: {p: 1}
+			#A: {a: {p: int}}
+			#In: {p: int}
+			#B: {b: 1}
+		}
+		w: {
+			b: 1
+			#A: {a: {p: int}}
+			#In: {p: int}
+			#B: {b: 1}
+		}
+	})
+}
+selectedFirst: {
+	x: s.a.p
+	s: {
+		a: {p: 1}
+		#A: {a: {p: int}}
+		#B: {a: {q: int}}
+		#A | #B
+	}
+	@test(eq, {
+		x: 1
+		s: {
+			a: {p: 1}
+			#A: {a: {p: int}}
+			#B: {a: {q: int}}
+		}
+	})
+}
+-- out/errors.txt --
+[eval] recursiveExtra: 2 errors in empty disjunction:
+recursiveExtra.Type: conflicting values "U" and "T":
+    ./in.cue:15:14
+    ./in.cue:16:25
+    ./in.cue:17:2
+    ./in.cue:18:8
+recursiveExtra.kids.0.t.extra: field not allowed:
+    ./in.cue:19:36
+[incomplete] refersOutside.other: unresolved disjunction {#A:{v:1},t:1} | {#A:{v:2},t:2} (type struct):
+    ./in.cue:212:9
+[incomplete] lateLookup.v: unresolved disjunction {#A:{x:1,z:3},#B:{y:2},x:1,z:3} | {#A:{x:1,z:3},#B:{y:2},y:2} (type struct):
+    ./in.cue:290:5
+[eval] conflictInDef.#A.x: conflicting values 2 and 1:
+    ./in.cue:331:10
+    ./in.cue:331:14
+[eval] typoInDef.#B.b: field not allowed:
+    ./in.cue:338:12
+[eval] typoThroughEmbedding.#B.b: field not allowed:
+    ./in.cue:345:11
+[eval] errorInUnusedDef.#Bad.x: conflicting values 2 and 1:
+    ./in.cue:353:12
+    ./in.cue:353:21
+[structural_cycle] structuralCycleDef.#A.a: structural cycle
+[eval] closedExtra.r: 2 errors in empty disjunction:
+closedExtra.r.a: field not allowed:
+    ./in.cue:403:6
+closedExtra.r.c: field not allowed:
+    ./in.cue:403:12
+[eval] dataExtraNested: 2 errors in empty disjunction:
+dataExtraNested.Type: conflicting values "B" and "A":
+    ./in.cue:424:14
+    ./in.cue:425:21
+    ./in.cue:426:8
+dataExtraNested.s.m: field not allowed:
+    ./in.cue:427:12
+[eval] listOfDef: 2 errors in empty disjunction:
+listOfDef.l: field not allowed:
+    ./in.cue:437:2
+listOfDef.l.1.f: field not allowed:
+    ./in.cue:437:21
+[eval] twoDisjunctions: 3 errors in empty disjunction:
+twoDisjunctions.b: field not allowed:
+    ./in.cue:454:7
+twoDisjunctions.c: field not allowed:
+    ./in.cue:455:7
+twoDisjunctions.d: field not allowed:
+    ./in.cue:456:7
+[eval] defaultSelected.x: field not allowed:
+    ./in.cue:474:2
+[eval] unifiedTwice.v.c: field not allowed:
+    ./in.cue:491:10
+-- out/eval/stats --
+Leaks:  138
+Freed:  1394
+Reused: 1315
+Allocs: 217
+Retain: 0
+
+Unifications: 576
+Conjuncts:    1163
+Disjuncts:    175
+Notifications: 108
+
+NumCloseIDs: 159

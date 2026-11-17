@@ -25,21 +25,110 @@ b: {
 		leaf_ref:      "leaf value"
 	})
 }
+-- sibling.cue --
+// A struct which embeds a definition is closed by it, recursively, so a field
+// added from outside the struct is not allowed, even within a definition which
+// the struct declares. Embedding the definition through a disjunction makes no
+// difference. The spec does not describe embedding before v0.18.0, so these
+// cases follow the rule as the evaluator has it.
+sibling: {
+	direct: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A
+		}
+		out: #A: z: 3
+		@test(err, code=eval, contains="field not allowed", pos=[6:12])
+	}
+	other: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#B
+		}
+		out: #A: z: 3
+		@test(err, code=eval, contains="field not allowed", pos=[6:12])
+	}
+	regular: {
+		out: {
+			a: {x: 1}
+			#C
+		}
+		#C: {}
+		out: a: z: 3
+		@test(err, code=eval, contains="field not allowed", pos=[6:11])
+	}
+	disjunction: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A | #B
+		}
+		out: #A: z: 3
+		@test(err, code=eval, contains="field not allowed", pos=[6:12])
+	}
+	comprehension: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A | #B
+		}
+		if true {out: #A: z: 3}
+		@test(eq, {
+			out: {#A: {z: 3, x: 1}, #B: {y: 2}, x: 1, z: 3} | {#A: {z: 3, x: 1}, #B: {y: 2}, y: 2}
+		}, incorrect)
+		@test(err:todo, p=2, code=eval, contains="field not allowed",
+			hint="a field added through a comprehension is not checked against the closed struct")
+	}
+	reference: {
+		out: {
+			#A: {x: 1}
+			#B: {y: 2}
+			#A | #B
+		}
+		out: extra
+		extra: #A: z: 3
+		@test(err, code=eval, contains="field not allowed", pos=[7:14])
+	}
+	pattern: {
+		[string]: {#A: z: 1}
+		out: {
+			#A: {x: int}
+			#B: {y: 2}
+			#A | #B
+		}
+		@test(err, code=eval, contains="field not allowed", pos=[1:18])
+	}
+}
 -- out/errors.txt --
 [eval] a.c: field not allowed:
     ./in.cue:5:4
+[eval] sibling.direct.out.#A.z: field not allowed:
+    ./sibling.cue:13:12
+[eval] sibling.other.out.#A.z: field not allowed:
+    ./sibling.cue:22:12
+[eval] sibling.regular.out.a.z: field not allowed:
+    ./sibling.cue:31:11
+[eval] sibling.disjunction.out.#A.z: field not allowed:
+    ./sibling.cue:40:12
+[eval] sibling.reference.out.#A.z: field not allowed:
+    ./sibling.cue:63:14
+[eval] sibling.pattern.out.#A.z: field not allowed:
+    ./sibling.cue:67:18
 -- out/eval/stats --
 Leaks:  0
-Freed:  11
-Reused: 3
-Allocs: 8
+Freed:  126
+Reused: 93
+Allocs: 33
 Retain: 0
 
-Unifications: 11
-Conjuncts:    16
-Disjuncts:    0
+Unifications: 69
+Conjuncts:    122
+Disjuncts:    8
+Notifications: 10
 
-NumCloseIDs: 6
+NumCloseIDs: 33
 -- out/diff-v2-v3.txt --
 Positions: v3 reports fewer positions than v2 for the "field not allowed" error.
 Reordering.

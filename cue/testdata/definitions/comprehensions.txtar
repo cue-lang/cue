@@ -14,19 +14,56 @@ issue595: {
 	}
 	@test(err, code=eval, at=files, contains="undefined field: nam", pos=[8:14, 3:10])
 }
+-- guard.cue --
+// A comparison with bottom in a guard finalizes the field it tests, which
+// computes the closedness requirements of the enclosing struct early.
+
+// The fields a disjunct declares beside the tested field are still checked.
+guardBeforeDisjunction: {
+	#A: {
+		a?: int
+		b?: {x: int}
+	}
+	oneAllowed: #A & {
+		b: {x: 1}
+		if b != _|_ {
+			{a: 1} | {typo: 2}
+		}
+	} @test(eq, {a: 1, b: {x: 1}} | {a?: int, b: {x: 1}, typo: 2}, incorrect) @test(eq:todo, {a: 1, b: {x: 1}})
+	noneAllowed: #A & {
+		b: {x: 1}
+		if b != _|_ {
+			{typo1: 1} | {typo2: 2}
+		}
+	} @test(eq, {a?: int, b: {x: 1}, typo1: 1} | {a?: int, b: {x: 1}, typo2: 2}, incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[3:5]), suberr=(contains="field not allowed", pos=[3:18]))
+	// A disjunct of an outer disjunction forks again within the guard.
+	nested: #A & ({
+		b: {x: 1}
+		if b != _|_ {
+			{a: 1} | {typo: 2}
+		}
+	} | {typo: 3}) @test(eq, {a: 1, b: {x: 1}} | {a?: int, b: {x: 1}, typo: 2}, incorrect) @test(eq:todo, {a: 1, b: {x: 1}})
+	// Without the comparison, no field is finalized before forking.
+	noGuard: #A & {
+		b: {x: 1}
+		if true {
+			{a: 1} | {typo: 2}
+		}
+	} @test(eq, {a: 1, b: {x: 1}})
+}
 -- out/errors.txt --
 [eval] issue595.files: undefined field: nam:
     ./in.cue:12:14
     ./in.cue:7:10
 -- out/eval/stats --
-Leaks:  0
-Freed:  7
-Reused: 0
-Allocs: 7
+Leaks:  5
+Freed:  65
+Reused: 44
+Allocs: 26
 Retain: 0
 
-Unifications: 7
-Conjuncts:    8
-Disjuncts:    0
+Unifications: 34
+Conjuncts:    73
+Disjuncts:    10
 
-NumCloseIDs: 2
+NumCloseIDs: 4

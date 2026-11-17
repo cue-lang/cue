@@ -13,7 +13,105 @@ issue595: {
 		files: cfg.nam
 	}
 }
+-- guard.cue --
+// A comparison with bottom in a guard finalizes the field it tests, which
+// computes the closedness requirements of the enclosing struct early.
+
+// The fields a disjunct declares beside the tested field are still checked.
+guardBeforeDisjunction: {
+	#A: {
+		a?: int
+		b?: {x: int}
+	}
+	oneAllowed: #A & {
+		b: {x: 1}
+		if b != _|_ {
+			{a: 1} | {typo: 2}
+		}
+	}
+	noneAllowed: #A & {
+		b: {x: 1}
+		if b != _|_ {
+			{typo1: 1} | {typo2: 2}
+		}
+	}
+	// A disjunct of an outer disjunction forks again within the guard.
+	nested: #A & ({
+		b: {x: 1}
+		if b != _|_ {
+			{a: 1} | {typo: 2}
+		}
+	} | {typo: 3})
+	// Without the comparison, no field is finalized before forking.
+	noGuard: #A & {
+		b: {x: 1}
+		if true {
+			{a: 1} | {typo: 2}
+		}
+	}
+}
 -- out/compile --
+--- guard.cue
+{
+  guardBeforeDisjunction: {
+    #A: {
+      a?: int
+      b?: {
+        x: int
+      }
+    }
+    oneAllowed: (〈0;#A〉 & {
+      b: {
+        x: 1
+      }
+      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+        ({
+          a: 1
+        }|{
+          typo: 2
+        })
+      }
+    })
+    noneAllowed: (〈0;#A〉 & {
+      b: {
+        x: 1
+      }
+      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+        ({
+          typo1: 1
+        }|{
+          typo2: 2
+        })
+      }
+    })
+    nested: (〈0;#A〉 & ({
+      b: {
+        x: 1
+      }
+      if (〈0;b〉 != _|_(explicit error (_|_ literal) in source)) {
+        ({
+          a: 1
+        }|{
+          typo: 2
+        })
+      }
+    }|{
+      typo: 3
+    }))
+    noGuard: (〈0;#A〉 & {
+      b: {
+        x: 1
+      }
+      if true {
+        ({
+          a: 1
+        }|{
+          typo: 2
+        })
+      }
+    })
+  }
+}
 --- in.cue
 {
   issue595: {

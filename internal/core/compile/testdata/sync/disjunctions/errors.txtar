@@ -236,7 +236,6 @@ issue4022: full: {
 // after it, which thus lack the evidence that they are allowed. Each disjunct
 // reports the error of the failed field rather than these other fields.
 reportFailedField: {
-	// The fields after #B are reported as not allowed instead.
 	def: {
 		#A: {a: int}
 		#B: #A & {b: 1}
@@ -244,7 +243,6 @@ reportFailedField: {
 		#D: {d: 1}
 		#C | #D
 	}
-	// The fields after _B are reported as not allowed instead.
 	hidden: {
 		#A: {a: int}
 		_B: #A & {b: 1}
@@ -253,7 +251,6 @@ reportFailedField: {
 		#C | #D
 	}
 	// The failed field was evaluated, so it is still checked.
-	// The fields after B are reported as not allowed as well.
 	regular: {
 		#A: {a: int}
 		B: #A & {b: 1}

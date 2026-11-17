@@ -2003,7 +2003,7 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 // The path is absolute from root and reflects where the reference resolves,
 // not its syntax: scope-relative and absolute references may report the same
 // path despite unifying differently. To tell them apart, inspect the conjunct
-// syntax via [Value.Expr] or [Value.Split].
+// syntax via [Value.Expr].
 func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.
 	if v.v == nil || v.v.IsData() {

@@ -1043,6 +1043,33 @@ g: &g [*f,*f,*f,*f,*f,*f,*f,*f,*f,*f]
 	qt.Assert(t, qt.StringContains(err.Error(), "aliases expand to more than"))
 }
 
+// TestMergeAliasFanout checks that merge keys referencing aliases count
+// towards the same expansion limit as value aliases.
+func TestMergeAliasFanout(t *testing.T) {
+	// Six levels of eight-way merges expand to ~8^6 nodes, even when the
+	// innermost map has no fields.
+	for _, l0 := range []string{"{v: 1}", "{}"} {
+		t.Run(l0, func(t *testing.T) {
+			var b strings.Builder
+			fmt.Fprintf(&b, "l0: &l0 %s\n", l0)
+			for i := 1; i <= 6; i++ {
+				fmt.Fprintf(&b, "l%d: &l%d {<<: [", i, i)
+				for j := range 8 {
+					if j > 0 {
+						b.WriteByte(',')
+					}
+					fmt.Fprintf(&b, "*l%d", i-1)
+				}
+				b.WriteString("]}\n")
+			}
+			_, err := callUnmarshal(t, b.String())
+			// TODO: merge keys do not count towards the limit, so the input
+			// is expanded in full.
+			qt.Assert(t, qt.IsNil(err))
+		})
+	}
+}
+
 func TestDecoderErrors(t *testing.T) {
 	for i, item := range unmarshalErrorTests {
 		t.Run(fmt.Sprintf("test %d: %q", i, item.data), func(t *testing.T) {

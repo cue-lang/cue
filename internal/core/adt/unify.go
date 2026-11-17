@@ -698,13 +698,21 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 		n.node.Arcs = slices.DeleteFunc(slices.Clone(n.node.Arcs), notPresent)
 	}
 
+	failed := false
 	for _, a := range n.node.Arcs {
 		if a.faultsParent() {
-			if err := a.Bottom(); err != nil {
+			// The fields after the one which fails a disjunct were skipped
+			// above, so an error one of them holds must not replace its
+			// error. A custom error may, as all of those are reported.
+			//
+			// TODO: report the custom errors of the fields which were not
+			// evaluated as well.
+			if err := a.Bottom(); err != nil && (!failed || err.Code == UserError) {
 				n.AddChildError(err)
 			}
 			success = true // other arcs are irrelevant
 		}
+		failed = failed || n.failsDisjunct(a)
 	}
 
 	// TODO: perhaps this code can go once we have builtins for comparing to

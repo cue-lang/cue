@@ -271,8 +271,8 @@ reportFailedField: {
 		} | {
 			d: 3 & 4
 		}
-		// Nor does the later error decide what kind of error the disjunct has.
-		// The custom error is listed as one of two errors instead of alone.
+		// Nor does the later error decide what kind of error the disjunct has:
+		// the custom error of the failed field is reported as such.
 		userError: {
 			early?: later
 			B:      error("custom")
@@ -280,7 +280,7 @@ reportFailedField: {
 		} | {
 			d: 3 & 4
 		}
-		// An eval error is reported instead of the structural cycle.
+		// Likewise for a structural cycle in the failed field.
 		structuralCycle: {
 			early?: later
 			B:      #L
@@ -304,7 +304,7 @@ reportFailedField: {
 		} | {
 			d: 3 & 4
 		}
-		// With a closedness error, the error of field later is reported instead.
+		// The same holds if the failed field has a closedness error.
 		closed: {
 			early?: later
 			B:      #A & {b: 1}

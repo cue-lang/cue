@@ -339,6 +339,10 @@ type nodeContext struct {
 	// instead of in nodeContextState as it should be cleared when a disjunction
 	// is split off. TODO: find something more principled.
 	hasDisjunction bool
+
+	// computedCloseInfo reports whether reqSets was computed. Neither is part
+	// of nodeContextState, as a cloned disjunct computes its own sets.
+	computedCloseInfo bool
 }
 
 type nodeContextState struct {
@@ -391,7 +395,6 @@ type nodeContextState struct {
 	isDef     bool // this node is a definition
 
 	dropParentRequirements bool // used for typo checking
-	computedCloseInfo      bool // used for typo checking
 	computedFlatReplaceIDs bool // whether [nodeContext.flatReplaceIDs] has been computed
 
 	isShared         bool       // set if we are currently structure sharing

@@ -993,6 +993,7 @@ var unmarshalErrorTests = []struct {
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},
 	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
 	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
+	{"a: &a\n  <<: *a\n", `test.yaml:2: anchor "a" value contains itself`},
 	{"a: &a { b: c }\n*a : foo", "test.yaml:2: invalid map key: !!map"},
 	{"a: &a [b]\n*a : foo", "test.yaml:2: invalid map key: !!seq"},
 	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},
@@ -1063,9 +1064,8 @@ func TestMergeAliasFanout(t *testing.T) {
 				b.WriteString("]}\n")
 			}
 			_, err := callUnmarshal(t, b.String())
-			// TODO: merge keys do not count towards the limit, so the input
-			// is expanded in full.
-			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.IsNotNil(err))
+			qt.Assert(t, qt.StringContains(err.Error(), "aliases expand to more than"))
 		})
 	}
 }

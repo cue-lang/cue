@@ -58,12 +58,10 @@ type decoder struct {
 	// but we need to extract these comments first since they have earlier positions.
 	pendingHeadComments []*ast.Comment
 
-	// extractingAliases ensures we don't loop forever when expanding YAML anchors.
+	// extractingAliases holds the aliases being expanded, so that we
+	// don't loop forever when expanding YAML anchors, and so that we only
+	// count the nodes they produce towards [decoder.aliasNodes].
 	extractingAliases map[*yaml.Node]bool
-
-	// aliasDepth is positive while we are expanding an alias, so that we
-	// only count the nodes it produces towards [decoder.aliasNodes].
-	aliasDepth int
 
 	// aliasNodes counts the nodes produced by alias expansion. See [yamlbase.MaxAliasNodes].
 	aliasNodes int
@@ -215,14 +213,22 @@ func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 	return n, nil
 }
 
-func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
-	// Reject documents whose aliases expand into too large a tree; nodes
-	// outside an alias map one-to-one to the input, so are not counted.
-	if d.aliasDepth > 0 {
+// countAliasNode rejects documents whose aliases expand into too large a
+// tree; nodes outside an alias map one-to-one to the input, so are not
+// counted.
+func (d *decoder) countAliasNode(yn *yaml.Node) error {
+	if len(d.extractingAliases) > 0 {
 		d.aliasNodes++
 		if d.aliasNodes > yamlbase.MaxAliasNodes {
-			return nil, d.posErrorf(yn, "aliases expand to more than %d nodes", yamlbase.MaxAliasNodes)
+			return d.posErrorf(yn, "aliases expand to more than %d nodes", yamlbase.MaxAliasNodes)
 		}
+	}
+	return nil
+}
+
+func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {
+	if err := d.countAliasNode(yn); err != nil {
+		return nil, err
 	}
 	d.addHeadCommentsToPending(yn)
 	var expr ast.Expr
@@ -712,10 +718,18 @@ outer:
 }
 
 func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
+	// Merging maps without fields extracts no nodes, so count merges too.
+	if err := d.countAliasNode(yn); err != nil {
+		return err
+	}
 	switch yn.Kind {
 	case yaml.MappingNode:
 		return d.insertMap(yn, m, multiline, true)
 	case yaml.AliasNode:
+		if err := d.enterAlias(yn); err != nil {
+			return err
+		}
+		defer delete(d.extractingAliases, yn)
 		return d.insertMap(yn.Alias, m, multiline, true)
 	case yaml.SequenceNode:
 		// Step backwards as earlier nodes take precedence.
@@ -896,15 +910,26 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 	}
 }
 
-func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
+// enterAlias marks the alias yn, which may be a value or a merge key, as
+// being expanded, rejecting an alias which is already being expanded.
+// The caller deletes yn from [decoder.extractingAliases] once expanded.
+func (d *decoder) enterAlias(yn *yaml.Node) error {
 	if d.extractingAliases[yn] {
 		// TODO this could actually be allowed in some circumstances.
-		return nil, d.posErrorf(yn, "anchor %q value contains itself", yn.Value)
+		return d.posErrorf(yn, "anchor %q value contains itself", yn.Value)
 	}
 	if d.extractingAliases == nil {
 		d.extractingAliases = make(map[*yaml.Node]bool)
 	}
 	d.extractingAliases[yn] = true
+	return nil
+}
+
+func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
+	if err := d.enterAlias(yn); err != nil {
+		return nil, err
+	}
+	defer delete(d.extractingAliases, yn)
 
 	// Save and reset decoder state so the alias extraction doesn't
 	// interfere with the outer position tracking. The aliased node
@@ -917,14 +942,11 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	d.lastOffset = -1 // no position yet, so pos() produces valid positions for the alias's children
 	d.forceNewline = false
 
-	d.aliasDepth++
 	node, err := d.extract(yn.Alias)
-	d.aliasDepth--
 
 	d.lastOffset = savedLastOffset
 	d.forceNewline = savedForceNewline
 	d.scopeEnd = savedScopeEnd
-	delete(d.extractingAliases, yn)
 	if err != nil {
 		return nil, err
 	}

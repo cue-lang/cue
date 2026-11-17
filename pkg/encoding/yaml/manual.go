@@ -66,12 +66,12 @@ func MarshalStream(v cue.Value) (string, error) {
 
 // Unmarshal parses the YAML to a CUE expression.
 func Unmarshal(data []byte) (ast.Expr, error) {
-	return cueyaml.Unmarshal("", data)
+	return cueyaml.Unmarshal("-", data)
 }
 
 // UnmarshalStream parses the YAML to a CUE list expression on success.
 func UnmarshalStream(data []byte) (ast.Expr, error) {
-	d := cueyaml.NewDecoder("", data)
+	d := cueyaml.NewDecoder("-", data)
 	a := []ast.Expr{}
 	for {
 		x, err := d.Decode()

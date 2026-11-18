@@ -2726,6 +2726,10 @@ func TestUnify(t *testing.T) {
 		pathB string
 		pathC string
 
+		// pathAB, if set, is selected from the unification of A and B
+		// before it is unified with C.
+		pathAB string
+
 		// pathV, if set, is the path of a validator which must accept
 		// the unification of A and B before it is unified with C.
 		pathV string
@@ -2882,6 +2886,74 @@ func TestUnify(t *testing.T) {
 		pathC: "cDef",
 		want:  `cue: marshal error: x.#def: conflicting values 5 and 6`,
 	}, {
+		// Issue #4589: a definition is closed at every level, even when
+		// close also closes its value at one level.
+		value: `
+			#F: close({a: b: 1})
+			y: a: z: 1
+			`,
+		pathA: "#F",
+		pathB: "y",
+		// TODO: a.z should not be allowed.
+		want: `{"a":{"b":1,"z":1}}`,
+	}, {
+		value: `
+			#F: close({a: b: 1})
+			x: #F
+			y: a: z: 1
+			`,
+		pathA: "x",
+		pathB: "y",
+		// TODO: a.z should not be allowed.
+		want: `{"a":{"b":1,"z":1}}`,
+	}, {
+		// Data unified into a definition looked up by its name is closed
+		// like the fields which the definition declares, whether or not
+		// close also closes it.
+		value: `
+			#D: in: _
+			w: in: close({a: b: 1})
+			c: a: z: 1
+			`,
+		pathA:  "#D",
+		pathB:  "w",
+		pathAB: "in",
+		pathC:  "c",
+		// TODO: a.z should not be allowed.
+		want: `{"a":{"b":1,"z":1}}`,
+	}, {
+		value: `
+			#D: in: _
+			w: in: a: b: 1
+			c: a: z: 1
+			`,
+		pathA:  "#D",
+		pathB:  "w",
+		pathAB: "in",
+		pathC:  "c",
+		want:   `cue: marshal error: #D.in.a.z: field not allowed`,
+	}, {
+		value: `
+			#Fn: {in: _, out: close(in)}
+			w: in: a: b: 1
+			c: a: z: 1
+			`,
+		pathA:  "#Fn",
+		pathB:  "w",
+		pathAB: "out",
+		pathC:  "c",
+		// TODO: a.z should not be allowed.
+		want: `{"a":{"b":1,"z":1}}`,
+	}, {
+		// Outside a definition, close closes at one level only.
+		value: `
+			x: close({a: b: 1})
+			y: a: z: 1
+			`,
+		pathA: "x",
+		pathB: "y",
+		want:  `{"a":{"b":1,"z":1}}`,
+	}, {
 		// Issue #4549: the parent of a field in an imported definition
 		// keeps its evaluation state from the context which evaluated it,
 		// and the unification must not use its stale closedness info.
@@ -2932,6 +3004,9 @@ y: [1]
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
 			y := v.LookupPath(cue.ParsePath(tc.pathB))
 			x = x.Unify(y)
+			if tc.pathAB != "" {
+				x = x.LookupPath(cue.ParsePath(tc.pathAB))
+			}
 			if tc.pathV != "" {
 				val := v.LookupPath(cue.ParsePath(tc.pathV))
 				if err := val.Unify(x).Validate(); err != nil {

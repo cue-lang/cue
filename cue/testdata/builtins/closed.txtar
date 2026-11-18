@@ -223,6 +223,106 @@ issue4535: {
 	nested:     close(close({k: int, if k == 1 {y: 1}})) & {k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
 	expression: close(x & {}) & {k: 1} @test(err, code=incomplete, contains="non-concrete value int in operand to ==") @test(eq:todo, {k: 1, y: 1})
 }
+
+// issue4589: a definition closes its value recursively even when it also
+// closes it at one level with close, so a nested field is denied through
+// every reference to it, whether the reference is evaluated before or after
+// the definition. https://cuelang.org/issue/4589
+issue4589: {
+	before: #F & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
+
+	#F: close({a: b: 1})
+
+	// Wrongly admitted once the definition is evaluated.
+	after:     #F & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+	swapped:   {a: z: 1} & #F @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:17])
+	noSharing: #F & {a: z: 1} & __no_sharing @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+	selected:  #F.a & {z: 1} @test(err, at=z, code=eval, contains="field not allowed", pos=[0:21])
+
+	#G: close({a: b: 1}) & {}
+	conjunction: #G & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:24])
+
+	#H: {close({a: b: 1})}
+	embedded: #H & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:21])
+
+	#N: close(close({a: b: 1}))
+	nested: #N & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
+
+	// The field declared by the definition is still allowed.
+	allowed: #F & {a: b: 1} @test(eq, {a: b: 1})
+
+	// The same holds however the definition or the call is reached.
+	held:    #F
+	viaHeld: held & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+
+	#D: x: close({a: b: 1})
+	defField: #D.x & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+
+	r: close({a: b: 1})
+	#R: r
+	viaRegular: #R & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+
+	// Only a field which the definition declares beside the call is allowed
+	// below the top level.
+	beside: {
+		#J: close({a: b: 1}) & {a: c: 1}
+		conjunct:  #J & {} @test(eq, {a: {b: 1, c: 1}})
+		noSharing: #J & __no_sharing @test(eq, {a: {b: 1, c: 1}})
+		denied:    #J & {a: z: 1} @test(eq, {a: {b: 1, c: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+
+		#L: close({a: b: 1})
+		#L: a: c: 1
+		declaration: #L & {} @test(eq, {a: {b: 1, c: 1}})
+
+		before: #O & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:20])
+		#O: close({a: _}) & {a: b: 1}
+		after: #O & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
+	}
+
+	// Outside a definition, close closes at one level only.
+	outsideDef: {
+		nested: x & {a: z: 1} @test(eq, {a: {b: 1, z: 1}})
+		top:    x & {z: 1} @test(err, at=z, code=eval, contains="field not allowed", pos=[0:16])
+		x: close({a: b: 1})
+	}
+
+	// close in a definition applied to data from outside of it closes the
+	// top level of that data. Below it, the spec does not settle whether the
+	// definition closes such data, and the two ways to extend it disagree,
+	// with or without close: a field selected from the unification admits a
+	// nested field, while unifying into the definition denies it. The nested
+	// cases record the results as they are, not what must hold.
+	openData: {
+		#Fn: {in: _, out: close(in)}
+		before: fn.out & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}, hint="the spec does not settle this; selecting from the unification and unifying into it should agree")
+		fn: #Fn & {in: {a: b: 1}}
+		after:     fn.out & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}, hint="the spec does not settle this; selecting from the unification and unifying into it should agree")
+		noSharing: fn.out & {a: z: 1} & __no_sharing @test(eq, {a: {b: 1, z: 1}}, hint="the spec does not settle this; selecting from the unification and unifying into it should agree")
+		inline:    (#Fn & {in: {a: b: 1}}).out & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}, hint="the spec does not settle this; selecting from the unification and unifying into it should agree")
+		into:      #Fn & {in: {a: b: 1}, out: a: z: 1} @test(err, at=out.a.z, code=eval, contains="field not allowed", pos=[0:44], hint="the spec does not settle this; selecting from the unification and unifying into it should agree")
+		top:       fn.out & {z: 1} @test(err, at=z, code=eval, contains="field not allowed", pos=[0:24])
+	}
+
+	// A definition recursively closes a regular struct it passes to close.
+	closeRegular: {
+		before: #C & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:20])
+		open: {a: b: 1}
+		#C: close(open)
+		after:     #C & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+		noSharing: #C & {a: z: 1} & __no_sharing @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+	}
+
+	// close applied to a definition keeps it closed recursively.
+	closeDef: {
+		#X: close(#F)
+		definition: #X & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:24])
+
+		x: close(#F)
+		reference: x & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}, incorrect) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+		inline:    close(#F) & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}, incorrect) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:30])
+		selected:  x.a & {z: 1} @test(eq, {b: 1, z: 1}, incorrect) @test(err:todo, at=z, code=eval, contains="field not allowed", pos=[0:21])
+	}
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -319,16 +419,16 @@ issue1206: elimination: {
 
 -- out/eval/stats --
 Leaks:  32
-Freed:  482
-Reused: 443
-Allocs: 71
+Freed:  729
+Reused: 668
+Allocs: 93
 Retain: 0
 
-Unifications: 348
-Conjuncts:    585
+Unifications: 571
+Conjuncts:    929
 Disjuncts:    80
 
-NumCloseIDs: 142
+NumCloseIDs: 234
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7
@@ -378,6 +478,20 @@ scalar.denied.b: field not allowed:
 [incomplete] non-concrete value int in operand to ==:
     ./in.cue:197:17
     ./in.cue:197:9
+[eval] issue4589.before.a.z: field not allowed:
+    ./in.cue:231:19
+[eval] issue4589.selected.z: field not allowed:
+    ./in.cue:239:21
+[eval] issue4589.beside.before.a.z: field not allowed:
+    ./in.cue:276:20
+[eval] issue4589.outsideDef.top.z: field not allowed:
+    ./in.cue:284:16
+[eval] issue4589.openData.into.out.a.z: field not allowed:
+    ./in.cue:301:44
+[eval] issue4589.openData.top.z: field not allowed:
+    ./in.cue:302:24
+[eval] issue4589.closeRegular.before.a.z: field not allowed:
+    ./in.cue:307:20
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

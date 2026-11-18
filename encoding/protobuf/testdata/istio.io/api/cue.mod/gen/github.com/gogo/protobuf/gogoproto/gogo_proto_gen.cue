@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BSD-2-Clause
 // Protocol Buffers for Go with Gadgets
 //
 // Copyright (c) 2013, The GoGo Authors. All rights reserved.

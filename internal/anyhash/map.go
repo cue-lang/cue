@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2025 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Derived from https://go.dev/cl/612217, a proposed addition to Go's
+// standard library.
 
 // Package anyhash defines hash-based containers such as [Map].
 // It's a clone of the up-coming functionality in the Go stdlib,

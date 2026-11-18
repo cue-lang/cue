@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Derived from golang.org/x/tools/gopls/internal/server/server.go at
+// revision c11269ccb0bf.
 
 // Package server defines the CUE implementation of the LSP server
 // interface, [protocol.Server]. Call [New] to create an instance.

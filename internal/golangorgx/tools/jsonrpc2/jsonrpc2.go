@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Derived from golang.org/x/tools/internal/jsonrpc2/jsonrpc2.go at
+// revision c11269ccb0bf.
 
 // Package jsonrpc2 is a minimal implementation of the JSON RPC 2 spec.
 // https://www.jsonrpc.org/specification

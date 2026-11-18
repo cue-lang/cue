@@ -1,6 +1,11 @@
+// SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2020 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Derived from
+// golang.org/x/tools/internal/jsonrpc2/servertest/servertest.go at
+// revision c11269ccb0bf.
 
 // Package servertest provides utilities for running tests against a remote LSP
 // server.

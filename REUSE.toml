@@ -1,0 +1,37 @@
+version = 1
+
+# The licensing of the files in this repository, following the REUSE
+# specification (https://reuse.software).
+#
+# A file which names its license in an SPDX-License-Identifier line is
+# under that license. The files derived from other projects do so,
+# beside those projects' copyright notices. Every other file is covered
+# by the annotation below. The license texts are under LICENSES/, and
+# a directory holding another project's code carries that project's
+# license text as LICENSE as well.
+[[annotations]]
+path = [
+    ".github/CODEOWNERS",
+    ".github/ISSUE_TEMPLATE/**",
+    ".github/pull_request_template.md",
+    "cmd/**",
+    "cue/**",
+    "cue.mod/**",
+    "cuego/**",
+    "doc/**",
+    "encoding/**",
+    "internal/**",
+    "mod/**",
+    "pkg/**",
+    "tools/**",
+    "unstable/**",
+    ".gitattributes",
+    "CONTRIBUTING.md",
+    "README.md",
+    "SECURITY.md",
+    "go.mod",
+    "go.sum",
+]
+precedence = "closest"
+SPDX-FileCopyrightText = "The CUE Authors"
+SPDX-License-Identifier = "Apache-2.0"

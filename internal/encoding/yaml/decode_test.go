@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Many test cases in this file were originally ported from
 // github.com/go-yaml/yaml, also known as gopkg.in/yaml.v3.
 //

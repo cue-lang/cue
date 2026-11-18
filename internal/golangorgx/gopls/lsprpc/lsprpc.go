@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2020 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Derived from golang.org/x/tools/gopls/internal/lsprpc/lsprpc.go at
+// revision c11269ccb0bf.
 
 // Package lsprpc implements a jsonrpc2.StreamServer that may be used to
 // serve the LSP on a jsonrpc2 channel.

@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2020 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Derived from cmd/go/internal/par/queue.go in the Go source tree at
+// commit a4d5fbc3a48b.
 
 package par
 

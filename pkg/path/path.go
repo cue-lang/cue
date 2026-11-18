@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0 AND BSD-3-Clause
 // Copyright 2020 CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +16,8 @@
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// Parts of this file are derived from Go's path/filepath package.
 
 // Package path implements utility routines for manipulating filename paths as
 // defined by targetted operating systems, and also paths that always use

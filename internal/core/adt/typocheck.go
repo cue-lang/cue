@@ -365,8 +365,10 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 // once, we need to ensure that within all contexts a single ID assigned to such
 // a resolver is tracked.
 //
-// closes tells how the resolved value closes the node. A reference which does
-// not name a definition passes [NoClosing]: it is only tracked for its ID.
+// closes tells how the resolved value closes the node: recursively for a
+// reference to a definition, whatever else closes its vertex, as the value
+// itself is closed for a closed value unified as is, and not at all for any
+// other reference, which is only tracked for its ID.
 func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, closes Closing) CloseInfo {
 	forceIgnore := closes == NoClosing
 	if n.ctx.OpenDef {
@@ -432,6 +434,10 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, closes Closin
 	if i := n.reqIndex(v); i >= 0 {
 		x := &n.reqDefIDs[i]
 		dstID = x.id
+		if closes == ClosesRecursively && !x.isRecursive {
+			x.isRecursive = true
+			n.invalidateReqSets()
+		}
 		if !ignore && (x.ignore || (x.conjunctOpened && !id.ConjunctOpened)) {
 			// A reference that does not open the vertex overrides the
 			// settings of an entry added by #A... or by an operand of
@@ -460,7 +466,7 @@ func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, closes Closin
 			ignore:         ignore,
 			kind:           defReference,
 			embed:          id.enclosingEmbed,
-			isRecursive:    v.ClosedRecursive,
+			isRecursive:    closes == ClosesRecursively,
 			conjunctOpened: id.ConjunctOpened,
 		})
 	}
@@ -690,8 +696,8 @@ func isClosedLiteral(s *StructLit) bool {
 
 // closeLiteral closes the node at one level for a closed struct literal,
 // #{...}, as close does: each field of the node must be declared in the
-// literal. Unlike the argument of close, the literal keeps the recursive
-// closedness of an enclosing definition, which id carries.
+// literal. Unlike the group of a close call, that of the literal applies at
+// every level within a definition, which id carries.
 func (n *nodeContext) closeLiteral(s *StructLit, id CloseInfo) CloseInfo {
 	closes := ClosesOnce
 	if id.FromDef {
@@ -722,7 +728,8 @@ func (n *nodeContext) closedScope(s *StructLit, id CloseInfo, closes Closing, re
 		r := &n.reqDefIDs[k]
 		r.ignore = id.Opened || closes == NoClosing
 		// Unlike the FromDef default of newReq, a close call inside a
-		// definition closes its literal at one level only.
+		// definition closes its literal at one level only: the reference
+		// to the definition closes the levels below.
 		r.isRecursive = closes == ClosesRecursively
 		r.parent = outer
 		r.conjunctOpened = id.ConjunctOpened
@@ -1177,18 +1184,10 @@ outer:
 				continue outer
 			}
 		}
-		once := false
-		if y.v != nil && y.kind != defEmbedding {
-			once = y.v.ClosedNonRecursive
-			if !y.ignore && !y.isRecursive {
-				once = true
-			}
-		}
-
 		a = append(a, reqSet{
 			id:             y.id,
 			parent:         y.parent,
-			once:           once,
+			once:           y.kind != defEmbedding && !y.ignore && !y.isRecursive,
 			ignored:        y.ignore,
 			embed:          y.embed,
 			kind:           y.kind,

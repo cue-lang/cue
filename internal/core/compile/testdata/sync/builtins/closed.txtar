@@ -179,7 +179,7 @@ issue4589: {
 
 	#F: close({a: b: 1})
 
-	// Wrongly admitted once the definition is evaluated.
+	// References evaluated after the definition.
 	after:     #F & {a: z: 1}
 	swapped:   {a: z: 1} & #F
 	noSharing: #F & {a: z: 1} & __no_sharing

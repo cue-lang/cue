@@ -2894,8 +2894,7 @@ func TestUnify(t *testing.T) {
 			`,
 		pathA: "#F",
 		pathB: "y",
-		// TODO: a.z should not be allowed.
-		want: `{"a":{"b":1,"z":1}}`,
+		want:  `cue: marshal error: #F.a.z: field not allowed`,
 	}, {
 		value: `
 			#F: close({a: b: 1})
@@ -2904,8 +2903,7 @@ func TestUnify(t *testing.T) {
 			`,
 		pathA: "x",
 		pathB: "y",
-		// TODO: a.z should not be allowed.
-		want: `{"a":{"b":1,"z":1}}`,
+		want:  `cue: marshal error: x.a.z: field not allowed`,
 	}, {
 		// Data unified into a definition looked up by its name is closed
 		// like the fields which the definition declares, whether or not
@@ -2919,8 +2917,7 @@ func TestUnify(t *testing.T) {
 		pathB:  "w",
 		pathAB: "in",
 		pathC:  "c",
-		// TODO: a.z should not be allowed.
-		want: `{"a":{"b":1,"z":1}}`,
+		want:   `cue: marshal error: #D.in.a.z: field not allowed`,
 	}, {
 		value: `
 			#D: in: _
@@ -2942,8 +2939,7 @@ func TestUnify(t *testing.T) {
 		pathB:  "w",
 		pathAB: "out",
 		pathC:  "c",
-		// TODO: a.z should not be allowed.
-		want: `{"a":{"b":1,"z":1}}`,
+		want:   `cue: marshal error: #Fn.out.a.z: field not allowed`,
 	}, {
 		// Outside a definition, close closes at one level only.
 		value: `

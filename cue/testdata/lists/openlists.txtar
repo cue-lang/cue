@@ -144,8 +144,8 @@ nestedClosedStruct: {
 	ok: #{y: #{d: 1, ...}, y: z: 1}     @test(eq, {y: {d: 1, z: 1}})
 }
 
-// Unlike the argument of close, the fields of a closed literal keep the
-// recursive closedness of an enclosing definition.
+// The fields of a closed literal keep the recursive closedness of an
+// enclosing definition.
 closedLiteralsInDef: {
 	#S: #{a: {b: int}}
 	#L: #[{a: int}]

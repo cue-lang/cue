@@ -233,34 +233,34 @@ issue4589: {
 
 	#F: close({a: b: 1})
 
-	// Wrongly admitted once the definition is evaluated.
-	after:     #F & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
-	swapped:   {a: z: 1} & #F @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:17])
-	noSharing: #F & {a: z: 1} & __no_sharing @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+	// References evaluated after the definition.
+	after:     #F & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+	swapped:   {a: z: 1} & #F @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:17])
+	noSharing: #F & {a: z: 1} & __no_sharing @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
 	selected:  #F.a & {z: 1} @test(err, at=z, code=eval, contains="field not allowed", pos=[0:21])
 
 	#G: close({a: b: 1}) & {}
-	conjunction: #G & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:24])
+	conjunction: #G & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:24])
 
 	#H: {close({a: b: 1})}
-	embedded: #H & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:21])
+	embedded: #H & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:21])
 
 	#N: close(close({a: b: 1}))
-	nested: #N & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
+	nested: #N & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
 
 	// The field declared by the definition is still allowed.
 	allowed: #F & {a: b: 1} @test(eq, {a: b: 1})
 
 	// The same holds however the definition or the call is reached.
 	held:    #F
-	viaHeld: held & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
+	viaHeld: held & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
 
 	#D: x: close({a: b: 1})
-	defField: #D.x & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+	defField: #D.x & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
 
 	r: close({a: b: 1})
 	#R: r
-	viaRegular: #R & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+	viaRegular: #R & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
 
 	// Only a field which the definition declares beside the call is allowed
 	// below the top level.
@@ -268,7 +268,7 @@ issue4589: {
 		#J: close({a: b: 1}) & {a: c: 1}
 		conjunct:  #J & {} @test(eq, {a: {b: 1, c: 1}})
 		noSharing: #J & __no_sharing @test(eq, {a: {b: 1, c: 1}})
-		denied:    #J & {a: z: 1} @test(eq, {a: {b: 1, c: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+		denied:    #J & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
 
 		#L: close({a: b: 1})
 		#L: a: c: 1
@@ -276,7 +276,7 @@ issue4589: {
 
 		before: #O & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:20])
 		#O: close({a: _}) & {a: b: 1}
-		after: #O & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
+		after: #O & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:19])
 	}
 
 	// Outside a definition, close closes at one level only.
@@ -308,14 +308,14 @@ issue4589: {
 		before: #C & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:20])
 		open: {a: b: 1}
 		#C: close(open)
-		after:     #C & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
-		noSharing: #C & {a: z: 1} & __no_sharing @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+		after:     #C & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
+		noSharing: #C & {a: z: 1} & __no_sharing @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:23])
 	}
 
 	// close applied to a definition keeps it closed recursively.
 	closeDef: {
 		#X: close(#F)
-		definition: #X & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:24])
+		definition: #X & {a: z: 1} @test(err, at=a.z, code=eval, contains="field not allowed", pos=[0:24])
 
 		x: close(#F)
 		reference: x & {a: z: 1} @test(eq, {a: {b: 1, z: 1}}, incorrect) @test(err:todo, at=a.z, code=eval, contains="field not allowed", pos=[0:22])
@@ -480,10 +480,32 @@ scalar.denied.b: field not allowed:
     ./in.cue:197:9
 [eval] issue4589.before.a.z: field not allowed:
     ./in.cue:231:19
+[eval] issue4589.after.a.z: field not allowed:
+    ./in.cue:236:22
+[eval] issue4589.swapped.a.z: field not allowed:
+    ./in.cue:237:17
+[eval] issue4589.noSharing.a.z: field not allowed:
+    ./in.cue:238:22
 [eval] issue4589.selected.z: field not allowed:
     ./in.cue:239:21
+[eval] issue4589.conjunction.a.z: field not allowed:
+    ./in.cue:242:24
+[eval] issue4589.embedded.a.z: field not allowed:
+    ./in.cue:245:21
+[eval] issue4589.nested.a.z: field not allowed:
+    ./in.cue:248:19
+[eval] issue4589.viaHeld.a.z: field not allowed:
+    ./in.cue:255:22
+[eval] issue4589.defField.a.z: field not allowed:
+    ./in.cue:258:23
+[eval] issue4589.viaRegular.a.z: field not allowed:
+    ./in.cue:262:23
+[eval] issue4589.beside.denied.a.z: field not allowed:
+    ./in.cue:270:23
 [eval] issue4589.beside.before.a.z: field not allowed:
     ./in.cue:276:20
+[eval] issue4589.beside.after.a.z: field not allowed:
+    ./in.cue:278:19
 [eval] issue4589.outsideDef.top.z: field not allowed:
     ./in.cue:284:16
 [eval] issue4589.openData.into.out.a.z: field not allowed:
@@ -492,6 +514,12 @@ scalar.denied.b: field not allowed:
     ./in.cue:302:24
 [eval] issue4589.closeRegular.before.a.z: field not allowed:
     ./in.cue:307:20
+[eval] issue4589.closeRegular.after.a.z: field not allowed:
+    ./in.cue:310:23
+[eval] issue4589.closeRegular.noSharing.a.z: field not allowed:
+    ./in.cue:311:23
+[eval] issue4589.closeDef.definition.a.z: field not allowed:
+    ./in.cue:317:24
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

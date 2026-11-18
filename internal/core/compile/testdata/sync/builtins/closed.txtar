@@ -271,7 +271,7 @@ issue4589: {
 }
 
 // A field may close the value it also unifies with, through any number of
-// fields. From seven of them on, a field of the value is instead rejected.
+// fields, in any order.
 chained: {
 	f0: f1 & close(f1)
 	f1: f2 & close(f2)

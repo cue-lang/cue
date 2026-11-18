@@ -299,6 +299,7 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	d.replaceIDs = append(d.replaceIDs, n.replaceIDs...)
 	d.flatReplaceIDs = append(d.flatReplaceIDs, n.flatReplaceIDs...)
 	d.minFlatReplaceIDTo = n.minFlatReplaceIDTo
+	d.containsDefIDCache = n.containsDefIDCache
 	d.conjunctInfo = append(d.conjunctInfo, n.conjunctInfo...)
 
 	// TODO: do we need to add cyclicConjuncts? Typically, cyclicConjuncts

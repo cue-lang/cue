@@ -325,10 +325,10 @@ issue4589: {
 }
 
 // A field may close the value it also unifies with, through any number of
-// fields. From seven of them on, a field of the value is instead rejected.
+// fields, in any order.
 chained: {
-	f0: f1 & close(f1)
-	f1: f2 & close(f2)
+	f0: f1 & close(f1) @test(permute, count=2)
+	f1: f2 & close(f2) @test(permute)
 	f2: f3 & close(f3)
 	f3: f4 & close(f4)
 	f4: f5 & close(f5)
@@ -336,8 +336,7 @@ chained: {
 	f6: f7 & close(f7)
 	f7: f8 & close(f8)
 	f8: {a: 1}
-	@test(err, code=eval, contains="field not allowed", at=f0.a, incorrect)
-	@test(eq:todo, {
+	@test(eq, {
 		f0: {a: 1}
 		f1: {a: 1}
 		f2: {a: 1}
@@ -551,10 +550,6 @@ scalar.denied.b: field not allowed:
     ./in.cue:311:23
 [eval] issue4589.closeDef.definition.a.z: field not allowed:
     ./in.cue:317:24
-[eval] chained.f0.a: field not allowed:
-    ./in.cue:337:7
-[eval] chained.f1.a: field not allowed:
-    ./in.cue:337:7
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

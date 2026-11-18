@@ -936,6 +936,7 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 			return int(b.to) - int(a.to)
 		})
 		n.computedFlatReplaceIDs = true
+		n.containsDefIDCache = nil
 
 		// Compute minimum 'to' value for early bailout optimization.
 		// Since flatReplaceIDs is sorted by 'to' in descending order,
@@ -949,7 +950,7 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 		}
 	}
 
-	// Caching in [OpContext.containsDefIDCache] adds overhead;
+	// Caching in [nodeContext.containsDefIDCache] adds overhead;
 	// only do it if we estimate that [nodeContext.containsDefIDRec]
 	// will do significant work by looking at the number of replaceIDs.
 	caching := len(n.flatReplaceIDs) > 15
@@ -958,7 +959,10 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	key := uint64(node)<<32 | uint64(child)
 	// Note that even a map lookup has some overhead, which adds up.
 	if caching {
-		if result, ok := c.containsDefIDCache[key]; ok {
+		if n.containsDefIDCache == nil {
+			n.containsDefIDCache = n.ancestorDefIDCache()
+		}
+		if result, ok := n.containsDefIDCache[key]; ok {
 			return result
 		}
 	}
@@ -968,13 +972,27 @@ func (n *nodeContext) containsDefID(node, child defID) bool {
 	result := n.containsDefIDRec(node, child, child)
 
 	if caching {
-		if c.containsDefIDCache == nil {
-			c.containsDefIDCache = make(map[uint64]bool)
-		}
-		c.containsDefIDCache[key] = result
+		n.containsDefIDCache[key] = result
 	}
 
 	return result
+}
+
+// ancestorDefIDCache returns a new cache of [nodeContext.containsDefID]
+// results, or that of an ancestor with the same flatReplaceIDs, which the
+// results also depend on. Only nodes adding no replaceIDs can separate the two.
+func (n *nodeContext) ancestorDefIDCache() map[uint64]bool {
+	for p := n; len(p.replaceIDs) == 0; {
+		parent := p.node.Parent
+		if parent == nil || parent.state == nil || parent.state.opID != n.opID {
+			break
+		}
+		p = parent.state
+		if p.containsDefIDCache != nil && slices.Equal(p.flatReplaceIDs, n.flatReplaceIDs) {
+			return p.containsDefIDCache
+		}
+	}
+	return make(map[uint64]bool)
 }
 
 func (n *nodeContext) containsDefIDRec(node, child, start defID) bool {
@@ -1421,11 +1439,11 @@ func (n *nodeContext) underOpened() bool {
 // marked as closed yet.
 //
 // The typo check memoizes three things: the requirement sets and the
-// replacement lists of the nodes it visits, and, shared by all nodes, the
-// results of [nodeContext.containsDefID]. Here they are computed from a
-// state that may still change, as replacements may still be added. So the
-// first two are discarded again, and the shared cache is set aside for the
-// duration: the peek leaves no trace for the typo check proper to trip over.
+// replacement lists of the nodes it visits, and the results of
+// [nodeContext.containsDefID]. Here they are computed from a state that may
+// still change, as replacements may still be added. So the first two are
+// discarded again, and the caches are set aside for the duration: the peek
+// leaves no trace for the typo check proper to trip over.
 func (n *nodeContext) peekOpenByEllipsis() bool {
 	c := n.ctx
 	if c.OpenDef {
@@ -1436,21 +1454,21 @@ func (n *nodeContext) peekOpenByEllipsis() bool {
 		closeInfo  bool
 		flat       bool
 		scopeDepth int32
+		cache      map[uint64]bool
 	}
 	var states []saved
 	for p := n; p.opID == n.opID; {
-		states = append(states, saved{p, p.computedCloseInfo, p.computedFlatReplaceIDs, p.scopeDepth})
+		states = append(states, saved{p, p.computedCloseInfo, p.computedFlatReplaceIDs, p.scopeDepth, p.containsDefIDCache})
+		p.containsDefIDCache = nil
 		parent := p.node.Parent
 		if parent == nil || parent.state == nil {
 			break
 		}
 		p = parent.state
 	}
-	cache := c.containsDefIDCache
-	c.containsDefIDCache = nil
 	defer func() {
-		c.containsDefIDCache = cache
 		for _, s := range states {
+			s.n.containsDefIDCache = s.cache
 			if !s.closeInfo {
 				s.n.invalidateReqSets()
 				s.n.scopeDepth = s.scopeDepth

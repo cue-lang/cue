@@ -138,9 +138,8 @@ type OpContext struct {
 	nest int
 
 	// used in typocheck.go
-	nextDefID          defID           // next available defID
-	containments       []containment   // parent relations
-	containsDefIDCache map[uint64]bool // cache for containsDefID results
+	nextDefID    defID         // next available defID
+	containments []containment // parent relations
 
 	// sawOpened is set once a reference opened with the postfix ... operator
 	// was added to any node; see [nodeContext.underOpened].

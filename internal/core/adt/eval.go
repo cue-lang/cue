@@ -308,6 +308,8 @@ type nodeContext struct {
 	replaceIDs         []replaceID
 	flatReplaceIDs     []replaceID // including all parents, and sorted by 'to' in descending order
 	minFlatReplaceIDTo defID       // minimum 'to' value in flatReplaceIDs, 0 if empty
+	// See [nodeContext.ancestorDefIDCache].
+	containsDefIDCache map[uint64]bool
 	conjunctInfo       []conjunctInfo
 	reqSets            reqSets
 
@@ -590,6 +592,7 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 	c.freeListNode = n
 	n.node = nil
 	n.refCount = 0
+	n.containsDefIDCache = nil
 	n.scheduler.clear()
 }
 

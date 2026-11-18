@@ -358,6 +358,70 @@ reportFailedField: {
 		#C | #D
 		@test(err, code=eval, contains="field not allowed", pos=[2:3])
 	}
+	// A field before the failed one may have evaluated a field after it,
+	// which then holds an error of its own. The disjunct still reports the
+	// error of the failed field.
+	evaluatedLater: {
+		#A: {a: int}
+		#L: {next: #L}
+		conflict: {
+			early?: later
+			B:      5 & 6
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		} @test(err, code=eval, contains="2 errors in empty disjunction",
+			suberr=(contains="conflicting values 6 and 5", pos=[2:12, 2:16]),
+			suberr=(contains="conflicting values 4 and 3", pos=[5:7, 5:11]),
+		)
+		// Nor does the later error decide what kind of error the disjunct has.
+		// The custom error is listed as one of two errors instead of alone.
+		userError: {
+			early?: later
+			B:      error("custom")
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		} @test(err, code=eval, contains="2 errors in empty disjunction", incorrect) @test(err:todo, code=eval, contains="custom")
+		// An eval error is reported instead of the structural cycle.
+		structuralCycle: {
+			early?: later
+			B:      #L
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		} @test(err, code=eval, contains="2 errors in empty disjunction", incorrect) @test(err:todo, code=structural_cycle, contains="2 errors in empty disjunction")
+		// All custom errors of a failed disjunction are to be reported, which
+		// includes those of the fields after the failed one.
+		userErrorSkipped: {
+			B: #A & {b: 1}
+			later: c: error("custom")
+		} | {
+			d: 3 & 4
+		} @test(err, code=eval, contains="2 errors in empty disjunction", incorrect) @test(err:todo, code=eval, contains="custom")
+		// It is reported if the later field was evaluated already.
+		userErrorLater: {
+			early?: later
+			B:      #A & {b: 1}
+			later: c: error("custom")
+		} | {
+			d: 3 & 4
+		} @test(err, code=eval, contains="custom")
+		// With a closedness error, the error of field later is reported instead.
+		closed: {
+			early?: later
+			B:      #A & {b: 1}
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		} @test(err, code=eval, contains="2 errors in empty disjunction", incorrect,
+			suberr=(contains="conflicting values 2 and 1", pos=[3:14, 3:18]),
+			suberr=(contains="conflicting values 4 and 3", pos=[5:7, 5:11]),
+		) @test(err:todo, code=eval, contains="2 errors in empty disjunction",
+			suberr=(contains="field not allowed", pos=[2:18]),
+			suberr=(contains="conflicting values 4 and 3", pos=[5:7, 5:11]),
+		)
+	}
 }
 -- out/errors.txt --
 [eval] reportFailedField.def.#B.b: field not allowed:
@@ -366,6 +430,42 @@ reportFailedField: {
     ./failedfield.cue:15:13
 [eval] reportFailedField.regular.B: field not allowed:
     ./failedfield.cue:24:3
+[structural_cycle] reportFailedField.evaluatedLater.#L.next: structural cycle
+[eval] reportFailedField.evaluatedLater.conflict: 2 errors in empty disjunction:
+reportFailedField.evaluatedLater.conflict.B: conflicting values 6 and 5:
+    ./failedfield.cue:38:12
+    ./failedfield.cue:38:16
+reportFailedField.evaluatedLater.conflict.d: conflicting values 4 and 3:
+    ./failedfield.cue:41:7
+    ./failedfield.cue:41:11
+[eval] reportFailedField.evaluatedLater.userError: 2 errors in empty disjunction:
+reportFailedField.evaluatedLater.userError.d: conflicting values 4 and 3:
+    ./failedfield.cue:53:7
+    ./failedfield.cue:53:11
+reportFailedField.evaluatedLater.userError.B: custom:
+    ./failedfield.cue:50:12
+[eval] reportFailedField.evaluatedLater.#L.next: structural cycle
+reportFailedField.evaluatedLater.structuralCycle: 2 errors in empty disjunction:
+reportFailedField.evaluatedLater.structuralCycle.d: conflicting values 4 and 3:
+    ./failedfield.cue:61:7
+    ./failedfield.cue:61:11
+[eval] reportFailedField.evaluatedLater.userErrorSkipped: 2 errors in empty disjunction:
+reportFailedField.evaluatedLater.userErrorSkipped.B.b: field not allowed:
+    ./failedfield.cue:66:13
+reportFailedField.evaluatedLater.userErrorSkipped.d: conflicting values 4 and 3:
+    ./failedfield.cue:69:7
+    ./failedfield.cue:69:11
+[eval] reportFailedField.evaluatedLater.userErrorLater.later.c: custom:
+    ./failedfield.cue:75:14
+    ./failedfield.cue:77:7
+    ./failedfield.cue:77:11
+[eval] reportFailedField.evaluatedLater.closed: 2 errors in empty disjunction:
+reportFailedField.evaluatedLater.closed.d: conflicting values 4 and 3:
+    ./failedfield.cue:85:7
+    ./failedfield.cue:85:11
+reportFailedField.evaluatedLater.closed.later.c: conflicting values 2 and 1:
+    ./failedfield.cue:83:14
+    ./failedfield.cue:83:18
 [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
     ./in.cue:5:11
     ./in.cue:6:19
@@ -436,16 +536,16 @@ issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
     ./optionalerror.cue:30:16
 -- out/eval/stats --
 Leaks:  40
-Freed:  383
-Reused: 357
+Freed:  440
+Reused: 414
 Allocs: 66
 Retain: 0
 
-Unifications: 201
-Conjuncts:    432
-Disjuncts:    102
+Unifications: 245
+Conjuncts:    505
+Disjuncts:    114
 Notifications: 8
 
-NumCloseIDs: 48
+NumCloseIDs: 51
 -- out/todo.txt --
 issue4022: only evaluated by v3 evaluator.

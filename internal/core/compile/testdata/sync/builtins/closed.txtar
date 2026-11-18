@@ -269,6 +269,20 @@ issue4589: {
 		selected:  x.a & {z: 1}
 	}
 }
+
+// A field may close the value it also unifies with, through any number of
+// fields. From seven of them on, a field of the value is instead rejected.
+chained: {
+	f0: f1 & close(f1)
+	f1: f2 & close(f2)
+	f2: f3 & close(f3)
+	f3: f4 & close(f4)
+	f4: f5 & close(f5)
+	f5: f6 & close(f6)
+	f6: f7 & close(f7)
+	f7: f8 & close(f8)
+	f8: {a: 1}
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -1109,6 +1123,19 @@ issue1206: elimination: {
       selected: (〈0;x〉.a & {
         z: 1
       })
+    }
+  }
+  chained: {
+    f0: (〈0;f1〉 & close(〈0;f1〉))
+    f1: (〈0;f2〉 & close(〈0;f2〉))
+    f2: (〈0;f3〉 & close(〈0;f3〉))
+    f3: (〈0;f4〉 & close(〈0;f4〉))
+    f4: (〈0;f5〉 & close(〈0;f5〉))
+    f5: (〈0;f6〉 & close(〈0;f6〉))
+    f6: (〈0;f7〉 & close(〈0;f7〉))
+    f7: (〈0;f8〉 & close(〈0;f8〉))
+    f8: {
+      a: 1
     }
   }
 }

@@ -323,6 +323,32 @@ issue4589: {
 		selected:  x.a & {z: 1} @test(eq, {b: 1, z: 1}, incorrect) @test(err:todo, at=z, code=eval, contains="field not allowed", pos=[0:21])
 	}
 }
+
+// A field may close the value it also unifies with, through any number of
+// fields. From seven of them on, a field of the value is instead rejected.
+chained: {
+	f0: f1 & close(f1)
+	f1: f2 & close(f2)
+	f2: f3 & close(f3)
+	f3: f4 & close(f4)
+	f4: f5 & close(f5)
+	f5: f6 & close(f6)
+	f6: f7 & close(f7)
+	f7: f8 & close(f8)
+	f8: {a: 1}
+	@test(err, code=eval, contains="field not allowed", at=f0.a, incorrect)
+	@test(eq:todo, {
+		f0: {a: 1}
+		f1: {a: 1}
+		f2: {a: 1}
+		f3: {a: 1}
+		f4: {a: 1}
+		f5: {a: 1}
+		f6: {a: 1}
+		f7: {a: 1}
+		f8: {a: 1}
+	})
+}
 -- embed.cue --
 // The old embedding opened the embedded value along the paths the
 // enclosing literal declares itself. As cue fix rewrites it, the extended
@@ -419,16 +445,21 @@ issue1206: elimination: {
 
 -- out/eval/stats --
 Leaks:  32
-Freed:  729
-Reused: 668
-Allocs: 93
+Freed:  904
+Reused: 710
+Allocs: 226
 Retain: 0
 
-Unifications: 571
-Conjuncts:    929
+Unifications: 710
+Conjuncts:    1428
 Disjuncts:    80
 
-NumCloseIDs: 234
+NumCloseIDs: 390
+
+ConjunctInfos:       852
+MaxConjunctInfos:    9
+MaxReqSets:          36
+MaxRedirect:         36
 -- out/errors.txt --
 [eval] nestedEmbedded.strict.foo.allowed: field not allowed:
     ./embed.cue:22:7
@@ -520,6 +551,10 @@ scalar.denied.b: field not allowed:
     ./in.cue:311:23
 [eval] issue4589.closeDef.definition.a.z: field not allowed:
     ./in.cue:317:24
+[eval] chained.f0.a: field not allowed:
+    ./in.cue:337:7
+[eval] chained.f1.a: field not allowed:
+    ./in.cue:337:7
 -- out/diff-v2-v3.txt --
 Reordering
 Let differs.

@@ -237,6 +237,61 @@ reportFailedField: {
 		#D: {d: 1}
 		#C | #D
 	}
+	// A field before the failed one may have evaluated a field after it,
+	// which then holds an error of its own. The disjunct still reports the
+	// error of the failed field.
+	evaluatedLater: {
+		#A: {a: int}
+		#L: {next: #L}
+		conflict: {
+			early?: later
+			B:      5 & 6
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		}
+		// Nor does the later error decide what kind of error the disjunct has.
+		// The custom error is listed as one of two errors instead of alone.
+		userError: {
+			early?: later
+			B:      error("custom")
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		}
+		// An eval error is reported instead of the structural cycle.
+		structuralCycle: {
+			early?: later
+			B:      #L
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		}
+		// All custom errors of a failed disjunction are to be reported, which
+		// includes those of the fields after the failed one.
+		userErrorSkipped: {
+			B: #A & {b: 1}
+			later: c: error("custom")
+		} | {
+			d: 3 & 4
+		}
+		// It is reported if the later field was evaluated already.
+		userErrorLater: {
+			early?: later
+			B:      #A & {b: 1}
+			later: c: error("custom")
+		} | {
+			d: 3 & 4
+		}
+		// With a closedness error, the error of field later is reported instead.
+		closed: {
+			early?: later
+			B:      #A & {b: 1}
+			later: c: 1 & 2
+		} | {
+			d: 3 & 4
+		}
+	}
 }
 -- out/compile --
 --- failedfield.cue
@@ -286,6 +341,73 @@ reportFailedField: {
         d: 1
       }
       (〈0;#C〉|〈0;#D〉)
+    }
+    evaluatedLater: {
+      #A: {
+        a: int
+      }
+      #L: {
+        next: 〈1;#L〉
+      }
+      conflict: ({
+        early?: 〈0;later〉
+        B: (5 & 6)
+        later: {
+          c: (1 & 2)
+        }
+      }|{
+        d: (3 & 4)
+      })
+      userError: ({
+        early?: 〈0;later〉
+        B: error("custom")
+        later: {
+          c: (1 & 2)
+        }
+      }|{
+        d: (3 & 4)
+      })
+      structuralCycle: ({
+        early?: 〈0;later〉
+        B: 〈1;#L〉
+        later: {
+          c: (1 & 2)
+        }
+      }|{
+        d: (3 & 4)
+      })
+      userErrorSkipped: ({
+        B: (〈1;#A〉 & {
+          b: 1
+        })
+        later: {
+          c: error("custom")
+        }
+      }|{
+        d: (3 & 4)
+      })
+      userErrorLater: ({
+        early?: 〈0;later〉
+        B: (〈1;#A〉 & {
+          b: 1
+        })
+        later: {
+          c: error("custom")
+        }
+      }|{
+        d: (3 & 4)
+      })
+      closed: ({
+        early?: 〈0;later〉
+        B: (〈1;#A〉 & {
+          b: 1
+        })
+        later: {
+          c: (1 & 2)
+        }
+      }|{
+        d: (3 & 4)
+      })
     }
   }
 }

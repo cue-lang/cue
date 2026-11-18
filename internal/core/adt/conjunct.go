@@ -93,7 +93,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 				if !id.Opened && !id.ConjunctOpened {
 					n.node.ClosedNonRecursive = true
 				}
-				id = n.addResolver(x, x, id, false)
+				id = n.addResolver(x, x, id, ClosesOnce)
 			}
 			n.scheduleVertexConjuncts(c, x, id)
 		}
@@ -566,9 +566,9 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo.FromDef = true
 		closeInfo.TopDef = false
 
-		closeInfo = n.addResolver(c.x, arc, closeInfo, false)
+		closeInfo = n.addResolver(c.x, arc, closeInfo, ClosesRecursively)
 	} else {
-		closeInfo = n.addResolver(c.x, arc, closeInfo, true)
+		closeInfo = n.addResolver(c.x, arc, closeInfo, NoClosing)
 	}
 	if closeInfo.defID != 0 && closeInfo.opID == n.ctx.opID {
 		c.CloseInfo.opID = closeInfo.opID
@@ -671,20 +671,23 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	case *Vertex:
 		// A closed value closes the node it is unified with, unless a
 		// spread opens it.
+		closes := NoClosing
+		switch {
+		case x.ClosedNonRecursive:
+			closes = ClosesOnce
+		case x.ClosedRecursive:
+			closes = ClosesRecursively
+		}
 		if !id.Opened && !id.ConjunctOpened {
-			if x.ClosedNonRecursive {
-				n.node.ClosedNonRecursive = true
-			} else if x.ClosedRecursive {
-				n.node.ClosedRecursive = true
-			}
+			n.node.markClosed(closes)
 		}
 		// A vertex which holds a disjunction adds no resolver of its own:
 		// its disjuncts do so as they are processed, each carrying its
 		// closing. A disjunct closed by a builtin (see [Builtin.PerDisjunct])
 		// carries that closing as a flag alone, so it needs the resolver
 		// here like any other closed vertex.
-		if (x.ClosedNonRecursive || x.ClosedRecursive) && disjunctionOf(x) == nil {
-			id = n.addResolver(v, x, id, false)
+		if closes != NoClosing && disjunctionOf(x) == nil {
+			id = n.addResolver(v, x, id, closes)
 		}
 		if _, ok := x.BaseValue.(*StructMarker); ok {
 			n.aStruct = true

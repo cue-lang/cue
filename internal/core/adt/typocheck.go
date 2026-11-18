@@ -364,7 +364,11 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 // multiple times to a single node. As we only want to insert each conjunct
 // once, we need to ensure that within all contexts a single ID assigned to such
 // a resolver is tracked.
-func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, forceIgnore bool) CloseInfo {
+//
+// closes tells how the resolved value closes the node. A reference which does
+// not name a definition passes [NoClosing]: it is only tracked for its ID.
+func (n *nodeContext) addResolver(p Node, v *Vertex, id CloseInfo, closes Closing) CloseInfo {
+	forceIgnore := closes == NoClosing
 	if n.ctx.OpenDef {
 		return id
 	}

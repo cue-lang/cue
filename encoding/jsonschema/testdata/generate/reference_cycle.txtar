@@ -22,18 +22,25 @@ conjunctionFieldCycle: ConjunctionFieldCycle.a
 #T: {a: int} | {n?: elems[0]}
 elems: [#T]
 disjunctionCycle: elems[0]
+
+// A field may be referenced while describing the let it is bound to.
+// TODO: the schema for the field then allows any value.
+
+letCycle: {
+	let L = {a?: #LetCycle, n?: int}
+	again: L
+}
+#LetCycle: {c?: letCycle.again}
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
-	$defs: T: anyOf: [{
-		type:                 "object"
-		additionalProperties: false
-		properties: a: type: "integer"
-		required: ["a"]
-	}, {
-		type:                 "object"
-		additionalProperties: false
-		properties: n: anyOf: [{
+	$defs: {
+		LetCycle: {
+			type:                 "object"
+			additionalProperties: false
+			properties: c: $ref: "#/$defs/again"
+		}
+		T: anyOf: [{
 			type:                 "object"
 			additionalProperties: false
 			properties: a: type: "integer"
@@ -41,9 +48,19 @@ disjunctionCycle: elems[0]
 		}, {
 			type:                 "object"
 			additionalProperties: false
-			properties: n: true
+			properties: n: anyOf: [{
+				type:                 "object"
+				additionalProperties: false
+				properties: a: type: "integer"
+				required: ["a"]
+			}, {
+				type:                 "object"
+				additionalProperties: false
+				properties: n: true
+			}]
 		}]
-	}]
+		again: true
+	}
 	type: "object"
 	properties: {
 		conjunctionFieldCycle: {
@@ -92,6 +109,16 @@ disjunctionCycle: elems[0]
 				c: true
 			}
 			required: ["b", "c"]
+		}
+		letCycle: {
+			type: "object"
+			properties: again: {
+				type: "object"
+				properties: {
+					a: $ref: "#/$defs/LetCycle"
+					n: type: "integer"
+				}
+			}
 		}
 		listCycle: {
 			type: "array"

@@ -877,6 +877,101 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 
+		// Required fields sit between regular and optional ones:
+		// {foo: x} ⊑ {foo!: x} ⊑ {foo?: x}.
+		{
+			in:  `a: {foo!: 1}, b: {foo!: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {foo!: 1}, b: {foo: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {foo?: 1}, b: {foo!: 1}`,
+			err: "",
+		},
+		{
+			in: `a: {foo: 1}, b: {foo!: 1}`,
+			err: `
+				field foo not present in {foo!:1}:
+				    subsume:1:17
+				missing field "foo"`,
+		},
+		{
+			// TODO: should not subsume.
+			in:  `a: {foo!: _}, b: {foo?: 1}`,
+			err: "",
+		},
+		{
+			in: `a: {foo!: 1}, b: {foo?: 1}`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:18
+				missing field "foo"`,
+		},
+		{
+			// A required field with a top value only asks for foo to be
+			// present, so it subsumes one whose value is incomplete.
+			in:  `a: {foo!: _}, b: {foo: c + 1}, c: int`,
+			err: "",
+		},
+		{
+			in:  `a: {foo!: _}, b: {foo!: c + 1}, c: int`,
+			err: "",
+		},
+
+		// Unlike an optional field, a required one is not subsumed by its
+		// absence, whatever its value and whether b is open, closed, or data.
+		{
+			in: `a: {foo!: 1}, b: {}`,
+			err: `
+				field foo not present in {}:
+				    subsume:1:18
+				missing field "foo"`,
+		},
+		{
+			// TODO: should not subsume.
+			in:  `a: {foo!: _}, b: {}`,
+			err: "",
+		},
+		{
+			// TODO: should not subsume.
+			in:  `a: {foo!: 1}, b: close({})`,
+			err: "",
+		},
+		{
+			// TODO: should not subsume.
+			in:  `a: {foo!: 1}, b: close({bar: 1})`,
+			err: "",
+		},
+		{
+			// A pattern only constrains foo; it does not make b have it.
+			// TODO: should not subsume.
+			in:  `a: {foo!: 1}, b: close({[string]: 1})`,
+			err: "",
+		},
+		{
+			in: `a: {x: {foo!: 1}}, b: {x: {}}`,
+			err: `
+				field foo not present in {}:
+				    subsume:1:27
+				field x not present in {x:{}}:
+				    subsume:1:23
+				missing field "x"`,
+		},
+		{
+			// TODO: should not subsume.
+			in:   `a: {foo!: 1}, b: {}`,
+			mode: subFinal,
+			err:  "",
+		},
+		{
+			in:   `a: {foo!: 1}, b: {foo: 1}`,
+			mode: subFinal,
+			err:  "",
+		},
+
 		{
 			in:  `a: {[_]: 4}, b: {[_]: int}`,
 			err: "value not an instance",

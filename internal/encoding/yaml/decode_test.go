@@ -994,6 +994,10 @@ var unmarshalErrorTests = []struct {
 	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
 	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
 	{"a: &a\n  <<: *a\n", `test.yaml:2: anchor "a" value contains itself`},
+	// TODO: a merge key may only alias a map or a sequence of maps.
+	{"a: &a [1]\nb: {<<: *a}", "panic: runtime error: index out of range [1] with length 1"},
+	{"a: &a [x, y]\nb: {<<: *a}", "<nil>"},
+	{"a: &a str\nb: {<<: *a}", "<nil>"},
 	{"a: &a { b: c }\n*a : foo", "test.yaml:2: invalid map key: !!map"},
 	{"a: &a [b]\n*a : foo", "test.yaml:2: invalid map key: !!seq"},
 	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},
@@ -1013,13 +1017,20 @@ var unmarshalErrorTests = []struct {
 func TestUnmarshalErrors(t *testing.T) {
 	for i, item := range unmarshalErrorTests {
 		t.Run(fmt.Sprintf("test %d: %q", i, item.data), func(t *testing.T) {
-			expr, err := callUnmarshal(t, item.data)
+			expr, err := func() (_ ast.Expr, err error) {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				return callUnmarshal(t, item.data)
+			}()
 			val := ""
 			if expr != nil {
 				val = cueStr(expr)
 			}
-			if err == nil || err.Error() != item.error {
-				t.Errorf("got %v; want %v; (value %v)", err, item.error, val)
+			if got := fmt.Sprint(err); got != item.error {
+				t.Errorf("got %v; want %v; (value %v)", got, item.error, val)
 			}
 		})
 	}
@@ -1073,9 +1084,16 @@ func TestMergeAliasFanout(t *testing.T) {
 func TestDecoderErrors(t *testing.T) {
 	for i, item := range unmarshalErrorTests {
 		t.Run(fmt.Sprintf("test %d: %q", i, item.data), func(t *testing.T) {
-			_, err := newDecoder(t, item.data).Decode()
-			if err == nil || err.Error() != item.error {
-				t.Errorf("got %v; want %v", err, item.error)
+			_, err := func() (_ ast.Expr, err error) {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				return newDecoder(t, item.data).Decode()
+			}()
+			if got := fmt.Sprint(err); got != item.error {
+				t.Errorf("got %v; want %v", got, item.error)
 			}
 		})
 	}

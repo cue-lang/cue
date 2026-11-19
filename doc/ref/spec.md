@@ -1068,6 +1068,8 @@ A struct `a` is an instance of `b`, or `a ⊑ b`, if for any label `f`
 defined for `b`, label `f` is also defined for `a` and `a.f ⊑ b.f`.
 Note that if `a` is an instance of `b` it may have fields with labels that
 are not defined for `b`.
+Constraints and closedness refine this rule;
+see [Subsumption of structs](#subsumption-of-structs).
 
 The (unique) struct with no fields, written `{}`, has every struct as an
 instance. It can be considered the type of all structs.
@@ -1489,6 +1491,35 @@ E1.e.feild1: field not allowed:
 
 <!-- (jba) Somewhere it should be said that optional fields are only
      interesting inside closed structs. -->
+
+#### Subsumption of structs
+
+The value a struct `s` _allows_ for a label `f` is `s.f` if `s` has a field
+or field constraint for `f`; otherwise the unification of the values of its
+pattern constraints matching `f`; otherwise the value of its default
+constraint, which is `_|_` for a closed struct; otherwise `_`.
+
+A struct `a` is an instance of a struct `b` if, for every label `f`,
+the value `a` allows for `f` is an instance of the value `b` allows for it,
+`a` defines `f` if `b` does,
+and `a` defines or requires `f` if `b` requires it.
+The last two conditions give the order of the markers stated in
+[Field constraints](#field-constraints): a regular field is an instance of
+a required field constraint, which is an instance of an optional one,
+and neither holds in reverse.
+
+```
+{a: 1}    ⊑ {a!: int}
+{a!: 1}   ⊑ {a?: int}
+{a?: 1}   ⋢ {a!: int}
+{a!: 1}   ⋢ {a: int}
+
+{}        ⋢ {a!: _}
+{}        ⋢ {a?: int}
+close({}) ⊑ {a?: int}
+close({}) ⋢ {a!: int}
+{b: 1}    ⋢ close({a?: int})
+```
 
 <!-- TODO: move embedding section to above the previous one -->
 

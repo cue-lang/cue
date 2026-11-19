@@ -730,7 +730,7 @@ func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
 			return err
 		}
 		defer delete(d.extractingAliases, yn)
-		return d.insertMap(yn.Alias, m, multiline, true)
+		return d.merge(yn.Alias, m, multiline)
 	case yaml.SequenceNode:
 		// Step backwards as earlier nodes take precedence.
 		for _, c := range slices.Backward(yn.Content) {

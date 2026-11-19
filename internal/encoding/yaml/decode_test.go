@@ -831,6 +831,12 @@ a:
 		"%TAG !m! tag:yaml.org,2002:\n---\nbase: &b\n  x: 1\nout:\n  !m!merge \"<<\": *b",
 		"base: {\n\tx: 1\n}\nout: {x: 1}",
 	},
+	// A merge key may alias a sequence of maps, where earlier maps
+	// take precedence.
+	{
+		"a: &a [{x: 1}, {x: 2, y: 2}]\nb: {<<: *a}",
+		"a: [{x: 1}, {x: 2, y: 2}]\nb: {x: 1, y: 2}",
+	},
 }
 
 type M map[interface{}]interface{}
@@ -994,10 +1000,10 @@ var unmarshalErrorTests = []struct {
 	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
 	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
 	{"a: &a\n  <<: *a\n", `test.yaml:2: anchor "a" value contains itself`},
-	// TODO: a merge key may only alias a map or a sequence of maps.
-	{"a: &a [1]\nb: {<<: *a}", "panic: runtime error: index out of range [1] with length 1"},
-	{"a: &a [x, y]\nb: {<<: *a}", "<nil>"},
-	{"a: &a str\nb: {<<: *a}", "<nil>"},
+	// A merge key may only alias a map or a sequence of maps.
+	{"a: &a [1]\nb: {<<: *a}", "test.yaml:1: map merge requires map or sequence of maps as the value"},
+	{"a: &a [x, y]\nb: {<<: *a}", "test.yaml:1: map merge requires map or sequence of maps as the value"},
+	{"a: &a str\nb: {<<: *a}", "test.yaml:1: map merge requires map or sequence of maps as the value"},
 	{"a: &a { b: c }\n*a : foo", "test.yaml:2: invalid map key: !!map"},
 	{"a: &a [b]\n*a : foo", "test.yaml:2: invalid map key: !!seq"},
 	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},
@@ -1017,14 +1023,7 @@ var unmarshalErrorTests = []struct {
 func TestUnmarshalErrors(t *testing.T) {
 	for i, item := range unmarshalErrorTests {
 		t.Run(fmt.Sprintf("test %d: %q", i, item.data), func(t *testing.T) {
-			expr, err := func() (_ ast.Expr, err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				return callUnmarshal(t, item.data)
-			}()
+			expr, err := callUnmarshal(t, item.data)
 			val := ""
 			if expr != nil {
 				val = cueStr(expr)
@@ -1084,14 +1083,7 @@ func TestMergeAliasFanout(t *testing.T) {
 func TestDecoderErrors(t *testing.T) {
 	for i, item := range unmarshalErrorTests {
 		t.Run(fmt.Sprintf("test %d: %q", i, item.data), func(t *testing.T) {
-			_, err := func() (_ ast.Expr, err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				return newDecoder(t, item.data).Decode()
-			}()
+			_, err := newDecoder(t, item.data).Decode()
 			if got := fmt.Sprint(err); got != item.error {
 				t.Errorf("got %v; want %v", got, item.error)
 			}

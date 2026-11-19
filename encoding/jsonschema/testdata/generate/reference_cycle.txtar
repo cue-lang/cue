@@ -24,7 +24,6 @@ elems: [#T]
 disjunctionCycle: elems[0]
 
 // A field may be referenced while describing the let it is bound to.
-// TODO: the schema for the field then allows any value.
 
 letCycle: {
 	let L = {a?: #LetCycle, n?: int}
@@ -59,7 +58,13 @@ letCycle: {
 				properties: n: true
 			}]
 		}]
-		again: true
+		again: {
+			type: "object"
+			properties: {
+				a: $ref: "#/$defs/LetCycle"
+				n: type: "integer"
+			}
+		}
 	}
 	type: "object"
 	properties: {

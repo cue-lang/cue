@@ -592,8 +592,8 @@ type generator struct {
 	redirectTo     *CUERef
 	inliningNonDef bool
 
-	// describing holds the references in [generator.makeEvaluatedItem],
-	// to end cycles through them.
+	// describing holds the references in [generator.makeEvaluatedItem]
+	// within the schema being generated, to end cycles through them.
 	describing map[adt.Expr]bool
 }
 
@@ -689,13 +689,13 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		if isDefinition(path) {
 			defMode = closedRecursively
 		}
-		defItem := g.makeItem(v, defMode)
+		defItem := g.makeDefItem(v, defMode)
 		if defMode != open {
 			if innerRef, ok := defItem.Value().(*CUERef); ok && !isDefinition(innerRef.Path) {
 				savedFrom, savedTo := g.redirectFrom, g.redirectTo
 				g.redirectFrom = innerRef
 				g.redirectTo = ref
-				defItem = g.makeItem(innerRef.Inst.LookupPath(innerRef.Path), defMode)
+				defItem = g.makeDefItem(innerRef.Inst.LookupPath(innerRef.Path), defMode)
 				g.redirectFrom, g.redirectTo = savedFrom, savedTo
 			}
 		}
@@ -929,6 +929,15 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	return &itemAllOf{
 		elems: elems,
 	}
+}
+
+// makeDefItem returns the item for the schema of a reference to v.
+// The schema must not depend on where it is first referenced from,
+// so the cycles being ended there do not apply to it.
+func (g *generator) makeDefItem(v cue.Value, mode closedMode) internItem {
+	defer func(saved map[adt.Expr]bool) { g.describing = saved }(g.describing)
+	g.describing = make(map[adt.Expr]bool)
+	return g.makeItem(v, mode)
 }
 
 // makeEvaluatedItem describes v by its evaluated value, or as any value when

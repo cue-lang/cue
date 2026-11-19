@@ -923,6 +923,23 @@ func TestValues(t *testing.T) {
 			err: "",
 		},
 		{
+			// A pattern of a constrains a field of b as an optional field
+			// would, so it subsumes b's field whether regular, required, or
+			// optional.
+			// TODO: should subsume.
+			in:  `a: {[string]: int}, b: close({foo!: int})`,
+			err: "value not an instance",
+		},
+		{
+			// TODO: should subsume.
+			in:  `a: {[string]: int}, b: close({foo?: int})`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: {[string]: int}, b: close({foo?: string})`,
+			err: "value not an instance",
+		},
+		{
 			// Pattern constraint subsumes itself.
 			in:  `a: {[string]: int}, b: {[string]: int}`,
 			err: "",

@@ -210,6 +210,10 @@ outer:
 		}
 
 		a.Finalize(ctx)
+		// x has no field f, so its patterns only constrain an optional one.
+		// Setting this when creating a would be lost, as MatchAndInsert
+		// adds a pattern's value as that of a regular field.
+		a.ArcType = adt.ArcOptional
 
 		if !s.vertices(a, b) {
 			return false

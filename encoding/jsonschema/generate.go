@@ -220,7 +220,7 @@ func Generate(v cue.Value, cfg *GenerateConfig) (ast.Expr, error) {
 
 	// Phase 2: assign names to all collected references before
 	// generating any AST, because CUERef.generate uses the Name.
-	defKeys, err := g.assignNames()
+	defKeys, err := g.assignNames(rootItem)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +293,7 @@ func GenerateMany(values []cue.Value, sharedSchemaRoot string, cfg *GenerateConf
 	}
 
 	// Phase 2: assign names across the whole shared pool.
-	defKeys, err := g.assignNames()
+	defKeys, err := g.assignNames(rootItems...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -365,10 +365,12 @@ func (g *generator) buildRoot(v cue.Value) internItem {
 	return g.makeItem(v, valueClosedMode(v, open))
 }
 
-// assignNames names every reference collected in g.defs, returning the
-// definition keys sorted by name. It must be called once after all roots have
-// been built (phase 2). It returns a nil slice when there are no references.
-func (g *generator) assignNames() ([]*CUERef, error) {
+// assignNames names every reference collected in g.defs which the roots
+// need, returning the definition keys sorted by name. It must be called once
+// after all roots have been built (phase 2). It returns a nil slice when
+// there are no references.
+func (g *generator) assignNames(roots ...internItem) ([]*CUERef, error) {
+	g.pruneDefs(roots)
 	if g.defs.Len() == 0 {
 		return nil, nil
 	}
@@ -391,6 +393,29 @@ func (g *generator) assignNames() ([]*CUERef, error) {
 		prev = k.Name
 	}
 	return defKeys, nil
+}
+
+// pruneDefs removes the schemas which the roots do not need.
+func (g *generator) pruneDefs(roots []internItem) {
+	needed := make(map[*CUERef]bool)
+	var need func(internItem, *uniqueItems) internItem
+	need = func(it internItem, u *uniqueItems) internItem {
+		k, ok := it.Value().(*CUERef)
+		if !ok {
+			return u.apply(it, need)
+		}
+		if !needed[k] {
+			needed[k] = true
+			need(g.defs.At(k), u)
+		}
+		return it
+	}
+	for _, root := range roots {
+		need(root, g.unique)
+	}
+	g.defs.DeleteFunc(func(k *CUERef, _ internItem) bool {
+		return !needed[k]
+	})
 }
 
 // renderRoot optimizes and renders a single root item into a struct literal

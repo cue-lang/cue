@@ -177,25 +177,11 @@ closedLeftRightLeftExtra: {
 				value: type: "integer"
 			}
 		}
-		"_left": {
-			type: "object"
-			properties: {
-				right: $ref: "#/$defs/_right"
-				value: type: "integer"
-			}
-		}
 		"_node": {
 			type: "object"
 			properties: {
 				next: $ref:  "#/$defs/_node"
 				value: type: "integer"
-			}
-		}
-		"_right": {
-			type: "object"
-			properties: {
-				left: $ref:  "#/$defs/_left"
-				value: type: "string"
 			}
 		}
 	}
@@ -228,11 +214,11 @@ mutualDeepExtra.data.t02.b.extra: field not allowed:
 exprExtra.data.t03: conflicting values {op:"+",left:1,right:2,extra:true} and int (mismatched types struct and int):
     ./datatest/testdata.cue:28:14
     1:548
-    1:1406
+    1:1204
 exprExtra.data.t03: invalid value {op:"+",left:1,right:2,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:538
     ./datatest/testdata.cue:28:14
-    1:1406
+    1:1204
 exprExtra.data.t03.extra: field not allowed:
     1:538
     ./datatest/testdata.cue:28:50

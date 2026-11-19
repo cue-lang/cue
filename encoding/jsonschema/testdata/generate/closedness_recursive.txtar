@@ -8,6 +8,7 @@ t03?: #Expr
 t04?: _node
 t05?: #WrapsNode
 t06?: #ClosedLeft
+t07?: #WrapsGrowing
 
 #Tree: {
 	value?: int
@@ -48,6 +49,15 @@ _right: {
 }
 
 #ClosedLeft: _left
+
+// Each level of _growing unifies with a further struct.
+
+_growing: {
+	value?: int
+	next?: _growing & {extra?: int}
+}
+
+#WrapsGrowing: _growing
 
 -- datatest/testdata.cue --
 package datatest
@@ -112,6 +122,21 @@ closedLeftRightLeftExtra: {
 	data: {t06: {value: 1, right: {value: "hello", left: {value: 2, extra: true}}}}
 	error: true
 }
+wrapsGrowingValid: {
+	data: {t07: {value: 1, next: {value: 2, extra: 3, next: {extra: 4, next: {value: 5}}}}}
+}
+wrapsGrowingExtra: {
+	data: {t07: {value: 1, extra: 2}}
+	error: true
+}
+wrapsGrowingNextExtra: {
+	data: {t07: {next: {extra: 1, other: 2}}}
+	error: true
+}
+wrapsGrowingNextValue: {
+	data: {t07: {next: {next: {next: {value: "x"}}}}}
+	error: true
+}
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
@@ -169,11 +194,42 @@ closedLeftRightLeftExtra: {
 				value: type: "integer"
 			}
 		}
+		WrapsGrowing: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				next: {
+					type:                 "object"
+					additionalProperties: false
+					properties: {
+						extra: type: "integer"
+						next: {
+							type: "object"
+							properties: extra: type: "integer"
+							$ref: "#/$defs/_growing"
+						}
+						value: type: "integer"
+					}
+				}
+				value: type: "integer"
+			}
+		}
 		WrapsNode: {
 			type:                 "object"
 			additionalProperties: false
 			properties: {
 				next: $ref:  "#/$defs/WrapsNode"
+				value: type: "integer"
+			}
+		}
+		"_growing": {
+			type: "object"
+			properties: {
+				next: {
+					type: "object"
+					properties: extra: type: "integer"
+					$ref: "#/$defs/_growing"
+				}
 				value: type: "integer"
 			}
 		}
@@ -193,6 +249,7 @@ closedLeftRightLeftExtra: {
 		t04: $ref: "#/$defs/_node"
 		t05: $ref: "#/$defs/WrapsNode"
 		t06: $ref: "#/$defs/ClosedLeft"
+		t07: $ref: "#/$defs/WrapsGrowing"
 	}
 }
 -- out/generate-v3/treeValid --
@@ -214,11 +271,11 @@ mutualDeepExtra.data.t02.b.extra: field not allowed:
 exprExtra.data.t03: conflicting values {op:"+",left:1,right:2,extra:true} and int (mismatched types struct and int):
     ./datatest/testdata.cue:28:14
     1:548
-    1:1204
+    1:1688
 exprExtra.data.t03: invalid value {op:"+",left:1,right:2,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:538
     ./datatest/testdata.cue:28:14
-    1:1204
+    1:1688
 exprExtra.data.t03.extra: field not allowed:
     1:538
     ./datatest/testdata.cue:28:50
@@ -241,3 +298,17 @@ closedLeftRightExtra.data.t06.right.extra: field not allowed:
 closedLeftRightLeftExtra.data.t06.right.left.extra: field not allowed:
     ./datatest/testdata.cue:60:66
 -- out/generate-v3/closedLeftValid --
+-- out/generate-v3/wrapsGrowingExtra --
+wrapsGrowingExtra.data.t07.extra: field not allowed:
+    ./datatest/testdata.cue:67:25
+-- out/generate-v3/wrapsGrowingNextExtra --
+wrapsGrowingNextExtra.data.t07.next.other: field not allowed:
+    ./datatest/testdata.cue:71:32
+-- out/generate-v3/wrapsGrowingNextValue --
+wrapsGrowingNextValue.data.t07.next.next.next.value: conflicting values "x" and int (mismatched types string and int):
+    ./datatest/testdata.cue:75:43
+    1:1107
+    1:1437
+    1:1473
+    1:1820
+-- out/generate-v3/wrapsGrowingValid --

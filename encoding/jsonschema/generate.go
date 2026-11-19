@@ -354,7 +354,7 @@ func newGenerator(cfg *GenerateConfig) (*generator, error) {
 		defs:    anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
 		unique:  newUniqueItems(),
 
-		describing: make(map[adt.Expr]bool),
+		describing: make(map[any]bool),
 	}, nil
 }
 
@@ -592,9 +592,10 @@ type generator struct {
 	redirectTo     *CUERef
 	inliningNonDef bool
 
-	// describing holds the references in [generator.makeEvaluatedItem]
-	// within the schema being generated, to end cycles through them.
-	describing map[adt.Expr]bool
+	// describing holds the references being described in place within the
+	// schema being generated, to end cycles through them: an [adt.Expr] in
+	// [generator.makeEvaluatedItem], a [refPath] in [generator.makeStructItem].
+	describing map[any]bool
 }
 
 func (g *generator) addError(pos cue.Value, err error) {
@@ -935,8 +936,8 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 // The schema must not depend on where it is first referenced from,
 // so the cycles being ended there do not apply to it.
 func (g *generator) makeDefItem(v cue.Value, mode closedMode) internItem {
-	defer func(saved map[adt.Expr]bool) { g.describing = saved }(g.describing)
-	g.describing = make(map[adt.Expr]bool)
+	defer func(saved map[any]bool) { g.describing = saved }(g.describing)
+	g.describing = make(map[any]bool)
 	return g.makeItem(v, mode)
 }
 
@@ -1458,11 +1459,22 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		props.patternProperties[pattern] = join(props.patternProperties[pattern], it, g.unique)
 	}
 	hasUniversalConstraint := false
+	recursive := false
 	for v := range valueConjuncts(v) {
 		pkg, path := v.ReferencePath()
-		if pkg.Exists() && mode != open && !isDefinition(path) && v.Kind() == cue.StructKind {
-			// In a closed context, inline non-definition references so
-			// their properties become local to additionalProperties.
+		// In a closed context, inline non-definition references so
+		// their properties become local to additionalProperties.
+		inline := pkg.Exists() && mode != open && !isDefinition(path) && v.Kind() == cue.StructKind
+		var inlined refPath
+		if inline {
+			inlined = refPath{pkg, path.String()}
+			if g.describing[inlined] {
+				// The field refers back to itself, so it cannot be
+				// inlined in full: leave this level open.
+				inline, recursive = false, true
+			}
+		}
+		if inline {
 			v = pkg.LookupPath(path)
 		} else if pkg.Exists() || (v.Kind() != cue.StructKind && !isIncompleteStruct(v)) {
 			// This conjunct is a reference or some other non-struct literal.
@@ -1474,6 +1486,9 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		if err != nil {
 			g.addError(v, err)
 			return &itemFalse{}
+		}
+		if inline {
+			g.describing[inlined] = true
 		}
 		type pat struct {
 			pattern     *regexp.Regexp
@@ -1564,6 +1579,9 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 			}
 			addProperty(fieldName, propItem)
 		}
+		if inline {
+			delete(g.describing, inlined)
+		}
 	}
 
 	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
@@ -1592,7 +1610,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		props.additionalProperties = join(props.additionalProperties, constraint, g.unique)
 		delete(props.patternProperties, "")
 	}
-	if mode != open && !g.cfg.ExplicitOpen && props.additionalProperties.Value() == nil {
+	if mode != open && !recursive && !g.cfg.ExplicitOpen && props.additionalProperties.Value() == nil {
 		// Note: additionalProperties is lexical (applies only to fields
 		// it's directly adjacent too) so it only makes sense to apply it
 		// when the struct is genuinely empty or there are properties locally.
@@ -2406,6 +2424,12 @@ func DefaultDescription(v cue.Value) string {
 		}
 		return b.String()
 	}
+}
+
+// refPath identifies the value which a reference points to.
+type refPath struct {
+	inst cue.Value
+	path string
 }
 
 // cueRefHasher implements [anyunique.Hasher] for the [CUERef] type.

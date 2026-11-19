@@ -128,6 +128,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			continue
 		}
 
+		b := y.LookupRaw(f)
 		isConstraint := false
 		switch a.ArcType {
 		case adt.ArcOptional:
@@ -142,23 +143,23 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			isConstraint = true
 
 		case adt.ArcRequired:
-			// TODO: what to do with required fields. Logically they should be
-			// ignored if subsuming at the value level. OTOH, they represent an
-			// (incomplete) error at the value level.
 			if s.IgnoreOptional {
 				continue
 			}
-			// If field a is optional and has value top, neither the
-			// omission of the field nor the field defined with any value
-			// may cause unification to fail.
-			if a.Kind() == adt.TopKind {
+			// Whether y is open, closed, or data, it admits values without
+			// f, none of which are instances of x.
+			if b == nil {
+				s.missing = f
+				s.errf("required field %v not present in %v", f, y)
+				return false
+			}
+			// A top value does not constrain a field that y has or
+			// requires, even one whose value is incomplete.
+			if a.Kind() == adt.TopKind && b.ArcType <= adt.ArcRequired {
 				continue
 			}
-
-			isConstraint = true
 		}
 
-		b := y.LookupRaw(f)
 		if b == nil {
 			if !isConstraint {
 				s.errf("regular field is constraint in subsumed value: %v", f)
@@ -166,9 +167,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			}
 
 			// If f is undefined for y and if y is closed, the field is
-			// implicitly defined as _|_ and thus subsumed. Technically, this is
-			// even true if a is not optional, but in that case it means that y
-			// is invalid, so return false regardless
+			// implicitly defined as _|_, which an optional field subsumes.
 			if (!yOpened && !y0.Accept(ctx, f)) || y.IsData() || s.Final {
 				continue
 			}

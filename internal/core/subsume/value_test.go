@@ -899,9 +899,11 @@ func TestValues(t *testing.T) {
 				missing field "foo"`,
 		},
 		{
-			// TODO: should not subsume.
-			in:  `a: {foo!: _}, b: {foo?: 1}`,
-			err: "",
+			in: `a: {foo!: _}, b: {foo?: 1}`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:18
+				missing field "foo"`,
 		},
 		{
 			in: `a: {foo!: 1}, b: {foo?: 1}`,
@@ -926,45 +928,55 @@ func TestValues(t *testing.T) {
 		{
 			in: `a: {foo!: 1}, b: {}`,
 			err: `
-				field foo not present in {}:
-				    subsume:1:18
-				missing field "foo"`,
+				missing field "foo"
+				required field foo not present in {}:
+				    subsume:1:18`,
 		},
 		{
-			// TODO: should not subsume.
-			in:  `a: {foo!: _}, b: {}`,
-			err: "",
+			in: `a: {foo!: _}, b: {}`,
+			err: `
+				missing field "foo"
+				required field foo not present in {}:
+				    subsume:1:18`,
 		},
 		{
-			// TODO: should not subsume.
-			in:  `a: {foo!: 1}, b: close({})`,
-			err: "",
+			in: `a: {foo!: 1}, b: close({})`,
+			err: `
+				missing field "foo"
+				required field foo not present in {}:
+				    subsume:1:18`,
 		},
 		{
-			// TODO: should not subsume.
-			in:  `a: {foo!: 1}, b: close({bar: 1})`,
-			err: "",
+			in: `a: {foo!: 1}, b: close({bar: 1})`,
+			err: `
+				missing field "foo"
+				required field foo not present in {bar:1}:
+				    subsume:1:18`,
 		},
 		{
 			// A pattern only constrains foo; it does not make b have it.
-			// TODO: should not subsume.
-			in:  `a: {foo!: 1}, b: close({[string]: 1})`,
-			err: "",
+			in: `a: {foo!: 1}, b: close({[string]: 1})`,
+			err: `
+				missing field "foo"
+				required field foo not present in {}:
+				    subsume:1:18`,
 		},
 		{
 			in: `a: {x: {foo!: 1}}, b: {x: {}}`,
 			err: `
-				field foo not present in {}:
-				    subsume:1:27
 				field x not present in {x:{}}:
 				    subsume:1:23
-				missing field "x"`,
+				missing field "x"
+				required field foo not present in {}:
+				    subsume:1:27`,
 		},
 		{
-			// TODO: should not subsume.
 			in:   `a: {foo!: 1}, b: {}`,
 			mode: subFinal,
-			err:  "",
+			err: `
+				missing field "foo"
+				required field foo not present in {}:
+				    subsume:1:18`,
 		},
 		{
 			in:   `a: {foo!: 1}, b: {foo: 1}`,

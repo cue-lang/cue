@@ -252,13 +252,6 @@ type nodeContext struct {
 	// processed may not be freed yet.
 	refCount int
 
-	// isDisjunct indicates whether this nodeContext is used in a disjunction.
-	// Disjunction cross products may call mergeCloseInfo, which assumes all
-	// closedness information, which is stored in the nodeContext, is still
-	// valid. This means that we need to follow a different approach for freeing
-	// disjunctions.
-	isDisjunct bool
-
 	// Keep node out of the nodeContextState to make them more accessible
 	// for source-level debuggers.
 	node *Vertex
@@ -345,6 +338,13 @@ type nodeContext struct {
 	// computedCloseInfo reports whether reqSets was computed. Neither is part
 	// of nodeContextState, as a cloned disjunct computes its own sets.
 	computedCloseInfo bool
+
+	// isDisjunct indicates whether this nodeContext is used in a disjunction.
+	// Disjunction cross products may call mergeCloseInfo, which assumes all
+	// closedness information, which is stored in the nodeContext, is still
+	// valid. This means that we need to follow a different approach for freeing
+	// disjunctions.
+	isDisjunct bool
 }
 
 type nodeContextState struct {

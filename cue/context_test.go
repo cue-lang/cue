@@ -396,6 +396,12 @@ package usescoped
 import "mod.test/scoped"
 
 out: scoped.x
+-- usescoped2/usescoped2.cue --
+package usescoped2
+
+import "mod.test/scoped"
+
+out: scoped.x
 -- hid/hid.cue --
 package hid
 
@@ -441,6 +447,7 @@ x:  _h
 	}
 	const (
 		scopedErr = `x: reference "y" not found`
+		inferErr  = `x: reference "strings" not found`
 		otherPath = "mod.test/other"
 	)
 	type step struct {
@@ -493,7 +500,7 @@ x:  _h
 		name: "InferBuiltinsNotSharedWithPlainBuild",
 		builds: []step{
 			{"infer", cue.InferBuiltins(true), `{x: "A"}`, "mod.test/infer@v0"},
-			{"infer", nil, `x: reference "strings" not found`, ""},
+			{"infer", nil, inferErr, ""},
 		},
 	}, {
 		name: "ImportPathAfterPlainBuild",
@@ -526,7 +533,7 @@ x:  _h
 		builds: []step{
 			{"inferhid", cue.InferBuiltins(true), "{\n\tx: \"A\"\n\ty: 1\n}", "mod.test/inferhid@v0"},
 			{"hid", nil, `{x: 1}`, "mod.test/hid"},
-			{"inferhid", nil, `x: reference "strings" not found`, ""},
+			{"inferhid", nil, inferErr, ""},
 		},
 	}, {
 		name: "ScopeAndImportPath",
@@ -542,6 +549,34 @@ x:  _h
 			// Building the instance it reports keeps the import path.
 			{"", nil, `{x: 1}`, otherPath},
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
+		},
+	}, {
+		name: "ScopeAfterFailedPlainBuild",
+		builds: []step{
+			{"scoped", nil, scopedErr, ""},
+			// The failure of the plain build is kept by the instance.
+			{"scoped", scope(1), scopedErr, ""},
+			{"scoped", nil, scopedErr, ""},
+		},
+	}, {
+		name: "ScopeAfterFailedImporter",
+		builds: []step{
+			{"usescoped", nil, scopedErr, ""},
+			// The failure of the importer's build is kept by the instance.
+			{"scoped", scope(1), scopedErr, ""},
+		},
+	}, {
+		name: "InferBuiltinsAfterFailedPlainBuild",
+		builds: []step{
+			{"infer", nil, inferErr, ""},
+			// The failure of the plain build is kept by the instance.
+			{"infer", cue.InferBuiltins(true), inferErr, ""},
+		},
+	}, {
+		name: "FailedImportOfTwoImporters",
+		builds: []step{
+			{"usescoped", nil, scopedErr, ""},
+			{"usescoped2", nil, scopedErr, ""},
 		},
 	}} {
 		t.Run(test.name, func(t *testing.T) {
@@ -583,6 +618,48 @@ x:  _h
 			}
 		})
 	}
+}
+
+// TestBuildInstanceErr checks that a failed build is reported by its value
+// alone: the build instances keep only their load errors, so that a later
+// build of them, even in another Context, does not fail because of it.
+func TestBuildInstanceErr(t *testing.T) {
+	fsys, err := txtar.FS(txtar.Parse([]byte(`
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.16.0"
+-- scoped/scoped.cue --
+package scoped
+
+x: y
+-- usescoped/usescoped.cue --
+package usescoped
+
+import "mod.test/scoped"
+
+out: scoped.x
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	usescoped := cueload.Instances([]string{"./usescoped"}, &cueload.Config{FS: fsys})[0]
+	qt.Assert(t, qt.IsNil(usescoped.Err))
+	scoped := usescoped.Imports[0]
+
+	errString := func(err error) string {
+		if err == nil {
+			return ""
+		}
+		return err.Error()
+	}
+	v := cuecontext.New().BuildInstance(usescoped)
+	qt.Assert(t, qt.Equals(errString(v.Err()), `x: reference "y" not found`))
+	// The build instances record the failure.
+	qt.Check(t, qt.Equals(errString(usescoped.Err), `reference "y" not found`))
+	qt.Check(t, qt.Equals(errString(scoped.Err), `reference "y" not found`))
+
+	ctx := cuecontext.New()
+	v = ctx.BuildInstance(scoped, cue.Scope(ctx.CompileString("y: 1")))
+	// The failure in another Context is reported again.
+	qt.Check(t, qt.Equals(errString(v.Err()), `x: reference "y" not found`))
 }
 
 // TestHiddenFieldScope tests looking up hidden fields with [cue.Hid] across the

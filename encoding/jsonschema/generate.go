@@ -602,11 +602,11 @@ func (g *generator) addError(pos cue.Value, err error) {
 	g.err = errors.Append(g.err, errors.Promote(err, ""))
 }
 
-// isDefinition reports whether the given path represents a definition.
-// A definition is indicated by a selector with DefinitionLabel type.
+// isDefinition reports whether the given path represents a definition,
+// which is indicated by a selector for a definition, hidden or not.
 func isDefinition(path cue.Path) bool {
 	for _, sel := range path.Selectors() {
-		if sel.LabelType() == cue.DefinitionLabel {
+		if sel.IsDefinition() {
 			return true
 		}
 	}

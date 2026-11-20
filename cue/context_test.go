@@ -412,7 +412,10 @@ out: hid.x
 	scope := func(y int) cue.BuildOption {
 		return cue.Scope(ctx.CompileString(fmt.Sprintf("y: %d", y)))
 	}
-	const otherPath = "mod.test/other"
+	const (
+		scopedErr = `x: reference "y" not found`
+		otherPath = "mod.test/other"
+	)
 	type step struct {
 		pkg      string          // the package to build
 		opt      cue.BuildOption // may be nil
@@ -427,15 +430,13 @@ out: hid.x
 	}{{
 		name: "ScopeNotAppliedToImports",
 		builds: []step{
-			// The import resolves y in the scope too.
-			{"usescoped", scope(1), `{out: 1}`, "mod.test/usescoped@v0"},
+			{"usescoped", scope(1), scopedErr, ""},
 		},
 	}, {
 		name: "ImportPathNotAppliedToImports",
 		builds: []step{
-			// The import is given the same path, so it is no longer found.
-			{"usehid", cue.ImportPath(otherPath), `out: import "mod.test/hid" not found`, ""},
-			{"hid", nil, `{x: 1}`, otherPath},
+			{"usehid", cue.ImportPath(otherPath), `{out: 1}`, otherPath},
+			{"hid", nil, `{x: 1}`, "mod.test/hid"},
 		},
 	}} {
 		t.Run(test.name, func(t *testing.T) {

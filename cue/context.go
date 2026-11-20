@@ -128,6 +128,8 @@ func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 
 // BuildInstance creates a [Value] from the given [*build.Instance].
 //
+// Options apply to i alone, not to the packages it imports.
+//
 // The returned value will represent an error, accessible through [Value.Err],
 // if any error occurred.
 func (c *Context) BuildInstance(i *build.Instance, options ...BuildOption) Value {

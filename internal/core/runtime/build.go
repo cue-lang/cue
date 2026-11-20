@@ -37,7 +37,7 @@ type Config struct {
 }
 
 // Build builds b and all its transitive dependencies, insofar they have not
-// been build yet.
+// been build yet. The options in cfg apply to b alone.
 func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs errors.Error) {
 	if err := b.Complete(); err != nil {
 		return nil, b.Err
@@ -58,7 +58,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	// Build transitive dependencies.
 	for _, file := range b.Files {
 		for s := range file.ImportSpecs() {
-			errs = errors.Append(errs, x.buildSpec(cfg, b, s))
+			errs = errors.Append(errs, x.buildSpec(b, s))
 		}
 	}
 
@@ -118,7 +118,7 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 	return v, p
 }
 
-func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {
+func (x *Runtime) buildSpec(b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {
 	path, err := strconv.Unquote(spec.Path.Value)
 	if err != nil {
 		return errors.Promote(err, "invalid import path")
@@ -141,7 +141,7 @@ func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec
 		return pkg.Err
 	}
 
-	if _, err := x.Build(cfg, pkg); err != nil {
+	if _, err := x.Build(nil, pkg); err != nil {
 		return err
 	}
 

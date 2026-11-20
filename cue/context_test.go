@@ -454,7 +454,7 @@ x:  _h
 		pkg      string          // the package to build, or "" for the previous value's
 		opt      cue.BuildOption // may be nil
 		want     string          // the value built, or its error
-		wantPath string          // the import path of the value's build instance
+		wantPath string          // the import path of the value's build instance, and its ID if different
 	}
 	// The builds of each test run in order, and are checked once they have
 	// all run, so that each is also checked against the later ones.
@@ -470,30 +470,30 @@ x:  _h
 		name: "ImportPathNotAppliedToImports",
 		builds: []step{
 			{"usehid", cue.ImportPath(otherPath), `{out: 1}`, otherPath},
-			{"hid", nil, `{x: 1}`, "mod.test/hid"},
+			{"hid", nil, `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
 		},
 	}, {
 		name: "ScopeNotReused",
 		builds: []step{
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
-			{"scoped", scope(2), `{x: 2}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
+			{"scoped", scope(2), `{x: 2}`, "mod.test/scoped (mod.test/scoped@v0)"},
 		},
 	}, {
 		name: "ScopeNotSharedWithPlainBuild",
 		builds: []step{
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
 			{"scoped", nil, scopedErr, ""},
 		},
 	}, {
 		name: "ScopeNotSharedWithPlainBuildOfItsInstance",
 		builds: []step{
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
 			{"", nil, scopedErr, ""},
 		},
 	}, {
 		name: "ScopeNotSharedWithImporter",
 		builds: []step{
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
 			{"usescoped", nil, scopedErr, ""},
 		},
 	}, {
@@ -505,34 +505,48 @@ x:  _h
 	}, {
 		name: "ImportPathAfterPlainBuild",
 		builds: []step{
-			{"hid", nil, `{x: 1}`, "mod.test/hid"},
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
+			{"hid", nil, `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
+			// The import path should identify the package, not its canonical ID.
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
 		},
 	}, {
 		name: "ImportPathBeforePlainBuild",
 		builds: []step{
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
-			{"hid", nil, `{x: 1}`, "mod.test/hid"},
+			// The import path should identify the package, not its canonical ID.
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
+			{"hid", nil, `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
+		},
+	}, {
+		name: "ImportPathOfItsInstance",
+		builds: []step{
+			{"hid", cue.ImportPath("mod.test/hid"), `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
+		},
+	}, {
+		name: "ImportPathWithQualifier",
+		builds: []step{
+			// The import path should identify the package, not its canonical ID.
+			{"hid", cue.ImportPath(otherPath + ":other"), `{x: 1}`, otherPath + ":other (mod.test/hid@v0)"},
 		},
 	}, {
 		name: "ImportPathNotSharedWithImporter",
 		builds: []step{
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
+			// The import path should identify the package, not its canonical ID.
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
 		},
 	}, {
 		name: "ScopeAfterFailedScope",
 		builds: []step{
 			{"scoped", noY, scopedErr, ""},
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
 			{"scoped", nil, scopedErr, ""},
 		},
 	}, {
 		name: "InferBuiltinsWithImport",
 		builds: []step{
 			{"inferhid", cue.InferBuiltins(true), "{\n\tx: \"A\"\n\ty: 1\n}", "mod.test/inferhid@v0"},
-			{"hid", nil, `{x: 1}`, "mod.test/hid"},
+			{"hid", nil, `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
 			{"inferhid", nil, inferErr, ""},
 		},
 	}, {
@@ -545,23 +559,24 @@ x:  _h
 	}, {
 		name: "ImportPathNotSharedWithPlainBuildOfItsInstance",
 		builds: []step{
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
+			// The import path should identify the package, not its canonical ID.
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
 			// Building the instance it reports keeps the import path.
-			{"", nil, `{x: 1}`, otherPath},
+			{"", nil, `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
 		},
 	}, {
 		name: "ScopeAfterFailedPlainBuild",
 		builds: []step{
 			{"scoped", nil, scopedErr, ""},
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
 			{"scoped", nil, scopedErr, ""},
 		},
 	}, {
 		name: "ScopeAfterFailedImporter",
 		builds: []step{
 			{"usescoped", nil, scopedErr, ""},
-			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped (mod.test/scoped@v0)"},
 		},
 	}, {
 		name: "InferBuiltinsAfterFailedPlainBuild",
@@ -609,6 +624,17 @@ x:  _h
 				}
 				if inst := v.BuildInstance(); inst != nil {
 					gotPath = inst.ImportPath
+					id := inst.ID()
+					if id != gotPath {
+						gotPath += " (" + id + ")"
+					}
+					// The hidden fields are scoped by the identifier.
+					iter, _ := v.Fields(cue.Hidden(true))
+					for iter.Next() {
+						if sel := iter.Selector(); sel.LabelType() == cue.HiddenLabel {
+							qt.Check(t, qt.Equals(sel.PkgPath(), id), qt.Commentf("build %d: %v", i, sel))
+						}
+					}
 				}
 				qt.Check(t, qt.Equals(got, b.want), qt.Commentf("build %d", i))
 				qt.Check(t, qt.Equals(gotPath, b.wantPath), qt.Commentf("build %d", i))

@@ -25,6 +25,21 @@ t01?: #Disj
 t02?: #Simple
 t03?: #NestedDisj
 t04?: #TwoStructDisj
+t05?: _#Hidden
+t06?: #RefsHidden
+t07?: _#WrapsRegular
+
+_#Hidden: {
+	a?: int
+}
+
+#RefsHidden: h?: _#Hidden
+
+_#WrapsRegular: _regular
+
+_regular: {
+	b?: int
+}
 
 -- datatest/testdata.cue --
 package datatest
@@ -53,6 +68,21 @@ twoStructDisjExtra: {
 	data: {t04: {a: 1, extra: true}}
 	error: true
 }
+hiddenValid: {
+	data: {t05: {a: 1}, t06: {h: {a: 2}}, t07: {b: 3}}
+}
+// BUG: this incorrectly allows extra fields.
+hiddenExtra: {
+	data: {t05: {a: 1, extra: true}}
+}
+// BUG: this incorrectly allows extra fields.
+refsHiddenExtra: {
+	data: {t06: {h: {a: 1, extra: true}}}
+}
+// BUG: this incorrectly allows extra fields.
+wrapsRegularExtra: {
+	data: {t07: {b: 1, extra: true}}
+}
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
@@ -64,6 +94,10 @@ twoStructDisjExtra: {
 			additionalProperties: false
 			properties: a: type: "integer"
 		}]
+		Hidden: {
+			type: "object"
+			properties: a: type: "integer"
+		}
 		NestedDisj: {
 			type:                 "object"
 			additionalProperties: false
@@ -74,6 +108,11 @@ twoStructDisjExtra: {
 				additionalProperties: false
 				properties: y: type: "integer"
 			}]
+		}
+		RefsHidden: {
+			type:                 "object"
+			additionalProperties: false
+			properties: h: $ref: "#/$defs/Hidden"
 		}
 		Simple: {
 			type:                 "object"
@@ -92,6 +131,11 @@ twoStructDisjExtra: {
 			additionalProperties: false
 			properties: b: type: "string"
 		}]
+		WrapsRegular: $ref: "#/$defs/_regular"
+		"_regular": {
+			type: "object"
+			properties: b: type: "integer"
+		}
 	}
 	type: "object"
 	properties: {
@@ -99,6 +143,9 @@ twoStructDisjExtra: {
 		t02: $ref: "#/$defs/Simple"
 		t03: $ref: "#/$defs/NestedDisj"
 		t04: $ref: "#/$defs/TwoStructDisj"
+		t05: $ref: "#/$defs/Hidden"
+		t06: $ref: "#/$defs/RefsHidden"
+		t07: $ref: "#/$defs/WrapsRegular"
 	}
 }
 -- out/generate-v3/disjInt --
@@ -107,11 +154,11 @@ twoStructDisjExtra: {
 disjStructExtra.data.t01: conflicting values {a:1,extra:true} and int (mismatched types struct and int):
     ./datatest/testdata.cue:9:14
     1:86
-    1:736
+    1:1016
 disjStructExtra.data.t01: invalid value {a:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
     1:76
     ./datatest/testdata.cue:9:14
-    1:736
+    1:1016
 disjStructExtra.data.t01.extra: field not allowed:
     1:76
     ./datatest/testdata.cue:9:28
@@ -122,22 +169,26 @@ simpleExtra.data.t02.extra: field not allowed:
 -- out/generate-v3/nestedDisjStructExtra --
 nestedDisjStructExtra.data.t03.x: conflicting values {y:1,extra:true} and string (mismatched types struct and string):
     ./datatest/testdata.cue:20:18
-    1:269
-    1:798
+    1:334
+    1:1078
 nestedDisjStructExtra.data.t03.x: invalid value {y:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
-    1:269
+    1:334
     ./datatest/testdata.cue:20:18
 nestedDisjStructExtra.data.t03.x.extra: field not allowed:
-    1:269
+    1:334
     ./datatest/testdata.cue:20:32
 -- out/generate-v3/twoStructDisjExtra --
 twoStructDisjExtra.data.t04: invalid value {a:1,extra:true} (does not satisfy matchN): 0 matched, expected >=1:
-    1:518
+    1:688
     ./datatest/testdata.cue:24:14
-    1:834
+    1:1114
 twoStructDisjExtra.data.t04.a: field not allowed:
-    1:518
+    1:688
     ./datatest/testdata.cue:24:18
 twoStructDisjExtra.data.t04.extra: field not allowed:
-    1:518
+    1:688
     ./datatest/testdata.cue:24:28
+-- out/generate-v3/hiddenExtra --
+-- out/generate-v3/hiddenValid --
+-- out/generate-v3/refsHiddenExtra --
+-- out/generate-v3/wrapsRegularExtra --

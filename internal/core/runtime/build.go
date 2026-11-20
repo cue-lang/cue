@@ -103,6 +103,10 @@ func (x *Runtime) build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 		cc = &cfg.Config
 	}
 	if cfg != nil && cfg.ImportPath != "" {
+		if cfg.ImportPath != b.ImportPath {
+			// A different import path also becomes the package's identifier.
+			b.CanonicalID = ""
+		}
 		b.ImportPath = cfg.ImportPath
 		b.PkgName = ast.ParseImportPath(b.ImportPath).Qualifier
 	}

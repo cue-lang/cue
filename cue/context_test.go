@@ -506,14 +506,12 @@ x:  _h
 		name: "ImportPathAfterPlainBuild",
 		builds: []step{
 			{"hid", nil, `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
-			// The import path should identify the package, not its canonical ID.
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
 		},
 	}, {
 		name: "ImportPathBeforePlainBuild",
 		builds: []step{
-			// The import path should identify the package, not its canonical ID.
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
 			{"hid", nil, `{x: 1}`, "mod.test/hid (mod.test/hid@v0)"},
 		},
 	}, {
@@ -524,15 +522,13 @@ x:  _h
 	}, {
 		name: "ImportPathWithQualifier",
 		builds: []step{
-			// The import path should identify the package, not its canonical ID.
-			{"hid", cue.ImportPath(otherPath + ":other"), `{x: 1}`, otherPath + ":other (mod.test/hid@v0)"},
+			{"hid", cue.ImportPath(otherPath + ":other"), `{x: 1}`, otherPath + ":other"},
 		},
 	}, {
 		name: "ImportPathNotSharedWithImporter",
 		builds: []step{
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
-			// The import path should identify the package, not its canonical ID.
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
 		},
 	}, {
@@ -559,10 +555,9 @@ x:  _h
 	}, {
 		name: "ImportPathNotSharedWithPlainBuildOfItsInstance",
 		builds: []step{
-			// The import path should identify the package, not its canonical ID.
-			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
 			// Building the instance it reports keeps the import path.
-			{"", nil, `{x: 1}`, otherPath + " (mod.test/hid@v0)"},
+			{"", nil, `{x: 1}`, otherPath},
 			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
 		},
 	}, {

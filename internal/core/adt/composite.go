@@ -235,7 +235,7 @@ type Vertex struct {
 	// what that reference brings in closed for nodes that are not opened. It
 	// is set when the Vertex is finalized, and overrides ClosedRecursive and
 	// ClosedNonRecursive for [Vertex.Accept]. A Vertex that shares an opened
-	// vertex has OpenedShared set instead.
+	// vertex has OpenedShared set instead; [Vertex.IsOpened] reads both.
 	Opened bool
 
 	// ClosedShared is set when this Vertex structure shares a vertex through
@@ -1343,6 +1343,19 @@ func (v *Vertex) IsClosedList() bool {
 	return x.NoEllipsis && (v.ClosedRecursive || v.ClosedNonRecursive)
 }
 
+// IsOpened reports whether the postfix ... operator opened v, so that v
+// admits fields that none of its conjuncts declare although it is marked as
+// closed. A vertex that shares another through an opened reference records
+// that on itself, as [Vertex.OpenedShared], and one that the operator opened
+// without sharing has [Vertex.Opened] set.
+//
+// A definition closes again what is opened within it for a reference from
+// outside of it, which is the view taken here. So neither mark counts for a
+// vertex within a definition, nor does the mark of a vertex that it shares.
+func (v *Vertex) IsOpened() bool {
+	return enclosingDef(v) == nil && (v.sharesOpened() || v.DerefValue().Opened)
+}
+
 // TODO: return error instead of boolean? (or at least have version that does.)
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	// TODO(#543): remove this check.
@@ -1366,16 +1379,9 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	// wrapper vertex (see closeBuiltin); capture it before dereferencing,
 	// which would otherwise discard it.
 	closed := v.ClosedNonRecursive
-	// Likewise, a vertex that shares another through a reference opened with
-	// the postfix ... operator records that on itself, and one that the
-	// operator opened without sharing has Opened set. A definition closes
-	// again what is opened within it for a reference from outside of it,
-	// which is the view taken here. So neither mark counts for a vertex
-	// within a definition, nor does the mark of a vertex that it shares.
-	inDef := enclosingDef(v) != nil
-	opened := !inDef && v.sharesOpened()
+	// Likewise for a vertex that shares another through an opened reference.
+	opened := v.IsOpened()
 	v = v.DerefValue()
-	opened = opened || (!inDef && v.Opened)
 	// While v still has unexpanded disjunctions, its final field set is not
 	// yet known: allow f if any pending disjunct may declare it, mirroring
 	// the expanded case below.

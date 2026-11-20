@@ -84,6 +84,10 @@ type index struct {
 	lock           sync.RWMutex
 	imports        map[*adt.Vertex]*build.Instance
 	importsByBuild map[*build.Instance]*adt.Vertex
+	// buildErrs holds the errors of the builds in importsByBuild which
+	// failed. [build.Instance.Err] holds load errors alone, as a build with
+	// other options may succeed.
+	buildErrs map[*build.Instance]errors.Error
 
 	nextUniqueID uint64
 	typeCache    sync.Map // map[reflect.Type]evaluated
@@ -102,6 +106,7 @@ func newIndex() *index {
 	i := &index{
 		imports:        map[*adt.Vertex]*build.Instance{},
 		importsByBuild: map[*build.Instance]*adt.Vertex{},
+		buildErrs:      map[*build.Instance]errors.Error{},
 	}
 	return i
 }
@@ -139,11 +144,24 @@ func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
 	return r.index.imports[key]
 }
 
-func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
+// built returns the root and the errors of an earlier build of key, if any.
+func (r *Runtime) built(key *build.Instance) (*adt.Vertex, errors.Error) {
 	r.index.lock.RLock()
 	defer r.index.lock.RUnlock()
 
-	return r.index.importsByBuild[key]
+	return r.index.importsByBuild[key], r.index.buildErrs[key]
+}
+
+// addBuild records v as the root of a shared build of p, with its errors.
+func (r *Runtime) addBuild(v *adt.Vertex, p *build.Instance, errs errors.Error) {
+	r.index.lock.Lock()
+	defer r.index.lock.Unlock()
+
+	r.index.imports[v] = p
+	r.index.importsByBuild[p] = v
+	if errs != nil {
+		r.index.buildErrs[p] = errs
+	}
 }
 
 // LoadBuiltin loads the builtin package with the given import path.

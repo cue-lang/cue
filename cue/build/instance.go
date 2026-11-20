@@ -91,7 +91,9 @@ type Instance struct {
 
 	// The Err for loading this package or nil on success. This does not
 	// include any errors of dependencies. Incomplete will be set if there
-	// were any errors in dependencies.
+	// were any errors in dependencies. Building the instance, such as with
+	// [cuelang.org/go/cue.Context.BuildInstance], does not set Err; the
+	// resulting value reports the errors of a build.
 	Err errors.Error
 
 	// ResolutionErr contains errors from identifier resolution, such as

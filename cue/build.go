@@ -39,7 +39,7 @@ type hiddenRuntime = Runtime
 
 func (r *Runtime) complete(p *build.Instance, v *adt.Vertex) (*Instance, error) {
 	idx := r.runtime()
-	inst := getImportFromBuild(idx, p, v)
+	inst := getImportFromBuild(idx, p, v, nil)
 	inst.ImportPath = p.ImportPath
 	if inst.Err != nil {
 		return nil, inst.Err
@@ -79,8 +79,8 @@ func (r *hiddenRuntime) BuildInstances(instances []*build.Instance) ([]*Instance
 	var errs errors.Error
 
 	for _, p := range instances {
-		v, _ := index.Build(nil, p)
-		i := getImportFromBuild(index, p, v)
+		v, err := index.Build(nil, p)
+		i := getImportFromBuild(index, p, v, err)
 		errs = errors.Append(errs, i.Err)
 		loaded = append(loaded, i)
 	}

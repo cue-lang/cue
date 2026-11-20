@@ -201,7 +201,7 @@ func (r *Runtime) Marshal(values ...InstanceOrValue) (b []byte, err error) {
 			}
 			if v := r.runtime().LoadInstance(impInst); v != nil {
 				allStaged[impInst] = true
-				imp := getImportFromBuild(r.runtime(), impInst, v)
+				imp := getImportFromBuild(r.runtime(), impInst, v, nil)
 				stageInstance(imp.Value())
 			}
 		}

@@ -554,23 +554,20 @@ x:  _h
 		name: "ScopeAfterFailedPlainBuild",
 		builds: []step{
 			{"scoped", nil, scopedErr, ""},
-			// The failure of the plain build is kept by the instance.
-			{"scoped", scope(1), scopedErr, ""},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
 			{"scoped", nil, scopedErr, ""},
 		},
 	}, {
 		name: "ScopeAfterFailedImporter",
 		builds: []step{
 			{"usescoped", nil, scopedErr, ""},
-			// The failure of the importer's build is kept by the instance.
-			{"scoped", scope(1), scopedErr, ""},
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
 		},
 	}, {
 		name: "InferBuiltinsAfterFailedPlainBuild",
 		builds: []step{
 			{"infer", nil, inferErr, ""},
-			// The failure of the plain build is kept by the instance.
-			{"infer", cue.InferBuiltins(true), inferErr, ""},
+			{"infer", cue.InferBuiltins(true), `{x: "A"}`, "mod.test/infer@v0"},
 		},
 	}, {
 		name: "FailedImportOfTwoImporters",
@@ -652,14 +649,12 @@ out: scoped.x
 	}
 	v := cuecontext.New().BuildInstance(usescoped)
 	qt.Assert(t, qt.Equals(errString(v.Err()), `x: reference "y" not found`))
-	// The build instances record the failure.
-	qt.Check(t, qt.Equals(errString(usescoped.Err), `reference "y" not found`))
-	qt.Check(t, qt.Equals(errString(scoped.Err), `reference "y" not found`))
+	qt.Check(t, qt.Equals(errString(usescoped.Err), ""))
+	qt.Check(t, qt.Equals(errString(scoped.Err), ""))
 
 	ctx := cuecontext.New()
 	v = ctx.BuildInstance(scoped, cue.Scope(ctx.CompileString("y: 1")))
-	// The failure in another Context is reported again.
-	qt.Check(t, qt.Equals(errString(v.Err()), `x: reference "y" not found`))
+	qt.Check(t, qt.Equals(errString(v.Err()), ""))
 }
 
 // TestHiddenFieldScope tests looking up hidden fields with [cue.Hid] across the

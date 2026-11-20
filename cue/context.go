@@ -133,7 +133,8 @@ func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 // builds or importers of i, and [Value.BuildInstance] returns a copy of i.
 //
 // The returned value will represent an error, accessible through [Value.Err],
-// if any error occurred.
+// if any error occurred. The error is not recorded in i.Err, which only holds
+// the errors from loading i, so it does not affect a later build of i.
 func (c *Context) BuildInstance(i *build.Instance, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
 	v, err := c.runtime().Build(&cfg, i)
@@ -152,7 +153,8 @@ func (c *Context) makeError(err errors.Error) Value {
 }
 
 // BuildInstances creates a [Value] for each of the given [*build.Instance]s and reports
-// the combined errors or nil if there were no errors.
+// the combined errors or nil if there were no errors. As with
+// [Context.BuildInstance], the errors are not recorded in the instances.
 func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 	var errs errors.Error
 	var a []Value

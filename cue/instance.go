@@ -83,7 +83,10 @@ func lookupInstance(x *runtime.Runtime, p *build.Instance) *Instance {
 	return nil
 }
 
-func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance {
+// getImportFromBuild returns the instance for p with root v. If it creates the
+// instance, it records errs on it, the errors of the build of v, or those of p
+// if errs is nil.
+func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex, errs errors.Error) *Instance {
 	inst := lookupInstance(x, p)
 	if inst != nil {
 		return inst
@@ -98,8 +101,11 @@ func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *I
 		inst:        p,
 		index:       x,
 	}
-	if p.Err != nil {
-		inst.setListOrError(p.Err)
+	if errs == nil {
+		errs = p.Err
+	}
+	if errs != nil {
+		inst.setListOrError(errs)
 	}
 
 	x.SetBuildData(p, inst)
@@ -122,7 +128,7 @@ func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
 		root = root.Parent
 	}
 
-	return getImportFromBuild(x, p, root)
+	return getImportFromBuild(x, p, root, nil)
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.

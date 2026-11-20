@@ -23,6 +23,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	cueload "cuelang.org/go/cue/load"
 )
@@ -2007,6 +2008,90 @@ import "example.com/inner"
 		}
 		if err := result.Validate(cue.Concrete(true)); err != nil {
 			t.Error(err)
+		}
+	})
+}
+
+// TestConcurrentBuildInstanceError tests concurrent builds of a failing
+// package and of two packages importing it, while reading the load errors of
+// their build instances, which no build may write to.
+func TestConcurrentBuildInstanceError(t *testing.T) {
+	fsys := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{Data: []byte(`module: "example.com"
+language: version: "v0.16.0"
+`)},
+		"bad/bad.cue": &fstest.MapFile{Data: []byte(`package bad
+
+x: y
+`)},
+		"usebad1/usebad1.cue": &fstest.MapFile{Data: []byte(`package usebad1
+
+import "example.com/bad"
+
+z: bad.x
+`)},
+		"usebad2/usebad2.cue": &fstest.MapFile{Data: []byte(`package usebad2
+
+import "example.com/bad"
+
+z: bad.x
+`)},
+	}
+	for range concurrentIterations {
+		var insts []*build.Instance
+		for _, inst := range cueload.Instances([]string{"./usebad1", "./usebad2"}, &cueload.Config{FS: fsys}) {
+			insts = append(insts, inst, inst.Imports[0])
+		}
+		ctx := cuecontext.New()
+		var wg sync.WaitGroup
+		for _, inst := range insts {
+			wg.Go(func() {
+				if err := inst.Err; err != nil {
+					t.Errorf("load error: %v", err)
+				}
+				if err := ctx.BuildInstance(inst).Err(); err == nil {
+					t.Errorf("building %s succeeded", inst.ImportPath)
+				}
+			})
+		}
+		wg.Wait()
+	}
+}
+
+// TestConcurrentBuildInstancesError tests concurrent calls of the deprecated
+// [cue.Runtime.BuildInstances] which share the [cue.Instance] of a failed
+// build: its error must be recorded before another call can see it.
+func TestConcurrentBuildInstancesError(t *testing.T) {
+	fsys := fstest.MapFS{
+		"cue.mod/module.cue": &fstest.MapFile{Data: []byte(`module: "example.com"
+language: version: "v0.16.0"
+`)},
+		"bad/bad.cue": &fstest.MapFile{Data: []byte(`package bad
+
+x: y
+`)},
+		"usebad/usebad.cue": &fstest.MapFile{Data: []byte(`package usebad
+
+import "example.com/bad"
+
+z: bad.x
+`)},
+	}
+	usebad := cueload.Instances([]string{"./usebad"}, &cueload.Config{FS: fsys})[0]
+	if err := usebad.Err; err != nil {
+		t.Fatal(err)
+	}
+	bad := usebad.Imports[0]
+
+	// The zero cue.Runtime initializes itself lazily, without synchronization.
+	r := (*cue.Runtime)(cuecontext.New())
+	// Build bad on behalf of an importer, but not its cue.Instance.
+	if _, err := r.BuildInstances([]*build.Instance{usebad}); err == nil {
+		t.Fatal("building usebad succeeded")
+	}
+	runConcurrent(t, func() {
+		if _, err := r.BuildInstances([]*build.Instance{bad}); err == nil {
+			t.Error("building bad succeeded")
 		}
 	})
 }

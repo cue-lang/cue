@@ -56,21 +56,22 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (*adt.Vertex, errors.Err
 		c := *b
 		return x.buildOwned(cfg, &c)
 	}
-	if v := x.getNodeFromInstance(b); v != nil {
-		return v, b.Err
+	if v, errs := x.built(b); v != nil || errs != nil {
+		return v, errs
 	}
 	v, errs := x.build(cfg, b)
-	x.AddInst(v, b)
+	x.addBuild(v, b, errs)
 	return v, errs
 }
 
 // buildOwned builds b, which no other build uses, so that no later build of b
-// reuses it.
+// reuses it. It records the errors in b for the caller.
 func (x *Runtime) buildOwned(cfg *Config, b *build.Instance) (*adt.Vertex, errors.Error) {
 	if err := b.Complete(); err != nil {
 		return nil, b.Err
 	}
 	v, errs := x.build(cfg, b)
+	b.Err = errs
 	x.addOwnedInst(v, b)
 	return v, errs
 }
@@ -112,7 +113,6 @@ func (x *Runtime) build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 
 	if errs != nil {
 		v = adt.ToVertex(&adt.Bottom{Err: errs})
-		b.Err = errs
 	}
 	return v, errs
 }
@@ -167,13 +167,6 @@ func (x *Runtime) buildSpec(b *build.Instance, spec *ast.ImportSpec) (errs error
 		return nil
 	}
 
-	if v := x.getNodeFromInstance(pkg); v != nil {
-		return pkg.Err
-	}
-
-	if _, err := x.Build(nil, pkg); err != nil {
-		return err
-	}
-
-	return nil
+	_, errs = x.Build(nil, pkg)
+	return errs
 }

@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
+	cueload "cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
@@ -374,6 +375,104 @@ func TestContextCheck(t *testing.T) {
 		var c cue.Context
 		c.CompileString("1")
 	}, `.*use cuecontext\.New.*`))
+}
+
+// TestBuildInstanceOptions checks that the options of a build do not reach
+// the packages it imports.
+func TestBuildInstanceOptions(t *testing.T) {
+	fsys, err := txtar.FS(txtar.Parse([]byte(`
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.16.0"
+-- scoped/scoped.cue --
+package scoped
+
+x: y
+-- usescoped/usescoped.cue --
+package usescoped
+
+import "mod.test/scoped"
+
+out: scoped.x
+-- hid/hid.cue --
+package hid
+
+_h: 1
+x:  _h
+-- usehid/usehid.cue --
+package usehid
+
+import "mod.test/hid"
+
+out: hid.x
+`)))
+	qt.Assert(t, qt.IsNil(err))
+
+	ctx := cuecontext.New()
+	scope := func(y int) cue.BuildOption {
+		return cue.Scope(ctx.CompileString(fmt.Sprintf("y: %d", y)))
+	}
+	const otherPath = "mod.test/other"
+	type step struct {
+		pkg      string          // the package to build
+		opt      cue.BuildOption // may be nil
+		want     string          // the value built, or its error
+		wantPath string          // the import path of the value's build instance
+	}
+	// The builds of each test run in order, and are checked once they have
+	// all run, so that each is also checked against the later ones.
+	for _, test := range []struct {
+		name   string
+		builds []step
+	}{{
+		name: "ScopeNotAppliedToImports",
+		builds: []step{
+			// The import resolves y in the scope too.
+			{"usescoped", scope(1), `{out: 1}`, "mod.test/usescoped@v0"},
+		},
+	}, {
+		name: "ImportPathNotAppliedToImports",
+		builds: []step{
+			// The import is given the same path, so it is no longer found.
+			{"usehid", cue.ImportPath(otherPath), `out: import "mod.test/hid" not found`, ""},
+			{"hid", nil, `{x: 1}`, otherPath},
+		},
+	}} {
+		t.Run(test.name, func(t *testing.T) {
+			// Importers must share the instances of their imports.
+			insts := make(map[string]*build.Instance)
+			for _, inst := range cueload.Instances([]string{"./..."}, &cueload.Config{FS: fsys}) {
+				qt.Assert(t, qt.IsNil(inst.Err))
+				insts[inst.PkgName] = inst
+			}
+			for _, inst := range insts {
+				for _, imp := range inst.Imports {
+					insts[imp.PkgName] = imp
+				}
+			}
+
+			var values []cue.Value
+			for _, b := range test.builds {
+				var opts []cue.BuildOption
+				if b.opt != nil {
+					opts = append(opts, b.opt)
+				}
+				values = append(values, ctx.BuildInstance(insts[b.pkg], opts...))
+			}
+			for i, b := range test.builds {
+				v := values[i]
+				got, gotPath := fmt.Sprint(v), ""
+				if err := v.Err(); err != nil {
+					got = err.Error()
+				}
+				if inst := v.BuildInstance(); inst != nil {
+					gotPath = inst.ImportPath
+				}
+				qt.Check(t, qt.Equals(got, b.want), qt.Commentf("build %d", i))
+				qt.Check(t, qt.Equals(gotPath, b.wantPath), qt.Commentf("build %d", i))
+			}
+		})
+	}
 }
 
 // TestHiddenFieldScope tests looking up hidden fields with [cue.Hid] across the

@@ -36,15 +36,48 @@ type Config struct {
 	compile.Config
 }
 
+// hasOptions reports whether c changes what an instance builds to. A new
+// option which does so must be reported here, or its builds are shared.
+func (c *Config) hasOptions() bool {
+	return c != nil && (c.Scope != nil || c.Imports != nil || c.ImportPath != "")
+}
+
 // Build builds b and all its transitive dependencies, insofar they have not
 // been build yet. The options in cfg apply to b alone.
-func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs errors.Error) {
+//
+// Only a build without options is shared with later builds and importers of
+// b. A build with options compiles a copy of b each time.
+func (x *Runtime) Build(cfg *Config, b *build.Instance) (*adt.Vertex, errors.Error) {
 	if err := b.Complete(); err != nil {
 		return nil, b.Err
+	}
+	if cfg.hasOptions() {
+		// Leave b as it is for its other builds and importers.
+		c := *b
+		return x.buildOwned(cfg, &c)
 	}
 	if v := x.getNodeFromInstance(b); v != nil {
 		return v, b.Err
 	}
+	v, errs := x.build(cfg, b)
+	x.AddInst(v, b)
+	return v, errs
+}
+
+// buildOwned builds b, which no other build uses, so that no later build of b
+// reuses it.
+func (x *Runtime) buildOwned(cfg *Config, b *build.Instance) (*adt.Vertex, errors.Error) {
+	if err := b.Complete(); err != nil {
+		return nil, b.Err
+	}
+	v, errs := x.build(cfg, b)
+	x.addOwnedInst(v, b)
+	return v, errs
+}
+
+// build builds b, which is complete, without looking for an earlier build of
+// it nor recording it.
+func (x *Runtime) build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs errors.Error) {
 	// TODO: clear cache of old implementation.
 	// if s := b.ImportPath; s != "" {
 	// 	// Use cached result, if available.
@@ -81,9 +114,6 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 		v = adt.ToVertex(&adt.Bottom{Err: errs})
 		b.Err = errs
 	}
-
-	x.AddInst(v, b)
-
 	return v, errs
 }
 
@@ -98,7 +128,7 @@ func (r *Runtime) Compile(cfg *Config, source interface{}) (*adt.Vertex, *build.
 	if err := p.AddFile(filename, source); err != nil {
 		return nil, p
 	}
-	v, _ := r.Build(cfg, p)
+	v, _ := r.buildOwned(cfg, p)
 	return v, p
 }
 
@@ -114,7 +144,7 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 		return nil, p
 	}
 	p.PkgName = file.PackageName()
-	v, _ := r.Build(cfg, p)
+	v, _ := r.buildOwned(cfg, p)
 	return v, p
 }
 

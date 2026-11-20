@@ -118,6 +118,15 @@ func (r *Runtime) AddInst(key *adt.Vertex, p *build.Instance) {
 	x.importsByBuild[p] = key
 }
 
+// addOwnedInst records that key is the root built from p, which no later
+// build of p reuses.
+func (r *Runtime) addOwnedInst(key *adt.Vertex, p *build.Instance) {
+	r.index.lock.Lock()
+	defer r.index.lock.Unlock()
+
+	r.index.imports[key] = p
+}
+
 func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
 	// A per-evaluation instance of an imported package is not registered
 	// itself; resolve it to the shared package root that is.

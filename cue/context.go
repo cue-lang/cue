@@ -128,7 +128,9 @@ func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 
 // BuildInstance creates a [Value] from the given [*build.Instance].
 //
-// Options apply to i alone, not to the packages it imports.
+// Options apply to i alone, not to the packages it imports. A build with a
+// [Scope], [ImportPath], or [InferBuiltins] option does not affect other
+// builds or importers of i, and [Value.BuildInstance] returns a copy of i.
 //
 // The returned value will represent an error, accessible through [Value.Err],
 // if any error occurred.

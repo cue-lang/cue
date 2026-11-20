@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/tdtest"
@@ -377,8 +378,9 @@ func TestContextCheck(t *testing.T) {
 	}, `.*use cuecontext\.New.*`))
 }
 
-// TestBuildInstanceOptions checks that the options of a build do not reach
-// the packages it imports.
+// TestBuildInstanceOptions checks that a build with options is not shared
+// with any other build of the same instance nor with the packages importing
+// it, and that the options do not reach the packages it imports.
 func TestBuildInstanceOptions(t *testing.T) {
 	fsys, err := txtar.FS(txtar.Parse([]byte(`
 -- cue.mod/module.cue --
@@ -405,6 +407,22 @@ package usehid
 import "mod.test/hid"
 
 out: hid.x
+-- infer/infer.cue --
+package infer
+
+x: strings.ToUpper("a")
+-- inferhid/inferhid.cue --
+package inferhid
+
+import "mod.test/hid"
+
+x: strings.ToUpper("a")
+y: hid.x
+-- scopedhid/scopedhid.cue --
+package scopedhid
+
+_h: y
+x:  _h
 `)))
 	qt.Assert(t, qt.IsNil(err))
 
@@ -412,12 +430,21 @@ out: hid.x
 	scope := func(y int) cue.BuildOption {
 		return cue.Scope(ctx.CompileString(fmt.Sprintf("y: %d", y)))
 	}
+	// noY is a scope which does not resolve y.
+	noY := cue.Scope(ctx.CompileString("z: 1"))
+	both := func(opts ...cue.BuildOption) cue.BuildOption {
+		return func(o *runtime.Config) {
+			for _, opt := range opts {
+				opt(o)
+			}
+		}
+	}
 	const (
 		scopedErr = `x: reference "y" not found`
 		otherPath = "mod.test/other"
 	)
 	type step struct {
-		pkg      string          // the package to build
+		pkg      string          // the package to build, or "" for the previous value's
 		opt      cue.BuildOption // may be nil
 		want     string          // the value built, or its error
 		wantPath string          // the import path of the value's build instance
@@ -437,6 +464,96 @@ out: hid.x
 		builds: []step{
 			{"usehid", cue.ImportPath(otherPath), `{out: 1}`, otherPath},
 			{"hid", nil, `{x: 1}`, "mod.test/hid"},
+		},
+	}, {
+		name: "ScopeNotReused",
+		builds: []step{
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			// The earlier build is reused, ignoring the new scope.
+			{"scoped", scope(2), `{x: 1}`, "mod.test/scoped"},
+		},
+	}, {
+		name: "ScopeNotSharedWithPlainBuild",
+		builds: []step{
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			// The build with a scope is reused.
+			{"scoped", nil, `{x: 1}`, "mod.test/scoped"},
+		},
+	}, {
+		name: "ScopeNotSharedWithPlainBuildOfItsInstance",
+		builds: []step{
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			// The build with a scope is reused.
+			{"", nil, `{x: 1}`, "mod.test/scoped"},
+		},
+	}, {
+		name: "ScopeNotSharedWithImporter",
+		builds: []step{
+			{"scoped", scope(1), `{x: 1}`, "mod.test/scoped"},
+			// The importer resolves to the build with a scope.
+			{"usescoped", nil, `{out: 1}`, "mod.test/usescoped@v0"},
+		},
+	}, {
+		name: "InferBuiltinsNotSharedWithPlainBuild",
+		builds: []step{
+			{"infer", cue.InferBuiltins(true), `{x: "A"}`, "mod.test/infer@v0"},
+			// The build with builtin inference is reused.
+			{"infer", nil, `{x: "A"}`, "mod.test/infer@v0"},
+		},
+	}, {
+		name: "ImportPathAfterPlainBuild",
+		builds: []step{
+			{"hid", nil, `{x: 1}`, "mod.test/hid"},
+			// The earlier build is reused, ignoring the import path.
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, "mod.test/hid"},
+		},
+	}, {
+		name: "ImportPathBeforePlainBuild",
+		builds: []step{
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
+			// The build with an import path is reused.
+			{"hid", nil, `{x: 1}`, otherPath},
+		},
+	}, {
+		name: "ImportPathNotSharedWithImporter",
+		builds: []step{
+			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
+			// The importer's build of the import is reused.
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, "mod.test/hid"},
+			{"usehid", nil, `{out: 1}`, "mod.test/usehid@v0"},
+		},
+	}, {
+		name: "ScopeAfterFailedScope",
+		builds: []step{
+			{"scoped", noY, scopedErr, ""},
+			// The failed build with a scope is reused.
+			{"scoped", scope(1), scopedErr, ""},
+			{"scoped", nil, scopedErr, ""},
+		},
+	}, {
+		name: "InferBuiltinsWithImport",
+		builds: []step{
+			{"inferhid", cue.InferBuiltins(true), "{\n\tx: \"A\"\n\ty: 1\n}", "mod.test/inferhid@v0"},
+			{"hid", nil, `{x: 1}`, "mod.test/hid"},
+			// The build with builtin inference is reused.
+			{"inferhid", nil, "{\n\tx: \"A\"\n\ty: 1\n}", "mod.test/inferhid@v0"},
+		},
+	}, {
+		name: "ScopeAndImportPath",
+		builds: []step{
+			{"scopedhid", both(scope(1), cue.ImportPath(otherPath)), `{x: 1}`, otherPath},
+			// The first build is reused, and the instance keeps its new path.
+			{"scopedhid", scope(2), `{x: 1}`, otherPath},
+			{"scopedhid", nil, `{x: 1}`, otherPath},
+		},
+	}, {
+		name: "ImportPathNotSharedWithPlainBuildOfItsInstance",
+		builds: []step{
+			{"hid", cue.ImportPath(otherPath), `{x: 1}`, otherPath},
+			// Building the instance it reports keeps the import path.
+			{"", nil, `{x: 1}`, otherPath},
+			// The importer no longer finds the renamed instance.
+			{"usehid", nil, `package "mod.test/hid" imported but not defined in mod.test/usehid@v0 (and 1 more errors)`, ""},
 		},
 	}} {
 		t.Run(test.name, func(t *testing.T) {
@@ -458,7 +575,11 @@ out: hid.x
 				if b.opt != nil {
 					opts = append(opts, b.opt)
 				}
-				values = append(values, ctx.BuildInstance(insts[b.pkg], opts...))
+				inst := insts[b.pkg]
+				if b.pkg == "" {
+					inst = values[len(values)-1].BuildInstance()
+				}
+				values = append(values, ctx.BuildInstance(inst, opts...))
 			}
 			for i, b := range test.builds {
 				v := values[i]

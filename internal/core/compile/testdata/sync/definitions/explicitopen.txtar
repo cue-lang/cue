@@ -489,8 +489,8 @@ recloseConjunction: {
 	}
 }
 // A spread opens the definition it spreads, so the struct admits any field.
-// The API instead reports it as closed and as not allowing the field, even
-// though unifying the field succeeds.
+// The API instead reports it as closed, even though unifying the field
+// succeeds.
 spreadDefClosed: {
 	#D: {a: {}}
 	v: {#D...}
@@ -525,6 +525,84 @@ spreadSelectMissing: {
 	closed: {
 		x: #D.z
 	}
+}
+// A spread opens the value it spreads, whether a definition or close closes
+// that value, and whether the field shares it or unifies it with a struct:
+// the result is not closed and admits any field. Without a spread it is
+// closed.
+//
+// The API instead reports the result as closed, unless the field unifies a
+// struct closed by close.
+spreadNotClosed: {
+	#D: a: {b: 1}
+	C: close({a: {b: 1}})
+
+	sharedDef:   #D...
+	embedDef:    {#D...}
+	sharedClose: C...
+	embedClose:  {C...}
+
+	noSpread: {
+		sharedDef:   #D
+		embedDef:    {#D}
+		sharedClose: C
+		embedClose:  {C}
+	}
+
+	// A field reading an opened value is open as well, as is a field
+	// selected from one.
+	read:   sharedDef
+	nested: embedDef.a
+	// So is a field selected from a value which shares the definition.
+	nestedShared: sharedDef.a
+	// An ellipsis beside the spread closes nothing either.
+	ellipsis: {#D..., ...}
+
+	// A definition closes again what a spread opens within it, as does
+	// unifying with the definition which the spread opens.
+	#Z: {d: #D..., e: {#D...}}
+	inDef: {
+		shared: #Z.d
+		embed:  #Z.e
+	}
+	reclosed: #D... & #D
+
+	// So does a definition which refers to an opened struct. A spread of a
+	// field holding that definition opens it again, also for a field read
+	// through the spread.
+	#Refers:            embedDef
+	refersDef:          #Refers
+	holdRefers: f:      #Refers
+	spreadRefers:       holdRefers...
+	readSpreadRefers:   spreadRefers.f
+	extendSpreadRefers: spreadRefers.f & {z: 1}
+
+	// So does a field holding the definition, whether it shares,
+	// embeds or unifies it, or a comprehension adds it.
+	holdDef: {
+		shared: #Z
+		embed: {#Z}
+		unify: #Z & {}
+		comprehension: {for k, v in {a: 1} {#Z}}
+	}
+	heldDef: {
+		shared:        holdDef.shared.d
+		embed:         holdDef.embed.d
+		unify:         holdDef.unify.d
+		comprehension: holdDef.comprehension.d
+	}
+	extendHeldDef: {
+		shared:        holdDef.shared.d & {z: 1}
+		embed:         holdDef.embed.d & {z: 1}
+		unify:         holdDef.unify.d & {z: 1}
+		comprehension: holdDef.comprehension.d & {z: 1}
+	}
+
+	// A spread opens the elements of a list as well. The list itself keeps
+	// its length, which is not reported as closed for any list.
+	#L: [{b: 1}]
+	sharedList: #L...
+	elemShared: sharedList[0]
 }
 
 -- out/compile --
@@ -966,6 +1044,105 @@ spreadSelectMissing: {
     closed: {
       x: 〈1;#D〉.z
     }
+  }
+  spreadNotClosed: {
+    #D: {
+      a: {
+        b: 1
+      }
+    }
+    C: close({
+      a: {
+        b: 1
+      }
+    })
+    sharedDef: 〈0;#D〉...
+    embedDef: {
+      〈1;#D〉...
+    }
+    sharedClose: 〈0;C〉...
+    embedClose: {
+      〈1;C〉...
+    }
+    noSpread: {
+      sharedDef: 〈1;#D〉
+      embedDef: {
+        〈2;#D〉
+      }
+      sharedClose: 〈1;C〉
+      embedClose: {
+        〈2;C〉
+      }
+    }
+    read: 〈0;sharedDef〉
+    nested: 〈0;embedDef〉.a
+    nestedShared: 〈0;sharedDef〉.a
+    ellipsis: {
+      〈1;#D〉...
+      ...
+    }
+    #Z: {
+      d: 〈1;#D〉...
+      e: {
+        〈2;#D〉...
+      }
+    }
+    inDef: {
+      shared: 〈1;#Z〉.d
+      embed: 〈1;#Z〉.e
+    }
+    reclosed: (〈0;#D〉... & 〈0;#D〉)
+    #Refers: 〈0;embedDef〉
+    refersDef: 〈0;#Refers〉
+    holdRefers: {
+      f: 〈1;#Refers〉
+    }
+    spreadRefers: 〈0;holdRefers〉...
+    readSpreadRefers: 〈0;spreadRefers〉.f
+    extendSpreadRefers: (〈0;spreadRefers〉.f & {
+      z: 1
+    })
+    holdDef: {
+      shared: 〈1;#Z〉
+      embed: {
+        〈2;#Z〉
+      }
+      unify: (〈1;#Z〉 & {})
+      comprehension: {
+        for k, v in {
+          a: 1
+        } {
+          〈4;#Z〉
+        }
+      }
+    }
+    heldDef: {
+      shared: 〈1;holdDef〉.shared.d
+      embed: 〈1;holdDef〉.embed.d
+      unify: 〈1;holdDef〉.unify.d
+      comprehension: 〈1;holdDef〉.comprehension.d
+    }
+    extendHeldDef: {
+      shared: (〈1;holdDef〉.shared.d & {
+        z: 1
+      })
+      embed: (〈1;holdDef〉.embed.d & {
+        z: 1
+      })
+      unify: (〈1;holdDef〉.unify.d & {
+        z: 1
+      })
+      comprehension: (〈1;holdDef〉.comprehension.d & {
+        z: 1
+      })
+    }
+    #L: [
+      {
+        b: 1
+      },
+    ]
+    sharedList: 〈0;#L〉...
+    elemShared: 〈0;sharedList〉[0]
   }
 }
 --- new.cue

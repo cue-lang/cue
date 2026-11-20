@@ -1,0 +1,40 @@
+# The spread operator opens the value at the root, recursively.
+-- test.cue --
+package test
+
+#Inner: {
+	x?: int
+	n?: {y?: int}
+}
+#Inner...
+
+-- datatest/testdata.cue --
+package datatest
+rootExtra: {
+	data: {x: 1, extra: true}
+	error: true // incorrect: the spread opens the value
+}
+nestedExtra: {
+	data: {n: {y: 1, extra: true}}
+	error: true // incorrect: the spread opens the value
+}
+-- out/generate-v3/schema --
+{
+	$schema:              "https://json-schema.org/draft/2020-12/schema"
+	type:                 "object"
+	additionalProperties: false
+	properties: {
+		n: {
+			type:                 "object"
+			additionalProperties: false
+			properties: y: type: "integer"
+		}
+		x: type: "integer"
+	}
+}
+-- out/generate-v3/nestedExtra --
+nestedExtra.data.n.extra: field not allowed:
+    ./datatest/testdata.cue:7:19
+-- out/generate-v3/rootExtra --
+rootExtra.data.extra: field not allowed:
+    ./datatest/testdata.cue:3:15

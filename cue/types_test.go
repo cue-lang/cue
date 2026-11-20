@@ -5605,6 +5605,223 @@ func TestIsClosed(t *testing.T) {
 			wantClosed:          true,
 			wantClosedRecursive: true,
 		},
+		{
+			desc:                "spread of a definition",
+			input:               `#X: {a: 1}, y: #X...`,
+			path:                "y",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a definition in a struct",
+			input:               `#X: {a: 1}, y: {#X...}`,
+			path:                "y",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a struct with close builtin in a struct",
+			input:               `x: close({a: 1}), y: {x...}`,
+			path:                "y",
+			wantClosed:          false,
+			wantClosedRecursive: false,
+		},
+		{
+			desc:                "spread of a definition: nested field",
+			input:               `#X: {a: {b: 1}}, y: {#X...}`,
+			path:                "y.a",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a definition: structure sharing",
+			input:               `#X: {a: 1}, x: #X..., y: x`,
+			path:                "y",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a definition: disjunction with elimination",
+			input:               `#A: {a: 1}, #B: {b: 2}, #X: #A | #B, y: #X... & {a: 1}`,
+			path:                "y",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a list definition",
+			input:               `#X: [{a: 1}], y: #X...`,
+			path:                "y",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a definition in a definition",
+			input:               `#X: {a: 1}, #Y: {b: #X...}`,
+			path:                "#Y.b",
+			wantClosed:          true, // The enclosing definition closes it again
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in an embedded definition",
+			input:               `#X: {a: 1}, #Y: {b: #X...}, y: {#Y}`,
+			path:                "y.b",
+			wantClosed:          true, // The embedded definition closes it again
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in a unified definition",
+			input:               `#X: {a: 1}, #Y: {b: #X...}, y: #Y & {}`,
+			path:                "y.b",
+			wantClosed:          true, // The unified definition closes it again
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition: field selected through the spread",
+			input:               `#Y: {b: 1}, #X: {a: #Y}, y: #X...`,
+			path:                "y.a",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a definition: inner spread selected through the spread",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, y: #Z...`,
+			path:                "y.d",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a field holding a definition",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, x: {#Z}, y: x...`,
+			path:                "y.d",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a field holding a definition: reference",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, x: {#Z}, y: x..., r: y.d`,
+			path:                "r",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a unification with a definition",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, p: (#Z & {d: _})...`,
+			path:                "p.d",
+			wantClosed:          true, // incorrect: opened by the spread
+			wantClosedRecursive: true, // incorrect: opened by the spread
+		},
+		{
+			desc:                "spread of a definition in an embedded definition: reference",
+			input:               `#X: {a: 1}, #Y: {b: #X...}, y: {#Y}, r: y.b`,
+			path:                "r",
+			wantClosed:          true, // The embedded definition closes it again
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in an embedded definition: references",
+			input:               `#X: {a: 1}, #Y: {b: #X...}, y: {#Y}, r: y.b, r: y.b`,
+			path:                "r",
+			wantClosed:          true, // The embedded definition closes it again
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in an embedded definition: unified reference",
+			input:               `#X: {a: 1}, #Y: {b: #X...}, y: {#Y}, r: y.b & {}`,
+			path:                "r",
+			wantClosed:          true, // The embedded definition closes it again
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in an embedded definition: selection from a unification",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, x: {#Z}, r: (x & {}).d`,
+			path:                "r",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in an embedded definition: reference beside a spread",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, #E: {a: int}, x: {#Z}, r: {x.d, #E...}`,
+			path:                "r",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in an embedded definition: reference unified with a spread",
+			input:               `#D: {a: 1}, #Z: {d: #D...}, #E: {a: int}, x: {#Z}, r: #E... & x.d`,
+			path:                "r",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a spread in an embedded definition",
+			input:               `#X: {a: 1}, y: #X..., #V: {q: y}, r: {#V}`,
+			path:                "r.q",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a spread in a unified definition: nested field",
+			input:               `#X: {a: {b: 1}}, y: #X..., #V: {q: y}, r: #V & {}`,
+			path:                "r.q.a",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition in a field allowed by a definition",
+			input:               `#X: {a: 1}, #C: {b: _}, y: #C & {b: #X...}`,
+			path:                "y.b",
+			wantClosed:          true, // incorrect: #C allows any value for b
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a definition holding a spread",
+			input:               `#X: {a: 1}, y: {#X...}, #W: y, r: #W`,
+			path:                "r",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a definition holding a spread: nested field",
+			input:               `#X: {a: {b: 1}}, y: {#X...}, #W: y, r: #W`,
+			path:                "r.a",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a definition holding a spread: reference",
+			input:               `#X: {a: 1}, y: {#X...}, #W: y, r: #W, s: r`,
+			path:                "s",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a definition holding a spread: let",
+			input:               `#X: {a: 1}, y: {#X...}, #W: y, let L = #W, r: L`,
+			path:                "r",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a definition holding a spread: list element",
+			input:               `#X: {a: 1}, y: {#X...}, #W: y, r: [#W][0]`,
+			path:                "r",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "reference to a definition holding a spread: optional field",
+			input:               `#X: {a: 1}, y: {#X...}, #W: {p?: y}, r: #W & {p: _}`,
+			path:                "r.p",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
+		{
+			desc:                "spread of a definition unified with the definition",
+			input:               `#X: {a: 1}, y: #X... & #X`,
+			path:                "y",
+			wantClosed:          true,
+			wantClosedRecursive: true,
+		},
 	}
 
 	for _, tc := range testCases {

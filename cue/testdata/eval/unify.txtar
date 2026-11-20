@@ -3,7 +3,7 @@ a: d: {
 	#base... // spread, as Y is not one of its fields
 	#info: {...}
 	Y:     #info.X @test(eq, "foo") @test(closed)
-} @test(closed)
+} @test(closed, incorrect) @test(closed:todo=false)
 
 #base: {
 	#info: {...}

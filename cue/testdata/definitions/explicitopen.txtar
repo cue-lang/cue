@@ -206,7 +206,7 @@ issue4150: {
 	x: #Def... & {
 			a: 42
 			b: 42
-	} @test(eq, {a: 42, b: 42}) @test(closed)
+	} @test(eq, {a: 42, b: 42}) @test(closed, incorrect) @test(closed:todo=false)
 
 	foo: {a: int}
 	bar: {b: int}
@@ -491,8 +491,8 @@ recloseConjunction: {
 	}
 }
 // A spread opens the definition it spreads, so the struct admits any field.
-// The API instead reports it as closed and as not allowing the field, even
-// though unifying the field succeeds.
+// The API instead reports it as closed, even though unifying the field
+// succeeds.
 spreadDefClosed: {
 	#D: {a: {}}
 	v: {#D...}
@@ -527,6 +527,84 @@ spreadSelectMissing: {
 	closed: {
 		x: #D.z @test(err, code=eval, contains="undefined field: z")
 	}
+}
+// A spread opens the value it spreads, whether a definition or close closes
+// that value, and whether the field shares it or unifies it with a struct:
+// the result is not closed and admits any field. Without a spread it is
+// closed.
+//
+// The API instead reports the result as closed, unless the field unifies a
+// struct closed by close.
+spreadNotClosed: {
+	#D: a: {b: 1}
+	C: close({a: {b: 1}})
+
+	sharedDef:   #D...   @test(closed:todo=false) @test(allows, z)
+	embedDef:    {#D...} @test(closed:todo=false) @test(allows, z)
+	sharedClose: C...    @test(closed:todo=false) @test(allows, z)
+	embedClose:  {C...}  @test(closed=false) @test(allows, z)
+
+	noSpread: {
+		sharedDef:   #D   @test(closed) @test(allows=false, z)
+		embedDef:    {#D} @test(closed) @test(allows=false, z)
+		sharedClose: C    @test(closed) @test(allows=false, z)
+		embedClose:  {C}  @test(closed) @test(allows=false, z)
+	}
+
+	// A field reading an opened value is open as well, as is a field
+	// selected from one.
+	read:   sharedDef  @test(closed:todo=false) @test(allows, z)
+	nested: embedDef.a @test(closed:todo=false) @test(allows, z)
+	// So is a field selected from a value which shares the definition.
+	nestedShared: sharedDef.a @test(closed:todo=false) @test(allows:todo, z)
+	// An ellipsis beside the spread closes nothing either.
+	ellipsis: {#D..., ...} @test(closed:todo=false) @test(allows, z)
+
+	// A definition closes again what a spread opens within it, as does
+	// unifying with the definition which the spread opens.
+	#Z: {d: #D..., e: {#D...}}
+	inDef: {
+		shared: #Z.d @test(closed) @test(allows=false, z)
+		embed:  #Z.e @test(closed) @test(allows=false, z)
+	}
+	reclosed: #D... & #D @test(closed) @test(allows=false, z)
+
+	// So does a definition which refers to an opened struct. A spread of a
+	// field holding that definition opens it again, also for a field read
+	// through the spread.
+	#Refers:            embedDef
+	refersDef:          #Refers                 @test(closed) @test(allows:todo=false, z)
+	holdRefers: f:      #Refers
+	spreadRefers:       holdRefers...
+	readSpreadRefers:   spreadRefers.f          @test(allows, z)
+	extendSpreadRefers: spreadRefers.f & {z: 1} @test(eq, {a: {b: 1}, z: 1})
+
+	// So does a field holding the definition, whether it shares,
+	// embeds or unifies it, or a comprehension adds it.
+	holdDef: {
+		shared: #Z
+		embed: {#Z}
+		unify: #Z & {}
+		comprehension: {for k, v in {a: 1} {#Z}}
+	}
+	heldDef: {
+		shared:        holdDef.shared.d        @test(closed) @test(allows=false, z)
+		embed:         holdDef.embed.d         @test(closed) @test(allows:todo=false, z)
+		unify:         holdDef.unify.d         @test(closed) @test(allows:todo=false, z)
+		comprehension: holdDef.comprehension.d @test(closed) @test(allows:todo=false, z)
+	}
+	extendHeldDef: {
+		shared:        holdDef.shared.d & {z: 1}        @test(err, code=eval, contains="field not allowed")
+		embed:         holdDef.embed.d & {z: 1}         @test(eq, {a: {b: 1}, z: 1}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		unify:         holdDef.unify.d & {z: 1}         @test(eq, {a: {b: 1}, z: 1}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+		comprehension: holdDef.comprehension.d & {z: 1} @test(eq, {a: {b: 1}, z: 1}, incorrect) @test(err:todo, code=eval, contains="field not allowed")
+	}
+
+	// A spread opens the elements of a list as well. The list itself keeps
+	// its length, which is not reported as closed for any list.
+	#L: [{b: 1}]
+	sharedList: #L... @test(closed:todo=false) @test(allows=false, int)
+	elemShared: sharedList[0] @test(closed:todo=false) @test(allows:todo, z)
 }
 
 -- out/errors.txt --
@@ -635,6 +713,8 @@ recloseSame.readDisjunct.m.y: field not allowed:
 [eval] spreadSelectMissing.closed.x: undefined field: z:
     ./issues.cue:330:9
     ./issues.cue:316:2
+[eval] spreadNotClosed.extendHeldDef.shared.z: field not allowed:
+    ./issues.cue:399:38
 [eval] useOld1.t1.err.c: field not allowed:
     ./new.cue:23:19
 [eval] useOld1.t2.err.c: field not allowed:
@@ -706,19 +786,19 @@ f9: combinenew.f9.ok is in error because two f9 declarations conflict.
 f14/f15: combinenew.f14.err and f15.err are NOT in error (v3 allows these).
 Structure sharing: NewOpen2: ~(#A), combinenew.f4.ok ~(NewClosed1), combinenew.f18.ok ~(NewClosed1).
 -- out/eval/stats --
-Leaks:  0
-Freed:  901
-Reused: 813
-Allocs: 88
+Leaks:  2
+Freed:  994
+Reused: 905
+Allocs: 91
 Retain: 0
 
-Unifications: 806
-Conjuncts:    2022
+Unifications: 901
+Conjuncts:    2169
 Disjuncts:    50
 
-NumCloseIDs: 698
+NumCloseIDs: 719
 
-ConjunctInfos:       1352
+ConjunctInfos:       1465
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         3

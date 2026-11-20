@@ -8,7 +8,7 @@ a: d: {
 } @test(eq, {
 	#info: {X: "foo"}
 	Y: "foo"
-}) @test(closed)
+}) @test(closed, incorrect) @test(closed:todo=false)
 
 #base: {
 	#info: {...} @test(closed)

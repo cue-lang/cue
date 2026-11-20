@@ -1,6 +1,8 @@
 # Tests for closedness with the spread operator.
 # Since v0.18.0, spread (#T...) opens a definition,
 # while plain embedding (#T) keeps it closed.
+# A definition closes again what a spread opens within it,
+# wherever the definition is embedded or unified.
 -- test.cue --
 package test
 
@@ -26,12 +28,19 @@ _bar: {
 	#Inner
 	y?: int
 }
+_spread: #Inner...
+#Holder: d?: #Inner...
+_embedHolder: {#Holder}
+_unifyHolder: #Holder & {}
 
 t01?: #WithSpread
 t02?: #Inner
 t03?: #MixedRef
 t04?: _foo
 t05?: _bar
+t06?: _spread
+t07?: _embedHolder
+t08?: _unifyHolder
 
 -- datatest/testdata.cue --
 package datatest
@@ -56,10 +65,30 @@ mixedChildExtra: {
 	data: {t03: {x: 1, child: {x: 2, extra: true}, z: "hi"}}
 	error: true
 }
+spreadSharedExtra: {
+	data: {t06: {x: 1, extra: true}}
+}
+embedHolderExtra: {
+	data: {t07: {d: {x: 1, extra: true}}}
+	error: true
+}
+unifyHolderExtra: {
+	data: {t08: {d: {x: 1, extra: true}}}
+	error: true
+}
 -- out/generate-v3/schema --
 {
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	$defs: {
+		Holder: {
+			type:                 "object"
+			additionalProperties: false
+			properties: d: {
+				type:                 "object"
+				additionalProperties: false
+				properties: x: type: "integer"
+			}
+		}
 		Inner: {
 			type:                 "object"
 			additionalProperties: false
@@ -87,12 +116,29 @@ mixedChildExtra: {
 			properties: y: type: "integer"
 			$ref: "#/$defs/Inner"
 		}
+		"_embedHolder": {
+			type:                 "object"
+			additionalProperties: false
+			properties: d: {
+				type:                 "object"
+				additionalProperties: false
+				properties: x: type: "integer"
+			}
+		}
 		"_foo": {
 			type: "object"
 			properties: {
 				x: type: "integer"
 				y: type: "integer"
 			}
+		}
+		"_spread": {
+			type: "object"
+			properties: x: type: "integer"
+		}
+		"_unifyHolder": {
+			type: "object"
+			$ref: "#/$defs/Holder"
 		}
 	}
 	type: "object"
@@ -102,6 +148,9 @@ mixedChildExtra: {
 		t03: $ref: "#/$defs/MixedRef"
 		t04: $ref: "#/$defs/_foo"
 		t05: $ref: "#/$defs/_bar"
+		t06: $ref: "#/$defs/_spread"
+		t07: $ref: "#/$defs/_embedHolder"
+		t08: $ref: "#/$defs/_unifyHolder"
 	}
 }
 -- out/generate-v3/spreadValid --
@@ -116,3 +165,10 @@ innerExtra.data.t02.extra: field not allowed:
 -- out/generate-v3/mixedChildExtra --
 mixedChildExtra.data.t03.child.extra: field not allowed:
     ./datatest/testdata.cue:20:35
+-- out/generate-v3/embedHolderExtra --
+embedHolderExtra.data.t07.d.extra: field not allowed:
+    ./datatest/testdata.cue:27:25
+-- out/generate-v3/spreadSharedExtra --
+-- out/generate-v3/unifyHolderExtra --
+unifyHolderExtra.data.t08.d.extra: field not allowed:
+    ./datatest/testdata.cue:31:25

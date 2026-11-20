@@ -325,6 +325,12 @@ func TestBuild(t *testing.T) {
 	}
 }
 
+func TestRuntimeCompileErr(t *testing.T) {
+	var r cue.Runtime
+	_, err := r.Compile("f.cue", "x: y")
+	qt.Assert(t, qt.ErrorMatches(err, `reference "y" not found`))
+}
+
 type builder struct {
 	ctxt    *build.Context
 	imports map[string]*bimport

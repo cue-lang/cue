@@ -2053,6 +2053,15 @@ func TestAllows(t *testing.T) {
 		`,
 		sel:   cue.Str("c"),
 		allow: true,
+	}, {
+		desc: "disallow new field in definition sharing a struct opened by a spread",
+		in: `
+		#Def: a: int
+		y: {#Def...}
+		#W: y
+		x: #W
+		`,
+		sel: cue.Str("c"),
 	}}
 
 	path := cue.ParsePath("x")

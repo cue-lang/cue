@@ -573,7 +573,7 @@ spreadNotClosed: {
 	// field holding that definition opens it again, also for a field read
 	// through the spread.
 	#Refers:            embedDef
-	refersDef:          #Refers                 @test(closed) @test(allows:todo=false, z)
+	refersDef:          #Refers                 @test(closed) @test(allows=false, z)
 	holdRefers: f:      #Refers
 	spreadRefers:       holdRefers...
 	readSpreadRefers:   spreadRefers.f          @test(allows, z)

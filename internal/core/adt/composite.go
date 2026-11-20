@@ -240,7 +240,8 @@ type Vertex struct {
 
 	// ClosedShared is set when this Vertex structure shares a vertex through
 	// a reference naming a definition, or shares a definition. It stops
-	// [Vertex.sharesOpened] here.
+	// [Vertex.sharedMark] here: the definition closes what is shared,
+	// whatever the vertices beyond it record, such as [Vertex.Opened].
 	ClosedShared bool
 
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
@@ -1352,8 +1353,20 @@ func (v *Vertex) IsClosedList() bool {
 // A definition closes again what is opened within it for a reference from
 // outside of it, which is the view taken here. So neither mark counts for a
 // vertex within a definition, nor does the mark of a vertex that it shares.
+// A vertex that shares another through a reference to a definition is
+// closed by it, whatever the shared vertex records.
 func (v *Vertex) IsOpened() bool {
-	return enclosingDef(v) == nil && (v.sharesOpened() || v.DerefValue().Opened)
+	if enclosingDef(v) != nil {
+		return false
+	}
+	switch x := v.sharedMark(); {
+	case x.ClosedShared:
+		return false
+	case x.OpenedShared:
+		return true
+	default:
+		return x.Opened
+	}
 }
 
 // TODO: return error instead of boolean? (or at least have version that does.)

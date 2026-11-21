@@ -339,22 +339,29 @@ func (v *Vertex) DerefNonDisjunct() *Vertex {
 	}
 }
 
-// sharesOpened reports whether v, or a node v indirects to as in
-// [Vertex.DerefValue], shares a vertex through an opened reference,
-// stopping at a node with ClosedShared set. Sharing does not copy
-// OpenedShared, as the shared vertex may not be evaluated yet.
-func (v *Vertex) sharesOpened() bool {
-	for !v.ClosedShared {
-		if v.OpenedShared {
-			return true
-		}
+// sharedMark returns the first node among v and those it indirects to, as
+// in [Vertex.DerefValue], which records how it shares another: through a
+// reference to a definition, as [Vertex.ClosedShared], or through an opened
+// reference, as [Vertex.OpenedShared]. If none does, it returns the vertex
+// that v finally shares, or v itself. Sharing does not copy these marks, as
+// the shared vertex may not be evaluated yet.
+func (v *Vertex) sharedMark() *Vertex {
+	for !v.ClosedShared && !v.OpenedShared {
 		arc, ok := v.BaseValue.(*Vertex)
 		if !ok {
-			return false
+			break
 		}
 		v = arc
 	}
-	return false
+	return v
+}
+
+// sharesOpened reports whether v, or a node v indirects to, shares a vertex
+// through an opened reference, stopping at a node with
+// [Vertex.ClosedShared] set.
+func (v *Vertex) sharesOpened() bool {
+	x := v.sharedMark()
+	return x.OpenedShared && !x.ClosedShared
 }
 
 // DerefNonRooted indirects a node that points to a value that is not rooted.

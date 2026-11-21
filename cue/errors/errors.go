@@ -296,10 +296,14 @@ func (e *posError) Position() token.Pos         { return e.pos }
 //
 // Note: this may mutate a if it is already a list, so
 // must not be used if a might have been shared across multiple
-// goroutines.
+// goroutines. It does not mutate b, even once the result is appended to.
 func Append(a, b Error) Error {
 	switch x := a.(type) {
 	case nil:
+		if l, ok := b.(list); ok {
+			// Appending to the result must not write to b.
+			return slices.Clip(l)
+		}
 		return b
 	case list:
 		return appendToList(x, b)
@@ -337,7 +341,8 @@ func appendToList(a list, err Error) list {
 		return a
 	case list:
 		if len(a) == 0 {
-			return x
+			// Appending to the result must not write to err.
+			return slices.Clip(x)
 		}
 		for _, e := range x {
 			a = appendToList(a, e)

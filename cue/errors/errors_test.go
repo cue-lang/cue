@@ -220,9 +220,7 @@ func TestAppendSharedList(t *testing.T) {
 		want []errors.Error
 	}{
 		{"shared", shared, []errors.Error{s1, s2, s3}},
-		// TODO: this should end in a, but both appends write to the spare
-		// capacity of the shared list.
-		{"a", gotA, []errors.Error{s1, s2, s3, b}},
+		{"a", gotA, []errors.Error{s1, s2, s3, a}},
 		{"b", gotB, []errors.Error{s1, s2, s3, b}},
 	} {
 		if got := errors.Errors(test.got); !slices.Equal(got, test.want) {

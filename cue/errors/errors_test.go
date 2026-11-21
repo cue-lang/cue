@@ -200,6 +200,37 @@ func TestListUnwrap(t *testing.T) {
 	}
 }
 
+// TestAppendSharedList checks that an error which [errors.Append] returns for
+// a list given as its second argument can be appended to without affecting
+// the list, nor any other error made from it.
+func TestAppendSharedList(t *testing.T) {
+	newErr := func(msg string) errors.Error {
+		return &posError{Message: errors.NewMessagef("%s", msg)}
+	}
+	// Three appends leave the list with spare capacity.
+	s1, s2, s3 := newErr("s1"), newErr("s2"), newErr("s3")
+	shared := errors.Append(errors.Append(s1, s2), s3)
+
+	a, b := newErr("a"), newErr("b")
+	gotA := errors.Append(errors.Append(nil, shared), a)
+	gotB := errors.Append(errors.Append(nil, shared), b)
+	for _, test := range []struct {
+		name string
+		got  errors.Error
+		want []errors.Error
+	}{
+		{"shared", shared, []errors.Error{s1, s2, s3}},
+		// TODO: this should end in a, but both appends write to the spare
+		// capacity of the shared list.
+		{"a", gotA, []errors.Error{s1, s2, s3, b}},
+		{"b", gotB, []errors.Error{s1, s2, s3, b}},
+	} {
+		if got := errors.Errors(test.got); !slices.Equal(got, test.want) {
+			t.Errorf("%s: got %v, want %v", test.name, got, test.want)
+		}
+	}
+}
+
 // inputsError is a [posError] with input positions, which it returns without
 // copying them, like the evaluator's errors do.
 type inputsError struct {

@@ -383,6 +383,15 @@ existsNStrict: {
 	t: existsN(1, s.a, s.typo)
 }
 
+// A validator does not take the errors another found before it as its own:
+// existsN is satisfied, so only matchN fails.
+existsNAfterMatchN: {
+	_p: k: 1
+	n:  int
+	ab: matchN(1, [int & >n]) & existsN(1, _p.k) & 5
+	ba: existsN(1, _p.k) & matchN(1, [int & >n]) & 5
+}
+
 // isValid converts a determined countN violation into a boolean (the
 // validator-to-boolean adapter).
 countNAdapter: {
@@ -1382,6 +1391,18 @@ guardedDisjunct: {
       a?: int
     })
     t: existsN(1, 〈0;s〉.a, 〈0;s〉.typo)
+  }
+  existsNAfterMatchN: {
+    _p: {
+      k: 1
+    }
+    n: int
+    ab: ((matchN(1, [
+      (int & >〈1;n〉),
+    ]) & existsN(1, 〈0;_p〉.k)) & 5)
+    ba: ((existsN(1, 〈0;_p〉.k) & matchN(1, [
+      (int & >〈1;n〉),
+    ])) & 5)
   }
   countNAdapter: {
     ok1: isValid(countN(1, [

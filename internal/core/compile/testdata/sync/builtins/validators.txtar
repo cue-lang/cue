@@ -98,6 +98,13 @@ uniqueConstrainsRecursive: {
 	distinct: {a: 1}
 }
 
+// A validator does not take the errors another found before it as its own:
+// the struct fails the bound, whatever matchN found in {b!: int}.
+matchNThenBound: {
+	ab: matchN(1, [{b!: int}]) & !={a: 1} & {a: 1}
+	ba: !={a: 1} & matchN(1, [{b!: int}]) & {a: 1}
+}
+
 conjuncts: {
 	kv: struct.MinFields(1)
 	kv: struct.MaxFields(3)
@@ -468,6 +475,26 @@ issue4115: {
     distinct: {
       a: 1
     }
+  }
+  matchNThenBound: {
+    ab: ((matchN(1, [
+      {
+        b!: int
+      },
+    ]) & !={
+      a: 1
+    }) & {
+      a: 1
+    })
+    ba: ((!={
+      a: 1
+    } & matchN(1, [
+      {
+        b!: int
+      },
+    ])) & {
+      a: 1
+    })
   }
   conjuncts: {
     kv: 〈import;struct〉.MinFields(1)

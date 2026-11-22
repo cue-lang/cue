@@ -1,24 +1,28 @@
-# The errors of every package which the tool files import should be
-# reported, along with those of the tool files themselves.
-# TODO: only the first error among the imports is.
+# The errors of every package which the tool files import are reported,
+# along with those of the tool files themselves.
 ! exec cue cmd hello
 ! stdout .
 cmp stderr expect-stderr
 
-# An import of a package which does not exist should fail every command in
+# An import of a package which does not exist fails every command in
 # the package and their listing, even if only one command uses it.
-# TODO: only the command which uses the import fails.
 cd badimport
-exec cue cmd hello
-stdout '^hi$'
+! exec cue cmd hello
+! stdout .
+cmp stderr expect-stderr
 ! exec cue cmd other
 cmp stderr expect-stderr
-exec cue help cmd
-stdout '^  hello'
+! exec cue help cmd
+! stdout '^  hello'
+cmp stderr expect-stderr
 
 -- expect-stderr --
 X: reference "undef1" not found:
     ./b1/b1.cue:3:4
+X: reference "undef2" not found:
+    ./b2/b2.cue:3:4
+command.hello.text: reference "missing" not found:
+    ./x_tool.cue:11:27
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.9.0"
@@ -46,8 +50,10 @@ package b2
 
 X: undef2
 -- badimport/expect-stderr --
-command.other: cannot find package "tool/clii":
-    ./x_tool.cue:11:17
+builtin package "tool/clii" undefined:
+    ./x_tool.cue:6:2
+package "tool/cli.v2" imported but not defined in test.example/badimport@v0:
+    ./x_tool.cue:7:2
 -- badimport/x.cue --
 package badimport
 -- badimport/x_tool.cue --

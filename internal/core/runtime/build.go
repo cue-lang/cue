@@ -92,11 +92,7 @@ func (x *Runtime) build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	errs = b.Err
 
 	// Build transitive dependencies.
-	for _, file := range b.Files {
-		for s := range file.ImportSpecs() {
-			errs = errors.Append(errs, x.buildSpec(b, s))
-		}
-	}
+	errs = errors.Append(errs, x.BuildImports(b))
 
 	errs = errors.Append(errs, b.ResolutionErr)
 
@@ -152,6 +148,17 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 	p.PkgName = file.PackageName()
 	v, _ := r.buildOwned(cfg, p)
 	return v, p
+}
+
+// BuildImports builds the imports of the files of b, which must be complete,
+// and returns their errors, including imports which resolve to no package.
+func (x *Runtime) BuildImports(b *build.Instance) (errs errors.Error) {
+	for _, file := range b.Files {
+		for s := range file.ImportSpecs() {
+			errs = errors.Append(errs, x.buildSpec(b, s))
+		}
+	}
+	return errs
 }
 
 func (x *Runtime) buildSpec(b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {

@@ -908,25 +908,22 @@ func buildLoadedTools(cmd *Command, binst []*build.Instance) (*cue.Instance, err
 		inst = cue.Merge(insts...) //lint:ignore SA1019 see buildToolInstances
 	}
 
-	// Compile the imports so that the tool files can resolve them,
-	// leaving their evaluation to the tasks which reference them.
-	// [cue.Context.BuildInstance] would evaluate each of them in full.
-	r, _ := value.ToInternal(inst.Value())
-	for _, b := range binst {
-		for _, i := range b.Imports {
-			if _, err := r.Build(nil, i); err != nil {
-				return nil, err
-			}
-		}
-	}
-
 	// Set the path and ID equal to those of the package from which it is
 	// loading, so that the tool files share its hidden fields.
 	ti.ImportPath = binst[0].ImportPath
 	ti.CanonicalID = binst[0].ID()
 
+	// Compile the imports, unless the tool files failed to load, so that they
+	// can resolve them. Unlike [cue.Context.BuildInstance], this leaves their
+	// evaluation to the tasks which reference them.
+	var importErrs errors.Error
+	if ti.Complete() == nil {
+		r, _ := value.ToInternal(inst.Value())
+		importErrs = r.BuildImports(ti)
+	}
+
 	inst = inst.Build(ti) //lint:ignore SA1019 see buildToolInstances
-	return inst, inst.Err
+	return inst, errors.Append(importErrs, inst.Err)
 }
 
 func shortFile(root string, f *build.File) string {

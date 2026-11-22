@@ -20,6 +20,7 @@ import (
 	"math"
 	"math/big"
 	"runtime"
+	"slices"
 	"testing"
 	"time"
 	"weak"
@@ -680,9 +681,9 @@ out: scoped.x
 	qt.Check(t, qt.Equals(errString(v.Err()), ""))
 }
 
-// TestCompileRetention checks that a Context does not keep alive the values
-// it compiles from source or builds with options once they are no longer
-// referenced, while a live value still reports its build instance.
+// TestCompileRetention checks what keeps alive the build instances of values
+// compiled from source or built with options: a live value, its Context, or a
+// root which outlives its Context via the values of another.
 func TestCompileRetention(t *testing.T) {
 	ctx := cuecontext.New()
 	parse := func(src string) *ast.File {
@@ -690,26 +691,41 @@ func TestCompileRetention(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		return f
 	}
-	compile := []func(src string) cue.Value{
-		func(src string) cue.Value { return ctx.CompileString(src) },
-		func(src string) cue.Value { return ctx.CompileBytes([]byte(src)) },
-		func(src string) cue.Value { return ctx.BuildFile(parse(src)) },
+	newInst := func(src string) *build.Instance {
+		inst := build.NewContext().NewInstance("", nil)
+		qt.Assert(t, qt.IsNil(inst.AddSyntax(parse(src))))
+		return inst
+	}
+	compile := []func(ctx *cue.Context, src string) cue.Value{
+		func(ctx *cue.Context, src string) cue.Value { return ctx.CompileString(src) },
+		func(ctx *cue.Context, src string) cue.Value { return ctx.CompileBytes([]byte(src)) },
+		func(ctx *cue.Context, src string) cue.Value { return ctx.BuildFile(parse(src)) },
 		// A build with options builds a copy of its build instance.
-		func(src string) cue.Value {
-			inst := build.NewContext().NewInstance("", nil)
-			qt.Assert(t, qt.IsNil(inst.AddSyntax(parse(src))))
-			return ctx.BuildInstance(inst, cue.InferBuiltins(true))
+		func(ctx *cue.Context, src string) cue.Value {
+			return ctx.BuildInstance(newInst(src), cue.InferBuiltins(true))
+		},
+		func(ctx *cue.Context, src string) cue.Value {
+			return ctx.BuildInstance(newInst(src), cue.Scope(ctx.CompileString("s: 1")))
+		},
+		func(ctx *cue.Context, src string) cue.Value {
+			return ctx.BuildInstance(newInst(src), cue.ImportPath("example.com/p"))
 		},
 	}
 	var insts []weak.Pointer[build.Instance]
 	var v cue.Value
 	for i := range 2 * len(compile) {
-		v = compile[i%len(compile)](fmt.Sprintf("a: %d", i))
+		v = compile[i%len(compile)](ctx, fmt.Sprintf("a: %d", i))
 		// Formatting looks up the value's instance, which may cache it.
 		qt.Assert(t, qt.Equals(fmt.Sprint(v), fmt.Sprintf("{a: %d}", i)))
 		inst := v.BuildInstance()
 		qt.Assert(t, qt.IsNotNil(inst))
 		insts = append(insts, weak.Make(inst))
+		// As a loader's functions might, lead the instance back to the value.
+		self := v
+		inst.CanonicalImportPath = func(path string) string {
+			runtime.KeepAlive(self)
+			return path
+		}
 	}
 	runtime.GC()
 	last := len(insts) - 1
@@ -717,6 +733,31 @@ func TestCompileRetention(t *testing.T) {
 		qt.Assert(t, qt.IsNil(inst.Value()), qt.Commentf("value %d", i))
 	}
 	qt.Assert(t, qt.Equals(insts[last].Value(), v.BuildInstance()))
+
+	var foreign []cue.Value
+	var foreignInsts []weak.Pointer[build.Instance]
+	for i, f := range compile {
+		built := f(cuecontext.New(), fmt.Sprintf("a: %d", i))
+		foreignInsts = append(foreignInsts, weak.Make(built.BuildInstance()))
+		foreign = append(foreign, ctx.CompileString("_").Unify(built))
+	}
+	// Freeing what a Context held takes collections and cleanups, which can
+	// lag on a busy machine.
+	for deadline := time.Now().Add(5 * time.Second); time.Now().Before(deadline); {
+		runtime.GC()
+		if !slices.ContainsFunc(foreignInsts, func(p weak.Pointer[build.Instance]) bool {
+			return p.Value() != nil
+		}) {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	for i, inst := range foreignInsts {
+		// TODO: a root which outlives its Context should not keep its build
+		// instance alive, as nothing can reach the instance through it.
+		qt.Check(t, qt.IsNotNil(inst.Value()), qt.Commentf("foreign value %d", i))
+		qt.Check(t, qt.Equals(fmt.Sprint(foreign[i]), fmt.Sprintf("{a: %d}", i)))
+	}
 }
 
 // TestHiddenFieldScope tests looking up hidden fields with [cue.Hid] across the

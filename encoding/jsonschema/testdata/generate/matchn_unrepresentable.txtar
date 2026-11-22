@@ -1,0 +1,316 @@
+A schema which only approximates a value admits more than it does. It
+cannot be negated, be one of several of which exactly one must match, be
+the condition of an if, or be counted up to a maximum, without rejecting
+valid data.
+
+-- test.cue --
+package test
+
+import (
+	"list"
+	"net"
+	"strings"
+	"time"
+)
+
+#P: strings.HasPrefix("a")
+
+notCall?: matchN(0, [strings.HasPrefix("a")])
+notReference?: matchN(0, [#P])
+notValidator?: matchN(0, [net.IPv4])
+notStringBound?: matchN(0, [<"b"])
+notFloat?: matchN(0, [float])
+notLayout?: matchN(0, [time.Format("15h")])
+notNotNull?: matchN(0, [!=null])
+notTop?: matchN(0, [_])
+oneOfCall?: matchN(1, [strings.HasPrefix("a"), "b"])
+ifCall?: matchIf(strings.HasPrefix("a"), "ab", _)
+notList?: matchN(0, [{
+	[...]
+	[1]:   matchN(1, [>3])
+	[>=1]: <5
+}])
+maxContainsCall?: list.MatchN(>=0 & <=1, strings.HasPrefix("a"))
+
+notBytes?: matchN(0, [bytes])
+notNotEqualReference?: matchN(0, [!=_s])
+notBoundReference?: matchN(0, [<_s])
+notCount?: matchN(0, [matchN(2, [int, number, string])])
+notCycle?: matchN(0, [_lists[0]])
+notRecursive?: matchN(0, [#WrapsGrowing])
+notPattern?: matchN(0, [{[<"b"]: int}])
+notListRest?: matchN(0, [[...<_s]])
+notListTopDisjunction?: matchN(0, [[int, ...(_ | string)]])
+
+_s: string
+_lists: [[..._lists[0]]]
+_growing: {
+	value?: int
+	next?: _growing & {extra?: int}
+}
+#WrapsGrowing: _growing
+
+-- datatest/tests.cue --
+package datatest
+
+// The schemas negate or count an approximation, so they reject the data.
+notCall: {
+	data: notCall: "b"
+	error: true
+}
+
+notReference: {
+	data: notReference: "b"
+	error: true
+}
+
+notValidator: {
+	data: notValidator: "b"
+	error: true
+}
+
+notStringBound: {
+	data: notStringBound: "c"
+	error: true
+}
+
+notFloat: {
+	data: notFloat: 1
+	error: true
+}
+
+notLayout: {
+	data: notLayout: "b"
+	error: true
+}
+
+oneOfCall: {
+	data: oneOfCall: "b"
+	error: true
+}
+
+ifCall: {
+	data: ifCall: "b"
+	error: true
+}
+
+notList: {
+	data: notList: [0, 2]
+	error: true
+}
+
+maxContainsCall: {
+	data: maxContainsCall: ["b", "c"]
+	error: true
+}
+
+notBytes: {
+	data: notBytes: "a"
+	error: true
+}
+
+notCount: {
+	data: notCount: "a"
+	error: true
+}
+
+notCycle: {
+	data: notCycle: [[1]]
+	error: true
+}
+
+notRecursive: {
+	data: notRecursive: {next: {next: {other: 1}}}
+	error: true
+}
+
+notPattern: {
+	data: notPattern: {a: "x"}
+	error: true
+}
+
+badNotListTopDisjunction: {
+	data: notListTopDisjunction: [1, "a"]
+	error: true
+}
+
+badNotNotNull: {
+	data: notNotNull: "a"
+	error: true
+}
+
+badNotTop: {
+	data: notTop: 1
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: {
+		IPv4: true
+		P:    true
+		WrapsGrowing: {
+			type:                 "object"
+			additionalProperties: false
+			properties: {
+				next: {
+					type:                 "object"
+					additionalProperties: false
+					properties: {
+						extra: type: "integer"
+						next: {
+							type: "object"
+							properties: extra: type: "integer"
+							$ref: "#/$defs/_growing"
+						}
+						value: type: "integer"
+					}
+				}
+				value: type: "integer"
+			}
+		}
+		"_growing": {
+			type: "object"
+			properties: {
+				next: {
+					type: "object"
+					properties: extra: type: "integer"
+					$ref: "#/$defs/_growing"
+				}
+				value: type: "integer"
+			}
+		}
+	}
+	type: "object"
+	properties: {
+		ifCall: {
+			if: true
+			then: const: "ab"
+		}
+		maxContainsCall: {
+			type:        "array"
+			contains:    true
+			maxContains: 1
+			minContains: 0
+		}
+		notBoundReference: not: true
+		notBytes: not: {
+			type:            "string"
+			contentEncoding: "base64"
+		}
+		notCall: not:  true
+		notCount: not: true
+		notCycle: not: {
+			type: "array"
+			items: type: "array"
+		}
+		notFloat: not: type:  "number"
+		notLayout: not: type: "string"
+		notList: not: {
+			type: "array"
+			items: {
+				type:             "number"
+				exclusiveMaximum: 5
+			}
+			prefixItems: [
+				true,
+				{
+					type:             "number"
+					exclusiveMaximum: 5
+				},
+			]
+		}
+		notListRest: not: type: "array"
+		notListTopDisjunction: not: {
+			type: "array"
+			items: anyOf: [true, {type: "string"}]
+			prefixItems: [{type: "integer"}]
+			minItems:    1
+		}
+		notNotEqualReference: not: true
+		notNotNull: not: not: const: null
+		notPattern: not: {
+			type:                 "object"
+			additionalProperties: true
+		}
+		notRecursive: not: $ref:   "#/$defs/WrapsGrowing"
+		notReference: not: $ref:   "#/$defs/P"
+		notStringBound: not: type: "string"
+		notTop: not: true
+		notValidator: not: $ref: "#/$defs/IPv4"
+		oneOfCall: oneOf: [true, {const: "b"}]
+	}
+}
+-- out/generate-v3/badNotNotNull --
+badNotNotNull.data.notNotNull: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
+    1:1381
+    ./datatest/tests.cue:85:20
+-- out/generate-v3/badNotTop --
+badNotTop.data.notTop: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
+    1:1630
+    ./datatest/tests.cue:90:16
+-- out/generate-v3/ifCall --
+ifCall.data.ifCall: invalid value "b" (does not satisfy matchIf): conflicting values "ab" and "b":
+    1:604
+    ./datatest/tests.cue:40:16
+    1:632
+-- out/generate-v3/maxContainsCall --
+maxContainsCall.data.maxContainsCall: invalid value ["b","c"] (does not satisfy list.MatchN): _ matches 2 list items, want >=0 & <=1:
+    1:681
+    ./datatest/tests.cue:50:25
+-- out/generate-v3/notCall --
+notCall.data.notCall: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
+    1:838
+    ./datatest/tests.cue:5:17
+-- out/generate-v3/notFloat --
+notFloat.data.notFloat: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
+    1:947
+    ./datatest/tests.cue:25:18
+-- out/generate-v3/notLayout --
+notLayout.data.notLayout: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
+    1:985
+    ./datatest/tests.cue:30:19
+-- out/generate-v3/notReference --
+notReference.data.notReference: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
+    1:1549
+    ./datatest/tests.cue:10:22
+-- out/generate-v3/notStringBound --
+notStringBound.data.notStringBound: invalid value "c" (does not satisfy matchN): 1 matched, expected 0:
+    1:1595
+    ./datatest/tests.cue:20:24
+-- out/generate-v3/notValidator --
+notValidator.data.notValidator: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
+    1:1658
+    ./datatest/tests.cue:15:22
+-- out/generate-v3/oneOfCall --
+oneOfCall.data.oneOfCall: invalid value "b" (does not satisfy matchN): 2 matched, expected 1:
+    1:1702
+    ./datatest/tests.cue:35:19
+-- out/generate-v3/notList --
+notList.data.notList: invalid value [0,2] (does not satisfy matchN): 1 matched, expected 0:
+    1:1021
+    ./datatest/tests.cue:45:17
+-- out/generate-v3/badNotListTopDisjunction --
+badNotListTopDisjunction.data.notListTopDisjunction: invalid value [1,"a"] (does not satisfy matchN): 1 matched, expected 0:
+    1:1216
+    ./datatest/tests.cue:80:31
+-- out/generate-v3/notBytes --
+notBytes.data.notBytes: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
+    1:775
+    ./datatest/tests.cue:55:18
+-- out/generate-v3/notCount --
+notCount.data.notCount: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
+    1:862
+    ./datatest/tests.cue:60:18
+-- out/generate-v3/notCycle --
+notCycle.data.notCycle: invalid value [[1]] (does not satisfy matchN): 1 matched, expected 0:
+    1:886
+    ./datatest/tests.cue:65:18
+-- out/generate-v3/notPattern --
+notPattern.data.notPattern: invalid value {a:"x"} (does not satisfy matchN): 1 matched, expected 0:
+    1:1425
+    ./datatest/tests.cue:75:20
+-- out/generate-v3/notRecursive --
+notRecursive.data.notRecursive: invalid value {next:{next:{other:1}}} (does not satisfy matchN): 1 matched, expected 0:
+    1:1494
+    ./datatest/tests.cue:70:22

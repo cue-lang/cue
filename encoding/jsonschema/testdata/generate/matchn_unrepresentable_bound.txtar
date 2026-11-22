@@ -1,0 +1,39 @@
+Below language version v0.15.0, a != bound only admits the kind of its
+operand, which the schema leaves out, so it cannot be negated either.
+
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.14.0"
+-- test.cue --
+package test
+
+negated?: matchN(0, [!=0])
+negatedEmbedded?: matchN(0, [{matchN(>=1, [!=0]), #h: 1}])
+
+-- datatest/tests.cue --
+package datatest
+
+// The schema negates an approximation, so it rejects the data.
+negated: {
+	data: negated: "a"
+	error: true
+}
+
+ok: data: negatedEmbedded: "a"
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		negated: not: not: const: 0
+		negatedEmbedded: not: {
+			type:  "object"
+			anyOf: [{not: const: 0}]
+		}
+	}
+}
+-- out/generate-v3/negated --
+negated.data.negated: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
+    1:100
+    ./datatest/tests.cue:5:17
+-- out/generate-v3/ok --

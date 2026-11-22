@@ -158,6 +158,10 @@ type generateDialect struct {
 	// accompanying minimum/maximum (draft-04 and OpenAPI 3.0).
 	numericExclusive bool
 
+	// booleanSchemas reports whether true is a schema, which an
+	// [itemUnknown] may then render as. OpenAPI 3.0 has no boolean schemas.
+	booleanSchemas bool
+
 	// supportsConst reports whether the const keyword is available.
 	// When false a single-valued enum is emitted instead.
 	supportsConst bool
@@ -354,7 +358,8 @@ func newGenerator(cfg *GenerateConfig) (*generator, error) {
 		defs:    anyhash.NewMap[*CUERef, internItem](cueRefHasher{}),
 		unique:  newUniqueItems(),
 
-		describing: make(map[any]bool),
+		describing:   make(map[any]bool),
+		widenedItems: make(map[internItem]bool),
 	}, nil
 }
 
@@ -398,24 +403,39 @@ func (g *generator) assignNames(roots ...internItem) ([]*CUERef, error) {
 // pruneDefs removes the schemas which the roots do not need.
 func (g *generator) pruneDefs(roots []internItem) {
 	needed := make(map[*CUERef]bool)
-	var need func(internItem, *uniqueItems) internItem
-	need = func(it internItem, u *uniqueItems) internItem {
-		k, ok := it.Value().(*CUERef)
-		if !ok {
-			return u.apply(it, need)
-		}
-		if !needed[k] {
+	g.walkItems(func(it internItem) bool {
+		if k, ok := it.Value().(*CUERef); ok {
 			needed[k] = true
-			need(g.defs.At(k), u)
 		}
-		return it
-	}
-	for _, root := range roots {
-		need(root, g.unique)
-	}
+		return true
+	}, roots...)
 	g.defs.DeleteFunc(func(k *CUERef, _ internItem) bool {
 		return !needed[k]
 	})
+}
+
+// walkItems calls f once for each of the items which the roots need,
+// following references, and descends into those for which f reports true.
+func (g *generator) walkItems(f func(internItem) bool, roots ...internItem) {
+	seen := make(map[internItem]bool)
+	var visit func(internItem, *uniqueItems) internItem
+	visit = func(it internItem, u *uniqueItems) internItem {
+		if seen[it] {
+			return it
+		}
+		seen[it] = true
+		if !f(it) {
+			return it
+		}
+		if k, ok := it.Value().(*CUERef); ok {
+			visit(g.defs.At(k), u)
+			return it
+		}
+		return u.apply(it, visit)
+	}
+	for _, root := range roots {
+		visit(root, g.unique)
+	}
 }
 
 // renderRoot optimizes and renders a single root item into a struct literal
@@ -596,6 +616,9 @@ type generator struct {
 	// schema being generated, to end cycles through them: an [adt.Expr] in
 	// [generator.makeEvaluatedItem], a [refPath] in [generator.makeStructItem].
 	describing map[any]bool
+
+	// widenedItems caches the answers of [generator.isWidened].
+	widenedItems map[internItem]bool
 }
 
 func (g *generator) addError(pos cue.Value, err error) {
@@ -803,7 +826,7 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		if !args[0].IsConcrete() {
 			// If it's not concrete, we can't represent it in JSON Schema
 			// so accept anything.
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 		syntax := args[0].Syntax()
 		expr, ok := syntax.(ast.Expr)
@@ -817,9 +840,12 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		if op == cue.EqualOp {
 			return it.Value()
 		}
-		return &itemNot{
-			elem: it,
+		not := &itemNot{elem: it}
+		if args[0].Kind() != cue.NullKind && v.IncompleteKind() != cue.TopKind {
+			// The bound also restricts the kind, which the schema leaves out.
+			return g.widened(not)
 		}
+		return not
 	case cue.LessThanOp,
 		cue.LessThanEqualOp,
 		cue.GreaterThanOp,
@@ -832,7 +858,7 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			// The bound refers to a non-concrete value (for example a
 			// bound on another field), so it can't be expressed in JSON
 			// Schema; accept anything.
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 		switch kind := args[0].Kind(); kind {
 		case cue.FloatKind, cue.IntKind:
@@ -855,9 +881,9 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			}
 		case cue.StringKind:
 			// Can't express bounds on strings in JSON Schema
-			return &itemType{
+			return g.widened(&itemType{
 				kinds: cueKindToJSONSchemaTypes(kind),
-			}
+			})
 		default:
 			g.addError(args[0], fmt.Errorf("bad argument to unary comparison"))
 			return &itemFalse{}
@@ -874,7 +900,7 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		}
 		// For unknown functions, accept anything rather than fail.
 		// This allows for gradual implementation of more function types.
-		return &itemTrue{}
+		return &itemUnknown{}
 	}
 	if ref := unfollowedRef(v); (ref != nil || op == cue.SelectorOp || op == cue.IndexOp) && !value.Vertex(v).IsData() {
 		// An index, a let or an embedding like `{#A}` may hide a disjunction,
@@ -900,8 +926,12 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 		// fields are still emitted rather than producing an empty schema.
 		kind = cue.StructKind
 	}
+	exact := isExactKind(v, kind)
 	if kind == cue.TopKind {
-		return &itemTrue{}
+		if exact {
+			return &itemTrue{}
+		}
+		return &itemUnknown{}
 	}
 	var it item // additional constraints for some known types.
 	switch kind {
@@ -921,6 +951,9 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	if it != nil {
 		elems = append(elems, g.unique.intern(it))
 	}
+	if !exact {
+		elems = append(elems, g.unique.intern(&itemUnknown{}))
+	}
 	switch len(elems) {
 	case 0:
 		return &itemTrue{}
@@ -932,6 +965,20 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	}
 }
 
+// isExactKind reports whether the schema for kind describes v exactly,
+// other than by the fields or elements of a struct or list.
+func isExactKind(v cue.Value, kind cue.Kind) bool {
+	if kind == cue.BytesKind || (kind&cue.NumberKind == cue.FloatKind) {
+		// JSON has neither bytes nor a distinct type for floats.
+		return false
+	}
+	switch adt.Unwrap(value.Vertex(v)).(type) {
+	case *adt.Top, *adt.BasicType, *adt.Null, *adt.Vertex:
+		return true
+	}
+	return false
+}
+
 // makeDefItem returns the item for the schema of a reference to v.
 // The schema must not depend on where it is first referenced from,
 // so the cycles being ended there do not apply to it.
@@ -941,12 +988,12 @@ func (g *generator) makeDefItem(v cue.Value, mode closedMode) internItem {
 	return g.makeItem(v, mode)
 }
 
-// makeEvaluatedItem describes v by its evaluated value, or as any value when
-// v refers back to itself through ref, keeping a defer out of makeItem0.
+// makeEvaluatedItem describes v by its evaluated value, or by an [itemUnknown]
+// when v refers back to itself through ref, keeping a defer out of makeItem0.
 func (g *generator) makeEvaluatedItem(v cue.Value, ref adt.Expr, mode closedMode) item {
 	if ref != nil {
 		if g.describing[ref] {
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 		g.describing[ref] = true
 		defer delete(g.describing, ref)
@@ -1197,7 +1244,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 		default:
 			// For other layouts, we can't express them in JSON Schema
 			// but at least we know it's a string.
-			return &itemType{kinds: []string{"string"}}
+			return g.widened(&itemType{kinds: []string{"string"}})
 		}
 		return &itemAllOf{
 			elems: []internItem{
@@ -1264,7 +1311,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 		// - list.MatchN(>=N & <=M, schema) represents contains with minContains: N and maxContains: M
 		if len(args) != 3 {
 			// Unrecognized form, accept anything
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 
 		// Parse the constraint from the first argument
@@ -1281,47 +1328,47 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 				minVal = new(n)
 			} else {
 				// Not a simple integer, accept anything
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 		case cue.GreaterThanEqualOp:
 			// >=N constraint for minimum
 			if len(opArgs) != 1 {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			n, err := opArgs[0].Int64()
 			if err != nil {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			minVal = new(n)
 		case cue.AndOp:
 			// Could be >=N & <=M
 			if len(opArgs) != 2 {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			// First operand should be >=N
 			op1, op1Args := opArgs[0].Expr()
 			if op1 != cue.GreaterThanEqualOp || len(op1Args) != 1 {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			n, err := op1Args[0].Int64()
 			if err != nil {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			minVal = new(n)
 
 			// Second operand should be <=M
 			op2, op2Args := opArgs[1].Expr()
 			if op2 != cue.LessThanEqualOp || len(op2Args) != 1 {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			n, err = op2Args[0].Int64()
 			if err != nil {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			maxVal = new(n)
 		default:
 			// Unknown constraint pattern, accept anything
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 
 		// Get the schema element from the second argument
@@ -1351,7 +1398,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 		// - matchN(N, [a, b, c, ...]) where N == len(list) represents allOf
 		if len(args) != 3 {
 			// Unrecognized form, accept anything
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 
 		constraintVal, listVal := args[1], args[2]
@@ -1380,14 +1427,14 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 			n, err := constraintVal.Int64()
 			if err != nil {
 				// Not an integer, accept anything
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			switch n {
 			case 0:
 				// matchN(0, [x]) represents not
 				if len(items) != 1 {
 					// Unexpected form, accept anything
-					return &itemTrue{}
+					return &itemUnknown{}
 				}
 				return &itemNot{elem: items[0]}
 			case 1:
@@ -1402,18 +1449,18 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 					return &itemAllOf{elems: items}
 				}
 				// Unknown matchN pattern, accept anything
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 
 		case cue.GreaterThanEqualOp:
 			// matchN(>=1, [a, b, c, ...]) represents anyOf
 			if len(opArgs) != 1 {
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			n, err := opArgs[0].Int64()
 			if err != nil || n != 1 {
 				// Unknown matchN pattern, accept anything
-				return &itemTrue{}
+				return &itemUnknown{}
 			}
 			if len(items) == 0 {
 				return &itemFalse{}
@@ -1422,7 +1469,7 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 
 		default:
 			// Unknown operator, accept anything
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 
 	case "matchIf":
@@ -1430,13 +1477,13 @@ func (g *generator) makeCallItem(v cue.Value, args []cue.Value, mode closedMode)
 		// - matchIf(ifExpr, thenExpr, elseExpr)
 		if len(args) != 4 {
 			// Unrecognized form, accept anything
-			return &itemTrue{}
+			return &itemUnknown{}
 		}
 
 		return &itemIfThenElse{
 			ifElem:   g.makeItem(args[1], open),
-			thenElem: trueAsNil(g.makeItem(args[2], open)),
-			elseElem: trueAsNil(g.makeItem(args[3], open)),
+			thenElem: g.makeItem(args[2], open),
+			elseElem: g.makeItem(args[3], open),
 		}
 
 	default:
@@ -1459,7 +1506,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		props.patternProperties[pattern] = join(props.patternProperties[pattern], it, g.unique)
 	}
 	hasUniversalConstraint := false
-	recursive := false
+	recursive, widened := false, false
 	for v := range valueConjuncts(v) {
 		pkg, path := v.ReferencePath()
 		// In a closed context, inline non-definition references so
@@ -1526,6 +1573,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 					// only thing we can do is treat the whole thing as explicitly
 					// open.
 					addPatternProperty("", g.unique.intern(&itemTrue{}))
+					widened = true
 				}
 				continue outer
 			case cue.OptionalConstraint:
@@ -1587,7 +1635,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	ellipsis := v.LookupPath(cue.MakePath(cue.AnyString))
 	if ellipsis.Exists() && !hasUniversalConstraint {
 		constraint := g.makeItem(ellipsis, mode.descend())
-		if isTrue(constraint) {
+		if admitsAny(constraint) {
 			// `... _` is indistingishable from `[_]: _` so set it as a
 			// pattern property so we can treat it uniformly.
 			addPatternProperty("", constraint)
@@ -1598,7 +1646,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		}
 	}
 
-	if constraint, ok := props.patternProperties[""]; ok && isTrue(constraint) || len(props.properties) == 0 {
+	if constraint, ok := props.patternProperties[""]; (ok && admitsAny(constraint)) || len(props.properties) == 0 {
 		// There's a universal pattern constraint and either no
 		// properties or we accept anything. In both these cases it's
 		// not possible to tell the difference between
@@ -1624,6 +1672,9 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 			len(props.required) > 0 ||
 			len(props.patternProperties) > 0 ||
 			props.additionalProperties.Value() != nil
+	if recursive || widened {
+		allOf.elems = append(allOf.elems, g.unique.intern(&itemUnknown{}))
+	}
 	if len(allOf.elems) > 0 {
 		if !hasObjectConstraints {
 			return allOf
@@ -1652,7 +1703,7 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 	// Positional schemas can also be expressed as index pattern
 	// constraints, which (unlike list elements) hold vacuously when the
 	// list is too short to reach the index. See [constraintPrefixItems].
-	pos, bounds, err := listIndexPatterns(v)
+	pos, bounds, widened, err := listIndexPatterns(v)
 	if err != nil {
 		g.addError(v, err)
 		return &itemFalse{}
@@ -1717,10 +1768,18 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 			n:          len(prefix),
 		}))
 	} else if rest.Exists() {
-		items.rest = trueAsNil(g.makeItem(rest, mode))
+		if it := g.makeItem(rest, mode); !admitsAny(it) {
+			items.rest = it
+		} else if !isTrue(it) {
+			// It needs no keyword, but the list is still an approximation.
+			widened = true
+		}
 	}
 	if items.rest.Value() != nil || len(items.prefix) > 0 {
 		a.elems = append(a.elems, g.unique.intern(items))
+	}
+	if widened {
+		return g.widened(a)
 	}
 	return a
 }
@@ -1798,15 +1857,20 @@ type indexBound struct {
 // CUE is more expressive than JSON Schema here, and omitting a
 // constraint we can't express only widens the generated schema, whereas
 // approximating it with the nearest keyword would reject valid data.
-func listIndexPatterns(v cue.Value) (pos map[int64]cue.Value, bounds []indexBound, err error) {
+// The widened result reports whether any pattern may be dropped.
+func listIndexPatterns(v cue.Value) (pos map[int64]cue.Value, bounds []indexBound, widened bool, err error) {
 	iter, err := v.Fields(cue.All(), cue.Patterns(true))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 	for iter.Next() {
 		sel := iter.Selector()
 		if sel.ConstraintType() != cue.PatternConstraint {
 			continue
+		}
+		val := iter.Value()
+		if val.IncompleteKind() == cue.TopKind && !evaluatesToTop(value.Vertex(val)) {
+			widened = true // unifyOptional may skip it.
 		}
 		switch kind, i := classifyIndexPattern(sel.Pattern()); kind {
 		case indexPatternExact:
@@ -1815,15 +1879,17 @@ func listIndexPatterns(v cue.Value) (pos map[int64]cue.Value, bounds []indexBoun
 			if pos == nil {
 				pos = make(map[int64]cue.Value)
 			}
-			pos[i] = unifyOptional(pos[i], iter.Value())
+			pos[i] = unifyOptional(pos[i], val)
 		case indexPatternFrom:
 			bounds = append(bounds, indexBound{
 				index: i,
-				value: iter.Value(),
+				value: val,
 			})
+		default:
+			widened = true
 		}
 	}
-	return pos, bounds, nil
+	return pos, bounds, widened, nil
 }
 
 // indexPatternKind describes the set of list indexes matched by an index
@@ -1898,10 +1964,10 @@ func classifyIndexPattern(p cue.Value) (kind indexPatternKind, index int64) {
 }
 
 // unifyOptional is like [cue.Value.Unify] except that it treats a
-// zero value, and top, as the identity. Skipping top isn't only an
-// optimization: the arms of the conjunction that Unify would produce
-// no longer report their [cue.Value.ReferencePath], so a reference
-// would be inlined instead of becoming a definition.
+// zero value, and any value of every kind such as top, as the identity.
+// Skipping top isn't only an optimization: the arms of the conjunction
+// that Unify would produce no longer report their [cue.Value.ReferencePath],
+// so a reference would be inlined instead of becoming a definition.
 func unifyOptional(a, b cue.Value) cue.Value {
 	if !a.Exists() || a.IncompleteKind() == cue.TopKind {
 		return b
@@ -1910,6 +1976,21 @@ func unifyOptional(a, b cue.Value) cue.Value {
 		return a
 	}
 	return a.Unify(b)
+}
+
+// evaluatesToTop reports whether v evaluates to top, which a validator such
+// as matchN does not, even though it too admits values of every kind.
+func evaluatesToTop(v adt.Value) bool {
+	switch x := adt.Unwrap(v).(type) {
+	case *adt.Top:
+		return true
+	case *adt.BasicType:
+		return x.K == adt.TopKind
+	case *adt.Disjunction:
+		// Such as `_ | string`, which admits anything through one arm.
+		return slices.ContainsFunc(x.Values, evaluatesToTop)
+	}
+	return false
 }
 
 // newGenerateDialect returns the dialect used to generate the given version.
@@ -1923,6 +2004,7 @@ func newGenerateDialect(v Version) (generateDialect, error) {
 			allowTypeArray:            true,
 			nullViaNullable:           false,
 			numericExclusive:          true,
+			booleanSchemas:            true,
 			supportsConst:             true,
 			tuples:                    tuplePrefixItems,
 			supportsContains:          true,
@@ -1940,6 +2022,7 @@ func newGenerateDialect(v Version) (generateDialect, error) {
 			allowTypeArray:            true,
 			nullViaNullable:           false,
 			numericExclusive:          true,
+			booleanSchemas:            true,
 			supportsConst:             true,
 			tuples:                    tupleItemsArray,
 			supportsContains:          true,
@@ -1971,6 +2054,10 @@ func newGenerateDialect(v Version) (generateDialect, error) {
 }
 
 func join(it1, it2 internItem, u *uniqueItems) internItem {
+	if it1 == it2 {
+		// An allOf of the two would hide from [admitsAny] that they admit any.
+		return it1
+	}
 	if it1.Value() == nil || isTrue(it1) {
 		return it2
 	}
@@ -2104,18 +2191,80 @@ func acceptsAllString(v cue.Value) bool {
 	return v.Unify(sv).Subsume(sv, cue.Final()) == nil
 }
 
-// trueAsNil returns the nil item if the item
-// is *itemTrue (top).
-func trueAsNil(it internItem) internItem {
-	if isTrue(it) {
-		return internItem{}
-	}
-	return it
-}
-
 func isTrue(it internItem) bool {
 	_, ok := it.Value().(*itemTrue)
 	return ok
+}
+
+// admitsAny reports whether it is absent, or rendered as a schema which
+// admits any value. Unlike with [isTrue], it may stand for a constraint
+// which cannot be expressed, and so must not be discarded.
+func admitsAny(it internItem) bool {
+	switch it.Value().(type) {
+	case nil, *itemTrue, *itemUnknown:
+		return true
+	}
+	return false
+}
+
+// widened returns an item which is rendered like it, marked as admitting
+// more than the value which it describes.
+func (g *generator) widened(it item) item {
+	return &itemAllOf{
+		elems: []internItem{g.unique.intern(it), g.unique.intern(&itemUnknown{})},
+	}
+}
+
+// isWidened reports whether the schema for root may admit more than the
+// value it describes, in which case negating it would reject valid data.
+// It can only be used once all the definitions are complete.
+func (g *generator) isWidened(root internItem) bool {
+	if w, ok := g.widenedItems[root]; ok {
+		return w
+	}
+	found := false
+	var walked []internItem
+	g.walkItems(func(it internItem) bool {
+		if found {
+			return false
+		}
+		if w, ok := g.widenedItems[it]; ok {
+			found = w
+			return false
+		}
+		walked = append(walked, it)
+		found = g.widens(it.Value())
+		return !found
+	}, root)
+	if found {
+		g.widenedItems[root] = true
+		return true
+	}
+	// Nothing which any of the walked items needs is widened either.
+	for _, it := range walked {
+		g.widenedItems[it] = false
+	}
+	return false
+}
+
+// widens reports whether it is itself rendered as admitting more than it
+// stands for, regardless of the items within it.
+func (g *generator) widens(it item) bool {
+	d := g.dialect
+	switch x := it.(type) {
+	case *itemUnknown:
+		return true
+	case *itemItems:
+		return d.tuples == tupleWiden && len(x.prefix) > 0
+	case *itemContains:
+		return !d.supportsContains ||
+			(!d.supportsMinMaxContains && (x.max != nil || (x.min != nil && *x.min != 1)))
+	case *itemProperties:
+		return !d.supportsPatternProperties && len(x.patternProperties) > 0
+	case *itemIfThenElse:
+		return !d.supportsIfThenElse
+	}
+	return false
 }
 
 // DefaultNameFunc holds the default function used by [Generate]

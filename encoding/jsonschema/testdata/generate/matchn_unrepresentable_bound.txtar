@@ -13,10 +13,9 @@ negatedEmbedded?: matchN(0, [{matchN(>=1, [!=0]), #h: 1}])
 -- datatest/tests.cue --
 package datatest
 
-// The schema negates an approximation, so it rejects the data.
 negated: {
 	data: negated: "a"
-	error: true
+	error: false
 }
 
 ok: data: negatedEmbedded: "a"
@@ -25,15 +24,9 @@ ok: data: negatedEmbedded: "a"
 	$schema: "https://json-schema.org/draft/2020-12/schema"
 	type:    "object"
 	properties: {
-		negated: not: not: const: 0
-		negatedEmbedded: not: {
-			type:  "object"
-			anyOf: [{not: const: 0}]
-		}
+		negated:         {}
+		negatedEmbedded: {}
 	}
 }
 -- out/generate-v3/negated --
-negated.data.negated: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
-    1:100
-    ./datatest/tests.cue:5:17
 -- out/generate-v3/ok --

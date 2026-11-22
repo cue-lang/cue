@@ -65,6 +65,25 @@ func (i *itemTrue) apply(f func(internItem, *uniqueItems) internItem, u *uniqueI
 	return i
 }
 
+// itemUnknown stands for a constraint which the schema cannot express.
+// It is rendered as a schema which admits any value, but unlike [itemTrue]
+// it must not be negated, as the value it stands for admits less.
+type itemUnknown struct{}
+
+func (i *itemUnknown) generate(g *generator) ast.Expr {
+	if !g.dialect.booleanSchemas {
+		return makeSchemaStructLit()
+	}
+	return ast.NewBool(true)
+}
+
+func (it *itemUnknown) hash(h *maphash.Hash, u *uniqueItems) {
+}
+
+func (i *itemUnknown) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
+	return i
+}
+
 // itemFalse represents a schema that accepts no values (false schema)
 type itemFalse struct{}
 
@@ -196,7 +215,14 @@ func (it *itemOneOf) hash(h *maphash.Hash, u *uniqueItems) {
 }
 
 func (i *itemOneOf) generate(g *generator) ast.Expr {
-	return singleKeyword("oneOf", generateList(g, i.elems))
+	keyword := "oneOf"
+	if slices.ContainsFunc(i.elems, g.isWidened) {
+		// A value may match several widened arms, but still one at least.
+		// Unlike [itemAnyOf], keep each arm as is: nullable only has an
+		// effect beside a type.
+		keyword = "anyOf"
+	}
+	return singleKeyword(keyword, generateList(g, i.elems))
 }
 
 func (i *itemOneOf) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
@@ -286,6 +312,10 @@ func (it *itemNot) hash(h *maphash.Hash, u *uniqueItems) {
 }
 
 func (i *itemNot) generate(g *generator) ast.Expr {
+	if g.isWidened(i.elem) {
+		// Drop the constraint. An empty schema is valid in every dialect.
+		return makeSchemaStructLit()
+	}
 	return singleKeyword("not", i.elem.Value().generate(g))
 }
 
@@ -402,7 +432,7 @@ func (i *itemDescription) generate(g *generator) ast.Expr {
 	default:
 		// All item generate methods return either *ast.StructLit
 		// (via makeSchemaStructLit or singleKeyword) or *ast.BasicLit
-		// (ast.NewBool in itemTrue and itemFalse), so this is unreachable.
+		// (ast.NewBool in itemTrue, itemUnknown and itemFalse), so this is unreachable.
 		panic(fmt.Errorf("unexpected expression type in itemDescription: %T", expr))
 	}
 }
@@ -839,7 +869,8 @@ func (i *itemContains) generate(g *generator) ast.Expr {
 		if i.min != nil {
 			fields = append(fields, makeField("minContains", ast.NewLit(token.INT, fmt.Sprint(*i.min))))
 		}
-		if i.max != nil {
+		if i.max != nil && !g.isWidened(i.elem) {
+			// A widened element would count values which are not matches.
 			fields = append(fields, makeField("maxContains", ast.NewLit(token.INT, fmt.Sprint(*i.max))))
 		}
 	}
@@ -939,15 +970,16 @@ func (it *itemIfThenElse) hash(h *maphash.Hash, u *uniqueItems) {
 }
 
 func (i *itemIfThenElse) generate(g *generator) ast.Expr {
-	if !g.dialect.supportsIfThenElse {
-		// No if/then/else support (OpenAPI 3.0): drop the constraint (lenient).
+	if !g.dialect.supportsIfThenElse || g.isWidened(i.ifElem) {
+		// No if/then/else support (OpenAPI 3.0), or a condition which would
+		// pick the wrong branch as it is widened: drop the constraint (lenient).
 		return makeSchemaStructLit()
 	}
 	fields := []ast.Decl{makeField("if", i.ifElem.Value().generate(g))}
-	if i.thenElem.Value() != nil {
+	if !admitsAny(i.thenElem) {
 		fields = append(fields, makeField("then", i.thenElem.Value().generate(g)))
 	}
-	if i.elseElem.Value() != nil {
+	if !admitsAny(i.elseElem) {
 		fields = append(fields, makeField("else", i.elseElem.Value().generate(g)))
 	}
 	return makeSchemaStructLit(fields...)
@@ -955,13 +987,8 @@ func (i *itemIfThenElse) generate(g *generator) ast.Expr {
 
 func (i *itemIfThenElse) apply(f func(internItem, *uniqueItems) internItem, u *uniqueItems) item {
 	ifElem := f(i.ifElem, u)
-	var thenElem, elseElem internItem
-	if i.thenElem.Value() != nil {
-		thenElem = f(i.thenElem, u)
-	}
-	if i.elseElem.Value() != nil {
-		elseElem = f(i.elseElem, u)
-	}
+	thenElem := f(i.thenElem, u)
+	elseElem := f(i.elseElem, u)
 
 	if ifElem == i.ifElem && thenElem == i.thenElem && elseElem == i.elseElem {
 		return i

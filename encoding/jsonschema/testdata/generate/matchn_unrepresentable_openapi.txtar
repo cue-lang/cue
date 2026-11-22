@@ -1,9 +1,10 @@
 #version: openapi
 
 A constraint which the dialect leaves out also makes the schema an
-approximation, which cannot be negated. Patterns which the schema can
-only describe as admitting any value keep a definition open, also when
-several of them join.
+approximation, which cannot be negated. A constraint which cannot be
+expressed is an empty schema, as the dialect has no boolean ones. Patterns
+which the schema can only describe as admitting any value keep a definition
+open, also when several of them join.
 
 -- test.cue --
 package test
@@ -13,6 +14,7 @@ import (
 	"strings"
 )
 
+call?: strings.HasPrefix("a")
 notPatternProperties?: matchN(0, [{[=~"^a"]: int}])
 notContains?: matchN(0, [[...int] & list.MatchN(>=1, int)])
 notIf?: matchN(0, [matchIf(int, >0, _)])
@@ -36,20 +38,19 @@ joined: {
 	error: false
 }
 
-// The schemas negate approximations, so they reject the data.
 notPatternProperties: {
 	data: notPatternProperties: {a: "x"}
-	error: true
+	error: false
 }
 
 notContains: {
 	data: notContains: []
-	error: true
+	error: false
 }
 
 notIf: {
 	data: notIf: -1
-	error: true
+	error: false
 }
 -- out/generate-v3/schema --
 {
@@ -57,33 +58,22 @@ notIf: {
 		F: type: "number"
 		Joined: {
 			type:                 "object"
-			additionalProperties: true
+			additionalProperties: {}
 			properties: a: type: "string"
 		}
 	}
 	type: "object"
 	properties: {
+		call: {}
 		joined: $ref: "#/components/schemas/Joined"
-		notContains: not: {
-			type: "array"
-			items: type: "integer"
-		}
-		notIf: not: {}
-		notPatternProperties: not: type: "object"
-		oneOfNull: oneOf:      [{$ref: "#/components/schemas/F"}, {enum: [null]}]
-		oneOfUnionNull: oneOf: [{anyOf: [{type: "number"}, {type: "string"}]}, {enum: [null]}]
+		notContains:          {}
+		notIf:                {}
+		notPatternProperties: {}
+		oneOfNull: anyOf:      [{$ref: "#/components/schemas/F"}, {enum: [null]}]
+		oneOfUnionNull: anyOf: [{anyOf: [{type: "number"}, {type: "string"}]}, {enum: [null]}]
 	}
 }
 -- out/generate-v3/notPatternProperties --
-notPatternProperties.data.notPatternProperties: invalid value {a:"x"} (does not satisfy matchN): 1 matched, expected 0:
-    1:330
-    ./datatest/tests.cue:10:30
 -- out/generate-v3/joined --
 -- out/generate-v3/notContains --
-notContains.data.notContains: invalid value [] (does not satisfy matchN): 1 matched, expected 0:
-    1:236
-    ./datatest/tests.cue:15:21
 -- out/generate-v3/notIf --
-notIf.data.notIf: invalid value -1 (does not satisfy matchN): 1 matched, expected 0:
-    1:296
-    ./datatest/tests.cue:20:15

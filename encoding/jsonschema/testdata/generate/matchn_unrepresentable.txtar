@@ -53,80 +53,79 @@ _growing: {
 -- datatest/tests.cue --
 package datatest
 
-// The schemas negate or count an approximation, so they reject the data.
 notCall: {
 	data: notCall: "b"
-	error: true
+	error: false
 }
 
 notReference: {
 	data: notReference: "b"
-	error: true
+	error: false
 }
 
 notValidator: {
 	data: notValidator: "b"
-	error: true
+	error: false
 }
 
 notStringBound: {
 	data: notStringBound: "c"
-	error: true
+	error: false
 }
 
 notFloat: {
 	data: notFloat: 1
-	error: true
+	error: false
 }
 
 notLayout: {
 	data: notLayout: "b"
-	error: true
+	error: false
 }
 
 oneOfCall: {
 	data: oneOfCall: "b"
-	error: true
+	error: false
 }
 
 ifCall: {
 	data: ifCall: "b"
-	error: true
+	error: false
 }
 
 notList: {
 	data: notList: [0, 2]
-	error: true
+	error: false
 }
 
 maxContainsCall: {
 	data: maxContainsCall: ["b", "c"]
-	error: true
+	error: false
 }
 
 notBytes: {
 	data: notBytes: "a"
-	error: true
+	error: false
 }
 
 notCount: {
 	data: notCount: "a"
-	error: true
+	error: false
 }
 
 notCycle: {
 	data: notCycle: [[1]]
-	error: true
+	error: false
 }
 
 notRecursive: {
 	data: notRecursive: {next: {next: {other: 1}}}
-	error: true
+	error: false
 }
 
 notPattern: {
 	data: notPattern: {a: "x"}
-	error: true
+	error: false
 }
 
 badNotListTopDisjunction: {
@@ -183,134 +182,62 @@ badNotTop: {
 	}
 	type: "object"
 	properties: {
-		ifCall: {
-			if: true
-			then: const: "ab"
-		}
+		ifCall: {}
 		maxContainsCall: {
 			type:        "array"
 			contains:    true
-			maxContains: 1
 			minContains: 0
 		}
-		notBoundReference: not: true
-		notBytes: not: {
-			type:            "string"
-			contentEncoding: "base64"
-		}
-		notCall: not:  true
-		notCount: not: true
-		notCycle: not: {
-			type: "array"
-			items: type: "array"
-		}
-		notFloat: not: type:  "number"
-		notLayout: not: type: "string"
-		notList: not: {
-			type: "array"
-			items: {
-				type:             "number"
-				exclusiveMaximum: 5
-			}
-			prefixItems: [
-				true,
-				{
-					type:             "number"
-					exclusiveMaximum: 5
-				},
-			]
-		}
-		notListRest: not: type: "array"
+		notBoundReference: {}
+		notBytes:          {}
+		notCall:           {}
+		notCount:          {}
+		notCycle:          {}
+		notFloat:          {}
+		notLayout:         {}
+		notList:           {}
+		notListRest:       {}
 		notListTopDisjunction: not: {
 			type: "array"
 			items: anyOf: [true, {type: "string"}]
 			prefixItems: [{type: "integer"}]
 			minItems:    1
 		}
-		notNotEqualReference: not: true
+		notNotEqualReference: {}
 		notNotNull: not: not: const: null
-		notPattern: not: {
-			type:                 "object"
-			additionalProperties: true
-		}
-		notRecursive: not: $ref:   "#/$defs/WrapsGrowing"
-		notReference: not: $ref:   "#/$defs/P"
-		notStringBound: not: type: "string"
+		notPattern:     {}
+		notRecursive:   {}
+		notReference:   {}
+		notStringBound: {}
 		notTop: not: true
-		notValidator: not: $ref: "#/$defs/IPv4"
-		oneOfCall: oneOf: [true, {const: "b"}]
+		notValidator: {}
+		oneOfCall: anyOf: [true, {const: "b"}]
 	}
 }
 -- out/generate-v3/badNotNotNull --
 badNotNotNull.data.notNotNull: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
-    1:1381
-    ./datatest/tests.cue:85:20
+    1:1000
+    ./datatest/tests.cue:84:20
 -- out/generate-v3/badNotTop --
 badNotTop.data.notTop: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
-    1:1630
-    ./datatest/tests.cue:90:16
+    1:1112
+    ./datatest/tests.cue:89:16
 -- out/generate-v3/ifCall --
-ifCall.data.ifCall: invalid value "b" (does not satisfy matchIf): conflicting values "ab" and "b":
-    1:604
-    ./datatest/tests.cue:40:16
-    1:632
 -- out/generate-v3/maxContainsCall --
-maxContainsCall.data.maxContainsCall: invalid value ["b","c"] (does not satisfy list.MatchN): _ matches 2 list items, want >=0 & <=1:
-    1:681
-    ./datatest/tests.cue:50:25
 -- out/generate-v3/notCall --
-notCall.data.notCall: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
-    1:838
-    ./datatest/tests.cue:5:17
 -- out/generate-v3/notFloat --
-notFloat.data.notFloat: invalid value 1 (does not satisfy matchN): 1 matched, expected 0:
-    1:947
-    ./datatest/tests.cue:25:18
 -- out/generate-v3/notLayout --
-notLayout.data.notLayout: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
-    1:985
-    ./datatest/tests.cue:30:19
 -- out/generate-v3/notReference --
-notReference.data.notReference: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
-    1:1549
-    ./datatest/tests.cue:10:22
 -- out/generate-v3/notStringBound --
-notStringBound.data.notStringBound: invalid value "c" (does not satisfy matchN): 1 matched, expected 0:
-    1:1595
-    ./datatest/tests.cue:20:24
 -- out/generate-v3/notValidator --
-notValidator.data.notValidator: invalid value "b" (does not satisfy matchN): 1 matched, expected 0:
-    1:1658
-    ./datatest/tests.cue:15:22
 -- out/generate-v3/oneOfCall --
-oneOfCall.data.oneOfCall: invalid value "b" (does not satisfy matchN): 2 matched, expected 1:
-    1:1702
-    ./datatest/tests.cue:35:19
 -- out/generate-v3/notList --
-notList.data.notList: invalid value [0,2] (does not satisfy matchN): 1 matched, expected 0:
-    1:1021
-    ./datatest/tests.cue:45:17
 -- out/generate-v3/badNotListTopDisjunction --
 badNotListTopDisjunction.data.notListTopDisjunction: invalid value [1,"a"] (does not satisfy matchN): 1 matched, expected 0:
-    1:1216
-    ./datatest/tests.cue:80:31
+    1:845
+    ./datatest/tests.cue:79:31
 -- out/generate-v3/notBytes --
-notBytes.data.notBytes: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
-    1:775
-    ./datatest/tests.cue:55:18
 -- out/generate-v3/notCount --
-notCount.data.notCount: invalid value "a" (does not satisfy matchN): 1 matched, expected 0:
-    1:862
-    ./datatest/tests.cue:60:18
 -- out/generate-v3/notCycle --
-notCycle.data.notCycle: invalid value [[1]] (does not satisfy matchN): 1 matched, expected 0:
-    1:886
-    ./datatest/tests.cue:65:18
 -- out/generate-v3/notPattern --
-notPattern.data.notPattern: invalid value {a:"x"} (does not satisfy matchN): 1 matched, expected 0:
-    1:1425
-    ./datatest/tests.cue:75:20
 -- out/generate-v3/notRecursive --
-notRecursive.data.notRecursive: invalid value {next:{next:{other:1}}} (does not satisfy matchN): 1 matched, expected 0:
-    1:1494
-    ./datatest/tests.cue:70:22

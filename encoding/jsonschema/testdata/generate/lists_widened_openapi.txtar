@@ -14,6 +14,11 @@ openPattern?: {
 	[...]
 	[0]: int
 }
+openTop?: {
+	[...]
+	[0]:   int
+	[>=0]: _
+}
 closed?: [int, string]
 bounded?: {
 	[...]
@@ -32,18 +37,20 @@ negated?: matchN(0, [{
 -- datatest/tests.cue --
 package datatest
 
-// The schemas hold every element to the positions, so they reject the data.
 open: {
 	data: open: [1, "s"]
-	error: true
+	error: false
 }
 
 openPattern: {
 	data: openPattern: [1, "s"]
-	error: true
+	error: false
 }
 
-ok: data: negated: ["s"]
+ok: data: {
+	negated: ["s"]
+	openTop: [1, "s"]
+}
 
 badClosed: {
 	data: closed: [true, "s"]
@@ -80,44 +87,42 @@ badConstrainedRest: {
 		}
 		negated: {}
 		open: {
-			type: "array"
-			items: type: "integer"
+			type:     "array"
+			items:    {}
 			minItems: 1
 		}
 		openPattern: {
-			type: "array"
-			items: type: "integer"
+			type:  "array"
+			items: {}
+		}
+		openTop: {
+			type:  "array"
+			items: {}
 		}
 	}
 }
 -- out/generate-v3/badBounded --
 badBounded.data.bounded.0: conflicting values "s" and int (mismatched types string and int):
-    ./datatest/tests.cue:22:18
+    ./datatest/tests.cue:24:18
     1:67
 -- out/generate-v3/badClosed --
 badClosed.data.closed.0: conflicting values true and int (mismatched types bool and int):
-    ./datatest/tests.cue:17:17
+    ./datatest/tests.cue:19:17
     1:143
 badClosed.data.closed.0: conflicting values true and string (mismatched types bool and string):
-    ./datatest/tests.cue:17:17
+    ./datatest/tests.cue:19:17
 badClosed.data.closed.0: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
     1:133
-    ./datatest/tests.cue:17:17
+    ./datatest/tests.cue:19:17
 -- out/generate-v3/badConstrainedRest --
 badConstrainedRest.data.constrainedRest.0: conflicting values true and int (mismatched types bool and int):
-    ./datatest/tests.cue:27:26
+    ./datatest/tests.cue:29:26
     1:279
 badConstrainedRest.data.constrainedRest.0: conflicting values true and string (mismatched types bool and string):
-    ./datatest/tests.cue:27:26
+    ./datatest/tests.cue:29:26
 badConstrainedRest.data.constrainedRest.0: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
     1:251
-    ./datatest/tests.cue:27:26
+    ./datatest/tests.cue:29:26
 -- out/generate-v3/ok --
 -- out/generate-v3/open --
-open.data.open.1: conflicting values "s" and int (mismatched types string and int):
-    ./datatest/tests.cue:5:18
-    1:345
 -- out/generate-v3/openPattern --
-openPattern.data.openPattern.1: conflicting values "s" and int (mismatched types string and int):
-    ./datatest/tests.cue:10:25
-    1:416

@@ -740,6 +740,9 @@ type itemItems struct {
 	prefix []internItem
 	// all elements beyond the prefix.
 	rest internItem
+	// open is whether there may be any elements beyond the prefix. It is only
+	// set for [tupleWiden], as equal items must otherwise intern as one.
+	open bool
 }
 
 func (it *itemItems) hash(h *maphash.Hash, u *uniqueItems) {
@@ -747,6 +750,7 @@ func (it *itemItems) hash(h *maphash.Hash, u *uniqueItems) {
 		u.writeHash(h, p)
 	}
 	u.writeHash(h, it.rest)
+	maphash.WriteComparable(h, it.open)
 }
 
 func (i *itemItems) generate(g *generator) ast.Expr {
@@ -798,6 +802,10 @@ func (i *itemItems) generateItemsArray(g *generator) ast.Expr {
 // support (OpenAPI 3.0). Positional typing is lost; the result validates
 // a superset of the original.
 func (i *itemItems) generateWiden(g *generator) ast.Expr {
+	if i.open && admitsAny(i.rest) {
+		// Any element may be beyond the prefix, where it may be anything.
+		return singleKeyword("items", makeSchemaStructLit())
+	}
 	var schemas []ast.Expr
 	for _, e := range i.prefix {
 		schemas = append(schemas, e.Value().generate(g))
@@ -823,7 +831,7 @@ func (i *itemItems) apply(f func(internItem, *uniqueItems) internItem, u *unique
 	if !changed && rest == i.rest {
 		return i
 	}
-	return &itemItems{prefix: prefix, rest: rest}
+	return &itemItems{prefix: prefix, rest: rest, open: i.open}
 }
 
 // itemUniqueItems represents the uniqueItems constraint for arrays.

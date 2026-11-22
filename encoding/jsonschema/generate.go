@@ -757,7 +757,7 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 			// so they're still processed individually.
 			if validators, ok := g.listValidators(args, mode); ok {
 				elems := []internItem{
-					g.unique.intern(g.makeListItem(v, mode)),
+					g.unique.intern(g.makeListItem(v, mode, validators)),
 				}
 				return &itemAllOf{elems: append(elems, validators...)}
 			}
@@ -938,7 +938,7 @@ func (g *generator) makeItem0(v cue.Value, mode closedMode) item {
 	case cue.StructKind:
 		it = g.makeStructItem(v, mode)
 	case cue.ListKind:
-		it = g.makeListItem(v, mode)
+		it = g.makeListItem(v, mode, nil)
 	case cue.BytesKind:
 		it = &itemBytes{}
 	}
@@ -1688,7 +1688,9 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 	return &itemTrue{}
 }
 
-func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
+// makeListItem returns the item for the list v, given the validators next to
+// it, which may bound its length.
+func (g *generator) makeListItem(v cue.Value, mode closedMode, validators []internItem) item {
 	// A list is closed only when its length is known exactly. Anything
 	// else (an ellipsis, a list validator, or a value holding index
 	// pattern constraints only) is treated as open: wrongly closing a
@@ -1752,7 +1754,9 @@ func (g *generator) makeListItem(v cue.Value, mode closedMode) item {
 	a := &itemAllOf{
 		elems: []internItem{g.unique.intern(&itemType{kinds: []string{"array"}})},
 	}
-	items := &itemItems{}
+	items := &itemItems{
+		open: g.dialect.tuples == tupleWiden && !closed && !boundedTo(validators, prefixLen),
+	}
 	if n > 0 {
 		a.elems = append(a.elems, g.unique.intern(&itemItemsBounds{
 			constraint: cue.GreaterThanEqualOp,
@@ -1818,6 +1822,18 @@ func (g *generator) listValidators(args []cue.Value, mode closedMode) (validator
 		}
 	}
 	return validators, true
+}
+
+// boundedTo reports whether the validators allow at most n elements in a list.
+func boundedTo(validators []internItem, n int64) bool {
+	for _, it := range validators {
+		for c := range itemConjuncts(it) {
+			if b, ok := c.Value().(*itemItemsBounds); ok && b.constraint == cue.LessThanEqualOp && int64(b.n) <= n {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // listMinLen returns the number of elements that the list v is

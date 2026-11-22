@@ -426,6 +426,98 @@ func TestValidate(t *testing.T) {
 				    test:2:30
 				    test:2:34
 				    test:3:8`,
+	}, {
+		name: "conflicting values in required field",
+		all:  true,
+		in: `
+			x: {foo?: 1} & {foo!: 2}
+		`,
+		// TODO: the conflict must be reported.
+		out: "",
+	}, {
+		name: "required field which is not allowed",
+		all:  true,
+		in: `
+			#A: a?: int
+			x: #A & {a: 1, err!: 1}
+		`,
+		// TODO: the field must be reported as not allowed.
+		out: "",
+	}, {
+		name: "required field which is not allowed in a definition",
+		all:  true,
+		in: `
+			#A: a?: int
+			#B: #A & {err!: 1}
+		`,
+		// TODO: the field must be reported as not allowed.
+		out: "",
+	}, {
+		name: "errors below required fields",
+		all:  true,
+		in: `
+			x: a!: b: 1 & 2
+			y: a!: b!: 3 & 4
+		`,
+		// TODO: both conflicts must be reported.
+		out: "",
+	}, {
+		// Each is reported whichever field comes first.
+		name: "typo and structural cycle below required field",
+		all:  true,
+		in: `
+			#A: a?: int
+			x: a!: {p: #A & {err: 1}, q: {n: q}}
+			y: a!: {q: {n: q}, p: #A & {err: 1}}
+		`,
+		// TODO: the typos and the cycles must be reported.
+		out: "",
+	}, {
+		name: "error in required field with final",
+		cfg:  &adt.ValidateConfig{Final: true},
+		all:  true,
+		in: `
+			x: a!: 1 & 2
+		`,
+		// TODO: the conflict must be reported instead.
+		out: `incomplete
+				x.a: field is required but not present:
+				    test:2:7`,
+	}, {
+		name: "incomplete error in required field with final",
+		cfg:  &adt.ValidateConfig{Final: true},
+		all:  true,
+		in: `
+			n: int
+			x: a!: n + 1
+		`,
+		out: `incomplete
+				x.a: field is required but not present:
+				    test:3:7`,
+	}, {
+		name: "optional field with an error below required field",
+		all:  true,
+		in: `
+			x: a!: b?: 1 & 2
+		`,
+	}, {
+		name: "required fields which are allowed",
+		all:  true,
+		in: `
+			#A: {[=~"^a"]: int}
+			#B: {b?: int, ...}
+			x: #A & {a1!: 1}
+			y: #B & {c!: 1}
+		`,
+	}, {
+		// The schema is valid, though a structural cycle is found with its
+		// fields in this order.
+		name: "mutual recursion through required field",
+		all:  true,
+		in: `
+			#Q: p?: #P
+			#P: q!: #Q
+		`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

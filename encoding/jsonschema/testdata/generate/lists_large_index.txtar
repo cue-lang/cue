@@ -1,0 +1,24 @@
+A schema spells out every position up to the index of a pattern, so a
+pattern on too large an index is dropped, as one it cannot express.
+A schema without the pattern admits more, so it cannot be negated.
+
+-- test.cue --
+package test
+
+exact?: {
+	[...]
+	[4611686018427387904]: int
+}
+
+from?: {
+	[...]
+	[>=4611686018427387904]: int
+}
+
+notExact?: matchN(0, [{
+	[...]
+	[4611686018427387904]: int
+}])
+
+-- out/generate-v3/error --
+panic: runtime error: makeslice: len out of range

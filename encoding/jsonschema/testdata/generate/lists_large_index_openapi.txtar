@@ -1,0 +1,23 @@
+#version: openapi
+
+Without tuples, a pattern on too large an index must not leave the schemas
+of the positions before it to describe every element.
+
+-- test.cue --
+package test
+
+list?: {
+	[...]
+	[0]:                   int
+	[4611686018427387904]: string
+}
+
+-- datatest/tests.cue --
+package datatest
+
+beyondPrefix: {
+	data: list: [1, "a"]
+	error: false
+}
+-- out/generate-v3/error --
+panic: runtime error: makeslice: len out of range

@@ -174,12 +174,10 @@ unknown?: {...}
 ...
 -- out/decode/testerr/err-conditional --
 conditional.c: field not allowed:
-    generated.cue:12:15
     test/err-conditional.json:3:10
 -- out/decode/testerr/err-dependent --
 dependent.c: field not allowed:
     test/err-dependent.json:3:10
 -- out/decode/testerr/err-inexact --
 inexact.c: field not allowed:
-    generated.cue:2:11
     test/err-inexact.json:4:10

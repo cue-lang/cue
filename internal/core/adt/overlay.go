@@ -293,6 +293,8 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	// may outlive the other, so neither may reclaim that disjunct.
 	n.disjunct = nil
 
+	// This includes yieldedAfterSettling and checkErrs: the clone also gets
+	// the settled arcs and the validators left to run, which go with them.
 	d.nodeContextState = n.nodeContextState
 
 	d.arcMap = append(d.arcMap, n.arcMap...)

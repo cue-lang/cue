@@ -90,34 +90,29 @@ func TestValidatorYield(t *testing.T) {
 	}{{
 		validators: []string{"pass", "fail"},
 		yielder:    "fail",
-		// TODO: the validator which yielded must run again.
-		want: "",
+		want:       "fail",
 	}, {
 		validators: []string{"pass", "fail"},
 		yielder:    "pass",
-		// TODO: the validators from the one which yielded must run again.
-		want: "",
+		want:       "fail",
 	}, {
 		validators: []string{"failA", "failB"},
 		want:       "failA (and 1 more errors)",
 	}, {
 		validators: []string{"failA", "failB"},
 		yielder:    "failB",
-		// TODO: the validator which yielded must run again.
-		want: "failA",
+		want:       "failA (and 1 more errors)",
 	}, {
 		validators: []string{"incomplete", "pass", "struct"},
 		want:       "struct",
 	}, {
 		validators: []string{"incomplete", "pass", "struct"},
 		yielder:    "pass",
-		// TODO: the validators from the one which yielded must run again.
-		want: "incomplete",
+		want:       "struct",
 	}, {
 		validators: []string{"incomplete", "pass", "struct"},
 		yielder:    "struct",
-		// TODO: the validator which yielded must run again.
-		want: "incomplete",
+		want:       "struct",
 	}}
 	for _, test := range tests {
 		name := strings.Join(test.validators, ",")

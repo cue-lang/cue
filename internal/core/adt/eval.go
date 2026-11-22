@@ -410,6 +410,7 @@ type nodeContextState struct {
 
 	dropParentRequirements bool // used for typo checking
 	computedFlatReplaceIDs bool // whether [nodeContext.flatReplaceIDs] has been computed
+	yieldedAfterSettling   bool // a validator yielded after closedness was settled
 
 	isShared         bool       // set if we are currently structure sharing
 	noSharing        bool       // set if structure sharing is not allowed
@@ -498,6 +499,10 @@ type nodeContextState struct {
 	lowerBound *BoundValue // > or >=
 	upperBound *BoundValue // < or <=
 	errs       *Bottom
+
+	// checkErrs holds the errors of the validators run before one yielded,
+	// until [nodeContext.runChecks] runs the rest.
+	checkErrs *Bottom
 }
 
 // A receiver receives notifications.

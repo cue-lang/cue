@@ -346,22 +346,24 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 			n.signal(subFieldsProcessed)
 		}
 
-		if v := n.node.Value(); v != nil && IsConcrete(v) {
-			n.runChecks(c)
-		}
-
 	// TODO(pushdown): remove
 	case needs&fieldSetKnown != 0:
 		n.evalArcTypes(mode)
 	}
 
-	if err := n.getErr(); err != nil {
-		n.errs = nil
-		if b := n.node.Bottom(); b != nil {
-			err = CombineErrors(nil, b, err)
-		}
-		n.setBaseValue(err)
+	// Decided before pending errors replace the value. The validators of a
+	// disjunction run on its disjuncts.
+	toValidate := false
+	if len(n.checks) > 0 && len(n.disjuncts) == 0 && n.completed&subFieldsProcessed != 0 {
+		v := n.node.Value()
+		toValidate = v != nil && IsConcrete(v)
 	}
+	// TODO(cycle): validate on the final value with a structural cycle pending
+	// too, once [ValidateAll] reports those on required fields.
+	if toValidate && n.errs != nil && n.errs.Code == StructuralCycleError {
+		n.runChecks(c)
+	}
+	n.commitErr()
 
 	n.finalizeDisjunctions()
 
@@ -463,9 +465,6 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	// For this reason we disable it now. It may be the case that we need
 	// to enable it for computing disjunctions.
 	//
-	n.incDepth()
-	defer n.decDepth()
-
 	// TODO: find more strategic place to set ClosedRecursive and get rid
 	// of helper fields.
 	blockClose := n.hasTop
@@ -476,15 +475,10 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		n.node.ClosedRecursive = true
 	}
 
-	switch {
-	case checkTypos:
-		n.checkTypos()
-		n.settleOpenness(false)
-	case foreign:
-		// The typo check does not run, but the vertex is final all the
-		// same: whoever asks next gets no other answer.
-		n.settleOpenness(true)
-	}
+	// TODO(closedness): validators are given a value with its typos checked,
+	// but completeAllArcs leaves them unchecked in the arcs of a node with a
+	// disjunction; drop `toValidate && !foreign` once it checks them.
+	n.settleClosedness(checkTypos || (toValidate && !foreign), foreign)
 
 	// After this we no longer need the defIDs of the conjuncts. By clearing
 	// them we ensure that we do not have rogue index values into the
@@ -500,7 +494,38 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 	v.status = finalized
 	v.finalizedBy = c.finalizeID
 
+	// Validators see the final value, so none finalizes it and reports its
+	// errors as a failure of its own.
+	if toValidate {
+		n.runChecks(c)
+		n.commitErr()
+	}
+
 	return n.meets(needs)
+}
+
+// settleClosedness checks the typos of n and settles its openness, one level
+// deeper than n. Validators run at the depth of n instead, where their
+// references to n are not taken for structural cycles.
+func (n *nodeContext) settleClosedness(checkTypos, foreign bool) {
+	// Not again when unify resumes after a validator yielded.
+	if n.yieldedAfterSettling {
+		n.yieldedAfterSettling = false
+		return
+	}
+
+	n.incDepth()
+	defer n.decDepth()
+
+	switch {
+	case checkTypos:
+		n.checkTypos()
+		n.settleOpenness(false)
+	case foreign:
+		// The typo check does not run, but the vertex is final all the
+		// same: whoever asks next gets no other answer.
+		n.settleOpenness(true)
+	}
 }
 
 // completeNodeTasks advances the scheduler for this node, processing any
@@ -578,26 +603,34 @@ func (n *nodeContext) validateScalar() {
 }
 
 // runChecks runs the collected validators against the node's value, once:
-// they are not run again when the value is used in a validator. The errors go
-// to c, which may be a context other than the node's own when that context
-// finalizes the node, as a builtin marshaling its argument does.
+// they are not run again when the value is used in a validator. Their errors
+// become errors of the node. c may be a context other than the node's own when
+// that context finalizes the node, as a builtin marshaling its argument does.
 //
 // A validator may suspend the current task: existsN resolves its references
 // cooperatively and yields while a referenced peer is still being computed.
 // The yield unwinds through this loop when the node is finalized from a task
 // of another node. The validator that yielded and those not yet run are then
-// put back, so that they run when the node is processed again.
+// put back, so that they run when the node is processed again. The errors of
+// those that did run are kept aside until then, so that the node does not
+// hold them while the others run, as it does not without a yield.
 func (n *nodeContext) runChecks(c *OpContext) {
 	if len(n.checks) == 0 {
 		return
 	}
 	checks := n.checks
 	n.checks = nil
-	// Validators do not run on an erroneous value. Adding the error of a
-	// validator given one would replace a child error with a copy that no
-	// longer leads to the other child errors. A node with conflicting kinds
-	// is erroneous too, even if its error is only set as its value later.
-	if n.kind == BottomKind || n.node.IsErr() {
+	errs := n.checkErrs
+	n.checkErrs = nil
+	// Validators do not run on an erroneous value, such as one with a typo.
+	// Adding the error of a validator given one would replace a child error
+	// with a copy that no longer leads to the other child errors. A node with
+	// conflicting kinds is erroneous too, even if its error is only set as its
+	// value later. An incomplete value may still fail them.
+	if n.kind == BottomKind {
+		return
+	}
+	if b := n.node.Bottom(); b != nil && !b.IsIncomplete() {
 		return
 	}
 	i := 0
@@ -605,15 +638,31 @@ func (n *nodeContext) runChecks(c *OpContext) {
 		if i < len(checks) {
 			// Unwound by a yield: restore the checks that did not complete.
 			n.checks = append(checks[i:len(checks):len(checks)], n.checks...)
+			n.checkErrs = errs
+			// A finalized node is not processed again.
+			if n.node.status == finalized {
+				n.node.status = evaluating
+				n.yieldedAfterSettling = true
+			}
 		}
 	}()
 	for ; i < len(checks); i++ {
 		// TODO(errors): make Validate return bottom and generate
 		// optimized conflict message. Also track and inject IDs
 		// to determine origin location.s
-		if b := c.Validate(checks[i], n.node); b != nil {
-			n.addBottom(b)
+		errs = CombineErrors(nil, errs, c.Validate(checks[i], n.node))
+	}
+	n.addBottom(errs)
+}
+
+// commitErr makes the pending errors of n part of its value.
+func (n *nodeContext) commitErr() {
+	if err := n.getErr(); err != nil {
+		n.errs = nil
+		if b := n.node.Bottom(); b != nil {
+			err = CombineErrors(nil, b, err)
 		}
+		n.setBaseValue(err)
 	}
 }
 

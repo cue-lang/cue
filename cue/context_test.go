@@ -753,9 +753,9 @@ func TestCompileRetention(t *testing.T) {
 		time.Sleep(10 * time.Millisecond)
 	}
 	for i, inst := range foreignInsts {
-		// TODO: a root which outlives its Context should not keep its build
-		// instance alive, as nothing can reach the instance through it.
-		qt.Check(t, qt.IsNotNil(inst.Value()), qt.Commentf("foreign value %d", i))
+		// A root which outlives its Context does not keep its build instance
+		// alive, as nothing can reach the instance through it.
+		qt.Check(t, qt.IsNil(inst.Value()), qt.Commentf("foreign value %d", i))
 		qt.Check(t, qt.Equals(fmt.Sprint(foreign[i]), fmt.Sprintf("{a: %d}", i)))
 	}
 }

@@ -16,7 +16,10 @@ package runtime
 
 import (
 	"path"
+	"runtime"
+	"slices"
 	"sync"
+	"sync/atomic"
 	"weak"
 
 	"cuelang.org/go/cue/build"
@@ -94,6 +97,9 @@ type index struct {
 	// kept alive by them.
 	self weak.Pointer[index]
 
+	// recorded lists the roots which record the index.
+	recorded *recordedRoots
+
 	nextUniqueID uint64
 	typeCache    sync.Map // map[reflect.Type]evaluated
 }
@@ -112,6 +118,7 @@ func newIndex() *index {
 		imports:        map[*adt.Vertex]*build.Instance{},
 		importsByBuild: map[*build.Instance]*adt.Vertex{},
 		buildErrs:      map[*build.Instance]errors.Error{},
+		recorded:       &recordedRoots{},
 	}
 	i.self = weak.Make(i)
 	return i
@@ -119,7 +126,8 @@ func newIndex() *index {
 
 // rootInfo is what a runtime records on a root which it builds.
 type rootInfo struct {
-	inst *build.Instance
+	// inst is cleared once the owner is collected.
+	inst atomic.Pointer[build.Instance]
 
 	// owner is the index of the runtime which built the root.
 	owner weak.Pointer[index]
@@ -128,7 +136,50 @@ type rootInfo struct {
 // recordRoot records that v is the root which x built from p. It must be
 // called before v is shared.
 func (x *index) recordRoot(v *adt.Vertex, p *build.Instance) {
-	v.SetRootInfo(&rootInfo{inst: p, owner: x.self})
+	info := &rootInfo{owner: x.self}
+	info.inst.Store(p)
+	v.SetRootInfo(info)
+	x.recorded.add(x, info)
+}
+
+// recordedRoots weakly lists what an index recorded on roots, so that a
+// cleanup can clear their build instances once the index is collected, as
+// the values of other runtimes can keep roots alive but cannot reach those.
+// The cleanup holds the list, so it must not lead to the index, even via a
+// root or build instance.
+type recordedRoots struct {
+	lock  sync.Mutex
+	infos []weak.Pointer[rootInfo]
+}
+
+// add lists info, which x recorded on a root.
+func (r *recordedRoots) add(x *index, info *rootInfo) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	if r.infos == nil {
+		// Many runtimes record no roots, so register the cleanup lazily.
+		runtime.AddCleanup(x, (*recordedRoots).forget, r)
+	}
+	if len(r.infos) == cap(r.infos) {
+		live := slices.DeleteFunc(r.infos, func(p weak.Pointer[rootInfo]) bool {
+			return p.Value() == nil
+		})
+		// A new array with room to double amortizes growth, and shrinks the
+		// list once most of its roots are collected.
+		r.infos = append(make([]weak.Pointer[rootInfo], 0, 2*len(live)+16), live...)
+	}
+	r.infos = append(r.infos, weak.Make(info))
+}
+
+// forget clears the build instances which the listed roots record.
+func (r *recordedRoots) forget() {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	for _, p := range r.infos {
+		if info := p.Value(); info != nil {
+			info.inst.Store(nil)
+		}
+	}
 }
 
 func (r *Runtime) AddInst(key *adt.Vertex, p *build.Instance) {
@@ -152,7 +203,11 @@ func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
 	// Roots are shared with the values of other runtimes, for which they are
 	// not the root of any instance.
 	if info, ok := key.RootInfo().(*rootInfo); ok && info.owner == r.index.self {
-		return info.inst
+		inst := info.inst.Load()
+		// Were the index collected before the load, its cleanup could clear
+		// the instance first.
+		runtime.KeepAlive(r.index)
+		return inst
 	}
 	r.index.lock.RLock()
 	defer r.index.lock.RUnlock()

@@ -216,6 +216,20 @@ func (v *validator) validate(x *Vertex) {
 	}
 
 	for _, a := range x.Arcs {
+		// A required field with an error fails its struct whether or not it
+		// is present. Without all, the child error of x reports it.
+		//
+		// TODO(cycle): report structural cycles too, once finding them in
+		// mutually recursive definitions does not depend on field order.
+		if v.all && a.ArcType == ArcRequired {
+			if b := a.Bottom(); b != nil && !b.IsIncomplete() && b.Code != StructuralCycleError {
+				// Only errors are reported, as in a definition.
+				v.inDefinition++
+				v.validate(a)
+				v.inDefinition--
+				continue
+			}
+		}
 		if a.ArcType == ArcRequired && v.Final && v.inDefinition == 0 {
 			saved := v.ctx.PushArcAndLabel(a)
 			v.add(NewRequiredNotPresentError(v.ctx, a, v.sharedPositions...))

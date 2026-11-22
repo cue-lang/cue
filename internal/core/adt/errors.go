@@ -123,8 +123,9 @@ func isError(v Value) bool {
 }
 
 // AddChildError updates x to record an error that occurred in one of
-// its descendent arcs. The resulting error will record the worst error code of
-// the current error or recursive error.
+// its descendent arcs. The resulting error records the worst error code of
+// the current error or recursive error, except that a typo takes the code of
+// recursive unless that is a structural cycle.
 //
 // If x is not already an error, the value is recorded in the error for
 // reference.
@@ -137,8 +138,14 @@ func (n *nodeContext) AddChildError(recursive *Bottom) {
 	x := v.BaseValue
 	err, _ := x.(*Bottom)
 	if err == nil || err.CloseCheck {
+		// A typo keeps its code over a cycle, as when found after it, so that
+		// the code does not depend on field order.
+		code := recursive.Code
+		if err != nil && code == StructuralCycleError {
+			code = err.Code
+		}
 		n.setBaseValue(&Bottom{
-			Code:         recursive.Code,
+			Code:         code,
 			Value:        v,
 			HasRecursive: true,
 			ChildError:   true,

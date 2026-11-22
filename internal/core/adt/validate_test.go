@@ -432,8 +432,10 @@ func TestValidate(t *testing.T) {
 		in: `
 			x: {foo?: 1} & {foo!: 2}
 		`,
-		// TODO: the conflict must be reported.
-		out: "",
+		out: `eval
+				x.foo: conflicting values 2 and 1:
+				    test:2:14
+				    test:2:26`,
 	}, {
 		name: "required field which is not allowed",
 		all:  true,
@@ -441,8 +443,9 @@ func TestValidate(t *testing.T) {
 			#A: a?: int
 			x: #A & {a: 1, err!: 1}
 		`,
-		// TODO: the field must be reported as not allowed.
-		out: "",
+		out: `eval
+				x.err: field not allowed:
+				    test:3:19`,
 	}, {
 		name: "required field which is not allowed in a definition",
 		all:  true,
@@ -450,8 +453,9 @@ func TestValidate(t *testing.T) {
 			#A: a?: int
 			#B: #A & {err!: 1}
 		`,
-		// TODO: the field must be reported as not allowed.
-		out: "",
+		out: `eval
+				#B.err: field not allowed:
+				    test:3:14`,
 	}, {
 		name: "errors below required fields",
 		all:  true,
@@ -459,8 +463,14 @@ func TestValidate(t *testing.T) {
 			x: a!: b: 1 & 2
 			y: a!: b!: 3 & 4
 		`,
-		// TODO: both conflicts must be reported.
-		out: "",
+		out: `eval
+				x.a.b: conflicting values 2 and 1:
+				    test:2:14
+				    test:2:18
+				eval
+				y.a.b: conflicting values 4 and 3:
+				    test:3:15
+				    test:3:19`,
 	}, {
 		// Each is reported whichever field comes first.
 		name: "typo and structural cycle below required field",
@@ -470,8 +480,16 @@ func TestValidate(t *testing.T) {
 			x: a!: {p: #A & {err: 1}, q: {n: q}}
 			y: a!: {q: {n: q}, p: #A & {err: 1}}
 		`,
-		// TODO: the typos and the cycles must be reported.
-		out: "",
+		out: `eval
+				x.a.p.err: field not allowed:
+				    test:3:21
+				structural_cycle
+				x.a.q.n: structural cycle
+				structural_cycle
+				y.a.q.n: structural cycle
+				eval
+				y.a.p.err: field not allowed:
+				    test:4:32`,
 	}, {
 		name: "error in required field with final",
 		cfg:  &adt.ValidateConfig{Final: true},
@@ -479,10 +497,10 @@ func TestValidate(t *testing.T) {
 		in: `
 			x: a!: 1 & 2
 		`,
-		// TODO: the conflict must be reported instead.
-		out: `incomplete
-				x.a: field is required but not present:
-				    test:2:7`,
+		out: `eval
+				x.a: conflicting values 2 and 1:
+				    test:2:11
+				    test:2:15`,
 	}, {
 		name: "incomplete error in required field with final",
 		cfg:  &adt.ValidateConfig{Final: true},

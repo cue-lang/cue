@@ -868,8 +868,9 @@ func (it *itemContains) hash(h *maphash.Hash, u *uniqueItems) {
 }
 
 func (i *itemContains) generate(g *generator) ast.Expr {
-	if !g.dialect.supportsContains {
-		// No contains support (OpenAPI 3.0): drop the constraint (lenient).
+	if !g.dialect.supportsContains || (!g.dialect.supportsMinMaxContains && i.min != nil && *i.min == 0) {
+		// No contains support (OpenAPI 3.0), or no minContains (draft-07) to
+		// allow for no matches: drop the constraint (lenient).
 		return makeSchemaStructLit()
 	}
 	fields := []ast.Decl{makeField("contains", i.elem.Value().generate(g))}

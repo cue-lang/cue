@@ -16,15 +16,14 @@ negated?: matchN(0, [list.MatchN(>=0, >3)])
 -- datatest/tests.cue --
 package datatest
 
-// The schemas require a match, so they reject the data.
 atLeastNone: {
 	data: atLeastNone: [1]
-	error: true
+	error: false
 }
 
 atMostOne: {
 	data: atMostOne: []
-	error: true
+	error: false
 }
 
 ok: data: negated: "a"
@@ -38,13 +37,7 @@ badAtLeastOne: {
 	$schema: "http://json-schema.org/draft-07/schema#"
 	type:    "object"
 	properties: {
-		atLeastNone: {
-			type: "array"
-			contains: {
-				type:             "number"
-				exclusiveMinimum: 3
-			}
-		}
+		atLeastNone: type: "array"
 		atLeastOne: {
 			type: "array"
 			contains: {
@@ -52,29 +45,15 @@ badAtLeastOne: {
 				exclusiveMinimum: 3
 			}
 		}
-		atMostOne: {
-			type: "array"
-			contains: {
-				type:             "number"
-				exclusiveMinimum: 3
-			}
-		}
+		atMostOne: type: "array"
 		negated: {}
 	}
 }
 -- out/generate-v3/atLeastNone --
-atLeastNone.data.atLeastNone: invalid value [1] (does not satisfy list.MatchN): >3 matches 0 list items, want >=1:
-    1:114
-    ./datatest/tests.cue:5:21
-    1:142
 -- out/generate-v3/atMostOne --
-atMostOne.data.atMostOne: invalid value [] (does not satisfy list.MatchN): >3 matches 0 list items, want >=1:
-    1:273
-    ./datatest/tests.cue:10:19
-    1:301
 -- out/generate-v3/badAtLeastOne --
 badAtLeastOne.data.atLeastOne: invalid value [1] (does not satisfy list.MatchN): >3 matches 0 list items, want >=1:
-    1:194
-    ./datatest/tests.cue:17:20
-    1:222
+    1:144
+    ./datatest/tests.cue:16:20
+    1:172
 -- out/generate-v3/ok --

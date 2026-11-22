@@ -1,0 +1,80 @@
+#version: draft7
+
+Without minContains, a contains requires a match, so it cannot express a
+list which needs none.
+
+-- test.cue --
+package test
+
+import "list"
+
+atLeastNone?: list.MatchN(>=0, >3)
+atMostOne?: list.MatchN(>=0 & <=1, >3)
+atLeastOne?: list.MatchN(>=1, >3)
+negated?: matchN(0, [list.MatchN(>=0, >3)])
+
+-- datatest/tests.cue --
+package datatest
+
+// The schemas require a match, so they reject the data.
+atLeastNone: {
+	data: atLeastNone: [1]
+	error: true
+}
+
+atMostOne: {
+	data: atMostOne: []
+	error: true
+}
+
+ok: data: negated: "a"
+
+badAtLeastOne: {
+	data: atLeastOne: [1]
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	$schema: "http://json-schema.org/draft-07/schema#"
+	type:    "object"
+	properties: {
+		atLeastNone: {
+			type: "array"
+			contains: {
+				type:             "number"
+				exclusiveMinimum: 3
+			}
+		}
+		atLeastOne: {
+			type: "array"
+			contains: {
+				type:             "number"
+				exclusiveMinimum: 3
+			}
+		}
+		atMostOne: {
+			type: "array"
+			contains: {
+				type:             "number"
+				exclusiveMinimum: 3
+			}
+		}
+		negated: {}
+	}
+}
+-- out/generate-v3/atLeastNone --
+atLeastNone.data.atLeastNone: invalid value [1] (does not satisfy list.MatchN): >3 matches 0 list items, want >=1:
+    1:114
+    ./datatest/tests.cue:5:21
+    1:142
+-- out/generate-v3/atMostOne --
+atMostOne.data.atMostOne: invalid value [] (does not satisfy list.MatchN): >3 matches 0 list items, want >=1:
+    1:273
+    ./datatest/tests.cue:10:19
+    1:301
+-- out/generate-v3/badAtLeastOne --
+badAtLeastOne.data.atLeastOne: invalid value [1] (does not satisfy list.MatchN): >3 matches 0 list items, want >=1:
+    1:194
+    ./datatest/tests.cue:17:20
+    1:222
+-- out/generate-v3/ok --

@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	cueload "cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/core/adt"
+	cueruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/value"
 	"github.com/go-quicktest/qt"
 )
@@ -2130,20 +2131,27 @@ language: version: "v0.16.0"
 		for _, tc := range []struct {
 			name string
 			use  func(cue.Value)
+			// caches is whether use caches an Instance of the imported
+			// package, which encloses the value at pathN.
+			caches bool
 		}{
-			{"Format", func(v cue.Value) { _ = fmt.Sprint(v.LookupPath(pathN)) }},
-			{"Syntax", func(v cue.Value) { v.LookupPath(pathN).Syntax() }},
-			{"Reference", func(v cue.Value) { v.LookupPath(pathN).Reference() }},
+			// TODO: formatting and Syntax only need the build instance, so
+			// should not create and cache an Instance.
+			{"Format", func(v cue.Value) { _ = fmt.Sprint(v.LookupPath(pathN)) }, true},
+			{"Syntax", func(v cue.Value) { v.LookupPath(pathN).Syntax() }, true},
+			{"Reference", func(v cue.Value) { v.LookupPath(pathN).Reference() }, true},
 			{"BuildInstances", func(v cue.Value) {
 				_, err := (*cue.Runtime)(v.Context()).BuildInstances(v.BuildInstance().Imports)
 				qt.Check(t, qt.IsNil(err))
-			}},
+			}, true},
 		} {
 			ctxPtr, shared := func() (weak.Pointer[cue.Context], *adt.Vertex) {
 				ctx := cuecontext.New()
 				v := ctx.BuildInstance(load())
 				shared := sharedRoot(v)
 				tc.use(v)
+				_, cached := (*cueruntime.Runtime)(ctx).BuildData(v.BuildInstance().Imports[0])
+				qt.Check(t, qt.Equals(cached, tc.caches), qt.Commentf("%s: cached an Instance", tc.name))
 				return weak.Make(ctx), shared
 			}()
 			runtime.GC()

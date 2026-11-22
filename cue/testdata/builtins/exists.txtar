@@ -418,6 +418,14 @@ existsNAfterMatchN: {
 	ba: existsN(1, _p.k) & matchN(1, [int & >n]) & 5 @test(err, code=incomplete, contains="does not satisfy matchN")
 }
 
+// An existsN which is not satisfied yet does not hide a typo in the struct it
+// constrains.
+existsNBesideTypo: {
+	p: k: 1
+	#A: {a?: int}
+	typo: existsN(>=1, p.m) & #A & {a: 1, err: 1} @test(err, code=incomplete, contains="existsN: 0 matched, expected >=1", incorrect) @test(err:todo, code=eval, contains="field not allowed")
+}
+
 // isValid converts a determined countN violation into a boolean (the
 // validator-to-boolean adapter).
 countNAdapter: {
@@ -983,6 +991,9 @@ existsNAfterMatchN.ba: invalid value 5 (does not satisfy matchN): 0 matched, exp
     ./in.cue:408:6
     ./in.cue:408:32
     ./in.cue:408:49
+[incomplete] existsNBesideTypo.typo: existsN: 0 matched, expected >=1:
+    ./in.cue:416:8
+    ./in.cue:416:16
 [cycle] fieldRefPostCheck: circular dependency in evaluation of conditionals: b changed after evaluation:
     ./review.cue:8:13
 [cycle] selectorPostCheck: circular dependency in evaluation of conditionals: s.b changed after evaluation:

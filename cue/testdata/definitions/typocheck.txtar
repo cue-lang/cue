@@ -173,6 +173,31 @@ embed: openValidator: t2: {
 		suberr=(code=eval, contains="does not satisfy matchN", pos=[-3:5, -3:12, -2:9, 0:8]),
 	)
 }
+// A struct or list with a permanent error, such as a typo, reports only that
+// error, whatever the order of its validators. One with incomplete fields may
+// still fail them.
+embed: boundAndTypo: {
+	#A: {a?: int}
+	#B: {b?: int}
+	#E: !=null
+	typo: #E & #A & {a: 1, err: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:25]))
+	typoReversed: {a: 1, err: 1} & #A & #E @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:23]))
+	requiredTypo: #E & #A & {a: 1, err!: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:33]))
+	failingSecond: !=null & struct.MinFields(5) & #A & {a: 1, err!: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:60]))
+	failingFirst: struct.MinFields(5) & !=null & #A & {a: 1, err!: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:59]))
+	satisfiedSecond: !=null & matchN(1, [{a: 1}]) & #A & {a: 1, err: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:62]))
+	satisfiedFirst: matchN(1, [{a: 1}]) & !=null & #A & {a: 1, err: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:61]))
+	typoInDisjunction: #E & (#A | #B) & {err: 1} @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="field not allowed"), incorrect) @test(err:todo, code=eval, suberr=(contains="field not allowed", pos=[0:39]))
+	typoInEmptyDisjunction: matchN(1, [{...}]) & #A & ({b: 1} | {c: 1}) & {a: 1, err: 1} @test(err, code=eval, contains="3 errors in empty disjunction")
+	typoInList: #E & [#A] & [{a: 1, err: 1}] @test(err, code=eval, contains="field not allowed", pos=[0:34])
+	otherError: #E & error("bad") & {a: 1} @test(err, code=user, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="bad"), incorrect) @test(err:todo, code=user, suberr=(contains="bad", pos=[0:19]))
+	listLength: #E & [int] & [1, 2] @test(err, code=eval, suberr=(contains="invalid left-hand value to '!='"), suberr=(contains="incompatible list lengths"), incorrect) @test(err:todo, code=eval, suberr=(contains="incompatible list lengths", pos=[0:27]))
+	n: int
+	incompleteFails: struct.MaxFields(0) & #A & {a: n + 1} @test(err, code=eval, contains="does not satisfy struct.MaxFields(0)")
+	#N: !={a: 1}
+	outOfBound: #N & #A & {a: 1} @test(err, code=eval, contains="out of bound")
+	outOfBoundReversed: {a: 1} & #A & #N @test(err, code=eval, contains="out of bound")
+}
 disjunction: withErr: t1: {
 	params: {}
 	out: #Schema1 & {
@@ -1024,19 +1049,19 @@ closednessSiblingError: {
 }
 -- out/eval/stats --
 Leaks:  30
-Freed:  931
-Reused: 879
+Freed:  1006
+Reused: 954
 Allocs: 82
 Retain: 0
 
-Unifications: 792
-Conjuncts:    1571
-Disjuncts:    84
+Unifications: 853
+Conjuncts:    1709
+Disjuncts:    88
 Notifications: 7
 
-NumCloseIDs: 441
+NumCloseIDs: 464
 
-ConjunctInfos:       1153
+ConjunctInfos:       1248
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -1076,6 +1101,74 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
     ./validators.cue:30:12
     ./validators.cue:31:9
     ./validators.cue:33:8
+[eval] embed.boundAndTypo.typo: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.typo.err: field not allowed:
+    ./validators.cue:43:6
+embed.boundAndTypo.typo.err: field not allowed:
+    ./validators.cue:43:6
+    ./validators.cue:44:25
+[eval] embed.boundAndTypo.typoReversed: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.typoReversed.err: field not allowed:
+    ./validators.cue:43:6
+embed.boundAndTypo.typoReversed.err: field not allowed:
+    ./validators.cue:43:6
+    ./validators.cue:45:23
+[eval] embed.boundAndTypo.requiredTypo: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.requiredTypo.err: field not allowed:
+    ./validators.cue:43:6
+embed.boundAndTypo.requiredTypo.err: field not allowed:
+    ./validators.cue:43:6
+    ./validators.cue:46:33
+[eval] embed.boundAndTypo.failingSecond: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.failingSecond.err: field not allowed:
+    ./validators.cue:47:17
+embed.boundAndTypo.failingSecond.err: field not allowed:
+    ./validators.cue:47:17
+    ./validators.cue:47:60
+[eval] embed.boundAndTypo.failingFirst.err: field not allowed:
+    ./validators.cue:48:16
+    ./validators.cue:48:59
+embed.boundAndTypo.failingFirst: invalid left-hand value to '!=' (type _|_): embed.boundAndTypo.failingFirst.err: field not allowed:
+    ./validators.cue:48:38
+[eval] embed.boundAndTypo.satisfiedSecond: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.satisfiedSecond.err: field not allowed:
+    ./validators.cue:49:19
+embed.boundAndTypo.satisfiedSecond.err: field not allowed:
+    ./validators.cue:49:19
+    ./validators.cue:49:62
+[eval] embed.boundAndTypo.satisfiedFirst.err: field not allowed:
+    ./validators.cue:50:18
+    ./validators.cue:50:61
+embed.boundAndTypo.satisfiedFirst: invalid left-hand value to '!=' (type _|_): embed.boundAndTypo.satisfiedFirst.err: field not allowed:
+    ./validators.cue:50:40
+[eval] embed.boundAndTypo.typoInDisjunction.err: field not allowed:
+    ./validators.cue:51:39
+embed.boundAndTypo.typoInDisjunction: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.typoInDisjunction.err: field not allowed:
+    ./validators.cue:43:6
+[eval] embed.boundAndTypo.typoInEmptyDisjunction: 3 errors in empty disjunction:
+embed.boundAndTypo.typoInEmptyDisjunction.b: field not allowed:
+    ./validators.cue:52:26
+    ./validators.cue:52:54
+embed.boundAndTypo.typoInEmptyDisjunction.c: field not allowed:
+    ./validators.cue:52:26
+    ./validators.cue:52:63
+embed.boundAndTypo.typoInEmptyDisjunction.err: field not allowed:
+    ./validators.cue:52:26
+    ./validators.cue:52:79
+[eval] embed.boundAndTypo.typoInList.0.err: field not allowed:
+    ./validators.cue:53:34
+[user] embed.boundAndTypo.otherError: invalid left-hand value to '!=' (type struct): embed.boundAndTypo.otherError: bad:
+    ./validators.cue:43:6
+embed.boundAndTypo.otherError: bad:
+    ./validators.cue:54:19
+[eval] embed.boundAndTypo.listLength: invalid left-hand value to '!=' (type list): embed.boundAndTypo.listLength: incompatible list lengths (1 and 2):
+    ./validators.cue:43:6
+embed.boundAndTypo.listLength: incompatible list lengths (1 and 2):
+    ./validators.cue:55:27
+[eval] embed.boundAndTypo.incompleteFails: invalid value {a:_|_(embed.boundAndTypo.incompleteFails.a: non-concrete value int in operand to +)} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0):
+    ./validators.cue:57:19
+    ./validators.cue:57:36
+[eval] embed.boundAndTypo.outOfBound: invalid value {a:1} (out of bound !={a:1}):
+    ./validators.cue:58:6
+    ./validators.cue:59:14
+[eval] embed.boundAndTypo.outOfBoundReversed: invalid value {a:1} (out of bound !={a:1}):
+    ./validators.cue:58:6
+    ./validators.cue:60:22
 [eval] and.transitive.err.out.err: field not allowed:
     ./in.cue:65:3
 [eval] and.transitiveWithEmbed.err.out.err: field not allowed:
@@ -1134,18 +1227,18 @@ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched
     ./siblingerror.cue:27:5
 [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
 disjunction.withErr.t1.out.b1: conflicting values {b2:{b3:params.mayExistLater}} and null (mismatched types struct and null):
-    ./validators.cue:39:7
-    ./validators.cue:40:7
-    ./validators.cue:42:17
+    ./validators.cue:64:7
+    ./validators.cue:65:7
+    ./validators.cue:67:17
 disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
 disjunction.withErr.t1.out.b1.b2: conflicting values {b3:params.mayExistLater} and null (mismatched types struct and null):
-    ./validators.cue:39:7
-    ./validators.cue:40:11
-    ./validators.cue:42:24
-    ./validators.cue:43:17
+    ./validators.cue:64:7
+    ./validators.cue:65:11
+    ./validators.cue:67:24
+    ./validators.cue:68:17
 disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
-    ./validators.cue:40:22
-    ./validators.cue:38:2
+    ./validators.cue:65:22
+    ./validators.cue:63:2
 -- out/diff-v2-v3.txt --
 Errors differ between v2 and v3 evaluators (v3 reports fewer positions).
 Structure sharing differences between v2 and v3.

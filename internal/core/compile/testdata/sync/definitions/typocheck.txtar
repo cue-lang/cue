@@ -136,6 +136,31 @@ embed: openValidator: t2: {
 	a: X
 	a: b: 1
 }
+// A struct or list with a permanent error, such as a typo, reports only that
+// error, whatever the order of its validators. One with incomplete fields may
+// still fail them.
+embed: boundAndTypo: {
+	#A: {a?: int}
+	#B: {b?: int}
+	#E: !=null
+	typo: #E & #A & {a: 1, err: 1}
+	typoReversed: {a: 1, err: 1} & #A & #E
+	requiredTypo: #E & #A & {a: 1, err!: 1}
+	failingSecond: !=null & struct.MinFields(5) & #A & {a: 1, err!: 1}
+	failingFirst: struct.MinFields(5) & !=null & #A & {a: 1, err!: 1}
+	satisfiedSecond: !=null & matchN(1, [{a: 1}]) & #A & {a: 1, err: 1}
+	satisfiedFirst: matchN(1, [{a: 1}]) & !=null & #A & {a: 1, err: 1}
+	typoInDisjunction: #E & (#A | #B) & {err: 1}
+	typoInEmptyDisjunction: matchN(1, [{...}]) & #A & ({b: 1} | {c: 1}) & {a: 1, err: 1}
+	typoInList: #E & [#A] & [{a: 1, err: 1}]
+	otherError: #E & error("bad") & {a: 1}
+	listLength: #E & [int] & [1, 2]
+	n: int
+	incompleteFails: struct.MaxFields(0) & #A & {a: n + 1}
+	#N: !={a: 1}
+	outOfBound: #N & #A & {a: 1}
+	outOfBoundReversed: {a: 1} & #A & #N
+}
 disjunction: withErr: t1: {
 	params: {}
 	out: #Schema1 & {
@@ -1895,6 +1920,98 @@ closednessSiblingError: {
           b: 1
         }
       }
+    }
+  }
+  embed: {
+    boundAndTypo: {
+      #A: {
+        a?: int
+      }
+      #B: {
+        b?: int
+      }
+      #E: !=null
+      typo: ((〈0;#E〉 & 〈0;#A〉) & {
+        a: 1
+        err: 1
+      })
+      typoReversed: (({
+        a: 1
+        err: 1
+      } & 〈0;#A〉) & 〈0;#E〉)
+      requiredTypo: ((〈0;#E〉 & 〈0;#A〉) & {
+        a: 1
+        err!: 1
+      })
+      failingSecond: (((!=null & 〈import;struct〉.MinFields(5)) & 〈0;#A〉) & {
+        a: 1
+        err!: 1
+      })
+      failingFirst: (((〈import;struct〉.MinFields(5) & !=null) & 〈0;#A〉) & {
+        a: 1
+        err!: 1
+      })
+      satisfiedSecond: (((!=null & matchN(1, [
+        {
+          a: 1
+        },
+      ])) & 〈0;#A〉) & {
+        a: 1
+        err: 1
+      })
+      satisfiedFirst: (((matchN(1, [
+        {
+          a: 1
+        },
+      ]) & !=null) & 〈0;#A〉) & {
+        a: 1
+        err: 1
+      })
+      typoInDisjunction: ((〈0;#E〉 & (〈0;#A〉|〈0;#B〉)) & {
+        err: 1
+      })
+      typoInEmptyDisjunction: (((matchN(1, [
+        {
+          ...
+        },
+      ]) & 〈0;#A〉) & ({
+        b: 1
+      }|{
+        c: 1
+      })) & {
+        a: 1
+        err: 1
+      })
+      typoInList: ((〈0;#E〉 & [
+        〈1;#A〉,
+      ]) & [
+        {
+          a: 1
+          err: 1
+        },
+      ])
+      otherError: ((〈0;#E〉 & error("bad")) & {
+        a: 1
+      })
+      listLength: ((〈0;#E〉 & [
+        int,
+      ]) & [
+        1,
+        2,
+      ])
+      n: int
+      incompleteFails: ((〈import;struct〉.MaxFields(0) & 〈0;#A〉) & {
+        a: (〈1;n〉 + 1)
+      })
+      #N: !={
+        a: 1
+      }
+      outOfBound: ((〈0;#N〉 & 〈0;#A〉) & {
+        a: 1
+      })
+      outOfBoundReversed: (({
+        a: 1
+      } & 〈0;#A〉) & 〈0;#N〉)
     }
   }
   disjunction: {

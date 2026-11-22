@@ -536,6 +536,35 @@ func TestValidate(t *testing.T) {
 			#Q: p?: #P
 			#P: q!: #Q
 		`,
+	}, {
+		// A validator must not turn that cycle into a failure of its own.
+		name: "mutual recursion through required field with a validator",
+		all:  true,
+		in: `
+			import "struct"
+
+			#Q: p?: #P
+			#P: {q!: #Q, v?: int}
+			x: struct.MinFields(1) & #P & {v: 1}
+		`,
+	}, {
+		// Nor may the cycle keep a failing validator from failing x. With
+		// sharing, only the cycle is reported for it.
+		name: "mutual recursion through required field with a failing validator",
+		all:  true,
+		in: `
+			import "struct"
+
+			#Q: p?: #P
+			#P: {q!: #Q, v?: int}
+			x: struct.MaxFields(0) & #P & {v: 1}
+		`,
+		out: `structural_cycle
+				#P.q: structural cycle`,
+		outNoShare: `eval
+				x: invalid value {v:1,q!:{p?:{q!:{p?:_|_(x.q.p.q.p.q: structural cycle)},v?:int}}} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0):
+				    test:6:7
+				    test:6:24`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

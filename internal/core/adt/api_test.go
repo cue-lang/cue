@@ -15,10 +15,13 @@
 package adt_test
 
 import (
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 func closeAll(ctx *cue.Context, v cue.Value) cue.Value {
@@ -69,5 +72,114 @@ func TestAPIModifyingValues(t *testing.T) {
 
 	if err := x.Err(); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// TestValidatorYield checks that the validators of a vertex give the same
+// result when one yields, as existsN does while a peer it refers to is being
+// computed, as when none does.
+//
+// A validator named "fail..." fails, "incomplete" gives an incomplete error,
+// "struct" fails if given the struct rather than its error, and "pass" passes.
+func TestValidatorYield(t *testing.T) {
+	type unwind struct{}
+	tests := []struct {
+		validators []string
+		yielder    string // none if empty
+		want       string
+	}{{
+		validators: []string{"pass", "fail"},
+		yielder:    "fail",
+		// TODO: the validator which yielded must run again.
+		want: "",
+	}, {
+		validators: []string{"pass", "fail"},
+		yielder:    "pass",
+		// TODO: the validators from the one which yielded must run again.
+		want: "",
+	}, {
+		validators: []string{"failA", "failB"},
+		want:       "failA (and 1 more errors)",
+	}, {
+		validators: []string{"failA", "failB"},
+		yielder:    "failB",
+		// TODO: the validator which yielded must run again.
+		want: "failA",
+	}, {
+		validators: []string{"incomplete", "pass", "struct"},
+		want:       "struct",
+	}, {
+		validators: []string{"incomplete", "pass", "struct"},
+		yielder:    "pass",
+		// TODO: the validators from the one which yielded must run again.
+		want: "incomplete",
+	}, {
+		validators: []string{"incomplete", "pass", "struct"},
+		yielder:    "struct",
+		// TODO: the validator which yielded must run again.
+		want: "incomplete",
+	}}
+	for _, test := range tests {
+		name := strings.Join(test.validators, ",")
+		if test.yielder != "" {
+			name += "/" + test.yielder + " yields"
+		}
+		t.Run(name, func(t *testing.T) {
+			r := runtime.New()
+			v := &adt.Vertex{}
+			v.AddConjunct(adt.MakeRootConjunct(nil, &adt.StructLit{}))
+			yielded := false
+			for _, name := range test.validators {
+				v.AddConjunct(adt.MakeRootConjunct(nil, &adt.ExternalValidator{
+					Name: name,
+					Validate: func(c *adt.OpContext, x adt.Value) *adt.Bottom {
+						if name == test.yielder && !yielded {
+							yielded = true
+							panic(unwind{})
+						}
+						switch {
+						case name == "incomplete":
+							b := c.NewErrf("incomplete")
+							b.Code = adt.IncompleteError
+							return b
+						case name == "struct":
+							if b := x.(*adt.Vertex).Bottom(); b != nil {
+								return b
+							}
+							return c.NewErrf("struct")
+						case strings.HasPrefix(name, "fail"):
+							return c.NewErrf("%s", name)
+						}
+						return nil
+					},
+				}))
+			}
+
+			c := adt.NewContext(r, v)
+			finalize := func() {
+				defer func() {
+					if e := recover(); e != nil {
+						if _, ok := e.(unwind); !ok {
+							panic(e)
+						}
+					}
+				}()
+				v.Finalize(c)
+			}
+			finalize()
+			if test.yielder != "" {
+				if !yielded {
+					t.Fatal("no validator yielded")
+				}
+				finalize()
+			}
+			got := ""
+			if b := v.Bottom(); b != nil {
+				got = b.Err.Error()
+			}
+			if got != test.want {
+				t.Errorf("got error %q, want %q", got, test.want)
+			}
+		})
 	}
 }

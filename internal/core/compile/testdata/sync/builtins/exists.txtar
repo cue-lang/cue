@@ -392,6 +392,14 @@ existsNAfterMatchN: {
 	ba: existsN(1, _p.k) & matchN(1, [int & >n]) & 5
 }
 
+// An existsN which is not satisfied yet does not hide a typo in the struct it
+// constrains.
+existsNBesideTypo: {
+	p: k: 1
+	#A: {a?: int}
+	typo: existsN(>=1, p.m) & #A & {a: 1, err: 1}
+}
+
 // isValid converts a determined countN violation into a boolean (the
 // validator-to-boolean adapter).
 countNAdapter: {
@@ -1403,6 +1411,18 @@ guardedDisjunct: {
     ba: ((existsN(1, 〈0;_p〉.k) & matchN(1, [
       (int & >〈1;n〉),
     ])) & 5)
+  }
+  existsNBesideTypo: {
+    p: {
+      k: 1
+    }
+    #A: {
+      a?: int
+    }
+    typo: ((existsN(>=1, 〈0;p〉.m) & 〈0;#A〉) & {
+      a: 1
+      err: 1
+    })
   }
   countNAdapter: {
     ok1: isValid(countN(1, [

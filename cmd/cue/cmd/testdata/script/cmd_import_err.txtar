@@ -1,0 +1,65 @@
+# The errors of every package which the tool files import should be
+# reported, along with those of the tool files themselves.
+# TODO: only the first error among the imports is.
+! exec cue cmd hello
+! stdout .
+cmp stderr expect-stderr
+
+# An import of a package which does not exist should fail every command in
+# the package and their listing, even if only one command uses it.
+# TODO: only the command which uses the import fails.
+cd badimport
+exec cue cmd hello
+stdout '^hi$'
+! exec cue cmd other
+cmp stderr expect-stderr
+exec cue help cmd
+stdout '^  hello'
+
+-- expect-stderr --
+X: reference "undef1" not found:
+    ./b1/b1.cue:3:4
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+-- x.cue --
+package home
+-- x_tool.cue --
+package home
+
+import (
+	"tool/cli"
+
+	"test.example/b1"
+	"test.example/b2"
+)
+
+command: hello: cli.Print & {
+	text: "\(b1.X) \(b2.X) \(missing)"
+}
+-- b1/b1.cue --
+package b1
+
+X: undef1
+-- b2/b2.cue --
+package b2
+
+X: undef2
+-- badimport/expect-stderr --
+command.other: cannot find package "tool/clii":
+    ./x_tool.cue:11:17
+-- badimport/x.cue --
+package badimport
+-- badimport/x_tool.cue --
+package badimport
+
+import (
+	"tool/cli"
+
+	"tool/clii"
+	dotted "tool/cli.v2"
+)
+
+command: hello: cli.Print & {text: "hi"}
+command: other: clii.Print & {text: "other"}
+command: third: dotted.Print & {text: "third"}

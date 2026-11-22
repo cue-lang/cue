@@ -16,16 +16,23 @@ package cue_test
 
 import (
 	"fmt"
+	"maps"
 	"math/big"
+	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"testing/fstest"
+	"weak"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	cueload "cuelang.org/go/cue/load"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/value"
+	"github.com/go-quicktest/qt"
 )
 
 // The tests in this file verify that cue.Value operations are safe for
@@ -2008,6 +2015,140 @@ import "example.com/inner"
 		}
 		if err := result.Validate(cue.Concrete(true)); err != nil {
 			t.Error(err)
+		}
+	})
+}
+
+// TestImportAcrossContexts tests that the values of a Context only resolve
+// imports to packages which that Context built, even when they come from the
+// values of another, so that no Context reads or writes the package roots of
+// another, nor keeps it alive via them.
+func TestImportAcrossContexts(t *testing.T) {
+	fsys := fstest.MapFS{
+		"cue.mod/module.cue": {Data: []byte(`
+module: "example.com/test@v0"
+language: version: "v0.16.0"
+`)},
+		"s/s.cue": {Data: []byte("package s\nm: 1\nS: n: m\n#D: x: int\n...\n")},
+		"a/a.cue": {Data: []byte("package a\nimport \"example.com/test/s\"\nA: s.S\nD: s.#D\n")},
+	}
+	load := func() *build.Instance {
+		return cueload.Instances([]string{"./a"}, &cueload.Config{FS: fsys})[0]
+	}
+	pathA, pathN := cue.ParsePath("A"), cue.ParsePath("A.n")
+	// sharedRoot returns the root of s which the evaluation of v's import of
+	// it was made from.
+	sharedRoot := func(v cue.Value) *adt.Vertex {
+		root, _ := v.LookupPath(pathN).ReferencePath()
+		return value.Vertex(root).ImportTemplate()
+	}
+	unifyIn := func(ctx *cue.Context, v cue.Value) cue.Value {
+		return ctx.CompileString("{zz: 1}").Unify(v)
+	}
+
+	t.Run("NotBuilt", func(t *testing.T) {
+		v := unifyIn(cuecontext.New(), cuecontext.New().BuildInstance(load()))
+		qt.Assert(t, qt.ErrorMatches(v.Validate(), `(?s).*cannot find package "example.com/test/s".*`))
+		for _, p := range []cue.Path{pathA, pathN} {
+			root, _ := v.LookupPath(p).ReferencePath()
+			qt.Check(t, qt.IsFalse(root.Exists()), qt.Commentf("%v", p))
+		}
+	})
+
+	t.Run("BuiltInBoth", func(t *testing.T) {
+		inst := load()
+		va := cuecontext.New().BuildInstance(inst)
+		ctx := cuecontext.New()
+		vb := ctx.BuildInstance(inst)
+		v := unifyIn(ctx, va)
+		qt.Assert(t, qt.IsNil(v.Validate()))
+		root, _ := v.LookupPath(pathA).ReferencePath()
+		qt.Assert(t, qt.IsTrue(root.Exists()))
+		qt.Assert(t, qt.Not(qt.Equals(sharedRoot(v), sharedRoot(va))))
+		qt.Assert(t, qt.Equals(sharedRoot(v), sharedRoot(vb)))
+	})
+
+	t.Run("BuiltInBothCollected", func(t *testing.T) {
+		// Having built the packages is enough, whatever is still referenced.
+		inst := load()
+		va := cuecontext.New().BuildInstance(inst)
+		ctx := cuecontext.New()
+		ctx.BuildInstance(inst)
+		runtime.GC()
+		qt.Assert(t, qt.IsNil(unifyIn(ctx, va).Validate()))
+		runtime.KeepAlive(inst)
+	})
+
+	t.Run("Concurrent", func(t *testing.T) {
+		// The owner evaluates the root in place, which is only safe as long
+		// as no other Context reads it. The package is big enough for the
+		// evaluations to overlap once released together.
+		var src strings.Builder
+		src.WriteString("package s\nm: 1\nS: n: m\n...\n")
+		for i := range 30 {
+			fmt.Fprintf(&src, "#D%d: {a: int, b: string | *\"x\"}\nf%d: #D%d & {a: %d}\n", i, i, i, i)
+		}
+		bigFS := maps.Clone(fsys)
+		bigFS["s/s.cue"] = &fstest.MapFile{Data: []byte(src.String())}
+		bigFS["a/a.cue"] = &fstest.MapFile{Data: []byte("package a\nimport \"example.com/test/s\"\nA: s.S\n")}
+		p := cueload.Instances([]string{"./a"}, &cueload.Config{FS: bigFS})[0]
+		// Each iteration is costly but reliably overlaps, so a few are enough.
+		for range concurrentIterations / 5 {
+			v := cuecontext.New().BuildInstance(p)
+			start := make(chan struct{})
+			var wg sync.WaitGroup
+			wg.Go(func() {
+				<-start
+				v.LookupPath(pathA).ReferencePath()
+			})
+			for range 3 {
+				extra := cuecontext.New().CompileString("{zz: 1}")
+				wg.Go(func() {
+					<-start
+					u := extra.Unify(v)
+					_ = u.Validate() // only races matter here
+					u.LookupPath(pathA).ReferencePath()
+					_ = fmt.Sprint(u.LookupPath(pathN))
+				})
+			}
+			close(start)
+			wg.Wait()
+		}
+	})
+
+	t.Run("Reference", func(t *testing.T) {
+		v := cuecontext.New().BuildInstance(load())
+		shared := sharedRoot(v)
+		inst, _ := v.LookupPath(pathN).Reference()
+		inst.Value()
+		qt.Assert(t, qt.IsTrue(shared.IsUnprocessed()))
+		again, _ := v.LookupPath(pathN).Reference()
+		qt.Assert(t, qt.Equals(again, inst))
+	})
+
+	t.Run("Retention", func(t *testing.T) {
+		for _, tc := range []struct {
+			name string
+			use  func(cue.Value)
+		}{
+			{"Format", func(v cue.Value) { _ = fmt.Sprint(v.LookupPath(pathN)) }},
+			{"Syntax", func(v cue.Value) { v.LookupPath(pathN).Syntax() }},
+			{"Reference", func(v cue.Value) { v.LookupPath(pathN).Reference() }},
+			{"BuildInstances", func(v cue.Value) {
+				_, err := (*cue.Runtime)(v.Context()).BuildInstances(v.BuildInstance().Imports)
+				qt.Check(t, qt.IsNil(err))
+			}},
+		} {
+			ctxPtr, shared := func() (weak.Pointer[cue.Context], *adt.Vertex) {
+				ctx := cuecontext.New()
+				v := ctx.BuildInstance(load())
+				shared := sharedRoot(v)
+				tc.use(v)
+				return weak.Make(ctx), shared
+			}()
+			runtime.GC()
+			qt.Check(t, qt.IsNil(ctxPtr.Value()), qt.Commentf("%s: the root keeps its Context alive", tc.name))
+			runtime.KeepAlive(shared)
 		}
 	})
 }

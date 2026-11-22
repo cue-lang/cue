@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"runtime"
 	"slices"
 	"testing"
 
@@ -383,4 +384,46 @@ func (b *builder) build(bi *bimport) *build.Instance {
 	}
 	_ = p.Complete()
 	return p
+}
+
+// TestImportOutsidePreamble tests references to packages which hand-built
+// instances import after other declarations. Those only resolve to packages
+// built by the time they are evaluated.
+func TestImportOutsidePreamble(t *testing.T) {
+	newPkg := func() *build.Instance {
+		pkg := &bimport{"x.test/p", []string{"package p\nX: 1\n"}}
+		return makeInstances([]*bimport{pkg}, pkg)[0]
+	}
+	// importer returns a package whose field C refers to pkg's field X.
+	importer := func(pkg *build.Instance) *build.Instance {
+		spec := ast.NewImport(nil, pkg.ImportPath)
+		ref := ast.NewIdent(pkg.PkgName)
+		ref.Node = spec
+		return &build.Instance{
+			ImportPath: "x.test/c",
+			PkgName:    "c",
+			Imports:    []*build.Instance{pkg},
+			Files: []*ast.File{{Decls: []ast.Decl{
+				&ast.Package{Name: ast.NewIdent("c")},
+				&ast.Field{Label: ast.NewIdent("C"), Value: ast.NewSel(ref, "X")},
+				&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
+			}}},
+		}
+	}
+	fieldC := cue.ParsePath("C")
+
+	t.Run("NotBuilt", func(t *testing.T) {
+		v := cuecontext.New().BuildInstance(importer(newPkg()))
+		qt.Assert(t, qt.ErrorMatches(v.LookupPath(fieldC).Err(), `.*cannot find package "x.test/p"`))
+	})
+	t.Run("Built", func(t *testing.T) {
+		ctx := cuecontext.New()
+		pkg := newPkg()
+		// Having built pkg is enough, whatever is still referenced.
+		ctx.BuildInstance(pkg)
+		runtime.GC()
+		v := ctx.BuildInstance(importer(pkg))
+		runtime.GC()
+		qt.Assert(t, qt.Equals(fmt.Sprint(v.LookupPath(fieldC)), "1"))
+	})
 }

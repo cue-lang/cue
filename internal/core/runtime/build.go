@@ -43,7 +43,8 @@ func (c *Config) hasOptions() bool {
 }
 
 // Build builds b and all its transitive dependencies, insofar they have not
-// been build yet. The options in cfg apply to b alone.
+// been build yet. The options in cfg apply to b alone. It assumes that the
+// imports have no cycles, as [build.Instance.Imports] requires.
 //
 // Only a build without options is shared with later builds and importers of
 // b. A build with options compiles a copy of b each time.

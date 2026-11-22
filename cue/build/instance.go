@@ -87,6 +87,11 @@ type Instance struct {
 	CanonicalID string
 
 	// Imports lists the instances of all direct imports of this instance.
+	//
+	// The import declarations of instances must not form a cycle.
+	// [cuelang.org/go/cue/load.Instances] reports cycles as errors, but
+	// building instances created by other means does not check for them,
+	// and may overflow the stack.
 	Imports []*Instance
 
 	// The Err for loading this package or nil on success. This does not

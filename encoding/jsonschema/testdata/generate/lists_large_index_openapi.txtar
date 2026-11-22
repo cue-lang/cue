@@ -19,5 +19,12 @@ beyondPrefix: {
 	data: list: [1, "a"]
 	error: false
 }
--- out/generate-v3/error --
-panic: runtime error: makeslice: len out of range
+-- out/generate-v3/schema --
+{
+	type: "object"
+	properties: list: {
+		type:  "array"
+		items: {}
+	}
+}
+-- out/generate-v3/beyondPrefix --

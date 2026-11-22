@@ -54,18 +54,10 @@ func TestGenerate(t *testing.T) {
 		if s, ok := t.Value("version"); ok {
 			version = testVersion(t, s)
 		}
-		r, err := func() (r ast.Expr, err error) {
-			// Generate panics on a large index pattern.
-			defer func() {
-				if p := recover(); p != nil {
-					err = fmt.Errorf("panic: %v", p)
-				}
-			}()
-			return jsonschema.Generate(v, &jsonschema.GenerateConfig{
-				Version:      version,
-				ExplicitOpen: t.HasTag("explicitOpen"),
-			})
-		}()
+		r, err := jsonschema.Generate(v, &jsonschema.GenerateConfig{
+			Version:      version,
+			ExplicitOpen: t.HasTag("explicitOpen"),
+		})
 		if err != nil {
 			fmt.Fprintln(t.Writer("error"), err)
 			return

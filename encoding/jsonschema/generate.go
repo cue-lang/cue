@@ -1857,6 +1857,10 @@ func listMinLen(v cue.Value, open bool) (int64, bool) {
 	return n, err == nil
 }
 
+// maxPrefixIndex is the largest index for which a pattern is expressed, as
+// the schema spells out every position up to it.
+const maxPrefixIndex = 10_000
+
 // indexBound holds the constraint imposed on all list indexes
 // from index onwards.
 type indexBound struct {
@@ -1869,7 +1873,8 @@ type indexBound struct {
 // bounds holds the constraints that apply to all indexes from some index
 // onwards, which includes the element type of an open list.
 //
-// A pattern matching any other set of indexes, such as [<5], is dropped:
+// A pattern matching any other set of indexes, such as [<5], is dropped,
+// as is one on an index past [maxPrefixIndex]:
 // CUE is more expressive than JSON Schema here, and omitting a
 // constraint we can't express only widens the generated schema, whereas
 // approximating it with the nearest keyword would reject valid data.
@@ -1913,8 +1918,8 @@ func listIndexPatterns(v cue.Value) (pos map[int64]cue.Value, bounds []indexBoun
 type indexPatternKind int
 
 const (
-	// indexPatternUnknown indicates a pattern matching some other set of
-	// indexes, which JSON Schema has no way of expressing.
+	// indexPatternUnknown indicates a pattern which is not expressed, as it
+	// matches some other set of indexes or one past [maxPrefixIndex].
 	indexPatternUnknown indexPatternKind = iota
 
 	// indexPatternExact indicates a pattern matching one index only.
@@ -1937,7 +1942,7 @@ func classifyIndexPattern(p cue.Value) (kind indexPatternKind, index int64) {
 	if p.Kind() == cue.IntKind {
 		// It's a single concrete index.
 		i, err := p.Int64()
-		if err != nil || i < 0 {
+		if err != nil || i < 0 || i > maxPrefixIndex {
 			return indexPatternUnknown, 0
 		}
 		return indexPatternExact, i
@@ -1957,7 +1962,7 @@ func classifyIndexPattern(p cue.Value) (kind indexPatternKind, index int64) {
 		// than rounded; there's no reason for one to appear as a list
 		// index and rounding it is easy to get subtly wrong.
 		i, err := args[0].Int64()
-		if err != nil {
+		if err != nil || i > maxPrefixIndex {
 			return indexPatternUnknown, 0
 		}
 		if op == cue.GreaterThanOp {

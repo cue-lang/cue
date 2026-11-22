@@ -60,11 +60,9 @@ droppedConstraints: data: {
 // The representable part of "mixed" is still enforced.
 mixedPrefixKept: data: mixed: ["a", "anything"]
 
-// The bound wraps around to constrain every index, so the schema rejects
-// the data.
 pastLargest: {
 	data: pastLargest: ["not an int"]
-	error: true
+	error: false
 }
 
 badMixedPrefix: {
@@ -96,7 +94,6 @@ badMixedPrefix: {
 		pastLargest: {
 			type:        "array"
 			description: "No index is past the largest integer"
-			items: type: "integer"
 		}
 		upperBound: {
 			type:        "array"
@@ -106,10 +103,7 @@ badMixedPrefix: {
 }
 -- out/generate-v3/badMixedPrefix --
 badMixedPrefix.data.mixed.0: conflicting values 1 and string (mismatched types int and string):
-    ./datatest/tests.cue:23:16
+    ./datatest/tests.cue:21:16
 -- out/generate-v3/droppedConstraints --
 -- out/generate-v3/mixedPrefixKept --
 -- out/generate-v3/pastLargest --
-pastLargest.data.pastLargest.0: conflicting values "not an int" and int (mismatched types string and int):
-    ./datatest/tests.cue:18:22
-    1:530

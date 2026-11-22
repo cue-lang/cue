@@ -20,5 +20,13 @@ notExact?: matchN(0, [{
 	[4611686018427387904]: int
 }])
 
--- out/generate-v3/error --
-panic: runtime error: makeslice: len out of range
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	type:    "object"
+	properties: {
+		exact: type: "array"
+		from: type:  "array"
+		notExact: {}
+	}
+}

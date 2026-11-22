@@ -1,5 +1,8 @@
 -- in.cue --
-import "list"
+import (
+	"encoding/json"
+	"list"
+)
 
 a1list: [{1}]
 let A1 = a1list
@@ -117,12 +120,32 @@ issue1116: {
 		@test(eq, {"b", #a: ["a", "b"]})
 	}
 }
+// A let added per comprehension yield has a result per yield, also via a
+// pattern constraint.
+multiLetPattern: {
+	for i in [1, 2] {
+		let X = i * 10
+		[string]: "v\(i)": X
+	}
+	k1: _
+	k2: _
+	@test(eq, {k1: {v1: 10, v2: 20}, k2: {v1: 10, v2: 20}})
+}
+
+// Likewise when a builtin evaluates it in its own context.
+multiLetBuiltin: {
+	for i in [1, 2] {
+		let X = {a: i, b: json.Marshal(multiLetBuiltin["c\(i)"].a)}
+		"c\(i)": X
+	}
+	@test(eq, {c1: {a: 1, b: "1"}, c2: {a: 2, b: "2"}})
+}
 -- out/errors.txt --
 [incomplete] incompleteLet.bar.max: undefined field: max:
-    ./in.cue:54:17
+    ./in.cue:57:17
     list:2:1
 [incomplete] incompleteLet.x: undefined field: max:
-    ./in.cue:61:11
+    ./in.cue:64:11
     list:2:1
 -- out/todo.txt --
 v2 reports a cycle error for issue1116.b (let List = #a before #a is defined):

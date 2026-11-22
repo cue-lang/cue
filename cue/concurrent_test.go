@@ -2090,8 +2090,7 @@ language: version: "v0.16.0"
 			{"Simple", "let X = s.S\np: [string]: X.n\n", "{k: 1}"},
 			{"Incomplete", "m: int\nlet X = s.S.n + m\np: [string]: X\n", "{k: _ & s.S.n+m}"},
 			{"Conflict", "let X = s.S.n & 2\np: [string]: X\n", "_|_ // k: conflicting values 1 and 2"},
-			// The evaluation of X in the other Context decides the result.
-			{"Selected", "let X = {a: s.S.n, b: 1 & 2}\np: [string]: X.a\n", `_|_ // X.a: cannot find package "example.com/test/s"`},
+			{"Selected", "let X = {a: s.S.n, b: 1 & 2}\np: [string]: X.a\n", "{k: 1}"},
 			{"Comprehension", "p: {for i in [1] {let X = s.S.n, [string]: X}}\n", "{k: 1}"},
 		} {
 			t.Run(tc.name, func(t *testing.T) {
@@ -2101,8 +2100,15 @@ language: version: "v0.16.0"
 				v := ctx.BuildInstance(cueload.Instances([]string{"./a"}, &cueload.Config{FS: letFS})[0])
 				v = v.LookupPath(cue.ParsePath("p"))
 				_ = cuecontext.New().CompileString("k: _").Unify(v).Validate()
-				got := ctx.CompileString("k: _").Unify(v)
-				qt.Assert(t, qt.Equals(fmt.Sprint(got), tc.want))
+				// Nor may the owner's own concurrent evaluations race.
+				var wg sync.WaitGroup
+				for range 4 {
+					wg.Go(func() {
+						got := ctx.CompileString("k: _").Unify(v)
+						qt.Check(t, qt.Equals(fmt.Sprint(got), tc.want))
+					})
+				}
+				wg.Wait()
 			})
 		}
 	})

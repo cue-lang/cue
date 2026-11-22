@@ -355,8 +355,8 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 		// TODO: consider associating lets with their Environment directly
 		// instead of storing them as arcs of the enclosing node. Now that
 		// comprehensions are implemented more simply, this should be more
-		// feasible, and it would remove the need for MultiLet and for the
-		// per-Environment let cache.
+		// feasible, and it would remove the need for MultiLet and for
+		// [OpContext.letCache].
 		return v
 	}
 

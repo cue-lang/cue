@@ -1050,7 +1050,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 
 	// TODO(mem): add counter for let cache usage.
 	key := cacheKey{expr, arc}
-	entry, ok := e.cache[key]
+	entry, ok := ctx.letCache[envCacheKey{e.key(ctx), key}]
 	if ok {
 		// A cached cycle placeholder is provisional: it was computed before a
 		// dependency had settled. Recompute it in case the dependency now has a
@@ -1075,8 +1075,8 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		c.Env = e
 		c.x = expr
 
-		if e.cache == nil {
-			e.cache = map[cacheKey]letCacheEntry{}
+		if ctx.letCache == nil {
+			ctx.letCache = map[envCacheKey]letCacheEntry{}
 		}
 		// Allocate a vertex with space for one conjunct.
 		var alloc struct {
@@ -1094,7 +1094,7 @@ func (x *LetReference) resolve(ctx *OpContext, state Flags) *Vertex {
 		// A non-nil entry.v means this computation replaces a discarded
 		// placeholder.
 		entry = letCacheEntry{v: n, fromRecompute: entry.v != nil}
-		e.cache[key] = entry
+		ctx.letCache[envCacheKey{e.key(ctx), key}] = entry
 		// TODO(mem): enable again once we implement memory management.
 		// nc := n.getState(ctx)
 		// TODO: we do not allow the first cycle to be skipped. Doing so can

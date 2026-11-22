@@ -105,13 +105,6 @@ type Environment struct {
 	// order. Allocated from [OpContext.nextCompID]; placed next to
 	// DynamicLabel so the two uint32 fields share an 8-byte slot.
 	CompID uint32
-
-	// TODO(perf): make the following public fields a shareable struct as it
-	// mostly is going to be the same for child nodes.
-
-	// TODO: This can probably move into the nodeContext, making it a map from
-	// conjunct to Value.
-	cache map[cacheKey]letCacheEntry
 }
 
 // Equal reports whether e and f refer to the same node.
@@ -250,8 +243,8 @@ type Vertex struct {
 	HasEllipsis bool
 
 	// MultiLet indicates whether multiple let fields were added from
-	// different sources. If true, a LetReference must be resolved using
-	// the per-Environment value cache.
+	// different sources. If true, a LetReference is resolved per environment
+	// via [OpContext.letCache].
 	MultiLet bool
 
 	// IsDynamic signifies whether this struct is computed as part of an

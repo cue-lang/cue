@@ -14,14 +14,14 @@ p: {for i in list.Range(0, 100, 1) {"k\(i)": _}}
 p: k0: 99 @test(eq, 99)
 p: k99: 99 @test(eq, 99)
 -- out/eval/stats --
-Leaks:  20203
+Leaks:  407
 Freed:  203
-Reused: 101
-Allocs: 20305
+Reused: 0
+Allocs: 610
 Retain: 0
 
-Unifications: 504
-Conjuncts:    21111
+Unifications: 211
+Conjuncts:    1218
 Disjuncts:    0
 
 NumCloseIDs: 200

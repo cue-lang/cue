@@ -1,5 +1,8 @@
 -- in.cue --
-import "list"
+import (
+	"encoding/json"
+	"list"
+)
 
 a1list: [{1}]
 let A1 = a1list
@@ -100,6 +103,24 @@ issue1116: {
 		let List = #a
 		List[len(List)-1]
 		#a: ["a", "b"]
+	}
+}
+// A let added per comprehension yield has a result per yield, also via a
+// pattern constraint.
+multiLetPattern: {
+	for i in [1, 2] {
+		let X = i * 10
+		[string]: "v\(i)": X
+	}
+	k1: _
+	k2: _
+}
+
+// Likewise when a builtin evaluates it in its own context.
+multiLetBuiltin: {
+	for i in [1, 2] {
+		let X = {a: i, b: json.Marshal(multiLetBuiltin["c\(i)"].a)}
+		"c\(i)": X
 	}
 }
 -- out/compile --
@@ -284,6 +305,31 @@ issue1116: {
         "a",
         "b",
       ]
+    }
+  }
+  multiLetPattern: {
+    for _, i in [
+      1,
+      2,
+    ] {
+      let X#12multi = (〈1;i〉 * 10)
+      [string]: {
+        "v\(〈2;i〉)": 〈1;let X#12〉
+      }
+    }
+    k1: _
+    k2: _
+  }
+  multiLetBuiltin: {
+    for _, i in [
+      1,
+      2,
+    ] {
+      let X#13multi = {
+        a: 〈2;i〉
+        b: 〈import;"encoding/json"〉.Marshal(〈4;multiLetBuiltin〉["c\(〈2;i〉)"].a)
+      }
+      "c\(〈1;i〉)": 〈0;let X#13〉
     }
   }
 }

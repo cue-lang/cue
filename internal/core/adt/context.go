@@ -356,6 +356,19 @@ type OpContext struct {
 	// do not share the runtime's mutable cached template.
 	// See [OpContext.importInstance].
 	importInstances map[*Vertex]*Vertex
+
+	// letCache holds let results per environment. It is per context as
+	// contexts share environments, and not in [nodeContext] as one result
+	// serves the whole environment.
+	letCache map[envCacheKey]letCacheEntry
+}
+
+// envCacheKey uses [envKey] rather than the environment pointer, as the
+// per-field copies of a pattern constraint's environment differ only in
+// [Environment.DynamicLabel], which a let there cannot refer to.
+type envCacheKey struct {
+	env envKey
+	cacheKey
 }
 
 func (c *OpContext) CloseInfo() CloseInfo { return c.ci }

@@ -2135,10 +2135,9 @@ language: version: "v0.16.0"
 			// package, which encloses the value at pathN.
 			caches bool
 		}{
-			// TODO: formatting and Syntax only need the build instance, so
-			// should not create and cache an Instance.
-			{"Format", func(v cue.Value) { _ = fmt.Sprint(v.LookupPath(pathN)) }, true},
-			{"Syntax", func(v cue.Value) { v.LookupPath(pathN).Syntax() }, true},
+			// Formatting and Syntax only need the build instance.
+			{"Format", func(v cue.Value) { _ = fmt.Sprint(v.LookupPath(pathN)) }, false},
+			{"Syntax", func(v cue.Value) { v.LookupPath(pathN).Syntax() }, false},
 			{"Reference", func(v cue.Value) { v.LookupPath(pathN).Reference() }, true},
 			{"BuildInstances", func(v cue.Value) {
 				_, err := (*cue.Runtime)(v.Context()).BuildInstances(v.BuildInstance().Imports)

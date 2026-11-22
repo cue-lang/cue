@@ -139,8 +139,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 
 func formatCUE(state fmt.State, v Value, showDocs, showAll bool) {
 
-	inst := v.instance()
-	pkgPath := inst.ID()
+	pkgPath, langVersion := packageSyntaxInfo(v.idx, v.v)
 
 	p := *export.Simplified
 
@@ -164,7 +163,7 @@ func formatCUE(state fmt.State, v Value, showDocs, showAll bool) {
 
 	p.ShowDocs = showDocs
 	p.ShowAttributes = showAll
-	p.TargetLanguageVersion = inst.languageVersion()
+	p.TargetLanguageVersion = langVersion
 
 	var n ast.Node
 	if isDef {

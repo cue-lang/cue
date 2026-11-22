@@ -715,7 +715,7 @@ func TestCompileRetention(t *testing.T) {
 	var v cue.Value
 	for i := range 2 * len(compile) {
 		v = compile[i%len(compile)](ctx, fmt.Sprintf("a: %d", i))
-		// Formatting looks up the value's instance, which may cache it.
+		// Formatting looks up the value's build instance.
 		qt.Assert(t, qt.Equals(fmt.Sprint(v), fmt.Sprintf("{a: %d}", i)))
 		inst := v.BuildInstance()
 		qt.Assert(t, qt.IsNotNil(inst))

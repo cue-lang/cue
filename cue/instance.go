@@ -117,21 +117,31 @@ func newUncachedInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex, e
 	return inst
 }
 
-func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
-	// Only a package's root vertex is registered as an instance, so walk up to
-	// find it; a sub-value would otherwise report no enclosing package.
-	var p *build.Instance
-	root := v
-	for {
-		if p = x.GetInstanceFromNode(root); p != nil {
-			break
+// enclosingPackage returns the root of the package which encloses v, which
+// may be v itself, and its build instance, or nils if there is none.
+func enclosingPackage(x *runtime.Runtime, v *adt.Vertex) (*adt.Vertex, *build.Instance) {
+	for ; v != nil; v = v.Parent {
+		if p := x.GetInstanceFromNode(v); p != nil {
+			return v, p
 		}
-		if root.Parent == nil {
-			return nil
-		}
-		root = root.Parent
 	}
+	return nil, nil
+}
 
+// packageSyntaxInfo returns the ID and language version of the package which
+// encloses v, without creating an [Instance], which the runtime would cache.
+func packageSyntaxInfo(x *runtime.Runtime, v *adt.Vertex) (id, langVersion string) {
+	if _, p := enclosingPackage(x, v); p != nil {
+		return p.ID(), p.TargetLanguageVersion()
+	}
+	return "", ""
+}
+
+func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
+	root, p := enclosingPackage(x, v)
+	if p == nil {
+		return nil
+	}
 	if inst := lookupInstance(x, p); inst != nil {
 		return inst
 	}
@@ -179,14 +189,6 @@ func (inst *Instance) ID() string {
 		return ""
 	}
 	return inst.inst.ID()
-}
-
-// languageVersion reports the target language version for exported CUE.
-func (inst *Instance) languageVersion() string {
-	if inst == nil {
-		return ""
-	}
-	return inst.inst.TargetLanguageVersion()
 }
 
 // Value returns the root value of the configuration. If the configuration

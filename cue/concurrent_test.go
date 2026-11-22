@@ -2080,6 +2080,33 @@ language: version: "v0.16.0"
 		runtime.KeepAlive(inst)
 	})
 
+	t.Run("Let", func(t *testing.T) {
+		// Every Context using a value shares the environments of its lets, so
+		// another Context, which cannot resolve the import, must not decide
+		// what a let evaluates to in the owner.
+		for _, tc := range []struct {
+			name, src, want string
+		}{
+			{"Simple", "let X = s.S\np: [string]: X.n\n", "{k: 1}"},
+			{"Incomplete", "m: int\nlet X = s.S.n + m\np: [string]: X\n", "{k: _ & s.S.n+m}"},
+			{"Conflict", "let X = s.S.n & 2\np: [string]: X\n", "_|_ // k: conflicting values 1 and 2"},
+			// The evaluation of X in the other Context decides the result.
+			{"Selected", "let X = {a: s.S.n, b: 1 & 2}\np: [string]: X.a\n", `_|_ // X.a: cannot find package "example.com/test/s"`},
+			{"Comprehension", "p: {for i in [1] {let X = s.S.n, [string]: X}}\n", "{k: 1}"},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				letFS := maps.Clone(fsys)
+				letFS["a/a.cue"] = &fstest.MapFile{Data: []byte("package a\nimport \"example.com/test/s\"\n" + tc.src)}
+				ctx := cuecontext.New()
+				v := ctx.BuildInstance(cueload.Instances([]string{"./a"}, &cueload.Config{FS: letFS})[0])
+				v = v.LookupPath(cue.ParsePath("p"))
+				_ = cuecontext.New().CompileString("k: _").Unify(v).Validate()
+				got := ctx.CompileString("k: _").Unify(v)
+				qt.Assert(t, qt.Equals(fmt.Sprint(got), tc.want))
+			})
+		}
+	})
+
 	t.Run("Concurrent", func(t *testing.T) {
 		// The owner evaluates the root in place, which is only safe as long
 		// as no other Context reads it. The package is big enough for the

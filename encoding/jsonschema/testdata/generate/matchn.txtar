@@ -26,6 +26,9 @@ singleAllOf?: matchN(1, [int])
 complexOneOf?: matchN(1, [int & >0, string & =~"^[a-z]+$", bool]) & !=null
 complexAnyOf?: matchN(>=1, [int, string]) & !=5
 
+// Equal tuples merge, as only OpenAPI tells open ones from closed ones
+tuples?: matchN(2, [[int, string], [int, string, ...]])
+
 -- datatest/tests.cue --
 package datatest
 
@@ -113,6 +116,13 @@ allOfNotMatch: {
 		singleOneOf: {
 			description: "Edge cases"
 			oneOf:       [{type: "string"}]
+		}
+		tuples: {
+			type:        "array"
+			description: "Equal tuples merge, as only OpenAPI tells open ones from closed ones"
+			prefixItems: [{type: "integer"}, {type: "string"}]
+			maxItems:    2
+			minItems:    2
 		}
 	}
 }

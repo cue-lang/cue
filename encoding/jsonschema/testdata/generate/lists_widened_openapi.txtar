@@ -1,0 +1,123 @@
+#version: openapi
+
+OpenAPI 3.0 has no tuples, so the schema of every element allows what any
+position does. If a list may go on beyond its positions, where it may be
+anything, then so may every element.
+
+-- test.cue --
+package test
+
+import "list"
+
+open?: [int, ...]
+openPattern?: {
+	[...]
+	[0]: int
+}
+closed?: [int, string]
+bounded?: {
+	[...]
+	[0]: int
+} & list.MaxItems(1)
+constrainedRest?: {
+	[...]
+	[0]:   string
+	[>=1]: int
+}
+negated?: matchN(0, [{
+	[...]
+	[0]: int
+}])
+
+-- datatest/tests.cue --
+package datatest
+
+// The schemas hold every element to the positions, so they reject the data.
+open: {
+	data: open: [1, "s"]
+	error: true
+}
+
+openPattern: {
+	data: openPattern: [1, "s"]
+	error: true
+}
+
+ok: data: negated: ["s"]
+
+badClosed: {
+	data: closed: [true, "s"]
+	error: true
+}
+
+badBounded: {
+	data: bounded: ["s"]
+	error: true
+}
+
+badConstrainedRest: {
+	data: constrainedRest: [true]
+	error: true
+}
+-- out/generate-v3/schema --
+{
+	type: "object"
+	properties: {
+		bounded: {
+			type: "array"
+			items: type: "integer"
+			maxItems: 1
+		}
+		closed: {
+			type: "array"
+			items: anyOf: [{type: "integer"}, {type: "string"}]
+			maxItems: 2
+			minItems: 2
+		}
+		constrainedRest: {
+			type: "array"
+			items: anyOf: [{type: "string"}, {type: "integer"}]
+		}
+		negated: {}
+		open: {
+			type: "array"
+			items: type: "integer"
+			minItems: 1
+		}
+		openPattern: {
+			type: "array"
+			items: type: "integer"
+		}
+	}
+}
+-- out/generate-v3/badBounded --
+badBounded.data.bounded.0: conflicting values "s" and int (mismatched types string and int):
+    ./datatest/tests.cue:22:18
+    1:67
+-- out/generate-v3/badClosed --
+badClosed.data.closed.0: conflicting values true and int (mismatched types bool and int):
+    ./datatest/tests.cue:17:17
+    1:143
+badClosed.data.closed.0: conflicting values true and string (mismatched types bool and string):
+    ./datatest/tests.cue:17:17
+badClosed.data.closed.0: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
+    1:133
+    ./datatest/tests.cue:17:17
+-- out/generate-v3/badConstrainedRest --
+badConstrainedRest.data.constrainedRest.0: conflicting values true and int (mismatched types bool and int):
+    ./datatest/tests.cue:27:26
+    1:279
+badConstrainedRest.data.constrainedRest.0: conflicting values true and string (mismatched types bool and string):
+    ./datatest/tests.cue:27:26
+badConstrainedRest.data.constrainedRest.0: invalid value true (does not satisfy matchN): 0 matched, expected >=1:
+    1:251
+    ./datatest/tests.cue:27:26
+-- out/generate-v3/ok --
+-- out/generate-v3/open --
+open.data.open.1: conflicting values "s" and int (mismatched types string and int):
+    ./datatest/tests.cue:5:18
+    1:345
+-- out/generate-v3/openPattern --
+openPattern.data.openPattern.1: conflicting values "s" and int (mismatched types string and int):
+    ./datatest/tests.cue:10:25
+    1:416

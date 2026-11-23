@@ -6,9 +6,8 @@ exec cue fix . --exp=explicitopen
 cmp b.cue b.cue.want
 
 cp b.cue.orig b.cue
-# Fixing the whole module takes int for the predeclared type.
 exec cue fix --exp=explicitopen
-cmp b.cue b.cue.orig
+cmp b.cue b.cue.want
 
 -- cue.mod/module.cue --
 module: "mod.test"

@@ -44,6 +44,16 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 		fn(&opts)
 	}
 
+	// A file shared by several instances, such as one in a parent directory,
+	// is fixed once, so it sees the fields of all of them.
+	pkgNames := map[*ast.File][]map[string]bool{}
+	for _, b := range insts {
+		names := packageNames(b.Files)
+		for _, f := range b.Files {
+			pkgNames[f] = append(pkgNames[f], names)
+		}
+	}
+
 	done := map[*ast.File]bool{}
 	var errs errors.Error
 
@@ -87,7 +97,7 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 			if ownVersion(f) {
 				fileVersion = f.Pos().LanguageVersion()
 			}
-			if _, err := file(f, fileVersion, outsideModule(b, f), o...); err != nil {
+			if _, err := file(f, fileVersion, outsideModule(b, f), pkgNames[f], o...); err != nil {
 				errs = errors.Append(errs, err)
 			}
 		}
@@ -99,6 +109,25 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 		}
 	}
 	return errs
+}
+
+// packageNames returns the top-level field names of the files with a package
+// clause.
+func packageNames(files []*ast.File) map[string]bool {
+	names := make(map[string]bool)
+	for _, f := range files {
+		if f.PackageName() == "" {
+			continue
+		}
+		for _, d := range f.Decls {
+			if x, ok := d.(*ast.Field); ok {
+				if name, isIdent, err := ast.LabelName(x.Label); isIdent && err == nil {
+					names[name] = true
+				}
+			}
+		}
+	}
+	return names
 }
 
 // outsideModule reports whether f, a file of b, belongs to no module: b has

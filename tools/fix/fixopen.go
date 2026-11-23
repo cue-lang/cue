@@ -135,7 +135,10 @@ func (c closeInfo) shouldReclose() bool {
 }
 
 // explicitOpenFixer rewrites files for the explicitopen experiment.
-type explicitOpenFixer struct{}
+type explicitOpenFixer struct {
+	// pkgNames holds the [packageNames] of each instance of the file.
+	pkgNames []map[string]bool
+}
 
 func (o *explicitOpenFixer) fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 	var hasChanges bool
@@ -816,11 +819,16 @@ func (o *explicitOpenFixer) openCompFieldValue(f *ast.Field) bool {
 // isScalarPredeclared reports whether x is a use of a predeclared identifier
 // which can never resolve to a struct, such as string or int8, so that neither
 // embedding it nor a spread on it can carry closedness. An identifier which
-// the parser resolved to a declaration in the file shadows the predeclared one
-// and does not count.
+// the parser resolved to a declaration in the file, or which names a top-level
+// field of the package, shadows the predeclared one and does not count.
 func (o *explicitOpenFixer) isScalarPredeclared(x *ast.Ident) bool {
 	if x.Node != nil || x.Scope != nil {
 		return false
+	}
+	for _, names := range o.pkgNames {
+		if names[x.Name] {
+			return false
+		}
 	}
 	if compile.LookupRange(x.Name) != nil {
 		return true

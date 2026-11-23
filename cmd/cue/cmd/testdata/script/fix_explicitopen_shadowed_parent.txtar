@@ -7,9 +7,8 @@ exec cue fix . ./sub --exp=explicitopen
 cmp root.cue root.cue.want
 
 cp root.cue.orig root.cue
-# The rewrite follows the meaning of int in the first instance.
 exec cue fix ./sub . --exp=explicitopen
-cmp root.cue root.cue.orig
+cmp root.cue root.cue.want
 
 -- cue.mod/module.cue --
 module: "mod.test"

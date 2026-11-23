@@ -125,7 +125,7 @@ func (o options) resolveExperiments(version string) ([]string, string, errors.Er
 
 // File applies fixes to f and returns it. It alters the original f.
 func File(f *ast.File, o ...Option) *ast.File {
-	f, err := file(f, "", false, o...)
+	f, err := file(f, "", false, nil, o...)
 	// TODO: this File method is public, and its signature was fixed
 	// before we started calling Sanitize. Ideally, we want to return
 	// this error, but that would require deprecating this File method,
@@ -143,8 +143,8 @@ func File(f *ast.File, o ...Option) *ast.File {
 
 // file applies fixes to f, judged at version. If outsideModule, f belongs to
 // no module, and a @version attribute records the version at which any
-// experiment added to it was applied.
-func file(f *ast.File, version string, outsideModule bool, o ...Option) (*ast.File, errors.Error) {
+// experiment added to it was applied. pkgNames is as in [explicitOpenFixer].
+func file(f *ast.File, version string, outsideModule bool, pkgNames []map[string]bool, o ...Option) (*ast.File, errors.Error) {
 	// A parsed file carries its experiments on its positions; one that was
 	// built, or rewritten before, carries them itself.
 	existingExps := f.Experiment()
@@ -189,7 +189,7 @@ func file(f *ast.File, version string, outsideModule bool, o ...Option) (*ast.Fi
 		added = cmp.Or(added, a)
 	}
 	if wantExps.ExplicitOpen && !existingExps.ExplicitOpen {
-		fix((&explicitOpenFixer{}).fixExplicitOpen, "explicitopen")
+		fix((&explicitOpenFixer{pkgNames: pkgNames}).fixExplicitOpen, "explicitopen")
 	}
 	if wantExps.AliasV2 && !existingExps.AliasV2 {
 		fix(fixAliasV2, "aliasv2")

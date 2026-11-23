@@ -1,0 +1,27 @@
+A let which each comprehension yield adds again, selected by a pattern
+constraint, is evaluated once per environment and not once per matching
+field, each of which copies the environment.
+-- in.cue --
+import "list"
+
+p: {
+	for j in [0, 0] {
+		let X = {for i in list.Range(0, 100, 1) {"f\(i)": i + j}}
+		[string]: X.f99
+	}
+}
+p: {for i in list.Range(0, 100, 1) {"k\(i)": _}}
+p: k0: 99 @test(eq, 99)
+p: k99: 99 @test(eq, 99)
+-- out/eval/stats --
+Leaks:  20203
+Freed:  203
+Reused: 101
+Allocs: 20305
+Retain: 0
+
+Unifications: 504
+Conjuncts:    21111
+Disjuncts:    0
+
+NumCloseIDs: 200

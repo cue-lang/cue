@@ -50,12 +50,25 @@ func TestDecode(t *testing.T) {
 		Untagged
 		Tagged
 	}
+	// Like in encoding/json, embedded fields which are not structs are named
+	// after their type.
+	type EmbedSlice []int
+	type EmbedInt int
+	type embedSlice struct {
+		EmbedSlice
+		Z int
+	}
+	type embedInt struct {
+		EmbedInt
+		Z int
+	}
 	intList := func(ints ...int) *[]int {
 		ints = append([]int{}, ints...)
 		return &ints
 	}
 	testCases := []struct {
 		value  string
+		encode any        // if not nil, the Go value to encode instead of value
 		newDst func() any // a new destination for each run
 		want   any
 		err    string
@@ -148,6 +161,17 @@ func TestDecode(t *testing.T) {
 		value:  `{X: 1}`,
 		newDst: func() any { return &embedTagged{} },
 		want:   embedTagged{Tagged: Tagged{X: 1}},
+	}, {
+		encode: embedSlice{EmbedSlice{1, 2}, 5},
+		newDst: func() any { return &embedSlice{} },
+		want:   embedSlice{EmbedSlice{1, 2}, 5},
+		// Wrong: the slice elements are encoded as integer labels.
+		err: "panic: Selector.Unquoted invoked on non-string label",
+	}, {
+		encode: embedInt{1, 5},
+		newDst: func() any { return &embedInt{} },
+		// Wrong: the embedded field is not encoded.
+		want: embedInt{0, 5},
 	}, {
 		value: `{for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,
@@ -351,9 +375,26 @@ func TestDecode(t *testing.T) {
 		},
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+		name := tc.value
+		if tc.encode != nil {
+			name = fmt.Sprintf("Encode(%T)", tc.encode)
+		}
+		cuetdtest.FullMatrix.Run(t, name, func(t *testing.T, m *cuetdtest.M) {
+			var v cue.Value
+			if tc.encode != nil {
+				v = m.CueContext().Encode(tc.encode)
+			} else {
+				v = getValue(m, tc.value)
+			}
 			dst := tc.newDst()
-			err := getValue(m, tc.value).Decode(dst)
+			err := func() (err error) {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				return v.Decode(dst)
+			}()
 			if !checkErr(t, err, tc.err, "init") {
 				return
 			}

@@ -15,6 +15,10 @@ cmp stderr print-bad.stderr
 exec cue exp ast join ./a
 cmp stdout join.stdout
 
+# A reference to a field in another file is kept apart from a renamed let.
+exec cue exp ast join ./c
+cmp stdout join-let.stdout
+
 ! exec cue exp ast join ./a ./b
 stderr '^joining multiple instances is not possible yet$'
 
@@ -230,6 +234,34 @@ b: +
 -- print-bad.stderr --
 expected operand, found 'EOF':
     -:2:6
+-- c/a.cue --
+package c
+
+let x = 1
+y: x
+-- c/b.cue --
+package c
+
+x: 2
+-- c/c.cue --
+package c
+
+z: x
+w: {
+	x: 3
+	v: z
+}
+-- join-let.stdout --
+let x_1 = 1
+y: x_1
+
+x: 2
+
+z: x
+w: {
+	x: 3
+	v: z
+}
 -- join.stdout --
 import (
 	"strings"

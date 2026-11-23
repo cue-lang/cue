@@ -200,6 +200,8 @@ func runExpASTJoin(cmd *Command, args []string) error {
 	if err := inst.Err; err != nil {
 		return err
 	}
+	bindPackageFields(inst.Files)
+
 	// TODO: we should sort and deduplicate imports.
 	imports := &ast.ImportDecl{}
 	joint := &ast.File{Decls: []ast.Decl{imports}}
@@ -219,4 +221,31 @@ func runExpASTJoin(cmd *Command, args []string) error {
 	}
 	_, err = cmd.OutOrStdout().Write(out)
 	return err
+}
+
+// bindPackageFields binds unresolved references to the package's top-level
+// fields, so that once joined, they stay apart from file-scoped declarations
+// of the same name, such as lets, which sanitizing renames.
+func bindPackageFields(files []*ast.File) {
+	fields := make(map[string]ast.Node)
+	for _, f := range files {
+		if f.PackageName() == "" {
+			continue
+		}
+		for _, d := range f.Decls {
+			if x, ok := d.(*ast.Field); ok {
+				if name, isIdent, err := ast.LabelName(x.Label); isIdent && err == nil {
+					fields[name] = x.Value
+				}
+			}
+		}
+	}
+	for _, f := range files {
+		for _, u := range f.Unresolved {
+			if n, ok := fields[u.Name]; ok {
+				u.Node = n
+				u.Scope = f
+			}
+		}
+	}
 }

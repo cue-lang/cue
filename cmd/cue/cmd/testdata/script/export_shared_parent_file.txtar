@@ -1,0 +1,37 @@
+# root.cue is shared by both instances. Its int is the field declared in
+# ./b for that instance, but the predeclared type for ".", in either order.
+
+# Resolving int for ./b binds it in the shared file, which breaks ".".
+! exec cue export . ./b
+stderr 'out: undefined field: int'
+
+exec cue export ./b .
+cmp stdout want-stdout-reversed
+
+-- want-stdout --
+{
+    "out": 1
+}
+{
+    "int": 1,
+    "out": 1
+}
+-- want-stdout-reversed --
+{
+    "int": 1,
+    "out": 1
+}
+{
+    "out": 1
+}
+-- cue.mod/module.cue --
+module: "mod.test/x"
+language: version: "v0.18.0"
+-- root.cue --
+package x
+
+out: [int][0] & 1
+-- b/b.cue --
+package x
+
+int: 1

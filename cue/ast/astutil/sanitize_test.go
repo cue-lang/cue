@@ -98,6 +98,72 @@ a: {list: list_1.Min()}
 a: bar.Min()
 `,
 	}, {
+		// The reference keeps its own name, which nothing declares.
+		desc: "Reference not named after its import",
+		file: func() *ast.File {
+			spec := ast.NewImport(nil, "foo/y")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						ast.NewIdent("x"), &ast.Ident{Name: "q", Node: spec},
+					),
+				},
+			}}
+		}(),
+		want: `import "foo/y"
+
+a: {x: q}
+`,
+	}, {
+		// The import is renamed, though its own name is free.
+		desc: "Reference named like a field in scope, not its import",
+		file: func() *ast.File {
+			spec := ast.NewImport(nil, "foo/y")
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						ast.NewIdent("q"), ast.NewLit(token.INT, "1"),
+						ast.NewIdent("x"), &ast.Ident{Name: "q", Node: spec},
+					),
+				},
+			}}
+		}(),
+		want: `import y_1 "foo/y"
+
+a: {
+	q: 1
+	x: y_1
+}
+`,
+	}, {
+		// The import's name is taken by a field in scope. The reference
+		// keeps its own name, which nothing declares.
+		desc: "Reference not named after its shadowed import",
+		file: func() *ast.File {
+			spec := ast.NewImport(nil, "foo/y")
+			y := &ast.Field{Label: ast.NewIdent("y"), Value: ast.NewLit(token.INT, "1")}
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{
+					Label: ast.NewIdent("a"),
+					Value: ast.NewStruct(
+						y,
+						ast.NewIdent("x"), &ast.Ident{Name: "q", Node: spec},
+						ast.NewIdent("c"), &ast.Ident{Name: "y", Node: y.Value},
+					),
+				},
+			}}
+		}(),
+		want: `import "foo/y"
+
+a: {
+	y: 1
+	x: q
+	c: y
+}
+`,
+	}, {
 		desc: "Rename duplicate import",
 		file: func() *ast.File {
 			spec1 := ast.NewImport(nil, "bar")

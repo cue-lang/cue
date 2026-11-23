@@ -20,7 +20,9 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/mod/module"
 )
 
 func TestIOFS(t *testing.T) {
@@ -547,6 +549,57 @@ x: "usr"
 			}
 			v := cuecontext.New().BuildInstance(insts[0])
 			qt.Assert(t, qt.Equals(fmt.Sprint(v.LookupPath(cue.ParsePath("out"))), `["gen", "pkg", "usr"]`))
+		})
+	}
+}
+
+// TestReadCUEFileCache checks that a second ReadCUEFile of the same file
+// is served from the cache, without reading the file again.
+func TestReadCUEFileCache(t *testing.T) {
+	const src = "package x\n\nimport \"strings\"\n"
+	tests := []struct {
+		name string
+		// fsys returns the module-root FS to read a.cue from,
+		// and a function which removes a.cue from it.
+		fsys func(t *testing.T) (fs.FS, func())
+	}{{
+		name: "Overlay",
+		fsys: func(t *testing.T) (fs.FS, func()) {
+			dir := t.TempDir()
+			writeFile(t, filepath.Join(dir, "a.cue"), src)
+			cfg, err := (&Config{Dir: dir}).complete()
+			qt.Assert(t, qt.IsNil(err))
+			ofs, err := newOverlayFS(cfg)
+			qt.Assert(t, qt.IsNil(err))
+			return ofs.ioFS(dir, "v0.14.0"), func() {
+				qt.Assert(t, qt.IsNil(os.Remove(filepath.Join(dir, "a.cue"))))
+			}
+		},
+	}, {
+		name: "IOFS",
+		fsys: func(t *testing.T) (fs.FS, func()) {
+			mapFS := fstest.MapFS{"a.cue": {Data: []byte(src)}}
+			cfg, err := (&Config{FS: mapFS, Dir: "/"}).complete()
+			qt.Assert(t, qt.IsNil(err))
+			ifs, err := newIOFSFileSystem(cfg)
+			qt.Assert(t, qt.IsNil(err))
+			return ifs.ioFS("/", "v0.14.0"), func() { delete(mapFS, "a.cue") }
+		},
+	}}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			fsys, remove := test.fsys(t)
+			cueFS := fsys.(module.ReadCUEFS)
+			pcfg := parser.NewConfig(parser.ImportsOnly)
+			f1, err := cueFS.ReadCUEFile("a.cue", pcfg)
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.IsNotNil(f1))
+
+			remove()
+			f2, err := cueFS.ReadCUEFile("a.cue", pcfg)
+			// The cache misses, so the removed file is read again.
+			qt.Assert(t, qt.ErrorIs(err, fs.ErrNotExist))
+			qt.Assert(t, qt.IsNil(f2))
 		})
 	}
 }

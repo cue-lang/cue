@@ -3099,8 +3099,10 @@ func TestUnify2(t *testing.T) {
 func TestUnifyVariadic(t *testing.T) {
 	type testCase struct {
 		vals []string
-		want string // JSON; unused if err is true
-		err  bool
+		// separateContexts compiles each value in a Context of its own.
+		separateContexts bool
+		want             string // JSON; unused if err is true
+		err              bool
 	}
 	testCases := []testCase{{
 		vals: []string{`a: int, b: string`, `a: 1`, `b: "foo"`, `c: true`},
@@ -3130,12 +3132,25 @@ func TestUnifyVariadic(t *testing.T) {
 		// Defaults are retained.
 		vals: []string{`a: *1 | int`, `b: 2`, `c: 3`},
 		want: `{"a":1,"b":2,"c":3}`,
+	}, {
+		// Lets declared by different values never unify.
+		vals: []string{`let v = 1, x: v`, `let v = 2, y: v`},
+		want: `{"x":1,"y":2}`,
+	}, {
+		// The let labels of each Context start from the same number, yet
+		// they collide, so y gets the value of the first let.
+		vals:             []string{`let v = 1, x: v`, `let v = 2, y: v`},
+		separateContexts: true,
+		want:             `{"x":1,"y":1}`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		ctx := t.M.CueContext()
 		vals := make([]cue.Value, len(tc.vals))
 		for i, src := range tc.vals {
+			if tc.separateContexts {
+				ctx = t.M.CueContext()
+			}
 			vals[i] = ctx.CompileString(src)
 		}
 

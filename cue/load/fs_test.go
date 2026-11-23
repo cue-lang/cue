@@ -222,9 +222,7 @@ language: version: "v0.14.0"
 				}
 			}()
 			runtime.GC()
-			// TODO: unless loading via Config.FS, p0 is kept alive, as the position
-			// leads to the loader's cache of every file it parsed.
-			qt.Check(t, qt.Equals(p0.Value() == nil, test.name == "FS"))
+			qt.Check(t, qt.Equals(p0.Value() == nil, true))
 			qt.Check(t, qt.Equals(pos.Line(), 3))
 		})
 	}

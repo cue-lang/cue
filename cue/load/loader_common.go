@@ -115,8 +115,8 @@ func makeFSLoc(fsys fs.FS, loaderPath string, cfgFromFSPath func(string) string)
 
 // makeOSFSLoc creates an FSLoc for an absolute OS path. The FS is rooted at
 // the filesystem root ("/" on Unix, the volume root on Windows). When a
-// non-nil overlay [overlayFileSystem] is provided, its overlay-aware
-// [fs.FS] view is used so that overlay entries are visible alongside the
+// non-nil overlay [overlayFileSystem] is provided, its [overlayDirFS]
+// view is used so that overlay entries are visible alongside the
 // underlying OS filesystem; otherwise a plain [os.DirFS] is used. The
 // returned FSLoc.Path is a valid [fs.FS] path (forward-slash separated, no
 // leading separator).
@@ -136,7 +136,7 @@ func makeOSFSLoc(absPath string, pathOS pkgpath.OS, overlay *overlayFileSystem) 
 	}
 	var fsys fs.FS
 	if overlay != nil {
-		fsys = overlay.ioFS(root, "")
+		fsys = &overlayDirFS{fs: overlay.overlayFiles, root: root}
 	} else {
 		fsys = os.DirFS(root)
 	}

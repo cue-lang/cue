@@ -77,13 +77,19 @@ func (f *overlayFile) Sys() interface{}   { return nil }
 // overlayFileSystem implements [fileSystem] using the host OS filesystem
 // with an optional overlay of in-memory files.
 type overlayFileSystem struct {
+	*overlayFiles
+	fileCache *fileCache
+}
+
+// overlayFiles is the host OS filesystem with an optional overlay of
+// in-memory files, without the cache of [overlayFileSystem].
+type overlayFiles struct {
 	overlayDirs map[string]map[string]*overlayFile
 	cwd         string
 	pathOS      pkgpath.OS
-	fileCache   *fileCache
 }
 
-func (fs *overlayFileSystem) getDir(dir string, create bool) map[string]*overlayFile {
+func (fs *overlayFiles) getDir(dir string, create bool) map[string]*overlayFile {
 	dir = pkgpath.Clean(dir, fs.pathOS)
 	m, ok := fs.overlayDirs[dir]
 	if !ok && create {
@@ -107,18 +113,18 @@ func (fs *overlayFileSystem) getDir(dir string, create bool) map[string]*overlay
 // implementation.
 func (fs *overlayFileSystem) ioFS(root string, languageVersion string) iofs.FS {
 	return &overlayIOFS{
-		fs:              fs,
-		root:            root,
+		overlayDirFS:    overlayDirFS{fs: fs.overlayFiles, root: root},
+		fileCache:       fs.fileCache,
 		languageVersion: languageVersion,
 	}
 }
 
 func newOverlayFS(cfg *Config) (*overlayFileSystem, error) {
-	fs := &overlayFileSystem{
+	fs := &overlayFileSystem{overlayFiles: &overlayFiles{
 		cwd:         cfg.Dir,
 		pathOS:      cfg.pathOS,
 		overlayDirs: map[string]map[string]*overlayFile{},
-	}
+	}}
 
 	// Organize overlay
 	for filename, src := range cfg.Overlay {
@@ -164,14 +170,14 @@ func newOverlayFS(cfg *Config) (*overlayFileSystem, error) {
 	return fs, nil
 }
 
-func (fs *overlayFileSystem) makeAbs(path string) string {
+func (fs *overlayFiles) makeAbs(path string) string {
 	if pkgpath.IsAbs(path, fs.pathOS) {
 		return path
 	}
 	return pkgpath.Join([]string{fs.cwd, path}, fs.pathOS)
 }
 
-func (fs *overlayFileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error) {
+func (fs *overlayFiles) readDir(path string) ([]iofs.DirEntry, errors.Error) {
 	path = fs.makeAbs(path)
 	m := fs.getDir(path, false)
 	items, err := os.ReadDir(path)
@@ -201,7 +207,7 @@ func (fs *overlayFileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error
 	return items, nil
 }
 
-func (fs *overlayFileSystem) getOverlay(path string) *overlayFile {
+func (fs *overlayFiles) getOverlay(path string) *overlayFile {
 	dir := pkgpath.Dir(path, fs.pathOS)
 	base := pkgpath.Base(path, fs.pathOS)
 	if m := fs.getDir(dir, false); m != nil {
@@ -210,7 +216,7 @@ func (fs *overlayFileSystem) getOverlay(path string) *overlayFile {
 	return nil
 }
 
-func (fs *overlayFileSystem) stat(path string) (iofs.FileInfo, errors.Error) {
+func (fs *overlayFiles) stat(path string) (iofs.FileInfo, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return fi, nil
@@ -222,7 +228,7 @@ func (fs *overlayFileSystem) stat(path string) (iofs.FileInfo, errors.Error) {
 	return fi, nil
 }
 
-func (fs *overlayFileSystem) openFile(path string) (io.ReadCloser, errors.Error) {
+func (fs *overlayFiles) openFile(path string) (io.ReadCloser, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return io.NopCloser(bytes.NewReader(fi.contents)), nil
@@ -241,7 +247,7 @@ var skipDir = errors.Newf(token.NoPos, "skip directory")
 // entry is nil when the root cannot be stat'ed.
 type walkFunc func(path string, entry iofs.DirEntry, err errors.Error) errors.Error
 
-func (fs *overlayFileSystem) walk(root string, f walkFunc) error {
+func (fs *overlayFiles) walk(root string, f walkFunc) error {
 	// Symlinks below the root are not followed, but the root itself is,
 	// as it may be the current directory reached through a symlink.
 	info, err := fs.stat(root)
@@ -257,7 +263,7 @@ func (fs *overlayFileSystem) walk(root string, f walkFunc) error {
 	return err
 }
 
-func (fs *overlayFileSystem) walkRec(path string, entry iofs.DirEntry, f walkFunc) errors.Error {
+func (fs *overlayFiles) walkRec(path string, entry iofs.DirEntry, f walkFunc) errors.Error {
 	if !entry.IsDir() {
 		return f(path, entry, nil)
 	}
@@ -288,7 +294,7 @@ func (fs *overlayFileSystem) walkRec(path string, entry iofs.DirEntry, f walkFun
 	return nil
 }
 
-func (fs *overlayFileSystem) getSource(cfg *Config, path string) (any, error) {
+func (fs *overlayFiles) getSource(cfg *Config, path string) (any, error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		if fi.file != nil {
@@ -328,19 +334,28 @@ var _ interface {
 	iofs.ReadDirFS
 	iofs.ReadFileFS
 	module.OSRootFS
-} = (*overlayIOFS)(nil)
+} = (*overlayDirFS)(nil)
 
+// overlayDirFS implements [io/fs.FS] for [overlayFiles] under root.
+// Parsed files record it in their [token.FSLoc], so it must not reach
+// the cache of parsed files, which any position would keep alive.
+type overlayDirFS struct {
+	fs   *overlayFiles
+	root string
+}
+
+// overlayIOFS adds [module.ReadCUEFS] to [overlayDirFS] via the cache.
 type overlayIOFS struct {
-	fs              *overlayFileSystem
-	root            string
+	overlayDirFS
+	fileCache       *fileCache
 	languageVersion string
 }
 
-func (fs *overlayIOFS) OSRoot() string {
+func (fs *overlayDirFS) OSRoot() string {
 	return fs.root
 }
 
-func (fs *overlayIOFS) Open(name string) (iofs.File, error) {
+func (fs *overlayDirFS) Open(name string) (iofs.File, error) {
 	fpath, err := fs.absPathFromFSPath(name)
 	if err != nil {
 		return nil, err
@@ -356,7 +371,7 @@ func (fs *overlayIOFS) Open(name string) (iofs.File, error) {
 	}, nil
 }
 
-func (fs *overlayIOFS) absPathFromFSPath(name string) (string, error) {
+func (fs *overlayDirFS) absPathFromFSPath(name string) (string, error) {
 	if !iofs.ValidPath(name) {
 		return "", fmt.Errorf("invalid io/fs path %q", name)
 	}
@@ -370,7 +385,7 @@ func (fs *overlayIOFS) absPathFromFSPath(name string) (string, error) {
 }
 
 // ReadDir implements [io/fs.ReadDirFS].
-func (fs *overlayIOFS) ReadDir(name string) ([]iofs.DirEntry, error) {
+func (fs *overlayDirFS) ReadDir(name string) ([]iofs.DirEntry, error) {
 	fpath, err := fs.absPathFromFSPath(name)
 	if err != nil {
 		return nil, err
@@ -379,7 +394,7 @@ func (fs *overlayIOFS) ReadDir(name string) ([]iofs.DirEntry, error) {
 }
 
 // ReadFile implements [io/fs.ReadFileFS].
-func (fs *overlayIOFS) ReadFile(name string) ([]byte, error) {
+func (fs *overlayDirFS) ReadFile(name string) ([]byte, error) {
 	fpath, err := fs.absPathFromFSPath(name)
 	if err != nil {
 		return nil, err
@@ -410,7 +425,7 @@ func (fs *overlayIOFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, e
 		return nil, err
 	}
 	key := fileCacheKey{cfg, fpath}
-	cache := fs.fs.fileCache
+	cache := fs.fileCache
 	cache.mu.Lock()
 	entry, ok := cache.entries[key]
 	cache.mu.Unlock()
@@ -435,7 +450,7 @@ func (fs *overlayIOFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, e
 		}
 	}
 	cfg = cfg.Apply(parser.Version(fs.languageVersion))
-	return fs.fs.getCUESyntax(&build.File{
+	return cache.getCUESyntax(&build.File{
 		Filename: fpath,
 		Encoding: build.CUE,
 		//		Form:     build.Schema,
@@ -445,7 +460,7 @@ func (fs *overlayIOFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, e
 
 // overlayIOFSFile implements [io/fs.File] for the overlay filesystem.
 type overlayIOFSFile struct {
-	fs      *overlayFileSystem
+	fs      *overlayFiles
 	path    string
 	rc      io.ReadCloser
 	entries []iofs.DirEntry

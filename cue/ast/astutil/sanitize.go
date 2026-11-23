@@ -453,6 +453,11 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		return true
 	}
 
+	if spec, ok := n.Node.(*ast.ImportSpec); ok {
+		// The import is reachable by its own name, not the reference's.
+		info, _ := ParseImportSpec(spec)
+		n.Name = info.Ident
+	}
 	_, _, node := s.lookup(n.Name)
 	if node.node == nil {
 		if n.IsPredeclared() {

@@ -98,7 +98,6 @@ a: {list: list_1.Min()}
 a: bar.Min()
 `,
 	}, {
-		// The reference keeps its own name, which nothing declares.
 		desc: "Reference not named after its import",
 		file: func() *ast.File {
 			spec := ast.NewImport(nil, "foo/y")
@@ -113,10 +112,9 @@ a: bar.Min()
 		}(),
 		want: `import "foo/y"
 
-a: {x: q}
+a: {x: y}
 `,
 	}, {
-		// The import is renamed, though its own name is free.
 		desc: "Reference named like a field in scope, not its import",
 		file: func() *ast.File {
 			spec := ast.NewImport(nil, "foo/y")
@@ -130,16 +128,16 @@ a: {x: q}
 				},
 			}}
 		}(),
-		want: `import y_1 "foo/y"
+		want: `import "foo/y"
 
 a: {
 	q: 1
-	x: y_1
+	x: y
 }
 `,
 	}, {
-		// The import's name is taken by a field in scope. The reference
-		// keeps its own name, which nothing declares.
+		// The import's name is taken by a field in scope, so the import is
+		// renamed; the reference to that field is left alone.
 		desc: "Reference not named after its shadowed import",
 		file: func() *ast.File {
 			spec := ast.NewImport(nil, "foo/y")
@@ -155,11 +153,11 @@ a: {
 				},
 			}}
 		}(),
-		want: `import "foo/y"
+		want: `import y_1 "foo/y"
 
 a: {
 	y: 1
-	x: q
+	x: y_1
 	c: y
 }
 `,

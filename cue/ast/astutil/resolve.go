@@ -626,7 +626,7 @@ func (s *scope) Before(n ast.Node) bool {
 		// Disallow referring to the current LHS name, unless a field took
 		// its place; see [scope.conflictFn].
 		name := x.Ident.Name
-		saved := s.index[name]
+		saved, declared := s.index[name]
 		if saved.node == x {
 			delete(s.index, name) // The same name may still appear in another scope
 		}
@@ -637,19 +637,23 @@ func (s *scope) Before(n ast.Node) bool {
 		s.inField = true
 		ast.Walk(x.Expr, s.Before, nil)
 		s.inField = false
-		s.index[name] = saved
+		if declared {
+			s.index[name] = saved
+		}
 		return false
 
 	case *ast.Alias:
 		// Disallow referring to the current LHS name, as for a let clause.
 		name := x.Ident.Name
-		saved := s.index[name]
+		saved, declared := s.index[name]
 		if saved.node == x {
 			delete(s.index, name) // The same name may still appear in another scope
 		}
 
 		ast.Walk(x.Expr, s.Before, nil)
-		s.index[name] = saved
+		if declared {
+			s.index[name] = saved
+		}
 		return false
 
 	case *ast.ImportSpec:

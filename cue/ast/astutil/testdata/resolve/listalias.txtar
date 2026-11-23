@@ -1,6 +1,6 @@
 An alias in a list, allowed before v0.18 and rejected by the compiler,
-declares nothing in the enclosing struct, yet walking it hides the field
-X from the reference r beside it, which is left unresolved.
+declares nothing in the enclosing struct, so the reference r beside it
+binds to the field X.
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.17.0"
@@ -11,10 +11,9 @@ a: {
 	r: X
 }
 -- out/resolve/in --
-3[X]:  Scope: 0[<nil>] Node: 0[]
-5[a]:  Scope: 0[<nil>] Node: 0[]
-8[l]:  Scope: 0[<nil>] Node: 0[]
-10[X]: Scope: 0[<nil>] Node: 0[]
-12[r]: Scope: 0[<nil>] Node: 0[]
-13[X]: Scope: 0[<nil>] Node: 0[]
-Unresolved: 13[X]
+3[X]:  Scope: 0[<nil>]     Node: 0[]
+5[a]:  Scope: 0[<nil>]     Node: 0[]
+8[l]:  Scope: 0[<nil>]     Node: 0[]
+10[X]: Scope: 0[<nil>]     Node: 0[]
+12[r]: Scope: 0[<nil>]     Node: 0[]
+13[X]: Scope: 1[*ast.File] Node: 0[1]

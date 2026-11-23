@@ -16,12 +16,10 @@ package cue
 
 import (
 	"bytes"
-	"cmp"
 	"encoding"
 	"encoding/json"
 	"math/big"
 	"reflect"
-	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -30,6 +28,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/convert"
 )
 
 // Decode initializes the value pointed to by x with [Value] v.
@@ -460,7 +459,7 @@ func (d *decoder) convertStruct(x reflect.Value, v Value) {
 
 		// Figure out field corresponding to key.
 		subv := x
-		for _, i := range f.index {
+		for _, i := range f.Index {
 			if subv.Kind() == reflect.Pointer {
 				if subv.IsNil() {
 					// If a struct embeds a pointer to an unexported type,
@@ -513,200 +512,43 @@ func isValidTag(s string) bool {
 	return true
 }
 
-// A field represents a single Go field found in a struct.
+// goField is a [convert.GoField] with what Decode needs to find it by name.
 type goField struct {
-	name      string
+	convert.GoField
 	nameBytes []byte                 // []byte(name)
 	equalFold func(s, t []byte) bool // bytes.EqualFold or equivalent
-
-	tag   bool
-	index []int
-	typ   reflect.Type
-}
-
-func compareFieldByIndex(a, b goField) int {
-	for i, x := range a.index {
-		if i >= len(b.index) {
-			break
-		}
-		if c := cmp.Compare(x, b.index[i]); c != 0 {
-			return c
-		}
-	}
-	return cmp.Compare(len(a.index), len(b.index))
 }
 
 // typeFields returns a list of fields that JSON should recognize for the given type.
-// The algorithm is breadth-first search over the set of structs to include - the top struct
-// and then any reachable anonymous structs.
 func typeFields(t reflect.Type) structFields {
-	// Anonymous fields to explore at the current level and the next.
-	current := []goField{}
-	next := []goField{{typ: t}}
-
-	// Count of queued names for current level and the next.
-	var count, nextCount map[reflect.Type]int
-
-	// Types already visited at an earlier level.
-	visited := map[reflect.Type]bool{}
-
-	// Fields found.
-	var fields []goField
-
-	for len(next) > 0 {
-		current, next = next, current[:0]
-		count, nextCount = nextCount, map[reflect.Type]int{}
-
-		for _, f := range current {
-			if visited[f.typ] {
-				continue
-			}
-			visited[f.typ] = true
-
-			// Scan f.typ for fields to include.
-			for i := range f.typ.NumField() {
-				sf := f.typ.Field(i)
-				isUnexported := sf.PkgPath != ""
-				if sf.Anonymous {
-					t := sf.Type
-					if t.Kind() == reflect.Pointer {
-						t = t.Elem()
-					}
-					if isUnexported && t.Kind() != reflect.Struct {
-						// Ignore embedded fields of unexported non-struct types.
-						continue
-					}
-					// Do not ignore embedded fields of unexported struct types
-					// since they may have exported fields.
-				} else if isUnexported {
-					// Ignore unexported non-embedded fields.
-					continue
-				}
-				tag := sf.Tag.Get("json")
-				if tag == "-" {
-					continue
-				}
-				name, _, _ := strings.Cut(tag, ",")
-				if !isValidTag(name) {
-					name = ""
-				}
-				index := make([]int, len(f.index)+1)
-				copy(index, f.index)
-				index[len(f.index)] = i
-
-				ft := sf.Type
-				if ft.Name() == "" && ft.Kind() == reflect.Pointer {
-					// Follow pointer.
-					ft = ft.Elem()
-				}
-
-				// Record found field and index sequence.
-				if name != "" || !sf.Anonymous || ft.Kind() != reflect.Struct {
-					tagged := name != ""
-					if name == "" {
-						name = sf.Name
-					}
-					field := goField{
-						name:  name,
-						tag:   tagged,
-						index: index,
-						typ:   ft,
-					}
-					field.nameBytes = []byte(field.name)
-					field.equalFold = foldFunc(field.nameBytes)
-
-					fields = append(fields, field)
-					if count[f.typ] > 1 {
-						// If there were multiple instances, add a second,
-						// so that the annihilation code will see a duplicate.
-						// It only cares about the distinction between 1 or 2,
-						// so don't bother generating any more copies.
-						fields = append(fields, fields[len(fields)-1])
-					}
-					continue
-				}
-
-				// Record new anonymous struct to explore in next round.
-				nextCount[ft]++
-				if nextCount[ft] == 1 {
-					next = append(next, goField{name: ft.Name(), index: index, typ: ft})
-				}
-			}
-		}
+	goFields := convert.GoFields(t, jsonTagName)
+	fields := make([]goField, 0, len(goFields))
+	for _, f := range goFields {
+		nameBytes := []byte(f.Name)
+		fields = append(fields, goField{
+			GoField:   f,
+			nameBytes: nameBytes,
+			equalFold: foldFunc(nameBytes),
+		})
 	}
-
-	slices.SortFunc(fields, func(a, b goField) int {
-		// sort field by name, breaking ties with depth, then
-		// breaking ties with "name came from json tag", then
-		// breaking ties with index sequence.
-		if c := cmp.Compare(a.name, b.name); c != 0 {
-			return c
-		}
-		if c := cmp.Compare(len(a.index), len(b.index)); c != 0 {
-			return c
-		}
-		if a.tag != b.tag {
-			if a.tag {
-				return -1
-			} else {
-				return 1
-			}
-		}
-		return compareFieldByIndex(a, b)
-	})
-
-	// Delete all fields that are hidden by the Go rules for embedded fields,
-	// except that fields with JSON tags are promoted.
-
-	// The fields are sorted in primary order of name, secondary order
-	// of field index length. Loop over names; for each name, delete
-	// hidden fields by choosing the one dominant field that survives.
-	out := fields[:0]
-	for advance, i := 0, 0; i < len(fields); i += advance {
-		// One iteration per name.
-		// Find the sequence of fields with the name of this first field.
-		fi := fields[i]
-		name := fi.name
-		for advance = 1; i+advance < len(fields); advance++ {
-			fj := fields[i+advance]
-			if fj.name != name {
-				break
-			}
-		}
-		if advance == 1 { // Only one field with this name
-			out = append(out, fi)
-			continue
-		}
-		dominant, ok := dominantField(fields[i : i+advance])
-		if ok {
-			out = append(out, dominant)
-		}
-	}
-
-	fields = out
-	slices.SortFunc(fields, compareFieldByIndex)
-
 	nameIndex := make(map[string]int, len(fields))
 	for i, field := range fields {
-		nameIndex[field.name] = i
+		nameIndex[field.Name] = i
 	}
 	return structFields{fields, nameIndex}
 }
 
-// dominantField looks through the fields, all of which are known to
-// have the same name, to find the single field that dominates the
-// others using Go's embedding rules, modified by the presence of
-// JSON tags. If there are multiple top-level fields, the boolean
-// will be false: This condition is an error in Go and we skip all
-// the fields.
-func dominantField(fields []goField) (goField, bool) {
-	// The fields are sorted in increasing index-length order, then by presence of tag.
-	// That means that the first field is the dominant one. We need only check
-	// for error cases: two fields at top level, either both tagged or neither tagged.
-	if len(fields) > 1 && len(fields[0].index) == len(fields[1].index) && fields[0].tag == fields[1].tag {
-		return goField{}, false
+// jsonTagName names a field by its json tag, for [convert.GoFields].
+func jsonTagName(sf reflect.StructField) (string, bool) {
+	tag := sf.Tag.Get("json")
+	if tag == "-" {
+		return "", false
 	}
-	return fields[0], true
+	name, _, _ := strings.Cut(tag, ",")
+	if !isValidTag(name) {
+		name = ""
+	}
+	return name, true
 }
 
 var fieldCache sync.Map // map[reflect.Type]structFields

@@ -1,0 +1,212 @@
+// Copyright 2026 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package convert
+
+import (
+	"cmp"
+	"reflect"
+	"slices"
+)
+
+// GoField is a field of a Go struct type, possibly promoted from an embedded
+// struct.
+type GoField struct {
+	Name        string              // from a tag, or else the Go field name
+	Index       []int               // for [reflect.Value.FieldByIndex]
+	StructField reflect.StructField // the Go field itself
+
+	tagged bool // whether Name comes from a tag
+}
+
+func compareFieldByIndex(a, b GoField) int {
+	for i, x := range a.Index {
+		if i >= len(b.Index) {
+			break
+		}
+		if c := cmp.Compare(x, b.Index[i]); c != 0 {
+			return c
+		}
+	}
+	return cmp.Compare(len(a.Index), len(b.Index))
+}
+
+// GoFields resolves the fields of the struct type t like encoding/json,
+// in index order, with a breadth-first search over its embedded structs.
+//
+// tagName names a field from its tags, or "" if they give no name, and
+// reports whether to keep the field. An unnamed embedded struct, or pointer
+// to one, has its fields promoted, and any other unnamed field takes its Go
+// name. Of several fields with the same name, the shallowest wins, then a
+// tagged one; a tie drops them all.
+func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) []GoField {
+	type queued struct {
+		index []int
+		typ   reflect.Type
+	}
+	// Anonymous fields to explore at the current level and the next.
+	current := []queued{}
+	next := []queued{{typ: t}}
+
+	// Count of queued names for current level and the next.
+	var count, nextCount map[reflect.Type]int
+
+	// Types already visited at an earlier level.
+	visited := map[reflect.Type]bool{}
+
+	// Fields found.
+	var fields []GoField
+
+	for len(next) > 0 {
+		current, next = next, current[:0]
+		count, nextCount = nextCount, map[reflect.Type]int{}
+
+		for _, f := range current {
+			if visited[f.typ] {
+				continue
+			}
+			visited[f.typ] = true
+
+			// Scan f.typ for fields to include.
+			for i := range f.typ.NumField() {
+				sf := f.typ.Field(i)
+				isUnexported := sf.PkgPath != ""
+				if sf.Anonymous {
+					t := sf.Type
+					if t.Kind() == reflect.Pointer {
+						t = t.Elem()
+					}
+					if isUnexported && t.Kind() != reflect.Struct {
+						// Ignore embedded fields of unexported non-struct types.
+						continue
+					}
+					// Do not ignore embedded fields of unexported struct types
+					// since they may have exported fields.
+				} else if isUnexported {
+					// Ignore unexported non-embedded fields.
+					continue
+				}
+				name, ok := tagName(sf)
+				if !ok {
+					continue
+				}
+				index := make([]int, len(f.index)+1)
+				copy(index, f.index)
+				index[len(f.index)] = i
+
+				ft := sf.Type
+				if ft.Name() == "" && ft.Kind() == reflect.Pointer {
+					// Follow pointer.
+					ft = ft.Elem()
+				}
+
+				// Record found field and index sequence.
+				if name != "" || !sf.Anonymous || ft.Kind() != reflect.Struct {
+					tagged := name != ""
+					if name == "" {
+						name = sf.Name
+					}
+					fields = append(fields, GoField{
+						Name:        name,
+						Index:       index,
+						tagged:      tagged,
+						StructField: sf,
+					})
+					if count[f.typ] > 1 {
+						// If there were multiple instances, add a second,
+						// so that the annihilation code will see a duplicate.
+						// It only cares about the distinction between 1 or 2,
+						// so don't bother generating any more copies.
+						fields = append(fields, fields[len(fields)-1])
+					}
+					continue
+				}
+
+				// Record new anonymous struct to explore in next round.
+				nextCount[ft]++
+				if nextCount[ft] == 1 {
+					next = append(next, queued{index: index, typ: ft})
+				}
+			}
+		}
+	}
+
+	slices.SortFunc(fields, func(a, b GoField) int {
+		// sort field by name, breaking ties with depth, then
+		// breaking ties with "name came from tag", then
+		// breaking ties with index sequence.
+		if c := cmp.Compare(a.Name, b.Name); c != 0 {
+			return c
+		}
+		if c := cmp.Compare(len(a.Index), len(b.Index)); c != 0 {
+			return c
+		}
+		if a.tagged != b.tagged {
+			if a.tagged {
+				return -1
+			} else {
+				return 1
+			}
+		}
+		return compareFieldByIndex(a, b)
+	})
+
+	// Delete all fields that are hidden by the Go rules for embedded fields,
+	// except that fields with tags are promoted.
+
+	// The fields are sorted in primary order of name, secondary order
+	// of field index length. Loop over names; for each name, delete
+	// hidden fields by choosing the one dominant field that survives.
+	out := fields[:0]
+	for advance, i := 0, 0; i < len(fields); i += advance {
+		// One iteration per name.
+		// Find the sequence of fields with the name of this first field.
+		fi := fields[i]
+		name := fi.Name
+		for advance = 1; i+advance < len(fields); advance++ {
+			fj := fields[i+advance]
+			if fj.Name != name {
+				break
+			}
+		}
+		if advance == 1 { // Only one field with this name
+			out = append(out, fi)
+			continue
+		}
+		dominant, ok := dominantField(fields[i : i+advance])
+		if ok {
+			out = append(out, dominant)
+		}
+	}
+
+	fields = out
+	slices.SortFunc(fields, compareFieldByIndex)
+	return fields
+}
+
+// dominantField looks through the fields, all of which are known to
+// have the same name, to find the single field that dominates the
+// others using Go's embedding rules, modified by the presence of
+// tags. If there are multiple top-level fields, the boolean
+// will be false: This condition is an error in Go and we skip all
+// the fields.
+func dominantField(fields []GoField) (GoField, bool) {
+	// The fields are sorted in increasing index-length order, then by presence of tag.
+	// That means that the first field is the dominant one. We need only check
+	// for error cases: two fields at top level, either both tagged or neither tagged.
+	if len(fields) > 1 && len(fields[0].Index) == len(fields[1].Index) && fields[0].tagged == fields[1].tagged {
+		return GoField{}, false
+	}
+	return fields[0], true
+}

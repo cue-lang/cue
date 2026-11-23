@@ -1972,12 +1972,10 @@ func unaryInteriorComments(x *ast.UnaryExpr) []*ast.CommentGroup {
 	return out
 }
 
-// postfixExpr converts a PostfixExpr. The operand is obtained via
-// exprCore so that the suffix operator is placed before any trailing
-// comments on the operand. The operand passes through
-// [converter.wrapForPrecedence] with [token.HighestPrec] so a lower-precedence
-// binary operand is parenthesised, preserving its grouping (`a & b ...`
-// must not re-parse as `a & (b ...)`).
+// postfixExpr converts a PostfixExpr. [converter.wrapForPrecedence]
+// parenthesizes a binary operand, as `a & b ...` would parse back as
+// `a & (b ...)`. The comments ending the operand go after the operator;
+// see [liftedOperands].
 func (c *converter) postfixExpr(x *ast.PostfixExpr) doc {
 	xDoc := c.wrapForPrecedence(x.X, token.HighestPrec, c.exprCore)
 	body := cat(xDoc, stringLit(x.Op.String()))
@@ -2107,8 +2105,6 @@ func (c *converter) tails(n ast.Node, lift bool) []*ast.CommentGroup {
 	case *ast.BinaryExpr:
 		out = c.tails(n.Y, lift)
 	case *ast.UnaryExpr:
-		out = c.tails(n.X, lift)
-	case *ast.PostfixExpr:
 		out = c.tails(n.X, lift)
 	default:
 		out = c.operandTails(n, lift)
@@ -4407,10 +4403,10 @@ func (c *converter) liftsChildComment(n ast.Node) bool {
 }
 
 // liftedOperands returns the operands of n followed by a token which
-// cannot start a line, such as a closing paren, an index, or the `in`
-// of a for clause. [converter.exprCore] and [converter.clause] move the
-// comments ending them to the end of n's output. Missing operands are
-// nil.
+// cannot start a line, such as a closing paren, an index, the `in` of a
+// for clause, or a postfix operator. [converter.exprCore] and
+// [converter.clause] move the comments ending them to the end of n's
+// output. Missing operands are nil.
 func liftedOperands(n ast.Node) (ops [3]ast.Expr) {
 	switch n := n.(type) {
 	case *ast.ParenExpr:
@@ -4426,6 +4422,8 @@ func liftedOperands(n ast.Node) (ops [3]ast.Expr) {
 			ops[0] = n.Key
 		}
 		ops[1] = n.Value
+	case *ast.PostfixExpr:
+		ops[0] = n.X
 	}
 	return ops
 }

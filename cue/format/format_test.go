@@ -906,8 +906,6 @@ func TestNodes(t *testing.T) {
 	}, {
 		// A parenthesized label renders its comments inside its parens,
 		// so a call argument's row does not repeat them.
-		//
-		// The row repeats the comment.
 		name: "call argument with a parenthesized label holding a comment",
 		in: func() ast.Node {
 			k := &ast.ParenExpr{X: ast.NewIdent("k")}
@@ -918,7 +916,7 @@ func TestNodes(t *testing.T) {
 				ArgLabels: []ast.Label{k, nil},
 			}
 		}(),
-		out: "f(\n\t( // c\n\t\tk): v, // c\n\tw,\n)",
+		out: "f(\n\t( // c\n\t\tk): v,\n\tw,\n)",
 	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the

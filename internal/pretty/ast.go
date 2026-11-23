@@ -1107,6 +1107,16 @@ func (c *converter) exprBody(x ast.Expr) doc {
 	}
 }
 
+// labelAfterComments returns the comments of a call argument's label l
+// which go at the end of the argument's row: all but its doc comments,
+// unless l is parenthesized, as [converter.label] then renders them.
+func labelAfterComments(l ast.Label) []*ast.CommentGroup {
+	if _, ok := l.(*ast.ParenExpr); ok || l == nil {
+		return nil
+	}
+	return classifyComments(l).nonDoc()
+}
+
 // label converts a Label node to a Doc.
 func (c *converter) label(l ast.Label) doc {
 	switch x := l.(type) {
@@ -1854,7 +1864,7 @@ func (c *converter) listElemRow(label ast.Label, e ast.Expr, last, trailing, omi
 			docRel = label.Pos().RelPos()
 		}
 		slots.doc = append(ls.doc, slots.doc...)
-		for _, cg := range ls.nonDoc() {
+		for _, cg := range labelAfterComments(label) {
 			routeNonDoc(cg)
 		}
 	}
@@ -2768,7 +2778,7 @@ func (c *converter) callExpr(x *ast.CallExpr) doc {
 		for i := range x.Args {
 			leads[i] = callArgLead(x, i)
 			l := callArgLabel(x, i)
-			lastMovesComment = c.endsWithLineComment(l)
+			lastMovesComment = len(labelAfterComments(l)) > 0
 			movesComment = movesComment || lastMovesComment
 		}
 		anyDoc = anyDoc || anyHasDocComment(leads)

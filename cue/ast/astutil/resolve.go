@@ -18,6 +18,7 @@ package astutil
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -99,26 +100,48 @@ func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 
 // resolve resolves all identifiers in n, returning those it could not resolve.
 func resolve(n ast.Node, errFn ErrFunc) (unresolved []*ast.Ident) {
-	stack := make([]*scope, 0, 8)
-	visitor := &scope{
-		index:      make(map[string]entry),
+	s := newRootScope(scope{
 		errFn:      errFn,
 		identFn:    resolveIdent,
 		unresolved: &unresolved,
-		scopeStack: &stack,
-	}
-	ast.Walk(n, visitor.Before, nil)
+	})
+	ast.Walk(n, s.Before, nil)
 	return unresolved
+}
+
+// newRootScope returns the outermost scope of a resolution from s, adding the
+// state its children share.
+func newRootScope(s scope) *scope {
+	s.index = make(map[string]entry)
+	scopes := append(make([]*scope, 0, 8), &s)
+	s.scopes = &scopes
+	return &s
 }
 
 // A scope maintains the set of named language entities declared
 // in the scope and a link to the immediately surrounding (outer)
 // scope.
+//
+// Scopes are created and freed in stack order, and share one index of each
+// name's innermost live declaration; each scope records what its own
+// declarations replaced there, to restore it when freed. Only the innermost
+// live scope looks up or declares names, except for [scope.declareRoot].
 type scope struct {
 	outer   *scope
 	node    ast.Node
-	index   map[string]entry
+	depth   int32 // the number of scopes enclosing this one
 	inField bool
+
+	index map[string]entry // shared by all scopes
+
+	// declared and shadowed hold the names this scope declares, the latter
+	// with the outer declaration each one shadows.
+	declared []string
+	shadowed []shadow
+
+	// ambiguous holds the names this scope declares for both a field and a
+	// renamed alias, so that a reference by name may mean either.
+	ambiguous []string
 
 	// signature is the scope holding the parameters of the function whose
 	// signature is being resolved, set on that scope and inherited by those
@@ -137,9 +160,9 @@ type scope struct {
 	// children.
 	unresolved *[]*ast.Ident
 
-	// scopeStack is used to reuse scope allocations.
+	// scopes holds the scope at each depth, live or freed for reuse.
 	// The pointer is shared between the root scope and all its children.
-	scopeStack *[]*scope
+	scopes *[]*scope
 }
 
 type entry struct {
@@ -147,29 +170,102 @@ type entry struct {
 	link  ast.Node   // Alias, LetClause, or Field
 	field *ast.Field // Used for LabelAliases
 
-	// ambiguous reports that a renamed alias shared this name in the same
-	// scope, so a reference by name alone may have meant either.
-	ambiguous bool
+	depth int32 // of the scope declaring the name
+
+	// shadow is one more than the index of the declaration this one shadows
+	// in its scope's shadowed list, or zero.
+	shadow int32
+}
+
+// A shadow is an outer declaration of name which a scope's own replaced.
+type shadow struct {
+	name  string
+	entry entry
+}
+
+// declarer returns the scope declaring e, which must be live.
+func (s *scope) declarer(e entry) *scope {
+	return (*s.scopes)[e.depth]
+}
+
+// shadows returns the declaration which e shadows, if any.
+func (s *scope) shadows(e entry) (entry, bool) {
+	if e.shadow == 0 {
+		return entry{}, false
+	}
+	return s.declarer(e).shadowed[e.shadow-1].entry, true
+}
+
+// isAmbiguous reports whether a non-nil s holds name in [scope.ambiguous].
+func (s *scope) isAmbiguous(name string) bool {
+	return s != nil && slices.Contains(s.ambiguous, name)
 }
 
 func (s *scope) allocScope() *scope {
-	if n := len(*s.scopeStack); n > 0 {
-		scope := (*s.scopeStack)[n-1]
-		*s.scopeStack = (*s.scopeStack)[:n-1]
+	depth := s.depth + 1
+	scopes := *s.scopes
+	if int(depth) < len(scopes) {
+		scope := scopes[depth]
+		if scope.node != nil {
+			panic("scope allocated while another one is live at its depth")
+		}
 		return scope
 	}
-	return &scope{
-		index:      make(map[string]entry, 4),
-		scopeStack: s.scopeStack,
+	scope := &scope{
+		index:  s.index,
+		depth:  depth,
+		scopes: s.scopes,
 	}
+	*s.scopes = append(scopes, scope)
+	return scope
 }
 
 func (s *scope) freeScope() {
+	if len(s.shadowed) == 0 && len(s.declared) == len(s.index) {
+		clear(s.index) // Every live name is declared in s.
+	} else {
+		for _, name := range s.declared {
+			delete(s.index, name)
+		}
+		for _, sh := range s.shadowed {
+			s.index[sh.name] = sh.entry
+		}
+	}
 	// Ensure no pointers remain, which can hold onto memory.
-	// We only reuse the index map capacity, and keep the scopeStack pointer.
-	*s = scope{index: s.index, scopeStack: s.scopeStack}
-	clear(s.index)
-	*s.scopeStack = append(*s.scopeStack, s)
+	// We only reuse the capacity of the slices, and keep the shared state.
+	*s = scope{
+		depth:     s.depth,
+		index:     s.index,
+		declared:  s.declared[:0],
+		shadowed:  s.shadowed[:0],
+		ambiguous: s.ambiguous[:0],
+		scopes:    s.scopes,
+	}
+}
+
+// walkHiding walks expr with the declaration of name by n in s hidden, if any.
+func (s *scope) walkHiding(name string, n ast.Node, expr ast.Expr) {
+	e, ok := s.index[name]
+	if !ok || e.depth != s.depth || e.node != n {
+		ast.Walk(expr, s.Before, nil)
+		return
+	}
+	if prev, ok := s.shadows(e); ok {
+		s.index[name] = prev
+	} else {
+		delete(s.index, name)
+	}
+	ast.Walk(expr, s.Before, nil)
+	s.index[name] = e
+}
+
+// declareRoot declares name in the root scope s while scopes within it are
+// live, which requires that none of them declares the name.
+func (s *scope) declareRoot(name string, n ast.Node) {
+	if _, ok := s.index[name]; ok {
+		panic(fmt.Sprintf("%q declared in the root scope while declared in scope", name))
+	}
+	s.insert(name, n, n, nil)
 }
 
 // freeScopesUntil frees all scopes from s up to (but not including) 'ancestor'.
@@ -196,6 +292,8 @@ func newScope(outer *scope, node ast.Node, decls []ast.Decl) *scope {
 	s.conflictFn = outer.conflictFn
 	s.unresolved = outer.unresolved
 
+	// Most declarations are a name each, and shadow none.
+	s.declared = slices.Grow(s.declared, len(decls))
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
@@ -266,7 +364,7 @@ func newFuncScope(outer *scope, fn *ast.Func) *scope {
 		if name == "" || name == "_" {
 			return
 		}
-		if e := s.index[name]; e.node != nil {
+		if e, ok := s.index[name]; ok && e.depth == s.depth {
 			s.errFn(p.Pos(), "parameter %q redeclared in same scope", name)
 			return
 		}
@@ -325,17 +423,19 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 	if name == "" {
 		return
 	}
-	e := entry{node: n, link: link, field: f}
+	e := entry{node: n, link: link, field: f, depth: s.depth}
 	// kept is the entry the name refers to in s: e, or a field
 	// taking the place of a renamed alias.
 	kept := e
+	existing, found := s.index[name]
 	// TODO: record both positions.
-	if outer, _, existing := s.lookup(name); existing.node != nil {
+	if found && name != "_" {
+		outer := s.declarer(existing)
 		isAlias := s.isLet(n, link)
 		conflict := isAlias != outer.isLet(existing.node, existing.link)
 		if !conflict && isAlias && outer != s {
 			// A field past the shadowed aliases conflicts too.
-			_, conflict = outer.aliasesPast(name)
+			_, conflict = s.aliasesPast(existing)
 		}
 		if conflict {
 			alias := e
@@ -345,7 +445,7 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 			ok := s.conflictFn != nil && s.conflictFn(alias)
 			if ok && !isAlias {
 				// The aliases the renamed one shadowed conflict too.
-				aliases, _ := outer.aliasesPast(name)
+				aliases, _ := s.aliasesPast(existing)
 				for _, alias := range aliases {
 					if ok = s.conflictFn(alias); !ok {
 						break
@@ -361,7 +461,7 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 				if isAlias {
 					kept = existing
 				}
-				kept.ambiguous = true
+				s.ambiguous = append(s.ambiguous, name)
 			}
 		} else if s.mustBeUnique(n, link) || outer.mustBeUnique(existing.node, existing.link) {
 			if outer == s {
@@ -381,28 +481,33 @@ func (s *scope) insert(name string, n, link ast.Node, f *ast.Field) {
 			// square brackets. The spec says allow it.
 			// s.errFn(n.Pos(), "alias %q already declared in enclosing scope", name)
 		}
-		// A repeated declaration keeps the ambiguity of the one it replaces.
-		if outer == s && existing.ambiguous {
-			kept.ambiguous = true
-		}
 	}
 	// nameFn runs after conflictFn, which may mark e for renaming.
 	if s.nameFn != nil {
 		s.nameFn(name, e)
 	}
+	switch {
+	case !found:
+		s.declared = append(s.declared, name)
+	case existing.depth == s.depth:
+		// A repeated declaration replaces the one in s.
+		kept.shadow = existing.shadow
+	default:
+		s.shadowed = append(s.shadowed, shadow{name: name, entry: existing})
+		kept.shadow = int32(len(s.shadowed))
+	}
 	s.index[name] = kept
 }
 
-// aliasesPast returns the aliases of name in the scopes enclosing s,
-// innermost first, and whether a field of that name is past them.
-func (s *scope) aliasesPast(name string) (aliases []entry, field bool) {
-	for o := s; ; {
-		var e entry
-		o, _, e = o.outer.lookup(name)
-		if e.node == nil {
+// aliasesPast returns the aliases e shadows, innermost first, and whether a
+// field is past them.
+func (s *scope) aliasesPast(e entry) (aliases []entry, field bool) {
+	for {
+		var ok bool
+		if e, ok = s.shadows(e); !ok {
 			return aliases, false
 		}
-		if !o.isLet(e.node, e.link) {
+		if !s.declarer(e).isLet(e.node, e.link) {
 			return aliases, true
 		}
 		aliases = append(aliases, e)
@@ -413,9 +518,9 @@ func (s *scope) aliasesPast(name string) (aliases []entry, field bool) {
 // entry. The node is a File or StructLit, or the Field declaring a pattern
 // constraint's label alias or a value alias.
 func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, e entry, ok bool) {
-	for ; s != nil; s = s.outer {
-		if e, ok := s.index[name]; ok && e.node == node {
-			return s.node, e, true
+	for e, ok := s.index[name]; ok; e, ok = s.shadows(e) {
+		if e.node == node {
+			return s.declarer(e).node, e, true
 		}
 	}
 	return nil, entry{}, false
@@ -425,22 +530,20 @@ func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 	if name == "_" {
 		return nil, nil, entry{}
 	}
-	for s != nil {
-		if n, ok := s.index[name]; ok {
-			if _, ok := n.node.(*ast.ImportSpec); ok {
-				return s, nil, n
-			}
-			obj := s.node
-			if n.field != nil {
-				// Label alias case.
-				obj = n.field
-			}
-			return s, obj, n
-		}
-		// s, last = s.outer, s
-		s = s.outer
+	n, ok := s.index[name]
+	if !ok {
+		return nil, nil, entry{}
 	}
-	return nil, nil, entry{}
+	p = s.declarer(n)
+	if _, ok := n.node.(*ast.ImportSpec); ok {
+		return p, nil, n
+	}
+	obj = p.node
+	if n.field != nil {
+		// Label alias case.
+		obj = n.field
+	}
+	return p, obj, n
 }
 
 func insertPostfixAliases(s *scope, x *ast.Field, expr ast.Node) {
@@ -533,10 +636,11 @@ func (s *scope) Before(n ast.Node) bool {
 	case *ast.Comprehension:
 		outer := s
 		s = scopeClauses(s, x.Clauses)
-		defer s.freeScopesUntil(outer)
 		ast.Walk(x.Value, s.Before, nil)
 		// Walk the fallback clause in the OUTER scope, since fallback should not
-		// have access to for/let variables from the comprehension clauses.
+		// have access to for/let variables from the comprehension clauses,
+		// whose scopes are freed first to keep stack order.
+		s.freeScopesUntil(outer)
 		if x.Fallback != nil {
 			ast.Walk(x.Fallback.Body, outer.Before, nil)
 		}
@@ -592,13 +696,18 @@ func (s *scope) Before(n ast.Node) bool {
 
 			ast.Walk(expr, nil, func(n ast.Node) {
 				if x, ok := n.(*ast.Ident); ok {
-					for s := s; s != nil && !s.inField; s = s.outer {
-						e, ok := s.index[x.Name]
+					// Declarations are innermost first, as are scopes.
+					e, ok := s.index[x.Name]
+					for s := s; ok && s != nil && !s.inField; s = s.outer {
+						if e.depth != s.depth {
+							continue
+						}
 						// An import is not a field to match against.
-						if _, isImport := e.node.(*ast.ImportSpec); ok && !isImport {
+						if _, isImport := e.node.(*ast.ImportSpec); !isImport {
 							s.errFn(n.Pos(),
 								"reference %q in label expression refers to field against which it would be matched", x.Name)
 						}
+						e, ok = s.shadows(e)
 					}
 				}
 			})
@@ -625,35 +734,18 @@ func (s *scope) Before(n ast.Node) bool {
 	case *ast.LetClause:
 		// Disallow referring to the current LHS name, unless a field took
 		// its place; see [scope.conflictFn].
-		name := x.Ident.Name
-		saved, declared := s.index[name]
-		if saved.node == x {
-			delete(s.index, name) // The same name may still appear in another scope
-		}
-
+		//
 		// Set inField so that the label expression check in pattern constraints
 		// does not walk beyond the let clause's value. A let clause's value is
 		// a separate context, just like a field value.
 		s.inField = true
-		ast.Walk(x.Expr, s.Before, nil)
+		s.walkHiding(x.Ident.Name, x, x.Expr)
 		s.inField = false
-		if declared {
-			s.index[name] = saved
-		}
 		return false
 
 	case *ast.Alias:
 		// Disallow referring to the current LHS name, as for a let clause.
-		name := x.Ident.Name
-		saved, declared := s.index[name]
-		if saved.node == x {
-			delete(s.index, name) // The same name may still appear in another scope
-		}
-
-		ast.Walk(x.Expr, s.Before, nil)
-		if declared {
-			s.index[name] = saved
-		}
+		s.walkHiding(x.Ident.Name, x, x.Expr)
 		return false
 
 	case *ast.ImportSpec:
@@ -762,10 +854,13 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 func (s *scope) String() string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "scope %p {", s)
-	if s != nil && len(s.index) > 0 {
+	if s != nil && len(s.declared)+len(s.shadowed) > 0 {
 		fmt.Fprintln(&b)
-		for name := range s.index {
+		for _, name := range s.declared {
 			fmt.Fprintf(&b, "\t%v\n", name)
+		}
+		for _, sh := range s.shadowed {
+			fmt.Fprintf(&b, "\t%v\n", sh.name)
 		}
 	}
 	fmt.Fprintf(&b, "}\n")

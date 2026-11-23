@@ -126,29 +126,24 @@ func sanitize(f *ast.File, names map[string]bool) error {
 	}
 
 	// Gather all names, and the declarations to rename.
-	stack := make([]*scope, 0, 8)
-	s := &scope{
+	s := newRootScope(scope{
 		errFn:      z.errf,
 		nameFn:     z.addName,
 		identFn:    z.markUsed,
 		conflictFn: z.renameAlias,
-		scopeStack: &stack,
-	}
+	})
 	ast.Walk(f, s.Before, nil)
 	if z.errs != nil {
 		return z.errs
 	}
 
 	// Add imports and unshadow.
-	stack = stack[:0]
-	s = &scope{
+	s = newRootScope(scope{
 		errFn:      z.errf,
 		nameFn:     z.newName,
 		identFn:    z.handleIdent,
 		conflictFn: z.renameAlias,
-		index:      make(map[string]entry),
-		scopeStack: &stack,
-	}
+	})
 	z.fileScope = s
 	// Put the referenced imports in scope from the start, so that a let
 	// clause or alias of the same name is renamed wherever it is declared.
@@ -436,9 +431,9 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 		if n.Node != nil {
 			name, ok = z.nodeNames[n.Node]
 		} else {
-			_, _, node := s.lookup(n.Name)
+			p, _, node := s.lookup(n.Name)
 			name, ok = z.newNames[declIdent(node)]
-			if !ok && node.ambiguous {
+			if !ok && p.isAmbiguous(n.Name) {
 				z.errf(n.Pos(), "reference %q is ambiguous: a declaration of that name was renamed", n.Name)
 				return true
 			}
@@ -480,7 +475,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 
 		_ = z.addImport(spec)
 		info, _ := ParseImportSpec(spec)
-		z.fileScope.insert(info.Ident, spec, spec, nil)
+		z.fileScope.declareRoot(info.Ident, spec)
 		return true
 	}
 
@@ -511,7 +506,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 				Path: x.Path,
 			})
 			z.importMap[xi.ID] = spec
-			z.fileScope.insert(name, spec, spec, nil)
+			z.fileScope.declareRoot(name, spec)
 		}
 
 		info, _ := ParseImportSpec(spec)

@@ -878,6 +878,35 @@ func TestNodes(t *testing.T) {
 		}(),
 		out: "[\n\t(a & b)..., // c\n]",
 	}, {
+		// A comment on its own line which moves to the end of a field
+		// after its attributes, or after a closing paren, is followed by
+		// a blank line, as when it ends the field's value. Without one,
+		// the comment parses back as a doc comment of the next field.
+		//
+		// There is no blank line, so a second format adds one.
+		name: "own-line comment moved after attributes",
+		in: func() ast.Node {
+			y := ast.NewIdent("y")
+			ast.AddComment(y, ownLineComment("c"))
+			return &ast.File{Decls: []ast.Decl{
+				&ast.Field{Label: ast.NewIdent("#a"), Value: y, Attrs: []*ast.Attribute{{Text: "@foo()"}}},
+				&ast.Field{Label: ast.NewIdent("#b"), Value: ast.NewIdent("z")},
+			}}
+		}(),
+		out: "#a: y @foo()\n// c\n#b: z\n",
+	}, {
+		// There is no blank line, so a second format adds one.
+		name: "own-line comment moved after a paren",
+		in: func() ast.Node {
+			y := ast.NewIdent("y")
+			ast.AddComment(y, ownLineComment("c"))
+			return &ast.File{Decls: []ast.Decl{
+				&ast.EmbedDecl{Expr: &ast.ParenExpr{X: y}},
+				&ast.Field{Label: ast.NewIdent("#b"), Value: ast.NewIdent("z")},
+			}}
+		}(),
+		out: "(y)\n// c\n#b: z\n",
+	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the
 		// receiver's last line.
@@ -904,6 +933,14 @@ func TestNodes(t *testing.T) {
 		})
 	}
 
+}
+
+// ownLineComment returns a comment on a line of its own after a node.
+func ownLineComment(text string) *ast.CommentGroup {
+	return &ast.CommentGroup{Position: 10, List: []*ast.Comment{{
+		Slash: token.NoPos.WithRel(token.Newline),
+		Text:  "// " + text,
+	}}}
 }
 
 // multiLineConjunction returns `(a & {b: c, d: e})` without positions, which

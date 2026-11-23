@@ -189,7 +189,7 @@ func file(f *ast.File, version string, outsideModule bool, o ...Option) (*ast.Fi
 		added = cmp.Or(added, a)
 	}
 	if wantExps.ExplicitOpen && !existingExps.ExplicitOpen {
-		fix(fixExplicitOpen, "explicitopen")
+		fix((&explicitOpenFixer{}).fixExplicitOpen, "explicitopen")
 	}
 	if wantExps.AliasV2 && !existingExps.AliasV2 {
 		fix(fixAliasV2, "aliasv2")

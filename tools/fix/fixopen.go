@@ -134,7 +134,10 @@ func (c closeInfo) shouldReclose() bool {
 	return c.suspendReclose == 0
 }
 
-func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
+// explicitOpenFixer rewrites files for the explicitopen experiment.
+type explicitOpenFixer struct{}
+
+func (o *explicitOpenFixer) fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 	var hasChanges bool
 	// Comprehension fields which the old semantics closed, and which
 	// openCompFieldValue must therefore leave alone.
@@ -261,7 +264,7 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			litStack = append(litStack, info)
 			info.embedFlags = embedFlags{}
 			if info.wholeValue {
-				_, info.wholeValue = soleEmbed(n)
+				_, info.wholeValue = o.soleEmbed(n)
 			}
 		}
 		return true
@@ -273,7 +276,7 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// See openCompFieldValue: comprehension conjuncts did not
 			// close their fields under the old semantics, unless the
 			// field had no other declaration to widen it.
-			if info.inComprehension && !closedCompFields[n] && openCompFieldValue(n) {
+			if info.inComprehension && !closedCompFields[n] && o.openCompFieldValue(n) {
 				hasChanges = true
 			}
 
@@ -297,7 +300,7 @@ func fixExplicitOpen(f *ast.File) (*ast.File, bool) {
 			// embeddings (e.g. inside struct operands of a conjunction)
 			// have already been processed; a Replace in the pre-visit
 			// would prevent the children from being traversed at all.
-			newExpr, exprChanged, flags := openEmbedExpr(n.Expr, info.wholeValue)
+			newExpr, exprChanged, flags := o.openEmbedExpr(n.Expr, info.wholeValue)
 			info.embedFlags = info.embedFlags.or(flags)
 			// An embedding declared directly in a comprehension value
 			// lost the old conditional closing when anything in it was
@@ -564,8 +567,8 @@ func unparen(expr ast.Expr) ast.Expr {
 }
 
 // oldClosedCompFields reports which fields reached through a comprehension
-// body the pre-v0.18.0 semantics closed, so that [openCompFieldValue] can
-// leave those alone.
+// body the pre-v0.18.0 semantics closed, so that
+// [explicitOpenFixer.openCompFieldValue] can leave those alone.
 //
 // A conjunct inserted through a comprehension behaved like an embedding: the
 // field it declared was closed by its value, except where another declaration
@@ -794,12 +797,12 @@ func declaresFields(expr ast.Expr) bool {
 // through comprehensions were treated like embeddings and did not close
 // their fields. The NOTE of a guessed spread goes on the field, where a
 // comment on the value would split it from its label.
-func openCompFieldValue(f *ast.Field) bool {
+func (o *explicitOpenFixer) openCompFieldValue(f *ast.Field) bool {
 	// PostfixExpr is excluded: the value already has an ellipsis.
 	switch f.Value.(type) {
 	case *ast.Ident, *ast.SelectorExpr, *ast.IndexExpr,
 		*ast.BinaryExpr, *ast.ParenExpr, *ast.CallExpr:
-		if flags := collectEmbedFlags(f.Value); flags.mayBeClosed() {
+		if flags := o.collectEmbedFlags(f.Value); flags.mayBeClosed() {
 			f.Value = addEllipsis(f.Value)
 			if guessedSpread(flags) {
 				addDeclNote(f, spreadNote)
@@ -815,7 +818,7 @@ func openCompFieldValue(f *ast.Field) bool {
 // embedding it nor a spread on it can carry closedness. An identifier which
 // the parser resolved to a declaration in the file shadows the predeclared one
 // and does not count.
-func isScalarPredeclared(x *ast.Ident) bool {
+func (o *explicitOpenFixer) isScalarPredeclared(x *ast.Ident) bool {
 	if x.Node != nil || x.Scope != nil {
 		return false
 	}
@@ -828,10 +831,10 @@ func isScalarPredeclared(x *ast.Ident) bool {
 
 // collectEmbedFlags recurses into an expression to collect embedding flags
 // without modifying the expression. It is the single classifier of what an
-// embedded expression may resolve to; [openEmbedExpr] derives its rewrites
-// from the flags it returns.
-func collectEmbedFlags(expr ast.Expr) embedFlags {
-	return embedFlagsOf(expr, nil)
+// embedded expression may resolve to; [explicitOpenFixer.openEmbedExpr] derives
+// its rewrites from the flags it returns.
+func (o *explicitOpenFixer) collectEmbedFlags(expr ast.Expr) embedFlags {
+	return o.embedFlagsOf(expr, nil)
 }
 
 // viaLet classifies the name x by the value of the let clause it refers to,
@@ -848,20 +851,20 @@ func viaLet[T any](x *ast.Ident, visiting []*ast.LetClause, classify func(ast.Ex
 	return classify(l.Expr, append(visiting, l)), true
 }
 
-// embedFlagsOf is [collectEmbedFlags] with the lets being classified up
-// the recursion, see [viaLet].
-func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
+// embedFlagsOf is [explicitOpenFixer.collectEmbedFlags] with the lets being
+// classified up the recursion, see [viaLet].
+func (o *explicitOpenFixer) embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
 		// Already has ellipsis (e.g. rewritten by a nested pass);
 		// still collect flags from the underlying expression.
 		if x.Op == token.ELLIPSIS {
-			return embedFlagsOf(x.X, visiting)
+			return o.embedFlagsOf(x.X, visiting)
 		}
 	case *ast.BinaryExpr:
 		if x.Op == token.AND || x.Op == token.OR {
-			xf := embedFlagsOf(x.X, visiting)
-			yf := embedFlagsOf(x.Y, visiting)
+			xf := o.embedFlagsOf(x.X, visiting)
+			yf := o.embedFlagsOf(x.Y, visiting)
 			f := xf.or(yf)
 			// A disjunction may resolve to any of its operands, so unless
 			// every operand is a definition the closing has to follow the
@@ -875,15 +878,15 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 		// Other binary ops (e.g. +, *) cannot resolve to closed structs.
 		return embedFlags{}
 	case *ast.ParenExpr:
-		return embedFlagsOf(x.X, visiting)
+		return o.embedFlagsOf(x.X, visiting)
 	case *ast.Ident:
-		if isTop(x) || isScalarPredeclared(x) {
+		if isTop(x) || o.isScalarPredeclared(x) {
 			return embedFlags{}
 		}
 		if internal.IsDefinition(x) {
 			return embedFlags{def: true}
 		}
-		if f, ok := viaLet(x, visiting, embedFlagsOf); ok {
+		if f, ok := viaLet(x, visiting, o.embedFlagsOf); ok {
 			return f
 		}
 		return embedFlags{other: true}
@@ -901,7 +904,7 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 			case "close":
 				f := embedFlags{close: true}
 				if len(x.Args) == 1 {
-					f = f.or(embedFlagsOf(x.Args[0], visiting))
+					f = f.or(o.embedFlagsOf(x.Args[0], visiting))
 				}
 				return f
 			case "__closeAll", "__reclose":
@@ -913,7 +916,7 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 					f.def = true
 				}
 				if len(x.Args) == 1 {
-					f = f.or(embedFlagsOf(x.Args[0], visiting))
+					f = f.or(o.embedFlagsOf(x.Args[0], visiting))
 				}
 				return f
 			case "and", "or":
@@ -926,7 +929,7 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 		// disjunction it marks a branch of needs a runtime check is
 		// decided by the disjunction.
 		if x.Op == token.MUL {
-			return embedFlagsOf(x.X, visiting)
+			return o.embedFlagsOf(x.X, visiting)
 		}
 		return embedFlags{}
 	case *ast.StructLit:
@@ -936,7 +939,7 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 		for _, d := range x.Elts {
 			switch d := d.(type) {
 			case *ast.EmbedDecl:
-				f = f.or(embedFlagsOf(d.Expr, visiting))
+				f = f.or(o.embedFlagsOf(d.Expr, visiting))
 			case *ast.Field:
 				// A literal reached through a let, which is what a
 				// non-empty visiting list means, keeps the guess when
@@ -944,7 +947,7 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 				// that value along a path the enclosing struct declares
 				// too, which openNestedClosing widens only in a literal
 				// embedded directly.
-				if len(visiting) > 0 && !fieldlessOf(d.Value, visiting) {
+				if len(visiting) > 0 && !o.fieldlessOf(d.Value, visiting) {
 					return embedFlags{other: true}
 				}
 			}
@@ -961,23 +964,23 @@ func embedFlagsOf(expr ast.Expr, visiting []*ast.LetClause) embedFlags {
 }
 
 // openEmbedExpr adds postfix ellipsis to embedded expressions, classifying
-// them via [collectEmbedFlags]. Conjunctions, disjunctions, and parenthesized
-// expressions always get ... on the whole expression; embedded close() calls
-// are hoisted; any other expression gets ... exactly when its flags indicate
-// it may resolve to a closed value.
+// them via [explicitOpenFixer.collectEmbedFlags]. Conjunctions, disjunctions,
+// and parenthesized expressions always get ... on the whole expression;
+// embedded close() calls are hoisted; any other expression gets ... exactly
+// when its flags indicate it may resolve to a closed value.
 //
 // whole reports that the embedding is the whole value of its struct literal
 // (see [closeInfo.wholeValue]), in which case no opening is needed at all:
 // nothing is declared beside the embedding for the old semantics to have
 // opened it for, and an ellipsis would open the closedness of its nested
 // paths too, which no wrapper restores.
-func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, flags embedFlags) {
+func (o *explicitOpenFixer) openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, flags embedFlags) {
 	switch x := expr.(type) {
 	case *ast.PostfixExpr:
 		// Already has ellipsis; still collect flags from the underlying
 		// expression, as they influence the wrapping of the enclosing
 		// struct.
-		return expr, false, collectEmbedFlags(x)
+		return expr, false, o.collectEmbedFlags(x)
 
 	case *ast.BinaryExpr:
 		if x.Op != token.AND && x.Op != token.OR {
@@ -989,20 +992,20 @@ func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, fl
 		}
 		// Add ... to the entire expression rather than each operand,
 		// even when no operand may resolve to a closed value.
-		return addEllipsis(expr), true, collectEmbedFlags(x)
+		return addEllipsis(expr), true, o.collectEmbedFlags(x)
 
 	case *ast.ParenExpr:
 		if whole {
 			break
 		}
 		// Add ... to the whole parenthesized expression.
-		return addEllipsis(expr), true, collectEmbedFlags(x)
+		return addEllipsis(expr), true, o.collectEmbedFlags(x)
 
 	case *ast.StructLit:
 		// The literal itself needs no ellipsis — its inner embeddings
 		// were already opened — but their flags still influence the
 		// wrapping of the enclosing struct.
-		return expr, false, collectEmbedFlags(x)
+		return expr, false, o.collectEmbedFlags(x)
 
 	case *ast.CallExpr:
 		if isCloseCall(x) {
@@ -1013,7 +1016,7 @@ func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, fl
 			// argument as the new embedding, and set the close flag
 			// so the containing struct gets close() wrapping.
 			if len(x.Args) == 1 {
-				newArg, _, f := openCloseArg(x.Args[0], whole)
+				newArg, _, f := o.openCloseArg(x.Args[0], whole)
 				if whole && !f.mayBeClosed() {
 					// Nothing inside the argument was opened, and the
 					// literal declares nothing beside the call, so the
@@ -1038,7 +1041,7 @@ func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, fl
 		// enclosing literal would close what the embedding leaves open.
 		return expr, false, embedFlags{}
 	}
-	if f := collectEmbedFlags(expr); f.mayBeClosed() {
+	if f := o.collectEmbedFlags(expr); f.mayBeClosed() {
 		return addEllipsis(expr), true, f
 	}
 	return expr, false, embedFlags{}
@@ -1049,20 +1052,20 @@ func openEmbedExpr(expr ast.Expr, whole bool) (result ast.Expr, changed bool, fl
 // arguments, it returns the flags without modifying the expression
 // (adding ... to a bare identifier inside close() is not valid).
 //
-// whole is as in [openEmbedExpr]: a close() call which is the whole value
-// of its literal passes it on, since its argument is then the whole value
-// of the call.
-func openCloseArg(expr ast.Expr, whole bool) (ast.Expr, bool, embedFlags) {
+// whole is as in [explicitOpenFixer.openEmbedExpr]: a close() call which is the
+// whole value of its literal passes it on, since its argument is then the whole
+// value of the call.
+func (o *explicitOpenFixer) openCloseArg(expr ast.Expr, whole bool) (ast.Expr, bool, embedFlags) {
 	s, ok := expr.(*ast.StructLit)
 	if !ok {
 		// Non-struct argument: process like a regular embedding so that
 		// e.g. close(#A) → #A... when hoisted.
-		newExpr, _, f := openEmbedExpr(expr, whole)
+		newExpr, _, f := o.openEmbedExpr(expr, whole)
 		return newExpr, f.mayBeClosed(), f
 	}
 	// An embedding is the whole value of the argument literal only if
 	// the literal declares nothing else, just as in the traversal.
-	_, sole := soleEmbed(s)
+	_, sole := o.soleEmbed(s)
 	whole = whole && sole
 	var f embedFlags
 	var changed bool
@@ -1073,7 +1076,7 @@ func openCloseArg(expr ast.Expr, whole bool) (ast.Expr, bool, embedFlags) {
 		if !ok {
 			continue
 		}
-		newExpr, exprChanged, ef := openEmbedExpr(embed.Expr, whole)
+		newExpr, exprChanged, ef := o.openEmbedExpr(embed.Expr, whole)
 		f = f.or(ef)
 		if exprChanged {
 			changed = true
@@ -1097,13 +1100,13 @@ func openCloseArg(expr ast.Expr, whole bool) (ast.Expr, bool, embedFlags) {
 // there. A quoted label is a regular field whatever its string.
 // [singleEmbed], which the rewrites dropping the braces of s use,
 // counts every declaration: dropping the braces would drop them all.
-func soleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
+func (o *explicitOpenFixer) soleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 	var found *ast.EmbedDecl
 	for _, d := range s.Elts {
 		switch d := d.(type) {
 		case *ast.Attribute, *ast.LetClause:
 		case *ast.Field:
-			if internal.IsRegularField(d) || !fieldless(d.Value) {
+			if internal.IsRegularField(d) || !o.fieldless(d.Value) {
 				return nil, false
 			}
 		case *ast.EmbedDecl:
@@ -1121,37 +1124,37 @@ func soleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 // fieldless reports whether expr can declare no field at any path: a
 // scalar or top, a let bound to one, or an expression built from those
 // alone.
-func fieldless(expr ast.Expr) bool {
-	return fieldlessOf(expr, nil)
+func (o *explicitOpenFixer) fieldless(expr ast.Expr) bool {
+	return o.fieldlessOf(expr, nil)
 }
 
-// fieldlessOf is [fieldless] with the lets being classified up the
-// recursion, see [viaLet].
-func fieldlessOf(expr ast.Expr, visiting []*ast.LetClause) bool {
+// fieldlessOf is [explicitOpenFixer.fieldless] with the lets being classified
+// up the recursion, see [viaLet].
+func (o *explicitOpenFixer) fieldlessOf(expr ast.Expr, visiting []*ast.LetClause) bool {
 	switch x := expr.(type) {
 	case *ast.BasicLit, *ast.Interpolation:
 		return true
 	case *ast.Ident:
-		if isTop(x) || isScalarPredeclared(x) {
+		if isTop(x) || o.isScalarPredeclared(x) {
 			return true
 		}
-		if r, ok := viaLet(x, visiting, fieldlessOf); ok {
+		if r, ok := viaLet(x, visiting, o.fieldlessOf); ok {
 			return r
 		}
 		return false
 	case *ast.ParenExpr:
-		return fieldlessOf(x.X, visiting)
+		return o.fieldlessOf(x.X, visiting)
 	case *ast.UnaryExpr:
 		// Only a default marker, *x, can produce a struct, from its
 		// operand.
-		return fieldlessOf(x.X, visiting)
+		return o.fieldlessOf(x.X, visiting)
 	case *ast.BinaryExpr:
 		// Only a conjunction or a disjunction can produce a struct; any
 		// other operator yields a scalar, or an error.
 		if x.Op != token.AND && x.Op != token.OR {
 			return true
 		}
-		return fieldlessOf(x.X, visiting) && fieldlessOf(x.Y, visiting)
+		return o.fieldlessOf(x.X, visiting) && o.fieldlessOf(x.Y, visiting)
 	}
 	return false
 }
@@ -1472,7 +1475,8 @@ func singleEmbed(s *ast.StructLit) (*ast.EmbedDecl, bool) {
 	if len(s.Elts) != 1 {
 		return nil, false
 	}
-	return soleEmbed(s)
+	e, ok := s.Elts[0].(*ast.EmbedDecl)
+	return e, ok
 }
 
 // soleEmbedExpr returns the expression which a single-embedding literal is

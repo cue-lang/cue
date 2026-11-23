@@ -7,16 +7,20 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
 	"testing/fstest"
+	"weak"
 
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/token"
 )
 
 func TestIOFS(t *testing.T) {
@@ -179,6 +183,51 @@ a: 1
 	qt.Assert(t, qt.HasLen(insts[0].BuildFiles, 1))
 	qt.Assert(t, qt.IsFalse(insts[0].BuildFiles[0].FilenameLoc.IsZero()))
 	qt.Assert(t, qt.Equals(insts[0].BuildFiles[0].FilenameLoc.String(), insts[0].BuildFiles[0].Filename))
+}
+
+// TestPosRetention checks that a position in one loaded package does not keep
+// alive the syntax of another package from the same [Instances] call.
+func TestPosRetention(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "cue.mod", "module.cue"), `module: "example.com/m@v0"
+language: version: "v0.14.0"
+`)
+	writeFile(t, filepath.Join(dir, "m.cue"), "package m\n\nx: 1\n")
+	writeFile(t, filepath.Join(dir, "p0", "p0.cue"), "package p0\n\ny: 2\n")
+
+	for _, test := range []struct {
+		name string
+		cfg  *Config
+	}{
+		{"Disk", &Config{Dir: dir}},
+		{"Overlay", &Config{Dir: dir, Overlay: map[string]Source{
+			filepath.Join(dir, "p0", "p0.cue"): FromString("package p0\n\ny: 3\n"),
+		}}},
+		{"FS", &Config{FS: os.DirFS(dir)}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var pos token.Pos
+			var p0 weak.Pointer[ast.File]
+			func() {
+				insts := Instances([]string{"./..."}, test.cfg)
+				qt.Assert(t, qt.HasLen(insts, 2))
+				for _, inst := range insts {
+					qt.Assert(t, qt.IsNil(inst.Err))
+					switch inst.PkgName {
+					case "m":
+						pos = inst.Files[0].Decls[1].Pos()
+					case "p0":
+						p0 = weak.Make(inst.Files[0])
+					}
+				}
+			}()
+			runtime.GC()
+			// TODO: unless loading via Config.FS, p0 is kept alive, as the position
+			// leads to the loader's cache of every file it parsed.
+			qt.Check(t, qt.Equals(p0.Value() == nil, test.name == "FS"))
+			qt.Check(t, qt.Equals(pos.Line(), 3))
+		})
+	}
 }
 
 func TestLoadFromFSWithDirectoryReplace(t *testing.T) {

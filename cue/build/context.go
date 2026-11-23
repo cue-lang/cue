@@ -26,8 +26,13 @@
 package build
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
 
 // A Context keeps track of state of building instances and caches work.
@@ -38,6 +43,51 @@ type Context struct {
 	initialized bool
 
 	imports map[string]*Instance
+
+	// resolved, if non-nil, holds the resolution of each file added to an
+	// instance, as set up by [hiddenContext.ResolveFilesOnce].
+	resolved map[*ast.File]*resolvedFile
+}
+
+type hiddenContext = Context
+
+// ResolveFilesOnce makes c resolve each file only the first time it is
+// added to an instance, until done is called. Files must not change meanwhile.
+//
+// NOTE: this is an internal API and may change at any time without notice.
+func (c *hiddenContext) ResolveFilesOnce() (done func()) {
+	c.resolved = make(map[*ast.File]*resolvedFile)
+	return func() { c.resolved = nil }
+}
+
+type resolvedFile struct {
+	unresolved []*ast.Ident
+	err        errors.Error
+	importRefs map[*ast.ImportSpec]bool // set by [Instance.resolveFile]
+}
+
+// resolve resolves f, or restores the unresolved identifiers of f
+// if c has resolved it before.
+func (c *Context) resolve(f *ast.File) errors.Error {
+	if r := c.resolution(f); r != nil {
+		f.Unresolved = slices.Clone(r.unresolved)
+		return r.err
+	}
+	var err errors.Error
+	astutil.Resolve(f, func(pos token.Pos, msg string, args ...any) {
+		err = errors.Append(err, errors.Newf(pos, msg, args...))
+	})
+	if c != nil && c.resolved != nil {
+		c.resolved[f] = &resolvedFile{unresolved: slices.Clone(f.Unresolved), err: err}
+	}
+	return err
+}
+
+func (c *Context) resolution(f *ast.File) *resolvedFile {
+	if c == nil {
+		return nil
+	}
+	return c.resolved[f]
 }
 
 // NewInstance creates an instance for this Context. If the [LoadFunc]

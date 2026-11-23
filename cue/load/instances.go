@@ -139,6 +139,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 	l := newLoader(c, tg, pkgs)
 
+	resolveDone := func() {}
 	if c.Context == nil {
 		opts := []build.Option{
 			build.ParseFile(c.ParseFile),
@@ -147,6 +148,10 @@ func Instances(args []string, c *Config) []*build.Instance {
 			opts = append(opts, build.Loader(f))
 		}
 		c.Context = build.NewContext(opts...)
+		// Files are parsed once per load and may be shared by instances,
+		// such as one in a parent directory of several packages.
+		// A Context from the caller is left alone, as it may be shared.
+		resolveDone = c.Context.ResolveFilesOnce()
 	}
 
 	a := []*build.Instance{}
@@ -170,6 +175,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 			p.SetTargetLanguageVersion(c.LanguageVersion)
 		}
 	}
+
+	// All instances are complete, and tag injection below changes files.
+	resolveDone()
 
 	// A file may be shared by multiple instances, such as one inherited from
 	// a parent directory, so collect the tags in each file once to inject each

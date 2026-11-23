@@ -139,6 +139,7 @@ ref: a
 `)
 			ref := shared.Decls[len(shared.Decls)-1].(*ast.Field).Value.(*ast.Ident)
 			ctx := NewContext()
+			done := ctx.ResolveFilesOnce()
 			newInst := func(name, src string) *Instance {
 				inst := ctx.NewInstance("", nil)
 				if err := inst.AddSyntax(shared); err != nil {
@@ -183,7 +184,8 @@ ref: a
 				}
 			}
 
-			// A file changed before it is added again is resolved again.
+			// Once done, a file changed since is resolved again.
+			done()
 			shared.Decls = slices.Delete(shared.Decls, 3, 4) // let X = 2
 			instC := newInst("c.cue", "package x\na: 1\n")
 			if instC.Err != nil {

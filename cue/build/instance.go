@@ -24,7 +24,6 @@ import (
 	"unicode"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -347,9 +346,7 @@ func (inst *Instance) AddFile(filename string, src interface{}) error {
 // AddSyntax adds the given file to list of files for this instance. The package
 // name of the file must match the package name of the instance.
 func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
-	astutil.Resolve(file, func(pos token.Pos, msg string, args ...interface{}) {
-		inst.Err = errors.Append(inst.Err, errors.Newf(pos, msg, args...))
-	})
+	inst.Err = errors.Append(inst.Err, inst.ctxt.resolve(file))
 	pkg := file.PackageName()
 	if pkg != "" && pkg != "_" && !inst.User && !inst.setPkg(pkg) && pkg != inst.PkgName {
 		err := errors.Newf(file.Pos(),
@@ -470,22 +467,27 @@ func (inst *Instance) resolveFile(f *ast.File, allFields map[string]ast.Node) er
 
 	// Verify each import is used.
 	if len(specs) > 0 {
-		// Find references to imports. This assumes that identifiers in labels
-		// are not resolved or that such errors are caught elsewhere.
-		ast.Walk(f, nil, func(n ast.Node) {
-			if x, ok := n.(*ast.Ident); ok {
-				// As we also visit labels, most nodes will be nil.
-				if x.Node == nil {
-					return
-				}
-				for i, s := range specs {
-					if s == x.Node {
-						specs[i] = nil
-						return
+		r := inst.ctxt.resolution(f)
+		if r == nil {
+			r = &resolvedFile{}
+		}
+		if r.importRefs == nil {
+			// Find references to imports. This assumes that identifiers in labels
+			// are not resolved or that such errors are caught elsewhere.
+			r.importRefs = make(map[*ast.ImportSpec]bool)
+			ast.Walk(f, nil, func(n ast.Node) {
+				if x, ok := n.(*ast.Ident); ok {
+					if spec, ok := x.Node.(*ast.ImportSpec); ok {
+						r.importRefs[spec] = true
 					}
 				}
+			})
+		}
+		for i, s := range specs {
+			if r.importRefs[s] {
+				specs[i] = nil
 			}
-		})
+		}
 
 		// Add errors for unused imports.
 		for _, spec := range specs {

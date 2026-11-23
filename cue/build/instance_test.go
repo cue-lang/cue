@@ -15,9 +15,12 @@
 package build
 
 import (
+	"fmt"
+	"slices"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modfiledata"
 )
@@ -107,5 +110,85 @@ func TestTargetLanguageVersionInModule(t *testing.T) {
 	inst.SetTargetLanguageVersion("v0.16.0")
 	if got := inst.TargetLanguageVersion(); got != "v0.17.0" {
 		t.Fatalf("module export version = %q", got)
+	}
+}
+
+// A file shared by instances of one context, such as one in a parent
+// directory, binds or clears its references to other files' fields for
+// each instance, and reports its errors in each.
+func TestSharedFile(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		addFirst bool   // add the file to both instances before completing either
+		wantB    string // what ref is bound to once instance b is complete
+	}{
+		{name: "CompleteFirst", wantB: "unresolved"},
+		// Instance b keeps the binding made by instance a.
+		{name: "AddFirst", addFirst: true, wantB: "a"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			shared, _ := parser.ParseFile("shared.cue", `
+package x
+
+import "list"
+
+let X = 1
+let X = 2
+out: X
+ref: a
+`)
+			ref := shared.Decls[len(shared.Decls)-1].(*ast.Field).Value.(*ast.Ident)
+			ctx := NewContext()
+			newInst := func(name, src string) *Instance {
+				inst := ctx.NewInstance("", nil)
+				if err := inst.AddSyntax(shared); err != nil {
+					t.Fatal(err)
+				}
+				if err := inst.AddFile(name, src); err != nil {
+					t.Fatal(err)
+				}
+				return inst
+			}
+			instA := newInst("a.cue", "package x\na: 1\n")
+			binding := func() string {
+				switch {
+				case ref.Node == nil && slices.Contains(shared.Unresolved, ref):
+					return "unresolved"
+				case ref.Node == instA.Files[1].Decls[1].(*ast.Field).Value:
+					return "a"
+				}
+				return fmt.Sprint(ref.Node)
+			}
+			var instB *Instance
+			if tc.addFirst {
+				instB = newInst("b.cue", "package x\nb: 1\n")
+			}
+			instA.Complete()
+			if got, want := binding(), "a"; got != want {
+				t.Errorf("instance a: ref bound to %s; want %s", got, want)
+			}
+			if !tc.addFirst {
+				instB = newInst("b.cue", "package x\nb: 1\n")
+			}
+			instB.Complete()
+			if got := binding(); got != tc.wantB {
+				t.Errorf("instance b: ref bound to %s; want %s", got, tc.wantB)
+			}
+			for _, inst := range []*Instance{instA, instB} {
+				if got, want := fmt.Sprint(inst.Err), `alias "X" redeclared in same scope`; got != want {
+					t.Errorf("Err = %q; want %q", got, want)
+				}
+				if got, want := fmt.Sprint(inst.ResolutionErr), `imported and not used: "list"`; got != want {
+					t.Errorf("ResolutionErr = %q; want %q", got, want)
+				}
+			}
+
+			// A file changed before it is added again is resolved again.
+			shared.Decls = slices.Delete(shared.Decls, 3, 4) // let X = 2
+			instC := newInst("c.cue", "package x\na: 1\n")
+			if instC.Err != nil {
+				t.Errorf("instance c: Err = %v; want nil", instC.Err)
+			}
+		})
 	}
 }

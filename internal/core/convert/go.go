@@ -140,13 +140,15 @@ func splitTag(tag string) (cue string, options string) {
 	return tag, ""
 }
 
-// getName returns the CUE name of a struct field. The first of the json, yaml,
-// and protobuf tags present on the field decides its name, even when the tag
-// gives no name, so that a field is named consistently with one encoding.
+// tagName names a struct field for [GoFields] by the first of its json, yaml,
+// and protobuf tags, even if that tag gives no name, so that a field is named
+// consistently with one encoding. It leaves out fields named "-", and an
+// unexported embedded struct named by a tag for which [hasMethods] holds,
+// much like encoding/json does since Go 1.27.
 //
 // TODO: should we allow mapping names in cue tags? This only seems like a good
 // idea if we ever want to allow mapping CUE to a different name than JSON.
-func getName(f *reflect.StructField) string {
+func tagName(f reflect.StructField) (string, bool) {
 	var name string
 	if tag, ok := f.Tag.Lookup("json"); ok {
 		name, _, _ = strings.Cut(tag, ",")
@@ -161,13 +163,61 @@ func getName(f *reflect.StructField) string {
 			}
 		}
 	}
-	switch {
-	case name != "":
-		return name
-	case f.Anonymous:
-		return ""
+	if name == "-" {
+		return "", false
 	}
-	return f.Name
+	if name != "" && !f.IsExported() {
+		t := f.Type
+		if t.Kind() == reflect.Pointer {
+			t = t.Elem()
+		}
+		if hasMethods(t) {
+			return "", false
+		}
+	}
+	return name, true
+}
+
+// goStruct holds the resolved fields of a Go struct type.
+// promotedCUE names an embedded field with a cue tag whose fields are
+// promoted, if any, as the tag has no struct value left to constrain.
+type goStruct struct {
+	fields      []GoField
+	promotedCUE string
+}
+
+var structFieldsCache sync.Map // map[reflect.Type]*goStruct
+
+// structFields resolves the fields of the struct type t, named by [tagName].
+func structFields(t reflect.Type) *goStruct {
+	if s, ok := structFieldsCache.Load(t); ok {
+		return s.(*goStruct)
+	}
+	fields, promoted := GoFields(t, tagName)
+	s := &goStruct{fields: fields}
+	for _, sf := range promoted {
+		if _, ok := sf.Tag.Lookup("cue"); ok {
+			s.promotedCUE = sf.Name
+			break
+		}
+	}
+	actual, _ := structFieldsCache.LoadOrStore(t, s)
+	return actual.(*goStruct)
+}
+
+// fieldByIndex is like [reflect.Value.FieldByIndexErr],
+// but reports a nil embedded pointer without allocating an error.
+func fieldByIndex(v reflect.Value, index []int) (reflect.Value, bool) {
+	for i, x := range index {
+		if i > 0 && v.Kind() == reflect.Pointer {
+			if v.IsNil() {
+				return reflect.Value{}, false
+			}
+			v = v.Elem()
+		}
+		v = v.Field(x)
+	}
+	return v, true
 }
 
 // isOptional indicates whether a field should be marked as optional.
@@ -371,6 +421,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		return n
 	}
 
+	// Keep hasMethods in sync with the type switch above, the interfaces
+	// below, and isZeroer for omitzero.
 	if v, ok := typeAssert[interface{ Core() runtime.Value }](val); ok {
 		// TODO: the zero cue.Value holds no vertex, and nil panics later on.
 		// See https://cuelang.org/issue/3175.
@@ -453,7 +505,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 	case reflect.Struct:
 		// Grow the slices to match the number of fields in the Go struct,
 		// avoiding repeated slice growth in append calls below.
-		numFields := typ.NumField()
+		fields := structFields(typ).fields
+		numFields := len(fields)
 		sl := &adt.StructLit{
 			Src:   src,
 			Decls: make([]adt.Decl, 0, numFields),
@@ -462,16 +515,14 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 			Arcs: make([]*adt.Vertex, 0, numFields),
 		}
 
-		for i := range typ.NumField() {
-			sf := typ.Field(i)
-			if sf.PkgPath != "" {
-				continue
+		for i := range fields {
+			field := &fields[i]
+			sf := field.StructField
+			val, ok := fieldByIndex(val, field.Index)
+			if !ok {
+				continue // a nil embedded pointer, like in encoding/json
 			}
-			val := val.Field(i)
 			if !nilIsTop && isNil(val) {
-				continue
-			}
-			if tag, _ := sf.Tag.Lookup("json"); tag == "-" {
 				continue
 			}
 			if isOmitEmpty(sf) && val.IsZero() {
@@ -490,19 +541,7 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 			}
 
 			// leave errors like we do during normal evaluation or do we want to return the error?
-			name := getName(&sf)
-			if name == "-" {
-				continue
-			}
-			if sf.Anonymous && name == "" {
-				arc, ok := sub.(*adt.Vertex)
-				if ok {
-					v.Arcs = append(v.Arcs, arc.Arcs...)
-				}
-				continue
-			}
-
-			f := ctx.StringLabel(name)
+			f := ctx.StringLabel(field.Name)
 			sl.Decls = append(sl.Decls, &adt.Field{Label: f, Value: sub})
 			v.Arcs = append(v.Arcs, ensureArcVertex(ctx, env, sub, f))
 		}
@@ -657,7 +696,32 @@ var (
 	apdDecimal    = reflect.TypeFor[*apd.Decimal]()
 	adtNum        = reflect.TypeFor[*adt.Num]()
 	topSentinel   = ast.NewIdent("_")
+
+	methodTypes = []reflect.Type{
+		reflect.TypeFor[interface{ Core() runtime.Value }](),
+		reflect.TypeFor[ast.Expr](),
+		jsonMarshaler,
+		textMarshaler,
+		reflect.TypeFor[error](),
+		isZeroerType,
+	}
 )
+
+// hasMethods reports whether [fromGoValue] converts a t or *t via its methods
+// or its type, which cannot be used through an unexported field.
+func hasMethods(t reflect.Type) bool {
+	pt := reflect.PointerTo(t)
+	switch pt {
+	case astFile, adtNum, bigInt, bigRat, bigFloat, apdDecimal:
+		return true
+	}
+	for _, iface := range methodTypes {
+		if t.Implements(iface) || pt.Implements(iface) {
+			return true
+		}
+	}
+	return false
+}
 
 // typeAssert is similar to [reflect.TypeAssert] except that
 // it will also convert v to a pointer if its pointer type implements
@@ -915,19 +979,19 @@ func (b *typeBuilder) buildStruct(t reflect.Type) ast.Expr {
 // buildStructLit builds the struct literal for a Go struct type.
 func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
 	obj := &ast.StructLit{}
-	for f := range t.Fields() {
-		if f.PkgPath != "" {
-			continue
-		}
+	s := structFields(t)
+	if s.promotedCUE != "" {
+		*b.errs = append(*b.errs, errors.Newf(token.NoPos,
+			"unsupported cue tag for field %q, whose fields are promoted", s.promotedCUE))
+		return &ast.BadExpr{}
+	}
+	for i := range s.fields {
+		field := &s.fields[i]
+		f, name := field.StructField, field.Name
 		_, ok := f.Tag.Lookup("cue")
 		elem := b.build(f.Type, !ok)
 		if isBad(elem) {
 			continue // Ignore fields for unsupported types
-		}
-
-		name := getName(&f)
-		if name == "-" {
-			continue
 		}
 
 		if tag, ok := f.Tag.Lookup("cue"); ok {
@@ -938,6 +1002,10 @@ func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
 			if isBad(v) {
 				return v
 			}
+			if err := checkPromotedRefs(t, s.fields, field, v); err != nil {
+				*b.errs = append(*b.errs, err)
+				return &ast.BadExpr{}
+			}
 			elem = ast.NewBinExpr(token.AND, elem, v)
 		}
 		// TODO: if an identifier starts with __ (or otherwise is not a
@@ -946,12 +1014,46 @@ func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
 
 		// The Go JSON decoder always allows a value to be undefined.
 		d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
-		if isOptional(&f) {
+		// A nil embedded pointer omits the fields promoted through it.
+		if field.Indirect || isOptional(&f) {
 			d.Constraint = token.OPTION
 		}
 		obj.Elts = append(obj.Elts, d)
 	}
 	return obj
+}
+
+// checkPromotedRefs reports an error if a reference in the cue tag v of the
+// field f, promoted into the struct type t with fields, resolves to a field
+// other than the one it does in the struct declaring f.
+func checkPromotedRefs(t reflect.Type, fields []GoField, f *GoField, v ast.Expr) errors.Error {
+	prefix := f.Index[:len(f.Index)-1]
+	if len(prefix) == 0 {
+		return nil
+	}
+	decl := t.FieldByIndex(prefix).Type
+	if decl.Kind() == reflect.Pointer {
+		decl = decl.Elem()
+	}
+	declFields := structFields(decl).fields
+	file := &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: v}}}
+	astutil.Resolve(file, func(token.Pos, string, ...any) {})
+	for _, id := range file.Unresolved {
+		// A reference to no field in either struct, such as int, is fine.
+		var want, got []int
+		if i := slices.IndexFunc(declFields, func(g GoField) bool { return g.Name == id.Name }); i >= 0 {
+			want = append(slices.Clip(prefix), declFields[i].Index...)
+		}
+		if i := slices.IndexFunc(fields, func(g GoField) bool { return g.Name == id.Name }); i >= 0 {
+			got = fields[i].Index
+		}
+		if !slices.Equal(got, want) {
+			return errors.Newf(token.NoPos,
+				"unsupported cue tag for promoted field %q: reference %q resolves to a different field",
+				f.Name, id.Name)
+		}
+	}
+	return nil
 }
 
 func fromGoType(ctx *adt.OpContext, t reflect.Type) adt.Expr {

@@ -415,10 +415,11 @@ func TestConvert(t *testing.T) {
 			EmbedSlice
 			Z int
 		}{EmbedSlice{1, 2}, 5},
-		// Wrong: encoding/json names the embedded field after its type.
 		`(struct){
-  0: (int){ 1 }
-  1: (int){ 2 }
+  EmbedSlice: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -426,9 +427,10 @@ func TestConvert(t *testing.T) {
 			EmbedMap
 			Z int
 		}{EmbedMap{"k": 1}, 5},
-		// Wrong: encoding/json names the embedded field after its type.
 		`(struct){
-  k: (int){ 1 }
+  EmbedMap: (struct){
+    k: (int){ 1 }
+  }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -436,8 +438,8 @@ func TestConvert(t *testing.T) {
 			EmbedInt
 			Z int
 		}{1, 5},
-		// Wrong: encoding/json names the embedded field after its type.
 		`(struct){
+  EmbedInt: (int){ 1 }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -445,8 +447,8 @@ func TestConvert(t *testing.T) {
 			*EmbedInt
 			Z int
 		}{new(EmbedInt(1)), 5},
-		// Wrong: encoding/json names the embedded field after its type.
 		`(struct){
+  EmbedInt: (int){ 1 }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -454,8 +456,8 @@ func TestConvert(t *testing.T) {
 			EmbedIface
 			Z int
 		}{"s", 5},
-		// Wrong: encoding/json names the embedded field after its type.
 		`(struct){
+  EmbedIface: (string){ "s" }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -463,9 +465,10 @@ func TestConvert(t *testing.T) {
 			EmbedIface
 			Z int
 		}{EmbedStruct{1}, 5},
-		// Wrong: encoding/json names the embedded field after its type.
 		`(struct){
-  A: (int){ 1 }
+  EmbedIface: (struct){
+    A: (int){ 1 }
+  }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -484,10 +487,7 @@ func TestConvert(t *testing.T) {
 			B int `yaml:"X"`
 			Z int
 		}{1, 2, 5},
-		// Wrong: both fields are kept.
 		`(struct){
-  X: (int){ 1 }
-  X: (int){ 2 }
   Z: (int){ 5 }
 }`,
 	}, {
@@ -508,28 +508,23 @@ func TestConvert(t *testing.T) {
 			EmbedOther:      EmbedOther{"o"},
 			X:               "x",
 		},
-		// Wrong: embedded non-structs and unexported structs are dropped,
-		// and hidden or ambiguous fields are kept.
 		`(struct){
+  EmbedString: (string){ "s" }
+  U: (int){ 1 }
   named: (struct){
     hello: (string){ "n" }
   }
-  X: (int){ 2 }
-  Y: (int){ 3 }
-  Y: (string){ "o" }
   X: (string){ "x" }
 }`,
 	}, {
 		EmbedRules{EmbedPtr: &EmbedPtr{4}},
-		// Wrong: as above.
 		`(struct){
   P: (int){ 4 }
+  EmbedString: (string){ "" }
+  U: (int){ 0 }
   named: (struct){
     hello: (string){ "" }
   }
-  X: (int){ 0 }
-  Y: (int){ 0 }
-  Y: (string){ "" }
   X: (string){ "" }
 }`,
 	}, {
@@ -791,9 +786,11 @@ func TestConvertType(t *testing.T) {
 			*EmbedInt
 			EmbedIface
 		}{},
-		// Wrong: encoding/json names the embedded field after its type.
 		want: `(struct){
-  ""?: (null){ null }
+  EmbedSlice?: ((null|list)){ |(*(null){ null }, (list){
+    }) }
+  EmbedInt?: ((null|int)){ |(*(null){ null }, (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }) }
+  EmbedIface?: (_){ _ }
 }`,
 	}, {
 		goTyp: struct {
@@ -802,12 +799,8 @@ func TestConvertType(t *testing.T) {
 			A int    `json:"X"`
 			B int    `yaml:"X"`
 		}{},
-		// Wrong: encoding/json names the embedded field after its type, so Z
-		// wins, and it drops both fields named X.
 		want: `(struct){
-  "": (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
   EmbedInt: (string){ string }
-  X: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
 }`,
 	}, {
 		goTyp: EmbedMethods{},
@@ -819,94 +812,76 @@ func TestConvertType(t *testing.T) {
 }`,
 	}, {
 		goTyp: EmbedInline{},
-		// Wrong: the embedded fields are not promoted.
 		want: `(struct){
   _EmbedInline_0: (struct){
-    "": (struct){
-      hello: (string){ string }
-      world: (string){ string }
-    }
+    hello: (string){ string }
+    world: (string){ string }
+  }
+  hello: (string){ string }
+  world: (string){ string }
+}`,
+	}, {
+		goTyp: EmbedRules{},
+		want: `(struct){
+  _EmbedRules_0: (struct){
+    P?: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+    EmbedString: (string){ string }
+    U: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+    named: ~(_EmbedHello_0)
+    X: (string){ string }
   }
   _EmbedHello_0: (struct){
     hello: (string){ string }
   }
-  _EmbedWorld_0: (struct){
-    world: (string){ string }
-  }
-  "": (struct){
-    hello: (string){ string }
-    world: (string){ string }
-  }
+  P?: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  EmbedString: (string){ string }
+  U: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  named: ~(_EmbedHello_0)
+  X: (string){ string }
 }`,
 	}, {
 		goTyp: struct{ EmbedRef }{},
-		// Wrong: the embedded fields are not promoted.
 		want: `(struct){
-  _EmbedRef_0: (struct){
-    a: (_|_){
-      // [incomplete] _EmbedRef_0.a: non-concrete value int64 in operand to +:
-      //     <field:>:1:1
-    }
-    b: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
+  a: (_|_){
+    // [incomplete] a: non-concrete value int64 in operand to +:
+    //     <field:>:1:1
   }
-  "": ~(_EmbedRef_0)
+  b: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
 }`,
 	}, {
 		goTyp: struct {
 			EmbedRef
 			B string `yaml:"b"`
 		}{},
-		// Wrong: the embedded fields are not promoted.
-		want: `(struct){
-  _EmbedRef_0: (struct){
-    a: (_|_){
-      // [incomplete] _EmbedRef_0.a: non-concrete value int64 in operand to +:
-      //     <field:>:1:1
-    }
-    b: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-  }
-  "": ~(_EmbedRef_0)
-  b: (string){ string }
-}`,
+		want:        "(_|_){// _|_(unsupported cue tag for promoted field \"a\": reference \"b\" resolves to a different field)\n}",
+		expectError: true,
+	}, {
+		goTyp: struct {
+			EmbedRef
+			EmbedRefB
+		}{},
+		want:        "(_|_){// _|_(unsupported cue tag for promoted field \"a\": reference \"b\" resolves to a different field)\n}",
+		expectError: true,
 	}, {
 		goTyp: struct{ EmbedRefInt }{},
-		// Wrong: the embedded fields are not promoted.
 		want: `(struct){
-  _EmbedRefInt_0: (struct){
-    a: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-  }
-  "": ~(_EmbedRefInt_0)
+  a: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
 }`,
 	}, {
 		goTyp: struct {
 			EmbedRefInt
 			I int `yaml:"int"`
 		}{},
-		// Wrong: the embedded fields are not promoted.
-		want: `(struct){
-  _EmbedRefInt_0: (struct){
-    a: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-  }
-  "": ~(_EmbedRefInt_0)
-  int: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-}`,
+		want:        "(_|_){// _|_(unsupported cue tag for promoted field \"a\": reference \"int\" resolves to a different field)\n}",
+		expectError: true,
 	}, {
 		// A cue tag on a field whose fields are promoted
 		// has no struct value left to constrain.
 		goTyp: struct {
 			EmbedInner `cue:"{X: >0}"`
 		}{},
-		// Wrong: the embedded fields are not promoted.
-		want: `(struct){
-  _EmbedInner_0: (struct){
-    X: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-    Y: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-  }
-  "": (struct){
-    X: (int){ &(>0, <=9223372036854775807, int) }
-    Y: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
-  }
-}`,
+		want:        "(_|_){// _|_(unsupported cue tag for field \"EmbedInner\", whose fields are promoted)\n}",
+		expectError: true,
 	}, {
 		goTyp: []string{},
 		want: `((null|list)){ |(*(null){ null }, (list){

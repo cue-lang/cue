@@ -25,6 +25,7 @@ import (
 type GoField struct {
 	Name        string              // from a tag, or else the Go field name
 	Index       []int               // for [reflect.Value.FieldByIndex]
+	Indirect    bool                // promoted via an embedded pointer
 	StructField reflect.StructField // the Go field itself
 
 	tagged bool // whether Name comes from a tag
@@ -44,16 +45,18 @@ func compareFieldByIndex(a, b GoField) int {
 
 // GoFields resolves the fields of the struct type t like encoding/json,
 // in index order, with a breadth-first search over its embedded structs.
+// It also returns the embedded fields whose fields were promoted.
 //
 // tagName names a field from its tags, or "" if they give no name, and
 // reports whether to keep the field. An unnamed embedded struct, or pointer
 // to one, has its fields promoted, and any other unnamed field takes its Go
 // name. Of several fields with the same name, the shallowest wins, then a
 // tagged one; a tie drops them all.
-func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) []GoField {
+func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) (fields []GoField, promoted []reflect.StructField) {
 	type queued struct {
-		index []int
-		typ   reflect.Type
+		index    []int
+		typ      reflect.Type
+		indirect bool
 	}
 	// Anonymous fields to explore at the current level and the next.
 	current := []queued{}
@@ -64,9 +67,6 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 
 	// Types already visited at an earlier level.
 	visited := map[reflect.Type]bool{}
-
-	// Fields found.
-	var fields []GoField
 
 	for len(next) > 0 {
 		current, next = next, current[:0]
@@ -121,6 +121,7 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 						Name:        name,
 						Index:       index,
 						tagged:      tagged,
+						Indirect:    f.indirect,
 						StructField: sf,
 					})
 					if count[f.typ] > 1 {
@@ -134,9 +135,11 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 				}
 
 				// Record new anonymous struct to explore in next round.
+				promoted = append(promoted, sf)
 				nextCount[ft]++
 				if nextCount[ft] == 1 {
-					next = append(next, queued{index: index, typ: ft})
+					indirect := f.indirect || ft != sf.Type
+					next = append(next, queued{index: index, typ: ft, indirect: indirect})
 				}
 			}
 		}
@@ -192,7 +195,7 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 
 	fields = out
 	slices.SortFunc(fields, compareFieldByIndex)
-	return fields
+	return fields, promoted
 }
 
 // dominantField looks through the fields, all of which are known to

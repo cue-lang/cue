@@ -521,7 +521,7 @@ type goField struct {
 
 // typeFields returns a list of fields that JSON should recognize for the given type.
 func typeFields(t reflect.Type) structFields {
-	goFields := convert.GoFields(t, jsonTagName)
+	goFields, _ := convert.GoFields(t, jsonTagName)
 	fields := make([]goField, 0, len(goFields))
 	for _, f := range goFields {
 		nameBytes := []byte(f.Name)

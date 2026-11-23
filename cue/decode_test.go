@@ -165,13 +165,10 @@ func TestDecode(t *testing.T) {
 		encode: embedSlice{EmbedSlice{1, 2}, 5},
 		newDst: func() any { return &embedSlice{} },
 		want:   embedSlice{EmbedSlice{1, 2}, 5},
-		// Wrong: the slice elements are encoded as integer labels.
-		err: "panic: Selector.Unquoted invoked on non-string label",
 	}, {
 		encode: embedInt{1, 5},
 		newDst: func() any { return &embedInt{} },
-		// Wrong: the embedded field is not encoded.
-		want: embedInt{0, 5},
+		want:   embedInt{1, 5},
 	}, {
 		value: `{for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,
@@ -387,14 +384,7 @@ func TestDecode(t *testing.T) {
 				v = getValue(m, tc.value)
 			}
 			dst := tc.newDst()
-			err := func() (err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				return v.Decode(dst)
-			}()
+			err := v.Decode(dst)
 			if !checkErr(t, err, tc.err, "init") {
 				return
 			}

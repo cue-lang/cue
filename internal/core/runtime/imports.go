@@ -100,17 +100,21 @@ type index struct {
 	// recorded lists the roots which record the index.
 	recorded *recordedRoots
 
+	// id identifies the index within the process; see [adt.MakeLetLabel].
+	id           uint64
 	nextUniqueID uint64
 	typeCache    sync.Map // map[reflect.Type]evaluated
 }
 
-func (i *index) getNextUniqueID() uint64 {
+var lastIndexID atomic.Uint64
+
+func (i *index) getNextUniqueID() (id, runtimeID uint64) {
 	// TODO: use atomic increment instead.
 	i.lock.Lock()
 	i.nextUniqueID++
 	x := i.nextUniqueID
 	i.lock.Unlock()
-	return x
+	return x, i.id
 }
 
 func newIndex() *index {
@@ -119,6 +123,7 @@ func newIndex() *index {
 		importsByBuild: map[*build.Instance]*adt.Vertex{},
 		buildErrs:      map[*build.Instance]errors.Error{},
 		recorded:       &recordedRoots{},
+		id:             lastIndexID.Add(1),
 	}
 	i.self = weak.Make(i)
 	return i

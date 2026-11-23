@@ -60,8 +60,9 @@ type StringIndexer interface {
 	// ToString returns a string s for index such that ToIndex(s) == index.
 	IndexToString(index int64) string
 
-	// NextUniqueID returns a new unique identifier.
-	NextUniqueID() uint64
+	// NextUniqueID returns a new identifier unique within the runtime,
+	// and the runtime's identifier, unique within the process.
+	NextUniqueID() (id, runtimeID uint64)
 }
 
 // SelectorString reports the shortest string representation of f when used as a
@@ -190,12 +191,15 @@ func HiddenKey(s, pkgPath string) string {
 // MakeLetLabel creates a label for the given let identifier s.
 //
 // A let declaration is always logically unique within its scope and will never
-// unify with a let field of another struct. This is enforced by ensuring that
-// the let identifier is unique across an entire configuration. This, in turn,
-// is done by adding a unique number to each let identifier.
+// unify with a let field of another struct. This is enforced by adding a
+// number unique within the runtime and, as values from different runtimes may
+// be combined, a fixed-width runtime identifier, which sorts by creation.
+//
+// TODO(mem): labels are never freed, so each let compiled grows the label
+// table for the life of the process, even in short-lived runtimes.
 func MakeLetLabel(r StringIndexer, s string) Feature {
-	id := r.NextUniqueID()
-	s = fmt.Sprintf("%s\x00%X", s, id)
+	id, runtimeID := r.NextUniqueID()
+	s = fmt.Sprintf("%s\x00%X\x00%016X", s, id, runtimeID)
 	i := r.StringToIndex(s)
 	f, err := MakeLabel(nil, i, LetLabel)
 	if err != nil {

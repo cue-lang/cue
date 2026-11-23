@@ -3137,11 +3137,10 @@ func TestUnifyVariadic(t *testing.T) {
 		vals: []string{`let v = 1, x: v`, `let v = 2, y: v`},
 		want: `{"x":1,"y":2}`,
 	}, {
-		// The let labels of each Context start from the same number, yet
-		// they collide, so y gets the value of the first let.
+		// Also when each value comes from a different Context.
 		vals:             []string{`let v = 1, x: v`, `let v = 2, y: v`},
 		separateContexts: true,
-		want:             `{"x":1,"y":1}`,
+		want:             `{"x":1,"y":2}`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

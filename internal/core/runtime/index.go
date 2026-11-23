@@ -29,7 +29,7 @@ func (r *Runtime) StringToIndex(s string) int64 {
 	return getKey(s)
 }
 
-func (r *Runtime) NextUniqueID() uint64 {
+func (r *Runtime) NextUniqueID() (id, runtimeID uint64) {
 	return r.index.getNextUniqueID()
 }
 

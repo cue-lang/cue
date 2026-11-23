@@ -190,9 +190,11 @@ func (w *printer) label(f adt.Feature) {
 		w.string(ident)
 
 	case f.IsLet():
-		ident := f.RawString(w.index)
-		ident = strings.Replace(ident, "\x00", "#", 1)
-		w.string(ident)
+		// Omit the runtime identifier, which depends on process history,
+		// so lets from different runtimes may print alike.
+		name, id, _ := strings.Cut(f.RawString(w.index), "\x00")
+		id, _, _ = strings.Cut(id, "\x00")
+		w.string(name + "#" + id)
 
 	default:
 		w.string(f.SelectorString(w.index))

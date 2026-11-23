@@ -414,7 +414,7 @@ existsNStrict: {
 existsNAfterMatchN: {
 	_p: k: 1
 	n:  int
-	ab: matchN(1, [int & >n]) & existsN(1, _p.k) & 5 @test(err, code=eval, contains="existsN: 1 matched, expected 1", incorrect) @test(err:todo, p=1, code=incomplete, contains="does not satisfy matchN")
+	ab: matchN(1, [int & >n]) & existsN(1, _p.k) & 5 @test(err, code=incomplete, contains="does not satisfy matchN")
 	ba: existsN(1, _p.k) & matchN(1, [int & >n]) & 5 @test(err, code=incomplete, contains="does not satisfy matchN")
 }
 
@@ -970,9 +970,12 @@ invalidValues.existsBaz: exists: cannot index non-struct/list value:
     ./in.cue:389:3
 [eval] existsNStrict.t: existsN: field typo not allowed by closed struct:
     ./in.cue:399:5
-[eval] existsNAfterMatchN.ab: existsN: 1 matched, expected 1:
-    ./in.cue:407:30
-    ./in.cue:407:38
+[incomplete] existsNAfterMatchN.ab: non-concrete value n for bound >:
+    ./in.cue:407:24
+existsNAfterMatchN.ab: invalid value 5 (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:407:6
+    ./in.cue:407:13
+    ./in.cue:407:49
 [incomplete] existsNAfterMatchN.ba: non-concrete value n for bound >:
     ./in.cue:408:43
 existsNAfterMatchN.ba: invalid value 5 (does not satisfy matchN): 0 matched, expected 1:

@@ -25,3 +25,7 @@ out: error in call to encoding/yaml.Marshal: invalid value {foo:_|_(foo: undefin
     ./in.cue:3:9
     ./in.cue:3:16
     ./in.cue:10:19
+out: error in call to encoding/yaml.Marshal: undefined field: #Foo_typo:
+    ./in.cue:10:6
+    ./in.cue:8:1
+    ./in.cue:11:18

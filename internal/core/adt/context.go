@@ -1189,31 +1189,18 @@ func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	return arc, err
 }
 
-// Validate calls validates value for the given validator.
+// Validate validates value against the given validator. The errors it leaves
+// in c, such as those of the schemas of matchN, are part of its result.
 //
 // TODO(errors): return boolean instead: only the caller has enough information
 // to generate a proper error message.
-func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
+func (c *OpContext) Validate(check Conjunct, value Value) (err *Bottom) {
 	// TODO: use a position stack to push both values.
-
-	// TODO: move to PushConjunct. Note that PushConjunct also saves and
-	// restores the error, which may change how errors are reported.
-	// saved := c.PushConjunct(check)
-
-	src := c.src
-	ci := c.ci
-	env := c.e
+	s := c.pushConjunct(check)
+	// Unlike pushConjunct, also when nil, as for an [ExternalValidator].
 	c.src = check.Source()
-	c.ci = check.CloseInfo
-	c.e = check.Env
-
-	err := check.x.(Validator).validate(c, value)
-
-	c.src = src
-	c.ci = ci
-	c.e = env
-
-	return err
+	defer func() { err = CombineErrors(nil, err, c.popConjunct(s)) }()
+	return check.x.(Validator).validate(c, value)
 }
 
 // concrete returns the concrete value of x after evaluating it.

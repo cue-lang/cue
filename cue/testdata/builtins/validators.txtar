@@ -111,7 +111,7 @@ uniqueConstrainsRecursive: {
 // A validator does not take the errors another found before it as its own:
 // the struct fails the bound, whatever matchN found in {b!: int}.
 matchNThenBound: {
-	ab: matchN(1, [{b!: int}]) & !={a: 1} & {a: 1} @test(err, code=incomplete, contains="does not satisfy matchN", incorrect) @test(err:todo, p=1, code=eval, contains="out of bound")
+	ab: matchN(1, [{b!: int}]) & !={a: 1} & {a: 1} @test(err, code=eval, contains="out of bound")
 	ba: !={a: 1} & matchN(1, [{b!: int}]) & {a: 1} @test(err, code=eval, contains="out of bound")
 }
 
@@ -374,28 +374,24 @@ issue4115: {
     ./in.cue:71:8
     ./in.cue:71:15
     ./in.cue:72:8
-uniqueConstrains3.list: invalid value [3] (does not satisfy matchN): 1 matched, expected 1:
-    ./in.cue:71:32
-    ./in.cue:71:8
-    ./in.cue:71:39
-    ./in.cue:72:8
-[eval] uniqueConstrains3.struct: invalid value {a:"s"} (does not satisfy matchN): 0 matched, expected 1:
+uniqueConstrains3.list.0: invalid value 3 (out of bound >=5):
+    ./in.cue:71:23
+    ./in.cue:72:9
+[eval] uniqueConstrains3.struct.a: conflicting values "s" and int (mismatched types string and int):
+    ./in.cue:74:32
+    ./in.cue:75:14
+uniqueConstrains3.struct: invalid value {a:"s"} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:74:10
     ./in.cue:74:17
     ./in.cue:75:10
-uniqueConstrains3.struct: invalid value {a:"s"} (does not satisfy matchN): 1 matched, expected 1:
-    ./in.cue:74:41
-    ./in.cue:74:10
-    ./in.cue:74:48
-    ./in.cue:75:10
-[eval] uniqueConstrainsRecursive.differ: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
+[eval] uniqueConstrainsRecursive.differ.a: conflicting values 1 and {[string]:#S1} (mismatched types int and struct):
+    ./in.cue:80:7
+    ./in.cue:80:18
+    ./in.cue:91:21
+    ./in.cue:92:14
+uniqueConstrainsRecursive.differ: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:91:10
     ./in.cue:91:17
-    ./in.cue:92:10
-uniqueConstrainsRecursive.differ: invalid value {a:1} (does not satisfy matchN): 1 matched, expected 1:
-    ./in.cue:91:29
-    ./in.cue:91:10
-    ./in.cue:91:36
     ./in.cue:92:10
 [eval] uniqueConstrainsRecursive.same.a: conflicting values 1 and {[string]:#S1} (mismatched types int and struct):
     ./in.cue:80:7
@@ -407,7 +403,12 @@ uniqueConstrainsRecursive.same: invalid value {a:1} (does not satisfy matchN): 0
     ./in.cue:104:8
     ./in.cue:104:34
     ./in.cue:105:8
-[eval] uniqueConstrainsRecursive.distinct.a: conflicting values 1 and {[string]:#S2} (mismatched types int and struct):
+[eval] uniqueConstrainsRecursive.distinct.a: conflicting values 1 and {[string]:#S1} (mismatched types int and struct):
+    ./in.cue:80:7
+    ./in.cue:80:18
+    ./in.cue:106:23
+    ./in.cue:107:16
+uniqueConstrainsRecursive.distinct.a: conflicting values 1 and {[string]:#S2} (mismatched types int and struct):
     ./in.cue:81:7
     ./in.cue:81:18
     ./in.cue:106:42
@@ -421,13 +422,9 @@ uniqueConstrainsRecursive.distinct: invalid value {a:1} (does not satisfy matchN
     ./in.cue:106:12
     ./in.cue:106:38
     ./in.cue:107:12
-[incomplete] matchNThenBound.ab: invalid value {a:1} (does not satisfy matchN): 0 matched, expected 1:
+[eval] matchNThenBound.ab: invalid value {a:1} (out of bound !={a:1}):
+    ./in.cue:113:31
     ./in.cue:113:6
-    ./in.cue:113:13
-matchNThenBound.ab.b: field is required but not present:
-    ./in.cue:113:6
-    ./in.cue:113:18
-    ./in.cue:113:42
 [eval] matchNThenBound.ba: invalid value {a:1} (out of bound !={a:1}):
     ./in.cue:114:6
 [eval] callOfCallToValidator.e: cannot call previously called validator b:
@@ -523,8 +520,8 @@ Reused: 286
 Allocs: 62
 Retain: 0
 
-Unifications: 337
-Conjuncts:    615
+Unifications: 338
+Conjuncts:    616
 Disjuncts:    4
 Notifications: 1
 

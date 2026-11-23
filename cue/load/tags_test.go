@@ -206,7 +206,6 @@ a: string & "bar" @tag(foo)
 package x
 
 b: a
--- a refers to string & "bar"
 `,
 	}, {
 		// Both instances share the file parsed by the loader.
@@ -229,7 +228,6 @@ a: string & "bar" @tag(foo)
 package x
 
 b: a
--- a refers to string & "bar"
 `,
 	}, {
 		// The value is injected via the second of the field's tags.
@@ -252,7 +250,6 @@ a: string & "bar" @tag(other) @tag(foo)
 package x
 
 b: a
--- a refers to string & "bar"
 `,
 	}, {
 		// A tag variable is injected alongside the other tag.
@@ -275,7 +272,6 @@ a: string & "bar" & "m1" @tag(foo) @tag(v,var=os)
 package x
 
 b: a
--- a refers to string & "bar" & "m1"
 `,
 	}, {
 		// Each field gets its own copy of the struct, sorted by name.

@@ -1,9 +1,8 @@
 # root.cue is shared by both instances. Its int is the field declared in
 # ./b for that instance, but the predeclared type for ".", in either order.
 
-# Resolving int for ./b binds it in the shared file, which breaks ".".
-! exec cue export . ./b
-stderr 'out: undefined field: int'
+exec cue export . ./b
+cmp stdout want-stdout
 
 exec cue export ./b .
 cmp stdout want-stdout-reversed

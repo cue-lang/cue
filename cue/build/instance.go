@@ -394,32 +394,19 @@ func IsLocalImport(path string) bool {
 		strings.HasPrefix(path, "./") || strings.HasPrefix(path, "../")
 }
 
+// resolveIdentifiers binds each file's references to its imports and reports
+// import errors. References to fields of other files are left to the compiler,
+// as a file may be shared by instances with different fields.
 func (inst *Instance) resolveIdentifiers() errors.Error {
-	// Link top-level declarations. As top-level entries get unified, an entry
-	// may be linked to any top-level entry of any of the files.
-	allFields := map[string]ast.Node{}
-	for _, f := range inst.Files {
-		if f.PackageName() == "" {
-			continue
-		}
-		for _, d := range f.Decls {
-			if f, ok := d.(*ast.Field); ok && f.Value != nil {
-				if ident, ok := f.Label.(*ast.Ident); ok {
-					allFields[ident.Name] = f.Value
-				}
-			}
-		}
-	}
-
 	var errs errors.Error
 	for _, f := range inst.Files {
-		err := inst.resolveFile(f, allFields)
+		err := inst.resolveFile(f)
 		errs = errors.Append(errs, err)
 	}
 	return errs
 }
 
-func (inst *Instance) resolveFile(f *ast.File, allFields map[string]ast.Node) errors.Error {
+func (inst *Instance) resolveFile(f *ast.File) errors.Error {
 	unresolved := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
 		unresolved[u.Name] = append(unresolved[u.Name], u)
@@ -505,21 +492,8 @@ func (inst *Instance) resolveFile(f *ast.File, allFields map[string]ast.Node) er
 	}
 
 	f.Unresolved = slices.DeleteFunc(f.Unresolved, func(u *ast.Ident) bool {
-		if n, ok := allFields[u.Name]; ok {
-			u.Node = n
-			u.Scope = f
-			return true
-		}
-		if u.Node != nil {
-			// Keep valid import resolutions; clear any stale
-			// field references from a previous instance context.
-			if _, ok := u.Node.(*ast.ImportSpec); ok {
-				return true
-			}
-			u.Node = nil
-			u.Scope = nil
-		}
-		return false
+		_, ok := u.Node.(*ast.ImportSpec)
+		return ok
 	})
 
 	return errs

@@ -114,17 +114,15 @@ func TestTargetLanguageVersionInModule(t *testing.T) {
 }
 
 // A file shared by instances of one context, such as one in a parent
-// directory, binds or clears its references to other files' fields for
-// each instance, and reports its errors in each.
+// directory, leaves its references to other files' fields unresolved,
+// for the compiler to resolve per instance, and reports its errors in each.
 func TestSharedFile(t *testing.T) {
 	for _, tc := range []struct {
 		name     string
-		addFirst bool   // add the file to both instances before completing either
-		wantB    string // what ref is bound to once instance b is complete
+		addFirst bool // add the file to both instances before completing either
 	}{
-		{name: "CompleteFirst", wantB: "unresolved"},
-		// Instance b keeps the binding made by instance a.
-		{name: "AddFirst", addFirst: true, wantB: "a"},
+		{name: "CompleteFirst"},
+		{name: "AddFirst", addFirst: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			shared, _ := parser.ParseFile("shared.cue", `
@@ -165,15 +163,15 @@ ref: a
 				instB = newInst("b.cue", "package x\nb: 1\n")
 			}
 			instA.Complete()
-			if got, want := binding(), "a"; got != want {
+			if got, want := binding(), "unresolved"; got != want {
 				t.Errorf("instance a: ref bound to %s; want %s", got, want)
 			}
 			if !tc.addFirst {
 				instB = newInst("b.cue", "package x\nb: 1\n")
 			}
 			instB.Complete()
-			if got := binding(); got != tc.wantB {
-				t.Errorf("instance b: ref bound to %s; want %s", got, tc.wantB)
+			if got, want := binding(), "unresolved"; got != want {
+				t.Errorf("instance b: ref bound to %s; want %s", got, want)
 			}
 			for _, inst := range []*Instance{instA, instB} {
 				if got, want := fmt.Sprint(inst.Err), `alias "X" redeclared in same scope`; got != want {

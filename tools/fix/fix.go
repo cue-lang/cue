@@ -124,6 +124,11 @@ func (o options) resolveExperiments(version string) ([]string, string, errors.Er
 }
 
 // File applies fixes to f and returns it. It alters the original f.
+//
+// File knows f alone: where another file of f's package declares a top-level
+// field with the name of a predeclared identifier, such as int, File takes
+// f's references to it for the predeclared one. Use [Instances] to fix the
+// files of a package together.
 func File(f *ast.File, o ...Option) *ast.File {
 	f, err := file(f, "", false, nil, o...)
 	// TODO: this File method is public, and its signature was fixed

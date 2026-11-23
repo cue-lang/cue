@@ -6,9 +6,9 @@ cmp stdout print-omitempty.stdout
 exec cue exp ast print --omitempty --pos --refs --files ref/ref.cue
 cmp stdout print-pos-refs.stdout
 
-# A reference to a field in another file of the package is bound to its value.
+# The loader leaves a reference to a field in another file of the package unbound.
 exec cue exp ast print --omitempty --refs ./d
-stdout 'Node: @ref001 \(\*ast\.BasicLit\)'
+! stdout 'Node:'
 
 # In --files mode, a file with syntax errors still has its partial tree printed.
 stdin bad/invalid.cue

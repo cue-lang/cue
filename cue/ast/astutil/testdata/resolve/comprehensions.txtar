@@ -32,3 +32,17 @@ y: {for aa in a {}}
 14[a]:  Scope: 0[<nil>] Node: 0[]
 Unresolved: 7[a]
 Unresolved: 14[a]
+-- fallback.cue --
+@experiment(try)
+
+// The fallback body resolves in the scope enclosing the comprehension:
+// its x is the field, not the for variable.
+x: 1
+for x in [1] {y: x} otherwise {y: x}
+-- out/resolve/fallback --
+3[x]:  Scope: 0[<nil>]          Node: 0[]
+5[x]:  Scope: 0[<nil>]          Node: 0[]
+8[y]:  Scope: 0[<nil>]          Node: 0[]
+9[x]:  Scope: 4[*ast.ForClause] Node: 5[x]
+12[y]: Scope: 0[<nil>]          Node: 0[]
+13[x]: Scope: 1[*ast.File]      Node: 0[1]

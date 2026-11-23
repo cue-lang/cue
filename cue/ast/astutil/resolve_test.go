@@ -17,6 +17,8 @@ package astutil_test
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
 	"testing"
 	"text/tabwriter"
@@ -92,6 +94,106 @@ func TestResolve(t *testing.T) {
 			fmt.Fprint(b)
 		}
 	})
+}
+
+// TestResolveNested resolves deep chains of scopes: a reference binds to its
+// nearest declaration however many scopes lie between, and a reference to a
+// name declared nowhere stays unresolved.
+func TestResolveNested(t *testing.T) {
+	const depth = 50
+	// nest repeats head depth times, with N replaced by the nesting level,
+	// then inner, then tail depth times.
+	nest := func(head, inner, tail string) string {
+		var b strings.Builder
+		for i := range depth {
+			b.WriteString(strings.ReplaceAll(head, "N", strconv.Itoa(i)))
+		}
+		b.WriteString(inner)
+		b.WriteString(strings.Repeat(tail, depth))
+		return b.String()
+	}
+	parse := func(t *testing.T, src string) *ast.File {
+		f, err := parser.ParseFile("test.cue", src)
+		qt.Assert(t, qt.IsNil(err))
+		return f
+	}
+	unresolved := func(f *ast.File) []string {
+		var names []string
+		for _, x := range f.Unresolved {
+			names = append(names, x.Name)
+		}
+		return names
+	}
+	// bound asserts that n identifiers named name are resolved, each to node.
+	bound := func(t *testing.T, f *ast.File, name string, n int, node ast.Node) {
+		var got []ast.Node
+		for _, x := range nodes[*ast.Ident](f) {
+			if x.Name == name && x.Node != nil {
+				got = append(got, x.Node)
+			}
+		}
+		qt.Assert(t, qt.HasLen(got, n))
+		for _, got := range got {
+			qt.Assert(t, qt.Equals(got, node))
+		}
+	}
+
+	t.Run("chained for clauses", func(t *testing.T) {
+		var refs []string
+		for i := range depth {
+			refs = append(refs, "x"+strconv.Itoa(i))
+		}
+		f := parse(t, "b: [1]\nx: ["+nest("for xN in b ", "{"+strings.Join(refs, "+")+"}", "")+"]")
+		qt.Assert(t, qt.HasLen(f.Unresolved, 0))
+		bound(t, f, "b", depth, f.Decls[0].(*ast.Field).Value)
+		// Each variable's reference binds to the identifier its own clause
+		// declares.
+		vars := map[string]ast.Node{}
+		for _, x := range nodes[*ast.ForClause](f) {
+			vars[x.Value.Name] = x.Value
+		}
+		for _, ref := range refs {
+			bound(t, f, ref, 1, vars[ref])
+		}
+	})
+
+	t.Run("nested let clauses", func(t *testing.T) {
+		// A let clause's name is hidden while its value is resolved, at
+		// every level, so the innermost reference is unresolved.
+		f := parse(t, nest("{let x = ", "x", "}"))
+		qt.Assert(t, qt.DeepEquals(unresolved(f), []string{"x"}))
+		bound(t, f, "x", 0, nil)
+
+		// A reference beside the innermost let clause binds to it.
+		f = parse(t, nest("{let x = N, y: {", "x", "}}"))
+		qt.Assert(t, qt.HasLen(f.Unresolved, 0))
+		lets := nodes[*ast.LetClause](f)
+		qt.Assert(t, qt.HasLen(lets, depth))
+		bound(t, f, "x", 1, lets[depth-1])
+	})
+
+	t.Run("nested pattern and dynamic labels", func(t *testing.T) {
+		f := parse(t, "a: \"a\"\n"+nest("[string]: {(a): {", "1", "}}"))
+		qt.Assert(t, qt.DeepEquals(unresolved(f), slices.Repeat([]string{"string"}, depth)))
+		bound(t, f, "a", depth, f.Decls[0].(*ast.Field).Value)
+	})
+
+	t.Run("nested function parameter types", func(t *testing.T) {
+		f := parse(t, "@experiment(functions)\nf: "+nest("func(a: ", "int", ")")+": 1")
+		qt.Assert(t, qt.DeepEquals(unresolved(f), []string{"int"}))
+	})
+}
+
+// nodes returns the nodes of type T in f, in walk order.
+func nodes[T ast.Node](f *ast.File) []T {
+	var nodes []T
+	ast.Walk(f, func(n ast.Node) bool {
+		if x, ok := n.(T); ok {
+			nodes = append(nodes, x)
+		}
+		return true
+	}, nil)
+	return nodes
 }
 
 // TestResolveFuncSignatureScopes tests that a reference to one of a

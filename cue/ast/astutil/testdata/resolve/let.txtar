@@ -1,3 +1,5 @@
+In shadow.cue, the value of a let clause sees past its own name to the
+outer let, and each scope's declarations stop shadowing once it ends.
 -- let.cue --
 b: X
 let X = int
@@ -10,3 +12,30 @@ a: X
 9[a]:   Scope: 0[<nil>]     Node: 0[]
 10[X]:  Scope: 1[*ast.File] Node: 5[let X=int]
 Unresolved: 7[int]
+-- shadow.cue --
+let x = 1
+a: {
+	let x = x
+	y: x
+}
+z: 1
+b: {
+	z: 2
+	y: z
+}
+c: [x, z]
+-- out/resolve/shadow --
+3[x]:  Scope: 0[<nil>]           Node: 0[]
+5[a]:  Scope: 0[<nil>]           Node: 0[]
+8[x]:  Scope: 0[<nil>]           Node: 0[]
+9[x]:  Scope: 1[*ast.File]       Node: 2[let x=1]
+11[y]: Scope: 0[<nil>]           Node: 0[]
+12[x]: Scope: 6[*ast.StructLit]  Node: 7[let x=x]
+14[z]: Scope: 0[<nil>]           Node: 0[]
+16[b]: Scope: 0[<nil>]           Node: 0[]
+19[z]: Scope: 0[<nil>]           Node: 0[]
+21[y]: Scope: 0[<nil>]           Node: 0[]
+22[z]: Scope: 17[*ast.StructLit] Node: 0[2]
+24[c]: Scope: 0[<nil>]           Node: 0[]
+25[x]: Scope: 1[*ast.File]       Node: 2[let x=1]
+26[z]: Scope: 1[*ast.File]       Node: 0[1]

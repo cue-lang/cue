@@ -597,9 +597,8 @@ func TestReadCUEFileCache(t *testing.T) {
 
 			remove()
 			f2, err := cueFS.ReadCUEFile("a.cue", pcfg)
-			// The cache misses, so the removed file is read again.
-			qt.Assert(t, qt.ErrorIs(err, fs.ErrNotExist))
-			qt.Assert(t, qt.IsNil(f2))
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(f2, f1))
 		})
 	}
 }

@@ -424,6 +424,8 @@ func (fs *overlayIOFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, e
 	if err != nil {
 		return nil, err
 	}
+	// [fileCache.getCUESyntax] stores the entry under the applied config.
+	cfg = cfg.Apply(parser.Version(fs.languageVersion))
 	key := fileCacheKey{cfg, fpath}
 	cache := fs.fileCache
 	cache.mu.Lock()
@@ -449,7 +451,6 @@ func (fs *overlayIOFS) ReadCUEFile(path string, cfg parser.Config) (*ast.File, e
 			return nil, err
 		}
 	}
-	cfg = cfg.Apply(parser.Version(fs.languageVersion))
 	return cache.getCUESyntax(&build.File{
 		Filename: fpath,
 		Encoding: build.CUE,

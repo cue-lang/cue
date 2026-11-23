@@ -160,6 +160,8 @@ func (fsys *fsIOFS) ReadCUEFile(p string, cfg parser.Config) (*ast.File, error) 
 		return nil, nil
 	}
 	absPath := path.Join(fsys.root, p)
+	// [fileCache.getCUESyntax] stores the entry under the applied config.
+	cfg = cfg.Apply(parser.Version(fsys.languageVersion))
 	key := fileCacheKey{cfg, absPath}
 	cache := fsys.fileCache
 	cache.mu.Lock()
@@ -175,7 +177,6 @@ func (fsys *fsIOFS) ReadCUEFile(p string, cfg parser.Config) (*ast.File, error) 
 		cache.entries[key] = fileCacheEntry{nil, err, nil}
 		return nil, err
 	}
-	cfg = cfg.Apply(parser.Version(fsys.languageVersion))
 	return fsys.fileCache.getCUESyntax(&build.File{
 		Filename: absPath,
 		Encoding: build.CUE,

@@ -44,17 +44,19 @@ func (v *Vertex) isInProgress() bool {
 	return v.status != finalized && v.state != nil && v.state.isInitialized
 }
 
+// isDone reports whether v has nothing left to evaluate: it is finalized, or
+// it has no state and shares a finalized vertex. A sharing vertex keeps the
+// status its target had before it was unified, so its own may be stale.
+// A done vertex may be shared between goroutines, so do not mutate it.
+func (v *Vertex) isDone() bool {
+	return v.status == finalized || (v.state == nil && v.isFinal())
+}
+
 func (v *Vertex) getBareState(c *OpContext) *nodeContext {
-	if v.status == finalized { // TODO: use BaseValue != nil
+	if v.isDone() { // TODO: use BaseValue != nil
 		return nil
 	}
 	if v.state == nil {
-		if v.isFinal() {
-			// A sharing vertex keeps the status its target had before it was
-			// unified. Its target is done, so there is nothing left to do,
-			// and v may be shared between goroutines, so do not mutate it.
-			return nil
-		}
 		v.state = c.newNodeContext(v)
 		v.state.initBare()
 	}

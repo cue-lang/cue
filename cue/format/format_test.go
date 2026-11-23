@@ -860,6 +860,28 @@ func TestNodes(t *testing.T) {
 		}(),
 		out: "x: (a & b). // c\n\tf",
 	}, {
+		// A postfix operator comes before the comment ending its operand,
+		// which the operand moves after its closing paren.
+		//
+		// The comment swallows the operator.
+		name: "postfix operator after an operand ending in a comment",
+		in: func() ast.Node {
+			c := ast.NewIdent("c")
+			ast.AddComment(c, internal.NewComment(false, "c"))
+			return &ast.Field{Label: ast.NewIdent("x"), Value: &ast.PostfixExpr{X: &ast.ParenExpr{X: c}, Op: token.ELLIPSIS}}
+		}(),
+		out: "x: (c) // c...",
+	}, {
+		// The comment swallows the operator and the comma, so the
+		// output parses back as a list of the parenthesized operand.
+		name: "postfix operator after a parenthesized operand ending in a comment",
+		in: func() ast.Node {
+			b := ast.NewIdent("b")
+			ast.AddComment(b, internal.NewComment(false, "c"))
+			return ast.NewList(&ast.PostfixExpr{X: ast.NewBinExpr(token.AND, ast.NewIdent("a"), b), Op: token.ELLIPSIS})
+		}(),
+		out: "[\n\t(a & b) // c...,\n]",
+	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the
 		// receiver's last line.

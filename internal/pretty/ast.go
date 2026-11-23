@@ -131,13 +131,10 @@ const (
 	isAuthored
 	// endsWithOwnLineComment marks a node whose rendered output ends
 	// with a `//` comment on its own line (Slash RelPos != Blank and
-	// cg.Line == false). We set it when the node has such a trailing
-	// comment attached directly, and propagate it up only through the
-	// rightmost-rendered child of non-bracketed nodes (Field,
-	// BinaryExpr, UnaryExpr, SelectorExpr, LetClause, EmbedDecl,
-	// PostfixExpr). Bracketed nodes (StructLit, ListLit, CallExpr,
-	// IndexExpr, SliceExpr, ParenExpr, ImportDecl) end with their
-	// closing bracket, so descendants don't propagate through them.
+	// cg.Line == false). It propagates up from the last child of a node
+	// not ending in a bracket (see [isBracketed]), and from any child
+	// whose comments the node moves to its end (see
+	// [converter.liftedChildComment]).
 	endsWithOwnLineComment
 	// endsWithLineComment marks a node whose rendered output ends with a
 	// `//` comment, whether or not that comment sits on the node's own
@@ -239,7 +236,7 @@ func (c *converter) analyse(root ast.Node) {
 		lastChildEndsLineComment     bool
 		// anyChildEndsLineComment reports whether any child, not only
 		// the last, ends with a line comment; see
-		// [converter.liftsChildComment].
+		// [converter.liftedChildComment].
 		anyChildEndsLineComment bool
 
 		node  ast.Node
@@ -301,7 +298,12 @@ func (c *converter) analyse(root ast.Node) {
 			}
 
 			slots := classifyComments(n)
-			trailingCommentLine := (f.lastChildTrailingCommentLine && !isBracketed(n)) || hasTrailingCommentLine(slots)
+			liftsComment, liftsOwnLine := false, false
+			if f.anyChildEndsLineComment {
+				liftsComment, liftsOwnLine = c.liftedChildComment(n)
+			}
+			trailingCommentLine := (f.lastChildTrailingCommentLine && !isBracketed(n)) ||
+				hasTrailingCommentLine(slots) || liftsOwnLine
 			if trailingCommentLine {
 				flags |= endsWithOwnLineComment
 			}
@@ -313,7 +315,7 @@ func (c *converter) analyse(root ast.Node) {
 			// after n runs to the end of its line.
 			endsLineComment := (f.lastChildEndsLineComment && !isBracketed(n)) ||
 				len(c.afterComments(n, slots)) > 0 ||
-				(f.anyChildEndsLineComment && c.liftsChildComment(n))
+				liftsComment
 			if endsLineComment {
 				flags |= endsWithLineComment
 			}
@@ -4386,20 +4388,22 @@ func hasTrailingCommentLine(s commentSlots) bool {
 	return false
 }
 
-// liftsChildComment reports whether n's renderer moves the comment
-// ending one of its children, which is not rendered last, to the end of
-// n's output, as it would otherwise swallow the tokens which follow.
-func (c *converter) liftsChildComment(n ast.Node) bool {
-	if f, ok := n.(*ast.Field); ok {
+// liftedChildComment reports whether n's renderer moves a comment ending
+// one of its children to the end of n's output, so that it does not
+// swallow the tokens after the child, and whether the last one is on a
+// line of its own.
+func (c *converter) liftedChildComment(n ast.Node) (lifts, ownLine bool) {
+	ops := liftedOperands(n)
+	if f, ok := n.(*ast.Field); ok && len(f.Attrs) > 0 {
 		// A field's attributes go before its value's comments.
-		return len(f.Attrs) > 0 && c.endsWithLineComment(f.Value)
+		ops[0] = f.Value
 	}
-	for _, x := range liftedOperands(n) {
+	for _, x := range ops {
 		if c.endsWithLineComment(x) {
-			return true
+			lifts, ownLine = true, c.nodeFlags[x]&endsWithOwnLineComment != 0
 		}
 	}
-	return false
+	return lifts, ownLine
 }
 
 // liftedOperands returns the operands of n followed by a token which
@@ -4457,7 +4461,7 @@ func (c *converter) endsWithLineComment(n ast.Node) bool {
 
 // isBracketed reports whether n's rendered output ends with a closing
 // bracket, so that only n's own trailing comments, and those its
-// renderer moves there (see [converter.liftsChildComment]), can end it.
+// renderer moves there (see [converter.liftedChildComment]), can end it.
 // A braceless struct, such as a file body, and a parenless import end
 // with their last child instead.
 func isBracketed(n ast.Node) bool {

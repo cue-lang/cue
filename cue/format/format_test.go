@@ -882,8 +882,6 @@ func TestNodes(t *testing.T) {
 		// after its attributes, or after a closing paren, is followed by
 		// a blank line, as when it ends the field's value. Without one,
 		// the comment parses back as a doc comment of the next field.
-		//
-		// There is no blank line, so a second format adds one.
 		name: "own-line comment moved after attributes",
 		in: func() ast.Node {
 			y := ast.NewIdent("y")
@@ -893,9 +891,8 @@ func TestNodes(t *testing.T) {
 				&ast.Field{Label: ast.NewIdent("#b"), Value: ast.NewIdent("z")},
 			}}
 		}(),
-		out: "#a: y @foo()\n// c\n#b: z\n",
+		out: "#a: y @foo()\n// c\n\n#b: z\n",
 	}, {
-		// There is no blank line, so a second format adds one.
 		name: "own-line comment moved after a paren",
 		in: func() ast.Node {
 			y := ast.NewIdent("y")
@@ -905,7 +902,7 @@ func TestNodes(t *testing.T) {
 				&ast.Field{Label: ast.NewIdent("#b"), Value: ast.NewIdent("z")},
 			}}
 		}(),
-		out: "(y)\n// c\n#b: z\n",
+		out: "(y)\n// c\n\n#b: z\n",
 	}, {
 		// An index or call after a receiver spanning lines, as the
 		// exporter builds for an index into a unification, stays on the

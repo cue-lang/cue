@@ -1878,10 +1878,10 @@ admission.rxC: invalid value "c" (out of bound =~"b"):
     ./in.cue:1183:9
     ./in.cue:1310:21
 -- out/eval/stats --
-Leaks:  262
-Freed:  3512
-Reused: 3232
-Allocs: 542
+Leaks:  261
+Freed:  3516
+Reused: 3236
+Allocs: 541
 Retain: 0
 
 Unifications: 3500

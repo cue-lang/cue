@@ -1,0 +1,44 @@
+# root.cue is fixed once for both instances. int is the predeclared type in
+# "." but a closed struct in ./sub, so the embedding needs a spread in either
+# order.
+
+cp root.cue root.cue.orig
+exec cue fix . ./sub --exp=explicitopen
+cmp root.cue root.cue.want
+
+cp root.cue.orig root.cue
+# The rewrite follows the meaning of int in the first instance.
+exec cue fix ./sub . --exp=explicitopen
+cmp root.cue root.cue.orig
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- root.cue --
+package foo
+
+y: {
+	int
+	b: 2
+}
+-- sub/sub.cue --
+package foo
+
+int: #D
+#D: a: 1
+-- root.cue.want --
+@experiment(explicitopen)
+
+package foo
+
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
+y: __reclose({
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
+	int...
+	b: 2
+})

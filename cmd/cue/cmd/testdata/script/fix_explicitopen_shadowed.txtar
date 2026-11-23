@@ -1,0 +1,43 @@
+# A field in another file shadows int, so embedding int may embed a closed
+# struct and needs a spread, whether the package is named or not.
+
+cp b.cue b.cue.orig
+exec cue fix . --exp=explicitopen
+cmp b.cue b.cue.want
+
+cp b.cue.orig b.cue
+# Fixing the whole module takes int for the predeclared type.
+exec cue fix --exp=explicitopen
+cmp b.cue b.cue.orig
+
+-- cue.mod/module.cue --
+module: "mod.test"
+
+language: version: "v0.17.0"
+
+-- a.cue --
+package foo
+
+int: #D
+#D: a: 1
+-- b.cue --
+package foo
+
+y: {
+	int
+	b: 2
+}
+-- b.cue.want --
+@experiment(explicitopen)
+
+package foo
+
+// NOTE(cue-fix): the __reclose wrapper below may not be needed: it only closes
+// the struct if one of the spread values in it is a closed struct.
+y: __reclose({
+	// NOTE(cue-fix): the spread operator below may not be needed: it only matters
+	// if the value is a closed struct, or closes a nested struct at a path which
+	// the enclosing struct also declares.
+	int...
+	b: 2
+})

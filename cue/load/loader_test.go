@@ -502,6 +502,23 @@ display:.
 files:
     $CWD/testdata/testmod_legacy/foo.cue`,
 	}, {
+		name: "AcceptLegacyModuleImportingItself",
+		cfg: &Config{
+			Dir:                 testdata("testmod_legacy"),
+			AcceptLegacyModules: true,
+		},
+		args: []string{"./imports"},
+		// The import parses the legacy module file again, strictly.
+		want: `err:    import failed: test.example/foo@v0: no language version declared in module.cue:
+    $CWD/testdata/testmod_legacy/imports/imports.cue:3:8
+path:   test.example/foo/imports@v0
+module: test.example/foo@v0
+root:   $CWD/testdata/testmod_legacy
+dir:    $CWD/testdata/testmod_legacy/imports
+display:./imports
+files:
+    $CWD/testdata/testmod_legacy/imports/imports.cue`,
+	}, {
 		name: "AcceptLegacyModuleWithNonLegacyModule",
 		cfg: &Config{
 			Dir:                 testdataDir,

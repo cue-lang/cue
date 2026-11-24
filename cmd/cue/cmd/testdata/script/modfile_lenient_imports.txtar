@@ -1,0 +1,81 @@
+# The module files of the main module and of directory replacements are
+# parsed leniently, as they are not published modules. Importing their
+# packages must not parse them again strictly, which rejects a dependency
+# without a major version.
+
+# TODO: importing a package parses its module file again strictly.
+cd $WORK/main
+! exec cue export .
+stderr 'import failed: main.example@v0: invalid module file cue.mod/module.cue: no major version in "dep.example/unused"'
+
+cd $WORK/local
+! exec cue export .
+stderr 'import failed: local: invalid module file cue.mod/module.cue: no major version in "dep.example/unused"'
+
+cd $WORK/replace
+! exec cue export .
+stderr 'import failed: dep.example@v0.1.0: invalid module file cue.mod/module.cue: no major version in "dep.example/unused"'
+
+-- main/cue.mod/module.cue --
+module: "main.example"
+language: version: "v0.17.0"
+deps: "dep.example/unused": v: "v0.1.0"
+-- main/main.cue --
+package main
+
+import "main.example/inner"
+
+out: inner.x
+-- main/inner/inner.cue --
+package inner
+
+x: 1
+-- main/want --
+{
+    "out": 1
+}
+-- local/cue.mod/module.cue --
+module: "main.example"
+language: version: "v0.17.0"
+deps: "dep.example/unused": v: "v0.1.0"
+-- local/main.cue --
+package main
+
+import "local.example/pkg"
+
+out: pkg.x
+-- local/cue.mod/pkg/local.example/pkg/pkg.cue --
+package pkg
+
+x: 2
+-- local/want --
+{
+    "out": 2
+}
+-- replace/cue.mod/module.cue --
+module: "main.example@v0"
+language: version: "v0.17.0"
+deps: "dep.example@v0": v: "v0.1.0"
+-- replace/cue.mod/local-module.cue --
+deps: "dep.example@v0": {
+	v:           "v0.1.0"
+	replaceWith: "./local_dep"
+}
+-- replace/main.cue --
+package main
+
+import "dep.example@v0:lib"
+
+out: lib.x
+-- replace/local_dep/cue.mod/module.cue --
+module: "dep.example@v0"
+language: version: "v0.9.0"
+deps: "dep.example/unused": v: "v0.1.0"
+-- replace/local_dep/lib.cue --
+package lib
+
+x: 3
+-- replace/want --
+{
+    "out": 3
+}

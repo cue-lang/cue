@@ -696,6 +696,60 @@ disjunctEnv: {
 	}
 }
 
+// The fields instantiated from a pattern constraint share its environment
+// but for their label, which label references read, so nothing cached per
+// environment may carry over from one such field to another.
+patternEnv: {
+	F: func(n: string) -> string: n
+
+	// Each field passes its own label.
+	args: {
+		x: [string]~(K, _): F(K)
+		x: {a: _, b: _}
+		out: x
+	}
+
+	// The same holds for a call below the field, within a comprehension
+	// or in a struct.
+	nested: {
+		x: [string]~(K, _): [for _ in [0] {F(K)}][0]
+		x: {a: _, b: _}
+		y: [string]~(K, _): {r: F(K)}
+		y: {a: _, b: _}
+		out: [x, y.b.r]
+	}
+
+	// Each field calls its own closure.
+	closures: {
+		p: [string]~(K, _): func() -> string: K
+		p: {a: _, b: _}
+		q: [string]~(K, _): p[K]()
+		q: {a: _, b: _}
+		out: [p.b(), q]
+	}
+
+	// Following a chain of closures through one call site is not
+	// recursion.
+	chain: {
+		next: {a: "b", b: "c", c: ""}
+		p: [string]~(K, _): func() -> string: [if next[K] != "" {p[next[K]]()}, K][0]
+		p: {a: _, b: _, c: _}
+		out: p.a()
+	}
+
+	// The defaults of each field are checked, not only those of the first,
+	// and a call omitting the parameter receives the field's own default.
+	defaults: {
+		bad: [string]~(K, _): func(n: "a" = K) -> string: n
+		bad: {a: _, b: _}
+		badB: bad.b
+
+		ok: [string]~(K, _): func(n: string = K) -> string: n
+		ok: {a: _, b: _}
+		okOut: [ok.a(), ok.b()]
+	}
+}
+
 // Declared compatibility aligns parameters as calls bind them: a type's
 // constraint on a labeled or omittable parameter must be covered by the
 // implementation parameter it binds to, while a default is no coverage
@@ -1237,6 +1291,109 @@ admission: {
         j: 2
       }
       out: 〈0;x〉.j
+    }
+  }
+  patternEnv: {
+    F: func(n: string) -> string: 〈0;n〉
+    args: {
+      x: {
+        [string]: 〈2;F〉(〈0;-〉)
+      }
+      x: {
+        a: _
+        b: _
+      }
+      out: 〈0;x〉
+    }
+    nested: {
+      x: {
+        [string]: [
+          for _, _ in [
+            0,
+          ] {
+            〈5;F〉(〈3;-〉)
+          },
+        ][0]
+      }
+      x: {
+        a: _
+        b: _
+      }
+      y: {
+        [string]: {
+          r: 〈3;F〉(〈1;-〉)
+        }
+      }
+      y: {
+        a: _
+        b: _
+      }
+      out: [
+        〈1;x〉,
+        〈1;y〉.b.r,
+      ]
+    }
+    closures: {
+      p: {
+        [string]: func() -> string: 〈1;-〉
+      }
+      p: {
+        a: _
+        b: _
+      }
+      q: {
+        [string]: 〈1;p〉[〈0;-〉]()
+      }
+      q: {
+        a: _
+        b: _
+      }
+      out: [
+        〈1;p〉.b(),
+        〈1;q〉,
+      ]
+    }
+    chain: {
+      next: {
+        a: "b"
+        b: "c"
+        c: ""
+      }
+      p: {
+        [string]: func() -> string: [
+          if (〈3;next〉[〈2;-〉] != "") {
+            〈4;p〉[〈4;next〉[〈3;-〉]]()
+          },
+          〈2;-〉,
+        ][0]
+      }
+      p: {
+        a: _
+        b: _
+        c: _
+      }
+      out: 〈0;p〉.a()
+    }
+    defaults: {
+      bad: {
+        [string]: func(n: "a" = 〈0;-〉) -> string: 〈0;n〉
+      }
+      bad: {
+        a: _
+        b: _
+      }
+      badB: 〈0;bad〉.b
+      ok: {
+        [string]: func(n: string = 〈0;-〉) -> string: 〈0;n〉
+      }
+      ok: {
+        a: _
+        b: _
+      }
+      okOut: [
+        〈1;ok〉.a(),
+        〈1;ok〉.b(),
+      ]
     }
   }
   admission: {

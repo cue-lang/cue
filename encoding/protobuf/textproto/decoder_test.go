@@ -15,6 +15,7 @@
 package textproto_test
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
@@ -56,22 +57,35 @@ func TestParse(t *testing.T) {
 			}
 		}
 
-		x, err := d.Parse(schema, filename, b)
-		if err != nil {
-			t.WriteErrors(errors.Promote(err, "test"))
-			return
+		decode := func() ([]byte, error) {
+			x, err := d.Parse(schema, filename, b)
+			if err != nil {
+				return nil, err
+			}
+			f, err := astutil.ToFile(x)
+			if err != nil {
+				return nil, err
+			}
+			return format.Node(f)
 		}
+		render := func() []byte {
+			out, err := decode()
+			if err == nil {
+				return out
+			}
+			var buf bytes.Buffer
+			errors.Print(&buf, errors.Promote(err, "test"), &errors.Config{
+				Cwd:     t.Dir,
+				ToSlash: true,
+			})
+			return buf.Bytes()
+		}
+		first := render()
+		_, _ = t.Write(first)
 
-		f, err := astutil.ToFile(x)
-		if err != nil {
-			t.WriteErrors(errors.Promote(err, "test"))
-			return
+		// Record a second Parse with the same Decoder if its result differs.
+		if second := render(); !bytes.Equal(first, second) {
+			_, _ = t.Writer("reparse").Write(second)
 		}
-		b, err = format.Node(f)
-		if err != nil {
-			t.WriteErrors(errors.Promote(err, "test"))
-			return
-		}
-		_, _ = t.Write(b)
 	})
 }

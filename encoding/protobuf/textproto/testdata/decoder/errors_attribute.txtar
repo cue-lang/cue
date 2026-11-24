@@ -1,6 +1,4 @@
-# A protobuf attribute without a type fails the first Parse, but a second
-# Parse with the same Decoder silently drops field b. The message fields
-# come first, so their mappings are built before the error.
+# A protobuf attribute without a type fails every Parse with the same Decoder.
 -- errors.cue --
 list?: [...#Pair] @protobuf(1,Pair)
 map?: {[string]: #Pair} @protobuf(2,map[string]Pair)
@@ -17,9 +15,3 @@ a: 1
 b: 2
 -- out/decode --
 textproto: field does not exist
--- out/decode/reparse --
-list: [{
-	key:   "k1"
-	value: "v1"
-}]
-a: 1

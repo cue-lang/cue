@@ -43,10 +43,8 @@ func NewDecoder(option ...Option) *Decoder {
 	return &Decoder{}
 }
 
-// A Decoder caches conversions of [cue.Value] between calls to its methods.
-type Decoder struct {
-	m map[*adt.Vertex]*mapping
-}
+// A Decoder converts textproto to CUE.
+type Decoder struct{}
 
 type decoder struct {
 	*Decoder
@@ -54,6 +52,7 @@ type decoder struct {
 	// Reset on each call
 	errs errors.Error
 	file *token.File
+	m    map[*adt.Vertex]*mapping
 }
 
 // Parse parses the given textproto bytes and converts them to a CUE expression,

@@ -726,7 +726,7 @@ func (c *Config) replaceDirModFile(dir string) *modfile.File {
 // checkReplaceDirModulePath verifies that the module.cue in a replacement
 // directory declares the same module path as the module being replaced.
 func (c *Config) checkReplaceDirModulePath(wantPath string, dir string) error {
-	replMF := c.replaceDirModFile(dir)
+	replMF := c.replaceDirModFile(c.absReplaceDir(dir))
 	if replMF == nil {
 		return nil
 	}

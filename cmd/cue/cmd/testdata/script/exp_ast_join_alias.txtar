@@ -1,0 +1,25 @@
+# TestLatest: skip - value aliases need a language version before v0.18.0.
+#
+# Joining files keeps a reference to a field with a value alias, declared in
+# another file, as a plain reference to the field.
+
+exec cue exp ast join .
+cmp stdout join.stdout
+
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.14.0"
+-- a.cue --
+package p
+
+u: V={a: 1, b: V.a}
+-- b.cue --
+package p
+
+t: u
+-- join.stdout --
+u: V={a: 1, b: V.a}
+
+t: u_1
+
+let u_1 = u

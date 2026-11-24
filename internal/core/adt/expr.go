@@ -1707,7 +1707,7 @@ func (x *Function) scheduleDefaultCheck(c *OpContext, env *Environment) *Bottom 
 // itself an error, or that conflicts with the constraint, is reported at the
 // default's position.
 func (x *Function) checkDefaults(c *OpContext, env *Environment) *Bottom {
-	key := funcAnchorKey{fn: x, envKey: env.key(c)}
+	key := funcAnchorKey{fn: x, funcEnvKey: env.funcKey(c)}
 	if c.checkingDefaults[key] || c.funcDefaultsChecked[key] {
 		return nil
 	}
@@ -2097,7 +2097,7 @@ func (n *nodeContext) scheduleComposedBody(t FuncType, fn *Function, types []Fun
 // captured in a particular closure environment.
 type funcAnchorKey struct {
 	fn *Function
-	envKey
+	funcEnvKey
 }
 
 // funcCallRefKey identifies the cached call references for a function call
@@ -2115,17 +2115,17 @@ type funcCallRefKey struct {
 // matched on that identity. See [OpContext.funcCallResults].
 type funcCallResultKey struct {
 	call *CallExpr
-	envKey
+	funcEnvKey
 }
 
 // A funcCallResult memoizes the finalized result of a completed function
 // call together with the identity of the callee that produced it. The callee
 // is matched much as [equalTerminal] compares function values: the function
-// literal, its closure environment (as an [envKey]), its recorded type
+// literal, its closure environment (as a [funcEnvKey]), its recorded type
 // constraints, and the arguments bound by partial application.
 type funcCallResult struct {
 	fn     *Function
-	env    envKey
+	env    funcEnvKey
 	types  []FuncType
 	args   []funcArg
 	result *Vertex
@@ -2133,7 +2133,7 @@ type funcCallResult struct {
 
 // matches reports whether a memoized result was produced by the given
 // callee, whose closure environment is identified by env.
-func (r *funcCallResult) matches(x *FuncValue, env envKey) bool {
+func (r *funcCallResult) matches(x *FuncValue, env funcEnvKey) bool {
 	return r.fn == x.Fn &&
 		r.env == env &&
 		equalFuncTypes(r.types, x.Types) &&
@@ -2229,8 +2229,8 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 	// re-entered through recursion — which the structural cycle detector must
 	// observe on the shared anchor — has no entry and is never
 	// short-circuited here.
-	resultKey := funcCallResultKey{call: call, envKey: callEnv.key(c)}
-	calleeEnv := x.Env.key(c)
+	resultKey := funcCallResultKey{call: call, funcEnvKey: callEnv.funcKey(c)}
+	calleeEnv := x.Env.funcKey(c)
 	results := c.funcCallResults[resultKey]
 	for i := range results {
 		if r := &results[i]; r.matches(x, calleeEnv) {
@@ -2498,11 +2498,11 @@ func (x *FuncValue) call(c *OpContext, call *CallExpr, state Flags) Value {
 // is dispatched by scheduleFuncCall — but creating it once per (literal,
 // closure) and reusing it across (recursive) calls lets the structural cycle
 // detector observe re-entry, because every call reaches the same arc.
-func (c *OpContext) funcAnchor(fn *Function, env envKey) *Vertex {
+func (c *OpContext) funcAnchor(fn *Function, env funcEnvKey) *Vertex {
 	if c.funcAnchors == nil {
 		c.funcAnchors = map[funcAnchorKey]*Vertex{}
 	}
-	key := funcAnchorKey{fn: fn, envKey: env}
+	key := funcAnchorKey{fn: fn, funcEnvKey: env}
 	if v := c.funcAnchors[key]; v != nil {
 		return v
 	}

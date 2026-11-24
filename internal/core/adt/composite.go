@@ -117,8 +117,7 @@ func (e *Environment) Equal(ctx *OpContext, f *Environment) bool {
 // pointers are shared across disjunct branches (overlay cloning copies task
 // environments), where they resolve to a different clone of their vertex in
 // each, so the pointer alone does not identify an environment; see
-// [Environment.DerefVertex]. The per-environment caches of function calls
-// are keyed by it.
+// [Environment.DerefVertex].
 type envKey struct {
 	up     *Environment
 	vertex *Vertex
@@ -126,6 +125,17 @@ type envKey struct {
 
 func (e *Environment) key(ctx *OpContext) envKey {
 	return envKey{up: e.Up, vertex: e.DerefVertex(ctx)}
+}
+
+// funcEnvKey identifies an environment for the caches of function calls. Its
+// label tells apart the fields instantiated from a pattern, as in [SameFunc].
+type funcEnvKey struct {
+	envKey
+	label Feature
+}
+
+func (e *Environment) funcKey(ctx *OpContext) funcEnvKey {
+	return funcEnvKey{envKey: e.key(ctx), label: e.DynamicLabel}
 }
 
 type cacheKey struct {

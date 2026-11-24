@@ -179,7 +179,7 @@ type OpContext struct {
 
 	// funcAnchors caches the stable anchor vertex for each native CUE
 	// function literal, keyed by literal and closure environment (see
-	// [envKey] for what identifies an environment). Reusing it across
+	// [funcEnvKey] for what identifies an environment). Reusing it across
 	// (recursive) calls lets the regular structural cycle detector observe
 	// recursion. See [OpContext.funcAnchor].
 	funcAnchors map[funcAnchorKey]*Vertex

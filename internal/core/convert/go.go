@@ -495,11 +495,17 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 				continue
 			}
 			if sf.Anonymous && name == "" {
-				arc, ok := sub.(*adt.Vertex)
-				if ok {
-					v.Arcs = append(v.Arcs, arc.Arcs...)
+				fieldType := sf.Type
+				if fieldType.Kind() == reflect.Pointer {
+					fieldType = fieldType.Elem()
 				}
-				continue
+				if fieldType.Kind() == reflect.Struct {
+					if arc, ok := sub.(*adt.Vertex); ok {
+						v.Arcs = append(v.Arcs, arc.Arcs...)
+					}
+					continue
+				}
+				name = sf.Name
 			}
 
 			f := ctx.StringLabel(name)

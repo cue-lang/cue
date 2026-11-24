@@ -211,6 +211,50 @@ func TestEncodeBigRat(t *testing.T) {
 	}
 }
 
+func TestEncodeEmbeddedFields(t *testing.T) {
+	type (
+		Slice   []int
+		Map     map[string]int
+		Integer int
+		Any     any
+		Record  struct{ Value int }
+	)
+	integer := Integer(42)
+	record := Record{Value: 1}
+	tests := []struct {
+		name  string
+		value any
+	}{
+		{"slice", struct {
+			Slice
+			Other int
+		}{Slice{1, 2}, 3}},
+		{"map", struct{ Map }{Map{"key": 1}}},
+		{"integer", struct{ Integer }{integer}},
+		{"integer pointer", struct{ *Integer }{&integer}},
+		{"interface", struct{ Any }{record}},
+		{"struct", struct {
+			Record
+			Other int
+		}{record, 3}},
+		{"struct pointer", struct{ *Record }{&record}},
+		{"named struct", struct {
+			Record `json:"record"`
+		}{record}},
+	}
+	ctx := cuecontext.New()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := ctx.Encode(tt.value)
+			got, err := v.MarshalJSON()
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.JSONEquals(got, tt.value))
+			var decoded any
+			qt.Assert(t, qt.IsNil(v.Decode(&decoded)))
+		})
+	}
+}
+
 func TestEncodeType(t *testing.T) {
 	type testCase struct {
 		name    string

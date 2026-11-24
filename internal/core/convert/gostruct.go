@@ -220,8 +220,9 @@ func dominantField(fields []GoField) (GoField, bool) {
 
 // JSONOptions are the options of a json struct tag which CUE supports.
 type JSONOptions struct {
-	OmitEmpty bool // "omitempty"
-	OmitZero  bool // "omitzero"
+	OmitEmpty  bool // "omitempty"
+	OmitZero   bool // "omitzero"
+	CaseStrict bool // "case:strict", to decode only from the exact name
 }
 
 // parseJSONOptions parses the options of a json struct tag.
@@ -234,6 +235,8 @@ func parseJSONOptions(tag string) JSONOptions {
 			o.OmitEmpty = true
 		case "omitzero":
 			o.OmitZero = true
+		case "case:strict":
+			o.CaseStrict = true
 		}
 	}
 	return o

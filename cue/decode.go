@@ -444,7 +444,7 @@ func (d *decoder) convertStruct(x reflect.Value, v Value) {
 			key := []byte(key)
 			for i := range fields.list {
 				ff := &fields.list[i]
-				if ff.equalFold(ff.nameBytes, key) {
+				if !ff.JSON.CaseStrict && ff.equalFold(ff.nameBytes, key) {
 					f = ff
 					break
 				}

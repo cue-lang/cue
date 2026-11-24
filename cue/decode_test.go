@@ -62,6 +62,11 @@ func TestDecode(t *testing.T) {
 		EmbedInt
 		Z int
 	}
+	// Fields match names case-insensitively unless they are strict.
+	type caseStrict struct {
+		Loose  int `json:"loose"`
+		Strict int `json:"strict,case:strict"`
+	}
 	intList := func(ints ...int) *[]int {
 		ints = append([]int{}, ints...)
 		return &ints
@@ -161,6 +166,14 @@ func TestDecode(t *testing.T) {
 		value:  `{X: 1}`,
 		newDst: func() any { return &embedTagged{} },
 		want:   embedTagged{Tagged: Tagged{X: 1}},
+	}, {
+		value:  `{LOOSE: 1, STRICT: 2}`,
+		newDst: func() any { return &caseStrict{} },
+		want:   caseStrict{Loose: 1},
+	}, {
+		value:  `{loose: 1, strict: 2}`,
+		newDst: func() any { return &caseStrict{} },
+		want:   caseStrict{Loose: 1, Strict: 2},
 	}, {
 		value:  `{state: N: 42}`,
 		newDst: func() any { return &EmbedState{} },

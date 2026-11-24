@@ -374,6 +374,17 @@ func TestConvert(t *testing.T) {
   b: (int){ 4 }
 }`,
 	}, {
+		// Only json tag names are validated like encoding/json does.
+		struct {
+			//lint:ignore SA5008 the odd name is what is being tested
+			A int `json:"a'b"`
+			B int `yaml:"b'c"`
+		}{3, 4},
+		`(struct){
+  A: (int){ 3 }
+  "b'c": (int){ 4 }
+}`,
+	}, {
 		struct {
 			A int    `json:"" yaml:"aa" protobuf:"bytes,1,opt,name=aa"`
 			B int    `yaml:"cc" json:"bb" protobuf:"bytes,2,opt,name=aa"`

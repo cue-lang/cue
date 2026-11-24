@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"slices"
 	"strings"
+	"unicode"
 )
 
 // GoField is a field of a Go struct type, possibly promoted from an embedded
@@ -236,4 +237,38 @@ func parseJSONOptions(tag string) JSONOptions {
 		}
 	}
 	return o
+}
+
+// JSONTagName names a field by its json tag alone for [GoFields],
+// like [encoding/json].
+func JSONTagName(sf reflect.StructField) (string, bool) {
+	return jsonTagName(sf.Tag.Get("json"))
+}
+
+func jsonTagName(tag string) (string, bool) {
+	if tag == "-" {
+		return "", false
+	}
+	name, _, _ := strings.Cut(tag, ",")
+	if !isValidTag(name) {
+		name = ""
+	}
+	return name, true
+}
+
+func isValidTag(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, c := range s {
+		switch {
+		case strings.ContainsRune("!#$%&()*+-./:;<=>?@[]^_{|}~ ", c):
+			// Backslash and quote chars are reserved, but
+			// otherwise any punctuation chars are allowed
+			// in a tag name.
+		case !unicode.IsLetter(c) && !unicode.IsDigit(c):
+			return false
+		}
+	}
+	return true
 }

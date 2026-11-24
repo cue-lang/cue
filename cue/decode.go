@@ -21,9 +21,7 @@ import (
 	"math/big"
 	"reflect"
 	"strconv"
-	"strings"
 	"sync"
-	"unicode"
 	"unicode/utf8"
 
 	"cuelang.org/go/cue/errors"
@@ -495,23 +493,6 @@ type structFields struct {
 	nameIndex map[string]int
 }
 
-func isValidTag(s string) bool {
-	if s == "" {
-		return false
-	}
-	for _, c := range s {
-		switch {
-		case strings.ContainsRune("!#$%&()*+-./:;<=>?@[]^_{|}~ ", c):
-			// Backslash and quote chars are reserved, but
-			// otherwise any punctuation chars are allowed
-			// in a tag name.
-		case !unicode.IsLetter(c) && !unicode.IsDigit(c):
-			return false
-		}
-	}
-	return true
-}
-
 // goField is a [convert.GoField] with what Decode needs to find it by name.
 type goField struct {
 	convert.GoField
@@ -521,7 +502,7 @@ type goField struct {
 
 // typeFields returns a list of fields that JSON should recognize for the given type.
 func typeFields(t reflect.Type) structFields {
-	goFields, _ := convert.GoFields(t, jsonTagName)
+	goFields, _ := convert.GoFields(t, convert.JSONTagName)
 	fields := make([]goField, 0, len(goFields))
 	for _, f := range goFields {
 		nameBytes := []byte(f.Name)
@@ -536,19 +517,6 @@ func typeFields(t reflect.Type) structFields {
 		nameIndex[field.Name] = i
 	}
 	return structFields{fields, nameIndex}
-}
-
-// jsonTagName names a field by its json tag, for [convert.GoFields].
-func jsonTagName(sf reflect.StructField) (string, bool) {
-	tag := sf.Tag.Get("json")
-	if tag == "-" {
-		return "", false
-	}
-	name, _, _ := strings.Cut(tag, ",")
-	if !isValidTag(name) {
-		name = ""
-	}
-	return name, true
 }
 
 var fieldCache sync.Map // map[reflect.Type]structFields

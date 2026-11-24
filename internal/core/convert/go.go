@@ -142,22 +142,25 @@ func splitTag(tag string) (cue string, options string) {
 
 // tagName names a struct field for [GoFields] by the first of its json, yaml,
 // and protobuf tags, even if that tag gives no name, so that a field is named
-// consistently with one encoding. It leaves out fields whose json or yaml tag
-// is exactly "-", and an unexported embedded struct named by a tag for which
-// [hasMethods] holds, much like encoding/json does since Go 1.27.
+// consistently with one encoding. json tags follow [JSONTagName]. It leaves out
+// fields whose yaml tag is exactly "-", and an unexported embedded struct named
+// by a tag for which [hasMethods] holds, much like encoding/json does since
+// Go 1.27.
 //
 // TODO: should we allow mapping names in cue tags? This only seems like a good
 // idea if we ever want to allow mapping CUE to a different name than JSON.
 func tagName(f reflect.StructField) (string, bool) {
-	tag, ok := f.Tag.Lookup("json")
-	if !ok {
-		tag, ok = f.Tag.Lookup("yaml")
-	}
-	if tag == "-" {
-		return "", false
-	}
 	var name string
-	if ok {
+	if tag, ok := f.Tag.Lookup("json"); ok {
+		var keep bool
+		if name, keep = jsonTagName(tag); !keep {
+			return "", false
+		}
+	} else if tag, ok := f.Tag.Lookup("yaml"); ok {
+		if tag == "-" {
+			return "", false
+		}
+		// Unlike encoding/json, yaml.v3 allows any name.
 		name, _, _ = strings.Cut(tag, ",")
 	} else if tag, ok := f.Tag.Lookup("protobuf"); ok {
 		// Protobuf tags give the name as an option, like "bytes,2,opt,name=foo".

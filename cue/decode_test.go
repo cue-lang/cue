@@ -162,6 +162,10 @@ func TestDecode(t *testing.T) {
 		newDst: func() any { return &embedTagged{} },
 		want:   embedTagged{Tagged: Tagged{X: 1}},
 	}, {
+		value:  `{state: N: 42}`,
+		newDst: func() any { return &EmbedState{} },
+		want:   EmbedState{embedState{N: 42}},
+	}, {
 		encode: embedSlice{EmbedSlice{1, 2}, 5},
 		newDst: func() any { return &embedSlice{} },
 		want:   embedSlice{EmbedSlice{1, 2}, 5},
@@ -391,6 +395,7 @@ func TestDecode(t *testing.T) {
 
 			got := reflect.ValueOf(dst).Elem().Interface()
 			qt.Assert(t, qt.CmpEquals(got, tc.want,
+				cmp.AllowUnexported(EmbedState{}),
 				cmp.Comparer(func(a, b *big.Int) bool {
 					return a.Cmp(b) == 0
 				}),
@@ -463,6 +468,16 @@ field: string | {
 }`))
 	})
 }
+
+// EmbedState embeds an unexported struct under a tag name. Decode fills its
+// fields even though it has an IsZero method, which convert skips it for.
+type EmbedState struct {
+	embedState `json:"state"`
+}
+
+type embedState struct{ N int }
+
+func (embedState) IsZero() bool { return false }
 
 type StructWithFloat struct {
 	Value *big.Float

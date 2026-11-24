@@ -1199,6 +1199,134 @@ issue4422: {
 	for host, _ in self.hosts {}
 
 }
+-- issue4595.cue --
+// A field which a pushed-down comprehension declares has its value when a for
+// loop over the struct is the first to evaluate that struct, so before the
+// field has any conjunct.
+issue4595: {
+	scalar: {
+		data: [for k, v in values {v + 1}]
+		values: {if true {T: c}}
+		c: 5
+	}
+	// With values first, it is evaluated before the loop over it.
+	valuesFirst: {
+		values: {if true {T: c}}
+		data: [for k, v in values {v + 1}]
+		c: 5
+	}
+	structComprehension: {
+		data: {for k, v in values {(k): v + 1}}
+		values: {if true {T: c}}
+		c: 5
+	}
+	forClause: {
+		data: [for k, v in values {v + 1}]
+		values: {for x in [c] {T: x}}
+		c: 5
+	}
+	guard: {
+		data: [for k, v in values {v + 1}]
+		values: {if c > 3 {T: c}}
+		c: 5
+	}
+	expression: {
+		data: [for k, v in values {v + 1}]
+		values: {if true {T: c + 1}}
+		c: 5
+	}
+	default: {
+		data: [for k, v in values {v + 1}]
+		values: {if true {T: *c | 7}}
+		c: 5
+	}
+	interpolation: {
+		data: [for k, v in values {"\(v)"}]
+		values: {if true {T: c}}
+		c: "a"
+	}
+	hidden: {
+		data: [for k, v in values {v + values._h + values.#d}]
+		values: {if true {T: c, _h: c, #d: c}}
+		c: 5
+	}
+	nested: {
+		data: [for k, v in values {[for k2, v2 in v {v2 + 1}]}]
+		values: {if true {T: {if true {U: c}}}}
+		c: 5
+	}
+	chained: {
+		data: [for k, v in values {v + 1}]
+		values: {if true {T: other.T}}
+		other: {if true {T: c}}
+		c: 5
+	}
+	inDefinition: {
+		out: #R.data
+		c: t: k: "v"
+		#R: {
+			values: {if true {T: c.t}}
+			data: [for k, v in values {v.k}]
+		}
+	}
+	inDefinitionDataFirst: {
+		c: t: k: "v"
+		#R: {
+			data: [for k, v in values {v.k}]
+			values: {if true {T: c.t}}
+		}
+	}
+	required: {
+		out: #R.data
+		c: t: k: "v"
+		#R: {
+			values: {if true {T!: c.t}}
+			data: [for k, v in values {k}]
+		}
+	}
+	length: {
+		out: #R.data
+		c: t: k: "v"
+		#R: {
+			values: {if true {T: c.t}}
+			data: [for k, v in values {len(v)}]
+		}
+	}
+	filter: {
+		out: #R.data
+		c: t: k: "v"
+		#R: {
+			values: {if true {T: c.t}}
+			data: [for k, v in values if v.k == "v" {k}]
+		}
+	}
+	bottomComparison: {
+		#R: {
+			data: [for k, v in values {[if v.k == _|_ {"bottom"}, "value"][0]}]
+			values: {if true {T: c.t}}
+		}
+		c: t: k: "v"
+		out: #R.data
+	}
+	// A conflict in the field is reported all the same.
+	conflict: {
+		out: #R.data
+		c: t: k: "v"
+		#R: {
+			values: {if true {T: c.t}}
+			values: T: k: "w"
+			data: [for k, v in values {v.k}]
+		}
+	}
+	conflictInBody: {
+		out: #R.data
+		c: t: k: "v"
+		#R: {
+			values: {if true {T: c.t & {k: "w"}}}
+			data: [for k, v in values {v.k}]
+		}
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -2540,6 +2668,342 @@ issue4422: {
       }
     }
     for host, _ in 〈1〉.hosts {}
+  }
+}
+--- issue4595.cue
+{
+  issue4595: {
+    scalar: {
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      values: {
+        if true {
+          T: 〈2;c〉
+        }
+      }
+      c: 5
+    }
+    valuesFirst: {
+      values: {
+        if true {
+          T: 〈2;c〉
+        }
+      }
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      c: 5
+    }
+    structComprehension: {
+      data: {
+        for k, v in 〈1;values〉 {
+          〈1;k〉: (〈1;v〉 + 1)
+        }
+      }
+      values: {
+        if true {
+          T: 〈2;c〉
+        }
+      }
+      c: 5
+    }
+    forClause: {
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      values: {
+        for _, x in [
+          〈2;c〉,
+        ] {
+          T: 〈1;x〉
+        }
+      }
+      c: 5
+    }
+    guard: {
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      values: {
+        if (〈1;c〉 > 3) {
+          T: 〈2;c〉
+        }
+      }
+      c: 5
+    }
+    expression: {
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      values: {
+        if true {
+          T: (〈2;c〉 + 1)
+        }
+      }
+      c: 5
+    }
+    default: {
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      values: {
+        if true {
+          T: (*〈2;c〉|7)
+        }
+      }
+      c: 5
+    }
+    interpolation: {
+      data: [
+        for k, v in 〈1;values〉 {
+          "\(〈1;v〉)"
+        },
+      ]
+      values: {
+        if true {
+          T: 〈2;c〉
+        }
+      }
+      c: "a"
+    }
+    hidden: {
+      data: [
+        for k, v in 〈1;values〉 {
+          ((〈1;v〉 + 〈3;values〉._h) + 〈3;values〉.#d)
+        },
+      ]
+      values: {
+        if true {
+          T: 〈2;c〉
+          _h: 〈2;c〉
+          #d: 〈2;c〉
+        }
+      }
+      c: 5
+    }
+    nested: {
+      data: [
+        for k, v in 〈1;values〉 {
+          [
+            for k2, v2 in 〈2;v〉 {
+              (〈1;v2〉 + 1)
+            },
+          ]
+        },
+      ]
+      values: {
+        if true {
+          T: {
+            if true {
+              U: 〈4;c〉
+            }
+          }
+        }
+      }
+      c: 5
+    }
+    chained: {
+      data: [
+        for k, v in 〈1;values〉 {
+          (〈1;v〉 + 1)
+        },
+      ]
+      values: {
+        if true {
+          T: 〈2;other〉.T
+        }
+      }
+      other: {
+        if true {
+          T: 〈2;c〉
+        }
+      }
+      c: 5
+    }
+    inDefinition: {
+      out: 〈0;#R〉.data
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        values: {
+          if true {
+            T: 〈3;c〉.t
+          }
+        }
+        data: [
+          for k, v in 〈1;values〉 {
+            〈1;v〉.k
+          },
+        ]
+      }
+    }
+    inDefinitionDataFirst: {
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        data: [
+          for k, v in 〈1;values〉 {
+            〈1;v〉.k
+          },
+        ]
+        values: {
+          if true {
+            T: 〈3;c〉.t
+          }
+        }
+      }
+    }
+    required: {
+      out: 〈0;#R〉.data
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        values: {
+          if true {
+            T!: 〈3;c〉.t
+          }
+        }
+        data: [
+          for k, v in 〈1;values〉 {
+            〈1;k〉
+          },
+        ]
+      }
+    }
+    length: {
+      out: 〈0;#R〉.data
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        values: {
+          if true {
+            T: 〈3;c〉.t
+          }
+        }
+        data: [
+          for k, v in 〈1;values〉 {
+            len(〈1;v〉)
+          },
+        ]
+      }
+    }
+    filter: {
+      out: 〈0;#R〉.data
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        values: {
+          if true {
+            T: 〈3;c〉.t
+          }
+        }
+        data: [
+          for k, v in 〈1;values〉 if (〈0;v〉.k == "v") {
+            〈1;k〉
+          },
+        ]
+      }
+    }
+    bottomComparison: {
+      #R: {
+        data: [
+          for k, v in 〈1;values〉 {
+            [
+              if (〈2;v〉.k == _|_(explicit error (_|_ literal) in source)) {
+                "bottom"
+              },
+              "value",
+            ][0]
+          },
+        ]
+        values: {
+          if true {
+            T: 〈3;c〉.t
+          }
+        }
+      }
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      out: 〈0;#R〉.data
+    }
+    conflict: {
+      out: 〈0;#R〉.data
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        values: {
+          if true {
+            T: 〈3;c〉.t
+          }
+        }
+        values: {
+          T: {
+            k: "w"
+          }
+        }
+        data: [
+          for k, v in 〈1;values〉 {
+            〈1;v〉.k
+          },
+        ]
+      }
+    }
+    conflictInBody: {
+      out: 〈0;#R〉.data
+      c: {
+        t: {
+          k: "v"
+        }
+      }
+      #R: {
+        values: {
+          if true {
+            T: (〈3;c〉.t & {
+              k: "w"
+            })
+          }
+        }
+        data: [
+          for k, v in 〈1;values〉 {
+            〈1;v〉.k
+          },
+        ]
+      }
+    }
   }
 }
 --- pending.cue

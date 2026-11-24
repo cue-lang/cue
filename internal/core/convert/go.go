@@ -184,8 +184,14 @@ func tagName(f reflect.StructField) (string, bool) {
 // promotedCUE names an embedded field with a cue tag whose fields are
 // promoted, if any, as the tag has no struct value left to constrain.
 type goStruct struct {
-	fields      []GoField
+	fields      []goStructField
 	promotedCUE string
+}
+
+// goStructField is a [GoField] with whether a zero value is omitted.
+type goStructField struct {
+	GoField
+	omitEmpty bool
 }
 
 var structFieldsCache sync.Map // map[reflect.Type]*goStruct
@@ -196,7 +202,10 @@ func structFields(t reflect.Type) *goStruct {
 		return s.(*goStruct)
 	}
 	fields, promoted := GoFields(t, tagName)
-	s := &goStruct{fields: fields}
+	s := &goStruct{fields: make([]goStructField, len(fields))}
+	for i, f := range fields {
+		s.fields[i] = newGoStructField(f)
+	}
 	for _, sf := range promoted {
 		if _, ok := sf.Tag.Lookup("cue"); ok {
 			s.promotedCUE = sf.Name
@@ -222,70 +231,46 @@ func fieldByIndex(v reflect.Value, index []int) (reflect.Value, bool) {
 	return v, true
 }
 
+// newGoStructField omits a zero value of f per its json "omitempty" option,
+// or if it has no json tag and can be nil.
+//
+// TODO: like [encoding/json], omit only nil or empty values with "omitempty",
+// not any zero value, and support the "string" option.
+func newGoStructField(f GoField) goStructField {
+	omitEmpty := f.JSON.OmitEmpty
+	if _, ok := f.StructField.Tag.Lookup("json"); !ok {
+		switch f.StructField.Type.Kind() {
+		case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
+			// Note: it may be confusing to distinguish between an empty slice and
+			// a nil slice. However, it is also surprising to not be able to specify
+			// a default value for a slice. So for now we will allow it.
+			omitEmpty = true
+		default:
+			// TODO: we can also infer omit empty if a type cannot be nil if there
+			// is a constraint that unconditionally disallows the zero value.
+		}
+	}
+	return goStructField{f, omitEmpty}
+}
+
 // isOptional indicates whether a field should be marked as optional.
-func isOptional(f *reflect.StructField) bool {
-	isOptional := false
-	switch f.Type.Kind() {
-	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
-		// Note: it may be confusing to distinguish between an empty slice and
-		// a nil slice. However, it is also surprising to not be able to specify
-		// a default value for a slice. So for now we will allow it.
-		isOptional = true
+func (f *goStructField) isOptional() bool {
+	tag, ok := f.StructField.Tag.Lookup("cue")
+	if !ok {
+		return f.omitEmpty || f.JSON.OmitZero
 	}
-	if tag, ok := f.Tag.Lookup("cue"); ok {
-		// TODO: only if first field is not empty.
-		_, opt := splitTag(tag)
-		isOptional = false
-		for f := range strings.SplitSeq(opt, ",") {
-			switch f {
-			case "opt":
-				isOptional = true
-			case "req":
-				return false
-			}
-		}
-	} else if tag, ok = f.Tag.Lookup("json"); ok {
-		isOptional = hasJSONOption(tag, "omitempty") || hasJSONOption(tag, "omitzero")
-	}
-	return isOptional
-}
-
-// hasJSONOption reports whether a json struct tag contains the given option,
-// such as "omitempty" or "omitzero".
-func hasJSONOption(tag, option string) bool {
-	_, opts, _ := strings.Cut(tag, ",")
-	for s := range strings.SplitSeq(opts, ",") {
-		if s == option {
-			return true
+	// TODO: only if first field is not empty.
+	_, opts := splitTag(tag)
+	optional := false
+	for opt := range strings.SplitSeq(opts, ",") {
+		switch opt {
+		case "opt":
+			optional = true
+		case "req":
+			return false
 		}
 	}
-	return false
-}
-
-// isOmitEmpty means that the zero value is interpreted as undefined.
-func isOmitEmpty(f reflect.StructField) bool {
-	isOmitEmpty := false
-	switch f.Type.Kind() {
-	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
-		// Note: it may be confusing to distinguish between an empty slice and
-		// a nil slice. However, it is also surprising to not be able to specify
-		// a default value for a slice. So for now we will allow it.
-		isOmitEmpty = true
-	default:
-		// TODO: we can also infer omit empty if a type cannot be nil if there
-		// is a constraint that unconditionally disallows the zero value.
-	}
-	if tag, ok := f.Tag.Lookup("json"); ok {
-		isOmitEmpty = hasJSONOption(tag, "omitempty")
-	}
-	return isOmitEmpty
-}
-
-// isOmitZero reports whether a field has the json "omitzero" option, meaning
-// that a zero value, as reported by [isZero], is interpreted as undefined.
-func isOmitZero(f reflect.StructField) bool {
-	tag, ok := f.Tag.Lookup("json")
-	return ok && hasJSONOption(tag, "omitzero")
+	return optional
 }
 
 // isZeroer matches types with an IsZero method, as used by json's omitzero.
@@ -519,7 +504,6 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 
 		for i := range fields {
 			field := &fields[i]
-			sf := field.StructField
 			val, ok := fieldByIndex(val, field.Index)
 			if !ok {
 				continue // a nil embedded pointer, like in encoding/json
@@ -527,10 +511,10 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 			if !nilIsTop && isNil(val) {
 				continue
 			}
-			if isOmitEmpty(sf) && val.IsZero() {
+			if field.omitEmpty && val.IsZero() {
 				continue
 			}
-			if isOmitZero(sf) && isZero(val) {
+			if field.JSON.OmitZero && isZero(val) {
 				continue
 			}
 			sub := fromGoValue(ctx, nilIsTop, val, depth+1)
@@ -1017,7 +1001,7 @@ func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
 		// The Go JSON decoder always allows a value to be undefined.
 		d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
 		// A nil embedded pointer omits the fields promoted through it.
-		if field.Indirect || isOptional(&f) {
+		if field.Indirect || field.isOptional() {
 			d.Constraint = token.OPTION
 		}
 		obj.Elts = append(obj.Elts, d)
@@ -1028,7 +1012,7 @@ func (b *typeBuilder) buildStructLit(t reflect.Type) ast.Expr {
 // checkPromotedRefs reports an error if a reference in the cue tag v of the
 // field f, promoted into the struct type t with fields, resolves to a field
 // other than the one it does in the struct declaring f.
-func checkPromotedRefs(t reflect.Type, fields []GoField, f *GoField, v ast.Expr) errors.Error {
+func checkPromotedRefs(t reflect.Type, fields []goStructField, f *goStructField, v ast.Expr) errors.Error {
 	prefix := f.Index[:len(f.Index)-1]
 	if len(prefix) == 0 {
 		return nil
@@ -1043,10 +1027,10 @@ func checkPromotedRefs(t reflect.Type, fields []GoField, f *GoField, v ast.Expr)
 	for _, id := range file.Unresolved {
 		// A reference to no field in either struct, such as int, is fine.
 		var want, got []int
-		if i := slices.IndexFunc(declFields, func(g GoField) bool { return g.Name == id.Name }); i >= 0 {
+		if i := slices.IndexFunc(declFields, func(g goStructField) bool { return g.Name == id.Name }); i >= 0 {
 			want = append(slices.Clip(prefix), declFields[i].Index...)
 		}
-		if i := slices.IndexFunc(fields, func(g GoField) bool { return g.Name == id.Name }); i >= 0 {
+		if i := slices.IndexFunc(fields, func(g goStructField) bool { return g.Name == id.Name }); i >= 0 {
 			got = fields[i].Index
 		}
 		if !slices.Equal(got, want) {

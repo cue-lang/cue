@@ -18,6 +18,7 @@ import (
 	"cmp"
 	"reflect"
 	"slices"
+	"strings"
 )
 
 // GoField is a field of a Go struct type, possibly promoted from an embedded
@@ -27,6 +28,7 @@ type GoField struct {
 	Index       []int               // for [reflect.Value.FieldByIndex]
 	Indirect    bool                // promoted via an embedded pointer
 	StructField reflect.StructField // the Go field itself
+	JSON        JSONOptions         // from its json tag
 
 	tagged bool // whether Name comes from a tag
 }
@@ -123,6 +125,7 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 						tagged:      tagged,
 						Indirect:    f.indirect,
 						StructField: sf,
+						JSON:        parseJSONOptions(sf.Tag.Get("json")),
 					})
 					if count[f.typ] > 1 {
 						// If there were multiple instances, add a second,
@@ -212,4 +215,25 @@ func dominantField(fields []GoField) (GoField, bool) {
 		return GoField{}, false
 	}
 	return fields[0], true
+}
+
+// JSONOptions are the options of a json struct tag which CUE supports.
+type JSONOptions struct {
+	OmitEmpty bool // "omitempty"
+	OmitZero  bool // "omitzero"
+}
+
+// parseJSONOptions parses the options of a json struct tag.
+func parseJSONOptions(tag string) JSONOptions {
+	var o JSONOptions
+	_, opts, _ := strings.Cut(tag, ",")
+	for opt := range strings.SplitSeq(opts, ",") {
+		switch opt {
+		case "omitempty":
+			o.OmitEmpty = true
+		case "omitzero":
+			o.OmitZero = true
+		}
+	}
+	return o
 }

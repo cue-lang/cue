@@ -230,6 +230,21 @@ func TestDecode(t *testing.T) {
 		newDst: func() any { return &EmbedState{} },
 		want:   EmbedState{embedState{N: 42}},
 	}, {
+		// Wrong: the field is decoded.
+		value:  `{m: I: 1}`,
+		newDst: func() any { return &EmbedMarshaler{} },
+		want:   EmbedMarshaler{embedMarshaler{I: 1}},
+	}, {
+		// Wrong: Decode panics.
+		value:  `{m: I: 1}`,
+		newDst: func() any { return &EmbedMarshalerPtr{} },
+		err:    "panic: reflect: reflect.Value.Set using value obtained using unexported field",
+	}, {
+		// Wrong: Decode panics.
+		value:  `{m: null}`,
+		newDst: func() any { return &EmbedMarshalerPtr{} },
+		err:    "panic: reflect: reflect.Value.Set using value obtained using unexported field",
+	}, {
 		encode: embedSlice{EmbedSlice{1, 2}, 5},
 		newDst: func() any { return &embedSlice{} },
 		want:   embedSlice{EmbedSlice{1, 2}, 5},
@@ -452,14 +467,21 @@ func TestDecode(t *testing.T) {
 				v = getValue(m, tc.value)
 			}
 			dst := tc.newDst()
-			err := v.Decode(dst)
+			err := func() (err error) {
+				defer func() {
+					if r := recover(); r != nil {
+						err = fmt.Errorf("panic: %v", r)
+					}
+				}()
+				return v.Decode(dst)
+			}()
 			if !checkErr(t, err, tc.err, "init") {
 				return
 			}
 
 			got := reflect.ValueOf(dst).Elem().Interface()
 			qt.Assert(t, qt.CmpEquals(got, tc.want,
-				cmp.AllowUnexported(EmbedState{}),
+				cmp.AllowUnexported(EmbedState{}, EmbedMarshaler{}, EmbedMarshalerPtr{}),
 				cmp.Comparer(func(a, b *big.Int) bool {
 					return a.Cmp(b) == 0
 				}),
@@ -542,6 +564,21 @@ type EmbedState struct {
 type embedState struct{ N int }
 
 func (embedState) IsZero() bool { return false }
+
+// EmbedMarshaler embeds an unexported struct under a tag name whose
+// MarshalJSON method cannot be called, so it is skipped like in encoding/json.
+type EmbedMarshaler struct {
+	embedMarshaler `json:"m"`
+}
+
+// EmbedMarshalerPtr is like [EmbedMarshaler] with an embedded pointer.
+type EmbedMarshalerPtr struct {
+	*embedMarshaler `json:"m"`
+}
+
+type embedMarshaler struct{ I int }
+
+func (embedMarshaler) MarshalJSON() ([]byte, error) { return []byte("{}"), nil }
 
 type StructWithFloat struct {
 	Value *big.Float

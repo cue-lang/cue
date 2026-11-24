@@ -191,6 +191,26 @@ type (
 func (embedTextA) MarshalText() ([]byte, error) { return []byte("a"), nil }
 func (embedTextB) MarshalText() ([]byte, error) { return []byte("b"), nil }
 
+// EmbedJSONMethods embeds unexported types under tag names whose methods
+// encoding/json would call, so they are skipped: an UnmarshalJSON method,
+// and IsZero with the "omitzero" option. IsZero alone does not count.
+type EmbedJSONMethods struct {
+	embedUnmarshal `json:"u"`
+	embedZero      `json:"z,omitzero"`
+	embedZeroKeep  `json:"k"`
+	Z              int
+}
+
+type (
+	embedUnmarshal struct{ U int }
+	embedZero      struct{ X int }
+	embedZeroKeep  struct{ K int }
+)
+
+func (*embedUnmarshal) UnmarshalJSON([]byte) error { return nil }
+func (embedZero) IsZero() bool                     { return false }
+func (embedZeroKeep) IsZero() bool                 { return false }
+
 func TestConvert(t *testing.T) {
 	type key struct {
 		a int
@@ -539,6 +559,14 @@ func TestConvert(t *testing.T) {
 	}, {
 		EmbedMethods{astFile: &ast.File{}}, `(struct){
   Z: (int){ 0 }
+}`,
+	}, {
+		// Wrong: u is converted and k is skipped.
+		EmbedJSONMethods{embedUnmarshal{1}, embedZero{2}, embedZeroKeep{3}, 4}, `(struct){
+  u: (struct){
+    U: (int){ 1 }
+  }
+  Z: (int){ 4 }
 }`,
 	}, {
 		EmbedOption{Opt: EmbedHello{"h"}, NamedPtr: &EmbedWorld{"w"}}, `(struct){

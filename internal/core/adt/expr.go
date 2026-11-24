@@ -3368,6 +3368,13 @@ func (x *Builtin) self() *Builtin {
 	return x
 }
 
+// clone returns a copy of x which keeps the identity of x.
+func (x *Builtin) clone() *Builtin {
+	c := *x
+	c.orig = x.self()
+	return &c
+}
+
 type Param struct {
 	Value Value
 }

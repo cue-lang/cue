@@ -2223,12 +2223,9 @@ func mergeBuiltinFunc(c *OpContext, b *Builtin, f *FuncValue) (*Builtin, *Bottom
 	if err := checkBuiltinSignatures(c, b, types); err != nil {
 		return nil, err
 	}
-	merged := *b
+	merged := b.clone()
 	merged.Types = types
-	if merged.orig == nil {
-		merged.orig = b
-	}
-	return &merged, nil
+	return merged, nil
 }
 
 // checkBuiltinSignatures checks every signature in types against b with the
@@ -2306,15 +2303,15 @@ func mergeBuiltins(c *OpContext, a, b *Builtin) (*Builtin, *Bottom) {
 	if err := checkFuncTypeSetsMeet(c, a.Types, b.Types); err != nil {
 		return nil, err
 	}
-	merged := *a
+	merged := a.clone()
 	merged.Types = mergeFuncTypes(a.Types, b.Types)
 	if err := checkBuiltinParamLabels(c, merged.Types); err != nil {
 		return nil, err
 	}
-	if err := checkBuiltinSignatures(c, &merged, merged.Types); err != nil {
+	if err := checkBuiltinSignatures(c, merged, merged.Types); err != nil {
 		return nil, err
 	}
-	return &merged, nil
+	return merged, nil
 }
 
 // BuiltinSubsumes reports whether builtin a subsumes builtin b: a builtin

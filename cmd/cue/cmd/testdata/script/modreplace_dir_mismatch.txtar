@@ -5,6 +5,13 @@
 ! exec cue export .
 stderr 'replacement directory.*has module path "example.com/other@v0", want "example.com/dep@v0"'
 
+# The replacement directory is relative to the module root,
+# even when loading from a subdirectory.
+# TODO: the module path is not checked from a subdirectory.
+cd sub
+exec cue export .
+stdout '"from local directory"'
+
 -- cue.mod/module.cue --
 module: "example.com/main@v0"
 language: version: "v0.17.0"
@@ -23,6 +30,12 @@ deps: {
 }
 -- main.cue --
 package main
+
+import "example.com/dep@v0:lib"
+
+output: lib.value
+-- sub/sub.cue --
+package sub
 
 import "example.com/dep@v0:lib"
 

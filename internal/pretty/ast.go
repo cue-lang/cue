@@ -5232,84 +5232,71 @@ func isBracketedInjectionTarget(e ast.Expr) bool {
 	return false
 }
 
-// bracketClose returns the closing-bracket position of e, whether
-// that bracket is empty, and whether e is a bracketed injection
-// target at all.
-func bracketClose(e ast.Expr) (close token.Pos, empty, bracketed bool) {
+// bracketClose returns the closing-bracket position of e, and whether
+// e is a bracketed injection target at all.
+func bracketClose(e ast.Expr) (close token.Pos, bracketed bool) {
 	switch x := e.(type) {
 	case *ast.StructLit:
 		if braced(x) {
-			return x.Rbrace, len(x.Elts) == 0, true
+			return x.Rbrace, true
 		}
 	case *ast.ListLit:
 		if x.Lbrack.IsValid() || x.Hash.IsValid() {
-			return x.Rbrack, len(x.Elts) == 0, true
+			return x.Rbrack, true
 		}
 	}
-	return token.NoPos, false, false
+	return token.NoPos, false
 }
 
-// commentTrailsBracket reports whether the PosPrefix comment cg
-// trails the brackets described by (close, empty, bracketed) rather
-// than sitting inside them.
-//
-//   - No bracket (bracketed == false, e.g. a bare `a + b` operand):
-//     the comment cannot be interior, so it trails.
-//   - Without usable source offsets (a programmatic AST) we cannot
-//     tell the two forms apart. We prefer the trailing form
-//     `a & {}, // c` for a same-line comment, and keep an own-line one
-//     inside the brackets, where decoders and other producers place an
-//     interior comment.
-//   - Non-empty bracket: a genuine interior header attaches to the
-//     first element, not the bracket, so a comment on the bracket
-//     node itself trails.
-//   - Empty bracket: the trailing and interior forms collapse to the
-//     same node and RelPos (the parser has no inner element to anchor
-//     an interior comment to), so we compare source offsets.
-func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, empty, bracketed bool) bool {
+// commentTrailsBracket reports whether the PosPrefix comment cg trails
+// the bracket closed at close rather than sitting inside it. With no
+// bracket, it trails; otherwise, it trails if it follows close in the
+// source. Without comparable offsets, as in a programmatic AST, a
+// same-line comment trails, as in `a & {}, // c`, and an own-line one
+// stays inside, where decoders place an interior comment.
+func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, bracketed bool) bool {
 	if !bracketed {
 		return true
 	}
-	// This is the only place where we must look at the AbsPos.
-	if len(cg.List) == 0 || !close.HasAbsPos() || !cg.List[0].Slash.HasAbsPos() {
+	if len(cg.List) == 0 {
 		return cg.Line
 	}
-	return !empty || cg.List[0].Slash.Offset() > close.Offset()
+	// This is the only place where we must look at the AbsPos.
+	pos := cg.List[0].Slash
+	if !close.HasAbsPos() || !pos.HasAbsPos() || close.File() != pos.File() {
+		return cg.Line
+	}
+	return pos.Offset() > close.Offset()
 }
 
-// trailingPrefixComments returns the `//` comments the parser hangs at
-// PosPrefix on a call argument's outermost node, on the same line or on
-// the following lines, which logically trail the whole argument rather
-// than sitting interior to it. In the call-argument context the parser
-// attaches an argument's trailing comment at PosPrefix on the argument
-// node, uniformly across node types (unlike the list-element context,
-// where it uses trailing positions that route correctly on their own).
+// trailingPrefixComments returns the PosPrefix comments on n which
+// trail it rather than sit inside its brackets. The parser files both a
+// call argument's trailing comment and a comment following a list
+// element's opener at PosPrefix on the outermost node, so only
+// [commentTrailsBracket] can tell them apart.
 //
-// We lift such a comment to the argument's trailing-comment column;
-// the node's own renderer skips it so it is not also rendered inside
-// the node. This is needed only for the node kinds whose renderer
-// would otherwise treat a PosPrefix comment as interior content - the
-// [nodeManagesInteriorComments] set: a BinaryExpr (the candidate
-// bracket is its final operand) or a StructLit / ListLit (the bracket
-// is the argument itself).
+// We lift such a comment to the trailing-comment column, and n's own
+// renderer skips it. Only the [nodeManagesInteriorComments] kinds need
+// this: a BinaryExpr, whose final operand is the candidate bracket, and
+// a StructLit or ListLit.
 func trailingPrefixComments(n ast.Node) []*ast.CommentGroup {
 	var close token.Pos
-	var empty, bracketed bool
+	var bracketed bool
 	switch n := n.(type) {
 	case *ast.BinaryExpr:
-		close, empty, bracketed = bracketClose(n.Y)
+		close, bracketed = bracketClose(n.Y)
 	// A struct or list renders its brackets even when they have no
 	// position, as in a decoded AST.
 	case *ast.StructLit:
-		close, empty, bracketed = n.Rbrace, len(n.Elts) == 0, true
+		close, bracketed = n.Rbrace, true
 	case *ast.ListLit:
-		close, empty, bracketed = n.Rbrack, len(n.Elts) == 0, true
+		close, bracketed = n.Rbrack, true
 	default:
 		return nil
 	}
 	var out []*ast.CommentGroup
 	for _, cg := range ast.Comments(n) {
-		if cg.Position == PosPrefix && commentTrailsBracket(cg, close, empty, bracketed) {
+		if cg.Position == PosPrefix && commentTrailsBracket(cg, close, bracketed) {
 			out = append(out, cg)
 		}
 	}

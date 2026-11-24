@@ -73,6 +73,10 @@ func TestDecode(t *testing.T) {
 		//lint:ignore SA5008 the repeated option is what is being tested
 		Both int `json:"both,case:strict,case:ignore"`
 	}
+	// Names match case-insensitively with Unicode folding as well.
+	type foldUnicode struct {
+		Kelvin int `json:"kelvin"`
+	}
 	// Names in json tags follow encoding/json as of Go 1.28.
 	type oddNames struct {
 		//lint:ignore SA5008 the odd name is what is being tested
@@ -186,6 +190,10 @@ func TestDecode(t *testing.T) {
 		value:  `{loose: 1, strict: 2}`,
 		newDst: func() any { return &caseStrict{} },
 		want:   caseStrict{Loose: 1, Strict: 2},
+	}, {
+		value:  `{"\u212Aelvin": 1}`, // the Kelvin sign folds to k
+		newDst: func() any { return &foldUnicode{} },
+		want:   foldUnicode{Kelvin: 1},
 	}, {
 		value:  `{A: 1, "€ c": 2}`,
 		newDst: func() any { return &oddNames{} },

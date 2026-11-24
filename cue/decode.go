@@ -15,13 +15,13 @@
 package cue
 
 import (
-	"bytes"
 	"encoding"
 	"encoding/json"
 	"math/big"
 	"reflect"
 	"strconv"
 	"sync"
+	"unicode"
 	"unicode/utf8"
 
 	"cuelang.org/go/cue/errors"
@@ -433,31 +433,19 @@ func (d *decoder) convertStruct(x reflect.Value, v Value) {
 	iter, err := v.Fields()
 	d.addErr(err)
 	for iter.Next() {
-		var f *goField
 		key := iter.Selector().Unquoted()
-		if i, ok := fields.nameIndex[key]; ok {
-			// Found an exact name match.
-			f = &fields.list[i]
-		} else {
-			// Fall back to the expensive case-insensitive
-			// linear search.
-			key := []byte(key)
-			for i := range fields.list {
-				ff := &fields.list[i]
-				if !ff.JSON.CaseStrict && ff.equalFold(ff.nameBytes, key) {
-					f = ff
-					break
-				}
-			}
+		index, ok := fields.byName[key]
+		if !ok {
+			// Fall back to a case-insensitive match.
+			index, ok = fields.byFoldedName[string(foldName(key))]
 		}
-
-		if f == nil {
+		if !ok {
 			continue
 		}
 
 		// Figure out field corresponding to key.
 		subv := x
-		for _, i := range f.Index {
+		for _, i := range index {
 			if subv.Kind() == reflect.Pointer {
 				if subv.IsNil() {
 					// If a struct embeds a pointer to an unexported type,
@@ -488,35 +476,30 @@ func (d *decoder) convertStruct(x reflect.Value, v Value) {
 	}
 }
 
+// structFields maps the names of a Go struct type's fields to their indices,
+// and their folded names too, except for fields with "case:strict".
 type structFields struct {
-	list      []goField
-	nameIndex map[string]int
+	byName       map[string][]int
+	byFoldedName map[string][]int
 }
 
-// goField is a [convert.GoField] with what Decode needs to find it by name.
-type goField struct {
-	convert.GoField
-	nameBytes []byte                 // []byte(name)
-	equalFold func(s, t []byte) bool // bytes.EqualFold or equivalent
-}
-
-// typeFields returns a list of fields that JSON should recognize for the given type.
+// typeFields returns the fields of the Go struct type t to decode into.
 func typeFields(t reflect.Type) structFields {
-	goFields, _ := convert.GoFields(t, convert.JSONTagName)
-	fields := make([]goField, 0, len(goFields))
-	for _, f := range goFields {
-		nameBytes := []byte(f.Name)
-		fields = append(fields, goField{
-			GoField:   f,
-			nameBytes: nameBytes,
-			equalFold: foldFunc(nameBytes),
-		})
+	fields, _ := convert.GoFields(t, convert.JSONTagName)
+	byName := make(map[string][]int, len(fields))
+	byFoldedName := make(map[string][]int, len(fields))
+	for _, f := range fields {
+		byName[f.Name] = f.Index
+		if f.JSON.CaseStrict {
+			continue
+		}
+		// The first field in index order wins.
+		folded := string(foldName(f.Name))
+		if _, ok := byFoldedName[folded]; !ok {
+			byFoldedName[folded] = f.Index
+		}
 	}
-	nameIndex := make(map[string]int, len(fields))
-	for i, field := range fields {
-		nameIndex[field.Name] = i
-	}
-	return structFields{fields, nameIndex}
+	return structFields{byName, byFoldedName}
 }
 
 var fieldCache sync.Map // map[reflect.Type]structFields
@@ -530,135 +513,30 @@ func cachedTypeFields(t reflect.Type) structFields {
 	return f.(structFields)
 }
 
-// foldFunc returns one of four different case folding equivalence
-// functions, from most general (and slow) to fastest:
-//
-// 1) [bytes.EqualFold], if the key s contains any non-ASCII UTF-8
-// 2) [equalFoldRight], if s contains special folding ASCII ('k', 'K', 's', 'S')
-// 3) [asciiEqualFold], no special, but includes non-letters (including _)
-// 4) [simpleLetterEqualFold], no specials, no non-letters.
-//
-// The letters S and K are special because they map to 3 runes, not just 2:
-//   - S maps to s and to U+017F 'ſ' Latin small letter long s
-//   - k maps to K and to U+212A 'K' Kelvin sign
-//
-// See https://play.golang.org/p/tTxjOc0OGo
-//
-// The returned function is specialized for matching against s and
-// should only be given s. It's not curried for performance reasons.
-func foldFunc(s []byte) func(s, t []byte) bool {
-	nonLetter := false
-	special := false // special letter
-	for _, b := range s {
-		if b >= utf8.RuneSelf {
-			return bytes.EqualFold
-		}
-		upper := b & caseMask
-		if upper < 'A' || upper > 'Z' {
-			nonLetter = true
-		} else if upper == 'K' || upper == 'S' {
-			// See above for why these letters are special.
-			special = true
-		}
-	}
-	if special {
-		return equalFoldRight
-	}
-	if nonLetter {
-		return asciiEqualFold
-	}
-	return simpleLetterEqualFold
+// foldName returns a folded form of name, such that two names fold to the
+// same bytes exactly when they are equal under [strings.EqualFold].
+// It is kept small enough to be inlined, so that arr does not escape.
+func foldName(name string) []byte {
+	var arr [32]byte // large enough for most names
+	return appendFoldedName(arr[:0], name)
 }
 
-const (
-	caseMask     = ^byte(0x20) // Mask to ignore case in ASCII.
-	kelvin       = '\u212a'
-	smallLongEss = '\u017f'
-)
-
-// equalFoldRight is a specialization of [bytes.EqualFold] when s is
-// known to be all ASCII (including punctuation), but contains an 's',
-// 'S', 'k', or 'K', requiring a Unicode fold on the bytes in t.
-// See comments on [foldFunc].
-func equalFoldRight(s, t []byte) bool {
-	for _, sb := range s {
-		if len(t) == 0 {
-			return false
-		}
-		tb := t[0]
-		if tb < utf8.RuneSelf {
-			if sb != tb {
-				sbUpper := sb & caseMask
-				if 'A' <= sbUpper && sbUpper <= 'Z' {
-					if sbUpper != tb&caseMask {
-						return false
-					}
-				} else {
-					return false
-				}
-			}
-			t = t[1:]
-			continue
-		}
-		// sb is ASCII and t is not. t must be either kelvin
-		// sign or long s; sb must be s, S, k, or K.
-		tr, size := utf8.DecodeRune(t)
-		switch sb {
-		case 's', 'S':
-			if tr != smallLongEss {
-				return false
-			}
-		case 'k', 'K':
-			if tr != kelvin {
-				return false
-			}
-		default:
-			return false
-		}
-		t = t[size:]
-
+func appendFoldedName(out []byte, name string) []byte {
+	for _, r := range name {
+		out = utf8.AppendRune(out, foldRune(r))
 	}
-	return len(t) == 0
+	return out
 }
 
-// asciiEqualFold is a specialization of [bytes.EqualFold] for use when
-// s is all ASCII (but may contain non-letters) and contains no
-// special-folding letters.
-// See comments on [foldFunc].
-func asciiEqualFold(s, t []byte) bool {
-	if len(s) != len(t) {
-		return false
-	}
-	for i, sb := range s {
-		tb := t[i]
-		if sb == tb {
-			continue
+// foldRune returns the smallest rune in the same fold set as r.
+func foldRune(r rune) rune {
+	for {
+		r2 := unicode.SimpleFold(r)
+		if r2 <= r {
+			return r2
 		}
-		if ('a' <= sb && sb <= 'z') || ('A' <= sb && sb <= 'Z') {
-			if sb&caseMask != tb&caseMask {
-				return false
-			}
-		} else {
-			return false
-		}
+		r = r2
 	}
-	return true
-}
-
-// simpleLetterEqualFold is a specialization of [bytes.EqualFold] for
-// use when s is all ASCII letters (no underscores, etc) and also
-// doesn't contain 'k', 'K', 's', or 'S'.
-// See comments on [foldFunc].
-func simpleLetterEqualFold(s, t []byte) bool {
-	if len(s) != len(t) {
-		return false
-	}
-	for i, b := range s {
-		if b&caseMask != t[i]&caseMask {
-			return false
-		}
-	}
-	return true
 }
 
 // indirect walks down v allocating pointers as needed,

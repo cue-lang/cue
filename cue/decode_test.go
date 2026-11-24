@@ -63,9 +63,21 @@ func TestDecode(t *testing.T) {
 		Z int
 	}
 	// Fields match names case-insensitively unless they are strict.
+	// Like encoding/json, only the leading identifier of an option counts,
+	// and giving both case options is not strict.
 	type caseStrict struct {
 		Loose  int `json:"loose"`
 		Strict int `json:"strict,case:strict"`
+		//lint:ignore SA5008 the odd option is what is being tested
+		Suffixed int `json:"suffixed,case:strict."`
+		//lint:ignore SA5008 the repeated option is what is being tested
+		Both int `json:"both,case:strict,case:ignore"`
+	}
+	// Names in json tags follow encoding/json as of Go 1.28.
+	type oddNames struct {
+		//lint:ignore SA5008 the odd name is what is being tested
+		A int `json:"a'b"`
+		C int `json:"€ c"`
 	}
 	intList := func(ints ...int) *[]int {
 		ints = append([]int{}, ints...)
@@ -167,13 +179,17 @@ func TestDecode(t *testing.T) {
 		newDst: func() any { return &embedTagged{} },
 		want:   embedTagged{Tagged: Tagged{X: 1}},
 	}, {
-		value:  `{LOOSE: 1, STRICT: 2}`,
+		value:  `{LOOSE: 1, STRICT: 2, SUFFIXED: 3, BOTH: 4}`,
 		newDst: func() any { return &caseStrict{} },
-		want:   caseStrict{Loose: 1},
+		want:   caseStrict{Loose: 1, Both: 4},
 	}, {
 		value:  `{loose: 1, strict: 2}`,
 		newDst: func() any { return &caseStrict{} },
 		want:   caseStrict{Loose: 1, Strict: 2},
+	}, {
+		value:  `{A: 1, "€ c": 2}`,
+		newDst: func() any { return &oddNames{} },
+		want:   oddNames{A: 1, C: 2},
 	}, {
 		value:  `{state: N: 42}`,
 		newDst: func() any { return &EmbedState{} },

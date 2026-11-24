@@ -374,15 +374,37 @@ func TestConvert(t *testing.T) {
   b: (int){ 4 }
 }`,
 	}, {
-		// Only json tag names are validated like encoding/json does.
+		// Names in json tags follow encoding/json as of Go 1.28: a quote
+		// in the name gives the Go name instead, and any other characters
+		// are allowed. Names in yaml tags are not validated.
 		struct {
 			//lint:ignore SA5008 the odd name is what is being tested
 			A int `json:"a'b"`
 			B int `yaml:"b'c"`
-		}{3, 4},
+			C int `json:"€ c,omitempty"`
+			D int `json:"'d,e'"`
+			//lint:ignore SA5008 the odd name is what is being tested
+			E int `json:"\xff"`
+		}{3, 4, 5, 6, 7},
 		`(struct){
   A: (int){ 3 }
   "b'c": (int){ 4 }
+  "€ c": (int){ 5 }
+  D: (int){ 6 }
+  "�": (int){ 7 }
+}`,
+	}, {
+		// Like encoding/json, only the leading identifier of an option counts.
+		struct {
+			//lint:ignore SA5008 the odd option is what is being tested
+			A int `json:"a,omitempty."`
+			//lint:ignore SA5008 the odd option is what is being tested
+			B int `json:"b,omitzero;x"`
+			//lint:ignore SA5008 the odd option is what is being tested
+			C int `json:"c,-omitempty"`
+		}{},
+		`(struct){
+  c: (int){ 0 }
 }`,
 	}, {
 		struct {

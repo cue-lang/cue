@@ -20,6 +20,7 @@ import (
 	"slices"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // GoField is a field of a Go struct type, possibly promoted from an embedded
@@ -226,24 +227,43 @@ type JSONOptions struct {
 }
 
 // parseJSONOptions parses the options of a json struct tag.
+// Like [encoding/json], it only looks at the leading identifier of each,
+// and giving both "case:strict" and "case:ignore" is not strict.
 func parseJSONOptions(tag string) JSONOptions {
 	var o JSONOptions
 	_, opts, _ := strings.Cut(tag, ",")
+	var caseStrict, caseIgnore bool
 	for opt := range strings.SplitSeq(opts, ",") {
-		switch opt {
+		switch name, rest := cutTagIdent(opt); name {
 		case "omitempty":
 			o.OmitEmpty = true
 		case "omitzero":
 			o.OmitZero = true
-		case "case:strict":
-			o.CaseStrict = true
+		case "case":
+			switch value, _ := cutTagIdent(strings.TrimPrefix(rest, ":")); value {
+			case "strict":
+				caseStrict = true
+			case "ignore":
+				caseIgnore = true
+			}
 		}
 	}
+	o.CaseStrict = caseStrict && !caseIgnore
 	return o
 }
 
-// JSONTagName names a field by its json tag alone for [GoFields],
-// like [encoding/json].
+// cutTagIdent cuts the letters, digits, and underscores which s starts with.
+func cutTagIdent(s string) (ident, rest string) {
+	rest = strings.TrimLeftFunc(s, func(r rune) bool {
+		return r == '_' || unicode.IsLetter(r) || unicode.IsNumber(r)
+	})
+	return s[:len(s)-len(rest)], rest
+}
+
+// JSONTagName names a field by its json tag alone for [GoFields], like
+// [encoding/json] as of Go 1.28 (https://go.dev/cl/828884): up to the first
+// comma, or no name if that includes a backslash, quote, or backtick.
+// Invalid UTF-8 is replaced by [utf8.RuneError].
 func JSONTagName(sf reflect.StructField) (string, bool) {
 	return jsonTagName(sf.Tag.Get("json"))
 }
@@ -252,26 +272,16 @@ func jsonTagName(tag string) (string, bool) {
 	if tag == "-" {
 		return "", false
 	}
-	name, _, _ := strings.Cut(tag, ",")
-	if !isValidTag(name) {
-		name = ""
+	n := strings.IndexAny(tag, ",\\'\"`")
+	switch {
+	case n < 0:
+		n = len(tag)
+	case tag[n] != ',':
+		return "", true
+	}
+	name := tag[:n]
+	if !utf8.ValidString(name) {
+		name = string([]rune(name))
 	}
 	return name, true
-}
-
-func isValidTag(s string) bool {
-	if s == "" {
-		return false
-	}
-	for _, c := range s {
-		switch {
-		case strings.ContainsRune("!#$%&()*+-./:;<=>?@[]^_{|}~ ", c):
-			// Backslash and quote chars are reserved, but
-			// otherwise any punctuation chars are allowed
-			// in a tag name.
-		case !unicode.IsLetter(c) && !unicode.IsDigit(c):
-			return false
-		}
-	}
-	return true
 }

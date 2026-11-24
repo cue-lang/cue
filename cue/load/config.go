@@ -20,6 +20,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path"
 	"runtime"
 	"strings"
 
@@ -184,6 +185,10 @@ type Config struct {
 	// cue.mod/local-module.cue file is present and hence modFile holds
 	// the main-module view derived from both files. It is nil otherwise.
 	baseModFile *modfile.File
+
+	// replaceDirModFiles holds the module file of each directory
+	// replacement, keyed by the directory as written.
+	replaceDirModFiles map[string]modFileResult
 
 	// parserConfig holds the configuration that will be passed
 	// when parsing CUE files. It includes the version from
@@ -668,18 +673,22 @@ func (c *Config) loadModule() error {
 		// is built once per package resolved through a replacement, too often
 		// to read and unify a module file each time.
 		replVersions := make(map[string]string)
+		c.replaceDirModFiles = make(map[string]modFileResult)
 		for replaced, r := range repls.All() {
 			if r.Dir == "" {
 				continue
 			}
-			if err := c.checkReplaceDirModulePath(replaced, r.Dir); err != nil {
-				return err
+			mf, err := c.replaceDirModFile(r.Dir)
+			c.replaceDirModFiles[r.Dir] = modFileResult{mf, err}
+			if mf == nil {
+				// The registry reports any problem with the file.
+				continue
 			}
-			// Key by the resolved directory, as the source location resolves
-			// what it is given before looking it up.
-			dir := c.absReplaceDir(r.Dir)
-			if mf := c.replaceDirModFile(dir); mf != nil && mf.Language != nil {
-				replVersions[dir] = mf.Language.Version
+			if got := mf.QualifiedModule(); got != "" && got != replaced {
+				return fmt.Errorf("replacement directory %s has module path %q, want %q", r.Dir, got, replaced)
+			}
+			if mf.Language != nil {
+				replVersions[c.absReplaceDir(r.Dir)] = mf.Language.Version
 			}
 		}
 		c.replacements = repls
@@ -689,7 +698,7 @@ func (c *Config) loadModule() error {
 				FS:  c.fileSystem.ioFS(dir, cmp.Or(replVersions[dir], c.languageVersion())),
 				Dir: ".",
 			}, nil
-		})
+		}, c.replaceDirModFile)
 	}
 	return nil
 }
@@ -702,38 +711,30 @@ func (c *Config) absReplaceDir(dir string) string {
 	return pkgpath.Join([]string{c.ModuleRoot, dir}, c.pathOS)
 }
 
-// replaceDirModFile returns the module file of the module in a replacement
-// directory, or nil if it cannot be read: any real problem with it is
-// reported when that module is loaded through the registry.
-func (c *Config) replaceDirModFile(dir string) *modfile.File {
-	modFilePath := pkgpath.Join([]string{dir, "cue.mod", "module.cue"}, c.pathOS)
-	rc, cerr := c.fileSystem.openFile(modFilePath)
-	if cerr != nil {
-		return nil
-	}
-	data, err := io.ReadAll(rc)
-	rc.Close()
-	if err != nil {
-		return nil
-	}
-	replMF, err := modfile.ParseNonStrict(data, modFilePath)
-	if err != nil {
-		return nil
-	}
-	return replMF
+// modFileResult is a parsed module file, or the error parsing it.
+type modFileResult struct {
+	mf  *modfile.File
+	err error
 }
 
-// checkReplaceDirModulePath verifies that the module.cue in a replacement
-// directory declares the same module path as the module being replaced.
-func (c *Config) checkReplaceDirModulePath(wantPath string, dir string) error {
-	replMF := c.replaceDirModFile(c.absReplaceDir(dir))
-	if replMF == nil {
-		return nil
+// replaceDirModFile returns the module file of the replacement directory
+// dir as written, reading it if it is not cached. Errors name the file by
+// dir as written, like the registry does.
+func (c *Config) replaceDirModFile(dir string) (*modfile.File, error) {
+	if rf, ok := c.replaceDirModFiles[dir]; ok {
+		return rf.mf, rf.err
 	}
-	if got := replMF.QualifiedModule(); got != "" && got != wantPath {
-		return fmt.Errorf("replacement directory %s has module path %q, want %q", dir, got, wantPath)
+	return c.readModFile(c.absReplaceDir(dir), path.Join(dir, "cue.mod/module.cue"))
+}
+
+// readModFile parses the module file of the module rooted at the absolute
+// directory root, naming it filename in errors.
+func (c *Config) readModFile(root, filename string) (*modfile.File, error) {
+	data, err := fs.ReadFile(c.fileSystem.ioFS(root, ""), "cue.mod/module.cue")
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	return modfile.ParseNonStrict(data, filename)
 }
 
 // localModuleHint returns a parenthesized hint to append to the error

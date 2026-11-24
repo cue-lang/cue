@@ -194,7 +194,7 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, opts *T
 		}
 		ld := &loader{
 			mainModule:    mainModuleVersion,
-			registry:      modpkgload.NewReplacingRegistry(reg, repls, opts.LocForPath),
+			registry:      modpkgload.NewReplacingRegistry(reg, repls, opts.LocForPath, nil),
 			mainModuleLoc: mainModuleLoc,
 			replacements:  repls,
 			checkTidy:     checkTidy,

@@ -53,10 +53,14 @@ type FullRegistry interface {
 // locForPath returns the source location corresponding to a replacement directory
 // path in repls, relative to the given absolute directory relTo if it's not absolute.
 // If it's nil, directory replacements are not supported.
+//
+// modFileForPath returns the module file of a replacement directory path,
+// parsed already by the caller. If it's nil, the file is read via locForPath.
 func NewReplacingRegistry(
 	reg FullRegistry,
 	repls *Replacements,
 	locForPath func(path string) (module.SourceLoc, error),
+	modFileForPath func(path string) (*modfile.File, error),
 ) FullRegistry {
 	if repls == nil {
 		return reg
@@ -67,18 +71,20 @@ func NewReplacingRegistry(
 		}
 	}
 	return &replacingRegistry{
-		underlying: reg,
-		repls:      repls,
-		locForPath: locForPath,
+		underlying:     reg,
+		repls:          repls,
+		locForPath:     locForPath,
+		modFileForPath: modFileForPath,
 	}
 }
 
 // replacingRegistry wraps a [FullRegistry] so that replaced modules are
 // served from their replacement sources.
 type replacingRegistry struct {
-	underlying FullRegistry
-	repls      *Replacements
-	locForPath func(path string) (module.SourceLoc, error)
+	underlying     FullRegistry
+	repls          *Replacements
+	locForPath     func(path string) (module.SourceLoc, error)
+	modFileForPath func(path string) (*modfile.File, error)
 }
 
 func (r *replacingRegistry) replacement(m module.Version) (Replacement, bool) {
@@ -112,6 +118,13 @@ func (r *replacingRegistry) ModuleVersions(ctx context.Context, mpath string) ([
 }
 
 func (r *replacingRegistry) modFileFromDir(dir string) (*modfile.File, error) {
+	if r.modFileForPath != nil {
+		mf, err := r.modFileForPath(dir)
+		if err != nil {
+			return nil, fmt.Errorf("replacement directory %q: %w", dir, err)
+		}
+		return mf, nil
+	}
 	loc, err := r.locForPath(dir)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get location for replacement directory: %v", err)

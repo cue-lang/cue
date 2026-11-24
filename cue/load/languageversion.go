@@ -155,14 +155,14 @@ func (c *Config) checkVersionAttr(path string, f *ast.File) errors.Error {
 	if root == "" {
 		return nil
 	}
+	modFile := pkgpath.Join([]string{root, modDir, moduleFile}, c.pathOS)
 	mf := c.modFile
 	if c.modFile == nil || root != c.ModuleRoot {
-		mf = c.replaceDirModFile(root)
+		mf, _ = c.readModFile(root, modFile)
 	}
 	if mf == nil || mf.Language == nil || mf.Language.Version == "" {
 		return nil
 	}
-	modFile := pkgpath.Join([]string{root, modDir, moduleFile}, c.pathOS)
 	if rel, err := pkgpath.Rel(c.Dir, modFile, c.pathOS); err == nil && !strings.HasPrefix(rel, "..") {
 		modFile = pkgpath.ToSlash(rel, c.pathOS)
 	}

@@ -6,6 +6,10 @@ cmp stdout print-omitempty.stdout
 exec cue exp ast print --omitempty --pos --refs --files ref/ref.cue
 cmp stdout print-pos-refs.stdout
 
+# A reference to a field in another file of the package is bound to its value.
+exec cue exp ast print --omitempty --refs ./d
+stdout 'Node: @ref001 \(\*ast\.BasicLit\)'
+
 # In --files mode, a file with syntax errors still has its partial tree printed.
 stdin bad/invalid.cue
 ! exec cue exp ast print --files -
@@ -251,6 +255,14 @@ w: {
 	x: 3
 	v: z
 }
+-- d/one.cue --
+package d
+
+x: 1
+-- d/two.cue --
+package d
+
+y: x
 -- join-let.stdout --
 let x_1 = 1
 y: x_1

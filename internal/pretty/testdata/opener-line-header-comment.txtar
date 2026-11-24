@@ -8,6 +8,10 @@
 # emits a single space between the opener and `//` - the layout the
 # user wrote.
 #
+# In a list element, the parser attaches such a comment as a
+# Position=1 prefix on the element whatever its body. The formatter
+# moves it after the element, even past its trailing comment.
+#
 # This is distinct from a `// c` on its own line inside the brackets,
 # which has rel != Blank and renders on its own indented line. Tests
 # for that shape live in empty-struct-with-comment.txtar.
@@ -27,6 +31,23 @@ list_with_content: [ // header
 call_with_args: f( // header
 	1,
 )
+
+list_elems: [
+	{ // header
+		// doc
+		x: _
+	},
+	[ // header
+		1,
+	],
+	{ // header
+		x: _
+	}, // trailing
+]
+
+hugged_list_elem: [{ // header
+	x: _
+}]
 -- out/relpos --
 struct_with_content: { // header
 	x: _
@@ -40,6 +61,25 @@ list_with_content: [ // header
 call_with_args: f( // header
 	1,
 )
+
+list_elems: [
+	{
+		// doc
+		x: _
+	}, // header
+	[
+		1,
+	], // header
+	{
+		x: _
+	}, // trailing
+	// header
+]
+
+hugged_list_elem: [{
+	x: _
+} // header
+]
 -- out/norelpos --
 struct_with_content: {
 	// header
@@ -54,3 +94,19 @@ call_with_args: f(
 	// header
 	1,
 )
+list_elems: [
+	{
+		// doc
+		x: _
+	},
+	// header
+	[1],
+	// header
+	{x: _},
+	// trailing
+	// header
+]
+hugged_list_elem: [
+	{x: _},
+	// header
+]

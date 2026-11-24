@@ -117,12 +117,13 @@ func Instances(args []string, c *Config) []*build.Instance {
 	tg := newTagger(c)
 
 	var pkgs *modpkgload.Packages
+	mainModFile := c.modFile
 	if !c.SkipImports {
 		if isAbsPkg {
 			// Note: replace the absolute package (which isn't actually a valid
 			// import path and may contain a version query like @latest)
 			// with the actual resolved import path.
-			pkgArgs[0], pkgs, err = loadAbsPackage(ctx, c, pkgArgs[0], tg)
+			pkgArgs[0], mainModFile, pkgs, err = loadAbsPackage(ctx, c, pkgArgs[0], tg)
 		} else {
 			// Pass all arguments that look like packages to loadPackages
 			// so that they'll be available when looking up the packages
@@ -137,7 +138,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 			return []*build.Instance{c.newErrInstance(err)}
 		}
 	}
-	l := newLoader(c, tg, pkgs)
+	l := newLoader(ctx, c, tg, pkgs, mainModFile)
 
 	resolveDone := func() {}
 	if c.Context == nil {
@@ -225,33 +226,34 @@ func Instances(args []string, c *Config) []*build.Instance {
 }
 
 // loadAbsPackage loads a single $package@$version package
-// as the main module and returns its actual import path
-// and the packages instance representing its module.
+// as the main module and returns its actual import path,
+// the module file of its module, and the packages instance
+// representing its module.
 func loadAbsPackage(
 	ctx context.Context,
 	cfg *Config,
 	pkg string,
 	tg *tagger,
-) (string, *modpkgload.Packages, error) {
+) (string, *modfile.File, *modpkgload.Packages, error) {
 	// First find the module that contains the package.
 	mv, _, err := modload.ResolveAbsolutePackage(ctx, cfg.Registry, pkg)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	// ResolveAbsolutePackage should already have fetched the module
 	// so this should be quick.
 	loc, err := cfg.Registry.Fetch(ctx, mv)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	modFilePath := path.Join(loc.Dir, modDir, moduleFile)
 	modFileData, err := fs.ReadFile(loc.FS, modFilePath)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	mf, err := modfile.Parse(modFileData, modFilePath)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	// Make the package path into a regular import path
 	// with only the major version suffix.
@@ -259,7 +261,7 @@ func loadAbsPackage(
 	ip.Version = semver.Major(mv.Version())
 
 	pkgs := loadPackages(ctx, cfg, mf, loc, []string{ip.String()}, tg)
-	return ip.String(), pkgs, nil
+	return ip.String(), mf, pkgs, nil
 }
 
 // loadPackages returns packages loaded from the given package list and also

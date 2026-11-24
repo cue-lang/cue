@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	pkgpath "cuelang.org/go/pkg/path"
 )
@@ -429,7 +430,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	if mv.Path() == "" {
 		return i
 	}
-	mf, err1 := l.modFileCache.modFile(mv, modRoot)
+	mf, err1 := l.moduleFile(mv)
 	if err1 != nil {
 		i.Err = errors.Append(i.Err, errors.Promote(err1, ""))
 	}
@@ -451,6 +452,20 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.CanonicalID = parts.Canonical().String()
 
 	return i
+}
+
+// moduleFile returns the module file of mv. A module without a version is
+// the main module of the load, as are local packages in cue.mod; the registry
+// provides any other, with its replacements applied.
+func (l *loader) moduleFile(mv module.Version) (*modfile.File, error) {
+	if mv.IsLocal() || mv.Version() == "" {
+		return l.mainModFile, nil
+	}
+	mf, err := l.cfg.Registry.ModFile(l.ctx, mv)
+	if err != nil {
+		return nil, fmt.Errorf("%v: %v", mv, err)
+	}
+	return mf, nil
 }
 
 // absDirFromImportPath converts a giving import path to an absolute directory

@@ -508,16 +508,15 @@ files:
 			AcceptLegacyModules: true,
 		},
 		args: []string{"./imports"},
-		// The import parses the legacy module file again, strictly.
-		want: `err:    import failed: test.example/foo@v0: no language version declared in module.cue:
-    $CWD/testdata/testmod_legacy/imports/imports.cue:3:8
-path:   test.example/foo/imports@v0
+		want: `path:   test.example/foo/imports@v0
 module: test.example/foo@v0
 root:   $CWD/testdata/testmod_legacy
 dir:    $CWD/testdata/testmod_legacy/imports
 display:./imports
 files:
-    $CWD/testdata/testmod_legacy/imports/imports.cue`,
+    $CWD/testdata/testmod_legacy/imports/imports.cue
+imports:
+    test.example/foo (id test.example/foo@v0): $CWD/testdata/testmod_legacy/foo.cue`,
 	}, {
 		name: "AcceptLegacyModuleWithNonLegacyModule",
 		cfg: &Config{

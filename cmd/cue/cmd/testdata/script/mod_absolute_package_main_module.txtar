@@ -1,0 +1,27 @@
+# An absolute package from the module of the working directory is read with
+# the published module file, at its language version, not the local one.
+exec cue export foo.com/bar@v0.1.0
+cmp stdout want
+
+-- want --
+{
+    "self": [
+        1,
+        2
+    ]
+}
+-- cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.9.0"
+-- bar/x.cue --
+package bar
+self: "local"
+-- _registry/foo.com_v0.1.0/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.17.0"
+-- _registry/foo.com_v0.1.0/bar/x.cue --
+package bar
+self: [
+	1
+	2
+]

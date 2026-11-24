@@ -21,20 +21,25 @@ package load
 
 import (
 	"cmp"
+	"context"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
 
 type loader struct {
-	cfg          *Config
-	tagger       *tagger
-	stk          importStack
-	pkgs         *modpkgload.Packages
-	modFileCache *modFileCache
+	ctx    context.Context
+	cfg    *Config
+	tagger *tagger
+	stk    importStack
+	pkgs   *modpkgload.Packages
+
+	// mainModFile is the module file of the main module of pkgs.
+	mainModFile *modfile.File
 
 	// dirCachedBuildFiles caches the work involved when reading a
 	// directory. It is keyed by directory name. When we descend into
@@ -49,12 +54,13 @@ type cachedDirFiles struct {
 	filenames []string
 }
 
-func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
+func newLoader(ctx context.Context, c *Config, tg *tagger, pkgs *modpkgload.Packages, mainModFile *modfile.File) *loader {
 	return &loader{
+		ctx:                 ctx,
 		cfg:                 c,
 		tagger:              tg,
 		pkgs:                pkgs,
-		modFileCache:        newModFileCache(),
+		mainModFile:         mainModFile,
 		dirCachedBuildFiles: make(map[string]cachedDirFiles),
 	}
 }

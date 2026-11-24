@@ -6,6 +6,12 @@ cp garbage.txt local_dep/cue.mod/module.cue
 ! exec cue export .
 stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: replacement directory "./local_dep": invalid module file syntax: expected label or '':'', found ''IDENT'' is:$'
 
+# A replacement directory with a module.cue file which fails validation,
+# whose error names the file by the replacement directory as written.
+cp invalid-version.txt local_dep/cue.mod/module.cue
+! exec cue export .
+stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot expand module graph: replacement directory "./local_dep": invalid module file local_dep/cue.mod/module.cue: cannot make version from module "example.com/x@v0", version "bad": '
+
 # A replacement directory without a module.cue file.
 rm local_dep/cue.mod/module.cue
 ! exec cue export .
@@ -13,6 +19,10 @@ stderr '^test.org@v0: import failed: cannot find package "example.com/e": cannot
 
 -- garbage.txt --
 this is not CUE {{{
+-- invalid-version.txt --
+module: "example.com/e@v0"
+language: version: "v0.9.0"
+deps: "example.com/x@v0": v: "bad"
 -- cue.mod/module.cue --
 module: "test.org"
 language: version: "v0.17.0"

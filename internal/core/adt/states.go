@@ -214,6 +214,10 @@ const (
 	// a scheduler.counters index.
 	arcTypeKnownIdx = 1
 
+	// valueKnownIdx is the bit-position index of valueKnown, for use as a
+	// scheduler.counters index.
+	valueKnownIdx = 2
+
 	// fieldConjunctsKnownIdx is the bit-position index of
 	// fieldConjunctsKnown, for use as a scheduler.counters index.
 	fieldConjunctsKnownIdx = 4
@@ -229,6 +233,7 @@ const (
 func _() {
 	var x [1]struct{}
 	_ = x[arcTypeKnown-1<<arcTypeKnownIdx]
+	_ = x[valueKnown-1<<valueKnownIdx]
 	_ = x[fieldConjunctsKnown-1<<fieldConjunctsKnownIdx]
 	_ = x[allTasksCompleted-1<<allTasksCompletedIdx]
 }
@@ -345,7 +350,10 @@ func stateCompletions(s *scheduler) condition {
 		}
 	}
 
-	if x.meets(valueKnown) {
+	// The valueKnown bit may be stale, as for fieldSetKnown below: a parent
+	// task, such as a pushed-down comprehension, may have added a conjunct
+	// since the counter first reached zero.
+	if x.meets(valueKnown) && s.counters[valueKnownIdx] == 0 {
 		// NOTE: in this case, scalarKnown is not the same as concreteKnown,
 		// especially if this arc is Pending, as it may still become concrete.
 		// We probably want to separate this out.

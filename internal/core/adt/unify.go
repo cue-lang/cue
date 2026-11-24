@@ -294,6 +294,14 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		return false
 	}
 
+	// No task completes arcTypeKnown, so a caller asking for nothing else, as
+	// [nodeContext.evalArcTypes] does, has run none of the tasks of v, only
+	// the parent tasks that may declare it. The value of v is not known yet,
+	// so do not settle it below.
+	if needs == arcTypeKnown {
+		return n.meets(needs)
+	}
+
 	if n.isShared {
 		if isCyclePlaceholder(n.origBaseValue) {
 			n.origBaseValue = nil

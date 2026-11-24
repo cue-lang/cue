@@ -1532,8 +1532,7 @@ issue4595: {
 		data: [for k, v in values {v + 1}]
 		values: {if true {T: c}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [6], values: T: 5, c: 5})
+		@test(eq, {data: [6], values: T: 5, c: 5})
 	}
 	// With values first, it is evaluated before the loop over it.
 	valuesFirst: {
@@ -1546,65 +1545,56 @@ issue4595: {
 		data: {for k, v in values {(k): v + 1}}
 		values: {if true {T: c}}
 		c: 5
-		@test(err, any, code=incomplete, incorrect)
-		@test(eq:todo, {data: T: 6, values: T: 5, c: 5})
+		@test(eq, {data: T: 6, values: T: 5, c: 5})
 	}
 	forClause: {
 		data: [for k, v in values {v + 1}]
 		values: {for x in [c] {T: x}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [6], values: T: 5, c: 5})
+		@test(eq, {data: [6], values: T: 5, c: 5})
 	}
 	guard: {
 		data: [for k, v in values {v + 1}]
 		values: {if c > 3 {T: c}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [6], values: T: 5, c: 5})
+		@test(eq, {data: [6], values: T: 5, c: 5})
 	}
 	expression: {
 		data: [for k, v in values {v + 1}]
 		values: {if true {T: c + 1}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [7], values: T: 6, c: 5})
+		@test(eq, {data: [7], values: T: 6, c: 5})
 	}
 	default: {
 		data: [for k, v in values {v + 1}]
 		values: {if true {T: *c | 7}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [6], values: T: *5 | 7, c: 5})
+		@test(eq, {data: [6], values: T: *5 | 7, c: 5})
 	}
 	interpolation: {
 		data: [for k, v in values {"\(v)"}]
 		values: {if true {T: c}}
 		c: "a"
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: ["a"], values: T: "a", c: "a"})
+		@test(eq, {data: ["a"], values: T: "a", c: "a"})
 	}
 	hidden: {
 		data: [for k, v in values {v + values._h + values.#d}]
 		values: {if true {T: c, _h: c, #d: c}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [15], values: {T: 5, _h: 5, #d: 5}, c: 5})
+		@test(eq, {data: [15], values: {T: 5, _h: 5, #d: 5}, c: 5})
 	}
 	nested: {
 		data: [for k, v in values {[for k2, v2 in v {v2 + 1}]}]
 		values: {if true {T: {if true {U: c}}}}
 		c: 5
-		@test(err, at=data[0][0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [[6]], values: T: U: 5, c: 5})
+		@test(eq, {data: [[6]], values: T: U: 5, c: 5})
 	}
 	chained: {
 		data: [for k, v in values {v + 1}]
 		values: {if true {T: other.T}}
 		other: {if true {T: c}}
 		c: 5
-		@test(err, at=data[0], code=incomplete, incorrect)
-		@test(eq:todo, {data: [6], values: T: 5, other: T: 5, c: 5})
+		@test(eq, {data: [6], values: T: 5, other: T: 5, c: 5})
 	}
 	inDefinition: {
 		out: #R.data
@@ -1613,8 +1603,7 @@ issue4595: {
 			values: {if true {T: c.t}}
 			data: [for k, v in values {v.k}]
 		}
-		@test(err, at=out[0], code=incomplete, incorrect)
-		@test(eq:todo, {
+		@test(eq, {
 			out: ["v"]
 			c: t: k: "v"
 			#R: {values: T: k: "v", data: ["v"]}
@@ -1626,8 +1615,7 @@ issue4595: {
 			data: [for k, v in values {v.k}]
 			values: {if true {T: c.t}}
 		}
-		@test(err, at=#R.data[0], code=incomplete, incorrect)
-		@test(eq:todo, {
+		@test(eq, {
 			c: t: k: "v"
 			#R: {data: ["v"], values: T: k: "v"}
 		})
@@ -1638,12 +1626,11 @@ issue4595: {
 		#R: {
 			values: {if true {T!: c.t}} @test(eq, {T!: k: "v"}) @test(debugCheck, """
 				(#struct){
-				  T!: (struct){
-				    struct
+				  T!: (#struct){
 				    k: (string){ "v" }
 				  }
 				}
-				""", incorrect)
+				""")
 			data: [for k, v in values {k}] @test(err, code=incomplete, contains="missing required field in for comprehension")
 		}
 	}
@@ -1654,8 +1641,7 @@ issue4595: {
 			values: {if true {T: c.t}}
 			data: [for k, v in values {len(v)}]
 		}
-		@test(err, at=out[0], code=incomplete, incorrect)
-		@test(eq:todo, {
+		@test(eq, {
 			out: [1]
 			c: t: k: "v"
 			#R: {values: T: k: "v", data: [1]}
@@ -1668,8 +1654,7 @@ issue4595: {
 			values: {if true {T: c.t}}
 			data: [for k, v in values if v.k == "v" {k}]
 		}
-		@test(err, any, code=incomplete, incorrect)
-		@test(eq:todo, {
+		@test(eq, {
 			out: ["T"]
 			c: t: k: "v"
 			#R: {values: T: k: "v", data: ["T"]}
@@ -1681,7 +1666,7 @@ issue4595: {
 			values: {if true {T: c.t}}
 		}
 		c: t: k: "v"
-		out: #R.data @test(eq, ["bottom"], incorrect) @test(eq:todo, ["value"])
+		out: #R.data @test(eq, ["value"])
 	}
 	// A conflict in the field is reported all the same.
 	conflict: {
@@ -1797,70 +1782,30 @@ voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
     ./issue3935.cue:50:16
 [incomplete] issue4422.hosts: key value of dynamic field not yet known:
     ./issue4422.cue:22:11
-[incomplete] issue4595.scalar.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:6:30
-    ./issue4595.cue:7:24
-[incomplete] issue4595.structComprehension.data.T: non-concrete value _ in operand to +:
-    ./issue4595.cue:20:35
-    ./issue4595.cue:21:24
-[incomplete] issue4595.forClause.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:27:30
-    ./issue4595.cue:28:29
-[incomplete] issue4595.guard.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:34:30
-    ./issue4595.cue:35:25
-[incomplete] issue4595.expression.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:41:30
-    ./issue4595.cue:42:24
-[incomplete] issue4595.default.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:48:30
-    ./issue4595.cue:49:24
-[incomplete] issue4595.interpolation.data.0: invalid interpolation: non-concrete value _ (type _):
-    ./issue4595.cue:55:30
-[incomplete] issue4595.hidden.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:62:30
-    ./issue4595.cue:63:24
-[incomplete] issue4595.nested.data.0.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:69:48
-    ./issue4595.cue:70:37
-[incomplete] issue4595.chained.data.0: non-concrete value _ in operand to +:
-    ./issue4595.cue:76:30
-    ./issue4595.cue:77:24
-[incomplete] issue4595.inDefinition.#R.data.0: v.k undefined as v is incomplete (type _):
-    ./issue4595.cue:88:31
-[incomplete] issue4595.inDefinitionDataFirst.#R.data.0: v.k undefined as v is incomplete (type _):
-    ./issue4595.cue:100:31
 [incomplete] issue4595.required.#R.data: missing required field in for comprehension: T:
-    ./issue4595.cue:121:11
-    ./issue4595.cue:113:22
-    ./issue4595.cue:121:23
+    ./issue4595.cue:108:11
+    ./issue4595.cue:101:22
+    ./issue4595.cue:108:23
 [incomplete] issue4595.required.#R.data: missing required field in for comprehension: T:
-    ./issue4595.cue:121:11
-    ./issue4595.cue:113:22
-    ./issue4595.cue:121:23
-[incomplete] issue4595.length.#R.data.0: error in call to len: incomplete argument struct (type struct):
-    ./issue4595.cue:129:31
-    ./issue4595.cue:126:9
-[incomplete] issue4595.filter.#R.data: v.k undefined as v is incomplete (type _):
-    ./issue4595.cue:143:33
-[incomplete] issue4595.filter.#R.data: v.k undefined as v is incomplete (type _):
-    ./issue4595.cue:143:33
+    ./issue4595.cue:108:11
+    ./issue4595.cue:101:22
+    ./issue4595.cue:108:23
 [eval] issue4595.conflict.#R.values.T.k: conflicting values "v" and "w":
-    ./issue4595.cue:163:12
-    ./issue4595.cue:165:25
-    ./issue4595.cue:166:18
+    ./issue4595.cue:148:12
+    ./issue4595.cue:150:25
+    ./issue4595.cue:151:18
 [eval] issue4595.conflict.#R.data.0: conflicting values "v" and "w":
-    ./issue4595.cue:163:12
-    ./issue4595.cue:166:18
-    ./issue4595.cue:167:31
+    ./issue4595.cue:148:12
+    ./issue4595.cue:151:18
+    ./issue4595.cue:152:31
 [eval] issue4595.conflictInBody.#R.values.T.k: conflicting values "v" and "w":
-    ./issue4595.cue:173:12
-    ./issue4595.cue:175:25
-    ./issue4595.cue:175:35
+    ./issue4595.cue:158:12
+    ./issue4595.cue:160:25
+    ./issue4595.cue:160:35
 [eval] issue4595.conflictInBody.#R.data.0: conflicting values "v" and "w":
-    ./issue4595.cue:173:12
-    ./issue4595.cue:175:35
-    ./issue4595.cue:176:31
+    ./issue4595.cue:158:12
+    ./issue4595.cue:160:35
+    ./issue4595.cue:161:31
 [incomplete] regression1.#Primary: undefined field: spec:
     ./rework.cue:5:13
     ./rework.cue:3:3

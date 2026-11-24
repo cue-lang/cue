@@ -58,6 +58,7 @@ floorE1: too many arguments in call to math.Floor (have 2, want 1):
     ./in.cue:27:10
 floorE2: cannot use "foo" (type string) as number in argument 1 to math.Floor:
     ./in.cue:28:21
+    ./in.cue:28:10
 floorNegInf: error in call to math.Floor: cannot convert -Infinity to an integer:
     ./in.cue:44:15
 ceilPosInf: error in call to math.Ceil: cannot convert Infinity to an integer:

@@ -73,7 +73,7 @@ disjunctionCycle: {
 	@test(err, code=eval, path=b,
 		hint="This probably should be a totally different error message.",
 		contains="cannot use %s (type %s) as %s in argument %d to %v",
-		args=[1, int, list, 1, and], pos=[2:9])
+		args=[1, int, list, 1, and], pos=[2:9, 2:5])
 }
 
 forCycle: {
@@ -162,10 +162,13 @@ issue3978B: {
 [structural_cycle] letCycleFail.t1.a.c: structural cycle
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:70:9
+    ./in.cue:70:5
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:70:9
+    ./in.cue:70:5
 [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:70:9
+    ./in.cue:70:5
 [structural_cycle] forCycle.#B.b: structural cycle
 [structural_cycle] closeCycle.c: structural cycle
 [structural_cycle] closeCycle.c: structural cycle

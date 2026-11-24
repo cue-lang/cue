@@ -21,6 +21,7 @@ joinErr: path.Join(["a", "b"], "foo")
 Errors:
 joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos" in argument 2 to path.Join:
     ./in.cue:4:32
+    ./in.cue:4:10
 
 Result:
 joinOK:  "a/b"

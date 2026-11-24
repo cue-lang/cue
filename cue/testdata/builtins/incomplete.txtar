@@ -85,8 +85,8 @@ incompleteListError: {
 
 badListType: {
 	x:       2
-	decimal: list.Max(x) @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-1:11])
-	str:     strings.Join(x, "") @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-2:11])
+	decimal: list.Max(x) @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-1:11, 0:11])
+	str:     strings.Join(x, "") @test(err, code=eval, contains="cannot use 2 (type int) as list", pos=[-2:11, 0:11])
 }
 
 badListError: {
@@ -181,8 +181,10 @@ NumCloseIDs: 7
     ./in.cue:80:11
 [eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
     ./in.cue:86:11
+    ./in.cue:87:11
 [eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
     ./in.cue:86:11
+    ./in.cue:88:11
 [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
     ./in.cue:92:11
     ./in.cue:93:11

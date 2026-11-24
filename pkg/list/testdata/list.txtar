@@ -79,6 +79,7 @@ concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list
     ./in.cue:31:10
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
     ./in.cue:30:9
+    ./in.cue:19:22
 minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
     ./in.cue:45:12
     ./in.cue:45:26
@@ -89,8 +90,10 @@ maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(lis
     ./in.cue:58:9
 reverse.fail1.v: cannot use 1 (type int) as list in argument 1 to list.Reverse:
     ./in.cue:68:15
+    ./in.cue:62:25
 reverse.fail2.v: cannot use "bad" (type string) as list in argument 1 to list.Reverse:
     ./in.cue:69:15
+    ./in.cue:62:25
 
 Result:
 import "list"

@@ -3524,9 +3524,12 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 			return b
 		}
 		if k := kind(a); x.Params[i].Kind()&k == BottomKind {
-			c.addErrf(EvalError, Pos(a),
+			err := c.NewPosf(Pos(a),
 				"cannot use %s (type %s) as %s in argument %d to %v",
 				a, k, x.Params[i].Kind(), i+1, x)
+			// A called builtin has no position of its own.
+			err.AddPos(call.Pos())
+			c.addErr(EvalError, err)
 			return nil
 		}
 		v := x.Params[i].Value
@@ -3536,9 +3539,11 @@ func (x *Builtin) call(call BuiltinCallContext) Expr {
 			n := c.newInlineVertex(nil, nil, Conjunct{env, expr, c.ci})
 			n.Finalize(c)
 			if n.IsErr() {
-				c.addErrf(0, Pos(a),
+				err := c.NewPosf(Pos(a),
 					"cannot use %s as %s in argument %d to %v",
 					a, v, i+1, x)
+				err.AddPos(call.Pos())
+				c.addErr(0, err)
 				return nil
 			}
 			call.args[i] = n

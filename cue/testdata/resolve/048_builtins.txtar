@@ -46,7 +46,7 @@ stringListErrors: {
 		x: []
 		result: strings.Join(x, int) @test(err, code=eval,
 			contains="cannot use int (type int) as string in argument 2 to strings.Join",
-			pos=[0:27])
+			pos=[0:27, 0:11])
 	}
 }
 
@@ -128,6 +128,7 @@ o3.a: conflicting values "baz" and "foo":
     ./in.cue:39:7
 [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
     ./in.cue:46:27
+    ./in.cue:46:11
 [eval] decimalListErrors.a.result: error in call to list.Avg: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
     ./in.cue:55:11
     ./in.cue:54:7

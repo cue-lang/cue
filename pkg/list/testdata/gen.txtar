@@ -88,6 +88,7 @@ t2: error in call to list.Avg: empty list:
     ./in.cue:4:6
 t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
     ./in.cue:5:15
+    ./in.cue:5:6
 t7: error in call to list.Drop: negative index:
     ./in.cue:9:6
 t13: error in call to list.FlattenN: cannot use value "foo" (type string) as list:
@@ -95,16 +96,20 @@ t13: error in call to list.FlattenN: cannot use value "foo" (type string) as lis
     ./in.cue:15:20
 t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN:
     ./in.cue:16:24
+    ./in.cue:16:6
 t16: error in call to list.Max: empty list:
     ./in.cue:18:6
 t17: cannot use "foo" (type string) as list in argument 1 to list.Max:
     ./in.cue:19:15
+    ./in.cue:19:6
 t19: error in call to list.Min: empty list:
     ./in.cue:21:6
 t20: cannot use "foo" (type string) as list in argument 1 to list.Min:
     ./in.cue:22:15
+    ./in.cue:22:6
 t23: cannot use "foo" (type string) as list in argument 1 to list.Product:
     ./in.cue:25:19
+    ./in.cue:25:6
 t24: error in call to list.Range: step must be non zero:
     ./in.cue:26:6
 t25: error in call to list.Range: end must be greater than start when step is positive:
@@ -154,6 +159,7 @@ t42: error in call to list.SortStrings: invalid list element 0 in argument 0 to 
     ./in.cue:48:24
 t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
     ./in.cue:51:15
+    ./in.cue:51:6
 t49: error in call to list.Take: negative index:
     ./in.cue:55:6
 t54: error in call to list.Sort: 2 errors in empty disjunction::

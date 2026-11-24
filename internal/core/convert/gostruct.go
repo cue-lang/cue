@@ -16,6 +16,8 @@ package convert
 
 import (
 	"cmp"
+	"encoding"
+	"encoding/json"
 	"reflect"
 	"slices"
 	"strings"
@@ -269,9 +271,55 @@ func cutTagIdent(s string) (ident, rest string) {
 // JSONTagName names a field by its json tag alone for [GoFields], like
 // [encoding/json] as of Go 1.28 (https://go.dev/cl/828884): up to the first
 // comma, or no name if that includes a backslash, quote, or backtick.
-// Invalid UTF-8 is replaced by [utf8.RuneError].
+// Invalid UTF-8 is replaced by [utf8.RuneError]. Like encoding/json since
+// Go 1.27, it leaves out an unexported embedded struct named by its tag
+// if [hasJSONMethods] holds.
 func JSONTagName(sf reflect.StructField) (string, bool) {
-	return jsonTagName(sf.Tag.Get("json"))
+	name, ok := jsonTagName(sf.Tag.Get("json"))
+	if name != "" && hasJSONMethods(sf) {
+		return "", false
+	}
+	return name, ok
+}
+
+// jsonMethodTypes are the interfaces whose methods encoding/json calls.
+//
+// TODO: add MarshalerTo and UnmarshalerFrom from encoding/json/v2
+// once we require Go 1.27.
+var jsonMethodTypes = []reflect.Type{
+	reflect.TypeFor[json.Marshaler](),
+	reflect.TypeFor[json.Unmarshaler](),
+	reflect.TypeFor[encoding.TextAppender](),
+	reflect.TypeFor[encoding.TextMarshaler](),
+	reflect.TypeFor[encoding.TextUnmarshaler](),
+}
+
+// hasJSONMethods reports whether sf is an unexported field whose methods
+// encoding/json would call, which it cannot through an unexported field.
+// That includes IsZero for the "omitzero" option.
+func hasJSONMethods(sf reflect.StructField) bool {
+	if sf.IsExported() {
+		return false
+	}
+	t := sf.Type
+	if t.Kind() == reflect.Pointer && t.Name() == "" {
+		t = t.Elem()
+	}
+	if parseJSONOptions(sf.Tag.Get("json")).OmitZero && implementsAny(t, isZeroerType) {
+		return true
+	}
+	return implementsAny(t, jsonMethodTypes...)
+}
+
+// implementsAny reports whether t or *t implements any of ifaces.
+func implementsAny(t reflect.Type, ifaces ...reflect.Type) bool {
+	pt := reflect.PointerTo(t)
+	for _, iface := range ifaces {
+		if t.Implements(iface) || pt.Implements(iface) {
+			return true
+		}
+	}
+	return false
 }
 
 func jsonTagName(tag string) (string, bool) {

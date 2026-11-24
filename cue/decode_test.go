@@ -230,20 +230,17 @@ func TestDecode(t *testing.T) {
 		newDst: func() any { return &EmbedState{} },
 		want:   EmbedState{embedState{N: 42}},
 	}, {
-		// Wrong: the field is decoded.
 		value:  `{m: I: 1}`,
 		newDst: func() any { return &EmbedMarshaler{} },
-		want:   EmbedMarshaler{embedMarshaler{I: 1}},
+		want:   EmbedMarshaler{},
 	}, {
-		// Wrong: Decode panics.
 		value:  `{m: I: 1}`,
 		newDst: func() any { return &EmbedMarshalerPtr{} },
-		err:    "panic: reflect: reflect.Value.Set using value obtained using unexported field",
+		want:   EmbedMarshalerPtr{},
 	}, {
-		// Wrong: Decode panics.
 		value:  `{m: null}`,
 		newDst: func() any { return &EmbedMarshalerPtr{} },
-		err:    "panic: reflect: reflect.Value.Set using value obtained using unexported field",
+		want:   EmbedMarshalerPtr{},
 	}, {
 		encode: embedSlice{EmbedSlice{1, 2}, 5},
 		newDst: func() any { return &embedSlice{} },
@@ -467,14 +464,7 @@ func TestDecode(t *testing.T) {
 				v = getValue(m, tc.value)
 			}
 			dst := tc.newDst()
-			err := func() (err error) {
-				defer func() {
-					if r := recover(); r != nil {
-						err = fmt.Errorf("panic: %v", r)
-					}
-				}()
-				return v.Decode(dst)
-			}()
+			err := v.Decode(dst)
 			if !checkErr(t, err, tc.err, "init") {
 				return
 			}
@@ -555,8 +545,8 @@ field: string | {
 	})
 }
 
-// EmbedState embeds an unexported struct under a tag name. Decode fills its
-// fields even though it has an IsZero method, which convert skips it for.
+// EmbedState embeds an unexported struct under a tag name. Its IsZero method
+// only matters with the "omitzero" option, so its fields are still decoded.
 type EmbedState struct {
 	embedState `json:"state"`
 }

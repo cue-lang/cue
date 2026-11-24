@@ -561,10 +561,9 @@ func TestConvert(t *testing.T) {
   Z: (int){ 0 }
 }`,
 	}, {
-		// Wrong: u is converted and k is skipped.
 		EmbedJSONMethods{embedUnmarshal{1}, embedZero{2}, embedZeroKeep{3}, 4}, `(struct){
-  u: (struct){
-    U: (int){ 1 }
+  k: (struct){
+    K: (int){ 3 }
   }
   Z: (int){ 4 }
 }`,

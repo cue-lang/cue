@@ -151,9 +151,9 @@ func splitTag(tag string) (cue string, options string) {
 // idea if we ever want to allow mapping CUE to a different name than JSON.
 func tagName(f reflect.StructField) (string, bool) {
 	var name string
-	if tag, ok := f.Tag.Lookup("json"); ok {
+	if _, ok := f.Tag.Lookup("json"); ok {
 		var keep bool
-		if name, keep = jsonTagName(tag); !keep {
+		if name, keep = JSONTagName(f); !keep {
 			return "", false
 		}
 	} else if tag, ok := f.Tag.Lookup("yaml"); ok {
@@ -412,8 +412,8 @@ func fromGoValue(ctx *adt.OpContext, nilIsTop bool, val reflect.Value, depth int
 		return n
 	}
 
-	// Keep hasMethods in sync with the type switch above, the interfaces
-	// below, and isZeroer for omitzero.
+	// Keep hasMethods in sync with the type switch above and the interfaces
+	// below.
 	if v, ok := typeAssert[interface{ Core() runtime.Value }](val); ok {
 		// TODO: the zero cue.Value holds no vertex, and nil panics later on.
 		// See https://cuelang.org/issue/3175.
@@ -693,24 +693,17 @@ var (
 		jsonMarshaler,
 		textMarshaler,
 		reflect.TypeFor[error](),
-		isZeroerType,
 	}
 )
 
 // hasMethods reports whether [fromGoValue] converts a t or *t via its methods
 // or its type, which cannot be used through an unexported field.
 func hasMethods(t reflect.Type) bool {
-	pt := reflect.PointerTo(t)
-	switch pt {
+	switch reflect.PointerTo(t) {
 	case astFile, adtNum, bigInt, bigRat, bigFloat, apdDecimal:
 		return true
 	}
-	for _, iface := range methodTypes {
-		if t.Implements(iface) || pt.Implements(iface) {
-			return true
-		}
-	}
-	return false
+	return implementsAny(t, methodTypes...)
 }
 
 // typeAssert is similar to [reflect.TypeAssert] except that

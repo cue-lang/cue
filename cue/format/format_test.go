@@ -245,6 +245,14 @@ func TestCommentPlacement(t *testing.T) {
 		in:   head + "x: f(\n\t[1],\n\t// c\n)\n",
 		want: head + "x: f(\n\t[1],\n\t// c\n)\n",
 	}, {
+		name: "after struct opener in list",
+		in:   "x: [\n\t{ // opener\n\t\t// field\n\t\ty: 1\n\t},\n]\n",
+		want: "x: [\n\t{ // opener\n\t\t// field\n\t\ty: 1\n\t},\n]\n",
+	}, {
+		name: "after struct closer in list",
+		in:   "x: [\n\t{\n\t\t// field\n\t\ty: 1\n\t}, // closer\n]\n",
+		want: "x: [\n\t{\n\t\t// field\n\t\ty: 1\n\t}, // closer\n]\n",
+	}, {
 		name: "after empty struct argument",
 		in:   head + "x: f(\n\t{},\n\t// c\n)\n",
 		want: head + "x: f(\n\t{},\n\t// c\n)\n",

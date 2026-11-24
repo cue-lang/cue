@@ -5149,21 +5149,20 @@ func isBracketedInjectionTarget(e ast.Expr) bool {
 	return false
 }
 
-// bracketClose returns the closing-bracket position of e, whether
-// that bracket is empty, and whether e is a bracketed injection
-// target at all.
-func bracketClose(e ast.Expr) (close token.Pos, empty, bracketed bool) {
+// bracketClose returns the closing-bracket position of e and whether
+// e is a bracketed injection target.
+func bracketClose(e ast.Expr) (close token.Pos, bracketed bool) {
 	switch x := e.(type) {
 	case *ast.StructLit:
 		if braced(x) {
-			return x.Rbrace, len(x.Elts) == 0, true
+			return x.Rbrace, true
 		}
 	case *ast.ListLit:
 		if x.Lbrack.IsValid() || x.Hash.IsValid() {
-			return x.Rbrack, len(x.Elts) == 0, true
+			return x.Rbrack, true
 		}
 	}
-	return token.NoPos, false, false
+	return token.NoPos, false
 }
 
 // commentTrailsBracket reports whether the PosPrefix comment cg
@@ -5172,26 +5171,23 @@ func bracketClose(e ast.Expr) (close token.Pos, empty, bracketed bool) {
 //
 //   - No bracket (bracketed == false, e.g. a bare `a + b` operand):
 //     the comment cannot be interior, so it trails.
-//   - Without usable source offsets (a programmatic AST) we cannot
+//   - Without comparable source offsets (e.g. a programmatic AST) we cannot
 //     tell the two forms apart. We prefer the trailing form
 //     `a & {}, // c` for a same-line comment, and keep an own-line one
 //     inside the brackets, where decoders and other producers place an
 //     interior comment.
-//   - Non-empty bracket: a genuine interior header attaches to the
-//     first element, not the bracket, so a comment on the bracket
-//     node itself trails.
-//   - Empty bracket: the trailing and interior forms collapse to the
-//     same node and RelPos (the parser has no inner element to anchor
-//     an interior comment to), so we compare source offsets.
-func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, empty, bracketed bool) bool {
+//   - When source offsets are comparable, a comment trails only if
+//     it comes after the closing bracket.
+func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, bracketed bool) bool {
 	if !bracketed {
 		return true
 	}
 	// This is the only place where we must look at the AbsPos.
-	if len(cg.List) == 0 || !close.HasAbsPos() || !cg.List[0].Slash.HasAbsPos() {
+	pos := cg.Pos()
+	if !close.HasAbsPos() || !pos.HasAbsPos() || close.File() != pos.File() {
 		return cg.Line
 	}
-	return !empty || cg.List[0].Slash.Offset() > close.Offset()
+	return pos.Offset() > close.Offset()
 }
 
 // trailingPrefixComments returns the `//` comments the parser hangs at
@@ -5211,22 +5207,22 @@ func commentTrailsBracket(cg *ast.CommentGroup, close token.Pos, empty, brackete
 // is the argument itself).
 func trailingPrefixComments(n ast.Node) []*ast.CommentGroup {
 	var close token.Pos
-	var empty, bracketed bool
+	var bracketed bool
 	switch n := n.(type) {
 	case *ast.BinaryExpr:
-		close, empty, bracketed = bracketClose(n.Y)
+		close, bracketed = bracketClose(n.Y)
 	// A struct or list renders its brackets even when they have no
 	// position, as in a decoded AST.
 	case *ast.StructLit:
-		close, empty, bracketed = n.Rbrace, len(n.Elts) == 0, true
+		close, bracketed = n.Rbrace, true
 	case *ast.ListLit:
-		close, empty, bracketed = n.Rbrack, len(n.Elts) == 0, true
+		close, bracketed = n.Rbrack, true
 	default:
 		return nil
 	}
 	var out []*ast.CommentGroup
 	for _, cg := range ast.Comments(n) {
-		if cg.Position == PosPrefix && commentTrailsBracket(cg, close, empty, bracketed) {
+		if cg.Position == PosPrefix && commentTrailsBracket(cg, close, bracketed) {
 			out = append(out, cg)
 		}
 	}

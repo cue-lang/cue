@@ -235,7 +235,13 @@ func bindPackageFields(files []*ast.File) {
 		for _, d := range f.Decls {
 			if x, ok := d.(*ast.Field); ok {
 				if name, isIdent, err := ast.LabelName(x.Label); isIdent && err == nil {
-					fields[name] = x.Value
+					// Bind to the node a reference within the file is
+					// bound to, which is past a value alias.
+					v := x.Value
+					if a, ok := v.(*ast.Alias); ok {
+						v = a.Expr
+					}
+					fields[name] = v
 				}
 			}
 		}

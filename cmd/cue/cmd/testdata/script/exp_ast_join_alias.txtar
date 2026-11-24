@@ -20,6 +20,4 @@ t: u
 -- join.stdout --
 u: V={a: 1, b: V.a}
 
-t: u_1
-
-let u_1 = u
+t: u

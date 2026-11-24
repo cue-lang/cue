@@ -238,7 +238,8 @@ func fieldByIndex(v reflect.Value, index []int) (reflect.Value, bool) {
 // or if it has no json tag and can be nil.
 //
 // TODO: like [encoding/json], omit only nil or empty values with "omitempty",
-// not any zero value, and support the "string" option.
+// not any zero value, and support the "string" option and "embed" on a map
+// or [json.RawMessage].
 func newGoStructField(f GoField) goStructField {
 	omitEmpty := f.JSON.OmitEmpty
 	if _, ok := f.StructField.Tag.Lookup("json"); !ok {

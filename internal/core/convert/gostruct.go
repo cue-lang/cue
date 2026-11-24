@@ -53,9 +53,10 @@ func compareFieldByIndex(a, b GoField) int {
 //
 // tagName names a field from its tags, or "" if they give no name, and
 // reports whether to keep the field. An unnamed embedded struct, or pointer
-// to one, has its fields promoted, and any other unnamed field takes its Go
-// name. Of several fields with the same name, the shallowest wins, then a
-// tagged one; a tie drops them all.
+// to one, has its fields promoted, as does an unnamed struct field with the
+// json option "embed", and any other unnamed field takes its Go name.
+// Of several fields with the same name, the shallowest wins, then a tagged
+// one; a tie drops them all.
 func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) (fields []GoField, promoted []reflect.StructField) {
 	type queued struct {
 		index    []int
@@ -116,7 +117,9 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 				}
 
 				// Record found field and index sequence.
-				if name != "" || !sf.Anonymous || ft.Kind() != reflect.Struct {
+				opts := parseJSONOptions(sf.Tag.Get("json"))
+				promote := name == "" && ft.Kind() == reflect.Struct && (sf.Anonymous || opts.Embed)
+				if !promote {
 					tagged := name != ""
 					if name == "" {
 						name = sf.Name
@@ -127,7 +130,7 @@ func GoFields(t reflect.Type, tagName func(reflect.StructField) (string, bool)) 
 						tagged:      tagged,
 						Indirect:    f.indirect,
 						StructField: sf,
-						JSON:        parseJSONOptions(sf.Tag.Get("json")),
+						JSON:        opts,
 					})
 					if count[f.typ] > 1 {
 						// If there were multiple instances, add a second,
@@ -224,6 +227,7 @@ type JSONOptions struct {
 	OmitEmpty  bool // "omitempty"
 	OmitZero   bool // "omitzero"
 	CaseStrict bool // "case:strict", to decode only from the exact name
+	Embed      bool // "embed", to promote the fields of an unnamed struct
 }
 
 // parseJSONOptions parses the options of a json struct tag.
@@ -239,6 +243,8 @@ func parseJSONOptions(tag string) JSONOptions {
 			o.OmitEmpty = true
 		case "omitzero":
 			o.OmitZero = true
+		case "embed":
+			o.Embed = true
 		case "case":
 			switch value, _ := cutTagIdent(strings.TrimPrefix(rest, ":")); value {
 			case "strict":

@@ -83,6 +83,19 @@ func TestDecode(t *testing.T) {
 	type foldUnicode struct {
 		Kelvin int `json:"kelvin"`
 	}
+	// The json option "embed" promotes the fields of a struct field.
+	type embedHello struct {
+		Hello string `json:"hello"`
+	}
+	type embedWorld struct {
+		World string `json:"world"`
+	}
+	type embedWorldPtr *embedWorld
+	type embedOption struct {
+		Opt      embedHello    `json:",embed"`
+		Ptr      *embedWorld   `json:",embed"`
+		NamedPtr embedWorldPtr `json:",embed"` // a named pointer is a regular field
+	}
 	// Names in json tags follow encoding/json as of Go 1.28.
 	type oddNames struct {
 		//lint:ignore SA5008 the odd name is what is being tested
@@ -204,6 +217,10 @@ func TestDecode(t *testing.T) {
 		value:  `{"\u212Aelvin": 1}`, // the Kelvin sign folds to k
 		newDst: func() any { return &foldUnicode{} },
 		want:   foldUnicode{Kelvin: 1},
+	}, {
+		value:  `{hello: "h", world: "w", NamedPtr: world: "n"}`,
+		newDst: func() any { return &embedOption{} },
+		want:   embedOption{embedHello{"h"}, &embedWorld{"w"}, &embedWorld{"n"}},
 	}, {
 		value:  `{A: 1, "€ c": 2}`,
 		newDst: func() any { return &oddNames{} },

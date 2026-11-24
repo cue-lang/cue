@@ -164,6 +164,16 @@ type (
 		X string
 	}
 
+	// EmbedOption promotes the fields of struct fields via the json
+	// option "embed", like encoding/json since Go 1.27, unless named.
+	EmbedOption struct {
+		Opt      EmbedHello    `json:",embed"`
+		Ptr      *EmbedWorld   `json:",embed"`
+		Named    EmbedHello    `json:"named,embed"`
+		NamedPtr EmbedWorldPtr `json:",embed"` // a named pointer is a regular field
+	}
+	EmbedWorldPtr *EmbedWorld
+
 	embedTextA struct{ A int }
 	embedTextB struct{ B int }
 	astFile    = ast.File
@@ -531,6 +541,16 @@ func TestConvert(t *testing.T) {
   Z: (int){ 0 }
 }`,
 	}, {
+		EmbedOption{Opt: EmbedHello{"h"}, NamedPtr: &EmbedWorld{"w"}}, `(struct){
+  hello: (string){ "h" }
+  named: (struct){
+    hello: (string){ "" }
+  }
+  NamedPtr: (struct){
+    world: (string){ "w" }
+  }
+}`,
+	}, {
 		EmbedInline{EmbedHello{"h"}, EmbedWorld{"w"}}, `(struct){
   hello: (string){ "h" }
   world: (string){ "w" }
@@ -849,6 +869,52 @@ func TestConvertType(t *testing.T) {
   }
   Z: (int){ &(>=-9223372036854775808, <=9223372036854775807, int) }
 }`,
+	}, {
+		goTyp: EmbedOption{},
+		want: `(struct){
+  _EmbedOption_0: (struct){
+    hello: (string){ string }
+    world?: (string){ string }
+    named: ~(_EmbedHello_0)
+    NamedPtr: ((null|struct)){ |(*(null){ null }, (struct){
+        world: (string){ string }
+      }) }
+  }
+  _EmbedHello_0: (struct){
+    hello: (string){ string }
+  }
+  _EmbedWorld_0: (struct){
+    world: (string){ string }
+  }
+  hello: (string){ string }
+  world?: (string){ string }
+  named: ~(_EmbedHello_0)
+  NamedPtr: ((null|struct)){ |(*(null){ null }, (struct){
+      world: (string){ string }
+    }) }
+}`,
+	}, {
+		// A cue tag on a field whose fields are promoted via the json option
+		// "embed" has no struct value left to constrain.
+		goTyp: struct {
+			Opt EmbedPtr `json:",embed" cue:"{P: >0}"`
+		}{},
+		want:        "(_|_){// _|_(unsupported cue tag for field \"Opt\", whose fields are promoted)\n}",
+		expectError: true,
+	}, {
+		// Even when no promoted fields are left.
+		goTyp: struct {
+			Opt struct{} `json:",embed" cue:"_|_"`
+		}{},
+		want:        "(_|_){// _|_(unsupported cue tag for field \"Opt\", whose fields are promoted)\n}",
+		expectError: true,
+	}, {
+		goTyp: struct {
+			EmbedPtr `cue:"{P: >0}"`
+			P        int
+		}{},
+		want:        "(_|_){// _|_(unsupported cue tag for field \"EmbedPtr\", whose fields are promoted)\n}",
+		expectError: true,
 	}, {
 		goTyp: EmbedInline{},
 		want: `(struct){

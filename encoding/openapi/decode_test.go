@@ -16,7 +16,6 @@ package openapi_test
 
 import (
 	"bytes"
-	"fmt"
 	"io/fs"
 	"path"
 	"path/filepath"
@@ -165,10 +164,6 @@ openapi: "3.0.0"
 info: {title: "t", version: "1"}
 components: schemas: Foo: type: "string"
 `)
-	// TODO: a nil config panics.
-	defer func() {
-		qt.Assert(t, qt.Matches(fmt.Sprint(recover()), `.*nil pointer dereference`))
-	}()
 	_, err := openapi.Extract(v, nil)
 	qt.Assert(t, qt.IsNil(err))
 }

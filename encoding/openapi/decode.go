@@ -32,11 +32,15 @@ import (
 // meta data.
 //
 // The result can be converted to a [cue.Value] via [cue.Context.BuildFile].
+// A nil config is the default one.
 func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	// TODO: find a good OpenAPI validator. Both go-openapi and kin-openapi
 	// seem outdated. The k8s one might be good, but avoid pulling in massive
 	// amounts of dependencies.
 
+	if c == nil {
+		c = defaultConfig
+	}
 	f := &ast.File{}
 	add := func(d ast.Decl) {
 		if d != nil {

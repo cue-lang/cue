@@ -27,4 +27,4 @@ module: "test.example"
 language: version: "$CUE_LANGUAGE_VERSION"
 source: kind:      "git"
 -- want-stderr --
-unrecognized source kind "bad"
+unrecognized source kind "bad"; must be "self" or "git"

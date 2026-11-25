@@ -35,12 +35,15 @@ directory must not already exist.
 
 If the module name is not provided, a default module path (cue.example) will be
 used.
+
+The --source flag sets the module's source, which is required to publish it;
+see 'cue help mod edit' for details.
 `,
 		RunE: mkRunE(c, runModInit),
 	}
 
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force moving old-style cue.mod file")
-	cmd.Flags().String(string(flagSource), "", "set the source field")
+	cmd.Flags().String(string(flagSource), "", `set the source field ("self" or "git")`)
 	cmd.Flags().String(string(flagLanguageVersion), "current", "set the language version ('current' means current language version)")
 	return cmd
 }

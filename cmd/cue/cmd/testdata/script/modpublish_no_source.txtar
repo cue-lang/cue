@@ -33,7 +33,7 @@ cmp stderr both.stderr
 cmp stderr both.stderr
 
 -- v0.9/publish.stderr --
-publishing a module requires a source field in cue.mod/module.cue; choose a source with 'cue mod edit --source'
+publishing a module requires declaring which of its files to include; see the --source flag in 'cue help mod edit'
 -- v0.9/cue.mod/module.cue --
 module: "test.example/09@v1"
 language: version: "v0.9.0-alpha.2"

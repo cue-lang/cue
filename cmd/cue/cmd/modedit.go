@@ -56,14 +56,20 @@ are not permitted in published modules, these edits are applied to
 cue.mod/local-module.cue rather than cue.mod/module.cue.
 
 The --module flag changes the module's path (the module.cue file's module field).
-The --source flag changes the module's declared source.
-The --drop-source flag removes the source field.
+The --source flag sets the module's source, which determines the files that
+'cue mod publish' includes in the module:
+
+	self  all files in the module directory
+	git   only the files in the module directory tracked by git
+
+The --drop-source flag removes the source field. For details on sources, see
+https://cuelang.org/docs/reference/modules/#determining-zip-file-contents
 `,
 		RunE: mkRunE(c, editCmd.run),
 		Args: cobra.ExactArgs(0),
 	}
 	flags := cmd.Flags()
-	flags.Var(flagFunc(editCmd.flagSource), string(flagSource), "set the source field")
+	flags.Var(flagFunc(editCmd.flagSource), string(flagSource), `set the source field ("self" or "git")`)
 	flags.Var(boolFlagFunc(editCmd.flagDropSource), "drop-source", "remove the source field")
 	flags.Var(flagFunc(editCmd.flagLanguageVersion), string(flagLanguageVersion), "set language.version ('current' means current language version)")
 	flags.Var(flagFunc(editCmd.flagModule), "module", "set the module path")

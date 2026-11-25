@@ -4,6 +4,10 @@ cmp cue.mod/module.cue want-module-0
 exec cue mod edit --source git
 cmp cue.mod/module.cue want-module-1
 
+! exec cue mod edit --source bad
+cmp stderr want-stderr-source
+cmp cue.mod/module.cue want-module-1
+
 exec cue mod edit --drop-source
 cmp cue.mod/module.cue want-module-2
 
@@ -52,6 +56,8 @@ source: kind:      "self"
 module: "main.org@v0"
 language: version: "v0.9.0-alpha.0"
 source: kind:      "git"
+-- want-stderr-source --
+invalid argument "bad" for "--source" flag: unrecognized source kind "bad"; must be "self" or "git"
 -- want-module-2 --
 module: "main.org@v0"
 language: version: "v0.9.0-alpha.0"

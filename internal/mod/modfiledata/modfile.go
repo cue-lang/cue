@@ -109,7 +109,7 @@ func (src *Source) Validate() error {
 	case "git", "self":
 		return nil
 	}
-	return fmt.Errorf("unrecognized source kind %q", src.Kind)
+	return fmt.Errorf("unrecognized source kind %q; must be \"self\" or \"git\"", src.Kind)
 }
 
 // Language holds the language section of a module file.

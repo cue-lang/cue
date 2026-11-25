@@ -572,6 +572,8 @@ func openAPIFunc(c *Config, f *build.File) interpretFunc {
 
 				StrictKeywords: tags["strictKeywords"],
 				StrictFeatures: tags["strictFeatures"],
+
+				TargetLanguageVersion: c.TargetLanguageVersion,
 			})
 		} else {
 			file, err = openapi.Extract(v, &openapi.Config{
@@ -582,6 +584,8 @@ func openAPIFunc(c *Config, f *build.File) interpretFunc {
 
 				StrictKeywords: tags["strictKeywords"],
 				StrictFeatures: tags["strictFeatures"],
+
+				TargetLanguageVersion: c.TargetLanguageVersion,
 			})
 		}
 		// TODO: simplify currently erases file line info. Reintroduce after fix.

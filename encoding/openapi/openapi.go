@@ -81,6 +81,11 @@ type Config struct {
 	// true, as that specification explicitly prohibits unknown keywords
 	// other than "x-" prefixed keywords.
 	StrictKeywords bool
+
+	// TargetLanguageVersion is [jsonschema.Config.TargetLanguageVersion]
+	// for the schemas extracted by [Extract]. The info section is written
+	// as [cue.Value.Syntax] gives it.
+	TargetLanguageVersion string
 }
 
 type Generator = Config

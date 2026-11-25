@@ -23,6 +23,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -53,6 +54,8 @@ func TestExtractV2(t *testing.T) {
 //	#extractv2                 selects this runner
 //	#Version: 3.0|3.1|crd      OpenAPI version (default: auto-detected)
 //	#ExpectError: <substring>  expect extraction to fail with this message
+//	#targetLanguageVersion: <version>
+//	                           CUE language version to extract and verify at
 func extractV2Test(t *cuetxtar.Test) {
 	ctx := t.CueContext()
 	v := ctx.BuildInstance(t.Instance())
@@ -64,6 +67,7 @@ func extractV2Test(t *cuetxtar.Test) {
 	if s, ok := t.Value("Version"); ok {
 		cfg.Version = v2Version(t, s)
 	}
+	cfg.TargetLanguageVersion, _ = t.Value("targetLanguageVersion")
 
 	expectedErr, shouldErr := t.Value("ExpectError")
 	f, err := openapi.ExtractV2(v, &cfg)
@@ -87,6 +91,9 @@ func extractV2Test(t *cuetxtar.Test) {
 	qt.Assert(t, qt.IsNil(err))
 
 	b, err := format.Node(f)
+	qt.Assert(t, qt.IsNil(err))
+	// The syntax must parse at the language version it targets.
+	_, err = parser.ParseFile("out.cue", b, parser.Version(cfg.TargetLanguageVersion))
 	qt.Assert(t, qt.IsNil(err))
 	_, err = t.Writer("out.cue").Write(append(bytes.TrimSpace(b), '\n'))
 	qt.Assert(t, qt.IsNil(err))

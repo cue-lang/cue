@@ -44,6 +44,11 @@ type ExtractConfig struct {
 	// always true, as that specification prohibits unknown keywords other than
 	// "x-" prefixed ones.
 	StrictKeywords bool
+
+	// TargetLanguageVersion is [jsonschema.Config.TargetLanguageVersion]
+	// for the extracted schemas. The rest of the document is written as
+	// [cue.Value.Syntax] gives it.
+	TargetLanguageVersion string
 }
 
 // ExtractV2 converts a whole OpenAPI document to an equivalent CUE
@@ -127,6 +132,8 @@ func ExtractV2(data cue.Value, cfg *ExtractConfig) (*ast.File, error) {
 		StrictFeatures:       cfg.StrictFeatures,
 		StrictKeywords:       jsVersion == jsonschema.VersionOpenAPI || cfg.StrictKeywords,
 		AllowNonExistentRoot: true,
+
+		TargetLanguageVersion: cfg.TargetLanguageVersion,
 	})
 	if err != nil {
 		return nil, err

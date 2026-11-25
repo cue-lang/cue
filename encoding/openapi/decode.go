@@ -89,10 +89,15 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 		StrictFeatures: c.StrictFeatures,
 		// OpenAPI 3.0 is stricter than JSON Schema about allowed keywords.
 		StrictKeywords: schemaVersion == jsonschema.VersionOpenAPI || c.StrictKeywords,
+
+		TargetLanguageVersion: c.TargetLanguageVersion,
 	})
 	if err != nil {
 		return nil, err
 	}
+	// The declarations move to f, which is written for the same version.
+	exp := js.Experiment()
+	f.SetExperiments(&exp)
 	preamble := js.Preamble()
 	body := js.Decls[len(preamble):]
 	for _, d := range preamble {

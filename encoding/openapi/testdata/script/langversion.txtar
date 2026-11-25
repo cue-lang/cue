@@ -1,0 +1,43 @@
+# The schemas are written at the target language version: below v0.18.0, the
+# alias for a key which is not an identifier takes the prefix form.
+#targetLanguageVersion: v0.17.0
+
+# The generator tests read out.cue at the current version, where the prefix
+# alias does not parse.
+#skip
+-- type.yaml --
+openapi: 3.1.0
+info:
+  title: Jobs schema
+  version: v1
+
+components:
+  schemas:
+    Job:
+      type: object
+      properties:
+        working-directory:
+          type: string
+        run:
+          type: string
+      dependentRequired:
+        working-directory: [run]
+-- out.cue --
+// Jobs schema
+package foo
+
+info: {
+	title:   *"Jobs schema" | string
+	version: *"v1" | string
+}
+
+#Job: {
+	"working-directory"?:     string
+	run?:                     string
+	_t0="working-directory"?: _
+	if _t0 != _|_ {
+		run!: _
+	}
+	{}
+	...
+}

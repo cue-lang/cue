@@ -1,17 +1,15 @@
-# OpenAPI imported into a module should be valid at the language version the
-# module declares, yet it is written at the current version, with and without
-# the openapiv2 experiment: a numeric enum becomes a disjunction of unary ==
-# bounds, which a module only accepts from v0.15.0.
+# OpenAPI imported into a module is valid at the language version the module
+# declares, with and without the openapiv2 experiment: a numeric enum becomes
+# a disjunction of unary == bounds only from v0.15.0, and pairs of bounds
+# before it.
 
 exec cue import -p api openapi+yaml: api.yaml
-grep 'weight\?: \(==1 \| ==2\) & int' api.cue
-! exec cue vet ./...
-stderr 'expected operand, found .==.'
+grep 'weight\?: \(>=1 & <=1 \| >=2 & <=2\) & int' api.cue
+exec cue vet ./...
 env CUE_EXPERIMENT=openapiv2
 exec cue import -f -p api openapi+yaml: api.yaml
-grep 'weight\?: \(==1 \| ==2\) & int' api.cue
-! exec cue vet ./...
-stderr 'expected operand, found .==.'
+grep 'weight\?: \(>=1 & <=1 \| >=2 & <=2\) & int' api.cue
+exec cue vet ./...
 
 -- cue.mod/module.cue --
 module: "old.test"

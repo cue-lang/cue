@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
@@ -44,6 +45,9 @@ import (
 // The first .json or .yaml file in the txtar archive (with no / in
 // the name) is used as the input. The first .cue file in the archive
 // (with no / in the name) is used as the expected output.
+//
+// A "#targetLanguageVersion: <version>" line in the archive comment selects
+// the CUE language version to extract for and to verify the output at.
 //
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
@@ -64,6 +68,11 @@ func TestDecode(t *testing.T) {
 			}
 
 			cfg := &openapi.Config{PkgName: "foo"}
+			for line := range strings.Lines(string(a.Comment)) {
+				if v, ok := strings.CutPrefix(line, "#targetLanguageVersion:"); ok {
+					cfg.TargetLanguageVersion = strings.TrimSpace(v)
+				}
+			}
 
 			var inFile *ast.File
 			var out, errout []byte
@@ -124,6 +133,12 @@ func TestDecode(t *testing.T) {
 				b, err := format.Node(gotFile)
 				if err != nil {
 					t.Fatal(err)
+				}
+				// The syntax must parse at the language version it targets.
+				_, err = parser.ParseFile(fullpath, b,
+					parser.Version(cfg.TargetLanguageVersion))
+				if err != nil {
+					t.Fatal(errors.Details(err, nil))
 				}
 
 				b = bytes.TrimSpace(b)

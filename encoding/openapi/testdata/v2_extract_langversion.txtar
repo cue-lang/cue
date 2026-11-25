@@ -1,0 +1,36 @@
+# The alias which sanitization gives the anonymous # definition, as in
+# v2_extract_quoted_name.txtar, takes the prefix form below v0.18.0.
+#extractv2
+#targetLanguageVersion: v0.17.0
+-- in.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+paths: "/x": get: responses: "200": content: "application/json": schema: "$ref": "#/components/schemas/some-name"
+components: schemas: "some-name": {
+	type:                 "object"
+	additionalProperties: false
+	properties: id: type: "integer"
+}
+-- out/TestExtractV2-v3/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#_1=#: "some-name": close({id?: int})
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #_1."some-name"
+-- out/TestExtractV2-v3-noshare/out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "t"
+	version: "1"
+}
+
+#_1=#: "some-name": close({id?: int})
+
+paths: "/x": get: responses: "200": content: "application/json": schema: #: #_1."some-name"

@@ -170,6 +170,7 @@ func TestConcurrentDefault(t *testing.T) {
 		a: *1 | int
 		b: *"hello" | string
 		c: *true | bool
+		d: *"default" | "other"
 	`)
 	if err := v.Err(); err != nil {
 		t.Fatal(err)
@@ -177,6 +178,7 @@ func TestConcurrentDefault(t *testing.T) {
 	aPath := cue.ParsePath("a")
 	bPath := cue.ParsePath("b")
 	cPath := cue.ParsePath("c")
+	dPath := cue.ParsePath("d")
 
 	runConcurrent(t, func() {
 		if d, ok := v.LookupPath(aPath).Default(); ok {
@@ -196,6 +198,11 @@ func TestConcurrentDefault(t *testing.T) {
 			if b != true {
 				t.Errorf("unexpected default for c: %v", b)
 			}
+		}
+		if d, ok := v.LookupPath(dPath).Default(); !ok {
+			t.Error("no default for d")
+		} else if s, _ := d.String(); s != "default" {
+			t.Errorf("unexpected default for d: %s", s)
 		}
 	})
 

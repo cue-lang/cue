@@ -3386,6 +3386,74 @@ func TestIssue4093(t *testing.T) {
 	})
 }
 
+func TestIssue3985(t *testing.T) {
+	// We run the evaluator twice with different versions of the evaluator. Each
+	// results in the use of emptyNode. Ensure that the it does not get
+	// assigned a nodeContext.
+	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV3)).CompileString(`a!: _, b: [for c in a if a != _|_ {}]`)
+
+}
+
+func TestIssue2293(t *testing.T) {
+	ctx := cuecontext.New()
+	c := `a: {}, a`
+	v1 := ctx.CompileString(c)
+	v2 := ctx.CompileString(c)
+
+	v1.Unify(v2)
+}
+
+func closeAll(ctx *cue.Context, v cue.Value) cue.Value {
+	path := cue.MakePath(cue.Def("#x"))
+	return ctx.CompileString("#x: _").FillPath(path, v).LookupPath(path)
+}
+
+type editConfig struct {
+	Edits []cue.Value `json:"edits,omitempty"`
+}
+
+// Modifying values can cause a mix of non-finalized nodes as children of
+// a finalized parent. Ensure that this does not cause issues.
+func TestAPIModifyingValues(t *testing.T) {
+	ctx := cuecontext.New()
+
+	v := ctx.CompileString(`
+        edits: [{
+            type: "replace"
+            data!: "^wrong"
+        }]
+    `)
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+	closed := closeAll(ctx, ctx.EncodeType(editConfig{}))
+
+	v = v.Unify(closed)
+	if err := v.Err(); err != nil {
+		t.Fatal(err)
+	}
+
+	var cfg editConfig
+	if err := v.Decode(&cfg); err != nil {
+		t.Fatal(err)
+	}
+
+	w := ctx.CompileString(`
+        type!: "fill" | "replace"
+        data!: _
+    `)
+
+	if err := w.Err(); err != nil {
+		t.Fatal(err)
+	}
+	x := cfg.Edits[0]
+	x = x.Unify(w)
+
+	if err := x.Err(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestEquals(t *testing.T) {
 	testCases := []struct {
 		a, b string

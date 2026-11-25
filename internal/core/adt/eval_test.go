@@ -22,8 +22,6 @@ import (
 
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -115,14 +113,6 @@ func runEvalTest(t *cuetxtar.Test, dbg cuedebug.Config, exp cueexperiment.Config
 	t.Write(debug.AppendNode(nil, r, v, &debug.Config{Cwd: t.Dir}))
 }
 
-func TestIssue3985(t *testing.T) {
-	// We run the evaluator twice with different versions of the evaluator. Each
-	// results in the use of emptyNode. Ensure that the it does not get
-	// assigned a nodeContext.
-	cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalV3)).CompileString(`a!: _, b: [for c in a if a != _|_ {}]`)
-
-}
-
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	// adt.OpenGraphs = true
@@ -211,27 +201,4 @@ b: c: a @test(shareID=A)
 	archive := txtar.Parse([]byte(in))
 	runner := cuetxtar.NewInlineRunner(t, m, archive, t.TempDir())
 	runner.Run()
-}
-
-func BenchmarkUnifyAPI(b *testing.B) {
-	for b.Loop() {
-		b.StopTimer()
-		ctx := cuecontext.New()
-		v := ctx.CompileString("")
-		for j := range 500 {
-			if j == 400 {
-				b.StartTimer()
-			}
-			v = v.FillPath(cue.ParsePath(fmt.Sprintf("i_%d", j)), j)
-		}
-	}
-}
-
-func TestIssue2293(t *testing.T) {
-	ctx := cuecontext.New()
-	c := `a: {}, a`
-	v1 := ctx.CompileString(c)
-	v2 := ctx.CompileString(c)
-
-	v1.Unify(v2)
 }

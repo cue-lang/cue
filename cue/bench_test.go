@@ -142,6 +142,20 @@ func BenchmarkUnify(b *testing.B) {
 	}
 }
 
+func BenchmarkUnifyAPI(b *testing.B) {
+	for b.Loop() {
+		b.StopTimer()
+		ctx := cuecontext.New()
+		v := ctx.CompileString("")
+		for j := range 500 {
+			if j == 400 {
+				b.StartTimer()
+			}
+			v = v.FillPath(cue.ParsePath(fmt.Sprintf("i_%d", j)), j)
+		}
+	}
+}
+
 // TODO(mvdan): move this benchmark to internal/encoding
 // and cover other encodings too.
 // We should also cover both encoding and decoding performance.

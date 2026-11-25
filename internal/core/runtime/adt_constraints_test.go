@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package adt_test
+package runtime_test
 
 import (
 	"testing"

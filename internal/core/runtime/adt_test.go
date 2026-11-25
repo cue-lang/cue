@@ -12,66 +12,135 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package adt_test
+package runtime_test
 
 import (
+	"strconv"
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 )
 
-func closeAll(ctx *cue.Context, v cue.Value) cue.Value {
-	path := cue.MakePath(cue.Def("#x"))
-	return ctx.CompileString("#x: _").FillPath(path, v).LookupPath(path)
+// TestEmptyNodeInert checks that initializing the shared empty node, as
+// returned for a failed lookup or list conversion, does not create a
+// nodeContext for it.
+func TestEmptyNodeInert(t *testing.T) {
+	ctx := adt.NewContext(runtime.New(), &adt.Vertex{})
+
+	// RawList returns the shared empty node for a value which is not a list.
+	empty := ctx.RawList(&adt.Top{})
+	ctx.Err() // discard the type error
+	if empty != ctx.RawList(&adt.Top{}) {
+		t.Fatal("RawList did not return a shared node")
+	}
+	ctx.Err()
+
+	// The empty node is shared, so an earlier test may already have given
+	// it a nodeContext. Check that it is finalized, and separately that a
+	// fresh finalized vertex does not get a nodeContext either.
+	done := &adt.Vertex{}
+	done.ForceDone()
+	if empty.Status() != done.Status() {
+		t.Fatalf("empty node has status %v, want %v", empty.Status(), done.Status())
+	}
+	for _, v := range []*adt.Vertex{empty, done} {
+		before := *ctx.Stats()
+		v.Init(ctx)
+		after := *ctx.Stats()
+		if after.Allocs != before.Allocs || after.Reused != before.Reused {
+			t.Fatalf("finalized node got a nodeContext: allocs %d -> %d, reused %d -> %d",
+				before.Allocs, after.Allocs, before.Reused, after.Reused)
+		}
+	}
 }
 
-type editConfig struct {
-	Edits []cue.Value `json:"edits,omitempty"`
-}
+func TestFeatureBool(t *testing.T) {
+	r := runtime.New()
+	ctx := adt.NewContext(r, &adt.Vertex{})
 
-// Modifying values can cause a mix of non-finalized nodes as children of
-// a finalized parent. Ensure that this does not cause issues.
-func TestAPIModifyingValues(t *testing.T) {
-	ctx := cuecontext.New()
-
-	v := ctx.CompileString(`
-        edits: [{
-            type: "replace"
-            data!: "^wrong"
-        }]
-    `)
-	if err := v.Err(); err != nil {
-		t.Fatal(err)
-	}
-	closed := closeAll(ctx, ctx.EncodeType(editConfig{}))
-
-	v = v.Unify(closed)
-	if err := v.Err(); err != nil {
-		t.Fatal(err)
+	makeInt := func(x int64) adt.Feature {
+		f, _ := adt.MakeLabel(nil, x, adt.IntLabel)
+		return f
 	}
 
-	var cfg editConfig
-	if err := v.Decode(&cfg); err != nil {
-		t.Fatal(err)
-	}
-
-	w := ctx.CompileString(`
-        type!: "fill" | "replace"
-        data!: _
-    `)
-
-	if err := w.Err(); err != nil {
-		t.Fatal(err)
-	}
-	x := cfg.Edits[0]
-	x = x.Unify(w)
-
-	if err := x.Err(); err != nil {
-		t.Fatal(err)
+	testCases := []struct {
+		in           adt.Feature
+		isRegular    bool
+		isDefinition bool
+		isHidden     bool
+		isString     bool
+		isInt        bool
+	}{{
+		in:        ctx.StringLabel("foo"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        ctx.StringLabel("_"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        ctx.StringLabel("_#foo"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        ctx.StringLabel("#foo"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        adt.MakeStringLabel(r, "foo"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        adt.MakeStringLabel(r, "_"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        adt.MakeStringLabel(r, "_#foo"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        adt.MakeStringLabel(r, "#foo"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:        makeInt(4),
+		isRegular: true,
+		isInt:     true,
+	}, {
+		in:        adt.MakeIdentLabel(r, "foo", "main"),
+		isRegular: true,
+		isString:  true,
+	}, {
+		in:           adt.MakeIdentLabel(r, "#foo", "main"),
+		isDefinition: true,
+	}, {
+		in:           adt.MakeIdentLabel(r, "_#foo", "main"),
+		isDefinition: true,
+		isHidden:     true,
+	}, {
+		in:       adt.MakeIdentLabel(r, "_foo", "main"),
+		isHidden: true,
+	}}
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			if got := tc.in.IsRegular(); got != tc.isRegular {
+				t.Errorf("IsRegular: got %v; want %v", got, tc.isRegular)
+			}
+			if got := tc.in.IsString(); got != tc.isString {
+				t.Errorf("IsString: got %v; want %v", got, tc.isString)
+			}
+			if got := tc.in.IsInt(); got != tc.isInt {
+				t.Errorf("IsInt: got %v; want %v", got, tc.isInt)
+			}
+			if got := tc.in.IsDef(); got != tc.isDefinition {
+				t.Errorf("isDefinition: got %v; want %v", got, tc.isDefinition)
+			}
+			if got := tc.in.IsHidden(); got != tc.isHidden {
+				t.Errorf("IsHidden: got %v; want %v", got, tc.isHidden)
+			}
+		})
 	}
 }
 

@@ -236,18 +236,98 @@ issue4532: {
 	guardedMatch: (#E & {}).m   @test(eq, 0)
 	direct:       #E            @test(eq, {out: [], n: 0, z: 1, m: 0})
 }
+// A disjunct that reads a field of a let or inline struct which fails a
+// validator fails itself. The error does not reach the other disjuncts, nor
+// the field whose evaluation reached the disjunction.
+// https://cuelang.org/issue/4597
+issue4597: {
+	let: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: L.out} | {b: 1} @test(eq, {a: 2}, incorrect) @test(eq:todo, {b: 1})
+	}
+	inlineDefault: {
+		#C: {
+			id:  string & !="storage"
+			out: "k/\(id)"
+		}
+		out: ({x: *{a: (#C & {id: "storage"}).out, c: 1} | {c: 2}}).x.c @test(eq, 1, incorrect) @test(eq:todo, 2)
+	}
+	letDefault: {
+		#C: {
+			id:  string & !="storage"
+			out: "k/\(id)"
+		}
+		let L = #C & {id: "storage"}
+		out: ({x: *{a: L.out, c: 1} | {c: 2}}).x.c @test(err, code=eval, contains="out of bound", incorrect) @test(eq:todo, 2)
+	}
+	bothDisjuncts: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: L.out} | {b: L.out} @test(eq, {a: 2}, incorrect) @test(err:todo, code=eval, contains="out of bound")
+	}
+	alsoReadDirectly: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: L.out} | {b: 1} @test(eq, {a: 2}, incorrect) @test(eq:todo, {b: 1})
+		r: L.out               @test(eq, 2, incorrect) @test(err:todo, code=eval, contains="out of bound")
+	}
+	nested: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: {p: L.out} | {q: L.out}, k: 1} | {b: 1} @test(eq, {a: p: 2, k: 1} | {b: 1}, incorrect) @test(eq:todo, {b: 1})
+	}
+	letDisjunction: {
+		let L = {v: 1 & >1, out: v + 1}
+		let D = {a: L.out} | {b: 1}
+		x: D @test(eq, {a: 2} | {b: 1}, incorrect) @test(eq:todo, {b: 1})
+	}
+	list: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: [L.out] | [5] @test(eq, [2], incorrect) @test(eq:todo, [5])
+	}
+	selector: {
+		let L = {v: 1 & >1, out: {z: v + 1}}
+		x: {a: L.out.z} | {b: 1} @test(eq, {a: 2}, incorrect) @test(eq:todo, {b: 1})
+	}
+	inlineInDisjunct: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: ({p: L.out}).p} | {b: 1} @test(eq, {a: 2}, incorrect) @test(eq:todo, {b: 1})
+	}
+	otherDisjunction: {
+		let L = {v: 1 & >1, out: v + 1}
+		y: {p: L.out} | {q: 1} @test(eq, {p: 2}, incorrect) @test(eq:todo, {q: 1})
+		x: {a: y.p} | {b: 1}   @test(eq, {a: 2} | {b: 1}, incorrect) @test(eq:todo, {b: 1})
+	}
+	scalar: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: L.out | 3 @test(eq, 3)
+	}
+	valid: {
+		let L = {v: 3 & >1, out: v + 1}
+		x: *{a: L.out} | {b: 1} @test(eq, *{a: 4} | {b: 1})
+	}
+	// A guard which compares with bottom is evaluated once more after the
+	// disjunct has run its tasks, reading its inline struct again.
+	guard: {
+		x: {
+			if ({v: 1 & >1, out: v + 1}).out+1 != _|_ {a: 1}
+		} | {b: 1} @test(err, code=eval, contains="out of bound", incorrect) @test(eq:todo, {b: 1})
+	}
+	guardValid: {
+		x: {
+			if ({v: 3 & >1, out: v + 1}).out+1 != _|_ {a: 1}
+		} | {b: 1} @test(eq, {a: 1} | {b: 1})
+	}
+}
 -- out/eval/stats --
-Leaks:  166
-Freed:  283
-Reused: 270
-Allocs: 179
+Leaks:  198
+Freed:  460
+Reused: 426
+Allocs: 232
 Retain: 0
 
-Unifications: 349
-Conjuncts:    631
-Disjuncts:    38
+Unifications: 503
+Conjuncts:    863
+Disjuncts:    74
 
-NumCloseIDs: 82
+NumCloseIDs: 91
 -- out/errors.txt --
 [eval] x: conflicting values 1 and 2:
     ./in.cue:4:14
@@ -386,3 +466,16 @@ x: conflicting values 1 and 2:
     ./in.cue:181:36
     ./in.cue:179:9
     ./in.cue:181:59
+[incomplete] issue4597.inlineDefault.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:245:9
+    ./in.cue:244:18
+[incomplete] issue4597.letDefault.#C.out: invalid interpolation: non-concrete value !="storage" (type string):
+    ./in.cue:252:9
+    ./in.cue:251:18
+[eval] issue4597.letDefault.L.id: invalid value "storage" (out of bound !="storage"):
+    ./in.cue:251:18
+    ./in.cue:251:9
+    ./in.cue:254:21
+[eval] v: invalid value 1 (out of bound >1):
+    ./in.cue:304:16
+    ./in.cue:304:12

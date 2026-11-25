@@ -229,6 +229,86 @@ issue4532: {
 	guardedMatch: (#E & {}).m
 	direct:       #E
 }
+// A disjunct that reads a field of a let or inline struct which fails a
+// validator fails itself. The error does not reach the other disjuncts, nor
+// the field whose evaluation reached the disjunction.
+// https://cuelang.org/issue/4597
+issue4597: {
+	let: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: L.out} | {b: 1}
+	}
+	inlineDefault: {
+		#C: {
+			id:  string & !="storage"
+			out: "k/\(id)"
+		}
+		out: ({x: *{a: (#C & {id: "storage"}).out, c: 1} | {c: 2}}).x.c
+	}
+	letDefault: {
+		#C: {
+			id:  string & !="storage"
+			out: "k/\(id)"
+		}
+		let L = #C & {id: "storage"}
+		out: ({x: *{a: L.out, c: 1} | {c: 2}}).x.c
+	}
+	bothDisjuncts: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: L.out} | {b: L.out}
+	}
+	alsoReadDirectly: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: L.out} | {b: 1}
+		r: L.out
+	}
+	nested: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: {p: L.out} | {q: L.out}, k: 1} | {b: 1}
+	}
+	letDisjunction: {
+		let L = {v: 1 & >1, out: v + 1}
+		let D = {a: L.out} | {b: 1}
+		x: D
+	}
+	list: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: [L.out] | [5]
+	}
+	selector: {
+		let L = {v: 1 & >1, out: {z: v + 1}}
+		x: {a: L.out.z} | {b: 1}
+	}
+	inlineInDisjunct: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: {a: ({p: L.out}).p} | {b: 1}
+	}
+	otherDisjunction: {
+		let L = {v: 1 & >1, out: v + 1}
+		y: {p: L.out} | {q: 1}
+		x: {a: y.p} | {b: 1}
+	}
+	scalar: {
+		let L = {v: 1 & >1, out: v + 1}
+		x: L.out | 3
+	}
+	valid: {
+		let L = {v: 3 & >1, out: v + 1}
+		x: *{a: L.out} | {b: 1}
+	}
+	// A guard which compares with bottom is evaluated once more after the
+	// disjunct has run its tasks, reading its inline struct again.
+	guard: {
+		x: {
+			if ({v: 1 & >1, out: v + 1}).out+1 != _|_ {a: 1}
+		} | {b: 1}
+	}
+	guardValid: {
+		x: {
+			if ({v: 3 & >1, out: v + 1}).out+1 != _|_ {a: 1}
+		} | {b: 1}
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -589,5 +669,197 @@ issue4532: {
     guardedField: (〈0;#E〉 & {}).z
     guardedMatch: (〈0;#E〉 & {}).m
     direct: 〈0;#E〉
+  }
+  issue4597: {
+    let: {
+      let L#11 = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: ({
+        a: 〈1;let L#11〉.out
+      }|{
+        b: 1
+      })
+    }
+    inlineDefault: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      out: {
+        x: (*{
+          a: (〈2;#C〉 & {
+            id: "storage"
+          }).out
+          c: 1
+        }|{
+          c: 2
+        })
+      }.x.c
+    }
+    letDefault: {
+      #C: {
+        id: (string & !="storage")
+        out: "k/\(〈0;id〉)"
+      }
+      let L#12 = (〈0;#C〉 & {
+        id: "storage"
+      })
+      out: {
+        x: (*{
+          a: 〈2;let L#12〉.out
+          c: 1
+        }|{
+          c: 2
+        })
+      }.x.c
+    }
+    bothDisjuncts: {
+      let L#13 = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: ({
+        a: 〈1;let L#13〉.out
+      }|{
+        b: 〈1;let L#13〉.out
+      })
+    }
+    alsoReadDirectly: {
+      let L#14 = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: ({
+        a: 〈1;let L#14〉.out
+      }|{
+        b: 1
+      })
+      r: 〈0;let L#14〉.out
+    }
+    nested: {
+      let L#15 = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: ({
+        a: ({
+          p: 〈2;let L#15〉.out
+        }|{
+          q: 〈2;let L#15〉.out
+        })
+        k: 1
+      }|{
+        b: 1
+      })
+    }
+    letDisjunction: {
+      let L#16 = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      let D#17 = ({
+        a: 〈1;let L#16〉.out
+      }|{
+        b: 1
+      })
+      x: 〈0;let D#17〉
+    }
+    list: {
+      let L#18 = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: ([
+        〈1;let L#18〉.out,
+      ]|[
+        5,
+      ])
+    }
+    selector: {
+      let L#19 = {
+        v: (1 & >1)
+        out: {
+          z: (〈1;v〉 + 1)
+        }
+      }
+      x: ({
+        a: 〈1;let L#19〉.out.z
+      }|{
+        b: 1
+      })
+    }
+    inlineInDisjunct: {
+      let L#1A = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: ({
+        a: {
+          p: 〈2;let L#1A〉.out
+        }.p
+      }|{
+        b: 1
+      })
+    }
+    otherDisjunction: {
+      let L#1B = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      y: ({
+        p: 〈1;let L#1B〉.out
+      }|{
+        q: 1
+      })
+      x: ({
+        a: 〈1;y〉.p
+      }|{
+        b: 1
+      })
+    }
+    scalar: {
+      let L#1C = {
+        v: (1 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: (〈0;let L#1C〉.out|3)
+    }
+    valid: {
+      let L#1D = {
+        v: (3 & >1)
+        out: (〈0;v〉 + 1)
+      }
+      x: (*{
+        a: 〈1;let L#1D〉.out
+      }|{
+        b: 1
+      })
+    }
+    guard: {
+      x: ({
+        if (({
+          v: (1 & >1)
+          out: (〈0;v〉 + 1)
+        }.out + 1) != _|_(explicit error (_|_ literal) in source)) {
+          a: 1
+        }
+      }|{
+        b: 1
+      })
+    }
+    guardValid: {
+      x: ({
+        if (({
+          v: (3 & >1)
+          out: (〈0;v〉 + 1)
+        }.out + 1) != _|_(explicit error (_|_ literal) in source)) {
+          a: 1
+        }
+      }|{
+        b: 1
+      })
+    }
   }
 }

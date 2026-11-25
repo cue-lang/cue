@@ -73,7 +73,6 @@ func runModGet(cmd *Command, args []string) error {
 	if err != nil {
 		return suggestModCommand(err)
 	}
-	// TODO check whether it's changed or not.
 	data, err := modfile.Format(mf)
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
@@ -85,7 +84,7 @@ func runModGet(cmd *Command, args []string) error {
 		// if it can't load the module file.
 		return err
 	}
-	return writeFileIfChanged(modPath, oldData, data, 0o666)
+	return writeModuleFileIfChanged(modPath, oldData, data)
 }
 
 func readModuleFile() (string, *modfile.File, []byte, error) {

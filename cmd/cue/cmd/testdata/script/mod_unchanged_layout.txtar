@@ -1,5 +1,5 @@
-# Commands which rewrite module files reformat one even when its data does
-# not change, dropping its comments and layout.
+# Commands which rewrite module files leave one as it is when its data does
+# not change, keeping its comments and layout.
 
 exec cue mod tidy
 cmp cue.mod/module.cue want-module
@@ -28,11 +28,26 @@ exec cue mod edit
 cmp cue.mod/module.cue want-module
 
 -- want-module --
+// The main module.
 module: "main.org@v0"
-language: version: "v0.17.0"
-deps: "example.com/dep@v0": v: "v0.1.0"
+
+language: {
+	version: "v0.17.0"
+}
+
+deps: {
+	// Required for its lib package.
+	"example.com/dep@v0": {
+		v: "v0.1.0"
+	}
+}
 -- want-local --
-deps: "example.com/dep@v0": replaceWith: "./local_dep"
+// Work on the dependency locally.
+deps: {
+	"example.com/dep@v0": {
+		replaceWith: "./local_dep"
+	}
+}
 -- want-module-source --
 module: "main.org@v0"
 language: version: "v0.17.0"

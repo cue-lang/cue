@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -23,6 +24,11 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -120,8 +126,8 @@ func dirReplaceLoc(modRoot string) func(string) (module.SourceLoc, error) {
 	}
 }
 
-// writeModuleFile formats mf with the given formatter and writes it to
-// filename, skipping the write when the content is unchanged.
+// writeModuleFile formats mf with format and writes it to filename
+// via [writeModuleFileIfChanged].
 func writeModuleFile(filename string, format func(*modfile.File) ([]byte, error), mf *modfile.File) error {
 	data, err := format(mf)
 	if err != nil {
@@ -131,7 +137,39 @@ func writeModuleFile(filename string, format func(*modfile.File) ([]byte, error)
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
-	return writeFileIfChanged(filename, oldData, data, 0o666)
+	return writeModuleFileIfChanged(filename, oldData, data)
+}
+
+// writeModuleFileIfChanged writes data to filename unless oldData, its current
+// content or nil, holds the same CUE data as written, not as filled in from
+// module.cue. This keeps the file's comments and layout across no-op runs.
+func writeModuleFileIfChanged(filename string, oldData, data []byte) error {
+	if oldData != nil && (bytes.Equal(oldData, data) || sameData(oldData, data)) {
+		return nil
+	}
+	return os.WriteFile(filename, data, 0o666)
+}
+
+// sameData reports whether old holds the same CUE data as new. Optional and
+// required fields in old count as a difference, as [cue.Value.Equals] ignores them.
+func sameData(old, new []byte) bool {
+	f, err := parser.ParseFile("", old)
+	if err != nil {
+		return false
+	}
+	constrained := false
+	ast.Walk(f, func(n ast.Node) bool {
+		if field, ok := n.(*ast.Field); ok && field.Constraint != token.ILLEGAL {
+			constrained = true
+		}
+		return !constrained
+	}, nil)
+	if constrained {
+		return false
+	}
+	ctx := cuecontext.New()
+	oldv := ctx.BuildFile(f)
+	return oldv.Validate(cue.Concrete(true)) == nil && oldv.Equals(ctx.CompileBytes(new))
 }
 
 // suggestModCommand rewrites a non-nil error to suggest to the user

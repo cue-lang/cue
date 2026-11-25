@@ -37,7 +37,8 @@ to the new standard syntax. It
 If there is no module path, it chooses an arbitrary path (test.example@v0).
 
 If the module.cue file is already compatible with the new syntax,
-it is just formatted without making any other changes.
+it is left unchanged unless its data needs normalizing,
+such as dropping a redundant default: false.
 `,
 		RunE: mkRunE(c, runModFix),
 		Args: cobra.ExactArgs(0),
@@ -63,5 +64,5 @@ func runModFix(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
 	}
-	return writeFileIfChanged(modPath, data, newData, 0o666)
+	return writeModuleFileIfChanged(modPath, data, newData)
 }

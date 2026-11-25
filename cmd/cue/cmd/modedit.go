@@ -113,7 +113,7 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if err := writeFileIfChanged(modPath, data, newData, 0o666); err != nil {
+	if err := writeModuleFileIfChanged(modPath, data, newData); err != nil {
 		return err
 	}
 	if len(c.localEdits) == 0 {
@@ -160,7 +160,7 @@ func (c *modEditCmd) runLocalEdits(modRoot string, base *modfile.File) error {
 	if err != nil {
 		return err
 	}
-	return writeFileIfChanged(localPath, oldData, newData, 0o666)
+	return writeModuleFileIfChanged(localPath, oldData, newData)
 }
 
 // localViewFromBase returns a main-module view that mirrors base's dependencies

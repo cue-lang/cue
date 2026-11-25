@@ -468,17 +468,23 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	// label queue drains in natural iteration order; e.g.
 	// `for x in ["A","B"] { (x)1, (x)2 }` produces [A1, A2, B1, B2] rather
 	// than the label-queue-draining order [A1, B1, A2, B2].
+	// A root joins as many rounds as it appeared, starting with the first;
+	// a struct nested in a conditional appears fewer times than its peers.
 	for i := 0; i < len(roots); {
 		runEnd := i + 1
+		rounds := roots[i].structInfo.Repeats
 		if compID := roots[i].structInfo.CompID; compID != 0 {
 			for runEnd < len(roots) &&
 				roots[runEnd].structInfo.CompID == compID {
+				rounds = max(rounds, roots[runEnd].structInfo.Repeats)
 				runEnd++
 			}
 		}
-		for range 1 + roots[i].structInfo.Repeats {
+		for round := range 1 + rounds {
 			for j := i; j < runEnd; j++ {
-				addRoot(&roots[j])
+				if round <= roots[j].structInfo.Repeats {
+					addRoot(&roots[j])
+				}
 			}
 		}
 		i = runEnd

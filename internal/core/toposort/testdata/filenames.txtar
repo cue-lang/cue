@@ -4,6 +4,11 @@
 //     before and after main.cue
 //   - outST and outTS, referring to s and t from swapped files
 //   - outU and u, embedding _dz from z.cue before _da from a.cue
+//   - outSplit and outWhole, embedding the same fields, which _split
+//     declares across a.cue and z.cue
+//
+// outA and outZ differ in y and w, as do outSplit and outWhole,
+// which is a bug.
 -- a.cue --
 package p
 
@@ -17,11 +22,15 @@ sa: x: {
 	if true {g1: "v"}
 	{"\("h1")": "v", h2: "v"}
 }
+sa: y: {for k in ["b", "a"] {{}, (k): "v"}}
+sa: w: {for k in ["b", "a"] {{}, "\(k)1": "v", "\(k)2": "v"}}
 
 outST: s
 outTS: t
 
 _da: {da1: "v", ("da2"): "v"}
+
+_split: a: true
 -- main.cue --
 package p
 
@@ -51,6 +60,13 @@ _b: {b1: "v"}
 _c: {c1: "v"}
 _e: {e1: "v"}
 _f: {f1: "v"}
+
+outSplit: {_first, _split, _last}
+outWhole: {_first, _whole, _last}
+
+_first: r: true
+_whole: {a: true, s: true}
+_last: b: true
 -- z.cue --
 package p
 
@@ -64,11 +80,15 @@ sz: x: {
 	if true {g1: "v"}
 	{"\("h1")": "v", h2: "v"}
 }
+sz: y: {for k in ["b", "a"] {{}, (k): "v"}}
+sz: w: {for k in ["b", "a"] {{}, "\(k)1": "v", "\(k)2": "v"}}
 
 outST: t
 outTS: s
 
 _dz: {("dz1"): "v", dz2: "v"}
+
+_split: s: true
 -- out/TestTopologicalSort/lexicographical=false/stats --
 Leaks:  0
 Freed:  0
@@ -79,36 +99,60 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
-OrderEdges:   113
+OrderEdges:   144
 -- out/TestTopologicalSort/lexicographical=false --
 {
-	outA: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		h1: "v"
-		h2: "v"
+	outA: {
+		w: {
+			a1: "v"
+			a2: "v"
+			b1: "v"
+			b2: "v"
+		}
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			a: "v"
+			b: "v"
+		}
 	}
-	outZ: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		h1: "v"
-		h2: "v"
+	outZ: {
+		w: {
+			b1: "v"
+			b2: "v"
+			a1: "v"
+			a2: "v"
+		}
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			b: "v"
+			a: "v"
+		}
 	}
 	outU: x: {
 		dz1: "v"
@@ -130,33 +174,57 @@ OrderEdges:   113
 		h1: "v"
 		h2: "v"
 	}
-	sa: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		h1: "v"
-		h2: "v"
+	sa: {
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			b: "v"
+			a: "v"
+		}
+		w: {
+			b1: "v"
+			b2: "v"
+			a1: "v"
+			a2: "v"
+		}
 	}
-	sz: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		h1: "v"
-		h2: "v"
+	sz: {
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			b: "v"
+			a: "v"
+		}
+		w: {
+			b1: "v"
+			b2: "v"
+			a1: "v"
+			a2: "v"
+		}
 	}
 	outST: x: {
 		a1: "v"
@@ -206,22 +274,46 @@ OrderEdges:   113
 		da1: "v"
 		da2: "v"
 	}
+	outSplit: {
+		r: true
+		a: true
+		b: true
+		s: true
+	}
+	outWhole: {
+		r: true
+		a: true
+		s: true
+		b: true
+	}
 }
 -- out/TestTopologicalSort/lexicographical=true --
 {
-	outA: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		h1: "v"
-		h2: "v"
+	outA: {
+		w: {
+			a1: "v"
+			a2: "v"
+			b1: "v"
+			b2: "v"
+		}
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			a: "v"
+			b: "v"
+		}
 	}
 	outST: x: {
 		a1: "v"
@@ -240,6 +332,12 @@ OrderEdges:   113
 		t2: "v"
 		t3: "v"
 		t4: "v"
+	}
+	outSplit: {
+		a: true
+		b: true
+		r: true
+		s: true
 	}
 	outTS: x: {
 		a1: "v"
@@ -265,19 +363,37 @@ OrderEdges:   113
 		dz1: "v"
 		dz2: "v"
 	}
-	outZ: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		h1: "v"
-		h2: "v"
+	outWhole: {
+		a: true
+		b: true
+		r: true
+		s: true
+	}
+	outZ: {
+		w: {
+			a1: "v"
+			a2: "v"
+			b1: "v"
+			b2: "v"
+		}
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			a: "v"
+			b: "v"
+		}
 	}
 	s: x: {
 		a1: "v"
@@ -293,33 +409,57 @@ OrderEdges:   113
 		h1: "v"
 		h2: "v"
 	}
-	sa: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		h1: "v"
-		h2: "v"
+	sa: {
+		w: {
+			a1: "v"
+			a2: "v"
+			b1: "v"
+			b2: "v"
+		}
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			a: "v"
+			b: "v"
+		}
 	}
-	sz: x: {
-		a1: "v"
-		b1: "v"
-		c1: "v"
-		d1: "v"
-		d2: "v"
-		d3: "v"
-		d4: "v"
-		e1: "v"
-		f1: "v"
-		g1: "v"
-		h1: "v"
-		h2: "v"
+	sz: {
+		w: {
+			a1: "v"
+			a2: "v"
+			b1: "v"
+			b2: "v"
+		}
+		x: {
+			a1: "v"
+			b1: "v"
+			c1: "v"
+			d1: "v"
+			d2: "v"
+			d3: "v"
+			d4: "v"
+			e1: "v"
+			f1: "v"
+			g1: "v"
+			h1: "v"
+			h2: "v"
+		}
+		y: {
+			a: "v"
+			b: "v"
+		}
 	}
 	t: x: {
 		t1: "v"

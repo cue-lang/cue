@@ -1,7 +1,30 @@
 // Structs without fields pass the field order on without duplicating
 // it. The `out: {}` lines keep consecutive `out: {} & {}` lines from
 // merging into one batch.
+//
+// An operand of & which only embeds a struct, also through other
+// expressions, is ordered as that struct is: its fields get no order
+// against those of the other operand. Structs with fields which it
+// embeds keep their order.
+//
+// index orders the fields of _y before m, which is a bug.
 -- in.cue --
+ref:    _y & {m: 1}
+embed:  {_y} & {m: 1}
+both:   {_y} & {_m}
+nested: {{_y}} & {m: 1}
+field:  {_y, z: 1} & {_m}
+mixed:  {{_y}, z: 1} & {m: 1}
+cond:   {if true {_y}} & {m: 1}
+loop:   {for k in ["k"] {_y}} & {m: 1}
+disj:   (*{_y} | null) & {m: 1}
+disjIn: {*{_y} | null} & {m: 1}
+call:   and([{_y}]) & {m: 1}
+index:  [{_y}][0] & {m: 1}
+fields: {{b: 1}, {a: 2}} & {m: 1}
+_y: {y1: 1, y2: 2}
+_m: {m: 1}
+
 out: {b: 1}
 out: {} & {}
 out: {}
@@ -46,6 +69,73 @@ out: {}
 out: {a: 1}
 -- out/TestTopologicalSort/lexicographical=false --
 {
+	ref: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	embed: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	both: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	nested: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	field: {
+		m:  1
+		y1: 1
+		y2: 2
+		z:  1
+	}
+	mixed: {
+		m:  1
+		y1: 1
+		y2: 2
+		z:  1
+	}
+	cond: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	loop: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	disj: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	disjIn: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	call: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	index: {
+		y1: 1
+		y2: 2
+		m:  1
+	}
+	fields: {
+		b: 1
+		a: 2
+		m: 1
+	}
 	out: {
 		b: 1
 		a: 1
@@ -61,11 +151,78 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
-OrderEdges:   1
+OrderEdges:   31
 -- out/TestTopologicalSort/lexicographical=true --
 {
+	both: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	call: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	cond: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	disj: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	disjIn: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	embed: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	field: {
+		m:  1
+		y1: 1
+		y2: 2
+		z:  1
+	}
+	fields: {
+		a: 2
+		b: 1
+		m: 1
+	}
+	index: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	loop: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
+	mixed: {
+		m:  1
+		y1: 1
+		y2: 2
+		z:  1
+	}
+	nested: {
+		m:  1
+		y1: 1
+		y2: 2
+	}
 	out: {
 		a: 1
 		b: 1
+	}
+	ref: {
+		m:  1
+		y1: 1
+		y2: 2
 	}
 }

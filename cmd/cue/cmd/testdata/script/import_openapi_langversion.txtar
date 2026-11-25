@@ -1,0 +1,32 @@
+# OpenAPI imported into a module should be valid at the language version the
+# module declares, yet it is written at the current version, with and without
+# the openapiv2 experiment: a numeric enum becomes a disjunction of unary ==
+# bounds, which a module only accepts from v0.15.0.
+
+exec cue import -p api openapi+yaml: api.yaml
+grep 'weight\?: \(==1 \| ==2\) & int' api.cue
+! exec cue vet ./...
+stderr 'expected operand, found .==.'
+env CUE_EXPERIMENT=openapiv2
+exec cue import -f -p api openapi+yaml: api.yaml
+grep 'weight\?: \(==1 \| ==2\) & int' api.cue
+! exec cue vet ./...
+stderr 'expected operand, found .==.'
+
+-- cue.mod/module.cue --
+module: "old.test"
+language: version: "v0.14.0"
+-- api.yaml --
+openapi: 3.0.0
+info:
+  title: API
+  version: v1
+paths: {}
+components:
+  schemas:
+    Foo:
+      type: object
+      properties:
+        weight:
+          type: integer
+          enum: [1, 2]

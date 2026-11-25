@@ -86,10 +86,13 @@ type vertexMap map[*Vertex]*Vertex
 type overlayFrame struct {
 	vertexMap vertexMap
 	root      *Vertex
+	// taskDepth is the length of the task stack when the frame was pushed;
+	// see [OpContext.rootedTaskNode].
+	taskDepth int
 }
 
 func (c *OpContext) pushOverlay(v *Vertex, m vertexMap) {
-	c.overlays = append(c.overlays, overlayFrame{m, v})
+	c.overlays = append(c.overlays, overlayFrame{m, v, len(c.stack)})
 }
 
 func (c *OpContext) popOverlay() {

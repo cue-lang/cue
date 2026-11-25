@@ -31,13 +31,30 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	if x == y {
 		return true
 	}
+	// A vertex which shares another has its own arc type, so compare them
+	// before dereferencing either.
 	if a, b := x.ArcType, y.ArcType; a < b {
 		return false
 	}
 
+	// A reference opened with the postfix ... operator opens the vertex it
+	// shares at every level. Only the vertex as found records that, so it
+	// is carried over to the vertices below the shared one.
+	xOpened := s.xOpened || x.IsOpened()
+	yOpened := s.yOpened || y.IsOpened()
+	xFound, yFound := x, y
+
 	if s.Defaults {
 		y = s.defaultOf(y)
 	}
+
+	// x0 and y0 are the vertices as found, which may share x and y.
+	x0, y0 := x, y
+	x, y = x.DerefValue(), y.DerefValue()
+
+	defer func(x, y bool) { s.xOpened, s.yOpened = x, y }(s.xOpened, s.yOpened)
+	s.xOpened = s.xOpened || (xOpened && x != xFound)
+	s.yOpened = s.yOpened || (yOpened && y != yFound)
 
 	if b := y.Bottom(); b != nil {
 		// If the value is incomplete, the error is not final. So either check
@@ -48,6 +65,18 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	ctx := s.ctx
 
 	final := y.IsData() || s.Final
+
+	yStructClosed := !yOpened && isClosed(y0, y)
+	xClosed := !xOpened && isClosed(x0, x) && !s.IgnoreClosedness
+	// TODO: this should not close for taking defaults. Do a more principled
+	// makeover of this package before making it public, though.
+	yClosed := s.Final || s.Defaults ||
+		(yStructClosed && !s.IgnoreClosedness)
+
+	if x == y && (!xClosed || yClosed || final) {
+		// x0 and y0 share one vertex, and x0 does not close it further.
+		return true
+	}
 
 	switch v := x.BaseValue.(type) {
 	case *adt.Bottom:
@@ -86,12 +115,6 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	default:
 		panic(fmt.Sprintf("unexpected type %T", v))
 	}
-
-	xClosed := !x.IsOpenStruct() && !s.IgnoreClosedness
-	// TODO: this should not close for taking defaults. Do a more principled
-	// makeover of this package before making it public, though.
-	yClosed := s.Final || s.Defaults ||
-		(!y.IsOpenStruct() && !s.IgnoreClosedness)
 
 	if xClosed && !yClosed && !final {
 		return false
@@ -135,7 +158,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			isConstraint = true
 		}
 
-		b := y.Lookup(f)
+		b := y.LookupRaw(f)
 		if b == nil {
 			if !isConstraint {
 				s.errf("regular field is constraint in subsumed value: %v", f)
@@ -146,7 +169,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			// implicitly defined as _|_ and thus subsumed. Technically, this is
 			// even true if a is not optional, but in that case it means that y
 			// is invalid, so return false regardless
-			if !y.Accept(ctx, f) || y.IsData() || s.Final {
+			if (!yOpened && !y0.Accept(ctx, f)) || y.IsData() || s.Final {
 				continue
 			}
 
@@ -194,7 +217,7 @@ outer:
 			}
 		}
 
-		if !x.Accept(ctx, f) {
+		if !xOpened && !x0.Accept(ctx, f) {
 			if s.Profile.IgnoreClosedness {
 				continue
 			}
@@ -220,19 +243,26 @@ outer:
 		}
 	}
 
-	return s.patterns(x, y, xClosed, final)
+	return s.patterns(x, y, xClosed, yStructClosed, final)
 }
 
-// patterns compares the pattern constraints of x and y, given whether x is
-// closed, meaning it allows no labels beyond its fields and patterns.
-func (s *subsumer) patterns(x, y *adt.Vertex, xClosed, final bool) bool {
+// isClosed reports whether the struct v allows no labels beyond its fields
+// and patterns. v0 is the vertex as found, which may share v and be closed
+// by itself.
+func isClosed(v0, v *adt.Vertex) bool {
+	return !v0.IsOpenStruct() || !v.IsOpenStruct()
+}
+
+// patterns compares the pattern constraints of x and y, given whether each
+// is closed, meaning it allows no labels beyond its fields and patterns.
+func (s *subsumer) patterns(x, y *adt.Vertex, xClosed, yClosed, final bool) bool {
 	apc := x.PatternConstraints
 	bpc := y.PatternConstraints
 	if bpc == nil {
 		if apc == nil {
 			return true
 		}
-		if !y.IsOpenStruct() || final {
+		if yClosed || final {
 			// This is a special case where know that any allowed optional field
 			// in a must be bottom in y, which is strictly more specific.
 			return true

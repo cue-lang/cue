@@ -938,6 +938,19 @@ func TestValues(t *testing.T) {
 			err: "value not an instance",
 		},
 		{
+			// Likewise when either value is a reference.
+			in:  `a: {[string]: c}, b: close({foo!: {x: 1}}), c: {x: int}`,
+			err: "",
+		},
+		{
+			in:  `a: {[string]: {x: int}}, b: close({foo?: c}), c: {x: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {[string]: c}, b: close({foo!: 1}), c: string`,
+			err: "value not an instance",
+		},
+		{
 			// Pattern constraint subsumes itself.
 			in:  `a: {[string]: int}, b: {[string]: int}`,
 			err: "",
@@ -1768,6 +1781,139 @@ func TestValues(t *testing.T) {
 		{
 			in:  ` a: "s \(d)m\(d) e", b: "s a e", d: _`,
 			err: `value not an instance`,
+		},
+
+		// A field whose value is a reference may share the vertex referred
+		// to. It is compared by its own arc type and closedness, and its
+		// value as if it were written out.
+		{
+			in: `a: {foo!: int}, b: {foo?: c}, c: 1`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:20
+				missing field "foo"`,
+		},
+		{
+			in:   `a: {foo!: int}, b: {foo?: c}, c: 1`,
+			mode: subDefaults,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:20
+				missing field "foo"`,
+		},
+		{
+			in: `a: {foo: c}, b: {foo?: c}, c: 1`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:17
+				missing field "foo"`,
+		},
+		{
+			in: `a: {foo: int}, b: {foo!: c}, c: 1`,
+			err: `
+				field foo not present in {foo!:1}:
+				    subsume:1:19
+				missing field "foo"`,
+		},
+		{
+			in:  `a: {foo?: c}, b: {foo?: {x: 1}}, c: {x: int}`,
+			err: "",
+		},
+		{
+			in:  `a: {foo!: c}, b: {foo!: {x: 1}}, c: {x: int}`,
+			err: "",
+		},
+		{
+			in: `a: {foo?: c}, b: {foo?: d}, c: string, d: 1`,
+			err: `
+				field foo not present in {foo?:1}:
+				    subsume:1:18
+				missing field "foo"`,
+		},
+		{
+			in:  `a: {x: int}, b: c, c: {x: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {foo: [...c]}, b: {foo: [d]}, c: {x: int}, d: {x: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {[string]: {x: int}}, b: close({foo: c}), c: {x: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {foo: #C}, b: {foo: #C}, #C: {[string]: int}`,
+			err: "",
+		},
+		{
+			in:   `a: #A, b: #B, #A: {[string]: #C}, #B: {[string]: #C}, #C: {[string]: int}`,
+			mode: subDefaults,
+			err:  "",
+		},
+		{
+			// close closes the reference, not the struct referred to.
+			in:  `a: close(c), b: c, c: {x: 1}`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: c, b: close(c), c: {x: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: {[string]: int}, b: close(c), c: {}`,
+			err: "",
+		},
+
+		// A reference opened with the postfix ... operator opens the struct
+		// it shares at every level, unless the reference is within a
+		// definition, which closes the struct again.
+		{
+			in:  `a: close({}), b: #B..., #B: {}`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: #B, b: #B..., #B: {x: 1}`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: #B..., b: #B..., #B: {x: int}`,
+			err: "",
+		},
+		{
+			in:  `a: [close({})], b: #L..., #L: [{}]`,
+			err: "value not an instance",
+		},
+		{
+			in:  `a: [close({})], b: #L, #L: [{}]`,
+			err: "",
+		},
+		{
+			in: `a: [{foo: close({})}], b: #L..., #L: [{foo: {}}]`,
+			err: `
+				field foo not present in {foo:{}}:
+				    subsume:1:39
+				missing field "foo"`,
+		},
+		{
+			in:   `a: [{x?: int}], b: #L..., #L: [{}]`,
+			mode: subDefaults,
+			err: `
+				field x not present in {}:
+				    subsume:1:32
+				missing field "x"`,
+		},
+		{
+			in:  `a: #B..., b: {foo: {x: 1, y: 2}}, #B: {foo: {x: int}}`,
+			err: "",
+		},
+		{
+			in:  `a: close({foo: close({x: int})}), b: #D, #D: {foo: #B...}, #B: {x: 1}`,
+			err: "",
+		},
+		{
+			in:  `a: #D, b: {foo: {x: 1, y: 2}}, #D: {foo: #B...}, #B: {x: int}`,
+			err: "value not an instance",
 		},
 	}
 

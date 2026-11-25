@@ -106,6 +106,11 @@ type subsumer struct {
 	// defaults holds the defaults of the vertices which are not their own
 	// default, as returned by [subsumer.defaultOf].
 	defaults map[*adt.Vertex]*adt.Vertex
+
+	// xOpened and yOpened report whether the vertices being compared are
+	// below one shared through a reference opened with the postfix ...
+	// operator, on the subsuming and subsumed side.
+	xOpened, yOpened bool
 }
 
 func (s *subsumer) errf(msg string, args ...interface{}) {

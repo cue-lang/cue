@@ -34,10 +34,12 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	}
 
 	if s.Defaults {
-		if y, ok := b.(*adt.Vertex); ok {
-			b = s.defaultOf(y)
-		} else {
+		if y, ok := b.(*adt.Vertex); !ok {
 			b = adt.DefaultDisjunct(b)
+		} else if _, ok := a.(*adt.Vertex); !ok {
+			// For two vertices, vertices takes the default itself, after
+			// it compares their arc types.
+			b = s.defaultOf(y)
 		}
 	}
 

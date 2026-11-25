@@ -81,6 +81,31 @@ exec cue fix --language-version v0.18.0 --exp=explicitopen
 cmp z.cue expect-explicitopen
 cd ..
 
+# The flag applies only to a loose file loaded with a package of a module,
+# yet cue fix judges both at the module's version.
+cd newmod
+exec cue fix --language-version v0.17.0 . ../alias.cue
+cmp ../alias.cue ../expect/alias
+cmp n.cue ../expect/newmod-n
+cd ..
+
+-- alias.cue --
+_alias: X={a: 1, b: X.a}
+-- expect/alias --
+_alias: {let X = self, a: 1, b: X.a}
+-- newmod/cue.mod/module.cue --
+module: "newmod.test"
+language: version: "v0.18.0"
+-- newmod/n.cue --
+@experiment(aliasv2)
+
+package n
+
+n: 1
+-- expect/newmod-n --
+package n
+
+n: 1
 -- mod/cue.mod/gen/g/g.cue --
 #A: a: int
 #B: b: int

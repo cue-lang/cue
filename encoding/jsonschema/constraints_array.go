@@ -30,7 +30,7 @@ func constraintAdditionalItems(key string, n cue.Value, s *state) {
 	case cue.BoolKind:
 		// Boolean values are supported even in earlier
 		// versions that did not support boolean schemas otherwise.
-		elem = boolSchema(s.boolValue(n))
+		elem = s.boolSchema(s.boolValue(n))
 	case cue.StructKind:
 		elem = s.schema(n)
 	default:
@@ -57,7 +57,7 @@ func setAdditionalItems(n cue.Value, elem ast.Expr, s *state) {
 		panic("no elements in list")
 	}
 	last := s.list.Elts[len(s.list.Elts)-1].(*ast.Ellipsis)
-	if isErrorCall(elem) {
+	if isDisallowed(elem) {
 		// No additional elements allowed. Remove the ellipsis.
 		s.list.Elts = s.list.Elts[:len(s.list.Elts)-1]
 		return
@@ -78,7 +78,7 @@ func setAdditionalItemsStruct(n cue.Value, elem ast.Expr, s *state) {
 		// allows anything.
 		return
 	}
-	if isErrorCall(elem) {
+	if isDisallowed(elem) {
 		// No additional elements allowed, so bound the length instead:
 		// there's no list literal to close.
 		list := s.addImport(n, "list")

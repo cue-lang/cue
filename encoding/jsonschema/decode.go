@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/encoding/jsonschema/internal/structbuilder"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/value"
 )
 
@@ -761,7 +762,7 @@ func (s *state) finalize() (e ast.Expr) {
 	if s.allowedTypes == 0 {
 		// Nothing is possible. This isn't a necessarily a problem, as
 		// we might be inside an allOf or oneOf with other valid constraints.
-		return errorDisallowed()
+		return s.disallowed()
 	}
 
 	s.finalizeObject()
@@ -961,7 +962,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (ex
 		if s.schemaVersion.is(vfrom(VersionDraft6)) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
 			// TODO if false, set s.allowedTypes and s.knownTypes to zero?
-			return boolSchema(s.boolValue(n)), s.schemaInfo
+			return s.boolSchema(s.boolValue(n)), s.schemaInfo
 		}
 		return s.errf(n, "boolean schemas not supported in %v", s.schemaVersion), s.schemaInfo
 	}
@@ -1310,31 +1311,36 @@ func excludeFields(decls []ast.Decl) []ast.Expr {
 	}
 }
 
-func errorDisallowed() ast.Expr {
+// disallowed returns a schema which no value satisfies: a call to the error
+// builtin, or bottom where the target language version predates it.
+func (d *decoder) disallowed() ast.Expr {
+	if v := d.targetExp.LanguageVersion(); v != "" && semver.Compare(v, "v0.14.0") < 0 {
+		return &ast.BottomLit{}
+	}
 	return ast.NewCall(ast.NewIdent("error"), ast.NewString("disallowed"))
 }
 
-func isErrorCall(e ast.Expr) bool {
-	call, ok := e.(*ast.CallExpr)
-	if !ok {
-		return false
+// isDisallowed reports whether e is as [decoder.disallowed] returns it.
+func isDisallowed(e ast.Expr) bool {
+	switch e := e.(type) {
+	case *ast.BottomLit:
+		return true
+	case *ast.CallExpr:
+		target, ok := e.Fun.(*ast.Ident)
+		return ok && target.Name == "error"
 	}
-	target, ok := call.Fun.(*ast.Ident)
-	if !ok {
-		return false
-	}
-	return target.Name == "error"
+	return false
 }
 
 func top() ast.Expr {
 	return ast.NewIdent("_")
 }
 
-func boolSchema(ok bool) ast.Expr {
+func (d *decoder) boolSchema(ok bool) ast.Expr {
 	if ok {
 		return top()
 	}
-	return errorDisallowed()
+	return d.disallowed()
 }
 
 func isTop(s ast.Expr) bool {

@@ -1,0 +1,69 @@
+# Extracting into a module below language version v0.14.0 must write a schema
+# which nothing satisfies as bottom, as the error builtin does not exist there.
+# Compare boolschema.txtar, which targets the current version.
+
+#targetLanguageVersion: v0.13.0
+
+-- schema.json --
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"never": false,
+		"either": {"anyOf": [{"type": "string"}, false]},
+		"tuple": {
+			"type": "array",
+			"items": [{"type": "string"}],
+			"additionalItems": false
+		}
+	}
+}
+-- test/ok.json --
+{"either": "a", "tuple": ["a"]}
+-- test/err-never.json --
+{"never": 1}
+-- test/err-either.json --
+{"either": 1}
+-- test/err-tuple.json --
+{"tuple": ["a", "b"]}
+-- out/decode-v3/extract --
+import "list"
+
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+never?:  _|_
+either?: matchN(>=1, [string, _|_])
+tuple?: {
+	[...]
+	[0]: string
+} & list.MaxItems(1)
+...
+-- out/decode-v3/testerr/err-either --
+either: conflicting values 1 and string (mismatched types int and string):
+    generated.cue:5:23
+    test/err-either.json:1:12
+either: invalid value 1 (does not satisfy matchN): 0 matched, expected >=1:
+    generated.cue:5:10
+    generated.cue:5:17
+    test/err-either.json:1:12
+explicit error (_|_ literal) in source:
+    generated.cue:5:31
+-- out/decode-v3/testerr/err-never --
+explicit error (_|_ literal) in source:
+    generated.cue:4:10
+-- out/decode-v3/testerr/err-tuple --
+tuple: invalid value ["a","b"] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1):
+    generated.cue:9:5
+    generated.cue:6:9
+    generated.cue:9:19
+    test/err-tuple.json:1:11
+-- out/decode-v3-noshare/extract --
+import "list"
+
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+never?:  _|_
+either?: matchN(>=1, [string, _|_])
+tuple?: {
+	[...]
+	[0]: string
+} & list.MaxItems(1)
+...

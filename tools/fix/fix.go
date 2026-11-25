@@ -146,16 +146,15 @@ func File(f *ast.File, o ...Option) *ast.File {
 	return f
 }
 
-// file applies fixes to f, judged at version. If outsideModule, f belongs to
-// no module, and a @version attribute records the version at which any
-// experiment added to it was applied. pkgNames is as in [explicitOpenFixer].
+// file applies fixes to f, judged at its own version, falling back to version.
+// If outsideModule, f belongs to no module, and a @version attribute records
+// the version at which any experiment added to it was applied. pkgNames is as
+// in [explicitOpenFixer].
 func file(f *ast.File, version string, outsideModule bool, pkgNames []map[string]bool, o ...Option) (*ast.File, errors.Error) {
 	// A parsed file carries its experiments on its positions; one that was
 	// built, or rewritten before, carries them itself.
 	existingExps := f.Experiment()
-	if version == "" {
-		version = existingExps.LanguageVersion()
-	}
+	version = cmp.Or(existingExps.LanguageVersion(), version)
 
 	options := options{}
 	for _, f := range o {

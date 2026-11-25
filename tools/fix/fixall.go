@@ -75,13 +75,11 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 			}
 		}
 
-		// A file that declares its own version with a @version attribute is
-		// judged at that version rather than the instance's.
-		ownVersion := func(f *ast.File) bool { return internal.VersionAttr(f) != nil }
-
 		// Validate the requested experiments against the instance's
 		// language version, so that an instance whose files do not even
 		// parse at that version, and so has no files, reports them too.
+		// Skip it if a file declares its own version with @version.
+		ownVersion := func(f *ast.File) bool { return internal.VersionAttr(f) != nil }
 		if version != "" && !slices.ContainsFunc(b.Files, ownVersion) {
 			if _, _, err := opts.resolveExperiments(version); err != nil {
 				return err
@@ -93,11 +91,7 @@ func Instances(insts []*build.Instance, o ...Option) errors.Error {
 				continue
 			}
 			done[f] = true
-			fileVersion := version
-			if ownVersion(f) {
-				fileVersion = f.Pos().LanguageVersion()
-			}
-			if _, err := file(f, fileVersion, outsideModule(b, f), pkgNames[f], o...); err != nil {
+			if _, err := file(f, version, outsideModule(b, f), pkgNames[f], o...); err != nil {
 				errs = errors.Append(errs, err)
 			}
 		}

@@ -562,7 +562,7 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
 	return func(v cue.Value) (file *ast.File, err error) {
-		tags := boolTagsForFile(f, build.JSONSchema)
+		tags := boolTagsForFile(f, build.OpenAPI)
 		if cueexperiment.Flags.OpenAPIV2 {
 			file, err = openapi.ExtractV2(v, &openapi.ExtractConfig{
 				PkgName: c.PkgName,

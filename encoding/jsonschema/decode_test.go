@@ -449,6 +449,58 @@ x?: blah.#Foo.bar
 `[1:]))
 }
 
+// TestMapRefShadowedTargetLanguageVersion checks that an alias introduced to
+// reach a shadowed definition is written in the form which the target
+// language version accepts: the postfix one from v0.18.0 on.
+func TestMapRefShadowedTargetLanguageVersion(t *testing.T) {
+	t.Parallel()
+	v := cuecontext.New().CompileString(`
+$defs: foo: type: "string"
+$defs: bar: {
+	type: "object"
+	properties: x: $ref: "#/$defs/foo"
+}
+`)
+	extract := func(version string) string {
+		expr, err := jsonschema.Extract(v, &jsonschema.Config{
+			TargetLanguageVersion: version,
+			MapRef: func(loc jsonschema.SchemaLoc) (string, cue.Path, error) {
+				switch loc.Path.String() {
+				case "$defs.foo":
+					return "", cue.ParsePath("#foo"), nil
+				case "$defs.bar":
+					// The reference to #foo above is shadowed here.
+					return "", cue.ParsePath("#nested.#foo"), nil
+				}
+				return "", cue.Path{}, nil
+			},
+		})
+		qt.Assert(t, qt.IsNil(err))
+		return string(formatExtracted(t, expr))
+	}
+	qt.Check(t, qt.Equals(extract(""), `
+_
+
+#foo~(#foo_1): string
+
+#nested: #foo: {
+	x?: #foo_1
+	...
+}
+`[1:]))
+	// TODO: v0.17.0 only accepts the prefix form.
+	qt.Check(t, qt.Equals(extract("v0.17.0"), `
+_
+
+#foo~(#foo_1): string
+
+#nested: #foo: {
+	x?: #foo_1
+	...
+}
+`[1:]))
+}
+
 func TestMapRefExternalRefForInternalSchema(t *testing.T) {
 	t.Parallel()
 	v := cuecontext.New().CompileString(`

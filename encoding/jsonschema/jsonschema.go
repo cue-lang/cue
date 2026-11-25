@@ -41,6 +41,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 // Extract converts JSON Schema data into an equivalent CUE representation.
@@ -94,6 +95,9 @@ func extract(data cue.InstanceOrValue, cfg *Config, extra []ast.Decl) (*ast.File
 	}
 	if !rootIDURI.IsAbs() {
 		return nil, fmt.Errorf("Config.ID %q is not absolute URI", cfg.ID)
+	}
+	if v := cfg.TargetLanguageVersion; v != "" && !semver.IsValid(v) {
+		return nil, fmt.Errorf("invalid Config.TargetLanguageVersion value %q: not a semantic version", v)
 	}
 	targetExp, err := cueexperiment.NewFile(cfg.TargetLanguageVersion)
 	if err != nil {
@@ -330,7 +334,8 @@ type Config struct {
 
 	// TargetLanguageVersion holds the CUE language version that the
 	// extracted syntax must be valid at. The empty string means the
-	// current one. Note that this is unrelated to [Config.DefaultVersion],
+	// current one; any other must be a valid semantic version, such as
+	// "v0.18.0". Note that this is unrelated to [Config.DefaultVersion],
 	// which selects a JSON Schema dialect.
 	//
 	// Set it when writing the result into a module that declares an older

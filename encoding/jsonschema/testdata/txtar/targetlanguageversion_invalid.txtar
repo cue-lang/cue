@@ -1,0 +1,10 @@
+# A target language version must be a semantic version; note the missing "v".
+#targetLanguageVersion: 0.18.0
+-- schema.json --
+{"const": 1}
+-- out/decode-v3/extract --
+ERROR:
+invalid Config.TargetLanguageVersion value "0.18.0": not a semantic version
+-- out/decode-v3-noshare/extract --
+ERROR:
+invalid Config.TargetLanguageVersion value "0.18.0": not a semantic version

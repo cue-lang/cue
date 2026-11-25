@@ -143,11 +143,16 @@ func writeModuleFile(filename string, format func(*modfile.File) ([]byte, error)
 // writeModuleFileIfChanged writes data to filename unless oldData, its current
 // content or nil, holds the same CUE data as written, not as filled in from
 // module.cue. This keeps the file's comments and layout across no-op runs.
+// An existing file is replaced atomically, as one left half written would
+// break every later command in the module.
 func writeModuleFileIfChanged(filename string, oldData, data []byte) error {
-	if oldData != nil && (bytes.Equal(oldData, data) || sameData(oldData, data)) {
+	if oldData == nil {
+		return os.WriteFile(filename, data, 0o666)
+	}
+	if bytes.Equal(oldData, data) || sameData(oldData, data) {
 		return nil
 	}
-	return os.WriteFile(filename, data, 0o666)
+	return writeFileAtomic(filename, data)
 }
 
 // sameData reports whether old holds the same CUE data as new. Optional and

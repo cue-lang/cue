@@ -145,6 +145,7 @@ import (
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/walk"
 )
 
 type structMeta struct {
@@ -179,6 +180,17 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 		}
 	}
 	return false
+}
+
+// hasFields reports whether sm's struct declares any field, including a
+// dynamic field which evaluated to one.
+func (sm *structMeta) hasFields(dynFieldsMap map[*adt.DynamicField][]adt.Feature) bool {
+	for _, decl := range sm.structInfo.Decls {
+		if _, ok := decl.(*adt.Field); ok {
+			return true
+		}
+	}
+	return sm.hasDynamic(dynFieldsMap)
 }
 
 // We need to order a Vertex's StructInfos. To do that, we want a
@@ -225,7 +237,7 @@ func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Featur
 // we look at the vertex's conjuncts. If a conjunct is a binary
 // expression &, then we look up the structMeta for the arguments to
 // the binary expression, and mark them as explicit unification.
-func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
+func analyseStructs(v *adt.Vertex, builder *GraphBuilder, dynFieldsMap map[*adt.DynamicField][]adt.Feature) []structMeta {
 	structInfos := v.Structs
 	// Note that it's important that nodeToStructMetas avoids duplicate entries,
 	// which cause significant slowness for some large configs.
@@ -333,11 +345,35 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 				sMeta.isExplicit = true
 				debug(" now explicit: %v\n", sMeta)
 			}
+			markEmbedded(expr, nodeToStructMetas, dynFieldsMap)
 		}
 		worklist = append(worklist, binExpr.X, binExpr.Y)
 	}
 
 	return structMetas
+}
+
+// markEmbedded marks as explicit the struct literals without fields which
+// expr, an operand of &, embeds, so that they stay. It skips the values of
+// fields, which belong to other vertices, and nested operands of &.
+func markEmbedded(expr adt.Expr, metas map[adt.Node]map[*structMeta]bool, dynFieldsMap map[*adt.DynamicField][]adt.Feature) {
+	v := walk.Visitor{Before: func(n adt.Node) bool {
+		switch x := n.(type) {
+		case *adt.StructLit:
+			for sMeta := range metas[x] {
+				// The map also holds the struct which x is a declaration of.
+				if sMeta.structInfo.StructLit == x && !sMeta.hasFields(dynFieldsMap) {
+					sMeta.isExplicit = true
+				}
+			}
+		case *adt.Field, *adt.LetField, *adt.BulkOptionalField, *adt.DynamicField:
+			return false
+		case *adt.BinaryExpr:
+			return x.Op != adt.AndOp
+		}
+		return true
+	}}
+	v.Elem(expr)
 }
 
 // Find all fields which have been created as a result of successful
@@ -439,7 +475,14 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 
 	builder := NewGraphBuilder(!ctx.Config.SortFields)
 	dynFieldsMap := dynamicFieldsFeatures(v)
-	roots := analyseStructs(v, builder)
+	roots := analyseStructs(v, builder, dynFieldsMap)
+	// A struct without fields adds no edges, and its position need not
+	// match its siblings', so it must not split runs or the frontier, nor
+	// join a batch. An operand of & stays, to keep its batch explicit.
+	roots = slices.DeleteFunc(roots, func(sm structMeta) bool {
+		return !sm.isExplicit && !sm.hasFields(dynFieldsMap)
+	})
+
 	vf := &vertexFeatures{
 		builder:      builder,
 		dynFieldsMap: dynFieldsMap,
@@ -510,7 +553,7 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 			if last := vf.addEdges(previous, root); last != adt.InvalidLabel {
 				next = append(next, last)
 			} else {
-				// A struct without fields leaves previous in place.
+				// A struct adding no fields leaves previous in place.
 				next = append(next, previous...)
 			}
 		}

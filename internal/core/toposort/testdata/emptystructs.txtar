@@ -6,8 +6,6 @@
 // expressions, is ordered as that struct is: its fields get no order
 // against those of the other operand. Structs with fields which it
 // embeds keep their order.
-//
-// index orders the fields of _y before m, which is a bug.
 -- in.cue --
 ref:    _y & {m: 1}
 embed:  {_y} & {m: 1}
@@ -127,9 +125,9 @@ out: {a: 1}
 		y2: 2
 	}
 	index: {
+		m:  1
 		y1: 1
 		y2: 2
-		m:  1
 	}
 	fields: {
 		b: 1
@@ -151,7 +149,7 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
-OrderEdges:   31
+OrderEdges:   30
 -- out/TestTopologicalSort/lexicographical=true --
 {
 	both: {

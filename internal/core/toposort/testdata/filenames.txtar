@@ -6,9 +6,6 @@
 //   - outU and u, embedding _dz from z.cue before _da from a.cue
 //   - outSplit and outWhole, embedding the same fields, which _split
 //     declares across a.cue and z.cue
-//
-// outA and outZ differ in y and w, as do outSplit and outWhole,
-// which is a bug.
 -- a.cue --
 package p
 
@@ -99,15 +96,15 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
-OrderEdges:   144
+OrderEdges:   141
 -- out/TestTopologicalSort/lexicographical=false --
 {
 	outA: {
 		w: {
-			a1: "v"
-			a2: "v"
 			b1: "v"
 			b2: "v"
+			a1: "v"
+			a2: "v"
 		}
 		x: {
 			a1: "v"
@@ -124,8 +121,8 @@ OrderEdges:   144
 			h2: "v"
 		}
 		y: {
-			a: "v"
 			b: "v"
+			a: "v"
 		}
 	}
 	outZ: {
@@ -277,8 +274,8 @@ OrderEdges:   144
 	outSplit: {
 		r: true
 		a: true
-		b: true
 		s: true
+		b: true
 	}
 	outWhole: {
 		r: true

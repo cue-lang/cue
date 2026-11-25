@@ -39,6 +39,15 @@ cmp alias.cue alias-unformatted.cue
 ! exec cue fmt --files --language-version v0.17.0 -
 stderr 'cannot combine --files with --language-version'
 
+# The flag applies only to a loose file loaded with a package of a module,
+# yet cue fmt formats both at the module's version.
+cd newmod
+! exec cue fmt --language-version v0.17.0 . ../alias.cue
+stderr 'old-style alias syntax \(=\) is not allowed as of language version v0.18.0'
+cmp ../alias.cue ../alias-unformatted.cue
+cmp n.cue ../expect/newmod-n
+cd ..
+
 # A directory holding a loose file and a nested module is rejected at once.
 ! exec cue fmt --files --language-version v0.17.0 dir
 stderr 'cannot combine --files with --language-version'
@@ -121,6 +130,17 @@ module: "nested.test"
 language: version: "v0.16.0"
 -- dir/nested/n.cue --
 n: 1
+-- newmod/cue.mod/module.cue --
+module: "newmod.test"
+language: version: "v0.18.0"
+-- newmod/n.cue --
+package n
+
+n~(X):    {a: 1, b: X.a}
+-- expect/newmod-n --
+package n
+
+n~(X): {a: 1, b: X.a}
 -- expect/import-current --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 "x-y"~(_t0)?: _

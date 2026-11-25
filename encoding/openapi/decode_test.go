@@ -16,6 +16,7 @@ package openapi_test
 
 import (
 	"bytes"
+	"fmt"
 	"io/fs"
 	"path"
 	"path/filepath"
@@ -152,5 +153,22 @@ func TestDecode(t *testing.T) {
 		})
 		return nil
 	})
+	qt.Assert(t, qt.IsNil(err))
+}
+
+// TestExtractNilConfig checks that [openapi.Extract] accepts a nil config,
+// as [openapi.ExtractV2] and [openapi.Generate] do.
+func TestExtractNilConfig(t *testing.T) {
+	t.Parallel()
+	v := cuecontext.New().CompileString(`
+openapi: "3.0.0"
+info: {title: "t", version: "1"}
+components: schemas: Foo: type: "string"
+`)
+	// TODO: a nil config panics.
+	defer func() {
+		qt.Assert(t, qt.Matches(fmt.Sprint(recover()), `.*nil pointer dereference`))
+	}()
+	_, err := openapi.Extract(v, nil)
 	qt.Assert(t, qt.IsNil(err))
 }

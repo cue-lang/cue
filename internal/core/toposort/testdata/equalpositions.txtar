@@ -1,0 +1,161 @@
+// Structs reached through one reference keep their declaration order,
+// also beyond the 12 roots up to which the sort is an insertion sort.
+//
+// Structs embedded through further references keep their embedding
+// order, which is the reverse of their declaration order here, so
+// outRefs.x orders its fields as refs.x does.
+//
+// out.x is scrambled, outRefs.x starts with m, and both it and refs.x
+// end with i1 rather than a1, which are bugs.
+-- in.cue --
+out: s & {}
+s: x: {
+	{("p1"): "v"}
+	{("p2"): "v"}
+	{("p3"): "v"}
+	{("p4"): "v"}
+	{("p5"): "v"}
+	{("p6"): "v"}
+	{("p7"): "v"}
+	{("p8"): "v"}
+	{("p9"): "v"}
+	{("q1"): "v"}
+	{("q2"): "v"}
+	{("q3"): "v"}
+	{("q4"): "v"}
+	{("q5"): "v"}
+	{q6: "v"}
+}
+
+outRefs: refs & {}
+refs: x: {
+	_c
+	{("m"): "v"}
+	_b
+	_a
+}
+_a: {_inner, ("a1"): "v"}
+_inner: {("i1"): "v"}
+_b: {("b1"): "v", b2: "v"}
+_c: {c1: "v", ("c2"): "v"}
+-- out/TestTopologicalSort/lexicographical=false/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+OrderEdges:   47
+-- out/TestTopologicalSort/lexicographical=false --
+{
+	out: x: {
+		q6: "v"
+		p8: "v"
+		q2: "v"
+		p3: "v"
+		p4: "v"
+		p5: "v"
+		p6: "v"
+		p2: "v"
+		p9: "v"
+		p7: "v"
+		q1: "v"
+		p1: "v"
+		q3: "v"
+		q4: "v"
+		q5: "v"
+	}
+	s: x: {
+		p1: "v"
+		p2: "v"
+		p3: "v"
+		p4: "v"
+		p5: "v"
+		p6: "v"
+		p7: "v"
+		p8: "v"
+		p9: "v"
+		q1: "v"
+		q2: "v"
+		q3: "v"
+		q4: "v"
+		q5: "v"
+		q6: "v"
+	}
+	outRefs: x: {
+		m:  "v"
+		c1: "v"
+		c2: "v"
+		b1: "v"
+		b2: "v"
+		a1: "v"
+		i1: "v"
+	}
+	refs: x: {
+		c1: "v"
+		c2: "v"
+		m:  "v"
+		b1: "v"
+		b2: "v"
+		a1: "v"
+		i1: "v"
+	}
+}
+-- out/TestTopologicalSort/lexicographical=true --
+{
+	out: x: {
+		p1: "v"
+		p2: "v"
+		p3: "v"
+		p4: "v"
+		p5: "v"
+		p6: "v"
+		p7: "v"
+		p8: "v"
+		p9: "v"
+		q1: "v"
+		q2: "v"
+		q3: "v"
+		q4: "v"
+		q5: "v"
+		q6: "v"
+	}
+	outRefs: x: {
+		a1: "v"
+		b1: "v"
+		b2: "v"
+		c1: "v"
+		c2: "v"
+		i1: "v"
+		m:  "v"
+	}
+	refs: x: {
+		a1: "v"
+		b1: "v"
+		b2: "v"
+		c1: "v"
+		c2: "v"
+		i1: "v"
+		m:  "v"
+	}
+	s: x: {
+		p1: "v"
+		p2: "v"
+		p3: "v"
+		p4: "v"
+		p5: "v"
+		p6: "v"
+		p7: "v"
+		p8: "v"
+		p9: "v"
+		q1: "v"
+		q2: "v"
+		q3: "v"
+		q4: "v"
+		q5: "v"
+		q6: "v"
+	}
+}

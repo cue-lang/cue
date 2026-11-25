@@ -39,12 +39,10 @@ cmp alias.cue alias-unformatted.cue
 ! exec cue fmt --files --language-version v0.17.0 -
 stderr 'cannot combine --files with --language-version'
 
-# The flag applies only to a loose file loaded with a package of a module,
-# yet cue fmt formats both at the module's version.
+# The flag applies only to a loose file loaded with a package of a module.
 cd newmod
-! exec cue fmt --language-version v0.17.0 . ../alias.cue
-stderr 'old-style alias syntax \(=\) is not allowed as of language version v0.18.0'
-cmp ../alias.cue ../alias-unformatted.cue
+exec cue fmt --language-version v0.17.0 . ../alias.cue
+cmp ../alias.cue ../expect/alias
 cmp n.cue ../expect/newmod-n
 cd ..
 

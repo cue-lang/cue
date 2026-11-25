@@ -99,12 +99,14 @@ Examples:
 					if err := inst.Err; err != nil {
 						return err
 					}
-					version := cmp.Or(inst.LanguageVersion(), langVersion)
-					for _, file := range inst.BuildFiles {
+					for i, file := range inst.BuildFiles {
 						shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
 						if !shouldFormat {
 							continue
 						}
+						// Format each file at the version it was loaded at.
+						exps := inst.Files[i].Experiment()
+						version := cmp.Or(exps.LanguageVersion(), inst.LanguageVersion(), langVersion)
 
 						wasModified, err := formatFile(file, formatOpts, version, doDiff, check, cmd)
 						if err != nil {

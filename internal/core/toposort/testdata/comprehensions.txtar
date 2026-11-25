@@ -1,0 +1,98 @@
+// A struct nested in a conditional appears in fewer iterations than its
+// sibling fields, which keep their iteration order whether they are
+// declared in the body itself or in structs embedded in it.
+//
+// fields loses its iteration order, which is a bug.
+-- in.cue --
+fields: {
+	for k in ["z", "c", "b"] {
+		if k == "z" {"\(k)x": 1}
+		"\(k)1": 1
+		"\(k)2": 1
+	}
+}
+structs: {
+	for k in ["z", "c", "b"] {
+		if k == "z" {"\(k)x": 1}
+		{"\(k)1": 1}
+		{"\(k)2": 1}
+	}
+}
+nested: {
+	for k in ["z", "c", "b"] {
+		{if k == "z" {"\(k)x": 1}}
+		"\(k)1": 1
+		"\(k)2": 1
+	}
+}
+-- out/TestTopologicalSort/lexicographical=false/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+OrderEdges:   16
+-- out/TestTopologicalSort/lexicographical=false --
+{
+	fields: {
+		b1: 1
+		b2: 1
+		c1: 1
+		c2: 1
+		zx: 1
+		z1: 1
+		z2: 1
+	}
+	structs: {
+		zx: 1
+		z1: 1
+		z2: 1
+		c1: 1
+		c2: 1
+		b1: 1
+		b2: 1
+	}
+	nested: {
+		zx: 1
+		z1: 1
+		z2: 1
+		c1: 1
+		c2: 1
+		b1: 1
+		b2: 1
+	}
+}
+-- out/TestTopologicalSort/lexicographical=true --
+{
+	fields: {
+		b1: 1
+		b2: 1
+		c1: 1
+		c2: 1
+		z1: 1
+		z2: 1
+		zx: 1
+	}
+	nested: {
+		b1: 1
+		b2: 1
+		c1: 1
+		c2: 1
+		z1: 1
+		z2: 1
+		zx: 1
+	}
+	structs: {
+		b1: 1
+		b2: 1
+		c1: 1
+		c2: 1
+		z1: 1
+		z2: 1
+		zx: 1
+	}
+}

@@ -114,6 +114,8 @@ func extract(data cue.InstanceOrValue, cfg *Config, extra []ast.Decl) (*ast.File
 		return nil, d.errs
 	}
 	f.Decls = append(f.Decls, extra...)
+	// Sanitizing may introduce aliases, whose form depends on the version.
+	f.SetExperiments(targetExp)
 	if err := astutil.SanitizeFiles([]*ast.File{f}); err != nil {
 		return nil, fmt.Errorf("cannot sanitize jsonschema resulting syntax: %v", err)
 	}

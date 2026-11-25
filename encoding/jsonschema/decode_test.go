@@ -488,11 +488,10 @@ _
 	...
 }
 `[1:]))
-	// TODO: v0.17.0 only accepts the prefix form.
 	qt.Check(t, qt.Equals(extract("v0.17.0"), `
 _
 
-#foo~(#foo_1): string
+#foo_1=#foo: string
 
 #nested: #foo: {
 	x?: #foo_1

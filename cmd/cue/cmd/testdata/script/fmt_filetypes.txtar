@@ -21,6 +21,10 @@ exec cue fmt --diff input.json
 exec cue fmt --diff cue: input.json
 cmp stdout input.json.diff
 
+# An interpreted file is formatted as its source, not as the CUE it generates.
+exec cue fmt --diff openapi+cue: openapi.json
+cmp stdout openapi.json.diff
+
 # TODO(mvdan): we should probably fail rather than doing nothing.
 exec cue fmt --diff input.yaml
 ! stdout .
@@ -57,6 +61,16 @@ diff input.json.orig input.json
 @@ -1,1 +1,1 @@
 -{"foo":     "bar"}
 +{"foo": "bar"}
+
+-- openapi.json --
+{"openapi":     "3.0.0", "info": {"title": "Test", "version": "v1"}, "components": {"schemas": {"Foo": {"type": "string"}}}}
+-- openapi.json.diff --
+diff openapi.json.orig openapi.json
+--- openapi.json.orig
++++ openapi.json
+@@ -1,1 +1,1 @@
+-{"openapi":     "3.0.0", "info": {"title": "Test", "version": "v1"}, "components": {"schemas": {"Foo": {"type": "string"}}}}
++{"openapi": "3.0.0", "info": {"title": "Test", "version": "v1"}, "components": {"schemas": {"Foo": {"type": "string"}}}}
 
 -- input.yaml --
 foo:

@@ -135,6 +135,19 @@ func (c *OpContext) rootedTaskNode() *nodeContext {
 	return nil
 }
 
+// scheduleDeferred schedules a [handleDeferred] task for arc, unless n has
+// one pending already: a comprehension may read the same node on each
+// iteration.
+func (n *nodeContext) scheduleDeferred(arc *Vertex) {
+	if t := n.deferred[arc]; t != nil && t.state == taskREADY && !t.defunct {
+		return
+	}
+	if n.deferred == nil {
+		n.deferred = make(map[*Vertex]*task)
+	}
+	n.deferred[arc] = n.scheduleTask(handleDeferred, nil, arc, CloseInfo{})
+}
+
 func (p *taskContext) pushTask(t *task) {
 	p.stack = append(p.stack, t)
 }
@@ -271,6 +284,10 @@ type scheduler struct {
 	// The list only contains tasks that are associated with this node.
 	// TODO: rename to queue and taskPos to nextQueueIndex.
 	tasks []*task
+
+	// deferred holds the latest [handleDeferred] task scheduled for each
+	// node, sparing a scan of tasks; see [nodeContext.scheduleDeferred].
+	deferred map[*Vertex]*task
 
 	// parentTasks are tasks that originate on a parent node but contribute
 	// fields to this node (e.g. a pushed-down comprehension on the parent
@@ -428,6 +445,7 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 	if s.isPendingArc() {
 		if mode == finalize {
 			s.tasks = s.tasks[:0]
+			s.deferred = nil
 		}
 		// The parent tasks above may have been the last that could declare
 		// this field, so let stateCompletions settle it now rather than

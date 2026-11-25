@@ -1,0 +1,41 @@
+# Tests comprehensions whose guard reads a field of a let before the let is
+# complete. Such a read schedules a task to complete the field: once for each
+# let which every iteration reads, rather than once per iteration, and once
+# per iteration when each has a let of its own.
+-- in.cue --
+import "list"
+
+sameLet: {
+	x: {for i in list.Range(0, 2000, 1) if K.w > 0 {"\(i)": i}}
+	n: len(x) @test(eq, 2000)
+	let K = {w: 1 & >0}
+}
+twoLets: {
+	x: {for i in list.Range(0, 2000, 1) if K.w + J.w > 0 {"\(i)": i}}
+	n: len(x) @test(eq, 2000)
+	let K = {w: 1 & >0}
+	let J = {w: 1 & >0}
+}
+ownLet: {
+	x: [for i in list.Range(0, 2000, 1) let L = {v: 1 & >0, out: v + 1} if L.out < 0 {i}] @test(eq, [])
+}
+// The error of a let which every iteration reads is still reported.
+sameLetFails: {
+	x: {for i in list.Range(0, 20, 1) if K.w + J.w > 0 {"\(i)": i}} @test(err, code=eval, contains="out of bound")
+	let K = {w: 1 & >0}
+	let J = {w: 1 & >1}
+}
+-- out/errors.txt --
+[eval] sameLetFails.J.w: invalid value 1 (out of bound >1):
+    ./in.cue:21:18
+    ./in.cue:21:14
+-- out/eval/stats --
+Leaks:  8020
+Freed:  4041
+Reused: 4013
+Allocs: 8048
+Retain: 0
+
+Unifications: 12061
+Conjuncts:    16096
+Disjuncts:    0

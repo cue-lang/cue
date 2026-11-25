@@ -336,6 +336,8 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 	ds.needs = ss.needs
 	ds.provided = ss.provided
 	ds.counters = ss.counters
+	// deferred is not carried over: a disjunct scheduling one more
+	// [handleDeferred] task for a node costs less than copying the map.
 
 	ss.blocking = ss.blocking[:0]
 

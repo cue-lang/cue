@@ -1721,7 +1721,7 @@ func (c *OpContext) evalStateRef(v Expr, state Flags) (result Value, ci CloseInf
 				// created it.
 				if arc.Internal() && !arc.IsDynamic && !allTasksFinished(s) {
 					if n := c.rootedTaskNode(); n != nil {
-						n.scheduleTask(handleDeferred, nil, arc, CloseInfo{})
+						n.scheduleDeferred(arc)
 					}
 				}
 

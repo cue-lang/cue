@@ -1,0 +1,79 @@
+# Tests comprehensions whose guard reads a field of a let before the let is
+# complete. Such a read schedules a task to complete the field: once for each
+# let which every iteration reads, rather than once per iteration, and once
+# per iteration when each has a let of its own.
+-- in.cue --
+import "list"
+
+sameLet: {
+	x: {for i in list.Range(0, 2000, 1) if K.w > 0 {"\(i)": i}}
+	n: len(x)
+	let K = {w: 1 & >0}
+}
+twoLets: {
+	x: {for i in list.Range(0, 2000, 1) if K.w + J.w > 0 {"\(i)": i}}
+	n: len(x)
+	let K = {w: 1 & >0}
+	let J = {w: 1 & >0}
+}
+ownLet: {
+	x: [for i in list.Range(0, 2000, 1) let L = {v: 1 & >0, out: v + 1} if L.out < 0 {i}]
+}
+// The error of a let which every iteration reads is still reported.
+sameLetFails: {
+	x: {for i in list.Range(0, 20, 1) if K.w + J.w > 0 {"\(i)": i}}
+	let K = {w: 1 & >0}
+	let J = {w: 1 & >1}
+}
+-- out/compile --
+--- in.cue
+{
+  sameLet: {
+    x: {
+      for _, i in 〈import;list〉.Range(0, 2000, 1) if (〈2;let K#1〉.w > 0) {
+        "\(〈1;i〉)": 〈1;i〉
+      }
+    }
+    n: len(〈0;x〉)
+    let K#1 = {
+      w: (1 & >0)
+    }
+  }
+  twoLets: {
+    x: {
+      for _, i in 〈import;list〉.Range(0, 2000, 1) if ((〈2;let K#2〉.w + 〈2;let J#3〉.w) > 0) {
+        "\(〈1;i〉)": 〈1;i〉
+      }
+    }
+    n: len(〈0;x〉)
+    let K#2 = {
+      w: (1 & >0)
+    }
+    let J#3 = {
+      w: (1 & >0)
+    }
+  }
+  ownLet: {
+    x: [
+      for _, i in 〈import;list〉.Range(0, 2000, 1) let L = {
+        v: (1 & >0)
+        out: (〈0;v〉 + 1)
+      } if (〈0;L〉.out < 0) {
+        〈2;i〉
+      },
+    ]
+  }
+  sameLetFails: {
+    x: {
+      for _, i in 〈import;list〉.Range(0, 20, 1) if ((〈2;let K#4〉.w + 〈2;let J#5〉.w) > 0) {
+        "\(〈1;i〉)": 〈1;i〉
+      }
+    }
+    let K#4 = {
+      w: (1 & >0)
+    }
+    let J#5 = {
+      w: (1 & >1)
+    }
+  }
+}

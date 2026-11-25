@@ -125,9 +125,10 @@ package toposort
 // for o, the StructInfos corresponding to a, b and c will all be
 // grouped together in a single batch and considered to be explicitly
 // unified. Also, structInfos that correspond to the same position
-// (including no position) will be treated as explicity unified, and
-// so no weight will be given to their relative position within the
-// Vertex's slice of StructInfos.
+// (including no position) will be treated as explicity unified.
+// Those with dynamic fields follow such a batch, ordered by the
+// further references which led to them and then by declaration, not
+// by their position within the Vertex's slice of StructInfos.
 //
 // TODO: Switch if possible to finding if a struct has been unified
 // with a definition and as much as possible taking order from the
@@ -136,6 +137,7 @@ package toposort
 // thus don't end up dealing with a cycle.
 
 import (
+	"cmp"
 	"fmt"
 	"maps"
 	"slices"
@@ -149,6 +151,11 @@ type structMeta struct {
 	structInfo adt.StructInfo
 	pos        token.Pos
 
+	// declPos is pos before following any reference, and refs holds the
+	// references followed, last one first, as kept for cycle detection.
+	declPos token.Pos
+	refs    *adt.RefNode
+
 	// Should this struct be considered to be part of an explicit
 	// unification (e.g. x & y)?
 	isExplicit bool
@@ -161,6 +168,9 @@ func (sMeta *structMeta) String() string {
 }
 
 func (sm *structMeta) hasDynamic(dynFieldsMap map[*adt.DynamicField][]adt.Feature) bool {
+	if len(dynFieldsMap) == 0 {
+		return false // sorting calls this per comparison
+	}
 	for _, decl := range sm.structInfo.Decls {
 		if dynField, ok := decl.(*adt.DynamicField); ok {
 			if _, found := dynFieldsMap[dynField]; found {
@@ -243,6 +253,7 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 		metaIdx++
 		sMeta.structInfo = s
 		sMeta.pos = adt.Pos(sl)
+		sMeta.declPos = sMeta.pos
 
 		structMetaMap(sl)[sMeta] = true
 		for _, decl := range sl.Decls {
@@ -263,13 +274,17 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) []structMeta {
 			if !found {
 				continue
 			}
+			refs := c.CloseInfo.CycleInfo.Refs
+			for sMeta := range sMetas {
+				sMeta.refs = refs
+			}
 			if src := field.Source(); src != nil {
 				pos := src.Pos()
 				for sMeta := range sMetas {
 					sMeta.pos = pos
+					sMeta.declPos = pos
 				}
 			}
-			refs := c.CloseInfo.CycleInfo.Refs
 			if refs == nil {
 				continue
 			}
@@ -380,12 +395,43 @@ func (vf *vertexFeatures) compareStructMeta(a, b structMeta) int {
 	bHasDyn := b.hasDynamic(vf.dynFieldsMap)
 	switch {
 	case aHasDyn == bHasDyn:
-		return 0
+		return compareRefs(a, b)
 	case aHasDyn:
 		return 1 // gather dynamic fields at the end
 	default:
 		return -1
 	}
+}
+
+// compareRefs compares the positions of the references followed to reach
+// a and b, first to last, and then those of their declarations, as
+// [slices.Compare] would. The roots share the first position.
+func compareRefs(a, b structMeta) int {
+	aRefs, bRefs := a.refs, b.refs
+	var aLen, bLen int32
+	if aRefs != nil {
+		aLen = aRefs.Len
+	}
+	if bRefs != nil {
+		bLen = bRefs.Len
+	}
+	// Chains are linked last reference first, so align them, keeping the
+	// position which follows the shorter chain's length in each.
+	aPos, bPos := a.declPos, b.declPos
+	for range aLen - bLen {
+		aPos, aRefs = adt.Pos(aRefs.Ref), aRefs.Next
+	}
+	for range bLen - aLen {
+		bPos, bRefs = adt.Pos(bRefs.Ref), bRefs.Next
+	}
+	// Each earlier difference overrides the later ones.
+	c := aPos.Compare(bPos)
+	for ; aRefs != bRefs; aRefs, bRefs = aRefs.Next, bRefs.Next {
+		if c1 := adt.Pos(aRefs.Ref).Compare(adt.Pos(bRefs.Ref)); c1 != 0 {
+			c = c1
+		}
+	}
+	return cmp.Or(c, cmp.Compare(aLen, bLen))
 }
 
 func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
@@ -394,14 +440,15 @@ func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	builder := NewGraphBuilder(!ctx.Config.SortFields)
 	dynFieldsMap := dynamicFieldsFeatures(v)
 	roots := analyseStructs(v, builder)
-
 	vf := &vertexFeatures{
 		builder:      builder,
 		dynFieldsMap: dynFieldsMap,
 		stats:        ctx.Stats(),
 	}
 
-	slices.SortFunc(roots, vf.compareStructMeta)
+	// Ties left are roots no position tells apart, such as values compiled
+	// separately and unified through the API; keep them in conjunct order.
+	slices.SortStableFunc(roots, vf.compareStructMeta)
 	debug("roots: %v\n", roots)
 
 	var batches structMetaBatches

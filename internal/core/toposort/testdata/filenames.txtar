@@ -4,8 +4,6 @@
 //     before and after main.cue
 //   - outST and outTS, referring to s and t from swapped files
 //   - outU and u, embedding _dz from z.cue before _da from a.cue
-//
-// The first two pairs differ, which is a bug.
 -- a.cue --
 package p
 
@@ -92,9 +90,9 @@ OrderEdges:   113
 		e1: "v"
 		f1: "v"
 		g1: "v"
-		d3: "v"
 		d1: "v"
 		d2: "v"
+		d3: "v"
 		h1: "v"
 		h2: "v"
 	}
@@ -108,9 +106,9 @@ OrderEdges:   113
 		g1: "v"
 		d1: "v"
 		d2: "v"
+		d3: "v"
 		h1: "v"
 		h2: "v"
-		d3: "v"
 	}
 	outU: x: {
 		dz1: "v"
@@ -170,13 +168,13 @@ OrderEdges:   113
 		g1: "v"
 		d1: "v"
 		d2: "v"
+		d3: "v"
 		h1: "v"
 		h2: "v"
-		d3: "v"
 		t1: "v"
 		t4: "v"
-		t3: "v"
 		t2: "v"
+		t3: "v"
 	}
 	outTS: x: {
 		a1: "v"
@@ -188,9 +186,9 @@ OrderEdges:   113
 		g1: "v"
 		d1: "v"
 		d2: "v"
+		d3: "v"
 		h1: "v"
 		h2: "v"
-		d3: "v"
 		t1: "v"
 		t4: "v"
 		t2: "v"

@@ -15,7 +15,10 @@
 package toposort_test
 
 import (
+	"bytes"
 	"fmt"
+	"math/rand/v2"
+	"slices"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -59,27 +62,54 @@ func TestTopologicalSort(t *testing.T) {
 					ShowAttributes:  true,
 				}
 
+				render := func(ctx *adt.OpContext) []byte {
+					expr, err := evalWithOptions.Value(ctx, inst.ID(), v)
+					if err != nil {
+						t.Fatal(err)
+					}
+					b, fmtErr := format.Node(expr)
+					if fmtErr != nil {
+						t.Fatal(fmtErr)
+					}
+					return b
+				}
+
 				// A fresh context, so the stats cover only the export.
 				ctx := adt.NewContext(run, v)
-				expr, err := evalWithOptions.Value(ctx, inst.ID(), v)
-				if err != nil {
-					t.Fatal(err)
-				}
+				b := render(ctx)
 				if !lexico {
 					// Record the stats once, for the mode whose graph
 					// keeps the edges it requests.
 					fmt.Fprintln(t.WriterFallback("stats"), ctx.Stats())
 				}
+				_, _ = t.Write(b)
 
-				{
-					b, err := format.Node(expr)
-					if err != nil {
-						t.Fatal(err)
-					}
-					_, _ = t.Write(b)
+				// The order of fields must not depend on the order in which
+				// the evaluator added structs to a vertex. Reversing swaps
+				// every pair, which a shuffle may not; a shuffle also covers
+				// the other permutations.
+				permuteStructs(v, slices.Reverse)
+				if got := render(adt.NewContext(run, v)); !bytes.Equal(got, b) {
+					t.Errorf("field order differs with the structs reversed:\n%s", got)
+				}
+				seed := rand.Uint64()
+				rng := rand.New(rand.NewPCG(seed, 0))
+				permuteStructs(v, func(s []adt.StructInfo) {
+					rng.Shuffle(len(s), func(i, j int) { s[i], s[j] = s[j], s[i] })
+				})
+				if got := render(adt.NewContext(run, v)); !bytes.Equal(got, b) {
+					t.Errorf("field order differs with the structs shuffled by seed %d:\n%s", seed, got)
 				}
 			})
 		})
+	}
+}
+
+// permuteStructs applies permute to [adt.Vertex.Structs] in v and its descendants.
+func permuteStructs(v *adt.Vertex, permute func([]adt.StructInfo)) {
+	permute(v.Structs)
+	for _, arc := range v.Arcs {
+		permuteStructs(arc, permute)
 	}
 }
 

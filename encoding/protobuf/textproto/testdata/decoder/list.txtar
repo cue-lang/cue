@@ -3,6 +3,7 @@
 -- list.cue --
 empty1: [...int]
 empty2: [...int]
+empty3: [...int]
 
 int1: [...int]
 int2: [...int]
@@ -21,6 +22,8 @@ msg3: [...#Msg]
 empty1: []
 empty2: [# foo
 ]
+# doc comment
+empty3: []
 
 int1: [1, 2]
 int2: [1 2]  # omitting commas okay
@@ -50,6 +53,9 @@ empty1: []
 empty2: [
 	// foo
 ]
+
+// doc comment
+
 int1: [1, 2]
 int2: [1, 2] // omitting commas okay
 int3: [

@@ -365,6 +365,25 @@ func TestDecode(t *testing.T) {
 		newDst: func() any { return new(any) },
 		want:   []any{},
 	}, {
+		value:  `{for k in ["z"] {(k): 1}, a: 2}`,
+		newDst: func() any { return new(any) },
+		want:   map[string]any{"a": int64(2), "z": int64(1)},
+	}, {
+		// Errors are reported in the order of the fields: the comprehension's
+		// sorts first, although it is added last.
+		value:  `{for k in ["z"] {(k): int}, a: int}`,
+		newDst: func() any { return new(any) },
+		err:    "z: cannot convert non-concrete value int (and 1 more errors)",
+	}, {
+		value:  `{x: {for k in ["z"] {(k): int}, a: int}}`,
+		newDst: func() any { return new(any) },
+		err:    "x.z: cannot convert non-concrete value int (and 1 more errors)",
+	}, {
+		// Only regular fields are decoded, including embedded and pattern ones.
+		value:  `{a: 1, _h: 2, #D: 3, o?: 4, [=~"^p"]: 5, p1: _, {e: 6}}`,
+		newDst: func() any { return new(any) },
+		want:   map[string]any{"a": int64(1), "p1": int64(5), "e": int64(6)},
+	}, {
 		// large integer which doesn't fit into an int32 or int on 32-bit platforms
 		value:  `8000000000`,
 		newDst: func() any { return new(any) },

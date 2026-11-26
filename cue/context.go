@@ -395,6 +395,17 @@ func NilIsAny(isAny bool) EncodeOption {
 func (c *Context) Encode(x any, option ...EncodeOption) Value {
 	switch v := x.(type) {
 	case adt.Value:
+		if adt.IsConcreteScalar(v) {
+			// A concrete scalar needs no evaluation, which would cost a new
+			// OpContext; builtins encode each of their arguments.
+			n := exprToVertex(v)
+			n.BaseValue = v
+			return newVertexRoot(c.runtime(), nil, n)
+		}
+		if w, ok := v.(*adt.Vertex); ok && w.IsFinal() {
+			// Nor does a finalized vertex, such as a builtin's argument.
+			return makeValue(c.runtime(), w, nil)
+		}
 		return newValueRoot(c.runtime(), c.ctx(), v)
 	}
 	var options encodeOptions

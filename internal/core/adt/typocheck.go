@@ -762,8 +762,8 @@ func (n *nodeContext) checkTypos() {
 		return
 	}
 
-	baseRequired := getReqSets(n)
-	if len(baseRequired) == 0 {
+	required := getReqSets(n)
+	if len(required) == 0 {
 		return
 	}
 
@@ -773,6 +773,9 @@ func (n *nodeContext) checkTypos() {
 	if i := slices.IndexFunc(arcs, n.failsDisjunct); i >= 0 {
 		arcs = arcs[:i+1]
 	}
+
+	// This does not depend on the arc.
+	n.removeEllipsisSets(required)
 
 	var err *Bottom
 	for _, a := range arcs {
@@ -787,19 +790,6 @@ func (n *nodeContext) checkTypos() {
 			// validators. In this case, the closedness will already have been
 			// checked and the nodeContext may already be nil.
 			continue
-		}
-
-		required := baseRequired
-		// If the field has its own rules, apply them as a delta.
-		// This requires a copy to not pollute the base for the next iteration.
-		if len(na.replaceIDs) > 0 {
-			required = slices.Clone(required)
-		}
-
-		for a := range required.elemPtrs() {
-			if id, embed := hasParentEllipsis(n, a, n.conjunctInfo); id != 0 {
-				n.removeSet(a, embed, n.scopeDepth)
-			}
 		}
 
 		// TODO(perf): somehow prevent error generation of recursive structures,
@@ -1355,16 +1345,10 @@ func (n *nodeContext) ellipsisOpensAll() bool {
 	}) {
 		return true
 	}
-	// As in checkTypos, but without marking the sets shared with the arcs.
-	// The copy rarely has more than a few sets, and it stays on the stack
-	// as long as it is not ranged over via elemPtrs.
+	// Mark a small copy on the stack, not the sets shared with the arcs.
 	var buf [8]reqSet
 	required = append(buf[:0], required...)
-	for i := range required {
-		if id, embed := hasParentEllipsis(n, &required[i], n.conjunctInfo); id != 0 {
-			n.removeSet(&required[i], embed, n.scopeDepth)
-		}
-	}
+	n.removeEllipsisSets(required)
 	// The zero conjunctInfo stands for a field added from outside of any
 	// definition or embedding.
 	return n.hasEvidenceForAll(required, []conjunctInfo{{}}, n.scopeDepth)
@@ -1506,6 +1490,16 @@ func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) (id,
 		}
 	}
 	return id, embed
+}
+
+// removeEllipsisSets marks the sets in a opened by an ellipsis of n.
+// It avoids elemPtrs, which would move a stack copy of a to the heap.
+func (n *nodeContext) removeEllipsisSets(a reqSets) {
+	for i := range a {
+		if id, embed := hasParentEllipsis(n, &a[i], n.conjunctInfo); id != 0 {
+			n.removeSet(&a[i], embed, n.scopeDepth)
+		}
+	}
 }
 
 // removeSet marks a as removed by an ellipsis from the embedding scope embed,

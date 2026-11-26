@@ -11,6 +11,12 @@ int3: [...int]
 string1: [...string]
 
 float1: [...number]
+
+msg1: [...#Msg]
+msg2: [...#Msg]
+msg3: [...#Msg]
+
+#Msg: a?: int
 -- input.textproto --
 empty1: []
 empty2: [# foo
@@ -29,6 +35,16 @@ string1: [
 ]
 
 float1: [ 1e+2 1. 0]
+
+msg1: []
+msg2: [{a: 1}, <a: 2>, {}]
+msg3: [ # c0
+    # c1
+    {a: 1}, # c2
+    # c3
+    <a: 2> # c4
+    # c5
+] # c6
 -- out/decode --
 empty1: []
 empty2: [
@@ -45,3 +61,9 @@ string1: [
 	"b",
 ]
 float1: [1e+2, 1.0, 0]
+msg1:   [{}]
+msg2:   [{}]
+msg3: [{
+
+	// c5
+} // c6]

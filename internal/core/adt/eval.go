@@ -365,25 +365,25 @@ type nodeContextState struct {
 	// node after a corresponding task has been completed.
 	toComplete bool
 
-	// tryBody, when non-nil, marks this node as a try clause body currently
-	// being finalized, which [scheduler.inTryBody] also relies on.
-	// See [TryClause.yield].
-	tryBody *tryBody
-
 	// embedClosedness is the strongest closing among the values embedded
 	// through a spread operator, which __reclose applies to its result.
 	// Use embedClosed to update it.
 	embedClosedness Closing
-
-	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
-	// progress.
-	isCompleting int
 
 	// runMode keeps track of what runMode a disjunct should run as. This is
 	// relevant for nested disjunctions, like the 2|3 in (1 | (2|3)) & (1 | 2),
 	// where the nested disjunction should _not_ be considered as final, as
 	// there is still a disjunction at a higher level to be processed.
 	runMode runMode
+
+	// tryBody, when non-nil, marks this node as a try clause body currently
+	// being finalized, which [scheduler.inTryBody] also relies on.
+	// See [TryClause.yield].
+	tryBody *tryBody
+
+	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
+	// progress.
+	isCompleting int
 
 	// evalDept is a number that is assigned when evaluating arcs and is set to
 	// detect structural cycles. This value may be temporarily altered when a

@@ -1402,26 +1402,35 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		}
 	}
 
-	// features are topologically sorted.
-	// TODO(sort): make sort order part of the evaluator and eliminate this.
-	features := export.VertexFeatures(ctx, obj)
-
+	// skip reports whether to leave out the field with label f.
+	skip := func(f adt.Feature) bool {
+		return f.IsLet() ||
+			(f.IsDef() && (o.omitDefinitions || o.concrete)) ||
+			(f.IsHidden() && o.omitHidden)
+	}
 	arcs := make([]*adt.Vertex, 0, len(obj.Arcs))
+	if o.unordered {
+		// Without sorting, the arcs give the same fields in their own order.
+		for _, arc := range obj.Arcs {
+			if !skip(arc.Label) {
+				arcs = append(arcs, arc)
+			}
+		}
+	} else {
+		// features are topologically sorted.
+		// TODO(sort): make sort order part of the evaluator and eliminate this.
+		for _, f := range export.VertexFeatures(ctx, obj) {
+			if skip(f) {
+				continue
+			}
+			if arc := obj.LookupRaw(f); arc != nil {
+				arcs = append(arcs, arc)
+			}
+		}
+	}
 
-	for _, f := range features {
-		if f.IsLet() {
-			continue
-		}
-		if f.IsDef() && (o.omitDefinitions || o.concrete) {
-			continue
-		}
-		if f.IsHidden() && o.omitHidden {
-			continue
-		}
-		arc := obj.LookupRaw(f)
-		if arc == nil {
-			continue
-		}
+	kept := arcs[:0]
+	for _, arc := range arcs {
 		switch arc.ArcType {
 		case adt.ArcOptional:
 			if o.omitOptional {
@@ -1433,7 +1442,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 			// it avoids hiding errors in required fields.
 			if o.omitOptional || o.concrete || o.final {
 				arc = &adt.Vertex{
-					Label:     f,
+					Label:     arc.Label,
 					Parent:    arc.Parent,
 					Conjuncts: arc.Conjuncts,
 					BaseValue: adt.NewRequiredNotPresentError(ctx, arc),
@@ -1441,13 +1450,13 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 				arc.ForceDone()
 			}
 		}
-		arcs = append(arcs, arc)
+		kept = append(kept, arc)
 	}
 	var patterns []adt.PatternConstraint
 	if o.includePatterns && obj.PatternConstraints != nil {
 		patterns = obj.PatternConstraints.Pairs
 	}
-	return structValue{ctx, orig, obj, arcs, patterns}, nil
+	return structValue{ctx, orig, obj, kept, patterns}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
@@ -2132,6 +2141,12 @@ type options struct {
 	ignoreClosedness bool // used for comparing APIs
 	docs             bool
 	disallowCycles   bool // implied by concrete
+	unordered        bool // see unorderedFields
+}
+
+// unorderedFields makes [Value.Fields] skip sorting the fields.
+func unorderedFields() Option {
+	return func(o *options) { o.unordered = true }
 }
 
 // An Option defines modes of evaluation.

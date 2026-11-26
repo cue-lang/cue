@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/core/export"
 )
 
 // Decode initializes the value pointed to by x with [Value] v.
@@ -62,6 +63,34 @@ func (v Value) Decode(x any) error {
 
 type decoder struct {
 	errs errors.Error
+}
+
+// structMap decodes the regular fields of v, as [Value.Fields] iterates
+// them, into a map. As their order does not matter there, they are only
+// sorted to report errors in their order.
+func (d *decoder) structMap(v Value) map[string]any {
+	iter, err := v.Fields(unorderedFields())
+	d.addErr(err)
+	m := make(map[string]any, len(iter.arcs))
+	errs := d.errs
+	var fieldErrs map[adt.Feature]errors.Error
+	for iter.Next() {
+		d.errs = nil
+		m[iter.Selector().Unquoted()] = d.interfaceValue(iter.Value())
+		if d.errs != nil {
+			if fieldErrs == nil {
+				fieldErrs = make(map[adt.Feature]errors.Error)
+			}
+			fieldErrs[iter.f] = d.errs
+		}
+	}
+	d.errs = errs
+	if fieldErrs != nil {
+		for _, f := range export.VertexFeatures(iter.ctx, iter.obj) {
+			d.addErr(fieldErrs[f])
+		}
+	}
+	return m
 }
 
 func (d *decoder) addErr(err error) {
@@ -332,13 +361,7 @@ func (d *decoder) interfaceValue(v Value) (x any) {
 		x = a
 
 	case StructKind:
-		m := map[string]any{}
-		iter, err := v.Fields()
-		d.addErr(err)
-		for iter.Next() {
-			m[iter.Selector().Unquoted()] = d.interfaceValue(iter.Value())
-		}
-		x = m
+		x = d.structMap(v)
 
 	default:
 		err = incompleteError(v)

@@ -375,6 +375,38 @@ func TestEncodeSyntax(t *testing.T) {
 	}
 }
 
+// TestEncodeAdtValue tests encoding an adt.Value, as builtins do with their
+// arguments.
+func TestEncodeAdtValue(t *testing.T) {
+	ctx := cuecontext.New()
+	// Encode evaluates a scalar in a new OpContext, and finalizes a vertex
+	// again in one.
+	tests := []struct {
+		x      adt.Value
+		want   string
+		allocs float64
+	}{
+		{&adt.Null{}, `null`, 6},
+		{&adt.Bool{B: true}, `true`, 6},
+		{ctx.Encode(42).Core().V.BaseValue.(*adt.Num), `42`, 6},
+		{ctx.Encode(1.5).Core().V.BaseValue.(*adt.Num), `1.5`, 6},
+		{&adt.String{Str: "foo"}, `"foo"`, 6},
+		{&adt.Bytes{B: []byte("foo")}, `'foo'`, 6},
+		{ctx.CompileString("[1]").Core().V, `[1]`, 1}, // finalized
+	}
+	for _, test := range tests {
+		v := ctx.Encode(test.x)
+		want := ctx.CompileString(test.want)
+		qt.Assert(t, qt.IsNil(v.Validate(cue.Concrete(true))))
+		qt.Assert(t, qt.IsTrue(v.Equals(want)))
+		qt.Assert(t, qt.Equals(fmt.Sprint(v), test.want))
+		allocs := testing.AllocsPerRun(100, func() { ctx.Encode(test.x) })
+		if allocs > test.allocs {
+			t.Errorf("Encode(%s) allocated %v times, want at most %v", test.want, allocs, test.allocs)
+		}
+	}
+}
+
 func TestContextCheck(t *testing.T) {
 	qt.Assert(t, qt.PanicMatches(func() {
 		var c cue.Context

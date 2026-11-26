@@ -497,15 +497,15 @@ selfCycle.t1.c.d.d: invalid value {d:{}} (does not satisfy matchN): structural c
     ./yamlcycle.cue:60:8
     ./yamlcycle.cue:61:8
 -- out/eval/stats --
-Leaks:  52
+Leaks:  54
 Freed:  475
 Reused: 448
-Allocs: 79
+Allocs: 81
 Retain: 0
 
-Unifications: 429
-Conjuncts:    799
+Unifications: 431
+Conjuncts:    805
 Disjuncts:    30
 Notifications: 2
 
-NumCloseIDs: 245
+NumCloseIDs: 249

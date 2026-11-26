@@ -336,15 +336,12 @@ func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Sch
 	var nmatch int64
 	for _, w := range list {
 		vx := adt.Unify(c, matchVertex, value.Vertex(w))
-		x := value.Make(c, vx)
-		if x.Validate(cue.Final()) == nil {
+		if adt.Validate(c, vx, &adt.ValidateConfig{Final: true}) == nil {
 			nmatch++
 		}
 	}
 
-	ctx := value.Context(c)
-
-	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
+	if adt.Unify(c, value.Vertex(n), c.NewInt64(nmatch)).Err(c) != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
 			Err: c.NewPosf(

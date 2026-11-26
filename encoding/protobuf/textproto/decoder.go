@@ -222,7 +222,7 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 				value = list
 			}
 
-			if len(x.Values) == 1 || f.ValueType == pbinternal.Message {
+			if !x.ChildrenAsList && (len(x.Values) == 1 || (f.ValueType == pbinternal.Message && !x.ValuesAsList)) {
 				v := d.decodeValue(f, x)
 				if value == nil {
 					if cg := addComments(x.PreComments...); cg != nil {
@@ -239,34 +239,34 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 			}
 
 			var last ast.Expr
-			// Handle [1, 2, 3]
-			for _, v := range x.Values {
-				if v.Value == "" {
-					if cg := addComments(v.PreComments...); cg != nil {
-						if last != nil {
-							cg.Position = 4
-							ast.AddComment(last, cg)
-						} else {
-							cg.Position = 1
-							ast.AddComment(list, cg)
-						}
+			if x.ChildrenAsList {
+				// Handle [{a: 1}, <a: 2>]
+				for _, c := range x.Children {
+					if c.IsCommentOnly() {
+						addListComment(list, last, c.PreComments...)
+						continue
 					}
-					continue
+					last = d.decodeValue(f, c)
+					if cg := addComments(c.PreComments...); cg != nil {
+						cg.Doc = true
+						ast.AddComment(last, cg)
+					}
+					list.Elts = append(list.Elts, last)
 				}
-				y := *x
-				y.Values = []*pbast.Value{v}
-				last = d.decodeValue(f, &y)
-				list.Elts = append(list.Elts, last)
-			}
-			if cg := addComments(x.PostValuesComments...); cg != nil {
-				if last != nil {
-					cg.Position = 4
-					ast.AddComment(last, cg)
-				} else {
-					cg.Position = 1
-					ast.AddComment(list, cg)
+			} else {
+				// Handle [1, 2, 3]
+				for _, v := range x.Values {
+					if v.Value == "" {
+						addListComment(list, last, v.PreComments...)
+						continue
+					}
+					y := *x
+					y.Values = []*pbast.Value{v}
+					last = d.decodeValue(f, &y)
+					list.Elts = append(list.Elts, last)
 				}
 			}
+			addListComment(list, last, x.PostValuesComments...)
 			if cg := addComments(x.ClosingBraceComment); cg != nil {
 				cg.Line = true
 				cg.Position = 4
@@ -338,6 +338,22 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 	}
 
 	return st
+}
+
+// addListComment adds comments after the last element of a list,
+// or inside the list if it has no elements yet.
+func addListComment(list *ast.ListLit, last ast.Expr, lines ...string) {
+	cg := addComments(lines...)
+	if cg == nil {
+		return
+	}
+	if last != nil {
+		cg.Position = 4
+		ast.AddComment(last, cg)
+	} else {
+		cg.Position = 1
+		ast.AddComment(list, cg)
+	}
 }
 
 func addComments(lines ...string) (cg *ast.CommentGroup) {

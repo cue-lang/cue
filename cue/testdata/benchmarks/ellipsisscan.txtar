@@ -1,0 +1,104 @@
+// A comprehension in a file which does not embed strictly gives each field
+// it yields its own embedding scope, which every field of the struct
+// inherits. Checking each field against each scope and conjunct for an
+// ellipsis must not take cubic time, whether there is none, as in roles,
+// one, as in openRoles, or one in each yielded struct, as in eachOpenRoles.
+//
+// Only the file with the comprehension is below v0.18.0, as when a
+// definition comes from an older dependency.
+//
+// NOTE: this cost is not measured by counters.
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- filter.cue --
+package p
+
+#Filter: {
+	#src: _
+	out: {
+		for k, v in #src {
+			if v.group == _|_ {
+				(k): v
+			}
+			if v.group != _|_ {
+				(k): v
+			}
+		}
+	}
+}
+
+#OpenFilter: {
+	#src: _
+	out: {
+		for k, v in #src {
+			if v.group == _|_ {
+				(k): v
+			}
+			if v.group != _|_ {
+				(k): v
+			}
+		}
+		...
+	}
+}
+
+#EachOpenFilter: {
+	#src: _
+	out: {
+		for k, v in #src {
+			if v.group == _|_ {
+				(k): v
+				...
+			}
+			if v.group != _|_ {
+				(k): v
+				...
+			}
+		}
+	}
+}
+-- in.cue --
+@experiment(explicitopen)
+
+package p
+
+import "list"
+
+src: {
+	for i in list.Range(0, 300, 1) {
+		"role\(i)": {id: i, perms: ["read", "write"]}
+	}
+}
+
+roles:         (#Filter & {#src: src}).out
+openRoles:     (#OpenFilter & {#src: src}).out
+eachOpenRoles: (#EachOpenFilter & {#src: src}).out
+
+_check0:           roles.role0.id           @test(eq, 0)
+_check299:         roles.role299.id         @test(eq, 299)
+_openCheck299:     openRoles.role299.id     @test(eq, 299)
+_eachOpenCheck299: eachOpenRoles.role299.id @test(eq, 299)
+-- out/errors.txt --
+[incomplete] #Filter.out: cannot range over #src (incomplete type _):
+    ./filter.cue:6:15
+[incomplete] #OpenFilter.out: cannot range over #src (incomplete type _):
+    ./filter.cue:20:15
+[incomplete] #EachOpenFilter.out: cannot range over #src (incomplete type _):
+    ./filter.cue:35:15
+-- out/eval/stats --
+Leaks:  2709
+Freed:  6018
+Reused: 5702
+Allocs: 3025
+Retain: 0
+
+Unifications: 6924
+Conjuncts:    11740
+Disjuncts:    0
+
+NumCloseIDs: 3621
+
+ConjunctInfos:       7835
+MaxConjunctInfos:    303
+MaxReqSets:          603

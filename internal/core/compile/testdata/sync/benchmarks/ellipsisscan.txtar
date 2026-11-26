@@ -1,0 +1,154 @@
+// A comprehension in a file which does not embed strictly gives each field
+// it yields its own embedding scope, which every field of the struct
+// inherits. Checking each field against each scope and conjunct for an
+// ellipsis must not take cubic time, whether there is none, as in roles,
+// one, as in openRoles, or one in each yielded struct, as in eachOpenRoles.
+//
+// Only the file with the comprehension is below v0.18.0, as when a
+// definition comes from an older dependency.
+//
+// NOTE: this cost is not measured by counters.
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.17.0"
+-- filter.cue --
+package p
+
+#Filter: {
+	#src: _
+	out: {
+		for k, v in #src {
+			if v.group == _|_ {
+				(k): v
+			}
+			if v.group != _|_ {
+				(k): v
+			}
+		}
+	}
+}
+
+#OpenFilter: {
+	#src: _
+	out: {
+		for k, v in #src {
+			if v.group == _|_ {
+				(k): v
+			}
+			if v.group != _|_ {
+				(k): v
+			}
+		}
+		...
+	}
+}
+
+#EachOpenFilter: {
+	#src: _
+	out: {
+		for k, v in #src {
+			if v.group == _|_ {
+				(k): v
+				...
+			}
+			if v.group != _|_ {
+				(k): v
+				...
+			}
+		}
+	}
+}
+-- in.cue --
+@experiment(explicitopen)
+
+package p
+
+import "list"
+
+src: {
+	for i in list.Range(0, 300, 1) {
+		"role\(i)": {id: i, perms: ["read", "write"]}
+	}
+}
+
+roles:         (#Filter & {#src: src}).out
+openRoles:     (#OpenFilter & {#src: src}).out
+eachOpenRoles: (#EachOpenFilter & {#src: src}).out
+
+_check0:           roles.role0.id
+_check299:         roles.role299.id
+_openCheck299:     openRoles.role299.id
+_eachOpenCheck299: eachOpenRoles.role299.id
+-- out/compile --
+--- filter.cue
+{
+  #Filter: {
+    #src: _
+    out: {
+      for k, v in 〈1;#src〉 {
+        if (〈1;v〉.group == _|_(explicit error (_|_ literal) in source)) {
+          〈2;k〉: 〈2;v〉
+        }
+        if (〈1;v〉.group != _|_(explicit error (_|_ literal) in source)) {
+          〈2;k〉: 〈2;v〉
+        }
+      }
+    }
+  }
+  #OpenFilter: {
+    #src: _
+    out: {
+      for k, v in 〈1;#src〉 {
+        if (〈1;v〉.group == _|_(explicit error (_|_ literal) in source)) {
+          〈2;k〉: 〈2;v〉
+        }
+        if (〈1;v〉.group != _|_(explicit error (_|_ literal) in source)) {
+          〈2;k〉: 〈2;v〉
+        }
+      }
+      ...
+    }
+  }
+  #EachOpenFilter: {
+    #src: _
+    out: {
+      for k, v in 〈1;#src〉 {
+        if (〈1;v〉.group == _|_(explicit error (_|_ literal) in source)) {
+          〈2;k〉: 〈2;v〉
+          ...
+        }
+        if (〈1;v〉.group != _|_(explicit error (_|_ literal) in source)) {
+          〈2;k〉: 〈2;v〉
+          ...
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{
+  src: {
+    for _, i in 〈import;list〉.Range(0, 300, 1) {
+      "role\(〈1;i〉)": {
+        id: 〈2;i〉
+        perms: [
+          "read",
+          "write",
+        ]
+      }
+    }
+  }
+  roles: (〈0;#Filter〉 & {
+    #src: 〈1;src〉
+  }).out
+  openRoles: (〈0;#OpenFilter〉 & {
+    #src: 〈1;src〉
+  }).out
+  eachOpenRoles: (〈0;#EachOpenFilter〉 & {
+    #src: 〈1;src〉
+  }).out
+  _check0(mod.test@v0:p): 〈0;roles〉.role0.id
+  _check299(mod.test@v0:p): 〈0;roles〉.role299.id
+  _openCheck299(mod.test@v0:p): 〈0;openRoles〉.role299.id
+  _eachOpenCheck299(mod.test@v0:p): 〈0;eachOpenRoles〉.role299.id
+}

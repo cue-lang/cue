@@ -1,9 +1,7 @@
 package fscache
 
 import (
-	"crypto/sha256"
 	"errors"
-	"fmt"
 	iofs "io/fs"
 	"os"
 	"path/filepath"
@@ -22,6 +20,7 @@ import (
 	"cuelang.org/go/internal/encoding/yaml/goccy"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/lsp/phantompkg"
 	"cuelang.org/go/internal/robustio"
 	"cuelang.org/go/mod/module"
 )
@@ -169,7 +168,7 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, bf *bui
 		}
 		if pkg.Name == nil || pkg.Name.Name == "" || pkg.Name.Name == "_" {
 			// Important that this ident has no position.
-			pkg.Name = ast.NewIdent(phantomPackageName(filename))
+			pkg.Name = ast.NewIdent(phantompkg.Name(filename))
 		}
 		syntax.Pos().File().SetContent(content)
 	}
@@ -178,37 +177,6 @@ func (p *cueFileParser) ReadCUE(config parser.Config) (syntax *ast.File, bf *bui
 	p.err = err
 
 	return syntax, bf, err
-}
-
-func phantomPackageName(filename string) string {
-	return fmt.Sprintf("_%x", sha256.Sum256([]byte(filename)))
-}
-
-// phantomPackageNameLength contains the total length of the package
-// name injected into files which do not have a package declaration.
-var phantomPackageNameLength = len(phantomPackageName(""))
-
-// IsPhantomPackage reports whether the package declaration was
-// created to be injected into a file's AST for files which have no
-// package declaration themselves.
-func IsPhantomPackage(pkgDecl *ast.Package) bool {
-	name := pkgDecl.Name
-	return name != nil && !name.Pos().IsValid() && len(name.Name) == phantomPackageNameLength && name.Name[0] == '_'
-}
-
-// RemovePhantomPackageDecl removes any phantom package declaration
-// from the provided AST.
-func RemovePhantomPackageDecl(file *ast.File) ast.Node {
-	pkgDecl, i := internal.Package(file)
-	if pkgDecl == nil || !IsPhantomPackage(pkgDecl) {
-		return file
-	}
-
-	decls := slices.Clone(file.Decls)
-	decls = slices.Delete(decls, i, i+1)
-	fileCopy := *file
-	fileCopy.Decls = decls
-	return &fileCopy
 }
 
 // Version implements [FileHandle]

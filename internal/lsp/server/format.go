@@ -19,7 +19,7 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
-	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/lsp/phantompkg"
 )
 
 // Formatting formats the params.TextDocument.URI as canonical cue.
@@ -44,7 +44,7 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 		return nil, nil
 	}
 
-	node := fscache.RemovePhantomPackageDecl(parsedFile)
+	node := phantompkg.RemoveDecl(parsedFile)
 	formatted, err := cueformat.Node(node)
 	if err != nil {
 		// TODO fix up the AST like gopls so we can do more with

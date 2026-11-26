@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/cue/inject/embed"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/lsp/rangeset"
 	"cuelang.org/go/unstable/lsp/eval"
 	"github.com/go-quicktest/qt"
@@ -7754,10 +7753,10 @@ func (tc *testCase) testCompletions(t *testing.T, files []*ast.File, analysis te
 				fieldCompletionGot := make(map[string]*eval.Node)
 				embedCompletionGot := make(map[string]*eval.Node)
 				for completions, names := range fe.CompletionsForOffset(i) {
-					if completions.Kind == protocol.FieldCompletion {
+					if completions.Kind == eval.FieldCompletion {
 						maps.Copy(fieldCompletionGot, names)
 					}
-					if completions.Kind == protocol.VariableCompletion {
+					if completions.Kind == eval.VariableCompletion {
 						maps.Copy(embedCompletionGot, names)
 					}
 				}
@@ -7811,10 +7810,10 @@ func (tc *testCase) dumpCompletions(t *testing.T, files []*ast.File, evalByFilen
 			fieldCompletionGot := make(map[string]*eval.Node)
 			embedCompletionGot := make(map[string]*eval.Node)
 			for completions, names := range fe.CompletionsForOffset(i) {
-				if completions.Kind == protocol.FieldCompletion {
+				if completions.Kind == eval.FieldCompletion {
 					maps.Copy(fieldCompletionGot, names)
 				}
-				if completions.Kind == protocol.VariableCompletion {
+				if completions.Kind == eval.VariableCompletion {
 					maps.Copy(embedCompletionGot, names)
 				}
 			}

@@ -328,6 +328,13 @@
 // Although `h` escapes from the in-line struct, it does not escape
 // the function call, so again we do not need to evaluate anything
 // further up the tree.
+//
+// # Independence from the language server
+//
+// The package describes what it finds in terms of its own, such as
+// [CompletionKind], and exposes no type of the Language Server
+// Protocol. A program can therefore use it without linking the
+// language server's implementation of that protocol.
 package eval
 
 import (
@@ -344,8 +351,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/inject/embed"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/lsp/fscache"
+	"cuelang.org/go/internal/lsp/phantompkg"
 	"cuelang.org/go/internal/lsp/rangeset"
 )
 
@@ -793,6 +799,20 @@ func (fe *FileEvaluator) DeclsForOffset(offset int) []*Decl {
 	return decls
 }
 
+// CompletionKind classifies a [Completion] by what its suggestions
+// name.
+type CompletionKind int
+
+const (
+	// FieldCompletion suggests the names of fields which may be
+	// declared at the offset.
+	FieldCompletion CompletionKind = iota + 1
+	// VariableCompletion suggests the names which an expression at the
+	// offset may refer to: the bindings in scope, or the fields of the
+	// value a path leads to.
+	VariableCompletion
+)
+
 type Completion struct {
 	// Start and End contain the range of the file that should be
 	// replaced by this Completion. They are byte offsets.
@@ -801,7 +821,7 @@ type Completion struct {
 	// Suffix should be appended to all string suggestions. It's
 	// typically ": " for suggested fields.
 	Suffix string
-	Kind   protocol.CompletionItemKind
+	Kind   CompletionKind
 }
 
 // CompletionsForOffset reports the set of strings that can form a new
@@ -966,7 +986,7 @@ nextFrame:
 					addBindings(nameSet, nav.bindings)
 				}
 				if len(nameSet) > 0 {
-					embedCompletions.Kind = protocol.VariableCompletion
+					embedCompletions.Kind = VariableCompletion
 					addCompletions(embedCompletions, nameSet)
 				}
 			}
@@ -1057,7 +1077,7 @@ nextFrame:
 		if len(nameSet) == 0 {
 			continue
 		}
-		embedCompletions.Kind = protocol.VariableCompletion
+		embedCompletions.Kind = VariableCompletion
 		addCompletions(embedCompletions, nameSet)
 	}
 
@@ -1074,7 +1094,7 @@ nextFrame:
 		if len(nameSet) == 0 {
 			continue
 		}
-		fieldCompletions.Kind = protocol.FieldCompletion
+		fieldCompletions.Kind = FieldCompletion
 		addCompletions(fieldCompletions, nameSet)
 	}
 
@@ -2194,7 +2214,7 @@ func (f *frame) eval() {
 
 			childFr := f.newFrame(nil, f.fileEvaluator.evaluator.pkgDecls, false)
 			childFr.kind = DeclPackage
-			if fscache.IsPhantomPackage(node) {
+			if phantompkg.Is(node) {
 				// For packages with invented names, be careful to avoid
 				// returning file coordinates that use the length of the
 				// invented name.

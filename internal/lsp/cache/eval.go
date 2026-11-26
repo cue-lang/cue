@@ -297,7 +297,7 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 		if len(names) == 0 {
 			continue
 		}
-		if completion.Kind == protocol.VariableCompletion && (isJsonSrc || isYamlSrc) {
+		if completion.Kind == eval.VariableCompletion && (isJsonSrc || isYamlSrc) {
 			// Don't suggest values if we're in a json or yaml file,
 			// because they can't have values which are references.
 			continue
@@ -349,7 +349,7 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 			}
 			item := protocol.CompletionItem{
 				Label: name,
-				Kind:  completion.Kind,
+				Kind:  completionItemKind(completion.Kind),
 			}
 			if sig := builtinSig(node); sig != "" {
 				item.Kind = protocol.FunctionCompletion
@@ -375,6 +375,20 @@ func (w *Workspace) Completion(file *File, fe *eval.FileEvaluator, srcMapper *pr
 	return &protocol.CompletionList{
 		Items: completionItems,
 	}
+}
+
+// completionItemKind maps the kind of an evaluator's completion to the
+// kind the protocol gives the items suggested for it. Items with the
+// same label are sent in the order of the protocol's kinds, which puts
+// a field before a variable.
+func completionItemKind(kind eval.CompletionKind) protocol.CompletionItemKind {
+	switch kind {
+	case eval.FieldCompletion:
+		return protocol.FieldCompletion
+	case eval.VariableCompletion:
+		return protocol.VariableCompletion
+	}
+	return 0
 }
 
 type loadAllPkgs uint8

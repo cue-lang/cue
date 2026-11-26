@@ -20,7 +20,20 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/unstable/lsp/eval"
 )
+
+// TestCompletionItemKind: each kind of the evaluator's completions is
+// sent as the protocol's kind of the same name, and a field is still
+// ordered before a variable of the same label.
+func TestCompletionItemKind(t *testing.T) {
+	field := completionItemKind(eval.FieldCompletion)
+	variable := completionItemKind(eval.VariableCompletion)
+	qt.Assert(t, qt.Equals(field, protocol.FieldCompletion))
+	qt.Assert(t, qt.Equals(variable, protocol.VariableCompletion))
+	qt.Assert(t, qt.IsTrue(field < variable))
+	qt.Assert(t, qt.Equals(completionItemKind(0), protocol.CompletionItemKind(0)))
+}
 
 func TestCompareLocations(t *testing.T) {
 	const src = protocol.DocumentURI("file:///src.cue")

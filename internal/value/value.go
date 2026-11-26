@@ -67,7 +67,11 @@ func Vertex(v cue.Value) *adt.Vertex {
 	return t.V
 }
 
-// Make wraps cue.MakeValue.
+// Make wraps [cue.Context.Encode].
+//
+// TODO: finalize v with ctx, so that builtin arguments are finalized by the
+// context evaluating them. Doing so now makes json.Marshal(this) and the like
+// re-enter the calling field while it is still incomplete.
 func Make(ctx *adt.OpContext, v adt.Value) cue.Value {
 	return Context(ctx).Encode(v)
 }

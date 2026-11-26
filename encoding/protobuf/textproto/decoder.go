@@ -189,7 +189,7 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 	var listMap map[string]*ast.ListLit
 
 	for _, x := range n {
-		if x.Values == nil && x.Children == nil {
+		if x.IsCommentOnly() {
 			if cg := addComments(x.PreComments...); cg != nil {
 				ast.SetRelPos(cg, token.NewSection)
 				st.Elts = append(st.Elts, cg)

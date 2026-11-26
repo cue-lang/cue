@@ -53,11 +53,10 @@ empty1: []
 empty2: [
 	// foo
 ]
-
 // doc comment
-
-int1: [1, 2]
-int2: [1, 2] // omitting commas okay
+empty3: []
+int1:   [1, 2]
+int2:   [1, 2] // omitting commas okay
 int3: [
 	1, // omitting comma okay
 	2,

@@ -49,7 +49,7 @@ func (v *Vertex) isInProgress() bool {
 // status its target had before it was unified, so its own may be stale.
 // A done vertex may be shared between goroutines, so do not mutate it.
 func (v *Vertex) isDone() bool {
-	return v.status == finalized || (v.state == nil && v.isFinal())
+	return v.status == finalized || (v.state == nil && v.IsFinal())
 }
 
 func (v *Vertex) getBareState(c *OpContext) *nodeContext {

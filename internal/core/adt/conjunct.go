@@ -629,7 +629,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 	// No need to do the notification mechanism if we are already complete.
 	switch {
-	case n.node.isFinal():
+	case n.node.IsFinal():
 		return
 	case !n.node.isInProgress():
 	case n.meets(allAncestorsProcessed):

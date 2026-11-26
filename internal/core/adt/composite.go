@@ -779,8 +779,8 @@ func (v *Vertex) isUndefined() bool {
 	return false
 }
 
-// isFinal reports whether this node may no longer be modified.
-func (v *Vertex) isFinal() bool {
+// IsFinal reports whether this node may no longer be modified.
+func (v *Vertex) IsFinal() bool {
 	// TODO(deref): the accounting of what is final should be recorded
 	// in the original node. Remove this dereference once the old
 	// evaluator has been removed.
@@ -1127,7 +1127,7 @@ func (c *OpContext) finalizeDeep(v *Vertex) {
 		a := v.Arcs[i]
 		switch {
 		case a.status == finalized:
-		case a.state == nil && a.isFinal():
+		case a.state == nil && a.IsFinal():
 			// a shares a finalized vertex, but its own status is stale.
 			a.status = finalized
 		default:
@@ -1156,7 +1156,7 @@ var finalizeGeneration atomic.Uint64
 // between goroutines. Such a vertex is never mutated: a copy of it is
 // evaluated on each call.
 func (v *Vertex) FinalizedCopy(r Runtime) *Vertex {
-	if v.isFinal() {
+	if v.IsFinal() {
 		return v
 	}
 	return v.evaluatedCopy(NewContext(r, nil))
@@ -1165,12 +1165,12 @@ func (v *Vertex) FinalizedCopy(r Runtime) *Vertex {
 // evaluatedCopy evaluates a copy of the unfinished vertex v.
 func (v *Vertex) evaluatedCopy(c *OpContext) *Vertex {
 	parent := v.Parent
-	if parent != nil && !parent.isFinal() {
+	if parent != nil && !parent.IsFinal() {
 		// Evaluating v reaches into its unfinished parent, such as the inline
 		// struct an argument is selected from, so use the arc of an evaluated
 		// copy of the parent.
 		parent = parent.evaluatedCopy(c)
-		if w := parent.DerefValue().LookupRaw(v.Label); w != nil && w.isFinal() {
+		if w := parent.DerefValue().LookupRaw(v.Label); w != nil && w.IsFinal() {
 			return w
 		}
 		// Not expected: the arc is missing from the copy or left unfinished.

@@ -1041,7 +1041,7 @@ const maxWitnesses = 48
 // admitted by b and rejected by a (see [OpContext.admits]). A concrete b is
 // its own only candidate.
 func (c *OpContext) refutesByWitness(a, b Value) bool {
-	if isConcreteScalar(b) {
+	if IsConcreteScalar(b) {
 		ok, decided := c.admitsConcrete(a, b)
 		return !ok && decided
 	}
@@ -1061,20 +1061,20 @@ func (c *OpContext) refutesByWitness(a, b Value) bool {
 // a scalar w, a kind, a concrete value, or a disjunction of concrete values
 // decides without unifying.
 func (c *OpContext) admitsConcrete(v Value, w Expr) (ok, decided bool) {
-	if w, scalar := w.(Value); scalar && isConcreteScalar(w) {
+	if w, scalar := w.(Value); scalar && IsConcreteScalar(w) {
 		switch x := v.(type) {
 		case *Top:
 			return true, true
 		case *BasicType:
 			return w.Kind()&^x.K == 0, true
 		case *Disjunction:
-			if !slices.ContainsFunc(x.Values, func(y Value) bool { return !isConcreteScalar(Unwrap(y)) }) {
+			if !slices.ContainsFunc(x.Values, func(y Value) bool { return !IsConcreteScalar(Unwrap(y)) }) {
 				return slices.ContainsFunc(x.Values, func(y Value) bool {
 					return Equal(c, Unwrap(y), w, CheckStructural)
 				}), true
 			}
 		}
-		if isConcreteScalar(v) {
+		if IsConcreteScalar(v) {
 			return Equal(c, v, w, CheckStructural), true
 		}
 	}
@@ -1088,9 +1088,9 @@ func (c *OpContext) admitsConcrete(v Value, w Expr) (ok, decided bool) {
 	return true, true
 }
 
-// isConcreteScalar reports whether v is a concrete value other than a struct,
+// IsConcreteScalar reports whether v is a concrete value other than a struct,
 // list, or function.
-func isConcreteScalar(v Value) bool {
+func IsConcreteScalar(v Value) bool {
 	switch v.(type) {
 	case *Null, *Bool, *Num, *String, *Bytes:
 		return true
@@ -2693,7 +2693,7 @@ func (c *OpContext) equalData(x, y Value) bool {
 	}
 	switch x := x.(type) {
 	case *Null, *Bool, *Num, *String, *Bytes:
-		return isConcreteScalar(y) && x.Kind() == y.Kind() && Equal(c, x, y, CheckStructural)
+		return IsConcreteScalar(y) && x.Kind() == y.Kind() && Equal(c, x, y, CheckStructural)
 	case *FuncValue, *Builtin:
 		return Equal(c, x, y, CheckStructural)
 	case *Vertex:

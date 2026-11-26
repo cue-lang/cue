@@ -66,7 +66,7 @@ func (n *nodeContext) sharesSingleValue() bool {
 	if n.shareCycleType == NoCycle {
 		v.Finalize(n.ctx)
 	}
-	return v.isFinal() && disjunctionOf(v) == nil
+	return v.IsFinal() && disjunctionOf(v) == nil
 }
 
 // hasResolver reports whether a disjunct of x is a reference, possibly in a
@@ -127,7 +127,7 @@ func (n *nodeContext) finalizeSharing() {
 		if n.shareCycleType == NoCycle {
 			v.Finalize(n.ctx)
 			// See the TODO in unify.go for toFinalize.
-			// } else if !v.isFinal() {
+			// } else if !v.IsFinal() {
 			// 	// TODO: ideally we just handle cycles in optional chains directly,
 			// 	// rather than relying on this mechanism. This requires us to add
 			// 	// a mechanism to detect that.

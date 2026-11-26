@@ -1250,6 +1250,9 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 	// outside holds the scopes opened by an ellipsis of the parent in which
 	// this node has no conjuncts: it is a field the ellipsis added.
 	var outside []defID
+	// The ellipses of the parent, found only once a set needs them.
+	var parentEllipses []conjunctInfo
+	foundEllipses := false
 	a = filterSets(a, func(a *reqSet) bool {
 		var f conjunctFlags
 		hasAny := false
@@ -1273,7 +1276,11 @@ func (n *nodeContext) filterTop(a reqSets, parentConjuncts []conjunctInfo) reqSe
 			return true
 		}
 
-		switch id, embed := hasParentEllipsis(n, a, parentConjuncts); {
+		if !foundEllipses {
+			parentEllipses = ellipsisConjuncts(parentConjuncts)
+			foundEllipses = true
+		}
+		switch id, embed := hasParentEllipsis(n, a, parentEllipses); {
 		case id == 0:
 		case !hasAny:
 			n.removeSet(a, embed, parentDepth)
@@ -1467,16 +1474,30 @@ func (n *nodeContext) peekOpenByEllipsis() bool {
 	return n.ellipsisOpensAll()
 }
 
-// hasParentEllipsis reports if the parent has any conjuncts from an ellipsis
-// matching any of the ids in a. It returns the id of the first such conjunct,
-// and the outermost embedding scope of all of them; see [nodeContext.outerEmbed].
+// ellipsisConjuncts returns those of conjuncts which have an ellipsis, the
+// only ones [hasParentEllipsis] looks at. Most nodes have none or few.
+func ellipsisConjuncts(conjuncts []conjunctInfo) []conjunctInfo {
+	var ellipses []conjunctInfo
+	for _, c := range conjuncts {
+		if c.flags.hasEllipsis() {
+			ellipses = append(ellipses, c)
+		}
+	}
+	return ellipses
+}
+
+// hasParentEllipsis reports if any of conjuncts, which all have an ellipsis
+// (see [ellipsisConjuncts]), matches any of the ids in a. It returns the id of
+// the first such conjunct, and the outermost embedding scope of all of them;
+// see [nodeContext.outerEmbed].
 //
-// TODO: this is currently called thrice. Consider an approach where we only need
-// to filter this once for each node. Luckily we can avoid quadratic checks
-// for any conjunct that is not an ellipsis, which is most.
+// TODO(perf): filterTop collects the ellipses of the parent once per child,
+// and scans them all for each set, so a struct with an ellipsis in each of
+// many embedded structs still costs cubic time. Record once per node which
+// scopes enclose an ellipsis, and the outermost embedding scope of each.
 func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) (id, embed defID) {
 	for _, c := range conjuncts {
-		if !c.flags.hasEllipsis() || !n.containsDefID(a.id, c.id) {
+		if !n.containsDefID(a.id, c.id) {
 			continue
 		}
 		if id == 0 {
@@ -1495,8 +1516,12 @@ func hasParentEllipsis(n *nodeContext, a *reqSet, conjuncts []conjunctInfo) (id,
 // removeEllipsisSets marks the sets in a opened by an ellipsis of n.
 // It avoids elemPtrs, which would move a stack copy of a to the heap.
 func (n *nodeContext) removeEllipsisSets(a reqSets) {
+	ellipses := ellipsisConjuncts(n.conjunctInfo)
+	if len(ellipses) == 0 {
+		return
+	}
 	for i := range a {
-		if id, embed := hasParentEllipsis(n, &a[i], n.conjunctInfo); id != 0 {
+		if id, embed := hasParentEllipsis(n, &a[i], ellipses); id != 0 {
 			n.removeSet(&a[i], embed, n.scopeDepth)
 		}
 	}

@@ -61,9 +61,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "load: %v\n", err)
 		os.Exit(1)
 	}
-	// Errors in the root pkg package are tolerated: it embeds the
-	// generated pkg.cue files, so it cannot load in a tree where they
-	// have not yet been generated, and nothing is generated from it.
+	// Errors in the root pkg package are tolerated: it imports every
+	// builtin package through the generated register.go, which may be
+	// stale, and nothing is generated from it.
 	errCount := 0
 	for _, pkg := range pkgs {
 		if pkg.PkgPath == pkgParent {
@@ -179,14 +179,18 @@ func generate(pkg *packages.Package) error {
 	pkgDir := filepath.Dir(pkg.GoFiles[0])
 	cuePkg := strings.TrimPrefix(pkg.PkgPath, pkgParent+"/")
 
-	params := headerParams{
-		GoPkg:  pkg.Name,
-		CUEPkg: cuePkg,
+	// Each pkg.go embeds its hand-maintained pkg.cue, without which
+	// the package cannot build.
+	if _, err := os.Stat(filepath.Join(pkgDir, "pkg.cue")); err != nil {
+		return err
 	}
+
 	// As a special case, the "tool" package cannot be imported from CUE.
-	skipRegister := params.CUEPkg == "tool"
-	if skipRegister {
-		params.CUEPkg = ""
+	skipRegister := cuePkg == "tool"
+	params := headerParams{
+		GoPkg:    pkg.Name,
+		CUEPkg:   cuePkg,
+		Register: !skipRegister,
 	}
 
 	if doc, err := os.ReadFile(filepath.Join(pkgDir, "doc.txt")); err == nil {
@@ -400,6 +404,9 @@ func loadSupplementalCUE(dir string) (*ast.File, error) {
 type headerParams struct {
 	GoPkg  string
 	CUEPkg string
+	// Register is whether to register the package's builtins,
+	// not only its definitions.
+	Register bool
 
 	PackageDoc  string
 	PackageDefs string
@@ -414,18 +421,22 @@ var header = template.Must(template.New("").Parse(
 {{end -}}
 package {{.GoPkg}}
 
-{{if .CUEPkg -}}
 import (
+	_ "embed"
+
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
 )
 
+//go:embed pkg.cue
+var pkgSource string
+
 func init() {
-	pkg.Register({{printf "%q" .CUEPkg}}, p)
+	pkg.Register({{printf "%q" .CUEPkg}}, {{if .Register}}p{{else}}nil{{end}}, pkgSource)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
-{{end}}
+
 `))
 
 // A goEmitter generates a package's pkg.go file, which registers the
@@ -434,8 +445,8 @@ type goEmitter struct {
 	dir     string
 	pkgPath string
 	// registered is whether the package registers itself for import
-	// from CUE; the "tool" package does not, and its pkg.go holds only
-	// the file header.
+	// from CUE; the "tool" package does not, and its pkg.go registers
+	// only its definitions.
 	registered bool
 	// pure is whether the package's Go sources carry the //cue:pure
 	// directive, the claim that every builtin in the package is pure.

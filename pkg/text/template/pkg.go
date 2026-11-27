@@ -3,12 +3,17 @@
 package template
 
 import (
+	_ "embed"
+
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
 )
 
+//go:embed pkg.cue
+var pkgSource string
+
 func init() {
-	pkg.Register("text/template", p)
+	pkg.Register("text/template", p, pkgSource)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used

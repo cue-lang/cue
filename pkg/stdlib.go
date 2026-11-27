@@ -14,14 +14,7 @@
 
 package pkg
 
-import (
-	"embed"
-	"io/fs"
-	"path"
-	"slices"
-	"strings"
-	"sync"
-)
+import "cuelang.org/go/internal/pkg"
 
 // Each standard library package has a hand-maintained pkg.cue file
 // alongside its generated pkg.go file, declaring each of the
@@ -64,14 +57,6 @@ import (
 // implementation and are not loaded during evaluation. They exist for
 // tooling that needs to present the standard library without
 // evaluating it, such as editor completion and hover documentation.
-//
-// The go:embed patterns match only pkg.cue files, so that stray files
-// cannot end up embedded in the binary. Patterns cannot recurse (**
-// is not supported), so each directory depth is named;
-// TestEmbedComplete fails if a pkg.cue file on disk is not covered.
-//
-//go:embed */pkg.cue */*/pkg.cue
-var defFS embed.FS
 
 // Source returns the CUE source of the generated definitions
 // describing the API of the standard library package with the given
@@ -80,11 +65,11 @@ var defFS embed.FS
 //
 // Experimental: this API may change.
 func Source(importPath string) ([]byte, bool) {
-	b, err := defFS.ReadFile(path.Join(importPath, "pkg.cue"))
-	if err != nil {
+	src, ok := pkg.Source(importPath)
+	if !ok {
 		return nil, false
 	}
-	return b, true
+	return []byte(src), true
 }
 
 // ImportPaths returns the import paths of all standard library
@@ -92,27 +77,5 @@ func Source(importPath string) ([]byte, bool) {
 //
 // Experimental: this API may change.
 func ImportPaths() []string {
-	return importPaths()
+	return pkg.SourceImportPaths()
 }
-
-var importPaths = sync.OnceValue(func() []string {
-	var paths []string
-	err := fs.WalkDir(defFS, ".", func(filename string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() || path.Base(filename) != "pkg.cue" {
-			return err
-		}
-		paths = append(paths, strings.TrimSuffix(filename, "/pkg.cue"))
-		return nil
-	})
-	if err != nil {
-		// The embedded file system is part of the build; walking it
-		// cannot fail.
-		panic(err)
-	}
-	// fs.WalkDir visits entries in lexical order per directory, but a
-	// path such as math/bits sorts differently from math relative to
-	// the other top-level entries, so the trimmed paths are not
-	// necessarily sorted.
-	slices.Sort(paths)
-	return paths
-})

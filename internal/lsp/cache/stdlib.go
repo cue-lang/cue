@@ -37,8 +37,8 @@ func newStdlibModule(w *Workspace) *Module {
 
 // ensureStdlibPkg returns the [Package] for the standard library
 // package with the given import path, loading it on first use from
-// the definition files embedded in [cuelang.org/go/pkg]. It returns
-// nil if importPath does not name a standard library package.
+// the definitions which [stdlib.Source] returns. It returns nil if
+// importPath does not name a standard library package.
 func (w *Workspace) ensureStdlibPkg(importPath ast.ImportPath) *Package {
 	if pkg, found := w.stdlibModule.packages[importPath]; found {
 		return pkg

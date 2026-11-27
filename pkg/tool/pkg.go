@@ -83,3 +83,19 @@
 //	//   $runif: a.b.$success or $guard: a.b.$success
 //	// With this `$after: a.b` would just be a shorthand for `$guard: a.b.$success`.
 package tool
+
+import (
+	_ "embed"
+
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/pkg"
+)
+
+//go:embed pkg.cue
+var pkgSource string
+
+func init() {
+	pkg.Register("tool", nil, pkgSource)
+}
+
+var _ = adt.TopKind // in case the adt package isn't used

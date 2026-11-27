@@ -15,12 +15,17 @@
 package path
 
 import (
+	_ "embed"
+
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
 )
 
+//go:embed pkg.cue
+var pkgSource string
+
 func init() {
-	pkg.Register("path", p)
+	pkg.Register("path", p, pkgSource)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used

@@ -20,7 +20,6 @@ import (
 	"io"
 	iofs "io/fs"
 	"maps"
-	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -50,13 +49,9 @@ func TestImportPaths(t *testing.T) {
 }
 
 // TestEmbedComplete checks that every pkg.cue file on disk is
-// embedded: the go:embed patterns name each directory depth
-// explicitly, so a definition file at a new depth would otherwise be
-// silently omitted.
-//
-// TestDefsCoverEveryPackage is its counterpart in the other
-// direction: every package with a generated registration has a
-// hand-maintained definition file.
+// registered: a package which pkg/register.go does not import would
+// otherwise be silently omitted. The other direction needs no test, as
+// a pkg.go file does not compile without its pkg.cue file.
 func TestEmbedComplete(t *testing.T) {
 	var onDisk []string
 	err := filepath.WalkDir(".", func(filename string, d iofs.DirEntry, err error) error {
@@ -124,26 +119,7 @@ func TestEmbedsWithinPackage(t *testing.T) {
 			offending = append(offending, p.ImportPath)
 		}
 	}
-	// The standard library definitions are embedded by the parent
-	// package from each builtin package's directory.
-	qt.Assert(t, qt.DeepEquals(offending, []string{"cuelang.org/go/pkg"}))
-}
-
-// TestDefsCoverEveryPackage checks that every package directory with
-// a pkg.go registration carries a pkg.cue definition file: the
-// definition files are maintained by hand, so nothing regenerates a
-// missing one.
-func TestDefsCoverEveryPackage(t *testing.T) {
-	err := filepath.WalkDir(".", func(filename string, d iofs.DirEntry, err error) error {
-		if err != nil || d.IsDir() || d.Name() != "pkg.go" {
-			return err
-		}
-		dir := filepath.Dir(filename)
-		_, statErr := os.Stat(filepath.Join(dir, "pkg.cue"))
-		qt.Check(t, qt.IsNil(statErr), qt.Commentf("%s has no pkg.cue definition file", dir))
-		return nil
-	})
-	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsNil(offending))
 }
 
 // TestDefsMatchRegisteredPackages is the consistency check for the

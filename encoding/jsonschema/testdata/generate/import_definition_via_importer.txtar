@@ -1,0 +1,19 @@
+# References to one imported definition share its definition, whether reached
+# through the package or through the importer's evaluation of it.
+-- cue.mod/module.cue --
+module: "test.example@v0"
+language: version: "v0.9.0"
+-- root.cue --
+package test
+
+import "test.example/lib"
+
+w?: {for k, v in lib.q {(k): v}}
+b?: lib.#S
+-- lib/lib.cue --
+package lib
+
+#S: {c?: string, next?: #S}
+q: n: #S
+-- out/generate-v3/error --
+NamesFunc returned non-unique name "S"

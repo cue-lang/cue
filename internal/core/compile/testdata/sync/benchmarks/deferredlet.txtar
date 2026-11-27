@@ -19,11 +19,22 @@ twoLets: {
 ownLet: {
 	x: [for i in list.Range(0, 2000, 1) let L = {v: 1 & >0, out: v + 1} if L.out < 0 {i}]
 }
+ownLetFields: {
+	x: {for i in list.Range(0, 2000, 1) let L = {v: 1 & >0, out: v + 1} if L.out > 0 {"\(i)": i}}
+	n: len(x)
+}
 // The error of a let which every iteration reads is still reported.
 sameLetFails: {
 	x: {for i in list.Range(0, 20, 1) if K.w + J.w > 0 {"\(i)": i}}
 	let K = {w: 1 & >0}
 	let J = {w: 1 & >1}
+}
+// The first failing let reports its error, whatever the number of iterations.
+bothLetsFail: {
+	odd:  {for i in list.Range(0, 3, 1) if K.w + J.w > 0 {"\(i)": i}}
+	even: {for i in list.Range(0, 4, 1) if K.w + J.w > 0 {"\(i)": i}}
+	let K = {w: 1 & >1}
+	let J = {w: 1 & >2}
 }
 -- out/compile --
 --- in.cue
@@ -63,6 +74,17 @@ sameLetFails: {
       },
     ]
   }
+  ownLetFields: {
+    x: {
+      for _, i in 〈import;list〉.Range(0, 2000, 1) let L = {
+        v: (1 & >0)
+        out: (〈0;v〉 + 1)
+      } if (〈0;L〉.out > 0) {
+        "\(〈2;i〉)": 〈2;i〉
+      }
+    }
+    n: len(〈0;x〉)
+  }
   sameLetFails: {
     x: {
       for _, i in 〈import;list〉.Range(0, 20, 1) if ((〈2;let K#4〉.w + 〈2;let J#5〉.w) > 0) {
@@ -74,6 +96,24 @@ sameLetFails: {
     }
     let J#5 = {
       w: (1 & >1)
+    }
+  }
+  bothLetsFail: {
+    odd: {
+      for _, i in 〈import;list〉.Range(0, 3, 1) if ((〈2;let K#6〉.w + 〈2;let J#7〉.w) > 0) {
+        "\(〈1;i〉)": 〈1;i〉
+      }
+    }
+    even: {
+      for _, i in 〈import;list〉.Range(0, 4, 1) if ((〈2;let K#6〉.w + 〈2;let J#7〉.w) > 0) {
+        "\(〈1;i〉)": 〈1;i〉
+      }
+    }
+    let K#6 = {
+      w: (1 & >1)
+    }
+    let J#7 = {
+      w: (1 & >2)
     }
   }
 }

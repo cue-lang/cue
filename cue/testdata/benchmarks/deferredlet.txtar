@@ -19,23 +19,40 @@ twoLets: {
 ownLet: {
 	x: [for i in list.Range(0, 2000, 1) let L = {v: 1 & >0, out: v + 1} if L.out < 0 {i}] @test(eq, [])
 }
+ownLetFields: {
+	x: {for i in list.Range(0, 2000, 1) let L = {v: 1 & >0, out: v + 1} if L.out > 0 {"\(i)": i}}
+	n: len(x) @test(eq, 2000)
+}
 // The error of a let which every iteration reads is still reported.
 sameLetFails: {
 	x: {for i in list.Range(0, 20, 1) if K.w + J.w > 0 {"\(i)": i}} @test(err, code=eval, contains="out of bound")
 	let K = {w: 1 & >0}
 	let J = {w: 1 & >1}
 }
+// The first failing let reports its error, whatever the number of iterations.
+bothLetsFail: {
+	odd:  {for i in list.Range(0, 3, 1) if K.w + J.w > 0 {"\(i)": i}} @test(err, code=eval, contains="out of bound >1")
+	even: {for i in list.Range(0, 4, 1) if K.w + J.w > 0 {"\(i)": i}} @test(err, code=eval, contains="out of bound >1")
+	let K = {w: 1 & >1}
+	let J = {w: 1 & >2}
+}
 -- out/errors.txt --
 [eval] sameLetFails.J.w: invalid value 1 (out of bound >1):
-    ./in.cue:21:18
-    ./in.cue:21:14
+    ./in.cue:25:18
+    ./in.cue:25:14
+[eval] bothLetsFail.K.w: invalid value 1 (out of bound >1):
+    ./in.cue:31:18
+    ./in.cue:31:14
+[eval] bothLetsFail.K.w: invalid value 1 (out of bound >1):
+    ./in.cue:31:18
+    ./in.cue:31:14
 -- out/eval/stats --
-Leaks:  8020
-Freed:  4041
-Reused: 4013
-Allocs: 8048
+Leaks:  16028
+Freed:  6058
+Reused: 4065
+Allocs: 18021
 Retain: 0
 
-Unifications: 12061
-Conjuncts:    16096
+Unifications: 22086
+Conjuncts:    28134
 Disjuncts:    0

@@ -15,5 +15,30 @@ package lib
 
 #S: {c?: string, next?: #S}
 q: n: #S
--- out/generate-v3/error --
-NamesFunc returned non-unique name "S"
+-- out/generate-v3/schema --
+{
+	$schema: "https://json-schema.org/draft/2020-12/schema"
+	$defs: S: {
+		type:                 "object"
+		additionalProperties: false
+		properties: {
+			c: type:    "string"
+			next: $ref: "#/$defs/S"
+		}
+	}
+	type: "object"
+	properties: {
+		b: $ref: "#/$defs/S"
+		w: {
+			type: "object"
+			properties: n: {
+				type:                 "object"
+				additionalProperties: false
+				properties: {
+					c: type:    "string"
+					next: $ref: "#/$defs/S"
+				}
+			}
+		}
+	}
+}

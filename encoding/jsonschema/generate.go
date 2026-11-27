@@ -1514,7 +1514,7 @@ func (g *generator) makeStructItem(v cue.Value, mode closedMode) item {
 		inline := pkg.Exists() && mode != open && !isDefinition(path) && v.Kind() == cue.StructKind
 		var inlined refPath
 		if inline {
-			inlined = refPath{pkg, path.String()}
+			inlined = refPath{refRoot(pkg), path.String()}
 			if g.describing[inlined] {
 				// The field refers back to itself, so it cannot be
 				// inlined in full: leave this level open.
@@ -2598,8 +2598,15 @@ func DefaultDescription(v cue.Value) string {
 
 // refPath identifies the value which a reference points to.
 type refPath struct {
-	inst cue.Value
+	inst *adt.Vertex // as returned by [refRoot]
 	path string
+}
+
+// refRoot identifies a root which [cue.Value.ReferencePath] reports. An
+// imported package may be reported as its root or as any instance of it.
+func refRoot(inst cue.Value) *adt.Vertex {
+	v := value.Vertex(inst)
+	return cmp.Or(v.ImportTemplate(), v)
 }
 
 // cueRefHasher implements [anyunique.Hasher] for the [CUERef] type.
@@ -2609,14 +2616,14 @@ type refPath struct {
 type cueRefHasher struct{}
 
 func (cueRefHasher) Hash(h *maphash.Hash, r *CUERef) {
-	maphash.WriteComparable(h, r.Inst)
+	maphash.WriteComparable(h, refRoot(r.Inst))
 	// TODO consider adding a Hash method to cue.Path to avoid the
 	// allocation from String.
 	h.WriteString(r.Path.String())
 }
 
 func (cueRefHasher) Equal(x, y *CUERef) bool {
-	return x.Inst == y.Inst && x.Path.Compare(y.Path) == 0
+	return refRoot(x.Inst) == refRoot(y.Inst) && x.Path.Compare(y.Path) == 0
 }
 
 // mapSlice returns a slice of f(x) for each x in xs.

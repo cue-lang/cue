@@ -15,9 +15,13 @@
 package pkg_test
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	iofs "io/fs"
 	"maps"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"slices"
@@ -71,6 +75,58 @@ func TestEmbedComplete(t *testing.T) {
 	}
 	slices.Sort(embedded)
 	qt.Assert(t, qt.DeepEquals(embedded, onDisk))
+}
+
+// TestEmbedsWithinPackage checks that no package in this module embeds
+// files from another Go package's directory. That is valid Go, but
+// Gazelle cannot express it in Bazel rules, so Bazel builds fail.
+func TestEmbedsWithinPackage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("runs go list")
+	}
+	// Only the embedded files matter here, so tolerate load errors.
+	cmd := exec.Command("go", "list", "-e", "-json=ImportPath,Dir,Module,EmbedFiles,TestEmbedFiles,XTestEmbedFiles", "cuelang.org/go/...")
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	out, err := cmd.Output()
+	qt.Assert(t, qt.IsNil(err), qt.Commentf("%s", &stderr))
+	var offending []string
+	dec := json.NewDecoder(bytes.NewReader(out))
+	for {
+		var p struct {
+			ImportPath      string
+			Dir             string
+			Module          *struct{ Path string }
+			EmbedFiles      []string
+			TestEmbedFiles  []string
+			XTestEmbedFiles []string
+		}
+		err := dec.Decode(&p)
+		if err == io.EOF {
+			break
+		}
+		qt.Assert(t, qt.IsNil(err))
+		if p.Module == nil || p.Module.Path != "cuelang.org/go" {
+			continue
+		}
+		embeds := slices.Concat(p.EmbedFiles, p.TestEmbedFiles, p.XTestEmbedFiles)
+		if slices.ContainsFunc(embeds, func(name string) bool {
+			// A file belongs to the nearest directory holding Go files.
+			for dir := path.Dir(name); dir != "."; dir = path.Dir(dir) {
+				goFiles, err := filepath.Glob(filepath.Join(p.Dir, filepath.FromSlash(dir), "*.go"))
+				qt.Assert(t, qt.IsNil(err))
+				if len(goFiles) > 0 {
+					return true
+				}
+			}
+			return false
+		}) {
+			offending = append(offending, p.ImportPath)
+		}
+	}
+	// The standard library definitions are embedded by the parent
+	// package from each builtin package's directory.
+	qt.Assert(t, qt.DeepEquals(offending, []string{"cuelang.org/go/pkg"}))
 }
 
 // TestDefsCoverEveryPackage checks that every package directory with

@@ -552,6 +552,8 @@ Conjuncts:    720
 Disjuncts:    56
 Notifications: 1
 
+GenerationMismatch: 5
+
 NumCloseIDs: 171
 -- out/todo.txt --
 v3 uses structure sharing (~) extensively in issue3641, issue3546, debug, issue3849, issue3903, and pending sections where v2 expanded values inline. v3 also omits shareCycle.t2.Y.x.x structural cycle error and instead reports conflicting values for shareCycle.t2.Y.x with additional position info.

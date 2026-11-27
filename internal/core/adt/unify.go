@@ -180,7 +180,14 @@ func (v *Vertex) unify(c *OpContext, flags Flags) bool {
 		// 	c.CloseInfo.enclosingEmbed = 0
 		// 	c.CloseInfo.outerID = 0
 		// }
-		c.stats.GenerationMismatch++
+		// Count it for the context owning the node while that evaluates, as
+		// when it calls a builtin: c is often dropped without reporting its
+		// stats. Once the owner is done, goroutines may race to get here.
+		if n.ctx.finalizeDepth > 0 {
+			n.ctx.stats.GenerationMismatch++
+		} else {
+			c.stats.GenerationMismatch++
+		}
 
 		// A different OpContext is finalizing this vertex (e.g.
 		// json.Marshal re-entering via [value.Make] mid-evaluation).

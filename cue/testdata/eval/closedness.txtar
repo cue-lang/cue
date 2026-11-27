@@ -624,4 +624,6 @@ Unifications: 410
 Conjuncts:    742
 Disjuncts:    6
 
+GenerationMismatch: 2
+
 NumCloseIDs: 135

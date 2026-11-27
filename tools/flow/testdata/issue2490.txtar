@@ -41,12 +41,14 @@ Conjuncts:    15
 Disjuncts:    0
 ResolveDep:   3
 
+GenerationMismatch: 2
+
 NumCloseIDs: 1
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,9 +1,14 @@
  Leaks:  0
 -Freed:  12
 -Reused: 5
@@ -62,6 +64,8 @@ diff old new
 +Conjuncts:    15
 +Disjuncts:    0
 +ResolveDep:   3
++
++GenerationMismatch: 2
 +
 +NumCloseIDs: 1
 -- out/run/t1/stats --
@@ -86,12 +90,14 @@ Conjuncts:    15
 Disjuncts:    0
 ResolveDep:   3
 
+GenerationMismatch: 2
+
 NumCloseIDs: 1
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,12 @@
+@@ -1,9 +1,14 @@
  Leaks:  0
 -Freed:  12
 -Reused: 5
@@ -107,6 +113,8 @@ diff old new
 +Conjuncts:    15
 +Disjuncts:    0
 +ResolveDep:   3
++
++GenerationMismatch: 2
 +
 +NumCloseIDs: 1
 -- out/run/stats/totals --

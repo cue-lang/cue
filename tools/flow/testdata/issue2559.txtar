@@ -70,12 +70,14 @@ Conjuncts:    1607
 Disjuncts:    174
 ResolveDep:   123
 
+GenerationMismatch: 2
+
 NumCloseIDs: 301
 -- diff/-out/run-v3/t1/stats<==>+out/run/t1/stats --
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,12 @@
+@@ -1,11 +1,14 @@
 -Leaks:  0
 -Freed:  25577
 -Reused: 25557
@@ -97,6 +99,8 @@ diff old new
 +Conjuncts:    1607
 +Disjuncts:    174
 +ResolveDep:   123
++
++GenerationMismatch: 2
 +
 +NumCloseIDs: 301
 -- out/run/t1/stats --
@@ -123,12 +127,14 @@ Conjuncts:    1607
 Disjuncts:    174
 ResolveDep:   123
 
+GenerationMismatch: 2
+
 NumCloseIDs: 301
 -- diff/-out/run-v3/stats/totals<==>+out/run/stats/totals --
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,12 @@
+@@ -1,11 +1,14 @@
 -Leaks:  0
 -Freed:  25577
 -Reused: 25557
@@ -150,6 +156,8 @@ diff old new
 +Conjuncts:    1607
 +Disjuncts:    174
 +ResolveDep:   123
++
++GenerationMismatch: 2
 +
 +NumCloseIDs: 301
 -- out/run/stats/totals --

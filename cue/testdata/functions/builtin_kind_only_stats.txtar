@@ -24,6 +24,8 @@ Unifications: 203
 Conjuncts:    593
 Disjuncts:    0
 
+GenerationMismatch: 2
+
 NumCloseIDs: 195
 -- out/evalalpha --
 (struct){

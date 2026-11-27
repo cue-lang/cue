@@ -557,6 +557,8 @@ Unifications: 917
 Conjuncts:    1509
 Disjuncts:    22
 
+GenerationMismatch: 26
+
 NumCloseIDs: 460
 -- out/errors.txt --
 [eval] openArguments.err2.out.a: conflicting values {allowed:"once"} and null (mismatched types struct and null):

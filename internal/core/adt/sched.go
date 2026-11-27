@@ -17,6 +17,7 @@ package adt
 import (
 	"math/bits"
 	"slices"
+	"sort"
 )
 
 // The CUE scheduler schedules tasks for evaluation.
@@ -1045,14 +1046,19 @@ func (s *scheduler) insertTask(t *task) {
 	s.incrementCounts(completes)
 	s.tasks = append(s.tasks, t)
 
-	// Sort by priority. This code is optimized for the case that there are
-	// very few tasks with higher priority. This loop will almost always
-	// terminate within 0 or 1 iterations.
-	for i := len(s.tasks) - 1; i > 0; i-- {
-		if s.tasks[i-1].run.priority <= s.tasks[i].run.priority {
-			break
-		}
-		s.tasks[i], s.tasks[i-1] = s.tasks[i-1], s.tasks[i]
+	// Keep the tasks sorted by priority, stable within each priority, as that
+	// order decides which failing [handleDeferred] task reports its error.
+	// A comprehension may schedule one of those per iteration, so there may be
+	// many to move past.
+	//
+	// TODO(perf): the copy is still quadratic for many deferred tasks;
+	// a queue of their own would avoid that.
+	i := len(s.tasks) - 1
+	p := t.run.priority
+	if i > 0 && s.tasks[i-1].run.priority > p {
+		j := sort.Search(i, func(k int) bool { return s.tasks[k].run.priority > p })
+		copy(s.tasks[j+1:], s.tasks[j:i])
+		s.tasks[j] = t
 	}
 }
 
